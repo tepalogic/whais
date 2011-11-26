@@ -1,0 +1,36 @@
+#!/bin/bash
+
+total_tests=0
+failed_tests=0
+
+function execute_test {
+   test_output=`./$1`
+   error_code=$?
+   found_fail=`echo "$test_output" | grep -i 'test.*fail'`
+   if [ -n  "$found_fail" ] || [ "$error_code" -ne 0 ]; then
+      echo -e "Test '\e[0;31m$1\e[0m' has failed:"
+      echo $test_output
+      let 'failed_tests+=1'
+   else
+      echo -e "Test '\e[0;32m$1\e[0m' has passed!"
+   fi
+   let 'total_tests+=1'
+}
+
+echo "Searching for test..."
+TEST_FILES=`find ./ -name 'test_*' -type f -perm -u+x`
+if [ -n "$TEST_FILES" ]; then
+   for test_p in $TEST_FILES
+   do
+      execute_test $test_p
+   done
+fi
+
+if [ "$total_tests" -eq 0 ]; then
+   echo "I could not find any tests to execute!"
+else
+   echo "Executed tests: $total_tests"
+   echo "Failed tests:   $failed_tests"
+fi
+
+
