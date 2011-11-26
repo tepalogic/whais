@@ -1,0 +1,11 @@
+#This files shall be ignore by git as they are the product
+#of build process
+
+#This will ensure that every one ignores the same file
+#.gitignore
+
+bin/
+compiler/parser/whisper.output
+compiler/parser/whisper.tab.c
+compiler/parser/whisper.tab.h
+tmp/
