@@ -146,7 +146,6 @@
 /instance/org.eclipse.cdt.core/org.eclipse.cdt.core.formatter.indent_body_declarations_compare_to_namespace_header=true
 /instance/org.eclipse.cdt.core/org.eclipse.cdt.core.formatter.brace_position_for_switch=next_line_shifted
 /instance/org.eclipse.cdt.core/org.eclipse.cdt.core.formatter.insert_new_line_before_while_in_do_statement=insert
-/configuration/org.eclipse.ui.ide/RECENT_WORKSPACES=/work/workspace\n/home/iupo/workspace
 /instance/org.eclipse.cdt.ui/content_assist_disabled_computers=
 /instance/org.eclipse.cdt.ui/MemberFilterActionGroup.COutlineViewer.16=true
 /instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.formatterprofiles.version=11
