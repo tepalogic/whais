@@ -228,7 +228,6 @@ install_list_declrs (struct ParserState * state, YYSTYPE sem_vars,
 		     YYSTYPE sem_type)
 {
   struct SemIdList *it;
-  struct SemTypeSpec type;
   YYSTYPE result = NULL;
 
   assert (sem_vars->val_type == VAL_ID_LIST);
@@ -237,7 +236,6 @@ install_list_declrs (struct ParserState * state, YYSTYPE sem_vars,
   it = &sem_vars->val.u_idlist;
   /* we do not need this anymore */
   sem_vars->val_type = VAL_REUSE;
-  type = sem_type->val.u_tspec;
 
   while (it != NULL)
     {

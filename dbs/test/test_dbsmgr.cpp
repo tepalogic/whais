@@ -100,6 +100,7 @@ test_fields (I_DBSTable & table)
 int
 main ()
 {
+
   // VC++ allocates memory when the C++ runtime is initialised
   // We need not to test against it!
   D_UINT prealloc_mem = test_get_mem_used ();
@@ -120,7 +121,6 @@ main ()
   DBSReleaseDatabase (handler);
   DBSShoutdown ();
 
-  D_UINT mem_peak = test_get_mem_peak ();
   D_UINT mem_usage = test_get_mem_used () - prealloc_mem;
 
   if (mem_usage)
@@ -151,7 +151,6 @@ main ()
 
   if (success)
     {
-      mem_peak = test_get_mem_peak ();
       mem_usage = test_get_mem_used () - prealloc_mem;
       if (mem_usage != 0)
         success = false;
