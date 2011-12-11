@@ -33,6 +33,7 @@
 #include "ps_container.h"
 #include "ps_blockcache.h"
 #include "ps_varstorage.h"
+#include "ps_btree_index.h"
 
 namespace pastra
 {
@@ -60,13 +61,18 @@ public:
   virtual PSFieldDescriptor GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const = 0;
 };
 
-class PSTable:public I_PSTable, public I_BlocksManager
+class PSTable:public I_PSTable, public I_BlocksManager, public I_BTreeNodeManager
 {
   friend class DbsHandler;
   friend class PSCacheManager;
   friend class std::auto_ptr < PSTable >;
 
 public:
+  //Implmenetations for I_BTreeNodeManager
+  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parrent, KEY_INDEX parrentKey);
+  virtual NODE_INDEX  GetRootNodeId ();
+  virtual void        SetRootNodeId (const NODE_INDEX node);
+
   //Implementations for I_PSBlocksManager
   virtual void StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount);
   virtual void RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount);
@@ -132,8 +138,16 @@ private:
   void SyncToFile ();
 
 protected:
+
+  //Implementations for I_BTreeNodeManager
+  virtual I_BTreeNode* GetNode (const NODE_INDEX node);
+  virtual void         StoreNode (I_BTreeNode *const node);
+
   PSTable (DbsHandler & dbsHandler, const std::string & tableName);
-  PSTable (DbsHandler & dbsHandler, const std::string & tableName, const DBSFieldDescriptor * pFields, D_UINT fieldsCount);
+  PSTable (DbsHandler & dbsHandler,
+           const std::string & tableName,
+           const DBSFieldDescriptor * pFields,
+           D_UINT fieldsCount);
   virtual ~ PSTable ();
 
   D_UINT64 IncreaseRowCount ();
@@ -144,6 +158,8 @@ protected:
   //Data members
   D_UINT64              m_VariableStorageSize;
   D_UINT64              m_RowsCount;
+  NODE_INDEX            m_RootNode;
+  NODE_INDEX            m_FirstUnallocatedRoot;
   D_UINT                m_ReferenceCount;
   D_UINT32              m_RowSize;
   D_UINT32              m_DescriptorsSize;
@@ -155,6 +171,46 @@ protected:
   std::auto_ptr <VaribaleLenghtStore>   m_apVariableFields;
   BlockCache            m_RowCache;
   bool                  m_Removed;
+};
+
+class PSTableRmKey : public I_BTreeKey
+{
+  friend class PSTableRmNode;
+  friend class PSTable;
+
+  PSTableRmKey (const D_UINT64 row) : m_Row (row) { assert (m_Row != 0); };
+  operator D_UINT64 () const { return m_Row; }
+
+  const D_UINT64 m_Row;
+};
+class PSTableRmNode : public I_BTreeNode
+{
+public:
+
+  static const D_UINT RAW_NODE_SIZE = 512;
+
+  PSTableRmNode (PSTable &table, const NODE_INDEX nodeId);
+  virtual ~PSTableRmNode ();
+
+  //Implementation of I_BTreeNode
+  virtual D_UINT GetKeysPerNode () const;
+
+  virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const;
+  virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode);
+
+  virtual KEY_INDEX InsertKey (const I_BTreeKey &key);
+  virtual void      RemoveKey (const KEY_INDEX keyIndex);
+
+  virtual NODE_INDEX Split ();
+  virtual NODE_INDEX Join ();
+
+  virtual bool IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+  virtual bool IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+  virtual bool IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+
+protected:
+  friend class PSTable;
+  D_UINT8 m_aNodeData [RAW_NODE_SIZE];
 };
 
 }

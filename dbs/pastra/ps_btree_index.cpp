@@ -42,7 +42,7 @@ I_BTreeNode::~I_BTreeNode ()
 }
 
 bool
-I_BTreeNode::FindBiggerOrEqual (I_BTreeKey &key, KEY_INDEX &outIndex)
+I_BTreeNode::FindBiggerOrEqual (const I_BTreeKey &key, KEY_INDEX &outIndex) const
 {
   KEY_INDEX top_key    = 0;
   KEY_INDEX bottom_key = GetKeysCount() - 1;
@@ -67,11 +67,70 @@ I_BTreeNode::FindBiggerOrEqual (I_BTreeKey &key, KEY_INDEX &outIndex)
   return true;
 }
 
+bool
+I_BTreeNode::NeedsJoining () const
+{
+  if (GetKeysCount() < (GetKeysPerNode() / 3))
+    return true;
+
+  return false;
+}
+
+bool
+I_BTreeNode::NeedsSpliting () const
+{
+  if (GetKeysCount () > (2 * GetKeysPerNode () / 3))
+    return true;
+
+  return false;
+}
+
+NODE_INDEX
+I_BTreeNode::GetChildNode (const I_BTreeKey &key) const
+{
+  KEY_INDEX outKey;
+
+  if ((FindBiggerOrEqual (key, outKey) == false) ||
+      (IsEqual (key, outKey) == false))
+    throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
+  return GetChildNode (outKey);
+}
+
+void
+I_BTreeNode::SetData (const KEY_INDEX, const D_UINT8 *)
+{
+  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+}
+
+void
+I_BTreeNode::RemoveKey (const I_BTreeKey &key)
+{
+  KEY_INDEX keyIndex;
+
+  if (FindBiggerOrEqual (key, keyIndex) == false)
+    {
+      assert (0);
+    }
+  else if (IsEqual (key, keyIndex) == false )
+    {
+      assert (0);
+    }
+
+  RemoveKey (keyIndex);
+}
+
 void
 I_BTreeNode::Release ()
 {
   m_NodesManager.ReleaseNode (m_NodeIndex);
 }
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 I_BTreeNodeManager::I_BTreeNodeManager () :
     m_Sync (),
@@ -142,7 +201,7 @@ BTree::FindBiggerOrEqual (I_BTreeKey &key,
       if ( (found == false) || node->IsLeaf())
         break;
 
-      outNode = node->GetKeyNode (outKeyIndex);
+      outNode = node->GetChildNode (outKeyIndex);
       node    = m_NodesManager.RetrieveNode (outNode);
     }
   while (found);
@@ -162,7 +221,7 @@ BTree::InsertKey (I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex)
 
       if (node->NeedsSpliting ())
         {
-          keyNode = node->Split (m_NodesManager);
+          keyNode = node->Split ();
           node    = m_NodesManager.RetrieveNode (keyNode);
 
           continue;
@@ -174,7 +233,7 @@ BTree::InsertKey (I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex)
           if (node->IsLeaf () == false)
             {
               keyNode  = m_NodesManager.AllocateNode (keyNode, keyIndex);
-              node->SetChild (keyIndex, keyNode);
+              node->SetChildNode (keyIndex, keyNode);
             }
         }
       else if (node->IsEqual (key, keyIndex))
@@ -182,10 +241,10 @@ BTree::InsertKey (I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex)
           if (node->IsLeaf ())
             break;
 
-          assert (node->GetKeyNode (keyIndex) == NIL_NODE);
+          assert (node->GetChildNode (keyIndex) == NIL_NODE);
 
           keyNode  = m_NodesManager.AllocateNode (keyNode, keyIndex);
-          node->SetChild (keyIndex, keyNode);
+          node->SetChildNode (keyIndex, keyNode);
         }
       else
         {
@@ -197,7 +256,7 @@ BTree::InsertKey (I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex)
               break;
             }
 
-          keyNode = node->GetKeyNode (keyIndex);
+          keyNode = node->GetChildNode (keyIndex);
         }
     }
   while (true);
@@ -223,7 +282,7 @@ BTree::RemoveKey (I_BTreeKey &key)
   node->RemoveKey (keyIndex);
 
   if (node->NeedsJoining())
-    node->Join (m_NodesManager);
+    node->Join ();
 }
 
 

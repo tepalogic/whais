@@ -33,7 +33,10 @@
 namespace pastra
 {
 
-class I_BTreeKey;
+class I_BTreeKey
+{
+};
+
 class I_BTreeNodeManager;
 
 typedef D_UINT64 NODE_INDEX;
@@ -47,40 +50,46 @@ public:
   I_BTreeNode (I_BTreeNodeManager &nodesManager, const NODE_INDEX nodeId);
   virtual ~I_BTreeNode ();
 
-  bool       IsLeaf () { return m_Header->m_Depth == 0; }
-  bool       IsDirty () { return m_Header->m_Dirty != 0; }
-  NODE_INDEX GetNodeId () { return m_NodeIndex; }
-  NODE_INDEX GetParrent () { return m_Header->m_Parrent; }
-  NODE_INDEX GetNext () { return m_Header->m_Right; }
-  NODE_INDEX GetPrev () { return m_Header->m_Left; }
+  bool       IsLeaf () const { return m_Header->m_Depth == 0; }
+  bool       IsDirty () const { return m_Header->m_Dirty != 0; }
+  bool       IsRemoved() const { return m_Header->m_Removed != 0; };
+  NODE_INDEX GetNodeId () const { return m_NodeIndex; }
+  NODE_INDEX GetParrent () const { return m_Header->m_Parrent; }
+  NODE_INDEX GetNext () const { return m_Header->m_Right; }
+  NODE_INDEX GetPrev () const { return m_Header->m_Left; }
 
+  void MarkAsRemoved() { m_Header->m_Removed = 1, m_Header->m_Dirty = 1;};
+  void MarkAsUsed() { m_Header->m_Removed = 0, m_Header->m_Dirty = 1;};
   void SetParrent (const NODE_INDEX parrent) { m_Header->m_Parrent = parrent, m_Header->m_Dirty = 1; }
   void SetNext (const NODE_INDEX next) { m_Header->m_Right = next, m_Header->m_Dirty = 1; }
   void SetPrev (const NODE_INDEX prev) { m_Header->m_Left = prev, m_Header->m_Dirty = 1; }
 
+  D_UINT GetKeysCount () const { return m_Header->m_KeysCount; }
+  void   SetKeysCount (D_UINT count) { m_Header->m_KeysCount = count; m_Header->m_Dirty = 1; }
+
   virtual D_UINT GetKeysPerNode () const = 0;
-  virtual D_UINT GetKeysCount () const = 0;
 
-  virtual bool NeedsSpliting () const = 0;
-  virtual bool NeedsJoining () const = 0;
 
-  virtual NODE_INDEX GetKeyNode (I_BTreeKey &key) const = 0;
-  virtual NODE_INDEX GetKeyNode (const KEY_INDEX keyIndex) const = 0;
+  virtual bool NeedsSpliting () const;
+  virtual bool NeedsJoining () const;
 
-  virtual void SetChild (const KEY_INDEX keyIndex, const NODE_INDEX child) = 0;
-  virtual void SetData (const KEY_INDEX keyIndex, const D_UINT *data) = 0;
+  virtual NODE_INDEX GetChildNode (const I_BTreeKey &key) const;
+  virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const = 0;
+  virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode) = 0;
+  virtual void       SetData (const KEY_INDEX keyIndex, const D_UINT8 *data);
 
-  virtual KEY_INDEX InsertKey (I_BTreeKey &key) = 0;
+  virtual KEY_INDEX InsertKey (const I_BTreeKey &key) = 0;
+  void              RemoveKey (const I_BTreeKey &key);
   virtual void      RemoveKey (const KEY_INDEX keyIndex) = 0;
 
-  virtual NODE_INDEX Split (I_BTreeNodeManager &nodesManager) = 0;
-  virtual NODE_INDEX Join (I_BTreeNodeManager &nodesManager) = 0;
+  virtual NODE_INDEX Split () = 0;
+  virtual NODE_INDEX Join () = 0;
 
-  virtual bool IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) = 0;
-  virtual bool IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) = 0;
-  virtual bool IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) = 0;
+  virtual bool IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const = 0;
+  virtual bool IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const = 0;
+  virtual bool IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const = 0;
 
-  bool FindBiggerOrEqual (I_BTreeKey &key, KEY_INDEX &outIndex);
+  bool FindBiggerOrEqual (const I_BTreeKey &key, KEY_INDEX &outIndex) const;
   void Release ();
 
 protected:
@@ -89,8 +98,10 @@ protected:
     NODE_INDEX    m_Parrent;
     NODE_INDEX    m_Left;
     NODE_INDEX    m_Right;
-    D_UINT        m_Depth : 8;
-    D_UINT        m_Dirty : 1;
+    D_UINT        m_KeysCount : 16;
+    D_UINT        m_Depth     : 8;
+    D_UINT        m_Dirty     : 1;
+    D_UINT        m_Removed   : 1;
   };
 
   NodeHeader         *m_Header;
@@ -127,9 +138,14 @@ public:
     }
 
   I_BTreeNode* operator-> ()
-  {
-    return m_pTreeNode;
-  }
+    {
+      return m_pTreeNode;
+    }
+
+  operator I_BTreeNode * ()
+    {
+      return m_pTreeNode;
+    }
 
 private:
   BTreeNodeHandler (const BTreeNodeHandler &);
@@ -148,9 +164,9 @@ public:
   void         ReleaseNode (const NODE_INDEX node);
   void         ReleaseNode (I_BTreeNode *node) { ReleaseNode (node->GetNodeId()); }
 
-  virtual NODE_INDEX  GetRootNodeId () = 0;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parrent, KEY_INDEX parrentKey) = 0;
-  virtual void        SetRoot (const NODE_INDEX node) = 0;
+  virtual NODE_INDEX  GetRootNodeId () = 0;
+  virtual void        SetRootNodeId (const NODE_INDEX node) = 0;
 
 protected:
   struct CachedData
@@ -187,6 +203,38 @@ public:
 protected:
   I_BTreeNodeManager &m_NodesManager;
 };
+
+
+template <typename T> void
+make_array_room (T *const pArray,
+                 const D_UINT lastIndex,
+                 const D_UINT fromIndex,
+                 const D_UINT elemsCount)
+{
+  D_INT iterator = lastIndex; // Unsigned as we need to check against underflow.
+
+  while (iterator >= _SC(D_INT, fromIndex))
+    {
+      pArray [iterator + elemsCount] = pArray [iterator];
+      --iterator;
+    }
+}
+
+template <typename T> void
+remove_array_elemes (T *const pArray,
+                     const D_UINT lastIndex,
+                     const D_UINT fromIndex,
+                     const D_UINT elemsCount)
+{
+  D_UINT iterator = fromIndex;
+
+  while (iterator < lastIndex)
+    {
+      pArray [iterator] = pArray [iterator + elemsCount];
+      ++iterator;
+    }
+}
+
 
 }
 
