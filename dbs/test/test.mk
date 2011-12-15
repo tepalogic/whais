@@ -13,10 +13,11 @@ test_createtable_SRC=test/test_createtable.cpp
 test_createtable_LIB=dbs/pastra utils/utils custom/custom
 test_createtable_INC=utils/include custom/include
 
-UNIT_EXES+=test_catree
-test_catree_SRC=test/test_catree.cpp
-test_catree_LIB=dbs/pastra utils/utils custom/custom
-test_catree_INC=utils/include custom/include
+#Not used anymore
+#UNIT_EXES+=test_catree
+#test_catree_SRC=test/test_catree.cpp
+#test_catree_LIB=dbs/pastra utils/utils custom/custom
+#test_catree_INC=utils/include custom/include
 
 UNIT_EXES+=test_dbstext
 test_dbstext_SRC=test/test_dbstext.cpp

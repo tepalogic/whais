@@ -68,7 +68,7 @@ public:
     return right;
   }
 
-  D_UINT64 GetParrent (D_UINT64 nodeIndex)
+  D_UINT64 GetParent (D_UINT64 nodeIndex)
   {
     assert (nodeIndex < mNodeArray.GetSize ());
 
@@ -112,12 +112,12 @@ public:
     if (IsRightChild (nodeIndex))
       {
         while (IsRightChild (nodeIndex))
-          nodeIndex = GetParrent (nodeIndex);
+          nodeIndex = GetParent (nodeIndex);
 
-        return GetParrent (nodeIndex);
+        return GetParent (nodeIndex);
       }
     else if (IsLeftChild (nodeIndex))
-      return GetParrent (nodeIndex);
+      return GetParent (nodeIndex);
 
     return Nil;
   }
@@ -157,12 +157,12 @@ public:
     if (IsLeftChild (nodeIndex))
       {
         while (IsLeftChild (nodeIndex))
-          nodeIndex = GetParrent (nodeIndex);
+          nodeIndex = GetParent (nodeIndex);
 
-        return GetParrent (nodeIndex);
+        return GetParent (nodeIndex);
       }
     else if (IsRightChild (nodeIndex))
-      return GetParrent (nodeIndex);
+      return GetParent (nodeIndex);
 
     return Nil;
   }
@@ -280,7 +280,7 @@ protected:
 
   bool FixTreeNode (D_UINT64& addedNode)
   {
-    D_UINT64 parrentNode = GetParrent (addedNode);
+    D_UINT64 parentNode = GetParent (addedNode);
     D_UINT64 leftNode = GetLeftChild (addedNode);
     D_UINT64 rightNode = GetRightChild (addedNode);
 
@@ -304,24 +304,24 @@ protected:
         fixComplete = false;
       }
     else if (IsLeftChild (addedNode) &&
-        (mNodeArray[parrentNode] < mNodeArray[addedNode]))
+        (mNodeArray[parentNode] < mNodeArray[addedNode]))
       {
         D_UINT64 replacement = GetSubtreeBiggest (addedNode);
-        mNodeArray.Exchange (parrentNode, replacement);
+        mNodeArray.Exchange (parentNode, replacement);
 
         if (replacement == addedNode)
-          addedNode = parrentNode;
+          addedNode = parentNode;
 
         fixComplete = false;
       }
     else if (IsRightChild (addedNode) &&
-        (mNodeArray[addedNode] < mNodeArray[parrentNode]))
+        (mNodeArray[addedNode] < mNodeArray[parentNode]))
       {
         D_UINT64 replacement = GetSubtreeSmallest (addedNode);
-        mNodeArray.Exchange (parrentNode, replacement);
+        mNodeArray.Exchange (parentNode, replacement);
 
         if (replacement == addedNode)
-          addedNode = parrentNode;
+          addedNode = parentNode;
 
         fixComplete = false;
       }
@@ -333,36 +333,36 @@ protected:
   {
     bool fixComplete = true;
 
-    D_UINT64 parrentNode = GetParrent (addedNode);
+    D_UINT64 parentNode = GetParent (addedNode);
     D_UINT64 leftNode = GetLeftChild (addedNode);
     D_UINT64 rightNode = GetRightChild (addedNode);
 
     if (IsLeftChild (addedNode) &&
         (leftNode == Nil))
       {
-        while (IsLeftChild (parrentNode))
+        while (IsLeftChild (parentNode))
           {
-            assert (mNodeArray[addedNode] <= mNodeArray[parrentNode]);
-            parrentNode = GetParrent (parrentNode);
+            assert (mNodeArray[addedNode] <= mNodeArray[parentNode]);
+            parentNode = GetParent (parentNode);
           }
 
-        if (parrentNode != 0)
+        if (parentNode != 0)
           {
-            parrentNode = GetParrent (parrentNode);
-            if (mNodeArray[addedNode] < mNodeArray [parrentNode])
+            parentNode = GetParent (parentNode);
+            if (mNodeArray[addedNode] < mNodeArray [parentNode])
               {
-                D_UINT64 prev = GetPrev (parrentNode);
+                D_UINT64 prev = GetPrev (parentNode);
 
                 if ( (prev == Nil) ||
                     (mNodeArray [prev] < mNodeArray [addedNode]))
                   {
-                    mNodeArray.Exchange (addedNode, parrentNode);
-                    addedNode = parrentNode;
+                    mNodeArray.Exchange (addedNode, parentNode);
+                    addedNode = parentNode;
                   }
                 else
                   {
-                    mNodeArray.Exchange (addedNode, parrentNode);
-                    mNodeArray.Exchange (parrentNode, prev);
+                    mNodeArray.Exchange (addedNode, parentNode);
+                    mNodeArray.Exchange (parentNode, prev);
                     addedNode = prev;
                   }
                 fixComplete = false;
@@ -372,29 +372,29 @@ protected:
     else if (IsRightChild (addedNode) &&
         (rightNode == Nil))
       {
-        while (IsRightChild (parrentNode))
+        while (IsRightChild (parentNode))
           {
-            assert (mNodeArray[parrentNode] <= mNodeArray[addedNode]);
-            parrentNode = GetParrent (parrentNode);
+            assert (mNodeArray[parentNode] <= mNodeArray[addedNode]);
+            parentNode = GetParent (parentNode);
           }
 
-        if (parrentNode != 0)
+        if (parentNode != 0)
           {
-            parrentNode = GetParrent (parrentNode);
-            if (mNodeArray[parrentNode] < mNodeArray[addedNode])
+            parentNode = GetParent (parentNode);
+            if (mNodeArray[parentNode] < mNodeArray[addedNode])
               {
-                D_UINT64 next = GetNext (parrentNode);
+                D_UINT64 next = GetNext (parentNode);
 
                 if ((next == Nil) ||
                     (mNodeArray[addedNode] < mNodeArray[next]))
                   {
-                    mNodeArray.Exchange (addedNode, parrentNode);
-                    addedNode = parrentNode;
+                    mNodeArray.Exchange (addedNode, parentNode);
+                    addedNode = parentNode;
                   }
                 else
                   {
-                    mNodeArray.Exchange (addedNode, parrentNode);
-                    mNodeArray.Exchange (parrentNode, next);
+                    mNodeArray.Exchange (addedNode, parentNode);
+                    mNodeArray.Exchange (parentNode, next);
                     addedNode = next;
                   }
                 fixComplete = false;
