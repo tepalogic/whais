@@ -68,8 +68,9 @@ class PSTable:public I_PSTable, public I_BlocksManager, public I_BTreeNodeManage
   friend class std::auto_ptr < PSTable >;
 
 public:
-  //Implmenetations for I_BTreeNodeManager
-  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parrent, KEY_INDEX parrentKey);
+  //Implementations for I_BTreeNodeManager
+  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
+  virtual void        FreeNode (const NODE_INDEX node);
   virtual NODE_INDEX  GetRootNodeId ();
   virtual void        SetRootNodeId (const NODE_INDEX node);
 
@@ -195,18 +196,22 @@ public:
   //Implementation of I_BTreeNode
   virtual D_UINT GetKeysPerNode () const;
 
+  virtual KEY_INDEX  GetParentKey (const I_BTreeNode &parent) const;
   virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const;
+  virtual void       ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex);
   virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode);
 
   virtual KEY_INDEX InsertKey (const I_BTreeKey &key);
   virtual void      RemoveKey (const KEY_INDEX keyIndex);
 
-  virtual NODE_INDEX Split ();
-  virtual NODE_INDEX Join ();
+  virtual void Split (const NODE_INDEX parentId);
+  virtual void Join (bool toRight);
 
   virtual bool IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
   virtual bool IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
   virtual bool IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+
+  virtual const I_BTreeKey& GetSentinelKey () const;
 
 protected:
   friend class PSTable;

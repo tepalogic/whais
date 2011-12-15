@@ -46,6 +46,8 @@ static const D_CHAR PS_TABLE_VARFIELDS_EXT[] = "_v";
 static const D_UINT8 PS_TABLE_SIGNATURE[] =
   { 0x50, 0x41, 0x53, 0x54, 0x52, 0x41, 0x54, 0x42 };
 
+static const D_UINT PS_HEADER_SIZE = 512;
+
 static const D_UINT PS_TABLE_SIG_OFF = 0; //Signature
 static const D_UINT PS_TABLES_SIG_lEN = 8;
 static const D_UINT PS_TABLE_FIELDS_COUNT_OFF = 8; //Number of fields.
@@ -64,9 +66,9 @@ static const D_UINT PS_TABLE_ROW_SIZE_OFF = 48; //Size of a row.
 static const D_UINT PS_TABLE_ROW_SIZE_LEN = 4;
 
 static const D_UINT PS_RESEVED_FOR_FUTURE_OFF = 52;
-static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = 36;
+static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_FUTURE_OFF;
 
-static const D_UINT PS_HEADER_SIZE = 88;
+
 
 static const D_UINT MAX_FIELD_VALUE_ALIGN = 8; /* Bytes. */
 
@@ -284,7 +286,7 @@ create_table_file(const string &baseFileName, const DBSFieldDescriptor *pFields,
   const D_UINT32 descriptorsSize = sizeof(PSFieldDescriptor) * fieldsCount +
 				   get_strlens_till_index(pFields, fieldsCount);
 
-  //Validate the optimally rearange the fileds for minimum rowsize
+  //Validate the optimally rearrange the fields for minimum row size
   D_UINT rowSize = 0;
   validate_field_descriptors(pFields, fieldsCount);
 
@@ -325,7 +327,11 @@ create_table_file(const string &baseFileName, const DBSFieldDescriptor *pFields,
 PSTableRmNode::PSTableRmNode (PSTable &table, const NODE_INDEX nodeId) :
     I_BTreeNode (table, nodeId)
 {
-  m_Header = _RC ( NodeHeader*, m_aNodeData);
+  m_Header           = _RC ( NodeHeader*, m_aNodeData);
+  m_Header->m_NodeId = nodeId;
+
+  assert (PS_HEADER_SIZE == RAW_NODE_SIZE);
+  assert ((sizeof (NodeHeader) % sizeof  (D_UINT64)) == 0);
 }
 
 PSTableRmNode::~PSTableRmNode ()
@@ -345,6 +351,22 @@ PSTableRmNode::GetKeysPerNode () const
   return result;
 }
 
+KEY_INDEX
+PSTableRmNode::GetParentKey (const I_BTreeNode &parent) const
+{
+  KEY_INDEX               result;
+  const NODE_INDEX *const pKeys = _RC ( const NODE_INDEX*, m_aNodeData + sizeof (NodeHeader));
+
+  const PSTableRmKey key (pKeys[0]);
+
+  FindBiggerOrEqual (key, result);
+
+  assert (parent.IsEqual (key, result));
+  assert (GetNodeId () == parent.GetChildNode (result));
+
+  return result;
+}
+
 NODE_INDEX
 PSTableRmNode::GetChildNode (const KEY_INDEX keyIndex) const
 {
@@ -355,6 +377,20 @@ PSTableRmNode::GetChildNode (const KEY_INDEX keyIndex) const
   const NODE_INDEX *const cpFirstKey = _RC (const NODE_INDEX *, m_aNodeData + firstKeyOff);
 
   return cpFirstKey [keyIndex];
+}
+
+void
+PSTableRmNode::ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex)
+{
+  assert (childNode.GetNodeId () == GetChildNode (keyIndex));
+
+  const PSTableRmNode &child       = _SC (const PSTableRmNode&, childNode);
+  NODE_INDEX *const pKeys          = _RC (NODE_INDEX*, m_aNodeData + sizeof (NodeHeader));
+  const NODE_INDEX *const pSrcKeys = _RC ( const NODE_INDEX*,
+                                           child.m_aNodeData + sizeof (NodeHeader));
+
+  pKeys [keyIndex] = pSrcKeys [0];
+
 }
 
 void
@@ -418,20 +454,23 @@ PSTableRmNode::RemoveKey (const KEY_INDEX keyIndex)
     }
 }
 
-NODE_INDEX
-PSTableRmNode::Split ()
+void
+PSTableRmNode::Split ( const NODE_INDEX parentId)
 {
   assert (NeedsSpliting ());
 
-  D_UINT64* const  pRows         = _RC (D_UINT64 *, m_aNodeData + sizeof (NodeHeader));
-  const KEY_INDEX  splitKey      = GetKeysCount() / 2;
-  const NODE_INDEX parrentNodeId = GetParrent();
+  D_UINT64* const  pRows     = _RC (D_UINT64 *, m_aNodeData + sizeof (NodeHeader));
+  const KEY_INDEX  splitKey  = GetKeysCount() / 2;
 
-  BTreeNodeHandler   parrentNode (m_NodesManager.RetrieveNode (parrentNodeId));
+  BTreeNodeHandler   parentNode (m_NodesManager.RetrieveNode (parentId));
   const PSTableRmKey key (pRows[splitKey]);
-  const KEY_INDEX    insertionPos    = parrentNode->InsertKey (key);
-  const NODE_INDEX   allocatedNodeId = m_NodesManager.AllocateNode (parrentNodeId, insertionPos);
+  const KEY_INDEX    insertionPos    = parentNode->InsertKey (key);
+  const NODE_INDEX   allocatedNodeId = m_NodesManager.AllocateNode (parentId, insertionPos);
   BTreeNodeHandler   allocatedNode (m_NodesManager.RetrieveNode (allocatedNodeId));
+
+  allocatedNode->SetLeaf (IsLeaf ());
+  allocatedNode->MarkAsUsed();
+
 
   PSTableRmNode *const pRawAllocNode = _SC (PSTableRmNode*, _SC (I_BTreeNode*, allocatedNode));
   D_UINT64* const pSplitRows         = _RC (D_UINT64*,
@@ -442,8 +481,8 @@ PSTableRmNode::Split ()
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX* const pNodes      = pRows + GetKeysPerNode ();
-      NODE_INDEX* const pSplitNodes = pSplitRows + GetKeysPerNode ();
+      NODE_INDEX* const pNodes      = _RC (NODE_INDEX*, pRows + GetKeysPerNode ());
+      NODE_INDEX* const pSplitNodes = _RC (NODE_INDEX*, pSplitRows + GetKeysPerNode ());
 
       for (D_UINT index = splitKey; index < GetKeysCount (); ++index)
         pSplitNodes [index - splitKey] = pNodes [index];
@@ -460,19 +499,19 @@ PSTableRmNode::Split ()
       BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (allocatedNode->GetPrev()));
       prevNode->SetNext (allocatedNodeId);
     }
-
-  return m_NodeIndex;
 }
 
-NODE_INDEX
-PSTableRmNode::Join ()
+void
+PSTableRmNode::Join (bool toRight)
 {
   assert (NeedsJoining ());
+
   D_UINT64 *const   pRows  = _RC (D_UINT64 *, m_aNodeData + sizeof (NodeHeader));
   NODE_INDEX *const pNodes = _RC (NODE_INDEX *, pRows + PSTableRmNode::GetKeysPerNode ());
 
-  if (GetNext() != NIL_NODE)
+  if (toRight)
     {
+      assert (GetNext () != NIL_NODE);
       BTreeNodeHandler     nextNode (m_NodesManager.RetrieveNode (GetNext ()));
       PSTableRmNode *const pNextNode = _SC (PSTableRmNode*, _SC (I_BTreeNode*, nextNode));
       D_UINT64 *const      pDestRows = _RC (D_UINT64 *, pNextNode->m_aNodeData + sizeof (NodeHeader));
@@ -482,7 +521,9 @@ PSTableRmNode::Join ()
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX *const pDestNodes = pDestRows + PSTableRmNode::GetKeysPerNode ();
+          NODE_INDEX *const pDestNodes = _RC (NODE_INDEX*,
+                                              pDestRows + PSTableRmNode::GetKeysPerNode ());
+
           for (D_UINT index = 0; index < GetKeysCount(); ++index)
             pDestNodes [index + pNextNode->GetKeysCount ()] = pNodes [index];
         }
@@ -495,49 +536,35 @@ PSTableRmNode::Join ()
           BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
           prevNode->SetNext (GetNext ());
         }
-
-      BTreeNodeHandler   parrentNode (m_NodesManager.RetrieveNode (GetParrent ()));
-      const PSTableRmKey key (pRows[0]);
-
-      parrentNode->RemoveKey (key);
-
-      MarkAsRemoved ();
-      return nextNode->GetNodeId ();
     }
+  else
+    {
+      assert (GetPrev () != NIL_NODE);
 
-    assert (GetPrev () != NIL_NODE);
+      BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetNext ()));
+      PSTableRmNode *const pPrevNode = _SC (PSTableRmNode*, _SC (I_BTreeNode*, prevNode));
+      D_UINT64 *const      pSrcRows  = _RC (D_UINT64 *, pPrevNode->m_aNodeData + sizeof (NodeHeader));
 
-    BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetNext ()));
-    PSTableRmNode *const pPrevNode = _SC (PSTableRmNode*, _SC (I_BTreeNode*, prevNode));
-    D_UINT64 *const      pSrcRows  = _RC (D_UINT64 *, pPrevNode->m_aNodeData + sizeof (NodeHeader));
+      for (D_UINT index = 0; index < prevNode->GetKeysCount(); ++index)
+        pRows [index + GetKeysCount ()] = pSrcRows [index];
 
-    for (D_UINT index = 0; index < prevNode->GetKeysCount(); ++index)
-      pRows [index + GetKeysCount ()] = pSrcRows [index];
+      if (IsLeaf () == false)
+        {
+          NODE_INDEX *const pSrcNodes = _RC (NODE_INDEX*,
+                                             pSrcRows + PSTableRmNode::GetKeysPerNode ());
 
-    if (IsLeaf () == false)
-      {
-        NODE_INDEX *const pSrcNodes = pSrcRows + PSTableRmNode::GetKeysPerNode ();
+          for (D_UINT index = 0; index < prevNode->GetKeysCount (); ++index)
+            pNodes [index + GetKeysCount ()] = pSrcNodes [index];
+        }
 
-        for (D_UINT index = 0; index < prevNode->GetKeysCount (); ++index)
-          pNodes [index + GetKeysCount ()] = pSrcNodes [index];
-      }
-
-    SetKeysCount (GetKeysCount () + prevNode->GetKeysCount());
-    SetPrev (prevNode->GetPrev ());
-    if (GetPrev () != NIL_NODE)
-      {
-        BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
-        prevNode->SetNext (GetNodeId ());
-      }
-
-    BTreeNodeHandler   parrentNode (m_NodesManager.RetrieveNode (prevNode->GetParrent ()));
-    const PSTableRmKey key (pSrcRows[0]);
-
-    parrentNode->RemoveKey (key);
-
-    prevNode->MarkAsRemoved();
-
-    return GetNodeId ();
+      SetKeysCount (GetKeysCount () + prevNode->GetKeysCount());
+      SetPrev (prevNode->GetPrev ());
+      if (GetPrev () != NIL_NODE)
+        {
+          BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
+          prevNode->SetNext (GetNodeId ());
+        }
+    }
 }
 
 bool
@@ -567,6 +594,13 @@ PSTableRmNode::IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const
   return tKey == pRows [keyIndex];
 }
 
+const I_BTreeKey&
+PSTableRmNode::GetSentinelKey () const
+{
+  static PSTableRmKey _key (~0);
+
+  return _key;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -588,7 +622,6 @@ PSTable::PSTable (DbsHandler & dbsHandler, const string & tableName) :
 
 
 {
-  assert ((sizeof (NODE_INDEX) % sizeof  (D_UINT64)) == 0);
   InitFromFile ();
 
   m_RowCache.Init (m_RowSize, 4096, 1024);
@@ -802,7 +835,7 @@ PSTable::GetFieldDescriptorInternal(const D_CHAR * const pFieldName) const
 }
 
 NODE_INDEX
-PSTable::AllocateNode (const NODE_INDEX parrent, KEY_INDEX parrentKey)
+PSTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
 {
   NODE_INDEX nodeIndex = m_FirstUnallocatedRoot;
 
@@ -811,7 +844,6 @@ PSTable::AllocateNode (const NODE_INDEX parrent, KEY_INDEX parrentKey)
       BTreeNodeHandler freeNode (RetrieveNode (nodeIndex));
 
       m_FirstUnallocatedRoot = freeNode->GetNext ();
-      freeNode->MarkAsUsed();
     }
   else
     {
@@ -820,13 +852,27 @@ PSTable::AllocateNode (const NODE_INDEX parrent, KEY_INDEX parrentKey)
       nodeIndex = m_MainTableFile.GetSize () / sizeof (PSTableRmNode::RAW_NODE_SIZE) + 1;
     }
 
-  if (parrent != NIL_NODE)
+  if (parent != NIL_NODE)
     {
-      BTreeNodeHandler parrentNode (RetrieveNode (nodeIndex));
-      parrentNode->SetChildNode (parrentKey, nodeIndex);
+      BTreeNodeHandler parentNode (RetrieveNode (nodeIndex));
+      parentNode->SetChildNode (parentKey, nodeIndex);
+
+      assert (parentNode->IsLeaf() == false);
     }
 
   return nodeIndex;
+}
+
+void
+PSTable::FreeNode (const NODE_INDEX nodeId)
+{
+  BTreeNodeHandler node (RetrieveNode (nodeId));
+
+  node->MarkAsRemoved();
+  node->SetNext (m_FirstUnallocatedRoot);
+
+  m_FirstUnallocatedRoot = node->GetNodeId();
+  SyncToFile ();
 }
 
 NODE_INDEX
