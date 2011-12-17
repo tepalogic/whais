@@ -39,3 +39,8 @@ test_tabledata_SRC=test/test_tabledata.cpp
 test_tabledata_LIB=dbs/pastra utils/utils custom/custom
 test_tabledata_INC=utils/include custom/include
 
+UNIT_EXES+=test_l_tablermrows
+test_l_tablermrows_SRC=test/test_tablermrows.cpp
+test_l_tablermrows_LIB=dbs/pastra utils/utils custom/custom
+test_l_tablermrows_INC=utils/include custom/include
+
