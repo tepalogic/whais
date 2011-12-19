@@ -141,6 +141,7 @@ private:
 protected:
 
   //Implementations for I_BTreeNodeManager
+  virtual D_UINT       GetMaxCachedNodes ();
   virtual I_BTreeNode* GetNode (const NODE_INDEX node);
   virtual void         StoreNode (I_BTreeNode *const node);
 
@@ -179,7 +180,7 @@ class PSTableRmKey : public I_BTreeKey
   friend class PSTableRmNode;
   friend class PSTable;
 
-  PSTableRmKey (const D_UINT64 row) : m_Row (row) { assert (m_Row != 0); };
+  PSTableRmKey (const D_UINT64 row) : m_Row (row) {};
   operator D_UINT64 () const { return m_Row; }
 
   const D_UINT64 m_Row;
@@ -188,7 +189,7 @@ class PSTableRmNode : public I_BTreeNode
 {
 public:
 
-  static const D_UINT RAW_NODE_SIZE = 512;
+  static const D_UINT RAW_NODE_SIZE = 4096;
 
   PSTableRmNode (PSTable &table, const NODE_INDEX nodeId);
   virtual ~PSTableRmNode ();
@@ -215,7 +216,8 @@ public:
 
 protected:
   friend class PSTable;
-  D_UINT8 m_aNodeData [RAW_NODE_SIZE];
+
+  D_UINT8 * const m_cpNodeData;
 };
 
 }

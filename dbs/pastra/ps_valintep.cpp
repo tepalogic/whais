@@ -51,8 +51,8 @@ static const D_INT PS_INT32_SIZE               = 4;
 static const D_INT PS_INT64_SIZE               = 8;
 static const D_INT PS_REAL_SIZE                = 12;
 static const D_INT PS_RICHREAL_SIZE            = 16;
-static const D_INT PS_TEXT_SIZE                = 16; //TODO: to be changed
-static const D_INT PS_ARRAY_SIZE               = 16; //TODO: to be changed
+static const D_INT PS_TEXT_SIZE                = 16;
+static const D_INT PS_ARRAY_SIZE               = 16;
 
 static const D_INT PS_BOOL_ALIGN               = 1;
 static const D_INT PS_CHAR_ALIGN               = 4;
@@ -65,9 +65,8 @@ static const D_INT PS_INT32_ALIGN              = 4;
 static const D_INT PS_INT64_ALIGN              = 8;
 static const D_INT PS_REAL_ALIGN               = 8;
 static const D_INT PS_RICHREAL_ALIGN           = 8;
-static const D_INT PS_TEXT_ALIGN               = 8; //TODO: to be changed
-static const D_INT PS_ARRAY_ALIGN              = 8; //TODO: to be changed
-
+static const D_INT PS_TEXT_ALIGN               = 8;
+static const D_INT PS_ARRAY_ALIGN              = 8;
 
 
 void

@@ -50,7 +50,7 @@ public:
   I_BTreeNode (I_BTreeNodeManager &nodesManager, const NODE_INDEX nodeId);
   virtual ~I_BTreeNode ();
 
-  bool       IsLeaf () const { return m_Header->m_Leaf == 0; }
+  bool       IsLeaf () const { return m_Header->m_Leaf != 0; }
   bool       IsDirty () const { return m_Header->m_Dirty != 0; }
   bool       IsRemoved() const { return m_Header->m_Removed != 0; };
   NODE_INDEX GetNodeId () const { return m_Header->m_NodeId; }
@@ -67,7 +67,6 @@ public:
   void   SetKeysCount (D_UINT count) { m_Header->m_KeysCount = count; m_Header->m_Dirty = 1; }
 
   virtual D_UINT GetKeysPerNode () const = 0;
-
 
   virtual bool NeedsSpliting () const;
   virtual bool NeedsJoining () const;
@@ -179,15 +178,16 @@ public:
 protected:
   struct CachedData
   {
-    CachedData (I_BTreeNode *pNode, const D_UINT refCount) :
+    CachedData (I_BTreeNode *pNode, const D_INT refCount) :
       m_pNode (pNode),
       m_ReferenceCount (refCount)
     {}
 
     I_BTreeNode *m_pNode;
-    D_UINT       m_ReferenceCount;
+    D_INT        m_ReferenceCount;
   };
 
+  virtual D_UINT       GetMaxCachedNodes () = 0;
   virtual I_BTreeNode* GetNode (const NODE_INDEX node) = 0;
   virtual void         StoreNode (I_BTreeNode *const node) = 0;
 
