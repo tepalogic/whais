@@ -189,7 +189,7 @@ class PSTableRmNode : public I_BTreeNode
 {
 public:
 
-  static const D_UINT RAW_NODE_SIZE = 4096;
+  static const D_UINT RAW_NODE_SIZE = 16384;
 
   PSTableRmNode (PSTable &table, const NODE_INDEX nodeId);
   virtual ~PSTableRmNode ();

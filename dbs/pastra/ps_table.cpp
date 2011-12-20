@@ -944,7 +944,7 @@ PSTable::SetRootNodeId (const NODE_INDEX node)
 D_UINT
 PSTable::GetMaxCachedNodes ()
 {
-  return 512;
+  return 128;
 }
 
 

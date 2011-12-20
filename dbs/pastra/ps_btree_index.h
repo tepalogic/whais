@@ -205,11 +205,16 @@ public:
                           NODE_INDEX &outNode,
                           KEY_INDEX  &outKeyIndex);
 
-  void InsertKey ( const I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex);
-  void RemoveKey (I_BTreeKey &key);
+  void InsertKey (const I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex);
+  void RemoveKey (const I_BTreeKey &key);
 
 protected:
-  bool DeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key);
+  bool RecursiveInsertNodeKey (const NODE_INDEX parentId,
+                               const NODE_INDEX nodeId,
+                               const I_BTreeKey &key,
+                               NODE_INDEX       &outNode,
+                               KEY_INDEX        &outKeyIndex);
+  bool RecursiveDeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key);
 
   I_BTreeNodeManager &m_NodesManager;
 };

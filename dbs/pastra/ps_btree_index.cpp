@@ -247,29 +247,32 @@ I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
 
   I_BTreeNode *const result = it->second.m_pNode;
 
-  if (m_NodesKeeper.size () > GetMaxCachedNodes ())
-    {
-      it = m_NodesKeeper.begin ();
-      while (it != m_NodesKeeper.end ())
-        {
-          if (it->second.m_ReferenceCount > 0)
-            ++it;
-          else
-            {
-              if ((it->second.m_ReferenceCount == 0) &&
-                  (it->second.m_pNode->GetNodeId() != GetRootNodeId()))
-                {
-                  StoreNode (it->second.m_pNode);
+  D_UINT exceededNodes = GetMaxCachedNodes ();
+  if (m_NodesKeeper.size() > exceededNodes)
+    exceededNodes = m_NodesKeeper.size () - exceededNodes;
+  else
+    exceededNodes = 0;
 
-                  delete it->second.m_pNode;
-                  m_NodesKeeper.erase (it++);
-                }
-              else
-                ++it;
+  it = m_NodesKeeper.begin ();
+  while ((it != m_NodesKeeper.end ()) && (exceededNodes > 0))
+    {
+      if (it->second.m_ReferenceCount > 0)
+        ++it;
+      else
+        {
+          if ((it->second.m_ReferenceCount == 0) &&
+              (it->second.m_pNode->GetNodeId() != GetRootNodeId()))
+            {
+              StoreNode (it->second.m_pNode);
+
+              delete it->second.m_pNode;
+              m_NodesKeeper.erase (it++);
+              --exceededNodes;
             }
+          else
+            ++it;
         }
     }
-
   return result;
 }
 
@@ -280,6 +283,7 @@ I_BTreeNodeManager::ReleaseNode (const NODE_INDEX node)
   map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.find (node);
 
   assert (it != m_NodesKeeper.end ());
+  assert (it->second.m_ReferenceCount > 0);
 
   it->second.m_ReferenceCount--;
 }
@@ -325,61 +329,23 @@ BTree::FindBiggerOrEqual (const I_BTreeKey &key,
 void
 BTree::InsertKey (const I_BTreeKey &key, NODE_INDEX &outNode, KEY_INDEX &outKeyIndex)
 {
-  NODE_INDEX       parentId = NIL_NODE;
-  BTreeNodeHandler itNode (m_NodesManager.RetrieveNode (m_NodesManager.GetRootNodeId ()));
-
-  outNode = m_NodesManager.GetRootNodeId ();
+  bool tryAgain = false;
   do
     {
-      if (itNode->NeedsSpliting ())
-        {
-          m_NodesManager.Split (parentId, itNode->GetNodeId());
-
-          //We don't know where the key could reside here.
-          //So search the parent again! Do not worry we won't need to split again.
-          itNode = m_NodesManager.RetrieveNode ((parentId == NIL_NODE) ?
-                                                 m_NodesManager.GetRootNodeId () : parentId);
-        }
-
-      if (itNode->IsLeaf ())
-        {
-          if (itNode->FindBiggerOrEqual (key, outKeyIndex) == false)
-            {
-              // The sentine shall be here!
-              assert (0);
-            }
-          else if (itNode->IsEqual (key, outKeyIndex))
-            throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
-
-          outKeyIndex ++;
-
-          assert (outKeyIndex < itNode->GetKeysPerNode () - 1);
-
-          outNode = itNode->GetNodeId ();
-          itNode->InsertKey (key);
-
-          break;
-        }
-      else
-        {
-          if (itNode->FindBiggerOrEqual (key, outKeyIndex) == false)
-            {
-              //There is no chance this key to be the biggest
-              //The sentinel shall be the biggest.
-              assert (false);
-            }
-          parentId = itNode->GetNodeId ();
-          itNode   = m_NodesManager.RetrieveNode (itNode->GetChildNode (outKeyIndex));
-        }
+      tryAgain = RecursiveInsertNodeKey (NIL_NODE,
+                                         m_NodesManager.GetRootNodeId (),
+                                         key,
+                                         outNode,
+                                         outKeyIndex);
     }
-  while (true);
+  while (tryAgain);
 }
 
 void
-BTree::RemoveKey (I_BTreeKey &key)
+BTree::RemoveKey (const I_BTreeKey &key)
 {
   BTreeNodeHandler node (m_NodesManager.RetrieveNode (m_NodesManager.GetRootNodeId ()));
-  DeleteNodeKey (*node, key);
+  RecursiveDeleteNodeKey (*node, key);
 
   if (node->IsLeaf () == false)
     {
@@ -392,7 +358,62 @@ BTree::RemoveKey (I_BTreeKey &key)
 }
 
 bool
-BTree::DeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key)
+BTree::RecursiveInsertNodeKey (const NODE_INDEX parentId,
+                               const NODE_INDEX nodeId,
+                               const I_BTreeKey &key,
+                               NODE_INDEX       &outNode,
+                               KEY_INDEX        &outKeyIndex)
+{
+  BTreeNodeHandler node (m_NodesManager.RetrieveNode (nodeId));
+
+  if (node->NeedsSpliting ())
+    {
+      m_NodesManager.Split (parentId, nodeId);
+      return true;
+    }
+
+  if (node->IsLeaf ())
+    {
+      if (node->FindBiggerOrEqual (key, outKeyIndex) == false)
+        {
+          // The sentinel shall be here!
+          assert (0);
+        }
+      else if (node->IsEqual (key, outKeyIndex))
+        throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
+      outKeyIndex ++;
+
+      assert (outKeyIndex < node->GetKeysPerNode () - 1);
+
+      node->InsertKey (key);
+
+      outNode = nodeId;
+      return false;
+    }
+
+  bool tryAgain = false;
+  do
+    {
+      if (node->FindBiggerOrEqual (key, outKeyIndex) == false)
+        {
+          //There is no chance this key to be the biggest
+          //The sentinel shall be the biggest.
+          assert (false);
+        }
+        tryAgain = RecursiveInsertNodeKey (nodeId,
+                                           node->GetChildNode (outKeyIndex),
+                                           key,
+                                           outNode,
+                                           outKeyIndex);
+    }
+  while (tryAgain);
+
+  return false;
+}
+
+bool
+BTree::RecursiveDeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key)
 {
   KEY_INDEX  keyIndex;
 
@@ -412,9 +433,9 @@ BTree::DeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key)
       if (childNode->NeedsJoining ())
         {
           m_NodesManager.Join (node.GetNodeId (), childNode->GetNodeId ());
-          return DeleteNodeKey (node, key);
+          return RecursiveDeleteNodeKey (node, key);
         }
-      else if (DeleteNodeKey (*childNode, key))
+      else if (RecursiveDeleteNodeKey (*childNode, key))
         {
           assert (node.IsEqual (key, keyIndex));
           node.ResetKeyNode (*childNode, keyIndex);

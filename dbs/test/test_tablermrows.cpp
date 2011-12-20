@@ -117,7 +117,7 @@ restore_first_rows (I_DBSTable &table)
 bool
 test_for_radius_rows (I_DBSTable &table)
 {
-  std::cout << "Delete rows symetrically ... " << std::endl;
+  std::cout << "Delete rows symmetrically ... " << std::endl;
   bool result = true;
 
   const D_UINT32 count = gElemsCount / 10;
@@ -141,7 +141,7 @@ test_for_radius_rows (I_DBSTable &table)
 
   if (result)
     {
-      std::cout << std::endl << "Restore symetric rows ... " << std::endl;
+      std::cout << std::endl << "Restore symmetric rows ... " << std::endl;
 
       for (D_UINT rowIndex = (gElemsCount / 2) - count + 1;
           rowIndex <= (gElemsCount / 2) + count;
@@ -155,7 +155,7 @@ test_for_radius_rows (I_DBSTable &table)
           DBSUInt32 fieldValue (false, rowIndex);
           table.SetEntry (fieldValue, rowIndex, 0);
 
-          std::cout << rowIndex << " (" << count << ")\r";
+          std::cout << rowIndex - ((gElemsCount / 2) - count + 1) << " (" << count * 2 << ")\r";
 
         }
     }
@@ -168,7 +168,7 @@ const D_CHAR db_name[] = "t_baza_date_1";
 int
 main ()
 {
-  // VC++ allocates memory when the C++ runtime is initialised
+  // VC++ allocates memory when the C++ runtime is initialized
   // We need not to test against it!
   std::cout << "Print a message to not confuse the memory tracker: " << (D_UINT) 0x3456 << "\n";
   D_UINT prealloc_mem = test_get_mem_used ();
