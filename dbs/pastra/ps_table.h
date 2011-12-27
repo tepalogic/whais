@@ -34,6 +34,7 @@
 #include "ps_blockcache.h"
 #include "ps_varstorage.h"
 #include "ps_btree_index.h"
+#include "ps_btree_fields.h"
 
 namespace pastra
 {
@@ -197,7 +198,7 @@ public:
   //Implementation of I_BTreeNode
   virtual D_UINT GetKeysPerNode () const;
 
-  virtual KEY_INDEX  GetParentKey (const I_BTreeNode &parent) const;
+  virtual KEY_INDEX  GetFirstKey (const I_BTreeNode &parent) const;
   virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const;
   virtual void       ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex);
   virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode);

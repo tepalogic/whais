@@ -56,12 +56,15 @@ public:
   NODE_INDEX GetNodeId () const { return m_Header->m_NodeId; }
   NODE_INDEX GetNext () const { return m_Header->m_Right; }
   NODE_INDEX GetPrev () const { return m_Header->m_Left; }
+  D_UINT16   GetNullKeysCount () const { return m_Header->m_NullKeysCount; };
 
   void SetLeaf (bool leaf) { m_Header->m_Leaf = (leaf == false) ? 0 : 1; }
   void MarkAsRemoved() { m_Header->m_Removed = 1, m_Header->m_Dirty = 1;};
   void MarkAsUsed() { m_Header->m_Removed = 0, m_Header->m_Dirty = 1;};
   void SetNext (const NODE_INDEX next) { m_Header->m_Right = next, m_Header->m_Dirty = 1; }
   void SetPrev (const NODE_INDEX prev) { m_Header->m_Left = prev, m_Header->m_Dirty = 1; }
+  void SetNullKeysCount (const D_UINT16 count) { m_Header->m_NullKeysCount = count,
+                                                 m_Header->m_Dirty = 1; };
 
   D_UINT GetKeysCount () const { return m_Header->m_KeysCount; }
   void   SetKeysCount (D_UINT count) { m_Header->m_KeysCount = count; m_Header->m_Dirty = 1; }
@@ -72,7 +75,7 @@ public:
   virtual bool NeedsJoining () const;
 
 
-  virtual KEY_INDEX  GetParentKey (const I_BTreeNode &parent) const = 0;
+  virtual KEY_INDEX  GetFirstKey (const I_BTreeNode &parent) const = 0;
   virtual NODE_INDEX GetChildNode (const I_BTreeKey &key) const;
   virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const = 0;
   virtual void       ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex) = 0;
@@ -98,13 +101,14 @@ public:
 protected:
   struct NodeHeader
   {
-    NODE_INDEX    m_Left;
-    NODE_INDEX    m_Right;
-    NODE_INDEX    m_NodeId;
-    D_UINT        m_KeysCount : 16;
-    D_UINT        m_Leaf      : 1;
-    D_UINT        m_Dirty     : 1;
-    D_UINT        m_Removed   : 1;
+    D_UINT64  m_Left          : 32;
+    D_UINT64  m_Right         : 32;
+    D_UINT64  m_NodeId        : 32;
+    D_UINT64  m_KeysCount     : 16;
+    D_UINT64  m_NullKeysCount : 16;
+    D_UINT64  m_Leaf          : 1;
+    D_UINT64  m_Dirty         : 1;
+    D_UINT64  m_Removed       : 1;
   };
 
   NodeHeader         *m_Header;

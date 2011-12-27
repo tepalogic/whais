@@ -205,7 +205,7 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
       assert (parentNode->IsLeaf() == false);
 
       BTreeNodeHandler node (RetrieveNode (nodeId));
-      const KEY_INDEX  keyIndex = node->GetParentKey (*parentNode);
+      const KEY_INDEX  keyIndex = node->GetFirstKey (*parentNode);
 
       if (keyIndex != 0)
         {
