@@ -56,7 +56,19 @@ struct DBSBool
     return *this;
   }
 
-  bool operator== (const DBSBool &source)
+  bool operator< (const DBSBool &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      if ((m_Value == false) && (source.m_Value == true))
+        return true;
+
+    return false;
+  }
+
+  bool operator== (const DBSBool &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -96,7 +108,18 @@ struct DBSChar
     return *this;
   }
 
-  bool operator== (const DBSChar &source)
+  bool operator< (const DBSChar &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSChar &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -139,7 +162,28 @@ struct DBSDate
     return *this;
   }
 
-  bool operator== (const DBSDate &source)
+  bool operator< (const DBSDate &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      {
+        if (m_Year < source.m_Year)
+          return true;
+        else if (m_Year == source.m_Year)
+          {
+            if (m_Month < source.m_Month)
+              return true;
+            else if (m_Month == source.m_Month)
+              return m_Day < source.m_Day;
+          }
+      }
+
+    return false;
+  }
+
+  bool operator== (const DBSDate &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -197,7 +241,43 @@ struct DBSDateTime
     return *this;
   }
 
-  bool operator== (const DBSDateTime &source)
+  bool operator< (const DBSDateTime &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      {
+        if (m_Year < source.m_Year)
+          return true;
+        else if (m_Year == source.m_Year)
+          {
+            if (m_Month < source.m_Month)
+              return true;
+            else if (m_Month == source.m_Month)
+              {
+                if (m_Day < source.m_Day)
+                  return true;
+                else if (m_Day == source.m_Day)
+                  {
+                    if (m_Hour < source.m_Hour)
+                      return true;
+                    else if (m_Hour == source.m_Hour)
+                      {
+                        if (m_Minutes < source.m_Minutes)
+                          return true;
+                        else if (m_Minutes == source.m_Minutes)
+                          return m_Seconds < source.m_Seconds;
+                      }
+                  }
+              }
+          }
+      }
+
+    return false;
+  }
+
+  bool operator== (const DBSDateTime &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -226,9 +306,9 @@ struct DBSDateTime
   const bool    m_IsNull;
 };
 
-struct DBSHiresDate
+struct DBSHiresTime
 {
-  explicit DBSHiresDate (bool isNull,
+  explicit DBSHiresTime (bool isNull,
                          D_INT32 year = DEFAULT_INT_VALUE,
                          D_UINT8 month = DEFAULT_INT_VALUE,
                          D_UINT8 day = DEFAULT_INT_VALUE,
@@ -237,7 +317,7 @@ struct DBSHiresDate
                          D_UINT8 seconds = DEFAULT_INT_VALUE,
                          D_UINT32 microsec = DEFAULT_INT_VALUE );
 
-  DBSHiresDate (const DBSHiresDate &source) :
+  DBSHiresTime (const DBSHiresTime &source) :
     m_Microsec (source.m_Microsec),
     m_Year (source.m_Year),
     m_Month (source.m_Month),
@@ -248,7 +328,7 @@ struct DBSHiresDate
     m_IsNull (source.m_IsNull)
   {}
 
-  DBSHiresDate& operator= (const DBSHiresDate& source)
+  DBSHiresTime& operator= (const DBSHiresTime& source)
   {
     if (this != &source)
       {
@@ -264,7 +344,48 @@ struct DBSHiresDate
     return *this;
   }
 
-  bool operator== (const DBSHiresDate &source)
+  bool operator< (const DBSHiresTime &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      {
+        if (m_Year < source.m_Year)
+          return true;
+        else if (m_Year == source.m_Year)
+          {
+            if (m_Month < source.m_Month)
+              return true;
+            else if (m_Month == source.m_Month)
+              {
+                if (m_Day < source.m_Day)
+                  return true;
+                else if (m_Day == source.m_Day)
+                  {
+                    if (m_Hour < source.m_Hour)
+                      return true;
+                    else if (m_Hour == source.m_Hour)
+                      {
+                        if (m_Minutes < source.m_Minutes)
+                          return true;
+                        else if (m_Minutes == source.m_Minutes)
+                          {
+                            if (m_Seconds < source.m_Seconds)
+                              return true;
+                            else if (m_Seconds == source.m_Seconds)
+                              return m_Microsec < source.m_Microsec;
+                          }
+                      }
+                  }
+              }
+          }
+      }
+
+    return false;
+  }
+
+  bool operator== (const DBSHiresTime &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -316,7 +437,18 @@ struct DBSUInt8
     return *this;
   }
 
-  bool operator== (const DBSUInt8 &source)
+  bool operator< (const DBSUInt8 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSUInt8 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -355,8 +487,18 @@ struct DBSUInt16
     return *this;
   }
 
+  bool operator< (const DBSUInt16 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
 
-  bool operator== (const DBSUInt16 &source)
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSUInt16 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -395,7 +537,18 @@ struct DBSUInt32
     return *this;
   }
 
-  bool operator== (const DBSUInt32 &source)
+  bool operator< (const DBSUInt32 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSUInt32 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -434,7 +587,18 @@ struct DBSUInt64
     return *this;
   }
 
-  bool operator== (const DBSUInt64 &source)
+  bool operator< (const DBSUInt64 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSUInt64 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -473,7 +637,18 @@ struct DBSInt8
     return *this;
   }
 
-  bool operator== (const DBSInt8 &source)
+  bool operator< (const DBSInt8 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSInt8 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -512,7 +687,18 @@ struct DBSInt16
     return *this;
   }
 
-  bool operator== (const DBSInt16 &source)
+  bool operator< (const DBSInt16 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSInt16 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -551,7 +737,18 @@ struct DBSInt32
     return *this;
   }
 
-  bool operator== (const DBSInt32 &source)
+  bool operator< (const DBSInt32 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSInt32 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -590,7 +787,18 @@ struct DBSInt64
     return *this;
   }
 
-  bool operator== (const DBSInt64 &source)
+  bool operator< (const DBSInt64 &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      return m_Value < source.m_Value;
+
+    return false;
+  }
+
+  bool operator== (const DBSInt64 &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -630,7 +838,23 @@ struct DBSReal
     return *this;
   }
 
-  bool operator== (const DBSReal &source)
+  bool operator< (const DBSReal &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      {
+        if (m_IntPart < source.m_IntPart)
+          return true;
+        else if (m_IntPart == source.m_IntPart)
+          return m_FracPart < source.m_FracPart;
+      }
+
+    return false;
+  }
+
+  bool operator== (const DBSReal &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -671,7 +895,23 @@ struct DBSRichReal
     return *this;
   }
 
-  bool operator== (const DBSRichReal &source)
+  bool operator< (const DBSRichReal &source) const
+  {
+    if (IsNull () && (source.IsNull () == false))
+      return true;
+
+    if (source.IsNull () == false)
+      {
+        if (m_IntPart < source.m_IntPart)
+          return true;
+        else if (m_IntPart == source.m_IntPart)
+          return m_FracPart < source.m_FracPart;
+      }
+
+    return false;
+  }
+
+  bool operator== (const DBSRichReal &source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -735,7 +975,7 @@ public:
   explicit DBSArray (const DBSChar *array, D_UINT64 count = 0);
   explicit DBSArray (const DBSDate *array, D_UINT64 count = 0);
   explicit DBSArray (const DBSDateTime *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSHiresDate *array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSHiresTime *array, D_UINT64 count = 0);
   explicit DBSArray (const DBSUInt8 *array, D_UINT64 count = 0);
   explicit DBSArray (const DBSUInt16 *array, D_UINT64 count = 0);
   explicit DBSArray (const DBSUInt32 *array, D_UINT64 count = 0);
@@ -762,7 +1002,7 @@ public:
   D_UINT64 AddElement (const DBSChar &value);
   D_UINT64 AddElement (const DBSDate &value);
   D_UINT64 AddElement (const DBSDateTime &value);
-  D_UINT64 AddElement (const DBSHiresDate &value);
+  D_UINT64 AddElement (const DBSHiresTime &value);
   D_UINT64 AddElement (const DBSUInt8 &value);
   D_UINT64 AddElement (const DBSUInt16 &value);
   D_UINT64 AddElement (const DBSUInt32 &value);
@@ -778,7 +1018,7 @@ public:
   void GetElement (DBSChar &outValue, const D_UINT64 index) const;
   void GetElement (DBSDate &outValue, const D_UINT64 index) const;
   void GetElement (DBSDateTime &outValue, const D_UINT64 index) const;
-  void GetElement (DBSHiresDate &outValue, const D_UINT64 index) const;
+  void GetElement (DBSHiresTime &outValue, const D_UINT64 index) const;
   void GetElement (DBSUInt8 &outValue, const D_UINT64 index) const;
   void GetElement (DBSUInt16 &outValue, const D_UINT64 index) const;
   void GetElement (DBSUInt32 &outValue, const D_UINT64 index) const;
@@ -794,7 +1034,7 @@ public:
   void SetElement (const DBSChar &newValue, const D_UINT64 index);
   void SetElement (const DBSDate &newValue, const D_UINT64 index);
   void SetElement (const DBSDateTime &newValue, const D_UINT64 index);
-  void SetElement (const DBSHiresDate &newValue, const D_UINT64 index);
+  void SetElement (const DBSHiresTime &newValue, const D_UINT64 index);
   void SetElement (const DBSUInt8 &newValue, const D_UINT64 index);
   void SetElement (const DBSUInt16 &newValue, const D_UINT64 index);
   void SetElement (const DBSUInt32 &newValue, const D_UINT64 index);

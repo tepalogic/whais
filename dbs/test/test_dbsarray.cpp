@@ -289,7 +289,7 @@ test_hiresdate_array ()
   D_UINT sec = 3;
   D_UINT32 msec = 4;
 
-  DBSArray testArray((DBSHiresDate *)NULL);
+  DBSArray testArray((DBSHiresTime *)NULL);
 
   for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -298,7 +298,7 @@ test_hiresdate_array ()
           result = false;
           break;
         }
-      testArray.AddElement (DBSHiresDate (false, year, month, day, hour, mins, sec, msec));
+      testArray.AddElement (DBSHiresTime (false, year, month, day, hour, mins, sec, msec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -316,7 +316,7 @@ test_hiresdate_array ()
   msec = 4;
   for (D_UINT64 index = 0; index < elementsCount; ++index)
   {
-    DBSHiresDate testValue (true);
+    DBSHiresTime testValue (true);
     testArray.GetElement (testValue, index);
 
     if ((testValue.m_IsNull != false) ||

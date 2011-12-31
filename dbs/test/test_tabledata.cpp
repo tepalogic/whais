@@ -35,7 +35,7 @@ static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
   std::vector<DBSChar> vectChar;\
   std::vector<DBSDate> vectDate;\
   std::vector<DBSDateTime> vectDateTime;\
-  std::vector<DBSHiresDate> vectHiResDate;\
+  std::vector<DBSHiresTime> vectHiResDate;\
   std::vector<DBSUInt8> vectUInt8;\
   std::vector<DBSUInt16> vectUInt16;\
   std::vector<DBSUInt32> vectUInt32;\
@@ -72,11 +72,11 @@ static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
   vectDateTime.push_back (DBSDateTime (false, 21, 12, 31, 23, 59, 59));\
   vectDateTime.push_back (DBSDateTime (true));\
 \
-  vectHiResDate.push_back (DBSHiresDate (false, 1, 1, 1, 0, 0, 0, 2312));\
-  vectHiResDate.push_back (DBSHiresDate (true));\
-  vectHiResDate.push_back (DBSHiresDate (false, 0, 1, 2, 1, 1, 1, 2132));\
-  vectHiResDate.push_back (DBSHiresDate (false, -1324, 12, 31, 23, 59, 59, 9897));\
-  vectHiResDate.push_back (DBSHiresDate (true));\
+  vectHiResDate.push_back (DBSHiresTime (false, 1, 1, 1, 0, 0, 0, 2312));\
+  vectHiResDate.push_back (DBSHiresTime (true));\
+  vectHiResDate.push_back (DBSHiresTime (false, 0, 1, 2, 1, 1, 1, 2132));\
+  vectHiResDate.push_back (DBSHiresTime (false, -1324, 12, 31, 23, 59, 59, 9897));\
+  vectHiResDate.push_back (DBSHiresTime (true));\
 \
   vectUInt8.push_back (DBSUInt8 (true));\
   vectUInt8.push_back (DBSUInt8 (false, 2));\

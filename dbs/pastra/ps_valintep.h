@@ -42,7 +42,7 @@ public:
   static void Store (const DBSChar &rSource, D_UINT8 *pDestination);
   static void Store (const DBSDate &rSource, D_UINT8 *pDestination);
   static void Store (const DBSDateTime &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSHiresDate &rSource, D_UINT8 *pDestination);
+  static void Store (const DBSHiresTime &rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt8 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt16 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt32 &rSource, D_UINT8 *pDestination);
@@ -58,7 +58,7 @@ public:
   static void Retrieve (DBSChar *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSDate *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSDateTime *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSHiresDate *pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSHiresTime *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt8 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt16 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt32 *pOutValue, const D_UINT8 *pSource);

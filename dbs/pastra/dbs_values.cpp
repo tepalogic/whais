@@ -118,7 +118,8 @@ DBSDate::DBSDate (bool isNull, D_INT32 year, D_UINT8 month, D_UINT8 day) :
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATE));
 }
 
-DBSDateTime::DBSDateTime (bool isNull, D_INT32 year,
+DBSDateTime::DBSDateTime (bool isNull,
+                          D_INT32 year,
                           D_UINT8 month,
                           D_UINT8 day,
                           D_UINT8 hour,
@@ -137,7 +138,8 @@ DBSDateTime::DBSDateTime (bool isNull, D_INT32 year,
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
 }
 
-DBSHiresDate::DBSHiresDate (bool isNull, D_INT32 year,
+DBSHiresTime::DBSHiresTime (bool isNull,
+                            D_INT32 year,
                             D_UINT8 month,
                             D_UINT8 day,
                             D_UINT8 hour,
@@ -428,7 +430,7 @@ DBSArray::DBSArray (const DBSDateTime *array, D_UINT64 count) :
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSHiresDate *array, D_UINT64 count) :
+DBSArray::DBSArray (const DBSHiresTime *array, D_UINT64 count) :
     m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
@@ -619,7 +621,7 @@ DBSArray::AddElement (const DBSDateTime &value)
 }
 
 D_UINT64
-DBSArray::AddElement (const DBSHiresDate &value)
+DBSArray::AddElement (const DBSHiresTime &value)
 {
   return add_array_element (value, m_pArray);
 }
@@ -727,7 +729,7 @@ DBSArray::GetElement (DBSDateTime &outValue, const D_UINT64 index) const
 }
 
 void
-DBSArray::GetElement (DBSHiresDate &outValue, const D_UINT64 index) const
+DBSArray::GetElement (DBSHiresTime &outValue, const D_UINT64 index) const
 {
   get_array_element (outValue, m_pArray, index);
 }
@@ -840,7 +842,7 @@ DBSArray::SetElement (const DBSDateTime &newValue, const D_UINT64 index)
 }
 
 void
-DBSArray::SetElement (const DBSHiresDate &newValue, const D_UINT64 index)
+DBSArray::SetElement (const DBSHiresTime &newValue, const D_UINT64 index)
 {
   set_array_element (m_pArray, newValue, index);
 }

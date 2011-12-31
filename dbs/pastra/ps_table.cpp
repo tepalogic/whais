@@ -1199,7 +1199,7 @@ PSTable::SetEntry (const DBSDateTime &rSource, const D_UINT64 rowIndex, const D_
 }
 
 void
-PSTable::SetEntry (const DBSHiresDate &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSHiresTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
@@ -1436,7 +1436,7 @@ PSTable::GetEntry (DBSDateTime &rDestination, const D_UINT64 rowIndex, const D_U
 }
 
 void
-PSTable::GetEntry (DBSHiresDate &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSHiresTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
@@ -1579,7 +1579,7 @@ PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT
         new (&rDestination) DBSArray(_SC(DBSDateTime *, NULL));
         break;
       case T_HIRESTIME:
-        new (&rDestination) DBSArray(_SC(DBSHiresDate *, NULL));
+        new (&rDestination) DBSArray(_SC(DBSHiresTime *, NULL));
         break;
       case T_UINT8:
         new (&rDestination) DBSArray(_SC(DBSUInt8 *, NULL));

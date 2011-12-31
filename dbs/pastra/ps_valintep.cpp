@@ -31,7 +31,7 @@ static void new_bool (DBSBool *object, bool value);
 static void new_char (DBSChar *object, D_UINT32 value);
 static void new_date (DBSDate *object, D_INT32 year, D_UINT8 month, D_UINT8 day);
 static void new_datetime (DBSDateTime *object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds);
-static void new_hirestime (DBSHiresDate *object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds, D_UINT32 microsec);
+static void new_hirestime (DBSHiresTime *object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds, D_UINT32 microsec);
 template <class T_OBJ, class T_VAL>
 static void new_integer (T_OBJ *object, T_VAL value);
 template <class T_OBJ, class T_INTEGER, class T_DECIMAL>
@@ -105,7 +105,7 @@ PSValInterp::Store (const DBSDateTime &rSource, D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Store (const DBSHiresDate &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSHiresTime &rSource, D_UINT8 *pDestination)
 {
   _RC(D_UINT32 *, pDestination)[0] = rSource.m_Microsec;
   _RC(D_UINT16 *, pDestination)[2] = rSource.m_Year;
@@ -218,7 +218,7 @@ PSValInterp::Retrieve (DBSDateTime *pOutValue, const D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Retrieve (DBSHiresDate *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSHiresTime *pOutValue, const D_UINT8 *pDestination)
 {
   D_INT32 microsec = _RC (const D_UINT32 *, pDestination)[0];
   D_INT16 year = _RC (const D_UINT16 *, pDestination)[2];
@@ -418,7 +418,7 @@ new_datetime (DBSDateTime *object,
 }
 
 void
-new_hirestime (DBSHiresDate *object,
+new_hirestime (DBSHiresTime *object,
                D_INT32 year,
                D_UINT8 month,
                D_UINT8 day,
@@ -427,8 +427,8 @@ new_hirestime (DBSHiresDate *object,
                D_UINT8 seconds,
                D_UINT32 microsec)
 {
-  object->~DBSHiresDate ();
-  new (object) DBSHiresDate (false, year, month, day,
+  object->~DBSHiresTime ();
+  new (object) DBSHiresTime (false, year, month, day,
                              hours, minutes, seconds, microsec);
 }
 
