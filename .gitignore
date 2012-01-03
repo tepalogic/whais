@@ -9,3 +9,5 @@ compiler/parser/whisper.output
 compiler/parser/whisper.tab.c
 compiler/parser/whisper.tab.h
 tmp/
+*~
+
