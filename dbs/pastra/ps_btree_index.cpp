@@ -288,6 +288,14 @@ I_BTreeNodeManager::ReleaseNode (const NODE_INDEX node)
   it->second.m_ReferenceCount--;
 }
 
+D_UINT
+I_BTreeNodeManager::GetRawNodeSize () const
+{
+  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
+  return 0;
+}
+
 BTree::BTree (I_BTreeNodeManager &nodesManager) :
     m_NodesManager (nodesManager)
 {

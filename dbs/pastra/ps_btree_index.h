@@ -173,8 +173,9 @@ public:
   void         ReleaseNode (const NODE_INDEX node);
   void         ReleaseNode (I_BTreeNode *node) { ReleaseNode (node->GetNodeId()); }
 
-  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
-  virtual void        FreeNode (const NODE_INDEX node) = 0;
+  virtual D_UINT     GetRawNodeSize () const;
+  virtual NODE_INDEX AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
+  virtual void       FreeNode (const NODE_INDEX node) = 0;
 
   virtual NODE_INDEX  GetRootNodeId () = 0;
   virtual void        SetRootNodeId (const NODE_INDEX node) = 0;
