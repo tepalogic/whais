@@ -30,11 +30,10 @@
 using namespace pastra;
 using namespace std;
 
-I_BTreeNode::I_BTreeNode (I_BTreeNodeManager &nodesManager, const NODE_INDEX node) :
+I_BTreeNode::I_BTreeNode (I_BTreeNodeManager &nodesManager) :
     m_Header (NULL),
     m_NodesManager (nodesManager)
 {
-    (void)node;
 }
 
 I_BTreeNode::~I_BTreeNode ()
@@ -288,12 +287,17 @@ I_BTreeNodeManager::ReleaseNode (const NODE_INDEX node)
   it->second.m_ReferenceCount--;
 }
 
-D_UINT
-I_BTreeNodeManager::GetRawNodeSize () const
+void
+I_BTreeNodeManager::FlushNodes ()
 {
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.begin ();
 
-  return 0;
+  while (it != m_NodesKeeper.end ())
+    {
+      StoreNode (it->second.m_pNode);
+      it->second.m_pNode->m_Header->m_Dirty = 0;
+      ++it;
+    }
 }
 
 BTree::BTree (I_BTreeNodeManager &nodesManager) :

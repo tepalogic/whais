@@ -43,9 +43,9 @@ bool
 operator!= (const DBSFieldDescriptor & field_1,
             const DBSFieldDescriptor & field_2)
 {
-  return (field_1.mFieldType != field_2.mFieldType) ||
+  return (field_1.m_FieldType != field_2.m_FieldType) ||
          (field_1.isArray != field_2.isArray) ||
-         (strcmp (field_1.mpFieldName, field_2.mpFieldName) != 0);
+         (strcmp (field_1.m_pFieldName, field_2.m_pFieldName) != 0);
 }
 
 bool
@@ -68,8 +68,8 @@ test_for_no_args (I_DBSHandler &rDbs)
   try
   {
     DBSFieldDescriptor temp;
-    temp.mpFieldName = "dummy";
-    temp.mFieldType = T_BOOL;
+    temp.m_pFieldName = "dummy";
+    temp.m_FieldType = T_BOOL;
     temp.isArray = false;
 
     if (result)
@@ -96,9 +96,9 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
 
   std::cout << "Test for invalid fields ... ";
 
-  temp.mFieldType = _SC (DBS_FIELD_TYPE, 78);
+  temp.m_FieldType = _SC (DBS_FIELD_TYPE, 78);
   temp.isArray = false;
-  temp.mpFieldName = "good_name";
+  temp.m_pFieldName = "good_name";
 
   try
   {
@@ -110,8 +110,8 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
       result = true;
   }
 
-  temp.mpFieldName = "1bad_name?";
-  temp.mFieldType = T_TEXT;
+  temp.m_pFieldName = "1bad_name?";
+  temp.m_FieldType = T_TEXT;
 
   try
   {
@@ -131,11 +131,11 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
   {
     DBSFieldDescriptor more_temps[3];
 
-    temp.mpFieldName = "field_1";
+    temp.m_pFieldName = "field_1";
     more_temps[0] = temp;
-    temp.mpFieldName = "field_2";
+    temp.m_pFieldName = "field_2";
     more_temps[1] = temp;
-    temp.mpFieldName = "field_1";
+    temp.m_pFieldName = "field_1";
     more_temps[2] = temp;
 
     if( result )
@@ -163,8 +163,8 @@ test_for_one_field (I_DBSHandler &rDbs)
   std::cout << "Test with one field ... ";
 
   DBSFieldDescriptor temp;
-  temp.mpFieldName = "dummy";
-  temp.mFieldType = T_INT16;
+  temp.m_pFieldName = "dummy";
+  temp.m_FieldType = T_INT16;
   temp.isArray = false;
 
   rDbs.AddTable ("t_test_tab", &temp, 1);
@@ -223,7 +223,7 @@ test_for_fields (I_DBSHandler &rDbs,
     {
       PSFieldDescriptor descr = _SC(I_PSTable &, table).GetFieldDescriptorInternal (fieldIndex);
 
-      if (descr.mNullBitIndex >= _SC(I_PSTable &, table).GetRowSize () * 8)
+      if (descr.m_NullBitIndex >= _SC(I_PSTable &, table).GetRowSize () * 8)
         {
           result = false;
           break;
@@ -231,23 +231,23 @@ test_for_fields (I_DBSHandler &rDbs,
 
       for (D_UINT index = 0; index < nullPositions.size (); ++index)
         {
-          if (descr.mNullBitIndex == nullPositions[index])
+          if (descr.m_NullBitIndex == nullPositions[index])
             {
               result = false;
               break;
             }
         }
 
-      if (descr.mNullBitIndex)
-        nullPositions.push_back (descr.mNullBitIndex);
+      if (descr.m_NullBitIndex)
+        nullPositions.push_back (descr.m_NullBitIndex);
 
       if (! result)
         break;
 
-      D_UINT elem_start = descr.mStoreIndex;
+      D_UINT elem_start = descr.m_StoreIndex;
       D_UINT elem_end = elem_start +
-          PSValInterp::GetSize (_SC (DBS_FIELD_TYPE, descr.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK),
-                                descr.mTypeDesc & PS_TABLE_ARRAY_MASK);
+          PSValInterp::GetSize (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
+                                (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0);
 
       for (D_UINT index = 0; index < storage.size (); ++index)
         {
@@ -255,8 +255,8 @@ test_for_fields (I_DBSHandler &rDbs,
               (elem_start <= storage[index].mEnd))
               || ((storage[index].mBegin >= elem_end) &&
                   (elem_end <= storage[index].mEnd))
-              || ((storage[index].mBegin >= descr.mNullBitIndex) &&
-                (descr.mNullBitIndex <= storage[index].mEnd) && descr.mNullBitIndex) )
+              || ((storage[index].mBegin >= descr.m_NullBitIndex) &&
+                (descr.m_NullBitIndex <= storage[index].mEnd) && descr.m_NullBitIndex) )
             {
               result = false;
               break;
@@ -268,8 +268,8 @@ test_for_fields (I_DBSHandler &rDbs,
         {
           if ( get_next_alignment (elem_start) >
             PSValInterp::GetSize (_SC (DBS_FIELD_TYPE,
-                                   descr.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK),
-                                   descr.mTypeDesc & PS_TABLE_ARRAY_MASK))
+                                   descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
+                                   (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0))
             result = false;
             break;
         }
@@ -277,7 +277,7 @@ test_for_fields (I_DBSHandler &rDbs,
       if (result)
         {
           DBSFieldDescriptor desc = table.GetFieldDescriptor(fieldIndex);
-          D_UINT array_index = desc.mpFieldName[0] - 'a';
+          D_UINT array_index = desc.m_pFieldName[0] - 'a';
           if (desc != pDesc[array_index])
             {
               result = false;

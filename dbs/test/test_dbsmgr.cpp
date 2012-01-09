@@ -34,9 +34,9 @@ bool
 operator!= (const DBSFieldDescriptor & field_1,
             const DBSFieldDescriptor & field_2)
 {
-  return (field_1.mFieldType != field_2.mFieldType) ||
+  return (field_1.m_FieldType != field_2.m_FieldType) ||
          (field_1.isArray != field_2.isArray) ||
-         (strcmp (field_1.mpFieldName, field_2.mpFieldName) != 0);
+         (strcmp (field_1.m_pFieldName, field_2.m_pFieldName) != 0);
 }
 
 static bool
@@ -49,7 +49,7 @@ test_fields (I_DBSTable & table)
   for (D_UINT index = 0; index < descCount; ++index)
     {
       field_d = table.GetFieldDescriptor (index);
-      std::cout << "\t" << field_d.mpFieldName << std::endl;
+      std::cout << "\t" << field_d.m_pFieldName << std::endl;
     }
 
   if (table.GetFieldsCount () != descCount)

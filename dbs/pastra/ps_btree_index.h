@@ -47,7 +47,7 @@ static const NODE_INDEX NIL_NODE = ~0;
 class I_BTreeNode
 {
 public:
-  I_BTreeNode (I_BTreeNodeManager &nodesManager, const NODE_INDEX nodeId);
+  I_BTreeNode (I_BTreeNodeManager &nodesManager);
   virtual ~I_BTreeNode ();
 
   bool       IsLeaf () const { return m_Header->m_Leaf != 0; }
@@ -57,6 +57,7 @@ public:
   NODE_INDEX GetNext () const { return m_Header->m_Right; }
   NODE_INDEX GetPrev () const { return m_Header->m_Left; }
   D_UINT16   GetNullKeysCount () const { return m_Header->m_NullKeysCount; };
+  D_UINT8*   GetRawData () const { return _RC (D_UINT8*, m_Header); }
 
   void SetLeaf (bool leaf) { m_Header->m_Leaf = (leaf == false) ? 0 : 1; }
   void MarkAsRemoved() { m_Header->m_Removed = 1, m_Header->m_Dirty = 1;};
@@ -98,7 +99,6 @@ public:
   bool FindBiggerOrEqual (const I_BTreeKey &key, KEY_INDEX &outIndex) const;
   void Release ();
 
-protected:
   struct NodeHeader
   {
     D_UINT64  m_Left          : 32;
@@ -109,7 +109,11 @@ protected:
     D_UINT64  m_Leaf          : 1;
     D_UINT64  m_Dirty         : 1;
     D_UINT64  m_Removed       : 1;
+    D_UINT64  __unused        : 61; //To make sure this is aligned well
   };
+
+protected:
+  friend class I_BTreeNodeManager;
 
   NodeHeader         *m_Header;
   I_BTreeNodeManager &m_NodesManager;
@@ -171,13 +175,14 @@ public:
 
   I_BTreeNode* RetrieveNode (const NODE_INDEX node);
   void         ReleaseNode (const NODE_INDEX node);
-  void         ReleaseNode (I_BTreeNode *node) { ReleaseNode (node->GetNodeId()); }
+  void         ReleaseNode (I_BTreeNode *pNode) { ReleaseNode (pNode->GetNodeId()); }
+  void         FlushNodes ();
 
-  virtual D_UINT     GetRawNodeSize () const;
+  virtual D_UINT     GetRawNodeSize () const = 0;
   virtual NODE_INDEX AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
   virtual void       FreeNode (const NODE_INDEX node) = 0;
 
-  virtual NODE_INDEX  GetRootNodeId () = 0;
+  virtual NODE_INDEX  GetRootNodeId () const = 0;
   virtual void        SetRootNodeId (const NODE_INDEX node) = 0;
 
 protected:
@@ -194,7 +199,7 @@ protected:
 
   virtual D_UINT       GetMaxCachedNodes () = 0;
   virtual I_BTreeNode* GetNode (const NODE_INDEX node) = 0;
-  virtual void         StoreNode (I_BTreeNode *const node) = 0;
+  virtual void         StoreNode (I_BTreeNode *const pNode) = 0;
 
   WSynchronizer                     m_Sync;
   std::map <NODE_INDEX, CachedData> m_NodesKeeper;
