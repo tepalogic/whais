@@ -58,16 +58,18 @@ public:
     FIELD_NAME_DUPLICATED                       = 13,
     FIELD_TYPE_INVALID                          = 14,
     FIELD_NOT_FOUND                             = 15,
-    GENERAL_CONTROL_ERROR                       = 16,
-    INVALID_PARAMETERS                          = 17,
-    INVALID_UTF8_STRING                         = 18,
-    STRING_INDEX_TOO_BIG                        = 19,
-    ARRAY_INDEX_TOO_BIG                         = 20,
-    INVALID_ARRAY_TYPE                          = 21,
-    NULL_ARRAY_ELEMENT                          = 22,
-    INVALID_DATE                                = 23,
-    INVALID_DATETIME                            = 24,
-    INVALID_HIRESTIME                           = 25
+    FIELD_NOT_INDEXED                           = 16,
+    FIELD_INDEXED                               = 17,
+    GENERAL_CONTROL_ERROR                       = 18,
+    INVALID_PARAMETERS                          = 19,
+    INVALID_UTF8_STRING                         = 20,
+    STRING_INDEX_TOO_BIG                        = 21,
+    ARRAY_INDEX_TOO_BIG                         = 22,
+    INVALID_ARRAY_TYPE                          = 23,
+    NULL_ARRAY_ELEMENT                          = 24,
+    INVALID_DATE                                = 25,
+    INVALID_DATETIME                            = 26,
+    INVALID_HIRESTIME                           = 27
   };
 };
 

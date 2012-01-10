@@ -33,7 +33,6 @@
 #include "ps_container.h"
 #include "ps_blockcache.h"
 #include "ps_varstorage.h"
-#include "ps_btree_index.h"
 #include "ps_btree_fields.h"
 
 namespace pastra
@@ -46,10 +45,11 @@ class DbsHandler;
 
 struct PSFieldDescriptor
 {
-  D_UINT32 mNullBitIndex;
-  D_UINT32 mTypeDesc;
-  D_UINT32 mStoreIndex;
-  D_UINT32 mNameOffset;
+  D_UINT32 m_NullBitIndex;
+  D_UINT32 m_StoreIndex;
+  D_UINT32 m_NameOffset;
+  D_UINT32 m_TypeDesc      :  16;
+  D_UINT32 m_IndexNodeSize :  8;
 };
 
 class I_PSTable : public I_DBSTable
@@ -70,9 +70,10 @@ class PSTable:public I_PSTable, public I_BlocksManager, public I_BTreeNodeManage
 
 public:
   //Implementations for I_BTreeNodeManager
+  virtual D_UINT      GetRawNodeSize () const;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
-  virtual NODE_INDEX  GetRootNodeId ();
+  virtual NODE_INDEX  GetRootNodeId () const;
   virtual void        SetRootNodeId (const NODE_INDEX node);
 
   //Implementations for I_PSBlocksManager
@@ -83,11 +84,16 @@ public:
   virtual D_UINT             GetFieldsCount ();
   virtual DBSFieldDescriptor GetFieldDescriptor (D_UINT fieldIndex);
   virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR * const pFieldName);
-  virtual D_UINT64 GetAllocatedRows ();
+  virtual D_UINT64           GetAllocatedRows ();
+  virtual D_UINT64           AddRow ();
+  virtual D_UINT64           AddReusedRow ();
+  virtual void               MarkRowForReuse (D_UINT64 rowindex);
 
-  virtual D_UINT64 AddRow ();
-  virtual D_UINT64 AddReusedRow ();
-  virtual void     MarkRowForReuse (D_UINT64 rowindex);
+  virtual void CreateFieldIndex (const D_UINT fieldIndex,
+                                 CREATE_INDEX_CALLBACK_FUNC *const cb_func,
+                                 CallBackIndexData *const pCbData);
+  virtual void RemoveFieldIndex (const D_UINT fieldIndex);
+  virtual bool IsFieldIndexed (const D_UINT fieldIndex) const;
 
   virtual void SetEntry (const DBSChar &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
   virtual void SetEntry (const DBSBool &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
@@ -98,7 +104,6 @@ public:
   virtual void SetEntry (const DBSInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
   virtual void SetEntry (const DBSInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
   virtual void SetEntry (const DBSInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-
   virtual void SetEntry (const DBSReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
   virtual void SetEntry (const DBSRichReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
   virtual void SetEntry (const DBSUInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
@@ -126,25 +131,140 @@ public:
   virtual void GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
   virtual void GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
 
+  virtual DBSArray GetMatchingRows (const DBSBool&  min,
+                                    const DBSBool&  max,
+                                    const D_UINT64  fromRow,
+                                    const D_UINT64  toRow,
+                                    const D_UINT64  ignoreFirst,
+                                    const D_UINT64  maxCount,
+                                    const D_UINT    fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSChar& min,
+                                    const DBSChar& max,
+                                    const D_UINT64 fromRow,
+                                    const D_UINT64 toRow,
+                                    const D_UINT64 ignoreFirst,
+                                    const D_UINT64 maxCount,
+                                    const D_UINT   fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSDate& min,
+                                    const DBSDate& max,
+                                    const D_UINT64 fromRow,
+                                    const D_UINT64 toRow,
+                                    const D_UINT64 ignoreFirst,
+                                    const D_UINT64 maxCount,
+                                    const D_UINT   fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSDateTime& min,
+                                    const DBSDateTime& max,
+                                    const D_UINT64     fromRow,
+                                    const D_UINT64     toRow,
+                                    const D_UINT64     ignoreFirst,
+                                    const D_UINT64     maxCount,
+                                    const D_UINT       fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSHiresTime& min,
+                                    const DBSHiresTime& max,
+                                    const D_UINT64      fromRow,
+                                    const D_UINT64      toRow,
+                                    const D_UINT64      ignoreFirst,
+                                    const D_UINT64      maxCount,
+                                    const D_UINT        fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSUInt8& min,
+                                    const DBSUInt8& max,
+                                    const D_UINT64  fromRow,
+                                    const D_UINT64  toRow,
+                                    const D_UINT64  ignoreFirst,
+                                    const D_UINT64  maxCount,
+                                    const D_UINT    fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSUInt16& min,
+                                    const DBSUInt16& max,
+                                    const D_UINT64   fromRow,
+                                    const D_UINT64   toRow,
+                                    const D_UINT64   ignoreFirst,
+                                    const D_UINT64   maxCount,
+                                    const D_UINT     fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSUInt32& min,
+                                    const DBSUInt32& max,
+                                    const D_UINT64   fromRow,
+                                    const D_UINT64   toRow,
+                                    const D_UINT64   ignoreFirst,
+                                    const D_UINT64   maxCount,
+                                    const D_UINT     fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSUInt64& min,
+                                    const DBSUInt64& max,
+                                    const D_UINT64   fromRow,
+                                    const D_UINT64   toRow,
+                                    const D_UINT64   ignoreFirst,
+                                    const D_UINT64   maxCount,
+                                    const D_UINT     fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSInt8& min,
+                                    const DBSInt8& max,
+                                    const D_UINT64 fromRow,
+                                    const D_UINT64 toRow,
+                                    const D_UINT64 ignoreFirst,
+                                    const D_UINT64 maxCount,
+                                    const D_UINT   fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSInt16& min,
+                                    const DBSInt16& max,
+                                    const D_UINT64  fromRow,
+                                    const D_UINT64  toRow,
+                                    const D_UINT64  ignoreFirst,
+                                    const D_UINT64  maxCount,
+                                    const D_UINT    fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSInt32& min,
+                                    const DBSInt32& max,
+                                    const D_UINT64  fromRow,
+                                    const D_UINT64  toRow,
+                                    const D_UINT64  ignoreFirst,
+                                    const D_UINT64  maxCount,
+                                    const D_UINT    fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSInt64& min,
+                                    const DBSInt64& max,
+                                    const D_UINT64   fromRow,
+                                    const D_UINT64   toRow,
+                                    const D_UINT64   ignoreFirst,
+                                    const D_UINT64   maxCount,
+                                    const D_UINT     fieldIndex);
+
   //Implementations for I_PSTable
   virtual D_UINT            GetRowSize () const;
   virtual PSFieldDescriptor GetFieldDescriptorInternal (D_UINT fieldIndex) const;
   virtual PSFieldDescriptor GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const;
 
 private:
-  template <class T> void StoreEntry (const T &, const D_UINT64, const D_UINT);
-  template <class T> void RetrieveEntry (T &, const D_UINT64, const D_UINT);
+  template <class T> void     StoreEntry (const T &, const D_UINT64, const D_UINT);
+  template <class T> void     RetrieveEntry (T &, const D_UINT64, const D_UINT);
+  template <class T> DBSArray MatchRowsWithIndex (FieldIndexNodeManager* const pNodeMgr,
+                                                  const T&                     min,
+                                                  const T&                     max,
+                                                  const D_UINT64               fromRow,
+                                                  D_UINT64                     toRow,
+                                                  D_UINT64                     ignoreFirst,
+                                                  D_UINT64                     maxCount);
 
+  template <class T> DBSArray MatchRows (const T&       min,
+                                         const T&       max,
+                                         const D_UINT64 fromRow,
+                                         D_UINT64       toRow,
+                                         D_UINT64       ignoreFirst,
+                                         D_UINT64       maxCount,
+                                         const D_UINT   filedIndex);
+
+  void InitIndexedFields ();
   void InitVariableStorages();
   void InitFromFile ();
   void SyncToFile ();
 
 protected:
-
-  //Implementations for I_BTreeNodeManager
-  virtual D_UINT       GetMaxCachedNodes ();
-  virtual I_BTreeNode* GetNode (const NODE_INDEX node);
-  virtual void         StoreNode (I_BTreeNode *const node);
 
   PSTable (DbsHandler & dbsHandler, const std::string & tableName);
   PSTable (DbsHandler & dbsHandler,
@@ -154,26 +274,32 @@ protected:
   virtual ~ PSTable ();
 
   D_UINT64 IncreaseRowCount ();
-  void RemoveFromDatabase ();
-  void CheckRowToReuse (const D_UINT64 rowIndex);
-  void CheckRowToDelete (const D_UINT64 rowIndex);
+  void     RemoveFromDatabase ();
+  void     CheckRowToReuse (const D_UINT64 rowIndex);
+  void     CheckRowToDelete (const D_UINT64 rowIndex);
+
+  //Implementations for I_BTreeNodeManager
+  virtual D_UINT       GetMaxCachedNodes ();
+  virtual I_BTreeNode* GetNode (const NODE_INDEX node);
+  virtual void         StoreNode (I_BTreeNode *const pNode);
 
   //Data members
-  D_UINT64              m_VariableStorageSize;
-  D_UINT64              m_RowsCount;
-  NODE_INDEX            m_RootNode;
-  NODE_INDEX            m_FirstUnallocatedRoot;
-  D_UINT                m_ReferenceCount;
-  D_UINT32              m_RowSize;
-  D_UINT32              m_DescriptorsSize;
-  D_UINT16              m_FieldsCount;
-  std::string           m_BaseFileName;
+  D_UINT64                              m_VariableStorageSize;
+  D_UINT64                              m_RowsCount;
+  NODE_INDEX                            m_RootNode;
+  NODE_INDEX                            m_FirstUnallocatedRoot;
+  D_UINT                                m_ReferenceCount;
+  D_UINT32                              m_RowSize;
+  D_UINT32                              m_DescriptorsSize;
+  D_UINT16                              m_FieldsCount;
+  std::string                           m_BaseFileName;
   std::auto_ptr <const D_UINT8>         m_FieldsDescriptors;
   WFile                                 m_MainTableFile;
   std::auto_ptr <FileContainer>         m_apFixedFields;
   std::auto_ptr <VaribaleLenghtStore>   m_apVariableFields;
-  BlockCache            m_RowCache;
-  bool                  m_Removed;
+  std::vector <FieldIndexNodeManager*>  m_vIndexNodeMgrs;
+  BlockCache                            m_RowCache;
+  bool                                  m_Removed;
 };
 
 class PSTableRmKey : public I_BTreeKey
@@ -186,6 +312,7 @@ class PSTableRmKey : public I_BTreeKey
 
   const D_UINT64 m_Row;
 };
+
 class PSTableRmNode : public I_BTreeNode
 {
 public:
@@ -196,29 +323,24 @@ public:
   virtual ~PSTableRmNode ();
 
   //Implementation of I_BTreeNode
-  virtual D_UINT GetKeysPerNode () const;
-
+  virtual D_UINT     GetKeysPerNode () const;
   virtual KEY_INDEX  GetFirstKey (const I_BTreeNode &parent) const;
   virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const;
   virtual void       ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex);
   virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode);
-
-  virtual KEY_INDEX InsertKey (const I_BTreeKey &key);
-  virtual void      RemoveKey (const KEY_INDEX keyIndex);
-
-  virtual void Split (const NODE_INDEX parentId);
-  virtual void Join (bool toRight);
-
-  virtual bool IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
-  virtual bool IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
-  virtual bool IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+  virtual KEY_INDEX  InsertKey (const I_BTreeKey &key);
+  virtual void       RemoveKey (const KEY_INDEX keyIndex);
+  virtual void       Split (const NODE_INDEX parentId);
+  virtual void       Join (bool toRight);
+  virtual bool       IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+  virtual bool       IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+  virtual bool       IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
 
   virtual const I_BTreeKey& GetSentinelKey () const;
 
 protected:
-  friend class PSTable;
 
-  D_UINT8 * const m_cpNodeData;
+  std::auto_ptr <D_UINT8> m_cpNodeData;
 };
 
 }

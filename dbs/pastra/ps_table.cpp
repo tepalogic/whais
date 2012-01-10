@@ -91,7 +91,7 @@ get_strlens_till_index(const DBSFieldDescriptor * pFields, D_UINT index)
 
   while (index-- > 0)
     {
-      result += strlen(pFields->mpFieldName) + 1;
+      result += strlen(pFields->m_pFieldName) + 1;
       ++pFields;
     }
 
@@ -121,21 +121,21 @@ validate_field_descriptors(const DBSFieldDescriptor * const pFields,
   assert ((fieldsCount > 0) && (pFields != NULL));
   for (D_UINT firstIt = 0; firstIt < fieldsCount; ++firstIt)
     {
-      validate_field_name(pFields[firstIt].mpFieldName);
+      validate_field_name(pFields[firstIt].m_pFieldName);
 
       for (D_UINT secondIt = firstIt; secondIt < fieldsCount; ++secondIt)
 	if (firstIt == secondIt)
 	  continue;
-	else if (strcmp(pFields[firstIt].mpFieldName, pFields[secondIt].mpFieldName) == 0)
+	else if (strcmp(pFields[firstIt].m_pFieldName, pFields[secondIt].m_pFieldName) == 0)
 	  throw DBSException (
-                              pFields[firstIt].mpFieldName,
+                              pFields[firstIt].m_pFieldName,
                               _EXTRA (DBSException::FIELD_NAME_DUPLICATED));
 
-      if ((pFields[firstIt].mFieldType == T_UNKNOWN) ||
-          (pFields[firstIt].mFieldType >= T_END_OF_TYPES))
+      if ((pFields[firstIt].m_FieldType == T_UNKNOWN) ||
+          (pFields[firstIt].m_FieldType >= T_END_OF_TYPES))
 	throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
 
-      else if (pFields[firstIt].isArray && (pFields[firstIt].mFieldType == T_TEXT))
+      else if (pFields[firstIt].isArray && (pFields[firstIt].m_FieldType == T_TEXT))
         throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
 }
@@ -178,11 +178,11 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
       for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
 	{
 	  D_INT currIndexSize = PSValInterp::GetSize(
-                                                      rvFields[schIndex].mFieldType,
+                                                      rvFields[schIndex].m_FieldType,
                                                       rvFields[schIndex].isArray);
 
 	  D_INT currReqAlign = PSValInterp::GetAlignment(
-                                                         rvFields[schIndex].mFieldType,
+                                                         rvFields[schIndex].m_FieldType,
                                                          rvFields[schIndex].isArray);
 
 	  D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
@@ -226,25 +226,25 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
       rvFields[foundIndex] = rvFields[fieldIndex];
       rvFields[fieldIndex] = temp;
 
-      pFieldDesc[fieldIndex].mNameOffset = get_strlens_till_index (&rvFields.front(), fieldIndex);
-      pFieldDesc[fieldIndex].mNameOffset += sizeof(PSFieldDescriptor) * rvFields.size();
+      pFieldDesc[fieldIndex].m_NameOffset = get_strlens_till_index (&rvFields.front(), fieldIndex);
+      pFieldDesc[fieldIndex].m_NameOffset += sizeof(PSFieldDescriptor) * rvFields.size();
 
-      strcpy(
-	     _RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].mNameOffset),
-	     _RC (const D_CHAR *, temp.mpFieldName));
+      strcpy(_RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
+	     _RC (const D_CHAR *, temp.m_pFieldName));
 
-      pFieldDesc[fieldIndex].mStoreIndex = uOutRowSize;
-      pFieldDesc[fieldIndex].mTypeDesc = temp.mFieldType;
+      pFieldDesc[fieldIndex].m_IndexNodeSize = 0;
+      pFieldDesc[fieldIndex].m_StoreIndex    = uOutRowSize;
+      pFieldDesc[fieldIndex].m_TypeDesc      = temp.m_FieldType;
 
       if (temp.isArray)
-	pFieldDesc[fieldIndex].mTypeDesc |= PS_TABLE_ARRAY_MASK;
+	pFieldDesc[fieldIndex].m_TypeDesc |= PS_TABLE_ARRAY_MASK;
 
       currentAlignment = foundResultedAlign;
 
       if (foundReqPaddsCount > 0)
 	padds.push_back(PaddInterval(uOutRowSize, foundReqPaddsCount));
 
-      uOutRowSize += foundSize + foundReqPaddsCount;
+      uOutRowSize       += foundSize + foundReqPaddsCount;
       paddingBytesCount += foundReqPaddsCount;
     }
 
@@ -257,7 +257,7 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
     }
 
   //Round the row size so the first element of the next row is alligned
-  D_INT32 needExtraAlign = PSValInterp::GetAlignment( rvFields[0].mFieldType, rvFields[0].isArray);
+  D_INT32 needExtraAlign = PSValInterp::GetAlignment( rvFields[0].m_FieldType, rvFields[0].isArray);
   needExtraAlign -= get_next_alignment(uOutRowSize);
   if (needExtraAlign > 0)
     uOutRowSize += needExtraAlign;
@@ -265,7 +265,7 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
   //Reuse the padding bytes to hold the fileds value null bits indicators.
   for (D_UINT fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
     {
-      pFieldDesc[fieldIndex].mNullBitIndex = padds[0].mBegin++;
+      pFieldDesc[fieldIndex].m_NullBitIndex = padds[0].mBegin++;
 
       if (padds[0].mBegin > padds[0].mEnd)
 	padds.erase(padds.begin());
@@ -340,19 +340,20 @@ create_table_file(const string &baseFileName, const DBSFieldDescriptor *pFields,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 PSTableRmNode::PSTableRmNode (PSTable &table, const NODE_INDEX nodeId) :
-    I_BTreeNode (table, nodeId),
-    m_cpNodeData (new D_UINT8 [RAW_NODE_SIZE])
-
+    I_BTreeNode (table),
+    m_cpNodeData (new D_UINT8 [table.GetRawNodeSize ()])
 {
-  m_Header           = _RC ( NodeHeader*, m_cpNodeData);
+  m_Header           = _RC ( NodeHeader*, m_cpNodeData.get ());
   m_Header->m_NodeId = nodeId;
 
+  SetNullKeysCount (0);
+
   assert ((sizeof (NodeHeader) % sizeof  (D_UINT64)) == 0);
+  assert (RAW_NODE_SIZE == m_NodesManager.GetRawNodeSize ());
 }
 
 PSTableRmNode::~PSTableRmNode ()
 {
-  delete m_cpNodeData;
 }
 
 D_UINT
@@ -360,7 +361,7 @@ PSTableRmNode::GetKeysPerNode () const
 {
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
-  D_UINT result = RAW_NODE_SIZE - sizeof (NodeHeader);
+  D_UINT result = m_NodesManager.GetRawNodeSize () - sizeof (NodeHeader);
 
   if (IsLeaf ())
     result /= sizeof (D_UINT64);
@@ -376,7 +377,7 @@ PSTableRmNode::GetFirstKey (const I_BTreeNode &parent) const
   assert (GetKeysCount() > 0);
 
   KEY_INDEX               result;
-  const NODE_INDEX *const pKeys = _RC ( const NODE_INDEX*, m_cpNodeData + sizeof (NodeHeader));
+  const NODE_INDEX *const pKeys = _RC ( const NODE_INDEX*, GetRawData () + sizeof (NodeHeader));
 
   const PSTableRmKey key (pKeys[0]);
 
@@ -396,7 +397,7 @@ PSTableRmNode::GetChildNode (const KEY_INDEX keyIndex) const
   assert (IsLeaf () == false);
 
   const D_UINT firstKeyOff = sizeof (NodeHeader) + PSTableRmNode::GetKeysPerNode() * sizeof (D_UINT64);
-  const NODE_INDEX *const cpFirstKey = _RC (const NODE_INDEX *, m_cpNodeData + firstKeyOff);
+  const NODE_INDEX *const cpFirstKey = _RC (const NODE_INDEX *, GetRawData () + firstKeyOff);
 
   return cpFirstKey [keyIndex];
 }
@@ -407,9 +408,9 @@ PSTableRmNode::ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIn
   assert (childNode.GetNodeId () == GetChildNode (keyIndex));
 
   const PSTableRmNode &child       = _SC (const PSTableRmNode&, childNode);
-  NODE_INDEX *const pKeys          = _RC (NODE_INDEX*, m_cpNodeData + sizeof (NodeHeader));
+  NODE_INDEX *const pKeys          = _RC (NODE_INDEX*, GetRawData () + sizeof (NodeHeader));
   const NODE_INDEX *const pSrcKeys = _RC ( const NODE_INDEX*,
-                                           child.m_cpNodeData + sizeof (NodeHeader));
+                                           child.GetRawData () + sizeof (NodeHeader));
 
   pKeys [keyIndex] = pSrcKeys [0];
 }
@@ -423,7 +424,7 @@ PSTableRmNode::SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNod
   assert (IsLeaf () == false);
 
   const D_UINT firstKeyOff = sizeof (NodeHeader) + PSTableRmNode::GetKeysPerNode() * sizeof (D_UINT64);
-  NODE_INDEX *const cpFirstKey = _RC (NODE_INDEX *, m_cpNodeData + firstKeyOff);
+  NODE_INDEX *const cpFirstKey = _RC (NODE_INDEX *, GetRawData () + firstKeyOff);
 
   cpFirstKey [keyIndex] = childNode;
 }
@@ -445,7 +446,7 @@ PSTableRmNode::InsertKey (const I_BTreeKey &key)
 
       assert ((keyIndex == 0) || IsLess (key, keyIndex - 1));
 
-      D_UINT64* const pRows = _RC (D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+      D_UINT64* const pRows = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
 
       make_array_room (pRows, lastKey, keyIndex, 1);
       SetKeysCount (GetKeysCount() + 1);
@@ -460,7 +461,7 @@ PSTableRmNode::InsertKey (const I_BTreeKey &key)
       return keyIndex;
     }
 
-  D_UINT64* const pRows = _RC (D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+  D_UINT64* const pRows = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   pRows [0]             = *( _SC(const PSTableRmKey *, &key));
 
   SetKeysCount (1);
@@ -474,7 +475,8 @@ PSTableRmNode::RemoveKey (const KEY_INDEX keyIndex)
   D_UINT lastKey = GetKeysCount () - 1;
 
   assert (lastKey < (GetKeysPerNode() - 1));
-  D_UINT64* const pRows = _RC (D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+
+  D_UINT64* const pRows = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   remove_array_elemes (pRows, lastKey, keyIndex, 1);
 
   if (IsLeaf () == false)
@@ -491,7 +493,7 @@ PSTableRmNode::Split ( const NODE_INDEX parentId)
 {
   assert (NeedsSpliting ());
 
-  D_UINT64* const  pRows    = _RC (D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+  D_UINT64* const  pRows    = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const KEY_INDEX  splitKey = GetKeysCount() / 2;
 
   BTreeNodeHandler   parentNode (m_NodesManager.RetrieveNode (parentId));
@@ -506,7 +508,7 @@ PSTableRmNode::Split ( const NODE_INDEX parentId)
 
   PSTableRmNode *const pRawAllocNode = _SC (PSTableRmNode*, &(*allocatedNode));
   D_UINT64* const pSplitRows         = _RC (D_UINT64*,
-                                            pRawAllocNode->m_cpNodeData + sizeof (NodeHeader));
+                                            pRawAllocNode->GetRawData () + sizeof (NodeHeader));
 
   for (D_UINT index = splitKey; index < GetKeysCount (); ++index)
     pSplitRows [index - splitKey] = pRows [index];
@@ -538,7 +540,7 @@ PSTableRmNode::Join (bool toRight)
 {
   assert (NeedsJoining ());
 
-  D_UINT64 *const   pRows  = _RC (D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+  D_UINT64 *const   pRows  = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   NODE_INDEX *const pNodes = _RC (NODE_INDEX *, pRows + PSTableRmNode::GetKeysPerNode ());
 
   if (toRight)
@@ -546,7 +548,7 @@ PSTableRmNode::Join (bool toRight)
       assert (GetNext () != NIL_NODE);
       BTreeNodeHandler     nextNode (m_NodesManager.RetrieveNode (GetNext ()));
       PSTableRmNode *const pNextNode = _SC (PSTableRmNode*, &(*nextNode));
-      D_UINT64 *const      pDestRows = _RC (D_UINT64 *, pNextNode->m_cpNodeData + sizeof (NodeHeader));
+      D_UINT64 *const      pDestRows = _RC (D_UINT64 *, pNextNode->GetRawData () + sizeof (NodeHeader));
 
       for (D_UINT index = 0; index < GetKeysCount (); ++index)
         pDestRows [index + pNextNode->GetKeysCount ()] = pRows [index];
@@ -575,7 +577,7 @@ PSTableRmNode::Join (bool toRight)
 
       BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetNext ()));
       PSTableRmNode *const pPrevNode = _SC (PSTableRmNode*, &(*prevNode));
-      D_UINT64 *const      pSrcRows  = _RC (D_UINT64 *, pPrevNode->m_cpNodeData + sizeof (NodeHeader));
+      D_UINT64 *const      pSrcRows  = _RC (D_UINT64 *, pPrevNode->GetRawData () + sizeof (NodeHeader));
 
       for (D_UINT index = 0; index < prevNode->GetKeysCount(); ++index)
         pRows [index + GetKeysCount ()] = pSrcRows [index];
@@ -602,7 +604,7 @@ PSTableRmNode::Join (bool toRight)
 bool
 PSTableRmNode::IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 {
-  const D_UINT64 *const pRows = _RC ( const D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+  const D_UINT64 *const pRows = _RC ( const D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const PSTableRmKey    tKey ( * _SC( const  PSTableRmKey*, &key));
 
   return tKey < pRows [keyIndex];
@@ -611,7 +613,7 @@ PSTableRmNode::IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 bool
 PSTableRmNode::IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 {
-  const D_UINT64 *const pRows = _RC ( const D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+  const D_UINT64 *const pRows = _RC ( const D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const PSTableRmKey    tKey ( * _SC( const  PSTableRmKey*, &key));
 
   return tKey == pRows [keyIndex];
@@ -620,7 +622,7 @@ PSTableRmNode::IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 bool
 PSTableRmNode::IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 {
-  const D_UINT64 *const pRows = _RC ( const D_UINT64 *, m_cpNodeData + sizeof (NodeHeader));
+  const D_UINT64 *const pRows = _RC ( const D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const PSTableRmKey    tKey ( * _SC( const  PSTableRmKey*, &key));
 
   return tKey > pRows [keyIndex];
@@ -654,12 +656,12 @@ PSTable::PSTable (DbsHandler & dbsHandler, const string & tableName) :
 {
   InitFromFile ();
 
-
   assert (m_RootNode != NIL_NODE);
 
   m_RowCache.Init (m_RowSize, 4096, 1024);
 
   InitVariableStorages ();
+  InitIndexedFields ();
 }
 
 
@@ -686,6 +688,7 @@ PSTable::PSTable(DbsHandler & dbsHandler,
   m_RowCache.Init (m_RowSize, 4096, 1024);
 
   InitVariableStorages ();
+  InitIndexedFields ();
 
   assert (m_RootNode == NIL_NODE);
 
@@ -704,7 +707,7 @@ PSTable::~PSTable()
   if (m_ReferenceCount != 0)
     throw DBSException(NULL, _EXTRA (DBSException::TABLE_IN_USE));
 
-  //TODO: You need to add code to check for a proper shoutdown
+  FlushNodes ();
 
   SyncToFile ();
 }
@@ -725,9 +728,9 @@ PSTable::GetFieldDescriptor (D_UINT fieldIndex)
 
   DBSFieldDescriptor result;
 
-  result.isArray = (pDesc[fieldIndex].mTypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-  result.mFieldType = _SC (DBS_FIELD_TYPE, pDesc[fieldIndex].mTypeDesc & PS_TABLE_FIELD_TYPE_MASK);
-  result.mpFieldName = _RC (const D_CHAR *, pDesc) + pDesc[fieldIndex].mNameOffset;
+  result.isArray      = (pDesc[fieldIndex].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
+  result.m_FieldType  = _SC (DBS_FIELD_TYPE, pDesc[fieldIndex].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK);
+  result.m_pFieldName = _RC (const D_CHAR *, pDesc) + pDesc[fieldIndex].m_NameOffset;
 
   return result;
 }
@@ -746,9 +749,9 @@ PSTable::GetFieldDescriptor(const D_CHAR * const pFieldName)
 	{
 	  DBSFieldDescriptor result;
 
-	  result.mpFieldName = _RC (const D_CHAR*, pDesc) + iterator;
-	  result.isArray = (pDesc[index].mTypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-	  result.mFieldType = _SC (DBS_FIELD_TYPE, pDesc[index].mTypeDesc & PS_TABLE_FIELD_TYPE_MASK);
+	  result.m_pFieldName = _RC (const D_CHAR*, pDesc) + iterator;
+	  result.isArray      = (pDesc[index].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
+	  result.m_FieldType  = _SC (DBS_FIELD_TYPE, pDesc[index].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK);
 
 	  return result;
 	}
@@ -762,31 +765,6 @@ D_UINT64
 PSTable::GetAllocatedRows()
 {
   return m_RowsCount;
-}
-
-void
-PSTable::MarkRowForReuse(D_UINT64 rowIndex)
-{
-  D_UINT fieldsCount = m_FieldsCount;
-
-  StoredItem cachedItem (m_RowCache.RetriveItem (rowIndex));
-  D_UINT8 *const pRawData = cachedItem.GetDataForUpdate();
-
-    while (fieldsCount-- > 0)
-      {
-        PSFieldDescriptor field = GetFieldDescriptorInternal (fieldsCount);
-        D_UINT byte_off = field.mNullBitIndex / 8;
-        D_UINT8 bit_off = field.mNullBitIndex % 8;
-
-        pRawData[byte_off] |= (1 << bit_off);
-      }
-
-    NODE_INDEX   node;
-    KEY_INDEX    keyIndex;
-    PSTableRmKey key (rowIndex);
-    BTree        removedRows (*this);
-
-    removedRows.InsertKey (key, node, keyIndex);
 }
 
 D_UINT64
@@ -843,7 +821,7 @@ PSTable::AddReusedRow ()
       assert (keyIndex < keyNode->GetKeysCount());
 
       const D_UINT64 *const pRows = _RC (D_UINT64*,
-                                         pNode->m_cpNodeData + sizeof (PSTableRmNode::NodeHeader));
+                                         pNode->GetRawData () + sizeof (PSTableRmNode::NodeHeader));
       result = pRows [keyIndex];
     }
 
@@ -852,6 +830,190 @@ PSTable::AddReusedRow ()
   return result;
 }
 
+void
+PSTable::MarkRowForReuse(D_UINT64 rowIndex)
+{
+  D_UINT fieldsCount = m_FieldsCount;
+
+  StoredItem cachedItem (m_RowCache.RetriveItem (rowIndex));
+  D_UINT8 *const pRawData = cachedItem.GetDataForUpdate();
+
+    while (fieldsCount-- > 0)
+      {
+        PSFieldDescriptor field = GetFieldDescriptorInternal (fieldsCount);
+        D_UINT byte_off = field.m_NullBitIndex / 8;
+        D_UINT8 bit_off = field.m_NullBitIndex % 8;
+
+        pRawData[byte_off] |= (1 << bit_off);
+      }
+
+    NODE_INDEX   node;
+    KEY_INDEX    keyIndex;
+    PSTableRmKey key (rowIndex);
+    BTree        removedRows (*this);
+
+    removedRows.InsertKey (key, node, keyIndex);
+}
+
+template <class T> static void
+insert_row_field (PSTable &table,
+                  BTree &tree,
+                  const D_UINT64 rowIndex,
+                  const D_UINT fieldIndex)
+{
+  T rowValue (true);
+  table.GetEntry (rowValue, rowIndex, fieldIndex);
+
+
+  NODE_INDEX dummyNode;
+  KEY_INDEX  dummyKey;
+
+  T_BTreeKey<T> keyValue (rowValue, rowIndex);
+  tree.InsertKey (keyValue, dummyNode, dummyKey);
+}
+
+void
+PSTable::CreateFieldIndex (const D_UINT fieldIndex,
+                           CREATE_INDEX_CALLBACK_FUNC *const cb_func,
+                           CallBackIndexData *const pCbData)
+{
+  if (PSTable::IsFieldIndexed(fieldIndex))
+    throw DBSException (NULL, _EXTRA (DBSException::FIELD_INDEXED));
+
+  if ((cb_func == NULL) && (pCbData != NULL))
+    throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
+
+  PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+
+  if ((field.m_TypeDesc == T_TEXT) ||
+      (field.m_TypeDesc == T_RICHREAL) ||
+      (field.m_TypeDesc == T_REAL) ||
+      (field.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0)
+    throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+
+  const D_UINT nodeSize    = 13; //16KB
+  string containerNameBase = m_BaseFileName;
+
+  containerNameBase += "_idf";
+  containerNameBase += fieldIndex;
+  containerNameBase += "bt";
+
+  auto_ptr <I_DataContainer> apIndexContainer (new FileContainer (containerNameBase.c_str (),
+                                                                  DBSGetMaxFileSize(),
+                                                                  0));
+
+  auto_ptr <FieldIndexNodeManager> apFieldMgr (new FieldIndexNodeManager (apIndexContainer,
+                                                                          1 << ( nodeSize + 1),
+                                                                          0x400000, //4MB
+                                                                          _SC (DBS_FIELD_TYPE,
+                                                                               field.m_TypeDesc),
+                                                                          true));
+
+  BTreeNodeHandler rootNode (apFieldMgr->RetrieveNode (apFieldMgr->AllocateNode (NIL_NODE, 0)));
+  rootNode->SetNext (NIL_NODE);
+  rootNode->SetPrev (NIL_NODE);
+  rootNode->SetKeysCount (0);
+  rootNode->SetLeaf (true);
+  rootNode->InsertKey (rootNode->GetSentinelKey ());
+
+  apFieldMgr->SetRootNodeId (rootNode->GetNodeId());
+  BTree fieldTree (* apFieldMgr.get ());
+
+  for (D_UINT64 rowIndex = 0; rowIndex < m_RowsCount; ++rowIndex)
+    {
+      switch (field.m_TypeDesc)
+      {
+      case T_BOOL:
+        insert_row_field<DBSBool> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_CHAR:
+        insert_row_field<DBSChar> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_DATE:
+        insert_row_field<DBSDate> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_DATETIME:
+        insert_row_field<DBSDateTime> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_HIRESTIME:
+        insert_row_field<DBSHiresTime> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_UINT8:
+        insert_row_field<DBSUInt8> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_UINT16:
+        insert_row_field<DBSUInt16> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_UINT32:
+        insert_row_field<DBSUInt32> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_UINT64:
+        insert_row_field<DBSUInt64> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_INT8:
+        insert_row_field<DBSInt8> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_INT16:
+        insert_row_field<DBSInt16> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_INT32:
+        insert_row_field<DBSInt32> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_INT64:
+        insert_row_field<DBSInt64> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      default:
+        assert (false);
+      }
+
+      if (cb_func != NULL)
+        {
+          if (pCbData != NULL)
+            {
+              pCbData->m_RowsCount = m_RowsCount;
+              pCbData->m_RowIndex  = rowIndex;
+            }
+          cb_func (pCbData);
+        }
+    }
+
+  field.m_IndexNodeSize = nodeSize;
+  SyncToFile ();
+
+  assert (m_vIndexNodeMgrs[fieldIndex] == NULL);
+  m_vIndexNodeMgrs[fieldIndex] = apFieldMgr.release ();
+
+}
+
+void
+PSTable::RemoveFieldIndex (const D_UINT fieldIndex)
+{
+  if (PSTable::IsFieldIndexed(fieldIndex) == false)
+    throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_INDEXED));
+
+  PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+
+  assert (field.m_IndexNodeSize > 0);
+
+  field.m_IndexNodeSize = 0;
+  SyncToFile ();
+
+  auto_ptr <FieldIndexNodeManager> apFieldMgr (m_vIndexNodeMgrs [fieldIndex]);
+  m_vIndexNodeMgrs[fieldIndex] = NULL;
+
+  apFieldMgr->MarkForRemoval ();
+}
+
+bool
+PSTable::IsFieldIndexed (const D_UINT fieldIndex) const
+{
+  if (fieldIndex >= m_FieldsCount)
+    throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+
+  assert (m_vIndexNodeMgrs.size () == m_FieldsCount);
+
+  return (m_vIndexNodeMgrs[fieldIndex] == NULL);
+}
 
 D_UINT
 PSTable::GetRowSize() const
@@ -889,6 +1051,12 @@ PSTable::GetFieldDescriptorInternal(const D_CHAR * const pFieldName) const
   throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
 }
 
+D_UINT
+PSTable::GetRawNodeSize () const
+{
+  return PSTableRmNode::RAW_NODE_SIZE;
+}
+
 NODE_INDEX
 PSTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
 {
@@ -899,12 +1067,13 @@ PSTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
       BTreeNodeHandler freeNode (RetrieveNode (nodeIndex));
 
       m_FirstUnallocatedRoot = freeNode->GetNext ();
+      SyncToFile ();
     }
   else
     {
-      assert (m_MainTableFile.GetSize () % PSTableRmNode::RAW_NODE_SIZE == 0);
+      assert (m_MainTableFile.GetSize () % GetRawNodeSize () == 0);
 
-      nodeIndex = m_MainTableFile.GetSize () / PSTableRmNode::RAW_NODE_SIZE;
+      nodeIndex = m_MainTableFile.GetSize () / GetRawNodeSize ();
     }
 
   if (parent != NIL_NODE)
@@ -931,7 +1100,7 @@ PSTable::FreeNode (const NODE_INDEX nodeId)
 }
 
 NODE_INDEX
-PSTable::GetRootNodeId ()
+PSTable::GetRootNodeId () const
 {
   return m_RootNode;
 }
@@ -950,40 +1119,38 @@ PSTable::GetMaxCachedNodes ()
   return 128;
 }
 
-
 I_BTreeNode*
 PSTable::GetNode (const NODE_INDEX node)
 {
-  PSTableRmNode *pNode = new PSTableRmNode (*this, node);
+  std::auto_ptr <PSTableRmNode> apNode (new PSTableRmNode (*this, node));
 
-  assert (m_MainTableFile.GetSize() % pNode->RAW_NODE_SIZE == 0);
+  assert (m_MainTableFile.GetSize() % GetRawNodeSize () == 0);
 
-  if (m_MainTableFile.GetSize() > node * pNode->RAW_NODE_SIZE)
+  if (m_MainTableFile.GetSize() > node * GetRawNodeSize ())
     {
-      m_MainTableFile.Seek (pNode->GetNodeId() * pNode->RAW_NODE_SIZE, WHC_SEEK_BEGIN);
-      m_MainTableFile.Read (pNode->m_cpNodeData, pNode->RAW_NODE_SIZE);
+      m_MainTableFile.Seek (apNode->GetNodeId() * GetRawNodeSize (), WHC_SEEK_BEGIN);
+      m_MainTableFile.Read (apNode->GetRawData (), GetRawNodeSize ());
     }
   else
     {
       //Reserve space for this node
-      assert (m_MainTableFile.GetSize() == (node * pNode->RAW_NODE_SIZE));
+      assert (m_MainTableFile.GetSize() == (node * GetRawNodeSize ()));
       m_MainTableFile.Seek (0, WHC_SEEK_END);
-      m_MainTableFile.Write (pNode->m_cpNodeData, pNode->RAW_NODE_SIZE);
+      m_MainTableFile.Write (apNode->GetRawData (), GetRawNodeSize ());
     }
 
-  return pNode;
+  return apNode.release ();
 }
 
 
 void
-PSTable::StoreNode (I_BTreeNode *const node)
+PSTable::StoreNode (I_BTreeNode *const pNode)
 {
-  if (node->IsDirty() == false)
+  if (pNode->IsDirty() == false)
     return ;
 
-  PSTableRmNode *pNode = _SC (PSTableRmNode*, node);
-  m_MainTableFile.Seek (pNode->GetNodeId() * pNode->RAW_NODE_SIZE, WHC_SEEK_BEGIN);
-  m_MainTableFile.Write (pNode->m_cpNodeData, pNode->RAW_NODE_SIZE);
+  m_MainTableFile.Seek (pNode->GetNodeId() * GetRawNodeSize (), WHC_SEEK_BEGIN);
+  m_MainTableFile.Write (pNode->GetRawData(), GetRawNodeSize ());
 
   return;
 }
@@ -1007,6 +1174,39 @@ PSTable::RetrieveItems (D_UINT8 *pDestBuffer,
   m_apFixedFields.get()->RetrieveData( firstItem * m_RowSize, itemsCount * m_RowSize, pDestBuffer);
 }
 
+
+void
+PSTable::InitIndexedFields ()
+{
+  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+    {
+      PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+
+      if (field.m_IndexNodeSize == 0)
+        {
+          m_vIndexNodeMgrs.push_back (NULL);
+          continue;
+        }
+
+      const D_UINT nodeSize    = 1 << (field.m_IndexNodeSize + 8);
+      string containerNameBase = m_BaseFileName;
+
+      containerNameBase += "_idf";
+      containerNameBase += fieldIndex;
+      containerNameBase += "bt";
+
+      auto_ptr <I_DataContainer> apIndexContainer (new FileContainer (containerNameBase.c_str (),
+                                                                      DBSGetMaxFileSize(),
+                                                                      0));
+
+      m_vIndexNodeMgrs.push_back (new FieldIndexNodeManager (apIndexContainer,
+                                                             nodeSize,
+                                                             0x400000, //4MB
+                                                             _SC (DBS_FIELD_TYPE, field.m_TypeDesc),
+                                                             false));
+    }
+}
+
 void
 PSTable::InitVariableStorages ()
 {
@@ -1021,9 +1221,9 @@ PSTable::InitVariableStorages ()
     {
         DBSFieldDescriptor fieldDesc = GetFieldDescriptor (fieldIndex);
 
-        assert ((fieldDesc.mFieldType > T_UNKNOWN) && (fieldDesc.mFieldType < T_UNDETERMINED));
+        assert ((fieldDesc.m_FieldType > T_UNKNOWN) && (fieldDesc.m_FieldType < T_UNDETERMINED));
 
-        if (fieldDesc.isArray || (fieldDesc.mFieldType == T_TEXT))
+        if (fieldDesc.isArray || (fieldDesc.m_FieldType == T_TEXT))
           {
             m_apVariableFields.reset (new VaribaleLenghtStore ());
             m_apVariableFields->Init ((m_BaseFileName + PS_TABLE_VARFIELDS_EXT).c_str(),
@@ -1119,7 +1319,7 @@ PSTable::CheckRowToDelete (const D_UINT64 rowIndex)
 {
   bool isRowDeleted = true;
 
-  StoredItem cachedItem = m_RowCache.RetriveItem (rowIndex);
+  StoredItem cachedItem   = m_RowCache.RetriveItem (rowIndex);
   D_UINT8 *const pRawData = cachedItem.GetDataForUpdate();
 
   for (D_UINT64 index = 0; index < m_FieldsCount; index += 8)
@@ -1127,7 +1327,7 @@ PSTable::CheckRowToDelete (const D_UINT64 rowIndex)
       PSFieldDescriptor fieldDesc = GetFieldDescriptorInternal (index);
       const D_UINT8     bitsSet   = ~0;
 
-      if ( pRawData [fieldDesc.mNullBitIndex / 8] != bitsSet)
+      if ( pRawData [fieldDesc.m_NullBitIndex / 8] != bitsSet)
         {
           isRowDeleted = false;
           break;
@@ -1158,7 +1358,7 @@ PSTable::CheckRowToReuse (const D_UINT64 rowIndex)
       PSFieldDescriptor fieldDesc = GetFieldDescriptorInternal (index);
       const D_UINT8     bitsSet   = ~0;
 
-      if ( pRawData [fieldDesc.mNullBitIndex / 8] != bitsSet)
+      if ( pRawData [fieldDesc.m_NullBitIndex / 8] != bitsSet)
         {
           wasRowDeleted = false;
           break;
@@ -1275,16 +1475,16 @@ PSTable::SetEntry (const DBSText &rSource, const D_UINT64 rowIndex, const D_UINT
   StoredItem cachedItem   = m_RowCache.RetriveItem (rowIndex);
   D_UINT8 *const pRawData = cachedItem.GetDataForUpdate();
 
-  D_UINT64 *const fieldFirstEntry = _RC (D_UINT64*, pRawData + field.mStoreIndex + 0);
+  D_UINT64 *const fieldFirstEntry = _RC (D_UINT64*, pRawData + field.m_StoreIndex + 0);
   D_UINT64 *const fieldValueSize  = _RC (D_UINT64*,
-                                         pRawData + field.mStoreIndex + sizeof (D_UINT64));
+                                         pRawData + field.m_StoreIndex + sizeof (D_UINT64));
   D_UINT64 newFirstEntry     = 0;
   D_UINT64 newFieldValueSize = 0;
 
-  assert (field.mNullBitIndex > 0);
+  assert (field.m_NullBitIndex > 0);
 
-  const D_UINT  byte_off = field.mNullBitIndex / 8;
-  const D_UINT8 bit_off  = field.mNullBitIndex % 8;
+  const D_UINT  byte_off = field.m_NullBitIndex / 8;
+  const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
   if ((pRawData [byte_off] & (1 << bit_off)) != 0)
     fieldValueWasNull = true;
@@ -1345,16 +1545,16 @@ PSTable::SetEntry (const DBSArray &rSource, const D_UINT64 rowIndex, const D_UIN
   StoredItem cachedItem   = m_RowCache.RetriveItem (rowIndex);
   D_UINT8 *const pRawData = cachedItem.GetDataForUpdate();
 
-  D_UINT64 *const fieldFirstEntry = _RC (D_UINT64*, pRawData + field.mStoreIndex + 0);
+  D_UINT64 *const fieldFirstEntry = _RC (D_UINT64*, pRawData + field.m_StoreIndex + 0);
   D_UINT64 *const fieldValueSize  = _RC (D_UINT64*,
-                                         pRawData + field.mStoreIndex + sizeof (D_UINT64));
+                                         pRawData + field.m_StoreIndex + sizeof (D_UINT64));
   D_UINT64 newFirstEntry     = 0;
   D_UINT64 newFieldValueSize = 0;
 
-  assert (field.mNullBitIndex > 0);
+  assert (field.m_NullBitIndex > 0);
 
-  const D_UINT  byte_off = field.mNullBitIndex / 8;
-  const D_UINT8 bit_off  = field.mNullBitIndex % 8;
+  const D_UINT  byte_off = field.m_NullBitIndex / 8;
+  const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
   if ((pRawData [byte_off] & (1 << bit_off)) != 0)
     fieldValueWasNull = true;
@@ -1502,6 +1702,377 @@ PSTable::GetEntry (DBSUInt64 &rDestination, const D_UINT64 rowIndex, const D_UIN
 }
 
 
+DBSArray
+PSTable::GetMatchingRows (const DBSBool&  min,
+                          const DBSBool&  max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSChar&  min,
+                          const DBSChar&  max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSDate&  min,
+                          const DBSDate&  max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSDateTime&  min,
+                          const DBSDateTime&  max,
+                          const D_UINT64      fromRow,
+                          const D_UINT64      toRow,
+                          const D_UINT64      ignoreFirst,
+                          const D_UINT64      maxCount,
+                          const D_UINT        fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSHiresTime& min,
+                          const DBSHiresTime& max,
+                          const D_UINT64      fromRow,
+                          const D_UINT64      toRow,
+                          const D_UINT64      ignoreFirst,
+                          const D_UINT64      maxCount,
+                          const D_UINT        fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSUInt8& min,
+                          const DBSUInt8& max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSUInt16& min,
+                          const DBSUInt16& max,
+                          const D_UINT64   fromRow,
+                          const D_UINT64   toRow,
+                          const D_UINT64   ignoreFirst,
+                          const D_UINT64   maxCount,
+                          const D_UINT     fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSUInt32& min,
+                          const DBSUInt32& max,
+                          const D_UINT64   fromRow,
+                          const D_UINT64   toRow,
+                          const D_UINT64   ignoreFirst,
+                          const D_UINT64   maxCount,
+                          const D_UINT     fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSUInt64& min,
+                          const DBSUInt64& max,
+                          const D_UINT64   fromRow,
+                          const D_UINT64   toRow,
+                          const D_UINT64   ignoreFirst,
+                          const D_UINT64   maxCount,
+                          const D_UINT     fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSInt8& min,
+                          const DBSInt8& max,
+                          const D_UINT64 fromRow,
+                          const D_UINT64 toRow,
+                          const D_UINT64 ignoreFirst,
+                          const D_UINT64 maxCount,
+                          const D_UINT   fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSInt16& min,
+                          const DBSInt16& max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSInt32& min,
+                          const DBSInt32& max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSInt64& min,
+                          const DBSInt64& max,
+                          const D_UINT64  fromRow,
+                          const D_UINT64  toRow,
+                          const D_UINT64  ignoreFirst,
+                          const D_UINT64  maxCount,
+                          const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+
+
+template <class T> void
+PSTable::StoreEntry (const T &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+{
+
+  //Check if we are trying to write a different value
+  T currentValue (true);
+  RetrieveEntry (currentValue, rowIndex, fieldIndex);
+
+  if (currentValue == rSource)
+    return; //Nothing to change
+
+  const PSFieldDescriptor field   = GetFieldDescriptorInternal (fieldIndex);
+  const D_UINT8           bitsSet = ~0;
+
+  StoredItem     cachedItem = m_RowCache.RetriveItem (rowIndex);
+  D_UINT8 *const pRawData   = cachedItem.GetDataForUpdate();
+
+  assert (field.m_NullBitIndex > 0);
+
+  const D_UINT  byte_off = field.m_NullBitIndex / 8;
+  const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
+
+  if (rSource.IsNull ())
+    {
+      assert ((pRawData [byte_off] & (1 << bit_off)) == 0);
+
+      pRawData [byte_off] |= (1 << bit_off);
+
+      if (pRawData [byte_off] == bitsSet)
+        CheckRowToDelete (rowIndex);
+    }
+  else
+    {
+      if (pRawData [byte_off] == bitsSet)
+        CheckRowToReuse (rowIndex);
+
+      pRawData [byte_off] &= ~(1 << bit_off);
+
+      PSValInterp::Store (rSource, pRawData + field.m_StoreIndex);
+    }
+
+  //Update the field index if it exists
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    {
+      BTree      fieldIndexTree (*m_vIndexNodeMgrs[fieldIndex]);
+      NODE_INDEX dummyNode;
+      KEY_INDEX  dummyKey;
+
+      fieldIndexTree.RemoveKey (T_BTreeKey<T> (currentValue, rowIndex));
+      fieldIndexTree.InsertKey (T_BTreeKey<T> (rSource, rowIndex), dummyNode, dummyKey);
+    }
+}
+
+template <class T> DBSArray
+PSTable::MatchRowsWithIndex (FieldIndexNodeManager* const pNodeMgr,
+                             const T&                     min,
+                             const T&                     max,
+                             const D_UINT64               fromRow,
+                             D_UINT64                     toRow,
+                             D_UINT64                     ignoreFirst,
+                             D_UINT64                     maxCount)
+{
+  toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
+
+  DBSArray            result (_SC (DBSUInt64*, NULL));
+  BTree               fieldIndexTree (*pNodeMgr);
+  NODE_INDEX          node;
+  KEY_INDEX           key;
+  const T_BTreeKey<T> firstKey (min, fromRow);
+  const T_BTreeKey<T> lastKey (max, MIN (toRow, m_RowsCount));
+
+  if ( (fieldIndexTree.FindBiggerOrEqual (firstKey, node, key) == false) ||
+       (maxCount == 0))
+    return result;
+
+  BTreeNodeHandler currentNode (pNodeMgr->RetrieveNode (node));
+
+  while (ignoreFirst > 0)
+    {
+      if (ignoreFirst <= key)
+        {
+          key         -= ignoreFirst;
+          ignoreFirst = 0;
+        }
+      else
+        {
+          NODE_INDEX nextNode = currentNode->GetNext ();
+
+          if (nextNode == NIL_NODE)
+            return result;
+
+          currentNode = pNodeMgr->RetrieveNode (node);
+          assert (currentNode->GetKeysCount() > 0);
+
+          ignoreFirst -= (key + 1);
+          key          = currentNode->GetKeysCount () - 1;
+        }
+    }
+
+
+  assert (key < currentNode->GetKeysCount ());
+
+  while (true)
+    {
+      I_BTreeFieldIndexNode* pNode    = _SC (I_BTreeFieldIndexNode*, &*currentNode);
+      KEY_INDEX              toKey    = ~0;;
+      bool                   lastNode = false;
+
+      if (pNode->FindBiggerOrEqual (lastKey, toKey) == false)
+        toKey = 0;
+      else
+        lastNode = true;
+
+      assert (key >= toKey);
+
+      if (maxCount <= (key - toKey + 1))
+        {
+          toKey += maxCount;
+          maxCount = 0;
+        }
+      else
+        maxCount -= (key - toKey + 1);
+
+      pNode->GetKeysRows (result, key, toKey);
+
+      if (lastNode || (pNode->GetNext() == NIL_NODE) || (maxCount == 0))
+        break;
+      else
+        {
+          currentNode = pNodeMgr->RetrieveNode (pNode->GetNext ());
+
+          assert (currentNode->GetKeysCount() > 0);
+          key = currentNode->GetKeysCount () - 1;
+        }
+    }
+
+  return result;
+}
+
+
+template <class T> DBSArray
+PSTable::MatchRows (const T&       min,
+                    const T&       max,
+                    const D_UINT64 fromRow,
+                    D_UINT64       toRow,
+                    D_UINT64       ignoreFirst,
+                    D_UINT64       maxCount,
+                    const D_UINT   fieldIndex)
+{
+  toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
+
+  DBSArray            result (_SC (DBSUInt64*, NULL));
+  T                   rowValue (true);
+
+  for (D_UINT64 rowIndex = fromRow; (rowIndex <= toRow) && (maxCount > 0); ++rowIndex)
+    {
+      GetEntry (rowValue, fieldIndex, rowIndex);
+
+      if ( (rowValue < min) || (max < rowValue))
+        continue;
+
+      if (ignoreFirst > 0)
+        {
+          --ignoreFirst;
+          continue;
+        }
+
+      --maxCount;
+
+      result.AddElement (DBSUInt64 (rowIndex));
+    }
+
+  return result;
+}
 
 //From this point this functions shall not allocated memory
 //Other way will not be traceable.
@@ -1514,19 +2085,19 @@ PSTable::GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT 
 {
   const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
 
-  if ((field.mTypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((field.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
+  if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
+      ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
   StoredItem cachedItem = m_RowCache.RetriveItem (rowIndex);
   const D_UINT8 *const pRawData = cachedItem.GetDataForRead();
 
-  const D_UINT64& fieldFirstEntry = *_RC (const D_UINT64*, pRawData + field.mStoreIndex + 0);
+  const D_UINT64& fieldFirstEntry = *_RC (const D_UINT64*, pRawData + field.m_StoreIndex + 0);
   const D_UINT64& fieldValueSize  = *_RC (const D_UINT64*,
-                                          pRawData + field.mStoreIndex + sizeof (D_UINT64));
+                                          pRawData + field.m_StoreIndex + sizeof (D_UINT64));
 
-  const D_UINT  byte_off = field.mNullBitIndex / 8;
-  const D_UINT8 bit_off  = field.mNullBitIndex % 8;
+  const D_UINT  byte_off = field.m_NullBitIndex / 8;
+  const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
   if (pRawData[byte_off] & (1 << bit_off))
     {
@@ -1547,24 +2118,24 @@ PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT
 
   const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
 
-  if ( ((field.mTypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
-      ((field.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, rDestination.GetElementsType())))
+  if ( ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
+      ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, rDestination.GetElementsType())))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
   StoredItem cachedItem = m_RowCache.RetriveItem (rowIndex);
   const D_UINT8 *const pRawData = cachedItem.GetDataForRead();
 
   const D_UINT64& fieldFirstEntry = *_RC (const D_UINT64*,
-                                          pRawData + field.mStoreIndex + 0);
+                                          pRawData + field.m_StoreIndex + 0);
 
-  const D_UINT  byte_off = field.mNullBitIndex / 8;
-  const D_UINT8 bit_off  = field.mNullBitIndex % 8;
+  const D_UINT  byte_off = field.m_NullBitIndex / 8;
+  const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
   if (pRawData[byte_off] & (1 << bit_off))
     {
       rDestination.~DBSArray ();
 
-      switch (field.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK)
+      switch (field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK)
       {
       case T_BOOL:
         new (&rDestination) DBSArray(_SC(DBSBool *, NULL));
@@ -1620,43 +2191,7 @@ PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT
       new (&rDestination) DBSArray(*
             (new RowFieldArray (*m_apVariableFields.get(),
                                 fieldFirstEntry,
-                                _SC(DBS_FIELD_TYPE, field.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK))));
-    }
-}
-
-template <class T> void
-PSTable::StoreEntry (const T &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
-{
-  const PSFieldDescriptor field   = GetFieldDescriptorInternal (fieldIndex);
-  const D_UINT8           bitsSet = ~0;
-
-  if ((field.mTypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((field.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, rSource))))
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
-
-  StoredItem     cachedItem = m_RowCache.RetriveItem (rowIndex);
-  D_UINT8 *const pRawData   = cachedItem.GetDataForUpdate();
-
-  assert (field.mNullBitIndex > 0);
-
-  const D_UINT  byte_off = field.mNullBitIndex / 8;
-  const D_UINT8 bit_off  = field.mNullBitIndex % 8;
-
-  if (rSource.IsNull ())
-    {
-      pRawData [byte_off] |= (1 << bit_off);
-
-      if (pRawData [byte_off] == bitsSet)
-        CheckRowToDelete (rowIndex);
-    }
-  else
-    {
-      if (pRawData [byte_off] == bitsSet)
-        CheckRowToReuse (rowIndex);
-
-      pRawData [byte_off] &= ~(1 << bit_off);
-
-      PSValInterp::Store (rSource, pRawData + field.mStoreIndex);
+                                _SC(DBS_FIELD_TYPE, field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK))));
     }
 }
 
@@ -1666,15 +2201,15 @@ PSTable::RetrieveEntry (T &rDestination, const D_UINT64 rowIndex, const D_UINT f
   T *const pDestination = &rDestination;
   const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
 
-  if ((field.mTypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((field.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, rDestination))))
+  if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
+      ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, rDestination))))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
   StoredItem           cachedItem = m_RowCache.RetriveItem (rowIndex);
   const D_UINT8 *const pRawData   = cachedItem.GetDataForRead();
 
-  const D_UINT  byte_off = field.mNullBitIndex / 8;
-  const D_UINT8 bit_off  = field.mNullBitIndex % 8;
+  const D_UINT  byte_off = field.m_NullBitIndex / 8;
+  const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
   if (pRawData[byte_off] & (1 << bit_off))
     {
@@ -1683,6 +2218,6 @@ PSTable::RetrieveEntry (T &rDestination, const D_UINT64 rowIndex, const D_UINT f
     }
   else
     {
-      PSValInterp::Retrieve (pDestination, pRawData + field.mStoreIndex);
+      PSValInterp::Retrieve (pDestination, pRawData + field.m_StoreIndex);
     }
 }

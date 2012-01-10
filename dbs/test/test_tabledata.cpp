@@ -213,7 +213,7 @@ add_fixed_values_vector_to_table (I_DBSTable &table, std::vector<T> &vectValues)
   while (fieldIndex < table.GetFieldsCount())
     {
       DBSFieldDescriptor desc = table.GetFieldDescriptor (fieldIndex);
-      if ((desc.mFieldType == vectValues[0]) && (desc.isArray == false))
+      if ((desc.m_FieldType == vectValues[0]) && (desc.isArray == false))
         break;
 
       ++fieldIndex;
@@ -228,7 +228,7 @@ add_fixed_values_vector_to_table (I_DBSTable &table, std::vector<T> &vectValues)
       if (table.GetAllocatedRows() <= index)
         table.AddRow();
 
-      table.SetEntry(vectValues[index], index, fieldIndex);
+      table.SetEntry (vectValues[index], index, fieldIndex);
     }
 
   return fieldIndex;
@@ -274,7 +274,7 @@ test_fixed_value_field (I_DBSHandler &rDbs, std::vector<T> &valuesVect)
 {
 
   D_UINT fieldIndex = ~0;
-  D_BOOL result = true;
+  bool   result = true;
 
   {
     I_DBSTable &table = rDbs.RetrievePersistentTable(tb_name);
@@ -308,7 +308,7 @@ bool
 test_fixed_values_table (I_DBSHandler &rDbs)
 {
   std::cout << "Testing fixed values ... ";
-  D_UINT result = true;
+  bool result = true;
 
   INIT_VECTORS;
 
@@ -390,7 +390,7 @@ add_vectors_values_to_table (I_DBSTable &table, std::vector<T> &testVect)
   for (; fieldIndex < table.GetFieldsCount(); ++fieldIndex)
     {
       struct DBSFieldDescriptor fieldDesc = table.GetFieldDescriptor (fieldIndex);
-      if (fieldDesc.isArray && (fieldDesc.mFieldType == testVect[0]))
+      if (fieldDesc.isArray && (fieldDesc.m_FieldType == testVect[0]))
         break;
     }
 
@@ -440,7 +440,7 @@ test_variable_field_array (I_DBSHandler &rDbs, std::vector<T> &testVect)
 {
 
   D_UINT fieldIndex = ~0;
-  D_BOOL result = true;
+  bool   result = true;
 
   {
     I_DBSTable &table = rDbs.RetrievePersistentTable(tb_name);
@@ -481,7 +481,7 @@ test_text_value_table (I_DBSHandler &rDbs, std::vector<DBSText> &vectText)
     for (; fieldIndex < table.GetFieldsCount (); ++ fieldIndex)
       {
         const DBSFieldDescriptor fieldDesc = table.GetFieldDescriptor(fieldIndex);
-        if (fieldDesc.mFieldType == T_TEXT)
+        if (fieldDesc.m_FieldType == T_TEXT)
           {
             assert (fieldDesc.isArray == false);
             break;
@@ -543,7 +543,7 @@ bool
 test_variable_values_table (I_DBSHandler &rDbs)
 {
   std::cout << "Testing variable values ... ";
-  D_UINT result = true;
+  bool result = true;
 
   INIT_VECTORS;
 
@@ -579,7 +579,7 @@ bool
 test_full_value_table (I_DBSHandler &rDbs)
 {
   std::cout << "Testing all values ... ";
-  D_UINT result = true;
+  bool result = true;
 
   INIT_VECTORS;
 
