@@ -38,7 +38,7 @@ struct CallBackIndexData
   D_UINT64      m_RowsCount;
 };
 
-typedef bool CREATE_INDEX_CALLBACK_FUNC (CallBackIndexData *cb_data);
+typedef void CREATE_INDEX_CALLBACK_FUNC (CallBackIndexData *cb_data);
 
 class I_DBSTable
 {

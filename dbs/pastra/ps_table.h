@@ -48,8 +48,9 @@ struct PSFieldDescriptor
   D_UINT32 m_NullBitIndex;
   D_UINT32 m_StoreIndex;
   D_UINT32 m_NameOffset;
-  D_UINT32 m_TypeDesc      :  16;
-  D_UINT32 m_IndexNodeSize :  8;
+  D_UINT32 m_TypeDesc        : 16;
+  D_UINT32 m_IndexNodeSize   : 8;
+  D_UINT32 m_IndexUnitsCount : 8;
 };
 
 class I_PSTable : public I_DBSTable
@@ -58,8 +59,8 @@ public:
   virtual ~I_PSTable() {};
   virtual D_UINT GetRowSize () const = 0;
 
-  virtual PSFieldDescriptor GetFieldDescriptorInternal (D_UINT fieldIndex) const = 0;
-  virtual PSFieldDescriptor GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const = 0;
+  virtual PSFieldDescriptor& GetFieldDescriptorInternal (D_UINT fieldIndex) const = 0;
+  virtual PSFieldDescriptor& GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const = 0;
 };
 
 class PSTable:public I_PSTable, public I_BlocksManager, public I_BTreeNodeManager
@@ -236,9 +237,9 @@ public:
                                     const D_UINT     fieldIndex);
 
   //Implementations for I_PSTable
-  virtual D_UINT            GetRowSize () const;
-  virtual PSFieldDescriptor GetFieldDescriptorInternal (D_UINT fieldIndex) const;
-  virtual PSFieldDescriptor GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const;
+  virtual D_UINT             GetRowSize () const;
+  virtual PSFieldDescriptor& GetFieldDescriptorInternal (D_UINT fieldIndex) const;
+  virtual PSFieldDescriptor& GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const;
 
 private:
   template <class T> void     StoreEntry (const T &, const D_UINT64, const D_UINT);
@@ -293,7 +294,7 @@ protected:
   D_UINT32                              m_DescriptorsSize;
   D_UINT16                              m_FieldsCount;
   std::string                           m_BaseFileName;
-  std::auto_ptr <const D_UINT8>         m_FieldsDescriptors;
+  std::auto_ptr <D_UINT8>               m_FieldsDescriptors;
   WFile                                 m_MainTableFile;
   std::auto_ptr <FileContainer>         m_apFixedFields;
   std::auto_ptr <VaribaleLenghtStore>   m_apVariableFields;

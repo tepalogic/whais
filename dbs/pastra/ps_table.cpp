@@ -232,9 +232,10 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
       strcpy(_RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
 	     _RC (const D_CHAR *, temp.m_pFieldName));
 
-      pFieldDesc[fieldIndex].m_IndexNodeSize = 0;
-      pFieldDesc[fieldIndex].m_StoreIndex    = uOutRowSize;
-      pFieldDesc[fieldIndex].m_TypeDesc      = temp.m_FieldType;
+      pFieldDesc[fieldIndex].m_IndexNodeSize   = 0;
+      pFieldDesc[fieldIndex].m_IndexUnitsCount = 0;
+      pFieldDesc[fieldIndex].m_StoreIndex      = uOutRowSize;
+      pFieldDesc[fieldIndex].m_TypeDesc        = temp.m_FieldType;
 
       if (temp.isArray)
 	pFieldDesc[fieldIndex].m_TypeDesc |= PS_TABLE_ARRAY_MASK;
@@ -575,7 +576,7 @@ PSTableRmNode::Join (bool toRight)
     {
       assert (GetPrev () != NIL_NODE);
 
-      BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetNext ()));
+      BTreeNodeHandler     prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
       PSTableRmNode *const pPrevNode = _SC (PSTableRmNode*, &(*prevNode));
       D_UINT64 *const      pSrcRows  = _RC (D_UINT64 *, pPrevNode->GetRawData () + sizeof (NodeHeader));
 
@@ -709,6 +710,19 @@ PSTable::~PSTable()
 
   FlushNodes ();
 
+  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+    if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+      {
+        PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
+
+        D_UINT unitsCount = DBSGetMaxFileSize() - 1;
+
+        unitsCount += m_vIndexNodeMgrs[fieldIndex]->GetIndexRawSize();
+        unitsCount /= DBSGetMaxFileSize ();
+
+        field.m_IndexUnitsCount = unitsCount;
+        delete m_vIndexNodeMgrs [fieldIndex];
+      }
   SyncToFile ();
 }
 
@@ -739,8 +753,7 @@ DBSFieldDescriptor
 PSTable::GetFieldDescriptor(const D_CHAR * const pFieldName)
 {
 
-  const PSFieldDescriptor * const pDesc = _RC(const PSFieldDescriptor*,
-					      m_FieldsDescriptors.get ());
+  const PSFieldDescriptor * const pDesc = _RC(const PSFieldDescriptor*, m_FieldsDescriptors.get ());
   D_UINT iterator = m_FieldsCount * sizeof(PSFieldDescriptor);
 
   for (D_UINT index = 0; index < m_FieldsCount; ++index)
@@ -840,9 +853,9 @@ PSTable::MarkRowForReuse(D_UINT64 rowIndex)
 
     while (fieldsCount-- > 0)
       {
-        PSFieldDescriptor field = GetFieldDescriptorInternal (fieldsCount);
-        D_UINT byte_off = field.m_NullBitIndex / 8;
-        D_UINT8 bit_off = field.m_NullBitIndex % 8;
+        const PSFieldDescriptor& field    = GetFieldDescriptorInternal (fieldsCount);
+        D_UINT                   byte_off = field.m_NullBitIndex / 8;
+        D_UINT8                  bit_off  = field.m_NullBitIndex % 8;
 
         pRawData[byte_off] |= (1 << bit_off);
       }
@@ -883,7 +896,7 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
   if ((cb_func == NULL) && (pCbData != NULL))
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
 
-  PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+  PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ((field.m_TypeDesc == T_TEXT) ||
       (field.m_TypeDesc == T_RICHREAL) ||
@@ -891,7 +904,7 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
       (field.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
 
-  const D_UINT nodeSize    = 13; //16KB
+  const D_UINT nodeSize    = 6; //16KB
   string containerNameBase = m_BaseFileName;
 
   containerNameBase += "_idf";
@@ -903,7 +916,7 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
                                                                   0));
 
   auto_ptr <FieldIndexNodeManager> apFieldMgr (new FieldIndexNodeManager (apIndexContainer,
-                                                                          1 << ( nodeSize + 1),
+                                                                          1 << ( nodeSize + 8),
                                                                           0x400000, //4MB
                                                                           _SC (DBS_FIELD_TYPE,
                                                                                field.m_TypeDesc),
@@ -977,7 +990,8 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
         }
     }
 
-  field.m_IndexNodeSize = nodeSize;
+  field.m_IndexNodeSize   = nodeSize;
+  field.m_IndexUnitsCount = 1;
   SyncToFile ();
 
   assert (m_vIndexNodeMgrs[fieldIndex] == NULL);
@@ -991,11 +1005,12 @@ PSTable::RemoveFieldIndex (const D_UINT fieldIndex)
   if (PSTable::IsFieldIndexed(fieldIndex) == false)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_INDEXED));
 
-  PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+  PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   assert (field.m_IndexNodeSize > 0);
 
-  field.m_IndexNodeSize = 0;
+  field.m_IndexNodeSize   = 0;
+  field.m_IndexUnitsCount = 0;
   SyncToFile ();
 
   auto_ptr <FieldIndexNodeManager> apFieldMgr (m_vIndexNodeMgrs [fieldIndex]);
@@ -1012,7 +1027,7 @@ PSTable::IsFieldIndexed (const D_UINT fieldIndex) const
 
   assert (m_vIndexNodeMgrs.size () == m_FieldsCount);
 
-  return (m_vIndexNodeMgrs[fieldIndex] == NULL);
+  return (m_vIndexNodeMgrs[fieldIndex] != NULL);
 }
 
 D_UINT
@@ -1021,10 +1036,10 @@ PSTable::GetRowSize() const
   return m_RowSize;
 }
 
-PSFieldDescriptor
+PSFieldDescriptor&
 PSTable::GetFieldDescriptorInternal(D_UINT fieldIndex) const
 {
-  const PSFieldDescriptor * const pDesc = _RC(const PSFieldDescriptor*, m_FieldsDescriptors.get ());
+  PSFieldDescriptor* const pDesc = _RC(PSFieldDescriptor*, m_FieldsDescriptors.get ());
 
   if (fieldIndex >= m_FieldsCount)
     throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
@@ -1032,13 +1047,12 @@ PSTable::GetFieldDescriptorInternal(D_UINT fieldIndex) const
   return pDesc[fieldIndex];
 }
 
-PSFieldDescriptor
+PSFieldDescriptor&
 PSTable::GetFieldDescriptorInternal(const D_CHAR * const pFieldName) const
 {
 
-  const PSFieldDescriptor * const pDesc = _RC(const PSFieldDescriptor*,
-					      m_FieldsDescriptors.get ());
-  D_UINT iterator = m_FieldsCount * sizeof(PSFieldDescriptor);
+  PSFieldDescriptor* const pDesc    = _RC (PSFieldDescriptor*, m_FieldsDescriptors.get ());
+  D_UINT                   iterator = m_FieldsCount * sizeof(PSFieldDescriptor);
 
   for (D_UINT index = 0; index < m_FieldsCount; ++index)
     {
@@ -1180,10 +1194,11 @@ PSTable::InitIndexedFields ()
 {
   for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     {
-      PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+      PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
       if (field.m_IndexNodeSize == 0)
         {
+          assert (field.m_IndexUnitsCount == 0);
           m_vIndexNodeMgrs.push_back (NULL);
           continue;
         }
@@ -1197,7 +1212,7 @@ PSTable::InitIndexedFields ()
 
       auto_ptr <I_DataContainer> apIndexContainer (new FileContainer (containerNameBase.c_str (),
                                                                       DBSGetMaxFileSize(),
-                                                                      0));
+                                                                      field.m_IndexUnitsCount ));
 
       m_vIndexNodeMgrs.push_back (new FieldIndexNodeManager (apIndexContainer,
                                                              nodeSize,
@@ -1229,7 +1244,7 @@ PSTable::InitVariableStorages ()
             m_apVariableFields->Init ((m_BaseFileName + PS_TABLE_VARFIELDS_EXT).c_str(),
                                       m_VariableStorageSize,
                                       maxFileSize);
-            break; //We finshed here!
+            break; //We finished here!
           }
     }
 }
@@ -1239,7 +1254,7 @@ PSTable::SyncToFile ()
 {
 
   if (m_Removed)
-    return ; //Do nothing! We are removed anyway
+    return ; //We were removed. We were removed.
 
   D_UINT8 aTableHdr[PS_HEADER_SIZE];
 
@@ -1259,7 +1274,7 @@ PSTable::SyncToFile ()
 
   m_MainTableFile.Seek (0, WHC_SEEK_BEGIN);
   m_MainTableFile.Write (aTableHdr, sizeof aTableHdr);
-
+  m_MainTableFile.Write (m_FieldsDescriptors.get (), m_DescriptorsSize);
 }
 
 void
@@ -1273,7 +1288,7 @@ PSTable::InitFromFile()
   if (memcmp(aTableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_lEN) != 0)
     throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
 
-  //Retreive the header information.
+  //Retrieve the header information.
   m_FieldsCount = _RC (D_UINT32 *, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF)[0];
   m_DescriptorsSize = _RC (D_UINT32 *, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)[0];
   m_RowsCount = _RC (D_UINT64 *, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)[0];
@@ -1282,7 +1297,8 @@ PSTable::InitFromFile()
   m_RootNode = _RC (NODE_INDEX *, aTableHdr + PS_TABLE_BT_ROOT_OFF)[0];
   m_FirstUnallocatedRoot = _RC (NODE_INDEX *, aTableHdr + PS_TABLE_BT_HEAD_OFF)[0];
 
-  //TODO: You need to add code to check for a proper shoutdown
+  //TODO: You need to add code to check for a proper shutdown
+  //TODO: You need extra check on removing nodes
 
   if ((m_FieldsCount == 0) || (m_DescriptorsSize < (sizeof(PSFieldDescriptor) * m_FieldsCount)))
     throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
@@ -1308,6 +1324,10 @@ PSTable::RemoveFromDatabase()
   if (m_apVariableFields.get() != NULL)
     m_apVariableFields->MarkForRemoval();
 
+  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex )
+    if (m_vIndexNodeMgrs[fieldIndex]  != NULL)
+      m_vIndexNodeMgrs[fieldIndex]->MarkForRemoval ();
+
   m_MainTableFile.Close();
   whc_fremove(m_BaseFileName.c_str());
 
@@ -1324,8 +1344,8 @@ PSTable::CheckRowToDelete (const D_UINT64 rowIndex)
 
   for (D_UINT64 index = 0; index < m_FieldsCount; index += 8)
     {
-      PSFieldDescriptor fieldDesc = GetFieldDescriptorInternal (index);
-      const D_UINT8     bitsSet   = ~0;
+      const PSFieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
+      const D_UINT8            bitsSet   = ~0;
 
       if ( pRawData [fieldDesc.m_NullBitIndex / 8] != bitsSet)
         {
@@ -1355,8 +1375,8 @@ PSTable::CheckRowToReuse (const D_UINT64 rowIndex)
 
   for (D_UINT64 index = 0; index < m_FieldsCount; index += 8)
     {
-      PSFieldDescriptor fieldDesc = GetFieldDescriptorInternal (index);
-      const D_UINT8     bitsSet   = ~0;
+      const PSFieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
+      const D_UINT8            bitsSet   = ~0;
 
       if ( pRawData [fieldDesc.m_NullBitIndex / 8] != bitsSet)
         {
@@ -1467,9 +1487,9 @@ PSTable::SetEntry (const DBSUInt64 &rSource, const D_UINT64 rowIndex, const D_UI
 void
 PSTable::SetEntry (const DBSText &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
-  const PSFieldDescriptor field             = GetFieldDescriptorInternal (fieldIndex);
-  const D_UINT8           bitsSet           = ~0;
-  bool                    fieldValueWasNull = false;
+  const PSFieldDescriptor& field             = GetFieldDescriptorInternal (fieldIndex);
+  const D_UINT8            bitsSet           = ~0;
+  bool                     fieldValueWasNull = false;
 
 
   StoredItem cachedItem   = m_RowCache.RetriveItem (rowIndex);
@@ -1540,10 +1560,10 @@ PSTable::SetEntry (const DBSArray &rSource, const D_UINT64 rowIndex, const D_UIN
   const D_UINT8 bitsSet           = ~0;
   bool          fieldValueWasNull = false;
 
-  const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+  const PSFieldDescriptor& field  = GetFieldDescriptorInternal (fieldIndex);
 
-  StoredItem cachedItem   = m_RowCache.RetriveItem (rowIndex);
-  D_UINT8 *const pRawData = cachedItem.GetDataForUpdate();
+  StoredItem cachedItem           = m_RowCache.RetriveItem (rowIndex);
+  D_UINT8 *const pRawData         = cachedItem.GetDataForUpdate();
 
   D_UINT64 *const fieldFirstEntry = _RC (D_UINT64*, pRawData + field.m_StoreIndex + 0);
   D_UINT64 *const fieldValueSize  = _RC (D_UINT64*,
@@ -1910,8 +1930,8 @@ PSTable::StoreEntry (const T &rSource, const D_UINT64 rowIndex, const D_UINT fie
   if (currentValue == rSource)
     return; //Nothing to change
 
-  const PSFieldDescriptor field   = GetFieldDescriptorInternal (fieldIndex);
-  const D_UINT8           bitsSet = ~0;
+  const PSFieldDescriptor& field   = GetFieldDescriptorInternal (fieldIndex);
+  const D_UINT8            bitsSet = ~0;
 
   StoredItem     cachedItem = m_RowCache.RetriveItem (rowIndex);
   D_UINT8 *const pRawData   = cachedItem.GetDataForUpdate();
@@ -1990,6 +2010,7 @@ PSTable::MatchRowsWithIndex (FieldIndexNodeManager* const pNodeMgr,
           if (nextNode == NIL_NODE)
             return result;
 
+          node        = nextNode;
           currentNode = pNodeMgr->RetrieveNode (node);
           assert (currentNode->GetKeysCount() > 0);
 
@@ -2010,7 +2031,10 @@ PSTable::MatchRowsWithIndex (FieldIndexNodeManager* const pNodeMgr,
       if (pNode->FindBiggerOrEqual (lastKey, toKey) == false)
         toKey = 0;
       else
-        lastNode = true;
+        {
+          lastNode = true;
+          toKey ++;
+        }
 
       assert (key >= toKey);
 
@@ -2083,7 +2107,7 @@ PSTable::MatchRows (const T&       min,
 void
 PSTable::GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
-  const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+  const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
@@ -2116,7 +2140,7 @@ void
 PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
 
-  const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+  const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ( ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, rDestination.GetElementsType())))
@@ -2198,8 +2222,8 @@ PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT
 template <class T> void
 PSTable::RetrieveEntry (T &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
-  T *const pDestination = &rDestination;
-  const PSFieldDescriptor field = GetFieldDescriptorInternal (fieldIndex);
+  T *const pDestination          = &rDestination;
+  const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, rDestination))))

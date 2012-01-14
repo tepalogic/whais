@@ -44,3 +44,8 @@ l_test_tablermrows_SRC=test/test_tablermrows.cpp
 l_test_tablermrows_LIB=dbs/pastra utils/utils custom/custom
 l_test_tablermrows_INC=utils/include custom/include
 
+UNIT_EXES+=l_test_uint8btindex
+l_test_uint8btindex_SRC=test/test_uint8btindex.cpp
+l_test_uint8btindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_uint8btindex_INC=utils/include custom/include
+

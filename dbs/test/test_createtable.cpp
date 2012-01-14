@@ -221,7 +221,7 @@ test_for_fields (I_DBSHandler &rDbs,
       result && (fieldIndex < fieldsCount);
       ++fieldIndex)
     {
-      PSFieldDescriptor descr = _SC(I_PSTable &, table).GetFieldDescriptorInternal (fieldIndex);
+      PSFieldDescriptor& descr = _SC(I_PSTable &, table).GetFieldDescriptorInternal (fieldIndex);
 
       if (descr.m_NullBitIndex >= _SC(I_PSTable &, table).GetRowSize () * 8)
         {

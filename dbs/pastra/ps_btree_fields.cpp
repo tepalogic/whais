@@ -49,6 +49,7 @@ FieldIndexNodeManager::FieldIndexNodeManager (std::auto_ptr <I_DataContainer> &c
 
 FieldIndexNodeManager::~FieldIndexNodeManager()
 {
+  FlushNodes ();
 }
 
 D_UINT
@@ -62,6 +63,12 @@ void
 FieldIndexNodeManager::MarkForRemoval ()
 {
   m_Container->MarkForRemoval ();
+}
+
+D_UINT64
+FieldIndexNodeManager::GetIndexRawSize () const
+{
+  return m_Container->GetContainerSize ();
 }
 
 NODE_INDEX

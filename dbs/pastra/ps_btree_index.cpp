@@ -164,7 +164,8 @@ I_BTreeNodeManager::Split (NODE_INDEX parentId, const NODE_INDEX nodeId)
 {
   BTreeNodeHandler node (RetrieveNode (nodeId));
 
-  assert (node->NeedsSpliting ());
+  if (node->NeedsSpliting() == false)
+    return;
 
   if (parentId == NIL_NODE )
     {
@@ -191,6 +192,8 @@ I_BTreeNodeManager::Split (NODE_INDEX parentId, const NODE_INDEX nodeId)
 void
 I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
 {
+  NODE_INDEX splitNode = NIL_NODE;
+
   if (parentId == NIL_NODE)
     {
       assert (nodeId == GetRootNodeId ());
@@ -208,14 +211,21 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
 
       if (keyIndex != 0)
         {
-          assert ((parentNode->NeedsJoining() == false) ||
+          splitNode = node->GetNext ();
+          assert (splitNode != NIL_NODE);
+
+          assert ((parentNode->NeedsJoining () == false) ||
                   (parentNode->GetNodeId () == GetRootNodeId()));
+
           parentNode->RemoveKey (keyIndex);
           node->Join (true);
         }
       else
         {
           const NODE_INDEX leftNode = node->GetPrev ();
+          splitNode = leftNode;
+
+          assert (splitNode != NIL_NODE);
           assert (leftNode == parentNode->GetChildNode (keyIndex + 1));
 
           node->Join (false);
@@ -224,6 +234,8 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
           parentNode->RemoveKey (keyIndex + 1);
         }
     }
+
+  Split (parentId, splitNode);
 }
 
 I_BTreeNode*

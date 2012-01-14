@@ -168,7 +168,12 @@ public:
   {
     const T_BTreeNode &node = _SC (const T_BTreeNode&, childNode);
 
-    SetKey (node.GetKey (0), keyIndex);
+    const T_BTreeKey<DBS_T> zeroKey  = node.GetKey (0);
+
+    if (zeroKey.m_ValuePart.IsNull () == true)
+      SetNullKeysCount (GetNullKeysCount () + 1);
+
+    SetKey (zeroKey, keyIndex);
   }
 
   virtual void SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode)
@@ -244,7 +249,7 @@ public:
     if (IsLeaf () == false)
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
 
-    if (keyIndex <= (GetKeysCount () - GetNullKeysCount ()))
+    if (keyIndex >= (GetKeysCount () - GetNullKeysCount ()))
       SetNullKeysCount (GetNullKeysCount () - 1);
 
     SetKeysCount (GetKeysCount () - 1);
@@ -302,18 +307,18 @@ public:
     if (toRight)
       {
         assert (GetNext() != NIL_NODE);
-        BTreeNodeHandler    nextNode (m_NodesManager.RetrieveNode (GetNext ()));
+        BTreeNodeHandler   nextNode (m_NodesManager.RetrieveNode (GetNext ()));
         T_BTreeNode *const pNextNode    = _SC (T_BTreeNode*,  &(*nextNode));
-        const KEY_INDEX     oldKeysCount = pNextNode->GetKeysCount ();
+        const KEY_INDEX    oldKeysCount = pNextNode->GetKeysCount ();
 
         pNextNode->SetKeysCount (oldKeysCount + GetKeysCount ());
         pNextNode->SetNullKeysCount (pNextNode->GetNullKeysCount () + GetNullKeysCount ());
 
-        for (KEY_INDEX index = 0; index < oldKeysCount; ++index)
+        for (KEY_INDEX index = 0; index < GetKeysCount (); ++index)
           pNextNode->SetKey (GetKey (index), index + oldKeysCount);
 
         if (IsLeaf () == false)
-          for (KEY_INDEX index = 0; index < oldKeysCount; ++index)
+          for (KEY_INDEX index = 0; index < GetKeysCount (); ++index)
             pNextNode->T_BTreeNode::SetChildNode (T_BTreeNode::GetChildNode (index),
                                                    index + oldKeysCount);
 
@@ -334,9 +339,9 @@ public:
       {
         assert (GetPrev () != NIL_NODE);
 
-        BTreeNodeHandler    prevNode (m_NodesManager.RetrieveNode (GetNext ()));
+        BTreeNodeHandler   prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
         T_BTreeNode *const pPrevNode    = _SC (T_BTreeNode*, &(*prevNode));
-        const KEY_INDEX     oldKeysCount = GetKeysCount ();
+        const KEY_INDEX    oldKeysCount = GetKeysCount ();
 
         SetKeysCount (oldKeysCount + pPrevNode->GetKeysCount ());
         SetNullKeysCount (GetNullKeysCount () + pPrevNode->GetKeysCount());
@@ -398,15 +403,14 @@ public:
     assert (fromPos < GetKeysCount ());
     assert (output.GetElementsType() == T_UINT64);
 
-    const D_UINT64* pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
+    const D_UINT64* const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
     if ((toPos == 0) && IsEqual (GetSentinelKey (), toPos))
       ++toPos;
 
     while (fromPos >= toPos)
       {
-        output.AddElement (DBSUInt64 (false, pRowParts[0]));
-        pRowParts++;
+        output.AddElement (DBSUInt64 (false, pRowParts[fromPos]));
         if (fromPos == 0)
           break;
         fromPos--;
@@ -421,7 +425,7 @@ protected:
 
     const D_UINT64 *const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-    if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
+    if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
       return T_BTreeKey<DBS_T> (DBS_T(true), pRowParts [keyIndex]);
 
     const T *const pValueParts = _RC (const T*, pRowParts + GetKeysPerNode ());
@@ -436,9 +440,7 @@ protected:
 
     D_UINT64 *const pRowParts = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-    if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
-      SetNullKeysCount (GetNullKeysCount () + 1);
-    else
+    if (keyIndex < GetKeysCount() - GetNullKeysCount ())
       {
         T *const pValueParts = _RC (T*, pRowParts + GetKeysPerNode ());
         pValueParts[keyIndex] = key.m_ValuePart.m_Value;
@@ -467,7 +469,7 @@ T_BTreeNode <void, DBSDate, 4>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT64 *const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
 
-  if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
+  if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     return DateBTreeKey (DBSDate(true), pRowParts [keyIndex]);
 
   const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + GetKeysPerNode ());
@@ -489,9 +491,7 @@ T_BTreeNode <void, DBSDate, 4>::SetKey (const DateBTreeKey &key,const KEY_INDEX 
 
   D_UINT64 *const pRowParts = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-  if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
-    SetNullKeysCount (GetNullKeysCount () + 1);
-  else
+  if (keyIndex < GetKeysCount() - GetNullKeysCount ())
     {
       D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
       D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
@@ -577,7 +577,7 @@ T_BTreeNode <void, DBSDate, 4>::RemoveKey (const KEY_INDEX keyIndex)
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
     }
 
-  if (keyIndex <= (GetKeysCount () - GetNullKeysCount ()))
+  if (keyIndex >= (GetKeysCount () - GetNullKeysCount ()))
     SetNullKeysCount (GetNullKeysCount () - 1);
 
   SetKeysCount (GetKeysCount () - 1);
@@ -600,7 +600,7 @@ T_BTreeNode <void, DBSDateTime, 7>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT64 *const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
 
-  if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
+  if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     return DateTimeBTreeKey (DBSDateTime(true), pRowParts [keyIndex]);
 
   const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + GetKeysPerNode ());
@@ -628,9 +628,7 @@ T_BTreeNode <void, DBSDateTime, 7>::SetKey (const DateTimeBTreeKey &key,const KE
 
   D_UINT64 *const pRowParts = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-  if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
-    SetNullKeysCount (GetNullKeysCount () + 1);
-  else
+  if (keyIndex < GetKeysCount() - GetNullKeysCount ())
     {
       D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
       D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
@@ -734,7 +732,7 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
     }
 
-  if (keyIndex <= (GetKeysCount () - GetNullKeysCount ()))
+  if (keyIndex >= (GetKeysCount () - GetNullKeysCount ()))
     SetNullKeysCount (GetNullKeysCount () - 1);
 
   SetKeysCount (GetKeysCount () - 1);
@@ -757,7 +755,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::GetKey (const KEY_INDEX keyIndex) const
 
   const D_UINT64 *const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-  if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
+  if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     return HiresTimeBTreeKey (DBSHiresTime(true), pRowParts [keyIndex]);
 
   const D_UINT32 *const pMicroParts = _RC (const D_UINT32*, pRowParts + GetKeysPerNode ());
@@ -787,9 +785,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey &key, cons
 
   D_UINT64 *const pRowParts = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-  if (keyIndex <= GetKeysCount() - GetNullKeysCount ())
-    SetNullKeysCount (GetNullKeysCount () + 1);
-  else
+  if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     {
       D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + GetKeysPerNode ());
       D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + GetKeysPerNode ());
@@ -899,7 +895,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
     }
 
-  if (keyIndex <= (GetKeysCount () - GetNullKeysCount ()))
+  if (keyIndex >= (GetKeysCount () - GetNullKeysCount ()))
     SetNullKeysCount (GetNullKeysCount () - 1);
 
   SetKeysCount (GetKeysCount () - 1);
@@ -933,7 +929,8 @@ public:
   virtual ~FieldIndexNodeManager();
 
 
-  void MarkForRemoval ();
+  void     MarkForRemoval ();
+  D_UINT64 GetIndexRawSize () const;
 
   //Implementations of I_BTreeNodeManager
   virtual D_UINT      GetRawNodeSize () const;

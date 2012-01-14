@@ -27,6 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 D_UINT64
 w_rnd_get_seed ();
 
@@ -35,5 +39,9 @@ w_rnd_set_seed (D_UINT64 seed);
 
 D_UINT64
 w_rnd ();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RANDOM_H_ */
