@@ -41,31 +41,43 @@ public:
   I_DBSHandler () {}
   virtual ~ I_DBSHandler () {}
 
-  virtual D_UINT GetPesistentTablesCount () = 0;
+  virtual D_UINT      GetPesistentTablesCount () = 0;
   virtual I_DBSTable& RetrievePersistentTable (D_UINT index) = 0;
-  virtual I_DBSTable& RetrievePersistentTable (const D_CHAR * pTableName) = 0;
-  virtual void ReleaseTable (I_DBSTable &) = 0;
-  virtual void AddTable (const D_CHAR * const pTableName, const DBSFieldDescriptor * pFields, D_UINT fieldsCount) = 0;
-  virtual void DeleteTable (const D_CHAR * const pTableName) = 0;
+  virtual I_DBSTable& RetrievePersistentTable (const D_CHAR* pTableName) = 0;
+  virtual void        ReleaseTable (I_DBSTable &) = 0;
+  virtual void        AddTable (const D_CHAR* const pTableName,
+                                const DBSFieldDescriptor* pFields,
+                                D_UINT fieldsCount) = 0;
+  virtual void        DeleteTable (const D_CHAR * const pTableName) = 0;
 };
 
 void
-DBSInit (const D_CHAR * const pDBSDirectory, const D_CHAR * const pTempDir, D_UINT64 maxFileSize = DEFAULT_MAX_FILE_SIZE);
+DBSInit (const D_CHAR * const pDBSDirectory,
+         const D_CHAR * const pTempDir,
+         D_UINT64 maxFileSize = DEFAULT_MAX_FILE_SIZE);
 
-void DBSShoutdown ();
+void
+DBSShoutdown ();
 
-const D_CHAR* DBSGetWorkingDir ();
+const D_CHAR*
+DBSGetWorkingDir ();
 
-const D_CHAR* DBSGetTempDir ();
+const D_CHAR*
+DBSGetTempDir ();
 
-D_UINT64 DBSGetMaxFileSize ();
+D_UINT64
+DBSGetMaxFileSize ();
 
-void DBSCreateDatabase (const D_CHAR * const pName);
+void
+DBSCreateDatabase (const D_CHAR* const pName);
 
-I_DBSHandler& DBSRetrieveDatabase (const D_CHAR * const pName);
+I_DBSHandler&
+DBSRetrieveDatabase (const D_CHAR* const pName);
 
-void DBSReleaseDatabase (I_DBSHandler & hndDatabase);
+void
+DBSReleaseDatabase (I_DBSHandler& hndDatabase);
 
-void DBSRemoveDatabase (const D_CHAR * const pName);
+void
+DBSRemoveDatabase (const D_CHAR* const pName);
 
 #endif /* DBS_MGR_H_ */

@@ -48,9 +48,9 @@ struct PSFieldDescriptor
   D_UINT32 m_NullBitIndex;
   D_UINT32 m_StoreIndex;
   D_UINT32 m_NameOffset;
-  D_UINT32 m_TypeDesc        : 16;
-  D_UINT32 m_IndexNodeSize   : 8;
-  D_UINT32 m_IndexUnitsCount : 8;
+  D_UINT32 m_TypeDesc        : 12;
+  D_UINT32 m_IndexNodeSizeKB : 10;
+  D_UINT32 m_IndexUnitsCount : 10;
 };
 
 class I_PSTable : public I_DBSTable

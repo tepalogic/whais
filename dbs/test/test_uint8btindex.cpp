@@ -25,7 +25,7 @@ struct DBSFieldDescriptor field_desc[] = {
 const D_CHAR db_name[] = "t_baza_date_1";
 const D_CHAR tb_name[] = "t_test_tab";
 
-D_UINT _rowsCount   = 20000000;
+D_UINT _rowsCount   = 100000000;
 D_UINT _removedRows = _rowsCount / 10;
 
 
@@ -54,43 +54,43 @@ fill_table_with_values (I_DBSTable &table,
       table.SetEntry (value, index, 0);
       tableValues.AddElement (value);
 
-      if ((index % 1000) != 0)
-        continue;
+    }
 
-      DBSArray values = table.GetMatchingRows (DBSUInt8 (true),
-                                               DBSUInt8 (false, 0xFF),
-                                               0,
-                                               ~0,
-                                               0,
-                                               ~0,
-                                               0);
-      if ((values.GetElementsCount() != tableValues.GetElementsCount ()) ||
-          (values.GetElementsCount () != index + 1))
+  std::cout << std::endl << "Check table with values ... " << std::endl;
+  DBSArray values = table.GetMatchingRows (DBSUInt8 (true),
+                                           DBSUInt8 (false, 0xFF),
+                                           0,
+                                           ~0,
+                                           0,
+                                           ~0,
+                                           0);
+  if ((values.GetElementsCount() != tableValues.GetElementsCount ()) ||
+      (values.GetElementsCount () != rowCount))
+    {
+      result = false;
+    }
+
+  for (D_UINT checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
+    {
+      DBSUInt8  rowValue (true);
+      DBSUInt64 rowIndex (true);
+
+      values.GetElement (rowIndex, checkIndex);
+      assert (rowIndex.IsNull() == false);
+
+      table.GetEntry (rowValue, rowIndex.m_Value, 0);
+
+      DBSUInt8 generated (true);
+      tableValues.GetElement (generated, rowIndex.m_Value);
+      assert (generated.IsNull() == false);
+
+      if ((rowValue == generated) == false)
         {
           result = false;
           break;
         }
 
-      for (D_UINT checkIndex = 0; checkIndex <= index; ++checkIndex)
-        {
-          DBSUInt8  rowValue (true);
-          DBSUInt64 rowIndex (true);
-
-          values.GetElement (rowIndex, checkIndex);
-          assert (rowIndex.IsNull() == false);
-
-          table.GetEntry (rowValue, rowIndex.m_Value, 0);
-
-          DBSUInt8 generated (true);
-          tableValues.GetElement (generated, rowIndex.m_Value);
-          assert (generated.IsNull() == false);
-
-          if ((rowValue == generated) == false)
-            {
-              result = false;
-              break;
-            }
-        }
+      std::cout << "\r" << checkIndex << "(" << rowCount << ")";
     }
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;

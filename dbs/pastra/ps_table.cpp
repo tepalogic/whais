@@ -232,7 +232,7 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
       strcpy(_RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
 	     _RC (const D_CHAR *, temp.m_pFieldName));
 
-      pFieldDesc[fieldIndex].m_IndexNodeSize   = 0;
+      pFieldDesc[fieldIndex].m_IndexNodeSizeKB = 0;
       pFieldDesc[fieldIndex].m_IndexUnitsCount = 0;
       pFieldDesc[fieldIndex].m_StoreIndex      = uOutRowSize;
       pFieldDesc[fieldIndex].m_TypeDesc        = temp.m_FieldType;
@@ -715,7 +715,7 @@ PSTable::~PSTable()
       {
         PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
-        D_UINT unitsCount = DBSGetMaxFileSize() - 1;
+        D_UINT64 unitsCount = DBSGetMaxFileSize() - 1;
 
         unitsCount += m_vIndexNodeMgrs[fieldIndex]->GetIndexRawSize();
         unitsCount /= DBSGetMaxFileSize ();
@@ -904,7 +904,7 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
       (field.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
 
-  const D_UINT nodeSize    = 6; //16KB
+  const D_UINT nodeSizeKB  = 16; //16KB
   string containerNameBase = m_BaseFileName;
 
   containerNameBase += "_idf";
@@ -916,7 +916,7 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
                                                                   0));
 
   auto_ptr <FieldIndexNodeManager> apFieldMgr (new FieldIndexNodeManager (apIndexContainer,
-                                                                          1 << ( nodeSize + 8),
+                                                                          nodeSizeKB * 1024,
                                                                           0x400000, //4MB
                                                                           _SC (DBS_FIELD_TYPE,
                                                                                field.m_TypeDesc),
@@ -990,7 +990,7 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
         }
     }
 
-  field.m_IndexNodeSize   = nodeSize;
+  field.m_IndexNodeSizeKB = nodeSizeKB;
   field.m_IndexUnitsCount = 1;
   SyncToFile ();
 
@@ -1007,9 +1007,10 @@ PSTable::RemoveFieldIndex (const D_UINT fieldIndex)
 
   PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
-  assert (field.m_IndexNodeSize > 0);
+  assert (field.m_IndexNodeSizeKB > 0);
+  assert (field.m_IndexUnitsCount > 0);
 
-  field.m_IndexNodeSize   = 0;
+  field.m_IndexNodeSizeKB = 0;
   field.m_IndexUnitsCount = 0;
   SyncToFile ();
 
@@ -1196,14 +1197,13 @@ PSTable::InitIndexedFields ()
     {
       PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
-      if (field.m_IndexNodeSize == 0)
+      if (field.m_IndexNodeSizeKB == 0)
         {
           assert (field.m_IndexUnitsCount == 0);
           m_vIndexNodeMgrs.push_back (NULL);
           continue;
         }
 
-      const D_UINT nodeSize    = 1 << (field.m_IndexNodeSize + 8);
       string containerNameBase = m_BaseFileName;
 
       containerNameBase += "_idf";
@@ -1215,7 +1215,7 @@ PSTable::InitIndexedFields ()
                                                                       field.m_IndexUnitsCount ));
 
       m_vIndexNodeMgrs.push_back (new FieldIndexNodeManager (apIndexContainer,
-                                                             nodeSize,
+                                                             field.m_IndexNodeSizeKB * 1024,
                                                              0x400000, //4MB
                                                              _SC (DBS_FIELD_TYPE, field.m_TypeDesc),
                                                              false));

@@ -219,19 +219,19 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
 
           parentNode->RemoveKey (keyIndex);
           node->Join (true);
+          FreeNode (node->GetNodeId());
         }
       else
         {
           const NODE_INDEX leftNode = node->GetPrev ();
-          splitNode = leftNode;
 
-          assert (splitNode != NIL_NODE);
+          splitNode = node->GetNodeId ();
+
           assert (leftNode == parentNode->GetChildNode (keyIndex + 1));
 
           node->Join (false);
-
-          parentNode->SetChildNode (keyIndex, leftNode);
           parentNode->RemoveKey (keyIndex + 1);
+          FreeNode (leftNode);
         }
     }
 
@@ -441,7 +441,10 @@ BTree::RecursiveDeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key)
 {
   KEY_INDEX  keyIndex;
 
-  node.FindBiggerOrEqual (key, keyIndex);
+  if (node.FindBiggerOrEqual (key, keyIndex) == false)
+    {
+      assert (false);
+    }
 
   if (node.IsLeaf ())
     {
@@ -465,7 +468,10 @@ BTree::RecursiveDeleteNodeKey (I_BTreeNode &node, const I_BTreeKey &key)
           node.ResetKeyNode (*childNode, keyIndex);
         }
       else if (node.IsEqual (key, keyIndex))
-        node.RemoveKey (keyIndex);
+        {
+          assert (false);
+          node.RemoveKey (keyIndex);
+        }
       else
         return false;
     }

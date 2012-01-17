@@ -285,9 +285,8 @@ public:
 
     if (IsLeaf () == false)
       for (KEY_INDEX index = splitKeyIndex; index < GetKeysCount (); ++index)
-        _SC (T_BTreeNode*, &(*allocatedNode))->T_BTreeNode::SetChildNode (
-                                                  T_BTreeNode::GetChildNode (index),
-                                                  index - splitKeyIndex);
+        _SC (T_BTreeNode*, &(*allocatedNode))->T_BTreeNode::SetChildNode (index - splitKeyIndex,
+                                                                          T_BTreeNode::GetChildNode (index));
 
     SetKeysCount (splitKeyIndex);
     assert (GetNullKeysCount () <= GetKeysCount ());
@@ -311,6 +310,9 @@ public:
         T_BTreeNode *const pNextNode    = _SC (T_BTreeNode*,  &(*nextNode));
         const KEY_INDEX    oldKeysCount = pNextNode->GetKeysCount ();
 
+        assert ((pNextNode->GetNullKeysCount() == 0) ||
+            ( GetKeysCount () == GetNullKeysCount ()));
+
         pNextNode->SetKeysCount (oldKeysCount + GetKeysCount ());
         pNextNode->SetNullKeysCount (pNextNode->GetNullKeysCount () + GetNullKeysCount ());
 
@@ -319,11 +321,8 @@ public:
 
         if (IsLeaf () == false)
           for (KEY_INDEX index = 0; index < GetKeysCount (); ++index)
-            pNextNode->T_BTreeNode::SetChildNode (T_BTreeNode::GetChildNode (index),
-                                                   index + oldKeysCount);
-
-        assert ((pNextNode->GetNullKeysCount() == 0) ||
-            ( GetKeysCount () == GetNullKeysCount ()));
+            pNextNode->T_BTreeNode::SetChildNode (index + oldKeysCount,
+                                                  T_BTreeNode::GetChildNode (index));
 
         nextNode->SetPrev (GetPrev ());
         if (GetPrev () != NIL_NODE)
@@ -344,15 +343,14 @@ public:
         const KEY_INDEX    oldKeysCount = GetKeysCount ();
 
         SetKeysCount (oldKeysCount + pPrevNode->GetKeysCount ());
-        SetNullKeysCount (GetNullKeysCount () + pPrevNode->GetKeysCount());
+        SetNullKeysCount (GetNullKeysCount () + pPrevNode->GetNullKeysCount());
 
-        for (KEY_INDEX index =0; index < pPrevNode->GetKeysCount (); ++index)
+        for (KEY_INDEX index = 0; index < pPrevNode->GetKeysCount (); ++index)
           SetKey (pPrevNode->GetKey (index), index + oldKeysCount);
 
         if (IsLeaf () == false)
           for (KEY_INDEX index = 0; index < oldKeysCount; ++index)
-            SetChildNode (pPrevNode->T_BTreeNode::GetChildNode (index),
-                          index + oldKeysCount);
+            SetChildNode (index + oldKeysCount, pPrevNode->T_BTreeNode::GetChildNode (index));
 
         SetPrev (prevNode->GetPrev ());
         if (GetPrev () != NIL_NODE)
