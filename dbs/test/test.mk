@@ -49,3 +49,32 @@ l_test_uint8btindex_SRC=test/test_uint8btindex.cpp
 l_test_uint8btindex_LIB=dbs/pastra utils/utils custom/custom
 l_test_uint8btindex_INC=utils/include custom/include
 
+UNIT_EXES+=l_test_uint16btindex
+l_test_uint16btindex_SRC=test/test_uint16btindex.cpp
+l_test_uint16btindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_uint16btindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_uint64btindex
+l_test_uint64btindex_SRC=test/test_uint64btindex.cpp
+l_test_uint64btindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_uint64btindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_charbtindex
+l_test_charbtindex_SRC=test/test_charbtindex.cpp
+l_test_charbtindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_charbtindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_datebtindex
+l_test_datebtindex_SRC=test/test_datebtindex.cpp
+l_test_datebtindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_datebtindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_datetimebtindex
+l_test_datetimebtindex_SRC=test/test_datetimebtindex.cpp
+l_test_datetimebtindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_datetimebtindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_hirestimebtindex
+l_test_hirestimebtindex_SRC=test/test_hirestimebtindex.cpp
+l_test_hirestimebtindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_hirestimebtindex_INC=utils/include custom/include

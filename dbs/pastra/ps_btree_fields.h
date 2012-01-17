@@ -276,7 +276,6 @@ public:
     else
       allocatedNode->SetNullKeysCount (GetNullKeysCount ());
 
-    SetNullKeysCount (GetNullKeysCount () - allocatedNode->GetNullKeysCount ());
     assert (GetNullKeysCount () <= GetKeysCount ());
     assert (allocatedNode->GetNullKeysCount () <= allocatedNode->GetNullKeysCount ());
 
@@ -288,6 +287,7 @@ public:
         _SC (T_BTreeNode*, &(*allocatedNode))->T_BTreeNode::SetChildNode (index - splitKeyIndex,
                                                                           T_BTreeNode::GetChildNode (index));
 
+    SetNullKeysCount (GetNullKeysCount () - allocatedNode->GetNullKeysCount ());
     SetKeysCount (splitKeyIndex);
     assert (GetNullKeysCount () <= GetKeysCount ());
 
@@ -454,7 +454,7 @@ protected:
 template <> inline const I_BTreeKey&
 T_BTreeNode <void, DBSDate, 4>::GetSentinelKey () const
 {
-  static DateBTreeKey _sentinel (DBSDate (false, 0x7FFF, 11, 31), ~0);
+  static DateBTreeKey _sentinel (DBSDate (false, 0x7FFF, 12, 31), ~0);
   return _sentinel;
 }
 
@@ -585,7 +585,7 @@ T_BTreeNode <void, DBSDate, 4>::RemoveKey (const KEY_INDEX keyIndex)
 template <> inline const I_BTreeKey&
 T_BTreeNode <void, DBSDateTime, 7>::GetSentinelKey () const
 {
-  static DateTimeBTreeKey _sentinel (DBSDateTime (false, 0x7FFF, 11, 31, 23, 59, 59), ~0);
+  static DateTimeBTreeKey _sentinel (DBSDateTime (false, 0x7FFF, 12, 31, 23, 59, 59), ~0);
   return _sentinel;
 }
 
@@ -606,7 +606,7 @@ T_BTreeNode <void, DBSDateTime, 7>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + GetKeysPerNode ());
   const D_UINT8 *const  pHourParts  = _RC (const D_UINT8*, pDayParts + GetKeysPerNode ());
   const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
-  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
+  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + GetKeysPerNode ());
 
   return DateTimeBTreeKey (DBSDateTime (false,
                                         pYearParts[keyIndex],
@@ -633,7 +633,7 @@ T_BTreeNode <void, DBSDateTime, 7>::SetKey (const DateTimeBTreeKey &key,const KE
       D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
       D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
       D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
+      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
 
       pYearParts[keyIndex]  = key.m_ValuePart.m_Year;
       pMonthParts[keyIndex] = key.m_ValuePart.m_Month;
@@ -674,7 +674,7 @@ T_BTreeNode <void, DBSDateTime, 7>::InsertKey (const I_BTreeKey &key)
   D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
   D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
   D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
 
@@ -714,7 +714,7 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
   D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
   D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
   D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
 
   remove_array_elemes (pRowParts, lastKey, keyIndex, 1);
   remove_array_elemes (pYearParts, lastKey, keyIndex, 1);
@@ -741,7 +741,7 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
 template <> inline const I_BTreeKey&
 T_BTreeNode <void, DBSHiresTime, 11>::GetSentinelKey () const
 {
-  static HiresTimeBTreeKey _sentinel (DBSHiresTime (false, 0x7FFF, 11, 31, 23, 59, 59, 999999999), ~0);
+  static HiresTimeBTreeKey _sentinel (DBSHiresTime (false, 0x7FFF, 12, 31, 23, 59, 59, 999999999), ~0);
   return _sentinel;
 }
 
@@ -762,7 +762,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + GetKeysPerNode ());
   const D_UINT8 *const  pHourParts  = _RC (const D_UINT8*, pDayParts + GetKeysPerNode ());
   const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
-  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
+  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + GetKeysPerNode ());
 
   return HiresTimeBTreeKey (DBSHiresTime (false,
                                           pYearParts[keyIndex],
@@ -783,7 +783,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey &key, cons
 
   D_UINT64 *const pRowParts = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-  if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
+  if (keyIndex < GetKeysCount() - GetNullKeysCount ())
     {
       D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + GetKeysPerNode ());
       D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + GetKeysPerNode ());
@@ -791,7 +791,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey &key, cons
       D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
       D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
       D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
+      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
 
       pMicroParts[keyIndex] = key.m_ValuePart.m_Microsec;
       pYearParts[keyIndex]  = key.m_ValuePart.m_Year;
@@ -834,7 +834,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::InsertKey (const I_BTreeKey &key)
   D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
   D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
   D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
 
@@ -876,7 +876,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
   D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
   D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
   D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
 
   remove_array_elemes (pRowParts, lastKey, keyIndex, 1);
   remove_array_elemes (pMicroParts, lastKey, keyIndex, 1);
