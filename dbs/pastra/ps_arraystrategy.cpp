@@ -143,7 +143,7 @@ NullArray::DecrementReferenceCount ()
 }
 
 void
-NullArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const
+NullArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
 {
   //Some does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
@@ -241,7 +241,7 @@ TemporalArray::~TemporalArray ()
 }
 
 void
-TemporalArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const
+TemporalArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
 {
   m_Storage.RetrieveData (offset, length, pData);
 }
@@ -304,7 +304,7 @@ RowFieldArray::GetRowValue()
 }
 
 void
-RowFieldArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const
+RowFieldArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
 {
   m_Storage.GetRecord(m_FirstRecordEntry, offset + sizeof (D_UINT64), length, pData);
 }

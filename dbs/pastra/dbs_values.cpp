@@ -687,7 +687,7 @@ DBSArray::AddElement (const DBSInt64 &value)
 }
 
 template <class T> void
-get_array_element (T& outElement, const I_ArrayStrategy *const pArrayStrategy, const D_UINT64 index)
+get_array_element (T& outElement, I_ArrayStrategy* const pArrayStrategy, const D_UINT64 index)
 {
   if (pArrayStrategy->GetElementsCount() <= index)
     throw DBSException (NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));

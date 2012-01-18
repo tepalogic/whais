@@ -40,14 +40,12 @@ namespace pastra
 class DataContainerException:public WException
 {
 public:
-  DataContainerException (const D_CHAR * message,
-                          const D_CHAR * file,
-                          D_UINT32 line,
-                          D_UINT32 extra):WException (message, file, line,
-                                                          extra)
+  DataContainerException (const D_CHAR * message, const D_CHAR * file, D_UINT32 line, D_UINT32 extra)
+    :
+      WException (message, file, line, extra)
   {
   }
-  virtual ~ DataContainerException ()
+  virtual ~DataContainerException ()
   {
   }
   ;
@@ -61,11 +59,11 @@ public:
   virtual ~ I_DataContainer ()
   {}
 
-  virtual void StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8 * puDataSource) = 0;
-  virtual void RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8 * puDataDestination) const = 0;
-  virtual void ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition) = 0;
+  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8 * puDataSource) = 0;
+  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8 * puDataDestination) = 0;
+  virtual void     ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition) = 0;
   virtual D_UINT64 GetContainerSize () const = 0;
-  virtual void MarkForRemoval () = 0;
+  virtual void     MarkForRemoval () = 0;
 };
 
 
@@ -76,28 +74,23 @@ public:
                  const D_UINT32 uMaxFileSize,
                  const D_UINT32 uUnitsCount);
 
-  virtual ~ FileContainer ();
+  virtual ~FileContainer ();
 
   // WIDataContainer virtual functions
-  virtual void StoreData (D_UINT64 uPosition,
-                          D_UINT64 uLenght,
-                          const D_UINT8 * puDataSource);
-  virtual void RetrieveData (D_UINT64 uPosition,
-                             D_UINT64 uLenght,
-                             D_UINT8 * puDataDestination) const;
-  virtual void ColapseContent (D_UINT64 uStartPosition,
-                               D_UINT64 uEndPosition);
+  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8 * puDataSource);
+  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8 * puDataDestination);
+  virtual void     ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition);
   virtual D_UINT64 GetContainerSize () const;
-  virtual void MarkForRemoval ();
+  virtual void     MarkForRemoval ();
 
 protected:
   void ExtendContainer ();
 
 protected:
-  const D_UINT32 m_uMaxFileUnitSize;
-  std::vector < WFile > m_FilesHandles;
-  std::string m_FileNameBase;
-  bool mIsMarked;
+  const D_UINT32       m_uMaxFileUnitSize;
+  std::vector< WFile > m_FilesHandles;
+  std::string          m_FileNameBase;
+  bool                 m_IsMarked;
 };
 
 class FileTempContainer:public FileContainer
@@ -105,53 +98,47 @@ class FileTempContainer:public FileContainer
 public:
   FileTempContainer (const D_CHAR * pFileNameBase,
                      const D_UINT32 uMaxFileSize);
-  virtual ~ FileTempContainer ();
+  virtual ~FileTempContainer ();
 };
 
 class TempContainer:public I_DataContainer
 {
 public:
   TempContainer (const D_CHAR * pTempDirectory, D_UINT uReservedMemory);
-  virtual ~ TempContainer ();
+  virtual ~TempContainer ();
 
   // WIDataContainer virtual functions
-  virtual void StoreData (D_UINT64 uPosition,
-                          D_UINT64 uLenght,
-                          const D_UINT8 * puDataSource);
-  virtual void RetrieveData (D_UINT64 uPosition,
-                             D_UINT64 uLenght,
-                             D_UINT8 * puDataDestination) const;
-  virtual void ColapseContent (D_UINT64 uStartPosition,
-                               D_UINT64 uEndPosition);
+  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8 * puDataSource);
+  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8 * puDataDestination);
+  virtual void     ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition);
   virtual D_UINT64 GetContainerSize () const;
-  virtual void MarkForRemoval ();
+  virtual void     MarkForRemoval ();
 
 protected:
-  void SwitchToFileContent ();
+  void  FillCache (D_UINT64 position);
 
-  std::auto_ptr < FileTempContainer > mContainer;
-  std::auto_ptr < D_UINT8 > mMemory;
-  std::string mTempDirectory;
-  D_UINT muMemorySize;
-  D_UINT muValidMemory;
+  std::auto_ptr<FileTempContainer> m_FileContainer;
+  std::auto_ptr<D_UINT8>           m_Cache;
+  D_UINT64                         m_CacheStartPos;
+  D_UINT64                         m_CacheEndPos;
+  const D_UINT                     m_CacheSize;
+  bool                             m_DirtyCache;
 
-  static D_UINT64 mTemporalsCount;
-  static WSynchronizer mSync;
+  static D_UINT64      sm_TemporalsCount;
+  static WSynchronizer sm_Sync;
 };
 
 class WFileContainerException:public DataContainerException
 {
 public:
   explicit
-  WFileContainerException (const D_CHAR * message,
-                           const D_CHAR * file,
-                           D_UINT32 line,
-                           D_UINT32
-                           extra):DataContainerException (message, file,
-                                                              line, extra)
+  WFileContainerException (const D_CHAR * message, const D_CHAR * file, D_UINT32 line, D_UINT32 extra)
+    :
+      DataContainerException (message, file, line, extra)
   {
   }
-  virtual ~ WFileContainerException ()
+
+  virtual ~WFileContainerException ()
   {
   }
 
@@ -166,3 +153,6 @@ public:
 }
 
 #endif /* PS_CONTAINER_H_ */
+
+
+

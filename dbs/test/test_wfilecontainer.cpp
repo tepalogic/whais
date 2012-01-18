@@ -9,6 +9,8 @@
 #include <memory.h>
 #include <iostream>
 
+#include "dbs_mgr.h"
+
 #include "test/test_fmw.h"
 #include "../pastra/ps_container.h"
 
@@ -16,7 +18,6 @@ using namespace pastra;
 
 D_UINT8 buffer[1468];
 const D_CHAR fileName[] = "./test_file.tm";
-
 
 
 static bool
@@ -157,6 +158,14 @@ main ()
   D_UINT mem_usage = test_get_mem_used ();
 
   bool success = true;
+
+  {
+    std::string dir = ".";
+    dir += whc_get_directory_delimiter ();
+
+    DBSInit (dir.c_str (), dir.c_str ());
+  }
+
   const D_UINT max_file_size = 512 * 1024;
   const D_UINT container_size = max_file_size * 4 + 345;
 
@@ -182,8 +191,10 @@ main ()
   if (!check_temp_container (760))
     success = false;
 
-  if (!check_temp_container (6781))
+  if (!check_temp_container (678109))
     success = false;
+
+  DBSShoutdown ();
 
   D_UINT mem_peak = test_get_mem_peak ();
   mem_usage = test_get_mem_used () - mem_usage;

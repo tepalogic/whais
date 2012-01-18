@@ -227,7 +227,7 @@ GenericText::DecreaseReferenceCount ()
 
 
 D_UINT64
-GenericText::GetCharactersCount() const
+GenericText::GetCharactersCount()
 {
 
   D_UINT64 offset = 0;
@@ -255,7 +255,7 @@ GenericText::GetBytesCount() const
 }
 
 void
-GenericText::Duplicate (const I_TextStrategy &source)
+GenericText::Duplicate (I_TextStrategy &source)
 {
 
   D_UINT64 offset = 0;
@@ -276,7 +276,7 @@ GenericText::Duplicate (const I_TextStrategy &source)
 }
 
 DBSChar
-GenericText::GetCharacterAtIndex (D_UINT64 index) const
+GenericText::GetCharacterAtIndex (D_UINT64 index)
 {
   if (index >= GetCharactersCount() )
     return DBSChar (true); //Null char!
@@ -319,7 +319,7 @@ GenericText::Append (const D_UINT32 charValue)
 }
 
 void
-GenericText::Append (const I_TextStrategy &text)
+GenericText::Append (I_TextStrategy &text)
 {
   D_UINT64 toAppend = text.GetBytesCount ();
   D_UINT64 appendOffset = 0;
@@ -412,7 +412,7 @@ NullText::DecreaseReferenceCount ()
 }
 
 void
-NullText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest) const
+NullText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
@@ -473,7 +473,7 @@ RowFieldText::DecreaseReferenceCount ()
 }
 
 void
-RowFieldText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest) const
+RowFieldText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8* const pBuffDest)
 {
   assert (m_FirstEntry > 0);
   m_Storage.GetRecord (m_FirstEntry, offset, count, pBuffDest);
@@ -527,7 +527,7 @@ TemporalText::~TemporalText()
 }
 
 void
-TemporalText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest) const
+TemporalText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
 {
   assert (m_BytesSize == m_Storage.GetContainerSize ());
   m_Storage.RetrieveData (offset, count, pBuffDest);

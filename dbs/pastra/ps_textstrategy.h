@@ -49,23 +49,23 @@ public:
 
   virtual void DecreaseReferenceCount () = 0;
 
-  virtual D_UINT64 GetCharactersCount () const = 0;
+  virtual D_UINT64 GetCharactersCount () = 0;
 
   virtual D_UINT64 GetBytesCount () const = 0;
 
-  virtual void Duplicate (const I_TextStrategy &source) = 0;
+  virtual void Duplicate (I_TextStrategy &source) = 0;
 
-  virtual DBSChar GetCharacterAtIndex (D_UINT64 index) const = 0;
+  virtual DBSChar GetCharacterAtIndex (D_UINT64 index) = 0;
 
   virtual void Append (const D_UINT32 charValue) = 0;
 
-  virtual void Append (const I_TextStrategy &text) = 0;
+  virtual void Append (I_TextStrategy &text) = 0;
 
   virtual void Truncate (D_UINT64 newCharCount) = 0;
 
   virtual void RawReadUtf8Data (const D_UINT64 offset,
                                 const D_UINT64 count,
-                                D_UINT8 *const pBuffDest) const = 0;
+                                D_UINT8 *const pBuffDest) = 0;
 
   virtual void RawWriteUtf8Data (const D_UINT64 offset,
                                  const D_UINT64 count,
@@ -97,17 +97,17 @@ public:
 
   virtual void DecreaseReferenceCount ();
 
-  virtual D_UINT64 GetCharactersCount () const;
+  virtual D_UINT64 GetCharactersCount ();
 
   virtual D_UINT64 GetBytesCount () const;
 
-  virtual void Duplicate (const I_TextStrategy &source);
+  virtual void Duplicate (I_TextStrategy &source);
 
-  virtual DBSChar GetCharacterAtIndex (D_UINT64 index) const;
+  virtual DBSChar GetCharacterAtIndex (D_UINT64 index);
 
   virtual void Append (const D_UINT32 charValue);
 
-  virtual void Append (const I_TextStrategy &text);
+  virtual void Append (I_TextStrategy& text);
 
   virtual void Truncate (D_UINT64 newCharCount);
 
@@ -137,7 +137,7 @@ public:
 
   virtual void RawReadUtf8Data (const D_UINT64 offset,
                                 const D_UINT64 count,
-                                D_UINT8 *const pBuffDest) const;
+                                D_UINT8 *const pBuffDest);
   virtual void RawWriteUtf8Data (const D_UINT64 offset,
                                  const D_UINT64 count,
                                  const D_UINT8 *const pBuffSrc);
@@ -170,7 +170,7 @@ protected:
   //Implementations of I_TextStrategy
   virtual void RawReadUtf8Data (const D_UINT64 offset,
                                 const D_UINT64 count,
-                                D_UINT8 *const pBuffDest) const;
+                                D_UINT8 *const pBuffDest);
 
   virtual void RawWriteUtf8Data (const D_UINT64 offset,
                                  const D_UINT64 count,
@@ -201,8 +201,7 @@ protected:
   //Implementations of I_TextStrategy
   virtual void RawReadUtf8Data (const D_UINT64 offset,
                                 const D_UINT64 count,
-                                D_UINT8 *const pBuffDest) const;
-
+                                D_UINT8 *const pBuffDest);
   virtual void RawWriteUtf8Data (const D_UINT64 offset,
                                  const D_UINT64 count,
                                  const D_UINT8 *const pBuffSrc);

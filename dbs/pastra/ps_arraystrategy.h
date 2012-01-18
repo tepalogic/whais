@@ -55,7 +55,7 @@ public:
   virtual void   IncrementReferenceCount ();
   virtual void   DecrementReferenceCount ();
 
-  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const = 0;
+  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) = 0;
   virtual void     WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData) = 0;
   virtual void     CollapseRawData (const D_UINT64 offset, const D_UINT64 count) = 0;
   virtual D_UINT64 GetRawDataSize () const = 0 ;
@@ -97,7 +97,7 @@ protected:
   virtual void   DecrementReferenceCount ();
 
   //Implements of I_ArrayStrategy
-  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const;
+  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData);
   virtual void     WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData);
   virtual void     CollapseRawData (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 GetRawDataSize () const;
@@ -112,7 +112,7 @@ public:
 
 protected:
    //Implements of I_ArrayStrategy
-  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const;
+  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData);
   virtual void     WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData);
   virtual void     CollapseRawData (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 GetRawDataSize () const;
@@ -136,7 +136,7 @@ protected:
   virtual pastra::RowFieldArray& GetRowValue();
 
   //Implements of I_ArrayStrategy
-  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) const;
+  virtual void     ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData);
   virtual void     WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData);
   virtual void     CollapseRawData (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 GetRawDataSize () const;
