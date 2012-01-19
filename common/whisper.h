@@ -53,7 +53,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if ! (defined(YYTOKENTYPE) || defined (YYBISON))
 /* Avoid some type name redefinition (for Windows) */
 #include "whisper_fileio.h"
-#include "whisper_sync.h"
+#include "whisper_thread.h"
 #endif
+
+/* General operation status codes */
+#define WOP_OK          0
 
 #endif /* WHISPER_H */

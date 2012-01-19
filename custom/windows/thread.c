@@ -26,25 +26,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_sync.h"
 
 void
-wh_init_sync (WH_SYNC *hnd)
+wh_sync_init (WH_SYNC *hnd)
 {
   InitializeCriticalSection (hnd);
 }
 
 void
-wh_destroy_sync (WH_SYNC *hnd)
+wh_sync_destroy (WH_SYNC *hnd)
 {
   DeleteCriticalSection (hnd);
 }
 
 void
-wh_enter_sync (WH_SYNC *hnd)
+wh_sync_enter (WH_SYNC *hnd)
 {
   EnterCriticalSection (hnd);
 }
 
 void
-wh_leave_sync (WH_SYNC *hnd)
+wh_sync_leave (WH_SYNC *hnd)
 {
   LeaveCriticalSection (hnd);
 }
