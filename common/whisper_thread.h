@@ -22,23 +22,47 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_SYNC_H_
-#define WHISPER_SYNC_H_
+#ifndef WHISPER_THREAD_H_
+#define WHISPER_THREAD_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-    void wh_init_sync (WH_SYNC *hnd);
 
-    void wh_destroy_sync (WH_SYNC *hnd);
+void wh_sync_init (WH_SYNC *hnd);
 
-    void wh_enter_sync (WH_SYNC *hnd);
+void wh_sync_destroy (WH_SYNC *hnd);
 
-    void wh_leave_sync (WH_SYNC *hnd);
+void wh_sync_enter (WH_SYNC *hnd);
+
+void wh_sync_leave (WH_SYNC *hnd);
+
+D_INT wh_cond_value_init (WH_COND_VALUE* pCondValue);
+
+D_INT wh_cond_value_wait (WH_COND_VALUE* pCondValue, WH_SYNC* pSync);
+
+D_INT wh_cond_value_signal (WH_COND_VALUE* pCondValue);
+
+D_INT wh_cond_value_broadcast (WH_COND_VALUE* pCondValue);
+
+D_INT wh_cond_value_destroy (WH_COND_VALUE* pCondValue);
+
+
+typedef void* W_THREAD_ROUTINE_ARGS;
+typedef void* W_THREAD_ROUTINE_STATUS;
+typedef void* (*W_THREAD_ROUTINE) (void*);
+
+D_INT wh_thread_create (WH_THREAD* pThread, W_THREAD_ROUTINE routine, W_THREAD_ROUTINE_ARGS args);
+
+D_INT wh_thread_exit (W_THREAD_ROUTINE_STATUS status);
+
+D_INT wh_thread_detach (WH_THREAD thread);
+
+D_INT wh_thread_join (WH_THREAD thread, W_THREAD_ROUTINE_ARGS* pOutStatus);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* WHISPER_SYNC_H_ */
+#endif /* WHISPER_THREAD_H_ */

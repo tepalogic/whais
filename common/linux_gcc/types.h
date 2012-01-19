@@ -32,32 +32,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "sys/types.h"
 #include "pthread.h"
 
-typedef int WH_FILE_HND;
+typedef int             WH_FILE_HND;
 typedef pthread_mutex_t WH_SYNC;
+typedef pthread_cond_t  WH_COND_VALUE;
+typedef pthread_t       WH_THREAD;
 
-typedef char D_BOOL;
+typedef char          D_BOOL;
 
-typedef char D_CHAR;
+typedef char          D_CHAR;
 typedef unsigned char D_UCHAR;
 
 typedef int D_INT;
-typedef unsigned int D_UINT;
+typedef unsigned int  D_UINT;
 
-typedef int8_t D_INT8;
-typedef u_int8_t D_UINT8;
+typedef int8_t        D_INT8;
+typedef u_int8_t      D_UINT8;
 
-typedef int16_t D_INT16;
-typedef u_int16_t D_UINT16;
+typedef int16_t       D_INT16;
+typedef u_int16_t     D_UINT16;
 
-typedef int32_t D_INT32;
-typedef u_int32_t D_UINT32;
+typedef int32_t       D_INT32;
+typedef u_int32_t     D_UINT32;
 
-typedef int64_t D_INT64;
-typedef u_int64_t D_UINT64;
+typedef int64_t       D_INT64;
+typedef u_int64_t     D_UINT64;
 
 /* D_INTMAX is the type that could hold the biggest integer
  * for a specific architecture */
-typedef D_INT64 D_INTMAX;
+typedef D_INT64  D_INTMAX;
 typedef D_UINT64 D_UINTMAX;
 
 #endif /* WHISPER_TYPES_H */

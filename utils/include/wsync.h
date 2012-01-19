@@ -30,24 +30,24 @@ class WSynchronizer
 public:
   WSynchronizer()
   {
-    wh_init_sync(&mSync);
+    wh_sync_init(&mSync);
   }
 
   ~WSynchronizer()
   {
-    wh_destroy_sync(&mSync);
+    wh_sync_destroy(&mSync);
   }
 
   void
   Enter()
   {
-    wh_enter_sync(&mSync);
+    wh_sync_enter(&mSync);
   }
 
   void
   Leave()
   {
-    wh_leave_sync(&mSync);
+    wh_sync_leave(&mSync);
   }
 
 private:

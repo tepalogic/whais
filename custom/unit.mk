@@ -22,7 +22,7 @@ SRC_FOLDER:=windows
 endif
 
 custom_SRC+=$(SRC_FOLDER)/fileio.c
-custom_SRC+=$(SRC_FOLDER)/sync.c  
+custom_SRC+=$(SRC_FOLDER)/thread.c  
 
 ifeq ($(BUILD_TESTS),yes)
 custom_SRC+=$(SRC_FOLDER)/memory_test.c test/test_fmw.c
