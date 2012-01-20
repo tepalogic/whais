@@ -113,3 +113,4 @@ wh_thread_join (WH_THREAD thread, W_THREAD_ROUTINE_STATUS* pOutStatus)
 {
   return pthread_join (thread, pOutStatus);
 }
+
