@@ -48,18 +48,15 @@ D_INT wh_cond_value_broadcast (WH_COND_VALUE* pCondValue);
 
 D_INT wh_cond_value_destroy (WH_COND_VALUE* pCondValue);
 
+typedef void (*WH_THREAD_ROUTINE) (void*);
 
-typedef void* W_THREAD_ROUTINE_ARGS;
-typedef void* W_THREAD_ROUTINE_STATUS;
-typedef void* (*W_THREAD_ROUTINE) (void*);
+D_INT wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void *args);
 
-D_INT wh_thread_create (WH_THREAD* pThread, W_THREAD_ROUTINE routine, W_THREAD_ROUTINE_ARGS args);
+D_INT wh_thread_join (WH_THREAD thread);
 
-D_INT wh_thread_exit (W_THREAD_ROUTINE_STATUS status);
+void  wh_yield ();
 
-D_INT wh_thread_detach (WH_THREAD thread);
-
-D_INT wh_thread_join (WH_THREAD thread, W_THREAD_ROUTINE_ARGS* pOutStatus);
+void  wh_sleep (D_UINT millisecs);
 
 #ifdef __cplusplus
 }

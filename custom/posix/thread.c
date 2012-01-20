@@ -25,8 +25,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "whisper_thread.h"
 
+/* Define to choose the POSIX variant when compile under Linux. */
+#define __USE_BSD       1
+
 #include <assert.h>
 #include <errno.h>
+#include <sched.h>
+#include <unistd.h>
 
 void
 wh_sync_init (WH_SYNC *hnd)
@@ -89,28 +94,25 @@ wh_cond_value_destroy (WH_COND_VALUE* pCondValue)
 }
 
 D_INT
-wh_thread_create (WH_THREAD* pThread, W_THREAD_ROUTINE routine, W_THREAD_ROUTINE_ARGS args)
+wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
 {
-  return pthread_create (pThread, NULL, routine, args);
+  return pthread_create (pThread, NULL, (void* (*)(void*))routine, args);
 }
 
 D_INT
-wh_thread_exit (W_THREAD_ROUTINE_STATUS status)
+wh_thread_join (WH_THREAD thread)
 {
-  pthread_exit (status);
-
-  return WOP_OK;
+  return pthread_join (thread, NULL);
 }
 
-D_INT
-wh_thread_detach (WH_THREAD thread)
+void
+wh_yield ()
 {
-  return pthread_detach (thread);
+  sched_yield ();
 }
 
-D_INT
-wh_thread_join (WH_THREAD thread, W_THREAD_ROUTINE_STATUS* pOutStatus)
+void
+wh_sleep (D_UINT millisecs)
 {
-  return pthread_join (thread, pOutStatus);
+  usleep (millisecs * 1000);
 }
-

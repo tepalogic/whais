@@ -32,7 +32,7 @@
 #include "dbs_values.h"
 
 #include "utils/include/wfile.h"
-#include "utils/include/wsync.h"
+#include "utils/include/wthread.h"
 
 namespace pastra
 {
@@ -141,6 +141,9 @@ public:
   virtual ~WFileContainerException ()
   {
   }
+
+  virtual WException*     Clone () { return new WFileContainerException (*this); }
+  virtual EXPCEPTION_TYPE GetType () { return FILE_CONTAINER_EXCEPTION; }
 
   enum
   {

@@ -29,7 +29,7 @@
 
 #include "../include/dbs_exception.h"
 #include "utils/include/wfile.h"
-#include "utils/include/wsync.h"
+#include "utils/include/wthread.h"
 
 #include "ps_dbsmgr.h"
 

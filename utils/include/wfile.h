@@ -34,6 +34,9 @@ public:
       const D_CHAR *file, D_UINT32 line, D_UINT32 extra)
   : WException (message, file, line, extra) {}
   virtual ~ WFileException () {};
+
+  virtual WException*     Clone () { return new WFileException (*this); }
+  virtual EXPCEPTION_TYPE GetType () { return FILE_EXCEPTION; }
 };
 
 class WFile

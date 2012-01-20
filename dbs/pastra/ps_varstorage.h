@@ -27,7 +27,7 @@
 
 #include "whisper.h"
 
-#include "wsync.h"
+#include "utils/include/wthread.h"
 
 #include "ps_container.h"
 #include "ps_blockcache.h"

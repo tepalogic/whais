@@ -68,6 +68,9 @@ public:
       const D_CHAR *file, D_UINT32 line, D_UINT32 extra)
   : WException (message, file, line, extra) {}
   virtual ~ WCompiledUnitException () {};
+
+  virtual WException*     Clone () { return new WCompiledUnitException (*this); }
+  virtual EXPCEPTION_TYPE GetType () { return UNIT_COMPILE_EXCEPTION; }
 };
 
 class WBufferCompiledUnit:public WICompiledUnit

@@ -28,7 +28,7 @@
 
 #include "whisper.h"
 
-#include "wsync.h"
+#include "utils/include/wthread.h"
 
 namespace pastra
 {

@@ -71,6 +71,9 @@ public:
     INVALID_DATETIME                            = 26,
     INVALID_HIRESTIME                           = 27
   };
+
+  virtual WException*     Clone () { return new DBSException (*this); }
+  virtual EXPCEPTION_TYPE GetType () { return DBS_EXCEPTION; }
 };
 
 #endif /* DBS_EXCEPTION_H_ */

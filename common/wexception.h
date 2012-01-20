@@ -29,6 +29,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WEXCEPTION_H_
 
 //Base class to handle all exceptions
+enum EXPCEPTION_TYPE
+{
+  COMPILER_CMD_LINE_EXCEPTION,
+  DBS_EXCEPTION,
+  DUMP_EXCEPTION,
+  DUMP_CMD_LINE_EXCEPTION,
+  FILE_EXCEPTION,
+  FILE_CONTAINER_EXCEPTION,
+  UNIT_COMPILE_EXCEPTION,
+  THREAD_EXCEPTION
+};
+
 class WException
 {
 public:
@@ -63,6 +75,9 @@ public:
   {
     return mLine;
   }
+
+  virtual WException*     Clone () = 0;
+  virtual EXPCEPTION_TYPE GetType () = 0;
 
 private:
   const D_CHAR* mErrorMessage;
