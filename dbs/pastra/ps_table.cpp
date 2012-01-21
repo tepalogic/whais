@@ -2074,8 +2074,8 @@ PSTable::MatchRows (const T&       min,
 {
   toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
 
-  DBSArray            result (_SC (DBSUInt64*, NULL));
-  T                   rowValue (true);
+  DBSArray result (_SC (DBSUInt64*, NULL));
+  T         rowValue (true);
 
   for (D_UINT64 rowIndex = fromRow; (rowIndex <= toRow) && (maxCount > 0); ++rowIndex)
     {
@@ -2092,7 +2092,7 @@ PSTable::MatchRows (const T&       min,
 
       --maxCount;
 
-      result.AddElement (DBSUInt64 (rowIndex));
+      result.AddElement (DBSUInt64 (false, rowIndex));
     }
 
   return result;

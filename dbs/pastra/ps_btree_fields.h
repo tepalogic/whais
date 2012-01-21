@@ -96,7 +96,7 @@ public:
    }
    virtual ~I_BTreeFieldIndexNode () {}
 
-   virtual void GetKeysRows (DBSArray &output, const KEY_INDEX fromPos, const KEY_INDEX toPos) const = 0;
+   virtual void GetKeysRows (DBSArray &output, KEY_INDEX fromPos, KEY_INDEX toPos) const = 0;
 };
 
 template <class T, class DBS_T, D_UINT typeSize = sizeof (T)>
@@ -449,6 +449,15 @@ protected:
 
   std::auto_ptr <D_UINT8> m_apNodeData;
 };
+
+
+//Specialization for DBSBool
+template <> inline const I_BTreeKey&
+T_BTreeNode <bool, DBSBool, 1>::GetSentinelKey () const
+{
+  static BoolBTreeKey _sentinel (DBSBool (false, true), ~0);
+  return _sentinel;
+}
 
 //Specializations for DBSDate
 template <> inline const I_BTreeKey&
@@ -900,7 +909,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
 }
 
 
-typedef T_BTreeNode <D_BOOL, DBSBool>        BoolBTreeNode;
+typedef T_BTreeNode <bool, DBSBool, 1>       BoolBTreeNode;
 typedef T_BTreeNode <D_UINT32, DBSChar>      CharBTreeNode;
 typedef T_BTreeNode <void, DBSDate, 4>       DateBTreeNode;
 typedef T_BTreeNode <void, DBSDateTime, 7>   DateTimeBTreeNode;

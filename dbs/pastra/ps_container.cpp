@@ -412,7 +412,7 @@ TempContainer::FillCache (D_UINT64 position)
   position -= (position % m_CacheSize);
 
   assert ((m_CacheStartPos % m_CacheSize) == 0);
-  assert (position <= m_CacheEndPos);
+  assert ((position % m_CacheSize) == 0);
 
   if (m_CacheStartPos == position)
     return;

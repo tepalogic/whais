@@ -57,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 /* General operation status codes */
-#define WOP_OK          0
+#define WOP_OK           0
+#define WOP_UNKNOW      -1
 
 #endif /* WHISPER_H */

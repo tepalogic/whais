@@ -34,36 +34,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if ! (defined(YYTOKENTYPE) || defined (YYBISON))
 /* Avoid some type name redefinition */
 #include "windows.h"
-typedef HANDLE WH_FILE_HND;
-typedef CRITICAL_SECTION WH_SYNC;
+typedef HANDLE              WH_FILE_HND;
+typedef CRITICAL_SECTION    WH_SYNC;
+typedef CONDITION_VARIABLE  WH_COND_VALUE;
+typedef HANDLE              WH_THREAD;
 #endif
 
-typedef char D_BOOL;
+typedef char             D_BOOL;
 
-typedef char D_CHAR;
-typedef unsigned char D_UCHAR;
+typedef char             D_CHAR;
+typedef unsigned char    D_UCHAR;
 
-typedef int D_INT;
-typedef unsigned int D_UINT;
+typedef int              D_INT;
+typedef unsigned int     D_UINT;
 
-typedef __int8 D_INT8;
-typedef unsigned __int8 D_UINT8;
+typedef __int8           D_INT8;
+typedef unsigned __int8  D_UINT8;
 
-typedef __int16 D_INT16;
+typedef __int16          D_INT16;
 typedef unsigned __int16 D_UINT16;
 
-typedef __int32 D_INT32;
+typedef __int32          D_INT32;
 typedef unsigned __int32 D_UINT32;
 
-typedef __int64 D_INT64;
+typedef __int64          D_INT64;
 typedef unsigned __int64 D_UINT64;
 
 /* D_INTMAX is the type that could hold the biggest integer
  * for a specific architecture */
-typedef D_INT64 D_INTMAX;
-typedef D_UINT64 D_UINTMAX;
-
-typedef long double D_REAL;
-
+typedef D_INT64          D_INTMAX;
+typedef D_UINT64         D_UINTMAX;
 
 #endif /* WHISPER_TYPES_H */

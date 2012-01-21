@@ -19,5 +19,6 @@ clean:
 	rm -rf ./bin
 	rm -rf compiler/parser/whisper.tab.c compiler/parser/whisper.tab.h compiler/parser/whisper.output
 	rm -rf vc90.idb vc90.pdb
+	rm -rf _CL_c*
 
 

@@ -22,8 +22,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include <assert.h>
+
 #include "whisper.h"
-#include "whisper_sync.h"
+#include "whisper_thread.h"
 
 void
 wh_sync_init (WH_SYNC *hnd)
@@ -47,4 +49,98 @@ void
 wh_sync_leave (WH_SYNC *hnd)
 {
   LeaveCriticalSection (hnd);
+}
+
+D_INT
+wh_cond_value_init (WH_COND_VALUE* pCondValue)
+{
+  InitializeConditionVariable (pCondValue);
+  return WOP_OK;
+}
+
+D_INT
+wh_cond_value_wait (WH_COND_VALUE* pCondValue, WH_SYNC* pSync)
+{
+  if (SleepConditionVariableCS (pCondValue, pSync, INFINITE) != 0)
+    {
+      D_INT result = GetLastError ();
+      if (result == WOP_OK)
+        result = WOP_UNKNOW;
+
+      return result;
+    }
+
+  return WOP_OK;
+}
+
+D_INT
+wh_cond_value_signal (WH_COND_VALUE* pCondValue)
+{
+  WakeConditionVariable (pCondValue);
+
+  return WOP_OK;
+}
+
+D_INT
+wh_cond_value_broadcast (WH_COND_VALUE* pCondValue)
+{
+  WakeAllConditionVariable (pCondValue);
+
+  return WOP_OK;
+}
+
+D_INT
+wh_cond_value_destroy (WH_COND_VALUE* pCondValue)
+{
+  assert (pCondValue != NULL);
+  return WOP_OK;
+}
+
+D_INT
+wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
+{
+  *pThread = CreateThread (NULL, 0, (LPTHREAD_START_ROUTINE)routine, args, 0, NULL);
+
+  if (*pThread == NULL)
+    {
+      D_INT result = GetLastError ();
+      if (result == WOP_OK)
+        result = WOP_UNKNOW;
+
+      return result;
+    }
+
+  return WOP_OK;
+}
+
+D_INT
+wh_thread_join (WH_THREAD thread)
+{
+  D_INT result = WOP_OK;
+
+  if (WaitForSingleObject (thread, INFINITE) != WAIT_OBJECT_0)
+    {
+      result = GetLastError ();
+      if (result == WOP_OK)
+        result = WOP_UNKNOW;
+    }
+
+  CloseHandle (thread);
+
+  return result;
+}
+
+void
+wh_yield ()
+{
+  Sleep (0);
+}
+
+void
+wh_sleep (D_UINT millisecs)
+{
+  if (millisecs == 0)
+    return;
+
+  Sleep (millisecs);
 }

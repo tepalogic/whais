@@ -24,7 +24,7 @@ using namespace pastra;
 bool test_bool_array ()
 {
   std::cout << "Testing T_BOOL array... ";
-  D_UINT result = true;
+  bool result = true;
   DBSArray anotherArray ((DBSBool *)NULL);
 
   if (result)
@@ -83,7 +83,7 @@ template <typename T, typename Tint> bool
 test_integers_array (const char *type)
 {
   std::cout << "Testing " << type << " array... ";
-  D_UINT result = true;
+  bool result = true;
 
   D_UINT64 elementsCount = 0;
   T nullValue (true, 0);
@@ -141,7 +141,7 @@ bool
 test_dates_array ()
 {
   std::cout << "Testing T_DATE array... ";
-  D_UINT result = true;
+  bool result = true;
 
   D_UINT elementsCount = 0;
   D_INT year = 1;
@@ -203,7 +203,7 @@ bool
 test_datetimes_array ()
 {
   std::cout << "Testing T_DATETIME array... ";
-  D_UINT result = true;
+  bool result = true;
 
   D_UINT elementsCount = 0;
   D_INT year = 1;
@@ -278,7 +278,7 @@ bool
 test_hiresdate_array ()
 {
   std::cout << "Testing T_HIRESTIME array... ";
-  D_UINT result = true;
+  bool result = true;
 
   D_UINT elementsCount = 0;
   D_INT year = 1;

@@ -59,7 +59,7 @@ typedef u_int64_t     D_UINT64;
 
 /* D_INTMAX is the type that could hold the biggest integer
  * for a specific architecture */
-typedef D_INT64  D_INTMAX;
-typedef D_UINT64 D_UINTMAX;
+typedef D_INT64       D_INTMAX;
+typedef D_UINT64      D_UINTMAX;
 
 #endif /* WHISPER_TYPES_H */
