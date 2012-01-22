@@ -27,33 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wthread.h"
 #include "wfile.h"
 
-void
-__internal_thread_routine (const WH_THREAD_ROUTINE routine, void *const args)
-{
-  WThread* const pThread = _RC(WThread*, args);
 
-  try
-  {
-    pThread->m_Routine (pThread->m_RoutineArgs);
-  }
-  catch (WException &e)
-  {
-    if (pThread->m_IgnoreExceptions == false)
-      pThread->m_Exception = e.Clone ();
-  }
-  catch (WException *pE)
-  {
-    if (pThread->m_IgnoreExceptions == false)
-      pThread->m_Exception = pE;
-  }
-  catch (...)
-  {
-    if (pThread->m_IgnoreExceptions == false)
-      pThread->m_UnkExceptSignaled = true;
-  }
-
-  pThread->m_Ended = true;
-}
 
 WThread::WThread (WH_THREAD_ROUTINE routine, void* const args) :
   m_Routine (routine),
@@ -62,15 +36,19 @@ WThread::WThread (WH_THREAD_ROUTINE routine, void* const args) :
   m_ThreadHnd (0),
   m_UnkExceptSignaled (false),
   m_IgnoreExceptions (false),
-  m_Ended (true)
+  m_Ended (true),
+  m_Joined (true)
 {
-  if (wh_thread_create (&m_ThreadHnd, __internal_thread_routine, this) != WOP_OK)
-    throw WThreadException (NULL, _EXTRA (FAILEDOP_EXCEPTION));
+  if (wh_thread_create (&m_ThreadHnd, WThread::ThreadWrapperRoutine, this) != WOP_OK)
+    throw WThreadException (NULL, _EXTRA (WThreadException::FAILEDOP_EXCEPTION));
+
+  m_Joined = false;
 }
 
 WThread::~WThread ()
 {
-  wh_thread_join (m_ThreadHnd);
+  if ( ! m_Joined)
+    wh_thread_join (m_ThreadHnd);
 
   delete m_Exception;
   //Do not throw exceptions from a destructor. Is not a smart idea at all.
@@ -80,6 +58,9 @@ void
 WThread::Join ()
 {
   wh_thread_join (m_ThreadHnd);
+
+  m_Joined = true;
+
   SignalPendingException ();
 }
 
@@ -104,4 +85,32 @@ WThread::SignalPendingException ()
 
       throw pTemp;
     }
+}
+
+void
+WThread::ThreadWrapperRoutine (void *const args)
+{
+  WThread* const pThread = _RC(WThread*, args);
+
+  try
+  {
+    pThread->m_Routine (pThread->m_RoutineArgs);
+  }
+  catch (WException &e)
+  {
+    if (pThread->m_IgnoreExceptions == false)
+      pThread->m_Exception = e.Clone ();
+  }
+  catch (WException *pE)
+  {
+    if (pThread->m_IgnoreExceptions == false)
+      pThread->m_Exception = pE;
+  }
+  catch (...)
+  {
+    if (pThread->m_IgnoreExceptions == false)
+      pThread->m_UnkExceptSignaled = true;
+  }
+
+  pThread->m_Ended = true;
 }

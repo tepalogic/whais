@@ -42,21 +42,18 @@ struct DBSBool
   explicit DBSBool (bool isNull, bool value = DEFAULT_BOOL_VALUE):
       m_Value (value), m_IsNull (isNull)
   {}
-  DBSBool (const DBSBool &source) :
+  DBSBool (const DBSBool& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
-  DBSBool& operator= (const DBSBool &source)
+  DBSBool& operator= (const DBSBool& source)
   {
-    if (this != &source)
-      {
-        _CC (bool&, m_Value) = source.m_Value;
-        _CC (bool&, m_IsNull) = source.m_IsNull;
-      }
+    _CC (bool&, m_Value) = source.m_Value;
+    _CC (bool&, m_IsNull) = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSBool &source) const
+  bool operator< (const DBSBool& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -68,7 +65,7 @@ struct DBSBool
     return false;
   }
 
-  bool operator== (const DBSBool &source) const
+  bool operator== (const DBSBool& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -78,7 +75,6 @@ struct DBSBool
 
     return (m_Value == source.m_Value);
   }
-
 
   operator DBS_FIELD_TYPE () const { return T_BOOL; }
   bool IsNull () const { return m_IsNull; }
@@ -93,22 +89,18 @@ struct DBSChar
       m_Value (ch), m_IsNull (isNull)
   {}
 
-  DBSChar (const DBSChar &source) :
+  DBSChar (const DBSChar& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
-  DBSChar& operator= (const DBSChar &source)
+  DBSChar& operator= (const DBSChar& source)
   {
-    if (this != &source)
-      {
-        _CC (D_UINT32&, m_Value) = source.m_Value;
-        _CC (bool&, m_IsNull)    = source.m_IsNull;
-      }
-
+    _CC (D_UINT32&, m_Value) = source.m_Value;
+    _CC (bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSChar &source) const
+  bool operator< (const DBSChar& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -119,7 +111,7 @@ struct DBSChar
     return false;
   }
 
-  bool operator== (const DBSChar &source) const
+  bool operator== (const DBSChar& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -143,26 +135,23 @@ struct DBSDate
                     D_INT32 year = DEFAULT_INT_VALUE,
                     D_UINT8 month = DEFAULT_INT_VALUE,
                     D_UINT8 day = DEFAULT_INT_VALUE);
-  DBSDate (const DBSDate &source) :
+  DBSDate (const DBSDate& source) :
     m_Year (source.m_Year),
     m_Month (source.m_Month),
     m_Day (source.m_Day),
     m_IsNull (source.m_IsNull)
   {}
 
-  DBSDate& operator= (const DBSDate &source)
+  DBSDate& operator= (const DBSDate& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT16&, m_Year)  = source.m_Year;
-        _CC( D_UINT8&, m_Month) = source.m_Month;
-        _CC( D_UINT8&, m_Day)   = source.m_Day;
-        _CC( bool&, m_IsNull)   = source.m_IsNull;
-      }
+    _CC( D_INT16&, m_Year)  = source.m_Year;
+    _CC( D_UINT8&, m_Month) = source.m_Month;
+    _CC( D_UINT8&, m_Day)   = source.m_Day;
+    _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSDate &source) const
+  bool operator< (const DBSDate& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -183,7 +172,7 @@ struct DBSDate
     return false;
   }
 
-  bool operator== (const DBSDate &source) const
+  bool operator== (const DBSDate& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -216,7 +205,7 @@ struct DBSDateTime
                         D_UINT8 minutes = DEFAULT_INT_VALUE,
                         D_UINT8 seconds = DEFAULT_INT_VALUE);
 
-  DBSDateTime (const DBSDateTime &source) :
+  DBSDateTime (const DBSDateTime& source) :
     m_Year (source.m_Year),
     m_Month (source.m_Month),
     m_Day (source.m_Day),
@@ -228,20 +217,17 @@ struct DBSDateTime
 
   DBSDateTime& operator= (const DBSDateTime& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT16&, m_Year)    = source.m_Year;
-        _CC( D_UINT8&, m_Month)   = source.m_Month;
-        _CC( D_UINT8&, m_Day)     = source.m_Day;
-        _CC( D_UINT8&, m_Hour)    = source.m_Hour;
-        _CC( D_UINT8&, m_Minutes) = source.m_Minutes;
-        _CC( D_UINT8&, m_Seconds) = source.m_Seconds;
-        _CC( bool&, m_IsNull)     = source.m_IsNull;
-      }
+    _CC( D_INT16&, m_Year)    = source.m_Year;
+    _CC( D_UINT8&, m_Month)   = source.m_Month;
+    _CC( D_UINT8&, m_Day)     = source.m_Day;
+    _CC( D_UINT8&, m_Hour)    = source.m_Hour;
+    _CC( D_UINT8&, m_Minutes) = source.m_Minutes;
+    _CC( D_UINT8&, m_Seconds) = source.m_Seconds;
+    _CC( bool&, m_IsNull)     = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSDateTime &source) const
+  bool operator< (const DBSDateTime& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -277,7 +263,7 @@ struct DBSDateTime
     return false;
   }
 
-  bool operator== (const DBSDateTime &source) const
+  bool operator== (const DBSDateTime& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -317,7 +303,7 @@ struct DBSHiresTime
                          D_UINT8 seconds = DEFAULT_INT_VALUE,
                          D_UINT32 microsec = DEFAULT_INT_VALUE );
 
-  DBSHiresTime (const DBSHiresTime &source) :
+  DBSHiresTime (const DBSHiresTime& source) :
     m_Microsec (source.m_Microsec),
     m_Year (source.m_Year),
     m_Month (source.m_Month),
@@ -330,21 +316,18 @@ struct DBSHiresTime
 
   DBSHiresTime& operator= (const DBSHiresTime& source)
   {
-    if (this != &source)
-      {
-        _CC( D_UINT32&, m_Microsec) = source.m_Microsec;
-        _CC( D_INT16&, m_Year)      = source.m_Year;
-        _CC( D_UINT8&, m_Month)     = source.m_Month;
-        _CC( D_UINT8&, m_Day)       = source.m_Day;
-        _CC( D_UINT8&, m_Hour)      = source.m_Hour;
-        _CC( D_UINT8&, m_Minutes)   = source.m_Minutes;
-        _CC( D_UINT8&, m_Seconds)   = source.m_Seconds;
-        _CC( bool&, m_IsNull)       = source.m_IsNull;
-      }
+    _CC( D_UINT32&, m_Microsec) = source.m_Microsec;
+    _CC( D_INT16&, m_Year)      = source.m_Year;
+    _CC( D_UINT8&, m_Month)     = source.m_Month;
+    _CC( D_UINT8&, m_Day)       = source.m_Day;
+    _CC( D_UINT8&, m_Hour)      = source.m_Hour;
+    _CC( D_UINT8&, m_Minutes)   = source.m_Minutes;
+    _CC( D_UINT8&, m_Seconds)   = source.m_Seconds;
+    _CC( bool&, m_IsNull)       = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSHiresTime &source) const
+  bool operator< (const DBSHiresTime& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -385,7 +368,7 @@ struct DBSHiresTime
     return false;
   }
 
-  bool operator== (const DBSHiresTime &source) const
+  bool operator== (const DBSHiresTime& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -423,21 +406,18 @@ struct DBSUInt8
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSUInt8 (const DBSUInt8 &source) :
+  DBSUInt8 (const DBSUInt8& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt8& operator= (const DBSUInt8& source)
   {
-    if (this != &source)
-      {
-        _CC( D_UINT8&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)   = source.m_IsNull;
-      }
+    _CC( D_UINT8&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSUInt8 &source) const
+  bool operator< (const DBSUInt8& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -448,7 +428,7 @@ struct DBSUInt8
     return false;
   }
 
-  bool operator== (const DBSUInt8 &source) const
+  bool operator== (const DBSUInt8& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -473,21 +453,18 @@ struct DBSUInt16
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSUInt16 (const DBSUInt16 &source) :
+  DBSUInt16 (const DBSUInt16& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt16& operator= (const DBSUInt16& source)
   {
-    if (this != &source)
-      {
-        _CC( D_UINT16&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)    = source.m_IsNull;
-      }
+    _CC( D_UINT16&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSUInt16 &source) const
+  bool operator< (const DBSUInt16& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -498,7 +475,7 @@ struct DBSUInt16
     return false;
   }
 
-  bool operator== (const DBSUInt16 &source) const
+  bool operator== (const DBSUInt16& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -523,21 +500,18 @@ struct DBSUInt32
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSUInt32 (const DBSUInt32 &source) :
+  DBSUInt32 (const DBSUInt32& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt32& operator= (const DBSUInt32& source)
   {
-    if (this != &source)
-      {
-        _CC( D_UINT32&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)    = source.m_IsNull;
-      }
+    _CC( D_UINT32&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSUInt32 &source) const
+  bool operator< (const DBSUInt32& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -548,7 +522,7 @@ struct DBSUInt32
     return false;
   }
 
-  bool operator== (const DBSUInt32 &source) const
+  bool operator== (const DBSUInt32& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -573,21 +547,18 @@ struct DBSUInt64
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSUInt64 (const DBSUInt64 &source) :
+  DBSUInt64 (const DBSUInt64& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt64& operator= (const DBSUInt64& source)
   {
-    if (this != &source)
-      {
-        _CC( D_UINT64&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)    = source.m_IsNull;
-      }
+    _CC( D_UINT64&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSUInt64 &source) const
+  bool operator< (const DBSUInt64& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -598,7 +569,7 @@ struct DBSUInt64
     return false;
   }
 
-  bool operator== (const DBSUInt64 &source) const
+  bool operator== (const DBSUInt64& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -623,21 +594,18 @@ struct DBSInt8
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSInt8 (const DBSInt8 &source) :
+  DBSInt8 (const DBSInt8& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSInt8& operator= (const DBSInt8& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT8&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)  = source.m_IsNull;
-      }
+    _CC( D_INT8&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)  = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSInt8 &source) const
+  bool operator< (const DBSInt8& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -648,7 +616,7 @@ struct DBSInt8
     return false;
   }
 
-  bool operator== (const DBSInt8 &source) const
+  bool operator== (const DBSInt8& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -673,21 +641,18 @@ struct DBSInt16
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSInt16 (const DBSInt16 &source) :
+  DBSInt16 (const DBSInt16& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSInt16& operator= (const DBSInt16& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT16&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)   = source.m_IsNull;
-      }
+    _CC( D_INT16&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSInt16 &source) const
+  bool operator< (const DBSInt16& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -698,7 +663,7 @@ struct DBSInt16
     return false;
   }
 
-  bool operator== (const DBSInt16 &source) const
+  bool operator== (const DBSInt16& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -723,21 +688,18 @@ struct DBSInt32
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSInt32 (const DBSInt32 &source) :
+  DBSInt32 (const DBSInt32& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSInt32& operator= (const DBSInt32& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT32&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)   = source.m_IsNull;
-      }
+    _CC( D_INT32&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSInt32 &source) const
+  bool operator< (const DBSInt32& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -748,7 +710,7 @@ struct DBSInt32
     return false;
   }
 
-  bool operator== (const DBSInt32 &source) const
+  bool operator== (const DBSInt32& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -773,21 +735,18 @@ struct DBSInt64
       m_Value (value), m_IsNull (isNull)
   {}
 
-  DBSInt64 (const DBSInt64 &source) :
+  DBSInt64 (const DBSInt64& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSInt64& operator= (const DBSInt64& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT64&, m_Value) = source.m_Value;
-        _CC( bool&, m_IsNull)   = source.m_IsNull;
-      }
+    _CC( D_INT64&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSInt64 &source) const
+  bool operator< (const DBSInt64& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -798,7 +757,7 @@ struct DBSInt64
     return false;
   }
 
-  bool operator== (const DBSInt64 &source) const
+  bool operator== (const DBSInt64& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -827,18 +786,15 @@ struct DBSReal
     m_IntPart (source.m_IntPart), m_FracPart (source.m_FracPart), m_IsNull (source.m_IsNull)
   {}
 
-  DBSReal& operator= (const DBSReal &source)
+  DBSReal& operator= (const DBSReal& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT64&, m_IntPart)   = source.m_IntPart;
-        _CC( D_UINT64&, m_FracPart) = source.m_FracPart;
-        _CC( bool&, m_IsNull)       = source.m_IsNull;
-      }
+    _CC( D_INT64&, m_IntPart)   = source.m_IntPart;
+    _CC( D_UINT64&, m_FracPart) = source.m_FracPart;
+    _CC( bool&, m_IsNull)       = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSReal &source) const
+  bool operator< (const DBSReal& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -854,7 +810,7 @@ struct DBSReal
     return false;
   }
 
-  bool operator== (const DBSReal &source) const
+  bool operator== (const DBSReal& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -884,18 +840,15 @@ struct DBSRichReal
     m_IntPart (source.m_IntPart), m_FracPart (source.m_FracPart), m_IsNull (source.m_IsNull)
   {}
 
-  DBSRichReal& operator= (const DBSRichReal &source)
+  DBSRichReal& operator= (const DBSRichReal& source)
   {
-    if (this != &source)
-      {
-        _CC( D_INT64&, m_IntPart)   = source.m_IntPart;
-        _CC( D_UINT64&, m_FracPart) = source.m_FracPart;
-        _CC( bool&, m_IsNull)       = source.m_IsNull;
-      }
+    _CC( D_INT64&, m_IntPart)   = source.m_IntPart;
+    _CC( D_UINT64&, m_FracPart) = source.m_FracPart;
+    _CC( bool&, m_IsNull)       = source.m_IsNull;
     return *this;
   }
 
-  bool operator< (const DBSRichReal &source) const
+  bool operator< (const DBSRichReal& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
@@ -911,7 +864,7 @@ struct DBSRichReal
     return false;
   }
 
-  bool operator== (const DBSRichReal &source) const
+  bool operator== (const DBSRichReal& source) const
   {
     if (m_IsNull != source.m_IsNull)
       return false;
@@ -936,11 +889,11 @@ class I_TextStrategy;
 class DBSText
 {
 public:
-  explicit DBSText (const D_UINT8 *pUtf8String = NULL);
-  explicit DBSText (I_TextStrategy &text);
+  explicit DBSText (const D_UINT8* pUtf8String = NULL);
+  explicit DBSText (I_TextStrategy& text);
 
-  DBSText (const DBSText &sourceText);
-  DBSText& operator= (const DBSText &sourceText);
+  DBSText (const DBSText& sourceText);
+  DBSText& operator= (const DBSText& sourceText);
   bool operator== (const DBSText &text);
 
   virtual ~DBSText ();
@@ -949,14 +902,14 @@ public:
 
   D_UINT64 GetCharactersCount() const;
   D_UINT64 GetRawUtf8Count() const;
-  void     GetRawUtf8 (D_UINT64 offset, D_UINT64 count, D_UINT8 *const pBuffer) const;
+  void     GetRawUtf8 (D_UINT64 offset, D_UINT64 count, D_UINT8* const pBuffer) const;
 
 
-  void Append (const DBSChar &character);
-  void Append (const DBSText &text);
+  void Append (const DBSChar& character);
+  void Append (const DBSText& text);
 
   DBSChar GetCharAtIndex(const D_UINT64 index) const;
-  void    SetCharAtIndex (const DBSChar &rCharacter, const D_UINT64 index);
+  void    SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index);
 
   operator DBS_FIELD_TYPE () const { return T_TEXT; }
 
@@ -971,23 +924,23 @@ class DBSArray
 {
 public:
 
-  explicit DBSArray (const DBSBool *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSChar *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSDate *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSDateTime *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSHiresTime *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt8 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt16 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt32 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt64 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSReal *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSRichReal *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt8 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt16 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt32 *array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt64 *array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSBool* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSChar* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSDate* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSDateTime* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSHiresTime* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSUInt8* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSUInt16* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSUInt32* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSUInt64* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSReal* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSRichReal* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSInt8* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSInt16* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSInt32* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSInt64* array, D_UINT64 count = 0);
 
-  explicit DBSArray (I_ArrayStrategy &array);
+  explicit DBSArray (I_ArrayStrategy& array);
 
   virtual ~DBSArray ();
 
@@ -998,55 +951,56 @@ public:
   D_UINT64       GetElementsCount () const;
   DBS_FIELD_TYPE GetElementsType () const;
 
-  D_UINT64 AddElement (const DBSBool &value);
-  D_UINT64 AddElement (const DBSChar &value);
-  D_UINT64 AddElement (const DBSDate &value);
-  D_UINT64 AddElement (const DBSDateTime &value);
-  D_UINT64 AddElement (const DBSHiresTime &value);
-  D_UINT64 AddElement (const DBSUInt8 &value);
-  D_UINT64 AddElement (const DBSUInt16 &value);
-  D_UINT64 AddElement (const DBSUInt32 &value);
-  D_UINT64 AddElement (const DBSUInt64 &value);
-  D_UINT64 AddElement (const DBSReal &value);
-  D_UINT64 AddElement (const DBSRichReal &value);
-  D_UINT64 AddElement (const DBSInt8 &value);
-  D_UINT64 AddElement (const DBSInt16 &value);
-  D_UINT64 AddElement (const DBSInt32 &value);
-  D_UINT64 AddElement (const DBSInt64 &value);
+  D_UINT64 AddElement (const DBSBool& value);
+  D_UINT64 AddElement (const DBSChar& value);
+  D_UINT64 AddElement (const DBSDate& value);
+  D_UINT64 AddElement (const DBSDateTime& value);
+  D_UINT64 AddElement (const DBSHiresTime& value);
+  D_UINT64 AddElement (const DBSUInt8& value);
+  D_UINT64 AddElement (const DBSUInt16& value);
+  D_UINT64 AddElement (const DBSUInt32& value);
+  D_UINT64 AddElement (const DBSUInt64& value);
+  D_UINT64 AddElement (const DBSReal& value);
+  D_UINT64 AddElement (const DBSRichReal& value);
+  D_UINT64 AddElement (const DBSInt8& value);
+  D_UINT64 AddElement (const DBSInt16& value);
+  D_UINT64 AddElement (const DBSInt32& value);
+  D_UINT64 AddElement (const DBSInt64& value);
 
-  void GetElement (DBSBool &outValue, const D_UINT64 index) const;
-  void GetElement (DBSChar &outValue, const D_UINT64 index) const;
-  void GetElement (DBSDate &outValue, const D_UINT64 index) const;
-  void GetElement (DBSDateTime &outValue, const D_UINT64 index) const;
-  void GetElement (DBSHiresTime &outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt8 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt16 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt32 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt64 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSReal &outValue, const D_UINT64 index) const;
-  void GetElement (DBSRichReal &outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt8 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt16 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt32 &outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt64 &outValue, const D_UINT64 index) const;
+  void GetElement (DBSBool& outValue, const D_UINT64 index) const;
+  void GetElement (DBSChar& outValue, const D_UINT64 index) const;
+  void GetElement (DBSDate& outValue, const D_UINT64 index) const;
+  void GetElement (DBSDateTime& outValue, const D_UINT64 index) const;
+  void GetElement (DBSHiresTime& outValue, const D_UINT64 index) const;
+  void GetElement (DBSUInt8& outValue, const D_UINT64 index) const;
+  void GetElement (DBSUInt16& outValue, const D_UINT64 index) const;
+  void GetElement (DBSUInt32& outValue, const D_UINT64 index) const;
+  void GetElement (DBSUInt64& outValue, const D_UINT64 index) const;
+  void GetElement (DBSReal& outValue, const D_UINT64 index) const;
+  void GetElement (DBSRichReal& outValue, const D_UINT64 index) const;
+  void GetElement (DBSInt8& outValue, const D_UINT64 index) const;
+  void GetElement (DBSInt16& outValue, const D_UINT64 index) const;
+  void GetElement (DBSInt32& outValue, const D_UINT64 index) const;
+  void GetElement (DBSInt64& outValue, const D_UINT64 index) const;
 
-  void SetElement (const DBSBool &newValue, const D_UINT64 index);
-  void SetElement (const DBSChar &newValue, const D_UINT64 index);
-  void SetElement (const DBSDate &newValue, const D_UINT64 index);
-  void SetElement (const DBSDateTime &newValue, const D_UINT64 index);
-  void SetElement (const DBSHiresTime &newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt8 &newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt16 &newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt32 &newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt64 &newValue, const D_UINT64 index);
-  void SetElement (const DBSReal &newValue, const D_UINT64 index);
-  void SetElement (const DBSRichReal &newValue, const D_UINT64 index);
-  void SetElement (const DBSInt8 &newValue, const D_UINT64 index);
-  void SetElement (const DBSInt16 &newValue, const D_UINT64 index);
-  void SetElement (const DBSInt32 &newValue, const D_UINT64 index);
-  void SetElement (const DBSInt64 &newValue, const D_UINT64 index);
+  void SetElement (const DBSBool& newValue, const D_UINT64 index);
+  void SetElement (const DBSChar& newValue, const D_UINT64 index);
+  void SetElement (const DBSDate& newValue, const D_UINT64 index);
+  void SetElement (const DBSDateTime& newValue, const D_UINT64 index);
+  void SetElement (const DBSHiresTime& newValue, const D_UINT64 index);
+  void SetElement (const DBSUInt8& newValue, const D_UINT64 index);
+  void SetElement (const DBSUInt16& newValue, const D_UINT64 index);
+  void SetElement (const DBSUInt32& newValue, const D_UINT64 index);
+  void SetElement (const DBSUInt64& newValue, const D_UINT64 index);
+  void SetElement (const DBSReal& newValue, const D_UINT64 index);
+  void SetElement (const DBSRichReal& newValue, const D_UINT64 index);
+  void SetElement (const DBSInt8& newValue, const D_UINT64 index);
+  void SetElement (const DBSInt16& newValue, const D_UINT64 index);
+  void SetElement (const DBSInt32& newValue, const D_UINT64 index);
+  void SetElement (const DBSInt64& newValue, const D_UINT64 index);
 
   void RemoveElement (const D_UINT64 index);
+  void Sort (bool reverse = false);
 
   operator I_ArrayStrategy&() const { return *m_pArray; }
 

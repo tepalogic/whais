@@ -39,6 +39,11 @@ test_tabledata_SRC=test/test_tabledata.cpp
 test_tabledata_LIB=dbs/pastra utils/utils custom/custom
 test_tabledata_INC=utils/include custom/include
 
+UNIT_EXES+=test_arraysort
+test_arraysort_SRC=test/test_arraysort.cpp
+test_arraysort_LIB=dbs/pastra utils/utils custom/custom
+test_arraysort_INC=utils/include custom/include
+
 UNIT_EXES+=l_test_tablermrows
 l_test_tablermrows_SRC=test/test_tablermrows.cpp
 l_test_tablermrows_LIB=dbs/pastra utils/utils custom/custom

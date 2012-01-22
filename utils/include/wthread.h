@@ -95,6 +95,8 @@ public:
 
 
 protected:
+  static void ThreadWrapperRoutine (void *const);
+
   const WH_THREAD_ROUTINE m_Routine;
   void* const             m_RoutineArgs;
   WException*             m_Exception;
@@ -102,6 +104,7 @@ protected:
   bool                    m_UnkExceptSignaled;
   bool                    m_IgnoreExceptions;
   bool                    m_Ended;
+  bool                    m_Joined;
 
 private:
   friend void __internal_thread_routine (WThread *const, const WH_THREAD_ROUTINE, void *const);

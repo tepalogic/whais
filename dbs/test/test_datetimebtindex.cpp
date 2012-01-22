@@ -31,7 +31,7 @@ D_UINT _removedRows = _rowsCount / 10;
 static DBSDateTime _max_date (false, 0x7FFF, 12, 31, 23, 59, 59);
 
 DBSDateTime
-get_random_hires_time ()
+get_random_datetime ()
 {
   D_INT16 year  = w_rnd () & 0xFFFF;
   D_UINT8 month = w_rnd () % 12 + 1;
@@ -58,7 +58,7 @@ fill_table_with_values (I_DBSTable &table,
   w_rnd_set_seed (seed);
   for (D_UINT index = 0; index < rowCount; ++index)
     {
-      DBSDateTime value = get_random_hires_time ();
+      DBSDateTime value = get_random_datetime ();
       if (table.AddRow () != index)
         {
           result = false;
