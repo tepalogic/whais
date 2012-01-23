@@ -936,8 +936,24 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to)
   DBS_T         leftEl (true);
   DBS_T         pivot (true);
   DBS_T         rightEl (true);
+  DBS_T         temp (true);
 
   array.GetElement (pivot, pivotIndex);
+  array.GetElement (leftEl, from);
+
+  if (leftEl == pivot)
+    {
+      while (from < to)
+        {
+          array.GetElement (leftEl, from + 1);
+          if (leftEl == pivot)
+            ++from;
+          else
+            break;
+        }
+      if (from == to)
+        return pivotIndex;
+    }
 
   while (from < to)
     {
@@ -948,6 +964,18 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to)
             ++from;
           else
             break;
+        }
+
+      if (leftEl == pivot)
+        {
+          while (from < to)
+            {
+              array.GetElement (temp, from + 1);
+              if (temp == pivot)
+                ++from;
+              else
+                break;
+            }
         }
 
       assert ((from < to) || (leftEl == pivot));
@@ -966,7 +994,10 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to)
       if (from < to)
         {
           if (leftEl == rightEl)
-            ++from;
+            {
+              assert (leftEl == pivot);
+              ++from;
+            }
           else
             {
               array.SetElement (leftEl, to);
@@ -988,8 +1019,24 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to)
   DBS_T         leftEl (true);
   DBS_T         pivot (true);
   DBS_T         rightEl (true);
+  DBS_T         temp (true);
 
   array.GetElement (pivot, pivotIndex);
+  array.GetElement (leftEl, from);
+
+  if (leftEl == pivot)
+    {
+      while (from < to)
+        {
+          array.GetElement (leftEl, from + 1);
+          if (leftEl == pivot)
+            ++from;
+          else
+            break;
+        }
+      if (from == to)
+        return pivotIndex;
+    }
 
   while (from < to)
     {
@@ -1000,6 +1047,18 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to)
             ++from;
           else
             break;
+        }
+
+      if (leftEl == pivot)
+        {
+          while (from < to)
+            {
+              array.GetElement (temp, from + 1);
+              if (temp == pivot)
+                ++from;
+              else
+                break;
+            }
         }
 
       assert ((from < to) || (leftEl == pivot));
@@ -1018,7 +1077,10 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to)
       if (from < to)
         {
           if (leftEl == rightEl)
-            ++from;
+            {
+              assert (leftEl == pivot);
+              ++from;
+            }
           else
             {
               array.SetElement (leftEl, to);

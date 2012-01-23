@@ -100,7 +100,7 @@ test_array_with_datetimes (void *)
   array.Sort ();
 
   if (array.GetElementsCount () != _elemsCount)
-    throw 0;
+    throw 2;
 
   DBSDateTime lastValue (true);
   for (D_UINT index = 0; index < _elemsCount; ++index)
@@ -108,7 +108,7 @@ test_array_with_datetimes (void *)
       DBSDateTime currValue (true);
       array.GetElement (currValue, index);
       if (currValue < lastValue)
-        throw 1;
+        throw 3;
 
       lastValue = currValue;
     }
@@ -128,7 +128,7 @@ test_array_with_hirestimes (void *)
   array.Sort ();
 
   if (array.GetElementsCount () != _elemsCount)
-    throw 0;
+    throw 4;
 
   DBSHiresTime lastValue (true);
   for (D_UINT index = 0; index < _elemsCount; ++index)
@@ -136,12 +136,40 @@ test_array_with_hirestimes (void *)
       DBSHiresTime currValue (true);
       array.GetElement (currValue, index);
       if (currValue < lastValue)
-        throw 1;
+        throw 5;
 
       lastValue = currValue;
     }
 
   std::cout << "Testing array sort with hirestimes ended!\n";
+}
+
+void
+test_array_with_int8 (void *)
+{
+  std::cout << "Testing array sort with int8 ...\n";
+  DBSArray array (_SC (DBSUInt8*, NULL));
+
+  for (D_UINT index = 0; index < _elemsCount; ++index)
+    array.AddElement (DBSUInt8 (false,  w_rnd () & 0xFF));
+
+  array.Sort ();
+
+  if (array.GetElementsCount () != _elemsCount)
+    throw 6;
+
+  DBSUInt8 lastValue (true);
+  for (D_UINT index = 0; index < _elemsCount; ++index)
+    {
+      DBSUInt8 currValue (true);
+      array.GetElement (currValue, index);
+      if (currValue < lastValue)
+        throw 7;
+
+      lastValue = currValue;
+    }
+
+  std::cout << "Testing array sort with int8 ended!\n";
 }
 
 
@@ -157,7 +185,7 @@ test_array_with_dates_r (void *)
   array.Sort (true);
 
   if (array.GetElementsCount () != _elemsCount)
-    throw 0;
+    throw 8;
 
   DBSDate lastValue (true);
   for (D_UINT index = _elemsCount; index-- > 0;)
@@ -165,7 +193,7 @@ test_array_with_dates_r (void *)
       DBSDate currValue (true);
       array.GetElement (currValue, index);
       if (currValue < lastValue)
-        throw 1;
+        throw 9;
 
       lastValue = currValue;
     }
@@ -186,7 +214,7 @@ test_array_with_datetimes_r (void *)
   array.Sort (true);
 
   if (array.GetElementsCount () != _elemsCount)
-    throw 0;
+    throw 10;
 
   DBSDateTime lastValue (true);
   for (D_UINT index = _elemsCount; index-- > 0 ;)
@@ -194,7 +222,7 @@ test_array_with_datetimes_r (void *)
       DBSDateTime currValue (true);
       array.GetElement (currValue, index);
       if (currValue < lastValue)
-        throw 1;
+        throw 11;
 
       lastValue = currValue;
     }
@@ -214,7 +242,7 @@ test_array_with_hirestimes_r (void *)
   array.Sort (true);
 
   if (array.GetElementsCount () != _elemsCount)
-    throw 0;
+    throw 12;
 
   DBSHiresTime lastValue (true);
   for (D_UINT index = _elemsCount; index-- > 0;)
@@ -222,12 +250,41 @@ test_array_with_hirestimes_r (void *)
       DBSHiresTime currValue (true);
       array.GetElement (currValue, index);
       if (currValue < lastValue)
-        throw 1;
+        throw 13;
 
       lastValue = currValue;
     }
 
   std::cout << "Testing array reverse sort with hirestimes ended!\n";
+}
+
+
+void
+test_array_with_int8_r (void *)
+{
+  std::cout << "Testing array reverse sort with int8 ...\n";
+  DBSArray array (_SC (DBSUInt8*, NULL));
+
+  for (D_UINT index = 0; index < _elemsCount; ++index)
+    array.AddElement (DBSUInt8 (false, w_rnd () & 0xFF));
+
+  array.Sort (true);
+
+  if (array.GetElementsCount () != _elemsCount)
+    throw 14;
+
+  DBSUInt8 lastValue (true);
+  for (D_UINT index = _elemsCount; index-- > 0;)
+    {
+    DBSUInt8 currValue (true);
+      array.GetElement (currValue, index);
+      if (currValue < lastValue)
+        throw 15;
+
+      lastValue = currValue;
+    }
+
+  std::cout << "Testing array reverse sort with int8 ended!\n";
 }
 
 int
@@ -249,10 +306,11 @@ main ()
     WThread th1 (test_array_with_dates, NULL);
     WThread th2 (test_array_with_datetimes, NULL);
     WThread th3 (test_array_with_hirestimes, NULL);
-
     WThread th4 (test_array_with_dates_r, NULL);
     WThread th5 (test_array_with_datetimes_r, NULL);
     WThread th6 (test_array_with_hirestimes_r, NULL);
+    WThread th7 (test_array_with_int8, NULL);
+    WThread th8 (test_array_with_int8_r, NULL);
 
     th1.Join();
     th2.Join();
@@ -260,6 +318,8 @@ main ()
     th4.Join();
     th5.Join();
     th6.Join();
+    th7.Join();
+    th8.Join();
   }
 
 
