@@ -927,7 +927,7 @@ DBSArray::RemoveElement (const D_UINT64 index)
 
 
 template <class DBS_T> D_INT64
-partition (DBSArray& array, D_INT64 from, D_INT64 to)
+partition (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
 {
   assert (from < to);
   assert (to < _SC(D_INT64, array.GetElementsCount()));
@@ -941,18 +941,23 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to)
   array.GetElement (pivot, pivotIndex);
   array.GetElement (leftEl, from);
 
-  if (leftEl == pivot)
+  alreadySorted = false;
+  if ((leftEl < pivot) || (leftEl == pivot))
     {
+      temp = leftEl;
       while (from < to)
         {
           array.GetElement (leftEl, from + 1);
-          if (leftEl == pivot)
-            ++from;
+          if (((leftEl < pivot) || (leftEl == pivot)) && ((temp < leftEl) || (temp == leftEl)))
+            {
+              ++from;
+              temp = leftEl;
+            }
           else
             break;
         }
       if (from == to)
-        return pivotIndex;
+        alreadySorted = true;
     }
 
   while (from < to)
@@ -1010,7 +1015,7 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to)
 }
 
 template <class DBS_T> D_INT64
-partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to)
+partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
 {
   assert (from < to);
   assert (to < _SC(D_INT64, array.GetElementsCount()));
@@ -1024,18 +1029,23 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to)
   array.GetElement (pivot, pivotIndex);
   array.GetElement (leftEl, from);
 
-  if (leftEl == pivot)
+  alreadySorted = false;
+  if ((leftEl > pivot) || (leftEl == pivot))
     {
+      temp = leftEl;
       while (from < to)
         {
           array.GetElement (leftEl, from + 1);
-          if (leftEl == pivot)
-            ++from;
+          if (((leftEl > pivot) || (leftEl == pivot)) && ((temp > leftEl) || (temp == leftEl)))
+            {
+              ++from;
+              temp = leftEl;
+            }
           else
             break;
         }
       if (from == to)
-        return pivotIndex;
+        alreadySorted = true;
     }
 
   while (from < to)
@@ -1116,18 +1126,21 @@ quick_sort (DBSArray&  array, D_INT64 from, D_INT64 to, const bool reverse)
         continue;
 
       D_INT64 pivot;
+      bool    alreadySorted;
 
       if (reverse)
-        pivot = partition_reverse<DBS_T> (array, current.m_From, current.m_To);
+        pivot = partition_reverse<DBS_T> (array, current.m_From, current.m_To, alreadySorted);
       else
-        pivot = partition<DBS_T> (array, current.m_From, current.m_To);
+        pivot = partition<DBS_T> (array, current.m_From, current.m_To, alreadySorted);
 
-      if ((pivot + 1) < current.m_To)
-        partStack.push_back (_partition_t (pivot + 1, current.m_To));
+      if (alreadySorted == false)
+        {
+          if ((pivot + 1) < current.m_To)
+            partStack.push_back (_partition_t (pivot + 1, current.m_To));
 
-      if (current.m_From < (pivot - 1))
-        partStack.push_back (_partition_t (current.m_From, pivot - 1));
-
+          if (current.m_From < (pivot - 1))
+            partStack.push_back (_partition_t (current.m_From, pivot - 1));
+        }
     } while (partStack.size() > 0);
 }
 
