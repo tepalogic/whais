@@ -778,19 +778,17 @@ struct DBSInt64
 
 struct DBSReal
 {
-  explicit DBSReal (bool isNull,
-                    D_INT64 integerPart = DEFAULT_INT_VALUE,
-                    D_UINT64 decimalPart = DEFAULT_INT_VALUE);
+  explicit DBSReal (bool  isNull, const float value = 0.0 ) : m_Value (value), m_IsNull (isNull)
+  {}
 
   DBSReal (const DBSReal& source) :
-    m_IntPart (source.m_IntPart), m_FracPart (source.m_FracPart), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSReal& operator= (const DBSReal& source)
   {
-    _CC( D_INT64&, m_IntPart)   = source.m_IntPart;
-    _CC( D_UINT64&, m_FracPart) = source.m_FracPart;
-    _CC( bool&, m_IsNull)       = source.m_IsNull;
+    _CC( float&, m_Value) = source.m_Value;
+    _CC( bool&, m_IsNull) = source.m_IsNull;
     return *this;
   }
 
@@ -800,13 +798,7 @@ struct DBSReal
       return true;
 
     if (source.IsNull () == false)
-      {
-        if (m_IntPart < source.m_IntPart)
-          return true;
-        else if (m_IntPart == source.m_IntPart)
-          return m_FracPart < source.m_FracPart;
-      }
-
+      return (m_Value < source.m_Value);
     return false;
   }
 
@@ -818,33 +810,30 @@ struct DBSReal
     if (m_IsNull == true)
       return true;
 
-    return (m_IntPart == source.m_IntPart) &&
-            (m_FracPart == source.m_FracPart);
+    return (m_Value == source.m_Value);
   }
 
   operator DBS_FIELD_TYPE () const { return T_REAL; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT64  m_IntPart;
-  const D_UINT64 m_FracPart;
-  const bool     m_IsNull;
+  const float  m_Value;
+  const bool   m_IsNull;
 };
 
 struct DBSRichReal
 {
-  explicit DBSRichReal (bool isNull,
-                        D_INT64 integerPart = DEFAULT_INT_VALUE,
-                        D_UINT64 decimalPart = DEFAULT_INT_VALUE);
+  explicit DBSRichReal (bool  isNull, const long double value = 0.0 ) :
+      m_Value (value), m_IsNull (isNull)
+  {}
 
   DBSRichReal (const DBSRichReal& source) :
-    m_IntPart (source.m_IntPart), m_FracPart (source.m_FracPart), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
 
   DBSRichReal& operator= (const DBSRichReal& source)
   {
-    _CC( D_INT64&, m_IntPart)   = source.m_IntPart;
-    _CC( D_UINT64&, m_FracPart) = source.m_FracPart;
-    _CC( bool&, m_IsNull)       = source.m_IsNull;
+    _CC( long double&, m_Value) = source.m_Value;
+    _CC( bool&,   m_IsNull)     = source.m_IsNull;
     return *this;
   }
 
@@ -854,13 +843,7 @@ struct DBSRichReal
       return true;
 
     if (source.IsNull () == false)
-      {
-        if (m_IntPart < source.m_IntPart)
-          return true;
-        else if (m_IntPart == source.m_IntPart)
-          return m_FracPart < source.m_FracPart;
-      }
-
+      return (m_Value < source.m_Value);
     return false;
   }
 
@@ -872,16 +855,14 @@ struct DBSRichReal
     if (m_IsNull == true)
       return true;
 
-    return (m_IntPart == source.m_IntPart) &&
-            (m_FracPart == source.m_FracPart);
+    return (m_Value == source.m_Value);
   }
 
   operator DBS_FIELD_TYPE () const { return T_RICHREAL; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT64  m_IntPart;
-  const D_UINT64 m_FracPart;
-  const bool     m_IsNull;
+  const long double m_Value;
+  const bool        m_IsNull;
 };
 
 

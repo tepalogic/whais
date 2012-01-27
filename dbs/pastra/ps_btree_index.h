@@ -109,7 +109,8 @@ public:
     D_UINT64  m_Leaf          : 1;
     D_UINT64  m_Dirty         : 1;
     D_UINT64  m_Removed       : 1;
-    D_UINT64  __unused        : 61; //To make sure this is aligned well
+    D_UINT64                  : 0; //To make sure this is aligned well
+    D_UINT64  _unused;
   };
 
 protected:

@@ -250,6 +250,12 @@ FieldIndexNodeManager::NodeFactory (const NODE_INDEX nodeId)
   case T_INT64:
     result = new Int64BTreeNode (*this, nodeId);
     break;
+  case T_REAL:
+    result = new RealBTreeNode (*this, nodeId);
+    break;
+  case T_RICHREAL:
+    result = new RichRealBTreeNode (*this, nodeId);
+    break;
   default:
     assert (false);
   }

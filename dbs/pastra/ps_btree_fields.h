@@ -26,6 +26,7 @@
 #define PS_BTREE_FIELDS_H_
 
 #include <assert.h>
+#include <limits>
 
 #include "whisper.h"
 
@@ -119,18 +120,19 @@ public:
 
   virtual D_UINT GetKeysPerNode () const
   {
-    assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
+    assert (sizeof (NodeHeader) % 16 == 0);
 
     D_UINT result = m_NodesManager.GetRawNodeSize () - sizeof (NodeHeader);
 
     if (IsLeaf())
-      result /= sizeof (D_UINT64) + typeSize;
+      {
+        result /= sizeof (D_UINT64) + typeSize;
+        result &= ~1ul;
+      }
     else
       {
         result /= (sizeof (D_UINT64) + typeSize + sizeof (NODE_INDEX));
-
-        //Ensure the right alignment for NODE_INDEX by dropping rows.
-        result -= (result * typeSize) % sizeof (NODE_INDEX);
+        result &= ~3ul;
       }
 
     return result;
@@ -909,21 +911,37 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
 }
 
 
-typedef T_BTreeNode <bool, DBSBool, 1>       BoolBTreeNode;
-typedef T_BTreeNode <D_UINT32, DBSChar>      CharBTreeNode;
-typedef T_BTreeNode <void, DBSDate, 4>       DateBTreeNode;
-typedef T_BTreeNode <void, DBSDateTime, 7>   DateTimeBTreeNode;
-typedef T_BTreeNode <void, DBSHiresTime, 11> HiresTimeBTreeNode;
-typedef T_BTreeNode <D_UINT8, DBSUInt8>      UInt8BTreeNode;
-typedef T_BTreeNode <D_UINT16, DBSUInt16>    UInt16BTreeNode;
-typedef T_BTreeNode <D_UINT32, DBSUInt32>    UInt32BTreeNode;
-typedef T_BTreeNode <D_UINT64, DBSUInt64>    UInt64BTreeNode;
-typedef T_BTreeNode <void, DBSReal, 16>      RealBTreeNode;
-typedef T_BTreeNode <void, DBSRichReal, 16>  RichRealBTreeNode;
-typedef T_BTreeNode <D_INT8, DBSInt8>        Int8BTreeNode;
-typedef T_BTreeNode <D_INT16, DBSInt16>      Int16BTreeNode;
-typedef T_BTreeNode <D_INT32, DBSInt32>      Int32BTreeNode;
-typedef T_BTreeNode <D_INT64, DBSInt64>      Int64BTreeNode;
+template <> inline const I_BTreeKey&
+T_BTreeNode <float, DBSReal, sizeof (float)>::GetSentinelKey () const
+{
+  static RealBTreeKey _sentinel (DBSReal (false, std::numeric_limits<float>::infinity ()), ~0);
+  return _sentinel;
+}
+
+template <> inline const I_BTreeKey&
+T_BTreeNode <long double, DBSRichReal, sizeof (long double)>::GetSentinelKey () const
+{
+  static RichRealBTreeKey _sentinel (DBSRichReal (false,
+                                                  std::numeric_limits<long double>::infinity ()),
+                                     ~0);
+  return _sentinel;
+}
+
+typedef T_BTreeNode <bool, DBSBool, 1>         BoolBTreeNode;
+typedef T_BTreeNode <D_UINT32, DBSChar>        CharBTreeNode;
+typedef T_BTreeNode <void, DBSDate, 4>         DateBTreeNode;
+typedef T_BTreeNode <void, DBSDateTime, 7>     DateTimeBTreeNode;
+typedef T_BTreeNode <void, DBSHiresTime, 11>   HiresTimeBTreeNode;
+typedef T_BTreeNode <D_UINT8, DBSUInt8>        UInt8BTreeNode;
+typedef T_BTreeNode <D_UINT16, DBSUInt16>      UInt16BTreeNode;
+typedef T_BTreeNode <D_UINT32, DBSUInt32>      UInt32BTreeNode;
+typedef T_BTreeNode <D_UINT64, DBSUInt64>      UInt64BTreeNode;
+typedef T_BTreeNode <float, DBSReal>           RealBTreeNode;
+typedef T_BTreeNode <long double, DBSRichReal> RichRealBTreeNode;
+typedef T_BTreeNode <D_INT8, DBSInt8>          Int8BTreeNode;
+typedef T_BTreeNode <D_INT16, DBSInt16>        Int16BTreeNode;
+typedef T_BTreeNode <D_INT32, DBSInt32>        Int32BTreeNode;
+typedef T_BTreeNode <D_INT64, DBSInt64>        Int64BTreeNode;
 
 class FieldIndexNodeManager : public I_BTreeNodeManager
 {

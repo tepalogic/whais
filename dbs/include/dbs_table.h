@@ -200,11 +200,27 @@ public:
 
   virtual DBSArray GetMatchingRows (const DBSInt64& min,
                                     const DBSInt64& max,
-                                    const D_UINT64   fromRow,
-                                    const D_UINT64   toRow,
-                                    const D_UINT64   ignoreFirst,
-                                    const D_UINT64   maxCount,
-                                    const D_UINT     fieldIndex) = 0;
+                                    const D_UINT64  fromRow,
+                                    const D_UINT64  toRow,
+                                    const D_UINT64  ignoreFirst,
+                                    const D_UINT64  maxCount,
+                                    const D_UINT    fieldIndex) = 0;
+
+  virtual DBSArray GetMatchingRows (const DBSReal& min,
+                                    const DBSReal& max,
+                                    const D_UINT64 fromRow,
+                                    const D_UINT64 toRow,
+                                    const D_UINT64 ignoreFirst,
+                                    const D_UINT64 maxCount,
+                                    const D_UINT   fieldIndex) = 0;
+
+  virtual DBSArray GetMatchingRows (const DBSRichReal& min,
+                                    const DBSRichReal& max,
+                                    const D_UINT64     fromRow,
+                                    const D_UINT64     toRow,
+                                    const D_UINT64     ignoreFirst,
+                                    const D_UINT64     maxCount,
+                                    const D_UINT       fieldIndex) = 0;
 };
 
 #endif /* DBS_TABLE_H_ */

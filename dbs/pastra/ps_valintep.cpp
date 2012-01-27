@@ -34,8 +34,8 @@ static void new_datetime (DBSDateTime *object, D_INT32 year, D_UINT8 month, D_UI
 static void new_hirestime (DBSHiresTime *object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds, D_UINT32 microsec);
 template <class T_OBJ, class T_VAL>
 static void new_integer (T_OBJ *object, T_VAL value);
-template <class T_OBJ, class T_INTEGER, class T_DECIMAL>
-static void new_real (T_OBJ *object, T_INTEGER int_part, T_DECIMAL decimal_part);
+template <class T_OBJ, class T_REAL>
+static void new_real (T_OBJ *object, T_REAL value);
 
 using namespace std;
 using namespace pastra;
@@ -49,8 +49,8 @@ static const D_INT PS_INT8_SIZE                = 1;
 static const D_INT PS_INT16_SIZE               = 2;
 static const D_INT PS_INT32_SIZE               = 4;
 static const D_INT PS_INT64_SIZE               = 8;
-static const D_INT PS_REAL_SIZE                = 12;
-static const D_INT PS_RICHREAL_SIZE            = 16;
+static const D_INT PS_REAL_SIZE                = sizeof (DBSReal::m_Value);
+static const D_INT PS_RICHREAL_SIZE            = sizeof (DBSRichReal::m_Value);
 static const D_INT PS_TEXT_SIZE                = 16;
 static const D_INT PS_ARRAY_SIZE               = 16;
 
@@ -63,8 +63,8 @@ static const D_INT PS_INT8_ALIGN               = 1;
 static const D_INT PS_INT16_ALIGN              = 2;
 static const D_INT PS_INT32_ALIGN              = 4;
 static const D_INT PS_INT64_ALIGN              = 8;
-static const D_INT PS_REAL_ALIGN               = 8;
-static const D_INT PS_RICHREAL_ALIGN           = 8;
+static const D_INT PS_REAL_ALIGN               = sizeof (DBSReal::m_Value);
+static const D_INT PS_RICHREAL_ALIGN           = sizeof (DBSRichReal::m_Value);
 static const D_INT PS_TEXT_ALIGN               = 8;
 static const D_INT PS_ARRAY_ALIGN              = 8;
 
@@ -143,14 +143,12 @@ PSValInterp::Store (const DBSInt64 &rSource, D_UINT8 *pDestination)
 void
 PSValInterp::Store (const DBSReal &rSource, D_UINT8 *pDestination)
 {
-  _RC(D_INT64 *, pDestination)[0] = rSource.m_IntPart;
-  _RC(D_UINT32 *, pDestination)[2] = _SC(D_UINT32, rSource.m_FracPart);
+  *_RC(float*, pDestination) = rSource.m_Value;
 }
 void
 PSValInterp::Store (const DBSRichReal &rSource, D_UINT8 *pDestination)
 {
-  _RC(D_INT64 *, pDestination)[0] = rSource.m_IntPart;
-  _RC(D_UINT64 *, pDestination)[1] = rSource.m_FracPart;
+  _RC(long double*, pDestination)[0] = rSource.m_Value;
 }
 
 void
@@ -259,16 +257,12 @@ PSValInterp::Retrieve (DBSInt64 *pOutValue, const D_UINT8 *pDestination)
 void
 PSValInterp::Retrieve (DBSReal *pOutValue, const D_UINT8 *pDestination)
 {
-  new_real (pOutValue,
-            _RC (const D_INT64 *, pDestination)[0],
-            _RC (const D_UINT32 *, pDestination)[2]);
+  new_real (pOutValue, _RC (const float*, pDestination)[0]);
 }
 void
 PSValInterp::Retrieve (DBSRichReal *pOutValue, const D_UINT8 *pDestination)
 {
-  new_real (pOutValue,
-            _RC (const D_INT64 *, pDestination)[0],
-            _RC (const D_UINT64*, pDestination)[1]);
+  new_real (pOutValue, _RC (const long double*, pDestination)[0]);
 }
 
 void
@@ -440,10 +434,10 @@ new_integer (T_OBJ *object, T_VAL value)
   new (object) T_OBJ (false, value);
 }
 
-template <class T_OBJ, class T_INTEGER, class T_DECIMAL>
+template <class T_OBJ, class T_REAL>
 static void
-new_real (T_OBJ *object, T_INTEGER int_part, T_DECIMAL decimal_part)
+new_real (T_OBJ *object, T_REAL value)
 {
   object->~T_OBJ ();
-  new (object) T_OBJ (false, int_part, decimal_part);
+  new (object) T_OBJ (false, value);
 }

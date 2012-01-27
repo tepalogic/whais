@@ -39,10 +39,10 @@ test_tabledata_SRC=test/test_tabledata.cpp
 test_tabledata_LIB=dbs/pastra utils/utils custom/custom
 test_tabledata_INC=utils/include custom/include
 
-UNIT_EXES+=test_arraysort
-test_arraysort_SRC=test/test_arraysort.cpp
-test_arraysort_LIB=dbs/pastra utils/utils custom/custom
-test_arraysort_INC=utils/include custom/include
+UNIT_EXES+=l_test_arraysort
+l_test_arraysort_SRC=test/test_arraysort.cpp
+l_test_arraysort_LIB=dbs/pastra utils/utils custom/custom
+l_test_arraysort_INC=utils/include custom/include
 
 UNIT_EXES+=l_test_tablermrows
 l_test_tablermrows_SRC=test/test_tablermrows.cpp
@@ -83,3 +83,13 @@ UNIT_EXES+=l_test_hirestimebtindex
 l_test_hirestimebtindex_SRC=test/test_hirestimebtindex.cpp
 l_test_hirestimebtindex_LIB=dbs/pastra utils/utils custom/custom
 l_test_hirestimebtindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_realbtindex
+l_test_realbtindex_SRC=test/test_realbtindex.cpp
+l_test_realbtindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_realbtindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_richrealbtindex
+l_test_richrealbtindex_SRC=test/test_richrealbtindex.cpp
+l_test_richrealbtindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_richrealbtindex_INC=utils/include custom/include

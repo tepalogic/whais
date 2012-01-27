@@ -162,23 +162,6 @@ DBSHiresTime::DBSHiresTime (bool isNull,
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
 }
 
-DBSReal::DBSReal (bool isNull, D_INT64 integerPart, D_UINT64 decimalPart) :
-    m_IntPart (integerPart),
-    m_FracPart (decimalPart),
-    m_IsNull (isNull)
-{
-}
-
-
-DBSRichReal::DBSRichReal (bool isNull, D_INT64 integerPart, D_UINT64 decimalPart) :
-    m_IntPart (integerPart),
-    m_FracPart (decimalPart),
-    m_IsNull (isNull)
-{
-}
-
-
-
 DBSText::DBSText (const D_UINT8 *pUtf8String) :
     m_pText (& NullText::GetSingletoneInstace())
 {

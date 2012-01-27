@@ -126,16 +126,16 @@ static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
   vectInt64.push_back (DBSInt64 (false, 2));\
   vectInt64.push_back (DBSInt64 (true));\
 \
-  vectReal.push_back (DBSReal (false, -199, 21));\
-  vectReal.push_back (DBSReal (false, 199, 21));\
+  vectReal.push_back (DBSReal (false, -199.21));\
+  vectReal.push_back (DBSReal (false, 199.21));\
   vectReal.push_back (DBSReal (true));\
-  vectReal.push_back (DBSReal (false, 0, 98989));\
-  vectReal.push_back (DBSReal (false, 98989, 0));\
+  vectReal.push_back (DBSReal (false, 0.98989));\
+  vectReal.push_back (DBSReal (false, 98989.0));\
 \
-  vectRichReal.push_back (DBSRichReal (false, 1, 0));\
-  vectRichReal.push_back (DBSRichReal (false, 1234, 91823412));\
-  vectRichReal.push_back (DBSRichReal (false, 3, 141592653589793));\
-  vectRichReal.push_back (DBSRichReal (false, -1, 6180339887498948482));\
+  vectRichReal.push_back (DBSRichReal (false, 1.0));\
+  vectRichReal.push_back (DBSRichReal (false, 1234.91823412));\
+  vectRichReal.push_back (DBSRichReal (false, 3.141592653589793));\
+  vectRichReal.push_back (DBSRichReal (false, -1.6180339887498948482));\
   vectRichReal.push_back (DBSRichReal (true));\
 \
   vectText.push_back (DBSText (_RC(D_UINT8*, text1)));\

@@ -236,6 +236,22 @@ public:
                                     const D_UINT64   maxCount,
                                     const D_UINT     fieldIndex);
 
+  virtual DBSArray GetMatchingRows (const DBSReal& min,
+                                    const DBSReal& max,
+                                    const D_UINT64 fromRow,
+                                    const D_UINT64 toRow,
+                                    const D_UINT64 ignoreFirst,
+                                    const D_UINT64 maxCount,
+                                    const D_UINT   fieldIndex);
+
+  virtual DBSArray GetMatchingRows (const DBSRichReal& min,
+                                    const DBSRichReal& max,
+                                    const D_UINT64     fromRow,
+                                    const D_UINT64     toRow,
+                                    const D_UINT64     ignoreFirst,
+                                    const D_UINT64     maxCount,
+                                    const D_UINT       fieldIndex);
+
   //Implementations for I_PSTable
   virtual D_UINT             GetRowSize () const;
   virtual PSFieldDescriptor& GetFieldDescriptorInternal (D_UINT fieldIndex) const;

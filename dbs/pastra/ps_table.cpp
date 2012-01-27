@@ -68,7 +68,7 @@ static const D_UINT PS_TABLE_ROW_SIZE_LEN = 4;
 static const D_UINT PS_RESEVED_FOR_FUTURE_OFF = 44;
 static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_FUTURE_OFF;
 
-static const D_UINT MAX_FIELD_VALUE_ALIGN = 8; /* Bytes. */
+static const D_UINT MAX_FIELD_VALUE_ALIGN = 16; /* Bytes. */
 
 struct PaddInterval
 {
@@ -145,7 +145,7 @@ get_next_alignment(D_INT size)
 {
   D_INT result = 1;
 
-  size &= 0x7, size |= 0x8;
+  size &= 0x0F, size |= 0x10;
 
   while ((size & 1) == 0)
     result <<= 1, size >>= 1;
@@ -161,19 +161,19 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
   vector<PaddInterval> padds;
 
   PSFieldDescriptor * const pFieldDesc = _RC (PSFieldDescriptor*, pOutFieldsDescription);
-  const D_INT nullBitsRequested = rvFields.size (); //One for each field.
-  D_INT paddingBytesCount = 0;
-  D_INT currentAlignment = 8;   //Force the best choice
+  const D_INT nullBitsRequested = rvFields.size ();      //One for each field.
+  D_INT       paddingBytesCount = 0;
+  D_INT       currentAlignment  = MAX_FIELD_VALUE_ALIGN; //Force the best choice
 
   //Find the best fields position in order to minimize the numbers of padding
   //bytes that are need it for values alignments
   for (D_UINT fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
     {
-      D_INT foundIndex = -1;            //-1 Nothing found!
-      D_INT foundReqAlign = 1;          //Worst requested align
+      D_INT foundIndex         = -1;     //-1 Nothing found!
+      D_INT foundReqAlign      = 1;     //Worst requested align
       D_INT foundResultedAlign = 1;     //Worst resulted align
       D_INT foundReqPaddsCount = MAX_FIELD_VALUE_ALIGN - 1; //Worst number of bytes required to padd
-      D_INT foundSize = 0;
+      D_INT foundSize          = 0;
 
       for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
 	{
@@ -187,17 +187,17 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
 
 	  D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
                                       (currReqAlign - currentAlignment) : 0;
-	  D_INT currResultedAlign = get_next_alignment(currReqPaddsCount + currIndexSize + uOutRowSize);
+	  D_INT currResultedAlign = get_next_alignment (currReqPaddsCount + currIndexSize + uOutRowSize);
 
-	  //Lets check if is btter than what we have found until now
+	  //Lets check if is better than what we have found until now
 	  if (foundReqPaddsCount > currReqPaddsCount)
 	    {
 	      //New best choice!
-	      foundIndex = schIndex;
-	      foundReqAlign = currReqAlign;
+	      foundIndex         = schIndex;
+	      foundReqAlign      = currReqAlign;
 	      foundResultedAlign = currResultedAlign;
 	      foundReqPaddsCount = currReqPaddsCount;
-	      foundSize = currIndexSize;
+	      foundSize          = currIndexSize;
 	    }
 	  else if (foundReqPaddsCount == currReqPaddsCount)
 	    {
@@ -206,11 +206,11 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
 							< currResultedAlign)))
 		{
 		  //New best choice!
-		  foundIndex = schIndex;
-		  foundReqAlign = currReqAlign;
+		  foundIndex         = schIndex;
+		  foundReqAlign      = currReqAlign;
 		  foundResultedAlign = currResultedAlign;
 		  foundReqPaddsCount = currReqPaddsCount;
-		  foundSize = currIndexSize;
+		  foundSize          = currIndexSize;
 		}
 	      else
 		continue; //Get the next one!
@@ -223,8 +223,8 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
       assert ((foundIndex >= 0) && (foundSize > 0));
 
       DBSFieldDescriptor temp = rvFields[foundIndex];
-      rvFields[foundIndex] = rvFields[fieldIndex];
-      rvFields[fieldIndex] = temp;
+      rvFields[foundIndex]    = rvFields[fieldIndex];
+      rvFields[fieldIndex]    = temp;
 
       pFieldDesc[fieldIndex].m_NameOffset = get_strlens_till_index (&rvFields.front(), fieldIndex);
       pFieldDesc[fieldIndex].m_NameOffset += sizeof(PSFieldDescriptor) * rvFields.size();
@@ -899,8 +899,6 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
   PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ((field.m_TypeDesc == T_TEXT) ||
-      (field.m_TypeDesc == T_RICHREAL) ||
-      (field.m_TypeDesc == T_REAL) ||
       (field.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
 
@@ -974,6 +972,12 @@ PSTable::CreateFieldIndex (const D_UINT fieldIndex,
         break;
       case T_INT64:
         insert_row_field<DBSInt64> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_REAL:
+        insert_row_field<DBSReal> (*this, fieldTree, rowIndex, fieldIndex);
+        break;
+      case T_RICHREAL:
+        insert_row_field<DBSRichReal> (*this, fieldTree, rowIndex, fieldIndex);
         break;
       default:
         assert (false);
@@ -1910,6 +1914,36 @@ PSTable::GetMatchingRows (const DBSInt64& min,
                           const D_UINT64  ignoreFirst,
                           const D_UINT64  maxCount,
                           const D_UINT    fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSReal& min,
+                          const DBSReal& max,
+                          const D_UINT64 fromRow,
+                          const D_UINT64 toRow,
+                          const D_UINT64 ignoreFirst,
+                          const D_UINT64 maxCount,
+                          const D_UINT   fieldIndex)
+{
+  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+    return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
+
+  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, fieldIndex);
+}
+
+DBSArray
+PSTable::GetMatchingRows (const DBSRichReal& min,
+                          const DBSRichReal& max,
+                          const D_UINT64     fromRow,
+                          const D_UINT64     toRow,
+                          const D_UINT64     ignoreFirst,
+                          const D_UINT64     maxCount,
+                          const D_UINT       fieldIndex)
 {
   if (m_vIndexNodeMgrs[fieldIndex] != NULL)
     return MatchRowsWithIndex (m_vIndexNodeMgrs[fieldIndex], min, max, fromRow, toRow, ignoreFirst, maxCount);
