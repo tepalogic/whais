@@ -110,18 +110,17 @@ is_valid_hiresdate (D_INT year,
   return true;
 }
 
-DBSDate::DBSDate (bool isNull, D_INT32 year, D_UINT8 month, D_UINT8 day) :
+DBSDate::DBSDate (D_INT32 year, D_UINT8 month, D_UINT8 day) :
     m_Year (year),
     m_Month (month),
     m_Day (day),
-    m_IsNull (isNull)
+    m_IsNull (false)
 {
   if ((m_IsNull == false) && (is_valid_date (year, month, day) == false))
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATE));
 }
 
-DBSDateTime::DBSDateTime (bool isNull,
-                          D_INT32 year,
+DBSDateTime::DBSDateTime (D_INT32 year,
                           D_UINT8 month,
                           D_UINT8 day,
                           D_UINT8 hour,
@@ -133,15 +132,14 @@ DBSDateTime::DBSDateTime (bool isNull,
     m_Hour (hour),
     m_Minutes (minutes),
     m_Seconds (seconds),
-    m_IsNull (isNull)
+    m_IsNull (false)
 {
   if ((m_IsNull == false) &&
       (is_valid_datetime (year, month, day, hour, minutes, seconds) == false))
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
 }
 
-DBSHiresTime::DBSHiresTime (bool isNull,
-                            D_INT32 year,
+DBSHiresTime::DBSHiresTime (D_INT32 year,
                             D_UINT8 month,
                             D_UINT8 day,
                             D_UINT8 hour,
@@ -155,7 +153,7 @@ DBSHiresTime::DBSHiresTime (bool isNull,
     m_Hour (hour),
     m_Minutes (minutes),
     m_Seconds (seconds),
-    m_IsNull (isNull)
+    m_IsNull (false)
 {
   if ((m_IsNull == false) &&
       (is_valid_hiresdate (year, month, day, hour, minutes, seconds, microsec) == false))
@@ -916,10 +914,10 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
   assert (to < _SC(D_INT64, array.GetElementsCount()));
 
   const D_INT64 pivotIndex = (from + to) / 2;
-  DBS_T         leftEl (true);
-  DBS_T         pivot (true);
-  DBS_T         rightEl (true);
-  DBS_T         temp (true);
+  DBS_T         leftEl;
+  DBS_T         pivot;
+  DBS_T         rightEl;
+  DBS_T         temp;
 
   array.GetElement (pivot, pivotIndex);
   array.GetElement (leftEl, from);
@@ -1004,10 +1002,10 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorte
   assert (to < _SC(D_INT64, array.GetElementsCount()));
 
   const D_INT64 pivotIndex = (from + to) / 2;
-  DBS_T         leftEl (true);
-  DBS_T         pivot (true);
-  DBS_T         rightEl (true);
-  DBS_T         temp (true);
+  DBS_T         leftEl;
+  DBS_T         pivot;
+  DBS_T         rightEl;
+  DBS_T         temp;
 
   array.GetElement (pivot, pivotIndex);
   array.GetElement (leftEl, from);

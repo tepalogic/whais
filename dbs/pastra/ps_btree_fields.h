@@ -392,7 +392,7 @@ public:
 
   virtual const I_BTreeKey& GetSentinelKey () const
   {
-    static T_BTreeKey<DBS_T> _sentinel (DBS_T (false, ~0), ~0);
+    static T_BTreeKey<DBS_T> _sentinel (DBS_T (~0), ~0);
 
     return _sentinel;
   }
@@ -410,7 +410,7 @@ public:
 
     while (fromPos >= toPos)
       {
-        output.AddElement (DBSUInt64 (false, pRowParts[fromPos]));
+        output.AddElement (DBSUInt64 (pRowParts[fromPos]));
         if (fromPos == 0)
           break;
         fromPos--;
@@ -426,11 +426,11 @@ protected:
     const D_UINT64 *const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
     if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
-      return T_BTreeKey<DBS_T> (DBS_T(true), pRowParts [keyIndex]);
+      return T_BTreeKey<DBS_T> (DBS_T (), pRowParts [keyIndex]);
 
     const T *const pValueParts = _RC (const T*, pRowParts + GetKeysPerNode ());
 
-    return T_BTreeKey<DBS_T> (DBS_T (false, pValueParts[keyIndex]), pRowParts [keyIndex]);
+    return T_BTreeKey<DBS_T> (DBS_T (pValueParts[keyIndex]), pRowParts [keyIndex]);
   }
 
   void SetKey (const T_BTreeKey<DBS_T> &key,const KEY_INDEX keyIndex)
@@ -457,7 +457,7 @@ protected:
 template <> inline const I_BTreeKey&
 T_BTreeNode <bool, DBSBool, 1>::GetSentinelKey () const
 {
-  static BoolBTreeKey _sentinel (DBSBool (false, true), ~0);
+  static BoolBTreeKey _sentinel (DBSBool (true), ~0);
   return _sentinel;
 }
 
@@ -465,7 +465,7 @@ T_BTreeNode <bool, DBSBool, 1>::GetSentinelKey () const
 template <> inline const I_BTreeKey&
 T_BTreeNode <void, DBSDate, 4>::GetSentinelKey () const
 {
-  static DateBTreeKey _sentinel (DBSDate (false, 0x7FFF, 12, 31), ~0);
+  static DateBTreeKey _sentinel (DBSDate (0x7FFF, 12, 31), ~0);
   return _sentinel;
 }
 
@@ -479,16 +479,13 @@ T_BTreeNode <void, DBSDate, 4>::GetKey (const KEY_INDEX keyIndex) const
 
 
   if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
-    return DateBTreeKey (DBSDate(true), pRowParts [keyIndex]);
+    return DateBTreeKey (DBSDate (), pRowParts [keyIndex]);
 
   const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + GetKeysPerNode ());
   const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + GetKeysPerNode ());
   const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + GetKeysPerNode ());
 
-  return DateBTreeKey (DBSDate (false,
-                                pYearParts [keyIndex],
-                                pMonthParts [keyIndex],
-                                pDayParts [keyIndex]),
+  return DateBTreeKey (DBSDate (pYearParts [keyIndex], pMonthParts [keyIndex], pDayParts [keyIndex]),
                        pRowParts [keyIndex]);
 }
 
@@ -596,7 +593,7 @@ T_BTreeNode <void, DBSDate, 4>::RemoveKey (const KEY_INDEX keyIndex)
 template <> inline const I_BTreeKey&
 T_BTreeNode <void, DBSDateTime, 7>::GetSentinelKey () const
 {
-  static DateTimeBTreeKey _sentinel (DBSDateTime (false, 0x7FFF, 12, 31, 23, 59, 59), ~0);
+  static DateTimeBTreeKey _sentinel (DBSDateTime (0x7FFF, 12, 31, 23, 59, 59), ~0);
   return _sentinel;
 }
 
@@ -610,7 +607,7 @@ T_BTreeNode <void, DBSDateTime, 7>::GetKey (const KEY_INDEX keyIndex) const
 
 
   if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
-    return DateTimeBTreeKey (DBSDateTime(true), pRowParts [keyIndex]);
+    return DateTimeBTreeKey (DBSDateTime (), pRowParts [keyIndex]);
 
   const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + GetKeysPerNode ());
   const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + GetKeysPerNode ());
@@ -619,8 +616,7 @@ T_BTreeNode <void, DBSDateTime, 7>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
   const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + GetKeysPerNode ());
 
-  return DateTimeBTreeKey (DBSDateTime (false,
-                                        pYearParts[keyIndex],
+  return DateTimeBTreeKey (DBSDateTime (pYearParts[keyIndex],
                                         pMonthParts[keyIndex],
                                         pDayParts[keyIndex],
                                         pHourParts[keyIndex],
@@ -752,7 +748,7 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
 template <> inline const I_BTreeKey&
 T_BTreeNode <void, DBSHiresTime, 11>::GetSentinelKey () const
 {
-  static HiresTimeBTreeKey _sentinel (DBSHiresTime (false, 0x7FFF, 12, 31, 23, 59, 59, 999999999), ~0);
+  static HiresTimeBTreeKey _sentinel (DBSHiresTime (0x7FFF, 12, 31, 23, 59, 59, 999999999), ~0);
   return _sentinel;
 }
 
@@ -765,7 +761,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT64 *const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
   if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
-    return HiresTimeBTreeKey (DBSHiresTime(true), pRowParts [keyIndex]);
+    return HiresTimeBTreeKey (DBSHiresTime (), pRowParts [keyIndex]);
 
   const D_UINT32 *const pMicroParts = _RC (const D_UINT32*, pRowParts + GetKeysPerNode ());
   const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pMicroParts + GetKeysPerNode ());
@@ -775,8 +771,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::GetKey (const KEY_INDEX keyIndex) const
   const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
   const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + GetKeysPerNode ());
 
-  return HiresTimeBTreeKey (DBSHiresTime (false,
-                                          pYearParts[keyIndex],
+  return HiresTimeBTreeKey (DBSHiresTime (pYearParts[keyIndex],
                                           pMonthParts[keyIndex],
                                           pDayParts[keyIndex],
                                           pHourParts[keyIndex],
@@ -914,15 +909,14 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
 template <> inline const I_BTreeKey&
 T_BTreeNode <float, DBSReal, sizeof (float)>::GetSentinelKey () const
 {
-  static RealBTreeKey _sentinel (DBSReal (false, std::numeric_limits<float>::infinity ()), ~0);
+  static RealBTreeKey _sentinel (DBSReal (std::numeric_limits<float>::infinity ()), ~0);
   return _sentinel;
 }
 
 template <> inline const I_BTreeKey&
 T_BTreeNode <long double, DBSRichReal, sizeof (long double)>::GetSentinelKey () const
 {
-  static RichRealBTreeKey _sentinel (DBSRichReal (false,
-                                                  std::numeric_limits<long double>::infinity ()),
+  static RichRealBTreeKey _sentinel (DBSRichReal (std::numeric_limits<long double>::infinity ()),
                                      ~0);
   return _sentinel;
 }

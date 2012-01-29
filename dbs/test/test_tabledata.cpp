@@ -48,95 +48,95 @@ static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
   std::vector<DBSInt64> vectInt64;\
   std::vector<DBSText> vectText;\
 \
-  vectBool.push_back (DBSBool(false, true));\
-  vectBool.push_back (DBSBool(false, true));\
-  vectBool.push_back (DBSBool(false, false));\
   vectBool.push_back (DBSBool(true));\
-  vectBool.push_back (DBSBool(false, false));\
+  vectBool.push_back (DBSBool(true));\
+  vectBool.push_back (DBSBool(false));\
+  vectBool.push_back (DBSBool());\
+  vectBool.push_back (DBSBool(false));\
   \
-  vectChar.push_back (DBSChar (true));\
-  vectChar.push_back (DBSChar (false, 'B'));\
-  vectChar.push_back (DBSChar (false, 0x2312));\
-  vectChar.push_back (DBSChar (false, 'V'));\
-  vectChar.push_back (DBSChar (false, '\n'));\
+  vectChar.push_back (DBSChar ());\
+  vectChar.push_back (DBSChar ('B'));\
+  vectChar.push_back (DBSChar (0x2312));\
+  vectChar.push_back (DBSChar ('V'));\
+  vectChar.push_back (DBSChar ('\n'));\
 \
-  vectDate.push_back (DBSDate (false, 1981, 11, 14));\
-  vectDate.push_back (DBSDate (false, 2091, 10, 11));\
-  vectDate.push_back (DBSDate (false, 92, 3, 30));\
-  vectDate.push_back (DBSDate (true));\
-  vectDate.push_back (DBSDate (false, -1, 3, 30));\
+  vectDate.push_back (DBSDate (1981, 11, 14));\
+  vectDate.push_back (DBSDate (2091, 10, 11));\
+  vectDate.push_back (DBSDate (92, 3, 30));\
+  vectDate.push_back (DBSDate ());\
+  vectDate.push_back (DBSDate (-1, 3, 30));\
 \
-  vectDateTime.push_back (DBSDateTime (false, 781, 1, 1, 10, 11, 12));\
-  vectDateTime.push_back (DBSDateTime (false, 1970, 1, 1, 0, 0, 0));\
-  vectDateTime.push_back (DBSDateTime (false, 0, 1, 1, 0, 0, 0));\
-  vectDateTime.push_back (DBSDateTime (false, 21, 12, 31, 23, 59, 59));\
-  vectDateTime.push_back (DBSDateTime (true));\
+  vectDateTime.push_back (DBSDateTime (781, 1, 1, 10, 11, 12));\
+  vectDateTime.push_back (DBSDateTime (1970, 1, 1, 0, 0, 0));\
+  vectDateTime.push_back (DBSDateTime (0, 1, 1, 0, 0, 0));\
+  vectDateTime.push_back (DBSDateTime (21, 12, 31, 23, 59, 59));\
+  vectDateTime.push_back (DBSDateTime ());\
 \
-  vectHiResDate.push_back (DBSHiresTime (false, 1, 1, 1, 0, 0, 0, 2312));\
-  vectHiResDate.push_back (DBSHiresTime (true));\
-  vectHiResDate.push_back (DBSHiresTime (false, 0, 1, 2, 1, 1, 1, 2132));\
-  vectHiResDate.push_back (DBSHiresTime (false, -1324, 12, 31, 23, 59, 59, 9897));\
-  vectHiResDate.push_back (DBSHiresTime (true));\
+  vectHiResDate.push_back (DBSHiresTime (1, 1, 1, 0, 0, 0, 2312));\
+  vectHiResDate.push_back (DBSHiresTime ());\
+  vectHiResDate.push_back (DBSHiresTime (0, 1, 2, 1, 1, 1, 2132));\
+  vectHiResDate.push_back (DBSHiresTime (-1324, 12, 31, 23, 59, 59, 9897));\
+  vectHiResDate.push_back (DBSHiresTime ());\
 \
-  vectUInt8.push_back (DBSUInt8 (true));\
-  vectUInt8.push_back (DBSUInt8 (false, 2));\
-  vectUInt8.push_back (DBSUInt8 (true));\
-  vectUInt8.push_back (DBSUInt8 (false, 0x67));\
-  vectUInt8.push_back (DBSUInt8 (false, 2));\
+  vectUInt8.push_back (DBSUInt8 ());\
+  vectUInt8.push_back (DBSUInt8 (2));\
+  vectUInt8.push_back (DBSUInt8 ());\
+  vectUInt8.push_back (DBSUInt8 (0x67));\
+  vectUInt8.push_back (DBSUInt8 (2));\
 \
-  vectUInt16.push_back (DBSUInt16 (false, 0xAABB));\
-  vectUInt16.push_back (DBSUInt16 (false,  0xBBAA));\
-  vectUInt16.push_back (DBSUInt16 (true));\
-  vectUInt16.push_back (DBSUInt16 (false, 0x67));\
-  vectUInt16.push_back (DBSUInt16 (false, 0xFF00));\
+  vectUInt16.push_back (DBSUInt16 (0xAABB));\
+  vectUInt16.push_back (DBSUInt16 ( 0xBBAA));\
+  vectUInt16.push_back (DBSUInt16 ());\
+  vectUInt16.push_back (DBSUInt16 (0x67));\
+  vectUInt16.push_back (DBSUInt16 (0xFF00));\
 \
-  vectUInt32.push_back (DBSUInt32 (false, 0x0));\
-  vectUInt32.push_back (DBSUInt32 (false,  0xCDDEBBAA));\
-  vectUInt32.push_back (DBSUInt32 (false, 0x0));\
-  vectUInt32.push_back (DBSUInt32 (false, 0xFF0000FF));\
-  vectUInt32.push_back (DBSUInt32 (true));\
+  vectUInt32.push_back (DBSUInt32 (0x0));\
+  vectUInt32.push_back (DBSUInt32 ( 0xCDDEBBAA));\
+  vectUInt32.push_back (DBSUInt32 (0x0));\
+  vectUInt32.push_back (DBSUInt32 (0xFF0000FF));\
+  vectUInt32.push_back (DBSUInt32 ());\
 \
-  vectUInt64.push_back (DBSUInt64 (false, ~0x0));\
-  vectUInt64.push_back (DBSUInt64 (false,  0x0102030405060708));\
-  vectUInt64.push_back (DBSUInt64 (false, 1));\
-  vectUInt64.push_back (DBSUInt64 (false, 2));\
-  vectUInt64.push_back (DBSUInt64 (true));\
+  vectUInt64.push_back (DBSUInt64 (~0x0));\
+  vectUInt64.push_back (DBSUInt64 ( 0x0102030405060708));\
+  vectUInt64.push_back (DBSUInt64 (1));\
+  vectUInt64.push_back (DBSUInt64 (2));\
+  vectUInt64.push_back (DBSUInt64 ());\
 \
-  vectInt8.push_back (DBSInt8 (true));\
-  vectInt8.push_back (DBSInt8 (false, -2));\
-  vectInt8.push_back (DBSInt8 (true));\
-  vectInt8.push_back (DBSInt8 (false, -67));\
-  vectInt8.push_back (DBSInt8 (false, 2));\
+  vectInt8.push_back (DBSInt8 ());\
+  vectInt8.push_back (DBSInt8 (-2));\
+  vectInt8.push_back (DBSInt8 ());\
+  vectInt8.push_back (DBSInt8 (-67));\
+  vectInt8.push_back (DBSInt8 (2));\
 \
-  vectInt16.push_back (DBSInt16 (false, -21));\
-  vectInt16.push_back (DBSInt16 (false,  21112));\
-  vectInt16.push_back (DBSInt16 (true));\
-  vectInt16.push_back (DBSInt16 (false, -2312));\
-  vectInt16.push_back (DBSInt16 (false, -12));\
+  vectInt16.push_back (DBSInt16 (-21));\
+  vectInt16.push_back (DBSInt16 ( 21112));\
+  vectInt16.push_back (DBSInt16 ());\
+  vectInt16.push_back (DBSInt16 (-2312));\
+  vectInt16.push_back (DBSInt16 (-12));\
 \
-  vectInt32.push_back (DBSInt32 (false, 0x10));\
-  vectInt32.push_back (DBSInt32 (false, 0x80808080));\
-  vectInt32.push_back (DBSInt32 (false, -1));\
-  vectInt32.push_back (DBSInt32 (false, -2));\
-  vectInt32.push_back (DBSInt32 (true));\
+  vectInt32.push_back (DBSInt32 (0x10));\
+  vectInt32.push_back (DBSInt32 (0x80808080));\
+  vectInt32.push_back (DBSInt32 (-1));\
+  vectInt32.push_back (DBSInt32 (-2));\
+  vectInt32.push_back (DBSInt32 ());\
 \
-  vectInt64.push_back (DBSInt64 (false, ~0x0));\
-  vectInt64.push_back (DBSInt64 (false, 0x0102030405060708));\
-  vectInt64.push_back (DBSInt64 (false, -1));\
-  vectInt64.push_back (DBSInt64 (false, 2));\
-  vectInt64.push_back (DBSInt64 (true));\
+  vectInt64.push_back (DBSInt64 (~0x0));\
+  vectInt64.push_back (DBSInt64 (0x0102030405060708));\
+  vectInt64.push_back (DBSInt64 (-1));\
+  vectInt64.push_back (DBSInt64 (2));\
+  vectInt64.push_back (DBSInt64 ());\
 \
-  vectReal.push_back (DBSReal (false, -199.21));\
-  vectReal.push_back (DBSReal (false, 199.21));\
-  vectReal.push_back (DBSReal (true));\
-  vectReal.push_back (DBSReal (false, 0.98989));\
-  vectReal.push_back (DBSReal (false, 98989.0));\
+  vectReal.push_back (DBSReal (-199.21));\
+  vectReal.push_back (DBSReal (199.21));\
+  vectReal.push_back (DBSReal ());\
+  vectReal.push_back (DBSReal (0.98989));\
+  vectReal.push_back (DBSReal (98989.0));\
 \
-  vectRichReal.push_back (DBSRichReal (false, 1.0));\
-  vectRichReal.push_back (DBSRichReal (false, 1234.91823412));\
-  vectRichReal.push_back (DBSRichReal (false, 3.141592653589793));\
-  vectRichReal.push_back (DBSRichReal (false, -1.6180339887498948482));\
-  vectRichReal.push_back (DBSRichReal (true));\
+  vectRichReal.push_back (DBSRichReal (1.0));\
+  vectRichReal.push_back (DBSRichReal (1234.91823412));\
+  vectRichReal.push_back (DBSRichReal (3.141592653589793));\
+  vectRichReal.push_back (DBSRichReal (-1.6180339887498948482));\
+  vectRichReal.push_back (DBSRichReal ());\
 \
   vectText.push_back (DBSText (_RC(D_UINT8*, text1)));\
   vectText.push_back (DBSText (NULL));\
@@ -237,7 +237,7 @@ add_fixed_values_vector_to_table (I_DBSTable &table, std::vector<T> &vectValues)
 template <class T> bool
 test_fixed_values_vector (I_DBSTable &table, const D_UINT fieldIndex, std::vector<T> &vectValues)
 {
-  T fieldValue (true);
+  T fieldValue;
 
   for (D_UINT rowIndex = 0; rowIndex < table.GetAllocatedRows(); ++rowIndex)
     {
@@ -254,7 +254,7 @@ test_fixed_values_vector_reverse (I_DBSTable &table,
                                   const D_UINT fieldIndex,
                                   std::vector<T> &vectValues)
 {
-  T fieldValue (true);
+  T fieldValue;
   D_UINT rowIndex = table.GetAllocatedRows();
 
   do
@@ -348,10 +348,10 @@ check_value_array (std::vector<T> &source, DBSArray &array, const D_UINT seed)
 
   for (D_UINT elIndex = 0; elIndex < source.size (); ++elIndex)
     {
-      T testElement (true);
+      T testElement;
 
       D_UINT64 testIndex = (elIndex + seed) % source.size ();
-      if (source[testIndex] == T(true))
+      if (source[testIndex] == T ())
         continue;
 
       array.GetElement (testElement, arrayIndex);
@@ -374,7 +374,7 @@ fill_value_array (std::vector<T> &source, DBSArray &array, const D_UINT seed)
   for (D_UINT elIndex = 0; elIndex < source.size (); ++elIndex)
     {
       D_UINT64 testIndex = (elIndex + seed) % source.size ();
-      if (source[testIndex] == T(true))
+      if (source[testIndex] == T ())
         continue;
 
       array.AddElement (source[testIndex]);

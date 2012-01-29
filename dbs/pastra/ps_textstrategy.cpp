@@ -279,7 +279,7 @@ DBSChar
 GenericText::GetCharacterAtIndex (D_UINT64 index)
 {
   if (index >= GetCharactersCount() )
-    return DBSChar (true); //Null char!
+    return DBSChar (); //Null char!
 
   D_UINT64 offset = 0;
   D_UINT32 charValue = 0;
@@ -302,7 +302,7 @@ GenericText::GetCharacterAtIndex (D_UINT64 index)
   const D_UINT charSize = decode_utf8_char (aUtf8Char, charValue);
   assert ((offset + charSize) <= m_BytesSize);
 
-  return DBSChar (false, charValue);
+  return DBSChar (charValue);
 }
 
 void

@@ -53,7 +53,7 @@ test_nulliness()
   if (result)
     {
       DBSText textSingleton;
-      textSingleton.Append (DBSChar (false, 0x42));
+      textSingleton.Append (DBSChar (0x42));
 
       if (textSingleton.IsNull() != false)
         result = false;
@@ -70,7 +70,7 @@ test_nulliness()
   if (result)
     {
       DBSText textTemporal (nullUtf8);
-      textTemporal.Append (DBSChar (false, 0x281));
+      textTemporal.Append (DBSChar (0x281));
 
       if (textTemporal.IsNull() != false)
         result = false;
@@ -87,7 +87,7 @@ test_nulliness()
   if (result)
     {
       DBSText textSingleton;
-      textSingleton.Append (DBSChar (false, 0x942));
+      textSingleton.Append (DBSChar (0x942));
 
       if (textSingleton.IsNull() != false)
         result = false;
@@ -104,7 +104,7 @@ test_nulliness()
   if (result)
     {
       DBSText textSingleton;
-      textSingleton.Append (DBSChar (false, 0x10942));
+      textSingleton.Append (DBSChar (0x10942));
 
       if (textSingleton.IsNull() != false)
         result = false;
@@ -120,7 +120,7 @@ test_nulliness()
   if (result)
     {
       DBSText textSingleton;
-      textSingleton.Append (DBSChar (false, 0x3010942));
+      textSingleton.Append (DBSChar (0x3010942));
 
       if (textSingleton.IsNull() != false)
         result = false;
@@ -150,7 +150,7 @@ test_nulliness()
       if (textVarRaw.IsNull() == false)
         return false;
 
-      textVarRaw.Append (DBSChar (false, 0x71201200));
+      textVarRaw.Append (DBSChar (0x71201200));
 
       if (textVarRaw.IsNull() != false)
         result = false;
@@ -284,7 +284,7 @@ test_character_insertion ()
         result = false;
       else
         {
-          DBSChar test_char = DBSChar (false, 'A');
+          DBSChar test_char = DBSChar ('A');
           originalText.SetCharAtIndex (test_char, 0);
 
           if (originalText.GetCharactersCount() != charsCount)
@@ -294,7 +294,7 @@ test_character_insertion ()
 
           if (result)
             {
-              DBSChar test_char = DBSChar(false, 0x3412);
+              DBSChar test_char = DBSChar(0x3412);
               originalText.SetCharAtIndex (test_char, charsCount - 1);
 
               if (originalText.GetCharactersCount() != charsCount)
@@ -315,7 +315,7 @@ test_character_insertion ()
               allocated_entry = storage.AddRecord (1, _RC(const D_UINT8*, pOriginalText), sizeof (charValues) / sizeof (D_UINT32));
               DBSText originalText (*(new RowFieldText(storage, allocated_entry, sizeof (charValues) / sizeof (D_UINT32))));
 
-              DBSChar test_char = DBSChar(false, 0x211356);
+              DBSChar test_char = DBSChar(0x211356);
               originalText.SetCharAtIndex (test_char, charsCount / 2);
 
               if (originalText.GetCharactersCount() != charsCount)

@@ -36,15 +36,15 @@ bool test_bool_array ()
       if (! anotherArray.IsNull ())
         result = false;
 
-      if ( anotherArray.AddElement(DBSBool (false, true)) != 0)
+      if ( anotherArray.AddElement(DBSBool (true)) != 0)
         result = false;
-      else if  (anotherArray.AddElement(DBSBool (false, false)) != 1)
+      else if  (anotherArray.AddElement(DBSBool (false)) != 1)
         result = false;
 
       if ( ! (anotherArray.IsNull() == false) && (anotherArray.GetElementsCount() != 2) )
         result = false;
 
-      DBSBool tv(true, false);
+      DBSBool tv;
       anotherArray.GetElement( tv, 0);
       if ((tv.IsNull()) || (tv.m_Value == false))
         result = false;
@@ -58,13 +58,13 @@ bool test_bool_array ()
     {
 
 
-      anotherArray.SetElement (DBSBool(false, true), 1);
-      DBSBool tv(true, false);
+      anotherArray.SetElement (DBSBool(true), 1);
+      DBSBool tv;
       anotherArray.GetElement( tv, 1);
       if ((tv.IsNull()) || (tv.m_Value == false))
         result = false;
 
-      const DBSBool nullBull (true, true);
+      const DBSBool nullBull;
       anotherArray.SetElement (nullBull, 0);
       anotherArray.GetElement( tv, 0);
       if ((tv.IsNull()) || (tv.m_Value == false) || (anotherArray.GetElementsCount() > 1))
@@ -86,7 +86,7 @@ test_integers_array (const char *type)
   bool result = true;
 
   D_UINT64 elementsCount = 0;
-  T nullValue (true, 0);
+  T nullValue;
   DBSArray testArray((T *)NULL);
 
   for (D_UINT64 index = 1; index < 10000; index += 13)
@@ -98,7 +98,7 @@ test_integers_array (const char *type)
         }
       //Limit to 0xFF because of VC++ run time check!
       //Don't worry C++0x will take care of this in future.
-      testArray.AddElement (T(false, index & 0xFF));
+      testArray.AddElement (T(index & 0xFF));
       ++elementsCount;
     }
 
@@ -114,7 +114,7 @@ test_integers_array (const char *type)
 
   if (result)
     {
-      T testValue (true, 0);
+      T testValue;
       D_INT64 content = 14;
       for (D_UINT index = 0; index < elementsCount; index++)
         {
@@ -157,7 +157,7 @@ test_dates_array ()
           result = false;
           break;
         }
-      testArray.AddElement (DBSDate (false, year, month, day));
+      testArray.AddElement (DBSDate (year, month, day));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -169,7 +169,7 @@ test_dates_array ()
   year = day = month = 1;
   for (D_UINT64 index = 0; index < elementsCount; ++index)
   {
-    DBSDate testValue (true);
+    DBSDate testValue;
     testArray.GetElement (testValue, index);
 
     if ((testValue.m_IsNull != false) ||
@@ -222,7 +222,7 @@ test_datetimes_array ()
           result = false;
           break;
         }
-      testArray.AddElement (DBSDateTime (false, year, month, day, hour, mins, sec));
+      testArray.AddElement (DBSDateTime (year, month, day, hour, mins, sec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -238,7 +238,7 @@ test_datetimes_array ()
   hour = mins = sec = 3;
   for (D_UINT64 index = 0; index < elementsCount; ++index)
   {
-    DBSDateTime testValue (true);
+    DBSDateTime testValue;
     testArray.GetElement (testValue, index);
 
     if ((testValue.m_IsNull != false) ||
@@ -298,7 +298,7 @@ test_hiresdate_array ()
           result = false;
           break;
         }
-      testArray.AddElement (DBSHiresTime (false, year, month, day, hour, mins, sec, msec));
+      testArray.AddElement (DBSHiresTime (year, month, day, hour, mins, sec, msec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -316,7 +316,7 @@ test_hiresdate_array ()
   msec = 4;
   for (D_UINT64 index = 0; index < elementsCount; ++index)
   {
-    DBSHiresTime testValue (true);
+    DBSHiresTime testValue;
     testArray.GetElement (testValue, index);
 
     if ((testValue.m_IsNull != false) ||

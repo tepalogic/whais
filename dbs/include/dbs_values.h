@@ -29,19 +29,22 @@
 #include "dbs_types.h"
 #include "dbs_exception.h"
 
-#define DEFAULT_INT_VALUE (~0)
-#define DEFAULT_BOOL_VALUE true
-#define DEFAULT_POINTER_VALUE NULL
-
 bool
 DBSIsDateValid (D_INT year, D_UINT mounth, D_UINT day);
 
 
 struct DBSBool
 {
-  explicit DBSBool (bool isNull, bool value = DEFAULT_BOOL_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSBool () :
+    m_Value (),
+    m_IsNull (true)
   {}
+
+  explicit DBSBool (bool value) :
+      m_Value (value),
+      m_IsNull (false)
+  {}
+
   DBSBool (const DBSBool& source) :
     m_Value (source.m_Value), m_IsNull (source.m_IsNull)
   {}
@@ -85,8 +88,14 @@ struct DBSBool
 
 struct DBSChar
 {
-  explicit DBSChar (bool isNull, D_UINT32 ch = DEFAULT_INT_VALUE):
-      m_Value (ch), m_IsNull (isNull)
+  DBSChar () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSChar ( D_UINT32 ch) :
+      m_Value (ch),
+      m_IsNull (false)
   {}
 
   DBSChar (const DBSChar& source) :
@@ -131,10 +140,15 @@ struct DBSChar
 
 struct DBSDate
 {
-  explicit DBSDate (bool isNull,
-                    D_INT32 year = DEFAULT_INT_VALUE,
-                    D_UINT8 month = DEFAULT_INT_VALUE,
-                    D_UINT8 day = DEFAULT_INT_VALUE);
+  DBSDate () :
+      m_Year (),
+      m_Month (),
+      m_Day (),
+      m_IsNull (true)
+  {}
+
+  explicit DBSDate (D_INT32 year, D_UINT8 month, D_UINT8 day);
+
   DBSDate (const DBSDate& source) :
     m_Year (source.m_Year),
     m_Month (source.m_Month),
@@ -197,13 +211,22 @@ struct DBSDate
 
 struct DBSDateTime
 {
-  explicit DBSDateTime (bool isNull,
-                        D_INT32 year = DEFAULT_INT_VALUE,
-                        D_UINT8 mounth = DEFAULT_INT_VALUE,
-                        D_UINT8 day = DEFAULT_INT_VALUE,
-                        D_UINT8 hour = DEFAULT_INT_VALUE,
-                        D_UINT8 minutes = DEFAULT_INT_VALUE,
-                        D_UINT8 seconds = DEFAULT_INT_VALUE);
+  DBSDateTime () :
+    m_Year (),
+    m_Month (),
+    m_Day (),
+    m_Hour (),
+    m_Minutes (),
+    m_Seconds (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSDateTime (D_INT32 year,
+                        D_UINT8 mounth,
+                        D_UINT8 day,
+                        D_UINT8 hour,
+                        D_UINT8 minutes,
+                        D_UINT8 seconds);
 
   DBSDateTime (const DBSDateTime& source) :
     m_Year (source.m_Year),
@@ -294,14 +317,25 @@ struct DBSDateTime
 
 struct DBSHiresTime
 {
-  explicit DBSHiresTime (bool isNull,
-                         D_INT32 year = DEFAULT_INT_VALUE,
-                         D_UINT8 month = DEFAULT_INT_VALUE,
-                         D_UINT8 day = DEFAULT_INT_VALUE,
-                         D_UINT8 hour = DEFAULT_INT_VALUE,
-                         D_UINT8 minutes = DEFAULT_INT_VALUE,
-                         D_UINT8 seconds = DEFAULT_INT_VALUE,
-                         D_UINT32 microsec = DEFAULT_INT_VALUE );
+
+  DBSHiresTime () :
+    m_Microsec (),
+    m_Year (),
+    m_Month (),
+    m_Day (),
+    m_Hour (),
+    m_Minutes (),
+    m_Seconds (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSHiresTime (D_INT32 year,
+                         D_UINT8 month,
+                         D_UINT8 day,
+                         D_UINT8 hour,
+                         D_UINT8 minutes,
+                         D_UINT8 seconds,
+                         D_UINT32 microsec);
 
   DBSHiresTime (const DBSHiresTime& source) :
     m_Microsec (source.m_Microsec),
@@ -402,12 +436,19 @@ struct DBSHiresTime
 
 struct DBSUInt8
 {
-  explicit DBSUInt8 (bool isNull, D_UINT8 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSUInt8 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSUInt8 (D_UINT8 value):
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSUInt8 (const DBSUInt8& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt8& operator= (const DBSUInt8& source)
@@ -449,12 +490,19 @@ struct DBSUInt8
 
 struct DBSUInt16
 {
-  explicit DBSUInt16 (bool isNull, D_UINT16 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSUInt16 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSUInt16 (D_UINT16 value):
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSUInt16 (const DBSUInt16& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt16& operator= (const DBSUInt16& source)
@@ -496,12 +544,19 @@ struct DBSUInt16
 
 struct DBSUInt32
 {
-  explicit DBSUInt32 (bool isNull, D_UINT32 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSUInt32 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSUInt32 (D_UINT32 value) :
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSUInt32 (const DBSUInt32& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSUInt32& operator= (const DBSUInt32& source)
@@ -543,8 +598,14 @@ struct DBSUInt32
 
 struct DBSUInt64
 {
-  explicit DBSUInt64 (bool isNull, D_UINT64 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSUInt64 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSUInt64 (D_UINT64 value) :
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSUInt64 (const DBSUInt64& source) :
@@ -590,12 +651,19 @@ struct DBSUInt64
 
 struct DBSInt8
 {
-  explicit DBSInt8 (bool isNull, D_INT8 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSInt8 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSInt8 (D_INT8 value):
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSInt8 (const DBSInt8& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSInt8& operator= (const DBSInt8& source)
@@ -637,12 +705,19 @@ struct DBSInt8
 
 struct DBSInt16
 {
-  explicit DBSInt16 (bool isNull, D_INT16 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSInt16 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSInt16 (D_INT16 value) :
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSInt16 (const DBSInt16& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSInt16& operator= (const DBSInt16& source)
@@ -684,12 +759,19 @@ struct DBSInt16
 
 struct DBSInt32
 {
-  explicit DBSInt32 (bool isNull, D_INT32 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSInt32 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSInt32 (D_INT32 value) :
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSInt32 (const DBSInt32& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSInt32& operator= (const DBSInt32& source)
@@ -731,12 +813,19 @@ struct DBSInt32
 
 struct DBSInt64
 {
-  explicit DBSInt64 (bool isNull, D_INT64 value = DEFAULT_INT_VALUE):
-      m_Value (value), m_IsNull (isNull)
+  DBSInt64 () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSInt64 (D_INT64 value):
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSInt64 (const DBSInt64& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSInt64& operator= (const DBSInt64& source)
@@ -778,11 +867,19 @@ struct DBSInt64
 
 struct DBSReal
 {
-  explicit DBSReal (bool  isNull, const float value = 0.0 ) : m_Value (value), m_IsNull (isNull)
+  DBSReal () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSReal (const float value) :
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSReal (const DBSReal& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSReal& operator= (const DBSReal& source)
@@ -822,12 +919,19 @@ struct DBSReal
 
 struct DBSRichReal
 {
-  explicit DBSRichReal (bool  isNull, const long double value = 0.0 ) :
-      m_Value (value), m_IsNull (isNull)
+  DBSRichReal () :
+    m_Value (),
+    m_IsNull (true)
+  {}
+
+  explicit DBSRichReal (const long double value) :
+      m_Value (value),
+      m_IsNull (false)
   {}
 
   DBSRichReal (const DBSRichReal& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+    m_Value (source.m_Value),
+    m_IsNull (source.m_IsNull)
   {}
 
   DBSRichReal& operator= (const DBSRichReal& source)

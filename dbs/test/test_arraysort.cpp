@@ -31,7 +31,7 @@ get_random_datetime ()
   D_UINT8 mins  = w_rnd () % 60;
   D_UINT8 secs  = w_rnd () % 60;
 
-  return DBSDateTime (false, year, month, day, hour, mins, secs);
+  return DBSDateTime (year, month, day, hour, mins, secs);
 }
 
 DBSHiresTime
@@ -45,7 +45,7 @@ get_random_hirestime ()
   D_UINT8 secs  = w_rnd () % 60;
   D_UINT32  mic = w_rnd () % 1000000000;
 
-  return DBSHiresTime (false, year, month, day, hour, mins, secs, mic);
+  return DBSHiresTime (year, month, day, hour, mins, secs, mic);
 }
 
 
@@ -57,7 +57,7 @@ get_random_date ()
   D_UINT8 month = w_rnd () % 12 + 1;
   D_UINT8 day   = w_rnd () % 27 + 1;
 
-  return DBSDate (false, year, month, day);
+  return DBSDate (year, month, day);
 }
 
 void
@@ -74,10 +74,10 @@ test_array_with_dates (void *)
   if (array.GetElementsCount () != _elemsCount)
     throw 0;
 
-  DBSDate lastValue (true);
+  DBSDate lastValue;
   for (D_UINT index = 0; index < _elemsCount; ++index)
     {
-      DBSDate currValue (true);
+      DBSDate currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 1;
@@ -102,10 +102,10 @@ test_array_with_datetimes (void *)
   if (array.GetElementsCount () != _elemsCount)
     throw 2;
 
-  DBSDateTime lastValue (true);
+  DBSDateTime lastValue;
   for (D_UINT index = 0; index < _elemsCount; ++index)
     {
-      DBSDateTime currValue (true);
+      DBSDateTime currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 3;
@@ -130,10 +130,10 @@ test_array_with_hirestimes (void *)
   if (array.GetElementsCount () != _elemsCount)
     throw 4;
 
-  DBSHiresTime lastValue (true);
+  DBSHiresTime lastValue;
   for (D_UINT index = 0; index < _elemsCount; ++index)
     {
-      DBSHiresTime currValue (true);
+      DBSHiresTime currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 5;
@@ -151,17 +151,17 @@ test_array_with_int8 (void *)
   DBSArray array (_SC (DBSUInt8*, NULL));
 
   for (D_UINT index = 0; index < _elemsCount; ++index)
-    array.AddElement (DBSUInt8 (false,  w_rnd () & 0xFF));
+    array.AddElement (DBSUInt8 ( w_rnd () & 0xFF));
 
   array.Sort ();
 
   if (array.GetElementsCount () != _elemsCount)
     throw 6;
 
-  DBSUInt8 lastValue (true);
+  DBSUInt8 lastValue;
   for (D_UINT index = 0; index < _elemsCount; ++index)
     {
-      DBSUInt8 currValue (true);
+      DBSUInt8 currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 7;
@@ -187,10 +187,10 @@ test_array_with_dates_r (void *)
   if (array.GetElementsCount () != _elemsCount)
     throw 8;
 
-  DBSDate lastValue (true);
+  DBSDate lastValue;
   for (D_UINT index = _elemsCount; index-- > 0;)
     {
-      DBSDate currValue (true);
+      DBSDate currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 9;
@@ -216,10 +216,10 @@ test_array_with_datetimes_r (void *)
   if (array.GetElementsCount () != _elemsCount)
     throw 10;
 
-  DBSDateTime lastValue (true);
+  DBSDateTime lastValue;
   for (D_UINT index = _elemsCount; index-- > 0 ;)
     {
-      DBSDateTime currValue (true);
+      DBSDateTime currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 11;
@@ -244,10 +244,10 @@ test_array_with_hirestimes_r (void *)
   if (array.GetElementsCount () != _elemsCount)
     throw 12;
 
-  DBSHiresTime lastValue (true);
+  DBSHiresTime lastValue;
   for (D_UINT index = _elemsCount; index-- > 0;)
     {
-      DBSHiresTime currValue (true);
+      DBSHiresTime currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 13;
@@ -266,17 +266,17 @@ test_array_with_int8_r (void *)
   DBSArray array (_SC (DBSUInt8*, NULL));
 
   for (D_UINT index = 0; index < _elemsCount; ++index)
-    array.AddElement (DBSUInt8 (false, w_rnd () & 0xFF));
+    array.AddElement (DBSUInt8 (w_rnd () & 0xFF));
 
   array.Sort (true);
 
   if (array.GetElementsCount () != _elemsCount)
     throw 14;
 
-  DBSUInt8 lastValue (true);
+  DBSUInt8 lastValue;
   for (D_UINT index = _elemsCount; index-- > 0;)
     {
-    DBSUInt8 currValue (true);
+    DBSUInt8 currValue;
       array.GetElement (currValue, index);
       if (currValue < lastValue)
         throw 15;

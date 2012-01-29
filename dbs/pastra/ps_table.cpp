@@ -349,7 +349,7 @@ PSTableRmNode::PSTableRmNode (PSTable &table, const NODE_INDEX nodeId) :
 
   SetNullKeysCount (0);
 
-  assert ((sizeof (NodeHeader) % sizeof  (D_UINT64)) == 0);
+  assert ((sizeof (NodeHeader) % ( 2 * sizeof  (D_UINT64)) == 0));
   assert (RAW_NODE_SIZE == m_NodesManager.GetRawNodeSize ());
 }
 
@@ -874,7 +874,7 @@ insert_row_field (PSTable &table,
                   const D_UINT64 rowIndex,
                   const D_UINT fieldIndex)
 {
-  T rowValue (true);
+  T rowValue;
   table.GetEntry (rowValue, rowIndex, fieldIndex);
 
 
@@ -1958,7 +1958,7 @@ PSTable::StoreEntry (const T &rSource, const D_UINT64 rowIndex, const D_UINT fie
 {
 
   //Check if we are trying to write a different value
-  T currentValue (true);
+  T currentValue;
   RetrieveEntry (currentValue, rowIndex, fieldIndex);
 
   if (currentValue == rSource)
@@ -2109,7 +2109,7 @@ PSTable::MatchRows (const T&       min,
   toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
 
   DBSArray result (_SC (DBSUInt64*, NULL));
-  T         rowValue (true);
+  T        rowValue;
 
   for (D_UINT64 rowIndex = fromRow; (rowIndex <= toRow) && (maxCount > 0); ++rowIndex)
     {
@@ -2126,7 +2126,7 @@ PSTable::MatchRows (const T&       min,
 
       --maxCount;
 
-      result.AddElement (DBSUInt64 (false, rowIndex));
+      result.AddElement (DBSUInt64 (rowIndex));
     }
 
   return result;
@@ -2272,7 +2272,7 @@ PSTable::RetrieveEntry (T &rDestination, const D_UINT64 rowIndex, const D_UINT f
   if (pRawData[byte_off] & (1 << bit_off))
     {
       pDestination->~T ();
-      new (pDestination) T (true);
+      new (pDestination) T ();
     }
   else
     {

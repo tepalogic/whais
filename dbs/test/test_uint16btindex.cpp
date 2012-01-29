@@ -25,7 +25,7 @@ struct DBSFieldDescriptor field_desc[] = {
 const D_CHAR db_name[] = "t_baza_date_1";
 const D_CHAR tb_name[] = "t_test_tab";
 
-D_UINT _rowsCount   = 100000000;
+D_UINT _rowsCount   = 5000000;
 D_UINT _removedRows = _rowsCount / 10;
 
 
@@ -43,7 +43,7 @@ fill_table_with_values (I_DBSTable &table,
   w_rnd_set_seed (seed);
   for (D_UINT index = 0; index < rowCount; ++index)
     {
-      DBSUInt16 value (false, w_rnd () & 0xFFFF);
+      DBSUInt16 value (w_rnd () & 0xFFFF);
       if (table.AddRow () != index)
         {
           result = false;
@@ -57,8 +57,8 @@ fill_table_with_values (I_DBSTable &table,
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DBSArray values = table.GetMatchingRows (DBSUInt16 (true),
-                                           DBSUInt16 (false, 0xFFFF),
+  DBSArray values = table.GetMatchingRows (DBSUInt16 (),
+                                           DBSUInt16 (0xFFFF),
                                            0,
                                            ~0,
                                            0,
@@ -72,15 +72,15 @@ fill_table_with_values (I_DBSTable &table,
 
   for (D_UINT checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
     {
-      DBSUInt16 rowValue (true);
-      DBSUInt64 rowIndex (true);
+      DBSUInt16 rowValue;
+      DBSUInt64 rowIndex;
 
       values.GetElement (rowIndex, checkIndex);
       assert (rowIndex.IsNull() == false);
 
       table.GetEntry (rowValue, rowIndex.m_Value, 0);
 
-      DBSUInt16 generated (true);
+      DBSUInt16 generated;
       tableValues.GetElement (generated, rowIndex.m_Value);
       assert (generated.IsNull() == false);
 
@@ -104,7 +104,7 @@ fill_table_with_first_nulls (I_DBSTable &table, const D_UINT32 rowCount)
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
 
-  DBSUInt16 nullValue (true);
+  DBSUInt16 nullValue;
 
   for (D_UINT64 index = 0; index < rowCount; ++index)
     {
@@ -123,13 +123,13 @@ fill_table_with_first_nulls (I_DBSTable &table, const D_UINT32 rowCount)
 
   for (D_UINT64 index = 0; (index < rowCount) && result; ++index)
     {
-      DBSUInt64 element (true);
+      DBSUInt64 element;
       values.GetElement (element, index);
 
       if (element.IsNull() || (element.m_Value != index))
         result = false;
 
-      DBSUInt16 rowValue(true, 31);
+      DBSUInt16 rowValue;
       table.GetEntry (rowValue, index, 0);
 
       if (rowValue.IsNull() == false)
@@ -152,7 +152,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   I_DBSTable& table = dbsHnd.RetrievePersistentTable (tb_name);
 
-  DBSUInt16 nullValue (true);
+  DBSUInt16 nullValue;
   DBSArray  values  = table.GetMatchingRows (nullValue,
                                              nullValue,
                                              0,
@@ -162,13 +162,13 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                              0);
   for (D_UINT64 index = 0; (index < _removedRows) && result; ++index)
     {
-      DBSUInt64 element (true);
+      DBSUInt64 element;
       values.GetElement (element, index);
 
       if (element.IsNull() || (element.m_Value != index))
         result = false;
 
-      DBSUInt16 rowValue(true, 31);
+      DBSUInt16 rowValue;
       table.GetEntry (rowValue, index, 0);
 
       if (rowValue.IsNull() == false)
@@ -176,7 +176,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
     }
 
   values  = table.GetMatchingRows (nullValue,
-                                   DBSUInt16 (false, 0xFFFF),
+                                   DBSUInt16 (0xFFFF),
                                    0,
                                    ~0,
                                    _removedRows,
@@ -185,16 +185,16 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   for (D_UINT64 index = _removedRows; (index < _rowsCount) && result; ++index)
     {
-      DBSUInt64 element (true);
+      DBSUInt64 element;
       values.GetElement (element, index - _removedRows);
 
-      DBSUInt16 rowValue(true, 31);
+      DBSUInt16 rowValue;
       table.GetEntry (rowValue, element.m_Value, 0);
 
       if (rowValue.IsNull() == true)
         result = false;
 
-      DBSUInt16 generatedValue (true);
+      DBSUInt16 generatedValue;
       tableValues.GetElement (generatedValue, element.m_Value);
       if ((rowValue == generatedValue) == false)
         result = false;
@@ -225,7 +225,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   for (D_UINT64 index = 0; index < _removedRows; ++index)
     {
-      DBSUInt16 rowValue (true);
+      DBSUInt16 rowValue;
       tableValues.GetElement (rowValue, index);
 
       table.SetEntry (rowValue, index, 0);
@@ -234,8 +234,8 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   table.CreateFieldIndex (0, callback_index_create, &data);
 
-  DBSArray values  = table.GetMatchingRows (DBSUInt16 (true),
-                                            DBSUInt16 (false, 0xFFFF),
+  DBSArray values  = table.GetMatchingRows (DBSUInt16 (),
+                                            DBSUInt16 (0xFFFF),
                                             0,
                                             ~0,
                                             0,
@@ -251,13 +251,13 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   for (D_UINT64 index = 0; (index < _rowsCount) && result; ++index)
     {
-      DBSUInt16 rowValue(true, 31);
+      DBSUInt16 rowValue;
       table.GetEntry (rowValue, index, 0);
 
       if (rowValue.IsNull() == true)
         result = false;
 
-      DBSUInt16 generatedValue (true);
+      DBSUInt16 generatedValue;
       tableValues.GetElement (generatedValue, index);
       if ((rowValue == generatedValue) == false)
         result = false;

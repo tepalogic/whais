@@ -49,8 +49,8 @@ static const D_INT PS_INT8_SIZE                = 1;
 static const D_INT PS_INT16_SIZE               = 2;
 static const D_INT PS_INT32_SIZE               = 4;
 static const D_INT PS_INT64_SIZE               = 8;
-static const D_INT PS_REAL_SIZE                = sizeof (DBSReal::m_Value);
-static const D_INT PS_RICHREAL_SIZE            = sizeof (DBSRichReal::m_Value);
+static const D_INT PS_REAL_SIZE                = sizeof (float);
+static const D_INT PS_RICHREAL_SIZE            = sizeof (long double);
 static const D_INT PS_TEXT_SIZE                = 16;
 static const D_INT PS_ARRAY_SIZE               = 16;
 
@@ -63,8 +63,8 @@ static const D_INT PS_INT8_ALIGN               = 1;
 static const D_INT PS_INT16_ALIGN              = 2;
 static const D_INT PS_INT32_ALIGN              = 4;
 static const D_INT PS_INT64_ALIGN              = 8;
-static const D_INT PS_REAL_ALIGN               = sizeof (DBSReal::m_Value);
-static const D_INT PS_RICHREAL_ALIGN           = sizeof (DBSRichReal::m_Value);
+static const D_INT PS_REAL_ALIGN               = sizeof (float);
+static const D_INT PS_RICHREAL_ALIGN           = sizeof (long double);
 static const D_INT PS_TEXT_ALIGN               = 8;
 static const D_INT PS_ARRAY_ALIGN              = 8;
 
@@ -381,21 +381,21 @@ void
 new_bool (DBSBool *object, bool value)
 {
   object->~DBSBool ();
-  new (object) DBSBool(false, value);
+  new (object) DBSBool(value);
 }
 
 void
 new_char (DBSChar *object, D_UINT32 value)
 {
   object->~DBSChar ();
-  new (object) DBSChar (false, value);
+  new (object) DBSChar (value);
 }
 
 void
 new_date (DBSDate *object, D_INT32 year, D_UINT8 month, D_UINT8 day)
 {
   object->~DBSDate ();
-  new (object) DBSDate (false, year, month, day);
+  new (object) DBSDate (year, month, day);
 }
 
 void
@@ -408,7 +408,7 @@ new_datetime (DBSDateTime *object,
               D_UINT8 seconds)
 {
   object->~DBSDateTime ();
-  new (object) DBSDateTime (false, year, month, day, hours, minutes, seconds);
+  new (object) DBSDateTime (year, month, day, hours, minutes, seconds);
 }
 
 void
@@ -422,8 +422,7 @@ new_hirestime (DBSHiresTime *object,
                D_UINT32 microsec)
 {
   object->~DBSHiresTime ();
-  new (object) DBSHiresTime (false, year, month, day,
-                             hours, minutes, seconds, microsec);
+  new (object) DBSHiresTime (year, month, day,hours, minutes, seconds, microsec);
 }
 
 template <class T_OBJ, class T_VAL>
@@ -431,7 +430,7 @@ static void
 new_integer (T_OBJ *object, T_VAL value)
 {
   object->~T_OBJ ();
-  new (object) T_OBJ (false, value);
+  new (object) T_OBJ (value);
 }
 
 template <class T_OBJ, class T_REAL>
@@ -439,5 +438,5 @@ static void
 new_real (T_OBJ *object, T_REAL value)
 {
   object->~T_OBJ ();
-  new (object) T_OBJ (false, value);
+  new (object) T_OBJ (value);
 }
