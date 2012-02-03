@@ -35,21 +35,23 @@
 namespace pastra
 {
 
-class DbsHandler:public I_DBSHandler
+class DbsHandler : public I_DBSHandler
 {
 public:
   DbsHandler (const std::string & name);
   virtual ~ DbsHandler ();
 
-  virtual D_UINT GetPesistentTablesCount ();
-  virtual I_DBSTable & RetrievePersistentTable (D_UINT index);
-  virtual I_DBSTable & RetrievePersistentTable (const D_CHAR * pTableName);
-  virtual void ReleaseTable (I_DBSTable &);
-  virtual void AddTable (const D_CHAR * const pTableName,
-                         const DBSFieldDescriptor * pFields,
-                         D_UINT fieldsCount);
-  virtual void DeleteTable (const D_CHAR * const pTableName);
+  virtual D_UINT      GetPesistentTablesCount ();
+  virtual I_DBSTable& RetrievePersistentTable (D_UINT index);
+  virtual I_DBSTable& RetrievePersistentTable (const D_CHAR * pTableName);
+  virtual void        ReleaseTable (I_DBSTable&);
+  virtual void        AddTable (const D_CHAR* const       pTableName,
+                                const DBSFieldDescriptor* pFields,
+                                const D_UINT              fieldsCount);
+  virtual void        DeleteTable (const D_CHAR * const pTableName);
 
+  virtual I_DBSTable* CreateTempTable (const DBSFieldDescriptor* pFields,
+                                       const D_UINT              fieldsCount);
 
   void Discard ();
   void RemoveFromStorage ();

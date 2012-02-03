@@ -40,6 +40,8 @@
 using namespace pastra;
 using namespace std;
 
+static const D_CHAR PS_TEMP_TABLE_SUFFIX[] = "pttable_";
+
 static const D_CHAR PS_TABLE_FIXFIELDS_EXT[] = "_f";
 static const D_CHAR PS_TABLE_VARFIELDS_EXT[] = "_v";
 
@@ -48,22 +50,22 @@ static const D_UINT8 PS_TABLE_SIGNATURE[] =
 
 static const D_UINT PS_HEADER_SIZE = 128;
 
-static const D_UINT PS_TABLE_SIG_OFF = 0; //Signature
-static const D_UINT PS_TABLES_SIG_lEN = 8;
-static const D_UINT PS_TABLE_FIELDS_COUNT_OFF = 8; //Number of fields.
-static const D_UINT PS_TABLE_FIELDS_COUNT_LEN = 4;
-static const D_UINT PS_TABLE_ELEMS_SIZE_OFF = 12; //Size of the fields description area
-static const D_UINT PS_TABLE_ELEMS_SIZE_LEN = 4;
-static const D_UINT PS_TABLE_RECORDS_COUNT_OFF = 16; //Number of allocated records.
-static const D_UINT PS_TABLE_RECORDS_COUNT_LEN = 8;
-static const D_UINT PS_TABLE_VARSTORAGE_SIZE_OFF = 24; //Size of variable storage file
-static const D_UINT PS_TABLE_VARSTORAGE_SIZE_LEN = 8;
-static const D_UINT PS_TABLE_BT_ROOT_OFF  = 32; //The root node of BTree holding the removed rows.
-static const D_UINT PS_TABLE_BT_ROOT_LEN  = 4;
-static const D_UINT PS_TABLE_BT_HEAD_OFF  = 36; //First node pointing to the removed BT nodes.
-static const D_UINT PS_TABLE_BT_HEAD_LEN  = 4;
-static const D_UINT PS_TABLE_ROW_SIZE_OFF = 40; //Size of a row.
-static const D_UINT PS_TABLE_ROW_SIZE_LEN = 4;
+static const D_UINT PS_TABLE_SIG_OFF               = 0; //Signature
+static const D_UINT PS_TABLES_SIG_lEN              = 8;
+static const D_UINT PS_TABLE_FIELDS_COUNT_OFF      = 8; //Number of fields.
+static const D_UINT PS_TABLE_FIELDS_COUNT_LEN      = 4;
+static const D_UINT PS_TABLE_ELEMS_SIZE_OFF        = 12; //Size of the fields description area
+static const D_UINT PS_TABLE_ELEMS_SIZE_LEN        = 4;
+static const D_UINT PS_TABLE_RECORDS_COUNT_OFF     = 16; //Number of allocated records.
+static const D_UINT PS_TABLE_RECORDS_COUNT_LEN     = 8;
+static const D_UINT PS_TABLE_VARSTORAGE_SIZE_OFF   = 24; //Size of variable storage file
+static const D_UINT PS_TABLE_VARSTORAGE_SIZE_LEN   = 8;
+static const D_UINT PS_TABLE_BT_ROOT_OFF           = 32; //The root node of BTree holding the removed rows.
+static const D_UINT PS_TABLE_BT_ROOT_LEN           = 4;
+static const D_UINT PS_TABLE_BT_HEAD_OFF           = 36; //First node pointing to the removed BT nodes.
+static const D_UINT PS_TABLE_BT_HEAD_LEN           = 4;
+static const D_UINT PS_TABLE_ROW_SIZE_OFF          = 40; //Size of a row.
+static const D_UINT PS_TABLE_ROW_SIZE_LEN          = 4;
 
 static const D_UINT PS_RESEVED_FOR_FUTURE_OFF = 44;
 static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_FUTURE_OFF;
@@ -85,7 +87,7 @@ struct PaddInterval
 };
 
 static D_UINT32
-get_strlens_till_index(const DBSFieldDescriptor * pFields, D_UINT index)
+get_strlens_till_index (const DBSFieldDescriptor* pFields, D_UINT index)
 {
   D_UINT32 result = 0;
 
@@ -99,7 +101,7 @@ get_strlens_till_index(const DBSFieldDescriptor * pFields, D_UINT index)
 }
 
 static void
-validate_field_name(const D_CHAR * pFieldName)
+validate_field_name (const D_CHAR* pFieldName)
 {
 
   while (pFieldName[0])
@@ -115,8 +117,8 @@ validate_field_name(const D_CHAR * pFieldName)
 }
 
 static void
-validate_field_descriptors(const DBSFieldDescriptor * const pFields,
-			   const D_UINT fieldsCount)
+validate_field_descriptors (const DBSFieldDescriptor* const pFields,
+			    const D_UINT                    fieldsCount)
 {
   assert ((fieldsCount > 0) && (pFields != NULL));
   for (D_UINT firstIt = 0; firstIt < fieldsCount; ++firstIt)
@@ -141,7 +143,7 @@ validate_field_descriptors(const DBSFieldDescriptor * const pFields,
 }
 
 static D_INT
-get_next_alignment(D_INT size)
+get_next_alignment (D_INT size)
 {
   D_INT result = 1;
 
@@ -154,8 +156,9 @@ get_next_alignment(D_INT size)
 }
 
 static void
-arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
-		      D_UINT8 * const pOutFieldsDescription, D_UINT32 &uOutRowSize)
+arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
+		       D_UINT8* const              pOutFieldsDescription,
+		       D_UINT32&                   uOutRowSize)
 {
 
   vector<PaddInterval> padds;
@@ -274,7 +277,7 @@ arrange_field_entries(vector<DBSFieldDescriptor> &rvFields,
 }
 
 static WFile
-create_table_file(const string &baseFileName, const DBSFieldDescriptor *pFields, D_UINT fieldsCount)
+create_table_file (const string& baseFileName, const DBSFieldDescriptor* pFields, D_UINT fieldsCount)
 {
 
   //Check the arguments
@@ -338,6 +341,22 @@ create_table_file(const string &baseFileName, const DBSFieldDescriptor *pFields,
   return tableFile;
 }
 
+static string
+get_temp_table_name ()
+{
+  static D_UINT64      countTemporalTables = 0;
+  static WSynchronizer sync;
+  string              result (PS_TEMP_TABLE_SUFFIX);
+
+  sync.Enter ();
+  D_UINT64 currentCount = countTemporalTables++;
+  sync.Leave ();
+
+  append_int_to_str (result, currentCount);
+
+  return result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 PSTableRmNode::PSTableRmNode (PSTable &table, const NODE_INDEX nodeId) :
@@ -373,7 +392,7 @@ PSTableRmNode::GetKeysPerNode () const
 }
 
 KEY_INDEX
-PSTableRmNode::GetFirstKey (const I_BTreeNode &parent) const
+PSTableRmNode::GetFirstKey (const I_BTreeNode& parent) const
 {
   assert (GetKeysCount() > 0);
 
@@ -431,7 +450,7 @@ PSTableRmNode::SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNod
 }
 
 KEY_INDEX
-PSTableRmNode::InsertKey (const I_BTreeKey &key)
+PSTableRmNode::InsertKey (const I_BTreeKey& key)
 {
   if (GetKeysCount () > 0)
     {
@@ -603,7 +622,7 @@ PSTableRmNode::Join (bool toRight)
 }
 
 bool
-PSTableRmNode::IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const
+PSTableRmNode::IsLess (const I_BTreeKey& key, KEY_INDEX keyIndex) const
 {
   const D_UINT64 *const pRows = _RC ( const D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const PSTableRmKey    tKey ( * _SC( const  PSTableRmKey*, &key));
@@ -612,7 +631,7 @@ PSTableRmNode::IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 }
 
 bool
-PSTableRmNode::IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const
+PSTableRmNode::IsEqual (const I_BTreeKey& key, KEY_INDEX keyIndex) const
 {
   const D_UINT64 *const pRows = _RC ( const D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const PSTableRmKey    tKey ( * _SC( const  PSTableRmKey*, &key));
@@ -640,7 +659,7 @@ PSTableRmNode::GetSentinelKey () const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-PSTable::PSTable (DbsHandler & dbsHandler, const string & tableName) :
+PSTable::PSTable (DbsHandler& dbsHandler, const string& tableName) :
   m_RowsCount (0),
   m_RootNode (NIL_NODE),
   m_FirstUnallocatedRoot (NIL_NODE),
@@ -666,17 +685,18 @@ PSTable::PSTable (DbsHandler & dbsHandler, const string & tableName) :
 }
 
 
-PSTable::PSTable(DbsHandler & dbsHandler,
-		 const string & tableName,
-		 const DBSFieldDescriptor * pFields,
-		 D_UINT fieldsCount) :
+PSTable::PSTable (DbsHandler&               dbsHandler,
+		  const string&             tableName,
+		  const DBSFieldDescriptor* pFields,
+		  const D_UINT              fieldsCount,
+		  const bool                temporal) :
   m_RowsCount (0),
   m_RootNode (NIL_NODE),
   m_FirstUnallocatedRoot (NIL_NODE),
   m_ReferenceCount (0),
   m_DescriptorsSize (~0),
   m_FieldsCount (0),
-  m_BaseFileName (DBSGetWorkingDir() + tableName),
+  m_BaseFileName ((temporal ? DBSGetTempDir () : DBSGetWorkingDir()) + tableName),
   m_FieldsDescriptors(NULL),
   m_MainTableFile (create_table_file (m_BaseFileName, pFields, fieldsCount)),
   m_apFixedFields (NULL),
@@ -703,7 +723,7 @@ PSTable::PSTable(DbsHandler & dbsHandler,
   SetRootNodeId (rootNode->GetNodeId());
 }
 
-PSTable::~PSTable()
+PSTable::~PSTable ()
 {
   if (m_ReferenceCount != 0)
     throw DBSException(NULL, _EXTRA (DBSException::TABLE_IN_USE));
@@ -750,7 +770,7 @@ PSTable::GetFieldDescriptor (D_UINT fieldIndex)
 }
 
 DBSFieldDescriptor
-PSTable::GetFieldDescriptor(const D_CHAR * const pFieldName)
+PSTable::GetFieldDescriptor (const D_CHAR* const pFieldName)
 {
 
   const PSFieldDescriptor * const pDesc = _RC(const PSFieldDescriptor*, m_FieldsDescriptors.get ());
@@ -775,13 +795,13 @@ PSTable::GetFieldDescriptor(const D_CHAR * const pFieldName)
 }
 
 D_UINT64
-PSTable::GetAllocatedRows()
+PSTable::GetAllocatedRows ()
 {
   return m_RowsCount;
 }
 
 D_UINT64
-PSTable::AddRow()
+PSTable::AddRow ()
 {
   D_UINT64 lastRowPosition = m_RowsCount * m_RowSize;
   D_UINT   toWrite         = m_RowSize;
@@ -844,7 +864,7 @@ PSTable::AddReusedRow ()
 }
 
 void
-PSTable::MarkRowForReuse(D_UINT64 rowIndex)
+PSTable::MarkRowForReuse (D_UINT64 rowIndex)
 {
   D_UINT fieldsCount = m_FieldsCount;
 
@@ -886,9 +906,9 @@ insert_row_field (PSTable &table,
 }
 
 void
-PSTable::CreateFieldIndex (const D_UINT fieldIndex,
-                           CREATE_INDEX_CALLBACK_FUNC *const cb_func,
-                           CallBackIndexData *const pCbData)
+PSTable::CreateFieldIndex (const D_UINT                      fieldIndex,
+                           CREATE_INDEX_CALLBACK_FUNC* const cb_func,
+                           CallBackIndexData* const          pCbData)
 {
   if (PSTable::IsFieldIndexed(fieldIndex))
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_INDEXED));
@@ -1053,7 +1073,7 @@ PSTable::GetFieldDescriptorInternal(D_UINT fieldIndex) const
 }
 
 PSFieldDescriptor&
-PSTable::GetFieldDescriptorInternal(const D_CHAR * const pFieldName) const
+PSTable::GetFieldDescriptorInternal(const D_CHAR* const pFieldName) const
 {
 
   PSFieldDescriptor* const pDesc    = _RC (PSFieldDescriptor*, m_FieldsDescriptors.get ());
@@ -1163,7 +1183,7 @@ PSTable::GetNode (const NODE_INDEX node)
 
 
 void
-PSTable::StoreNode (I_BTreeNode *const pNode)
+PSTable::StoreNode (I_BTreeNode* const pNode)
 {
   if (pNode->IsDirty() == false)
     return ;
@@ -1175,9 +1195,9 @@ PSTable::StoreNode (I_BTreeNode *const pNode)
 }
 
 void
-PSTable::StoreItems (const D_UINT8 *pSrcBuffer,
-                     D_UINT64 firstItem,
-                     D_UINT itemsCount)
+PSTable::StoreItems (const D_UINT8* pSrcBuffer,
+                     D_UINT64       firstItem,
+                     D_UINT         itemsCount)
 {
   m_apFixedFields.get()->StoreData( firstItem * m_RowSize, itemsCount * m_RowSize, pSrcBuffer);
 }
@@ -1185,7 +1205,7 @@ PSTable::StoreItems (const D_UINT8 *pSrcBuffer,
 void
 PSTable::RetrieveItems (D_UINT8 *pDestBuffer,
                         D_UINT64 firstItem,
-                        D_UINT itemsCount)
+                        D_UINT   itemsCount)
 {
   if (itemsCount + firstItem > m_RowsCount)
     itemsCount = m_RowsCount - firstItem;
@@ -1282,7 +1302,7 @@ PSTable::SyncToFile ()
 }
 
 void
-PSTable::InitFromFile()
+PSTable::InitFromFile ()
 {
   D_UINT8 aTableHdr[PS_HEADER_SIZE];
 
@@ -1312,15 +1332,14 @@ PSTable::InitFromFile()
   m_MainTableFile.Read(_CC(D_UINT8 *, m_FieldsDescriptors.get ()), m_DescriptorsSize);
 }
 
-
 D_UINT64
-PSTable::IncreaseRowCount()
+PSTable::IncreaseRowCount ()
 {
   return ++m_RowsCount;
 }
 
 void
-PSTable::RemoveFromDatabase()
+PSTable::RemoveFromDatabase ()
 {
   if (m_apFixedFields.get() != NULL)
     m_apFixedFields->MarkForRemoval();
@@ -1399,97 +1418,97 @@ PSTable::CheckRowToReuse (const D_UINT64 rowIndex)
 }
 
 void
-PSTable::SetEntry (const DBSChar &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSChar& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSBool &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSBool& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSDate &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSDate& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSDateTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSDateTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSHiresTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSHiresTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSInt8& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSInt16& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSInt32& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSInt64& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSReal& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSRichReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSRichReal& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSUInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSUInt8& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSUInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSUInt16& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSUInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSUInt32& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSUInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSUInt64& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
 }
 
 void
-PSTable::SetEntry (const DBSText &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSText& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   const PSFieldDescriptor& field             = GetFieldDescriptorInternal (fieldIndex);
   const D_UINT8            bitsSet           = ~0;
@@ -1559,7 +1578,7 @@ PSTable::SetEntry (const DBSText &rSource, const D_UINT64 rowIndex, const D_UINT
 }
 
 void
-PSTable::SetEntry (const DBSArray &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   const D_UINT8 bitsSet           = ~0;
   bool          fieldValueWasNull = false;
@@ -1636,91 +1655,91 @@ PSTable::SetEntry (const DBSArray &rSource, const D_UINT64 rowIndex, const D_UIN
 }
 
 void
-PSTable::GetEntry (DBSChar &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSChar& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSBool &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSBool& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSDate &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSDate& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSDateTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSDateTime& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSHiresTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSHiresTime& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSInt8 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSInt8& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSInt16 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSInt16& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSInt32 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSInt32& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSInt64 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSInt64& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSReal &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSReal& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSRichReal &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSRichReal& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSUInt8 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSUInt8& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSUInt16 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSUInt16& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSUInt32 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSUInt32& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
 
 void
-PSTable::GetEntry (DBSUInt64 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSUInt64& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   RetrieveEntry (rDestination, rowIndex, fieldIndex);
 }
@@ -1954,7 +1973,7 @@ PSTable::GetMatchingRows (const DBSRichReal& min,
 
 
 template <class T> void
-PSTable::StoreEntry (const T &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::StoreEntry (const T& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
 
   //Check if we are trying to write a different value
@@ -2132,6 +2151,21 @@ PSTable::MatchRows (const T&       min,
   return result;
 }
 
+
+
+PSTemporalTable::PSTemporalTable (DbsHandler&               dbsHandler,
+                                  const DBSFieldDescriptor* pFields,
+                                  const D_UINT              fieldsCount) :
+  PSTable (dbsHandler, get_temp_table_name (), pFields, fieldsCount, true)
+{
+}
+
+PSTemporalTable::~PSTemporalTable ()
+{
+  FlushNodes ();
+  RemoveFromDatabase ();
+}
+
 //From this point this functions shall not allocated memory
 //Other way will not be traceable.
 #ifdef new
@@ -2139,7 +2173,7 @@ PSTable::MatchRows (const T&       min,
 #endif
 
 void
-PSTable::GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSText& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
@@ -2171,7 +2205,7 @@ PSTable::GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT 
 }
 
 void
-PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::GetEntry (DBSArray& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
 
   const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
@@ -2254,9 +2288,9 @@ PSTable::GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT
 }
 
 template <class T> void
-PSTable::RetrieveEntry (T &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
+PSTable::RetrieveEntry (T& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
-  T *const pDestination          = &rDestination;
+  T *const pDestination          =& rDestination;
   const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||

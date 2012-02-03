@@ -53,21 +53,11 @@ struct PSFieldDescriptor
   D_UINT32 m_IndexUnitsCount : 10;
 };
 
-class I_PSTable : public I_DBSTable
-{
-public:
-  virtual ~I_PSTable() {};
-  virtual D_UINT GetRowSize () const = 0;
-
-  virtual PSFieldDescriptor& GetFieldDescriptorInternal (D_UINT fieldIndex) const = 0;
-  virtual PSFieldDescriptor& GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const = 0;
-};
-
-class PSTable:public I_PSTable, public I_BlocksManager, public I_BTreeNodeManager
+class PSTable : public I_DBSTable, public I_BlocksManager, public I_BTreeNodeManager
 {
   friend class DbsHandler;
   friend class PSCacheManager;
-  friend class std::auto_ptr < PSTable >;
+  friend class std::auto_ptr<PSTable>;
 
 public:
   //Implementations for I_BTreeNodeManager
@@ -78,59 +68,59 @@ public:
   virtual void        SetRootNodeId (const NODE_INDEX node);
 
   //Implementations for I_PSBlocksManager
-  virtual void StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount);
-  virtual void RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount);
+  virtual void StoreItems (const D_UINT8* pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount);
+  virtual void RetrieveItems (D_UINT8* pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount);
 
   //Implementations for I_DBSTable
   virtual D_UINT             GetFieldsCount ();
   virtual DBSFieldDescriptor GetFieldDescriptor (D_UINT fieldIndex);
-  virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR * const pFieldName);
+  virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName);
   virtual D_UINT64           GetAllocatedRows ();
   virtual D_UINT64           AddRow ();
   virtual D_UINT64           AddReusedRow ();
   virtual void               MarkRowForReuse (D_UINT64 rowindex);
 
   virtual void CreateFieldIndex (const D_UINT fieldIndex,
-                                 CREATE_INDEX_CALLBACK_FUNC *const cb_func,
-                                 CallBackIndexData *const pCbData);
+                                 CREATE_INDEX_CALLBACK_FUNC* const cb_func,
+                                 CallBackIndexData* const pCbData);
   virtual void RemoveFieldIndex (const D_UINT fieldIndex);
   virtual bool IsFieldIndexed (const D_UINT fieldIndex) const;
 
-  virtual void SetEntry (const DBSChar &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSBool &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSDate &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSDateTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSHiresTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSRichReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSUInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSUInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSUInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSUInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSText &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void SetEntry (const DBSArray &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSChar& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSBool& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSDate& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSDateTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSHiresTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSInt8& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSInt16& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSInt32& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSInt64& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSReal& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSRichReal& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSUInt8& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSUInt16& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSUInt32& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSUInt64& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSText& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex);
 
-  virtual void GetEntry (DBSChar &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSBool &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSDate &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSDateTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSHiresTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSInt8 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSInt16 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSInt32 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSInt64 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSReal &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSRichReal &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSUInt8 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSUInt16 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSUInt32 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSUInt64 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
-  virtual void GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSChar& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSBool& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSDate& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSDateTime& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSHiresTime& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSInt8& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSInt16& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSInt32& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSInt64& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSReal& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSRichReal& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSUInt8& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSUInt16& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSUInt32& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSUInt64& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSText& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
+  virtual void GetEntry (DBSArray& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex);
 
   virtual DBSArray GetMatchingRows (const DBSBool&  min,
                                     const DBSBool&  max,
@@ -253,9 +243,9 @@ public:
                                     const D_UINT       fieldIndex);
 
   //Implementations for I_PSTable
-  virtual D_UINT             GetRowSize () const;
-  virtual PSFieldDescriptor& GetFieldDescriptorInternal (D_UINT fieldIndex) const;
-  virtual PSFieldDescriptor& GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const;
+  D_UINT             GetRowSize () const;
+  PSFieldDescriptor& GetFieldDescriptorInternal (D_UINT fieldIndex) const;
+  PSFieldDescriptor& GetFieldDescriptorInternal (const D_CHAR * const pFieldName) const;
 
 private:
   template <class T> void     StoreEntry (const T &, const D_UINT64, const D_UINT);
@@ -283,11 +273,12 @@ private:
 
 protected:
 
-  PSTable (DbsHandler & dbsHandler, const std::string & tableName);
-  PSTable (DbsHandler & dbsHandler,
-           const std::string & tableName,
-           const DBSFieldDescriptor * pFields,
-           D_UINT fieldsCount);
+  PSTable (DbsHandler& dbsHandler, const std::string& tableName);
+  PSTable (DbsHandler&               dbsHandler,
+           const std::string&        tableName,
+           const DBSFieldDescriptor* pFields,
+           const D_UINT              fieldsCount,
+           const bool                temporal = false);
   virtual ~ PSTable ();
 
   D_UINT64 IncreaseRowCount ();
@@ -317,6 +308,16 @@ protected:
   std::vector <FieldIndexNodeManager*>  m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
   bool                                  m_Removed;
+};
+
+class PSTemporalTable : public PSTable
+{
+  friend class DbsHandler;
+
+  PSTemporalTable (DbsHandler&               dbsHandler,
+                   const DBSFieldDescriptor* pFields,
+                   const D_UINT              fieldsCount);
+  virtual ~PSTemporalTable ();
 };
 
 class PSTableRmKey : public I_BTreeKey

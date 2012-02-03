@@ -338,8 +338,9 @@ I_DBSTable & DbsHandler::RetrievePersistentTable (const D_CHAR * pTableName)
 }
 
 void
-DbsHandler::AddTable (const D_CHAR * const pTableName,
-                      const DBSFieldDescriptor * pFields, D_UINT fieldsCount)
+DbsHandler::AddTable (const D_CHAR* const       pTableName,
+                      const DBSFieldDescriptor* pFields,
+                      const D_UINT              fieldsCount)
 {
 
   if ((pTableName == NULL) || (pFields == NULL) || (fieldsCount == 0))
@@ -404,6 +405,13 @@ DbsHandler::DeleteTable (const D_CHAR * const pTableName)
   SyncToFile ();
 }
 
+I_DBSTable*
+DbsHandler::CreateTempTable (const DBSFieldDescriptor* pFields,
+                             const D_UINT              fieldsCount)
+{
+  return new PSTemporalTable (*this, pFields, fieldsCount);
+}
+
 void
 DbsHandler::Discard ()
 {
@@ -448,8 +456,8 @@ DbsHandler::RemoveFromStorage ()
       assert (it->first.c_str () != NULL);
       assert (it->second == NULL);
 
-      auto_ptr < PSTable > dummy (new PSTable (*this, it->first));
-      dummy->RemoveFromDatabase ();
+      auto_ptr<PSTable> table (new PSTable (*this, it->first));
+      table->RemoveFromDatabase ();
     }
 
   //Remove the database file

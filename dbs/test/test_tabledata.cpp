@@ -28,7 +28,7 @@ static D_CHAR text2[] = "This is should be bigger. It mus have more chars then t
 static D_CHAR text3[] = "FirstName LastName";
 static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
                         "Some one will say because one can, but this is not the case.\b"
-                         "I have no idea what I wrote here!\n";
+                        "I have no idea what I wrote here!\n";
 
 
 #define INIT_VECTORS  std::vector<DBSBool> vectBool;\
@@ -304,6 +304,33 @@ test_fixed_value_field (I_DBSHandler &rDbs, std::vector<T> &valuesVect)
   return result;
 }
 
+template <class T> bool
+test_fixed_value_field (I_DBSTable &table, std::vector<T> &valuesVect)
+{
+
+  D_UINT fieldIndex = ~0;
+  bool   result = true;
+
+  {
+    fieldIndex = add_fixed_values_vector_to_table (table, valuesVect);
+
+    if (fieldIndex == _SC(D_UINT, ~0))
+      result = false;
+
+
+    if (result && test_fixed_values_vector (table, fieldIndex, valuesVect) == false)
+      result = false;
+  }
+
+  if (result)
+  {
+    if (test_fixed_values_vector_reverse (table, fieldIndex, valuesVect) == false)
+      result = false;
+  }
+
+  return result;
+}
+
 bool
 test_fixed_values_table (I_DBSHandler &rDbs)
 {
@@ -470,6 +497,33 @@ test_variable_field_array (I_DBSHandler &rDbs, std::vector<T> &testVect)
   return result;
 }
 
+template <class T> bool
+test_variable_field_array (I_DBSTable &table, std::vector<T> &testVect)
+{
+
+  D_UINT fieldIndex = ~0;
+  bool   result = true;
+
+  {
+    fieldIndex = add_vectors_values_to_table (table, testVect);
+
+    if (fieldIndex == _SC(D_UINT, ~0))
+      result = false;
+
+
+    if (result && test_vector_values_table (table, fieldIndex, testVect) == false)
+      result = false;
+  }
+
+  if (result)
+  {
+    if (test_vector_values_table (table, fieldIndex, testVect) == false)
+      result = false;
+  }
+
+  return result;
+}
+
 bool
 test_text_value_table (I_DBSHandler &rDbs, std::vector<DBSText> &vectText)
 {
@@ -534,6 +588,67 @@ test_text_value_table (I_DBSHandler &rDbs, std::vector<DBSText> &vectText)
             }
         }
       rDbs.ReleaseTable (table);
+    }
+
+  return result;
+}
+
+
+bool
+test_text_value_table (I_DBSTable &table, std::vector<DBSText> &vectText)
+{
+  D_UINT fieldIndex = 0;
+  bool result = true;
+
+  {
+    for (; fieldIndex < table.GetFieldsCount (); ++ fieldIndex)
+      {
+        const DBSFieldDescriptor fieldDesc = table.GetFieldDescriptor(fieldIndex);
+        if (fieldDesc.m_FieldType == T_TEXT)
+          {
+            assert (fieldDesc.isArray == false);
+            break;
+          }
+      }
+
+    if (fieldIndex >= table.GetFieldsCount())
+      result = false;
+  }
+
+  if (result)
+    {
+      for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+        {
+          if (rowIndex >= table.GetAllocatedRows())
+            table.AddRow();
+          table.SetEntry (vectText[rowIndex], rowIndex, fieldIndex);
+        }
+
+      for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+        {
+          DBSText testValue(NULL);
+          table.GetEntry (testValue, rowIndex, fieldIndex);
+          if (! (testValue == vectText[rowIndex]))
+            {
+              result = false;
+              break;
+            }
+        }
+    }
+
+  if (result)
+    {
+      for (D_UINT rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
+        {
+          --rowIndex;
+          DBSText testValue(NULL);
+          table.GetEntry (testValue, rowIndex, fieldIndex);
+          if (! (testValue == vectText[rowIndex]))
+            {
+              result = false;
+              break;
+            }
+        }
     }
 
   return result;
@@ -626,8 +741,62 @@ test_full_value_table (I_DBSHandler &rDbs)
   //Special case for DBSText!
   result = result && test_text_value_table (rDbs, vectText);
 
-
   rDbs.DeleteTable (tb_name);
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  return result;
+}
+
+bool
+test_full_value_temp_table (I_DBSHandler &rDbs)
+{
+  std::cout << "Testing all values on temporal table... ";
+  bool result = true;
+
+  INIT_VECTORS;
+
+  std::auto_ptr<I_DBSTable> apTable (rDbs.CreateTempTable (field_descs, TOTAL_DESC_FIELDS_COUNT));
+
+  result = result && test_fixed_value_field (*apTable.get (), vectBool);
+  result = result && test_fixed_value_field (*apTable.get (), vectChar);
+  result = result && test_fixed_value_field (*apTable.get (), vectDate);
+  result = result && test_fixed_value_field (*apTable.get (), vectDateTime);
+  result = result && test_fixed_value_field (*apTable.get (), vectHiResDate);
+  result = result && test_fixed_value_field (*apTable.get (), vectUInt8);
+  result = result && test_fixed_value_field (*apTable.get (), vectUInt16);
+  result = result && test_fixed_value_field (*apTable.get (), vectUInt32);
+  result = result && test_fixed_value_field (*apTable.get (), vectUInt64);
+
+  result = result && test_variable_field_array (*apTable.get (), vectBool);
+  result = result && test_variable_field_array (*apTable.get (), vectChar);
+  result = result && test_variable_field_array (*apTable.get (), vectDate);
+
+
+  result = result && test_fixed_value_field (*apTable.get (), vectReal);
+  result = result && test_fixed_value_field (*apTable.get (), vectRichReal);
+
+  result = result && test_variable_field_array (*apTable.get (), vectDateTime);
+  result = result && test_variable_field_array (*apTable.get (), vectHiResDate);
+  result = result && test_variable_field_array (*apTable.get (), vectUInt8);
+  result = result && test_variable_field_array (*apTable.get (), vectUInt16);
+  result = result && test_variable_field_array (*apTable.get (), vectUInt32);
+  result = result && test_variable_field_array (*apTable.get (), vectUInt64);
+  result = result && test_variable_field_array (*apTable.get (), vectInt8);
+  result = result && test_variable_field_array (*apTable.get (), vectInt16);
+
+  result = result && test_fixed_value_field (*apTable.get (), vectInt8);
+  result = result && test_fixed_value_field (*apTable.get (), vectInt16);
+  result = result && test_fixed_value_field (*apTable.get (), vectInt32);
+  result = result && test_fixed_value_field (*apTable.get (), vectInt64);
+
+
+  result = result && test_variable_field_array (*apTable.get (), vectInt32);
+  result = result && test_variable_field_array (*apTable.get (), vectInt64);
+  result = result && test_variable_field_array (*apTable.get (), vectReal);
+  result = result && test_variable_field_array (*apTable.get (), vectRichReal);
+
+  //Special case for DBSText!
+  result = result && test_text_value_table (*apTable.get (), vectText);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
@@ -656,6 +825,7 @@ main ()
   success = success && test_fixed_values_table (handler);
   success = success && test_variable_values_table (handler);
   success = success && test_full_value_table (handler);
+  success = success && test_full_value_temp_table (handler);
 
   DBSReleaseDatabase (handler);
   DBSRemoveDatabase (db_name);

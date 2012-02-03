@@ -53,7 +53,7 @@ public:
 
   virtual D_UINT             GetFieldsCount () = 0;
   virtual DBSFieldDescriptor GetFieldDescriptor (D_UINT fieldIndex) = 0;
-  virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR * const pFieldName) = 0;
+  virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName) = 0;
   virtual D_UINT64           GetAllocatedRows () = 0;
 
   virtual D_UINT64 AddRow () = 0;
@@ -61,46 +61,46 @@ public:
   virtual void     MarkRowForReuse (D_UINT64 rowindex) = 0;
 
   virtual void CreateFieldIndex (const D_UINT fieldIndex,
-                                 CREATE_INDEX_CALLBACK_FUNC *const cb_func,
-                                 CallBackIndexData * const pCbData) = 0;
+                                 CREATE_INDEX_CALLBACK_FUNC* const cb_func,
+                                 CallBackIndexData* const pCbData) = 0;
   virtual void RemoveFieldIndex (const D_UINT fieldIndex) = 0;
   virtual bool IsFieldIndexed (const D_UINT fieldIndex) const = 0;
 
   virtual void SetEntry (const DBSBool &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
   virtual void SetEntry (const DBSChar &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSDate &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSDateTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSHiresTime &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSRichReal &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSUInt8 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSUInt16 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSUInt32 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSUInt64 &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSText &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSArray &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSDate& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSDateTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSHiresTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSInt8& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSInt16& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSInt32& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSInt64& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSReal& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSRichReal& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSUInt8& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSUInt16& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSUInt32& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSUInt64& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSText& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
 
-  virtual void GetEntry (DBSBool &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSChar &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSDate &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSDateTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSHiresTime &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSInt8 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSInt16 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSInt32 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSInt64 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSReal &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSRichReal &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSUInt8 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSUInt16 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSUInt32 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSUInt64 &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSText &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void GetEntry (DBSArray &rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSBool& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSChar& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSDate& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSDateTime& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSHiresTime& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSInt8& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSInt16& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSInt32& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSInt64& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSReal& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSRichReal& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSUInt8& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSUInt16& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSUInt32& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSUInt64& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSText& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void GetEntry (DBSArray& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
 
   virtual DBSArray GetMatchingRows (const DBSBool&  min,
                                     const DBSBool&  max,

@@ -33,11 +33,18 @@
 using namespace pastra;
 
 static void
-append_int_to_str (std::string & dest, D_UINT64 number)
+safe_memcpy (D_UINT8* pDest, D_UINT8* pSrc, D_UINT64 uCount)
 {
-  const D_UINT integer_bits = 64;
-  D_CHAR       buffer[integer_bits];
-  D_CHAR*      conv         = &buffer[integer_bits - 1];
+  while (uCount-- > 0)
+    *pDest++ = *pSrc++;
+}
+
+void
+pastra::append_int_to_str (std::string& dest, D_UINT64 number)
+{
+  const D_UINT bitsCount    = sizeof (number) * 8;
+  D_CHAR       buffer[bitsCount];
+  D_CHAR*      conv         = &buffer[bitsCount - 1];
 
   *conv = 0;
   do
@@ -51,14 +58,7 @@ append_int_to_str (std::string & dest, D_UINT64 number)
   dest += conv;
 }
 
-static void
-safe_memcpy (D_UINT8 * pDest, D_UINT8 * pSrc, D_UINT64 uCount)
-{
-  while (uCount-- > 0)
-    *pDest++ = *pSrc++;
-}
-
-FileContainer::FileContainer (const D_CHAR * pFileNameBase,
+FileContainer::FileContainer (const D_CHAR*  pFileNameBase,
                               const D_UINT32 uMaxFileSize,
                               const D_UINT32 uUnitsCount)
   : m_uMaxFileUnitSize (uMaxFileSize),
@@ -105,7 +105,7 @@ FileContainer::~FileContainer ()
 }
 
 void
-FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8 * puDataSource)
+FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* puDataSource)
 {
   D_UINT64     uContainerIndex  = uPosition / m_uMaxFileUnitSize;
   D_UINT64     uUnitPosition    = uPosition % m_uMaxFileUnitSize;
@@ -142,7 +142,7 @@ FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8 * 
 }
 
 void
-FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8 * puDataDestination)
+FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8* puDataDestination)
 {
   D_UINT64     uContainerIndex  = uPosition / m_uMaxFileUnitSize;
   D_UINT64     uUnitPosition    = uPosition % m_uMaxFileUnitSize;
@@ -257,7 +257,7 @@ FileContainer::ExtendContainer ()
 
 ////////////WTempFileContainer///////////////////////////////////////////////
 
-FileTempContainer::FileTempContainer (const D_CHAR * pFileNameBase,
+FileTempContainer::FileTempContainer (const D_CHAR*  pFileNameBase,
                                       const D_UINT32 uMaxFileSize):
     FileContainer (pFileNameBase, uMaxFileSize, 0)
 {
@@ -270,7 +270,7 @@ FileTempContainer::~FileTempContainer ()
 
 //////////////////WTemCotainer/////////////////////////////////////////////////
 
-TempContainer::TempContainer (const D_CHAR * pTempDirectory, D_UINT uReservedMemory) :
+TempContainer::TempContainer (const D_CHAR* pTempDirectory, D_UINT uReservedMemory) :
   I_DataContainer (),
   m_FileContainer (NULL),
   m_Cache (new D_UINT8[uReservedMemory]),
