@@ -33,48 +33,48 @@ class WSynchronizer
 public:
   WSynchronizer()
   {
-    wh_sync_init(&mSync);
+    wh_sync_init (&m_Sync);
   }
 
   ~WSynchronizer()
   {
-    wh_sync_destroy(&mSync);
+    wh_sync_destroy (&m_Sync);
   }
 
-  void Enter() { wh_sync_enter(&mSync); }
+  void Enter() { wh_sync_enter (&m_Sync); }
 
-  void Leave() { wh_sync_leave(&mSync); }
+  void Leave() { wh_sync_leave (&m_Sync); }
 
 private:
   //Does not support any kind of copy or assignment!
   WSynchronizer(const WSynchronizer&);
   WSynchronizer& operator=(const WSynchronizer&);
 
-  WH_SYNC mSync;
+  WH_SYNC m_Sync;
 };
 
-class WSynchronizerHolder
-  {
+class WSynchronizerRAII
+{
 public:
-  explicit WSynchronizerHolder(WSynchronizer &rSync) :
-    mSync(rSync),
+  explicit WSynchronizerRAII (WSynchronizer &rSync) :
+    m_Sync(rSync),
     m_IsEntered (true)
   {
-    mSync.Enter();
+    m_Sync.Enter();
   }
 
-  void Enter () { m_IsEntered = true; mSync.Enter (); }
+  void Enter () { m_IsEntered = true; m_Sync.Enter (); }
 
-  void Leave () { m_IsEntered = false; mSync.Leave(); }
+  void Leave () { m_IsEntered = false; m_Sync.Leave(); }
 
-  ~WSynchronizerHolder()
+  ~WSynchronizerRAII ()
   {
     if (m_IsEntered)
-      mSync.Leave();
+      m_Sync.Leave();
   }
 
 private:
-  WSynchronizer &mSync;
+  WSynchronizer& m_Sync;
   bool           m_IsEntered;
 };
 
@@ -95,7 +95,7 @@ public:
 
 
 protected:
-  static void ThreadWrapperRoutine (void *const);
+  static void ThreadWrapperRoutine (void* const);
 
   const WH_THREAD_ROUTINE m_Routine;
   void* const             m_RoutineArgs;
@@ -107,7 +107,6 @@ protected:
   bool                    m_Joined;
 
 private:
-  friend void __internal_thread_routine (WThread *const, const WH_THREAD_ROUTINE, void *const);
   WThread (const WThread&);
   WThread& operator= (const WThread&);
 };
@@ -116,8 +115,8 @@ private:
 class WThreadException : public WException
 {
 public:
-  explicit WThreadException (const D_CHAR *message,
-                             const D_CHAR *file,
+  explicit WThreadException (const D_CHAR* message,
+                             const D_CHAR* file,
                              D_UINT32      line,
                              D_UINT32      extra)  :
            WException (message, file, line, extra) {}

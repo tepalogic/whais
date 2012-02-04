@@ -183,7 +183,7 @@ I_DBSHandler & DBSRetrieveDatabase (const D_CHAR * const pName)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
 
   //Acquire the DBS's manager lock!
-  WSynchronizerHolder (apDbsManager_->mSync);
+  WSynchronizerRAII syncHolder (apDbsManager_->mSync);
 
   DATABASES_MAP & rMap = apDbsManager_->mDatabases;
   DATABASES_MAP::iterator it = rMap.find (pName);
@@ -206,7 +206,7 @@ DBSReleaseDatabase (I_DBSHandler & hndDatabase)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
 
   //Acquire the DBS's manager lock!
-  WSynchronizerHolder (apDbsManager_->mSync);
+  WSynchronizerRAII  syncHolder (apDbsManager_->mSync);
 
   DATABASES_MAP & rMap = apDbsManager_->mDatabases;
   DATABASES_MAP::iterator it;
@@ -234,7 +234,7 @@ DBSRemoveDatabase (const D_CHAR * const pName)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
 
   //Acquire the DBS's manager lock!
-  WSynchronizerHolder (apDbsManager_->mSync);
+  WSynchronizerRAII syncHolder (apDbsManager_->mSync);
 
   DATABASES_MAP & rMap = apDbsManager_->mDatabases;
   DATABASES_MAP::iterator it = rMap.find (pName);

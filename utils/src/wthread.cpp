@@ -88,7 +88,7 @@ WThread::SignalPendingException ()
 }
 
 void
-WThread::ThreadWrapperRoutine (void *const args)
+WThread::ThreadWrapperRoutine (void* const args)
 {
   WThread* const pThread = _RC(WThread*, args);
 

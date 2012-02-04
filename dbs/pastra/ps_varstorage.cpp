@@ -135,7 +135,7 @@ VaribaleLenghtStore::AddRecord (
 {
   D_UINT64 resultEntry = 0;
   {
-    WSynchronizerHolder synchHolder(m_Sync);
+    WSynchronizerRAII synchHolder(m_Sync);
 
     resultEntry = AllocateEntry (0);
     StoredItem cachedItem = m_EntrysCache.RetriveItem (resultEntry);
@@ -168,7 +168,7 @@ VaribaleLenghtStore::AddRecord (
 {
   D_UINT64 resultEntry = 0;
   {
-    WSynchronizerHolder synchHolder(m_Sync);
+    WSynchronizerRAII synchHolder(m_Sync);
 
     resultEntry = AllocateEntry (0);
     StoredItem cachedItem = m_EntrysCache.RetriveItem (resultEntry);
@@ -198,7 +198,7 @@ VaribaleLenghtStore::AddRecord (
 {
   D_UINT64 resultEntry = 0;
   {
-    WSynchronizerHolder synchHolder(m_Sync);
+    WSynchronizerRAII synchHolder(m_Sync);
 
     resultEntry = AllocateEntry (0);
     StoredItem cachedItem = m_EntrysCache.RetriveItem (resultEntry);
@@ -224,7 +224,7 @@ VaribaleLenghtStore::GetRecord (
                                 D_UINT64 count,
                                 D_UINT8 *pBuffer)
 {
-  WSynchronizerHolder synchHolder(m_Sync);
+  WSynchronizerRAII synchHolder(m_Sync);
 
   do
     {
@@ -272,7 +272,7 @@ VaribaleLenghtStore::UpdateRecord (
                                    D_UINT64 count,
                                    const D_UINT8 *pBuffer)
 {
-  WSynchronizerHolder synchHolder(m_Sync);
+  WSynchronizerRAII synchHolder(m_Sync);
 
   D_UINT64 prevEntry = recordFirstEntry;
 
@@ -338,7 +338,7 @@ VaribaleLenghtStore::UpdateRecord (
 
   do
     {
-      WSynchronizerHolder synchHolder (m_Sync);
+      WSynchronizerRAII synchHolder (m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -365,7 +365,7 @@ VaribaleLenghtStore::UpdateRecord (
 
   do
     {
-      WSynchronizerHolder sourceSyncHolder (sourceStore.m_Sync);
+      WSynchronizerRAII sourceSyncHolder (sourceStore.m_Sync);
 
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -393,7 +393,7 @@ VaribaleLenghtStore::UpdateRecord (
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-      WSynchronizerHolder synchHolder (m_Sync);
+      WSynchronizerRAII synchHolder (m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
@@ -403,7 +403,7 @@ VaribaleLenghtStore::UpdateRecord (
       D_UINT8 tempBuffer [64];
       D_UINT  tempValid = 0;
       {
-        WSynchronizerHolder sourceSyncHolder (sourceStore.m_Sync);
+        WSynchronizerRAII sourceSynchHolder (sourceStore.m_Sync);
 
         StoredItem cachedItem = sourceStore.m_EntrysCache.RetriveItem (sourceFirstEntry);
         StoreEntry *cpEntry = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
@@ -455,7 +455,7 @@ VaribaleLenghtStore::UpdateRecord (
                                    D_UINT64 sourceOffset,
                                    D_UINT64 sourceCount)
 {
-  WSynchronizerHolder synchHolder(m_Sync);
+  WSynchronizerRAII synchHolder(m_Sync);
 
   D_UINT64 prevEntry = recordFirstEntry;
 
@@ -515,7 +515,7 @@ VaribaleLenghtStore::UpdateRecord (
 void
 VaribaleLenghtStore::RemoveRecord (D_UINT64 recordFirstEntry)
 {
-  WSynchronizerHolder synchHolder(m_Sync);
+  WSynchronizerRAII synchHolder(m_Sync);
 
   {
     StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);

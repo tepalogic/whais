@@ -241,7 +241,7 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
 I_BTreeNode*
 I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
 {
-  WSynchronizerHolder syncHnd (m_Sync);
+  WSynchronizerRAII syncHolder (m_Sync);
   map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.find (node);
 
   if (it == m_NodesKeeper.end ())
@@ -290,7 +290,7 @@ I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
 void
 I_BTreeNodeManager::ReleaseNode (const NODE_INDEX node)
 {
-  WSynchronizerHolder syncHnd (m_Sync);
+  WSynchronizerRAII syncHolder (m_Sync);
   map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.find (node);
 
   assert (it != m_NodesKeeper.end ());
