@@ -13,3 +13,5 @@ tmp/
 *.idb
 *.pdb
 _CL_*
+.*.swp
+
