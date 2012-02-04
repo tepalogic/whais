@@ -31,24 +31,24 @@
 #include "dbs_mgr.h"
 #include "ps_table.h"
 
-
 namespace pastra
 {
 
 class DbsHandler : public I_DBSHandler
 {
 public:
-  DbsHandler (const std::string & name);
-  virtual ~ DbsHandler ();
+  explicit DbsHandler (const std::string& name);
+  DbsHandler (const DbsHandler& source);
+  virtual ~DbsHandler ();
 
   virtual D_UINT      GetPesistentTablesCount ();
   virtual I_DBSTable& RetrievePersistentTable (D_UINT index);
-  virtual I_DBSTable& RetrievePersistentTable (const D_CHAR * pTableName);
+  virtual I_DBSTable& RetrievePersistentTable (const D_CHAR* pTableName);
   virtual void        ReleaseTable (I_DBSTable&);
   virtual void        AddTable (const D_CHAR* const       pTableName,
                                 const DBSFieldDescriptor* pFields,
                                 const D_UINT              fieldsCount);
-  virtual void        DeleteTable (const D_CHAR * const pTableName);
+  virtual void        DeleteTable (const D_CHAR* const pTableName);
 
   virtual I_DBSTable* CreateTempTable (const DBSFieldDescriptor* pFields,
                                        const D_UINT              fieldsCount);
@@ -56,13 +56,14 @@ public:
   void Discard ();
   void RemoveFromStorage ();
 protected:
-  typedef std::map < std::string, PSTable * >TABLES;
+  typedef std::map<std::string, PSTable*> TABLES;
 
   void SyncToFile ();
 
-  const std::string mName;
-  TABLES mTables;
+  WSynchronizer     m_Sync;
+  const std::string m_Name;
+  TABLES            m_Tables;
 };
-}
 
+}
 #endif				/* PS_DBSMGR_H_ */
