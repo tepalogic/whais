@@ -62,8 +62,8 @@ public:
   virtual ~ I_DataContainer ()
   {}
 
-  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* puDataSource) = 0;
-  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8* puDataDestination) = 0;
+  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource) = 0;
+  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination) = 0;
   virtual void     ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition) = 0;
   virtual D_UINT64 GetContainerSize () const = 0;
   virtual void     MarkForRemoval () = 0;
@@ -80,8 +80,8 @@ public:
   virtual ~FileContainer ();
 
   // WIDataContainer virtual functions
-  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* puDataSource);
-  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8* puDataDestination);
+  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource);
+  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination);
   virtual void     ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition);
   virtual D_UINT64 GetContainerSize () const;
   virtual void     MarkForRemoval ();
@@ -111,8 +111,8 @@ public:
   virtual ~TempContainer ();
 
   // WIDataContainer virtual functions
-  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* puDataSource);
-  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8* puDataDestination);
+  virtual void     StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource);
+  virtual void     RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination);
   virtual void     ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition);
   virtual D_UINT64 GetContainerSize () const;
   virtual void     MarkForRemoval ();

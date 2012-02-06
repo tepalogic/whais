@@ -32,12 +32,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../../utils/include/le_converter.h"
 
-static const D_UINT MAX_INT64_LENGHT = 25;	//log (MAX_UINT64) = 19.34
+static const D_UINT MAX_INT64_LENGTH = 25;	//log (MAX_UINT64) = 19.34
 
 static const D_CHAR *
 int_to_ascii (D_UINT64 value, D_CHAR * t_buffer, D_BOOL is_unsigned = TRUE)
 {
-  D_UINT i = MAX_INT64_LENGHT - 1;
+  D_UINT i = MAX_INT64_LENGTH - 1;
   t_buffer[i--] = 0;
   const D_BOOL negative = is_unsigned ? FALSE : ((value >> 63) & 1) != 0;
 
@@ -157,7 +157,7 @@ static D_UINT
 wod_dec_w_ldd (const D_UINT8 * in_args, D_CHAR * operand_1,
 	       D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
 
   const D_UINT8 day = in_args[0];
   const D_UINT8 month = in_args[1];
@@ -181,7 +181,7 @@ static D_UINT
 wod_dec_w_lddt (const D_UINT8 * in_args, D_CHAR * operand_1,
 		D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
 
   const D_UINT8 sec = in_args[0];
   const D_UINT8 min = in_args[1];
@@ -217,7 +217,7 @@ static D_UINT
 wod_dec_w_ldht (const D_UINT8 * in_args, D_CHAR * operand_1,
 		D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
 
   const D_UINT32 u_sec = from_le_int32 (in_args);
   const D_UINT8 sec = in_args[4];
@@ -257,7 +257,7 @@ static D_UINT
 wod_dec_w_ldr (const D_UINT8 * in_args, D_CHAR * operand_1,
 	       D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   D_UINT64 real_part = from_le_int64 (in_args);
   D_UINT64 frac_part = from_le_int64 (in_args + sizeof (D_UINT64));
 
@@ -290,7 +290,7 @@ static D_UINT
 wod_dec_w_ldlo8 (const D_UINT8 * in_args, D_CHAR * operand_1,
 		 D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   const D_UINT8 value = in_args[0];
 
   strcpy (operand_1, int_to_ascii (value, t_str));
@@ -303,7 +303,7 @@ static D_UINT
 wod_dec_w_ldlo16 (const D_UINT8 * in_args, D_CHAR * operand_1,
 		  D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   const D_UINT16 value = from_le_int16 (in_args);
 
   strcpy (operand_1, int_to_ascii (value, t_str));
@@ -316,7 +316,7 @@ static D_UINT
 wod_dec_w_ldlo32 (const D_UINT8 * in_args, D_CHAR * operand_1,
 		  D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   const D_UINT32 value = from_le_int32 (in_args);
 
   strcpy (operand_1, int_to_ascii (value, t_str));
@@ -347,7 +347,7 @@ static D_UINT
 wod_dec_w_call (const D_UINT8 * in_args, D_CHAR * operand_1,
 		D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   const D_UINT32 value = from_le_int32 (in_args);
 
   strcpy (operand_1, int_to_ascii (value, t_str));
@@ -451,7 +451,7 @@ const FDECODE_OPCODE wod_dec_w_xorb = wod_dec_w_ldnull;
 static D_UINT
 wod_dec_w_jf (const D_UINT8 * in_args, D_CHAR * operand_1, D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   const D_INT32 temp = _SC (D_INT32, from_le_int32 (in_args));
   const D_INT64 value = temp;
 
@@ -473,7 +473,7 @@ static D_UINT
 wod_dec_w_bsync (const D_UINT8 * in_args, D_CHAR * operand_1,
 		 D_CHAR * operand_2)
 {
-  D_CHAR t_str[MAX_INT64_LENGHT];
+  D_CHAR t_str[MAX_INT64_LENGTH];
   const D_UINT8 value = in_args[0];
 
   strcpy (operand_1, int_to_ascii (value, t_str));

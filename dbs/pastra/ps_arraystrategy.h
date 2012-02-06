@@ -65,7 +65,6 @@ public:
   virtual bool IsRowValue () const;
 
   virtual pastra::TemporalArray& GetTemporal();
-
   virtual pastra::RowFieldArray& GetRowValue();
 
 protected:
@@ -117,7 +116,7 @@ protected:
   virtual void     CollapseRawData (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 GetRawDataSize () const;
 
-  virtual pastra::TemporalArray& GetTemporal();
+  virtual TemporalArray& GetTemporal();
 
   TempContainer m_Storage;
 };
@@ -126,7 +125,7 @@ class RowFieldArray : public I_ArrayStrategy
 {
   friend class PSTable;
 public:
-  RowFieldArray (VaribaleLenghtStore &storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type);
+  RowFieldArray (VariableLengthStore &storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type);
   ~RowFieldArray ();
 
 protected:
@@ -141,12 +140,13 @@ protected:
   virtual void     CollapseRawData (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 GetRawDataSize () const;
 
-  const D_UINT64           m_FirstRecordEntry;
-  VaribaleLenghtStore &m_Storage;
+  const D_UINT64       m_FirstRecordEntry;
+  VariableLengthStore& m_Storage;
+private:
+  RowFieldArray (const RowFieldArray&);
+  RowFieldArray& operator= (const RowFieldArray&);
 
 };
-
-
 
 }
 #endif /* PS_ARRAYSTRATEGY_H_ */

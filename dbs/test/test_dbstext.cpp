@@ -139,11 +139,11 @@ test_nulliness()
       std::string temp_file_base = DBSGetWorkingDir();
       temp_file_base += "t_cont_1";
 
-      VaribaleLenghtStore storage;
+      VariableLengthStore storage;
       storage.Init(temp_file_base.c_str(), 0, 713);
       storage.MarkForRemoval();
 
-      D_UINT64 allocated_entry = storage.AddRecord (0, NULL, 0);
+      D_UINT64 allocated_entry = storage.AddRecord (NULL, 0);
 
       DBSText textVarRaw  (*(new RowFieldText(storage, allocated_entry, 0)));
 
@@ -230,10 +230,9 @@ test_text_append ()
       const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
 
       {
-        VaribaleLenghtStore storage;
+        VariableLengthStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
-        allocated_entry = storage.AddRecord (0,
-                                             _RC(const D_UINT8*, pOriginalText),
+        allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText),
                                              (sizeof charValues / sizeof (D_UINT32)));
 
       }
@@ -242,7 +241,7 @@ test_text_append ()
         result = false;
       else
         {
-          VaribaleLenghtStore storage;
+          VariableLengthStore storage;
           storage.Init(temp_file_base.c_str(), (originalText.GetRawUtf8Count() + 713 - 1) / 713, 713);
           storage.MarkForRemoval();
 
@@ -309,10 +308,10 @@ test_character_insertion ()
               temp_file_base += "ps_t_text";
               D_UINT64 allocated_entry = 0;
 
-              VaribaleLenghtStore storage;
+              VariableLengthStore storage;
               storage.Init(temp_file_base.c_str(), 0, 713);
               storage.MarkForRemoval();
-              allocated_entry = storage.AddRecord (1, _RC(const D_UINT8*, pOriginalText), sizeof (charValues) / sizeof (D_UINT32));
+              allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText), sizeof (charValues) / sizeof (D_UINT32));
               DBSText originalText (*(new RowFieldText(storage, allocated_entry, sizeof (charValues) / sizeof (D_UINT32))));
 
               DBSChar test_char = DBSChar(0x211356);

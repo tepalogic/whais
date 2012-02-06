@@ -105,7 +105,7 @@ FileContainer::~FileContainer ()
 }
 
 void
-FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* puDataSource)
+FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource)
 {
   D_UINT64     uContainerIndex  = uPosition / m_uMaxFileUnitSize;
   D_UINT64     uUnitPosition    = uPosition % m_uMaxFileUnitSize;
@@ -121,12 +121,12 @@ FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* p
         ExtendContainer ();
     }
 
-  D_UINT uWriteLenght = uLenght;
+  D_UINT uWriteLength = uLength;
 
-  if ((uWriteLenght + uUnitPosition) > m_uMaxFileUnitSize)
-    uWriteLenght = m_uMaxFileUnitSize - uUnitPosition;
+  if ((uWriteLength + uUnitPosition) > m_uMaxFileUnitSize)
+    uWriteLength = m_uMaxFileUnitSize - uUnitPosition;
 
-  assert (uWriteLenght <= uLenght);
+  assert (uWriteLength <= uLength);
 
   WFile & rUnitContainer = m_FilesHandles[uContainerIndex];
 
@@ -134,36 +134,36 @@ FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* p
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
   rUnitContainer.Seek (uUnitPosition, WHC_SEEK_BEGIN);
-  rUnitContainer.Write (puDataSource, uWriteLenght);
+  rUnitContainer.Write (puDataSource, uWriteLength);
 
   //Let write the rest
-  if (uWriteLenght < uLenght)
-    StoreData (uPosition + uWriteLenght, uLenght - uWriteLenght, puDataSource + uWriteLenght);
+  if (uWriteLength < uLength)
+    StoreData (uPosition + uWriteLength, uLength - uWriteLength, puDataSource + uWriteLength);
 }
 
 void
-FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8* puDataDestination)
+FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination)
 {
   D_UINT64     uContainerIndex  = uPosition / m_uMaxFileUnitSize;
   D_UINT64     uUnitPosition    = uPosition % m_uMaxFileUnitSize;
   const D_UINT uContainersCount = m_FilesHandles.size ();
 
-  if ((uContainerIndex > uContainersCount) || (uPosition + uLenght > GetContainerSize ()))
+  if ((uContainerIndex > uContainersCount) || (uPosition + uLength > GetContainerSize ()))
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
   WFile rUnitContainer = m_FilesHandles[uContainerIndex];
 
-  D_UINT uReadLenght = uLenght;
+  D_UINT uReadLength = uLength;
 
-  if (uReadLenght + uUnitPosition > rUnitContainer.GetSize ())
-    uReadLenght = rUnitContainer.GetSize () - uUnitPosition;
+  if (uReadLength + uUnitPosition > rUnitContainer.GetSize ())
+    uReadLength = rUnitContainer.GetSize () - uUnitPosition;
 
   rUnitContainer.Seek (uUnitPosition, WHC_SEEK_BEGIN);
-  rUnitContainer.Read (puDataDestination, uReadLenght);
+  rUnitContainer.Read (puDataDestination, uReadLength);
 
   //Lets read the rest
-  if (uReadLenght != uLenght)
-    RetrieveData (uPosition + uReadLenght, uLenght - uReadLenght, puDataDestination + uReadLenght);
+  if (uReadLength != uLength)
+    RetrieveData (uPosition + uReadLength, uLength - uReadLength, puDataDestination + uReadLength);
 
 }
 
@@ -286,17 +286,17 @@ TempContainer::~TempContainer ()
 }
 
 void
-TempContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* puDataSource)
+TempContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource)
 {
   if (uPosition > GetContainerSize ())
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
-  while (uLenght > 0)
+  while (uLength > 0)
     {
       assert ((m_CacheStartPos % m_CacheSize) == 0);
       if ((uPosition >= m_CacheStartPos) && (uPosition < (m_CacheStartPos + m_CacheSize)))
         {
-          const D_UINT toWrite = MIN (uLenght, m_CacheStartPos + m_CacheSize - uPosition);
+          const D_UINT toWrite = MIN (uLength, m_CacheStartPos + m_CacheSize - uPosition);
           memcpy (m_Cache.get () + (uPosition - m_CacheStartPos), puDataSource, toWrite);
 
           if (uPosition + toWrite > m_CacheEndPos)
@@ -305,7 +305,7 @@ TempContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* p
           m_DirtyCache = true;
           uPosition    += toWrite;
           puDataSource += toWrite;
-          uLenght      -= toWrite;
+          uLength      -= toWrite;
 
         }
       else
@@ -314,22 +314,22 @@ TempContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLenght, const D_UINT8* p
 }
 
 void
-TempContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLenght, D_UINT8* puDataDestination)
+TempContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination)
 {
-  if (uPosition + uLenght > GetContainerSize ())
+  if (uPosition + uLength > GetContainerSize ())
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
-  while (uLenght > 0)
+  while (uLength > 0)
     {
       assert ((m_CacheStartPos % m_CacheSize) == 0);
       if ((uPosition >= m_CacheStartPos) && (uPosition < m_CacheEndPos))
         {
-          const D_UINT toRead = MIN (uLenght, m_CacheEndPos - uPosition);
+          const D_UINT toRead = MIN (uLength, m_CacheEndPos - uPosition);
           memcpy (puDataDestination, m_Cache.get () + (uPosition - m_CacheStartPos), toRead);
 
           uPosition         += toRead;
           puDataDestination += toRead;
-          uLenght           -= toRead;
+          uLength           -= toRead;
 
         }
       else

@@ -65,8 +65,7 @@ StoreEntry::UpdateEntryData (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer
 }
 
 
-
-VaribaleLenghtStore::VaribaleLenghtStore () :
+VariableLengthStore::VariableLengthStore () :
     I_BlocksManager (),
     m_apEntriesContainer (NULL),
     m_EntrysCache (*this),
@@ -76,19 +75,20 @@ VaribaleLenghtStore::VaribaleLenghtStore () :
 {
 }
 
-VaribaleLenghtStore::~VaribaleLenghtStore ()
+VariableLengthStore::~VariableLengthStore ()
 {
 }
 
 void
-VaribaleLenghtStore::Init (
-                           const D_CHAR * pContainerBaseName,
-                           D_UINT64 uContainerSize, D_UINT uMaxFileSize)
+VariableLengthStore::Init (const D_CHAR* pContainerBaseName,
+                           D_UINT64      uContainerSize,
+                           D_UINT        uMaxFileSize)
 {
 
   assert (uMaxFileSize != 0);
 
   const D_UINT64 uUnitsCount = (uContainerSize + uMaxFileSize- 1) / uMaxFileSize;
+
   m_apEntriesContainer.reset (new FileContainer (pContainerBaseName, uMaxFileSize, uUnitsCount));
 
   m_EntrysCount = m_apEntriesContainer->GetContainerSize () / sizeof (StoreEntry);
@@ -97,8 +97,8 @@ VaribaleLenghtStore::Init (
     {
       StoreEntry sEntry;
 
-      sEntry.MarkAsDeleted();
-      sEntry.MarkFirstAsPrev ();
+      sEntry.MarkAsDeleted (true);
+      sEntry.MarkAsFirstEntry (false);
 
       sEntry.SetPrevEntry (0);
       sEntry.SetNextEntry (StoreEntry::LAST_DELETED_ENTRY);
@@ -108,11 +108,11 @@ VaribaleLenghtStore::Init (
     }
   m_EntrysCache.Init (sizeof (StoreEntry), 1024, 1024);
 
-  StoredItem cachedItem = m_EntrysCache.RetriveItem (0);
-  const StoreEntry *const pEntryHdr = _RC(const StoreEntry *, cachedItem.GetDataForRead ());
+  StoredItem              cachedItem = m_EntrysCache.RetriveItem (0);
+  const StoreEntry* const pEntryHdr  = _RC(const StoreEntry *, cachedItem.GetDataForRead ());
 
   assert (pEntryHdr->IsDeleted());
-  assert (pEntryHdr->IsIndexFirst() == false);
+  assert (pEntryHdr->IsFirstEntry() == false);
 
   m_FirstFreeEntry = pEntryHdr->GetNextEntry ();
 
@@ -122,30 +122,28 @@ VaribaleLenghtStore::Init (
 }
 
 void
-VaribaleLenghtStore::MarkForRemoval ()
+VariableLengthStore::MarkForRemoval ()
 {
   m_apEntriesContainer.get ()->MarkForRemoval ();
 }
 
 D_UINT64
-VaribaleLenghtStore::AddRecord (
-                                const D_UINT64 rowIndex,
-                                const D_UINT8 *pBuffer,
+VariableLengthStore::AddRecord (const D_UINT8* pBuffer,
                                 const D_UINT64 count)
 {
   D_UINT64 resultEntry = 0;
   {
     WSynchronizerRAII synchHolder(m_Sync);
 
-    resultEntry = AllocateEntry (0);
-    StoredItem cachedItem = m_EntrysCache.RetriveItem (resultEntry);
-    StoreEntry *pEntryHdr = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+    resultEntry            = AllocateEntry (0);
+    StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
+    StoreEntry* pEntryHdr  = _RC (StoreEntry *, cachedItem.GetDataForUpdate ());
 
-    pEntryHdr->MarkAsUsed();
-    pEntryHdr->MarkFirstAsIndex();
+    pEntryHdr->MarkAsDeleted (false);
+    pEntryHdr->MarkAsFirstEntry (true);
 
     pEntryHdr->SetNextEntry (StoreEntry::LAST_CHAINED_ENTRY);
-    pEntryHdr->SetPrevEntry (rowIndex);
+    pEntryHdr->SetPrevEntry (1);
   }
 
   if ((resultEntry != 0) && (count > 0))
@@ -158,27 +156,25 @@ VaribaleLenghtStore::AddRecord (
 }
 
 D_UINT64
-VaribaleLenghtStore::AddRecord (
-                                const D_UINT64 rowIndex,
-                                VaribaleLenghtStore &sourceStore,
-                                D_UINT64 sourceFirstEntry,
-                                D_UINT64 sourceOffset,
-                                D_UINT64 sourceCount)
+VariableLengthStore::AddRecord (VariableLengthStore& sourceStore,
+                                D_UINT64             sourceFirstEntry,
+                                D_UINT64             sourceOffset,
+                                D_UINT64             sourceCount)
 
 {
   D_UINT64 resultEntry = 0;
   {
     WSynchronizerRAII synchHolder(m_Sync);
 
-    resultEntry = AllocateEntry (0);
-    StoredItem cachedItem = m_EntrysCache.RetriveItem (resultEntry);
-    StoreEntry *pEntryHdr = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+    resultEntry            = AllocateEntry (0);
+    StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
+    StoreEntry* pEntryHdr  = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
-    pEntryHdr->MarkAsUsed();
-    pEntryHdr->MarkFirstAsIndex();
+    pEntryHdr->MarkAsDeleted (false);
+    pEntryHdr->MarkAsFirstEntry (true);
 
     pEntryHdr->SetNextEntry (StoreEntry::LAST_CHAINED_ENTRY);
-    pEntryHdr->SetPrevEntry (rowIndex);
+    pEntryHdr->SetPrevEntry (1);
   }
 
   if ((resultEntry != 0) && (sourceCount > 0))
@@ -189,26 +185,24 @@ VaribaleLenghtStore::AddRecord (
 
 
 D_UINT64
-VaribaleLenghtStore::AddRecord (
-                                const D_UINT64 rowIndex,
-                                I_DataContainer &sourceContainer,
-                                D_UINT64 sourceOffset,
-                                D_UINT64 sourceCount)
+VariableLengthStore::AddRecord (I_DataContainer& sourceContainer,
+                                D_UINT64         sourceOffset,
+                                D_UINT64         sourceCount)
 
 {
   D_UINT64 resultEntry = 0;
   {
     WSynchronizerRAII synchHolder(m_Sync);
 
-    resultEntry = AllocateEntry (0);
-    StoredItem cachedItem = m_EntrysCache.RetriveItem (resultEntry);
-    StoreEntry *pEntryHdr = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+    resultEntry            = AllocateEntry (0);
+    StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
+    StoreEntry* pEntryHdr  = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
-    pEntryHdr->MarkAsUsed();
-    pEntryHdr->MarkFirstAsIndex();
+    pEntryHdr->MarkAsDeleted (false);
+    pEntryHdr->MarkAsFirstEntry (true);
 
     pEntryHdr->SetNextEntry (StoreEntry::LAST_CHAINED_ENTRY);
-    pEntryHdr->SetPrevEntry (rowIndex);
+    pEntryHdr->SetPrevEntry (1);
   }
 
   if ((resultEntry != 0) && (sourceCount > 0))
@@ -218,11 +212,10 @@ VaribaleLenghtStore::AddRecord (
 }
 
 void
-VaribaleLenghtStore::GetRecord (
-                                D_UINT64 recordFirstEntry,
+VariableLengthStore::GetRecord (D_UINT64 recordFirstEntry,
                                 D_UINT64 offset,
                                 D_UINT64 count,
-                                D_UINT8 *pBuffer)
+                                D_UINT8* pBuffer)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
@@ -231,15 +224,15 @@ VaribaleLenghtStore::GetRecord (
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
       if (offset < cpEntry->GetRawDataSize())
         break;
 
-      offset -= cpEntry->GetRawDataSize();
+      offset           -= cpEntry->GetRawDataSize();
       recordFirstEntry = cpEntry->GetNextEntry();
     }
   while (true);
@@ -249,8 +242,8 @@ VaribaleLenghtStore::GetRecord (
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -266,11 +259,10 @@ VaribaleLenghtStore::GetRecord (
 }
 
 void
-VaribaleLenghtStore::UpdateRecord (
-                                   D_UINT64 recordFirstEntry,
-                                   D_UINT64 offset,
-                                   D_UINT64 count,
-                                   const D_UINT8 *pBuffer)
+VariableLengthStore::UpdateRecord (D_UINT64       recordFirstEntry,
+                                   D_UINT64       offset,
+                                   D_UINT64       count,
+                                   const D_UINT8* pBuffer)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
@@ -286,16 +278,16 @@ VaribaleLenghtStore::UpdateRecord (
             break;
         }
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
       if (offset < cpEntry->GetRawDataSize())
         break;
 
-      offset -= cpEntry->GetRawDataSize();
-      prevEntry = recordFirstEntry;
+      offset           -= cpEntry->GetRawDataSize();
+      prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
 
     }
@@ -306,8 +298,8 @@ VaribaleLenghtStore::UpdateRecord (
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      StoreEntry *cpEntry = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+      StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -315,7 +307,7 @@ VaribaleLenghtStore::UpdateRecord (
       assert (chunkSize > 0);
 
 
-      count -= chunkSize, pBuffer += chunkSize;
+      count  -= chunkSize, pBuffer += chunkSize;
       offset = (offset + chunkSize) % cpEntry->GetRawDataSize();
 
       prevEntry = recordFirstEntry;
@@ -325,15 +317,14 @@ VaribaleLenghtStore::UpdateRecord (
 }
 
 void
-VaribaleLenghtStore::UpdateRecord (
-                                   D_UINT64 recordFirstEntry,
-                                   D_UINT64 offset,
-                                   VaribaleLenghtStore &sourceStore,
-                                   D_UINT64 sourceFirstEntry,
-                                   D_UINT64 sourceOffset,
-                                   D_UINT64 sourceCount)
+VariableLengthStore::UpdateRecord (D_UINT64             recordFirstEntry,
+                                   D_UINT64             offset,
+                                   VariableLengthStore& sourceStore,
+                                   D_UINT64             sourceFirstEntry,
+                                   D_UINT64             sourceOffset,
+                                   D_UINT64             sourceCount)
 {
-  D_UINT64 prevEntry = recordFirstEntry;
+  D_UINT64 prevEntry       = recordFirstEntry;
   D_UINT64 sourcePrevEntry = sourceFirstEntry;
 
   do
@@ -348,16 +339,16 @@ VaribaleLenghtStore::UpdateRecord (
             break;
         }
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
       if (offset < cpEntry->GetRawDataSize())
         break;
 
-      offset -= cpEntry->GetRawDataSize();
-      prevEntry = recordFirstEntry;
+      offset           -= cpEntry->GetRawDataSize();
+      prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
 
     }
@@ -375,15 +366,15 @@ VaribaleLenghtStore::UpdateRecord (
             break;
         }
 
-      StoredItem cachedItem = sourceStore.m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = sourceStore.m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
       if (sourceOffset < cpEntry->GetRawDataSize())
         break;
 
-      sourceOffset -= cpEntry->GetRawDataSize();
+      sourceOffset     -= cpEntry->GetRawDataSize();
       sourceFirstEntry = cpEntry->GetNextEntry();
     }
   while (true);
@@ -405,19 +396,20 @@ VaribaleLenghtStore::UpdateRecord (
       {
         WSynchronizerRAII sourceSynchHolder (sourceStore.m_Sync);
 
-        StoredItem cachedItem = sourceStore.m_EntrysCache.RetriveItem (sourceFirstEntry);
-        StoreEntry *cpEntry = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+        StoredItem  cachedItem = sourceStore.m_EntrysCache.RetriveItem (sourceFirstEntry);
+        StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
         assert (cpEntry->GetRawDataSize() <= sizeof tempBuffer);
-        tempValid = cpEntry->ReadEntryData(sourceOffset, sourceCount, tempBuffer);
-        sourcePrevEntry = sourceFirstEntry;
+
+        tempValid        = cpEntry->ReadEntryData(sourceOffset, sourceCount, tempBuffer);
+        sourcePrevEntry  = sourceFirstEntry;
         sourceFirstEntry = cpEntry->GetNextEntry();
       }
 
       synchHolder.Enter();
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      StoreEntry *cpEntry = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+      StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -448,12 +440,11 @@ VaribaleLenghtStore::UpdateRecord (
 }
 
 void
-VaribaleLenghtStore::UpdateRecord (
-                                   D_UINT64 recordFirstEntry,
-                                   D_UINT64 offset,
-                                   I_DataContainer &sourceContainer,
-                                   D_UINT64 sourceOffset,
-                                   D_UINT64 sourceCount)
+VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
+                                   D_UINT64         offset,
+                                   I_DataContainer& sourceContainer,
+                                   D_UINT64         sourceOffset,
+                                   D_UINT64         sourceCount)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
@@ -469,16 +460,16 @@ VaribaleLenghtStore::UpdateRecord (
             break;
         }
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
       if (offset < cpEntry->GetRawDataSize())
         break;
 
-      offset -= cpEntry->GetRawDataSize();
-      prevEntry = recordFirstEntry;
+      offset           -= cpEntry->GetRawDataSize();
+      prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
 
     }
@@ -489,8 +480,8 @@ VaribaleLenghtStore::UpdateRecord (
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
 
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      StoreEntry *cpEntry = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+      StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -505,42 +496,52 @@ VaribaleLenghtStore::UpdateRecord (
       assert (chunkSize == tempValid);
 
       sourceCount -= tempValid, sourceOffset += tempValid;
-      offset = (offset + tempValid) % cpEntry->GetRawDataSize();
+      offset      = (offset + tempValid) % cpEntry->GetRawDataSize();
 
-      prevEntry = recordFirstEntry;
+      prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
     }
 }
 
 void
-VaribaleLenghtStore::RemoveRecord (D_UINT64 recordFirstEntry)
+VariableLengthStore::IncrementRecordRef (const D_UINT64 recordFirstEntry)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
-  {
-    StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-    const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+  StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+  StoreEntry* const cpEntry    = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
-    if (cpEntry->IsDeleted() || (cpEntry->IsIndexFirst() == false))
-      throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
-  }
+  assert (cpEntry->IsFirstEntry ());
+  assert (cpEntry->IsDeleted () == false);
+  assert (cpEntry->GetPrevEntry () > 0);
 
-  while (recordFirstEntry != StoreEntry::LAST_CHAINED_ENTRY)
-    {
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry *cpEntry = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+  cpEntry->SetPrevEntry (cpEntry->GetPrevEntry () + 1);
 
-      assert (cpEntry->IsDeleted() == false);
+}
 
-      const D_UINT64 currentEntry = recordFirstEntry;
-      recordFirstEntry = cpEntry->GetNextEntry();
+void
+VariableLengthStore::DecrementRecordRef (const D_UINT64 recordFirstEntry)
+{
+  WSynchronizerRAII synchHolder(m_Sync);
 
-      AddToFreeList (currentEntry);
-    }
+  StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+  StoreEntry* const cpEntry    = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+
+  assert (cpEntry->IsFirstEntry ());
+  assert (cpEntry->IsDeleted () == false);
+
+  D_UINT64 refCount = cpEntry->GetPrevEntry ();
+
+  assert (refCount > 0);
+
+  cpEntry->SetPrevEntry (--refCount);
+
+  if (refCount == 0)
+    RemoveRecord (recordFirstEntry);
 }
 
 D_UINT64
-VaribaleLenghtStore::GetRawSize() const
+VariableLengthStore::GetRawSize() const
 {
   if (m_apEntriesContainer.get() == NULL)
     return 0;
@@ -549,7 +550,7 @@ VaribaleLenghtStore::GetRawSize() const
 }
 
 void
-VaribaleLenghtStore::StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount)
+VariableLengthStore::StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount)
 {
   if (firstItem + itemsCount > m_EntrysCount)
     itemsCount = m_EntrysCount - firstItem;
@@ -561,7 +562,7 @@ VaribaleLenghtStore::StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, 
 }
 
 void
-VaribaleLenghtStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount)
+VariableLengthStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount)
 {
 
   if (firstItem + itemsCount > m_EntrysCount)
@@ -574,22 +575,24 @@ VaribaleLenghtStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_
 }
 
 D_UINT64
-VaribaleLenghtStore::AllocateEntry (const D_UINT64 prevEntry)
+VariableLengthStore::AllocateEntry (const D_UINT64 prevEntry)
 {
   D_UINT64 foundFree = m_FirstFreeEntry;
 
   //Try to find a neighbor for of the previous entry;
   if ((prevEntry + 1) < m_EntrysCount)
     {
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (prevEntry + 1);
-      const StoreEntry *pEntHdr = _RC( const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (prevEntry + 1);
+      const StoreEntry* pEntHdr    = _RC( const StoreEntry *, cachedItem.GetDataForRead());
+
       if (pEntHdr->IsDeleted())
         foundFree = prevEntry + 1;
     }
   else if (prevEntry > 1)
     {
-      StoredItem cachedItem = m_EntrysCache.RetriveItem (prevEntry - 1);
-      const StoreEntry *pEntHdr = _RC( const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (prevEntry - 1);
+      const StoreEntry* pEntHdr    = _RC( const StoreEntry *, cachedItem.GetDataForRead());
+
       if (pEntHdr->IsDeleted())
         foundFree = prevEntry - 1;
     }
@@ -599,13 +602,14 @@ VaribaleLenghtStore::AllocateEntry (const D_UINT64 prevEntry)
 
   ExtractFromFreeList (foundFree);
 
-  StoredItem cachedItem = m_EntrysCache.RetriveItem (foundFree);
-  StoreEntry *pEntHdr = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  StoredItem  cachedItem = m_EntrysCache.RetriveItem (foundFree);
+  StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
 
   if (prevEntry > 0)
     {
-      StoredItem prevCachedItem = m_EntrysCache.RetriveItem (prevEntry);
-      StoreEntry *pPrevEntHdr = _RC( StoreEntry *, prevCachedItem.GetDataForUpdate());
+      StoredItem  prevCachedItem = m_EntrysCache.RetriveItem (prevEntry);
+      StoreEntry* pPrevEntHdr    = _RC( StoreEntry *, prevCachedItem.GetDataForUpdate());
+
 
       const D_UINT64 prevNext = pPrevEntHdr->GetNextEntry();
 
@@ -615,7 +619,7 @@ VaribaleLenghtStore::AllocateEntry (const D_UINT64 prevEntry)
       pPrevEntHdr->SetNextEntry(foundFree);
 
       pEntHdr->SetPrevEntry (prevEntry);
-      pEntHdr->MarkFirstAsPrev();
+      pEntHdr->MarkAsFirstEntry (false);
       pEntHdr->SetNextEntry (prevNext);
 
       if (pEntHdr->GetNextEntry() != StoreEntry::LAST_CHAINED_ENTRY)
@@ -628,7 +632,7 @@ VaribaleLenghtStore::AllocateEntry (const D_UINT64 prevEntry)
     }
   else
     {
-      pEntHdr->MarkFirstAsIndex ();
+      pEntHdr->MarkAsFirstEntry (true);
       pEntHdr->SetPrevEntry (0);
       pEntHdr->SetNextEntry (StoreEntry::LAST_CHAINED_ENTRY);
     }
@@ -637,16 +641,16 @@ VaribaleLenghtStore::AllocateEntry (const D_UINT64 prevEntry)
 }
 
 D_UINT64
-VaribaleLenghtStore::ExtentFreeList ()
+VariableLengthStore::ExtentFreeList ()
 {
   assert (m_FirstFreeEntry == StoreEntry::LAST_DELETED_ENTRY);
   StoreEntry addEntry;
 
-  addEntry.MarkAsDeleted();
+  addEntry.MarkAsDeleted (true);
   addEntry.SetPrevEntry (0);
   addEntry.SetNextEntry (StoreEntry::LAST_DELETED_ENTRY);
 
-  addEntry.MarkFirstAsPrev ();
+  addEntry.MarkAsFirstEntry (false);
 
   D_UINT64 insertPos = m_apEntriesContainer.get ()->GetContainerSize();
   m_FirstFreeEntry = insertPos / sizeof (addEntry);
@@ -660,22 +664,46 @@ VaribaleLenghtStore::ExtentFreeList ()
   //Reload the content of item's block.
   m_EntrysCache.ForceItemUpdate (m_FirstFreeEntry);
 
-  StoredItem cachedItem = m_EntrysCache.RetriveItem (0);
-  StoreEntry *pEntHdr = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  StoredItem  cachedItem = m_EntrysCache.RetriveItem (0);
+  StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+
   pEntHdr->SetNextEntry (m_FirstFreeEntry);
 
   return m_FirstFreeEntry;
 }
 
 void
-VaribaleLenghtStore::ExtractFromFreeList (const D_UINT64 freeEntry)
+VariableLengthStore::RemoveRecord (D_UINT64 recordFirstEntry)
 {
-  StoredItem cachedItem = m_EntrysCache.RetriveItem (freeEntry);
-  StoreEntry *pEntHdr = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+  const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+
+  assert (cpEntry->IsDeleted () == false);
+  assert (cpEntry->IsFirstEntry ());
+
+  while (recordFirstEntry != StoreEntry::LAST_CHAINED_ENTRY)
+    {
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+
+      assert (cpEntry->IsDeleted() == false);
+
+      const D_UINT64 currentEntry = recordFirstEntry;
+      recordFirstEntry            = cpEntry->GetNextEntry();
+
+      AddToFreeList (currentEntry);
+    }
+}
+
+void
+VariableLengthStore::ExtractFromFreeList (const D_UINT64 freeEntry)
+{
+  StoredItem  cachedItem = m_EntrysCache.RetriveItem (freeEntry);
+  StoreEntry* pEntHdr    = _RC( StoreEntry*, cachedItem.GetDataForUpdate());
 
   assert (freeEntry != 0);
   assert (pEntHdr->IsDeleted());
-  assert (pEntHdr->IsIndexFirst() == false);
+  assert (pEntHdr->IsFirstEntry () == false);
 
   const D_UINT64 prevEntry = pEntHdr->GetPrevEntry();
   const D_UINT64 nextEntry = pEntHdr->GetNextEntry();
@@ -683,14 +711,15 @@ VaribaleLenghtStore::ExtractFromFreeList (const D_UINT64 freeEntry)
   assert (prevEntry < m_EntrysCount);
   assert ((nextEntry == StoreEntry::LAST_DELETED_ENTRY) || (nextEntry < m_EntrysCount));
 
-  pEntHdr->MarkAsUsed();
+  pEntHdr->MarkAsDeleted (false);
   pEntHdr->SetPrevEntry (0);
   pEntHdr->SetNextEntry (0);
 
   cachedItem = m_EntrysCache.RetriveItem (prevEntry);
-  pEntHdr = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  pEntHdr    = _RC( StoreEntry*, cachedItem.GetDataForUpdate());
+
   assert (pEntHdr->IsDeleted());
-  assert (pEntHdr->IsIndexFirst() == false);
+  assert (pEntHdr->IsFirstEntry() == false);
 
   pEntHdr->SetNextEntry (nextEntry);
 
@@ -703,19 +732,19 @@ VaribaleLenghtStore::ExtractFromFreeList (const D_UINT64 freeEntry)
       pEntHdr = _RC( StoreEntry *,cachedItem.GetDataForUpdate());
 
       assert (pEntHdr->IsDeleted());
-      assert (pEntHdr->IsIndexFirst() == false);
+      assert (pEntHdr->IsFirstEntry() == false);
 
       pEntHdr->SetPrevEntry(prevEntry);
     }
 }
 
 void
-VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
+VariableLengthStore::AddToFreeList (const D_UINT64 entry)
 {
   assert (m_EntrysCount > entry);
 
-  StoredItem cachedItem = m_EntrysCache.RetriveItem (entry);
-  StoreEntry *pEntHdr = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  StoredItem  cachedItem = m_EntrysCache.RetriveItem (entry);
+  StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
 
   StoredItem neighborCachedItem = cachedItem; //Just to have a valid initialization
   StoreEntry *pNeighborEntHdr = NULL;
@@ -723,8 +752,8 @@ VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
   assert (entry > 0);
   assert (pEntHdr->IsDeleted() == false);
 
-  pEntHdr->MarkAsDeleted();
-  pEntHdr->MarkFirstAsPrev ();
+  pEntHdr->MarkAsDeleted (true);
+  pEntHdr->MarkAsFirstEntry (false);
 
   //Maybe we are lucky! Check to see if we can link to one of our neighbors!
   if (m_EntrysCount > (entry + 1))
@@ -735,7 +764,7 @@ VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
 
   if ((pNeighborEntHdr != NULL) && pNeighborEntHdr->IsDeleted())
     {
-      assert (pNeighborEntHdr->IsIndexFirst() == false);
+      assert (pNeighborEntHdr->IsFirstEntry() == false);
 
       const D_UINT64 prevEntry = pNeighborEntHdr->GetPrevEntry();
       pNeighborEntHdr->SetPrevEntry (entry);
@@ -746,7 +775,7 @@ VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
       pNeighborEntHdr = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
 
       assert (pNeighborEntHdr->IsDeleted());
-      assert (pNeighborEntHdr->IsIndexFirst() == false);
+      assert (pNeighborEntHdr->IsFirstEntry() == false);
 
       pNeighborEntHdr->SetNextEntry (entry);
 
@@ -762,11 +791,11 @@ VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
   if (entry > 1)
     {
       neighborCachedItem = m_EntrysCache.RetriveItem (entry - 1);
-      pNeighborEntHdr = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
+      pNeighborEntHdr    = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
 
       if (pNeighborEntHdr->IsDeleted())
         {
-          assert (pNeighborEntHdr->IsIndexFirst() == false);
+          assert (pNeighborEntHdr->IsFirstEntry() == false);
 
           const D_UINT64 nextEntry = pNeighborEntHdr->GetNextEntry();
           pNeighborEntHdr->SetNextEntry (entry);
@@ -780,7 +809,7 @@ VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
           pNeighborEntHdr = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
 
           assert (pNeighborEntHdr->IsDeleted());
-          assert (pNeighborEntHdr->IsIndexFirst() == false);
+          assert (pNeighborEntHdr->IsFirstEntry() == false);
 
           pNeighborEntHdr->SetPrevEntry (entry);
 
@@ -793,11 +822,11 @@ VaribaleLenghtStore::AddToFreeList (const D_UINT64 entry)
   pEntHdr->SetNextEntry( m_FirstFreeEntry);
 
   m_FirstFreeEntry = entry;
-  cachedItem = m_EntrysCache.RetriveItem (0);
-  pEntHdr = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  cachedItem       = m_EntrysCache.RetriveItem (0);
+  pEntHdr          = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
 
   assert (pEntHdr->IsDeleted());
-  assert (pEntHdr->IsIndexFirst() == false);
+  assert (pEntHdr->IsFirstEntry() == false);
 
   pEntHdr->SetNextEntry (entry);
 

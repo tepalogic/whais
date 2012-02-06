@@ -44,7 +44,7 @@ bool test_pattern (D_UINT8 *pattern, D_UINT size, D_UINT8 seed)
   return true;
 }
 
-bool test_record (VaribaleLenghtStore *storage,
+bool test_record (VariableLengthStore *storage,
                   D_UINT8*const pattern,
                   D_UINT seed,
                   D_UINT firstEntry,
@@ -68,11 +68,11 @@ bool test_record_create ()
     std::string temp_file_base = DBSGetWorkingDir();
     temp_file_base += "t_ps_varstore";
 
-    VaribaleLenghtStore storage;
+    VariableLengthStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
 
     init_pattern (pattern1, sizeof pattern1, 31);
-    firstEntries[0] = storage.AddRecord (1, pattern1, sizeof pattern1);
+    firstEntries[0] = storage.AddRecord (pattern1, sizeof pattern1);
 
     if (test_record (&storage, pattern1, 31, firstEntries[0], sizeof pattern1) == false)
       result = false;
@@ -80,7 +80,7 @@ bool test_record_create ()
     if (result)
       {
         init_pattern (pattern2, sizeof pattern2, 41);
-        firstEntries[1] = storage.AddRecord (2, pattern2, sizeof pattern2);
+        firstEntries[1] = storage.AddRecord (pattern2, sizeof pattern2);
 
         if (test_record (&storage, pattern1, 31, firstEntries[0], sizeof pattern1) == false)
           result = false;
@@ -91,7 +91,7 @@ bool test_record_create ()
     if (result)
       {
         init_pattern (pattern3, sizeof pattern3, 61);
-        firstEntries[2] = storage.AddRecord (3, pattern3, sizeof pattern3);
+        firstEntries[2] = storage.AddRecord (pattern3, sizeof pattern3);
 
         if (test_record (&storage, pattern1, 31, firstEntries[0], sizeof pattern1) == false)
           result = false;
@@ -111,7 +111,7 @@ bool test_record_create ()
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VaribaleLenghtStore storage;
+      VariableLengthStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
@@ -142,12 +142,12 @@ test_record_removal ()
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
-    VaribaleLenghtStore storage;
+    VariableLengthStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
     if (result)
       {
-        storage.RemoveRecord (firstEntries[1]);
+        storage.DecrementRecordRef (firstEntries[1]);
 
         if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
           result = false;
@@ -157,7 +157,7 @@ test_record_removal ()
 
     if (result)
       {
-        storage.RemoveRecord (firstEntries[0]);
+        storage.DecrementRecordRef (firstEntries[0]);
 
         if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
           result = false;
@@ -173,7 +173,7 @@ test_record_removal ()
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VaribaleLenghtStore storage;
+      VariableLengthStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
@@ -198,14 +198,14 @@ bool test_record_update ()
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
-    VaribaleLenghtStore storage;
+    VariableLengthStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
 
     if (result)
       {
 
-        firstEntries[0] = storage.AddRecord (4, NULL, 0);
+        firstEntries[0] = storage.AddRecord (NULL, 0);
         init_pattern (pattern1, sizeof pattern1, 58);
         storage.UpdateRecord (firstEntries[0], 0, sizeof pattern1, pattern1);
 
@@ -236,7 +236,7 @@ bool test_record_update ()
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VaribaleLenghtStore storage;
+      VariableLengthStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
       storage.MarkForRemoval ();
 
@@ -274,11 +274,11 @@ test_record_container_update ()
     TempContainer container (DBSGetTempDir(), 1024);
     container.StoreData (0, sizeof testBuffer, testBuffer);
 
-    VaribaleLenghtStore storage;
+    VariableLengthStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
-    const D_UINT64 entry = storage.AddRecord (1/*dummy*/, container,  0, 0);
+    const D_UINT64 entry = storage.AddRecord (container,  0, 0);
 
     if (entry == 0)
       {
@@ -337,11 +337,11 @@ test_record_record_update ()
     TempContainer container (DBSGetTempDir(), 1024);
     container.StoreData (0, sizeof testBuffer, testBuffer);
 
-    VaribaleLenghtStore storage;
+    VariableLengthStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
-    const D_UINT64 entry = storage.AddRecord (1, container,  0, container.GetContainerSize());
+    const D_UINT64 entry = storage.AddRecord (container,  0, container.GetContainerSize());
 
     if (entry == 0)
       {

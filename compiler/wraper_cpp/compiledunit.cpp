@@ -91,7 +91,7 @@ D_UINT WBufferCompiledUnit::GetProceduresCount ()
   return whc_get_procs_count (mHandler);
 }
 
-D_UINT WBufferCompiledUnit::GetGlobalNameLenght (D_UINT item)
+D_UINT WBufferCompiledUnit::GetGlobalNameLength (D_UINT item)
 {
   WHC_GLBVAR_DESC globalDesc;
   if (!whc_get_global (mHandler, item, &globalDesc))
@@ -395,7 +395,7 @@ D_UINT WFileCompiledUnit::GetGlobalsCount ()
   return mGlobalsCount;
 }
 
-D_UINT WFileCompiledUnit::GetGlobalNameLenght (D_UINT item)
+D_UINT WFileCompiledUnit::GetGlobalNameLength (D_UINT item)
 {
   if (item >= mGlobalsCount)
     throw

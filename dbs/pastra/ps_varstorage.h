@@ -41,26 +41,27 @@ public:
   static const D_UINT64 LAST_DELETED_ENTRY = 0x0FFFFFFFFFFFFFFF;
   static const D_UINT64 LAST_CHAINED_ENTRY = 0x0FFFFFFFFFFFFFFF;
   static const D_UINT64 ENTRY_DELETED_MASK = 0x8000000000000000;
-  static const D_UINT64 FIRST_IS_ROW_INDEX = 0x4000000000000000;
+  static const D_UINT64 FIRST_RECORD_ENTRY = 0x4000000000000000;
 
   static const D_UINT   ENTRY_SIZE = 48;
 
   StoreEntry ();
   ~StoreEntry () {} ;
 
-  void MarkAsDeleted () { m_NextEntry |= ENTRY_DELETED_MASK; };
-  void MarkAsUsed () { m_NextEntry &= ~ENTRY_DELETED_MASK; };
-
-  void MarkFirstAsIndex () { m_NextEntry |= FIRST_IS_ROW_INDEX; };
-  void MarkFirstAsPrev () { m_NextEntry &= ~FIRST_IS_ROW_INDEX; }
+  void MarkAsDeleted (const bool deleted) { deleted ?
+                                            (m_NextEntry |= ENTRY_DELETED_MASK) :
+                                            (m_NextEntry &= ~ENTRY_DELETED_MASK); }
+  void MarkAsFirstEntry (const bool first) { first ? 
+                                             (m_NextEntry |= FIRST_RECORD_ENTRY) :
+                                             (m_NextEntry &= ~FIRST_RECORD_ENTRY); }
 
   bool IsDeleted () const { return (m_NextEntry & ENTRY_DELETED_MASK) != 0; }
-  bool IsIndexFirst () const { return (m_NextEntry & FIRST_IS_ROW_INDEX) != 0; }
+  bool IsFirstEntry () const { return (m_NextEntry & FIRST_RECORD_ENTRY) != 0; }
 
   D_UINT64 GetPrevEntry () const { return m_PrevEntry; }
   void     SetPrevEntry (D_UINT64 content) { m_PrevEntry = content; }
-  D_UINT64 GetNextEntry () const { return m_NextEntry & ~(ENTRY_DELETED_MASK | FIRST_IS_ROW_INDEX); }
-  void     SetNextEntry (D_UINT64 content) { m_NextEntry &= (ENTRY_DELETED_MASK | FIRST_IS_ROW_INDEX); m_NextEntry |= content; }
+  D_UINT64 GetNextEntry () const { return m_NextEntry & ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY); }
+  void     SetNextEntry (D_UINT64 content) { m_NextEntry &= (ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY); m_NextEntry |= content; }
 
   D_UINT  ReadEntryData (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const ;
   D_UINT  UpdateEntryData (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer);
@@ -73,91 +74,75 @@ private:
   D_UINT8  m_aRawData[ENTRY_SIZE];
 };
 
-class VaribaleLenghtStore : public I_BlocksManager
+class VariableLengthStore : public I_BlocksManager
 {
 public:
 
-  VaribaleLenghtStore ();
-  ~VaribaleLenghtStore ();
+  VariableLengthStore ();
+  ~VariableLengthStore ();
 
-  void Init (
-             const D_CHAR * pContainerBaseName,
+  void Init (const D_CHAR * pContainerBaseName,
              D_UINT64 uContainerSize,
              D_UINT uMaxFileSize);
 
   void MarkForRemoval ();
 
-  D_UINT64 AddRecord (
-                      const D_UINT64 rowIndex,
-                      const D_UINT8* pBuffer,
+  D_UINT64 AddRecord (const D_UINT8* pBuffer,
                       const D_UINT64 count);
 
-  D_UINT64 AddRecord (
-                      const D_UINT64 rowIndex,
-                      VaribaleLenghtStore &sourceStore,
+  D_UINT64 AddRecord (VariableLengthStore &sourceStore,
                       D_UINT64 sourceFirstEntry,
                       D_UINT64 sourceOffset,
                       D_UINT64 sourceCount);
 
-  D_UINT64 AddRecord (
-                      const D_UINT64 rowIndex,
-                      I_DataContainer &sourceContainer,
+  D_UINT64 AddRecord (I_DataContainer &sourceContainer,
                       D_UINT64 sourceOffset,
                       D_UINT64 sourceCount);
 
-  void     GetRecord (
-                       D_UINT64 recordFirstEntry,
-                       D_UINT64 offset,
-                       D_UINT64 count,
-                       D_UINT8 *pBuffer);
+  void     GetRecord (D_UINT64 recordFirstEntry,
+                      D_UINT64 offset,
+                      D_UINT64 count,
+                      D_UINT8 *pBuffer);
 
-  void     UpdateRecord (
-                         D_UINT64 recordFirstEntry,
+  void     UpdateRecord (D_UINT64 recordFirstEntry,
                          D_UINT64 offset,
                          D_UINT64 count,
                          const D_UINT8 *pBuffer);
 
-  void     UpdateRecord (
-                         D_UINT64 recordFirstEntry,
+  void     UpdateRecord (D_UINT64 recordFirstEntry,
                          D_UINT64 offset,
-                         VaribaleLenghtStore &sourceStore,
+                         VariableLengthStore &sourceStore,
                          D_UINT64 sourceFirstEntry,
                          D_UINT64 sourceOffset,
                          D_UINT64 sourceCount);
 
-  void     UpdateRecord (
-                         D_UINT64 recordFirstEntry,
+  void     UpdateRecord (D_UINT64 recordFirstEntry,
                          D_UINT64 offset,
                          I_DataContainer &sourceContainer,
                          D_UINT64 sourceOffset,
                          D_UINT64 sourceCount);
 
-  void     RemoveRecord (
-                         D_UINT64 recordFirstEntry);
+  void     IncrementRecordRef (const D_UINT64 recordFirstEntry);
+  void     DecrementRecordRef (const D_UINT64 recordFirstEntry);
 
   D_UINT64 GetRawSize () const;
 
   //Implementations for I_BlocksManager
-  virtual void StoreItems (
-                           const D_UINT8 *pSrcBuffer,
+  virtual void StoreItems (const D_UINT8 *pSrcBuffer,
                            D_UINT64 firstItem,
                            D_UINT itemsCount);
 
-  virtual void RetrieveItems (
-                              D_UINT8 *pDestBuffer,
+  virtual void RetrieveItems (D_UINT8 *pDestBuffer,
                               D_UINT64 firstItem,
                               D_UINT itemsCount);
 
 protected:
-  D_UINT64   AllocateEntry (
-                            const D_UINT64 prevEntry);
-
+  D_UINT64   AllocateEntry (const D_UINT64 prevEntry);
   D_UINT64   ExtentFreeList ();
+  void       RemoveRecord (D_UINT64 recordFirstEntry);
 
-  void       ExtractFromFreeList (
-                                  const D_UINT64 entry);
-  void       AddToFreeList (
-                            const D_UINT64 entry);
+  void       ExtractFromFreeList (const D_UINT64 entry);
+  void       AddToFreeList (const D_UINT64 entry);
 
   std::auto_ptr<FileContainer> m_apEntriesContainer;
   BlockCache                   m_EntrysCache;
@@ -165,7 +150,6 @@ protected:
   D_UINT64                     m_EntrysCount;
   WSynchronizer                m_Sync;
 };
-
 
 }
 

@@ -270,19 +270,22 @@ TemporalArray::CollapseRawData (const D_UINT64 offset, const D_UINT64 count)
 }
 
 
-RowFieldArray::RowFieldArray (VaribaleLenghtStore &storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type) :
+RowFieldArray::RowFieldArray (VariableLengthStore &storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type) :
     I_ArrayStrategy (type),
     m_FirstRecordEntry (firstRecordEntry),
     m_Storage (storage)
 {
   assert (m_FirstRecordEntry > 0);
 
+  m_Storage.IncrementRecordRef (m_FirstRecordEntry);
   m_Storage.GetRecord (firstRecordEntry, 0, sizeof (m_ElementsCount), _RC(D_UINT8*, &m_ElementsCount));
 }
 
 RowFieldArray::~RowFieldArray ()
 {
   assert (m_ReferenceCount == 0);
+
+  m_Storage.DecrementRecordRef (m_FirstRecordEntry);
 }
 
 D_UINT

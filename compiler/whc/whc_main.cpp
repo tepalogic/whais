@@ -58,7 +58,7 @@ fill_globals_table (WICompiledUnit & unit,
 	  || (data_outstream (symbols,
 			      _RC (const D_UINT8 *,
 				   unit.RetriveGlobalName (glb_it)),
-			      unit.GetGlobalNameLenght (glb_it)) == NULL)
+			      unit.GetGlobalNameLength (glb_it)) == NULL)
 	  || (uint8_outstream (symbols, 0) == NULL))
 	throw bad_alloc ();
     }

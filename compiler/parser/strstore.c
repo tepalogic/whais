@@ -73,30 +73,30 @@ release_string_store (StringStoreHnd * handle)
 }
 
 D_CHAR *
-alloc_str (StringStoreHnd handle, D_UINT lenght)
+alloc_str (StringStoreHnd handle, D_UINT length)
 {
   D_CHAR *result;
   struct StoreLink *link = (struct StoreLink *) handle;
 
-  while ((link->unused < lenght) && (link->next != NULL))
+  while ((link->unused < length) && (link->next != NULL))
     link = link->next;
 
-  if (link->unused > lenght)
+  if (link->unused > length)
     {
       result = (link->allocated - link->unused) + link->data;
-      link->unused -= lenght;
+      link->unused -= length;
     }
   else
     {
-      link->next = alloc_link ((lenght < DEFAULT_STR_SIZE ?
-				DEFAULT_STR_SIZE : lenght));
+      link->next = alloc_link ((length < DEFAULT_STR_SIZE ?
+				DEFAULT_STR_SIZE : length));
       link = link->next;
       if (link == NULL)
 	result = NULL;
       else
 	{
 	  result = (link->allocated - link->unused) + link->data;
-	  link->unused -= lenght;
+	  link->unused -= length;
 	}
     }
 

@@ -41,6 +41,6 @@ void
 release_string_store (StringStoreHnd * handle);
 
 D_CHAR *
-alloc_str (StringStoreHnd handle, D_UINT lenght);
+alloc_str (StringStoreHnd handle, D_UINT length);
 
 #endif /* STRSTORE_H */

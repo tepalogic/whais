@@ -235,6 +235,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       strcpy(_RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
 	     _RC (const D_CHAR *, temp.m_pFieldName));
 
+      pFieldDesc[fieldIndex].m_AquiredForWrite = 0;
       pFieldDesc[fieldIndex].m_IndexNodeSizeKB = 0;
       pFieldDesc[fieldIndex].m_IndexUnitsCount = 0;
       pFieldDesc[fieldIndex].m_StoreIndex      = uOutRowSize;
@@ -672,6 +673,7 @@ PSTable::PSTable (DbsHandler& dbsHandler, const string& tableName) :
   m_apFixedFields (NULL),
   m_apVariableFields (NULL),
   m_RowCache (*this),
+  m_Sync (),
   m_Removed (false)
 {
   InitFromFile ();
@@ -702,6 +704,7 @@ PSTable::PSTable (DbsHandler&               dbsHandler,
   m_apFixedFields (NULL),
   m_apVariableFields (NULL),
   m_RowCache (*this),
+  m_Sync (),
   m_Removed (false)
 {
   InitFromFile ();
@@ -1264,7 +1267,7 @@ PSTable::InitVariableStorages ()
 
         if (fieldDesc.isArray || (fieldDesc.m_FieldType == T_TEXT))
           {
-            m_apVariableFields.reset (new VaribaleLenghtStore ());
+            m_apVariableFields.reset (new VariableLengthStore ());
             m_apVariableFields->Init ((m_BaseFileName + PS_TABLE_VARFIELDS_EXT).c_str(),
                                       m_VariableStorageSize,
                                       maxFileSize);
@@ -1418,6 +1421,37 @@ PSTable::CheckRowToReuse (const D_UINT64 rowIndex)
 }
 
 void
+PSTable::AquireFieldForWrite (PSFieldDescriptor* const pFieldDesc)
+{
+  bool aquired = false;
+  while ( ! aquired)
+    {
+      m_Sync.Enter ();
+      if (pFieldDesc->m_AquiredForWrite == 0)
+        {
+          pFieldDesc->m_AquiredForWrite = 1;
+          aquired = true;
+        }
+      m_Sync.Leave ();
+
+      if ( ! aquired)
+        wh_yield ();
+    }
+}
+
+void
+PSTable::ReleaseFieldForWrite (PSFieldDescriptor* const pFieldDesc)
+{
+  m_Sync.Enter ();
+
+  assert (pFieldDesc->m_AquiredForWrite != 0);
+
+  pFieldDesc->m_AquiredForWrite = 0;
+
+  m_Sync.Leave ();
+}
+
+void
 PSTable::SetEntry (const DBSChar& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
   StoreEntry (rSource, rowIndex, fieldIndex);
@@ -1553,8 +1587,7 @@ PSTable::SetEntry (const DBSText& rSource, const D_UINT64 rowIndex, const D_UINT
         {
           RowFieldText& value = text.GetRowValue();
           newFieldValueSize   = value.m_BytesSize;
-          newFirstEntry       = m_apVariableFields->AddRecord (rowIndex,
-                                                               value.m_Storage,
+          newFirstEntry       = m_apVariableFields->AddRecord (value.m_Storage,
                                                                value.m_FirstEntry,
                                                                0,
                                                                value.m_BytesSize);
@@ -1563,15 +1596,14 @@ PSTable::SetEntry (const DBSText& rSource, const D_UINT64 rowIndex, const D_UINT
         {
           TemporalText& value = text.GetTemporal();
           newFieldValueSize   = value.m_BytesSize;
-          newFirstEntry       = m_apVariableFields->AddRecord (rowIndex,
-                                                               value.m_Storage,
+          newFirstEntry       = m_apVariableFields->AddRecord (value.m_Storage,
                                                                0,
                                                                newFieldValueSize);
         }
     }
 
   if (fieldValueWasNull == false)
-    m_apVariableFields->RemoveRecord (*fieldFirstEntry);
+    m_apVariableFields->DecrementRecordRef (*fieldFirstEntry);
 
   *fieldFirstEntry = newFirstEntry;
   *fieldValueSize  = newFieldValueSize;
@@ -1623,8 +1655,7 @@ PSTable::SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, const D_UIN
         {
           RowFieldArray& value = array.GetRowValue();
           newFieldValueSize    = value.GetRawDataSize();
-          newFirstEntry        = m_apVariableFields->AddRecord (rowIndex,
-                                                                value.m_Storage,
+          newFirstEntry        = m_apVariableFields->AddRecord (value.m_Storage,
                                                                 value.m_FirstRecordEntry,
                                                                 0,
                                                                 newFieldValueSize);
@@ -1635,8 +1666,7 @@ PSTable::SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, const D_UIN
           newFieldValueSize    = value.GetRawDataSize();
 
           const D_UINT64 elemsCount = value.GetElementsCount();
-          newFirstEntry             = m_apVariableFields->AddRecord (rowIndex,
-                                                                     _RC(const D_UINT8*, &elemsCount),
+          newFirstEntry             = m_apVariableFields->AddRecord (_RC(const D_UINT8*, &elemsCount),
                                                                      sizeof elemsCount);
           m_apVariableFields->UpdateRecord (newFirstEntry,
                                             sizeof elemsCount,
@@ -1648,7 +1678,7 @@ PSTable::SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, const D_UIN
     }
 
   if (fieldValueWasNull == false)
-    m_apVariableFields->RemoveRecord (*fieldFirstEntry);
+    m_apVariableFields->DecrementRecordRef (*fieldFirstEntry);
 
   *fieldFirstEntry = newFirstEntry;
   *fieldValueSize  = newFieldValueSize;
@@ -1983,8 +2013,10 @@ PSTable::StoreEntry (const T& rSource, const D_UINT64 rowIndex, const D_UINT fie
   if (currentValue == rSource)
     return; //Nothing to change
 
-  const PSFieldDescriptor& field   = GetFieldDescriptorInternal (fieldIndex);
-  const D_UINT8            bitsSet = ~0;
+  const D_UINT8      bitsSet = ~0;
+  PSFieldDescriptor& field   = GetFieldDescriptorInternal (fieldIndex);
+
+  AquireFieldForWrite (&field);
 
   StoredItem     cachedItem = m_RowCache.RetriveItem (rowIndex);
   D_UINT8 *const pRawData   = cachedItem.GetDataForUpdate();
@@ -1994,35 +2026,45 @@ PSTable::StoreEntry (const T& rSource, const D_UINT64 rowIndex, const D_UINT fie
   const D_UINT  byte_off = field.m_NullBitIndex / 8;
   const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
-  if (rSource.IsNull ())
+  try
     {
-      assert ((pRawData [byte_off] & (1 << bit_off)) == 0);
+      if (rSource.IsNull ())
+        {
+          assert ((pRawData [byte_off] & (1 << bit_off)) == 0);
 
-      pRawData [byte_off] |= (1 << bit_off);
+          pRawData [byte_off] |= (1 << bit_off);
 
-      if (pRawData [byte_off] == bitsSet)
-        CheckRowToDelete (rowIndex);
+          if (pRawData [byte_off] == bitsSet)
+            CheckRowToDelete (rowIndex);
+        }
+      else
+        {
+          if (pRawData [byte_off] == bitsSet)
+            CheckRowToReuse (rowIndex);
+
+          pRawData [byte_off] &= ~(1 << bit_off);
+
+          PSValInterp::Store (rSource, pRawData + field.m_StoreIndex);
+        }
+
+      //Update the field index if it exists
+      if (m_vIndexNodeMgrs[fieldIndex] != NULL)
+        {
+          BTree      fieldIndexTree (*m_vIndexNodeMgrs[fieldIndex]);
+          NODE_INDEX dummyNode;
+          KEY_INDEX  dummyKey;
+
+          fieldIndexTree.RemoveKey (T_BTreeKey<T> (currentValue, rowIndex));
+          fieldIndexTree.InsertKey (T_BTreeKey<T> (rSource, rowIndex), dummyNode, dummyKey);
+        }
     }
-  else
+  catch (...)
     {
-      if (pRawData [byte_off] == bitsSet)
-        CheckRowToReuse (rowIndex);
-
-      pRawData [byte_off] &= ~(1 << bit_off);
-
-      PSValInterp::Store (rSource, pRawData + field.m_StoreIndex);
+      ReleaseFieldForWrite (&field);
+      throw;
     }
 
-  //Update the field index if it exists
-  if (m_vIndexNodeMgrs[fieldIndex] != NULL)
-    {
-      BTree      fieldIndexTree (*m_vIndexNodeMgrs[fieldIndex]);
-      NODE_INDEX dummyNode;
-      KEY_INDEX  dummyKey;
-
-      fieldIndexTree.RemoveKey (T_BTreeKey<T> (currentValue, rowIndex));
-      fieldIndexTree.InsertKey (T_BTreeKey<T> (rSource, rowIndex), dummyNode, dummyKey);
-    }
+  ReleaseFieldForWrite (&field);
 }
 
 template <class T> DBSArray
@@ -2181,8 +2223,8 @@ PSTable::GetEntry (DBSText& rDestination, const D_UINT64 rowIndex, const D_UINT 
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
-  StoredItem cachedItem = m_RowCache.RetriveItem (rowIndex);
-  const D_UINT8 *const pRawData = cachedItem.GetDataForRead();
+  StoredItem           cachedItem = m_RowCache.RetriveItem (rowIndex);
+  const D_UINT8* const pRawData   = cachedItem.GetDataForRead();
 
   const D_UINT64& fieldFirstEntry = *_RC (const D_UINT64*, pRawData + field.m_StoreIndex + 0);
   const D_UINT64& fieldValueSize  = *_RC (const D_UINT64*,
@@ -2214,8 +2256,8 @@ PSTable::GetEntry (DBSArray& rDestination, const D_UINT64 rowIndex, const D_UINT
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, rDestination.GetElementsType())))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
-  StoredItem cachedItem = m_RowCache.RetriveItem (rowIndex);
-  const D_UINT8 *const pRawData = cachedItem.GetDataForRead();
+  StoredItem           cachedItem = m_RowCache.RetriveItem (rowIndex);
+  const D_UINT8 *const pRawData   = cachedItem.GetDataForRead();
 
   const D_UINT64& fieldFirstEntry = *_RC (const D_UINT64*,
                                           pRawData + field.m_StoreIndex + 0);
@@ -2280,17 +2322,17 @@ PSTable::GetEntry (DBSArray& rDestination, const D_UINT64 rowIndex, const D_UINT
     }
   else
     {
-      new (&rDestination) DBSArray(*
+      new (&rDestination) DBSArray (*
             (new RowFieldArray (*m_apVariableFields.get(),
                                 fieldFirstEntry,
-                                _SC(DBS_FIELD_TYPE, field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK))));
+                                _SC (DBS_FIELD_TYPE, field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK))));
     }
 }
 
 template <class T> void
 PSTable::RetrieveEntry (T& rDestination, const D_UINT64 rowIndex, const D_UINT fieldIndex)
 {
-  T *const pDestination          =& rDestination;
+  T *const pDestination          = &rDestination;
   const PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
   if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||

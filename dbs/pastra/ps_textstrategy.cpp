@@ -442,16 +442,19 @@ NullText::GetSingletoneInstace ()
   return nullTextInstance;
 }
 
-RowFieldText::RowFieldText (VaribaleLenghtStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize) :
+RowFieldText::RowFieldText (VariableLengthStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize) :
     GenericText (bytesSize),
     m_FirstEntry (firstEntry),
     m_Storage (storage)
 {
+  m_Storage.IncrementRecordRef (m_FirstEntry);
 }
 
 RowFieldText::~RowFieldText ()
 {
   assert (m_ReferenceCount == 0);
+  
+  m_Storage.DecrementRecordRef (m_FirstEntry);
 }
 
 D_UINT64

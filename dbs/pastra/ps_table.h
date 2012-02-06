@@ -49,7 +49,8 @@ struct PSFieldDescriptor
   D_UINT32 m_StoreIndex;
   D_UINT32 m_NameOffset;
   D_UINT32 m_TypeDesc        : 12;
-  D_UINT32 m_IndexNodeSizeKB : 10;
+  D_UINT32 m_AquiredForWrite : 1;
+  D_UINT32 m_IndexNodeSizeKB : 9;
   D_UINT32 m_IndexUnitsCount : 10;
 };
 
@@ -272,7 +273,6 @@ private:
   void SyncToFile ();
 
 protected:
-
   PSTable (DbsHandler& dbsHandler, const std::string& tableName);
   PSTable (DbsHandler&               dbsHandler,
            const std::string&        tableName,
@@ -285,6 +285,8 @@ protected:
   void     RemoveFromDatabase ();
   void     CheckRowToReuse (const D_UINT64 rowIndex);
   void     CheckRowToDelete (const D_UINT64 rowIndex);
+  void     AquireFieldForWrite (PSFieldDescriptor* const pFieldDesc);
+  void     ReleaseFieldForWrite (PSFieldDescriptor* const pFieldDesc);
 
   //Implementations for I_BTreeNodeManager
   virtual D_UINT       GetMaxCachedNodes ();
@@ -304,9 +306,10 @@ protected:
   std::auto_ptr <D_UINT8>               m_FieldsDescriptors;
   WFile                                 m_MainTableFile;
   std::auto_ptr <FileContainer>         m_apFixedFields;
-  std::auto_ptr <VaribaleLenghtStore>   m_apVariableFields;
+  std::auto_ptr <VariableLengthStore>   m_apVariableFields;
   std::vector <FieldIndexNodeManager*>  m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
+  WSynchronizer                         m_Sync;
   bool                                  m_Removed;
 };
 

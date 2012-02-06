@@ -158,7 +158,7 @@ class RowFieldText : public GenericText
 {
   friend class PSTable;
 public:
-  RowFieldText (VaribaleLenghtStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
+  RowFieldText (VariableLengthStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
 
 protected:
   virtual D_UINT64 GetReferenceCount () const;
@@ -187,8 +187,13 @@ protected:
 
   virtual void ClearMyself ();
 
-  const D_UINT64 m_FirstEntry;
-  VaribaleLenghtStore &m_Storage;
+  const D_UINT64       m_FirstEntry;
+  VariableLengthStore& m_Storage;
+
+private:
+  RowFieldText (const RowFieldText&);
+  RowFieldText operator= (const RowFieldText&);
+
 };
 
 class TemporalText : public GenericText
