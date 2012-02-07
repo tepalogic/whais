@@ -217,10 +217,11 @@ VariableLengthStore::GetRecord (D_UINT64 recordFirstEntry,
                                 D_UINT64 count,
                                 D_UINT8* pBuffer)
 {
-  WSynchronizerRAII synchHolder(m_Sync);
 
   do
     {
+      WSynchronizerRAII synchHolder(m_Sync);
+
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
@@ -239,6 +240,8 @@ VariableLengthStore::GetRecord (D_UINT64 recordFirstEntry,
 
   while (count > 0)
     {
+      WSynchronizerRAII synchHolder(m_Sync);
+
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
@@ -264,12 +267,13 @@ VariableLengthStore::UpdateRecord (D_UINT64       recordFirstEntry,
                                    D_UINT64       count,
                                    const D_UINT8* pBuffer)
 {
-  WSynchronizerRAII synchHolder(m_Sync);
 
   D_UINT64 prevEntry = recordFirstEntry;
 
   do
     {
+      WSynchronizerRAII synchHolder(m_Sync);
+
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
@@ -295,6 +299,8 @@ VariableLengthStore::UpdateRecord (D_UINT64       recordFirstEntry,
 
   while (count > 0)
     {
+      WSynchronizerRAII synchHolder(m_Sync);
+
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
 
@@ -446,12 +452,13 @@ VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
                                    D_UINT64         sourceOffset,
                                    D_UINT64         sourceCount)
 {
-  WSynchronizerRAII synchHolder(m_Sync);
 
   D_UINT64 prevEntry = recordFirstEntry;
 
   do
     {
+      WSynchronizerRAII synchHolder(m_Sync);
+
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
@@ -477,6 +484,8 @@ VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
 
   while (sourceCount > 0)
     {
+      WSynchronizerRAII synchHolder(m_Sync);
+
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
 

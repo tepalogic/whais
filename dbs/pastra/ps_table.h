@@ -49,7 +49,7 @@ struct PSFieldDescriptor
   D_UINT32 m_StoreIndex;
   D_UINT32 m_NameOffset;
   D_UINT32 m_TypeDesc        : 12;
-  D_UINT32 m_AquiredForWrite : 1;
+  D_UINT32 m_Aquired         : 1;
   D_UINT32 m_IndexNodeSizeKB : 9;
   D_UINT32 m_IndexUnitsCount : 10;
 };
@@ -251,13 +251,13 @@ public:
 private:
   template <class T> void     StoreEntry (const T &, const D_UINT64, const D_UINT);
   template <class T> void     RetrieveEntry (T &, const D_UINT64, const D_UINT);
-  template <class T> DBSArray MatchRowsWithIndex (FieldIndexNodeManager* const pNodeMgr,
-                                                  const T&                     min,
-                                                  const T&                     max,
-                                                  const D_UINT64               fromRow,
-                                                  D_UINT64                     toRow,
-                                                  D_UINT64                     ignoreFirst,
-                                                  D_UINT64                     maxCount);
+  template <class T> DBSArray MatchRowsWithIndex (const D_UINT   fieldIndex,
+                                                  const T&       min,
+                                                  const T&       max,
+                                                  const D_UINT64 fromRow,
+                                                  D_UINT64       toRow,
+                                                  D_UINT64       ignoreFirst,
+                                                  D_UINT64       maxCount);
 
   template <class T> DBSArray MatchRows (const T&       min,
                                          const T&       max,
@@ -285,8 +285,8 @@ protected:
   void     RemoveFromDatabase ();
   void     CheckRowToReuse (const D_UINT64 rowIndex);
   void     CheckRowToDelete (const D_UINT64 rowIndex);
-  void     AquireFieldForWrite (PSFieldDescriptor* const pFieldDesc);
-  void     ReleaseFieldForWrite (PSFieldDescriptor* const pFieldDesc);
+  void     AquireIndexField (PSFieldDescriptor* const pFieldDesc);
+  void     ReleaseIndexField (PSFieldDescriptor* const pFieldDesc);
 
   //Implementations for I_BTreeNodeManager
   virtual D_UINT       GetMaxCachedNodes ();
@@ -310,6 +310,7 @@ protected:
   std::vector <FieldIndexNodeManager*>  m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
   WSynchronizer                         m_Sync;
+  WSynchronizer                         m_IndexSync;
   bool                                  m_Removed;
 };
 

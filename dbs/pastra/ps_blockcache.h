@@ -40,8 +40,8 @@ public:
   I_BlocksManager () {}
   virtual ~I_BlocksManager () {}
 
-  virtual void StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount) = 0;
-  virtual void RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount) = 0;
+  virtual void StoreItems (const D_UINT8* pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount) = 0;
+  virtual void RetrieveItems (D_UINT8* pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount) = 0;
 };
 
 
@@ -60,7 +60,7 @@ protected:
   void  RegisterUser () { m_ReferenceCount++; }
   void  ReleaseUser () {  assert ( m_ReferenceCount > 0); m_ReferenceCount--; }
 
-  explicit BlockEntry (D_UINT64 baseItemIndex, D_UINT8 *pData) :
+  explicit BlockEntry (D_UINT64 baseItemIndex, D_UINT8* pData) :
       m_BaseItemIndex (baseItemIndex),
       m_BlockData (pData),
       m_ReferenceCount (0),
@@ -71,21 +71,25 @@ protected:
 
   static const D_UINT32 BLOCK_ENTRY_DIRTY = 0x00000001;
 
-  const D_UINT64  m_BaseItemIndex;
-  D_UINT8  *const m_BlockData;
-  D_UINT32        m_ReferenceCount;
-  D_UINT32        m_Flags;
+  const D_UINT64 m_BaseItemIndex;
+  D_UINT8* const m_BlockData;
+  D_UINT32       m_ReferenceCount;
+  D_UINT32       m_Flags;
 };
 
 class StoredItem
 {
 public:
-  StoredItem (BlockEntry &blockEntry, D_UINT itemOffset) : m_BlockEntry (&blockEntry), m_ItemOffset (itemOffset)
+  StoredItem (BlockEntry &blockEntry, D_UINT itemOffset) :
+    m_BlockEntry (&blockEntry),
+    m_ItemOffset (itemOffset)
   {
     m_BlockEntry->RegisterUser ();
   }
 
-  StoredItem (const StoredItem &rSource) : m_BlockEntry (rSource.m_BlockEntry), m_ItemOffset (rSource.m_ItemOffset)
+  StoredItem (const StoredItem &rSource) :
+    m_BlockEntry (rSource.m_BlockEntry),
+    m_ItemOffset (rSource.m_ItemOffset)
   {
     m_BlockEntry->RegisterUser ();
   }
@@ -115,13 +119,13 @@ public:
     return m_BlockEntry->m_BlockData + m_ItemOffset;
   }
 
-  const D_UINT8 *GetDataForRead () const
+  const D_UINT8* GetDataForRead () const
   {
     return m_BlockEntry->m_BlockData + m_ItemOffset;
   }
 
 protected:
-  BlockEntry *m_BlockEntry;
+  BlockEntry* m_BlockEntry;
   D_UINT      m_ItemOffset;
 };
 
@@ -138,10 +142,11 @@ public:
 
 
 protected:
-  I_BlocksManager &mManager;
-  D_UINT mItemSize;
-  D_UINT mMaxBlocks;
-  D_UINT mBlockSize;
+  I_BlocksManager& mManager;
+  D_UINT           mItemSize;
+  D_UINT           mMaxBlocks;
+  D_UINT           mBlockSize;
+
   std::map <D_UINT64, class BlockEntry> mCachedBlocks;
 
 private:
