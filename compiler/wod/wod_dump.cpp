@@ -52,10 +52,10 @@ wod_dump_header (WFile & wobj, std::ostream & outs)
   outs << "File Signature:\t\t\t\t0x" << woheader[0] << " 0x" << woheader[1] <<
       " ('" << woheader[0] << "', '" << woheader[1] << "')" << std::endl;
   outs.flags (std::ios::dec);
-  outs << "Format major:\t\t\t\t" << woheader[WHC_FORMATMMAJ_OFF] << std::endl;
-  outs << "Format minor:\t\t\t\t" << woheader[WHC_FORMATMIN_OFF] << std::endl;
-  outs << "Language major:\t\t\t\t" << woheader[WHC_LANGVER_MAJ_OFF] << std::endl;
-  outs << "Language minor:\t\t\t\t" << woheader[WHC_LANGVER_MIN_OFF] << std::endl;
+  outs << "Format major:\t\t\t\t" << _SC (D_UINT, woheader[WHC_FORMATMMAJ_OFF]) << std::endl;
+  outs << "Format minor:\t\t\t\t" << _SC (D_UINT, woheader[WHC_FORMATMIN_OFF]) << std::endl;
+  outs << "Language major:\t\t\t\t" << _SC (D_UINT, woheader[WHC_LANGVER_MAJ_OFF]) << std::endl;
+  outs << "Language minor:\t\t\t\t" << _SC (D_UINT, woheader[WHC_LANGVER_MIN_OFF]) << std::endl;
 
   temp32 = from_le_int32 (woheader + WHC_GLOBS_COUNT_OFF);
   outs << "Globals count:\t\t\t\t" << temp32 << std::endl;
@@ -210,6 +210,7 @@ wod_dump_basic_type_info (std::ostream & outs, D_UINT16 type)
       break;
     case T_UINT64:
       outs << "UNSIGNED INT64";
+      break;
     default:
       assert (0);
     }

@@ -145,7 +145,8 @@ main (int argc, char **argv)
       throw - 1;		// we can not handle files these size anyway
 
     buffer.reset (new D_UINT8[_SC (unsigned int, buff_size + 1)]);
-    buffer.get ()[buff_size + 1] = 0;	//ensures the null terminator
+    buffer.get ()[buff_size] = 0;  //ensures the null terminator
+
     file_in.Seek (0, WHC_SEEK_CURR);
     file_in.Read (buffer.get (), _SC (unsigned int, buff_size));
     assert (file_in.Tell () == buff_size);

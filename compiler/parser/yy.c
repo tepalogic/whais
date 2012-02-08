@@ -976,8 +976,8 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
 	}
       break;
     default:
-      /* what I'm doing here? */
-      assert (0);
+      /* What I'm doing here? Return an error!*/
+      result = 0;
     }
 
   return result;
