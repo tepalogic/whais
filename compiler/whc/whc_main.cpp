@@ -65,9 +65,10 @@ fill_globals_table (WICompiledUnit & unit,
 }
 
 static void
-process_procedures_table (WICompiledUnit & unit,
-			  WFile & dest_file,
-			  OutStream * symbols, OutStream * procs_table)
+process_procedures_table (WICompiledUnit& unit,
+                          WFile&          dest_file,
+			  OutStream*      symbols,
+			  OutStream*      procs_table)
 {
   const D_UINT proc_count = unit.GetProceduresCount ();
 
@@ -152,8 +153,7 @@ main (int argc, char **argv)
     assert (file_in.Tell () == buff_size);
     file_in.Close ();
 
-    WBufferCompiledUnit unit (buffer.get (),
-			      buff_size, my_postman, buffer.get ());
+    WBufferCompiledUnit unit (buffer.get (), buff_size, my_postman, buffer.get ());
 
     WFile file_out (args.GetOutputFile (), WHC_FILEWRITE | WHC_FILECREATE);
     file_out.SetSize (0);
@@ -219,10 +219,12 @@ main (int argc, char **argv)
   catch (WCompiledUnitException &)
   {
     ret_code = -1;
-  } catch (WhcCmdLineException & e)
+  }
+  catch (WhcCmdLineException & e)
   {
     std::cerr << e.GetDescription () << std::endl;
-  } catch (WException & e)
+  }
+  catch (WException & e)
   {
     std::cerr << "error : " << e.GetDescription () << std::endl;
     std::cerr << "file: " << e.GetFile() << " : " << e.GetLine() << std::endl;

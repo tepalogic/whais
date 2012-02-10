@@ -112,7 +112,7 @@ private:
     WHC_HANDLER mHandler;
 };
 
-class WFileCompiledUnit:public WICompiledUnit
+class WFileCompiledUnit : public WICompiledUnit
 {
 
 public:
