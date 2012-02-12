@@ -4,7 +4,7 @@ UNIT_EXES:=
 UNIT_LIBS:=prima
 
 prima_INC:=utils/include
-prima_SRC=prima/pm_interpreter.cpp prima/pm_typemanager.cpp
+prima_SRC= prima/pm_operand.cpp prima/pm_interpreter.cpp prima/pm_typemanager.cpp
 		   
 
 ifeq ($(BUILD_TESTS),yes)

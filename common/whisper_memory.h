@@ -46,9 +46,21 @@ void* operator new [] (size_t size);
 void  operator delete [] (void *ptr);
 void  operator delete [] (void *ptr, const D_CHAR *, D_UINT);
 
-//It should be defined only when memory tracing is been enabled.
-//Is kept like this for debugging purposes.
-#define new new(__FILE__, __LINE__)
+template <class T> static inline void
+_placement_new (void* place, const T& value)
+{
+  new (place) T (value);
+}
+
+template <class T> static inline void
+_placement_new (void* place, T& value)
+{
+  new (place) T (value);
+}
+
+#ifdef ENABLE_MEMORY_TRACE
+  #define new new(__FILE__, __LINE__)
+#endif
 
 extern "C"
 {
@@ -76,17 +88,17 @@ extern "C"
 
 #endif				/* ENABLE_MEMORY_TRACE */
 
-  void *custom_trace_mem_alloc (size_t size, const char *file, D_UINT line);
+void *custom_trace_mem_alloc (size_t size, const char *file, D_UINT line);
 
-  void *custom_trace_mem_realloc (void *old_ptr,
-				  size_t new_size,
-				  const char *file, D_UINT line);
+void *custom_trace_mem_realloc (void *old_ptr,
+                                size_t new_size,
+                                const char *file, D_UINT line);
 
-  void custom_trace_mem_free (void *ptr, const char *file, D_UINT line);
+void custom_trace_mem_free (void *ptr, const char *file, D_UINT line);
 
-  void *custom_mem_alloc (size_t size);
-  void *custom_mem_realloc (void *old_ptr, size_t new_size);
-  void custom_mem_free (void *ptr);
+void *custom_mem_alloc (size_t size);
+void *custom_mem_realloc (void *old_ptr, size_t new_size);
+void custom_mem_free (void *ptr);
 
 #ifdef __cplusplus
 }

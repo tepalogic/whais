@@ -49,6 +49,11 @@ public:
 
   virtual InterpreterException* Clone () { return new InterpreterException (*this); }
   virtual EXPCEPTION_TYPE       GetType () { return INTERPRETER_EXCEPTION; }
+
+  enum
+  {
+    INVALID_OP_CONVERSION
+  };
 };
 
 class I_InterpreterSession
