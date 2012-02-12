@@ -27,19 +27,19 @@
 
 #include "interpreter.h"
 
+#include "pm_typemanager.h"
+
 namespace prima
 {
 
-class Interpreter : public I_InterpreterHandler
+class GlobalSession : public I_InterpreterSession
 {
 public:
-  Interpreter (I_DBSHandler& dbsHandler);
-  virtual ~Interpreter ();
-
-  virtual void LoadCompiledUnit (WICompiledUnit& unit);
+  GlobalSession ();
+  virtual ~GlobalSession ();
 
 protected:
-  I_DBSHandler& m_DbsHandler;
+  TypeManager   m_TypeManager;
 };
 
 }

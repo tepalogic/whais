@@ -1,5 +1,5 @@
 /******************************************************************************
- PASTRA - A light database one file system and more.
+ PRIMA - A language interpretor for wshiper source objects
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -38,26 +38,45 @@ public:
   explicit InterpreterException (const D_CHAR*  message,
                                  const D_CHAR*  file,
                                  const D_UINT32 line,
-                                 const D_UINT32 extra)
-  : WException (message, file, line, extra) {}
-  virtual ~InterpreterException () {};
+                                 const D_UINT32 extra) :
+     WException (message, file, line, extra)
+  {
+  }
+
+  virtual ~InterpreterException ()
+  {
+  }
 
   virtual InterpreterException* Clone () { return new InterpreterException (*this); }
   virtual EXPCEPTION_TYPE       GetType () { return INTERPRETER_EXCEPTION; }
 };
 
-class I_InterpreterHandler
+class I_InterpreterSession
 {
 public:
-  I_InterpreterHandler ();
-  virtual ~I_InterpreterHandler ();
+  I_InterpreterSession ()
+  {
+  }
+  virtual ~I_InterpreterSession ()
+  {
+  }
 
-  virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
-
-protected:
+//  virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
 };
 
+void
+InitInterpreter ();
 
+I_InterpreterSession&
+GetInterpreterInstance ();
 
+I_InterpreterSession&
+GetInterpreterInstance (I_DBSHandler& dbsHandler);
+
+void
+ReleaseInterpreterInstance (I_InterpreterSession& dbsHandler);
+
+void
+CleanInterpreter ();
 
 #endif /* INTERPRETER_H_ */

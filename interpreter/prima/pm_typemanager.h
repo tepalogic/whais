@@ -22,40 +22,37 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include "pm_interpreter.h"
+#ifndef PR_TYPEMANAGER_H_
+#define PR_TYPEMANAGER_H_
 
-using namespace std;
-using namespace prima;
+#include <vector>
 
-void
-InitInterpreter ()
+#include "whisper.h"
+
+namespace prima
 {
+
+class TypeManager
+{
+public:
+  TypeManager ();
+  ~TypeManager ();
+
+  D_UINT32 FindTypeDescription (const D_UINT8* const pTypeDescription);
+  D_UINT32 AddTypeDescription (const D_UINT8* const pTypeDescription);
+
+  const D_UINT8* GetTypeDescription (const D_UINT32 offset) const;
+
+  static bool  IsTypeDescriptionValid (const D_UINT8* pTypeDescription);
+
+  static const D_UINT32 INVALID_OFFSET = 0xFFFFFFFF;
+
+protected:
+
+  std::vector<D_UINT8> m_TypesDescriptions;
+};
+
 }
 
-I_InterpreterSession&
-GetInterpreterInstance ()
-{
-  static GlobalSession slGlobalSession;
 
-  return slGlobalSession;
-}
-
-I_InterpreterSession&
-GetInterpreterInstance (I_DBSHandler& dbsHandler)
-{
-  //TODO: Not implemented yet
-  return GetInterpreterInstance ();
-}
-
-void
-ReleaseInterpreterInstance (I_InterpreterSession& dbsHandler)
-{
-  //TODO: Not implemented yet
-}
-
-
-void
-CleanInterpreter ()
-{
-  //TODO: Not implemented yet
-}
+#endif /* PR_TYPEMANAGER_H_ */

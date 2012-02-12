@@ -229,10 +229,10 @@ is_type_spec_valid (const struct TypeSpec * spec)
   D_BOOL result = TRUE;
 
   if (((spec->type == T_UNKNOWN) || (spec->type > T_UNDETERMINED)) &&
-      ((spec->type | T_ARRAY_MASK) == 0) &&
-      ((spec->type | T_CONTAINER_MASK) != T_ROW_MASK) &&
-      ((spec->type | T_CONTAINER_MASK) != T_TABLE_MASK) &&
-      ((spec->type | T_CONTAINER_MASK) != T_RECORD_MASK))
+      ((spec->type & T_ARRAY_MASK) == 0) &&
+      ((spec->type & T_CONTAINER_MASK) != T_ROW_MASK) &&
+      ((spec->type & T_CONTAINER_MASK) != T_TABLE_MASK) &&
+      ((spec->type & T_CONTAINER_MASK) != T_RECORD_MASK))
     {
       result = FALSE;
     }
@@ -243,8 +243,9 @@ is_type_spec_valid (const struct TypeSpec * spec)
     }
   else if ((spec->type & T_ARRAY_MASK) != 0)
     {
-      assert ((spec->type & ~T_ARRAY_MASK) <= T_UNDETERMINED);
-      if (spec->data_len != 2)
+      if ( (spec->data_len != 2) ||
+           ((spec->type & ~T_ARRAY_MASK) == T_UNKNOWN) ||
+           ((spec->type & ~T_ARRAY_MASK) > T_UNDETERMINED) )
 	{
 	  result = FALSE;
 	}
