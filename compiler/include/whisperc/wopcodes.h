@@ -2,7 +2,7 @@
 WHISPERC - A compiler for whisper programs
 Copyright (C) 2009  Iulian Popa
 
-Address: Str Olimp nr. 6 
+Address: Str Olimp nr. 6
          Pantelimon Ilfov,
          Romania
 Phone:   +40721939650
@@ -182,7 +182,9 @@ enum W_OPCODE
   W_JTC,
   W_JMP,
 
-  W_IND,
+  W_INDT,
+  W_INDA,
+  W_INDR,
   W_SELF,
 
   W_BSYNC,

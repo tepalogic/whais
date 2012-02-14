@@ -1222,9 +1222,11 @@ translate_exp_index (struct ParserState *const state,
   const D_UINT ftype = ft->type & ~T_L_VALUE;
   const D_UINT stype = st->type & ~T_L_VALUE;
   struct ExpResultType result = r_unk;
-  const enum W_OPCODE opcode = W_IND;
+  enum W_OPCODE opcode = W_NA;
 
-  if (((ftype & T_ARRAY_MASK) == 0) && ((ftype & T_TABLE_MASK) == 0))
+  if (((ftype & T_ARRAY_MASK) == 0) &&
+      ((ftype & T_TABLE_MASK) == 0) &&
+      ((ftype != T_TEXT)))
     {
       w_log_msg (state, state->buffer_pos, MSG_INDEX_EAT,
 		 type_to_text (ftype));
@@ -1245,6 +1247,7 @@ translate_exp_index (struct ParserState *const state,
       const struct DeclaredVar *it = ft->extra;
       assert (it != NULL);
 
+      opcode = W_INDR;
       result.type = T_ROW_MASK | T_L_VALUE;
       while ((it->type & T_FIELD_MASK) != 0)
 	{
@@ -1254,10 +1257,11 @@ translate_exp_index (struct ParserState *const state,
       assert (it->type & T_TABLE_MASK);
       result.extra = it;
     }
-  else
+  else if ((ftype & T_ARRAY_MASK) != 0)
     {
-      assert ((ftype & T_ARRAY_MASK) != 0);
       assert (ft->extra == NULL);
+
+      opcode = W_INDA;
       result.type = (ftype & ~T_ARRAY_MASK);
       if (result.type == T_UNDETERMINED)
 	{
@@ -1267,6 +1271,15 @@ translate_exp_index (struct ParserState *const state,
 	}
       result.type |= T_L_VALUE;
     }
+  else
+    {
+      assert (ftype == T_TEXT);
+
+      opcode = W_INDT;
+      result.type = T_CHAR;
+    }
+
+  assert (opcode != W_NA);
 
   if (w_opcode_encode (instrs, opcode) == NULL)
     {
@@ -2022,7 +2035,15 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 
   if (exp_type.type != T_UNDETERMINED)
     {
-      if ((ret_type.type & T_CONTAINER_MASK) == 0)
+      if ((ret_type.type & T_CONTAINER_MASK) != (exp_type.type & T_CONTAINER_MASK))
+        {
+          w_log_msg (state, state->buffer_pos,
+                     MSG_PROC_RET_NA_EXT,
+                     type_to_text (ret_type.type),
+                     type_to_text (exp_type.type));
+          state->err_sem = TRUE;
+        }
+      else if ((ret_type.type & T_CONTAINER_MASK) == 0)
 	{
 	  const D_UINT exp_t = exp_type.type & ~(T_L_VALUE | T_ARRAY_MASK);
 	  const D_UINT ret_t = ret_type.type & ~(T_L_VALUE | T_ARRAY_MASK);
@@ -2038,6 +2059,7 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 			 MSG_PROC_RET_NA_EXT,
 			 type_to_text (ret_type.type),
 			 type_to_text (exp_type.type));
+	      state->err_sem = TRUE;
 
 	    }
 	  else if (temp_op == W_NA)

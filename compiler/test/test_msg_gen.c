@@ -1141,6 +1141,14 @@ D_CHAR test_prog_7[] = ""
   "some_int = 0; \n"
   "ENDSYNC \n" " \n" "RETURN some_var; \n" "ENDPROC \n" " \n";
 
+D_CHAR test_prog_8[] = ""
+  "PROCEDURE Proc() RETURN TABLE WITH (f1 AS TEXT, f2 AS DATE) \n"
+  "DO \n" "LET some_var AS TABLE WITH (v1 AS TEXT, v2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+
+D_CHAR test_prog_9[] = ""
+  "PROCEDURE Proc() RETURN TABLE WITH (f1 AS TEXT, f2 AS DATE) \n"
+  "DO \n" "LET some_var AS TABLE WITH (f1 AS TEXT, f2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 {
@@ -1184,7 +1192,7 @@ main ()
     test_for_error (test_prog_1, MSG_PROC_RET_NA_EXT, MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_2,
-						     MSG_PROC_RET_NA,
+						     MSG_PROC_RET_NA_EXT,
 						     MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
@@ -1199,12 +1207,21 @@ main ()
 						     MSG_BREAK_NOLOOP,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6, MSG_SYNC_NA,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
+                                                     MSG_SYNC_NA,
 						     MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
 						     MSG_SYNC_MANY,
 						     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_8,
+                                                     MSG_PROC_RET_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_9,
+                                                     MSG_PROC_RET_NA,
+                                                     MSG_ERROR_EVENT);
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");

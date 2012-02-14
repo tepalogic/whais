@@ -162,6 +162,7 @@ public:
 
 class CharOperand : public I_Operand, public DBSChar
 {
+public:
   explicit CharOperand (const DBSChar& value) :
     I_Operand (),
     DBSChar (value)
@@ -243,7 +244,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 class UInt16Operand : public I_Operand, public DBSUInt16
@@ -267,7 +267,7 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
+
 
 };
 
@@ -292,8 +292,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
-
 };
 
 class UInt64Operand : public I_Operand, public DBSUInt64
@@ -317,7 +315,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 class Int8Operand : public I_Operand, public DBSInt8
@@ -341,7 +338,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 class Int16Operand : public I_Operand, public DBSInt16
@@ -365,7 +361,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 class Int32Operand : public I_Operand, public DBSInt32
@@ -389,7 +384,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 class Int64Operand : public I_Operand, public DBSInt64
@@ -413,7 +407,6 @@ public:
   virtual Int64Operand     GetInt64Operand ();
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 
@@ -430,7 +423,6 @@ public:
 
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 
 };
 
@@ -447,7 +439,6 @@ public:
 
   virtual RealOperand      GetRealOperand ();
   virtual RichRealOperand  GetRichRealOperand ();
-  virtual TextOperand      GetTextOperand ();
 };
 
 class TextOperand : public I_Operand, public DBSText

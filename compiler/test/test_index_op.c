@@ -50,23 +50,25 @@ check_used_vals (struct ParserState *state)
 }
 
 D_CHAR proc_decl_buffer[] =
-  "LET gb AS INT16;"
-  "PROCEDURE ProcId1 (v1 AS ARRAY OF DATE) RETURN DATE "
+  "LET gb AS INT16; "
+  "LET gb2 AS TABLE WITH (field AS DATE);\n" ""
+  "PROCEDURE ProcId1 (v1 AS ARRAY OF DATE) RETURN ROW OF TABLE gb2 "
   "DO "
-  "RETURN v1[gb]; "
+  "RETURN gb2[gb]; "
   "ENDPROC\n\n"
   ""
   "PROCEDURE ProcId2 (v1 AS ARRAY OF INT16) RETURN INT16 "
+  "DO " "RETURN v1[gb]; " "ENDPROC\n\n" ""
+  "PROCEDURE ProcId3 (v1 AS TEXT) RETURN CHARACTER "
   "DO " "RETURN v1[gb]; " "ENDPROC\n\n" "";
 
 static D_BOOL
-check_procedure (struct ParserState *state, D_CHAR * proc_name)
+check_procedure (struct ParserState *state, D_CHAR * proc_name, const enum W_OPCODE op_expect)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name));
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
-  enum W_OPCODE op_expect = W_IND;
 
   /* check the opcode based on the return type */
   if (code_size < 5)
@@ -84,17 +86,14 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
 static D_BOOL
 check_all_procs (struct ParserState *state)
 {
-  D_UINT count;
-  D_CHAR proc_name[25];
+  if (check_procedure (state, "ProcId1", W_INDR) == FALSE)
+    return FALSE;
 
-  for (count = 1; count <= 2; ++count)
-    {
-      sprintf (proc_name, "ProcId%d", count);
-      if (check_procedure (state, proc_name) == FALSE)
-	{
-	  return FALSE;
-	}
-    }
+  if (check_procedure (state, "ProcId2", W_INDA) == FALSE)
+    return FALSE;
+
+  if (check_procedure (state, "ProcId3", W_INDT) == FALSE)
+    return FALSE;
 
   return TRUE;
 }
@@ -133,15 +132,18 @@ main ()
 	}
     }
 
-  printf ("Testing index op usage ...");
-  if (check_all_procs (&state))
+  if (test_result)
     {
-      printf ("PASSED\n");
-    }
-  else
-    {
-      printf ("FAILED\n");
-      test_result = FALSE;
+      printf ("Testing index op usage ...");
+      if (check_all_procs (&state))
+        {
+          printf ("PASSED\n");
+        }
+      else
+        {
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
     }
 
   free_state (&state);

@@ -466,7 +466,9 @@ const FDECODE_OPCODE wod_dec_w_jt = wod_dec_w_jf;
 const FDECODE_OPCODE wod_dec_w_jtc = wod_dec_w_jf;
 const FDECODE_OPCODE wod_dec_w_jmp = wod_dec_w_jf;
 
-const FDECODE_OPCODE wod_dec_w_ind = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_indt = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_inda = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_indr = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_self = wod_dec_w_ldt;
 
 static D_UINT
@@ -621,7 +623,9 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_jtc,
   wod_dec_w_jmp,
 
-  wod_dec_w_ind,
+  wod_dec_w_indt,
+  wod_dec_w_inda,
+  wod_dec_w_indr,
   wod_dec_w_self,
 
   wod_dec_w_bsync,
@@ -764,7 +768,9 @@ const D_CHAR *wod_str_table[] = {
   "jtc",
   "jmp",
 
-  "ind",
+  "indt",
+  "inda",
+  "indr",
   "self",
 
   "bsync",

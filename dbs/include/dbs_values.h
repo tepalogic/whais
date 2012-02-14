@@ -158,10 +158,10 @@ struct DBSDate
 
   DBSDate& operator= (const DBSDate& source)
   {
-    _CC( D_INT16&, m_Year)  = source.m_Year;
-    _CC( D_UINT8&, m_Month) = source.m_Month;
-    _CC( D_UINT8&, m_Day)   = source.m_Day;
-    _CC( bool&, m_IsNull)   = source.m_IsNull;
+    _CC( D_INT16&, m_Year)   = source.m_Year;
+    _CC( D_UINT8&, m_Month)  = source.m_Month;
+    _CC( D_UINT8&, m_Day)    = source.m_Day;
+    _CC( bool&,    m_IsNull) = source.m_IsNull;
     return *this;
   }
 
@@ -246,7 +246,7 @@ struct DBSDateTime
     _CC( D_UINT8&, m_Hour)    = source.m_Hour;
     _CC( D_UINT8&, m_Minutes) = source.m_Minutes;
     _CC( D_UINT8&, m_Seconds) = source.m_Seconds;
-    _CC( bool&, m_IsNull)     = source.m_IsNull;
+    _CC( bool&,    m_IsNull)  = source.m_IsNull;
     return *this;
   }
 
@@ -351,13 +351,13 @@ struct DBSHiresTime
   DBSHiresTime& operator= (const DBSHiresTime& source)
   {
     _CC( D_UINT32&, m_Microsec) = source.m_Microsec;
-    _CC( D_INT16&, m_Year)      = source.m_Year;
-    _CC( D_UINT8&, m_Month)     = source.m_Month;
-    _CC( D_UINT8&, m_Day)       = source.m_Day;
-    _CC( D_UINT8&, m_Hour)      = source.m_Hour;
-    _CC( D_UINT8&, m_Minutes)   = source.m_Minutes;
-    _CC( D_UINT8&, m_Seconds)   = source.m_Seconds;
-    _CC( bool&, m_IsNull)       = source.m_IsNull;
+    _CC( D_INT16&,  m_Year)     = source.m_Year;
+    _CC( D_UINT8&,  m_Month)    = source.m_Month;
+    _CC( D_UINT8&,  m_Day)      = source.m_Day;
+    _CC( D_UINT8&,  m_Hour)     = source.m_Hour;
+    _CC( D_UINT8&,  m_Minutes)  = source.m_Minutes;
+    _CC( D_UINT8&,  m_Seconds)  = source.m_Seconds;
+    _CC( bool&,     m_IsNull)   = source.m_IsNull;
     return *this;
   }
 
