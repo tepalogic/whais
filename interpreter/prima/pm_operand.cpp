@@ -27,365 +27,211 @@
 using namespace std;
 using namespace prima;
 
-template <class T> static inline T
-get_op_not_supp ()
-{
-  assert (false);
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_CONVERSION));
-}
-
-template <class T, class DBSType> static inline T
-get_op_null ()
-{
-  return T (DBSType ());
-}
-
-
 ////////////////////////////I_Operand//////////////////////////////
 
-I_Operand::~I_Operand ()
+void
+I_Operand::GetValue (DBSBool& outValue) const
 {
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-NullOperand
-I_Operand::GetNullOperand ()
+void
+I_Operand::GetValue (DBSChar& outValue) const
 {
-  return get_op_not_supp<NullOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-BoolOperand
-I_Operand::GetBoolOperand ()
+void
+I_Operand::GetValue (DBSDate& outValue) const
 {
-  return get_op_not_supp<BoolOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-CharOperand
-I_Operand::GetCharOperand ()
+void
+I_Operand::GetValue (DBSDateTime& outValue) const
 {
-  return get_op_not_supp<CharOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-DateOperand
-I_Operand::GetDateOperand ()
+void
+I_Operand::GetValue (DBSHiresTime& outValue) const
 {
-  return get_op_not_supp<DateOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-DateTimeOperand
-I_Operand::GetDateTimeOperand ()
+void
+I_Operand::GetValue (DBSInt8& outValue) const
 {
-  return get_op_not_supp<DateTimeOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-HiresTimeOperand
-I_Operand::GetHiresTimeOperand ()
+void
+I_Operand::GetValue (DBSInt16& outValue) const
 {
-  return get_op_not_supp<HiresTimeOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt8Operand
-I_Operand::GetUInt8Operand ()
+void
+I_Operand::GetValue (DBSInt32& outValue) const
 {
-  return get_op_not_supp<UInt8Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt16Operand
-I_Operand::GetUInt16Operand ()
+void
+I_Operand::GetValue (DBSInt64& outValue) const
 {
-  return get_op_not_supp<UInt16Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt32Operand
-I_Operand::GetUInt32Operand ()
+void
+I_Operand::GetValue (DBSReal& outValue) const
 {
-  return get_op_not_supp<UInt32Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt64Operand
-I_Operand::GetUInt64Operand ()
+void
+I_Operand::GetValue (DBSRichReal& outValue) const
 {
-  return get_op_not_supp<UInt64Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int8Operand
-I_Operand::GetInt8Operand ()
+void
+I_Operand::GetValue (DBSText& outValue) const
 {
-  return get_op_not_supp<Int8Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int16Operand
-I_Operand::GetInt16Operand ()
+void
+I_Operand::GetValue (DBSUInt8& outValue) const
 {
-  return get_op_not_supp<Int16Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int32Operand
-I_Operand::GetInt32Operand ()
+void
+I_Operand::GetValue (DBSUInt16& outValue) const
 {
-  return get_op_not_supp<Int32Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int64Operand
-I_Operand::GetInt64Operand ()
+void
+I_Operand::GetValue (DBSUInt32& outValue) const
 {
-  return get_op_not_supp<Int64Operand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-RealOperand
-I_Operand::GetRealOperand ()
+void
+I_Operand::GetValue (DBSUInt64& outValue) const
 {
-  return get_op_not_supp<RealOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-RichRealOperand
-I_Operand::GetRichRealOperand ()
+void
+I_Operand::GetValue (DBSArray& outValue) const
 {
-  return get_op_not_supp<RichRealOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-TextOperand
-I_Operand::GetTextOperand ()
+void
+I_Operand::SetValue (const DBSBool& outValue)
 {
-  return get_op_not_supp<TextOperand> ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-
-
-////////////////StackOperand////////////////////////////////////
-
-StackedOperand::~StackedOperand ()
+void
+I_Operand::SetValue (const DBSChar& outValue)
 {
-  I_Operand& operand = *_RC (I_Operand*, m_OperandPlacement);
-  operand.~I_Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-NullOperand
-StackedOperand::GetNullOperand ()
+void
+I_Operand::SetValue (const DBSDate& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetNullOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-BoolOperand
-StackedOperand::GetBoolOperand ()
+void
+I_Operand::SetValue (const DBSDateTime& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetBoolOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-CharOperand
-StackedOperand::GetCharOperand ()
+void
+I_Operand::SetValue (const DBSHiresTime& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetCharOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-DateOperand
-StackedOperand::GetDateOperand ()
+void
+I_Operand::SetValue (const DBSInt8& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetDateOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-DateTimeOperand
-StackedOperand::GetDateTimeOperand ()
+void
+I_Operand::SetValue (const DBSInt16& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetDateTimeOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-HiresTimeOperand
-StackedOperand::GetHiresTimeOperand ()
+void
+I_Operand::SetValue (const DBSInt32& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetHiresTimeOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt8Operand
-StackedOperand::GetUInt8Operand ()
+void
+I_Operand::SetValue (const DBSInt64& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetUInt8Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt16Operand
-StackedOperand::GetUInt16Operand ()
+void
+I_Operand::SetValue (const DBSReal& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetUInt16Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt32Operand
-StackedOperand::GetUInt32Operand ()
+void
+I_Operand::SetValue (const DBSRichReal& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetUInt32Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-UInt64Operand
-StackedOperand::GetUInt64Operand ()
+void
+I_Operand::SetValue (const DBSText& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetUInt64Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int8Operand
-StackedOperand::GetInt8Operand ()
+void
+I_Operand::SetValue (const DBSUInt8& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetInt8Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int16Operand
-StackedOperand::GetInt16Operand ()
+void
+I_Operand::SetValue (const DBSUInt16& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetInt16Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int32Operand
-StackedOperand::GetInt32Operand ()
+void
+I_Operand::SetValue (const DBSUInt32& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetInt32Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-Int64Operand
-StackedOperand::GetInt64Operand ()
+void
+I_Operand::SetValue (const DBSUInt64& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetInt64Operand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-RealOperand
-StackedOperand::GetRealOperand ()
+void
+I_Operand::SetValue (const DBSArray& outValue)
 {
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetRealOperand ();
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
-
-RichRealOperand
-StackedOperand::GetRichRealOperand ()
-{
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetRichRealOperand ();
-}
-
-TextOperand
-StackedOperand::GetTextOperand ()
-{
-  I_Operand& operand = *_RC(I_Operand*, m_OperandPlacement);
-  return operand.GetTextOperand ();
-}
-
-
-///////////////////////NullOperand////////////////////////////////
-NullOperand::~NullOperand ()
-{
-}
-
-NullOperand
-NullOperand::GetNullOperand ()
-{
-  return *this;
-}
-
-BoolOperand
-NullOperand::GetBoolOperand ()
-{
-  return get_op_null<BoolOperand, DBSBool> ();
-}
-
-CharOperand
-NullOperand::GetCharOperand ()
-{
-  return get_op_null<CharOperand, DBSChar> ();
-}
-
-DateOperand
-NullOperand::GetDateOperand ()
-{
-  return get_op_null<DateOperand, DBSDate> ();
-}
-
-DateTimeOperand
-NullOperand::GetDateTimeOperand ()
-{
-  return get_op_null<DateTimeOperand, DBSDateTime> ();
-}
-
-HiresTimeOperand
-NullOperand::GetHiresTimeOperand ()
-{
-  return get_op_null<HiresTimeOperand, DBSHiresTime> ();
-}
-
-UInt8Operand
-NullOperand::GetUInt8Operand ()
-{
-  return get_op_null<UInt8Operand, DBSUInt8> ();
-}
-
-UInt16Operand
-NullOperand::GetUInt16Operand ()
-{
-  return get_op_null<UInt16Operand, DBSUInt16> ();
-}
-
-UInt32Operand
-NullOperand::GetUInt32Operand ()
-{
-  return get_op_null<UInt32Operand, DBSUInt32> ();
-}
-
-UInt64Operand
-NullOperand::GetUInt64Operand ()
-{
-  return get_op_null<UInt64Operand, DBSUInt64> ();
-}
-
-Int8Operand
-NullOperand::GetInt8Operand ()
-{
-  return get_op_null<Int8Operand, DBSInt8> ();
-}
-
-Int16Operand
-NullOperand::GetInt16Operand ()
-{
-  return get_op_null<Int16Operand, DBSInt16> ();
-}
-
-Int32Operand
-NullOperand::GetInt32Operand ()
-{
-  return get_op_null<Int32Operand, DBSInt32> ();
-}
-
-Int64Operand
-NullOperand::GetInt64Operand ()
-{
-  return get_op_null<Int64Operand, DBSInt64> ();
-}
-
-RealOperand
-NullOperand::GetRealOperand ()
-{
-  return get_op_null<RealOperand, DBSReal> ();
-}
-
-RichRealOperand
-NullOperand::GetRichRealOperand ()
-{
-  return get_op_null<RichRealOperand, DBSRichReal> ();
-}
-
-TextOperand
-NullOperand::GetTextOperand ()
-{
-  return get_op_null<TextOperand, DBSText> ();
-}
-
 
 ////////////////////BoolOperand///////////////////////////////////
 
@@ -393,10 +239,16 @@ BoolOperand::~BoolOperand ()
 {
 }
 
-BoolOperand
-BoolOperand::GetBoolOperand ()
+void
+BoolOperand::GetValue (DBSBool& outValue) const
 {
-  return *this;
+  outValue = m_Value;
+}
+
+void
+BoolOperand::SetValue (const DBSBool& value)
+{
+  m_Value = value;
 }
 
 ////////////////////CharOperand////////////////////////////////////
@@ -405,20 +257,26 @@ CharOperand::~CharOperand ()
 {
 }
 
-CharOperand
-CharOperand::GetCharOperand ()
+void
+CharOperand::GetValue (DBSChar& outValue) const
 {
-  return *this;
+  outValue = m_Value;
 }
 
-TextOperand
-CharOperand::GetTextOperand ()
+void
+CharOperand::GetValue (DBSText& outValue) const
 {
   DBSText text;
 
-  text.Append (*this);
+  text.Append (m_Value);
 
-  return TextOperand (text);
+  outValue = text;
+}
+
+void
+CharOperand::SetValue (const DBSChar& value)
+{
+  m_Value = value;
 }
 
 ///////////////////////DateOperand///////////////////////////////////
@@ -427,46 +285,57 @@ DateOperand::~DateOperand ()
 {
 }
 
-DateOperand
-DateOperand::GetDateOperand ()
+void
+DateOperand::GetValue (DBSDate& outValue) const
 {
-  return *this;
+  outValue = m_Value;
 }
 
-DateTimeOperand
-DateOperand::GetDateTimeOperand ()
+void
+DateOperand::GetValue (DBSDateTime& outValue) const
 {
-  DBSDateTime time;
-
-  //Avoid validy checks
-  _CC (D_INT16&, time.m_Year)    = this->m_Year;
-  _CC (D_UINT8&, time.m_Month)   = this->m_Month;
-  _CC (D_UINT8&, time.m_Day)     = this->m_Day;
-  _CC (D_UINT8&, time.m_Hour)    = 0;
-  _CC (D_UINT8&, time.m_Minutes) = 0;
-  _CC (D_UINT8&, time.m_Seconds) = 0;
-  _CC (bool&,    time.m_IsNull)  = false;
-
-  return DateTimeOperand (time);
+  if (m_Value.IsNull ())
+    {
+      const DBSDateTime temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSDateTime temp (m_Value.m_Year,
+                              m_Value.m_Month,
+                              m_Value.m_Day,
+                              0,
+                              0,
+                              0);
+      outValue = temp;
+    }
 }
 
-HiresTimeOperand
-DateOperand::GetHiresTimeOperand ()
+void
+DateOperand::GetValue (DBSHiresTime& outValue) const
 {
-  DBSHiresTime time;
+  if (m_Value.IsNull ())
+    {
+      const DBSHiresTime temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSHiresTime temp (m_Value.m_Year,
+                              m_Value.m_Month,
+                              m_Value.m_Day,
+                              0,
+                              0,
+                              0,
+                              0);
+      outValue = temp;
+    }
+}
 
-  //Avoid validy checks
-
-  _CC (D_INT16&,  time.m_Year)     = this->m_Year;
-  _CC (D_UINT8&,  time.m_Month)    = this->m_Month;
-  _CC (D_UINT8&,  time.m_Day)      = this->m_Day;
-  _CC (D_UINT8&,  time.m_Hour)     = 0;
-  _CC (D_UINT8&,  time.m_Minutes)  = 0;
-  _CC (D_UINT8&,  time.m_Seconds)  = 0;
-  _CC (D_UINT32&, time.m_Microsec) = 0;
-  _CC (bool&,     time.m_IsNull)   = false;
-
-  return HiresTimeOperand (time);
+void
+DateOperand::SetValue (const DBSDate& value)
+{
+  m_Value = value;
 }
 
 ////////////////////////////////DateTimeOperand/////////////////////////////
@@ -475,43 +344,54 @@ DateTimeOperand::~DateTimeOperand ()
 {
 }
 
-DateOperand
-DateTimeOperand::GetDateOperand ()
+void
+DateTimeOperand::GetValue (DBSDate& outValue) const
 {
-  DBSDate date;
-
-  //Avoid validy checks
-  _CC (D_INT16&, date.m_Year)    = this->m_Year;
-  _CC (D_UINT8&, date.m_Month)   = this->m_Month;
-  _CC (D_UINT8&, date.m_Day)     = this->m_Day;
-  _CC (bool&,    date.m_IsNull)  = false;
-
-  return DateOperand (date);
+  if (m_Value.IsNull ())
+    {
+      const DBSDate temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSDate temp (m_Value.m_Year,
+                          m_Value.m_Month,
+                          m_Value.m_Day);
+      outValue = temp;
+    }
 }
 
-DateTimeOperand
-DateTimeOperand::GetDateTimeOperand ()
+void
+DateTimeOperand::GetValue (DBSDateTime& outValue) const
 {
-  return *this;
+  outValue = m_Value;
 }
 
-HiresTimeOperand
-DateTimeOperand::GetHiresTimeOperand ()
+void
+DateTimeOperand::GetValue (DBSHiresTime& outValue) const
 {
-  DBSHiresTime time;
+  if (m_Value.IsNull ())
+    {
+      const DBSHiresTime temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSHiresTime temp (m_Value.m_Year,
+                              m_Value.m_Month,
+                              m_Value.m_Day,
+                              m_Value.m_Hour,
+                              m_Value.m_Minutes,
+                              m_Value.m_Seconds,
+                              0);
+      outValue = temp;
+    }
+}
 
-  //Avoid validy checks
-
-  _CC (D_INT16&,  time.m_Year)     = this->m_Year;
-  _CC (D_UINT8&,  time.m_Month)    = this->m_Month;
-  _CC (D_UINT8&,  time.m_Day)      = this->m_Day;
-  _CC (D_UINT8&,  time.m_Hour)     = this->m_Hour;
-  _CC (D_UINT8&,  time.m_Minutes)  = this->m_Minutes;
-  _CC (D_UINT8&,  time.m_Seconds)  = this->m_Seconds;
-  _CC (D_UINT32&, time.m_Microsec) = 0;
-  _CC (bool&,     time.m_IsNull)   = false;
-
-  return HiresTimeOperand (time);
+void
+DateTimeOperand::SetValue (const DBSDateTime& value)
+{
+  m_Value = value;
 }
 
 ///////////////////////////HiresTimeOperand/////////////////////////////////
@@ -520,42 +400,53 @@ HiresTimeOperand::~HiresTimeOperand ()
 {
 }
 
-DateOperand
-HiresTimeOperand::GetDateOperand ()
+void
+HiresTimeOperand::GetValue (DBSDate& outValue) const
 {
-  DBSDate date;
-
-  //Avoid validy checks
-  _CC (D_INT16&, date.m_Year)    = this->m_Year;
-  _CC (D_UINT8&, date.m_Month)   = this->m_Month;
-  _CC (D_UINT8&, date.m_Day)     = this->m_Day;
-  _CC (bool&,    date.m_IsNull)  = false;
-
-  return DateOperand (date);
+  if (m_Value.IsNull ())
+    {
+      const DBSDate temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSDate temp (m_Value.m_Year,
+                          m_Value.m_Month,
+                          m_Value.m_Day);
+      outValue = temp;
+    }
 }
 
-DateTimeOperand
-HiresTimeOperand::GetDateTimeOperand ()
+void
+HiresTimeOperand::GetValue (DBSDateTime& outValue) const
 {
-  DBSDateTime time;
-
-  //Avoid validy checks
-
-  _CC (D_INT16&,  time.m_Year)    = this->m_Year;
-  _CC (D_UINT8&,  time.m_Month)   = this->m_Month;
-  _CC (D_UINT8&,  time.m_Day)     = this->m_Day;
-  _CC (D_UINT8&,  time.m_Hour)    = this->m_Hour;
-  _CC (D_UINT8&,  time.m_Minutes) = this->m_Minutes;
-  _CC (D_UINT8&,  time.m_Seconds) = this->m_Seconds;
-  _CC (bool&,     time.m_IsNull)  = false;
-
-  return DateTimeOperand (time);
+  if (m_Value.IsNull ())
+    {
+      const DBSDateTime temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSDateTime temp (m_Value.m_Year,
+                              m_Value.m_Month,
+                              m_Value.m_Day,
+                              m_Value.m_Hour,
+                              m_Value.m_Minutes,
+                              m_Value.m_Seconds);
+      outValue = temp;
+    }
 }
 
-HiresTimeOperand
-HiresTimeOperand::GetHiresTimeOperand ()
+void
+HiresTimeOperand::GetValue (DBSHiresTime& outValue) const
 {
-  return *this;
+  outValue = m_Value;
+}
+
+void
+HiresTimeOperand::SetValue (const DBSHiresTime& value)
+{
+  m_Value = value;
 }
 
 ////////////////////////////UInt8Operand//////////////////////////////////
@@ -564,64 +455,96 @@ UInt8Operand::~UInt8Operand ()
 {
 }
 
-UInt8Operand
-UInt8Operand::GetUInt8Operand ()
+void
+UInt8Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-UInt8Operand::GetUInt16Operand ()
+void
+UInt8Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-UInt8Operand::GetUInt32Operand ()
+void
+UInt8Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-UInt8Operand::GetUInt64Operand ()
+void
+UInt8Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-UInt8Operand::GetInt8Operand ()
+void
+UInt8Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-UInt8Operand::GetInt16Operand ()
+void
+UInt8Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-UInt8Operand::GetInt32Operand ()
+void
+UInt8Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-UInt8Operand::GetInt64Operand ()
+void
+UInt8Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-UInt8Operand::GetRealOperand ()
+void
+UInt8Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-UInt8Operand::GetRichRealOperand ()
+void
+UInt8Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+}
+
+void
+UInt8Operand::SetValue (const DBSUInt8& value)
+{
+  m_Value = value;
 }
 
 
@@ -631,64 +554,96 @@ UInt16Operand::~UInt16Operand ()
 {
 }
 
-UInt8Operand
-UInt16Operand::GetUInt8Operand ()
+void
+UInt16Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-UInt16Operand::GetUInt16Operand ()
+void
+UInt16Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-UInt16Operand::GetUInt32Operand ()
+void
+UInt16Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-UInt16Operand::GetUInt64Operand ()
+void
+UInt16Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-UInt16Operand::GetInt8Operand ()
+void
+UInt16Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-UInt16Operand::GetInt16Operand ()
+void
+UInt16Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-UInt16Operand::GetInt32Operand ()
+void
+UInt16Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-UInt16Operand::GetInt64Operand ()
+void
+UInt16Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-UInt16Operand::GetRealOperand ()
+void
+UInt16Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-UInt16Operand::GetRichRealOperand ()
+void
+UInt16Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+}
+
+void
+UInt16Operand::SetValue (const DBSUInt16& value)
+{
+  m_Value = value;
 }
 
 
@@ -698,66 +653,97 @@ UInt32Operand::~UInt32Operand ()
 {
 }
 
-UInt8Operand
-UInt32Operand::GetUInt8Operand ()
+void
+UInt32Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-UInt32Operand::GetUInt16Operand ()
+void
+UInt32Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-UInt32Operand::GetUInt32Operand ()
+void
+UInt32Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-UInt32Operand::GetUInt64Operand ()
+void
+UInt32Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-UInt32Operand::GetInt8Operand ()
+void
+UInt32Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-UInt32Operand::GetInt16Operand ()
+void
+UInt32Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-UInt32Operand::GetInt32Operand ()
+void
+UInt32Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-UInt32Operand::GetInt64Operand ()
+void
+UInt32Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-UInt32Operand::GetRealOperand ()
+void
+UInt32Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-UInt32Operand::GetRichRealOperand ()
+void
+UInt32Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
 }
 
+void
+UInt32Operand::SetValue (const DBSUInt32& value)
+{
+  m_Value = value;
+}
 
 ////////////////////////////UInt64Operand//////////////////////////////////
 
@@ -765,130 +751,194 @@ UInt64Operand::~UInt64Operand ()
 {
 }
 
-UInt8Operand
-UInt64Operand::GetUInt8Operand ()
+void
+UInt64Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-UInt64Operand::GetUInt16Operand ()
+void
+UInt64Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-UInt64Operand::GetUInt32Operand ()
+void
+UInt64Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-UInt64Operand::GetUInt64Operand ()
+void
+UInt64Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-UInt64Operand::GetInt8Operand ()
+void
+UInt64Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-UInt64Operand::GetInt16Operand ()
+void
+UInt64Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-UInt64Operand::GetInt32Operand ()
+void
+UInt64Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-UInt64Operand::GetInt64Operand ()
+void
+UInt64Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-UInt64Operand::GetRealOperand ()
+void
+UInt64Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-UInt64Operand::GetRichRealOperand ()
+void
+UInt64Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
 }
 
-////////////////////////////Int8Operand//////////////////////////////////
+void
+UInt64Operand::SetValue (const DBSUInt64& value)
+{
+  m_Value = value;
+}
+
+///////////////////////////Int8Operand//////////////////////////////////
 
 Int8Operand::~Int8Operand ()
 {
 }
 
-UInt8Operand
-Int8Operand::GetUInt8Operand ()
+void
+Int8Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-Int8Operand::GetUInt16Operand ()
+void
+Int8Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-Int8Operand::GetUInt32Operand ()
+void
+Int8Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-Int8Operand::GetUInt64Operand ()
+void
+Int8Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-Int8Operand::GetInt8Operand ()
+void
+Int8Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-Int8Operand::GetInt16Operand ()
+void
+Int8Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-Int8Operand::GetInt32Operand ()
+void
+Int8Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-Int8Operand::GetInt64Operand ()
+void
+Int8Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-Int8Operand::GetRealOperand ()
+void
+Int8Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-Int8Operand::GetRichRealOperand ()
+void
+Int8Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+}
+
+void
+Int8Operand::SetValue (const DBSInt8& value)
+{
+  m_Value = value;
 }
 
 ////////////////////////////Int16Operand//////////////////////////////////
@@ -897,66 +947,97 @@ Int16Operand::~Int16Operand ()
 {
 }
 
-UInt8Operand
-Int16Operand::GetUInt8Operand ()
+void
+Int16Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-Int16Operand::GetUInt16Operand ()
+void
+Int16Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-Int16Operand::GetUInt32Operand ()
+void
+Int16Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-Int16Operand::GetUInt64Operand ()
+void
+Int16Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-Int16Operand::GetInt8Operand ()
+void
+Int16Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-Int16Operand::GetInt16Operand ()
+void
+Int16Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-Int16Operand::GetInt32Operand ()
+void
+Int16Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-Int16Operand::GetInt64Operand ()
+void
+Int16Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-Int16Operand::GetRealOperand ()
+void
+Int16Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-Int16Operand::GetRichRealOperand ()
+void
+Int16Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
 }
 
+void
+Int16Operand::SetValue (const DBSInt16& value)
+{
+  m_Value = value;
+}
 
 ////////////////////////////Int32Operand//////////////////////////////////
 
@@ -964,64 +1045,96 @@ Int32Operand::~Int32Operand ()
 {
 }
 
-UInt8Operand
-Int32Operand::GetUInt8Operand ()
+void
+Int32Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-Int32Operand::GetUInt16Operand ()
+void
+Int32Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-Int32Operand::GetUInt32Operand ()
+void
+Int32Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-Int32Operand::GetUInt64Operand ()
+void
+Int32Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-Int32Operand::GetInt8Operand ()
+void
+Int32Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-Int32Operand::GetInt16Operand ()
+void
+Int32Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-Int32Operand::GetInt32Operand ()
+void
+Int32Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-Int32Operand::GetInt64Operand ()
+void
+Int32Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-Int32Operand::GetRealOperand ()
+void
+Int32Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-Int32Operand::GetRichRealOperand ()
+void
+Int32Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+}
+
+void
+Int32Operand::SetValue (const DBSInt32& value)
+{
+  m_Value = value;
 }
 
 ////////////////////////////Int64Operand//////////////////////////////////
@@ -1030,64 +1143,96 @@ Int64Operand::~Int64Operand ()
 {
 }
 
-UInt8Operand
-Int64Operand::GetUInt8Operand ()
+void
+Int64Operand::GetValue (DBSInt8& outValue) const
 {
-  return UInt8Operand (DBSUInt8 (_SC (D_UINT8, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
 }
 
-UInt16Operand
-Int64Operand::GetUInt16Operand ()
+void
+Int64Operand::GetValue (DBSInt16& outValue) const
 {
-  return UInt16Operand (DBSUInt16 (_SC (D_UINT16, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
 }
 
-UInt32Operand
-Int64Operand::GetUInt32Operand ()
+void
+Int64Operand::GetValue (DBSInt32& outValue) const
 {
-  return UInt32Operand (DBSUInt32 (_SC (D_UINT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
 }
 
-UInt64Operand
-Int64Operand::GetUInt64Operand ()
+void
+Int64Operand::GetValue (DBSInt64& outValue) const
 {
-  return UInt64Operand (DBSUInt64 (_SC (D_UINT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
+  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
 }
 
-Int8Operand
-Int64Operand::GetInt8Operand ()
+void
+Int64Operand::GetValue (DBSRichReal& outValue) const
 {
-  return Int8Operand (DBSInt8 (_SC (D_INT8, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSRichReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSRichReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int16Operand
-Int64Operand::GetInt16Operand ()
+void
+Int64Operand::GetValue (DBSReal& outValue) const
 {
-  return Int16Operand (DBSInt16 (_SC (D_INT16, this->m_Value)));
+  if (m_Value.IsNull ())
+    {
+      const DBSReal temp;
+      outValue = temp;
+    }
+  else
+    {
+      const DBSReal temp (m_Value.m_Value);
+      outValue = temp;
+    }
 }
 
-Int32Operand
-Int64Operand::GetInt32Operand ()
+void
+Int64Operand::GetValue (DBSUInt8& outValue) const
 {
-  return Int32Operand (DBSInt32 (_SC (D_INT32, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
 }
 
-Int64Operand
-Int64Operand::GetInt64Operand ()
+void
+Int64Operand::GetValue (DBSUInt16& outValue) const
 {
-  return Int64Operand (DBSInt64 (_SC (D_INT64, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
 }
 
-RealOperand
-Int64Operand::GetRealOperand ()
+void
+Int64Operand::GetValue (DBSUInt32& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
 }
 
-RichRealOperand
-Int64Operand::GetRichRealOperand ()
+void
+Int64Operand::GetValue (DBSUInt64& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
+  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+}
+
+void
+Int64Operand::SetValue (const DBSInt64& value)
+{
+  m_Value = value;
 }
 
 /////////////////////RealOperand///////////////////////////////////
@@ -1096,17 +1241,25 @@ RealOperand::~RealOperand ()
 {
 }
 
-RealOperand
-RealOperand::GetRealOperand ()
+void
+RealOperand::GetValue (DBSReal& outValue) const
 {
-  return *this;
+  outValue = m_Value;
 }
 
-RichRealOperand
-RealOperand::GetRichRealOperand ()
+void
+RealOperand::GetValue (DBSRichReal& outValue) const
 {
-  return RichRealOperand (DBSRichReal (_SC (long double, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull)       = m_Value.m_IsNull;
+  _CC (long double&, outValue.m_Value) = _SC (long double, m_Value.m_Value);
 }
+
+void
+RealOperand::SetValue (const DBSReal& value)
+{
+  m_Value = value;
+}
+
 
 ////////////////////RichRealOperand/////////////////////////////////
 
@@ -1114,26 +1267,60 @@ RichRealOperand::~RichRealOperand ()
 {
 }
 
-RealOperand
-RichRealOperand::GetRealOperand ()
+void
+RichRealOperand::GetValue (DBSReal& outValue) const
 {
-  return RealOperand (DBSReal (_SC (float, this->m_Value)));
+  _CC (bool&, outValue.m_IsNull) = m_Value.m_IsNull;
+  _CC (float&, outValue.m_Value) = _SC (float, m_Value.m_Value);
 }
 
-RichRealOperand
-RichRealOperand::GetRichRealOperand ()
+void
+RichRealOperand::GetValue (DBSRichReal& outValue) const
 {
-  return *this;
+  outValue = m_Value;
 }
 
+void
+RichRealOperand::SetValue (const DBSRichReal& value)
+{
+  m_Value = value;
+}
 ////////////////////TextOperand//////////////////////////////////////
 
 TextOperand::~TextOperand ()
 {
 }
 
-TextOperand
-TextOperand::GetTextOperand ()
+void
+TextOperand::GetValue (DBSText& outValue) const
 {
-  return *this;
+  outValue = m_Value;
 }
+
+void
+TextOperand::SetValue (const DBSText& value)
+{
+  m_Value = value;
+}
+
+
+//////////////////////ArrayOperand///////////////////////////////////
+
+ArrayOperand::~ArrayOperand ()
+{
+}
+
+void
+ArrayOperand::GetValue (DBSArray& outValue) const
+{
+  outValue = m_Value;
+}
+
+void
+ArrayOperand::SetValue (const DBSArray& value)
+{
+  m_Value = value;
+}
+
+
+

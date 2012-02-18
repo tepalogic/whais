@@ -44,7 +44,7 @@ public:
   virtual D_UINT      GetPesistentTablesCount () = 0;
   virtual I_DBSTable& RetrievePersistentTable (D_UINT index) = 0;
   virtual I_DBSTable& RetrievePersistentTable (const D_CHAR* pTableName) = 0;
-  virtual void        ReleaseTable (I_DBSTable &) = 0;
+  virtual void        ReleaseTable (I_DBSTable&) = 0;
   virtual void        AddTable (const D_CHAR* const       pTableName,
                                 const DBSFieldDescriptor* pFields,
                                 const D_UINT              fieldsCount) = 0;

@@ -22,37 +22,51 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef PR_TYPEMANAGER_H_
-#define PR_TYPEMANAGER_H_
+#ifndef PM_GLOBALS_H_
+#define PM_GLOBALS_H_
 
 #include <vector>
 
-#include "whisper.h"
+#include "operands.h"
 
 namespace prima
 {
 
-class TypeManager
+struct GlobalEntry
+{
+  D_UINT32  m_IdOffet;
+  D_UINT32  m_TypeOffset;
+  bool      m_Resolved;
+};
+
+class GlobalManager
 {
 public:
-  TypeManager ();
-  ~TypeManager ();
+  GlobalManager ()
+  {
+  }
 
-  D_UINT32 FindTypeDescription (const D_UINT8* const pTypeDescription);
-  D_UINT32 AddTypeDescription (const D_UINT8* const pTypeDescription);
+  ~GlobalManager ()
+  {
+  }
 
-  const D_UINT8* GetTypeDescription (const D_UINT32 offset) const;
+  D_UINT             AddGlobal (const D_UINT8 *const pIdentifier,
+                                const D_UINT32       typeOffset,
+                                bool                 external);
+  D_UINT             FindGlobal (const D_UINT8 *const pIdentifier);
+  bool               IsResolved (const D_UINT glbEntry);
+  StackedOperand&    GetGlobalValue (const D_UINT glbEntry);
+  const GlobalEntry& GetGlobalDescriptor (const D_UINT glbEntry);
 
-  static bool    IsTypeDescriptionValid (const D_UINT8* pTypeDescription);
-
-  static const D_UINT32 INVALID_OFFSET = 0xFFFFFFFF;
+  static const D_UINT INVALID_ENTRY = ~0;
 
 protected:
-
-  std::vector<D_UINT8> m_TypesDescriptions;
+  std::vector<D_UINT8>        m_Identifiers;
+  std::vector<StackedOperand> m_Storage;
+  std::vector<GlobalEntry>    m_GlobalsEntrys;
 };
+
 
 }
 
-
-#endif /* PR_TYPEMANAGER_H_ */
+#endif /* PM_GLOBALS_H_ */

@@ -52,7 +52,8 @@ public:
 
   enum
   {
-    INVALID_OP_CONVERSION
+    INVALID_OP_CONVERSION,
+    INVALID_OP_REQUEST
   };
 };
 

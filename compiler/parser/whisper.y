@@ -282,16 +282,16 @@ proc_decl_stmt: PROCEDURE IDENTIFIER
 extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER 
                 {
                     state->extern_decl = TRUE;
-                    install_proc_decl(state, $2);
+                    install_proc_decl(state, $3);
                     state->extern_decl = FALSE;
                     CHK_SEM_ERROR;
                 }
                 '(' procedure_parameter_decl ')'
                 RETURN type_spec ';'
                 {
-                    install_proc_args(state, $5);
+                    install_proc_args(state, $6);
                     CHK_SEM_ERROR;
-                    set_proc_rettype(state, $8);
+                    set_proc_rettype(state, $9);
                     CHK_SEM_ERROR;
                     finish_proc_decl(state);
                     $$ = NULL;

@@ -277,10 +277,16 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
       op_expect = W_STHT;
       break;
     case T_INT8:
+      op_expect = W_STI8;
+      break;
     case T_INT16:
+      op_expect = W_STI16;
+      break;
     case T_INT32:
+      op_expect = W_STI32;
+      break;
     case T_INT64:
-      op_expect = W_ST;
+      op_expect = W_STI64;
       break;
     case T_REAL:
       op_expect = W_STR;

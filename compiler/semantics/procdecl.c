@@ -110,7 +110,7 @@ install_proc_decl (struct ParserState *state, struct SemValue *val_id)
   struct Statement stmt;
 
   assert (state->current_stmt->type == STMT_GLOBAL);
-  assert (val_id->val_type = VAL_ID);
+  assert (val_id->val_type == VAL_ID);
 
   if (init_proc_stmt (state->current_stmt, &stmt) == FALSE)
     {
@@ -162,7 +162,7 @@ set_proc_rettype (struct ParserState *state, struct SemValue *rtype)
   struct DeclaredVar *retv = (struct DeclaredVar *)
     get_item (&(state->current_stmt->spec.proc.param_list), 0);
 
-  assert (rtype->val_type = VAL_TYPE_SPEC);
+  assert (rtype->val_type == VAL_TYPE_SPEC);
 
   memset (retv, 0, sizeof (retv));
   retv->type = rtype->val.u_tspec.type;

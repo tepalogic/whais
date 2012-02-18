@@ -335,10 +335,17 @@ const FDECODE_OPCODE wod_dec_w_stc = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_std = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stdt = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stht = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_st = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sti8 = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sti16 = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sti32 = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sti64 = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_str = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_strr = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stt = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_stui8 = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_stui16 = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_stui32 = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_stui64 = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stro = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stta = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sta = wod_dec_w_ldnull;
@@ -516,10 +523,17 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_std,
   wod_dec_w_stdt,
   wod_dec_w_stht,
-  wod_dec_w_st,
+  wod_dec_w_sti8,
+  wod_dec_w_sti16,
+  wod_dec_w_sti32,
+  wod_dec_w_sti64,
   wod_dec_w_str,
   wod_dec_w_strr,
   wod_dec_w_stt,
+  wod_dec_w_stui8,
+  wod_dec_w_stui16,
+  wod_dec_w_stui32,
+  wod_dec_w_stui64,
   wod_dec_w_stro,
   wod_dec_w_stta,
   wod_dec_w_sta,
@@ -661,10 +675,17 @@ const D_CHAR *wod_str_table[] = {
   "std",
   "stdt",
   "stht",
-  "st",
+  "sti8",
+  "sti16",
+  "sti32",
+  "sti64",
   "str",
   "strr",
   "stt",
+  "stui8",
+  "stui16",
+  "stui32",
+  "stui64",
   "stro",
   "stta",
   "sta",
