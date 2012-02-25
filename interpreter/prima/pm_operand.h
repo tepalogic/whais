@@ -30,6 +30,115 @@
 
 namespace prima
 {
+
+class GlobalOperandStorage
+{
+private:
+  friend class GlobalValue;
+
+  static const D_UINT MAX_OP_SIZE = 3;
+
+  D_UINT64 m_Storage [MAX_OP_SIZE];
+
+  I_Operand& GetOperand () { return *_RC (I_Operand*, m_Storage); }
+};
+
+class GlobalValue
+{
+public:
+  template <class OP_T>
+  explicit GlobalValue (const OP_T& op)
+  {
+    const I_Operand& compileTest = op;
+    (void)compileTest; //Do nothing! Is here just to make sure OP_T is a valid type!
+
+    assert (sizeof (OP_T) <= sizeof (GlobalOperandStorage));
+    _placement_new (m_Operand.m_Storage, op);
+  }
+
+  ~GlobalValue ()
+  {
+  }
+
+  template <class DBS_T>
+  void GetValue (DBS_T& outValue)
+  {
+    //TODO: Make sure this is multi thread safe
+    m_Operand.GetOperand ().GetValue (outValue);
+  }
+
+  template <class DBS_T>
+  void SetValue (const DBS_T& value)
+  {
+    //TODO: Make sure this is multi thread safe:
+    //      Check the DBS_X opertor= to be thread safe by seting null condition LAST
+    //      Check the conversion operator by setting the null FIRST
+    //      Array and text strategys are not safe!
+    m_Operand.GetOperand ().SetValue (value);
+  }
+
+  TableOperand& GetTableOp ()
+  {
+    return m_Operand.GetOperand ().GetTableOp ();
+  }
+
+  RowOperand&   GetRowOp ()
+  {
+    return m_Operand.GetOperand ().GetRowOp ();
+  }
+
+protected:
+  GlobalOperandStorage m_Operand;
+};
+
+class GlobalOperand : public I_Operand
+{
+  GlobalOperand (GlobalValue& global);
+  ~GlobalOperand ();
+
+  virtual void GetValue (DBSBool& outValue) const;
+  virtual void GetValue (DBSChar& outValue) const;
+  virtual void GetValue (DBSDate& outValue) const;
+  virtual void GetValue (DBSDateTime& outValue) const;
+  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DBSInt8& outValue) const;
+  virtual void GetValue (DBSInt16& outValue) const;
+  virtual void GetValue (DBSInt32& outValue) const;
+  virtual void GetValue (DBSInt64& outValue) const;
+  virtual void GetValue (DBSReal& outValue) const;
+  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DBSUInt8& outValue) const;
+  virtual void GetValue (DBSUInt16& outValue) const;
+  virtual void GetValue (DBSUInt32& outValue) const;
+  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DBSArray& outValue) const;
+
+  virtual void SetValue (const DBSBool& value);
+  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DBSDate& value);
+  virtual void SetValue (const DBSDateTime& value);
+  virtual void SetValue (const DBSHiresTime& value);
+  virtual void SetValue (const DBSInt8& value);
+  virtual void SetValue (const DBSInt16& value);
+  virtual void SetValue (const DBSInt32& value);
+  virtual void SetValue (const DBSInt64& value);
+  virtual void SetValue (const DBSReal& value);
+  virtual void SetValue (const DBSRichReal& value);
+  virtual void SetValue (const DBSText& value);
+  virtual void SetValue (const DBSUInt8& value);
+  virtual void SetValue (const DBSUInt16& value);
+  virtual void SetValue (const DBSUInt32& value);
+  virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DBSArray& value);
+
+  virtual TableOperand& GetTableOp ();
+  virtual RowOperand&   GetRowOp();
+
+protected:
+  GlobalValue& m_Value;
+};
+
 }
 
 

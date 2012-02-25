@@ -73,6 +73,7 @@ public:
   virtual void RetrieveItems (D_UINT8* pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount);
 
   //Implementations for I_DBSTable
+  virtual bool               IsTemporal () const;
   virtual D_UINT             GetFieldsCount ();
   virtual DBSFieldDescriptor GetFieldDescriptor (D_UINT fieldIndex);
   virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName);
@@ -322,6 +323,8 @@ class PSTemporalTable : public PSTable
                    const DBSFieldDescriptor* pFields,
                    const D_UINT              fieldsCount);
   virtual ~PSTemporalTable ();
+
+  virtual bool  IsTemporal () const;
 };
 
 class PSTableRmKey : public I_BTreeKey

@@ -22,61 +22,84 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+#include <assert.h>
 #include <string.h>
 
 #include "pm_globals.h"
+#include "pm_interpreter.h"
 
+using namespace std;
 using namespace prima;
 
 
-D_UINT
-GlobalManager::AddGlobal (const D_UINT8 *const pIdentifier,
-                          const D_UINT32       typeOffset,
-                          bool                 external)
+D_UINT64
+GlobalsManager::AddGlobal (const D_UINT8 *    pIdentifier,
+                           const GlobalValue& value,
+                           const D_UINT32     typeOffset)
 {
-  //TODO: Finish this
-  return 0;
+  assert (FindGlobal (pIdentifier) == INVALID_ENTRY);
+  assert (m_GlobalsEntrys.size () == m_Storage.size ());
+
+  const D_UINT64 result   = m_GlobalsEntrys.size ();
+  const D_UINT32 IdOffset = m_Identifiers.size ();
+
+  do
+    m_Identifiers.push_back (*pIdentifier);
+  while (*pIdentifier++ != 0);
+
+  m_Storage.push_back (value);
+
+  const GlobalEntry entry = {IdOffset, typeOffset};
+  m_GlobalsEntrys.push_back (entry);
+
+  return result;
 }
 
-D_UINT
-GlobalManager::FindGlobal (const D_UINT8* const pIdentifier)
+D_UINT64
+GlobalsManager::FindGlobal (const D_UINT8* pIdentifier)
 {
-  D_UINT iterator = 0;
+  assert (m_GlobalsEntrys.size () == m_Storage.size ());
+  D_UINT64 elIndex = 0;
 
-  while (iterator < m_GlobalsEntrys.size ())
+  while (elIndex < m_GlobalsEntrys.size ())
     {
-      const D_UINT8* const pItIdentfier = &m_Identifiers[m_GlobalsEntrys[iterator].m_IdOffet];
-      if (strcmp (_RC (const D_CHAR*, pIdentifier),
-                  _RC (const D_CHAR*, pItIdentfier)) == 0)
-        return iterator;
+      const GlobalEntry& entry          = m_GlobalsEntrys[elIndex];
+      const D_CHAR*      pEntIdentifier = _RC (const D_CHAR* , &m_Identifiers [entry.m_IdOffet]);
+
+      if (strcmp (pEntIdentifier, _RC (const D_CHAR*, pIdentifier)) == 0)
+        return elIndex;
+
+      ++elIndex;
     }
 
   return INVALID_ENTRY;
 }
 
-bool
-GlobalManager::IsResolved (const D_UINT glbEntry)
+GlobalValue&
+GlobalsManager::GetGlobal (const D_UINT64 globalIndex)
 {
-  assert (glbEntry < m_Storage.size ());
-  assert (m_Storage.size () == m_GlobalsEntrys.size ());
+  assert (m_GlobalsEntrys.size () == m_Storage.size ());
+  assert (globalIndex < m_GlobalsEntrys.size ());
 
-  return m_GlobalsEntrys[glbEntry].m_Resolved;
+  if (globalIndex >= m_Storage.size ())
+    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_GLOBAL_REQUEST));
+
+  return m_Storage[globalIndex];
 }
 
-StackedOperand&
-GlobalManager::GetGlobalValue (const D_UINT glbEntry)
+const D_UINT8*
+GlobalsManager::GetGlobalTypeDesctiption (const D_UINT64 globalIndex)
 {
-  assert (glbEntry < m_Storage.size ());
-  assert (m_Storage.size () == m_GlobalsEntrys.size ());
+  assert (m_GlobalsEntrys.size () == m_Storage.size ());
+  assert (globalIndex < m_GlobalsEntrys.size ());
 
-  return m_Storage[glbEntry];
-}
+  if (globalIndex >= m_GlobalsEntrys.size ())
+    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_GLOBAL_REQUEST));
 
-const GlobalEntry&
-GlobalManager::GetGlobalDescriptor (const D_UINT glbEntry)
-{
-  assert (glbEntry < m_Storage.size ());
-  assert (m_Storage.size () == m_GlobalsEntrys.size ());
+  TypeManager&   typeMgr = m_Session.GetTypeManager ();
+  const D_UINT8* pType   = typeMgr.GetTypeDescription (m_GlobalsEntrys[globalIndex].m_TypeOffset);
 
-  return m_GlobalsEntrys[glbEntry];
+  assert (typeMgr.IsTypeDescriptionValid (pType));
+
+  return pType;
 }

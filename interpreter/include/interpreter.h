@@ -25,6 +25,7 @@
 #ifndef INTERPRETER_H_
 #define INTERPRETER_H_
 
+#include <string>
 
 #include "whisper.h"
 
@@ -53,8 +54,39 @@ public:
   enum
   {
     INVALID_OP_CONVERSION,
-    INVALID_OP_REQUEST
+    INVALID_OP_REQUEST,
+    INVALID_GLOBAL_REQUEST,
+    INVALID_TYPE_DESCRIPTION,
+    DUPLICATE_DEFINITION,
+    EXTERNAL_FIRST,
+    EXTERNAL_MISMATCH
   };
+};
+
+
+enum LOG_LEVEL
+{
+  LOG_GENERAL_INFO  = 0x01,
+  LOG_EXCEPION_DESC = 0x02,
+  LOG_INT_WARNING   = 0x04,
+  LOG_INT_ERROR     = 0x08,
+  LOG_INT_CRITICAL  = 0x10
+};
+
+class I_InterpreterLogger
+{
+public:
+
+  I_InterpreterLogger ()
+  {
+  }
+
+  virtual ~I_InterpreterLogger ()
+  {
+  }
+
+  virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
+  virtual void Flush () = 0;
 };
 
 class I_InterpreterSession
@@ -63,12 +95,16 @@ public:
   I_InterpreterSession ()
   {
   }
+
   virtual ~I_InterpreterSession ()
   {
   }
 
-//  virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
+  virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
+  virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
 };
+
+
 
 void
 InitInterpreter ();

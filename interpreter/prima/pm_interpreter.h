@@ -28,18 +28,53 @@
 #include "interpreter.h"
 
 #include "pm_typemanager.h"
+#include "pm_globals.h"
 
 namespace prima
 {
 
-class GlobalSession : public I_InterpreterSession
+
+class Session : public I_InterpreterSession
+{
+public:
+  Session () :
+    I_InterpreterSession ()
+    {
+    }
+
+  virtual ~Session ()
+  {
+  }
+
+  virtual I_DBSHandler&   GetDBSHandler ()     = 0;
+  virtual TypeManager&    GetTypeManager ()    = 0;
+  virtual GlobalsManager& GetGlobalsManager () = 0;
+
+  //Default implement for I_InterpreterSession
+  virtual void LoadCompiledUnit (WICompiledUnit& unit);
+  virtual void LogMessage (const LOG_LEVEL level, std::string& message);
+
+protected:
+  void DefineGlobalValue (const D_UINT8* pIdentifier,
+                          const D_UINT8* pTypeDescriptor,
+                          const bool     external);
+};
+
+class GlobalSession : public Session
 {
 public:
   GlobalSession ();
   virtual ~GlobalSession ();
 
+  virtual I_DBSHandler&   GetDBSHandler () { return m_DbsHandler; }
+  virtual TypeManager&    GetTypeManager () { return m_TypeManager; }
+  virtual GlobalsManager& GetGlobalsManager () { return m_GlbsManager; }
+
 protected:
-  TypeManager   m_TypeManager;
+  I_DBSHandler&  m_DbsHandler;
+  TypeManager    m_TypeManager;
+  GlobalsManager m_GlbsManager;
+
 };
 
 }

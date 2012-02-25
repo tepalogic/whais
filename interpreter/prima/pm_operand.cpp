@@ -24,6 +24,8 @@
 
 #include "pm_operand.h"
 
+#include "pm_typemanager.h"
+
 using namespace std;
 using namespace prima;
 
@@ -229,6 +231,18 @@ I_Operand::SetValue (const DBSUInt64& outValue)
 
 void
 I_Operand::SetValue (const DBSArray& outValue)
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
+TableOperand&
+I_Operand::GetTableOp ()
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
+RowOperand&
+I_Operand::GetRowOp ()
 {
   throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
@@ -1303,6 +1317,31 @@ TextOperand::SetValue (const DBSText& value)
   m_Value = value;
 }
 
+//////////////////////CharTextOperand////////////////////////////////
+CharTextOperand::CharTextOperand (DBSText &text, const D_UINT64 elIndex) :
+    I_Operand (),
+    m_Index (elIndex),
+    m_Text (text)
+
+{
+}
+
+CharTextOperand::~CharTextOperand ()
+{
+}
+
+void
+CharTextOperand::GetValue (DBSChar& outValue) const
+{
+  m_Text.GetCharAtIndex (m_Index);
+}
+
+void
+CharTextOperand::SetValue (const DBSChar& value)
+{
+  m_Text.SetCharAtIndex (value, m_Index);
+}
+
 
 //////////////////////ArrayOperand///////////////////////////////////
 
@@ -1322,5 +1361,262 @@ ArrayOperand::SetValue (const DBSArray& value)
   m_Value = value;
 }
 
+//////////////////////TableOperand//////////////////////////////////////
+
+TableOperand::TableOperand (I_DBSHandler* const pDbsHnd, I_DBSTable* const pTable) :
+    I_Operand (),
+    m_pDbsHandler (pDbsHnd),
+    m_pTable (pTable)
+
+{
+  assert (m_pDbsHandler != NULL);
+  assert (m_pTable != NULL);
+}
+
+//The copy does not own the object.
+//Make sure this is deallocated, before 'source'.
+TableOperand::TableOperand (const TableOperand& source) :
+    I_Operand (),
+    m_pDbsHandler (NULL),
+    m_pTable (source.m_pTable)
+{
+}
+
+TableOperand::~TableOperand ()
+{
+  if (m_pDbsHandler != NULL)
+    delete m_pTable;
+}
+
+
+
+//////////////////GlobalOperand/////////////////////////////////////
+
+GlobalOperand::GlobalOperand (GlobalValue& value) :
+    I_Operand (),
+    m_Value (value)
+{
+}
+
+GlobalOperand::~GlobalOperand ()
+{
+}
+
+
+void
+GlobalOperand::GetValue (DBSBool& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSChar& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSDate& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSDateTime& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSHiresTime& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSInt8& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSInt16& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSInt32& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSInt64& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSReal& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSRichReal& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSText& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSUInt8& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSUInt16& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSUInt32& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSUInt64& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::GetValue (DBSArray& outValue) const
+{
+  m_Value.GetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSBool& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSChar& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSDate& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSDateTime& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSHiresTime& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSInt8& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSInt16& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSInt32& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSInt64& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSReal& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSRichReal& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSText& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSUInt8& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSUInt16& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSUInt32& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSUInt64& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SetValue (const DBSArray& outValue)
+{
+  m_Value.SetValue (outValue);
+}
+
+TableOperand&
+GlobalOperand::GetTableOp ()
+{
+  return m_Value.GetTableOp ();
+}
+
+RowOperand&
+GlobalOperand::GetRowOp ()
+{
+  return m_Value.GetRowOp ();
+}
 
 

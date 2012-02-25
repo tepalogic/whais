@@ -29,13 +29,17 @@
 
 #include "whisper.h"
 
+#include "pm_operand.h"
+
 namespace prima
 {
+
+class Session;
 
 class TypeManager
 {
 public:
-  TypeManager ();
+  TypeManager (Session& session);
   ~TypeManager ();
 
   D_UINT32 FindTypeDescription (const D_UINT8* const pTypeDescription);
@@ -43,14 +47,23 @@ public:
 
   const D_UINT8* GetTypeDescription (const D_UINT32 offset) const;
 
-  static bool    IsTypeDescriptionValid (const D_UINT8* pTypeDescription);
+  GlobalValue CreateGlobalValue (D_UINT8* pInOutTypeDescription);
+  StackValue  CreateLocalValue (D_UINT8* pInOutTypeDescription);
+
+  static bool   IsTypeDescriptionValid (const D_UINT8* pTypeDescription);
+  static D_UINT GetTypeLength (const D_UINT8* pTypeDescription);
 
   static const D_UINT32 INVALID_OFFSET = 0xFFFFFFFF;
 
 protected:
 
+  Session&             m_Session;
   std::vector<D_UINT8> m_TypesDescriptions;
 };
+
+
+
+
 
 }
 

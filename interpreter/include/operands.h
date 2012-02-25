@@ -27,7 +27,11 @@
 
 #include <assert.h>
 
+#include "dbs/include/dbs_mgr.h"
 #include "dbs/include/dbs_values.h"
+
+class TableOperand;
+class RowOperand;
 
 class I_Operand
 {
@@ -73,6 +77,9 @@ public:
   virtual void SetValue (const DBSUInt32& value);
   virtual void SetValue (const DBSUInt64& value);
   virtual void SetValue (const DBSArray& value);
+
+  virtual TableOperand& GetTableOp ();
+  virtual RowOperand&   GetRowOp();
 };
 
 class BoolOperand : public I_Operand
@@ -458,10 +465,25 @@ protected:
 };
 
 
+class CharTextOperand : public I_Operand
+{
+public:
+  explicit CharTextOperand (DBSText &text, const D_UINT64 elIndex);
+  virtual ~CharTextOperand ();
+
+  virtual void GetValue (DBSChar& outValue) const;
+
+  virtual void SetValue (const DBSChar& value);
+
+protected:
+  const D_UINT64 m_Index;
+  DBSText        m_Text;
+};
+
 class ArrayOperand : public I_Operand
 {
 public:
-  explicit ArrayOperand (DBSArray& array) :
+  explicit ArrayOperand (const DBSArray& array) :
     I_Operand (),
     m_Value (array)
     {
@@ -584,29 +606,232 @@ protected:
   DBSArray m_Array;
 };
 
-typedef ArrayElement<BoolOperand, DBSBool> IndexedBoolOperand;
-typedef ArrayElement<CharOperand, DBSChar> IndexedCharOperand;
-typedef ArrayElement<DateOperand, DBSDate> IndexedDateOperand;
-typedef ArrayElement<DateTimeOperand, DBSDateTime> IndexedDateTimeOperand;
+typedef ArrayElement<BoolOperand, DBSBool>           IndexedBoolOperand;
+typedef ArrayElement<CharOperand, DBSChar>           IndexedCharOperand;
+typedef ArrayElement<DateOperand, DBSDate>           IndexedDateOperand;
+typedef ArrayElement<DateTimeOperand, DBSDateTime>   IndexedDateTimeOperand;
 typedef ArrayElement<HiresTimeOperand, DBSHiresTime> IndexedHiresTimeOperand;
-typedef ArrayElement<UInt8Operand, DBSUInt8> IndexedUInt8Operand;
-typedef ArrayElement<UInt16Operand, DBSUInt16> IndexedUInt16Operand;
-typedef ArrayElement<UInt32Operand, DBSUInt32> IndexedUInt32Operand;
-typedef ArrayElement<UInt64Operand, DBSUInt64> IndexedUInt64Operand;
-typedef ArrayElement<Int8Operand, DBSInt8> IndexedInt8Operand;
-typedef ArrayElement<Int16Operand, DBSInt16> IndexedInt16Operand;
-typedef ArrayElement<Int32Operand, DBSInt32> IndexedInt32Operand;
-typedef ArrayElement<Int64Operand, DBSInt64> IndexedInt64Operand;
-typedef ArrayElement<RealOperand, DBSReal> IndexedRealOperand;
-typedef ArrayElement<RichRealOperand, DBSRichReal> IndexedRichRealOperand;
+typedef ArrayElement<UInt8Operand, DBSUInt8>         IndexedUInt8Operand;
+typedef ArrayElement<UInt16Operand, DBSUInt16>       IndexedUInt16Operand;
+typedef ArrayElement<UInt32Operand, DBSUInt32>       IndexedUInt32Operand;
+typedef ArrayElement<UInt64Operand, DBSUInt64>       IndexedUInt64Operand;
+typedef ArrayElement<Int8Operand, DBSInt8>           IndexedInt8Operand;
+typedef ArrayElement<Int16Operand, DBSInt16>         IndexedInt16Operand;
+typedef ArrayElement<Int32Operand, DBSInt32>         IndexedInt32Operand;
+typedef ArrayElement<Int64Operand, DBSInt64>         IndexedInt64Operand;
+typedef ArrayElement<RealOperand, DBSReal>           IndexedRealOperand;
+typedef ArrayElement<RichRealOperand, DBSRichReal>   IndexedRichRealOperand;
 
-
-
-class StackedOperand : public I_Operand
+class TableOperand : public I_Operand
 {
 public:
-  StackedOperand ();
-  virtual ~StackedOperand ();
+  TableOperand (I_DBSHandler* const pDbsHnd, I_DBSTable* const pTable);
+  TableOperand (const TableOperand& source);
+  virtual ~TableOperand ();
+
+  I_DBSTable& GetTable () { return *m_pTable; }
+
+protected:
+  I_DBSHandler* const m_pDbsHandler;
+  I_DBSTable* const   m_pTable;
+};
+
+class RowOperand : public I_Operand
+{
+public:
+  RowOperand (I_DBSTable& table, const D_UINT64 rowIndex);
+  virtual ~RowOperand ();
+
+protected:
+  I_DBSTable& m_Table;
+  D_UINT64    m_Index;
+};
+
+
+template <class OP_T, class DBS_T>
+class FieldOperand : public I_Operand
+{
+public:
+  FieldOperand (I_DBSTable& table, const D_UINT64 rowIndex, const D_UINT fieldIndex) :
+    m_Table (table),
+    m_RowIndex (rowIndex),
+    m_FieldIndex (fieldIndex)
+  {
+  }
+
+  virtual ~FieldOperand ()
+  {
+  }
+
+  virtual void GetValue (DBSBool& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSChar& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSDate& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSDateTime& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSHiresTime& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSInt8& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSInt16& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSInt32& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSInt64& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSReal& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSRichReal& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSUInt8& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSUInt16& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSUInt32& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSUInt64& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSArray& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+  virtual void GetValue (DBSText& outValue) const
+    {
+      GetInternalOp ().GetValue (outValue);
+    }
+
+
+  virtual void SetValue (const DBS_T& value)
+  {
+    m_Table.SetEntry (value, m_RowIndex, m_FieldIndex);
+  }
+
+protected:
+  OP_T GetInternalOp () const
+  {
+    DBS_T value;
+    m_Table.GetEntry (value, m_RowIndex, m_FieldIndex);
+    return OP_T (value);
+  }
+
+  I_DBSTable&    m_Table;
+  const D_UINT64 m_RowIndex;
+  const D_UINT   m_FieldIndex;
+};
+
+typedef FieldOperand<BoolOperand, DBSBool>           BoolFieldOperand;
+typedef FieldOperand<CharOperand, DBSChar>           CharFieldOperand;
+typedef FieldOperand<DateOperand, DBSDate>           DateFieldOperand;
+typedef FieldOperand<DateTimeOperand, DBSDateTime>   DateTimeFieldOperand;
+typedef FieldOperand<HiresTimeOperand, DBSHiresTime> HiresTimeFieldOperand;
+typedef FieldOperand<UInt8Operand, DBSUInt8>         UInt8FieldOperand;
+typedef FieldOperand<UInt16Operand, DBSUInt16>       UInt16FieldOperand;
+typedef FieldOperand<UInt32Operand, DBSUInt32>       UInt32FieldOperand;
+typedef FieldOperand<UInt64Operand, DBSUInt64>       UInt64FieldOperand;
+typedef FieldOperand<Int8Operand, DBSInt8>           Int8FieldOperand;
+typedef FieldOperand<Int16Operand, DBSInt16>         Int16FieldOperand;
+typedef FieldOperand<Int32Operand, DBSInt32>         Int32FieldOperand;
+typedef FieldOperand<Int64Operand, DBSInt64>         Int64FieldOperand;
+typedef FieldOperand<RealOperand, DBSReal>           RealFieldOperand;
+typedef FieldOperand<RichRealOperand, DBSRichReal>   RichRealFieldOperand;
+typedef FieldOperand<ArrayOperand, DBSArray>         ArrayFieldOperand;
+typedef FieldOperand<TextOperand, DBSText>           TextFieldOperand;
+
+class OperandStorage
+{
+private:
+  friend class StackValue;
+
+  static const D_UINT MAX_OP_SIZE = 3;
+
+  D_UINT64 m_Storage [MAX_OP_SIZE];
+
+  I_Operand& GetOperand () { return *_RC (I_Operand*, m_Storage); }
+};
+
+class StackValue
+{
+public:
+
+  template <class OP_T>
+  explicit StackValue (const OP_T& op)
+  {
+    const I_Operand& compileTest = op;
+    (void)compileTest;
+
+    assert (sizeof (OP_T) <= sizeof (OperandStorage));
+
+    _placement_new (m_Operand.m_Storage, op);
+  }
+
+  ~StackValue ()
+  {
+  }
+
+  template <class DBS_T>
+  void GetValue (DBS_T& outValue) const
+  {
+    m_Operand.GetOperand ().GetValue (outValue);
+  }
+
+  template <class DBS_T>
+  void SetValue (const DBS_T& value)
+  {
+    m_Operand.GetOperand ().SetValue (value);
+  }
+
+  I_Operand& GetOperand () { return m_Operand.GetOperand (); }
+
+protected:
+  OperandStorage m_Operand;
 };
 
 

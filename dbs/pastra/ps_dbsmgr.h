@@ -50,7 +50,7 @@ public:
                                 const D_UINT              fieldsCount);
   virtual void        DeleteTable (const D_CHAR* const pTableName);
 
-  virtual I_DBSTable* CreateTempTable (const DBSFieldDescriptor* pFields,
+  virtual I_DBSTable& CreateTempTable (const DBSFieldDescriptor* pFields,
                                        const D_UINT              fieldsCount);
 
   void Discard ();

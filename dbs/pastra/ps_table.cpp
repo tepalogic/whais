@@ -751,6 +751,12 @@ PSTable::~PSTable ()
   SyncToFile ();
 }
 
+bool
+PSTable::IsTemporal () const
+{
+  return false;
+}
+
 D_UINT
 PSTable::GetFieldsCount ()
 {
@@ -2111,7 +2117,7 @@ PSTable::StoreEntry (const T& rSource, const D_UINT64 rowIndex, const D_UINT fie
 
       AquireIndexField (&field);
 
-      try 
+      try
         {
           BTree fieldIndexTree (*m_vIndexNodeMgrs[fieldIndex]);
 
@@ -2137,7 +2143,7 @@ PSTable::MatchRowsWithIndex (const D_UINT   fieldIndex,
                              D_UINT64       maxCount)
 {
   PSFieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
- 
+
   if ((field.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, min))))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
@@ -2152,7 +2158,7 @@ PSTable::MatchRowsWithIndex (const D_UINT   fieldIndex,
   const T_BTreeKey<T>          lastKey (max, MIN (toRow, m_RowsCount));
 
   assert (pNodeMgr != NULL);
-  
+
   AquireIndexField (&field);
 
   try
@@ -2234,7 +2240,7 @@ PSTable::MatchRowsWithIndex (const D_UINT   fieldIndex,
       throw;
     }
 
-force_return: 
+force_return:
   ReleaseIndexField (&field);
   return result;
 }
@@ -2290,13 +2296,19 @@ PSTemporalTable::~PSTemporalTable ()
   RemoveFromDatabase ();
 }
 
+bool
+PSTemporalTable::IsTemporal () const
+{
+  return true;
+}
+
 
 static RowFieldText*
 allocate_row_field_text (VariableLengthStore& store,
                          const D_UINT64       firstRecordEntry,
                          const D_UINT64       valueSize)
 {
-  return new RowFieldText (store, firstRecordEntry, valueSize); 
+  return new RowFieldText (store, firstRecordEntry, valueSize);
 }
 
 static RowFieldArray*
@@ -2304,7 +2316,7 @@ allocate_row_field_array (VariableLengthStore& store,
                           const D_UINT64       firstRecordEntry,
                           const DBS_FIELD_TYPE type)
 {
-  return new RowFieldArray (store, firstRecordEntry, type); 
+  return new RowFieldArray (store, firstRecordEntry, type);
 }
 
 //From this point this functions shall not allocated memory

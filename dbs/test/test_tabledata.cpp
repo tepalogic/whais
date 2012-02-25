@@ -755,48 +755,50 @@ test_full_value_temp_table (I_DBSHandler &rDbs)
 
   INIT_VECTORS;
 
-  std::auto_ptr<I_DBSTable> apTable (rDbs.CreateTempTable (field_descs, TOTAL_DESC_FIELDS_COUNT));
+  I_DBSTable& table = rDbs.CreateTempTable (field_descs, TOTAL_DESC_FIELDS_COUNT);
 
-  result = result && test_fixed_value_field (*apTable.get (), vectBool);
-  result = result && test_fixed_value_field (*apTable.get (), vectChar);
-  result = result && test_fixed_value_field (*apTable.get (), vectDate);
-  result = result && test_fixed_value_field (*apTable.get (), vectDateTime);
-  result = result && test_fixed_value_field (*apTable.get (), vectHiResDate);
-  result = result && test_fixed_value_field (*apTable.get (), vectUInt8);
-  result = result && test_fixed_value_field (*apTable.get (), vectUInt16);
-  result = result && test_fixed_value_field (*apTable.get (), vectUInt32);
-  result = result && test_fixed_value_field (*apTable.get (), vectUInt64);
+  result = result && test_fixed_value_field (table, vectBool);
+  result = result && test_fixed_value_field (table, vectChar);
+  result = result && test_fixed_value_field (table, vectDate);
+  result = result && test_fixed_value_field (table, vectDateTime);
+  result = result && test_fixed_value_field (table, vectHiResDate);
+  result = result && test_fixed_value_field (table, vectUInt8);
+  result = result && test_fixed_value_field (table, vectUInt16);
+  result = result && test_fixed_value_field (table, vectUInt32);
+  result = result && test_fixed_value_field (table, vectUInt64);
 
-  result = result && test_variable_field_array (*apTable.get (), vectBool);
-  result = result && test_variable_field_array (*apTable.get (), vectChar);
-  result = result && test_variable_field_array (*apTable.get (), vectDate);
-
-
-  result = result && test_fixed_value_field (*apTable.get (), vectReal);
-  result = result && test_fixed_value_field (*apTable.get (), vectRichReal);
-
-  result = result && test_variable_field_array (*apTable.get (), vectDateTime);
-  result = result && test_variable_field_array (*apTable.get (), vectHiResDate);
-  result = result && test_variable_field_array (*apTable.get (), vectUInt8);
-  result = result && test_variable_field_array (*apTable.get (), vectUInt16);
-  result = result && test_variable_field_array (*apTable.get (), vectUInt32);
-  result = result && test_variable_field_array (*apTable.get (), vectUInt64);
-  result = result && test_variable_field_array (*apTable.get (), vectInt8);
-  result = result && test_variable_field_array (*apTable.get (), vectInt16);
-
-  result = result && test_fixed_value_field (*apTable.get (), vectInt8);
-  result = result && test_fixed_value_field (*apTable.get (), vectInt16);
-  result = result && test_fixed_value_field (*apTable.get (), vectInt32);
-  result = result && test_fixed_value_field (*apTable.get (), vectInt64);
+  result = result && test_variable_field_array (table, vectBool);
+  result = result && test_variable_field_array (table, vectChar);
+  result = result && test_variable_field_array (table, vectDate);
 
 
-  result = result && test_variable_field_array (*apTable.get (), vectInt32);
-  result = result && test_variable_field_array (*apTable.get (), vectInt64);
-  result = result && test_variable_field_array (*apTable.get (), vectReal);
-  result = result && test_variable_field_array (*apTable.get (), vectRichReal);
+  result = result && test_fixed_value_field (table, vectReal);
+  result = result && test_fixed_value_field (table, vectRichReal);
+
+  result = result && test_variable_field_array (table, vectDateTime);
+  result = result && test_variable_field_array (table, vectHiResDate);
+  result = result && test_variable_field_array (table, vectUInt8);
+  result = result && test_variable_field_array (table, vectUInt16);
+  result = result && test_variable_field_array (table, vectUInt32);
+  result = result && test_variable_field_array (table, vectUInt64);
+  result = result && test_variable_field_array (table, vectInt8);
+  result = result && test_variable_field_array (table, vectInt16);
+
+  result = result && test_fixed_value_field (table, vectInt8);
+  result = result && test_fixed_value_field (table, vectInt16);
+  result = result && test_fixed_value_field (table, vectInt32);
+  result = result && test_fixed_value_field (table, vectInt64);
+
+
+  result = result && test_variable_field_array (table, vectInt32);
+  result = result && test_variable_field_array (table, vectInt64);
+  result = result && test_variable_field_array (table, vectReal);
+  result = result && test_variable_field_array (table, vectRichReal);
 
   //Special case for DBSText!
-  result = result && test_text_value_table (*apTable.get (), vectText);
+  result = result && test_text_value_table (table, vectText);
+
+  rDbs.ReleaseTable (table);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;

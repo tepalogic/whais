@@ -27,43 +27,51 @@
 
 #include <vector>
 
-#include "operands.h"
+#include "whisper.h"
+
+#include "pm_operand.h"
 
 namespace prima
 {
+
+class Session;
 
 struct GlobalEntry
 {
   D_UINT32  m_IdOffet;
   D_UINT32  m_TypeOffset;
-  bool      m_Resolved;
 };
 
-class GlobalManager
+class GlobalsManager
 {
 public:
-  GlobalManager ()
+  GlobalsManager (Session& session) :
+    m_Session (session),
+    m_Identifiers (),
+    m_Storage (),
+    m_GlobalsEntrys ()
   {
   }
 
-  ~GlobalManager ()
+  ~GlobalsManager ()
   {
   }
 
-  D_UINT             AddGlobal (const D_UINT8 *const pIdentifier,
-                                const D_UINT32       typeOffset,
-                                bool                 external);
-  D_UINT             FindGlobal (const D_UINT8 *const pIdentifier);
-  bool               IsResolved (const D_UINT glbEntry);
-  StackedOperand&    GetGlobalValue (const D_UINT glbEntry);
-  const GlobalEntry& GetGlobalDescriptor (const D_UINT glbEntry);
+  D_UINT64           AddGlobal (const D_UINT8 *    pIdentifier,
+                                const GlobalValue& value,
+                                const D_UINT32     typeOffset);
+  D_UINT64           FindGlobal (const D_UINT8 *const pIdentifier);
 
-  static const D_UINT INVALID_ENTRY = ~0;
+  GlobalValue&       GetGlobal (const D_UINT64 globalIndex);
+  const D_UINT8*     GetGlobalTypeDesctiption (const D_UINT64 globalIndex);
+
+  static const D_UINT64 INVALID_ENTRY = ~0;
 
 protected:
-  std::vector<D_UINT8>        m_Identifiers;
-  std::vector<StackedOperand> m_Storage;
-  std::vector<GlobalEntry>    m_GlobalsEntrys;
+  Session&                 m_Session;
+  std::vector<D_UINT8>     m_Identifiers;
+  std::vector<GlobalValue> m_Storage;
+  std::vector<GlobalEntry> m_GlobalsEntrys;
 };
 
 

@@ -381,6 +381,13 @@ DbsHandler::AddTable (const D_CHAR* const       pTableName,
 void
 DbsHandler::ReleaseTable (I_DBSTable& hndTable)
 {
+
+  if (hndTable.IsTemporal ())
+    {
+      delete &_SC (PSTemporalTable&, hndTable);
+      return;
+    }
+
   WSynchronizerRAII syncHolder (m_Sync);
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
@@ -419,11 +426,11 @@ DbsHandler::DeleteTable (const D_CHAR * const pTableName)
   SyncToFile ();
 }
 
-I_DBSTable*
+I_DBSTable&
 DbsHandler::CreateTempTable (const DBSFieldDescriptor* pFields,
                              const D_UINT              fieldsCount)
 {
-  return new PSTemporalTable (*this, pFields, fieldsCount);
+  return *(new PSTemporalTable (*this, pFields, fieldsCount));
 }
 
 void
