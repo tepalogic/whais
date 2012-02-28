@@ -65,10 +65,10 @@ WBufferCompiledUnit::RetriveTypeInformation ()
   return temp;
 }
 
-D_UINT WBufferCompiledUnit::GetConsAreaSize ()
+D_UINT WBufferCompiledUnit::GetConstAreaSize ()
 {
-  const D_UINT8 *dummy;
-  const D_UINT result = whc_get_const_area (mHandler, &dummy);
+  const D_UINT8* dummy;
+  const D_UINT   result = whc_get_const_area (mHandler, &dummy);
 
   return result;
 }
@@ -379,7 +379,7 @@ WFileCompiledUnit::RetriveTypeInformation ()
   return mTypeInfo.get ();
 }
 
-D_UINT WFileCompiledUnit::GetConsAreaSize ()
+D_UINT WFileCompiledUnit::GetConstAreaSize ()
 {
   return mConstAreaSize;
 }

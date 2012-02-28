@@ -38,12 +38,12 @@ public:
 
   virtual D_UINT GetTypeInformationSize () = 0;
   virtual const D_UINT8 *RetriveTypeInformation () = 0;
-  virtual D_UINT GetConsAreaSize () = 0;
+  virtual D_UINT GetConstAreaSize () = 0;
   virtual const D_UINT8 *RetrieveConstArea () = 0;
 
   virtual D_UINT GetGlobalsCount () = 0;
   virtual D_UINT GetGlobalNameLength (D_UINT item) = 0;
-  virtual const D_CHAR *RetriveGlobalName (D_UINT item) = 0;
+  virtual const D_CHAR* RetriveGlobalName (D_UINT item) = 0;
   virtual D_UINT GetGlobalTypeIndex (D_UINT item) = 0;
   virtual D_BOOL IsGlobalExternal (D_UINT item) = 0;
 
@@ -83,7 +83,7 @@ public:
 
   virtual D_UINT GetTypeInformationSize ();
   virtual const D_UINT8 *RetriveTypeInformation ();
-  virtual D_UINT GetConsAreaSize ();
+  virtual D_UINT GetConstAreaSize ();
   virtual const D_UINT8 *RetrieveConstArea ();
 
   virtual D_UINT GetGlobalsCount ();
@@ -127,7 +127,7 @@ public:
   virtual const D_CHAR *RetriveGlobalName (D_UINT item);
   virtual D_UINT GetGlobalTypeIndex (D_UINT item);
   virtual D_BOOL IsGlobalExternal (D_UINT item);
-  virtual D_UINT GetConsAreaSize ();
+  virtual D_UINT GetConstAreaSize ();
   virtual const D_UINT8 *RetrieveConstArea ();
 
   virtual D_UINT GetProceduresCount ();

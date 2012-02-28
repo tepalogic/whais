@@ -32,7 +32,7 @@ using namespace std;
 using namespace prima;
 
 
-D_UINT64
+D_UINT32
 GlobalsManager::AddGlobal (const D_UINT8 *    pIdentifier,
                            const GlobalValue& value,
                            const D_UINT32     typeOffset)
@@ -40,7 +40,7 @@ GlobalsManager::AddGlobal (const D_UINT8 *    pIdentifier,
   assert (FindGlobal (pIdentifier) == INVALID_ENTRY);
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
 
-  const D_UINT64 result   = m_GlobalsEntrys.size ();
+  const D_UINT32 result   = m_GlobalsEntrys.size ();
   const D_UINT32 IdOffset = m_Identifiers.size ();
 
   do
@@ -55,11 +55,11 @@ GlobalsManager::AddGlobal (const D_UINT8 *    pIdentifier,
   return result;
 }
 
-D_UINT64
+D_UINT32
 GlobalsManager::FindGlobal (const D_UINT8* pIdentifier)
 {
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
-  D_UINT64 elIndex = 0;
+  D_UINT32 elIndex = 0;
 
   while (elIndex < m_GlobalsEntrys.size ())
     {

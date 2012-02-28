@@ -79,7 +79,7 @@ else
 endif " has("autocmd")
 
 "text editing
-colorscheme default
+colorscheme zellner
 
 "commenting a higlight selection
 map ,/ :s/^/\/\//<CR>
@@ -97,10 +97,11 @@ set spelllang=en
 set spellfile=~/.vim/vimspellfile.en.add
 
 set spell
+set guifont=Courier\ 10\ Pitch\ 10
 
 set guioptions-=m " turn off menu bar
 set guioptions-=T " turn off toolbar
-set completeopt=longest,menuone,preview
+set completeopt=longest,menu
 
 function! GnuIndent()
    setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
@@ -110,4 +111,6 @@ function! GnuIndent()
 endfunction
 
 au FileType c,cpp call GnuIndent()
+au FileType c,cpp,java,php autocmd BufWritePre <buffer> :%s/\s\+$//e
+
 

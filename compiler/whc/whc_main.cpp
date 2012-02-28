@@ -181,8 +181,8 @@ main (int argc, char **argv)
     file_out.Write (get_buffer_outstream (&symbols), get_size_outstream (&symbols));
 
     *_RC (D_UINT32 *, whc_header + WHC_CONSTAREA_START_OFF) = file_out.Tell ();
-    *_RC (D_UINT32 *, whc_header + WHC_CONSTAREA_SIZE_OFF) = unit.GetConsAreaSize ();
-    file_out.Write (unit.RetrieveConstArea (), unit.GetConsAreaSize ());
+    *_RC (D_UINT32 *, whc_header + WHC_CONSTAREA_SIZE_OFF) = unit.GetConstAreaSize ();
+    file_out.Write (unit.RetrieveConstArea (), unit.GetConstAreaSize ());
 
     file_out.Write (get_buffer_outstream (&glbs_table),
 		    get_size_outstream (&glbs_table));

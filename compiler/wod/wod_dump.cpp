@@ -108,7 +108,7 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 	  if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
 	    outs << " ";
 
-	  if (row_pos + const_pos >= unit.GetConsAreaSize ())
+	  if (row_pos + const_pos >= unit.GetConstAreaSize ())
 	    outs << "  ";
 	  else
 	    {
@@ -119,7 +119,7 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
       outs << '\t';
       for (D_UINT row_pos = 0; row_pos < row_size; row_pos++)
 	{
-	  if (row_pos + const_pos >= unit.GetConsAreaSize ())
+	  if (row_pos + const_pos >= unit.GetConstAreaSize ())
 	    break;
 	  else
 	    {
@@ -135,7 +135,7 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 	}
       const_pos += row_size;
     }
-  while (const_pos < unit.GetConsAreaSize ());
+  while (const_pos < unit.GetConstAreaSize ());
 
   outs << std::setw (1);
   outs.flags (std::ios::dec);
