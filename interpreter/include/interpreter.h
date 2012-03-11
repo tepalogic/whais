@@ -62,6 +62,11 @@ public:
     EXTERNAL_MISMATCH,
     INVALID_PROC_REQUEST,
     INVALID_PROC_LOCAL_REQUEST,
+
+    ALREADY_INITED,
+    NOT_INITED,
+    INVALID_SESSION,
+    SESSION_IN_USE
   };
 };
 
@@ -75,30 +80,14 @@ enum LOG_LEVEL
   LOG_INT_CRITICAL  = 0x10
 };
 
-class I_InterpreterLogger
+class I_Session
 {
 public:
-
-  I_InterpreterLogger ()
+  I_Session ()
   {
   }
 
-  virtual ~I_InterpreterLogger ()
-  {
-  }
-
-  virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
-  virtual void Flush () = 0;
-};
-
-class I_InterpreterSession
-{
-public:
-  I_InterpreterSession ()
-  {
-  }
-
-  virtual ~I_InterpreterSession ()
+  virtual ~I_Session ()
   {
   }
 
@@ -111,16 +100,13 @@ public:
 void
 InitInterpreter ();
 
-I_InterpreterSession&
-GetInterpreterInstance ();
-
-I_InterpreterSession&
-GetInterpreterInstance (I_DBSHandler& dbsHandler);
+I_Session&
+GetInstance (const D_CHAR* const name);
 
 void
-ReleaseInterpreterInstance (I_InterpreterSession& dbsHandler);
+ReleaseInterpreterInstance (I_Session& hInstance);
 
 void
-CleanInterpreter ();
+CleanInterpreter (const bool force = false);
 
 #endif /* INTERPRETER_H_ */

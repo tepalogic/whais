@@ -286,9 +286,9 @@ main ()
     dir += whc_get_directory_delimiter ();
 
     DBSInit (dir.c_str (), dir.c_str ());
+    DBSCreateDatabase (dir.c_str (), db_name);
   }
 
-  DBSCreateDatabase (db_name);
   I_DBSHandler & handler = DBSRetrieveDatabase (db_name);
   handler.AddTable ("t_test_tab", field_desc, sizeof field_desc / sizeof (field_desc[0]));
 

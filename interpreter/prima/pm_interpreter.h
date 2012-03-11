@@ -35,33 +35,28 @@
 namespace prima
 {
 
-class Session : public I_InterpreterSession
+class Session : public I_Session
 {
 public:
-  Session () :
-    I_InterpreterSession ()
-  {
-  }
+  Session (I_DBSHandler& dbsHandler);
+  virtual ~Session ();
 
-  virtual ~Session ()
-  {
-  }
+  I_DBSHandler&     GetDBSHandler () { return m_DbsHandler; }
+  TypeManager&      GetTypeManager () { return m_TypeManager; }
+  GlobalsManager&   GetGlobalsManager () { return m_GlbsManager; }
+  ProcedureManager& GetProcedureManager () { return m_ProcsManager; }
+  UnitsManager&     GetUnitsManager () { return m_UnitsManager; }
 
-  virtual I_DBSHandler&     GetDBSHandler ()       = 0;
-  virtual TypeManager&      GetTypeManager ()      = 0;
-  virtual GlobalsManager&   GetGlobalsManager ()   = 0;
-  virtual ProcedureManager& GetProcedureManager () = 0;
-  virtual UnitsManager&     GetUnitsManager ()     = 0;
-
-  //Default implement for I_InterpreterSession
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
   virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 
 protected:
   D_UINT32 DefineGlobalValue (const D_UINT8* pIdentifier,
+                              const D_UINT   identifierLength,
                               const D_UINT8* pTypeDescriptor,
                               const bool     external);
   D_UINT32 DefineProcedure (const D_UINT8*    pIdentfier,
+                            const D_UINT      identifierLength,
                             const D_UINT32    localsCount,
                             const D_UINT32    argsCount,
                             const D_UINT32    syncCount,
@@ -70,26 +65,21 @@ protected:
                             const D_UINT8*    pCode,
                             const D_UINT32    codeSize,
                             const bool        external);
-};
 
-class GlobalSession : public Session
-{
-public:
-  GlobalSession ();
-  virtual ~GlobalSession ();
-
-  virtual I_DBSHandler&     GetDBSHandler () { return m_DbsHandler; }
-  virtual TypeManager&      GetTypeManager () { return m_TypeManager; }
-  virtual GlobalsManager&   GetGlobalsManager () { return m_GlbsManager; }
-  virtual ProcedureManager& GetProcedureManager () {return m_ProcsManager;}
-  virtual UnitsManager&     GetUnitsManager () {return m_UnitsManager;}
-
-protected:
   I_DBSHandler&    m_DbsHandler;
   TypeManager      m_TypeManager;
   GlobalsManager   m_GlbsManager;
   ProcedureManager m_ProcsManager;
   UnitsManager     m_UnitsManager;
+};
+
+class CommonSession : public Session
+{
+public:
+  CommonSession (I_DBSHandler& dbsHandler);
+  virtual ~CommonSession ();
+
+  virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 };
 
 }

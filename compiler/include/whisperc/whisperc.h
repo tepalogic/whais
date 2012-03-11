@@ -44,9 +44,9 @@ typedef enum DBS_FIELD_TYPE VARTYPES;
 #define T_L_VALUE      0x2000	/* Mask applied to suggest if this is a
 				   genuine l-value */
 
-typedef void *WHC_HANDLER;
-typedef void *WHC_PROC_HANDLER;
-typedef void *WHC_MESSENGER_ARG;
+typedef const void* WHC_HANDLER;
+typedef const void* WHC_PROC_HANDLER;
+typedef const void* WHC_MESSENGER_ARG;
 typedef void (*WHC_MESSENGER) (WHC_MESSENGER_ARG data,
 			       unsigned int buff_pos,
 			       unsigned int msg_id,

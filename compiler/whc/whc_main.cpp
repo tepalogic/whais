@@ -74,11 +74,11 @@ process_procedures_table (WICompiledUnit& unit,
 
   for (D_UINT proc_it = 0; proc_it < proc_count; ++proc_it)
     {
-      const D_UINT16 nlocals = unit.GetProcLocalsCount (proc_it);
-      const D_UINT16 nparams = unit.GetProcParametersCount (proc_it);
-      const D_UINT32 proc_off = dest_file.Tell ();
+      const D_UINT16 nlocals        = unit.GetProcLocalsCount (proc_it);
+      const D_UINT16 nparams        = unit.GetProcParametersCount (proc_it);
+      const D_UINT32 proc_off       = dest_file.Tell ();
       const D_UINT32 proc_code_size = unit.GetProcCodeAreaSize (proc_it);
-      D_UINT32 proc_retype = unit.GetProcReturnTypeIndex (proc_it);
+      D_UINT32       proc_retype    = unit.GetProcReturnTypeIndex (proc_it);
 
       assert (nlocals >= nparams);
 
@@ -101,19 +101,18 @@ process_procedures_table (WICompiledUnit& unit,
 			   unit.GetProcCodeAreaSize (proc_it));
 	}
 
-      if ((uint32_outstream (procs_table, get_size_outstream (symbols)) ==
-	   NULL) || (uint32_outstream (procs_table, proc_off) == NULL)
-	  || (uint32_outstream (procs_table, proc_retype) == NULL)
-	  || (uint16_outstream (procs_table, nlocals) == NULL)
-	  || (uint16_outstream (procs_table, nparams) == NULL)
-	  || (uint32_outstream (procs_table, proc_code_size) == NULL))
+      if ((uint32_outstream (procs_table, get_size_outstream (symbols)) == NULL) ||
+          (uint32_outstream (procs_table, proc_off) == NULL) ||
+          (uint32_outstream (procs_table, proc_retype) == NULL) ||
+          (uint16_outstream (procs_table, nlocals) == NULL) ||
+          (uint16_outstream (procs_table, nparams) == NULL) ||
+          (uint32_outstream (procs_table, proc_code_size) == NULL))
 	throw bad_alloc ();
 
       if ((data_outstream (symbols,
-			   _RC (const D_UINT8 *,
-				unit.RetriveProcName (proc_it)),
-			   unit.GetProcNameSize (proc_it)) == NULL)
-	  || (uint8_outstream (symbols, 0) == NULL))
+			   _RC (const D_UINT8 *, unit.RetriveProcName (proc_it)),
+			   unit.GetProcNameSize (proc_it)) == NULL) ||
+	   (uint8_outstream (symbols, 0) == NULL))
 	throw bad_alloc ();
     }
 }

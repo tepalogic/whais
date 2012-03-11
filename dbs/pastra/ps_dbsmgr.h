@@ -28,16 +28,18 @@
 #include <map>
 #include <string.h>
 
+#include "wthread.h"
 #include "dbs_mgr.h"
-#include "ps_table.h"
 
 namespace pastra
 {
 
+class PSTable;
+
 class DbsHandler : public I_DBSHandler
 {
 public:
-  explicit DbsHandler (const std::string& name);
+  DbsHandler (const std::string& name);
   DbsHandler (const DbsHandler& source);
   virtual ~DbsHandler ();
 
@@ -55,6 +57,8 @@ public:
 
   void Discard ();
   void RemoveFromStorage ();
+
+  const std::string& GetDir () { return m_DbsDirectory; }
 protected:
   typedef std::map<std::string, PSTable*> TABLES;
 
@@ -62,6 +66,7 @@ protected:
 
   WSynchronizer     m_Sync;
   const std::string m_Name;
+  std::string       m_DbsDirectory;
   TABLES            m_Tables;
 };
 

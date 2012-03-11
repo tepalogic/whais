@@ -29,6 +29,7 @@
 
 #include "dbs_table.h"
 #include "dbs_types.h"
+#include "ps_dbsmgr.h"
 
 #include "ps_container.h"
 #include "ps_blockcache.h"
@@ -40,8 +41,6 @@ namespace pastra
 
 static const D_UINT PS_TABLE_FIELD_TYPE_MASK = 0xFF;
 static const D_UINT PS_TABLE_ARRAY_MASK = 0x0100;
-
-class DbsHandler;
 
 struct PSFieldDescriptor
 {

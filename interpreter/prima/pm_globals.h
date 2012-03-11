@@ -57,15 +57,21 @@ public:
   {
   }
 
-  D_UINT32           AddGlobal (const D_UINT8 *    pIdentifier,
+  D_UINT32           AddGlobal (const D_UINT8*     pIdentifier,
+                                const D_UINT       identifierLength,
                                 const GlobalValue& value,
                                 const D_UINT32     typeOffset);
-  D_UINT32           FindGlobal (const D_UINT8 *const pIdentifier);
+  D_UINT32           FindGlobal (const D_UINT8 *const pIdentifier,
+                                 const D_UINT         identifierLength);
 
   GlobalValue&       GetGlobal (const D_UINT64 globalIndex);
   const D_UINT8*     GetGlobalTypeDesctiption (const D_UINT64 globalIndex);
 
   static const D_UINT32 INVALID_ENTRY = ~0;
+
+private:
+  GlobalsManager (const GlobalsManager&);
+  GlobalsManager& operator= (const GlobalsManager);
 
 protected:
   Session&                 m_Session;

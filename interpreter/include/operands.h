@@ -40,7 +40,9 @@ public:
   {
   }
 
-  virtual ~I_Operand ();
+  virtual ~I_Operand ()
+  {
+  }
 
   virtual void GetValue (DBSBool& outValue) const;
   virtual void GetValue (DBSChar& outValue) const;

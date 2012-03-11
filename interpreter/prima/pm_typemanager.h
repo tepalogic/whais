@@ -55,6 +55,10 @@ public:
 
   static const D_UINT32 INVALID_OFFSET = 0xFFFFFFFF;
 
+private:
+  TypeManager (const TypeManager&);
+  TypeManager& operator= (const TypeManager&);
+
 protected:
 
   Session&             m_Session;

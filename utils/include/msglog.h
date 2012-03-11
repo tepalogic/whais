@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "stdarg.h"
 
-typedef void *POSTMAN_BAG;
+typedef const void *POSTMAN_BAG;
 
 #define IGNORE_BUFFER_POS      (D_UINT)(~0)
 

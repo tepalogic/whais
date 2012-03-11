@@ -39,7 +39,7 @@ class I_DBSHandler
 {
 public:
   I_DBSHandler () {}
-  virtual ~ I_DBSHandler () {}
+  virtual ~I_DBSHandler () {}
 
   virtual D_UINT      GetPesistentTablesCount () = 0;
   virtual I_DBSTable& RetrievePersistentTable (D_UINT index) = 0;
@@ -72,7 +72,7 @@ D_UINT64
 DBSGetMaxFileSize ();
 
 void
-DBSCreateDatabase (const D_CHAR* const pName);
+DBSCreateDatabase (const D_CHAR* const pName, const D_CHAR* pDbsDirectory);
 
 I_DBSHandler&
 DBSRetrieveDatabase (const D_CHAR* const pName);

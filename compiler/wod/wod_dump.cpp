@@ -85,11 +85,9 @@ wod_dump_header (WFile & wobj, std::ostream & outs)
 void
 wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 {
-  outs << std::endl << std::endl
-    <<
+  outs << std::endl << std::endl <<
     "************************************************************************"
-    << std::endl << "THE CONSTANT AREA DUMP" << std::
-    endl <<
+    << std::endl << "THE CONSTANT AREA DUMP" << std::endl <<
     "************************************************************************"
     << std::endl;
 
@@ -99,9 +97,8 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
       const D_UINT row_size = 16;
 
       outs.flags (std::ios::hex | std::ios::uppercase);
-      outs << std::endl << std::setw (sizeof (D_UINT32) *
-				      2) << std::
-	setfill ('0') << const_pos << ":\t";
+      outs << std::endl << std::setw (sizeof (D_UINT32) * 2) <<
+           std::setfill ('0') << const_pos << ":\t";
 
       for (D_UINT row_pos = 0; row_pos < row_size; row_pos++)
 	{
@@ -112,8 +109,8 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 	    outs << "  ";
 	  else
 	    {
-	      outs << std::setw (sizeof (D_UINT8) * 2) <<
-	          std::setfill ('0') << unit.RetrieveConstArea ()[const_pos + row_pos];
+	      outs << std::setw (sizeof (D_UINT8) * 2) << std::setfill ('0') <<
+	           _SC(D_UINT, unit.RetrieveConstArea ()[const_pos + row_pos]);
 	    }
 	}
       outs << '\t';
@@ -125,8 +122,8 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 	    {
 	      if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
 		outs << " ";
-	      D_UINT char_code =
-		unit.RetrieveConstArea ()[const_pos + row_pos];
+
+	      D_UINT char_code = unit.RetrieveConstArea ()[const_pos + row_pos];
 	      if (isalnum (char_code) || ispunct (char_code))
 		outs << _SC (D_CHAR, char_code);
 	      else
@@ -144,7 +141,6 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 static void
 wod_dump_basic_type_info (std::ostream & outs, D_UINT16 type)
 {
-
   assert ((type & (T_CONTAINER_MASK | T_FIELD_MASK)) == 0);
 
   if (type & T_ARRAY_MASK)
@@ -221,6 +217,7 @@ wod_dump_rectable_type_inf (const D_UINT8 * buffer, std::ostream & outs)
 {
   const D_UINT16 type = from_le_int16 (buffer);
   buffer += sizeof (D_UINT16);
+
   const D_UINT16 type_size = from_le_int16 (buffer);
   buffer += sizeof (D_UINT16);
 
@@ -244,7 +241,7 @@ wod_dump_rectable_type_inf (const D_UINT8 * buffer, std::ostream & outs)
 	    print_comma = TRUE;
 
 	  outs << buffer << " AS ";
-	  buffer +=::strlen (_RC (const char *, buffer)) + 1;
+	  buffer += strlen (_RC (const char *, buffer)) + 1;
 
 	  D_UINT16 type = from_le_int16 (buffer);
 	  buffer += sizeof (D_UINT16);
@@ -260,13 +257,14 @@ wod_dump_row_type_info (const D_UINT8 * buffer, std::ostream & outs)
 {
   const D_UINT16 type = from_le_int16 (buffer);
   buffer += sizeof (D_UINT16);
+
   const D_UINT16 type_size = from_le_int16 (buffer);
   buffer += sizeof (D_UINT16);
 
   if (type_size > 2)
     {
       const D_UINT32 GLOBAL_DECLARED = 0x80000000;
-      D_UINT32 var_id = from_le_int32 (buffer);
+      D_UINT32       var_id          = from_le_int32 (buffer);
 
       if ((var_id & GLOBAL_DECLARED) != 0)
 	outs << "ROW OF GLOBAL VAR ID. " << (var_id & ~GLOBAL_DECLARED);
@@ -282,7 +280,7 @@ wod_dump_row_type_info (const D_UINT8 * buffer, std::ostream & outs)
 static void
 wod_dump_type_info (const D_UINT8 * buffer, std::ostream & outs)
 {
-  const D_UINT16 type = from_le_int16 (buffer);
+  const D_UINT16 type      = from_le_int16 (buffer);
   const D_UINT16 type_size = from_le_int16 (buffer + sizeof (D_UINT16));
 
   if ((type_size < 2)
@@ -304,12 +302,11 @@ wod_dump_type_info (const D_UINT8 * buffer, std::ostream & outs)
 void
 wod_dump_globals_tables (WICompiledUnit & unit, std::ostream & outs)
 {
-  outs << std::endl << std::endl
-    <<
+  outs << std::endl << std::endl <<
     "************************************************************************"
-    << std::
-    endl << "THE TABLE WITH THE REFERENCES TO THE GLOBALS VALUES" << std::
-    endl <<
+    << std::endl <<
+    "THE TABLE WITH THE REFERENCES TO THE GLOBALS VALUES" <<
+    std::endl <<
     "************************************************************************"
     << std::endl << std::endl;
 
@@ -319,20 +316,20 @@ wod_dump_globals_tables (WICompiledUnit & unit, std::ostream & outs)
       outs << "No globals entries." << std::endl;
       return;
     }
-  outs << "Id.\tName\t\t\tVisible\tType" << std::endl
-    <<
-    "************************************************************************"
-    << std::endl;
+  outs << "Id.\tName\t\t\tVisible\tType" << std::endl <<
+    "************************************************************************" << std::endl;
 
   for (D_INT glb_it = 0; glb_it < nglobals; ++glb_it)
     {
       outs << glb_it << "\t";
       outs << unit.RetriveGlobalName (glb_it);
       outs << "\t\t\t";
+
       if (unit.IsGlobalExternal (glb_it))
 	outs << "EXT" << "\t";
       else
 	outs << "DEF" << "\t";
+
       wod_dump_type_info (unit.RetriveTypeInformation ()
 			  + unit.GetGlobalTypeIndex (glb_it), outs);
       outs << std::endl;
@@ -394,15 +391,17 @@ wod_dump_procs (WICompiledUnit & unit, std::ostream & outs, D_BOOL show_code)
 	  else
 	    outs << "local (id. " << local_it << " )\t\t";
 
-	  wod_dump_type_info (unit.RetriveTypeInformation ()
-			      + unit.GetProcLocalTypeIndex (proc_it,
-							    local_it), outs);
+	  wod_dump_type_info (unit.RetriveTypeInformation () +
+	                        unit.GetProcLocalTypeIndex (proc_it, local_it),
+	                      outs);
 	  outs << std::endl;
 	}
+
       outs << std::endl << "Code:" << std::endl;
       wod_dump_code (unit.RetriveProcCodeArea (proc_it),
 		     unit.GetProcCodeAreaSize (proc_it),
-		     outs, unit.RetriveProcName (proc_it));
+		     outs,
+		     unit.RetriveProcName (proc_it));
       outs << std::endl << std::endl;
     }
 

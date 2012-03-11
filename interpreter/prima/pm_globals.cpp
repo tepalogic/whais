@@ -33,19 +33,19 @@ using namespace prima;
 
 
 D_UINT32
-GlobalsManager::AddGlobal (const D_UINT8 *    pIdentifier,
+GlobalsManager::AddGlobal (const D_UINT8*     pIdentifier,
+                           const D_UINT       identifierLength,
                            const GlobalValue& value,
                            const D_UINT32     typeOffset)
 {
-  assert (FindGlobal (pIdentifier) == INVALID_ENTRY);
+  assert (FindGlobal (pIdentifier, identifierLength) == INVALID_ENTRY);
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
 
   const D_UINT32 result   = m_GlobalsEntrys.size ();
   const D_UINT32 IdOffset = m_Identifiers.size ();
 
-  do
-    m_Identifiers.push_back (*pIdentifier);
-  while (*pIdentifier++ != 0);
+  m_Identifiers.insert (m_Identifiers.end (), pIdentifier, pIdentifier + identifierLength);
+  m_Identifiers.push_back (0);
 
   m_Storage.push_back (value);
 
@@ -56,7 +56,8 @@ GlobalsManager::AddGlobal (const D_UINT8 *    pIdentifier,
 }
 
 D_UINT32
-GlobalsManager::FindGlobal (const D_UINT8* pIdentifier)
+GlobalsManager::FindGlobal (const D_UINT8* pIdentifier,
+                            const D_UINT   identifierLength)
 {
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
   D_UINT32 elIndex = 0;
@@ -66,7 +67,7 @@ GlobalsManager::FindGlobal (const D_UINT8* pIdentifier)
       const GlobalEntry& entry          = m_GlobalsEntrys[elIndex];
       const D_CHAR*      pEntIdentifier = _RC (const D_CHAR* , &m_Identifiers [entry.m_IdOffet]);
 
-      if (strcmp (pEntIdentifier, _RC (const D_CHAR*, pIdentifier)) == 0)
+      if (strncmp (pEntIdentifier, _RC (const D_CHAR*, pIdentifier), identifierLength) == 0)
         return elIndex;
 
       ++elIndex;

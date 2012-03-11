@@ -818,10 +818,9 @@ main ()
     dir += whc_get_directory_delimiter ();
 
     DBSInit (dir.c_str (), dir.c_str ());
+    DBSCreateDatabase (dir.c_str (), db_name);
   }
 
-
-  DBSCreateDatabase (db_name);
   I_DBSHandler & handler = DBSRetrieveDatabase (db_name);
 
   success = success && test_fixed_values_table (handler);

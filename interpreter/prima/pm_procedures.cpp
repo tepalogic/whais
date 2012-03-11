@@ -34,6 +34,7 @@ using namespace prima;
 
 D_UINT32
 ProcedureManager::AddProcedure (const D_UINT8*    pIndentifier,
+                                const D_UINT      identifierLength,
                                 const D_UINT32    localsCount,
                                 const D_UINT32    argsCount,
                                 const D_UINT32    syncCount,
@@ -42,7 +43,7 @@ ProcedureManager::AddProcedure (const D_UINT8*    pIndentifier,
                                 const D_UINT8*    pCode,
                                 const D_UINT32    codeSize)
 {
-  assert (GetProcedure (pIndentifier) == INVALID_ENTRY);
+  assert (GetProcedure (pIndentifier, identifierLength) == INVALID_ENTRY);
   assert (argsCount < localsCount);
 
   ProcedureEntry entry;
@@ -62,11 +63,10 @@ ProcedureManager::AddProcedure (const D_UINT8*    pIndentifier,
 
   m_SyncStmts.insert (m_SyncStmts.end(), syncCount, false);
   m_LocalsValues.insert (m_LocalsValues.end (),
-                        pLocalValues,
-                        pLocalValues + (localsCount - argsCount));
-  m_Identifiers.insert (m_Identifiers.end (),
-                        pIndentifier,
-                        pIndentifier + strlen (_RC (const D_CHAR*, pIndentifier)) + 1);
+                         pLocalValues,
+                         pLocalValues + (localsCount - argsCount));
+  m_Identifiers.insert (m_Identifiers.end (), pIndentifier, pIndentifier + identifierLength);
+  m_Identifiers.push_back (0);
   m_Definitions.insert (m_Definitions.end (), pCode, pCode + codeSize);
   m_LocalsTypes.insert (m_LocalsTypes.end (), pTypesOffset, pTypesOffset + localsCount);
   m_ProcsEntrys.push_back (entry);
@@ -98,12 +98,14 @@ ProcedureManager::GetArgsCount (const D_UINT procIndex)
 }
 
 D_UINT32
-ProcedureManager::GetProcedure (const D_UINT8* pIndetifier)
+ProcedureManager::GetProcedure (const D_UINT8* pIndetifier, const D_UINT identifierLength)
 {
   for (D_UINT32 index = 0; index < m_ProcsEntrys.size (); ++index)
     {
-      if (strcmp (_RC (const D_CHAR*, pIndetifier),
-                  _RC (const D_CHAR*, m_Identifiers[m_ProcsEntrys[index].m_IdIndex]) ) == 0)
+      if (strncmp (_RC (const D_CHAR*, pIndetifier),
+                   _RC (const D_CHAR*,
+                        &m_Identifiers[m_ProcsEntrys[index].m_IdIndex]),
+                   identifierLength) == 0)
         return index;
     }
 

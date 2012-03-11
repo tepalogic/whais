@@ -55,9 +55,12 @@ public:
 
     }
 
-  ~ProcedureManager ();
+  ~ProcedureManager ()
+    {
+    }
 
   D_UINT32 AddProcedure (const D_UINT8*    pIndentifier,
+                         const D_UINT      identifierLength,
                          const D_UINT32    localsCount,
                          const D_UINT32    argsCount,
                          const D_UINT32    syncCount,
@@ -65,7 +68,8 @@ public:
                          const D_UINT32*   pTypesOffset,
                          const D_UINT8*    pCode,
                          const D_UINT32    codeSize);
-  D_UINT32 GetProcedure (const D_UINT8* pIdentifier);
+  D_UINT32 GetProcedure (const D_UINT8* pIdentifier,
+                         const D_UINT   identifierLength);
 
   const D_UINT32    GetLocalsCount (const D_UINT procIndex);
   const D_UINT32    GetArgsCount (const D_UINT procIndex);
@@ -74,6 +78,10 @@ public:
   const D_UINT8*    GetCode (const D_UINT procIndex, D_UINT64* pOutCodeSize);
 
   static const D_UINT32 INVALID_ENTRY = ~0;
+
+private:
+  ProcedureManager (const ProcedureManager&);
+  ProcedureManager& operator= (const ProcedureManager&);
 
 protected:
   Session& m_Session;

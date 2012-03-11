@@ -43,12 +43,12 @@ struct TypeSpec
   D_UINT16 data_len;
   D_UINT8  data[2];    /* keep this last */
 
-  D_UINT16 GetSize () const { return data_len + sizeof (data) + sizeof (data_len); }
+  D_UINT16 GetSize () const { return data_len + sizeof (type) + sizeof (data_len); }
 
   bool operator== (const TypeSpec& second) const
     {
-      if (GetSize () == second.GetSize ())
-        return memcmp (data, second.data, GetSize ());
+      if ((type == second.type ) && (GetSize () == second.GetSize ()))
+        return (memcmp (data, second.data, GetSize ()) == 0);
 
       return false;
     }
@@ -95,18 +95,17 @@ TypeManager::AddTypeDescription (const D_UINT8* const pTypeDescription)
 {
   assert (IsTypeDescriptionValid (pTypeDescription));
 
-  bool result = FindTypeDescription (pTypeDescription);
+  D_UINT32 result = FindTypeDescription (pTypeDescription);
 
   if (result != INVALID_OFFSET)
     return result;
 
   result = m_TypesDescriptions.size ();
-  const TypeSpec* const pSpec = _RC (const TypeSpec*, &m_TypesDescriptions[result]);
+  const TypeSpec* const pSpec = _RC (const TypeSpec*, pTypeDescription);
 
-  m_TypesDescriptions.resize (result + pSpec->GetSize ());
-
-  for (D_UINT8 index = result; index < m_TypesDescriptions.size (); ++index)
-    m_TypesDescriptions [index] = pTypeDescription[index];
+  m_TypesDescriptions.insert (m_TypesDescriptions.end (),
+                              pTypeDescription,
+                              pTypeDescription + pSpec->GetSize ());
 
   return result;
 }
@@ -114,7 +113,7 @@ TypeManager::AddTypeDescription (const D_UINT8* const pTypeDescription)
 const D_UINT8*
 TypeManager::GetTypeDescription (const D_UINT32 offset) const
 {
-  assert (offset < m_TypesDescriptions.size ());
+  assert ((offset == 0) || (offset < m_TypesDescriptions.size ()));
 
   const D_UINT8 *const pTypeDescription = &m_TypesDescriptions[offset];
 
@@ -143,7 +142,7 @@ create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescrip
       field.m_pFieldName = _RC (D_CHAR*, &spec.data[typeIt]);
 
       typeIt += strlen (field.m_pFieldName) + 1;
-      assert (typeIt < spec.data_len - 4);
+      assert (typeIt < spec.data_len - 2);
 
       type   =  spec.data[typeIt + 1]; type <<= 8; type += spec.data[typeIt];
       typeIt += 2;
