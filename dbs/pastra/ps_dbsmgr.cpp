@@ -167,7 +167,20 @@ DBSCreateDatabase (const D_CHAR* const pName, const D_CHAR* pDbsDirectory)
   if (pDbsDirectory == NULL)
     pDbsDirectory = DBSGetWorkingDir ();
 
-  string fileName (DBSGetWorkingDir ());
+  string fileName;
+
+  if ((pName != NULL) && whc_is_path_absolute (pDbsDirectory))
+    {
+      fileName += pDbsDirectory;
+      fileName += whc_get_directory_delimiter ();
+    }
+  else
+    {
+      fileName += DBSGetWorkingDir ();
+      fileName += pDbsDirectory;
+      fileName += whc_get_directory_delimiter ();
+    }
+
   fileName += pName;
   fileName += DBS_FILE_EXT;
 

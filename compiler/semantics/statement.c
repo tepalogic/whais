@@ -213,7 +213,7 @@ stmt_get_param_count (const struct Statement *const stmt)
   return get_array_count (&stmt->spec.proc.param_list) - 1;
 }
 
-D_UINT16
+D_UINT32
 stmt_get_import_id (const struct Statement * const stmt)
 {
   assert (stmt->type == STMT_PROC);

@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_fileio.h"
 
 WH_FILE_HND
-whc_fopen (const D_CHAR * fname, D_UINT mode)
+whc_fopen (const D_CHAR* fname, D_UINT mode)
 {
   DWORD dwDesiredAccess = 0;
   DWORD dwCreation = 0;
@@ -103,7 +103,7 @@ whc_fseek (WH_FILE_HND f_hnd, D_INT64 where, D_INT whence)
 }
 
 D_BOOL
-whc_fread (WH_FILE_HND f_hnd, D_UINT8 * buffer, D_UINT size)
+whc_fread (WH_FILE_HND f_hnd, D_UINT8* buffer, D_UINT size)
 {
   D_BOOL result = TRUE;
   D_UINT actual_count = 0;
@@ -154,13 +154,13 @@ whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8 * buffer, D_UINT size)
 }
 
 D_BOOL
-whc_ftell (WH_FILE_HND f_hnd, D_UINT64 * output)
+whc_ftell (WH_FILE_HND f_hnd, D_UINT64* output)
 {
 
   const LARGE_INTEGER sTemp = { 0, };
 
   if (!SetFilePointerEx (f_hnd, sTemp,
-                         (LARGE_INTEGER *) output, FILE_CURRENT))
+                         (LARGE_INTEGER*) output, FILE_CURRENT))
     return FALSE;
 
   return TRUE;
@@ -174,9 +174,9 @@ whc_fsync (WH_FILE_HND f_hnd)
 }
 
 D_BOOL
-whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64 * output)
+whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64* output)
 {
-  return GetFileSizeEx (f_hnd, (LARGE_INTEGER *) output);
+  return GetFileSizeEx (f_hnd, (LARGE_INTEGER*) output);
 }
 
 D_BOOL
@@ -201,7 +201,7 @@ whc_fgetlasterror ()
 }
 
 D_BOOL
-whc_ferrtostrs (D_UINT64 error_code, D_CHAR * str, D_UINT str_size)
+whc_ferrtostrs (D_UINT64 error_code, D_CHAR *str, D_UINT str_size)
 {
   return FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM |
 			FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -212,12 +212,20 @@ whc_ferrtostrs (D_UINT64 error_code, D_CHAR * str, D_UINT str_size)
 }
 
 D_BOOL
-whc_fremove (const D_CHAR * fname)
+whc_fremove (const D_CHAR *fname)
 {
   return DeleteFile (fname);
 }
 
-const D_CHAR* whc_get_directory_delimiter ()
+const D_CHAR*
+whc_get_directory_delimiter ()
 {
   return "\\";
+}
+
+D_BOOL
+whc_is_path_absolute (const D_CHAR* path)
+{
+  assert (path != NULL);
+  return (path[1] == ':');
 }

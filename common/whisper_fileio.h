@@ -41,39 +41,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef __cplusplus
 extern "C"
-  {
+{
 #endif
 
-    WH_FILE_HND whc_fopen (const D_CHAR * fname, D_UINT mode);
+WH_FILE_HND
+whc_fopen (const D_CHAR* fname, D_UINT mode);
 
-    WH_FILE_HND whc_fdup (WH_FILE_HND f_hnd);
+WH_FILE_HND
+whc_fdup (WH_FILE_HND f_hnd);
 
-    D_BOOL whc_fread (WH_FILE_HND f_hnd, D_UINT8 * buffer, D_UINT size);
+D_BOOL
+whc_fread (WH_FILE_HND f_hnd, D_UINT8* buffer, D_UINT size);
 
-    D_BOOL whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8 * buffer, D_UINT size);
+D_BOOL
+whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8* buffer, D_UINT size);
 
-    D_BOOL whc_fseek (WH_FILE_HND f_hnd, D_INT64 where, D_INT whence);
+D_BOOL
+whc_fseek (WH_FILE_HND f_hnd, D_INT64 where, D_INT whence);
 
-    D_BOOL whc_ftell (WH_FILE_HND f_hnd, D_UINT64 * output);
+D_BOOL
+whc_ftell (WH_FILE_HND f_hnd, D_UINT64* output);
 
-    D_BOOL whc_fsync (WH_FILE_HND f_hnd);
+D_BOOL
+whc_fsync (WH_FILE_HND f_hnd);
 
-    D_BOOL whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64 * outut);
+D_BOOL
+whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64* outut);
 
-    D_BOOL whc_fsetsize (WH_FILE_HND, D_UINT64 size);
+D_BOOL
+whc_fsetsize (WH_FILE_HND, D_UINT64 size);
 
-    D_BOOL whc_fclose (WH_FILE_HND f_hnd);
+D_BOOL
+whc_fclose (WH_FILE_HND f_hnd);
 
-    D_UINT32 whc_fgetlasterror ();
+D_UINT32
+whc_fgetlasterror ();
 
-    D_BOOL whc_ferrtostrs (D_UINT64 error_code, D_CHAR * str, D_UINT str_size);
+D_BOOL
+whc_ferrtostrs (D_UINT64 error_code, D_CHAR* str, D_UINT str_size);
 
-    D_BOOL whc_fremove (const D_CHAR * fname);
+D_BOOL
+whc_fremove (const D_CHAR* fname);
 
-    const D_CHAR* whc_get_directory_delimiter ();
+const D_CHAR*
+whc_get_directory_delimiter ();
+
+D_BOOL
+whc_is_path_absolute (const D_CHAR* path);
 
 #ifdef __cplusplus
-  } /* extern C++ */
+} /* extern C++ */
 #endif
 
 #endif				/* WHISPER_FILEIO_H_ */

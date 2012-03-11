@@ -63,13 +63,9 @@ struct _ProcStatementSpec
 				   1 - first parameter, 2 second parameter */
   struct OutStream instrs;	/* the execution path for procedure
 				   statements */
-#if 0
-  struct OutStream const_area;	/* area where all constant values for this
-				   statement are placed */
-#endif
   struct UArray branch_stack;	/* keep track of conditional branches */
   struct UArray loop_stack;	/* keep the track of looping statements */
-  D_UINT16 proc_id;		/* ID of the procedure in the import table */
+  D_UINT32 proc_id;		/* ID of the procedure in the import table */
   D_UINT16 sync_keeper;
 };
 
@@ -107,7 +103,7 @@ const struct DeclaredVar *stmt_get_param (const struct Statement *const stmt,
 					  D_UINT arg_n);
 D_UINT stmt_get_param_count (const struct Statement *const stmt);
 
-D_UINT16 stmt_get_import_id (const struct Statement *const proc);
+D_UINT32 stmt_get_import_id (const struct Statement *const proc);
 
 /* some inline functions to access statement members */
 static INLINE struct OutStream *

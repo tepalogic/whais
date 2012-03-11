@@ -213,7 +213,15 @@ whc_fremove (const D_CHAR * fname)
   return FALSE;
 }
 
-const D_CHAR* whc_get_directory_delimiter ()
+const D_CHAR*
+whc_get_directory_delimiter ()
 {
   return "/";
+}
+
+D_BOOL
+whc_is_path_absolute (const D_CHAR* path)
+{
+  assert (path != NULL);
+  return ((path[0] == '/') || (path[0] == '~'));
 }

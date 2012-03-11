@@ -213,7 +213,7 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
         const D_UINT8* const pTypeDescriptor = unit.RetriveTypeInformation () + typeOffset;
         const D_UINT8* const pIdentifier     = _RC (const D_UINT8*, unit.RetriveGlobalName (glbIndex));
         const D_UINT         idLength        = unit.GetGlobalNameLength (glbIndex);
-        const bool           external        = unit.IsGlobalExternal (glbIndex);
+        const bool           external        = (unit.IsGlobalExternal (glbIndex) != FALSE);
 
 
         const D_UINT32 glbDefIndex = DefineGlobalValue (pIdentifier,
@@ -227,7 +227,7 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
       {
         const D_UINT8* const pIdentifier = _RC (const D_UINT8*, unit.RetriveProcName (procIndex));
         const D_UINT         idLength    = unit.GetProcNameSize (procIndex);
-        const bool           external    = unit.IsProcExternal (procIndex);
+        const bool           external    = (unit.IsProcExternal (procIndex) != FALSE);
         const D_UINT         localsCount = unit.GetProcLocalsCount (procIndex);
         const D_UINT         argsCount   = unit.GetProcParametersCount (procIndex);
         vector<D_UINT32>     typesOffset;

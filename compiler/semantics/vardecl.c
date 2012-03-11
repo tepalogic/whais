@@ -285,7 +285,7 @@ install_field_declaration (struct ParserState * state,
   assert (sem_var->val_type == VAL_ID);
 
   /* check for fields with the same name */
-  while (it)
+  while (it != NULL)
     {
       assert ((it->type & T_FIELD_MASK) != 0);
       if ((it->l_label == id->length) &&
@@ -301,7 +301,25 @@ install_field_declaration (struct ParserState * state,
       it = it->extra;
     }
   result = install_declaration (state, sem_var, sem_type, FALSE, FALSE);
+
   result->extra = extra;
+  it = extra;
+  while (it != NULL)
+    {
+      /* Insert this alphabetically to make sure we avoid equivalent fields declarations. */
+      if (strncmp (it->label, result->label, it->l_label) >= 0)
+        {
+          struct DeclaredVar* pExtra = it->extra;
+
+          it->extra = result;
+          result->extra = pExtra;
+
+          result = extra;
+          break;
+        }
+      it = it->extra;
+    }
+
 
   /* mark for reuse */
   sem_var->val_type = VAL_REUSE;

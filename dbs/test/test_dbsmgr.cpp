@@ -111,7 +111,7 @@ main ()
     dir += whc_get_directory_delimiter ();
 
     DBSInit (dir.c_str (), dir.c_str ());
-    DBSCreateDatabase (dir.c_str (), "baza_date_1");
+    DBSCreateDatabase ("baza_date_1", dir.c_str ());
   }
 
   I_DBSHandler & handler = DBSRetrieveDatabase ("baza_date_1");

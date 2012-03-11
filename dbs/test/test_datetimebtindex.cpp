@@ -301,7 +301,7 @@ main ()
     dir += whc_get_directory_delimiter ();
 
     DBSInit (dir.c_str (), dir.c_str ());
-    DBSCreateDatabase (dir.c_str(), db_name);
+    DBSCreateDatabase (db_name, dir.c_str ());
   }
 
   I_DBSHandler & handler = DBSRetrieveDatabase (db_name);

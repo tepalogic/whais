@@ -72,6 +72,7 @@ static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_
 
 static const D_UINT MAX_FIELD_VALUE_ALIGN = 16; /* Bytes. */
 
+
 struct PaddInterval
 {
   PaddInterval(D_UINT32 begin_byte, D_UINT32 bytes_count) :
@@ -172,7 +173,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
   //bytes that are need it for values alignments
   for (D_UINT fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
     {
-      D_INT foundIndex         = -1;     //-1 Nothing found!
+      D_INT foundIndex         = -1;    //-1 Nothing found!
       D_INT foundReqAlign      = 1;     //Worst requested align
       D_INT foundResultedAlign = 1;     //Worst resulted align
       D_INT foundReqPaddsCount = MAX_FIELD_VALUE_ALIGN - 1; //Worst number of bytes required to padd
@@ -204,9 +205,8 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 	    }
 	  else if (foundReqPaddsCount == currReqPaddsCount)
 	    {
-	      if ((foundReqAlign < currReqAlign)
-		  || ((foundReqAlign == currReqAlign) && (foundResultedAlign
-							< currResultedAlign)))
+	      if ((foundReqAlign < currReqAlign) ||
+	          ((foundReqAlign == currReqAlign) && (foundResultedAlign < currResultedAlign)))
 		{
 		  //New best choice!
 		  foundIndex         = schIndex;
@@ -215,8 +215,23 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 		  foundReqPaddsCount = currReqPaddsCount;
 		  foundSize          = currIndexSize;
 		}
+	      else if ((foundReqAlign == currReqAlign) && (foundResultedAlign == currResultedAlign))
+	        {
+	          if (strcmp (rvFields[foundIndex].m_pFieldName, rvFields[schIndex].m_pFieldName) > 0)
+	            {
+                      //New best choice!
+                      assert (foundReqAlign == currReqAlign);
+                      assert (foundResultedAlign == currResultedAlign);
+                      assert (foundReqPaddsCount == currReqPaddsCount);
+                      assert (foundSize == currIndexSize);
+
+                      foundIndex = schIndex;
+	            }
+	          else
+	            continue; //Get the next one
+		}
 	      else
-		continue; //Get the next one!
+	        continue; //Get the next one
 	    }
 	  else
 	    continue; //Get the next one!
