@@ -2,7 +2,7 @@
 WHISPERC - A compiler for whisper programs
 Copyright (C) 2009  Iulian Popa
 
-Address: Str Olimp nr. 6 
+Address: Str Olimp nr. 6
          Pantelimon Ilfov,
          Romania
 Phone:   +40721939650
@@ -68,9 +68,10 @@ install_list_declrs (struct ParserState *state,
 		     YYSTYPE sem_vars, YYSTYPE sem_type);
 
 YYSTYPE
-install_field_declaration (struct ParserState *state,
-			   YYSTYPE sem_var,
-			   YYSTYPE sem_type, struct DeclaredVar *const extra);
+install_field_declaration (struct ParserState*       pState,
+			   YYSTYPE                   sem_var,
+			   YYSTYPE                   sem_type,
+			   struct DeclaredVar* const pExtra);
 D_BOOL
 process_container_decls (struct ParserState *state,
                          struct DeclaredVar *var, void *extra);

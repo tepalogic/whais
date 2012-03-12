@@ -351,8 +351,7 @@ parse_composed_operator_value (const char *op_str)
   D_UINT count = 0;
   while (composed_operators[count].string != NULL)
     {
-      if (strncmp (composed_operators[count].string, op_str,
-		   COMPOSED_OPERATOR_LEN) == 0)
+      if (strncmp (composed_operators[count].string, op_str, COMPOSED_OPERATOR_LEN) == 0)
 	{
 	  break;
 	}

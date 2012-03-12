@@ -89,8 +89,7 @@ test_buff_ids (void)
       if ((result != IDENTIFIER) ||
 	  (lvalp->val_type != VAL_ID) ||
 	  (lvalp->val.u_id.length != ids_vals[count].length) ||
-	  (strncmp (lvalp->val.u_id.text, ids_vals[count].text,
-		    ids_vals[count].length) != 0))
+	  (strncmp (lvalp->val.u_id.text, ids_vals[count].text, ids_vals[count].length) != 0))
 	{
 	  printf ("FAIL\n");
 	  return -1;

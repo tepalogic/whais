@@ -110,9 +110,7 @@ general_proc_check (struct Statement *glb_stmt,
   if ((proc_stmt->type != STMT_PROC) ||
       (proc_stmt->parent != glb_stmt) ||
       (proc_stmt->spec.proc.nlength != strlen (proc_name)) ||
-      (strncmp
-       (proc_stmt->spec.proc.name, proc_name,
-	proc_stmt->spec.proc.nlength) != 0))
+      (strncmp (proc_stmt->spec.proc.name, proc_name, proc_stmt->spec.proc.nlength) != 0))
     {
       /* what is this? */
       return FALSE;

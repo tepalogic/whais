@@ -1771,23 +1771,22 @@ translate_exp_call (struct ParserState *const state,
 	{
 	  if ((result.type & T_CONTAINER_MASK) == 0)
 	    {
-	      const D_UINT arg_t =
-		arg_type.type & ~(T_L_VALUE | T_ARRAY_MASK);
-	      const D_UINT res_t = result.type & ~(T_L_VALUE | T_ARRAY_MASK);
+	      const D_UINT arg_t = arg_type.type & ~(T_L_VALUE | T_ARRAY_MASK | T_CONTAINER_MASK);
+	      const D_UINT res_t = result.type & ~(T_L_VALUE | T_ARRAY_MASK | T_CONTAINER_MASK);
 	      const enum W_OPCODE temp_op = store_op[arg_t][res_t];
 
 	      assert (arg_t <= T_UNDETERMINED);
 	      assert (res_t <= T_UNDETERMINED);
 
-	      if ((result.type & T_ARRAY_MASK) !=
-		  (arg_type.type & T_ARRAY_MASK))
+	      if ((result.type & T_ARRAY_MASK) != (arg_type.type & T_ARRAY_MASK))
 		{
 		  w_log_msg (state, state->buffer_pos,
 			     MSG_PROC_ARG_NA,
 			     copy_text_truncate (temp, proc->spec.proc.name,
 						 sizeof temp,
 						 proc->spec.proc.nlength),
-			     arg_count, type_to_text (arg_type.type),
+			     arg_count,
+			     type_to_text (arg_type.type),
 			     type_to_text (result.type));
 		  state->err_sem = TRUE;
 		  return r_unk;
@@ -1795,7 +1794,7 @@ translate_exp_call (struct ParserState *const state,
 	      else if (W_NA == temp_op)
 		{
 		  if ((arg_type.type & (T_UNDETERMINED | T_ARRAY_MASK)) !=
-		      (T_UNDETERMINED | T_ARRAY_MASK))
+                      (T_UNDETERMINED | T_ARRAY_MASK))
 		    {
 		      w_log_msg (state, state->buffer_pos,
 				 MSG_PROC_ARG_NA,
@@ -1803,7 +1802,8 @@ translate_exp_call (struct ParserState *const state,
 						     proc->spec.proc.name,
 						     sizeof temp,
 						     proc->spec.proc.nlength),
-				 arg_count, type_to_text (arg_type.type),
+				 arg_count,
+				 type_to_text (arg_type.type),
 				 type_to_text (result.type));
 
 		      return r_unk;
@@ -1811,8 +1811,7 @@ translate_exp_call (struct ParserState *const state,
 		}
 	    }
 	  else
-	    if (are_compatible_containers (state, &arg_type, &result, FALSE)
-		== FALSE)
+	    if (are_compatible_containers (state, &arg_type, &result, FALSE) == FALSE)
 	    {
 	      /* The two containers's types are not compatible.
 	       * The error was already logged. */

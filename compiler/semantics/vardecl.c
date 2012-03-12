@@ -272,56 +272,73 @@ install_list_declrs (struct ParserState * state, YYSTYPE sem_vars,
 }
 
 YYSTYPE
-install_field_declaration (struct ParserState * state,
-			   YYSTYPE sem_var,
-			   YYSTYPE sem_type, struct DeclaredVar * const extra)
+install_field_declaration (struct ParserState*       pState,
+			   YYSTYPE                   sem_var,
+			   YYSTYPE                   sem_type,
+			   struct DeclaredVar* const pExtra)
 {
-  struct DeclaredVar *result = NULL;
-  struct DeclaredVar *it = extra;
-  struct SemId *id = &sem_var->val.u_id;
+  struct DeclaredVar* result = NULL;
+  struct DeclaredVar* pPrev  = NULL;
+  struct DeclaredVar* pIt = pExtra;
+  struct SemId*       pSemId = &sem_var->val.u_id;
 
   assert (sem_type->val_type == VAL_TYPE_SPEC);
   assert ((sem_type->val.u_tspec.type & T_FIELD_MASK) != 0);
   assert (sem_var->val_type == VAL_ID);
 
   /* check for fields with the same name */
-  while (it != NULL)
+  while (pIt != NULL)
     {
-      assert ((it->type & T_FIELD_MASK) != 0);
-      if ((it->l_label == id->length) &&
-	  (strncmp (it->label, id->text, it->l_label) == 0))
+      assert ((pIt->type & T_FIELD_MASK) != 0);
+      if ((pIt->l_label == pSemId->length) &&
+	  (strncmp (pIt->label, pSemId->text, pIt->l_label) == 0))
 	{
 	  D_CHAR tname[128];
-	  copy_text_truncate (tname, id->text, sizeof tname, id->length);
-	  w_log_msg (state, state->buffer_pos, MSG_SAME_FIELD, tname);
-	  state->err_sem = TRUE;
+
+	  copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
+	  w_log_msg (pState, pState->buffer_pos, MSG_SAME_FIELD, tname);
+
+	  pState->err_sem = TRUE;
 	  return NULL;
 	}
       /* next one */
-      it = it->extra;
+      pIt = pIt->extra;
     }
-  result = install_declaration (state, sem_var, sem_type, FALSE, FALSE);
+  result = install_declaration (pState, sem_var, sem_type, FALSE, FALSE);
 
-  result->extra = extra;
-  it = extra;
-  while (it != NULL)
+  result->extra = NULL;
+  pIt           = pExtra;
+  while (pIt != NULL)
     {
       /* Insert this alphabetically to make sure we avoid equivalent fields declarations. */
-      if (strncmp (it->label, result->label, it->l_label) >= 0)
+      const D_INT compare = strncmp (pIt->label, result->label, MIN (pIt->l_label, result->l_label));
+      if ((compare > 0) || ((compare == 0) && (pIt->l_label >= result->l_label)))
         {
-          struct DeclaredVar* pExtra = it->extra;
+          assert ((compare > 0) || (pIt->l_label > result->l_label));
 
-          it->extra = result;
-          result->extra = pExtra;
-
-          result = extra;
-          break;
+          if (pPrev == NULL)
+            {
+              result->extra = pIt;
+              break;
+            }
+          else
+            {
+              assert (pPrev->extra == pIt);
+              result->extra = pPrev->extra;
+              result = pExtra;
+              break;
+            }
         }
-      it = it->extra;
+      pPrev = pIt;
+      pIt   = pIt->extra;
+      if (pIt == NULL)
+        {
+          pPrev->extra = result;
+          result       = pExtra;
+        }
     }
 
-
-  /* mark for reuse */
+  /* Mark for reuse! */
   sem_var->val_type = VAL_REUSE;
   sem_type->val_type = VAL_REUSE;
 
