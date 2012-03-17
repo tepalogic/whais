@@ -82,18 +82,37 @@ static const D_UINT8 secondCode[] =
     "ENDPROC\n";
 
 static const D_UINT8 notDefGlbCode[] =
-    "EXTERN LET someGlobal AS UNSIGNED INT32;";
+    "EXTERN LET someGlobal AS UNSIGNED INT32;"
+    "PROCEDURE random_proc_name () RETURN INT32\n"
+    "DO\n"
+    "RETURN someGlobal;\n"
+    "\n"
+    "ENDPROC\n";
 
 static const D_UINT8 notDefProcCode[] =
     "EXTERN PROCEDURE some_proc_name (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
     "                   p1v3 AS ARRAY,\n"
     "                   p1v4 AS DATETIME)\n"
-    "RETURN HIRESTIME;\n";
+    "RETURN HIRESTIME;\n"
+    "\n"
+    "PROCEDURE ref_proc ()\n"
+    "RETURN HIRESTIME\n"
+    "DO\n"
+    "RETURN some_proc_name (NULL, NULL, NULL, NULL);\n"
+    "\n"
+    "ENDPROC\n";
+
+
 
 static const D_UINT8 doubleDefGlbCode[] =
     "EXTERN LET gb1 AS UNSIGNED INT32;\n"
-    "LET gb0 AS UNSIGNED INT32;";
+    "LET gb0 AS UNSIGNED INT32;"
+    "PROCEDURE random_proc_name_2 () RETURN INT32\n"
+    "DO\n"
+    "RETURN gb1;\n"
+    "\n"
+    "ENDPROC\n";
 
 static const D_UINT8 doubleDefProcCode[] =
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
@@ -111,14 +130,27 @@ static const D_UINT8 doubleDefProcCode[] =
     "ENDPROC\n";
 
 static const D_UINT8 diffDefGlbCode[] =
-    "EXTERN LET gb1 AS UNSIGNED INT64;\n";
+    "EXTERN LET gb1 AS UNSIGNED INT64;\n"
+    "PROCEDURE random_proc_name_4 () RETURN INT64\n"
+    "DO\n"
+    "RETURN gb1;\n"
+    "\n"
+    "ENDPROC\n";
 
 static const D_UINT8 diffDefProcCode[] =
     "EXTERN PROCEDURE proced_1 (p1v1 AS DATE,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
     "                   p1v3 AS ARRAY,\n"
     "                   p1v4 AS DATETIME)\n"
-    "RETURN HIRESTIME;\n";
+    "RETURN HIRESTIME;\n"
+    "\n"
+    "PROCEDURE ref_proc_2 ()\n"
+    "RETURN HIRESTIME\n"
+    "DO\n"
+    "RETURN proced_1 (NULL, NULL, NULL, NULL);\n"
+    "\n"
+    "ENDPROC\n";
+
 
 
 

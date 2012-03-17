@@ -205,6 +205,99 @@ static const D_UINT FIXED_DESC_FIELDS_COUNT = 15;
 static const D_UINT VAR_DESC_FIELDS_COUNT = 16;
 static const D_UINT TOTAL_DESC_FIELDS_COUNT = 31;
 
+static const D_CHAR *
+type_to_text (D_UINT type)
+{
+  if (type == T_BOOL)
+    {
+      return "BOOL";
+    }
+  else if (type == T_CHAR)
+    {
+      return "CHARACTER";
+    }
+  else if (type == T_DATE)
+    {
+      return "DATE";
+    }
+  else if (type == T_DATETIME)
+    {
+      return "DATETIME";
+    }
+  else if (type == T_HIRESTIME)
+    {
+      return "HIRESTIME";
+    }
+  else if (type == T_INT8)
+    {
+      return "INT8";
+    }
+  else if (type == T_INT16)
+    {
+      return "INT16";
+    }
+  else if (type == T_INT32)
+    {
+      return "INT32";
+    }
+  else if (type == T_INT64)
+    {
+      return "INT64";
+    }
+  else if (type == T_REAL)
+    {
+      return "REAL";
+    }
+  else if (type == T_RICHREAL)
+    {
+      return "RICHREAL";
+    }
+  else if (type == T_TEXT)
+    {
+      return "TEXT";
+    }
+  else if (type == T_UINT8)
+    {
+      return "UNSIGNED INT8";
+    }
+  else if (type == T_UINT16)
+    {
+      return "UNSIGNED INT16";
+    }
+  else if (type == T_UINT32)
+    {
+      return "UNSIGNED INT32";
+    }
+  else if (type == T_UINT64)
+    {
+      return "UNSIGNED INT64";
+    }
+  assert (0);
+  return NULL;
+}
+
+
+static void
+print_table_fields (I_DBSHandler& rDbs, const D_CHAR* tb_name)
+{
+  D_UINT      fieldIndex = 0;
+  I_DBSTable& table      = rDbs.RetrievePersistentTable (tb_name);
+
+  std::cout << "Field list:" << std::endl;
+  while (fieldIndex < table.GetFieldsCount ())
+    {
+      DBSFieldDescriptor currField = table.GetFieldDescriptor (fieldIndex);
+
+      std::cout << '\t' << currField.m_pFieldName << "\t: ";
+      if (currField.isArray)
+        std::cout << "ARRAY ";
+      std::cout << type_to_text (currField.m_FieldType) << std::endl;
+
+      ++fieldIndex;
+    }
+  rDbs.ReleaseTable (table);
+}
+
 template <class T> D_UINT
 add_fixed_values_vector_to_table (I_DBSTable &table, std::vector<T> &vectValues)
 {
@@ -340,6 +433,7 @@ test_fixed_values_table (I_DBSHandler &rDbs)
   INIT_VECTORS;
 
   rDbs.AddTable (tb_name, field_descs, FIXED_DESC_FIELDS_COUNT);
+  print_table_fields (rDbs, tb_name);
 
   result = result && test_fixed_value_field (rDbs, vectBool);
   result = result && test_fixed_value_field (rDbs, vectChar);
@@ -593,7 +687,6 @@ test_text_value_table (I_DBSHandler &rDbs, std::vector<DBSText> &vectText)
   return result;
 }
 
-
 bool
 test_text_value_table (I_DBSTable &table, std::vector<DBSText> &vectText)
 {
@@ -663,6 +756,7 @@ test_variable_values_table (I_DBSHandler &rDbs)
   INIT_VECTORS;
 
   rDbs.AddTable (tb_name, field_descs + FIXED_DESC_FIELDS_COUNT, VAR_DESC_FIELDS_COUNT);
+  print_table_fields (rDbs, tb_name);
 
   result = result && test_variable_field_array (rDbs, vectBool);
   result = result && test_variable_field_array (rDbs, vectChar);
@@ -699,6 +793,7 @@ test_full_value_table (I_DBSHandler &rDbs)
   INIT_VECTORS;
 
   rDbs.AddTable (tb_name, field_descs, TOTAL_DESC_FIELDS_COUNT);
+  print_table_fields (rDbs, tb_name);
 
   result = result && test_fixed_value_field (rDbs, vectBool);
   result = result && test_fixed_value_field (rDbs, vectChar);

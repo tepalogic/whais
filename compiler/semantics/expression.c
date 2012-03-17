@@ -1459,6 +1459,7 @@ translate_exp_leaf (struct ParserState *const state,
       struct DeclaredVar *var = stmt_find_declaration (stmt,
 						       exp->val.u_id.text,
 						       exp->val.u_id.length,
+						       TRUE,
 						       TRUE);
       D_UINT32 value;
       D_UINT32 value_32 = ~0;
@@ -1476,8 +1477,8 @@ translate_exp_leaf (struct ParserState *const state,
 	  return r_unk;
 	}
 
-      value = var->var_id & (~(GLOBAL_DECLARED | EXTERN_DECLARED));
-      if (var->var_id & GLOBAL_DECLARED)
+      value = RETRIVE_ID (var->var_id);
+      if (var->var_id & GLOBAL_DECL)
 	{
 	  if (stmt->parent != NULL)
 	    {
@@ -1707,7 +1708,8 @@ translate_exp_call (struct ParserState *const state,
 
   proc = find_proc_decl (state,
 			 call_exp->first_op->val.u_id.text,
-			 call_exp->first_op->val.u_id.length);
+			 call_exp->first_op->val.u_id.length,
+			 TRUE);
   if (proc == NULL)
     {
       w_log_msg (state, state->buffer_pos,

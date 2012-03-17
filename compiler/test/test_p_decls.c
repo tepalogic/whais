@@ -177,7 +177,7 @@ check_procs_decl (struct ParserState *state)
     }
   /* check local declarations */
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
-				   strlen ("dummy_var1"), FALSE);
+				   strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_REAL)
     {
       return FALSE;
@@ -201,7 +201,7 @@ check_procs_decl (struct ParserState *state)
     }
   /* check local declarations */
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
-				   strlen ("dummy_var1"), FALSE);
+				   strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
     {
       return FALSE;
@@ -302,22 +302,22 @@ check_procs_decl (struct ParserState *state)
 
   /* check local declarations */
   if (tmp_table !=
-      stmt_find_declaration (proc, "Var4", strlen ("Var4"), FALSE))
+      stmt_find_declaration (proc, "Var4", strlen ("Var4"), FALSE, FALSE))
     {
       return FALSE;		/* no transparency between local vars and parameters */
     }
 
-  tmp_var = stmt_find_declaration (proc, "v1", strlen ("v1"), FALSE);
+  tmp_var = stmt_find_declaration (proc, "v1", strlen ("v1"), FALSE, FALSE);
   if ((tmp_var->type != T_ROW_MASK) || (tmp_var->extra != tmp_table))
     {
       return FALSE;
     }
-  tmp_var = stmt_find_declaration (proc, "f1", strlen ("f1"), FALSE);
+  tmp_var = stmt_find_declaration (proc, "f1", strlen ("f1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
     {
       return FALSE;
     }
-  tmp_var = stmt_find_declaration (proc, "f2", strlen ("f2"), FALSE);
+  tmp_var = stmt_find_declaration (proc, "f2", strlen ("f2"), FALSE, FALSE);
   if (tmp_var->type != T_REAL)
     {
       return FALSE;

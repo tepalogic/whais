@@ -61,7 +61,7 @@ check_declared_var (struct Statement *stm,
   struct OutStream *os = &stm->spec.glb.type_desc;
   if ((var == NULL) ||		/* var not found */
       (var->type != type) ||	/* invalid type */
-      ((var->var_id & GLOBAL_DECLARED)) == 0)
+      ((var->var_id & GLOBAL_DECL)) == 0)
     {
       return FALSE;
     }
@@ -104,14 +104,14 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar01_", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "aVar01_", 7, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_INT32 | T_ARRAY_MASK)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar02_", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "aVar02_", 7, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_REAL | T_ARRAY_MASK)))
     {
@@ -119,37 +119,35 @@ check_vars_decl (struct ParserState *state)
     }
   temp_pos = decl_var->type_spec_pos;
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar03", 6, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "aVar03", 6, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_UNDETERMINED | T_ARRAY_MASK)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar04", 6, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "aVar04", 6, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_TEXT | T_ARRAY_MASK)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt,
-				    "__array__", 9, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "__array__", 9, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_UNDETERMINED | T_ARRAY_MASK)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt,
-				    "__array_2_", 10, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "__array_2_", 10, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_TEXT | T_ARRAY_MASK)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar031", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "aVar031", 7, FALSE, FALSE);
   if (!check_declared_var
       (&state->global_stmt, decl_var, (T_REAL | T_ARRAY_MASK))
       || temp_pos != decl_var->type_spec_pos)

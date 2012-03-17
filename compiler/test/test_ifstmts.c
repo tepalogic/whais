@@ -117,7 +117,7 @@ static D_BOOL
 check_procedure_1 (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
@@ -150,7 +150,7 @@ static D_BOOL
 check_procedure_2 (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
@@ -190,7 +190,7 @@ static D_BOOL
 check_procedure_3 (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
@@ -239,7 +239,7 @@ static D_BOOL
 check_procedure_4 (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;

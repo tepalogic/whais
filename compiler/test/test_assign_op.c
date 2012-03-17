@@ -254,9 +254,11 @@ static D_BOOL
 check_procedure (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   struct DeclaredVar *v1 = stmt_find_declaration (stmt, "v1",
-						  strlen ("v1"), FALSE);
+						  strlen ("v1"),
+						  FALSE,
+						  FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_NA;

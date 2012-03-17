@@ -34,23 +34,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define YYSTYPE struct SemValue*
 #endif
 
-struct Statement *
-find_proc_decl (struct ParserState *state,
-                const D_CHAR * name, const D_UINT nlength);
+struct Statement*
+find_proc_decl (struct ParserState *pState,
+                const D_CHAR* pName,
+                const D_UINT  nlength,
+                const D_BOOL  referenced);
 
 YYSTYPE
 add_prcdcl_list (YYSTYPE list, YYSTYPE s_id, YYSTYPE s_type);
 
 void
-install_proc_args (struct ParserState *state, struct SemValue *arg_list);
+install_proc_args (struct ParserState* pState, struct SemValue* arg_list);
 
 void
-install_proc_decl (struct ParserState *state, struct SemValue *val_id);
+install_proc_decl (struct ParserState* pState, struct SemValue* val_id);
 
 void
-set_proc_rettype (struct ParserState *state, struct SemValue *rtype);
+set_proc_rettype (struct ParserState* pState, struct SemValue* rtype);
 
 void
-finish_proc_decl (struct ParserState *state);
+finish_proc_decl (struct ParserState* pState);
 
 #endif /* PROCDECL_H */

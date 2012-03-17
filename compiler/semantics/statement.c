@@ -109,93 +109,117 @@ clear_proc_stmt (struct Statement *proc)
 }
 
 struct DeclaredVar *
-stmt_find_declaration (const struct Statement *stmt,
-		       const char *label,
-		       const D_UINT label_len, const D_BOOL recursive)
+stmt_find_declaration (struct Statement* pStmt,
+		       const char*       label,
+		       const D_UINT      label_len,
+		       const D_BOOL      recursive,
+		       const D_BOOL      referenced)
 {
-  struct DeclaredVar *result = NULL;
-  D_UINT count = 0;
-  D_UINT stored_vals = get_array_count (&stmt->decls);
+  struct DeclaredVar* result      = NULL;
+  D_UINT              count       = 0;
+  D_UINT              stored_vals = get_array_count (&pStmt->decls);
 
   while (count < stored_vals)
     {
-      result = get_item (&stmt->decls, count);
+      result = get_item (&pStmt->decls, count);
       assert (result != NULL);
       if (((result->type & T_FIELD_MASK) == 0) &&
 	  (label_len == result->l_label) &&
 	  (strncmp (label, result->label, label_len) == 0))
 	{
-	  /*  here it is */
+          if (referenced && ((result->var_id & NOTREF_DECL) != 0))
+            {
+              if (pStmt->type == STMT_GLOBAL)
+                {
+                  assert (RETRIVE_ID (result->var_id) == 0);
+                  assert ((result->var_id & GLOBAL_DECL) != 0);
+
+                  result->var_id &= ~NOTREF_DECL;
+                  result->var_id |= pStmt->locals_used++;
+                }
+              else
+                result->var_id &= ~NOTREF_DECL;
+            }
+
 	  return result;
 	}
       count++;
     }
 
-  if (stmt->parent != NULL)
+  if (pStmt->parent != NULL)
     {
       /* let's check if is a parameter */
-      stored_vals = get_array_count (&stmt->spec.proc.param_list);
+      stored_vals = get_array_count (&pStmt->spec.proc.param_list);
       /* index 0 is reserved to hold the return type */
       count = 1;
       while (count < stored_vals)
 	{
-	  result = get_item (&stmt->spec.proc.param_list, count);
+	  result = get_item (&pStmt->spec.proc.param_list, count);
 	  assert (result != NULL);
 	  if (((result->type & T_FIELD_MASK) == 0) &&
 	      (label_len == result->l_label) &&
 	      (strncmp (label, result->label, label_len) == 0))
 	    {
-	      /*  here it is */
-	      return result;
+              if (referenced && ((result->var_id & NOTREF_DECL) != 0))
+                {
+                  assert (RETRIVE_ID (result->var_id) != 0);
+                  assert ((result->var_id & GLOBAL_DECL) == 0);
+                  assert (pStmt->type = STMT_PROC);
+
+                  result->var_id &= ~NOTREF_DECL;
+                }
+
+              return result;
 	    }
 	  count++;
 	}
       /* maybe is global */
       if (recursive)
 	{
-	  return stmt_find_declaration (stmt->parent, label,
-					label_len, recursive);
+	  return stmt_find_declaration (pStmt->parent,
+	                                label,
+					label_len,
+					recursive,
+					referenced);
 	}
     }
   return NULL;			/* nothing found */
 }
 
 struct DeclaredVar *
-stmt_add_declaration (struct Statement *stmt,
-		      struct DeclaredVar *var, D_BOOL parameter)
+stmt_add_declaration (struct Statement*   pStmt,
+		      struct DeclaredVar* pVar,
+		      D_BOOL              parameter)
 {
+  struct OutStream *pOutStream;
 
-  struct OutStream *os;
-
-  if ((var->type & T_FIELD_MASK) == 0)
-    var->var_id = stmt->locals_used++;
-  else
-    var->var_id = ~0;
-
-  if (stmt->type == STMT_GLOBAL)
+  pVar->var_id = 0;
+  if ((pVar->type & T_FIELD_MASK) != 0)
+      pVar->var_id = ~0;
+  else if (pStmt->type == STMT_GLOBAL)
     {
-      var->var_id |= GLOBAL_DECLARED;
-      os = &(stmt->spec.glb.type_desc);
+      pVar->var_id |= (GLOBAL_DECL | NOTREF_DECL);
+      pOutStream   = &(pStmt->spec.glb.type_desc);
     }
   else
     {
-      assert (stmt->parent->type == STMT_GLOBAL);
-      os = &(stmt->parent->spec.glb.type_desc);
+      assert (pStmt->parent->type == STMT_GLOBAL);
+
+      pVar->var_id |= pStmt->locals_used++ | NOTREF_DECL;
+      pOutStream   = &(pStmt->parent->spec.glb.type_desc);
     }
 
-  var->type_spec_pos = type_spec_fill (os, var);
+  pVar->type_spec_pos = type_spec_fill (pOutStream, pVar);
 
   if (parameter)
     {
-      assert (stmt->parent != NULL);
-      var = add_item (&stmt->spec.proc.param_list, var);
+      assert (pStmt->parent != NULL);
+      pVar = add_item (&pStmt->spec.proc.param_list, pVar);
     }
   else
-    {
-      var = add_item (&stmt->decls, var);
-    }
+    pVar = add_item (&pStmt->decls, pVar);
 
-  return (struct DeclaredVar *) var;
+  return (struct DeclaredVar*) pVar;
 }
 
 const struct DeclaredVar *
@@ -214,10 +238,10 @@ stmt_get_param_count (const struct Statement *const stmt)
 }
 
 D_UINT32
-stmt_get_import_id (const struct Statement * const stmt)
+stmt_get_import_id (const struct Statement* const stmt)
 {
   assert (stmt->type == STMT_PROC);
-  return stmt->spec.proc.proc_id;
+  return RETRIVE_ID (stmt->spec.proc.proc_id);
 
 }
 
@@ -326,12 +350,13 @@ type_spec_fill_field (struct OutStream *outs, const struct DeclaredVar *list)
 
   while (list && ((list->type & T_FIELD_MASK) != 0))
     {
-      if ((data_outstream (outs, (D_UINT8 *) list->label, list->l_label) ==
-	   NULL) || (uint8_outstream (outs, 0) == NULL))
+      if ((data_outstream (outs, (D_UINT8 *) list->label, list->l_label) ==  NULL) ||
+          (uint8_outstream (outs, 0) == NULL))
 	{
 	  result = TYPE_SPEC_ERROR;
 	  break;
 	}
+
       result += list->l_label + 1;
       if (uint16_outstream (outs, list->type & ~T_FIELD_MASK) == NULL)
 	{
@@ -391,7 +416,9 @@ type_spec_fill_container (struct OutStream *outs,
 	{
 	  if (var->extra)
 	    {
-	      D_UINT32 tmp = var->extra->var_id & ~EXTERN_DECLARED;
+	      assert ((var->extra->var_id & NOTREF_DECL) == 0);
+
+	      D_UINT32 tmp = var->extra->var_id & ~EXTERN_DECL;
 	      if (uint32_outstream (outs, tmp) == NULL)
 		result = TYPE_SPEC_ERROR;
 	      else

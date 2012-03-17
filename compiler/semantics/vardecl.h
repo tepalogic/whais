@@ -34,9 +34,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 /* A mark to identify global declared variables*/
-#define GLOBAL_DECLARED 0x80000000
+#define GLOBAL_DECL    0x80000000
 /* A mark to identify external declarations */
-#define EXTERN_DECLARED 0x40000000
+#define EXTERN_DECL    0x40000000
+/* A mark to identify the unused declarations */
+#define NOTREF_DECL    0x20000000
+
+#define RETRIVE_ID(x) ((x) & ~(GLOBAL_DECL | EXTERN_DECL | NOTREF_DECL))
+
 
 struct DeclaredVar
 {
@@ -56,16 +61,20 @@ YYSTYPE
 add_idlist (YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
-create_type_spec (struct ParserState *state, D_UINT16 type);
+create_type_spec (struct ParserState *pState,
+                  D_UINT16            type);
 
 struct DeclaredVar *
-install_declaration (struct ParserState *state,
-                     YYSTYPE sem_var,
-                     YYSTYPE sem_type, D_BOOL paramter, D_BOOL unique);
+install_declaration (struct ParserState* pState,
+                     YYSTYPE             sem_var,
+                     YYSTYPE             sem_type,
+                     D_BOOL              paramter,
+                     D_BOOL              unique);
 
 YYSTYPE
-install_list_declrs (struct ParserState *state,
-		     YYSTYPE sem_vars, YYSTYPE sem_type);
+install_list_declrs (struct ParserState* pState,
+		     YYSTYPE             sem_vars,
+		     YYSTYPE             sem_type);
 
 YYSTYPE
 install_field_declaration (struct ParserState*       pState,
@@ -73,7 +82,8 @@ install_field_declaration (struct ParserState*       pState,
 			   YYSTYPE                   sem_type,
 			   struct DeclaredVar* const pExtra);
 D_BOOL
-process_container_decls (struct ParserState *state,
-                         struct DeclaredVar *var, void *extra);
+process_container_decls (struct ParserState* pState,
+                         struct DeclaredVar* pVar,
+                         void*               extra);
 
 #endif /* VARDECL_H */

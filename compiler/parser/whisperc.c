@@ -95,8 +95,7 @@ get_var_from_stmt (const struct Statement *stmt, unsigned int item)
       struct DeclaredVar *var_it = get_item (&stmt->decls, it);
       if ((var_it->var_id & T_FIELD_MASK) != 0)
 	continue;
-      else if ((var_it->var_id & ~(GLOBAL_DECLARED | EXTERN_DECLARED)) ==
-	       item)
+      else if (RETRIVE_ID (var_it->var_id) == item)
 	return var_it;
     }
   return NULL;
@@ -112,13 +111,13 @@ whc_get_global (WHC_HANDLER hnd, unsigned int item, WHC_GLBVAR_DESC * output)
   if (var == NULL)
     return 0;
 
-  assert (var->var_id & GLOBAL_DECLARED);
-  assert ((var->var_id & ~(GLOBAL_DECLARED | EXTERN_DECLARED)) == item);
+  assert (var->var_id & GLOBAL_DECL);
+  assert (RETRIVE_ID (var->var_id) == item);
   assert (var->l_label);
 
   output->name = var->label;
   output->name_len = var->l_label;
-  output->defined = (var->var_id & EXTERN_DECLARED) ? 0 : ~0;
+  output->defined = (var->var_id & EXTERN_DECL) ? 0 : ~0;
   output->type =
     get_buffer_outstream (&(state->global_stmt.spec.glb.type_desc)) +
     var->type_spec_pos;
@@ -128,49 +127,55 @@ whc_get_global (WHC_HANDLER hnd, unsigned int item, WHC_GLBVAR_DESC * output)
 unsigned int
 whc_get_procs_count (WHC_HANDLER hnd)
 {
-  struct ParserState *state = (struct ParserState *) hnd;
+  struct ParserState* pState = (struct ParserState*) hnd;
 
-  return get_array_count (&(state->global_stmt.spec.glb.proc_decls));
+  return pState->global_stmt.spec.glb.procs_count;
 }
 
 unsigned int
-whc_get_proc (WHC_HANDLER hnd, unsigned int item, WHC_PROC_DESC * output)
+whc_get_proc (WHC_HANDLER hnd, unsigned int item, WHC_PROC_DESC* pOutDesc)
 {
-  struct ParserState *state = (struct ParserState *) hnd;
-  const struct Statement *proc = (const struct Statement *)
-    get_item (&(state->global_stmt.spec.glb.proc_decls), item);
+  struct ParserState*     pState = (struct ParserState*) hnd;
+  const struct Statement* pProc  = (const struct Statement*) whc_get_proc_hnd (hnd, item);
 
-  if (proc == NULL)
-    return 0;
+  if (pProc == NULL)
+    return 0; /* Not found */
 
-  assert (proc->type & STMT_PROC);
-  assert ((proc->spec.proc.proc_id & ~EXTERN_DECLARED) == item);
+  assert ((pProc->spec.proc.proc_id & ~EXTERN_DECL) == item);
 
-  output->name = proc->spec.proc.name;
-  output->name_len = proc->spec.proc.nlength;
-  output->param_count = get_array_count (&(proc->spec.proc.param_list)) - 1;
-  output->locals_count = proc->locals_used;
-  output->syncs_count = proc->spec.proc.sync_keeper;
-  output->instrs_size = get_size_outstream (&(proc->spec.proc.instrs));
-  output->instrs = get_buffer_outstream (&(proc->spec.proc.instrs));
+  pOutDesc->name = pProc->spec.proc.name;
+  pOutDesc->name_len = pProc->spec.proc.nlength;
+  pOutDesc->param_count = get_array_count (&(pProc->spec.proc.param_list)) - 1;
+  pOutDesc->locals_count = pProc->locals_used;
+  pOutDesc->syncs_count = pProc->spec.proc.sync_keeper;
+  pOutDesc->instrs_size = get_size_outstream (&(pProc->spec.proc.instrs));
+  pOutDesc->instrs = get_buffer_outstream (&(pProc->spec.proc.instrs));
 
-  return ~0;
+  return 1; /* Output valid */
 }
 
 WHC_PROC_HANDLER
 whc_get_proc_hnd (WHC_HANDLER hnd, unsigned int item)
 {
-  struct ParserState *state = (struct ParserState *) hnd;
-  const struct Statement *proc = (struct Statement *)
-    get_item (&(state->global_stmt.spec.glb.proc_decls), item);
+  struct ParserState*     pState     = (struct ParserState*) hnd;
+  const struct Statement* pProc      = NULL;
+  const D_UINT            totalProcs = get_array_count (&pState->global_stmt.spec.glb.proc_decls);
+  D_UINT                  procIndex;
 
-  if (proc != NULL)
+  for (procIndex = 0; procIndex < totalProcs; ++procIndex)
     {
-      assert (proc->type & STMT_PROC);
-      assert ((proc->spec.proc.proc_id & ~EXTERN_DECLARED) == item);
+      const struct Statement* pProcIt = get_item (&pState->global_stmt.spec.glb.proc_decls,
+                                                  procIndex);
+      assert (pProcIt->type & STMT_PROC);
+
+      if (RETRIVE_ID (pProcIt->spec.proc.proc_id) == item)
+        {
+          pProc = pProcIt;
+          break;
+        }
     }
 
-  return (WHC_PROC_HANDLER) proc;
+  return (WHC_PROC_HANDLER) pProc;
 }
 
 void

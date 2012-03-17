@@ -71,7 +71,7 @@ check_declared_var (struct Statement *stm,
   struct OutStream *os = &stm->spec.glb.type_desc;
   if ((var == NULL) ||		/* var not found */
       (var->type != type) ||	/* invalid type */
-      ((var->var_id & GLOBAL_DECLARED)) == 0)
+      ((var->var_id & GLOBAL_DECL)) == 0)
     {
       return FALSE;
     }
@@ -113,134 +113,134 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_01", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_01", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_BOOL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_02", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_02", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_CHAR))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_03", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_03", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_DATE))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_04", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_04", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_DATETIME))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_05", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_05", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_HIRESTIME))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_06", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_06", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_INT8))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_07", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_07", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_INT16))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_08", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_08", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_INT32))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_09", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_09", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_INT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_10", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_10", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_11", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_11", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_RICHREAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_12", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_12", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_TEXT))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_13", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_13", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_UINT8))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_14", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_14", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_UINT16))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_15", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_15", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_UINT32))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_16", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_16", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_UINT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_var_16", 7, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_var_16", 7, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_UINT64))
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->global_stmt,
-				    "second_var", 10, FALSE);
+				    "second_var", 10, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_INT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_1", 2, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_1", 2, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "a2", 2, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "a2", 2, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "_a3", 3, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "_a3", 3, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "b4c", 3, FALSE);
+  decl_var = stmt_find_declaration (&state->global_stmt, "b4c", 3, FALSE, FALSE);
   if (!check_declared_var (&state->global_stmt, decl_var, T_RICHREAL))
     {
       return FALSE;

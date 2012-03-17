@@ -41,90 +41,99 @@ enum STATEMENT_TYPE
 
 struct StatementGlobalSymbol
 {
-  D_CHAR *symbol;
-  D_UINT index;
+  D_CHAR* symbol;
+  D_UINT  index;
 };
 
 struct _GlobalStatmentSpec
 {
   struct OutStream type_desc;	/* describes the variable types */
   struct OutStream const_area;
-  struct UArray proc_decls;	/* for GLOBAL statement contains the list
+  struct UArray    proc_decls;	/* for GLOBAL statement contains the list
 				   of procedures */
+  D_UINT32         procs_count;
 };
 
 struct _ProcStatementSpec
 {
-  const D_CHAR *name;		/* name of the procedure, not necessarily
-				   null terminated */
-  D_UINT nlength;		/* length of the name */
-  struct UArray param_list;	/* Used only for procedures
-				   0 - special case for return type
-				   1 - first parameter, 2 second parameter */
-  struct OutStream instrs;	/* the execution path for procedure
-				   statements */
-  struct UArray branch_stack;	/* keep track of conditional branches */
-  struct UArray loop_stack;	/* keep the track of looping statements */
-  D_UINT32 proc_id;		/* ID of the procedure in the import table */
-  D_UINT16 sync_keeper;
+  const D_CHAR* name;		 /* name of the procedure, not necessarily
+				    null terminated */
+  D_UINT        nlength;	 /* length of the name */
+  struct UArray param_list;	 /* Used only for procedures
+				    0 - special case for return type
+				    1 - first parameter, 2 second parameter */
+  struct OutStream instrs;	 /* the execution path for procedure
+				    statements */
+  struct UArray    branch_stack; /* keep track of conditional branches */
+  struct UArray    loop_stack;	 /* keep the track of looping statements */
+  D_UINT32         proc_id;	 /* ID of the procedure in the import table */
+  D_UINT16         sync_keeper;
 };
 
 struct Statement
 {
-  struct Statement *parent;	/* NULL for global statement */
-  D_UINT locals_used;		/* used to assign IDs to declared variables */
+  struct Statement*   parent;   	/* NULL for global statement */
+  D_UINT              locals_used;	/* used to assign IDs to declared variables */
   enum STATEMENT_TYPE type;	/* type of the statement */
-  struct UArray decls;		/* variables declared in this statement */
+  struct UArray       decls;	/* variables declared in this statement */
   union
   {
-    struct _ProcStatementSpec proc;
+    struct _ProcStatementSpec  proc;
     struct _GlobalStatmentSpec glb;
   } spec;
 };
 
-D_BOOL init_glbl_stmt (struct Statement *stmt);
+D_BOOL
+init_glbl_stmt (struct Statement* pStmt);
 
-void clear_glbl_stmt (struct Statement *glbl);
+void
+clear_glbl_stmt (struct Statement* pGlbStmt);
 
-D_BOOL init_proc_stmt (struct Statement *parent, struct Statement *stmt);
+D_BOOL
+init_proc_stmt (struct Statement* pParentStmt, struct Statement* pStmt);
 
-void clear_proc_stmt (struct Statement *proc);
+void
+clear_proc_stmt (struct Statement* pProcStmt);
 
-struct DeclaredVar *stmt_find_declaration (const struct Statement *stmt,
-					   const char *label,
-					   const D_UINT label_len,
-					   const D_BOOL recursive);
+struct DeclaredVar*
+stmt_find_declaration (struct Statement* pStmt,
+                       const char*       label,
+		       const D_UINT      label_len,
+                       const D_BOOL      recursive,
+		       const D_BOOL      refferenced);
 
-struct DeclaredVar *stmt_add_declaration (struct Statement *stmt,
-					  struct DeclaredVar *var,
-					  D_BOOL parameter);
+struct DeclaredVar*
+stmt_add_declaration (struct Statement* pStmt, struct DeclaredVar* pVar, D_BOOL parameter);
 
-const struct DeclaredVar *stmt_get_param (const struct Statement *const stmt,
-					  D_UINT arg_n);
-D_UINT stmt_get_param_count (const struct Statement *const stmt);
+const struct DeclaredVar*
+stmt_get_param (const struct Statement* const pStmt, D_UINT arg_n);
 
-D_UINT32 stmt_get_import_id (const struct Statement *const proc);
+D_UINT
+stmt_get_param_count (const struct Statement* const pStmt);
+
+D_UINT32
+stmt_get_import_id (const struct Statement* const pProc);
 
 /* some inline functions to access statement members */
-static INLINE struct OutStream *
-stmt_query_instrs (struct Statement *const stmt)
+static INLINE struct OutStream*
+stmt_query_instrs (struct Statement* const pStmt)
 {
-  assert (stmt->type == STMT_PROC);
-  return &stmt->spec.proc.instrs;
+  assert (pStmt->type == STMT_PROC);
+  return &pStmt->spec.proc.instrs;
 }
 
-static INLINE struct UArray *
-stmt_query_branch_stack (struct Statement *const stmt)
+static INLINE struct UArray*
+stmt_query_branch_stack (struct Statement* const pStmt)
 {
-  assert (stmt->type == STMT_PROC);
-  return &stmt->spec.proc.branch_stack;
+  assert (pStmt->type == STMT_PROC);
+  return &pStmt->spec.proc.branch_stack;
 }
 
-static INLINE struct UArray *
-stmt_query_loop_stack (struct Statement *const stmt)
+static INLINE struct UArray*
+stmt_query_loop_stack (struct Statement* const pStmt)
 {
-  assert (stmt->type == STMT_PROC);
-  return &stmt->spec.proc.loop_stack;
+  assert (pStmt->type == STMT_PROC);
+  return &pStmt->spec.proc.loop_stack;
 }
 
 /*****************************Type specification section ***************/
@@ -139,15 +148,17 @@ struct TypeSpec
   D_UINT8 data[2];		/* keep this last */
 };
 
-D_BOOL is_type_spec_valid (const struct TypeSpec *spec);
+D_BOOL
+is_type_spec_valid (const struct TypeSpec* pSpec);
 
 D_BOOL
-type_spec_cmp (const struct TypeSpec *pSpec_1,
-	       const struct TypeSpec *pSpec_2);
+type_spec_cmp (const struct TypeSpec* pSpec_1,
+	       const struct TypeSpec* pSpec_2);
 
-D_UINT type_spec_fill (struct OutStream *outs, const struct DeclaredVar *var);
+D_UINT
+type_spec_fill (struct OutStream* outs, const struct DeclaredVar* pVar);
 
 D_INT
-add_text_const (struct Statement *stmt, const D_UINT8 * buffer, D_UINT size);
+add_text_const (struct Statement* pStmt, const D_UINT8* buffer, D_UINT size);
 
 #endif /*STATEMENT_H_ */

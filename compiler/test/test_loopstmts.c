@@ -94,7 +94,7 @@ static D_BOOL
 check_procedure_1 (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   int shift = 0;
   int cond_exp_pos = 5;
@@ -165,7 +165,7 @@ static D_BOOL
 check_procedure_2 (struct ParserState *state, D_CHAR * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl (state, proc_name, strlen (proc_name));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   int shift = 0;
   int cond_exp_pos = 0;

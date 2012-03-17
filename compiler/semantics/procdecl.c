@@ -30,8 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "vardecl.h"
 
 struct Statement *
-find_proc_decl (struct ParserState *state,
-		const D_CHAR * name, const D_UINT nlength)
+find_proc_decl (struct ParserState* state,
+		const D_CHAR* name,
+		const D_UINT  nlength,
+		const D_BOOL  referenced)
 {
   const struct UArray *procs = &(state->global_stmt.spec.glb.proc_decls);
   D_UINT count = get_array_count (procs);
@@ -46,7 +48,15 @@ find_proc_decl (struct ParserState *state,
       if ((result->spec.proc.nlength == nlength) &&
 	  (strncmp (result->spec.proc.name, name, nlength) == 0))
 	{
-	  /* found */
+          if (referenced && ((result->spec.proc.proc_id & NOTREF_DECL) != 0))
+            {
+              assert (RETRIVE_ID (result->spec.proc.proc_id) == 0);
+              assert ((result->spec.proc.proc_id & EXTERN_DECL) != 0);
+
+              result->spec.proc.proc_id &= ~NOTREF_DECL;
+              result->spec.proc.proc_id |= state->global_stmt.spec.glb.procs_count++;
+            }
+
 	  return result;
 	}
     }
@@ -122,8 +132,7 @@ install_proc_decl (struct ParserState *state, struct SemValue *val_id)
   stmt.spec.proc.name = val_id->val.u_id.text;
   stmt.spec.proc.nlength = val_id->val.u_id.length;
 
-  if (find_proc_decl (state, stmt.spec.proc.name, stmt.spec.proc.nlength) !=
-      NULL)
+  if (find_proc_decl (state, stmt.spec.proc.name, stmt.spec.proc.nlength, FALSE) != NULL)
     {
       D_CHAR tname[128];
       copy_text_truncate (tname, stmt.spec.proc.name,
@@ -136,9 +145,11 @@ install_proc_decl (struct ParserState *state, struct SemValue *val_id)
     {
       void *nstmt = NULL;
 
-      stmt.spec.proc.proc_id = get_array_count (procs);
       if (state->extern_decl)
-	stmt.spec.proc.proc_id |= EXTERN_DECLARED;
+	stmt.spec.proc.proc_id = EXTERN_DECL | NOTREF_DECL;
+      else
+        stmt.spec.proc.proc_id = state->global_stmt.spec.glb.procs_count++;
+
       nstmt = add_item (procs, &stmt);
       if (nstmt == NULL)
 	{
