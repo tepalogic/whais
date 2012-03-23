@@ -31,14 +31,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /////////////******WBufferCompiledUnit********//////////////////////////////
 
-WBufferCompiledUnit::WBufferCompiledUnit (const D_UINT8*    buffer,
-                                          D_UINT            buffer_size,
-                                          WHC_MESSENGER     callback,
-                                          WHC_MESSENGER_ARG context)
+WBufferCompiledUnit::WBufferCompiledUnit (const D_UINT8*    pBuuffer,
+                                          D_UINT            bufferSize,
+                                          WHC_MESSENGER     messenger,
+                                          WHC_MESSENGER_ARG messengerContext)
   : m_Handler (NULL)
 {
-  m_Handler = whc_hnd_create (_RC (const D_CHAR*, buffer), buffer_size, callback, context);
-
+  m_Handler = whc_hnd_create (_RC (const D_CHAR*, pBuuffer),
+                              bufferSize,
+                              messenger,
+                              messengerContext);
   if (m_Handler == NULL)
     throw WCompiledUnitException ("Failed to compile the buffer.", _EXTRA(0));
 }
@@ -61,7 +63,7 @@ WBufferCompiledUnit::GetTypeInformationSize ()
 const D_UINT8*
 WBufferCompiledUnit::RetriveTypeInformation ()
 {
-  const D_UINT8* pTypeInfo;
+  const D_UINT8* pTypeInfo = NULL;
 
   whc_get_typedec_pool (m_Handler, &pTypeInfo);
 
@@ -80,7 +82,7 @@ WBufferCompiledUnit::GetConstAreaSize ()
 const D_UINT8*
 WBufferCompiledUnit::RetrieveConstArea ()
 {
-  const D_UINT8* pConstArea;
+  const D_UINT8* pConstArea = NULL;
 
   whc_get_const_area (m_Handler, &pConstArea);
 
@@ -102,12 +104,12 @@ WBufferCompiledUnit::GetProceduresCount ()
 D_UINT
 WBufferCompiledUnit::GetGlobalNameLength (D_UINT item)
 {
-  WHC_GLBVAR_DESC globalDesc;
+  WHC_GLBVAR_DESC globalDesc = {NULL, };
 
   if (!whc_get_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  return globalDesc.name_len;
+  return globalDesc.m_NameLength;
 }
 
 const D_CHAR*
@@ -118,7 +120,7 @@ WBufferCompiledUnit::RetriveGlobalName (D_UINT item)
   if (!whc_get_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  return globalDesc.name;
+  return globalDesc.m_Name;
 }
 
 D_UINT
@@ -132,9 +134,9 @@ WBufferCompiledUnit::GetGlobalTypeIndex (D_UINT item)
   const D_UINT8* pTemp;
   whc_get_typedec_pool (m_Handler, &pTemp);
 
-  assert (pTemp && (pTemp <= globalDesc.type));
+  assert (pTemp && (pTemp <= globalDesc.m_Type));
 
-  return globalDesc.type - pTemp;
+  return globalDesc.m_Type - pTemp;
 
 }
 
@@ -146,7 +148,7 @@ WBufferCompiledUnit::IsGlobalExternal (D_UINT item)
   if (!whc_get_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  return (globalDesc.defined == FALSE);
+  return (globalDesc.m_Defined == FALSE);
 }
 
 D_UINT
@@ -157,7 +159,7 @@ WBufferCompiledUnit::GetProcSyncStatementsCount (D_UINT item)
   if (!whc_get_proc (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.syncs_count;
+  return desc.m_SyncsCount;
 }
 
 D_UINT
@@ -168,7 +170,7 @@ WBufferCompiledUnit::GetProcCodeAreaSize (D_UINT item)
   if (!whc_get_proc (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.instrs_size;
+  return desc.m_CodeSize;
 }
 
 const D_UINT8*
@@ -179,7 +181,7 @@ WBufferCompiledUnit::RetriveProcCodeArea (D_UINT item)
   if (!whc_get_proc (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.instrs;
+  return desc.m_Code;
 }
 
 D_UINT
@@ -190,7 +192,7 @@ WBufferCompiledUnit::GetProcLocalsCount (D_UINT item)
   if (!whc_get_proc (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.locals_count;
+  return desc.m_LocalsCount;
 }
 
 D_UINT
@@ -201,7 +203,7 @@ WBufferCompiledUnit::GetProcParametersCount (D_UINT item)
   if (!whc_get_proc (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.param_count;
+  return desc.m_ParamsCount;
 }
 
 D_UINT
@@ -231,7 +233,7 @@ WBufferCompiledUnit::GetProcNameSize (D_UINT proc_item)
   if (!whc_get_proc (m_Handler, proc_item, &desc))
     throw WCompiledUnitException ("Could not get the procedure's description.", _EXTRA(0));
 
-  return desc.name_len;
+  return desc.m_NameLength;
 }
 
 const D_CHAR*
@@ -242,7 +244,7 @@ WBufferCompiledUnit::RetriveProcName (D_UINT proc_item)
   if (!whc_get_proc (m_Handler, proc_item, &desc))
     throw WCompiledUnitException ("Could not get procedure's description.", _EXTRA(0));
 
-  return desc.name;
+  return desc.m_Name;
 }
 
 D_UINT
@@ -296,7 +298,7 @@ WFileCompiledUnit::WFileCompiledUnit (const D_CHAR * file_name)
     m_ProcData (NULL)
 {
   ProcessHeader ();
-  m_ProcData.reset (new PD_UINT8[m_ProcsCount]);
+  m_ProcData.reset (new D_UINT8*[m_ProcsCount]);
 
   for (D_UINT count = 0; count < m_ProcsCount; ++count)
     m_ProcData.get ()[count] = NULL;

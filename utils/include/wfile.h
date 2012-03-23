@@ -30,10 +30,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class WFileException : public WException
 {
 public:
-  explicit WFileException (const D_CHAR *message,
-      const D_CHAR *file, D_UINT32 line, D_UINT32 extra)
-  : WException (message, file, line, extra) {}
-  virtual ~ WFileException () {};
+  explicit WFileException (const D_CHAR* pMessage,
+                           const D_CHAR* pFile,
+                           D_UINT32      line,
+                           D_UINT32      extra)
+  : WException (pMessage, pFile, line, extra)
+  {
+  }
+  virtual ~WFileException ()
+  {
+  };
 
   virtual WException*     Clone () { return new WFileException (*this); }
   virtual EXPCEPTION_TYPE GetType () { return FILE_EXCEPTION; }
@@ -42,23 +48,22 @@ public:
 class WFile
 {
 public:
-  explicit WFile (const D_CHAR * fname, D_UINT mode = 0);
-  WFile (const WFile &rSource);
-   ~WFile ();
+  explicit WFile (const D_CHAR* fname, D_UINT mode = 0);
+  WFile (const WFile& rSource);
+  ~WFile ();
 
-  void Read (D_UINT8 * buffer, D_UINT size);
-  void Write (const D_UINT8 * buffer, D_UINT size);
-  void Seek (D_INT64 where, D_INT whence);
+  void     Read (D_UINT8* buffer, D_UINT size);
+  void     Write (const D_UINT8* buffer, D_UINT size);
+  void     Seek (D_INT64 where, D_INT whence);
   D_UINT64 Tell ();
-  void Sync ();
+  void     Sync ();
   D_UINT64 GetSize () const;
-  void SetSize (D_UINT64 size);
-  void Close ();
+  void     SetSize (D_UINT64 size);
+  void     Close ();
 
-  WFile & operator= (const WFile &);
-
+  WFile&   operator= (const WFile &);
 private:
-  WH_FILE_HND mHandle;
+  WH_FILE_HND m_Handle;
 };
 
 #endif /* WFILE_H_ */

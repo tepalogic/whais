@@ -35,10 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 struct Statement*
-find_proc_decl (struct ParserState *pState,
-                const D_CHAR* pName,
-                const D_UINT  nlength,
-                const D_BOOL  referenced);
+find_proc_decl (struct ParserState* pState,
+                const D_CHAR*       pName,
+                const D_UINT        nameLength,
+                const D_BOOL        referenced);
 
 YYSTYPE
 add_prcdcl_list (YYSTYPE list, YYSTYPE s_id, YYSTYPE s_type);

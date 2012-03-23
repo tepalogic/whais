@@ -35,7 +35,7 @@ void
 begin_if_stmt (struct ParserState *const state,
 	       YYSTYPE exp, enum BRANCH_TYPE bt)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const branch_stack = stmt_query_branch_stack (stmt);
   struct BranchData branch;
@@ -43,7 +43,7 @@ begin_if_stmt (struct ParserState *const state,
   if (!translate_bool_exp (state, exp))
     {
       /* errors encountered */
-      assert (state->err_sem == TRUE);
+      assert (state->abortError == TRUE);
       return;
     }
 
@@ -57,8 +57,8 @@ begin_if_stmt (struct ParserState *const state,
     }
 
   branch.type = bt;
-  branch.skip_pos = get_size_outstream (instrs) - sizeof (D_UINT32) - 1;
-  branch.exit_pos = 0;
+  branch.skipPos = get_size_outstream (instrs) - sizeof (D_UINT32) - 1;
+  branch.exitPos = 0;
 
   if (add_item (branch_stack, &branch) == NULL)
     {
@@ -71,7 +71,7 @@ begin_if_stmt (struct ParserState *const state,
 void
 begin_else_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const branch_stack = stmt_query_branch_stack (stmt);
   D_UINT it_n = get_array_count (branch_stack) - 1;
@@ -86,9 +86,9 @@ begin_else_stmt (struct ParserState *const state)
 
       return;
     }
-  it->exit_pos = get_size_outstream (instrs) - sizeof (D_UINT32) - 1;
-  offset = get_size_outstream (instrs) - it->skip_pos;
-  memcpy (get_buffer_outstream (instrs) + it->skip_pos + 1, &offset,
+  it->exitPos = get_size_outstream (instrs) - sizeof (D_UINT32) - 1;
+  offset = get_size_outstream (instrs) - it->skipPos;
+  memcpy (get_buffer_outstream (instrs) + it->skipPos + 1, &offset,
 	  sizeof offset);
 }
 
@@ -97,7 +97,7 @@ begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
 {
   begin_else_stmt (state);
 
-  if (!state->err_sem)
+  if (!state->abortError)
     {
       begin_if_stmt (state, exp, BT_ELSEIF);
     }
@@ -106,7 +106,7 @@ begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
 void
 finalize_if_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const branch_stack = stmt_query_branch_stack (stmt);
   D_UINT it_n = get_array_count (branch_stack);
@@ -117,21 +117,21 @@ finalize_if_stmt (struct ParserState *const state)
       D_INT32 offset = get_size_outstream (instrs);
       it = get_item (branch_stack, --it_n);
 
-      if (it->exit_pos == 0)
+      if (it->exitPos == 0)
 	{
 	  /* handle the lack of an else statement */
-	  assert (it->skip_pos > 0);
-	  offset -= it->skip_pos;
+	  assert (it->skipPos > 0);
+	  offset -= it->skipPos;
 	  assert (offset > 0);
-	  memcpy (get_buffer_outstream (instrs) + it->skip_pos + 1, &offset,
+	  memcpy (get_buffer_outstream (instrs) + it->skipPos + 1, &offset,
 		  sizeof offset);
 	}
       else
 	{
 	  /*handle the skip of the else or elseif statements */
-	  offset -= it->exit_pos;
+	  offset -= it->exitPos;
 	  assert (offset > 0);
-	  memcpy (get_buffer_outstream (instrs) + it->exit_pos + 1, &offset,
+	  memcpy (get_buffer_outstream (instrs) + it->exitPos + 1, &offset,
 		  sizeof offset);
 	}
 
@@ -145,22 +145,22 @@ finalize_if_stmt (struct ParserState *const state)
 void
 begin_while_stmt (struct ParserState *const state, YYSTYPE exp)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const loop_stack = stmt_query_loop_stack (stmt);
   struct LoopData loop;
 
   loop.type = LE_WHILE_BEGIN;
-  loop.begin_pos = get_size_outstream (instrs);
+  loop.startPos = get_size_outstream (instrs);
 
   if (!translate_bool_exp (state, exp))
     {
       /* errors encountered */
-      assert (state->err_sem == TRUE);
+      assert (state->abortError == TRUE);
       return;
     }
 
-  loop.jmp_pos = get_size_outstream (instrs);
+  loop.endPos = get_size_outstream (instrs);
   if ((w_opcode_encode (instrs, W_JFC) == NULL)
       || (uint32_outstream (instrs, 0) == NULL))
     {
@@ -180,7 +180,7 @@ begin_while_stmt (struct ParserState *const state, YYSTYPE exp)
 void
 finalize_while_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   D_UINT8 *const code = get_buffer_outstream (instrs);
   struct UArray *const loop_stack = stmt_query_loop_stack (stmt);
@@ -207,7 +207,7 @@ finalize_while_stmt (struct ParserState *const state)
 	{
 	case LE_BREAK:
 	case LE_WHILE_BEGIN:
-	  offset = end_while_stmt_pos - it->jmp_pos;
+	  offset = end_while_stmt_pos - it->endPos;
 	  break;
 	default:
 	  /* Continue statements should be already handled in case
@@ -215,13 +215,13 @@ finalize_while_stmt (struct ParserState *const state)
 	  assert (0);
 	}
       /* make the jump corrections */
-      memcpy (code + it->jmp_pos + 1, &offset, sizeof offset);
+      memcpy (code + it->endPos + 1, &offset, sizeof offset);
     }
   while ((it->type == LE_CONTINUE) || (it->type == LE_BREAK));
 
   assert (it->type == LE_WHILE_BEGIN);
   /* path the loop jump */
-  offset = it->begin_pos - end_while_loop;
+  offset = it->startPos - end_while_loop;
   memcpy (code + end_while_loop + 1, &offset, sizeof offset);
 
   /* update the loop stack */
@@ -231,14 +231,14 @@ finalize_while_stmt (struct ParserState *const state)
 void
 begin_until_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const loop_stack = stmt_query_loop_stack (stmt);
   struct LoopData loop;
 
   loop.type = LE_UNTIL_BEGIN;
-  loop.begin_pos = get_size_outstream (instrs);
-  loop.jmp_pos = 0;
+  loop.startPos = get_size_outstream (instrs);
+  loop.endPos = 0;
 
   if (add_item (loop_stack, &loop) == NULL)
     {
@@ -250,7 +250,7 @@ begin_until_stmt (struct ParserState *const state)
 void
 finalize_until_stmt (struct ParserState *const state, YYSTYPE exp)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   D_UINT8 *const code = get_buffer_outstream (instrs);
   struct UArray *const loop_stack = stmt_query_loop_stack (stmt);
@@ -263,14 +263,14 @@ finalize_until_stmt (struct ParserState *const state, YYSTYPE exp)
   if (!translate_bool_exp (state, exp))
     {
       /* errors encountered */
-      assert (state->err_sem == TRUE);
+      assert (state->abortError == TRUE);
       return;
     }
   if ((w_opcode_encode (instrs, W_JTC) == NULL)
       || (uint32_outstream (instrs, 0) == NULL))
     {
       /* errors encountered */
-      assert (state->err_sem == TRUE);
+      assert (state->abortError == TRUE);
       return;
     }
   end_until_stmt_pos = get_size_outstream (instrs);
@@ -281,20 +281,20 @@ finalize_until_stmt (struct ParserState *const state, YYSTYPE exp)
       switch (it->type)
 	{
 	case LE_CONTINUE:
-	  offset = until_exp_pos - it->jmp_pos;
+	  offset = until_exp_pos - it->endPos;
 	  break;
 	case LE_BREAK:
-	  offset = end_until_stmt_pos - it->jmp_pos;
+	  offset = end_until_stmt_pos - it->endPos;
 	  break;
 	case LE_UNTIL_BEGIN:
 	  /* JCT 0x01020304 should be encoded on 5 bytes */
-	  it->jmp_pos = end_until_stmt_pos - 5;
-	  offset = it->begin_pos - it->jmp_pos;
+	  it->endPos = end_until_stmt_pos - 5;
+	  offset = it->startPos - it->endPos;
 	  break;
 	default:
 	  assert (0);
 	}
-      memcpy (code + it->jmp_pos + 1, &offset, sizeof offset);
+      memcpy (code + it->endPos + 1, &offset, sizeof offset);
     }
   while ((it->type == LE_CONTINUE) || (it->type == LE_BREAK));
 
@@ -305,21 +305,21 @@ finalize_until_stmt (struct ParserState *const state, YYSTYPE exp)
 void
 handle_break_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const loop_stack = stmt_query_loop_stack (stmt);
   struct LoopData loop;
 
   if (get_array_count (loop_stack) == 0)
     {
-      w_log_msg (state, state->buffer_pos, MSG_BREAK_NOLOOP);
+      w_log_msg (state, state->bufferPos, MSG_BREAK_NOLOOP);
 
       return;
     }
 
   loop.type = LE_BREAK;
-  loop.begin_pos = 0;
-  loop.jmp_pos = get_size_outstream (instrs);
+  loop.startPos = 0;
+  loop.endPos = get_size_outstream (instrs);
 
   if (add_item (loop_stack, &loop) == NULL)
     {
@@ -339,7 +339,7 @@ handle_break_stmt (struct ParserState *const state)
 void
 handle_continue_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   struct UArray *const loop_stack = stmt_query_loop_stack (stmt);
   D_UINT it_n = get_array_count (loop_stack);
@@ -361,13 +361,13 @@ handle_continue_stmt (struct ParserState *const state)
 
   if (it == NULL)
     {
-      w_log_msg (state, state->buffer_pos, MSG_CONTINUE_NOLOOP);
+      w_log_msg (state, state->bufferPos, MSG_CONTINUE_NOLOOP);
 
       return;
     }
 
   loop.type = LE_CONTINUE;
-  loop.jmp_pos = get_size_outstream (instrs);
+  loop.endPos = get_size_outstream (instrs);
   switch (it->type)
     {
     case LE_UNTIL_BEGIN:
@@ -386,7 +386,7 @@ handle_continue_stmt (struct ParserState *const state)
       break;
     case LE_WHILE_BEGIN:
       if ((w_opcode_encode (instrs, W_JMP) == NULL)
-	  || (uint32_outstream (instrs, it->begin_pos - loop.jmp_pos) ==
+	  || (uint32_outstream (instrs, it->startPos - loop.endPos) ==
 	      NULL))
 	{
 	  w_log_msg (state, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -403,19 +403,19 @@ handle_continue_stmt (struct ParserState *const state)
 void
 begin_sync_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
-  const D_UINT stmts_count = stmt->spec.proc.sync_keeper / 2;
+  const D_UINT stmts_count = stmt->spec.proc.syncTracker / 2;
 
-  if (stmt->spec.proc.sync_keeper & 1)
+  if (stmt->spec.proc.syncTracker & 1)
     {
-      w_log_msg (state, state->buffer_pos, MSG_SYNC_NA);
+      w_log_msg (state, state->bufferPos, MSG_SYNC_NA);
 
       return;
     }
   else if (stmts_count > 255)
     {
-      w_log_msg (state, state->buffer_pos, MSG_SYNC_MANY);
+      w_log_msg (state, state->bufferPos, MSG_SYNC_MANY);
 
       return;
     }
@@ -428,17 +428,17 @@ begin_sync_stmt (struct ParserState *const state)
       return;
     }
   /* update the keeper */
-  stmt->spec.proc.sync_keeper++;
+  stmt->spec.proc.syncTracker++;
 }
 
 void
 finalize_sync_stmt (struct ParserState *const state)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
-  const D_UINT stmts_count = stmt->spec.proc.sync_keeper / 2;
+  const D_UINT stmts_count = stmt->spec.proc.syncTracker / 2;
 
-  assert (stmt->spec.proc.sync_keeper & 1);
+  assert (stmt->spec.proc.syncTracker & 1);
 
   if ((w_opcode_encode (instrs, W_ESYNC) == NULL)
       || (uint8_outstream (instrs, stmts_count) == NULL))
@@ -448,5 +448,5 @@ finalize_sync_stmt (struct ParserState *const state)
       return;
     }
   /* update the keeper */
-  stmt->spec.proc.sync_keeper++;
+  stmt->spec.proc.syncTracker++;
 }

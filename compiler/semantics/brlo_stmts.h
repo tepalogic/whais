@@ -46,22 +46,23 @@ enum BRANCH_TYPE
 struct BranchData
 {
   enum BRANCH_TYPE type;
-  D_INT32 skip_pos;
-  D_INT32 exit_pos;
+  D_INT32          skipPos;
+  D_INT32          exitPos;
 };
 
 void
-begin_if_stmt (struct ParserState *const state,
-	       YYSTYPE exp, enum BRANCH_TYPE type);
+begin_if_stmt (struct ParserState* const pState,
+	       YYSTYPE                   exp,
+	       enum BRANCH_TYPE          type);
 
 void
-begin_else_stmt (struct ParserState *const state);
+begin_else_stmt (struct ParserState* const pState);
 
 void
-begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp);
+begin_elseif_stmt (struct ParserState* const pState, YYSTYPE exp);
 
 void
-finalize_if_stmt (struct ParserState *const state);
+finalize_if_stmt (struct ParserState* const pState);
 
 /* Handle loop statements */
 
@@ -78,32 +79,32 @@ enum LOOP_ELEMENT_TYPE
 struct LoopData
 {
   enum LOOP_ELEMENT_TYPE type;
-  D_UINT32 begin_pos;
-  D_INT32 jmp_pos;
+  D_UINT32               startPos;
+  D_INT32                endPos;
 };
 
 void
-begin_while_stmt (struct ParserState *const state, YYSTYPE exp);
+begin_while_stmt (struct ParserState*const pState, YYSTYPE exp);
 
 void
-finalize_while_stmt (struct ParserState *const state);
+finalize_while_stmt (struct ParserState* const pState);
 
 void
-begin_until_stmt (struct ParserState *const state);
+begin_until_stmt (struct ParserState* const pState);
 
 void
-finalize_until_stmt (struct ParserState *const state, YYSTYPE exp);
+finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp);
 
 void
-handle_break_stmt (struct ParserState *const state);
+handle_break_stmt (struct ParserState *const pState);
 
 void
-handle_continue_stmt (struct ParserState *const state);
+handle_continue_stmt (struct ParserState* const pState);
 
 void
-begin_sync_stmt (struct ParserState *const state);
+begin_sync_stmt (struct ParserState* const pState);
 
 void
-finalize_sync_stmt (struct ParserState *const state);
+finalize_sync_stmt (struct ParserState* const pState);
 
 #endif /* BRLO_STMTS_H */

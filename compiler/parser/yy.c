@@ -457,8 +457,8 @@ parse_real_value (const char *buffer,
   assert (buffer_len != 0);
   assert (output != NULL);
 
-  output->int_part = 0;
-  output->frac_part = 0;
+  output->integerPart = 0;
+  output->fractionalPart = 0;
   if (buffer[0] == '-' && buffer_len > 1 && is_numeric (buffer[1], FALSE))
     {
       negative = TRUE;
@@ -474,11 +474,11 @@ parse_real_value (const char *buffer,
 	  digit += (*buffer - '0');
 	  if (dpif == FALSE)
 	    {
-	      output->int_part *= 10;
-	      output->int_part += digit;
+	      output->integerPart *= 10;
+	      output->integerPart += digit;
 	    }
 	  else
-	    output->frac_part |=
+	    output->fractionalPart |=
 	      (((D_UINT64) digit & 0x0F) << (frac_nible-- * 4));
 	}
       else if (*buffer == '.')
@@ -500,7 +500,7 @@ parse_real_value (const char *buffer,
 
   if (negative)
     {
-      output->int_part *= -1;
+      output->integerPart *= -1;
     }
 
   return (old_len - buffer_len);
@@ -837,9 +837,9 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
   const D_CHAR *token = NULL;
   D_UINT token_len = 0;
   TOKEN_TYPE token_type;
-  D_UINT buffer_pos = state->buffer_pos;
+  D_UINT buffer_pos = state->bufferPos;
 
-  if (state->buffer_pos > state->buffer_len)
+  if (state->bufferPos > state->bufferSize)
     return 0;
 
   /* recall where to start from */
@@ -847,7 +847,7 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
   token_type = get_next_token (buffer, &token, &token_len);
 
   /* remember to start from here  next time */
-  state->buffer_pos += (D_UINT) ((token + token_len) - buffer);
+  state->bufferPos += (D_UINT) ((token + token_len) - buffer);
 
   /* allocate storage for value */
   *lvalp = NULL;		/* if we are to crash... make it loud */
@@ -859,7 +859,7 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
       *lvalp = get_sem_value (state);
       if (*lvalp == NULL)
 	{
-	  w_log_msg (state, IGNORE_BUFFER_POS, state->buffer_pos, MSG_NO_MEM);
+	  w_log_msg (state, IGNORE_BUFFER_POS, state->bufferPos, MSG_NO_MEM);
 	  return 0;
 	}
     }
@@ -920,7 +920,7 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
       if ((token_len > 1) || (token[0] != '\"'))
 	{
 	  token++;
-	  (*lvalp)->val.u_text.text = alloc_str (state->strs, token_len - 1);
+	  (*lvalp)->val.u_text.text = alloc_str (state->strings, token_len - 1);
 	  result = parse_string_value (token, token_len,
 				       (*lvalp)->val.u_text.text,
 				       &(*lvalp)->val.u_text.length);
@@ -984,7 +984,7 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
 int
 yyerror (struct ParserState *state, const D_CHAR * msg)
 {
-  w_log_msg (state, state->buffer_pos, MSG_COMPILER_ERR);
+  w_log_msg (state, state->bufferPos, MSG_COMPILER_ERR);
 
   return 0;
 }

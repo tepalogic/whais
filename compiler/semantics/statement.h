@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 
 #include "../../utils/include/array.h"
-#include "../../utils/include/list.h"
+/* #include "../../utils/include/list.h" */
 #include "../../utils/include/outstream.h"
 
 enum STATEMENT_TYPE
@@ -47,33 +47,32 @@ struct StatementGlobalSymbol
 
 struct _GlobalStatmentSpec
 {
-  struct OutStream type_desc;	/* describes the variable types */
-  struct OutStream const_area;
-  struct UArray    proc_decls;	/* for GLOBAL statement contains the list
+  struct OutStream typesDescs;	/* describes the variable types */
+  struct OutStream constsArea;
+  struct UArray    procsDecls;	/* for GLOBAL statement contains the list
 				   of procedures */
-  D_UINT32         procs_count;
+  D_UINT32         procsCount;
 };
 
 struct _ProcStatementSpec
 {
-  const D_CHAR* name;		 /* name of the procedure, not necessarily
-				    null terminated */
-  D_UINT        nlength;	 /* length of the name */
-  struct UArray param_list;	 /* Used only for procedures
+  const D_CHAR*    name;	 /* name of the procedure */
+  D_UINT           nameLength;	 /* length of the name */
+  struct UArray    paramsList;	 /* Used only for procedures
 				    0 - special case for return type
 				    1 - first parameter, 2 second parameter */
-  struct OutStream instrs;	 /* the execution path for procedure
+  struct OutStream code;	 /* the execution path for procedure
 				    statements */
-  struct UArray    branch_stack; /* keep track of conditional branches */
-  struct UArray    loop_stack;	 /* keep the track of looping statements */
-  D_UINT32         proc_id;	 /* ID of the procedure in the import table */
-  D_UINT16         sync_keeper;
+  struct UArray    branchStack;  /* keep track of conditional branches */
+  struct UArray    loopStack;	 /* keep the track of looping statements */
+  D_UINT32         procId;	 /* ID of the procedure in the import table */
+  D_UINT16         syncTracker;
 };
 
 struct Statement
 {
-  struct Statement*   parent;   	/* NULL for global statement */
-  D_UINT              locals_used;	/* used to assign IDs to declared variables */
+  struct Statement*   pParentStmt;   	/* NULL for global statement */
+  D_UINT              localsUsed;	/* used to assign IDs to declared variables */
   enum STATEMENT_TYPE type;	/* type of the statement */
   struct UArray       decls;	/* variables declared in this statement */
   union
@@ -106,7 +105,7 @@ struct DeclaredVar*
 stmt_add_declaration (struct Statement* pStmt, struct DeclaredVar* pVar, D_BOOL parameter);
 
 const struct DeclaredVar*
-stmt_get_param (const struct Statement* const pStmt, D_UINT arg_n);
+stmt_get_param (const struct Statement* const pStmt, D_UINT paramerId);
 
 D_UINT
 stmt_get_param_count (const struct Statement* const pStmt);
@@ -119,33 +118,33 @@ static INLINE struct OutStream*
 stmt_query_instrs (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
-  return &pStmt->spec.proc.instrs;
+  return &pStmt->spec.proc.code;
 }
 
 static INLINE struct UArray*
 stmt_query_branch_stack (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
-  return &pStmt->spec.proc.branch_stack;
+  return &pStmt->spec.proc.branchStack;
 }
 
 static INLINE struct UArray*
 stmt_query_loop_stack (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
-  return &pStmt->spec.proc.loop_stack;
+  return &pStmt->spec.proc.loopStack;
 }
 
 /*****************************Type specification section ***************/
-#define TYPE_SPEC_END_MARK ';'
+#define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
 #define TYPE_SPEC_ERROR         0xFFFFFFFD
 
 struct TypeSpec
 {
   D_UINT16 type;
-  D_UINT16 data_len;
-  D_UINT8 data[2];		/* keep this last */
+  D_UINT16 dataSize;
+  D_UINT8  data[2];		/* keep this last */
 };
 
 D_BOOL

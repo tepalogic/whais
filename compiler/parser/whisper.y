@@ -20,7 +20,7 @@ struct ParserState;
 int yylex(YYSTYPE *lvalp, struct ParserState *state);
 void yyerror(struct ParserState *state,  const char *msg);
 
-#define CHK_SEM_ERROR  { if (state->err_sem != FALSE) YYABORT; }
+#define CHK_SEM_ERROR  { if (state->abortError != FALSE) YYABORT; }
 %}
 
 %token ARRAY
@@ -99,9 +99,9 @@ global_block_statement: /* empty */
                       | proc_decl_stmt global_block_statement
                       | extern_proc_decl_stmt global_block_statement
                       | EXTERN
-                            { state->extern_decl = TRUE; } 
+                            { state->externDeclaration = TRUE; } 
                         var_decl_stmt
-                            { state->extern_decl = FALSE; }
+                            { state->externDeclaration = FALSE; }
                         global_block_statement
 ;
 
@@ -252,9 +252,9 @@ proc_decl_stmt: PROCEDURE IDENTIFIER
 
 extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER 
                             {
-                                state->extern_decl = TRUE;
+                                state->externDeclaration = TRUE;
                                 install_proc_decl(state, $3);
-                                state->extern_decl = FALSE;
+                                state->externDeclaration = FALSE;
                                 CHK_SEM_ERROR;
                             }
                        '(' procedure_parameter_decl ')'

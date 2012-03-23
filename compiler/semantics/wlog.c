@@ -166,21 +166,21 @@ w_log_msg (struct ParserState *state, D_UINT buff_pos, D_UINT msgCode, ...)
     }
 
   va_start (args, msgCode);
-  if (state->msg_callback != NULL)
+  if (state->messenger != NULL)
     {
-      state->msg_callback (state->context,
+      state->messenger (state->messengerContext,
 			   buff_pos, msgCode, entry->type, entry->msg, args);
     }
   else
     {
       /* don not send the message */
-      assert (state->context == NULL);
+      assert (state->messengerContext == NULL);
     }
   if ((entry->type == MSG_ERROR_EVENT) ||
       (entry->type == MSG_INTERNAL_ERROR) ||
       (entry->type == MSG_GENERAL_EVENT))
     {
-      state->err_sem = TRUE;
+      state->abortError = TRUE;
     }
   va_end (args);
 }

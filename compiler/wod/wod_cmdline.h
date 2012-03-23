@@ -34,16 +34,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class WodCmdLineParser
 {
 public:
-  WodCmdLineParser (D_INT argc, D_CHAR ** argv);
+  WodCmdLineParser (D_INT argc, D_CHAR** argv);
   ~WodCmdLineParser ();
 
-  const D_CHAR *GetSourceFile () const
+  const D_CHAR* GetSourceFile () const
   {
-    return mSourceFile;
+    return m_SourceFile;
   }
-  std::ostream & GetOutStream () const
+  std::ostream& GetOutStream () const
   {
-    return *mOutStream;
+    return *m_OutStream;
   }
 
 private:
@@ -52,21 +52,28 @@ private:
   void CheckArguments ();
 
 private:
-    D_INT mArgCount;
-  D_CHAR **mArgs;
-  const D_CHAR *mSourceFile;
-    std::ostream * mOutStream;
-  bool mDisplayHelp;
+  D_INT         m_ArgCount;
+  D_CHAR**      m_Args;
+  const D_CHAR* m_SourceFile;
+  std::ostream* m_OutStream;
+  bool          m_ShowHelp;
 
 };
 
-class WodCmdLineException:public WException
+class WodCmdLineException : public WException
 {
 public:
-  WodCmdLineException (const D_CHAR *message,
-      const D_CHAR *file, D_UINT32 line, D_UINT32 extra)
-  : WException (message, file, line, extra) {}
-  virtual ~ WodCmdLineException () {};
+  WodCmdLineException (const D_CHAR* pMessage,
+                       const D_CHAR* pFile,
+                       D_UINT32      line,
+                       D_UINT32      extra)
+  : WException (pMessage, pFile, line, extra)
+  {
+  }
+
+  virtual ~WodCmdLineException ()
+  {
+  };
 
   virtual WException*     Clone () { return new WodCmdLineException (*this); }
   virtual EXPCEPTION_TYPE GetType () { return DUMP_CMD_LINE_EXCEPTION; }

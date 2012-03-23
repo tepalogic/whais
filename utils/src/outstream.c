@@ -29,11 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct OutStream *
 init_outstream (struct OutStream *os, D_UINT inc_size)
 {
-  os->size = 0;
+  os->dataSize = 0;
   os->increment = (inc_size != 0) ? inc_size : OUTSTREAM_INCREMENT_SIZE;
-  os->output = NULL;
+  os->data = NULL;
 
-  os->allocated = 0;
+  os->reserved = 0;
 
   return os;
 }
@@ -41,34 +41,34 @@ init_outstream (struct OutStream *os, D_UINT inc_size)
 struct OutStream *
 data_outstream (struct OutStream *os, const D_UINT8 * data, D_UINT data_size)
 {
-  assert (os->allocated >= os->size);
+  assert (os->reserved >= os->dataSize);
 
-  if (data_size + os->size > os->allocated)
+  if (data_size + os->dataSize > os->reserved)
     {
       /* output buffer needs to be enlarged */
 
       D_UINT8 *temp;
-      D_UINT increment = data_size + os->size - os->allocated;
+      D_UINT increment = data_size + os->dataSize - os->reserved;
       if (increment > os->increment)
 	{
 	  /* The increment defined previously is not enough to hold the new
 	   * data. Avoid this problem in future */
 	  os->increment = increment;
 	}
-      temp = mem_realloc (os->output, os->increment + os->allocated);
+      temp = mem_realloc (os->data, os->increment + os->reserved);
       if (temp == NULL)
 	{
 	  return NULL;		/* not enough memory */
 	}
 
-      os->output = temp;
-      os->allocated += os->increment;
+      os->data = temp;
+      os->reserved += os->increment;
     }
 
   /* add the data at the end */
   while (data_size-- > 0)
     {
-      os->output[os->size++] = *data++;
+      os->data[os->dataSize++] = *data++;
     }
 
   return os;
@@ -77,9 +77,9 @@ data_outstream (struct OutStream *os, const D_UINT8 * data, D_UINT data_size)
 void
 destroy_outstream (struct OutStream *os)
 {
-  if (os->output != NULL)
+  if (os->data != NULL)
     {
-      mem_free (os->output);
+      mem_free (os->data);
     }
-  os->output = NULL;
+  os->data = NULL;
 }

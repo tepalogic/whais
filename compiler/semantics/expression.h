@@ -75,15 +75,15 @@ create_exp_link (struct ParserState* pState,
 		 enum EXP_OPERATION  op);
 
 YYSTYPE
-translate_exp (struct ParserState *state, YYSTYPE exp);
+translate_exp (struct ParserState* pState, YYSTYPE exp);
 
 YYSTYPE
-translate_return_exp (struct ParserState *state, YYSTYPE exp);
+translate_return_exp (struct ParserState* pState, YYSTYPE exp);
 
 D_BOOL
-translate_bool_exp (struct ParserState *state, YYSTYPE exp);
+translate_bool_exp (struct ParserState* pState, YYSTYPE exp);
 
 YYSTYPE
-create_arg_link (struct ParserState *state, YYSTYPE arg, YYSTYPE next);
+create_arg_link (struct ParserState* pState, YYSTYPE arg, YYSTYPE next);
 
 #endif /* EXPRESSION_H */

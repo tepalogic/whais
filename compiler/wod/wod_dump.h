@@ -34,31 +34,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../../utils/include/wfile.h"
 
-void wod_dump_header (WFile & wobj, std::ostream & outs);
-
-void wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs);
-
-void wod_dump_globals_tables (WICompiledUnit & unit, std::ostream & outs);
+void
+wod_dump_header (WFile& wobj, std::ostream& outs);
 
 void
-wod_dump_procs (WICompiledUnit & unit, std::ostream & outs, D_BOOL show_code);
+wod_dump_const_area (WICompiledUnit& unit, std::ostream& outs);
 
-class WDumpException:public WException
+void
+wod_dump_globals_tables (WICompiledUnit& unit, std::ostream& outs);
+
+void
+wod_dump_procs (WICompiledUnit& unit, std::ostream& outs, D_BOOL showCode);
+
+class WDumpException : public WException
 {
 public:
-  WDumpException (const D_CHAR *message,
-      const D_CHAR *file, D_UINT32 line, D_UINT32 extra)
-  : WException (message, file, line, extra) {}
-  virtual ~ WDumpException () {};
+  WDumpException (const D_CHAR* pMessage,
+                  const D_CHAR* pFile,
+                  D_UINT32      line,
+                  D_UINT32      extra)
+  : WException (pMessage, pFile, line, extra)
+  {
+  }
+  virtual ~ WDumpException ()
+  {
+  };
 
   virtual WException*     Clone () { return new WDumpException (*this); }
   virtual EXPCEPTION_TYPE GetType () { return DUMP_EXCEPTION; }
 };
 
-typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8 * in_args,
-				  D_CHAR * operand_1, D_CHAR * operand_2);
+typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8* in_args,
+				  D_CHAR*        operand_1,
+				  D_CHAR*        operand_2);
 
 extern FDECODE_OPCODE wod_decode_table[];
-extern const D_CHAR *wod_str_table[];
+extern const D_CHAR*  wod_str_table[];
 
 #endif /* WOD_DUMP_H_ */

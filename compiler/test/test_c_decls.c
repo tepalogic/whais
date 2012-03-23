@@ -21,30 +21,30 @@ static void
 init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
 {
   state->buffer = buffer;
-  state->strs = create_string_store ();
-  state->buffer_len = strlen (buffer);
-  init_array (&state->vals, sizeof (struct SemValue));
+  state->strings = create_string_store ();
+  state->bufferSize = strlen (buffer);
+  init_array (&state->parsedValues, sizeof (struct SemValue));
 
-  init_glbl_stmt (&state->global_stmt);
-  state->current_stmt = &state->global_stmt;
+  init_glbl_stmt (&state->globalStmt);
+  state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
 free_state (struct ParserState *state)
 {
-  release_string_store (state->strs);
-  clear_glbl_stmt (&(state->global_stmt));
-  destroy_array (&state->vals);
+  release_string_store (state->strings);
+  clear_glbl_stmt (&(state->globalStmt));
+  destroy_array (&state->parsedValues);
 
 }
 
 static D_BOOL
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->vals);
+  D_INT vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->vals, vals_count);
+      struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
 	{
 	  return TRUE;		/* found value still in use */
@@ -68,7 +68,7 @@ check_type_spec_fill (const struct TypeSpec *ts,
 
   if (fname == NULL)
     {
-      if (ts->data_len != 2)
+      if (ts->dataSize != 2)
 	{
 	  return FALSE;
 	}
@@ -78,7 +78,7 @@ check_type_spec_fill (const struct TypeSpec *ts,
 	}
     }
 
-  while (count < (ts->data_len - 2))
+  while (count < (ts->dataSize - 2))
     {
       D_UINT16 temp = strlen ((D_CHAR *) it) + 1;
       if (strcmp ((D_CHAR *) it, fname) != 0)
@@ -137,7 +137,7 @@ check_container_field (struct Statement *stmt,
   if (result != FALSE)
     {
       D_UINT8 *const buffer =
-	get_buffer_outstream (&stmt->spec.glb.type_desc);
+	get_buffer_outstream (&stmt->spec.glb.typesDescs);
       struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->type_spec_pos);
       result = check_type_spec_fill (ts, field, type);
     }
@@ -152,20 +152,20 @@ check_vars_decl (struct ParserState *state)
   struct DeclaredVar *table_1 = NULL;
   struct DeclaredVar *table_2 = NULL;
 
-  if (state->global_stmt.type != STMT_GLOBAL ||
-      state->global_stmt.parent != NULL)
+  if (state->globalStmt.type != STMT_GLOBAL ||
+      state->globalStmt.pParentStmt != NULL)
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vTable", 6, FALSE, FALSE);
+  decl_var = stmt_find_declaration (&state->globalStmt, "vTable", 6, FALSE, FALSE);
   if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
       decl_var->extra != decl_var)
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vTable2", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration (&state->globalStmt, "vTable2", 7, FALSE, FALSE);
   if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
       decl_var->extra == decl_var)
     {
@@ -173,7 +173,7 @@ check_vars_decl (struct ParserState *state)
     }
   table_1 = decl_var;
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vTable3", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration (&state->globalStmt, "vTable3", 7, FALSE, FALSE);
   if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
       (decl_var->extra != table_1->extra) ||
       (decl_var->type_spec_pos != table_1->type_spec_pos))
@@ -187,10 +187,10 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  if (!(check_container_field (&state->global_stmt, decl_var, "v2", T_DATE) &&
-	check_container_field (&state->global_stmt, decl_var, "t2",
+  if (!(check_container_field (&state->globalStmt, decl_var, "v2", T_DATE) &&
+	check_container_field (&state->globalStmt, decl_var, "t2",
 			       T_DATETIME)
-	&& check_container_field (&state->global_stmt, decl_var, "t3",
+	&& check_container_field (&state->globalStmt, decl_var, "t3",
 				  T_INT16)))
     {
       return FALSE;

@@ -87,7 +87,7 @@ install_declaration (struct ParserState* pState,
   struct DeclaredVar*     result = NULL;
   struct DeclaredVar*     pDecl  = NULL;
   struct SemId* const     pId    = &(sem_var->val.u_id);
-  struct Statement* const stmt   = pState->current_stmt;
+  struct Statement* const stmt   = pState->pCurrentStmt;
 
   assert (sem_var->val_type == VAL_ID);
   assert (sem_type->val_type == VAL_TYPE_SPEC);
@@ -107,7 +107,7 @@ install_declaration (struct ParserState* pState,
       /* Already declared! */
       D_CHAR text[128];
       copy_text_truncate (text, pDecl->label, sizeof text, pDecl->l_label);
-      w_log_msg (pState, pState->buffer_pos, MSG_VAR_DEFINED, text);
+      w_log_msg (pState, pState->bufferPos, MSG_VAR_DEFINED, text);
     }
   else
     {
@@ -127,7 +127,7 @@ install_declaration (struct ParserState* pState,
 	{
 	  /* no more memory */
 	  w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-	  pState->err_sem = TRUE;
+	  pState->abortError = TRUE;
 	}
       else if (var.type & T_TABLE_MASK )
 	{
@@ -147,9 +147,9 @@ install_declaration (struct ParserState* pState,
 	}
     }
 
-  if (result && pState->extern_decl)
+  if (result && pState->externDeclaration)
     {
-      assert (pState->current_stmt == &pState->global_stmt);
+      assert (pState->pCurrentStmt == &pState->globalStmt);
       assert (result->var_id & GLOBAL_DECL);
 
       result->var_id |= EXTERN_DECL;
@@ -158,11 +158,11 @@ install_declaration (struct ParserState* pState,
            ((result->var_id & T_FIELD_MASK) == 0) &&
            ((result->var_id & GLOBAL_DECL) != 0) )
     {
-      assert (pState->current_stmt == &pState->global_stmt);
+      assert (pState->pCurrentStmt == &pState->globalStmt);
 
       /* Defined globals are referenced by default. */
       result->var_id &= ~NOTREF_DECL;
-      result->var_id |= pState->global_stmt.locals_used++;
+      result->var_id |= pState->globalStmt.localsUsed++;
     }
 
   return result;
@@ -238,9 +238,9 @@ install_field_declaration (struct ParserState*       pState,
 	  D_CHAR tname[128];
 
 	  copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
-	  w_log_msg (pState, pState->buffer_pos, MSG_SAME_FIELD, tname);
+	  w_log_msg (pState, pState->bufferPos, MSG_SAME_FIELD, tname);
 
-	  pState->err_sem = TRUE;
+	  pState->abortError = TRUE;
 	  return NULL;
 	}
       /* next one */

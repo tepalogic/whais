@@ -54,7 +54,7 @@ create_exp_link (struct ParserState* pState,
   result->val.u_exp.pFirstOp  = firstOp;
   result->val.u_exp.pSecondOp = secondOp;
   result->val.u_exp.pThirdOp  = thirdOp;
-  result->val.u_exp.op = op;
+  result->val.u_exp.opcode = op;
 
   return result;
 }
@@ -91,7 +91,7 @@ translate_exp_tree (struct ParserState *const state,
 static D_BOOL
 is_leaf_exp (struct SemExpression *exp)
 {
-  return (exp->op == OP_NULL) && (exp->pSecondOp == NULL);
+  return (exp->opcode == OP_NULL) && (exp->pSecondOp == NULL);
 }
 
 static const struct DeclaredVar *
@@ -224,7 +224,7 @@ static struct ExpResultType
 translate_exp_inc (struct ParserState *state,
 		   const struct ExpResultType *const ft)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   D_UINT type = ft->type & ~T_L_VALUE;
@@ -234,7 +234,7 @@ translate_exp_inc (struct ParserState *state,
 
   if ((ft->type & T_L_VALUE) == 0)
     {
-      w_log_msg (state, state->buffer_pos, MSG_INC_ELV);
+      w_log_msg (state, state->bufferPos, MSG_INC_ELV);
       return r_unk;
     }
 
@@ -243,7 +243,7 @@ translate_exp_inc (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_INC_NA, type_to_text (type));
+      w_log_msg (state, state->bufferPos, MSG_INC_NA, type_to_text (type));
       return r_unk;
     }
 
@@ -260,7 +260,7 @@ static struct ExpResultType
 translate_exp_dec (struct ParserState *state,
 		   const struct ExpResultType *const ft)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   D_UINT type = ft->type & ~T_L_VALUE;
@@ -270,7 +270,7 @@ translate_exp_dec (struct ParserState *state,
 
   if ((ft->type & T_L_VALUE) == 0)
     {
-      w_log_msg (state, state->buffer_pos, MSG_DEC_ELV);
+      w_log_msg (state, state->bufferPos, MSG_DEC_ELV);
       return r_unk;
     }
 
@@ -279,7 +279,7 @@ translate_exp_dec (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_DEC_NA, type_to_text (type));
+      w_log_msg (state, state->bufferPos, MSG_DEC_NA, type_to_text (type));
 
       return r_unk;
     }
@@ -297,7 +297,7 @@ static struct ExpResultType
 translate_exp_not (struct ParserState *state,
 		   const struct ExpResultType *const ft)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT type = ft->type & ~T_L_VALUE;
@@ -313,7 +313,7 @@ translate_exp_not (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_NOT_NA, type_to_text (type));
+      w_log_msg (state, state->bufferPos, MSG_NOT_NA, type_to_text (type));
       return r_unk;
     }
 
@@ -332,7 +332,7 @@ translate_exp_add (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -347,7 +347,7 @@ translate_exp_add (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_ADD_NA, type_to_text (ftype),
+      w_log_msg (state, state->bufferPos, MSG_ADD_NA, type_to_text (ftype),
 		 type_to_text (stype));
       return r_unk;
     }
@@ -363,7 +363,7 @@ translate_exp_add (struct ParserState *state,
     case W_ADD:
       if (is_unsigned (ftype) != is_unsigned (stype))
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_ADD_SIGN);
+	  w_log_msg (state, state->bufferPos, MSG_ADD_SIGN);
 	  result.type = T_INT64;
 	}
       else if (is_unsigned (ftype))
@@ -399,7 +399,7 @@ translate_exp_sub (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -414,7 +414,7 @@ translate_exp_sub (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos,
+      w_log_msg (state, state->bufferPos,
 		 MSG_SUB_NA, type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -430,7 +430,7 @@ translate_exp_sub (struct ParserState *state,
     case W_SUB:
       if (is_unsigned (ftype) != is_unsigned (stype))
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_SUB_SIGN);
+	  w_log_msg (state, state->bufferPos, MSG_SUB_SIGN);
 	  result.type = T_INT64;
 	}
       else if (is_unsigned (ftype))
@@ -463,7 +463,7 @@ translate_exp_mul (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -478,7 +478,7 @@ translate_exp_mul (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos,
+      w_log_msg (state, state->bufferPos,
 		 MSG_MUL_NA, type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -494,7 +494,7 @@ translate_exp_mul (struct ParserState *state,
     case W_MUL:
       if (is_unsigned (ftype) != is_unsigned (stype))
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_MUL_SIGN);
+	  w_log_msg (state, state->bufferPos, MSG_MUL_SIGN);
 	  result.type = T_INT64;
 	}
       else if (is_unsigned (ftype))
@@ -527,7 +527,7 @@ translate_exp_div (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -542,7 +542,7 @@ translate_exp_div (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_DIV_NA, type_to_text (ftype),
+      w_log_msg (state, state->bufferPos, MSG_DIV_NA, type_to_text (ftype),
 		 type_to_text (stype));
       return r_unk;
     }
@@ -558,7 +558,7 @@ translate_exp_div (struct ParserState *state,
     case W_DIV:
       if (is_unsigned (ftype) != is_unsigned (stype))
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_DIV_SIGN);
+	  w_log_msg (state, state->bufferPos, MSG_DIV_SIGN);
 	  result.type = T_INT64;
 	}
       else if (is_unsigned (ftype))
@@ -591,7 +591,7 @@ translate_exp_mod (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -606,7 +606,7 @@ translate_exp_mod (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_MOD_NA, type_to_text (ftype),
+      w_log_msg (state, state->bufferPos, MSG_MOD_NA, type_to_text (ftype),
 		 type_to_text (stype));
       return r_unk;
     }
@@ -629,7 +629,7 @@ translate_exp_less (struct ParserState *state,
 		    const struct ExpResultType *const ft,
 		    const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -644,7 +644,7 @@ translate_exp_less (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_LT_NA,
+      w_log_msg (state, state->bufferPos, MSG_LT_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -670,7 +670,7 @@ translate_exp_less_equal (struct ParserState *state,
 			  const struct ExpResultType *const ft,
 			  const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -685,7 +685,7 @@ translate_exp_less_equal (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_LE_NA,
+      w_log_msg (state, state->bufferPos, MSG_LE_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -711,7 +711,7 @@ translate_exp_grater (struct ParserState *state,
 		      const struct ExpResultType *const ft,
 		      const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -726,7 +726,7 @@ translate_exp_grater (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_GT_NA,
+      w_log_msg (state, state->bufferPos, MSG_GT_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -751,7 +751,7 @@ translate_exp_grater_equal (struct ParserState *state,
 			    const struct ExpResultType *const ft,
 			    const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -766,7 +766,7 @@ translate_exp_grater_equal (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_GE_NA,
+      w_log_msg (state, state->bufferPos, MSG_GE_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -792,7 +792,7 @@ translate_exp_equals (struct ParserState *state,
 		      const struct ExpResultType *const ft,
 		      const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -807,7 +807,7 @@ translate_exp_equals (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_EQ_NA,
+      w_log_msg (state, state->bufferPos, MSG_EQ_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -833,7 +833,7 @@ translate_exp_not_equals (struct ParserState *state,
 			  const struct ExpResultType *const ft,
 			  const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -848,7 +848,7 @@ translate_exp_not_equals (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_NE_NA,
+      w_log_msg (state, state->bufferPos, MSG_NE_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -874,7 +874,7 @@ translate_exp_or (struct ParserState *state,
 		  const struct ExpResultType *const ft,
 		  const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -889,7 +889,7 @@ translate_exp_or (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_OR_NA,
+      w_log_msg (state, state->bufferPos, MSG_OR_NA,
 		 type_to_text (ftype), type_to_text (stype));
       return r_unk;
     }
@@ -922,7 +922,7 @@ translate_exp_and (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -937,7 +937,7 @@ translate_exp_and (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_AND_NA, type_to_text (ftype),
+      w_log_msg (state, state->bufferPos, MSG_AND_NA, type_to_text (ftype),
 		 type_to_text (stype));
       return r_unk;
     }
@@ -968,7 +968,7 @@ translate_exp_xor (struct ParserState *state,
 		   const struct ExpResultType *const ft,
 		   const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -983,7 +983,7 @@ translate_exp_xor (struct ParserState *state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_XOR_NA, type_to_text (ftype),
+      w_log_msg (state, state->bufferPos, MSG_XOR_NA, type_to_text (ftype),
 		 type_to_text (stype));
       return r_unk;
     }
@@ -1020,7 +1020,7 @@ are_compatible_tables (struct ParserState *const         pState,
 
   if ((pFirstType->type & T_TABLE_MASK) != (pSecondType->type & T_TABLE_MASK))
     {
-      w_log_msg (pState, pState->buffer_pos, MSG_CONTAINER_NA);
+      w_log_msg (pState, pState->bufferPos, MSG_CONTAINER_NA);
       return FALSE;
     }
 
@@ -1044,7 +1044,7 @@ are_compatible_tables (struct ParserState *const         pState,
 	{
 	  if (!ignore_unfound_fields)
 	    {
-	      w_log_msg (pState, pState->buffer_pos, MSG_NO_FIELD,
+	      w_log_msg (pState, pState->bufferPos, MSG_NO_FIELD,
 			 copy_text_truncate (temp, dst_field->label,
 					     sizeof temp,
 					     dst_field->l_label));
@@ -1054,12 +1054,12 @@ are_compatible_tables (struct ParserState *const         pState,
 	}
       else if (are_compatible_fields (dst_field, found) == FALSE)
 	{
-	  w_log_msg (pState, pState->buffer_pos, MSG_FIELD_NA,
+	  w_log_msg (pState, pState->bufferPos, MSG_FIELD_NA,
 		     copy_text_truncate (temp, dst_field->label,
 					 sizeof temp, dst_field->l_label),
 		     type_to_text (dst_field->type & ~T_FIELD_MASK),
 		     type_to_text (found->type & ~T_FIELD_MASK));
-	  pState->err_sem = TRUE;
+	  pState->abortError = TRUE;
 	  return FALSE;
 	}
       dst_field = dst_field->extra;
@@ -1073,7 +1073,7 @@ translate_exp_store (struct ParserState *const state,
 		     const struct ExpResultType *const ft,
 		     const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -1083,7 +1083,7 @@ translate_exp_store (struct ParserState *const state,
 
   if ((ft->type & T_L_VALUE) == 0)
     {
-      w_log_msg (state, state->buffer_pos, MSG_STORE_ELV);
+      w_log_msg (state, state->bufferPos, MSG_STORE_ELV);
 
       return r_unk;
     }
@@ -1137,7 +1137,7 @@ translate_exp_store (struct ParserState *const state,
 
   if (opcode == W_NA)
     {
-      w_log_msg (state, state->buffer_pos, MSG_STORE_NA,
+      w_log_msg (state, state->bufferPos, MSG_STORE_NA,
 		 type_to_text (ftype), type_to_text (stype));
 
       return r_unk;
@@ -1160,7 +1160,7 @@ translate_exp_index (struct ParserState *const state,
 		     const struct ExpResultType *const ft,
 		     const struct ExpResultType *const st)
 {
-  struct Statement *const stmt = state->current_stmt;
+  struct Statement *const stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (stmt);
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
   const D_UINT ftype = ft->type & ~T_L_VALUE;
@@ -1172,7 +1172,7 @@ translate_exp_index (struct ParserState *const state,
       ((ftype & T_TABLE_MASK) == 0) &&
       ((ftype != T_TEXT)))
     {
-      w_log_msg (state, state->buffer_pos, MSG_INDEX_EAT,
+      w_log_msg (state, state->bufferPos, MSG_INDEX_EAT,
 		 type_to_text (ftype));
 
       return r_unk;
@@ -1180,7 +1180,7 @@ translate_exp_index (struct ParserState *const state,
 
   if (!is_integer (stype))
     {
-      w_log_msg (state, state->buffer_pos, MSG_INDEX_ENI,
+      w_log_msg (state, state->bufferPos, MSG_INDEX_ENI,
 		 type_to_text (stype));
 
       return r_unk;
@@ -1193,8 +1193,8 @@ translate_exp_index (struct ParserState *const state,
       result.type = (ftype & ~T_ARRAY_MASK);
       if (result.type == T_UNDETERMINED)
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_INDEX_UNA);
-	  state->err_sem = TRUE;
+	  w_log_msg (state, state->bufferPos, MSG_INDEX_UNA);
+	  state->abortError = TRUE;
 	  return r_unk;
 	}
       result.type |= T_L_VALUE;
@@ -1319,7 +1319,7 @@ translate_exp_leaf (struct ParserState *const state,
 
   if (exp->val_type == VAL_ID)
     {
-      struct Statement *stmt = state->current_stmt;
+      struct Statement *stmt = state->pCurrentStmt;
       struct DeclaredVar *var = stmt_find_declaration (stmt,
 						       exp->val.u_id.text,
 						       exp->val.u_id.length,
@@ -1336,18 +1336,18 @@ translate_exp_leaf (struct ParserState *const state,
 	  D_CHAR temp[128];
 	  copy_text_truncate (temp, exp->val.u_id.text,
 			      sizeof temp, exp->val.u_id.length);
-	  w_log_msg (state, state->buffer_pos, MSG_VAR_NFOUND, temp);
-	  state->err_sem = TRUE;
+	  w_log_msg (state, state->bufferPos, MSG_VAR_NFOUND, temp);
+	  state->abortError = TRUE;
 	  return r_unk;
 	}
 
       value = RETRIVE_ID (var->var_id);
       if (var->var_id & GLOBAL_DECL)
 	{
-	  if (stmt->parent != NULL)
+	  if (stmt->pParentStmt != NULL)
 	    {
 	      assert (stmt->type == STMT_PROC);
-	      stmt = stmt->parent;
+	      stmt = stmt->pParentStmt;
 	    }
 	  assert (stmt->type == STMT_GLOBAL);
 	}
@@ -1507,8 +1507,8 @@ translate_exp_leaf (struct ParserState *const state,
     {
       result.type = T_REAL;
       if ((w_opcode_encode (instrs, W_LDR) == NULL) ||
-	  (uint64_outstream (instrs, exp->val.u_real.int_part) == NULL) ||
-	  (uint64_outstream (instrs, exp->val.u_real.frac_part) == NULL))
+	  (uint64_outstream (instrs, exp->val.u_real.integerPart) == NULL) ||
+	  (uint64_outstream (instrs, exp->val.u_real.fractionalPart) == NULL))
 
 	{
 	  w_log_msg (state, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -1576,7 +1576,7 @@ translate_exp_call (struct ParserState *const state,
 			 TRUE);
   if (proc == NULL)
     {
-      w_log_msg (state, state->buffer_pos,
+      w_log_msg (state, state->bufferPos,
 		 MSG_NO_PROC,
 		 copy_text_truncate (temp, call_exp->pFirstOp->val.u_id.text,
 				     sizeof temp,
@@ -1601,14 +1601,14 @@ translate_exp_call (struct ParserState *const state,
       if (proc_arg == NULL)
 	{
 	  w_log_msg (state,
-	             state->buffer_pos,
+	             state->bufferPos,
 	             MSG_PROC_MORE_ARGS,
 		     copy_text_truncate (temp,
 					 call_exp->pFirstOp->val.u_id.text,
 					 sizeof temp,
 					 call_exp->pFirstOp->val.u_id.length),
 		     stmt_get_param_count (proc));
-	  state->err_sem = TRUE;
+	  state->abortError = TRUE;
 	  return r_unk;
 	}
       else
@@ -1623,12 +1623,12 @@ translate_exp_call (struct ParserState *const state,
 	{
 	  /* An error that must be propagated upwards. The error message
 	   * was logged during expression's evaluation. */
-	  assert (state->err_sem == TRUE);
-	  w_log_msg (state, state->buffer_pos,
+	  assert (state->abortError == TRUE);
+	  w_log_msg (state, state->bufferPos,
 		     MSG_PROC_ARG_COUNT,
 		     copy_text_truncate (temp, proc->spec.proc.name,
 					 sizeof temp,
-					 proc->spec.proc.nlength), arg_count);
+					 proc->spec.proc.nameLength), arg_count);
 	  return r_unk;
 	}
       else
@@ -1649,15 +1649,15 @@ translate_exp_call (struct ParserState *const state,
 
 	      if ((result.type & T_ARRAY_MASK) != (arg_type.type & T_ARRAY_MASK))
 		{
-		  w_log_msg (state, state->buffer_pos,
+		  w_log_msg (state, state->bufferPos,
 			     MSG_PROC_ARG_NA,
 			     copy_text_truncate (temp, proc->spec.proc.name,
 						 sizeof temp,
-						 proc->spec.proc.nlength),
+						 proc->spec.proc.nameLength),
 			     arg_count,
 			     type_to_text (arg_type.type),
 			     type_to_text (result.type));
-		  state->err_sem = TRUE;
+		  state->abortError = TRUE;
 		  return r_unk;
 		}
 	      else if (W_NA == temp_op)
@@ -1665,12 +1665,12 @@ translate_exp_call (struct ParserState *const state,
 		  if ((arg_type.type & (T_UNDETERMINED | T_ARRAY_MASK)) !=
                       (T_UNDETERMINED | T_ARRAY_MASK))
 		    {
-		      w_log_msg (state, state->buffer_pos,
+		      w_log_msg (state, state->bufferPos,
 				 MSG_PROC_ARG_NA,
 				 copy_text_truncate (temp,
 						     proc->spec.proc.name,
 						     sizeof temp,
-						     proc->spec.proc.nlength),
+						     proc->spec.proc.nameLength),
 				 arg_count,
 				 type_to_text (arg_type.type),
 				 type_to_text (result.type));
@@ -1684,11 +1684,11 @@ translate_exp_call (struct ParserState *const state,
 	    {
 	      /* The two containers's types are not compatible.
 	       * The error was already logged. */
-	      w_log_msg (state, state->buffer_pos,
+	      w_log_msg (state, state->bufferPos,
 			 MSG_PROC_ARG_COUNT,
 			 copy_text_truncate (temp, proc->spec.proc.name,
 					     sizeof temp,
-					     proc->spec.proc.nlength),
+					     proc->spec.proc.nameLength),
 			 arg_count);
 
 	      return r_unk;
@@ -1702,7 +1702,7 @@ translate_exp_call (struct ParserState *const state,
 
   if (arg_count < stmt_get_param_count (proc))
     {
-      w_log_msg (state, state->buffer_pos, MSG_PROC_LESS_ARGS,
+      w_log_msg (state, state->bufferPos, MSG_PROC_LESS_ARGS,
 		 copy_text_truncate (temp, call_exp->pFirstOp->val.u_id.text,
 				     sizeof temp,
 				     call_exp->pFirstOp->val.u_id.length),
@@ -1749,14 +1749,14 @@ translate_exp_field (struct ParserState* const   pState,
 {
   const struct ExpResultType  r_unk      = { NULL, T_UNKNOWN };
   const struct DeclaredVar*   pVarField  = NULL;
-  struct OutStream *const     pInstrs    = stmt_query_instrs (pState->current_stmt);
+  struct OutStream *const     pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
   struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
   struct SemExpression* const pSecondExp = &pCallExp->pSecondOp->val.u_exp;
   struct SemId* const         pId        = &pCallExp->pThirdOp->val.u_id;
   struct ExpResultType        tableType;
   struct ExpResultType        expType;
 
-  assert (pCallExp->op == OP_FIELD);
+  assert (pCallExp->opcode == OP_FIELD);
   assert (pCallExp->pFirstOp->val_type == VAL_EXP_LINK);
   assert (pCallExp->pSecondOp->val_type == VAL_EXP_LINK);
   assert (pCallExp->pThirdOp->val_type == VAL_ID);
@@ -1764,18 +1764,18 @@ translate_exp_field (struct ParserState* const   pState,
   tableType = translate_exp_tree (pState, pStmt, pFirstExp);
   if ((tableType.type & T_TABLE_MASK) == 0)
     {
-      w_log_msg (pState, pState->buffer_pos, MSG_MEMSEL_NA, type_to_text (tableType.type));
+      w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_NA, type_to_text (tableType.type));
 
-      pState->err_sem = TRUE;
+      pState->abortError = TRUE;
       return r_unk;
     }
 
   expType = translate_exp_tree (pState, pStmt, pSecondExp);
   if (!is_integer (expType.type & ~T_L_VALUE))
     {
-      w_log_msg (pState, pState->buffer_pos, MSG_INDEX_ENI, type_to_text (expType.type));
+      w_log_msg (pState, pState->bufferPos, MSG_INDEX_ENI, type_to_text (expType.type));
 
-      pState->err_sem = TRUE;
+      pState->abortError = TRUE;
       return r_unk;
     }
 
@@ -1786,9 +1786,9 @@ translate_exp_field (struct ParserState* const   pState,
     {
       D_CHAR temp[128];
       copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
-      w_log_msg (pState, pState->buffer_pos, MSG_MEMSEL_ERD, temp);
+      w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_ERD, temp);
 
-      pState->err_sem = TRUE;
+      pState->abortError = TRUE;
       return r_unk;
     }
 
@@ -1812,7 +1812,7 @@ translate_exp_tree (struct ParserState *const state,
 		    struct SemExpression *const call_exp)
 {
   const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
-  struct OutStream *const instrs = stmt_query_instrs (state->current_stmt);
+  struct OutStream *const instrs = stmt_query_instrs (state->pCurrentStmt);
   D_UINT8 *temp_buffer;
   D_INT jmp_position;
   D_INT jmp_data_pos;
@@ -1820,18 +1820,18 @@ translate_exp_tree (struct ParserState *const state,
   struct ExpResultType first_type;
   struct ExpResultType second_type;
 
-  assert (state->current_stmt->type == STMT_PROC);
+  assert (state->pCurrentStmt->type == STMT_PROC);
 
   if (is_leaf_exp (call_exp))
     {
       return translate_exp_leaf (state, statement, call_exp->pFirstOp);
     }
-  else if (call_exp->op == OP_CALL)
+  else if (call_exp->opcode == OP_CALL)
     {
       /* procedure call */
       return translate_exp_call (state, statement, call_exp);
     }
-  else if (call_exp->op == OP_FIELD)
+  else if (call_exp->opcode == OP_FIELD)
     {
       return translate_exp_field (state, statement, call_exp);
     }
@@ -1855,7 +1855,7 @@ translate_exp_tree (struct ParserState *const state,
        * Use 0 for jump offset just to reserve the space. It will be corrected
        * after we parse the second expression */
       jmp_position = get_size_outstream (instrs);
-      if (call_exp->op == OP_OR)
+      if (call_exp->opcode == OP_OR)
 	{
 	  if ((w_opcode_encode (instrs, W_JT) == NULL) ||
 	      (uint32_outstream (instrs, 0) == NULL))
@@ -1865,7 +1865,7 @@ translate_exp_tree (struct ParserState *const state,
 	    }
 	  needs_jmp_correction = TRUE;
 	}
-      else if (call_exp->op == OP_AND)
+      else if (call_exp->opcode == OP_AND)
 	{
 	  if ((w_opcode_encode (instrs, W_JF) == NULL) ||
 	      (uint32_outstream (instrs, 0) == NULL))
@@ -1893,7 +1893,7 @@ translate_exp_tree (struct ParserState *const state,
     }
 
   /* use second_type to store result */
-  second_type = translate_exp_op (state, statement, call_exp->op, &first_type,
+  second_type = translate_exp_op (state, statement, call_exp->opcode, &first_type,
 				  &second_type);
 
   if (needs_jmp_correction && ((second_type.type & ~T_L_VALUE) == T_BOOL))
@@ -1915,7 +1915,7 @@ translate_exp_tree (struct ParserState *const state,
 YYSTYPE
 translate_exp (struct ParserState * state, YYSTYPE exp)
 {
-  struct Statement *const curr_stmt = state->current_stmt;
+  struct Statement *const curr_stmt = state->pCurrentStmt;
   struct OutStream *instrs = stmt_query_instrs (curr_stmt);
 
   assert (exp->val_type = VAL_EXP_LINK);
@@ -1935,7 +1935,7 @@ translate_exp (struct ParserState * state, YYSTYPE exp)
 YYSTYPE
 translate_return_exp (struct ParserState * state, YYSTYPE exp)
 {
-  struct Statement *const curr_stmt = state->current_stmt;
+  struct Statement *const curr_stmt = state->pCurrentStmt;
   struct OutStream *const instrs = stmt_query_instrs (curr_stmt);
   const struct DeclaredVar *const decl_ret = stmt_get_param (curr_stmt, 0);
 
@@ -1949,7 +1949,7 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
   if (exp_type.type == T_UNKNOWN)
     {
       /* some error has been encountered evaluating of return expression */
-      assert (state->err_sem != FALSE);
+      assert (state->abortError != FALSE);
       return NULL;
     }
   exp->val_type = VAL_REUSE;
@@ -1962,11 +1962,11 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
     {
       if ((ret_type.type & T_TABLE_MASK) != (exp_type.type & T_TABLE_MASK))
         {
-          w_log_msg (state, state->buffer_pos,
+          w_log_msg (state, state->bufferPos,
                      MSG_PROC_RET_NA_EXT,
                      type_to_text (ret_type.type),
                      type_to_text (exp_type.type));
-          state->err_sem = TRUE;
+          state->abortError = TRUE;
         }
       else if ((ret_type.type & T_TABLE_MASK) == 0)
 	{
@@ -1980,11 +1980,11 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 	  if ((ret_type.type & T_ARRAY_MASK) !=
 	      (exp_type.type & T_ARRAY_MASK))
 	    {
-	      w_log_msg (state, state->buffer_pos,
+	      w_log_msg (state, state->bufferPos,
 			 MSG_PROC_RET_NA_EXT,
 			 type_to_text (ret_type.type),
 			 type_to_text (exp_type.type));
-	      state->err_sem = TRUE;
+	      state->abortError = TRUE;
 
 	    }
 	  else if (temp_op == W_NA)
@@ -1992,11 +1992,11 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 	      if ((ret_type.type & (T_UNDETERMINED | T_ARRAY_MASK)) !=
 		  (T_UNDETERMINED | T_ARRAY_MASK))
 		{
-		  w_log_msg (state, state->buffer_pos,
+		  w_log_msg (state, state->bufferPos,
 			     MSG_PROC_RET_NA_EXT,
 			     type_to_text (ret_type.type),
 			     type_to_text (exp_type.type));
-		  state->err_sem = TRUE;
+		  state->abortError = TRUE;
 		}
 	    }
 	}
@@ -2004,8 +2004,8 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 	{
 	  /* The two containers types are not compatible.
 	   * The error was already logged. */
-	  w_log_msg (state, state->buffer_pos, MSG_PROC_RET_NA);
-	  state->err_sem = TRUE;
+	  w_log_msg (state, state->bufferPos, MSG_PROC_RET_NA);
+	  state->abortError = TRUE;
 	}
     }
 
@@ -2024,17 +2024,17 @@ translate_bool_exp (struct ParserState * state, YYSTYPE exp)
 
   assert (exp->val_type == VAL_EXP_LINK);
   exp_type =
-    translate_exp_tree (state, state->current_stmt, &(exp->val.u_exp));
+    translate_exp_tree (state, state->pCurrentStmt, &(exp->val.u_exp));
   if (exp_type.type == T_UNKNOWN)
     {
       /* Some error was encounter evaluating expression.
        * The error should be already logged */
-      assert (state->err_sem == TRUE);
+      assert (state->abortError == TRUE);
       return FALSE;
     }
   else if ((exp_type.type & ~T_L_VALUE) != T_BOOL)
     {
-      w_log_msg (state, state->buffer_pos, MSG_EXP_NOT_BOOL);
+      w_log_msg (state, state->bufferPos, MSG_EXP_NOT_BOOL);
 
       return FALSE;
     }

@@ -36,11 +36,11 @@ get_sem_value (struct ParserState *state)
 {
   struct SemValue *result = NULL;
   D_UINT iter = 0;
-  D_UINT stored_vals = get_array_count (&state->vals);
+  D_UINT stored_vals = get_array_count (&state->parsedValues);
 
   while (iter < stored_vals)
     {
-      result = get_item (&state->vals, iter);
+      result = get_item (&state->parsedValues, iter);
       assert (result != NULL);
       if (result->val_type == VAL_REUSE)
 	break;			/* found something to be reused */
@@ -49,7 +49,7 @@ get_sem_value (struct ParserState *state)
   if (result == NULL || result->val_type != VAL_REUSE)
     {
       static struct SemValue dummy;
-      result = (struct SemValue *) add_item (&state->vals, &dummy);
+      result = (struct SemValue *) add_item (&state->parsedValues, &dummy);
     }
   return result;
 }
@@ -60,7 +60,7 @@ get_bool_sem_value (struct ParserState *state, D_BOOL value)
   struct SemValue *val = get_sem_value (state);
 
   if (val == NULL)
-    w_log_msg (state, IGNORE_BUFFER_POS, state->buffer_pos, MSG_NO_MEM);
+    w_log_msg (state, IGNORE_BUFFER_POS, state->bufferPos, MSG_NO_MEM);
   else
     {
       val->val_type = VAL_C_BOOL;

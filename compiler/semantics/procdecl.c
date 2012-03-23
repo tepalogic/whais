@@ -35,7 +35,7 @@ find_proc_decl (struct ParserState* state,
 		const D_UINT  nlength,
 		const D_BOOL  referenced)
 {
-  const struct UArray *procs = &(state->global_stmt.spec.glb.proc_decls);
+  const struct UArray *procs = &(state->globalStmt.spec.glb.procsDecls);
   D_UINT count = get_array_count (procs);
   while (count-- > 0)
     {
@@ -43,18 +43,18 @@ find_proc_decl (struct ParserState* state,
       result = (struct Statement *) get_item (procs, count);
       assert (result->type == STMT_PROC);
       assert (result->spec.proc.name != NULL);
-      assert (result->spec.proc.nlength != 0);
+      assert (result->spec.proc.nameLength != 0);
 
-      if ((result->spec.proc.nlength == nlength) &&
+      if ((result->spec.proc.nameLength == nlength) &&
 	  (strncmp (result->spec.proc.name, name, nlength) == 0))
 	{
-          if (referenced && ((result->spec.proc.proc_id & NOTREF_DECL) != 0))
+          if (referenced && ((result->spec.proc.procId & NOTREF_DECL) != 0))
             {
-              assert (RETRIVE_ID (result->spec.proc.proc_id) == 0);
-              assert ((result->spec.proc.proc_id & EXTERN_DECL) != 0);
+              assert (RETRIVE_ID (result->spec.proc.procId) == 0);
+              assert ((result->spec.proc.procId & EXTERN_DECL) != 0);
 
-              result->spec.proc.proc_id &= ~NOTREF_DECL;
-              result->spec.proc.proc_id |= state->global_stmt.spec.glb.procs_count++;
+              result->spec.proc.procId &= ~NOTREF_DECL;
+              result->spec.proc.procId |= state->globalStmt.spec.glb.procsCount++;
             }
 
 	  return result;
@@ -116,13 +116,13 @@ install_proc_args (struct ParserState *state, struct SemValue *arg_list)
 void
 install_proc_decl (struct ParserState *state, struct SemValue *val_id)
 {
-  struct UArray *const procs = &(state->global_stmt.spec.glb.proc_decls);
+  struct UArray *const procs = &(state->globalStmt.spec.glb.procsDecls);
   struct Statement stmt;
 
-  assert (state->current_stmt->type == STMT_GLOBAL);
+  assert (state->pCurrentStmt->type == STMT_GLOBAL);
   assert (val_id->val_type == VAL_ID);
 
-  if (init_proc_stmt (state->current_stmt, &stmt) == FALSE)
+  if (init_proc_stmt (state->pCurrentStmt, &stmt) == FALSE)
     {
       /* not enough memory */
       w_log_msg (state, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -130,14 +130,14 @@ install_proc_decl (struct ParserState *state, struct SemValue *val_id)
     }
 
   stmt.spec.proc.name = val_id->val.u_id.text;
-  stmt.spec.proc.nlength = val_id->val.u_id.length;
+  stmt.spec.proc.nameLength = val_id->val.u_id.length;
 
-  if (find_proc_decl (state, stmt.spec.proc.name, stmt.spec.proc.nlength, FALSE) != NULL)
+  if (find_proc_decl (state, stmt.spec.proc.name, stmt.spec.proc.nameLength, FALSE) != NULL)
     {
       D_CHAR tname[128];
       copy_text_truncate (tname, stmt.spec.proc.name,
-			  sizeof tname, stmt.spec.proc.nlength);
-      w_log_msg (state, state->buffer_pos, MSG_PROC_ADECL, tname);
+			  sizeof tname, stmt.spec.proc.nameLength);
+      w_log_msg (state, state->bufferPos, MSG_PROC_ADECL, tname);
 
       clear_proc_stmt (&stmt);
     }
@@ -145,21 +145,21 @@ install_proc_decl (struct ParserState *state, struct SemValue *val_id)
     {
       void *nstmt = NULL;
 
-      if (state->extern_decl)
-	stmt.spec.proc.proc_id = EXTERN_DECL | NOTREF_DECL;
+      if (state->externDeclaration)
+	stmt.spec.proc.procId = EXTERN_DECL | NOTREF_DECL;
       else
-        stmt.spec.proc.proc_id = state->global_stmt.spec.glb.procs_count++;
+        stmt.spec.proc.procId = state->globalStmt.spec.glb.procsCount++;
 
       nstmt = add_item (procs, &stmt);
       if (nstmt == NULL)
 	{
 	  /* not enough memory */
 	  w_log_msg (state, IGNORE_BUFFER_POS, MSG_NO_MEM);
-	  state->err_sem = TRUE;
+	  state->abortError = TRUE;
 	  clear_proc_stmt (&stmt);
 	}
       else
-	state->current_stmt = nstmt;
+	state->pCurrentStmt = nstmt;
     }
 
   val_id->val_type = VAL_REUSE;
@@ -171,7 +171,7 @@ void
 set_proc_rettype (struct ParserState* pState, struct SemValue* pRettype)
 {
   struct DeclaredVar* pRetVar = (struct DeclaredVar*)
-    get_item (&(pState->current_stmt->spec.proc.param_list), 0);
+    get_item (&(pState->pCurrentStmt->spec.proc.paramsList), 0);
 
   assert (pRettype->val_type == VAL_TYPE_SPEC);
 
@@ -196,7 +196,7 @@ set_proc_rettype (struct ParserState* pState, struct SemValue* pRettype)
     }
 
   pRetVar->type_spec_pos =
-    type_spec_fill (&pState->global_stmt.spec.glb.type_desc, pRetVar);
+    type_spec_fill (&pState->globalStmt.spec.glb.typesDescs, pRetVar);
   pRettype->val_type = VAL_REUSE;
   return;
 }
@@ -204,10 +204,10 @@ set_proc_rettype (struct ParserState* pState, struct SemValue* pRettype)
 void
 finish_proc_decl (struct ParserState *state)
 {
-  assert (state->current_stmt->type = STMT_PROC);
-  assert (&(state->global_stmt) == state->current_stmt->parent);
+  assert (state->pCurrentStmt->type = STMT_PROC);
+  assert (&(state->globalStmt) == state->pCurrentStmt->pParentStmt);
 
-  state->current_stmt = &(state->global_stmt);
+  state->pCurrentStmt = &(state->globalStmt);
 
   return;
 }

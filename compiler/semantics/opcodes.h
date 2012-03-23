@@ -49,9 +49,10 @@ extern const enum W_OPCODE xor_op[T_END_OF_TYPES][T_END_OF_TYPES];
 extern const enum W_OPCODE and_op[T_END_OF_TYPES][T_END_OF_TYPES];
 extern const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES];
 
-struct OutStream *w_opcode_encode (struct OutStream *outs,
-				   const enum W_OPCODE opcode);
+struct OutStream*
+w_opcode_encode (struct OutStream *pStream, const enum W_OPCODE opcode);
 
-enum W_OPCODE w_opcode_decode (const D_UINT8 * ins);
+enum W_OPCODE
+w_opcode_decode (const D_UINT8* pCode);
 
 #endif /* OPCODES_H_ */

@@ -31,107 +31,108 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 static INLINE void
-to_le_int16 (D_UINT8 * value)
+to_le_int16 (D_UINT8* pValue)
 {
+  D_UINT8        temp;
   const D_UINT16 le_machine = 0x1;
-  D_UINT8 temp;
 
   if (*((D_UINT8 *) & le_machine))
     return;			/* no need for conversion */
 
-  temp = value[0];
-  value[0] = value[1];
-  value[1] = temp;
+  temp      = pValue[0];
+  pValue[0] = pValue[1];
+  pValue[1] = temp;
 }
 
 static INLINE void
-to_le_int32 (D_UINT8 * value)
+to_le_int32 (D_UINT8* pValue)
 {
+  D_UINT8        temp;
   const D_UINT16 le_machine = 0x1;
-  D_UINT8 temp;
 
   if (*((D_UINT8 *) & le_machine))
     return;			/* no need for conversion */
 
-  temp = value[0];
-  value[0] = value[3];
-  value[3] = temp;
-  temp = value[1];
-  value[1] = value[2];
-  value[2] = temp;
+  temp      = pValue[0];
+  pValue[0] = pValue[3];
+  pValue[3] = temp;
+  temp      = pValue[1];
+  pValue[1] = pValue[2];
+  pValue[2] = temp;
 }
 
 static INLINE void
-to_le_int64 (D_UINT8 * value)
+to_le_int64 (D_UINT8* pValue)
 {
+  D_UINT8        temp;
   const D_UINT16 le_machine = 0x1;
-  D_UINT8 temp;
+
 
   if (*((D_UINT8 *) & le_machine))
     return;			/* no need for conversion */
 
-  temp = value[0];
-  value[0] = value[7];
-  value[7] = temp;
-  temp = value[1];
-  value[1] = value[6];
-  value[6] = temp;
-  temp = value[2];
-  value[2] = value[5];
-  value[5] = temp;
-  temp = value[3];
-  value[3] = value[4];
-  value[4] = temp;
+  temp      = pValue[0];
+  pValue[0] = pValue[7];
+  pValue[7] = temp;
+  temp      = pValue[1];
+  pValue[1] = pValue[6];
+  pValue[6] = temp;
+  temp      = pValue[2];
+  pValue[2] = pValue[5];
+  pValue[5] = temp;
+  temp      = pValue[3];
+  pValue[3] = pValue[4];
+  pValue[4] = temp;
 }
 
 static INLINE D_UINT16
-from_le_int16 (const D_UINT8 * value)
+from_le_int16 (const D_UINT8* pValue)
 {
-
   D_UINT16 result;
 
-  result = value[1];
+  result = pValue[1];
   result <<= 8;
-  result += value[0];
+  result += pValue[0];
   return result;
 }
 
 static INLINE D_UINT32
-from_le_int32 (const D_UINT8 * value)
+from_le_int32 (const D_UINT8* pValue)
 {
-
   D_UINT32 result;
 
-  result = value[3];
+  result = pValue[3];
   result <<= 8;
-  result += value[2];
+  result += pValue[2];
   result <<= 8;
-  result += value[1];
+  result += pValue[1];
   result <<= 8;
-  result += value[0];
+  result += pValue[0];
+
   return result;
 }
 
 static INLINE D_UINT64
-from_le_int64 (const D_UINT8 * value)
+from_le_int64 (const D_UINT8* pValue)
 {
   D_UINT64 result;
 
-  result = value[7];
+  result = pValue[7];
   result <<= 8;
-  result += value[6];
+  result += pValue[6];
   result <<= 8;
-  result += value[5];
+  result += pValue[5];
   result <<= 8;
-  result += value[4];
+  result += pValue[4];
   result <<= 8;
-  result += value[3];
+  result += pValue[3];
   result <<= 8;
-  result += value[2];
+  result += pValue[2];
   result <<= 8;
-  result += value[1];
+  result += pValue[1];
   result <<= 8;
-  result += value[0];
+  result += pValue[0];
+
   return result;
 }
 

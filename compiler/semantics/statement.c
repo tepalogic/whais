@@ -36,9 +36,9 @@ init_glbl_stmt (struct Statement * stmt)
   memset (stmt, 0, sizeof (*stmt));
   stmt->type = STMT_GLOBAL;
 
-  init_outstream (&(stmt->spec.glb.type_desc), 0);
-  init_outstream (&(stmt->spec.glb.const_area), 0);
-  init_array (&stmt->spec.glb.proc_decls, sizeof (struct Statement));
+  init_outstream (&(stmt->spec.glb.typesDescs), 0);
+  init_outstream (&(stmt->spec.glb.constsArea), 0);
+  init_array (&stmt->spec.glb.procsDecls, sizeof (struct Statement));
   init_array (&stmt->decls, sizeof (struct DeclaredVar));
   return TRUE;
 }
@@ -46,20 +46,20 @@ init_glbl_stmt (struct Statement * stmt)
 void
 clear_glbl_stmt (struct Statement *glbl)
 {
-  D_UINT nprocs = get_array_count (&(glbl->spec.glb.proc_decls));
+  D_UINT nprocs = get_array_count (&(glbl->spec.glb.procsDecls));
 
-  assert (glbl->parent == NULL);
+  assert (glbl->pParentStmt == NULL);
   assert (glbl->type == STMT_GLOBAL);
 
   while (nprocs-- > 0)
     {
       struct Statement *proc =
-	get_item (&(glbl->spec.glb.proc_decls), nprocs);
+	get_item (&(glbl->spec.glb.procsDecls), nprocs);
       clear_proc_stmt (proc);
     }
-  destroy_outstream (&glbl->spec.glb.type_desc);
-  destroy_outstream (&glbl->spec.glb.const_area);
-  destroy_array (&(glbl->spec.glb.proc_decls));
+  destroy_outstream (&glbl->spec.glb.typesDescs);
+  destroy_outstream (&glbl->spec.glb.constsArea);
+  destroy_array (&(glbl->spec.glb.procsDecls));
   destroy_array (&(glbl->decls));
 
   glbl->type = STMT_ERR;
@@ -74,30 +74,30 @@ init_proc_stmt (struct Statement * parent, struct Statement * stmt)
 
   memset (stmt, 0, sizeof (*stmt));
   stmt->type = STMT_PROC;
-  stmt->parent = parent;
-  stmt->spec.proc.sync_keeper = 0;
-  init_array (&stmt->spec.proc.param_list, sizeof (struct DeclaredVar));
+  stmt->pParentStmt = parent;
+  stmt->spec.proc.syncTracker = 0;
+  init_array (&stmt->spec.proc.paramsList, sizeof (struct DeclaredVar));
   init_array (&stmt->decls, sizeof (struct DeclaredVar));
   init_array (stmt_query_branch_stack (stmt), sizeof (struct BranchData));
   init_array (stmt_query_loop_stack (stmt), sizeof (struct LoopData));
 
   init_outstream (stmt_query_instrs (stmt), 0);
   /* reserve space for return type */
-  if (add_item (&(stmt->spec.proc.param_list), &ret_type) == NULL)
+  if (add_item (&(stmt->spec.proc.paramsList), &ret_type) == NULL)
     return FALSE;
 
-  stmt->locals_used++;
+  stmt->localsUsed++;
   return TRUE;
 }
 
 void
 clear_proc_stmt (struct Statement *proc)
 {
-  assert (proc->parent != NULL);
+  assert (proc->pParentStmt != NULL);
   assert (proc->type == STMT_PROC);
-  assert ((proc->spec.proc.name != NULL) && (proc->spec.proc.nlength != 0));
+  assert ((proc->spec.proc.name != NULL) && (proc->spec.proc.nameLength != 0));
 
-  destroy_array (&(proc->spec.proc.param_list));
+  destroy_array (&(proc->spec.proc.paramsList));
   destroy_array (&(proc->decls));
   destroy_array (stmt_query_branch_stack (proc));
   destroy_array (stmt_query_loop_stack (proc));
@@ -135,7 +135,7 @@ stmt_find_declaration (struct Statement* pStmt,
                   assert ((result->var_id & GLOBAL_DECL) != 0);
 
                   result->var_id &= ~NOTREF_DECL;
-                  result->var_id |= pStmt->locals_used++;
+                  result->var_id |= pStmt->localsUsed++;
                 }
               else
                 result->var_id &= ~NOTREF_DECL;
@@ -146,15 +146,15 @@ stmt_find_declaration (struct Statement* pStmt,
       count++;
     }
 
-  if (pStmt->parent != NULL)
+  if (pStmt->pParentStmt != NULL)
     {
       /* let's check if is a parameter */
-      stored_vals = get_array_count (&pStmt->spec.proc.param_list);
+      stored_vals = get_array_count (&pStmt->spec.proc.paramsList);
       /* index 0 is reserved to hold the return type */
       count = 1;
       while (count < stored_vals)
 	{
-	  result = get_item (&pStmt->spec.proc.param_list, count);
+	  result = get_item (&pStmt->spec.proc.paramsList, count);
 	  assert (result != NULL);
 	  if (((result->type & T_FIELD_MASK) == 0) &&
 	      (label_len == result->l_label) &&
@@ -176,7 +176,7 @@ stmt_find_declaration (struct Statement* pStmt,
       /* maybe is global */
       if (recursive)
 	{
-	  return stmt_find_declaration (pStmt->parent,
+	  return stmt_find_declaration (pStmt->pParentStmt,
 	                                label,
 					label_len,
 					recursive,
@@ -199,22 +199,22 @@ stmt_add_declaration (struct Statement*   pStmt,
   else if (pStmt->type == STMT_GLOBAL)
     {
       pVar->var_id |= (GLOBAL_DECL | NOTREF_DECL);
-      pOutStream   = &(pStmt->spec.glb.type_desc);
+      pOutStream   = &(pStmt->spec.glb.typesDescs);
     }
   else
     {
-      assert (pStmt->parent->type == STMT_GLOBAL);
+      assert (pStmt->pParentStmt->type == STMT_GLOBAL);
 
-      pVar->var_id |= pStmt->locals_used++ | NOTREF_DECL;
-      pOutStream   = &(pStmt->parent->spec.glb.type_desc);
+      pVar->var_id |= pStmt->localsUsed++ | NOTREF_DECL;
+      pOutStream   = &(pStmt->pParentStmt->spec.glb.typesDescs);
     }
 
   pVar->type_spec_pos = type_spec_fill (pOutStream, pVar);
 
   if (parameter)
     {
-      assert (pStmt->parent != NULL);
-      pVar = add_item (&pStmt->spec.proc.param_list, pVar);
+      assert (pStmt->pParentStmt != NULL);
+      pVar = add_item (&pStmt->spec.proc.paramsList, pVar);
     }
   else
     pVar = add_item (&pStmt->decls, pVar);
@@ -227,21 +227,21 @@ stmt_get_param (const struct Statement *const stmt, D_UINT arg_pos)
 {
   assert (stmt->type == STMT_PROC);
   return (struct DeclaredVar *)
-    get_item (&stmt->spec.proc.param_list, arg_pos);
+    get_item (&stmt->spec.proc.paramsList, arg_pos);
 }
 
 D_UINT
 stmt_get_param_count (const struct Statement *const stmt)
 {
   assert (stmt->type == STMT_PROC);
-  return get_array_count (&stmt->spec.proc.param_list) - 1;
+  return get_array_count (&stmt->spec.proc.paramsList) - 1;
 }
 
 D_UINT32
 stmt_get_import_id (const struct Statement* const stmt)
 {
   assert (stmt->type == STMT_PROC);
-  return RETRIVE_ID (stmt->spec.proc.proc_id);
+  return RETRIVE_ID (stmt->spec.proc.procId);
 
 }
 
@@ -258,14 +258,14 @@ is_type_spec_valid (const struct TypeSpec * spec)
     {
       result = FALSE;
     }
-  else if ((spec->data[spec->data_len - 2] != TYPE_SPEC_END_MARK) ||
-	   (spec->data[spec->data_len - 1] != 0))
+  else if ((spec->data[spec->dataSize - 2] != TYPE_SPEC_END_MARK) ||
+	   (spec->data[spec->dataSize - 1] != 0))
     {
       result = FALSE;
     }
   else if ((spec->type & T_ARRAY_MASK) != 0)
     {
-      if ( (spec->data_len != 2) ||
+      if ( (spec->dataSize != 2) ||
            ((spec->type & ~T_ARRAY_MASK) == T_UNKNOWN) ||
            ((spec->type & ~T_ARRAY_MASK) > T_UNDETERMINED) )
 	{
@@ -276,7 +276,7 @@ is_type_spec_valid (const struct TypeSpec * spec)
     {
       D_UINT index = 0;
 
-      while ((index < (D_UINT) (spec->data_len - 2)) && (result != FALSE))
+      while ((index < (D_UINT) (spec->dataSize - 2)) && (result != FALSE))
 	{
 	  D_UINT16 type;
 	  D_UINT id_len = strlen ((char *) &spec->data[index]);
@@ -318,7 +318,7 @@ find_type_spec (const D_UINT8 * buffer, D_UINT32 buffer_len,
 	{
 	  return position;
 	}
-      position += it->data_len + 2 * sizeof (D_UINT16);
+      position += it->dataSize + 2 * sizeof (D_UINT16);
     }
 
   return TYPE_SPEC_INVALID_POS;
@@ -329,8 +329,8 @@ type_spec_cmp (const struct TypeSpec * pSpec_1,
 	       const struct TypeSpec * pSpec_2)
 {
   return (pSpec_1->type == pSpec_2->type) &&
-    (pSpec_1->data_len == pSpec_2->data_len) &&
-    (memcmp (&pSpec_1->data[0], &pSpec_2->data[0], pSpec_1->data_len) == 0);
+    (pSpec_1->dataSize == pSpec_2->dataSize) &&
+    (memcmp (&pSpec_1->data[0], &pSpec_2->data[0], pSpec_1->dataSize) == 0);
 }
 
 static D_UINT
@@ -388,7 +388,7 @@ type_spec_fill_table (struct OutStream *outs,
       struct TypeSpec *ts = (struct TypeSpec *)
         (get_buffer_outstream (outs) + spec_pos);
       result += 2;
-      ts->data_len = result;
+      ts->dataSize = result;
     }
   else
     {
@@ -406,12 +406,12 @@ type_spec_fill_array (struct OutStream *outs, const struct DeclaredVar *var)
   assert ((var->type & T_ARRAY_MASK) != 0);
 
   ts.type = var->type;
-  ts.data_len = 2;
+  ts.dataSize = 2;
   ts.data[0] = TYPE_SPEC_END_MARK;
   ts.data[1] = 0;
 
   if ((uint16_outstream (outs, ts.type) != NULL) &&
-      (uint16_outstream (outs, ts.data_len) != NULL) &&
+      (uint16_outstream (outs, ts.dataSize) != NULL) &&
       (data_outstream (outs, ts.data, sizeof ts.data) != NULL))
     {
       result = 2 * sizeof  (D_UINT16) + sizeof (ts.data);
@@ -434,7 +434,7 @@ type_spec_fill_basic (struct OutStream *outs, const struct DeclaredVar *var)
   assert (var->type <= T_UINT64);
 
   ts.type = var->type;
-  ts.data_len = 2;
+  ts.dataSize = 2;
   ts.data[0] = TYPE_SPEC_END_MARK;
   ts.data[1] = 0;
 
@@ -515,7 +515,7 @@ D_INT
 add_text_const (struct Statement * stmt, const D_UINT8 * buffer, D_UINT size)
 {
   struct OutStream *outs = (stmt->type == STMT_GLOBAL) ?
-    &stmt->spec.glb.const_area : &stmt->parent->spec.glb.const_area;
+    &stmt->spec.glb.constsArea : &stmt->pParentStmt->spec.glb.constsArea;
 
   const D_UINT8 *outs_buff = get_buffer_outstream (outs);
   const D_UINT stream_size = get_size_outstream (outs);

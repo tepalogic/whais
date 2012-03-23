@@ -204,8 +204,8 @@ extern "C"
 #endif
 
 unsigned int
-whc_decode_opcode (const unsigned char *ins, enum W_OPCODE *opcode);
-
+whc_decode_opcode (const unsigned char* pCode,
+                    enum W_OPCODE*      pOutOpcode);
 #ifdef __cplusplus
 }
 #endif

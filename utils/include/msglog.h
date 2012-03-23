@@ -31,25 +31,33 @@ typedef const void *POSTMAN_BAG;
 
 #define IGNORE_BUFFER_POS      (D_UINT)(~0)
 
-typedef
-  void (*POSTMAN) (POSTMAN_BAG bag,
-		   D_UINT buff_pos,
-		   D_UINT msgCode,
-		   D_UINT msgType, D_CHAR * msgFormat, va_list args);
-
-void register_postman (POSTMAN man, POSTMAN_BAG handle);
-
-POSTMAN get_postman (void);
-
-POSTMAN_BAG get_postman_bag (void);
+typedef void (*POSTMAN) (POSTMAN_BAG bag,
+		         D_UINT      bufferPosition,
+		         D_UINT      msgCode,
+		         D_UINT      msgType,
+		         D_CHAR*     msgFormat,
+		         va_list     args);
 
 void
-LOGMSG (D_UINT buff_pos, D_UINT msgCode, D_UINT msgType, D_CHAR * msgFormat,
+register_postman (POSTMAN man, POSTMAN_BAG handle);
+
+POSTMAN
+get_postman (void);
+
+POSTMAN_BAG
+get_postman_bag (void);
+
+void
+LOGMSG (D_UINT  buff_pos,
+        D_UINT  msgCode,
+        D_UINT  msgType,
+        D_CHAR* msgFormat,
 	va_list args);
 
 /* utils for LOGMSG arguments */
-D_CHAR *copy_text_truncate (D_CHAR * dest,
-			    const D_CHAR * src,
-			    D_UINT dest_max, D_UINT src_len);
+D_CHAR *copy_text_truncate (D_CHAR*        dest,
+			    const D_CHAR*  src,
+			    D_UINT         dest_max,
+			    D_UINT         src_len);
 
 #endif /*MSGLOG_H_ */
