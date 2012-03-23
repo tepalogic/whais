@@ -141,7 +141,7 @@ wod_dump_const_area (WICompiledUnit & unit, std::ostream & outs)
 static void
 wod_dump_basic_type_info (std::ostream & outs, D_UINT16 type)
 {
-  assert ((type & (T_CONTAINER_MASK | T_FIELD_MASK)) == 0);
+  assert ((type & (T_TABLE_MASK | T_FIELD_MASK)) == 0);
 
   if (type & T_ARRAY_MASK)
     {
@@ -223,11 +223,6 @@ wod_dump_rectable_type_inf (const D_UINT8 * buffer, std::ostream & outs)
 
   if (type == T_TABLE_MASK)
     outs << "TABLE";
-  else
-    {
-      assert (type == T_RECORD_MASK);
-      outs << "RECORD";
-    }
 
   if (type_size > 2)
     {
@@ -253,31 +248,6 @@ wod_dump_rectable_type_inf (const D_UINT8 * buffer, std::ostream & outs)
 }
 
 static void
-wod_dump_row_type_info (const D_UINT8 * buffer, std::ostream & outs)
-{
-  const D_UINT16 type = from_le_int16 (buffer);
-  buffer += sizeof (D_UINT16);
-
-  const D_UINT16 type_size = from_le_int16 (buffer);
-  buffer += sizeof (D_UINT16);
-
-  if (type_size > 2)
-    {
-      const D_UINT32 GLOBAL_DECLARED = 0x80000000;
-      D_UINT32       var_id          = from_le_int32 (buffer);
-
-      if ((var_id & GLOBAL_DECLARED) != 0)
-	outs << "ROW OF GLOBAL VAR ID. " << (var_id & ~GLOBAL_DECLARED);
-      else
-	outs << "ROW OF LOCAL VAR ID. " << (var_id & ~GLOBAL_DECLARED);
-    }
-  else
-    outs << "ROW";
-
-  assert ((type & T_ROW_MASK) != 0);
-}
-
-static void
 wod_dump_type_info (const D_UINT8 * buffer, std::ostream & outs)
 {
   const D_UINT16 type      = from_le_int16 (buffer);
@@ -288,15 +258,10 @@ wod_dump_type_info (const D_UINT8 * buffer, std::ostream & outs)
       || (buffer[type_size + sizeof (D_UINT16) + 1] != 0x0))
     throw WDumpException ("Object file is corrupt!", _EXTRA(0));
 
-  if ((type & T_CONTAINER_MASK) == 0)
+  if ((type & T_TABLE_MASK) == 0)
     return wod_dump_basic_type_info (outs, type);
-  else if ((type == T_TABLE_MASK) || (type == T_RECORD_MASK))
-    return wod_dump_rectable_type_inf (buffer, outs);
   else
-    {
-      assert (type == T_ROW_MASK);
-      return wod_dump_row_type_info (buffer, outs);
-    }
+    return wod_dump_rectable_type_inf (buffer, outs);
 }
 
 void

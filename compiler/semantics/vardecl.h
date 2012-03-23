@@ -82,7 +82,7 @@ install_field_declaration (struct ParserState*       pState,
 			   YYSTYPE                   sem_type,
 			   struct DeclaredVar* const pExtra);
 D_BOOL
-process_container_decls (struct ParserState* pState,
+process_table_decls (struct ParserState* pState,
                          struct DeclaredVar* pVar,
                          void*               extra);
 

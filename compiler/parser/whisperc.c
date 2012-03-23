@@ -135,7 +135,6 @@ whc_get_procs_count (WHC_HANDLER hnd)
 unsigned int
 whc_get_proc (WHC_HANDLER hnd, unsigned int item, WHC_PROC_DESC* pOutDesc)
 {
-  struct ParserState*     pState = (struct ParserState*) hnd;
   const struct Statement* pProc  = (const struct Statement*) whc_get_proc_hnd (hnd, item);
 
   if (pProc == NULL)

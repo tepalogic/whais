@@ -74,10 +74,6 @@ D_CHAR test_prog_1[] = ""
   "DO \n" "LET some_var AS DATE; \n" "RETURN some_var; \n" "ENDPROC \n";
 
 D_CHAR test_prog_2[] = ""
-  "PROCEDURE Proc() RETURN RECORD WITH (f1 AS TEXT) \n"
-  "DO \n" "LET some_var AS TEXT; \n" "RETURN some_var; \n" "ENDPROC \n";
-
-D_CHAR test_prog_3[] = ""
   "PROCEDURE Proc_1() RETURN DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
@@ -89,15 +85,15 @@ D_CHAR test_prog_3[] = ""
   "IF Proc_1() THEN \n"
   "RETURN 0.23; \n" "END \n" "RETURN 0.1; \n" "ENDPROC \n";
 
-D_CHAR test_prog_4[] = ""
+D_CHAR test_prog_3[] = ""
   "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
   "DO \n" "CONTINUE; \n" "RETURN some_var; \n" "ENDPROC \n";
 
-D_CHAR test_prog_5[] = ""
+D_CHAR test_prog_4[] = ""
   "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
   "DO \n" "BREAK; \n" "RETURN some_var; \n" "ENDPROC \n";;
 
-D_CHAR test_prog_6[] = ""
+D_CHAR test_prog_5[] = ""
   "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
@@ -107,7 +103,7 @@ D_CHAR test_prog_6[] = ""
   "some_int = 0; \n"
   "ENDSYNC \n" "ENDSYNC \n" "RETURN some_var; \n" "ENDPROC \n";
 
-D_CHAR test_prog_7[] = ""
+D_CHAR test_prog_6[] = ""
   "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
@@ -1141,13 +1137,13 @@ D_CHAR test_prog_7[] = ""
   "some_int = 0; \n"
   "ENDSYNC \n" " \n" "RETURN some_var; \n" "ENDPROC \n" " \n";
 
-D_CHAR test_prog_8[] = ""
-  "PROCEDURE Proc() RETURN TABLE WITH (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE WITH (v1 AS TEXT, v2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+D_CHAR test_prog_7[] = ""
+  "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
+  "DO \n" "LET some_var AS TABLE OF (v1 AS TEXT, v2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
-D_CHAR test_prog_9[] = ""
-  "PROCEDURE Proc() RETURN TABLE WITH (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE WITH (f1 AS TEXT, f2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+D_CHAR test_prog_8[] = ""
+  "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
+  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
@@ -1192,34 +1188,30 @@ main ()
     test_for_error (test_prog_1, MSG_PROC_RET_NA_EXT, MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_2,
-						     MSG_PROC_RET_NA_EXT,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
 						     MSG_EXP_NOT_BOOL,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
 						     MSG_CONTINUE_NOLOOP,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
 						     MSG_BREAK_NOLOOP,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
                                                      MSG_SYNC_NA,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
 						     MSG_SYNC_MANY,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_8,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
                                                      MSG_PROC_RET_NA,
                                                      MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_9,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_8,
                                                      MSG_PROC_RET_NA,
                                                      MSG_ERROR_EVENT);
   if (test_result == FALSE)

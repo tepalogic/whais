@@ -64,77 +64,15 @@ create_type_spec (struct ParserState* pState, D_UINT16 type)
   return result;
 }
 
-static D_BOOL
-process_row_decl (struct ParserState* pState,
-		  struct DeclaredVar* pVar,
-		  struct SemValue*    pSemVal)
-{
-  struct Statement *const pStmt  = pState->current_stmt;
-  struct SemId*           pId    = (pSemVal == NULL) ? NULL : (&(pSemVal->val.u_id));
-  D_BOOL                  result = TRUE;
-
-  assert (pSemVal == NULL || pSemVal->val_type == VAL_ID);
-
-  if (pId == NULL)
-    pVar->extra = NULL;
-  else
-    {
-      D_CHAR tname[128];
-      struct DeclaredVar* pFoundVar = stmt_find_declaration (pStmt,
-                                                            pId->text,
-                                                            pId->length,
-                                                            TRUE,
-                                                            TRUE);
-
-      if (pFoundVar == NULL)
-	{
-	  copy_text_truncate (tname, pId->text, sizeof tname, pId->length);
-	  w_log_msg (pState, pState->buffer_pos, MSG_VAR_NFOUND, tname);
-	  pState->err_sem = TRUE;
-	  result          = FALSE;
-	}
-      else if (pFoundVar->type != T_TABLE_MASK)
-	{
-	  copy_text_truncate (tname, pId->text, sizeof tname, pId->length);
-	  w_log_msg (pState, pState->buffer_pos, MSG_NOT_TABLE, tname);
-	  pState->err_sem = TRUE;
-	  result          = FALSE;
-	}
-      else
-        pVar->extra = pFoundVar;
-
-      /* mark this for reuse */
-      pSemVal->val_type = VAL_REUSE;
-    }
-
-  return result;
-}
-
 D_BOOL
-process_container_decls (struct ParserState* pState,
-                         struct DeclaredVar* pVar,
-			 void*               pExtra)
+process_table_decls (struct ParserState* pState,
+                     struct DeclaredVar* pVar,
+                     void*               pExtra)
 {
   D_BOOL result = TRUE;
 
-  switch (pVar->type)
-    {
-    case T_ROW_MASK:
-      {
-	struct SemValue *const ex_row = (struct SemValue *) pExtra;
-	result = process_row_decl (pState, pVar, ex_row);
-      }
-      break;
-    case T_TABLE_MASK:
-    case T_RECORD_MASK:
-      pVar->extra = (struct DeclaredVar *) pExtra;
-      break;
-    default:
-      assert (FALSE); /* we should not be here */
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_INT_ERR);
-
-      return FALSE;
-    }
+  assert (pVar->type == T_TABLE_MASK);
+  pVar->extra = (struct DeclaredVar*) pExtra;
 
   return result;
 }
@@ -180,8 +118,8 @@ install_declaration (struct ParserState* pState,
       var.extra   = NULL;
       var.offset  = 0;
 
-      if ((var.type & T_CONTAINER_MASK) &&
-	  (process_container_decls (pState, &var, sem_type->val.u_tspec.extra) == FALSE))
+      if ((var.type & T_TABLE_MASK) &&
+	  (process_table_decls (pState, &var, sem_type->val.u_tspec.extra) == FALSE))
 	{
 	  result = NULL;	/* something went wrong along the way */
 	}
@@ -191,7 +129,7 @@ install_declaration (struct ParserState* pState,
 	  w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
 	  pState->err_sem = TRUE;
 	}
-      else if (((var.type & (T_TABLE_MASK | T_RECORD_MASK)) != 0))
+      else if (var.type & T_TABLE_MASK )
 	{
 	  /* Set a sentinel for the extra field. */
 	  struct DeclaredVar *it = result->extra;

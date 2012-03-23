@@ -74,12 +74,6 @@ D_CHAR test_prog_2[] = ""
   "PROCEDURE Proc_2( v1 AS DATE)\n RETURN DATE "
   "DO\n " "v2 = v1;\n " "RETURN v2;\n " "ENDPROC\n " "\n " "";
 
-D_CHAR test_prog_3[] = ""
-  "PROCEDURE Proc_3( v1 AS DATE)\n RETURN DATE "
-  "DO\n "
-  "LET v2 AS ROW OF TABLE some_missing_table;\n "
-  "RETURN v1;\n " "ENDPROC\n " "\n " "";
-
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 {
@@ -120,14 +114,8 @@ main ()
 
   printf ("Testing for received error messages...\n");
   test_result = test_for_error (test_prog_1, MSG_VAR_NFOUND, MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_2,
-						     MSG_VAR_NFOUND,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
-						     MSG_VAR_NFOUND,
-						     MSG_ERROR_EVENT);
+  test_result = test_result && test_for_error (test_prog_2, MSG_VAR_NFOUND, MSG_ERROR_EVENT);
+
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");

@@ -11,13 +11,9 @@ extern int yyparse (struct ParserState *);
 
 
 D_CHAR buffer[] =
-  "LET vRecord AS RECORD;\n"
   "LET vTable  AS TABLE;\n"
-  "LET vRow    AS ROW;\n"
-  "LET vRow1   AS ROW OF TABLE vTable;\n"
-  "LET vRecord1 AS RECORD WITH (v1 AS TEXT, v2 AS INT8, v3 AS ARRAY, v4 AS ARRAY OF UNSIGNED INT8);\n"
-  "LET vTable2, vTable3 AS TABLE WITH (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n"
-  "LET vRow3 AS ROW OF TABLE vTable3;\n";
+  "LET vTable2, vTable3 AS TABLE OF (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n";
+
 
 extern D_BOOL is_type_spec_valid (const struct TypeSpec *spec);
 
@@ -109,30 +105,6 @@ check_type_spec_fill (const struct TypeSpec *ts,
 }
 
 static D_BOOL
-check_row_decl (struct Statement *stmt,
-		struct DeclaredVar *var, struct DeclaredVar *table)
-{
-  if (var->extra != table)
-    {
-      return FALSE;
-    }
-  else if (var->extra != NULL)
-    {
-      D_UINT32 table_spec = ~0;
-      D_UINT8 *const buffer =
-	get_buffer_outstream (&stmt->spec.glb.type_desc);
-      struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->type_spec_pos);
-      table_spec = *((D_UINT32 *) ts->data);
-      if (table_spec != table->var_id)
-	{
-	  return FALSE;
-	}
-    }
-
-  return TRUE;
-}
-
-static D_BOOL
 check_container_field (struct Statement *stmt,
 		       struct DeclaredVar *var, D_CHAR * field, D_UINT32 type)
 {
@@ -179,17 +151,9 @@ check_vars_decl (struct ParserState *state)
   struct DeclaredVar *decl_var = NULL;
   struct DeclaredVar *table_1 = NULL;
   struct DeclaredVar *table_2 = NULL;
-  struct DeclaredVar *table_3 = NULL;
 
   if (state->global_stmt.type != STMT_GLOBAL ||
       state->global_stmt.parent != NULL)
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRecord", 7, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_RECORD_MASK ||
-      decl_var->extra != decl_var)
     {
       return FALSE;
     }
@@ -200,44 +164,6 @@ check_vars_decl (struct ParserState *state)
     {
       return FALSE;
     }
-  else
-    {
-      table_1 = decl_var;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRow", 4, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_ROW_MASK ||
-      (decl_var->extra != NULL) ||
-      (!check_row_decl (&state->global_stmt, decl_var, NULL)))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRow1", 5, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_ROW_MASK ||
-      (decl_var->extra != table_1) ||
-      (!check_row_decl (&state->global_stmt, decl_var, table_1)))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt,
-				    "vRecord1", 8, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_RECORD_MASK ||
-      decl_var->extra == decl_var)
-    {
-      return FALSE;
-    }
-
-  if (!(check_container_field (&state->global_stmt, decl_var, "v1", T_TEXT) &&
-	check_container_field (&state->global_stmt, decl_var, "v2", T_INT8) &&
-	check_container_field (&state->global_stmt, decl_var, "v3",
-			       T_ARRAY_MASK | T_UNDETERMINED)
-	&& check_container_field (&state->global_stmt, decl_var, "v4",
-				  T_ARRAY_MASK | T_UINT8)))
-    {
-      return FALSE;
-    }
 
   decl_var = stmt_find_declaration (&state->global_stmt, "vTable2", 7, FALSE, FALSE);
   if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
@@ -245,17 +171,18 @@ check_vars_decl (struct ParserState *state)
     {
       return FALSE;
     }
-  table_2 = decl_var;
+  table_1 = decl_var;
 
   decl_var = stmt_find_declaration (&state->global_stmt, "vTable3", 7, FALSE, FALSE);
   if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
-      (decl_var->extra != table_2->extra) ||
-      (decl_var->type_spec_pos != table_2->type_spec_pos))
+      (decl_var->extra != table_1->extra) ||
+      (decl_var->type_spec_pos != table_1->type_spec_pos))
     {
       return FALSE;
     }
-  table_3 = decl_var;
-  if (table_3->extra != table_2->extra)
+
+  table_2 = decl_var;
+  if (table_2->extra != table_1->extra)
     {
       return FALSE;
     }
@@ -269,17 +196,7 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRow3", 5, FALSE, FALSE);
-  if ((decl_var == NULL) || (decl_var->type != T_ROW_MASK) ||
-      (decl_var->extra != table_3) ||
-      (!check_row_decl (&state->global_stmt, decl_var, table_3)))
-
-    {
-      return FALSE;
-    }
-
   return TRUE;
-
 }
 
 int

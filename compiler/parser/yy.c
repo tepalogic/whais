@@ -278,10 +278,8 @@ static TOKEN_SEMANTIC keywords[] = {
   {"NOT", NOT},
   {"NULL", WHISPER_NULL},
   {"REAL", REAL},
-  {"RECORD", RECORD},
   {"RETURN", RETURN},
   {"RICHREAL", RICHREAL},
-  {"ROW", ROW},
   {"PROCEDURE", PROCEDURE},
   {"SYNC", SYNC},
   {"TABLE", TABLE},
@@ -291,7 +289,6 @@ static TOKEN_SEMANTIC keywords[] = {
   {"UNTIL", UNTIL},
   {"UNSIGNED", UNSIGNED},
   {"WHILE", WHILE},
-  {"WITH", WITH},
   {"XOR", XOR},
 
   /* some aliases of our own */

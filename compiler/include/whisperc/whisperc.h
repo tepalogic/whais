@@ -32,17 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
 #define T_ARRAY_MASK    0x0100	/* a mask to tell that variable is an array */
+#define T_TABLE_MASK    0x0200	/*the variable is a table */
+#define T_FIELD_MASK    0x0400	/*the variable is a table */
 
-#define T_RECORD_MASK   0x0200	/*the variable is a set */
-#define T_ROW_MASK      0x0400	/*the variable is a row of a table */
-#define T_TABLE_MASK    0x0800	/*the variable is a table */
-#define T_CONTAINER_MASK  (T_ROW_MASK | T_TABLE_MASK | T_RECORD_MASK)
-
-#define T_FIELD_MASK   0x1000	/* this variable was not declared directly
-				   and it is a field of a record,
-				   a raw or table */
-#define T_L_VALUE      0x2000	/* Mask applied to suggest if this is a
-				   genuine l-value */
+#define T_L_VALUE       0x1000	/* Mask applied to suggest if this is a genuine l-value */
 
 typedef const void* WHC_HANDLER;
 typedef const void* WHC_PROC_HANDLER;

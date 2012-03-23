@@ -50,8 +50,8 @@ check_used_vals (struct ParserState *state)
 }
 
 D_CHAR proc_decl_buffer[] =
-  "LET tab_glb AS TABLE WITH ( field AS DATE); "
-  "LET tab_glb2 AS TABLE WITH ( field2 AS TEXT, field AS DATE); "
+  "LET tab_glb AS TABLE OF ( field AS DATE); "
+  "LET tab_glb2 AS TABLE OF ( field2 AS TEXT, field AS DATE); "
   "PROCEDURE ProcId1 (v1 AS CHARACTER, v2 AS CHARACTER) RETURN CHARACTER "
   "DO "
   "RETURN v1 = v2; "
@@ -197,58 +197,30 @@ D_CHAR proc_decl_buffer[] =
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId30 (v1 AS ROW, v2 AS ROW) RETURN ROW "
+  "PROCEDURE ProcId30 (v1 AS TABLE, v2 AS TABLE) RETURN TABLE "
   "DO "
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId31 (v1 AS ROW, v2 AS ROW OF TABLE tab_glb) RETURN ROW "
+  "PROCEDURE ProcId31 (v1 AS TABLE OF (field AS DATE, f2 AS TEXT), v2 AS TABLE OF (field as DATE, f3 AS REAL)) RETURN TABLE "
   "DO "
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId32 (v1 AS ROW OF TABLE tab_glb2, v2 AS ROW OF TABLE tab_glb) RETURN ROW "
+  "PROCEDURE ProcId32 (v1 AS ARRAY, v2 AS ARRAY) RETURN ARRAY "
   "DO "
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId33 (v1 AS ROW OF TABLE tab_glb, v2 AS ROW OF TABLE tab_glb2) RETURN ROW "
+  "PROCEDURE ProcId33 (v1 AS ARRAY, v2 AS ARRAY OF DATETIME) RETURN ARRAY "
   "DO "
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId34 (v1 AS ROW OF TABLE tab_glb, v2 AS RECORD WITH (f1 AS REAL, field AS DATE)) RETURN ROW "
+  "PROCEDURE ProcId34 (v1 AS ARRAY OF INT8, v2 AS ARRAY OF INT16) RETURN ARRAY "
   "DO "
   "RETURN v1 = v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId35 (v1 AS RECORD WITH (f1 AS REAL, field AS DATE), v2 AS ROW OF TABLE tab_glb2) RETURN RECORD "
-  "DO "
-  "RETURN v1 = v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId36 (v1 AS TABLE, v2 AS TABLE) RETURN TABLE "
-  "DO "
-  "RETURN v1 = v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId37 (v1 AS TABLE WITH (field AS DATE, f2 AS TEXT), v2 AS TABLE WITH (field as DATE, f3 AS REAL)) RETURN TABLE "
-  "DO "
-  "RETURN v1 = v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId38 (v1 AS ARRAY, v2 AS ARRAY) RETURN ARRAY "
-  "DO "
-  "RETURN v1 = v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId39 (v1 AS ARRAY, v2 AS ARRAY OF DATETIME) RETURN ARRAY "
-  "DO "
-  "RETURN v1 = v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId40 (v1 AS ARRAY OF INT8, v2 AS ARRAY OF INT16) RETURN ARRAY "
-  "DO " "RETURN v1 = v2; " "ENDPROC\n\n" "";
+  "ENDPROC\n\n" "";
 
 static D_BOOL
 check_procedure (struct ParserState *state, D_CHAR * proc_name)
@@ -304,10 +276,6 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
 	{
 	  op_expect = W_STTA;
 	}
-      else if (((v1->type & (T_ROW_MASK | T_RECORD_MASK)) != 0))
-	{
-	  op_expect = W_STRO;
-	}
       else if ((v1->type & T_ARRAY_MASK) != 0)
 	{
 	  op_expect = W_STA;
@@ -315,7 +283,8 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
       else
 	{
 	  /* we should not be here */
-	  return FALSE;
+          assert (0);
+          return FALSE;
 	}
     }
 
@@ -337,7 +306,7 @@ check_all_procs (struct ParserState *state)
   D_UINT count;
   D_CHAR proc_name[25];
 
-  for (count = 1; count <= 40; ++count)
+  for (count = 1; count <= 34; ++count)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)

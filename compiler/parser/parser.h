@@ -131,10 +131,10 @@ struct SemProcParamList
 
 struct SemExpression
 {
-  struct SemValue *first_op;
-  struct SemValue *second_op;
-
-  D_UINT16 op;
+  struct SemValue* pFirstOp;
+  struct SemValue* pSecondOp;
+  struct SemValue* pThirdOp;
+  D_UINT16         op;
 };
 
 struct SemProcArgumentsList

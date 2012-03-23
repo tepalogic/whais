@@ -70,7 +70,6 @@ enum W_OPCODE
   W_STUI16,
   W_STUI32,
   W_STUI64,
-  W_STRO,
   W_STTA,
   W_STA,
 
@@ -191,7 +190,6 @@ enum W_OPCODE
 
   W_INDT,
   W_INDA,
-  W_INDR,
   W_SELF,
 
   W_BSYNC,

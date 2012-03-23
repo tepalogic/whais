@@ -254,9 +254,7 @@ is_type_spec_valid (const struct TypeSpec * spec)
 
   if (((spec->type == T_UNKNOWN) || (spec->type > T_UNDETERMINED)) &&
       ((spec->type & T_ARRAY_MASK) == 0) &&
-      ((spec->type & T_CONTAINER_MASK) != T_ROW_MASK) &&
-      ((spec->type & T_CONTAINER_MASK) != T_TABLE_MASK) &&
-      ((spec->type & T_CONTAINER_MASK) != T_RECORD_MASK))
+      ((spec->type & T_TABLE_MASK) != T_TABLE_MASK))
     {
       result = FALSE;
     }
@@ -274,15 +272,7 @@ is_type_spec_valid (const struct TypeSpec * spec)
 	  result = FALSE;
 	}
     }
-  else if ((spec->type & T_CONTAINER_MASK) == T_ROW_MASK)
-    {
-      if ((spec->data_len != 2) && (spec->data_len != 6))
-	{
-	  result = FALSE;
-	}
-    }
-  else if (((spec->type & T_CONTAINER_MASK) == T_TABLE_MASK) ||
-	   ((spec->type & T_CONTAINER_MASK) == T_RECORD_MASK))
+  else if (spec->type & T_TABLE_MASK)
     {
       D_UINT index = 0;
 
@@ -296,7 +286,7 @@ is_type_spec_valid (const struct TypeSpec * spec)
 	  type = ((D_UINT16 *) & (spec->data[index]))[0];
 	  /* clear an eventual array mask */
 	  type &= ~T_ARRAY_MASK;
-	  if ((type == T_UNKNOWN) || (type > T_UNDETERMINED))
+	  if ((type == T_UNKNOWN) || (type >= T_UNDETERMINED))
 	    {
 	      result = FALSE;
 	      break;
@@ -371,86 +361,40 @@ type_spec_fill_field (struct OutStream *outs, const struct DeclaredVar *list)
 }
 
 static D_UINT
-type_spec_fill_container (struct OutStream *outs,
-			  const struct DeclaredVar *var)
+type_spec_fill_table (struct OutStream *outs,
+                      const struct DeclaredVar *var)
 {
-  D_UINT result = 0;
+  D_UINT result   = 0;
   D_UINT spec_pos = get_size_outstream (outs);
 
-  assert ((var->type & T_CONTAINER_MASK) != 0);
-  switch (var->type & T_CONTAINER_MASK)
+  assert (var->type & T_TABLE_MASK);
+
+  /* output the type and a dummy length to fill
+   * after fields are output */
+  if ((uint16_outstream (outs, var->type) != NULL) &&
+      (uint16_outstream (outs, 0) != NULL))
     {
-    case T_RECORD_MASK:
-    case T_TABLE_MASK:
-      /* output the type and a dummy length to fill
-       * after fields are output */
-      if ((uint16_outstream (outs, var->type) != NULL) &&
-	  (uint16_outstream (outs, 0) != NULL))
-	{
-	  result = type_spec_fill_field (outs, var->extra);
-	}
-      else
-	{
-	  result = TYPE_SPEC_ERROR;
-	}
-
-      if ((result != TYPE_SPEC_ERROR) &&
-	  (uint8_outstream (outs, TYPE_SPEC_END_MARK) != NULL) &&
-	  (uint8_outstream (outs, 0) != NULL))
-	{
-	  struct TypeSpec *ts = (struct TypeSpec *)
-	    (get_buffer_outstream (outs) + spec_pos);
-	  result += 2;
-	  ts->data_len = result;
-	}
-      else
-	{
-	  result = TYPE_SPEC_ERROR;
-	}
-      break;
-    case T_ROW_MASK:
-      /* output the type and a dummy length to fill
-       * after fields are output */
-      if ((uint16_outstream (outs, var->type) != NULL) &&
-	  (uint16_outstream (outs, 0) != NULL))
-	{
-	  if (var->extra)
-	    {
-	      assert ((var->extra->var_id & NOTREF_DECL) == 0);
-
-	      D_UINT32 tmp = var->extra->var_id & ~EXTERN_DECL;
-	      if (uint32_outstream (outs, tmp) == NULL)
-		result = TYPE_SPEC_ERROR;
-	      else
-		result = sizeof (D_UINT32);
-	    }
-	  else
-	    {
-	      result = 0;
-	    }
-
-	}
-      else
-	{
-	  result = TYPE_SPEC_ERROR;
-	}
-      if ((result != TYPE_SPEC_ERROR) &&
-	  (uint8_outstream (outs, TYPE_SPEC_END_MARK) != NULL) &&
-	  (uint8_outstream (outs, 0) != NULL))
-	{
-	  struct TypeSpec *ts = (struct TypeSpec *)
-	    (get_buffer_outstream (outs) + spec_pos);
-	  ts->data_len = result + 2;
-	}
-      else
-	{
-	  result = TYPE_SPEC_ERROR;
-	}
-      break;
-    default:
-      assert (0);
-      result = 0;
+      result = type_spec_fill_field (outs, var->extra);
     }
+  else
+    {
+      result = TYPE_SPEC_ERROR;
+    }
+
+  if ((result != TYPE_SPEC_ERROR) &&
+      (uint8_outstream (outs, TYPE_SPEC_END_MARK) != NULL) &&
+      (uint8_outstream (outs, 0) != NULL))
+    {
+      struct TypeSpec *ts = (struct TypeSpec *)
+        (get_buffer_outstream (outs) + spec_pos);
+      result += 2;
+      ts->data_len = result;
+    }
+  else
+    {
+      result = TYPE_SPEC_ERROR;
+    }
+
   return result;
 }
 
@@ -522,13 +466,13 @@ type_spec_fill (struct OutStream * outs, const struct DeclaredVar * var)
     }
   init_outstream (&temp, OUTSTREAM_INCREMENT_SIZE);
 
-  if ((var->type & (T_CONTAINER_MASK | T_ARRAY_MASK)) == 0)
+  if ((var->type & (T_TABLE_MASK | T_ARRAY_MASK)) == 0)
     {
       result = type_spec_fill_basic (&temp, var);
     }
-  else if ((var->type & T_CONTAINER_MASK) != 0)
+  else if ((var->type & T_TABLE_MASK) != 0)
     {
-      result = type_spec_fill_container (&temp, var);
+      result = type_spec_fill_table (&temp, var);
     }
   else if ((var->type & T_ARRAY_MASK) != 0)
     {

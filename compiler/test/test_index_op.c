@@ -51,15 +51,9 @@ check_used_vals (struct ParserState *state)
 
 D_CHAR proc_decl_buffer[] =
   "LET gb AS INT16; "
-  "LET gb2 AS TABLE WITH (field AS DATE);\n" ""
-  "PROCEDURE ProcId1 (v1 AS ARRAY OF DATE) RETURN ROW OF TABLE gb2 "
-  "DO "
-  "RETURN gb2[gb]; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId2 (v1 AS ARRAY OF INT16) RETURN INT16 "
+  "PROCEDURE ProcId1 (v1 AS ARRAY OF INT16) RETURN INT16 "
   "DO " "RETURN v1[gb]; " "ENDPROC\n\n" ""
-  "PROCEDURE ProcId3 (v1 AS TEXT) RETURN CHARACTER "
+  "PROCEDURE ProcId2 (v1 AS TEXT) RETURN CHARACTER "
   "DO " "RETURN v1[gb]; " "ENDPROC\n\n" "";
 
 static D_BOOL
@@ -86,13 +80,10 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name, const enum W_OPC
 static D_BOOL
 check_all_procs (struct ParserState *state)
 {
-  if (check_procedure (state, "ProcId1", W_INDR) == FALSE)
+  if (check_procedure (state, "ProcId1", W_INDA) == FALSE)
     return FALSE;
 
-  if (check_procedure (state, "ProcId2", W_INDA) == FALSE)
-    return FALSE;
-
-  if (check_procedure (state, "ProcId3", W_INDT) == FALSE)
+  if (check_procedure (state, "ProcId2", W_INDT) == FALSE)
     return FALSE;
 
   return TRUE;

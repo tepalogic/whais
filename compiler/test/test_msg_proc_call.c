@@ -70,80 +70,44 @@ my_postman (POSTMAN_BAG bag,
 }
 
 D_CHAR test_prog_1[] = ""
-  "LET table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16); \n"
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
-  " \n"
-  "PROCEDURE Proc_1 ( row_arg AS ROW OF TABLE table_1) RETURN INT16 \n"
-  "DO \n"
-  "RETURN row_arg.f2; \n"
-  "ENDPROC \n"
+  "LET table_2 AS TABLE OF ( f1 as DATE); \n"
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( one_row ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
+  "Proc_1 ( 0 ); \n"
+  "RETURN table_2[10, f1]; \n"
+  "ENDPROC \n";
 
 D_CHAR test_prog_2[] = ""
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
+  "LET table_1 AS TABLE OF ( f1 as DATE, f2 as INT16); \n"
+  " \n"
+  "PROCEDURE Proc_1 ( proc_arg AS INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN proc_arg; \n"
+  "ENDPROC \n"
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( one_row ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
+  "LET proc_arg  AS INT16; \n"
+  "LET some_arg AS TEXT; \n"
+  "Proc_1 ( proc_arg, some_arg ); \n"
+  "RETURN table_1[0, f1]; \n"
+  "ENDPROC \n";
 
 D_CHAR test_prog_3[] = ""
-  "LET table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16); \n"
+  "LET table_1 AS TABLE OF ( f1 as DATE, f2 as INT16); \n"
+  "LET table_2 AS TABLE OF ( f1 as DATE); \n"
   " \n"
-  "PROCEDURE Proc_1 ( row_arg AS ROW OF TABLE table_1) RETURN INT16 \n"
+  "PROCEDURE Proc_1 ( proc_arg AS INT16) RETURN INT16 \n"
   "DO \n"
-  "RETURN row_arg.f2; \n"
+  "RETURN proc_arg; \n"
   "ENDPROC \n"
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "LET one_row  AS ROW OF TABLE table_1; \n"
-  "LET some_arg AS TEXT; \n"
-  "Proc_1 ( one_row, some_arg ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
+  "Proc_1 ( ); \n" "RETURN '2010/01/01'; \n" "ENDPROC \n";
 
 D_CHAR test_prog_4[] = ""
-  "LET table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16); \n"
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
-  " \n"
-  "PROCEDURE Proc_1 ( row_arg AS ROW OF TABLE table_1) RETURN INT16 \n"
-  "DO \n"
-  "RETURN row_arg.f2; \n"
-  "ENDPROC \n"
-  " \n"
-  "PROCEDURE Proc_1_2 () RETURN DATE \n"
-  "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
-
-D_CHAR test_prog_5[] = ""
-  "PROCEDURE Proc_1 ( table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16)) RETURN INT16 \n"
-  "DO \n"
-  "RETURN table_1[0].f2; \n"
-  "ENDPROC \n"
-  " \n"
-  "PROCEDURE Proc_1_2 () RETURN DATE \n"
-  "DO \n"
-  "LET one_rec AS RECORD WITH (f1 AS DATE); \n"
-  "Proc_1 ( one_rec); \n" "RETURN one_rec.f1; \n" "ENDPROC \n";
-
-D_CHAR test_prog_6[] = ""
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
-  " \n"
-  "PROCEDURE Proc_1 ( table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16)) RETURN INT16 \n"
-  "DO \n"
-  "RETURN table_1[3].f2; \n"
-  "ENDPROC \n"
-  " \n"
-  "PROCEDURE Proc_1_2 () RETURN DATE \n"
-  "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( one_row ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
-
-D_CHAR test_prog_7[] = ""
   "PROCEDURE Proc_1 ( v1 as DATE, v2 as INT16) RETURN INT16 \n"
   "DO \n"
   "RETURN v2; \n"
@@ -193,28 +157,19 @@ main ()
   D_BOOL test_result = TRUE;
 
   printf ("Testing for received error messages...\n");
-  test_result = test_for_error (test_prog_1, MSG_NO_FIELD, MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_2, MSG_NO_PROC,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_1, MSG_NO_PROC,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_2,
 						     MSG_PROC_MORE_ARGS,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
 						     MSG_PROC_LESS_ARGS,
 						     MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
-						     MSG_CONTAINER_NA,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
-						     MSG_CONTAINER_NA,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
 						     MSG_PROC_ARG_NA,
 						     MSG_ERROR_EVENT);
   if (test_result == FALSE)

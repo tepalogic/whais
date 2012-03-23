@@ -92,13 +92,14 @@ D_CHAR proc_decl_buffer[] =
   "ENDPROC "
   ""
   "PROCEDURE ProcId_3_ (Var1 as REAL, Var2 as TEXT, Var3 as ARRAY, "
-  "                  Var4 AS TABLE WITH ( f1 AS REAL, f2 as UNSIGNED INT32, "
-  "                                       f3 as ARRAY OF INT16), Var5 AS INT64) "
-  "RETURN TABLE WITH (f1 as TEXT, f2 as DATETIME) "
+  "                  Var4 AS TABLE OF ( f1 AS REAL, f2 as UNSIGNED INT32, "
+  "                                     f3 as ARRAY OF INT16), Var5 AS INT64) "
+  "RETURN TABLE OF (f1 as TEXT, f2 as DATETIME) "
   "DO "
   "LET f1 as TEXT; "
   "LET f2 as REAL; "
-  "LET v1 as ROW OF TABLE Var4; " "RETURN NULL; " "ENDPROC";
+  "RETURN NULL; "
+  "ENDPROC";
 
 static D_BOOL
 general_proc_check (struct Statement *glb_stmt,
@@ -232,7 +233,7 @@ check_procs_decl (struct ParserState *state)
     }
 
   proc = get_item (proc_decls, 2);
-  if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 5, 3))
+  if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 5, 2))
     {
       return FALSE;
     }
@@ -307,11 +308,6 @@ check_procs_decl (struct ParserState *state)
       return FALSE;		/* no transparency between local vars and parameters */
     }
 
-  tmp_var = stmt_find_declaration (proc, "v1", strlen ("v1"), FALSE, FALSE);
-  if ((tmp_var->type != T_ROW_MASK) || (tmp_var->extra != tmp_table))
-    {
-      return FALSE;
-    }
   tmp_var = stmt_find_declaration (proc, "f1", strlen ("f1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
     {

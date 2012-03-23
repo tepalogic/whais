@@ -129,7 +129,7 @@ create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescrip
 
   TypeSpec& spec  = *_RC(TypeSpec*, pInOutTypeDescription);
 
-  assert ((spec.type & T_CONTAINER_MASK) == T_TABLE_MASK);
+  assert (spec.type & T_TABLE_MASK);
 
   vector<DBSFieldDescriptor> vFields;
   D_INT                      typeIt = 0;
@@ -260,7 +260,7 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTypeDescription)
         assert (false);
       }
     }
-  else if ((spec.type & T_CONTAINER_MASK) == T_TABLE_MASK)
+  else if (spec.type & T_TABLE_MASK)
     {
       I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
                                                        pInOutTypeDescription);
@@ -359,7 +359,7 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTypeDescription)
         assert (false);
       }
     }
-  else if ((spec.type & T_CONTAINER_MASK) == T_TABLE_MASK)
+  else if (spec.type & T_TABLE_MASK)
     {
       I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
                                                        pInOutTypeDescription);
@@ -379,9 +379,7 @@ TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
 
   if (((spec.type == T_UNKNOWN) || (spec.type > T_UNDETERMINED)) &&
       ((spec.type & T_ARRAY_MASK) == 0) &&
-      ((spec.type & T_CONTAINER_MASK) != T_ROW_MASK) &&
-      ((spec.type & T_CONTAINER_MASK) != T_TABLE_MASK) &&
-      ((spec.type & T_CONTAINER_MASK) != T_RECORD_MASK))
+      ((spec.type & T_TABLE_MASK) == 0))
     {
       result = false;
     }
@@ -400,15 +398,7 @@ TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
           result = false;
         }
     }
-  else if ((spec.type & T_CONTAINER_MASK) == T_ROW_MASK)
-    {
-      if ((spec.data_len != 2) && (spec.data_len != 6))
-        {
-          result = false;
-        }
-    }
-  else if (((spec.type & T_CONTAINER_MASK) == T_TABLE_MASK) ||
-           ((spec.type & T_CONTAINER_MASK) == T_RECORD_MASK))
+  else if (spec.type & T_TABLE_MASK)
     {
       D_UINT index = 0;
 
@@ -424,7 +414,7 @@ TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
           type += spec.data [index];
           /* clear an eventual array mask */
           type &= ~T_ARRAY_MASK;
-          if ((type == T_UNKNOWN) || (type > T_UNDETERMINED))
+          if ((type == T_UNKNOWN) || (type >= T_UNDETERMINED))
             {
               result = false;
               break;

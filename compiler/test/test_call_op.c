@@ -83,16 +83,7 @@ D_CHAR proc_decl_buffer[] =
   "RETURN TRUE; "
   "ENDPROC "
   " "
-  "PROCEDURE ProcId3( v1 AS RECORD, "
-  "          v2 AS RECORD WITH ( var1 AS REAL, "
-  "                      var2 AS ARRAY, "
-  "                      var3 AS ARRAY OF UNSIGNED INT16)) "
-  "RETURN BOOL "
-  "DO "
-  "RETURN TRUE; "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcId4 (v1 AS TABLE WITH ( v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8), "
+  "PROCEDURE ProcId3 (v1 AS TABLE OF ( v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8), "
   "          v2 AS TABLE) "
   "RETURN BOOL "
   "DO "
@@ -147,33 +138,17 @@ D_CHAR proc_decl_buffer[] =
   "PROCEDURE ProcIdTst3() "
   "RETURN BOOL "
   "DO "
-  "LET v1 AS RECORD WITH (f1 AS INT8, f2 AS INT64); "
-  "LET v2 AS RECORD WITH (var1 AS REAL, var2 AS ARRAY, var3 AS ARRAY OF UNSIGNED INT16); "
+  "LET v1 AS TABLE OF (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
+  "LET v2 AS TABLE; "
   "RETURN ProcId3(v1, v2); "
   "ENDPROC "
   " "
   "PROCEDURE ProcIdTst3_1() "
   "RETURN BOOL "
   "DO "
-  "LET v1 AS RECORD; "
-  "LET v2 AS RECORD WITH (var1 AS RICHREAL, var2 AS ARRAY OF INT8, var3 AS ARRAY OF UNSIGNED INT32); "
-  "RETURN ProcId3(v1, v2); "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcIdTst4() "
-  "RETURN BOOL "
-  "DO "
-  "LET v1 AS TABLE WITH (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
-  "LET v2 AS TABLE; "
-  "RETURN ProcId4(v1, v2); "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcIdTst4_1() "
-  "RETURN BOOL "
-  "DO "
-  "LET v1 AS TABLE WITH (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
-  "LET v2 AS TABLE WITH (v1 AS HIRESTIME, v2 AS TEXT, v3 AS ARRAY OF BOOL); "
-  "RETURN ProcId4(v1, v2); " "ENDPROC " "\n" "";
+  "LET v1 AS TABLE OF (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
+  "LET v2 AS TABLE OF (v1 AS HIRESTIME, v2 AS TEXT, v3 AS ARRAY OF BOOL); "
+  "RETURN ProcId3(v1, v2); " "ENDPROC " "\n" "";
 
 static D_BOOL
 check_procedure (struct ParserState *state,
@@ -237,9 +212,6 @@ check_procedure_calls (struct ParserState *state)
 
   result &= check_procedure (state, "ProcIdTst3", "ProcId3", 2);
   result &= check_procedure (state, "ProcIdTst3_1", "ProcId3", 2);
-
-  result &= check_procedure (state, "ProcIdTst4", "ProcId4", 2);
-  result &= check_procedure (state, "ProcIdTst4_1", "ProcId4", 2);
 
   return result;
 

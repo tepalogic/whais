@@ -36,20 +36,24 @@
 
 
 YYSTYPE
-create_exp_link (struct ParserState * state,
-		 YYSTYPE first_op, YYSTYPE second_op, enum EXP_OPERATION op)
+create_exp_link (struct ParserState* pState,
+		 YYSTYPE             firstOp,
+		 YYSTYPE             secondOp,
+		 YYSTYPE             thirdOp,
+		 enum EXP_OPERATION  op)
 {
-  struct SemValue *const result = get_sem_value (state);
+  struct SemValue *const result = get_sem_value (pState);
 
   if (result == NULL)
     {
-      w_log_msg (state, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return NULL;
     }
 
-  result->val_type = VAL_EXP_LINK;
-  result->val.u_exp.first_op = first_op;
-  result->val.u_exp.second_op = second_op;
+  result->val_type            = VAL_EXP_LINK;
+  result->val.u_exp.pFirstOp  = firstOp;
+  result->val.u_exp.pSecondOp = secondOp;
+  result->val.u_exp.pThirdOp  = thirdOp;
   result->val.u_exp.op = op;
 
   return result;
@@ -87,7 +91,7 @@ translate_exp_tree (struct ParserState *const state,
 static D_BOOL
 is_leaf_exp (struct SemExpression *exp)
 {
-  return (exp->op == OP_NULL) && (exp->second_op == NULL);
+  return (exp->op == OP_NULL) && (exp->pSecondOp == NULL);
 }
 
 static const struct DeclaredVar *
@@ -207,14 +211,6 @@ type_to_text (D_UINT type)
     {
       return "ARRAY";
     }
-  else if (type & T_RECORD_MASK)
-    {
-      return "RECORD";
-    }
-  else if (type & T_ROW_MASK)
-    {
-      return "ROW";
-    }
   else if (type & T_TABLE_MASK)
     {
       return "TABLE";
@@ -243,13 +239,7 @@ translate_exp_inc (struct ParserState *state,
     }
 
   if (type < T_END_OF_TYPES)
-    {
-      opcode = inc_op[type];
-    }
-  else if (type & T_ROW_MASK)
-    {
-      opcode = W_INC;
-    }
+    opcode = inc_op[type];
 
   if (opcode == W_NA)
     {
@@ -285,13 +275,7 @@ translate_exp_dec (struct ParserState *state,
     }
 
   if (type < T_END_OF_TYPES)
-    {
-      opcode = dec_op[type];
-    }
-  else if (type & T_ROW_MASK)
-    {
-      opcode = W_DEC;
-    }
+    opcode = dec_op[type];
 
   if (opcode == W_NA)
     {
@@ -1026,52 +1010,25 @@ translate_exp_xor (struct ParserState *state,
 }
 
 static D_BOOL
-are_compatible_containers (struct ParserState *const state,
-			   const struct ExpResultType *const ft,
-			   const struct ExpResultType *const st,
-			   D_BOOL ignore_unfound_fields)
+are_compatible_tables (struct ParserState *const         pState,
+                       const struct ExpResultType *const pFirstType,
+                       const struct ExpResultType *const pSecondType,
+                       D_BOOL                            ignore_unfound_fields)
 {
   const struct DeclaredVar *dst_field = NULL;
   const struct DeclaredVar *src_field = NULL;
 
-  if (((ft->type & T_CONTAINER_MASK) == 0) ||
-      ((st->type & T_CONTAINER_MASK) == 0))
+  if ((pFirstType->type & T_TABLE_MASK) != (pSecondType->type & T_TABLE_MASK))
     {
-      assert ((ft->type & T_CONTAINER_MASK) != (st->type & T_CONTAINER_MASK));
-      return FALSE;
-    }
-  if ((ft->type & T_TABLE_MASK) != (st->type & T_TABLE_MASK))
-    {
-      w_log_msg (state, state->buffer_pos, MSG_CONTAINER_NA);
+      w_log_msg (pState, pState->buffer_pos, MSG_CONTAINER_NA);
       return FALSE;
     }
 
-  if (((ft->type & T_ROW_MASK) != 0) && (ft->extra != NULL))
-    {
-      /* skip the table rows point to */
-      assert ((ft->extra->type & T_TABLE_MASK) != 0);
-      dst_field = ft->extra->extra;
-    }
-  else
-    {
-      dst_field = ft->extra;
-    }
-
+  dst_field = pFirstType->extra;
   if (dst_field == NULL)
-    {
-      return TRUE;
-    }
+    return TRUE;
 
-  if (((st->type & T_ROW_MASK) != 0) && (st->extra != NULL))
-    {
-      /* skip the table rows point to */
-      assert ((st->extra->type & T_TABLE_MASK) != 0);
-      src_field = st->extra->extra;
-    }
-  else
-    {
-      src_field = st->extra;
-    }
+  src_field = pSecondType->extra;
 
   while ((dst_field->type & T_FIELD_MASK) != 0)
     {
@@ -1087,7 +1044,7 @@ are_compatible_containers (struct ParserState *const state,
 	{
 	  if (!ignore_unfound_fields)
 	    {
-	      w_log_msg (state, state->buffer_pos, MSG_NO_FIELD,
+	      w_log_msg (pState, pState->buffer_pos, MSG_NO_FIELD,
 			 copy_text_truncate (temp, dst_field->label,
 					     sizeof temp,
 					     dst_field->l_label));
@@ -1097,12 +1054,12 @@ are_compatible_containers (struct ParserState *const state,
 	}
       else if (are_compatible_fields (dst_field, found) == FALSE)
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_FIELD_NA,
+	  w_log_msg (pState, pState->buffer_pos, MSG_FIELD_NA,
 		     copy_text_truncate (temp, dst_field->label,
 					 sizeof temp, dst_field->l_label),
 		     type_to_text (dst_field->type & ~T_FIELD_MASK),
 		     type_to_text (found->type & ~T_FIELD_MASK));
-	  state->err_sem = TRUE;
+	  pState->err_sem = TRUE;
 	  return FALSE;
 	}
       dst_field = dst_field->extra;
@@ -1138,18 +1095,9 @@ translate_exp_store (struct ParserState *const state,
 	{
 	  opcode = store_op[ftype][stype];
 	}
-      else if (((ftype & (T_ROW_MASK | T_RECORD_MASK)) != 0) &&
-	       (((stype & (T_ROW_MASK | T_RECORD_MASK)) != 0)))
-	{
-	  if (!are_compatible_containers (state, ft, st, TRUE))
-	    {
-	      return r_unk;
-	    }
-	  opcode = W_STRO;
-	}
       else if (((ftype & T_TABLE_MASK) != 0) && ((stype & T_TABLE_MASK) != 0))
 	{
-	  if (!are_compatible_containers (state, ft, st, TRUE))
+	  if (!are_compatible_tables (state, ft, st, TRUE))
 	    {
 	      return r_unk;
 	    }
@@ -1176,10 +1124,6 @@ translate_exp_store (struct ParserState *const state,
       if (ftype < T_UNDETERMINED)
 	{
 	  opcode = store_op[ftype][ftype];
-	}
-      else if (ftype & (T_ROW_MASK | T_RECORD_MASK))
-	{
-	  opcode = W_STRO;
 	}
       else if (ftype & T_TABLE_MASK)
 	{
@@ -1241,22 +1185,6 @@ translate_exp_index (struct ParserState *const state,
 
       return r_unk;
     }
-
-  if ((ftype & T_TABLE_MASK) != 0)
-    {
-      const struct DeclaredVar *it = ft->extra;
-      assert (it != NULL);
-
-      opcode = W_INDR;
-      result.type = T_ROW_MASK | T_L_VALUE;
-      while ((it->type & T_FIELD_MASK) != 0)
-	{
-	  it = it->extra;
-	}
-
-      assert (it->type & T_TABLE_MASK);
-      result.extra = it;
-    }
   else if ((ftype & T_ARRAY_MASK) != 0)
     {
       assert (ft->extra == NULL);
@@ -1287,70 +1215,6 @@ translate_exp_index (struct ParserState *const state,
 
       return r_unk;
     }
-
-  return result;
-}
-
-static struct ExpResultType
-translate_exp_member_sel (struct ParserState *const state,
-			  const struct ExpResultType *const ft,
-			  const struct SemId *const id)
-{
-  struct Statement *const stmt = state->current_stmt;
-  struct OutStream *const instrs = stmt_query_instrs (stmt);
-  const struct DeclaredVar *var = NULL;
-  const struct ExpResultType r_unk = { NULL, T_UNKNOWN };
-  struct ExpResultType result;
-
-  if (ft->extra && ((ft->type & T_ROW_MASK) != 0))
-    {
-      /* for row skip the table entry */
-      assert (ft->extra->type & T_TABLE_MASK);
-      var = find_field (id->text, id->length, ft->extra->extra);
-    }
-  else if (ft->extra)
-    {
-      var = find_field (id->text, id->length, ft->extra);
-    }
-
-  if (((ft->type & T_ROW_MASK) != 0) || (ft->type & T_RECORD_MASK) != 0)
-    {
-      D_CHAR temp[128];
-      if (var == NULL)
-	{
-	  const D_UINT code = (ft->type & T_ROW_MASK) ?
-	    MSG_MEMSEL_ERD : MSG_MEMSEL_ERED;
-	  copy_text_truncate (temp, id->text, sizeof temp, id->length);
-	  w_log_msg (state, state->buffer_pos, code, temp);
-	  state->err_sem = TRUE;
-	  return r_unk;
-	}
-    }
-  else
-    {
-
-      w_log_msg (state, state->buffer_pos, MSG_MEMSEL_NA,
-		 type_to_text (ft->type));
-
-      return r_unk;
-    }
-
-  {
-    D_INT32 temp32 = add_text_const (&state->global_stmt,
-				     (const D_UINT8 *) var->label,
-				     var->l_label);
-
-    if ((temp32 < 0) ||
-	(w_opcode_encode (instrs, W_SELF) == NULL) ||
-	(uint32_outstream (instrs, temp32) == NULL))
-      {
-	w_log_msg (state, IGNORE_BUFFER_POS, MSG_NO_MEM);
-	return r_unk;
-      }
-  }
-
-  result.extra = NULL;
-  result.type = (var->type | T_L_VALUE) & ~T_FIELD_MASK;
 
   return result;
 }
@@ -1702,26 +1566,26 @@ translate_exp_call (struct ParserState *const state,
   D_UINT arg_count = 0;
   D_CHAR temp[128];
 
-  assert (call_exp->first_op->val_type == VAL_ID);
-  assert ((call_exp->second_op == NULL) ||
-	  (call_exp->second_op->val_type == VAL_PRC_ARG_LINK));
+  assert (call_exp->pFirstOp->val_type == VAL_ID);
+  assert ((call_exp->pSecondOp == NULL) ||
+	  (call_exp->pSecondOp->val_type == VAL_PRC_ARG_LINK));
 
   proc = find_proc_decl (state,
-			 call_exp->first_op->val.u_id.text,
-			 call_exp->first_op->val.u_id.length,
+			 call_exp->pFirstOp->val.u_id.text,
+			 call_exp->pFirstOp->val.u_id.length,
 			 TRUE);
   if (proc == NULL)
     {
       w_log_msg (state, state->buffer_pos,
 		 MSG_NO_PROC,
-		 copy_text_truncate (temp, call_exp->first_op->val.u_id.text,
+		 copy_text_truncate (temp, call_exp->pFirstOp->val.u_id.text,
 				     sizeof temp,
-				     call_exp->first_op->val.u_id.length));
+				     call_exp->pFirstOp->val.u_id.length));
 
       return r_unk;
     }
 
-  exp_arg = call_exp->second_op;
+  exp_arg = call_exp->pSecondOp;
   while (exp_arg != NULL)
     {
       struct SemValue *const param = exp_arg->val.u_args.expr;
@@ -1736,12 +1600,14 @@ translate_exp_call (struct ParserState *const state,
 
       if (proc_arg == NULL)
 	{
-	  w_log_msg (state, state->buffer_pos, MSG_PROC_MORE_ARGS,
+	  w_log_msg (state,
+	             state->buffer_pos,
+	             MSG_PROC_MORE_ARGS,
 		     copy_text_truncate (temp,
-					 call_exp->first_op->val.u_id.text,
+					 call_exp->pFirstOp->val.u_id.text,
 					 sizeof temp,
-					 call_exp->first_op->val.u_id.length),
-		     stmt_get_param_count (proc) - 1);
+					 call_exp->pFirstOp->val.u_id.length),
+		     stmt_get_param_count (proc));
 	  state->err_sem = TRUE;
 	  return r_unk;
 	}
@@ -1751,6 +1617,7 @@ translate_exp_call (struct ParserState *const state,
 	  arg_type.type = proc_arg->type;
 	  arg_type.extra = proc_arg->extra;
 	}
+
       result = translate_exp_tree (state, statement, &param->val.u_exp);
       if (result.type == T_UNKNOWN)
 	{
@@ -1771,10 +1638,10 @@ translate_exp_call (struct ParserState *const state,
 
       if (result.type != T_UNDETERMINED)
 	{
-	  if ((result.type & T_CONTAINER_MASK) == 0)
+	  if ((result.type & T_TABLE_MASK) == 0)
 	    {
-	      const D_UINT arg_t = arg_type.type & ~(T_L_VALUE | T_ARRAY_MASK | T_CONTAINER_MASK);
-	      const D_UINT res_t = result.type & ~(T_L_VALUE | T_ARRAY_MASK | T_CONTAINER_MASK);
+	      const D_UINT arg_t = arg_type.type & ~(T_L_VALUE | T_ARRAY_MASK | T_TABLE_MASK);
+	      const D_UINT res_t = result.type & ~(T_L_VALUE | T_ARRAY_MASK | T_TABLE_MASK);
 	      const enum W_OPCODE temp_op = store_op[arg_t][res_t];
 
 	      assert (arg_t <= T_UNDETERMINED);
@@ -1813,7 +1680,7 @@ translate_exp_call (struct ParserState *const state,
 		}
 	    }
 	  else
-	    if (are_compatible_containers (state, &arg_type, &result, FALSE) == FALSE)
+	    if (are_compatible_tables (state, &arg_type, &result, FALSE) == FALSE)
 	    {
 	      /* The two containers's types are not compatible.
 	       * The error was already logged. */
@@ -1836,16 +1703,16 @@ translate_exp_call (struct ParserState *const state,
   if (arg_count < stmt_get_param_count (proc))
     {
       w_log_msg (state, state->buffer_pos, MSG_PROC_LESS_ARGS,
-		 copy_text_truncate (temp, call_exp->first_op->val.u_id.text,
+		 copy_text_truncate (temp, call_exp->pFirstOp->val.u_id.text,
 				     sizeof temp,
-				     call_exp->first_op->val.u_id.length),
+				     call_exp->pFirstOp->val.u_id.length),
 		 stmt_get_param_count (proc), arg_count);
 
       return r_unk;
     }
   else
     {
-      call_exp->first_op->val_type = VAL_REUSE;
+      call_exp->pFirstOp->val_type = VAL_REUSE;
     }
 
   if ((w_opcode_encode (instrs, W_CALL) == NULL) ||
@@ -1876,6 +1743,70 @@ translate_exp_call (struct ParserState *const state,
 }
 
 static struct ExpResultType
+translate_exp_field (struct ParserState* const   pState,
+		     struct Statement* const     pStmt,
+		     struct SemExpression* const pCallExp)
+{
+  const struct ExpResultType  r_unk      = { NULL, T_UNKNOWN };
+  const struct DeclaredVar*   pVarField  = NULL;
+  struct OutStream *const     pInstrs    = stmt_query_instrs (pState->current_stmt);
+  struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
+  struct SemExpression* const pSecondExp = &pCallExp->pSecondOp->val.u_exp;
+  struct SemId* const         pId        = &pCallExp->pThirdOp->val.u_id;
+  struct ExpResultType        tableType;
+  struct ExpResultType        expType;
+
+  assert (pCallExp->op == OP_FIELD);
+  assert (pCallExp->pFirstOp->val_type == VAL_EXP_LINK);
+  assert (pCallExp->pSecondOp->val_type == VAL_EXP_LINK);
+  assert (pCallExp->pThirdOp->val_type == VAL_ID);
+
+  tableType = translate_exp_tree (pState, pStmt, pFirstExp);
+  if ((tableType.type & T_TABLE_MASK) == 0)
+    {
+      w_log_msg (pState, pState->buffer_pos, MSG_MEMSEL_NA, type_to_text (tableType.type));
+
+      pState->err_sem = TRUE;
+      return r_unk;
+    }
+
+  expType = translate_exp_tree (pState, pStmt, pSecondExp);
+  if (!is_integer (expType.type & ~T_L_VALUE))
+    {
+      w_log_msg (pState, pState->buffer_pos, MSG_INDEX_ENI, type_to_text (expType.type));
+
+      pState->err_sem = TRUE;
+      return r_unk;
+    }
+
+  if (tableType.extra != NULL)
+    pVarField = find_field (pId->text, pId->length, tableType.extra);
+
+  if (pVarField == NULL)
+    {
+      D_CHAR temp[128];
+      copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
+      w_log_msg (pState, pState->buffer_pos, MSG_MEMSEL_ERD, temp);
+
+      pState->err_sem = TRUE;
+      return r_unk;
+    }
+
+  if ((w_opcode_encode (pInstrs, W_SELF) == NULL)||
+      (data_outstream (pInstrs, (const D_UINT8*)pId->text, pId->length) == NULL) ||
+      (uint8_outstream (pInstrs, 0) == NULL))
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return r_unk;
+    }
+
+  expType.type  = (pVarField->type | T_L_VALUE) & ~T_FIELD_MASK;
+  expType.extra = NULL;
+
+  return expType;
+}
+
+static struct ExpResultType
 translate_exp_tree (struct ParserState *const state,
 		    struct Statement *const statement,
 		    struct SemExpression *const call_exp)
@@ -1893,28 +1824,31 @@ translate_exp_tree (struct ParserState *const state,
 
   if (is_leaf_exp (call_exp))
     {
-      return translate_exp_leaf (state, statement, call_exp->first_op);
+      return translate_exp_leaf (state, statement, call_exp->pFirstOp);
     }
   else if (call_exp->op == OP_CALL)
     {
       /* procedure call */
       return translate_exp_call (state, statement, call_exp);
     }
+  else if (call_exp->op == OP_FIELD)
+    {
+      return translate_exp_field (state, statement, call_exp);
+    }
 
-  assert (call_exp->first_op->val_type == VAL_EXP_LINK);
+  assert (call_exp->pFirstOp->val_type == VAL_EXP_LINK);
 
   first_type = translate_exp_tree (state, statement,
-				   &(call_exp->first_op->val.u_exp));
+				   &(call_exp->pFirstOp->val.u_exp));
   if (first_type.type == T_UNKNOWN)
     {
       /* something went wrong, and the error
        * should be already logged  */
       return r_unk;
     }
-  call_exp->first_op->val_type = VAL_REUSE;
+  call_exp->pFirstOp->val_type = VAL_REUSE;
 
-  if (((first_type.type & ~T_L_VALUE) == T_BOOL) &&
-      (call_exp->op != OP_MEMBER))
+  if ((first_type.type & ~T_L_VALUE) == T_BOOL)
     {
       /* Handle special case for OR or AND with boolean types not to evaluate
        * the second expression when is unnecessary!
@@ -1943,29 +1877,19 @@ translate_exp_tree (struct ParserState *const state,
 	}
       jmp_data_pos = get_size_outstream (instrs) - sizeof (D_UINT32);
     }
-  else if (call_exp->op == OP_MEMBER)
-    {
-      /* Until a better design handle here the special case of member
-       * selection because the 'second_exp' is actually an IDENTIFIER.
-       */
-      second_type = translate_exp_member_sel (state, &first_type,
-					      &call_exp->second_op->val.u_id);
-      call_exp->second_op->val_type = VAL_REUSE;
-      return second_type;
-    }
 
-  if (call_exp->second_op != NULL)
+  if (call_exp->pSecondOp != NULL)
     {
-      assert (call_exp->second_op->val_type == VAL_EXP_LINK);
+      assert (call_exp->pSecondOp->val_type == VAL_EXP_LINK);
       second_type = translate_exp_tree (state, statement,
-					&(call_exp->second_op->val.u_exp));
+					&(call_exp->pSecondOp->val.u_exp));
       if (second_type.type == T_UNKNOWN)
 	{
 	  /* something went wrong, and the error
 	   * should be already signaled  */
 	  return r_unk;
 	}
-      call_exp->second_op->val_type = VAL_REUSE;
+      call_exp->pSecondOp->val_type = VAL_REUSE;
     }
 
   /* use second_type to store result */
@@ -2036,7 +1960,7 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 
   if (exp_type.type != T_UNDETERMINED)
     {
-      if ((ret_type.type & T_CONTAINER_MASK) != (exp_type.type & T_CONTAINER_MASK))
+      if ((ret_type.type & T_TABLE_MASK) != (exp_type.type & T_TABLE_MASK))
         {
           w_log_msg (state, state->buffer_pos,
                      MSG_PROC_RET_NA_EXT,
@@ -2044,7 +1968,7 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
                      type_to_text (exp_type.type));
           state->err_sem = TRUE;
         }
-      else if ((ret_type.type & T_CONTAINER_MASK) == 0)
+      else if ((ret_type.type & T_TABLE_MASK) == 0)
 	{
 	  const D_UINT exp_t = exp_type.type & ~(T_L_VALUE | T_ARRAY_MASK);
 	  const D_UINT ret_t = ret_type.type & ~(T_L_VALUE | T_ARRAY_MASK);
@@ -2076,8 +2000,7 @@ translate_return_exp (struct ParserState * state, YYSTYPE exp)
 		}
 	    }
 	}
-      else if (are_compatible_containers (state, &ret_type, &exp_type, FALSE)
-	       == FALSE)
+      else if (are_compatible_tables (state, &ret_type, &exp_type, FALSE) == FALSE)
 	{
 	  /* The two containers types are not compatible.
 	   * The error was already logged. */

@@ -168,44 +168,36 @@ install_proc_decl (struct ParserState *state, struct SemValue *val_id)
 }
 
 void
-set_proc_rettype (struct ParserState *state, struct SemValue *rtype)
+set_proc_rettype (struct ParserState* pState, struct SemValue* pRettype)
 {
-  struct DeclaredVar *retv = (struct DeclaredVar *)
-    get_item (&(state->current_stmt->spec.proc.param_list), 0);
+  struct DeclaredVar* pRetVar = (struct DeclaredVar*)
+    get_item (&(pState->current_stmt->spec.proc.param_list), 0);
 
-  assert (rtype->val_type == VAL_TYPE_SPEC);
+  assert (pRettype->val_type == VAL_TYPE_SPEC);
 
-  memset (retv, 0, sizeof (retv));
-  retv->type = rtype->val.u_tspec.type;
-  retv->extra = rtype->val.u_tspec.extra;
+  memset (pRetVar, 0, sizeof (pRetVar));
+  pRetVar->type  = pRettype->val.u_tspec.type;
+  pRetVar->extra = pRettype->val.u_tspec.extra;
 
-  if (retv->type & T_CONTAINER_MASK)
+  if (pRetVar->type & T_TABLE_MASK)
     {
-      if (process_container_decls (state, retv, retv->extra))
-	{
-	  if (retv->type & (T_TABLE_MASK | T_RECORD_MASK))
-	    {
-	      struct DeclaredVar *it = retv->extra;
-
-	      if (it == NULL)
-		retv->extra = retv;
-	      else
-		{
-		  while (it->extra && ((it->extra->type & T_FIELD_MASK) != 0))
-		    it = it->extra;
-
-		  it->extra = retv;
-		}
-	    }
-
-	}
+      struct DeclaredVar *it = pRetVar->extra;
+      if (it == NULL)
+        pRetVar->extra = pRetVar;
       else
-	return;			/* An error occurred! */
+        {
+          while (it->extra != NULL)
+            {
+              assert (it->type & T_FIELD_MASK);
+              it = it->extra;
+            }
+          it->extra = pRetVar;
+        }
     }
 
-  retv->type_spec_pos =
-    type_spec_fill (&state->global_stmt.spec.glb.type_desc, retv);
-  rtype->val_type = VAL_REUSE;
+  pRetVar->type_spec_pos =
+    type_spec_fill (&pState->global_stmt.spec.glb.type_desc, pRetVar);
+  pRettype->val_type = VAL_REUSE;
   return;
 }
 

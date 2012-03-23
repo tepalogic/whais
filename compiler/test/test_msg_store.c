@@ -99,18 +99,6 @@ D_CHAR test_prog_5[] = ""
   "LET _some AS UNSIGNED INT32;\n "
   "(_some + _some) = _some;\n " "RETURN TRUE;" "ENDPROC\n ";
 
-D_CHAR test_prog_6[] = ""
-  "PROCEDURE Proc_7 () RETURN BOOL\n "
-  "DO\n "
-  "LET table_1 AS TABLE WITH (one_field AS INT32);\n "
-  "LET table_2 AS TABLE WITH (one_field AS DATE);\n "
-  "LET row_1 AS ROW OF TABLE table_1;\n "
-  "LET row_2 AS ROW OF TABLE table_2;\n "
-  "\n "
-  "row_1 = table_1[0];\n "
-  "row_2 = table_2[0];\n "
-  "\n " "row_1 = row_2;\n " "RETURN FALSE;\n " "ENDPROC\n ";
-
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 {
@@ -166,10 +154,6 @@ main ()
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
 						     MSG_STORE_ELV,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
-						     MSG_FIELD_NA,
 						     MSG_ERROR_EVENT);
   if (test_result == FALSE)
     {

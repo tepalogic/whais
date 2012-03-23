@@ -67,8 +67,9 @@ my_postman (POSTMAN_BAG bag,
 D_CHAR test_prog_1[] = ""
   "PROCEDURE Proc_1 (v1 AS BOOL) RETURN BOOL\n "
   "DO\n "
-  "LET table_1 AS TABLE WITH (field AS UNSIGNED INT64, field AS DATE);\n "
-  "LET one_row AS ROW OF TABLE table_1;\n " "RETURN v1;\n " "ENDPROC\n ";
+  "LET table_1 AS TABLE OF (field AS UNSIGNED INT64, field AS DATE);\n "
+  "RETURN v1;\n "
+  "ENDPROC\n ";
 
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)

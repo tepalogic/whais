@@ -74,9 +74,8 @@ D_CHAR proc_decl_buffer[] =
   "DO "
   "RETURN ++v1; "
   "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId6 (v1 AS ROW) RETURN ROW "
-  "DO " "RETURN ++v1; " "ENDPROC\n\n" "" "";
+  "";
+
 
 static D_BOOL
 check_procedure (struct ParserState *state, D_CHAR * proc_name)
@@ -105,7 +104,7 @@ check_all_procs (struct ParserState *state)
   D_UINT count;
   D_CHAR proc_name[25];
 
-  for (count = 1; count <= 6; ++count)
+  for (count = 1; count <= 5; ++count)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)
