@@ -31,11 +31,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
-#define T_ARRAY_MASK    0x0100	/* a mask to tell that variable is an array */
-#define T_TABLE_MASK    0x0200	/*the variable is a table */
-#define T_FIELD_MASK    0x0400	/*the variable is a table */
+#define T_ARRAY_MASK          0x0100	/* a mask to tell that variable is an array */
+#define T_FIELD_MASK          0x0200
+#define T_TABLE_MASK          0x0400	/*the variable is a table */
+#define T_TABLE_FIELD_MASK    0x0800	/*the variable is a table */
 
-#define T_L_VALUE       0x1000	/* Mask applied to suggest if this is a genuine l-value */
+#define T_L_VALUE             0x1000	/* Mask applied to suggest if this is a genuine l-value */
+
+#define IS_ARRAY(type)          (((type) & T_ARRAY_MASK) != 0)
+#define IS_FIELD(type)          (((type) & T_FIELD_MASK) != 0)
+#define IS_TABLE(type)          (((type) & T_TABLE_MASK) != 0)
+#define IS_TABLE_FIELD(type)    (((type) & T_TABLE_FIELD_MASK) != 0)
+#define IS_L_VALUE(type)        (((type) & T_L_VALUE) != 0)
+
+#define MARK_ARRAY(type)        ((type) |= T_ARRAY_MASK)
+#define MARK_FIELD(type)        ((type) |= T_FIELD_MASK)
+#define MARK_TABLE(type)        ((type) |= T_TABLE_MASK)
+#define MARK_TABLE_FIELD(type)  ((type) |= T_TABLE_FIELD_MASK)
+#define MARK_L_VALUE(type)      ((type) |= T_L_VALUE)
+
+#define GET_TYPE(type)       ((type) & ~(T_L_VALUE | T_TABLE_FIELD_MASK))
+#define GET_BASIC_TYPE(type) ((type) & 0xFF)
+#define GET_FIELD_TYPE(type) ((type) & ~T_TABLE_FIELD_MASK)
+
 
 typedef const void* WHC_HANDLER;
 typedef const void* WHC_PROC_HANDLER;
@@ -114,23 +132,23 @@ whc_get_proc_rettype (WHC_HANDLER      hnd,
 const unsigned char*
 whc_get_local_type (WHC_HANDLER      hnd,
                     WHC_PROC_HANDLER hProc,
-                    unsigned int     local);
+                    unsigned int     localId);
 
 unsigned int
 whc_get_typedec_pool (WHC_HANDLER           hnd,
-                      const unsigned char** p_OutPTypes);
+                      const unsigned char** pOutPTypes);
 
 unsigned int
 whc_get_const_area (WHC_HANDLER           hnd,
                     const unsigned char** pOutPConsts);
 
 void
-whc_get_libver (unsigned int* p_OutMajor,
-                unsigned int* p_OutMinor);
+whc_get_libver (unsigned int* pOutMajor,
+                unsigned int* pOutMinor);
 
 void
 whc_get_lang_ver (unsigned int* pOutMajor,
-                  unsigned int* minor);
+                  unsigned int* pOutMinor);
 
 #ifdef __cplusplus
 }				/* extern "C" */

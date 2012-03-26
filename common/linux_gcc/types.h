@@ -42,7 +42,7 @@ typedef char          D_BOOL;
 typedef char          D_CHAR;
 typedef unsigned char D_UCHAR;
 
-typedef int D_INT;
+typedef int           D_INT;
 typedef unsigned int  D_UINT;
 
 typedef int8_t        D_INT8;

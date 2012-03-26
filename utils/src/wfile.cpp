@@ -29,15 +29,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-WFile::WFile (const D_CHAR * fname, D_UINT mode) : m_Handle (0)
+WFile::WFile (const D_CHAR* pFileName, D_UINT mode) :
+  m_Handle (0)
 {
-  m_Handle = whc_fopen (fname, mode);
+  m_Handle = whc_fopen (pFileName, mode);
   if (m_Handle == 0)
     throw WFileException (NULL, _EXTRA(whc_fgetlasterror()));
 }
 
-WFile::WFile (const WFile &rSource)
-:m_Handle (whc_fdup (rSource.m_Handle))
+WFile::WFile (const WFile &rSource) :
+  m_Handle (whc_fdup (rSource.m_Handle))
 {
   if (m_Handle == 0)
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
@@ -51,16 +52,16 @@ WFile::~WFile ()
 }
 
 void
-WFile::Read (D_UINT8 * buffer, D_UINT size)
+WFile::Read (D_UINT8* pBuffer, D_UINT size)
 {
-  if (!whc_fread (m_Handle, buffer, size))
+  if (!whc_fread (m_Handle, pBuffer, size))
     throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
 }
 
 void
-WFile::Write (const D_UINT8 * buffer, D_UINT size)
+WFile::Write (const D_UINT8* pBuffer, D_UINT size)
 {
-  if (!whc_fwrite (m_Handle, buffer, size))
+  if (!whc_fwrite (m_Handle, pBuffer, size))
     throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
 }
 
@@ -73,11 +74,10 @@ WFile::Seek (D_INT64 where, D_INT whence)
 
 D_UINT64 WFile::Tell ()
 {
-  D_UINT64
-    position;
+  D_UINT64 position;
+
   if (!whc_ftell (m_Handle, &position))
-    throw
-    WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
 
   return position;
 }
@@ -91,12 +91,11 @@ WFile::Sync ()
 
 D_UINT64 WFile::GetSize () const
 {
-  D_UINT64
-    size;
+  D_UINT64 size;
 
   if (!whc_ftellsize (m_Handle, &size))
-    throw
-    WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+
   return size;
 }
 
@@ -128,6 +127,7 @@ WFile::operator= (const WFile &rSource)
     return *this;
 
   Close(); // Close the old handler
+
   m_Handle = whc_fdup (rSource.m_Handle);
   if (m_Handle == 0)
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));

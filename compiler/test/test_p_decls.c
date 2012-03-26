@@ -55,14 +55,14 @@ check_container_field (struct DeclaredVar *extra, D_CHAR * field,
   unsigned int f_len = strlen (field);
   while (extra != NULL)
     {
-      if ((extra->type | T_FIELD_MASK) == 0)
+      if ((extra->type | T_TABLE_FIELD_MASK) == 0)
 	{
 	  break;
 	}
-      if ((extra->l_label == f_len) &&
+      if ((extra->labelLength == f_len) &&
 	  (strncmp (field, extra->label, f_len) == 0))
 	{
-	  if (extra->type == (type | T_FIELD_MASK))
+	  if (extra->type == (type | T_TABLE_FIELD_MASK))
 	    {
 	      result = TRUE;
 	    }
@@ -125,7 +125,7 @@ general_proc_check (struct Statement *glb_stmt,
   while (count < get_array_count (&(proc_stmt->decls)))
     {
       struct DeclaredVar *var = get_item (&(proc_stmt->decls), count);
-      if ((var->type & T_FIELD_MASK) == 0)
+      if ((var->type & T_TABLE_FIELD_MASK) == 0)
 	{
 	  nlocals++;
 	}
@@ -167,7 +167,7 @@ check_procs_decl (struct ParserState *state)
     }
   /*check return type */
   tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
-  if ((tmp_var->label != NULL) || (tmp_var->l_label != 0))
+  if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
       return FALSE;
@@ -191,7 +191,7 @@ check_procs_decl (struct ParserState *state)
     }
   /*check return type */
   tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
-  if ((tmp_var->label != NULL) || (tmp_var->l_label != 0))
+  if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
       return FALSE;
@@ -209,24 +209,24 @@ check_procs_decl (struct ParserState *state)
     }
   /* check parameters */
   tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var1", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var1", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_INT8))
     {
       return FALSE;
     }
 
   tmp_var = get_item (&(proc->spec.proc.paramsList), 2);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var2", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var2", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_TEXT))
     {
       return FALSE;
     }
 
   tmp_var = get_item (&(proc->spec.proc.paramsList), 3);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var3", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_DATETIME))
     {
       return FALSE;
@@ -239,7 +239,7 @@ check_procs_decl (struct ParserState *state)
     }
   /*check return type */
   tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
-  if ((tmp_var->label != NULL) || (tmp_var->l_label != 0))
+  if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
       return FALSE;
@@ -256,22 +256,22 @@ check_procs_decl (struct ParserState *state)
 
   /*check parameters  declarations */
   tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var1", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var1", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_REAL))
     {
       return FALSE;
     }
   tmp_var = get_item (&(proc->spec.proc.paramsList), 2);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var2", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var2", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_TEXT))
     {
       return FALSE;
     }
   tmp_var = get_item (&(proc->spec.proc.paramsList), 3);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var3", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) ||
       (tmp_var->type != (T_ARRAY_MASK | T_UNDETERMINED)))
     {
@@ -280,8 +280,8 @@ check_procs_decl (struct ParserState *state)
 
   tmp_var = get_item (&(proc->spec.proc.paramsList), 4);
   tmp_table = tmp_var;
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var4", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var4", tmp_var->labelLength) != 0) ||
       (tmp_var->type != T_TABLE_MASK))
     {
       return FALSE;
@@ -294,8 +294,8 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
   tmp_var = get_item (&(proc->spec.proc.paramsList), 5);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var5", tmp_var->l_label) != 0) ||
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var5", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_INT64))
     {
       return FALSE;

@@ -66,8 +66,8 @@ public:
   WodCmdLineException (const D_CHAR* pMessage,
                        const D_CHAR* pFile,
                        D_UINT32      line,
-                       D_UINT32      extra)
-  : WException (pMessage, pFile, line, extra)
+                       D_UINT32      extra) :
+    WException (pMessage, pFile, line, extra)
   {
   }
 

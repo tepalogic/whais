@@ -52,8 +52,8 @@ is_space (char c)
 INLINE static D_BOOL
 is_numeric (char c, D_BOOL is_hexa)
 {
-  return (c >= '0' && c <= '9')
-    || (is_hexa && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
+  return (c >= '0' && c <= '9') ||
+         (is_hexa && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
 }
 
 INLINE static D_BOOL
@@ -85,8 +85,7 @@ typedef enum
   TK_REAL,			/* a real number */
   TK_KEYWORD,			/* the token is a key word */
   TK_UNDETERMINED,		/* token type is not yet determined */
-  TK_ERROR
-/* an obvious syntax error was encountered */
+  TK_ERROR                      /* an obvious syntax error was encountered */
 } TOKEN_TYPE;
 
 /*
@@ -96,147 +95,147 @@ typedef enum
  * Warning!!! This function modifies the input buffer
  */
 static TOKEN_TYPE
-get_next_token (const char *buffer, char const **token, D_UINT * token_len)
+get_next_token (const char*  pBuffer,
+                char const** pOutPToken,
+                D_UINT*      pOutTokenLen)
 {
   TOKEN_TYPE result = TK_UNDETERMINED;
-  assert (token != NULL);
-  assert (token_len != NULL);
 
-  while (is_space (*buffer))
-    ++buffer;
+  assert (pOutPToken != NULL);
+  assert (pOutTokenLen != NULL);
 
-  if (*buffer == '#')
+  while (is_space (*pBuffer))
+    ++pBuffer;
+
+  if (*pBuffer == '#')
     {
       /* skip line with commentaries and try again */
-      while (!is_eol (*buffer))
-	++buffer;
-      return get_next_token (buffer, token, token_len);
+      while (!is_eol (*pBuffer))
+	++pBuffer;
+      return get_next_token (pBuffer, pOutPToken, pOutTokenLen);
     }
 
-  *token = buffer;
-  *token_len = 0;
-  if ((*buffer == '-') && is_numeric (buffer[1], FALSE))
+  *pOutPToken   = pBuffer;
+  *pOutTokenLen = 0;
+
+  if ((*pBuffer == '-') && is_numeric (pBuffer[1], FALSE))
+    pBuffer++;
+
+  if (is_numeric (*pBuffer, FALSE))
     {
-      buffer++;
-    }
-  if (is_numeric (*buffer, FALSE))
-    {
-      D_BOOL is_hexa = FALSE;
-      if ((buffer[0] == '0') && (buffer[1] == 'x' || buffer[1] == 'X'))
+      D_BOOL isHexa = FALSE;
+
+      if ((pBuffer[0] == '0') && (pBuffer[1] == 'x' || pBuffer[1] == 'X'))
 	{
-	  is_hexa = TRUE;
-	  buffer += 2;
+	  isHexa  = TRUE;
+	  pBuffer += 2;
 	}
 
-      while (is_numeric (*buffer, is_hexa))
-	{
-	  buffer++;
-	}
+      while (is_numeric (*pBuffer, isHexa))
+        pBuffer++;
+
       result = TK_NUMERIC;
-      if ((*buffer == '.') && (is_hexa == FALSE))
+      if ((*pBuffer == '.') && (isHexa == FALSE))
 	{
-	  ++buffer;
-	  while (is_numeric (*buffer, FALSE))
-	    {
-	      ++buffer;
-	    }
+	  ++pBuffer;
+
+	  while (is_numeric (*pBuffer, FALSE))
+            ++pBuffer;
+
 	  result = TK_REAL;
 	}
     }
-  else if (is_idlegal (*buffer))
+  else if (is_idlegal (*pBuffer))
     {
-      while (is_idlegal (*buffer))
-	{
-	  buffer++;
-	}
+      while (is_idlegal (*pBuffer))
+        pBuffer++;
+
       result = TK_IDENTIFIER;
     }
-  else if (*buffer == '+')
+  else if (*pBuffer == '+')
     {
-      buffer++;
-      if (*buffer == '+')
-	{
-	  buffer++;
-	}
+      pBuffer++;
+      if (*pBuffer == '+')
+        pBuffer++;
+
       result = TK_OPERATOR;
     }
-  else if (*buffer == '-')
+  else if (*pBuffer == '-')
     {
-      buffer++;
-      if (*buffer == '-')
-	{
-	  buffer++;
-	}
+      pBuffer++;
+
+      if (*pBuffer == '-')
+        pBuffer++;
+
       result = TK_OPERATOR;
     }
-  else if (*buffer == '<' || *buffer == '>' || *buffer == '!'
-	   || *buffer == '=')
+  else if (*pBuffer == '<' || *pBuffer == '>' || *pBuffer == '!' || *pBuffer == '=')
     {
-      buffer++;
-      if (*buffer == '=')
-	{
-	  buffer++;
-	}
+      pBuffer++;
+
+      if (*pBuffer == '=')
+        pBuffer++;
+
       result = TK_OPERATOR;
     }
-  else if (*buffer == '\"')
+  else if (*pBuffer == '\"')
     {
       do
 	{
-	  buffer++;
-	  if (is_eol (*buffer) || (*buffer == 0))
+	  pBuffer++;
+
+	  if (is_eol (*pBuffer) || (*pBuffer == 0))
 	    {
 	      /* an new line or end of buffer
 	       * encountered before ending \" */
 	      return TK_ERROR;
 	    }
 	}
-      while ((*buffer != '\"') || ((*(buffer - 1) == '\\') && (*(buffer - 2)
-							       != '\\')));
-      buffer++;
+      while ((*pBuffer != '\"') ||
+             ((*(pBuffer - 1) == '\\') && (*(pBuffer - 2) != '\\')));
+
+      pBuffer++;
 
       result = TK_STRING;
     }
-  else if (*buffer == '\'')
+  else if (*pBuffer == '\'')
     {
       do
 	{
-	  buffer++;
-	  if (is_eol (*buffer) || (*buffer == 0))
+	  pBuffer++;
+
+	  if (is_eol (*pBuffer) || (*pBuffer == 0))
 	    {
 	      /* an new line or end of buffer
 	       * encountered before ending \' */
 	      return TK_ERROR;
 	    }
 	}
-      while ((*buffer != '\'') || ((*(buffer - 1) == '\\') && (*(buffer - 2)
-							       != '\\')));
-      buffer++;
+      while ((*pBuffer != '\'') ||
+             ((*(pBuffer - 1) == '\\') && (*(pBuffer - 2) != '\\')));
 
-      if ((*token)[1] == '\\' || (*token)[2] == '\'')
+      pBuffer++;
+
+      if ((*pOutPToken)[1] == '\\' || (*pOutPToken)[2] == '\'')
 	{
 	  /* this clearly is not a date time entry */
 	  result = TK_CHAR;
 	}
       else
-	{
-	  result = TK_DATETIME;
-	}
+        result = TK_DATETIME;
     }
   else
-    {
-      buffer++;
-    }
+    pBuffer++;
 
-  *token_len = (D_UINT) (buffer - *token);
+  *pOutTokenLen = (D_UINT) (pBuffer - *pOutPToken);
 
   return result;
 }
 
 typedef struct
 {
-  const char *string;
-  D_UINT value;
+  const char* text;
+  D_UINT      token;
 } TOKEN_SEMANTIC;
 
 /*
@@ -247,715 +246,689 @@ typedef struct
 #define MAX_KEYWORD_LEN 13
 
 static TOKEN_SEMANTIC keywords[] = {
-  {"AND", AND},
-  {"ARRAY", ARRAY},
-  {"AS", AS},
-  {"BOOL", BOOL},
-  {"BREAK", BREAK},
-  {"CHARACTER", CHARACTER},
-  {"CONTINUE", CONTINUE},
-  {"DATE", DATE},
-  {"DATETIME", DATETIME},
-  {"DO", DO},
-  {"ELSE", ELSE},
-  {"ELSEIF", ELSEIF},
-  {"END", END},
-  {"ENDPROC", ENDPROC},
-  {"ENDSYNC", ENDSYNC},
-  {"EXTERN", EXTERN},
-  {"FALSE", W_FALSE},
-  {"FOREACH", FOREACH},
-  {"HIRESTIME", HIRESTIME},
-  {"IF", IF},
-  {"IN", IN},
-  {"INT8", INT8},
-  {"INT16", INT16},
-  {"INT32", INT32},
-  {"INT64", INT64},
-  {"LET", LET},
-  {"OF", OF},
-  {"OR", OR},
-  {"NOT", NOT},
-  {"NULL", WHISPER_NULL},
-  {"REAL", REAL},
-  {"RETURN", RETURN},
-  {"RICHREAL", RICHREAL},
-  {"PROCEDURE", PROCEDURE},
-  {"SYNC", SYNC},
-  {"TABLE", TABLE},
-  {"TEXT", TEXT},
-  {"THEN", THEN},
-  {"TRUE", W_TRUE},
-  {"UNTIL", UNTIL},
-  {"UNSIGNED", UNSIGNED},
-  {"WHILE", WHILE},
-  {"XOR", XOR},
+                                      {"AND", AND},
+                                      {"ARRAY", ARRAY},
+                                      {"AS", AS},
+                                      {"BOOL", BOOL},
+                                      {"BREAK", BREAK},
+                                      {"CHARACTER", CHARACTER},
+                                      {"CONTINUE", CONTINUE},
+                                      {"DATE", DATE},
+                                      {"DATETIME", DATETIME},
+                                      {"DO", DO},
+                                      {"ELSE", ELSE},
+                                      {"ELSEIF", ELSEIF},
+                                      {"END", END},
+                                      {"ENDPROC", ENDPROC},
+                                      {"ENDSYNC", ENDSYNC},
+                                      {"EXTERN", EXTERN},
+                                      {"FALSE", W_FALSE},
+                                      {"FOREACH", FOREACH},
+                                      {"HIRESTIME", HIRESTIME},
+                                      {"IF", IF},
+                                      {"IN", IN},
+                                      {"INT8", INT8},
+                                      {"INT16", INT16},
+                                      {"INT32", INT32},
+                                      {"INT64", INT64},
+                                      {"LET", LET},
+                                      {"OF", OF},
+                                      {"OR", OR},
+                                      {"NOT", NOT},
+                                      {"NULL", WHISPER_NULL},
+                                      {"REAL", REAL},
+                                      {"RETURN", RETURN},
+                                      {"RICHREAL", RICHREAL},
+                                      {"PROCEDURE", PROCEDURE},
+                                      {"SYNC", SYNC},
+                                      {"TABLE", TABLE},
+                                      {"TEXT", TEXT},
+                                      {"THEN", THEN},
+                                      {"TRUE", W_TRUE},
+                                      {"UNTIL", UNTIL},
+                                      {"UNSIGNED", UNSIGNED},
+                                      {"WHILE", WHILE},
+                                      {"XOR", XOR},
 
-  /* some aliases of our own */
-  {"NUMBER", INT32},
-
-  {NULL, 0}
-};
+                                      /* some aliases of our own */
+                                      {"NUMBER", INT32},
+                                      {NULL, 0}
+                                    };
 
 static int
-parse_keyword_value (const char *key, D_UINT key_len)
+parse_keyword (const char* keyWord, D_UINT keyLen)
 {
-  char key_upcase[MAX_KEYWORD_LEN];
   D_UINT count;
+  char   key_upcase[MAX_KEYWORD_LEN];
 
-  if (key_len >= MAX_KEYWORD_LEN)
-    {
-      return 0;
-    }
+  if (keyLen >= MAX_KEYWORD_LEN)
+    return 0;
 
-  for (count = 0; count < key_len; count++)
+  for (count = 0; count < keyLen; count++)
     {
-      key_upcase[count] = key[count];
-      if (key[count] >= 'a' && key[count] <= 'z')
-	{
-	  key_upcase[count] += 'A' - 'a';
-	}
+      key_upcase[count] = keyWord[count];
+
+      if (keyWord[count] >= 'a' && keyWord[count] <= 'z')
+        key_upcase[count] += ('A' - 'a');
     }
-  key_upcase[count] = 0;	/* add the NULL end */
+  key_upcase[count] = 0; /* add NULL at the end */
 
   count = 0;
-  while (keywords[count].string != NULL)
+  while (keywords[count].text != NULL)
     {
-      if (strcmp (keywords[count].string, key_upcase) == 0)
-	{
-	  break;
-	}
+      if (strcmp (keywords[count].text, key_upcase) == 0)
+        break;
+
       ++count;
     }
 
-  return keywords[count].value;
+  return keywords[count].token;
 }
 
 #define COMPOSED_OPERATOR_LEN    2	/* a compose operator has exactly 2 chars */
+
 static TOKEN_SEMANTIC composed_operators[] = {
-  {"==", EQ},
-  {"!=", NE},
-  {"<=", LE},
-  {">=", GE},
-  {"++", INC},
-  {"--", DEC},
-  {NULL, 0}
-};
+                                               {"==", EQ},
+                                               {"!=", NE},
+                                               {"<=", LE},
+                                               {">=", GE},
+                                               {"++", INC},
+                                               {"--", DEC},
+                                               {NULL, 0}
+                                             };
 
 static int
-parse_composed_operator_value (const char *op_str)
+parse_composed_operator (const char* pOpText)
 {
   D_UINT count = 0;
-  while (composed_operators[count].string != NULL)
+
+  while (composed_operators[count].text != NULL)
     {
-      if (strncmp (composed_operators[count].string, op_str, COMPOSED_OPERATOR_LEN) == 0)
-	{
-	  break;
-	}
+      if (strncmp (composed_operators[count].text, pOpText, COMPOSED_OPERATOR_LEN) == 0)
+        break;
+
       ++count;
     }
 
-  return composed_operators[count].value;
+  return composed_operators[count].token;
 }
 
 static D_UINT
-parse_integer_value (const char *buffer,
-		     D_UINT buffer_len,
-		     D_UINTMAX * output, D_BOOL * is_signed)
+parse_integer (const char* pBuffer,
+               D_UINT      bufferLen,
+               D_UINTMAX*  pOutVal,
+               D_BOOL*     pOutSigned)
 {
-  const D_UINT old_len = buffer_len;
-  D_UINT numeric_base = 10;
-  D_BOOL negative = FALSE;
+  const D_UINT oldLen   = bufferLen;
+  D_UINT       base     = 10;
+  D_BOOL       negative = FALSE;
 
-  assert (buffer != NULL);
-  assert (buffer_len != 0);
-  assert (output != NULL);
+  assert (pBuffer != NULL);
+  assert (bufferLen != 0);
+  assert (pOutVal != NULL);
 
-  *output = 0;
-  *is_signed = FALSE;
-  if (buffer[0] == '-' && buffer_len > 1 && is_numeric (buffer[1], FALSE))
+  *pOutVal    = 0;
+  *pOutSigned = FALSE;
+  if (pBuffer[0] == '-' && bufferLen > 1 && is_numeric (pBuffer[1], FALSE))
     {
       negative = TRUE;
-      buffer++;
-      buffer_len--;
+      pBuffer++;
+      bufferLen--;
     }
-  if (buffer[0] == '0' && buffer_len > 1
-      && (buffer[1] == 'x' || buffer[1] == 'X'))
+
+  if (pBuffer[0] == '0' && bufferLen > 1 && (pBuffer[1] == 'x' || pBuffer[1] == 'X'))
     {
-      buffer_len -= 2;
-      buffer += 2;
-      numeric_base = 16;	/* hexa decimal notation */
+      bufferLen -= 2;
+      pBuffer   += 2;
+      base      = 16;	/* hexa decimal notation */
     }
-  else if (buffer[0] == '0')
+  else if (pBuffer[0] == '0')
     {
-      buffer_len -= 1;
-      buffer += 1;
-      if (buffer_len > 0)
-	{
-	  /* leading 0 means the number is unsigned */
-	}
+      bufferLen -= 1;
+      pBuffer   += 1;
     }
 
   if (negative)
-    {
-      *is_signed = TRUE;
-    }
+    *pOutSigned = TRUE;
 
-  while (buffer_len > 0)
+  while (bufferLen > 0)
     {
       D_UINT8 digit;
 
-      if (*buffer >= '0' && *buffer <= '9')
+      if (*pBuffer >= '0' && *pBuffer <= '9')
+        digit = (*pBuffer - '0');
+      else if (base == 16)
 	{
-	  digit = (*buffer - '0');
-	}
-      else if (numeric_base == 16)
-	{
-	  if (*buffer >= 'a' && *buffer <= 'f')
-	    {
-	      digit = ((*buffer - 'a') + 10);
-	    }
-	  else if (*buffer >= 'A' && *buffer <= 'F')
-	    {
-	      digit = ((*buffer - 'A') + 10);
-	    }
+	  if (*pBuffer >= 'a' && *pBuffer <= 'f')
+            digit = ((*pBuffer - 'a') + 10);
+	  else if (*pBuffer >= 'A' && *pBuffer <= 'F')
+            digit = ((*pBuffer - 'A') + 10);
 	  else
-	    {
-	      break;		/* no more hexa digits for you */
-	    }
+            break;		/* no more hexa digits for you */
 	}
       else
-	{
-	  break;		/* no more digits for you */
-	}
+        break;		/* no more digits for you */
 
-      *output *= numeric_base;
-      *output += digit;
+      *pOutVal *= base;
+      *pOutVal += digit;
 
-      buffer++;
-      buffer_len--;
+      pBuffer++;
+      bufferLen--;
     }
 
   if (negative)
-    {
-      *output *= -1;
-    }
+    *pOutVal *= -1;
 
-  return (old_len - buffer_len);
+  return (oldLen - bufferLen);
 }
 
 static D_UINT
-parse_real_value (const char *buffer,
-		  D_UINT buffer_len, struct SemCReal *output)
+parse_real_value (const char*      pBuffer,
+		  D_UINT           bufferLen,
+		  struct SemCReal* pOutReal)
 {
-  const D_UINT old_len = buffer_len;
-  D_BOOL dpif = FALSE;		/* Decimal Point Is Found */
-  D_BOOL negative = FALSE;
-  D_UINT frac_nible = 15;
+  const D_UINT oldLen            = bufferLen;
+  D_BOOL       foundDecimalPoint = FALSE;
+  D_BOOL       negative          = FALSE;
+  D_UINT       fractionNible     = 15;
 
-  assert (buffer != NULL);
-  assert (buffer_len != 0);
-  assert (output != NULL);
+  assert (pBuffer != NULL);
+  assert (bufferLen != 0);
+  assert (pOutReal != NULL);
 
-  output->integerPart = 0;
-  output->fractionalPart = 0;
-  if (buffer[0] == '-' && buffer_len > 1 && is_numeric (buffer[1], FALSE))
+  pOutReal->integerPart    = 0;
+  pOutReal->fractionalPart = 0;
+
+  if (pBuffer[0] == '-' && bufferLen > 1 && is_numeric (pBuffer[1], FALSE))
     {
       negative = TRUE;
-      buffer++;
-      buffer_len--;
+      pBuffer++;
+      bufferLen--;
     }
 
-  while (buffer_len > 0)
+  while (bufferLen > 0)
     {
       int digit = 0;
-      if (*buffer >= '0' && *buffer <= '9')
+
+      if (*pBuffer >= '0' && *pBuffer <= '9')
 	{
-	  digit += (*buffer - '0');
-	  if (dpif == FALSE)
+	  digit += (*pBuffer - '0');
+	  if (foundDecimalPoint == FALSE)
 	    {
-	      output->integerPart *= 10;
-	      output->integerPart += digit;
+	      pOutReal->integerPart *= 10;
+	      pOutReal->integerPart += digit;
 	    }
 	  else
-	    output->fractionalPart |=
-	      (((D_UINT64) digit & 0x0F) << (frac_nible-- * 4));
+	    pOutReal->fractionalPart |= (((D_UINT64) digit & 0x0F) << (fractionNible-- * 4));
 	}
-      else if (*buffer == '.')
+      else if (*pBuffer == '.')
 	{
-	  if (dpif == TRUE)
+	  if (foundDecimalPoint == TRUE)
 	    {
 	      /* we already found a decimal point */
 	      return 0;
 	    }
-	  dpif = TRUE;
+	  foundDecimalPoint = TRUE;
 	}
       else
-	{
-	  break;		/* nothing for us here */
-	}
-      buffer++;
-      buffer_len--;
+        break;		/* nothing for us here */
+
+      pBuffer++;
+      bufferLen--;
     }
 
   if (negative)
-    {
-      output->integerPart *= -1;
-    }
+    pOutReal->integerPart *= -1;
 
-  return (old_len - buffer_len);
+  return (oldLen - bufferLen);
 }
 
 static D_UINT
-parse_char_value (const char *buffer, D_UINT buffer_len, D_CHAR * output)
+parse_character (const char* pBuffer,
+                D_UINT       bufferLen,
+                D_CHAR*      pOutChar)
 {
   D_UINT result = 0;
 
-  assert (buffer != NULL);
-  assert (buffer_len != 0);
-  assert (output != NULL);
+  assert (pBuffer != NULL);
+  assert (bufferLen != 0);
+  assert (pOutChar != NULL);
 
-  *output = 0;
-  if (*buffer == '\\')
+  *pOutChar = 0;
+
+  if (*pBuffer == '\\')
     {
-      if (buffer_len > 0)
+      if (bufferLen > 0)
 	{
-	  ++buffer;
+	  ++pBuffer;
 	  ++result;
-	  --buffer_len;
+	  --bufferLen;
 	}
       else
+        return 0;		/* error */
+
+      if (*pBuffer == '\\')
 	{
-	  return 0;		/* error */
-	}
-      if (*buffer == '\\')
-	{
-	  *output = '\\';
+	  *pOutChar = '\\';
 	  ++result;
 	}
-      else if (*buffer == 'n')
+      else if (*pBuffer == 'n')
 	{
-	  *output = '\n';
+	  *pOutChar = '\n';
 	  ++result;
 	}
-      else if (*buffer == 'r')
+      else if (*pBuffer == 'r')
 	{
-	  *output = '\r';
+	  *pOutChar = '\r';
 	  ++result;
 	}
-      else if (*buffer == 'f')
+      else if (*pBuffer == 'f')
 	{
-	  *output = '\f';
+	  *pOutChar = '\f';
 	  ++result;
 	}
-      else if (*buffer == 't')
+      else if (*pBuffer == 't')
 	{
-	  *output = '\t';
+	  *pOutChar = '\t';
 	  ++result;
 	}
-      else if (*buffer == 'v')
+      else if (*pBuffer == 'v')
 	{
-	  *output = '\v';
+	  *pOutChar = '\v';
 	  ++result;
 	}
-      else if (*buffer == 'b')
+      else if (*pBuffer == 'b')
 	{
-	  *output = '\b';
+	  *pOutChar = '\b';
 	  ++result;
 	}
-      else if (*buffer == 'a')
+      else if (*pBuffer == 'a')
 	{
-	  *output = '\a';
+	  *pOutChar = '\a';
 	  ++result;
 	}
-      else if (*buffer == '\'')
+      else if (*pBuffer == '\'')
 	{
-	  *output = '\'';
+	  *pOutChar = '\'';
 	  ++result;
 	}
-      else if (*buffer == '\"')
+      else if (*pBuffer == '\"')
 	{
-	  *output = '\"';
+	  *pOutChar = '\"';
 	  ++result;
 	}
-      else if (is_numeric (*buffer, FALSE))
+      else if (is_numeric (*pBuffer, FALSE))
 	{
-	  D_UINTMAX int_value = 0;
-	  D_BOOL dummy;
-	  result +=
-	    parse_integer_value (buffer, buffer_len, &int_value, &dummy);
-	  *output = (D_CHAR) int_value;
+	  D_UINTMAX intValue = 0;
+	  D_BOOL    dummy;
+
+	  result    += parse_integer (pBuffer, bufferLen, &intValue, &dummy);
+	  *pOutChar = (D_CHAR) intValue;
 	}
     }
   else
     {
-      *output = *buffer;
-      result = 1;
+      *pOutChar = *pBuffer;
+      result    = 1;
     }
 
   return result;
 }
 
 static D_UINT
-parse_string_value (const char *buffer,
-		    D_UINT buffer_len, D_CHAR * output, D_UINT * output_len)
+parse_string (const char* pBuffer,
+	      D_UINT      bufferLen,
+	      D_CHAR*     pOutString,
+	      D_UINT*     oOutStringLen)
 {
-  const D_UINT old_len = buffer_len;
+  const D_UINT oldLen = bufferLen;
 
-  assert (buffer != NULL);
-  assert (buffer_len != 0);
-  assert (output != NULL);
+  assert (pBuffer != NULL);
+  assert (bufferLen != 0);
+  assert (pOutString != NULL);
 
-  *output_len = 0;
+  *oOutStringLen = 0;
 
-  while ((buffer_len > 0) && (*buffer != '\"'))
+  while ((bufferLen > 0) && (*pBuffer != '\"'))
     {
-      D_UINT result = 0;
-      result = parse_char_value (buffer, buffer_len, output);
+      D_UINT result = parse_character (pBuffer, bufferLen, pOutString);
+
       if (result != 0)
 	{
-	  buffer += result;
-	  buffer_len -= result;
-	  output++;
-	  (*output_len)++;
+	  pBuffer   += result;
+	  bufferLen -= result;
+	  pOutString++;
+	  (*oOutStringLen)++;
 	}
       else
-	{			/* reserved for possible future error cases */
-	  return 0;
-	}
+        return 0;
     }
 
-  *output = 0;			/* add the null character */
-  (*output_len)++;
-  return (old_len - buffer_len);
+  *pOutString = 0;			/* add the null character */
+  (*oOutStringLen)++;
+
+  return (oldLen - bufferLen);
 }
 
 static D_UINT
-parse_time_value (const char *buffer,
-		  D_UINT buffer_len, struct SemCTime *output)
+parse_time_value (const char*      pBuffer,
+		  D_UINT           bufferLen,
+		  struct SemCTime* pOutTime)
 {
-  D_INTMAX int_v;
-  D_UINT int_vlen;
-  D_UINT result = 0;
-  D_BOOL dummy;
+  D_INTMAX intVal    = 0;
+  D_UINT   intValLen = 0;
+  D_UINT   result    = 0;
+  D_BOOL   dummy;
 
   /* initialise the structure with default valid values */
-  memset (output, 0, sizeof (output[0]));
-  output->month = output->day = 1;
+  memset (pOutTime, 0, sizeof (pOutTime[0]));
+  pOutTime->month = pOutTime->day = 1;
 
   /* found the year part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX*) &intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->year = (D_INT16) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->year = (D_INT16) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
-  if (buffer[0] == '\'')
-    {
-      return result;		/* end of date/time entry */
-    }
-  else if (buffer[0] != '/')
+  if (pBuffer[0] == '\'')
+    return result;		/* end of date/time entry */
+  else if (pBuffer[0] != '/')
     {
       /* no date delimiter */
       return 0;			/* parsing error */
     }
   else
     {
-      ++result, ++buffer, --buffer_len;
+      ++result;
+      ++pBuffer;
+      --bufferLen;
     }
 
   /* found the month part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->month = (D_UINT8) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->month = (D_UINT8) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
-  if (buffer[0] == '\'')
-    {
-      return result;		/* end of date/time entry */
-    }
-  else if (buffer[0] != '/')
+  if (pBuffer[0] == '\'')
+    return result;		/* end of date/time entry */
+  else if (pBuffer[0] != '/')
     {
       /* no date delimiter */
       return 0;			/* parsing error */
     }
   else
     {
-      ++result, ++buffer, --buffer_len;
+      ++result,
+      ++pBuffer,
+      --bufferLen;
     }
 
   /* found the day part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->day = (D_UINT8) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->day = (D_UINT8) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
-  if (buffer[0] == '\'')
-    {
-      return result;		/* end of date/time entry */
-    }
-  else if (buffer[0] != ' ')
+  if (pBuffer[0] == '\'')
+    return result;		/* end of date/time entry */
+  else if (pBuffer[0] != ' ')
     {
       /* no date delimiter */
       return 0;			/* parsing error */
     }
   else
     {
-      ++result, ++buffer, --buffer_len;
+      ++result;
+      ++pBuffer;
+      --bufferLen;
     }
 
   /* found the hour part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->hour = (D_UINT8) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->hour = (D_UINT8) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
-  if (buffer[0] != ':')
+  if (pBuffer[0] != ':')
     {
       /* no time delimiter */
       return 0;			/* parsing error */
     }
   else
     {
-      ++result, ++buffer, --buffer_len;
+      ++result;
+      ++pBuffer;
+      --bufferLen;
     }
 
   /* found the minute part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->min = (D_UINT8) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->min = (D_UINT8) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
-  if (buffer[0] == '\'')
-    {
-      return result;
-    }
-  else if (buffer[0] != ':')
+  if (pBuffer[0] == '\'')
+    return result;
+  else if (pBuffer[0] != ':')
     {
       /* no time delimiter */
       return 0;			/* parsing error */
     }
   else
     {
-      ++result, ++buffer, --buffer_len;
+      ++result;
+      ++pBuffer;
+      --bufferLen;
     }
+
   /* found the second part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->sec = (D_UINT8) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->sec = (D_UINT8) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
-  if (buffer[0] == '\'')
-    {
-      return result;
-    }
-  else if (buffer[0] != '.')
+  if (pBuffer[0] == '\'')
+    return result;
+  else if (pBuffer[0] != '.')
     {
       /* no time delimiter */
       return 0;			/* parsing error */
     }
   else
     {
-      ++result, ++buffer, --buffer_len;
+      ++result;
+      ++pBuffer;
+      --bufferLen;
     }
+
   /* found the microsecond part */
-  int_vlen = parse_integer_value (buffer, buffer_len, (D_UINTMAX *) & int_v,
-				  &dummy);
-  if (int_vlen > 0)
+  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  if (intValLen > 0)
     {
-      result += int_vlen;
-      buffer += int_vlen;
-      buffer_len -= int_vlen;
-      output->usec = (D_UINT32) int_v;
+      result    += intValLen;
+      pBuffer   += intValLen;
+      bufferLen -= intValLen;
+
+      pOutTime->usec = (D_UINT32) intVal;
     }
   else
-    {
-      return 0;			/* parsing error */
-    }
+    return 0;			/* parsing error */
 
   return result;
 }
 
 int
-yylex (YYSTYPE * lvalp, struct ParserState *state)
+yylex (YYSTYPE * lvalp, struct ParserState* pState)
 {
   int result = 0;
-  const D_CHAR *buffer = state->buffer;
-  const D_CHAR *token = NULL;
-  D_UINT token_len = 0;
-  TOKEN_TYPE token_type;
-  D_UINT buffer_pos = state->bufferPos;
+  const D_CHAR* pBuffer   = pState->buffer;
+  const D_CHAR* pToken    = NULL;
+  D_UINT        tokenLen  = 0;
+  TOKEN_TYPE    tokenType = TK_ERROR;
+  D_UINT        bufferOff = pState->bufferPos;
 
-  if (state->bufferPos > state->bufferSize)
+  if (pState->bufferPos > pState->bufferSize)
     return 0;
 
   /* recall where to start from */
-  buffer += buffer_pos;
-  token_type = get_next_token (buffer, &token, &token_len);
+  pBuffer   += bufferOff;
+  tokenType =  get_next_token (pBuffer, &pToken, &tokenLen);
 
   /* remember to start from here  next time */
-  state->bufferPos += (D_UINT) ((token + token_len) - buffer);
+  pState->bufferPos += (D_UINT) ((pToken + tokenLen) - pBuffer);
 
   /* allocate storage for value */
   *lvalp = NULL;		/* if we are to crash... make it loud */
-  if ((token_type != TK_UNDETERMINED) && (token_type != TK_OPERATOR)
-      && ((token_type != TK_IDENTIFIER)
-	  || ((result = parse_keyword_value (token, token_len)) == 0)))
+  if ((tokenType != TK_UNDETERMINED) && (tokenType != TK_OPERATOR) &&
+      ((tokenType != TK_IDENTIFIER) || ((result = parse_keyword (pToken, tokenLen)) == 0)))
     {
       /* if the token is not a key word */
-      *lvalp = get_sem_value (state);
+      *lvalp = alloc_sem_value (pState);
       if (*lvalp == NULL)
 	{
-	  w_log_msg (state, IGNORE_BUFFER_POS, state->bufferPos, MSG_NO_MEM);
+	  w_log_msg (pState, IGNORE_BUFFER_POS, pState->bufferPos, MSG_NO_MEM);
 	  return 0;
 	}
     }
-  else if (token_type == TK_IDENTIFIER)
+  else if (tokenType == TK_IDENTIFIER)
     {
       /* after we parsed the token we found is a keyword */
-      token_type = TK_KEYWORD;
+      tokenType = TK_KEYWORD;
       return result;
     }
-  else if (token_len == 1)
-    {
-      return *token;
-    }
+  else if (tokenLen == 1)
+    return *pToken;
 
-  switch (token_type)
+  switch (tokenType)
     {
     case TK_IDENTIFIER:
       /* parsing was successful */
-      (*lvalp)->val_type = VAL_ID;
-      (*lvalp)->val.u_id.text = token;
-      (*lvalp)->val.u_id.length = token_len;
+      (*lvalp)->val_type        = VAL_ID;
+      (*lvalp)->val.u_id.text   = pToken;
+      (*lvalp)->val.u_id.length = tokenLen;
+
       result = IDENTIFIER;
       break;
+
     case TK_OPERATOR:
-      return parse_composed_operator_value (token);
+      return parse_composed_operator (pToken);
+
     case TK_NUMERIC:
-      result = parse_integer_value (token, token_len,
-				    &((*lvalp)->val.u_int.value),
-				    &((*lvalp)->val.u_int.is_signed));
+      result = parse_integer (pToken,
+                              tokenLen,
+			      &((*lvalp)->val.u_int.value),
+			      &((*lvalp)->val.u_int.is_signed));
       if (result != 0)
 	{			/* parsing was successful */
 	  (*lvalp)->val_type = VAL_C_INT;
+
 	  result = WHISPER_INTEGER;
 	}
       break;
+
     case TK_CHAR:
-      if ((token_len > 2) || (token[0] != '\''))
+      if ((tokenLen > 2) || (pToken[0] != '\''))
 	{
-	  token++;
-	  result = parse_char_value (token, token_len - 1,
-				     &((*lvalp)->val.u_char.value));
-	  if (token[result] != '\'')
-	    {
-	      result = 0;
-	    }
+	  pToken++;
+	  result = parse_character (pToken,
+	                            tokenLen - 1,
+				    &((*lvalp)->val.u_char.value));
+	  if (pToken[result] != '\'')
+            result = 0;
 	}
       else
-	{
-	  result = 0;		/* error */
-	}
+        result = 0;		/* error */
+
       if (result != 0)
 	{			/* parsing was successful */
 	  (*lvalp)->val_type = VAL_C_CHAR;
+
 	  result = WHISPER_CHARACTER;
 	}
       break;
+
     case TK_STRING:
-      if ((token_len > 1) || (token[0] != '\"'))
+      if ((tokenLen > 1) || (pToken[0] != '\"'))
 	{
-	  token++;
-	  (*lvalp)->val.u_text.text = alloc_str (state->strings, token_len - 1);
-	  result = parse_string_value (token, token_len,
-				       (*lvalp)->val.u_text.text,
-				       &(*lvalp)->val.u_text.length);
-	  if (token[result] != '\"')
-	    {
-	      result = 0;
-	    }
+	  pToken++;
+	  (*lvalp)->val.u_text.text = alloc_str (pState->strings, tokenLen - 1);
+	  result = parse_string (pToken,
+	                         tokenLen,
+				 (*lvalp)->val.u_text.text,
+				 &(*lvalp)->val.u_text.length);
+
+	  if (pToken[result] != '\"')
+            result = 0;
 	  else
 	    {
 	      /* parsing was successful, result contains the
 	       * length of the text */
 	      (*lvalp)->val_type = VAL_C_TEXT;
+
 	      result = WHISPER_TEXT;
 	    }
 	}
       else
-	{
-	  result = 0;		/* error */
-	}
+        result = 0;		/* error */
+
       break;
+
     case TK_DATETIME:
-      if ((token_len > 2) || (token[0] != '\''))
+      if ((tokenLen > 2) || (pToken[0] != '\''))
 	{
-	  token++;
-	  result = parse_time_value (token, token_len - 1,
+	  pToken++;
+	  result = parse_time_value (pToken,
+	                             tokenLen - 1,
 				     &((*lvalp)->val.u_time));
-	  if (token[result] != '\'')
-	    {
-	      result = 0;
-	    }
+	  if (pToken[result] != '\'')
+            result = 0;
 	}
       else
-	{
-	  result = 0;		/* error */
-	}
+        result = 0;		/* error */
+
       if (result != 0)
 	{
 	  (*lvalp)->val_type = VAL_C_TIME;
@@ -963,14 +936,16 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
 	  result = WHISPER_TIME;
 	}
       break;
+
     case TK_REAL:
-      result = parse_real_value (token, token_len, &((*lvalp)->val.u_real));
+      result = parse_real_value (pToken, tokenLen, &((*lvalp)->val.u_real));
       if (result != 0)
 	{			/* parsing was successful */
 	  (*lvalp)->val_type = VAL_C_REAL;
 	  result = WHISPER_REAL;
 	}
       break;
+
     default:
       /* What I'm doing here? Return an error!*/
       result = 0;
@@ -982,9 +957,9 @@ yylex (YYSTYPE * lvalp, struct ParserState *state)
 /* this is internally used by yyparse()
  * it's declaration is found on wisper.y */
 int
-yyerror (struct ParserState *state, const D_CHAR * msg)
+yyerror (struct ParserState* pState, const D_CHAR* msg)
 {
-  w_log_msg (state, state->bufferPos, MSG_COMPILER_ERR);
+  w_log_msg (pState, pState->bufferPos, MSG_COMPILER_ERR);
 
   return 0;
 }

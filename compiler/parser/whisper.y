@@ -116,9 +116,9 @@ var_decl_stmt: LET id_list AS type_spec ';'
 		          { $$ = install_list_declrs(state, $2, $4); CHK_SEM_ERROR; }
 
 id_list: IDENTIFIER  
-			{ $$ = add_idlist(NULL, $1); }
+			{ $$ = add_id_to_list(NULL, $1); }
        | id_list ',' IDENTIFIER
-       		{ $$ = add_idlist($1, $3); }
+       		{ $$ = add_id_to_list($1, $3); }
 ;
 
 type_spec: basic_type_spec
@@ -200,28 +200,28 @@ cont_clause: /* empty */
 
 container_type_decl: IDENTIFIER AS basic_type_spec ',' container_type_decl
                     	{
-                    		$3->val.u_tspec.type |= T_FIELD_MASK;
+                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
                     		$$ = install_field_declaration(state,
                     			$1, $3, (struct DeclaredVar *)$5);
                             CHK_SEM_ERROR;
                     	} 
                    | IDENTIFIER AS array_type_spec ',' container_type_decl
                     	{
-                    		$3->val.u_tspec.type |= T_FIELD_MASK;
+                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
                     		$$ = install_field_declaration(state,
                     			$1, $3, (struct DeclaredVar *)$5);
                             CHK_SEM_ERROR;
                     	}                
                    | IDENTIFIER AS basic_type_spec
                     	{
-                    		$3->val.u_tspec.type |= T_FIELD_MASK;
+                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
                     		$$ = install_field_declaration(state,
                     			$1, $3, NULL);
                             CHK_SEM_ERROR;
                     	}                
                    | IDENTIFIER AS array_type_spec
                     	{
-                    		$3->val.u_tspec.type |= T_FIELD_MASK;
+                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
                     		$$ = install_field_declaration(state,
                     			$1, $3, NULL);
                             CHK_SEM_ERROR;
@@ -466,14 +466,14 @@ const_exp: WHISPER_INTEGER
             }
          | W_TRUE
             {
-                $1 = get_bool_sem_value(state, TRUE);
+                $1 = alloc_boolean_sem_value(state, TRUE);
                 CHK_SEM_ERROR;
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR; 
             }
          | W_FALSE
             {
-                $1 = get_bool_sem_value(state, FALSE);
+                $1 = alloc_boolean_sem_value(state, FALSE);
                 CHK_SEM_ERROR;
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR; 

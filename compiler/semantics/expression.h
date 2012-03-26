@@ -72,7 +72,7 @@ create_exp_link (struct ParserState* pState,
 		 YYSTYPE             firstOp,
 		 YYSTYPE             secondOp,
 		 YYSTYPE             thirdOp,
-		 enum EXP_OPERATION  op);
+		 enum EXP_OPERATION  opcode);
 
 YYSTYPE
 translate_exp (struct ParserState* pState, YYSTYPE exp);

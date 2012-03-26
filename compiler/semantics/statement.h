@@ -89,15 +89,15 @@ void
 clear_glbl_stmt (struct Statement* pGlbStmt);
 
 D_BOOL
-init_proc_stmt (struct Statement* pParentStmt, struct Statement* pStmt);
+init_proc_stmt (struct Statement* pParentStmt, struct Statement* pOutStmt);
 
 void
-clear_proc_stmt (struct Statement* pProcStmt);
+clear_proc_stmt (struct Statement* pStmt);
 
 struct DeclaredVar*
 stmt_find_declaration (struct Statement* pStmt,
-                       const char*       label,
-		       const D_UINT      label_len,
+                       const char*       pName,
+		       const D_UINT      nameLength,
                        const D_BOOL      recursive,
 		       const D_BOOL      refferenced);
 
@@ -105,7 +105,7 @@ struct DeclaredVar*
 stmt_add_declaration (struct Statement* pStmt, struct DeclaredVar* pVar, D_BOOL parameter);
 
 const struct DeclaredVar*
-stmt_get_param (const struct Statement* const pStmt, D_UINT paramerId);
+stmt_get_param (const struct Statement* const pStmt, D_UINT param);
 
 D_UINT
 stmt_get_param_count (const struct Statement* const pStmt);
@@ -151,13 +151,16 @@ D_BOOL
 is_type_spec_valid (const struct TypeSpec* pSpec);
 
 D_BOOL
-type_spec_cmp (const struct TypeSpec* pSpec_1,
-	       const struct TypeSpec* pSpec_2);
+type_spec_cmp (const struct TypeSpec* const pSpec_1,
+	       const struct TypeSpec* const pSpec_2);
 
 D_UINT
-type_spec_fill (struct OutStream* outs, const struct DeclaredVar* pVar);
+type_spec_fill (struct OutStream* const         pOutStream,
+                const struct DeclaredVar* const pVar);
 
 D_INT
-add_text_const (struct Statement* pStmt, const D_UINT8* buffer, D_UINT size);
+add_text_const (struct Statement* const pStmt,
+                const D_UINT8* const    pText,
+                const D_UINT            textSize);
 
 #endif /*STATEMENT_H_ */

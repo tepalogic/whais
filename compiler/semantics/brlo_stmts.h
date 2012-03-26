@@ -43,17 +43,17 @@ enum BRANCH_TYPE
   BT_ELSEIF
 };
 
-struct BranchData
+struct Branch
 {
   enum BRANCH_TYPE type;
-  D_INT32          skipPos;
-  D_INT32          exitPos;
+  D_INT32          startPos;
+  D_INT32          elsePos;
 };
 
 void
 begin_if_stmt (struct ParserState* const pState,
-	       YYSTYPE                   exp,
-	       enum BRANCH_TYPE          type);
+	       YYSTYPE                   expression,
+	       enum BRANCH_TYPE          branchType);
 
 void
 begin_else_stmt (struct ParserState* const pState);
@@ -76,7 +76,7 @@ enum LOOP_ELEMENT_TYPE
   LE_CONTINUE
 };
 
-struct LoopData
+struct Loop
 {
   enum LOOP_ELEMENT_TYPE type;
   D_UINT32               startPos;

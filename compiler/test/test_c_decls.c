@@ -115,14 +115,14 @@ check_container_field (struct Statement *stmt,
   while (extra != NULL)
     {
       result = FALSE;		/* changed to TRUE if everything is good */
-      if ((extra->type & T_FIELD_MASK) == 0)
+      if ((extra->type & T_TABLE_FIELD_MASK) == 0)
 	{
 	  break;
 	}
-      if ((extra->l_label == f_len) &&
+      if ((extra->labelLength == f_len) &&
 	  (strncmp (field, extra->label, f_len) == 0))
 	{
-	  if (extra->type == (type | T_FIELD_MASK))
+	  if (extra->type == (type | T_TABLE_FIELD_MASK))
 	    {
 	      result = TRUE;
 	    }
@@ -138,7 +138,7 @@ check_container_field (struct Statement *stmt,
     {
       D_UINT8 *const buffer =
 	get_buffer_outstream (&stmt->spec.glb.typesDescs);
-      struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->type_spec_pos);
+      struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->typeSpecOff);
       result = check_type_spec_fill (ts, field, type);
     }
 
@@ -176,7 +176,7 @@ check_vars_decl (struct ParserState *state)
   decl_var = stmt_find_declaration (&state->globalStmt, "vTable3", 7, FALSE, FALSE);
   if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
       (decl_var->extra != table_1->extra) ||
-      (decl_var->type_spec_pos != table_1->type_spec_pos))
+      (decl_var->typeSpecOff != table_1->typeSpecOff))
     {
       return FALSE;
     }

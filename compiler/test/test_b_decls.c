@@ -71,19 +71,19 @@ check_declared_var (struct Statement *stm,
   struct OutStream *os = &stm->spec.glb.typesDescs;
   if ((var == NULL) ||		/* var not found */
       (var->type != type) ||	/* invalid type */
-      ((var->var_id & GLOBAL_DECL)) == 0)
+      ((var->varId & GLOBAL_DECL)) == 0)
     {
       return FALSE;
     }
 
-  if ((var->type_spec_pos >= get_size_outstream (os)))
+  if ((var->typeSpecOff >= get_size_outstream (os)))
     {
       return FALSE;
     }
   else
     {
       struct TypeSpec *ts = (struct TypeSpec *)
-	&(get_buffer_outstream (os)[var->type_spec_pos]);
+	&(get_buffer_outstream (os)[var->typeSpecOff]);
       if ((ts->type != type) ||
 	  (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
 	{

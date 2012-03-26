@@ -180,16 +180,16 @@ struct ParserState
 
 };
 
-struct SemValue *
-get_sem_value (struct ParserState *state);
+struct SemValue*
+alloc_sem_value (struct ParserState* const pState);
 
-struct SemValue *
-get_bool_sem_value (struct ParserState *state, D_BOOL value);
+struct SemValue*
+alloc_boolean_sem_value (struct ParserState* const pState, const D_BOOL intialValue);
 
 INLINE static void
-recycle_sem_value (struct SemValue *value)
+free_sem_value (struct SemValue* const pValue)
 {
-  value->val_type = VAL_REUSE;
+  pValue->val_type = VAL_REUSE;
 }
 
 #endif /* PARSER_H */

@@ -43,35 +43,36 @@ extern "C"
 #endif
 
 struct OutStream*
-init_outstream (struct OutStream* pStream, D_UINT inc_size);
+init_outstream (struct OutStream* pStream, D_UINT increment);
+
+void
+destroy_outstream (struct OutStream* pStream);
 
 struct OutStream*
-data_outstream (struct OutStream* pStream, const D_UINT8* data, D_UINT data_size);
-
-void destroy_outstream (struct OutStream* pStream);
+output_data (struct OutStream* pStream, const D_UINT8* pData, D_UINT dataSize);
 
 INLINE static struct OutStream*
-uint8_outstream (struct OutStream* pStream, D_UINT8 val)
+output_uint8 (struct OutStream* pStream, D_UINT8 value)
 {
-  return data_outstream (pStream, &val, sizeof val);
+  return output_data (pStream, &value, sizeof value);
 }
 
 INLINE static struct OutStream*
-uint16_outstream (struct OutStream* pStream, D_UINT16 val)
+output_uint16 (struct OutStream* pStream, D_UINT16 value)
 {
-  return data_outstream (pStream, (D_UINT8*)&val, sizeof val);
+  return output_data (pStream, (D_UINT8*)&value, sizeof value);
 }
 
 INLINE static struct OutStream*
-uint32_outstream (struct OutStream* pStream, D_UINT32 val)
+output_uint32 (struct OutStream* pStream, D_UINT32 value)
 {
-  return data_outstream (pStream, (D_UINT8*)&val, sizeof val);
+  return output_data (pStream, (D_UINT8*)&value, sizeof value);
 }
 
 INLINE static struct OutStream*
-uint64_outstream (struct OutStream* pStream, D_UINT64 val)
+output_uint64 (struct OutStream* pStream, D_UINT64 value)
 {
-  return data_outstream (pStream, (D_UINT8*)&val, sizeof val);
+  return output_data (pStream, (D_UINT8*)&value, sizeof value);
 }
 
 #define get_buffer_outstream(pStream) ((pStream)->data)

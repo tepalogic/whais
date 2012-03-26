@@ -2,7 +2,7 @@
 WHISPERC - A compiler for whisper programs
 Copyright (C) 2008  Iulian Popa
 
-Address: Str Olimp nr. 6 
+Address: Str Olimp nr. 6
          Pantelimon Ilfov,
          Rommania
 Phone:   +40721939650
@@ -29,5 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FALSE   0
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
+#define MAX(a,b) ((a)<(b)?(b):(a))
 
 #endif /*WHISPER_MACROS_H */

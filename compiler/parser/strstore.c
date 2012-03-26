@@ -34,23 +34,23 @@
 struct StoreLink
 {
   struct StoreLink *next;
-  D_UINT allocated;
-  D_UINT unused;
-  D_CHAR data[1];
+  D_UINT            allocated;
+  D_UINT            unused;
+  D_CHAR            data[1];
 };
 
-static struct StoreLink *
+static struct StoreLink*
 alloc_link (const D_UINT size)
 {
-  struct StoreLink *link =
-    mem_alloc (sizeof (struct StoreLink) + size * sizeof (D_CHAR));
-  if (link != NULL)
+  struct StoreLink* const pLink = mem_alloc (sizeof (struct StoreLink) + size * sizeof (D_CHAR));
+  if (pLink != NULL)
     {
-      link->next = NULL;
-      link->unused = link->allocated = size;
+      pLink->next      = NULL;
+      pLink->unused    = size;
+      pLink->allocated = size;
     }
 
-  return link;
+  return pLink;
 }
 
 StringStoreHnd
@@ -60,14 +60,15 @@ create_string_store ()
 }
 
 void
-release_string_store (StringStoreHnd * handle)
+release_string_store (StringStoreHnd* handle)
 {
-  struct StoreLink *link = (struct StoreLink *) handle;
-  while (link != NULL)
+  struct StoreLink *pLink = (struct StoreLink*) handle;
+  while (pLink != NULL)
     {
-      struct StoreLink *temp = link->next;
-      mem_free (link);
-      link = temp;
+      struct StoreLink* const temp = pLink->next;
+
+      mem_free (pLink);
+      pLink = temp;
     }
 
 }
@@ -75,28 +76,28 @@ release_string_store (StringStoreHnd * handle)
 D_CHAR *
 alloc_str (StringStoreHnd handle, D_UINT length)
 {
-  D_CHAR *result;
-  struct StoreLink *link = (struct StoreLink *) handle;
+  D_CHAR*           result = NULL;
+  struct StoreLink* pLink  = (struct StoreLink*) handle;
 
-  while ((link->unused < length) && (link->next != NULL))
-    link = link->next;
+  while ((pLink->unused < length) && (pLink->next != NULL))
+    pLink = pLink->next;
 
-  if (link->unused > length)
+  if (pLink->unused > length)
     {
-      result = (link->allocated - link->unused) + link->data;
-      link->unused -= length;
+      result        =  (pLink->allocated - pLink->unused) + pLink->data;
+      pLink->unused -= length;
     }
   else
     {
-      link->next = alloc_link ((length < DEFAULT_STR_SIZE ?
-				DEFAULT_STR_SIZE : length));
-      link = link->next;
-      if (link == NULL)
+      pLink->next = alloc_link (MAX (length,  DEFAULT_STR_SIZE));
+      pLink       = pLink->next;
+
+      if (pLink == NULL)
 	result = NULL;
       else
 	{
-	  result = (link->allocated - link->unused) + link->data;
-	  link->unused -= length;
+	  result        =  (pLink->allocated - pLink->unused) + pLink->data;
+	  pLink->unused -= length;
 	}
     }
 

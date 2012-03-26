@@ -61,19 +61,19 @@ check_declared_var (struct Statement *stm,
   struct OutStream *os = &stm->spec.glb.typesDescs;
   if ((var == NULL) ||		/* var not found */
       (var->type != type) ||	/* invalid type */
-      ((var->var_id & GLOBAL_DECL)) == 0)
+      ((var->varId & GLOBAL_DECL)) == 0)
     {
       return FALSE;
     }
 
-  if ((var->type_spec_pos >= get_size_outstream (os)))
+  if ((var->typeSpecOff >= get_size_outstream (os)))
     {
       return FALSE;
     }
   else
     {
       struct TypeSpec *ts = (struct TypeSpec *)
-	&(get_buffer_outstream (os)[var->type_spec_pos]);
+	&(get_buffer_outstream (os)[var->typeSpecOff]);
       if ((ts->type != type) ||
 	  (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
 	{
@@ -117,7 +117,7 @@ check_vars_decl (struct ParserState *state)
     {
       return FALSE;
     }
-  temp_pos = decl_var->type_spec_pos;
+  temp_pos = decl_var->typeSpecOff;
 
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar03", 6, FALSE, FALSE);
   if (!check_declared_var
@@ -150,7 +150,7 @@ check_vars_decl (struct ParserState *state)
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar031", 7, FALSE, FALSE);
   if (!check_declared_var
       (&state->globalStmt, decl_var, (T_REAL | T_ARRAY_MASK))
-      || temp_pos != decl_var->type_spec_pos)
+      || temp_pos != decl_var->typeSpecOff)
     {
       return FALSE;
     }

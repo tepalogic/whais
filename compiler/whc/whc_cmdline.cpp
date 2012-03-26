@@ -33,16 +33,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whc_cmdline.h"
 
 static inline bool
-isStrEqual (const D_CHAR * str1, const D_CHAR * str2)
+isStrEqual (const D_CHAR* str1, const D_CHAR* str2)
 {
   return::strcmp (str1, str2) == 0;
 }
 
-WhcCmdLineParser::WhcCmdLineParser (int argc, char **argv):
-m_ArgCount (argc),
-m_Args (argv),
-m_SourceFile (NULL),
-m_OutputFile (NULL), m_ShowHelp (false), m_OutputFileOwn (true)
+WhcCmdLineParser::WhcCmdLineParser (int argc, char **argv) :
+  m_ArgCount (argc),
+  m_Args (argv),
+  m_SourceFile (NULL),
+  m_OutputFile (NULL),
+  m_ShowHelp (false),
+  m_OutputFileOwn (true)
 {
   Parse ();
 }
@@ -50,21 +52,22 @@ m_OutputFile (NULL), m_ShowHelp (false), m_OutputFileOwn (true)
 WhcCmdLineParser::~WhcCmdLineParser ()
 {
   if (m_OutputFileOwn)
-    delete[]m_OutputFile;
+    delete [] m_OutputFile;
 }
 
 void
 WhcCmdLineParser::Parse ()
 {
   using namespace std;
+
   int index = 1;
   if (index >= m_ArgCount)
-    throw WhcCmdLineException ("No arguments! Use --help first!", _EXTRA(0));
+    throw WhcCmdLineException ("No arguments! Use --help first!", _EXTRA (0));
 
   while (index < m_ArgCount)
     {
-      if (isStrEqual (m_Args[index], "-h")
-	  || isStrEqual (m_Args[index], "--help"))
+      if (isStrEqual (m_Args[index], "-h") ||
+          isStrEqual (m_Args[index], "--help"))
 	{
 	  m_ShowHelp = true;
 	  ++index;
@@ -72,30 +75,25 @@ WhcCmdLineParser::Parse ()
       else if (isStrEqual (m_Args[index], "-o"))
 	{
 	  if ((void *) m_OutputFile != NULL)
-	    throw WhcCmdLineException ("Parameter '-o' is given twice",
-	        _EXTRA(0));
+	    throw WhcCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
 
 	  if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
-	    throw WhcCmdLineException (
-	        "Missing file name argument for for parameter '-o'.",
-	        _EXTRA(0));
+	    throw WhcCmdLineException ("Missing file name argument for for parameter '-o'.",
+	                               _EXTRA (0));
 	  else
-	  m_OutputFile = m_Args[index++];
+	    m_OutputFile = m_Args[index++];
 
 	  m_OutputFileOwn = false;
 	}
       else if ((m_Args[index][0] != '-') && (m_Args[index][0] != '\\'))
 	{
 	  if ((void *) m_SourceFile != NULL)
-	    throw
-	      WhcCmdLineException ("The object file was already specified!",
-	          _EXTRA(0));
+	    throw WhcCmdLineException ("The object file was already specified!", _EXTRA (0));
 
 	  m_SourceFile = m_Args[index++];
 	}
       else
-	throw WhcCmdLineException ("Unknown arguments! Use --help first!",
-	    _EXTRA(0));
+	throw WhcCmdLineException ("Unknown arguments! Use --help first!", _EXTRA (0));
     }
 
   CheckArguments ();
@@ -111,21 +109,22 @@ WhcCmdLineParser::CheckArguments ()
     }
   else if (m_SourceFile == NULL)
     throw WhcCmdLineException ("No given input file!", _EXTRA(0));
-  else
-if (m_OutputFile == NULL)
+  else if (m_OutputFile == NULL)
   {
-    const D_CHAR file_ext[] = ".wo";
-    const D_UINT file_name_len = strlen (m_SourceFile);
-    D_CHAR *const temp = new D_CHAR[file_name_len + sizeof file_ext];
+    const D_CHAR  fileExt[]   = ".wo";
+    const D_UINT  fileNameLen = strlen (m_SourceFile);
+    D_CHAR* const tempBuffer  = new D_CHAR[fileNameLen + sizeof fileExt];
 
-    m_OutputFile = temp;
-    strcpy (temp, m_SourceFile);
-    if ((m_SourceFile[file_name_len - 1] == 'c')
-	&& (m_SourceFile[file_name_len - 2] == 'w')
-	&& (m_SourceFile[file_name_len - 3]) == '.')
-      temp[file_name_len - 1] = 'o';
+    m_OutputFile = tempBuffer;
+    strcpy (tempBuffer, m_SourceFile);
+    if ((m_SourceFile[fileNameLen - 1] == 'c') &&
+        (m_SourceFile[fileNameLen - 2] == 'w') &&
+        (m_SourceFile[fileNameLen - 3]) == '.')
+      {
+        tempBuffer[fileNameLen - 1] = 'o';
+      }
     else
-      strcat (temp, file_ext);
+      strcat (tempBuffer, fileExt);
   }
 }
 
@@ -133,12 +132,13 @@ void
 WhcCmdLineParser::DisplayUsage () const
 {
   using namespace std;
+
   unsigned int ver_maj, ver_min;
   whc_get_libver (&ver_maj, &ver_min);
+
   cout << "Whisper Compiler ver. " << ver_maj << '.' << ver_min;
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
-    << "Usage: "
-    << "whisperc  input_file [-o output_file] [--help | -h]" << endl;
+       << "Usage: whisperc  input_file [-o output_file] [--help | -h]" << endl;
 }
 
 

@@ -93,7 +93,7 @@ static const struct MsgCodeEntry messages[] = {
   {MSG_XOR_NA, MSG_ERROR_EVENT,
    "\'XOR\' operator can not be used with operands of type \'%s\' and \'%s\',"},
   {MSG_INDEX_EAT, MSG_ERROR_EVENT,
-   "[] operator applied to a \'%s\'. But an array or a table is required."},
+   "[] operator applied to a \'%s\'. But an array or a text is required."},
   {MSG_INDEX_ENI, MSG_ERROR_EVENT,
    "[] operator has the indexer as a \'%s\' but an integer is required."},
   {MSG_INDEX_UNA, MSG_ERROR_EVENT,
@@ -154,12 +154,12 @@ find_string (D_UINT msgCode)
 }
 
 void
-w_log_msg (struct ParserState *state, D_UINT buff_pos, D_UINT msgCode, ...)
+w_log_msg (struct ParserState *state, D_UINT buffPos, D_UINT msgCode, ...)
 {
   va_list args;
-  const struct MsgCodeEntry *entry = find_string (msgCode);
+  const struct MsgCodeEntry *pMsgEntry = find_string (msgCode);
 
-  if (entry == NULL)
+  if (pMsgEntry == NULL)
     {
       w_log_msg (state, IGNORE_BUFFER_POS, MSG_INT_ERR);
       return;
@@ -169,16 +169,20 @@ w_log_msg (struct ParserState *state, D_UINT buff_pos, D_UINT msgCode, ...)
   if (state->messenger != NULL)
     {
       state->messenger (state->messengerContext,
-			   buff_pos, msgCode, entry->type, entry->msg, args);
+			buffPos,
+			msgCode,
+			pMsgEntry->type,
+			pMsgEntry->msg,
+			args);
     }
   else
     {
       /* don not send the message */
       assert (state->messengerContext == NULL);
     }
-  if ((entry->type == MSG_ERROR_EVENT) ||
-      (entry->type == MSG_INTERNAL_ERROR) ||
-      (entry->type == MSG_GENERAL_EVENT))
+  if ((pMsgEntry->type == MSG_ERROR_EVENT) ||
+      (pMsgEntry->type == MSG_INTERNAL_ERROR) ||
+      (pMsgEntry->type == MSG_GENERAL_EVENT))
     {
       state->abortError = TRUE;
     }

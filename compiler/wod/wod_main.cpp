@@ -37,36 +37,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 int
 main (int argc, char **argv)
 {
-  D_INT ret_code = 0;
+  D_INT retCode = 0;
 
   try
   {
-    WodCmdLineParser CmdLine (argc, argv);
+    WodCmdLineParser cmdLine (argc, argv);
 
     {
-      WFile FileObj (CmdLine.GetSourceFile (), WHC_FILEREAD);
-      wod_dump_header (FileObj, CmdLine.GetOutStream ());
+      WFile inFileObj (cmdLine.GetSourceFile (), WHC_FILEREAD);
+      wod_dump_header (inFileObj, cmdLine.GetOutStream ());
     }
 
-    WFileCompiledUnit object (CmdLine.GetSourceFile ());
+    WFileCompiledUnit inUnit (cmdLine.GetSourceFile ());
 
-    wod_dump_const_area (object, CmdLine.GetOutStream ());
-    wod_dump_globals_tables (object, CmdLine.GetOutStream ());
-    wod_dump_procs (object, CmdLine.GetOutStream (), false);
+    wod_dump_const_area (inUnit, cmdLine.GetOutStream ());
+    wod_dump_globals_tables (inUnit, cmdLine.GetOutStream ());
+    wod_dump_procs (inUnit, cmdLine.GetOutStream (), false);
 
-  } catch (WCompiledUnitException & e)
+  }
+  catch (WCompiledUnitException& e)
   {
     std::cerr << e.GetDescription () << std::endl;
-    ret_code = -1;
-  } catch (WFileException & e)
+    retCode = -1;
+  }
+  catch (WFileException& e)
   {
     std::cerr << "File IO error " << e.GetExtra ();
     if (e.GetDescription() != NULL)
       std::cerr << ": " << e.GetDescription () << std::endl;
     else
       std::cerr << '.' << std::endl;
-    ret_code = -1;
-  } catch (WodCmdLineException & e)
+    retCode = -1;
+  }
+  catch (WodCmdLineException& e)
   {
     std::cerr << e.GetDescription () << std::endl;
   } catch (WException & e)
@@ -74,16 +77,19 @@ main (int argc, char **argv)
     std::cerr << "error : " << e.GetDescription () << std::endl;
     std::cerr << "file: " << e.GetFile() << " : " << e.GetLine() << std::endl;
     std::cerr << "Extra: " << e.GetExtra() << std::endl;
-    ret_code = -1;
-  } catch (std::bad_alloc &)
+
+    retCode = -1;
+  }
+  catch (std::bad_alloc &)
   {
     std::cerr << "Memory allocation failed!" << std::endl;
-    ret_code = -1;
-  } catch (...)
+    retCode = -1;
+  }
+  catch (...)
   {
     std::cerr << "Unknown exception thrown!" << std::endl;
-    ret_code = -1;
+    retCode = -1;
   }
 
-  return ret_code;
+  return retCode;
 }

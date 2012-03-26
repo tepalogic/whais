@@ -372,44 +372,48 @@ const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 
 static const D_UINT16 SECOND_BYTE_MARK = 0x80;
 
-struct OutStream *
-w_opcode_encode (struct OutStream *outs, const enum W_OPCODE opcode)
+struct OutStream*
+w_opcode_encode (struct OutStream* pStream, const enum W_OPCODE opcode)
 {
-  D_UINT16 t_opcode = opcode;
+  D_UINT16 tempOpcode = opcode;
 
-  if (t_opcode > SECOND_BYTE_MARK)
+  if (tempOpcode > SECOND_BYTE_MARK)
     {
-      t_opcode &= (SECOND_BYTE_MARK << 8);
-      return uint16_outstream (outs, t_opcode);
+      tempOpcode &= (SECOND_BYTE_MARK << 8);
+      return output_uint16 (pStream, tempOpcode);
     }
 
-  return uint8_outstream (outs, (D_UINT8) t_opcode);
+  return output_uint8 (pStream, (D_UINT8)tempOpcode);
 }
 
 enum W_OPCODE
-w_opcode_decode (const D_UINT8 * ins)
+w_opcode_decode (const D_UINT8* pCode)
 {
-  if (*ins & SECOND_BYTE_MARK)
+  if (*pCode & SECOND_BYTE_MARK)
     {
-      D_UINT16 t_opcode = ((*ins & ~SECOND_BYTE_MARK) << 8);
-      t_opcode += *(++ins);
-      return t_opcode;
+      D_UINT16 opcode = ((*pCode & ~SECOND_BYTE_MARK) << 8);
+
+      opcode += *(++pCode);
+
+      return opcode;
     }
 
-  return *ins;
+  return *pCode;
 }
 
 unsigned int
-whc_decode_opcode (const unsigned char *ins, enum W_OPCODE *opcode)
+whc_decode_opcode (const unsigned char* pCode, enum W_OPCODE* pOutOpcode)
 {
-  if (*ins & SECOND_BYTE_MARK)
+  if (*pCode & SECOND_BYTE_MARK)
     {
-      D_UINT16 t_opcode = ((*ins & ~SECOND_BYTE_MARK) << 8);
-      t_opcode += *(++ins);
-      *opcode = t_opcode;
+      D_UINT16 tempOpcode = ((*pCode & ~SECOND_BYTE_MARK) << 8);
+
+      tempOpcode  += *(++pCode);
+      *pOutOpcode = tempOpcode;
+
       return 2;
     }
 
-  *opcode = *ins;
+  *pOutOpcode = *pCode;
   return 1;
 }

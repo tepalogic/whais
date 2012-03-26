@@ -105,6 +105,6 @@ struct MsgCodeEntry
 #define MSG_SYNC_MANY     	 (MSG_SYNC_NA + 1)
 
 void
-w_log_msg (struct ParserState *state, D_UINT buff_pos, D_UINT msgCode, ...);
+w_log_msg (struct ParserState *state, D_UINT buffPos, D_UINT msgCode, ...);
 
 #endif /*WLOG_H_ */
