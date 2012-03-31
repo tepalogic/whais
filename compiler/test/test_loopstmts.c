@@ -41,13 +41,13 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR proc_decl_buffer[] =
@@ -73,7 +73,7 @@ D_CHAR proc_decl_buffer[] =
   "IF (b) THEN "
   "CONTINUE; "
   "ELSEIF (c) THEN "
-  "BREAK; " "END " "UNTIL (a); " "RETURN 	c; " "ENDPROC " "";
+  "BREAK; " "END " "UNTIL (a); " "RETURN         c; " "ENDPROC " "";
 
 static D_INT32
 get_int32 (D_UINT8 * buffer)
@@ -109,18 +109,18 @@ check_procedure_1 (struct ParserState *state, D_CHAR * proc_name)
       while_end_pos = get_int32 (code + cond_exp_pos + 3);
       while_end_pos += cond_exp_pos + 2;
       if (w_opcode_decode (code + while_end_pos - 5) != W_JMP)
-	{
-	  return FALSE;
-	}
+        {
+          return FALSE;
+        }
       else
-	{
-	  int jmp_back = get_int32 (code + while_end_pos - 4);
-	  jmp_back += while_end_pos - 5;
-	  if (jmp_back != cond_exp_pos)
-	    {
-	      return FALSE;
-	    }
-	}
+        {
+          int jmp_back = get_int32 (code + while_end_pos - 4);
+          jmp_back += while_end_pos - 5;
+          if (jmp_back != cond_exp_pos)
+            {
+              return FALSE;
+            }
+        }
     }
 
   /* check the break statement */
@@ -240,15 +240,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing loop statements ...");

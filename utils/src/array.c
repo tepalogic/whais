@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct UArray*
 init_array_ex (struct UArray* pOutArray,
-	       size_t         itemSize,
-	       D_UINT         increment,
-	       D_UINT         alignment)
+               size_t         itemSize,
+               D_UINT         increment,
+               D_UINT         alignment)
 {
 
   if ((alignment > sizeof (D_UINTMAX)) || (alignment == 0))
@@ -62,7 +62,7 @@ static D_BOOL
 increment_array (struct UArray* pArray)
 {
   D_INT8 **temp = mem_realloc (pArray->arraysList,
-			       (pArray->arraysCount + 1) * sizeof (temp[0]));
+                               (pArray->arraysCount + 1) * sizeof (temp[0]));
   if (temp == NULL)
     return FALSE;
 

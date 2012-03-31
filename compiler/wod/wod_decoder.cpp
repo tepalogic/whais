@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../../utils/include/le_converter.h"
 
-static const D_UINT MAX_INT64_LENGTH = 25;	//log (MAX_UINT64) = 19.34
+static const D_UINT MAX_INT64_LENGTH = 25;        //log (MAX_UINT64) = 19.34
 
 static const D_CHAR*
 int_to_ascii (D_UINT64 value,
@@ -51,7 +51,7 @@ int_to_ascii (D_UINT64 value,
     {
       pOutBuffer[index] = (value % 10) + '0';
       if (value < 10)
-	break;
+        break;
       --index;
     }
 
@@ -266,14 +266,14 @@ wod_dec_w_ldr (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
     {
       D_UINT operand_pos = strlen (pOp1);
       while (frac_part != 0)
-	{
-	  const D_UINT8 tempValue = ((frac_part >> 7) & 0xFF);
+        {
+          const D_UINT8 tempValue = ((frac_part >> 7) & 0xFF);
 
-	  int8_str_conv (pOp1, tempValue);
+          int8_str_conv (pOp1, tempValue);
 
-	  operand_pos += 2;
-	  frac_part   <<= 8;
-	}
+          operand_pos += 2;
+          frac_part   <<= 8;
+        }
     }
   pOp2[0] = 0;
 

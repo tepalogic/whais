@@ -40,13 +40,13 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR proc_decl_buffer[] =
@@ -228,9 +228,9 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   struct DeclaredVar *v1 = stmt_find_declaration (stmt, "v1",
-						  strlen ("v1"),
-						  FALSE,
-						  FALSE);
+                                                  strlen ("v1"),
+                                                  FALSE,
+                                                  FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_NA;
@@ -273,19 +273,19 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
       break;
     default:
       if ((v1->type & T_TABLE_MASK) != 0)
-	{
-	  op_expect = W_STTA;
-	}
+        {
+          op_expect = W_STTA;
+        }
       else if ((v1->type & T_ARRAY_MASK) != 0)
-	{
-	  op_expect = W_STA;
-	}
+        {
+          op_expect = W_STA;
+        }
       else
-	{
-	  /* we should not be here */
+        {
+          /* we should not be here */
           assert (0);
           return FALSE;
-	}
+        }
     }
 
   if (code_size < 4)
@@ -310,9 +310,9 @@ check_all_procs (struct ParserState *state)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)
-	{
-	  return FALSE;
-	}
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -341,15 +341,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing le op usage ...");

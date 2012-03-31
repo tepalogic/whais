@@ -30,9 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 enum W_OPCODE
 {
   /* one byte opcodes */
-  W_NA = 0,			/* invalid opcode */
+  W_NA = 0,     /* invalid opcode */
 
-  /* W_LDxx put a value on the stack */
   W_LDNULL,
   W_LDC,
   W_LDI8,
@@ -76,25 +75,20 @@ enum W_OPCODE
   W_CALL,
   W_RET,
 
-  /* W_ADDxx add the two value from the top of stack */
   W_ADD,
   W_ADDR,
   W_ADDRR,
   W_ADDT,
 
-  /* W_ANDxx, logical/arithmetical and operator */
   W_AND,
   W_ANDB,
 
-  /* W_DEC, decrement operator */
   W_DEC,
 
-  /* W_DIVxx, divide operator */
   W_DIV,
   W_DIVR,
   W_DIVRR,
 
-  /* W_EQxx, equality operator */
   W_EQ,
   W_EQB,
   W_EQC,
@@ -105,7 +99,6 @@ enum W_OPCODE
   W_EQRR,
   W_EQT,
 
-  /* W_GExx, grater or equal operator */
   W_GE,
   W_GEC,
   W_GED,
@@ -115,7 +108,6 @@ enum W_OPCODE
   W_GERR,
   W_GET,
 
-  /* W_GT, grater than operator */
   W_GT,
   W_GTC,
   W_GTD,
@@ -125,10 +117,8 @@ enum W_OPCODE
   W_GTRR,
   W_GTT,
 
-  /* W_INCxx, increment operator */
   W_INC,
 
-  /* W_LE, less or equal operator */
   W_LE,
   W_LEC,
   W_LED,
@@ -138,7 +128,6 @@ enum W_OPCODE
   W_LERR,
   W_LET,
 
-  /* W_LT, less than operator */
   W_LT,
   W_LTC,
   W_LTD,
@@ -148,15 +137,12 @@ enum W_OPCODE
   W_LTRR,
   W_LTT,
 
-  /* W_MODxx, modulo operator */
   W_MOD,
 
-  /* W_MULxx, multiplication operator */
   W_MUL,
   W_MULR,
   W_MULRR,
 
-  /* W_NExx,  unequal operator */
   W_NE,
   W_NEB,
   W_NEC,
@@ -167,18 +153,15 @@ enum W_OPCODE
   W_NERR,
   W_NET,
 
-  /* W_NOTxx, negation operator or bit inversion operator */
   W_NOT,
 
   W_OR,
   W_ORB,
 
-  /*W_SUBxx, subtract operator */
   W_SUB,
   W_SUBR,
   W_SUBRR,
 
-  /* W_XORxx, xor operator */
   W_XOR,
   W_XORB,
 
@@ -210,4 +193,4 @@ whc_decode_opcode (const unsigned char* pCode,
 }
 #endif
 
-#endif				/* WOPCODES_H */
+#endif  /* WOPCODES_H */

@@ -39,11 +39,11 @@ test_tokens (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if (tokens_values[count++] != result ||
-	  get_array_count (&(state.parsedValues)) != 0)
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          get_array_count (&(state.parsedValues)) != 0)
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
     }
   if ((count != (W_TRUE - ARRAY + 1)) ||
       (count != sizeof (tokens_values) / sizeof (tokens_values[0])) ||
@@ -84,13 +84,13 @@ test_buff_ids (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != IDENTIFIER) ||
-	  (lvalp->val_type != VAL_ID) ||
-	  (lvalp->val.u_id.length != ids_vals[count].length) ||
-	  (strncmp (lvalp->val.u_id.text, ids_vals[count].text, ids_vals[count].length) != 0))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_ID) ||
+          (lvalp->val.u_id.length != ids_vals[count].length) ||
+          (strncmp (lvalp->val.u_id.text, ids_vals[count].text, ids_vals[count].length) != 0))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
@@ -123,12 +123,12 @@ test_buff_integers (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_INTEGER) ||
-	  (lvalp->val_type != VAL_C_INT) ||
-	  (lvalp->val.u_int.value != int_vals[count].value))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_INT) ||
+          (lvalp->val.u_int.value != int_vals[count].value))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
@@ -167,13 +167,13 @@ test_buff_reals (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_REAL) ||
-	  (lvalp->val_type != VAL_C_REAL) ||
-	  (lvalp->val.u_real.integerPart != real_vals[count].integerPart) ||
-	  (lvalp->val.u_real.fractionalPart != real_vals[count].fractionalPart))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_REAL) ||
+          (lvalp->val.u_real.integerPart != real_vals[count].integerPart) ||
+          (lvalp->val.u_real.fractionalPart != real_vals[count].fractionalPart))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
@@ -209,12 +209,12 @@ test_buff_chars (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_CHARACTER) ||
-	  (lvalp->val_type != VAL_C_CHAR) ||
-	  (lvalp->val.u_char.value != char_vals[count].value))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_CHAR) ||
+          (lvalp->val.u_char.value != char_vals[count].value))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
@@ -250,13 +250,13 @@ test_buff_dates (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_TIME) ||
-	  (lvalp->val_type != VAL_C_TIME) ||
-	  memcmp (&lvalp->val.u_time,
-		  &date_vals[count], sizeof date_vals[0]) != 0)
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_TIME) ||
+          memcmp (&lvalp->val.u_time,
+                  &date_vals[count], sizeof date_vals[0]) != 0)
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
@@ -310,13 +310,13 @@ test_buff_strs (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_TEXT) ||
-	  (lvalp->val_type != VAL_C_TEXT) ||
-	  memcmp (lvalp->val.u_text.text, strs_vals[count],
-		  lvalp->val.u_text.length) != 0)
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_TEXT) ||
+          memcmp (lvalp->val.u_text.text, strs_vals[count],
+                  lvalp->val.u_text.length) != 0)
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 

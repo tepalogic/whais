@@ -34,8 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 WBufferCompiledUnit::WBufferCompiledUnit (const D_UINT8*    pBuuffer,
                                           D_UINT            bufferSize,
                                           WHC_MESSENGER     messenger,
-                                          WHC_MESSENGER_ARG messengerContext)
-  : m_Handler (NULL)
+                                          WHC_MESSENGER_ARG messengerContext) :
+  m_Handler (NULL)
 {
   m_Handler = whc_hnd_create (_RC (const D_CHAR*, pBuuffer),
                               bufferSize,
@@ -285,8 +285,8 @@ WBufferCompiledUnit::IsProcExternal (D_UINT item_proc)
 
 /////////////******WFileCompiledUnit********//////////////////////////////
 
-WFileCompiledUnit::WFileCompiledUnit (const D_CHAR * file_name)
-  : m_File (file_name, WHC_FILEREAD),
+WFileCompiledUnit::WFileCompiledUnit (const D_CHAR * file_name) :
+    m_File (file_name, WHC_FILEREAD),
     m_GlobalsCount (0),
     m_ProcsCount (0),
     m_TtySize (0),
@@ -326,14 +326,14 @@ WFileCompiledUnit::ProcessHeader ()
   m_GlobalsCount = from_le_int32 (t_buffer + WHC_GLOBS_COUNT_OFF);
   m_ProcsCount   = from_le_int32 (t_buffer + WHC_PROCS_COUNT_OFF);
 
-  temp32   = from_le_int32 (t_buffer + WHC_TYPEINFO_START_OFF);
+  temp32    = from_le_int32 (t_buffer + WHC_TYPEINFO_START_OFF);
   m_TtySize = from_le_int32 (t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
   m_TypeInfo.reset (new D_UINT8[m_TtySize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
   m_File.Read (m_TypeInfo.get (), m_TtySize);
 
-  temp32       = from_le_int32 (t_buffer + WHC_SYMTABLE_START_OFF);
+  temp32        = from_le_int32 (t_buffer + WHC_SYMTABLE_START_OFF);
   m_SymbolsSize = from_le_int32 (t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
   m_Symbols.reset (new D_UINT8[m_SymbolsSize]);
@@ -382,7 +382,7 @@ D_UINT WFileCompiledUnit::GetTypeInformationSize ()
   return m_TtySize;
 }
 
-const D_UINT8 *
+const D_UINT8*
 WFileCompiledUnit::RetriveTypeInformation ()
 {
   return m_TypeInfo.get ();
@@ -393,7 +393,7 @@ D_UINT WFileCompiledUnit::GetConstAreaSize ()
   return m_ConstAreaSize;
 }
 
-const D_UINT8 *
+const D_UINT8*
 WFileCompiledUnit::RetrieveConstArea ()
 {
   return m_ConstArea.get ();
@@ -548,16 +548,16 @@ WFileCompiledUnit::GetProcNameSize (D_UINT proc_item)
   return::strlen (_RC (const D_CHAR *, m_Symbols.get () + temp32));
 }
 
-const D_CHAR *
+const D_CHAR*
 WFileCompiledUnit::RetriveProcName (D_UINT proc_item)
 {
   if (proc_item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.",
         _EXTRA(0));
 
-  D_UINT temp32 = from_le_int32 (m_Procs.get ()
-      + (proc_item * WHC_PROC_ENTRY_SIZE) +
-      WHC_PROC_ENTRY_NAME_OFF);
+  D_UINT temp32 = from_le_int32 (m_Procs.get () +
+                                 (proc_item * WHC_PROC_ENTRY_SIZE) +
+                                 WHC_PROC_ENTRY_NAME_OFF);
   assert (temp32 < m_SymbolsSize);
   return _RC (const D_CHAR *, m_Symbols.get () + temp32);
 }
@@ -573,7 +573,7 @@ WFileCompiledUnit::GetProcLocalTypeIndex (D_UINT item_proc, D_UINT item_local)
 
   LoadProcInMemory (item_proc);
 
-  const D_UINT8 *pProcEntry = m_ProcData.get ()[item_proc];
+  const D_UINT8* pProcEntry = m_ProcData.get ()[item_proc];
   pProcEntry += (item_local * WHC_PROC_BODY_LOCAL_ENTRY_SIZE);
 
   D_UINT temp32 = from_le_int32 (pProcEntry);

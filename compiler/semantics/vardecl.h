@@ -56,20 +56,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct DeclaredVar
 {
-  const D_CHAR*       label;	   /* not necessarily  null terminated */
-  struct DeclaredVar* extra;	   /* only for tables, list to/next field entries */
+  const D_CHAR*       label;        /* not necessarily  null terminated */
+  struct DeclaredVar* extra;        /* only for tables, list to/next field entries */
   D_UINT32            typeSpecOff;
   D_UINT32            varId;
-  D_UINT32            offset;      /* offset position */
-  D_UINT16            labelLength; /* label's length */
-  D_UINT16            type;	   /* type of this variable */
+  D_UINT32            offset;       /* offset position */
+  D_UINT16            labelLength;  /* label's length */
+  D_UINT16            type;         /* type of this variable */
 };
 
 YYSTYPE
 add_id_to_list (YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
-create_type_spec (struct ParserState *pState,
+create_type_spec (struct ParserState* pState,
                   D_UINT16            type);
 
 struct DeclaredVar *
@@ -81,14 +81,14 @@ install_declaration (struct ParserState* pState,
 
 YYSTYPE
 install_list_declrs (struct ParserState* pState,
-		     YYSTYPE             pVars,
-		     YYSTYPE             pType);
+                     YYSTYPE             pVars,
+                     YYSTYPE             pType);
 
 YYSTYPE
 install_field_declaration (struct ParserState*       pState,
-			   YYSTYPE                   pVar,
-			   YYSTYPE                   pType,
-			   struct DeclaredVar* const pExtra);
+                           YYSTYPE                   pVar,
+                           YYSTYPE                   pType,
+                           struct DeclaredVar* const pExtra);
 D_BOOL
 process_table_decls (struct ParserState*     pState,
                          struct DeclaredVar* pVar,

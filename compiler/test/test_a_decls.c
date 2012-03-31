@@ -38,13 +38,13 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR buffer[] =
@@ -56,11 +56,11 @@ D_CHAR buffer[] =
 
 static D_BOOL
 check_declared_var (struct Statement *stm,
-		    struct DeclaredVar *var, D_UINT type)
+                    struct DeclaredVar *var, D_UINT type)
 {
   struct OutStream *os = &stm->spec.glb.typesDescs;
-  if ((var == NULL) ||		/* var not found */
-      (var->type != type) ||	/* invalid type */
+  if ((var == NULL) ||                /* var not found */
+      (var->type != type) ||        /* invalid type */
       ((var->varId & GLOBAL_DECL)) == 0)
     {
       return FALSE;
@@ -73,12 +73,12 @@ check_declared_var (struct Statement *stm,
   else
     {
       struct TypeSpec *ts = (struct TypeSpec *)
-	&(get_buffer_outstream (os)[var->typeSpecOff]);
+        &(get_buffer_outstream (os)[var->typeSpecOff]);
       if ((ts->type != type) ||
-	  (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
-	{
-	  return FALSE;
-	}
+          (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -181,15 +181,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing declarations...");

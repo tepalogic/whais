@@ -82,10 +82,10 @@ process_table_decls (struct ParserState* pState,
 
 struct DeclaredVar *
 install_declaration (struct ParserState* pState,
-		     YYSTYPE             pVar,
-		     YYSTYPE             pType,
-		     D_BOOL              parameter,
-		     D_BOOL              unique)
+                     YYSTYPE             pVar,
+                     YYSTYPE             pType,
+                     D_BOOL              parameter,
+                     D_BOOL              unique)
 {
   struct DeclaredVar*     result = NULL;
   struct DeclaredVar*     pDecl  = NULL;
@@ -115,6 +115,7 @@ install_declaration (struct ParserState* pState,
   else
     {
       struct DeclaredVar var;
+
       var.label       = pId->text;
       var.labelLength = pId->length;
       var.type        = pType->val.u_tspec.type;
@@ -122,32 +123,32 @@ install_declaration (struct ParserState* pState,
       var.offset      = 0;
 
       if ((var.type & T_TABLE_MASK) &&
-	  (process_table_decls (pState, &var, pType->val.u_tspec.extra) == FALSE))
-	{
-	  result = NULL;	/* something went wrong along the way */
-	}
+          (process_table_decls (pState, &var, pType->val.u_tspec.extra) == FALSE))
+        {
+          result = NULL;        /* something went wrong along the way */
+        }
       else if ((result = stmt_add_declaration (stmt, &var, parameter)) == NULL)
-	{
-	  /* no more memory */
-	  w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-	  pState->abortError = TRUE;
-	}
+        {
+          /* no more memory */
+          w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          pState->abortError = TRUE;
+        }
       else if (var.type & T_TABLE_MASK )
-	{
-	  /* Set a sentinel for the extra field. */
-	  struct DeclaredVar *it = result->extra;
+        {
+          /* Set a sentinel for the extra field. */
+          struct DeclaredVar *it = result->extra;
 
-	  if (it == NULL)
+          if (it == NULL)
             result->extra = result;
-	  else
-	    {
-	      while (it->extra && IS_TABLE_FIELD (it->extra->type))
+          else
+            {
+              while (it->extra && IS_TABLE_FIELD (it->extra->type))
                 it = it->extra;
 
-	      it->extra = result;
-	    }
+              it->extra = result;
+            }
 
-	}
+        }
     }
 
   if (result && pState->externDeclaration)
@@ -174,7 +175,7 @@ install_declaration (struct ParserState* pState,
 YYSTYPE
 install_list_declrs (struct ParserState* pState,
                      YYSTYPE             pVarsList,
-		     YYSTYPE             pType)
+                     YYSTYPE             pType)
 {
   YYSTYPE           result = NULL;
   struct SemIdList* pIt    = &pVarsList->val.u_idlist;
@@ -193,16 +194,16 @@ install_list_declrs (struct ParserState* pState,
       id.val.u_id = pIt->id;
 
       if ((result = (YYSTYPE)install_declaration (pState, &id, pType, FALSE, TRUE)) == NULL)
-        break;		/* some error has been encountered */
+        break;                /* some error has been encountered */
 
       /* next in list */
       if (pIt->next != NULL)
-	{
-	  assert (pIt->next->val_type == VAL_ID_LIST);
+        {
+          assert (pIt->next->val_type == VAL_ID_LIST);
 
-	  free_sem_value (pIt->next);
-	  pIt = &(pIt->next->val.u_idlist);
-	}
+          free_sem_value (pIt->next);
+          pIt = &(pIt->next->val.u_idlist);
+        }
       else
         pIt = NULL;
     }
@@ -215,13 +216,13 @@ install_list_declrs (struct ParserState* pState,
 
 YYSTYPE
 install_field_declaration (struct ParserState*       pState,
-			   YYSTYPE                   pVar,
-			   YYSTYPE                   pType,
-			   struct DeclaredVar* const pExtra)
+                           YYSTYPE                   pVar,
+                           YYSTYPE                   pType,
+                           struct DeclaredVar* const pExtra)
 {
   struct DeclaredVar* result = NULL;
   struct DeclaredVar* pPrev  = NULL;
-  struct DeclaredVar* pIt = pExtra;
+  struct DeclaredVar* pIt    = pExtra;
   struct SemId*       pSemId = &pVar->val.u_id;
 
   assert (pType->val_type == VAL_TYPE_SPEC);
@@ -233,16 +234,16 @@ install_field_declaration (struct ParserState*       pState,
     {
       assert ((pIt->type & T_TABLE_FIELD_MASK) != 0);
       if ((pIt->labelLength == pSemId->length) &&
-	  (strncmp (pIt->label, pSemId->text, pIt->labelLength) == 0))
-	{
-	  D_CHAR tname[128];
+          (strncmp (pIt->label, pSemId->text, pIt->labelLength) == 0))
+        {
+          D_CHAR tname[128];
 
-	  copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
-	  w_log_msg (pState, pState->bufferPos, MSG_SAME_FIELD, tname);
+          copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
+          w_log_msg (pState, pState->bufferPos, MSG_SAME_FIELD, tname);
 
-	  pState->abortError = TRUE;
-	  return NULL;
-	}
+          pState->abortError = TRUE;
+          return NULL;
+        }
       /* next one */
       pIt = pIt->extra;
     }

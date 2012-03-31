@@ -39,13 +39,13 @@ struct UArray
   D_UINT itemsReserved;
 
   /* Array of pointers to the array's elements */
-  D_INT8 **arraysList;
+  D_INT8** arraysList;
   D_UINT   incrementCount;
   D_UINT   arraysCount;
   D_UINT   arraysUsed;
 };
 
-#define ARRAY_INCRMENT_SIZE     512	/* in bytes here */
+#define ARRAY_INCRMENT_SIZE     512        /* in bytes here */
 #define init_array(a, x) init_array_ex((a),\
                                        (x),\
                                        (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\

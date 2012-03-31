@@ -38,37 +38,37 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 static D_BOOL
 check_container_field (struct DeclaredVar *extra, D_CHAR * field,
-		       unsigned type)
+                       unsigned type)
 {
   D_CHAR result = FALSE;
   unsigned int f_len = strlen (field);
   while (extra != NULL)
     {
       if ((extra->type | T_TABLE_FIELD_MASK) == 0)
-	{
-	  break;
-	}
+        {
+          break;
+        }
       if ((extra->labelLength == f_len) &&
-	  (strncmp (field, extra->label, f_len) == 0))
-	{
-	  if (extra->type == (type | T_TABLE_FIELD_MASK))
-	    {
-	      result = TRUE;
-	    }
+          (strncmp (field, extra->label, f_len) == 0))
+        {
+          if (extra->type == (type | T_TABLE_FIELD_MASK))
+            {
+              result = TRUE;
+            }
 
-	  break;
-	}
+          break;
+        }
 
       /* use the next field */
       extra = extra->extra;
@@ -103,8 +103,8 @@ D_CHAR proc_decl_buffer[] =
 
 static D_BOOL
 general_proc_check (struct Statement *glb_stmt,
-		    struct Statement *proc_stmt,
-		    D_CHAR * proc_name, D_INT parameters, D_INT local_vars)
+                    struct Statement *proc_stmt,
+                    D_CHAR * proc_name, D_INT parameters, D_INT local_vars)
 {
   D_UINT count = 0;
   D_UINT nlocals = 0;
@@ -126,9 +126,9 @@ general_proc_check (struct Statement *glb_stmt,
     {
       struct DeclaredVar *var = get_item (&(proc_stmt->decls), count);
       if ((var->type & T_TABLE_FIELD_MASK) == 0)
-	{
-	  nlocals++;
-	}
+        {
+          nlocals++;
+        }
       count++;
     }
 
@@ -178,7 +178,7 @@ check_procs_decl (struct ParserState *state)
     }
   /* check local declarations */
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
-				   strlen ("dummy_var1"), FALSE, FALSE);
+                                   strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_REAL)
     {
       return FALSE;
@@ -202,7 +202,7 @@ check_procs_decl (struct ParserState *state)
     }
   /* check local declarations */
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
-				   strlen ("dummy_var1"), FALSE, FALSE);
+                                   strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
     {
       return FALSE;
@@ -249,7 +249,7 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
   if (!(check_container_field (tmp_var->extra, "f1", T_TEXT) &&
-	check_container_field (tmp_var->extra, "f2", T_DATETIME)))
+        check_container_field (tmp_var->extra, "f2", T_DATETIME)))
     {
       return FALSE;
     }
@@ -287,9 +287,9 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
   if (!(check_container_field (tmp_var->extra, "f1", T_REAL) &&
-	check_container_field (tmp_var->extra, "f2", T_UINT32) &&
-	check_container_field (tmp_var->extra, "f3",
-			       (T_ARRAY_MASK | T_INT16))))
+        check_container_field (tmp_var->extra, "f2", T_UINT32) &&
+        check_container_field (tmp_var->extra, "f3",
+                               (T_ARRAY_MASK | T_INT16))))
     {
       return FALSE;
     }
@@ -305,7 +305,7 @@ check_procs_decl (struct ParserState *state)
   if (tmp_table !=
       stmt_find_declaration (proc, "Var4", strlen ("Var4"), FALSE, FALSE))
     {
-      return FALSE;		/* no transparency between local vars and parameters */
+      return FALSE;                /* no transparency between local vars and parameters */
     }
 
   tmp_var = stmt_find_declaration (proc, "f1", strlen ("f1"), FALSE, FALSE);
@@ -345,15 +345,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing procedure declarations...");

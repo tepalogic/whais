@@ -27,24 +27,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 
 void *
-custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
+custom_trace_mem_alloc (size_t size, const char* pFile, D_UINT line)
 {
   /* avoid unused variable warnings */
-  file = 0;
-  line = 0;
+  pFile = 0;
+  line  = 0;
 
   return custom_mem_alloc (size);
 }
 
-void *
-custom_trace_mem_realloc (void *old_ptr,
-			  size_t new_size, const char *file, D_UINT line)
+void*
+custom_trace_mem_realloc (void*       oldPtr,
+                          size_t      new_size,
+                          const char* pFile,
+                          D_UINT      line)
 {
   /* avoid unused variable warnings */
-  file = 0;
-  line = 0;
+  pFile = 0;
+  line  = 0;
 
-  return custom_mem_realloc (old_ptr, new_size);
+  return custom_mem_realloc (oldPtr, new_size);
 }
 
 void
@@ -57,20 +59,20 @@ custom_trace_mem_free (void *ptr, const char *file, D_UINT line)
   custom_mem_free (ptr);
 }
 
-void *
+void*
 custom_mem_alloc (size_t size)
 {
   return malloc (size);
 }
 
-void *
-custom_mem_realloc (void *old_ptr, size_t new_size)
+void*
+custom_mem_realloc (void* oldPtr, size_t newSize)
 {
-  return realloc (old_ptr, new_size);
+  return realloc (oldPtr, newSize);
 }
 
 void
-custom_mem_free (void *ptr)
+custom_mem_free (void* ptr)
 {
   free (ptr);
 }

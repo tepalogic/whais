@@ -33,8 +33,8 @@
 
 void
 begin_if_stmt (struct ParserState* const pState,
-	       YYSTYPE                   expression,
-	       enum BRANCH_TYPE          branchType)
+               YYSTYPE                   expression,
+               enum BRANCH_TYPE          branchType)
 {
   struct Statement* const pStmt        = pState->pCurrentStmt;
   struct OutStream* const pCodeStream  = stmt_query_instrs (pStmt);
@@ -92,7 +92,7 @@ begin_else_stmt (struct ParserState* const pState)
   jumpOffest         = get_size_outstream (pCodeStream) - pBranchIt->startPos;
   memcpy (get_buffer_outstream (pCodeStream) + pBranchIt->startPos + 1,
           &jumpOffest,
-	  sizeof jumpOffest);
+          sizeof jumpOffest);
 }
 
 void
@@ -122,24 +122,24 @@ finalize_if_stmt (struct ParserState* const pState)
       pBranchIt = get_item (pBranchStack, --branchId);
 
       if (pBranchIt->elsePos == 0)
-	{
-	  /* handle the lack of an else statement */
-	  assert (pBranchIt->startPos > 0);
+        {
+          /* handle the lack of an else statement */
+          assert (pBranchIt->startPos > 0);
 
-	  jumpOffset -= pBranchIt->startPos;
-	  assert (jumpOffset > 0);
-	  memcpy (get_buffer_outstream (pCodeStream) + pBranchIt->startPos + 1, &jumpOffset,
-		  sizeof jumpOffset);
-	}
+          jumpOffset -= pBranchIt->startPos;
+          assert (jumpOffset > 0);
+          memcpy (get_buffer_outstream (pCodeStream) + pBranchIt->startPos + 1, &jumpOffset,
+                  sizeof jumpOffset);
+        }
       else
-	{
-	  /*handle the skip of the else or elseif statements */
-	  jumpOffset -= pBranchIt->elsePos;
-	  assert (jumpOffset > 0);
-	  memcpy (get_buffer_outstream (pCodeStream) + pBranchIt->elsePos + 1,
-	          &jumpOffset,
-		  sizeof jumpOffset);
-	}
+        {
+          /*handle the skip of the else or elseif statements */
+          jumpOffset -= pBranchIt->elsePos;
+          assert (jumpOffset > 0);
+          memcpy (get_buffer_outstream (pCodeStream) + pBranchIt->elsePos + 1,
+                  &jumpOffset,
+                  sizeof jumpOffset);
+        }
 
     }
   while (pBranchIt->type == BT_ELSEIF);
@@ -184,14 +184,14 @@ begin_while_stmt (struct ParserState* const pState, YYSTYPE exp)
 }
 
 void
-finalize_while_stmt (struct ParserState *const pState)
+finalize_while_stmt (struct ParserState* const pState)
 {
   struct Statement* const pStmt            = pState->pCurrentStmt;
   struct OutStream* const pCodeStream      = stmt_query_instrs (pStmt);
   D_UINT8* const          pCode            = get_buffer_outstream (pCodeStream);
   struct UArray* const    pLoopStack       = stmt_query_loop_stack (pStmt);
   D_UINT                  loopId           = get_array_count (pLoopStack);
-  const struct Loop*  pLoopIt          = NULL;
+  const struct Loop*      pLoopIt          = NULL;
   D_INT32                 endWhileLoop     = get_size_outstream (pCodeStream);
   D_INT32                 endWhileStmtPos  = 0;
   D_INT32                 offset           = 0;
@@ -210,17 +210,17 @@ finalize_while_stmt (struct ParserState *const pState)
     {
       pLoopIt = get_item (pLoopStack, --loopId);
       switch (pLoopIt->type)
-	{
-	case LE_BREAK:
-	case LE_WHILE_BEGIN:
-	  offset = endWhileStmtPos - pLoopIt->endPos;
-	  break;
+        {
+        case LE_BREAK:
+        case LE_WHILE_BEGIN:
+          offset = endWhileStmtPos - pLoopIt->endPos;
+          break;
 
-	default:
-	  /* Continue statements should be already handled in case
-	   * of while statements */
-	  assert (0);
-	}
+        default:
+          /* Continue statements should be already handled in case
+           * of while statements */
+          assert (0);
+        }
       /* make the jump corrections */
       memcpy (pCode + pLoopIt->endPos + 1, &offset, sizeof offset);
     }
@@ -236,7 +236,7 @@ finalize_while_stmt (struct ParserState *const pState)
 }
 
 void
-begin_until_stmt (struct ParserState *const pState)
+begin_until_stmt (struct ParserState* const pState)
 {
   struct Statement* const pStmt       = pState->pCurrentStmt;
   struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
@@ -284,24 +284,24 @@ finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp)
     {
       pLoopIt = get_item (pLoopStack, --loopId);
       switch (pLoopIt->type)
-	{
-	case LE_CONTINUE:
-	  offset = untilExpPos - pLoopIt->endPos;
-	  break;
+        {
+        case LE_CONTINUE:
+          offset = untilExpPos - pLoopIt->endPos;
+          break;
 
-	case LE_BREAK:
-	  offset = endUntilStmtPos - pLoopIt->endPos;
-	  break;
+        case LE_BREAK:
+          offset = endUntilStmtPos - pLoopIt->endPos;
+          break;
 
-	case LE_UNTIL_BEGIN:
-	  /* JCT 0x01020304 should be encoded on 5 bytes */
-	  pLoopIt->endPos = endUntilStmtPos - 5;
-	  offset          = pLoopIt->startPos - pLoopIt->endPos;
-	  break;
+        case LE_UNTIL_BEGIN:
+          /* JCT 0x01020304 should be encoded on 5 bytes */
+          pLoopIt->endPos = endUntilStmtPos - 5;
+          offset          = pLoopIt->startPos - pLoopIt->endPos;
+          break;
 
-	default:
-	  assert (0);
-	}
+        default:
+          assert (0);
+        }
       memcpy (pCode + pLoopIt->endPos + 1, &offset, sizeof offset);
     }
   while ((pLoopIt->type == LE_CONTINUE) || (pLoopIt->type == LE_BREAK));
@@ -376,11 +376,11 @@ handle_continue_stmt (struct ParserState* const pState)
     case LE_UNTIL_BEGIN:
       if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
           (output_uint32 (pCodeStream, 0) == NULL))
-	{
-	  w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        {
+          w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
-	  return;
-	}
+          return;
+        }
 
       if (add_item (pLoopStack, &loop) == NULL)
         w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -389,11 +389,11 @@ handle_continue_stmt (struct ParserState* const pState)
     case LE_WHILE_BEGIN:
       if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
           (output_uint32 (pCodeStream, pLoopIt->startPos - loop.endPos) == NULL))
-	{
-	  w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        {
+          w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
-	  return;
-	}
+          return;
+        }
       /* this statement won't need jump correction latter */
       break;
     default:
@@ -433,11 +433,11 @@ begin_sync_stmt (struct ParserState* const pState)
 }
 
 void
-finalize_sync_stmt (struct ParserState *const pState)
+finalize_sync_stmt (struct ParserState* const pState)
 {
-  struct Statement *const pStmt = pState->pCurrentStmt;
+  struct Statement *const pStmt       = pState->pCurrentStmt;
   struct OutStream *const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT stmtsCount = pStmt->spec.proc.syncTracker / 2;
+  const D_UINT            stmtsCount  = pStmt->spec.proc.syncTracker / 2;
 
   assert (pStmt->spec.proc.syncTracker & 1);
 

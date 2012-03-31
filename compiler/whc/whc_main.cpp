@@ -41,8 +41,8 @@ D_UINT8 whc_header[WHC_TABLE_SIZE] = { 0, };
 
 static void
 fill_globals_table (WICompiledUnit&   rUnit,
-		    struct OutStream* pSymbolsStream,
-		    struct OutStream* pGlblsTableStream)
+                    struct OutStream* pSymbolsStream,
+                    struct OutStream* pGlblsTableStream)
 {
   const D_UINT globals_count = rUnit.GetGlobalsCount ();
 
@@ -52,15 +52,15 @@ fill_globals_table (WICompiledUnit&   rUnit,
       D_UINT32 glbNameIndex = get_size_outstream (pSymbolsStream);
 
       if (rUnit.IsGlobalExternal (glbIt))
-	glbTypeIndex |= EXTERN_MASK;
+        glbTypeIndex |= EXTERN_MASK;
 
       if ((output_uint32 (pGlblsTableStream, glbTypeIndex) == NULL) ||
           (output_uint32 (pGlblsTableStream, glbNameIndex) == NULL) ||
           (output_data (pSymbolsStream,
                        _RC (const D_UINT8 *,
                             rUnit.RetriveGlobalName (glbIt)),
-			    rUnit.GetGlobalNameLength (glbIt)) == NULL) ||
-	  (output_uint8 (pSymbolsStream, 0) == NULL))
+                            rUnit.GetGlobalNameLength (glbIt)) == NULL) ||
+          (output_uint8 (pSymbolsStream, 0) == NULL))
         {
           throw bad_alloc ();
         }
@@ -70,8 +70,8 @@ fill_globals_table (WICompiledUnit&   rUnit,
 static void
 process_procedures_table (WICompiledUnit& rUnit,
                           WFile&          rDestFile,
-			  OutStream*      pSymbolsStream,
-			  OutStream*      pProcTableStream)
+                          OutStream*      pSymbolsStream,
+                          OutStream*      pProcTableStream)
 {
   const D_UINT proc_count = rUnit.GetProceduresCount ();
 
@@ -86,23 +86,23 @@ process_procedures_table (WICompiledUnit& rUnit,
       assert (localsCount >= paramsCound);
 
       for (D_UINT localIt = 0; localIt < localsCount; ++localIt)
-	{
-	  D_UINT32 localTypeOff = rUnit.GetProcLocalTypeIndex (procIt,
-	                                                       localIt);
-	  to_le_int32 (_RC (D_UINT8 *, &localTypeOff));
-	  rDestFile.Write (_RC (D_UINT8 *, &localTypeOff), sizeof localTypeOff);
-	}
+        {
+          D_UINT32 localTypeOff = rUnit.GetProcLocalTypeIndex (procIt,
+                                                               localIt);
+          to_le_int32 (_RC (D_UINT8 *, &localTypeOff));
+          rDestFile.Write (_RC (D_UINT8 *, &localTypeOff), sizeof localTypeOff);
+        }
 
       if (rUnit.IsProcExternal (procIt))
-	procRetType |= EXTERN_MASK;
+        procRetType |= EXTERN_MASK;
       else
-	{
-	  D_UINT8 n_sync_stmts = rUnit.GetProcSyncStatementsCount (procIt);
-	  rDestFile.Write (_RC (D_UINT8 *, &n_sync_stmts),
-			   sizeof n_sync_stmts);
-	  rDestFile.Write (rUnit.RetriveProcCodeArea (procIt),
-			   rUnit.GetProcCodeAreaSize (procIt));
-	}
+        {
+          D_UINT8 n_sync_stmts = rUnit.GetProcSyncStatementsCount (procIt);
+          rDestFile.Write (_RC (D_UINT8 *, &n_sync_stmts),
+                           sizeof n_sync_stmts);
+          rDestFile.Write (rUnit.RetriveProcCodeArea (procIt),
+                           rUnit.GetProcCodeAreaSize (procIt));
+        }
 
       if ((output_uint32 (pProcTableStream, get_size_outstream (pSymbolsStream)) == NULL) ||
           (output_uint32 (pProcTableStream, procOff) == NULL) ||
@@ -115,9 +115,9 @@ process_procedures_table (WICompiledUnit& rUnit,
         }
 
       if ((output_data (pSymbolsStream,
-			   _RC (const D_UINT8 *, rUnit.RetriveProcName (procIt)),
-			   rUnit.GetProcNameSize (procIt)) == NULL) ||
-	   (output_uint8 (pSymbolsStream, 0) == NULL))
+                           _RC (const D_UINT8 *, rUnit.RetriveProcName (procIt)),
+                           rUnit.GetProcNameSize (procIt)) == NULL) ||
+           (output_uint8 (pSymbolsStream, 0) == NULL))
         {
           throw bad_alloc ();
         }
@@ -150,7 +150,7 @@ main (int argc, char **argv)
     buffSize = inputFile.GetSize ();
 
     if (buffSize >= 0xFFFFFFFE)
-      throw - 1;		// we can not handle files these size anyway
+      throw - 1;                // we can not handle files these size anyway
 
     buffer.reset (new D_UINT8[_SC (unsigned int, buffSize + 1)]);
     buffer.get ()[buffSize] = 0;  //ensures the null terminator
@@ -198,9 +198,9 @@ main (int argc, char **argv)
     outputFile.Write (unit.RetrieveConstArea (), unit.GetConstAreaSize ());
 
     outputFile.Write (get_buffer_outstream (&glbsTableStream),
-	              get_size_outstream (&glbsTableStream));
+                      get_size_outstream (&glbsTableStream));
     outputFile.Write (get_buffer_outstream (&procsTableStream),
-		      get_size_outstream (&procsTableStream));
+                      get_size_outstream (&procsTableStream));
 
     whc_header[WHC_SIGNATURE_OFF]     = WH_SIGNATURE[0];
     whc_header[WHC_SIGNATURE_OFF + 1] = WH_SIGNATURE[1];

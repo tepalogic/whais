@@ -46,9 +46,9 @@ get_line_from_buffer (const D_CHAR* pBuffer, D_UINT bufferOff)
       if (pBuffer[count] == '\n')
         ++result;
       else if (pBuffer[count] == 0)
-	{
-	  assert (0);
-	}
+        {
+          assert (0);
+        }
       ++count;
     }
   return result;
@@ -56,11 +56,11 @@ get_line_from_buffer (const D_CHAR* pBuffer, D_UINT bufferOff)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-	    D_UINT            buffOff,
-	    D_UINT            msgId,
-	    D_UINT            msgType,
-	    const D_CHAR*     msgFormat,
-	    va_list           args)
+            D_UINT            buffOff,
+            D_UINT            msgId,
+            D_UINT            msgType,
+            const D_CHAR*     msgFormat,
+            va_list           args)
 {
   const D_CHAR* pBuffer  = (const D_CHAR*)data;
   D_INT         buffLine = get_line_from_buffer (pBuffer, buffOff);

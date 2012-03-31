@@ -31,22 +31,23 @@ extern "C"
 #endif
 
 void
-wh_sync_init (WH_SYNC *hnd);
+wh_sync_init (WH_SYNC* pSync);
 
 void
-wh_sync_destroy (WH_SYNC *hnd);
+wh_sync_destroy (WH_SYNC* pSync);
 
 void
-wh_sync_enter (WH_SYNC *hnd);
+wh_sync_enter (WH_SYNC* pSync);
 
 void
-wh_sync_leave (WH_SYNC *hnd);
+wh_sync_leave (WH_SYNC* pSync);
 
 D_INT
 wh_cond_value_init (WH_COND_VALUE* pCondValue);
 
 D_INT
-wh_cond_value_wait (WH_COND_VALUE* pCondValue, WH_SYNC* pSync);
+wh_cond_value_wait (WH_COND_VALUE* pCondValue,
+                    WH_SYNC*       pSync);
 
 D_INT
 wh_cond_value_signal (WH_COND_VALUE* pCondValue);
@@ -60,7 +61,9 @@ wh_cond_value_destroy (WH_COND_VALUE* pCondValue);
 typedef void (*WH_THREAD_ROUTINE) (void*);
 
 D_INT
-wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void *args);
+wh_thread_create (WH_THREAD*        pThread,
+                  WH_THREAD_ROUTINE routine,
+                  void*             args);
 
 D_INT
 wh_thread_join (WH_THREAD thread);

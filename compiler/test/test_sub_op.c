@@ -40,13 +40,13 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR proc_decl_buffer[] =
@@ -161,9 +161,9 @@ check_op_symmetry ()
        i--, j++)
     {
       if (sub_op[i][j] != sub_op[j][i])
-	{
-	  return FALSE;
-	}
+        {
+          return FALSE;
+        }
     }
 
   if ((i >= 0) || (j != T_END_OF_TYPES))
@@ -227,9 +227,9 @@ check_all_procs (struct ParserState *state)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)
-	{
-	  return FALSE;
-	}
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -258,15 +258,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing sub op symmetry...");

@@ -37,7 +37,7 @@ to_le_int16 (D_UINT8* pValue)
   const D_UINT16 le_machine = 0x1;
 
   if (*((D_UINT8 *) & le_machine))
-    return;			/* no need for conversion */
+    return;     /* no need for conversion */
 
   temp      = pValue[0];
   pValue[0] = pValue[1];
@@ -51,7 +51,7 @@ to_le_int32 (D_UINT8* pValue)
   const D_UINT16 le_machine = 0x1;
 
   if (*((D_UINT8 *) & le_machine))
-    return;			/* no need for conversion */
+    return;     /* no need for conversion */
 
   temp      = pValue[0];
   pValue[0] = pValue[3];
@@ -69,7 +69,7 @@ to_le_int64 (D_UINT8* pValue)
 
 
   if (*((D_UINT8 *) & le_machine))
-    return;			/* no need for conversion */
+    return;     /* no need for conversion */
 
   temp      = pValue[0];
   pValue[0] = pValue[7];

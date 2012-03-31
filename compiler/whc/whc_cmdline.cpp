@@ -68,32 +68,32 @@ WhcCmdLineParser::Parse ()
     {
       if (isStrEqual (m_Args[index], "-h") ||
           isStrEqual (m_Args[index], "--help"))
-	{
-	  m_ShowHelp = true;
-	  ++index;
-	}
+        {
+          m_ShowHelp = true;
+          ++index;
+        }
       else if (isStrEqual (m_Args[index], "-o"))
-	{
-	  if ((void *) m_OutputFile != NULL)
-	    throw WhcCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
+        {
+          if ((void *) m_OutputFile != NULL)
+            throw WhcCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
 
-	  if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
-	    throw WhcCmdLineException ("Missing file name argument for for parameter '-o'.",
-	                               _EXTRA (0));
-	  else
-	    m_OutputFile = m_Args[index++];
+          if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
+            throw WhcCmdLineException ("Missing file name argument for for parameter '-o'.",
+                                       _EXTRA (0));
+          else
+            m_OutputFile = m_Args[index++];
 
-	  m_OutputFileOwn = false;
-	}
+          m_OutputFileOwn = false;
+        }
       else if ((m_Args[index][0] != '-') && (m_Args[index][0] != '\\'))
-	{
-	  if ((void *) m_SourceFile != NULL)
-	    throw WhcCmdLineException ("The object file was already specified!", _EXTRA (0));
+        {
+          if ((void *) m_SourceFile != NULL)
+            throw WhcCmdLineException ("The object file was already specified!", _EXTRA (0));
 
-	  m_SourceFile = m_Args[index++];
-	}
+          m_SourceFile = m_Args[index++];
+        }
       else
-	throw WhcCmdLineException ("Unknown arguments! Use --help first!", _EXTRA (0));
+        throw WhcCmdLineException ("Unknown arguments! Use --help first!", _EXTRA (0));
     }
 
   CheckArguments ();

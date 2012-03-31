@@ -67,29 +67,29 @@ WodCmdLineParser::Parse ()
     {
       if (isStrEqual (m_Args[index], "-h") ||
           isStrEqual (m_Args[index], "--help"))
-	{
-	  m_ShowHelp = true;
-	  ++index;
-	}
+        {
+          m_ShowHelp = true;
+          ++index;
+        }
       else if (isStrEqual (m_Args[index], "-o"))
-	{
-	  if (m_OutStream != &cout)
-	    throw WodCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
+        {
+          if (m_OutStream != &cout)
+            throw WodCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
 
-	  if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
-	    throw WodCmdLineException ("Missing file name argument for parameter -o", _EXTRA(0));
-	  else
-	    m_OutStream = new ofstream (m_Args[index++]);
-	}
+          if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
+            throw WodCmdLineException ("Missing file name argument for parameter -o", _EXTRA(0));
+          else
+            m_OutStream = new ofstream (m_Args[index++]);
+        }
       else if ((m_Args[index][0] != '-') && (m_Args[index][0] != '\\'))
-	{
-	  if ((void *) m_SourceFile != NULL)
-	    throw WodCmdLineException ("The source file was already specified!", _EXTRA(0));
+        {
+          if ((void *) m_SourceFile != NULL)
+            throw WodCmdLineException ("The source file was already specified!", _EXTRA(0));
 
-	  m_SourceFile = m_Args[index++];
-	}
+          m_SourceFile = m_Args[index++];
+        }
       else
-	throw WodCmdLineException ("Unknown arguments! Use --help first!", _EXTRA(0));
+        throw WodCmdLineException ("Unknown arguments! Use --help first!", _EXTRA(0));
     }
   CheckArguments ();
 }

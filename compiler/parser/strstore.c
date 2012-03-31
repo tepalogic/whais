@@ -33,7 +33,7 @@
 
 struct StoreLink
 {
-  struct StoreLink *next;
+  struct StoreLink* next;
   D_UINT            allocated;
   D_UINT            unused;
   D_CHAR            data[1];
@@ -62,7 +62,7 @@ create_string_store ()
 void
 release_string_store (StringStoreHnd* handle)
 {
-  struct StoreLink *pLink = (struct StoreLink*) handle;
+  struct StoreLink* pLink = (struct StoreLink*) handle;
   while (pLink != NULL)
     {
       struct StoreLink* const temp = pLink->next;
@@ -84,7 +84,7 @@ alloc_str (StringStoreHnd handle, D_UINT length)
 
   if (pLink->unused > length)
     {
-      result        =  (pLink->allocated - pLink->unused) + pLink->data;
+      result         =  (pLink->allocated - pLink->unused) + pLink->data;
       pLink->unused -= length;
     }
   else
@@ -93,12 +93,12 @@ alloc_str (StringStoreHnd handle, D_UINT length)
       pLink       = pLink->next;
 
       if (pLink == NULL)
-	result = NULL;
+        result = NULL;
       else
-	{
-	  result        =  (pLink->allocated - pLink->unused) + pLink->data;
-	  pLink->unused -= length;
-	}
+        {
+          result         =  (pLink->allocated - pLink->unused) + pLink->data;
+          pLink->unused -= length;
+        }
     }
 
   return result;

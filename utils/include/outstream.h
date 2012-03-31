@@ -79,7 +79,7 @@ output_uint64 (struct OutStream* pStream, D_UINT64 value)
 #define get_size_outstream(pStream) ((pStream)->dataSize)
 
 #ifdef __cplusplus
-}				/* extern "C" */
+}                                /* extern "C" */
 #endif
 
 #endif /* OUTSTREAM_H */

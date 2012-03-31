@@ -118,10 +118,10 @@ clear_proc_stmt (struct Statement* pStmt)
 
 struct DeclaredVar*
 stmt_find_declaration (struct Statement* pStmt,
-		       const char*       pName,
-		       const D_UINT      nameLength,
-		       const D_BOOL      recursive,
-		       const D_BOOL      referenced)
+                       const char*       pName,
+                       const D_UINT      nameLength,
+                       const D_BOOL      recursive,
+                       const D_BOOL      referenced)
 {
   struct DeclaredVar* result      = NULL;
   D_UINT              count       = 0;
@@ -133,9 +133,9 @@ stmt_find_declaration (struct Statement* pStmt,
       assert (result != NULL);
 
       if ((IS_TABLE_FIELD (result->type) == FALSE) &&
-	  (nameLength == result->labelLength) &&
-	  (strncmp (pName, result->label, nameLength) == 0))
-	{
+          (nameLength == result->labelLength) &&
+          (strncmp (pName, result->label, nameLength) == 0))
+        {
           if (referenced && (IS_REFERENCED (result->varId) == FALSE))
             {
               if (pStmt->type == STMT_GLOBAL)
@@ -150,8 +150,8 @@ stmt_find_declaration (struct Statement* pStmt,
                 MARK_AS_REFERENCED (result->varId);
             }
 
-	  return result;
-	}
+          return result;
+        }
       count++;
     }
 
@@ -162,14 +162,14 @@ stmt_find_declaration (struct Statement* pStmt,
       /* index 0 is reserved to hold the return type */
       count = 1;
       while (count < stored_vals)
-	{
-	  result = get_item (&pStmt->spec.proc.paramsList, count);
-	  assert (result != NULL);
+        {
+          result = get_item (&pStmt->spec.proc.paramsList, count);
+          assert (result != NULL);
 
-	  if ((IS_TABLE_FIELD (result->type) == FALSE) &&
-	      (nameLength == result->labelLength) &&
-	      (strncmp (pName, result->label, nameLength) == 0))
-	    {
+          if ((IS_TABLE_FIELD (result->type) == FALSE) &&
+              (nameLength == result->labelLength) &&
+              (strncmp (pName, result->label, nameLength) == 0))
+            {
               if (referenced && (IS_REFERENCED (result->varId) == FALSE))
                 {
                   assert (RETRIVE_ID (result->varId) != 0);
@@ -180,18 +180,18 @@ stmt_find_declaration (struct Statement* pStmt,
                 }
 
               return result;
-	    }
-	  count++;
-	}
+            }
+          count++;
+        }
       /* maybe is global */
       if (recursive)
-	{
-	  return stmt_find_declaration (pStmt->pParentStmt,
-	                                pName,
-					nameLength,
-					recursive,
-					referenced);
-	}
+        {
+          return stmt_find_declaration (pStmt->pParentStmt,
+                                        pName,
+                                        nameLength,
+                                        recursive,
+                                        referenced);
+        }
     }
 
   return NULL;
@@ -199,11 +199,10 @@ stmt_find_declaration (struct Statement* pStmt,
 
 struct DeclaredVar*
 stmt_add_declaration (struct Statement*   pStmt,
-		      struct DeclaredVar* pVar,
-		      D_BOOL              parameter)
+                      struct DeclaredVar* pVar,
+                      D_BOOL              parameter)
 {
   struct OutStream *pOutStream = NULL;
-
 
   if (IS_TABLE_FIELD (pVar->type))
       pVar->varId = ~0; /* Set the id to a generic value! */
@@ -278,7 +277,7 @@ is_type_spec_valid (const struct TypeSpec* pType)
       result = FALSE;
     }
   else if ((pType->data[pType->dataSize - 2] != TYPE_SPEC_END_MARK) ||
-	   (pType->data[pType->dataSize - 1] != 0))
+           (pType->data[pType->dataSize - 1] != 0))
     {
       result = FALSE;
     }
@@ -287,32 +286,32 @@ is_type_spec_valid (const struct TypeSpec* pType)
       if ( (pType->dataSize != 2) ||
            (GET_BASIC_TYPE (pType->type) == T_UNKNOWN) ||
            (GET_BASIC_TYPE (pType->type) > T_UNDETERMINED) )
-	{
-	  result = FALSE;
-	}
+        {
+          result = FALSE;
+        }
     }
   else if (IS_TABLE (pType->type))
     {
       D_UINT index = 0;
 
       while ((index < (D_UINT) (pType->dataSize - 2)) && (result != FALSE))
-	{
-	  D_UINT16 type;
-	  D_UINT   identifierLength = strlen ((char *) &pType->data[index]);
+        {
+          D_UINT16 type;
+          D_UINT   identifierLength = strlen ((char *) &pType->data[index]);
 
-	  /* don't check for zero here, because of strlen */
-	  index += identifierLength + 1;
-	  type  = ((D_UINT16 *) & (pType->data[index]))[0];
+          /* don't check for zero here, because of strlen */
+          index += identifierLength + 1;
+          type  = ((D_UINT16 *) & (pType->data[index]))[0];
 
-	  /* Ignore an eventual array mask */
-	  if ( (GET_BASIC_TYPE (type) == T_UNKNOWN) ||
-	       (GET_BASIC_TYPE (type) > T_UNDETERMINED))
-	    {
-	      result = FALSE;
-	      break;
-	    }
-	  index += 2;
-	}
+          /* Ignore an eventual array mask */
+          if ( (GET_BASIC_TYPE (type) == T_UNKNOWN) ||
+               (GET_BASIC_TYPE (type) > T_UNDETERMINED))
+            {
+              result = FALSE;
+              break;
+            }
+          index += 2;
+        }
     }
 
   return result;
@@ -321,7 +320,7 @@ is_type_spec_valid (const struct TypeSpec* pType)
 static D_UINT32
 find_type_spec (const D_UINT8*         pTypeBuffer,
                 D_UINT32               typeBufferSize,
-		const struct TypeSpec* pSpec)
+                const struct TypeSpec* pSpec)
 {
   D_UINT                 position = 0;
   const struct TypeSpec* pIterator;
@@ -331,11 +330,11 @@ find_type_spec (const D_UINT8*         pTypeBuffer,
       pIterator = (struct TypeSpec*)(pTypeBuffer + position);
 
       if ( ! is_type_spec_valid (pIterator))
-	{
-	  /* internal error */
-	  assert (0);
-	  return TYPE_SPEC_ERROR;
-	}
+        {
+          /* internal error */
+          assert (0);
+          return TYPE_SPEC_ERROR;
+        }
 
       if (type_spec_cmp (pIterator, pSpec) != FALSE)
         return position;
@@ -348,7 +347,7 @@ find_type_spec (const D_UINT8*         pTypeBuffer,
 
 D_BOOL
 type_spec_cmp (const struct TypeSpec* pSpec_1,
-	       const struct TypeSpec* pSpec_2)
+               const struct TypeSpec* pSpec_2)
 {
   return (pSpec_1->type == pSpec_2->type) &&
          (pSpec_1->dataSize == pSpec_2->dataSize) &&
@@ -366,20 +365,20 @@ type_spec_fill_field (struct OutStream* const   pStream,
   while (pFieldList && IS_TABLE_FIELD (pFieldList->type))
     {
       if ((output_data (pStream,
-                           (D_UINT8*)pFieldList->label,
-                           pFieldList->labelLength) == NULL) ||
+                        (D_UINT8*)pFieldList->label,
+                        pFieldList->labelLength) == NULL) ||
           (output_uint8 (pStream, 0) == NULL))
-	{
-	  result = TYPE_SPEC_ERROR;
-	  break;
-	}
+        {
+          result = TYPE_SPEC_ERROR;
+          break;
+        }
 
       result += pFieldList->labelLength + 1;
       if (output_uint16 (pStream, GET_BASIC_TYPE (pFieldList->type)) == NULL)
-	{
-	  result = TYPE_SPEC_ERROR;
-	  break;
-	}
+        {
+          result = TYPE_SPEC_ERROR;
+          break;
+        }
       result     += 2;
       pFieldList = pFieldList->extra;
     }
@@ -411,8 +410,9 @@ type_spec_fill_table (struct OutStream* const        pStream,
       (output_uint8 (pStream, 0) != NULL))
     {
       struct TypeSpec *ts = (struct TypeSpec*)(get_buffer_outstream (pStream) + specOff);
+
       result       += 2;
-      ts->dataSize = result;
+      ts->dataSize  = result;
     }
   else
     result = TYPE_SPEC_ERROR;
@@ -504,9 +504,9 @@ type_spec_fill (struct OutStream* const         pStream,
   else
     {
       result = find_type_spec (get_buffer_outstream (pStream),
-			       get_size_outstream (pStream),
-			       (struct TypeSpec*)
-			       get_buffer_outstream (&temporalStream));
+                               get_size_outstream (pStream),
+                               (struct TypeSpec*)
+                               get_buffer_outstream (&temporalStream));
     }
 
   if (result == TYPE_SPEC_INVALID_POS)
@@ -514,10 +514,10 @@ type_spec_fill (struct OutStream* const         pStream,
       result = get_size_outstream (pStream);
       if (output_data (pStream,
                           get_buffer_outstream (&temporalStream),
-			  get_size_outstream (&temporalStream)) == NULL)
-	{
-	  return TYPE_SPEC_INVALID_POS;
-	}
+                          get_size_outstream (&temporalStream)) == NULL)
+        {
+          return TYPE_SPEC_INVALID_POS;
+        }
     }
 
   destroy_outstream (&temporalStream);
@@ -541,7 +541,7 @@ add_text_const (struct Statement* const pStmt,
 
   for (iterator = 0; iterator + testSize <= streamSize; ++iterator)
     if ((memcmp (pStreamBuff + iterator, pText, testSize) == 0) &&
-	((pText[testSize - 1] == 0) || (pStreamBuff[iterator + testSize] == 0)))
+        ((pText[testSize - 1] == 0) || (pStreamBuff[iterator + testSize] == 0)))
       {
         return iterator;
       }

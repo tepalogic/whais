@@ -30,11 +30,13 @@
 #include "vardecl.h"
 
 struct Statement*
-find_proc_decl(struct ParserState* pState, const D_CHAR* pName,
-    const D_UINT nameLength, const D_BOOL referenced)
+find_proc_decl(struct ParserState* pState,
+               const D_CHAR*       pName,
+               const D_UINT        nameLength,
+               const D_BOOL        referenced)
 {
   const struct UArray* pProcsList = &(pState->globalStmt.spec.glb.procsDecls);
-  D_UINT procIt = get_array_count (pProcsList);
+  D_UINT               procIt     = get_array_count (pProcsList);
 
   while (procIt-- > 0)
     {
@@ -53,8 +55,7 @@ find_proc_decl(struct ParserState* pState, const D_CHAR* pName,
               assert(RETRIVE_ID (result->spec.proc.procId) == 0);
               assert(IS_EXTERNAL (result->spec.proc.procId));
 
-              result->spec.proc.procId |=
-                  pState->globalStmt.spec.glb.procsCount++;
+              result->spec.proc.procId |= pState->globalStmt.spec.glb.procsCount++;
               MARK_AS_REFERENCED(result->spec.proc.procId);
             }
           return result;
@@ -73,9 +74,9 @@ YYSTYPE add_prcdcl_list(YYSTYPE pList, YYSTYPE pIdentifier, YYSTYPE pType)
   struct SemTypeSpec typeDesc = pType->val.u_tspec;
 
   /* reconvert s_type to a VAL_PRCDCL_LIST */
-  pType->val_type = VAL_PRCDCL_LIST;
+  pType->val_type         = VAL_PRCDCL_LIST;
   pType->val.u_prdcl.type = typeDesc;
-  pType->val.u_prdcl.id = pIdentifier->val.u_id;
+  pType->val.u_prdcl.id   = pIdentifier->val.u_id;
   pType->val.u_prdcl.next = pList;
 
   /* recycle some things */
@@ -91,28 +92,28 @@ install_proc_args(struct ParserState* const pState, struct SemValue* pArgList)
   struct SemValue type;
 
   identifier.val_type = VAL_ID;
-  type.val_type = VAL_TYPE_SPEC;
+  type.val_type       = VAL_TYPE_SPEC;
 
   while (pArgList != NULL)
     {
       assert(pArgList->val_type == VAL_PRCDCL_LIST);
 
       identifier.val.u_id = pArgList->val.u_prdcl.id;
-      type.val.u_tspec = pArgList->val.u_prdcl.type;
+      type.val.u_tspec    = pArgList->val.u_prdcl.type;
 
       install_declaration (pState, &identifier, &type, TRUE, TRUE);
 
       pArgList->val_type = VAL_REUSE;
-      pArgList = pArgList->val.u_prdcl.next;
+      pArgList           = pArgList->val.u_prdcl.next;
     }
 }
 
 void
 install_proc_decl(struct ParserState* const pState,
-    struct SemValue* const pIdentifier)
+                  struct SemValue* const    pIdentifier)
 {
-  struct UArray * const procs = &(pState->globalStmt.spec.glb.procsDecls);
-  struct Statement stmt;
+  struct UArray* const procs = &(pState->globalStmt.spec.glb.procsDecls);
+  struct Statement     stmt;
 
   assert(pState->pCurrentStmt->type == STMT_GLOBAL);
   assert(pIdentifier->val_type == VAL_ID);
@@ -129,8 +130,10 @@ install_proc_decl(struct ParserState* const pState,
                       FALSE) != NULL)
     {
       D_CHAR tname[128];
-      copy_text_truncate (tname, stmt.spec.proc.name, sizeof tname,
-          stmt.spec.proc.nameLength);
+      copy_text_truncate (tname,
+                          stmt.spec.proc.name,
+                          sizeof tname,
+                          stmt.spec.proc.nameLength);
       w_log_msg (pState, pState->bufferPos, MSG_PROC_ADECL, tname);
 
       clear_proc_stmt (&stmt);
@@ -168,13 +171,13 @@ install_proc_decl(struct ParserState* const pState,
 void
 set_proc_rettype(struct ParserState* const pState, struct SemValue* const pType)
 {
-  struct DeclaredVar* pRetVar = (struct DeclaredVar*) get_item (
-      &(pState->pCurrentStmt->spec.proc.paramsList), 0);
+  struct DeclaredVar* pRetVar = (struct DeclaredVar*)
+      get_item (&(pState->pCurrentStmt->spec.proc.paramsList), 0);
 
   assert(pType->val_type == VAL_TYPE_SPEC);
 
   memset (pRetVar, 0, sizeof(pRetVar));
-  pRetVar->type = pType->val.u_tspec.type;
+  pRetVar->type  = pType->val.u_tspec.type;
   pRetVar->extra = pType->val.u_tspec.extra;
 
   if (IS_TABLE (pRetVar->type))
@@ -194,9 +197,8 @@ set_proc_rettype(struct ParserState* const pState, struct SemValue* const pType)
         }
     }
 
-  pRetVar->typeSpecOff = type_spec_fill (
-      &pState->globalStmt.spec.glb.typesDescs, pRetVar);
-
+  pRetVar->typeSpecOff = type_spec_fill (&pState->globalStmt.spec.glb.typesDescs,
+                                         pRetVar);
   free_sem_value (pType);
 
   return;

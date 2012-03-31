@@ -409,7 +409,7 @@ whc_decode_opcode (const unsigned char* pCode, enum W_OPCODE* pOutOpcode)
       D_UINT16 tempOpcode = ((*pCode & ~SECOND_BYTE_MARK) << 8);
 
       tempOpcode  += *(++pCode);
-      *pOutOpcode = tempOpcode;
+      *pOutOpcode  = tempOpcode;
 
       return 2;
     }

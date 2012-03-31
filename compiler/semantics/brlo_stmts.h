@@ -52,8 +52,8 @@ struct Branch
 
 void
 begin_if_stmt (struct ParserState* const pState,
-	       YYSTYPE                   expression,
-	       enum BRANCH_TYPE          branchType);
+               YYSTYPE                   expression,
+               enum BRANCH_TYPE          branchType);
 
 void
 begin_else_stmt (struct ParserState* const pState);
@@ -96,7 +96,7 @@ void
 finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp);
 
 void
-handle_break_stmt (struct ParserState *const pState);
+handle_break_stmt (struct ParserState* const pState);
 
 void
 handle_continue_stmt (struct ParserState* const pState);

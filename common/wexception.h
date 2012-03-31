@@ -48,14 +48,17 @@ public:
   WException (const D_CHAR* pMessage,
               const D_CHAR* pFile,
               D_UINT32      line,
-              D_UINT32      extra)
-  : m_ErrorMessage (pMessage),
+              D_UINT32      extra) :
+    m_ErrorMessage (pMessage),
     m_File (pFile),
     m_Line (line),
     m_Extra (extra)
   {
   }
-  virtual ~WException () {};
+
+  virtual ~WException ()
+  {
+  };
 
   D_UINT32 GetExtra ()
   {

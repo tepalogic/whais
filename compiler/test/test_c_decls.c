@@ -46,18 +46,18 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 static D_BOOL
 check_type_spec_fill (const struct TypeSpec *ts,
-		      const D_CHAR * fname, const D_UINT type)
+                      const D_CHAR * fname, const D_UINT type)
 {
   const D_UINT8 *it = ts->data;
   D_UINT count = 0;
@@ -69,44 +69,44 @@ check_type_spec_fill (const struct TypeSpec *ts,
   if (fname == NULL)
     {
       if (ts->dataSize != 2)
-	{
-	  return FALSE;
-	}
+        {
+          return FALSE;
+        }
       else
-	{
-	  return TRUE;
-	}
+        {
+          return TRUE;
+        }
     }
 
   while (count < (ts->dataSize - 2))
     {
       D_UINT16 temp = strlen ((D_CHAR *) it) + 1;
       if (strcmp ((D_CHAR *) it, fname) != 0)
-	{
-	  it += temp;
-	  count += temp;
-	  it += sizeof (D_UINT16);
-	  count += sizeof (D_UINT16);
-	}
+        {
+          it += temp;
+          count += temp;
+          it += sizeof (D_UINT16);
+          count += sizeof (D_UINT16);
+        }
       else
-	{
-	  D_UINT16 *ts_type = (D_UINT16 *) (it + temp);
-	  if (*ts_type == type)
-	    {
-	      return TRUE;
-	    }
-	  else
-	    {
-	      return FALSE;
-	    }
-	}
+        {
+          D_UINT16 *ts_type = (D_UINT16 *) (it + temp);
+          if (*ts_type == type)
+            {
+              return TRUE;
+            }
+          else
+            {
+              return FALSE;
+            }
+        }
     }
   return FALSE;
 }
 
 static D_BOOL
 check_container_field (struct Statement *stmt,
-		       struct DeclaredVar *var, D_CHAR * field, D_UINT32 type)
+                       struct DeclaredVar *var, D_CHAR * field, D_UINT32 type)
 {
   struct DeclaredVar *extra = var->extra;
   D_CHAR result = TRUE;
@@ -114,21 +114,21 @@ check_container_field (struct Statement *stmt,
 
   while (extra != NULL)
     {
-      result = FALSE;		/* changed to TRUE if everything is good */
+      result = FALSE;                /* changed to TRUE if everything is good */
       if ((extra->type & T_TABLE_FIELD_MASK) == 0)
-	{
-	  break;
-	}
+        {
+          break;
+        }
       if ((extra->labelLength == f_len) &&
-	  (strncmp (field, extra->label, f_len) == 0))
-	{
-	  if (extra->type == (type | T_TABLE_FIELD_MASK))
-	    {
-	      result = TRUE;
-	    }
+          (strncmp (field, extra->label, f_len) == 0))
+        {
+          if (extra->type == (type | T_TABLE_FIELD_MASK))
+            {
+              result = TRUE;
+            }
 
-	  break;
-	}
+          break;
+        }
 
       /* use the next field */
       extra = extra->extra;
@@ -137,7 +137,7 @@ check_container_field (struct Statement *stmt,
   if (result != FALSE)
     {
       D_UINT8 *const buffer =
-	get_buffer_outstream (&stmt->spec.glb.typesDescs);
+        get_buffer_outstream (&stmt->spec.glb.typesDescs);
       struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->typeSpecOff);
       result = check_type_spec_fill (ts, field, type);
     }
@@ -188,10 +188,10 @@ check_vars_decl (struct ParserState *state)
     }
 
   if (!(check_container_field (&state->globalStmt, decl_var, "v2", T_DATE) &&
-	check_container_field (&state->globalStmt, decl_var, "t2",
-			       T_DATETIME)
-	&& check_container_field (&state->globalStmt, decl_var, "t3",
-				  T_INT16)))
+        check_container_field (&state->globalStmt, decl_var, "t2",
+                               T_DATETIME)
+        && check_container_field (&state->globalStmt, decl_var, "t3",
+                                  T_INT16)))
     {
       return FALSE;
     }
@@ -222,15 +222,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing declarations...");

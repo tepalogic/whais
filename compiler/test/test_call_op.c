@@ -40,13 +40,13 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR proc_decl_buffer[] =
@@ -152,12 +152,12 @@ D_CHAR proc_decl_buffer[] =
 
 static D_BOOL
 check_procedure (struct ParserState *state,
-		 D_CHAR * proc_name, D_CHAR * called_proc, D_UINT nargs)
+                 D_CHAR * proc_name, D_CHAR * called_proc, D_UINT nargs)
 {
   struct Statement *stmt = find_proc_decl (state, proc_name,
-					   strlen (proc_name), FALSE);
+                                           strlen (proc_name), FALSE);
   struct Statement *called_stmt = find_proc_decl (state, called_proc,
-						  strlen (called_proc), FALSE);
+                                                  strlen (called_proc), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_UINT code_size = get_size_outstream (stmt_query_instrs (stmt));
   D_UINT count = 0;
@@ -172,10 +172,10 @@ check_procedure (struct ParserState *state,
     {
       const D_UINT offset = count * 2;
       if ((w_opcode_decode (code + offset) != W_LDLO8) ||
-	  (code[offset + 1] != (count + 1)))
-	{
-	  return FALSE;
-	}
+          (code[offset + 1] != (count + 1)))
+        {
+          return FALSE;
+        }
     }
   count = nargs * 2;
   if ((code[count] != W_CALL))
@@ -240,15 +240,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
   printf ("Testing function calls...");
   if (check_procedure_calls (&state) == FALSE)

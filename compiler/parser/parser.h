@@ -36,7 +36,7 @@
 
 enum SEMVALUE_TYPE
 {
-  VAL_ERROR = 0,		/* reserved for error situations */
+  VAL_ERROR = 0,       /* reserved for error situations */
   VAL_ID,
 
   VAL_C_CHAR,
@@ -54,15 +54,15 @@ enum SEMVALUE_TYPE
   VAL_EXP_LINK,
 
   VAL_NULL,
-  VAL_REUSE,			/* marked for reuse */
+  VAL_REUSE,
   VAL_UNKNOWN
 };
 
 /* represents an identifier */
 struct SemId
 {
-  const D_CHAR* text;	 /* points at the name of identifier */
-  D_UINT        length;	 /* the name's length of the identifier */
+  const D_CHAR* text;         /* points at the name of identifier */
+  D_UINT        length;       /* the name's length of the identifier */
 };
 
 /* represents a number */
@@ -95,7 +95,7 @@ struct SemCChar
 /* represents a date and time value */
 struct SemCTime
 {
-  D_UINT32 usec;		/* microseconds */
+  D_UINT32 usec;        /* microseconds */
   D_INT16  year;
   D_UINT8  month;
   D_UINT8  day;
@@ -117,15 +117,15 @@ struct SemIdList
 
 struct SemTypeSpec
 {
-  void*    extra;	/* extra info for container types */
-  D_UINT16 type;	/* contains the type specification */
+  void*    extra;       /* extra info for container types */
+  D_UINT16 type;        /* contains the type specification */
 };
 
 struct SemProcParamList
 {
-  struct SemValue*   next;	/* next in list */
-  struct SemId       id;	/* the id of this parameter */
-  struct SemTypeSpec type;	/*type of this parameter */
+  struct SemValue*   next;      /* next in list */
+  struct SemId       id;        /* the id of this parameter */
+  struct SemTypeSpec type;      /* type of this parameter */
 };
 
 struct SemExpression
@@ -138,14 +138,14 @@ struct SemExpression
 
 struct SemProcArgumentsList
 {
-  struct SemValue* expr;	/* holds the expression tree */
-  struct SemValue* next;	/* next argument in list */
+  struct SemValue* expr;        /* holds the expression tree */
+  struct SemValue* next;        /* next argument in list */
 };
 
 struct SemValue
 {
   /*    D_UINT   buffer_pos; */
-  enum SEMVALUE_TYPE val_type;	/* the type of the value */
+  enum SEMVALUE_TYPE val_type;        /* the type of the value */
   union
   {
     struct SemId                u_id;
@@ -169,14 +169,14 @@ struct ParserState
   WHC_MESSENGER     messenger;
 
   const D_CHAR*     buffer;
-  D_UINT            bufferPos;		/* Use this offset to get the next token */
-  D_UINT            bufferSize;		/* how big the buffer is */
-  StringStoreHnd    strings;		/* String container to hold constant strings */
-  struct UArray     parsedValues;	/* Array to store the semantics values parsed */
-  struct Statement  globalStmt;	        /* the global statement */
+  D_UINT            bufferSize;
+  D_UINT            bufferPos;           /* Use this offset to get the next token */
+  StringStoreHnd    strings;             /* String container to hold constant strings */
+  struct UArray     parsedValues;        /* Array to store the semantics values parsed */
+  struct Statement  globalStmt;          /* the global statement */
   struct Statement* pCurrentStmt;
-  D_BOOL            abortError;		/* set to true to abort parsing. */
-  D_BOOL            externDeclaration;	/* set to true if the declaration is external */
+  D_BOOL            abortError;          /* set to true to abort parsing. */
+  D_BOOL            externDeclaration;   /* set to true if the declaration is external */
 
 };
 

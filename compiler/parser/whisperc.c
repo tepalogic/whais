@@ -35,9 +35,9 @@ extern int yyparse (struct ParserState*);
 
 WHC_HANDLER
 whc_hnd_create (const char*       pBuffer,
-		unsigned          bufferSize,
-		WHC_MESSENGER     messenger,
-		WHC_MESSENGER_ARG messengerContext)
+                unsigned          bufferSize,
+                WHC_MESSENGER     messenger,
+                WHC_MESSENGER_ARG messengerContext)
 {
   struct ParserState* pState = mem_alloc (sizeof (*pState));
 
@@ -57,10 +57,10 @@ whc_hnd_create (const char*       pBuffer,
 
       /* begin the compilation of the buffer */
       if (yyparse (pState) != 0)
-	{
-	  whc_hnd_destroy ((WHC_HANDLER) pState);
-	  pState = NULL;
-	}
+        {
+          whc_hnd_destroy ((WHC_HANDLER) pState);
+          pState = NULL;
+        }
     }
 
   return pState;
@@ -69,7 +69,7 @@ whc_hnd_create (const char*       pBuffer,
 void
 whc_hnd_destroy (WHC_HANDLER hnd)
 {
-  struct ParserState* pState = (struct ParserState*) hnd;
+  struct ParserState* pState = (struct ParserState*)hnd;
 
   release_string_store (pState->strings);
   clear_glbl_stmt (&(pState->globalStmt));
@@ -80,13 +80,13 @@ whc_hnd_destroy (WHC_HANDLER hnd)
 unsigned int
 whc_get_globals_count (WHC_HANDLER hnd)
 {
-  struct ParserState* pState = (struct ParserState*) hnd;
+  struct ParserState* pState = (struct ParserState*)hnd;
 
   return pState->globalStmt.localsUsed;
 }
 
 static struct DeclaredVar*
-get_var_from_stmt (const struct Statement *pStmt, unsigned int item)
+get_var_from_stmt (const struct Statement* pStmt, unsigned int item)
 {
   const unsigned int stored_vals = get_array_count (&(pStmt->decls));
   unsigned int       it          = 0;
@@ -96,9 +96,9 @@ get_var_from_stmt (const struct Statement *pStmt, unsigned int item)
       struct DeclaredVar *var_it = get_item (&pStmt->decls, it);
 
       if (IS_TABLE_FIELD (var_it->varId))
-	continue;
+        continue;
       else if (RETRIVE_ID (var_it->varId) == item)
-	return var_it;
+        return var_it;
     }
   return NULL;
 }
@@ -108,9 +108,9 @@ whc_get_global (WHC_HANDLER      hnd,
                 unsigned int     globalId,
                 WHC_GLBVAR_DESC* pOutDescript)
 {
-  struct ParserState* pState = (struct ParserState *) hnd;
-  struct DeclaredVar* pVar   = (struct DeclaredVar *) get_var_from_stmt (&(pState->globalStmt),
-                                                                         globalId);
+  struct ParserState* pState = (struct ParserState*)hnd;
+  struct DeclaredVar* pVar   = (struct DeclaredVar*)get_var_from_stmt (&(pState->globalStmt),
+                                                                       globalId);
   if (pVar == NULL)
     return 0;
 
@@ -129,7 +129,7 @@ whc_get_global (WHC_HANDLER      hnd,
 unsigned int
 whc_get_procs_count (WHC_HANDLER hnd)
 {
-  struct ParserState* pState = (struct ParserState*) hnd;
+  struct ParserState* pState = (struct ParserState*)hnd;
 
   return pState->globalStmt.spec.glb.procsCount;
 }
@@ -139,7 +139,7 @@ whc_get_proc (WHC_HANDLER    hnd,
               unsigned int   procId,
               WHC_PROC_DESC* pOutDesc)
 {
-  const struct Statement* pProc  = (const struct Statement*) whc_get_proc_hnd (hnd, procId);
+  const struct Statement* pProc  = (const struct Statement*)whc_get_proc_hnd (hnd, procId);
 
   if (pProc == NULL)
     return 0; /* Not found */
@@ -160,7 +160,7 @@ whc_get_proc (WHC_HANDLER    hnd,
 WHC_PROC_HANDLER
 whc_get_proc_hnd (WHC_HANDLER hnd, unsigned int procId)
 {
-  struct ParserState*     pState     = (struct ParserState*) hnd;
+  struct ParserState*     pState     = (struct ParserState*)hnd;
   const struct Statement* pProc      = NULL;
   const D_UINT            totalProcs = get_array_count (&pState->globalStmt.spec.glb.procsDecls);
   D_UINT                  procIndex;
@@ -192,8 +192,8 @@ const unsigned char *
 whc_get_proc_rettype (WHC_HANDLER hnd, WHC_PROC_HANDLER hProc)
 {
   struct ParserState* const pState     = (struct ParserState*) hnd;
-  struct Statement* const   pProc      = (struct Statement *) hProc;
-  struct DeclaredVar* const pRetrunVar = (struct DeclaredVar *)
+  struct Statement* const   pProc      = (struct Statement*) hProc;
+  struct DeclaredVar* const pRetrunVar = (struct DeclaredVar*)
                                           get_item (&(pProc->spec.proc.paramsList), 0);
 
   assert (pRetrunVar != NULL);
@@ -204,12 +204,12 @@ whc_get_proc_rettype (WHC_HANDLER hnd, WHC_PROC_HANDLER hProc)
 
 const unsigned char *
 whc_get_local_type (WHC_HANDLER      hnd,
-		    WHC_PROC_HANDLER hProc,
-		    unsigned int     localId)
+                    WHC_PROC_HANDLER hProc,
+                    unsigned int     localId)
 {
 
-  struct ParserState* pState          = (struct ParserState *) hnd;
-  struct Statement*   pProc           = (struct Statement *) hProc;
+  struct ParserState* pState          = (struct ParserState*) hnd;
+  struct Statement*   pProc           = (struct Statement*) hProc;
   struct DeclaredVar* pLocalVal       = NULL;
   const D_UINT        procParamsCount = get_array_count (&(pProc->spec.proc.paramsList));
 
@@ -246,7 +246,7 @@ whc_get_typedec_pool (WHC_HANDLER hnd, const unsigned char** pOutPTypes)
 unsigned int
 whc_get_const_area (WHC_HANDLER hnd, const unsigned char** pOutPConsts)
 {
-  struct ParserState* const     pState     = (struct ParserState *) hnd;
+  struct ParserState* const     pState     = (struct ParserState*) hnd;
   const struct Statement* const pGlbStm    = &pState->globalStmt;
   const struct OutStream* const pConsts    = &pGlbStm->spec.glb.constsArea;
   const unsigned                constsSize = get_size_outstream (pConsts);

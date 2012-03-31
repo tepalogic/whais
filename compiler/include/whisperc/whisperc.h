@@ -31,12 +31,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
-#define T_ARRAY_MASK          0x0100	/* a mask to tell that variable is an array */
+#define T_ARRAY_MASK          0x0100        /* a mask to tell that variable is an array */
 #define T_FIELD_MASK          0x0200
-#define T_TABLE_MASK          0x0400	/*the variable is a table */
-#define T_TABLE_FIELD_MASK    0x0800	/*the variable is a table */
+#define T_TABLE_MASK          0x0400        /*the variable is a table */
+#define T_TABLE_FIELD_MASK    0x0800        /*the variable is a table */
 
-#define T_L_VALUE             0x1000	/* Mask applied to suggest if this is a genuine l-value */
+#define T_L_VALUE             0x1000        /* Mask applied to suggest if this is a genuine l-value */
 
 #define IS_ARRAY(type)          (((type) & T_ARRAY_MASK) != 0)
 #define IS_FIELD(type)          (((type) & T_FIELD_MASK) != 0)
@@ -50,28 +50,28 @@ typedef enum DBS_FIELD_TYPE VARTYPES;
 #define MARK_TABLE_FIELD(type)  ((type) |= T_TABLE_FIELD_MASK)
 #define MARK_L_VALUE(type)      ((type) |= T_L_VALUE)
 
-#define GET_TYPE(type)       ((type) & ~(T_L_VALUE | T_TABLE_FIELD_MASK))
-#define GET_BASIC_TYPE(type) ((type) & 0xFF)
-#define GET_FIELD_TYPE(type) ((type) & ~T_TABLE_FIELD_MASK)
+#define GET_TYPE(type)          ((type) & ~(T_L_VALUE | T_TABLE_FIELD_MASK))
+#define GET_BASIC_TYPE(type)    ((type) & 0xFF)
+#define GET_FIELD_TYPE(type)    ((type) & ~T_TABLE_FIELD_MASK)
 
 
 typedef const void* WHC_HANDLER;
 typedef const void* WHC_PROC_HANDLER;
 typedef const void* WHC_MESSENGER_ARG;
 typedef void        (*WHC_MESSENGER) (WHC_MESSENGER_ARG data,
-			              unsigned int buff_pos,
-			              unsigned int msg_id,
-			              unsigned int msg_type,
-			              const char *msg_format,
-			              va_list args);
+                                      unsigned int      buffPos,
+                                      unsigned int      msgId,
+                                      unsigned int      msgType,
+                                      const char*       pMessage,
+                                      va_list           args);
 
 #define WHC_IGNORE_BUFFER_POS      (D_UINT)(-1)
 
 typedef struct
 {
-  const char*          m_Name;	     /* global variable name */
+  const char*          m_Name;       /* global variable name */
   unsigned int         m_NameLength; /* length of the name */
-  const unsigned char* m_Type;	     /* describe the type of the variable */
+  const unsigned char* m_Type;       /* describe the type of the variable */
   unsigned char        m_Defined;    /* 0 for externally declared global variables */
 } WHC_GLBVAR_DESC;
 
@@ -151,7 +151,7 @@ whc_get_lang_ver (unsigned int* pOutMajor,
                   unsigned int* pOutMinor);
 
 #ifdef __cplusplus
-}				/* extern "C" */
+}       /* extern "C" */
 #endif
 
-#endif				/* WHISPERC_H */
+#endif  /* WHISPERC_H */

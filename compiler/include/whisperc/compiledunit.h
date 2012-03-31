@@ -61,7 +61,7 @@ public:
   virtual D_UINT         GetProcNameSize (D_UINT proc_item) = 0;
   virtual const D_CHAR*  RetriveProcName (D_UINT proc_item) = 0;
   virtual D_UINT         GetProcLocalTypeIndex (D_UINT item_proc,
-			          		D_UINT item_local) = 0;
+                                                D_UINT item_local) = 0;
   virtual D_BOOL         IsProcExternal (D_UINT item_proc) = 0;
 };
 
@@ -71,8 +71,8 @@ public:
   WCompiledUnitException (const D_CHAR* pMessage,
                           const D_CHAR* pFile,
                           D_UINT32      line,
-                          D_UINT32      extra)
-    : WException (pMessage, pFile, line, extra)
+                          D_UINT32      extra) :
+    WException (pMessage, pFile, line, extra)
   {
   }
   virtual ~WCompiledUnitException ()
@@ -87,9 +87,9 @@ class WBufferCompiledUnit : public WICompiledUnit
 {
 public:
   WBufferCompiledUnit (const D_UINT8*    pBuffer,
-		       D_UINT            bufferSize,
-		       WHC_MESSENGER     messenger,
-		       WHC_MESSENGER_ARG messengerContext);
+                       D_UINT            bufferSize,
+                       WHC_MESSENGER     messenger,
+                       WHC_MESSENGER_ARG messengerContext);
   virtual ~WBufferCompiledUnit ();
 
   virtual D_UINT         GetTypeInformationSize ();

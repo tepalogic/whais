@@ -170,7 +170,7 @@ FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDa
 void
 FileContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
 {
-  const D_UINT   cuBufferSize   = 4096;	//4KB
+  const D_UINT   cuBufferSize   = 4096;        //4KB
   const D_UINT64 uIntervalSize  = uEndPosition - uStartPosition;
   const D_UINT64 uContainerSize = GetContainerSize ();
 

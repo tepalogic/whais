@@ -65,8 +65,8 @@ public:
 };
 
 typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8* pInArgs,
-				  D_CHAR*        pOp1,
-				  D_CHAR*        pOp2);
+                                  D_CHAR*        pOp1,
+                                  D_CHAR*        pOp2);
 
 extern FDECODE_OPCODE wod_decode_table[];
 extern const D_CHAR*  wod_str_table[];

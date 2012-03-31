@@ -57,11 +57,11 @@ enum EXP_OPERATION
   OP_OR,
   OP_XOR,
 
-  OP_GROUP,			/* (...) */
-  OP_INDEX,			/* [...] */
-  OP_FIELD,			/* table */
+  OP_GROUP,     /* (...) */
+  OP_INDEX,     /* [...] */
+  OP_FIELD,     /* table */
   OP_ATTR,
-  OP_C_ATTR,			/* { ... } */
+  OP_C_ATTR,    /* { ... } */
   OP_CALL,
 
   OP_MAX
@@ -69,10 +69,10 @@ enum EXP_OPERATION
 
 YYSTYPE
 create_exp_link (struct ParserState* pState,
-		 YYSTYPE             firstOp,
-		 YYSTYPE             secondOp,
-		 YYSTYPE             thirdOp,
-		 enum EXP_OPERATION  opcode);
+                 YYSTYPE             firstOp,
+                 YYSTYPE             secondOp,
+                 YYSTYPE             thirdOp,
+                 enum EXP_OPERATION  opcode);
 
 YYSTYPE
 translate_exp (struct ParserState* pState, YYSTYPE exp);

@@ -101,36 +101,36 @@ wod_dump_const_area (WICompiledUnit& rUnit, std::ostream& rOutputStream)
            std::setfill ('0') << constantOff << ":\t";
 
       for (D_UINT row_pos = 0; row_pos < rowSize; row_pos++)
-	{
-	  if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
-	    rOutputStream << " ";
+        {
+          if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
+            rOutputStream << " ";
 
-	  if (row_pos + constantOff >= rUnit.GetConstAreaSize ())
-	    rOutputStream << "  ";
-	  else
-	    {
-	      rOutputStream << std::setw (sizeof (D_UINT8) * 2) << std::setfill ('0') <<
-	           _SC(D_UINT, rUnit.RetrieveConstArea ()[constantOff + row_pos]);
-	    }
-	}
+          if (row_pos + constantOff >= rUnit.GetConstAreaSize ())
+            rOutputStream << "  ";
+          else
+            {
+              rOutputStream << std::setw (sizeof (D_UINT8) * 2) << std::setfill ('0') <<
+                   _SC(D_UINT, rUnit.RetrieveConstArea ()[constantOff + row_pos]);
+            }
+        }
 
       rOutputStream << '\t';
       for (D_UINT row_pos = 0; row_pos < rowSize; row_pos++)
-	{
-	  if (row_pos + constantOff >= rUnit.GetConstAreaSize ())
-	    break;
-	  else
-	    {
-	      if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
-		rOutputStream << " ";
+        {
+          if (row_pos + constantOff >= rUnit.GetConstAreaSize ())
+            break;
+          else
+            {
+              if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
+                rOutputStream << " ";
 
-	      D_UINT char_code = rUnit.RetrieveConstArea ()[constantOff + row_pos];
-	      if (isalnum (char_code) || ispunct (char_code))
-		rOutputStream << _SC (D_CHAR, char_code);
-	      else
-		rOutputStream << ".";
-	    }
-	}
+              D_UINT char_code = rUnit.RetrieveConstArea ()[constantOff + row_pos];
+              if (isalnum (char_code) || ispunct (char_code))
+                rOutputStream << _SC (D_CHAR, char_code);
+              else
+                rOutputStream << ".";
+            }
+        }
       constantOff += rowSize;
     }
   while (constantOff < rUnit.GetConstAreaSize ());
@@ -150,9 +150,9 @@ wod_dump_basic_type_info (std::ostream& rOutStream, D_UINT16 type)
       type = GET_BASIC_TYPE (type);
 
       if (type != T_UNDETERMINED)
-	rOutStream << " OF ";
+        rOutStream << " OF ";
       else
-	return;
+        return;
     }
 
   assert (type > T_UNKNOWN);
@@ -231,20 +231,20 @@ wod_dump_rectable_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStrea
 
       rOutputStream << " WITH ( ";
       while (pTypeDesc[0] != ';' && pTypeDesc[1] != 0)
-	{
-	  if (printComma)
-	    rOutputStream << ", ";
-	  else
-	    printComma = TRUE;
+        {
+          if (printComma)
+            rOutputStream << ", ";
+          else
+            printComma = TRUE;
 
-	  rOutputStream << pTypeDesc << " AS ";
-	  pTypeDesc += strlen (_RC (const char *, pTypeDesc)) + 1;
+          rOutputStream << pTypeDesc << " AS ";
+          pTypeDesc += strlen (_RC (const char *, pTypeDesc)) + 1;
 
-	  D_UINT16 type = from_le_int16 (pTypeDesc);
+          D_UINT16 type = from_le_int16 (pTypeDesc);
 
-	  pTypeDesc += sizeof (D_UINT16);
-	  wod_dump_basic_type_info (rOutputStream, type);
-	}
+          pTypeDesc += sizeof (D_UINT16);
+          wod_dump_basic_type_info (rOutputStream, type);
+        }
       rOutputStream << " )";
     }
 
@@ -296,9 +296,9 @@ wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutputStream)
       rOutputStream << "\t\t\t";
 
       if (rUnit.IsGlobalExternal (globalIt))
-	rOutputStream << "EXT" << "\t";
+        rOutputStream << "EXT" << "\t";
       else
-	rOutputStream << "DEF" << "\t";
+        rOutputStream << "DEF" << "\t";
 
       wod_dump_type_info (rUnit.RetriveTypeInformation () + rUnit.GetGlobalTypeIndex (globalIt),
                           rOutputStream);
@@ -309,20 +309,20 @@ wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutputStream)
 
 static void
 wod_dump_code (const D_UINT8* pCode,
-	       const D_UINT   codeSize,
-	       std::ostream&  rOutputStream,
-	       const D_CHAR*  pPrefix)
+               const D_UINT   codeSize,
+               std::ostream&  rOutputStream,
+               const D_CHAR*  pPrefix)
 {
   D_UINT currPos = 0;
 
   while (currPos < codeSize)
     {
       if (pPrefix != NULL)
-	{
-	  rOutputStream << pPrefix << "+";
-	  rOutputStream << std::setw (4) << std::setfill ('0') << currPos;
-	  rOutputStream << "\t";
-	}
+        {
+          rOutputStream << pPrefix << "+";
+          rOutputStream << std::setw (4) << std::setfill ('0') << currPos;
+          rOutputStream << "\t";
+        }
 
       D_CHAR        operand1[24];
       D_CHAR        operand2[24];
@@ -330,12 +330,12 @@ wod_dump_code (const D_UINT8* pCode,
       D_UINT        instr_size = whc_decode_opcode (pCode, &opcode);
 
       instr_size += wod_decode_table[opcode] (pCode + instr_size,
-					      operand1,
-					      operand2);
+                                              operand1,
+                                              operand2);
 
       rOutputStream << wod_str_table[opcode] << "\t" << operand1;
       if (operand2[0] != 0)
-	rOutputStream << ", " << operand2;
+        rOutputStream << ", " << operand2;
 
       rOutputStream << std::endl;
 
@@ -353,30 +353,30 @@ wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutputStream, D_BOOL showC
   for (D_UINT proc_it = 0; proc_it < procsCount; ++proc_it)
     {
       rOutputStream << "PROCEDURE " << rUnit.RetriveProcName (proc_it) << std::endl
-	<<
-	"********************************************************************"
-	<< std::endl;
+        <<
+        "********************************************************************"
+        << std::endl;
       D_UINT localsCount = rUnit.GetProcLocalsCount (proc_it);
       for (D_UINT localIt = 0; localIt < localsCount; ++localIt)
-	{
-	  if (localIt == 0)
-	    rOutputStream << "return (id. 0)\t\t";
-	  else if (localIt <= rUnit.GetProcParametersCount (proc_it))
-	    rOutputStream << "param (id. " << localIt << " )\t\t";
-	  else
-	    rOutputStream << "local (id. " << localIt << " )\t\t";
+        {
+          if (localIt == 0)
+            rOutputStream << "return (id. 0)\t\t";
+          else if (localIt <= rUnit.GetProcParametersCount (proc_it))
+            rOutputStream << "param (id. " << localIt << " )\t\t";
+          else
+            rOutputStream << "local (id. " << localIt << " )\t\t";
 
-	  wod_dump_type_info (rUnit.RetriveTypeInformation () +
-	                        rUnit.GetProcLocalTypeIndex (proc_it, localIt),
-	                      rOutputStream);
-	  rOutputStream << std::endl;
-	}
+          wod_dump_type_info (rUnit.RetriveTypeInformation () +
+                                rUnit.GetProcLocalTypeIndex (proc_it, localIt),
+                              rOutputStream);
+          rOutputStream << std::endl;
+        }
 
       rOutputStream << std::endl << "Code:" << std::endl;
       wod_dump_code (rUnit.RetriveProcCodeArea (proc_it),
-		     rUnit.GetProcCodeAreaSize (proc_it),
-		     rOutputStream,
-		     rUnit.RetriveProcName (proc_it));
+                     rUnit.GetProcCodeAreaSize (proc_it),
+                     rOutputStream,
+                     rUnit.RetriveProcName (proc_it));
       rOutputStream << std::endl << std::endl;
     }
 }

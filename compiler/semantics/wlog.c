@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../parser/parser.h"
 
 #if 0
-#define MAX_DECIMAL_REPRESENTING_LEN  41	/* 41 > (Log10(2^128) + 2) */
+#define MAX_DECIMAL_REPRESENTING_LEN  41        /* 41 > (Log10(2^128) + 2) */
 #endif
 
 static const struct MsgCodeEntry messages[] = {
@@ -137,7 +137,7 @@ static const struct MsgCodeEntry messages[] = {
   {0, 0, 0}
 };
 
-static const struct MsgCodeEntry *
+static const struct MsgCodeEntry*
 find_string (D_UINT msgCode)
 {
   D_UINT count = 0;
@@ -154,37 +154,37 @@ find_string (D_UINT msgCode)
 }
 
 void
-w_log_msg (struct ParserState *state, D_UINT buffPos, D_UINT msgCode, ...)
+w_log_msg (struct ParserState* pState, D_UINT buffPos, D_UINT msgCode, ...)
 {
   va_list args;
   const struct MsgCodeEntry *pMsgEntry = find_string (msgCode);
 
   if (pMsgEntry == NULL)
     {
-      w_log_msg (state, IGNORE_BUFFER_POS, MSG_INT_ERR);
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_INT_ERR);
       return;
     }
 
   va_start (args, msgCode);
-  if (state->messenger != NULL)
+  if (pState->messenger != NULL)
     {
-      state->messenger (state->messengerContext,
-			buffPos,
-			msgCode,
-			pMsgEntry->type,
-			pMsgEntry->msg,
-			args);
+      pState->messenger (pState->messengerContext,
+                        buffPos,
+                        msgCode,
+                        pMsgEntry->type,
+                        pMsgEntry->msg,
+                        args);
     }
   else
     {
       /* don not send the message */
-      assert (state->messengerContext == NULL);
+      assert (pState->messengerContext == NULL);
     }
   if ((pMsgEntry->type == MSG_ERROR_EVENT) ||
       (pMsgEntry->type == MSG_INTERNAL_ERROR) ||
       (pMsgEntry->type == MSG_GENERAL_EVENT))
     {
-      state->abortError = TRUE;
+      pState->abortError = TRUE;
     }
   va_end (args);
 }

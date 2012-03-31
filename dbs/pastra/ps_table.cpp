@@ -108,10 +108,10 @@ validate_field_name (const D_CHAR* pFieldName)
   while (pFieldName[0])
     {
       if (!(((pFieldName[0] >= 'a') && (pFieldName[0] <= 'z'))
-	    || ((pFieldName[0] >= 'A') && (pFieldName[0] <= 'Z'))
-	    || ((pFieldName[0] >= '0') && (pFieldName[0] <= '9'))
-	    || (pFieldName[0] >= '_')))
-	throw DBSException(NULL, _EXTRA (DBSException::FIELD_NAME_INVALID));
+            || ((pFieldName[0] >= 'A') && (pFieldName[0] <= 'Z'))
+            || ((pFieldName[0] >= '0') && (pFieldName[0] <= '9'))
+            || (pFieldName[0] >= '_')))
+        throw DBSException(NULL, _EXTRA (DBSException::FIELD_NAME_INVALID));
 
       ++pFieldName;
     }
@@ -119,7 +119,7 @@ validate_field_name (const D_CHAR* pFieldName)
 
 static void
 validate_field_descriptors (const DBSFieldDescriptor* const pFields,
-			    const D_UINT                    fieldsCount)
+                            const D_UINT                    fieldsCount)
 {
   assert ((fieldsCount > 0) && (pFields != NULL));
   for (D_UINT firstIt = 0; firstIt < fieldsCount; ++firstIt)
@@ -127,16 +127,16 @@ validate_field_descriptors (const DBSFieldDescriptor* const pFields,
       validate_field_name(pFields[firstIt].m_pFieldName);
 
       for (D_UINT secondIt = firstIt; secondIt < fieldsCount; ++secondIt)
-	if (firstIt == secondIt)
-	  continue;
-	else if (strcmp(pFields[firstIt].m_pFieldName, pFields[secondIt].m_pFieldName) == 0)
-	  throw DBSException (
+        if (firstIt == secondIt)
+          continue;
+        else if (strcmp(pFields[firstIt].m_pFieldName, pFields[secondIt].m_pFieldName) == 0)
+          throw DBSException (
                               pFields[firstIt].m_pFieldName,
                               _EXTRA (DBSException::FIELD_NAME_DUPLICATED));
 
       if ((pFields[firstIt].m_FieldType == T_UNKNOWN) ||
           (pFields[firstIt].m_FieldType >= T_END_OF_TYPES))
-	throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+        throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
 
       else if (pFields[firstIt].isArray && (pFields[firstIt].m_FieldType == T_TEXT))
         throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
@@ -158,8 +158,8 @@ get_next_alignment (D_INT size)
 
 static void
 arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
-		       D_UINT8* const              pOutFieldsDescription,
-		       D_UINT32&                   uOutRowSize)
+                       D_UINT8* const              pOutFieldsDescription,
+                       D_UINT32&                   uOutRowSize)
 {
 
   vector<PaddInterval> padds;
@@ -180,45 +180,45 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       D_INT foundSize          = 0;
 
       for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
-	{
-	  D_INT currIndexSize = PSValInterp::GetSize(
+        {
+          D_INT currIndexSize = PSValInterp::GetSize(
                                                       rvFields[schIndex].m_FieldType,
                                                       rvFields[schIndex].isArray);
 
-	  D_INT currReqAlign = PSValInterp::GetAlignment(
+          D_INT currReqAlign = PSValInterp::GetAlignment(
                                                          rvFields[schIndex].m_FieldType,
                                                          rvFields[schIndex].isArray);
 
-	  D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
+          D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
                                       (currReqAlign - currentAlignment) : 0;
-	  D_INT currResultedAlign = get_next_alignment (currReqPaddsCount + currIndexSize + uOutRowSize);
+          D_INT currResultedAlign = get_next_alignment (currReqPaddsCount + currIndexSize + uOutRowSize);
 
-	  //Lets check if is better than what we have found until now
-	  if (foundReqPaddsCount > currReqPaddsCount)
-	    {
-	      //New best choice!
-	      foundIndex         = schIndex;
-	      foundReqAlign      = currReqAlign;
-	      foundResultedAlign = currResultedAlign;
-	      foundReqPaddsCount = currReqPaddsCount;
-	      foundSize          = currIndexSize;
-	    }
-	  else if (foundReqPaddsCount == currReqPaddsCount)
-	    {
-	      if ((foundReqAlign < currReqAlign) ||
-	          ((foundReqAlign == currReqAlign) && (foundResultedAlign < currResultedAlign)))
-		{
-		  //New best choice!
-		  foundIndex         = schIndex;
-		  foundReqAlign      = currReqAlign;
-		  foundResultedAlign = currResultedAlign;
-		  foundReqPaddsCount = currReqPaddsCount;
-		  foundSize          = currIndexSize;
-		}
-	      else if ((foundReqAlign == currReqAlign) && (foundResultedAlign == currResultedAlign))
-	        {
-	          if (strcmp (rvFields[foundIndex].m_pFieldName, rvFields[schIndex].m_pFieldName) > 0)
-	            {
+          //Lets check if is better than what we have found until now
+          if (foundReqPaddsCount > currReqPaddsCount)
+            {
+              //New best choice!
+              foundIndex         = schIndex;
+              foundReqAlign      = currReqAlign;
+              foundResultedAlign = currResultedAlign;
+              foundReqPaddsCount = currReqPaddsCount;
+              foundSize          = currIndexSize;
+            }
+          else if (foundReqPaddsCount == currReqPaddsCount)
+            {
+              if ((foundReqAlign < currReqAlign) ||
+                  ((foundReqAlign == currReqAlign) && (foundResultedAlign < currResultedAlign)))
+                {
+                  //New best choice!
+                  foundIndex         = schIndex;
+                  foundReqAlign      = currReqAlign;
+                  foundResultedAlign = currResultedAlign;
+                  foundReqPaddsCount = currReqPaddsCount;
+                  foundSize          = currIndexSize;
+                }
+              else if ((foundReqAlign == currReqAlign) && (foundResultedAlign == currResultedAlign))
+                {
+                  if (strcmp (rvFields[foundIndex].m_pFieldName, rvFields[schIndex].m_pFieldName) > 0)
+                    {
                       //New best choice!
                       assert (foundReqAlign == currReqAlign);
                       assert (foundResultedAlign == currResultedAlign);
@@ -226,16 +226,16 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
                       assert (foundSize == currIndexSize);
 
                       foundIndex = schIndex;
-	            }
-	          else
-	            continue; //Get the next one
-		}
-	      else
-	        continue; //Get the next one
-	    }
-	  else
-	    continue; //Get the next one!
-	}
+                    }
+                  else
+                    continue; //Get the next one
+                }
+              else
+                continue; //Get the next one
+            }
+          else
+            continue; //Get the next one!
+        }
 
       //We made our choice! Let's note it.
       assert ((foundIndex >= 0) && (foundSize > 0));
@@ -248,7 +248,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       pFieldDesc[fieldIndex].m_NameOffset += sizeof(PSFieldDescriptor) * rvFields.size();
 
       strcpy(_RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
-	     _RC (const D_CHAR *, temp.m_pFieldName));
+             _RC (const D_CHAR *, temp.m_pFieldName));
 
       pFieldDesc[fieldIndex].m_Aquired         = 0;
       pFieldDesc[fieldIndex].m_IndexNodeSizeKB = 0;
@@ -257,12 +257,12 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       pFieldDesc[fieldIndex].m_TypeDesc        = temp.m_FieldType;
 
       if (temp.isArray)
-	pFieldDesc[fieldIndex].m_TypeDesc |= PS_TABLE_ARRAY_MASK;
+        pFieldDesc[fieldIndex].m_TypeDesc |= PS_TABLE_ARRAY_MASK;
 
       currentAlignment = foundResultedAlign;
 
       if (foundReqPaddsCount > 0)
-	padds.push_back(PaddInterval(uOutRowSize, foundReqPaddsCount));
+        padds.push_back(PaddInterval(uOutRowSize, foundReqPaddsCount));
 
       uOutRowSize       += foundSize + foundReqPaddsCount;
       paddingBytesCount += foundReqPaddsCount;
@@ -288,7 +288,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       pFieldDesc[fieldIndex].m_NullBitIndex = padds[0].mBegin++;
 
       if (padds[0].mBegin > padds[0].mEnd)
-	padds.erase(padds.begin());
+        padds.erase(padds.begin());
     }
 }
 
@@ -302,7 +302,7 @@ create_table_file (const string& baseFileName, const DBSFieldDescriptor* pFields
 
   //Compute the table header descriptor size
   const D_UINT32 descriptorsSize = sizeof(PSFieldDescriptor) * fieldsCount +
-				   get_strlens_till_index(pFields, fieldsCount);
+                                   get_strlens_till_index(pFields, fieldsCount);
 
   //Validate the optimally rearrange the fields for minimum row size
   D_UINT rowSize = 0;
@@ -704,10 +704,10 @@ PSTable::PSTable (DbsHandler& dbsHandler, const string& tableName) :
 
 
 PSTable::PSTable (DbsHandler&               dbsHandler,
-		  const string&             tableName,
-		  const DBSFieldDescriptor* pFields,
-		  const D_UINT              fieldsCount,
-		  const bool                temporal) :
+                  const string&             tableName,
+                  const DBSFieldDescriptor* pFields,
+                  const D_UINT              fieldsCount,
+                  const bool                temporal) :
   m_RowsCount (0),
   m_RootNode (NIL_NODE),
   m_FirstUnallocatedRoot (NIL_NODE),
@@ -805,15 +805,15 @@ PSTable::GetFieldDescriptor (const D_CHAR* const pFieldName)
   for (D_UINT index = 0; index < m_FieldsCount; ++index)
     {
       if (strcmp(_RC (const D_CHAR *, m_FieldsDescriptors.get() + iterator), pFieldName) == 0)
-	{
-	  DBSFieldDescriptor result;
+        {
+          DBSFieldDescriptor result;
 
-	  result.m_pFieldName = _RC (const D_CHAR*, pDesc) + iterator;
-	  result.isArray      = (pDesc[index].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-	  result.m_FieldType  = _SC (DBS_FIELD_TYPE, pDesc[index].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK);
+          result.m_pFieldName = _RC (const D_CHAR*, pDesc) + iterator;
+          result.isArray      = (pDesc[index].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
+          result.m_FieldType  = _SC (DBS_FIELD_TYPE, pDesc[index].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK);
 
-	  return result;
-	}
+          return result;
+        }
       iterator += strlen(_RC(const D_CHAR*, pDesc) + iterator) + 1;
     }
 
@@ -1108,7 +1108,7 @@ PSTable::GetFieldDescriptorInternal(const D_CHAR* const pFieldName) const
   for (D_UINT index = 0; index < m_FieldsCount; ++index)
     {
       if (strcmp ( _RC(const D_CHAR *, m_FieldsDescriptors.get() + iterator), pFieldName) == 0)
-	return pDesc[index];
+        return pDesc[index];
 
       iterator += strlen( _RC(const D_CHAR*, pDesc) + iterator) + 1;
     }

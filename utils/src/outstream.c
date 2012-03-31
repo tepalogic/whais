@@ -58,15 +58,15 @@ output_data (struct OutStream *pStream, const D_UINT8* pData, D_UINT dataSize)
       D_UINT8* temp;
       D_UINT   increment = dataSize + pStream->dataSize - pStream->reserved;
       if (increment > pStream->increment)
-	{
-	  /* The increment defined previously is not enough to hold the new
-	   * data. Avoid this problem in future */
-	  pStream->increment = increment;
-	}
+        {
+          /* The increment defined previously is not enough to hold the new
+           * data. Avoid this problem in future */
+          pStream->increment = increment;
+        }
 
       temp = mem_realloc (pStream->data, pStream->increment + pStream->reserved);
       if (temp == NULL)
-        return NULL;		/* not enough memory */
+        return NULL;                /* not enough memory */
 
       pStream->data     = temp;
       pStream->reserved += pStream->increment;

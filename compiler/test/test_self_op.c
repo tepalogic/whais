@@ -42,13 +42,13 @@ check_used_vals (struct ParserState *state)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR proc_decl_buffer[] =
@@ -89,10 +89,10 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
     {
       D_UINT32 index = from_le_int32 (code + 3);
       const D_UINT8 *buffer =
-	get_buffer_outstream (&state->globalStmt.spec.glb.constsArea);
+        get_buffer_outstream (&state->globalStmt.spec.glb.constsArea);
       buffer += index;
       if (strcmp ((const char *) buffer, "field") != 0)
-	return FALSE;
+        return FALSE;
     }
 
   return TRUE;
@@ -108,9 +108,9 @@ check_all_procs (struct ParserState *state)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)
-	{
-	  return FALSE;
-	}
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -139,15 +139,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing field select op usage ...");

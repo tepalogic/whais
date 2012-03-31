@@ -44,7 +44,7 @@ alloc_sem_value (struct ParserState* const pState)
       assert (result != NULL);
 
       if (result->val_type == VAL_REUSE)
-	break;			/* found something to be reused */
+        break;                        /* found something to be reused */
       iter++;
     }
    if (result == NULL || result->val_type != VAL_REUSE)
