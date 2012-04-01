@@ -71,7 +71,10 @@ my_postman (POSTMAN_BAG bag,
 
 D_CHAR test_prog_1[] = ""
   "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
-  "DO \n" "LET some_var AS DATE; \n" "RETURN some_var; \n" "ENDPROC \n";
+  "DO \n"
+  "LET some_var AS DATE; \n"
+  "RETURN some_var; \n"
+  "ENDPROC \n";
 
 D_CHAR test_prog_2[] = ""
   "PROCEDURE Proc_1() RETURN DATE \n"

@@ -129,11 +129,11 @@ static D_BOOL
 are_compatible_fields (const struct DeclaredVar* const pFirstField,
                        const struct DeclaredVar* const pSecondField)
 {
-  assert (IS_TABLE_FIELD (pFirstField->type));
-  assert (IS_TABLE_FIELD (pSecondField->type));
-
   const D_UINT firstBaseType  = GET_BASIC_TYPE (pFirstField->type);
   const D_UINT secondBaseType = GET_BASIC_TYPE (pSecondField->type);
+
+  assert (IS_TABLE_FIELD (pFirstField->type));
+  assert (IS_TABLE_FIELD (pSecondField->type));
 
   assert (firstBaseType < T_UNDETERMINED);
   assert (secondBaseType < T_UNDETERMINED);
@@ -150,9 +150,135 @@ are_compatible_fields (const struct DeclaredVar* const pFirstField,
 }
 
 static const D_CHAR*
+array_to_text (D_UINT type)
+{
+  type = GET_BASIC_TYPE (type);
+
+  assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
+
+  if (type == T_BOOL)
+    return "ARRAY OF BOOL";
+  else if (type == T_CHAR)
+    return "ARRAY OF CHARACTER";
+  else if (type == T_DATE)
+    return "ARRAY OF DATE";
+  else if (type == T_DATETIME)
+    return "ARRAY OF DATETIME";
+  else if (type == T_HIRESTIME)
+    return "ARRAY OF HIRESTIME";
+  else if (type == T_INT8)
+    return "ARRAY OF INT8";
+  else if (type == T_INT16)
+    return "ARRAY OF INT16";
+  else if (type == T_INT32)
+    return "ARRAY OF INT32";
+  else if (type == T_INT64)
+    return "ARRAY OF INT64";
+  else if (type == T_REAL)
+    return "ARRAY OF REAL";
+  else if (type == T_RICHREAL)
+    return "ARRAY OF RICHREAL";
+  else if (type == T_TEXT)
+    return "ARRAY OF TEXT";
+  else if (type == T_UINT8)
+    return "ARRAY OF UNSIGNED INT8";
+  else if (type == T_UINT16)
+    return "ARRAY OF UNSIGNED INT16";
+  else if (type == T_UINT32)
+    return "ARRAY OF UNSIGNED INT32";
+  else if (type == T_UINT64)
+    return "ARRAY OF UNSIGNED INT64";
+
+  return "ARRAY";
+}
+
+static const D_CHAR*
+field_to_text (D_UINT type)
+{
+  assert (IS_FIELD (type) == type);
+
+  type = GET_BASIC_TYPE (type);
+
+  assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
+
+  if (type == T_BOOL)
+    return "FIELD OF BOOL";
+  else if (type == T_CHAR)
+    return "FIELD OF CHARACTER";
+  else if (type == T_DATE)
+    return "FIELD OF DATE";
+  else if (type == T_DATETIME)
+    return "FIELD OF DATETIME";
+  else if (type == T_HIRESTIME)
+    return "FIELD OF HIRESTIME";
+  else if (type == T_INT8)
+    return "FIELD OF INT8";
+  else if (type == T_INT16)
+    return "FIELD OF INT16";
+  else if (type == T_INT32)
+    return "FIELD OF INT32";
+  else if (type == T_INT64)
+    return "FIELD OF INT64";
+  else if (type == T_REAL)
+    return "FIELD OF REAL";
+  else if (type == T_RICHREAL)
+    return "FIELD OF RICHREAL";
+  else if (type == T_TEXT)
+    return "FIELD OF TEXT";
+  else if (type == T_UINT8)
+    return "FIELD OF UNSIGNED INT8";
+  else if (type == T_UINT16)
+    return "FIELD OF UNSIGNED INT16";
+  else if (type == T_UINT32)
+    return "FIELD OF UNSIGNED INT32";
+  else if (type == T_UINT64)
+    return "FIELD OF UNSIGNED INT64";
+  else if (IS_ARRAY (type))
+    {
+      type = GET_BASIC_TYPE (type);
+      assert (type > T_UNKNOWN || type < T_UNDETERMINED);
+
+      if (type == T_BOOL)
+        return "FIELD OF ARRAY OF BOOL";
+      else if (type == T_CHAR)
+        return "FIELD OF ARRAY OF CHARACTER";
+      else if (type == T_DATE)
+        return "FIELD OF ARRAY OF DATE";
+      else if (type == T_DATETIME)
+        return "FIELD OF ARRAY OF DATETIME";
+      else if (type == T_HIRESTIME)
+        return "FIELD OF ARRAY OF HIRESTIME";
+      else if (type == T_INT8)
+        return "FIELD OF ARRAY OF INT8";
+      else if (type == T_INT16)
+        return "FIELD OF ARRAY OF INT16";
+      else if (type == T_INT32)
+        return "FIELD OF ARRAY OF INT32";
+      else if (type == T_INT64)
+        return "FIELD OF ARRAY OF INT64";
+      else if (type == T_REAL)
+        return "FIELD OF ARRAY OF REAL";
+      else if (type == T_RICHREAL)
+        return "FIELD OF ARRAY OF RICHREAL";
+      else if (type == T_TEXT)
+        return "FIELD OF ARRAY OF TEXT";
+      else if (type == T_UINT8)
+        return "FIELD OF ARRAY OF UNSIGNED INT8";
+      else if (type == T_UINT16)
+        return "FIELD OF ARRAY OF UNSIGNED INT16";
+      else if (type == T_UINT32)
+        return "FIELD OF ARRAY OF UNSIGNED INT32";
+      else if (type == T_UINT64)
+        return "FIELD OF ARRAY OF UNSIGNED INT64";
+    }
+
+  return "FIELD";
+}
+
+static const D_CHAR*
 type_to_text (D_UINT type)
 {
-  type &= GET_TYPE (type);
+  type = GET_TYPE (type);
 
   if (type == T_BOOL)
     return "BOOL";
@@ -186,9 +312,11 @@ type_to_text (D_UINT type)
     return "UNSIGNED INT32";
   else if (type == T_UINT64)
     return "UNSIGNED INT64";
-  else if (type & T_ARRAY_MASK)
-    return "ARRAY";
-  else if (type & T_TABLE_MASK)
+  else if (IS_FIELD (type))
+    return field_to_text (type);
+  else if (IS_ARRAY (type))
+    return array_to_text (type);
+  else if (IS_TABLE (type))
     return "TABLE";
 
   assert (0);
@@ -1088,6 +1216,12 @@ translate_exp_store (struct ParserState* const         pState,
 
           opcode = W_STTA;
         }
+      else if (IS_FIELD (ftype) && IS_FIELD (stype))
+        {
+          if ((GET_FIELD_TYPE (ftype) == T_UNDETERMINED) ||
+              (GET_FIELD_TYPE (ftype) == GET_FIELD_TYPE (stype)))
+            opcode = W_STF;
+        }
       else if (IS_ARRAY (ftype) && IS_ARRAY (stype))
         {
           const D_UINT temp_ftype = GET_BASIC_TYPE (ftype);
@@ -1110,7 +1244,7 @@ translate_exp_store (struct ParserState* const         pState,
         opcode = store_op[ftype][ftype];
       else if (IS_TABLE (ftype))
         opcode = W_STTA;
-      else if (IS_ARRAY (T_ARRAY_MASK))
+      else if (IS_ARRAY (ftype))
         opcode = W_STA;
     }
 
@@ -1146,7 +1280,8 @@ translate_exp_index (struct ParserState* const         pState,
   enum W_OPCODE           opcode      = W_NA;
   struct ExpResultType    result;
 
-  if ((IS_ARRAY (ftype) == FALSE) &&
+  if ((IS_FIELD (ftype) == FALSE) &&
+      (IS_ARRAY (ftype) == FALSE) &&
       ((ftype != T_TEXT)))
     {
       w_log_msg (pState,
@@ -1164,6 +1299,16 @@ translate_exp_index (struct ParserState* const         pState,
                  MSG_INDEX_ENI,
                  type_to_text (stype));
       return gResultUnk;
+    }
+  else if (IS_FIELD (ftype))
+    {
+      assert (firstType->extra == NULL);
+
+      opcode      = W_INDF;
+      result.type = GET_FIELD_TYPE (ftype);
+
+      assert (IS_ARRAY (result.type) ||
+              ((result.type < T_UNDETERMINED) && (result.type > T_UNKNOWN)));
     }
   else if (IS_ARRAY (ftype))
     {
@@ -1590,7 +1735,8 @@ translate_exp_call (struct ParserState* const   pState,
   pExpArg = callExp->pSecondOp;
   while (pExpArg != NULL)
     {
-      struct SemValue* const pParam = pExpArg->val.u_args.expr;
+      struct SemValue* const pParam   = pExpArg->val.u_args.expr;
+      struct SemValue*       pTempSem = NULL;
       struct ExpResultType   argType;
 
       assert (pExpArg->val_type == VAL_PRC_ARG_LINK);
@@ -1698,9 +1844,8 @@ translate_exp_call (struct ParserState* const   pState,
             }
         }
 
-      struct SemValue* const pTempSem = pExpArg;
-
-      pExpArg = pExpArg->val.u_args.next;
+      pTempSem = pExpArg;
+      pExpArg  = pExpArg->val.u_args.next;
 
       free_sem_value (pTempSem);
     }
@@ -1742,9 +1887,9 @@ translate_exp_call (struct ParserState* const   pState,
 }
 
 static struct ExpResultType
-translate_exp_field (struct ParserState* const   pState,
-                     struct Statement* const     pStmt,
-                     struct SemExpression* const pCallExp)
+translate_exp_tabval (struct ParserState* const   pState,
+                      struct Statement* const     pStmt,
+                      struct SemExpression* const pCallExp)
 {
   const struct DeclaredVar*   pVarField  = NULL;
   struct OutStream* const     pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
@@ -1754,7 +1899,7 @@ translate_exp_field (struct ParserState* const   pState,
   struct ExpResultType        tableType;
   struct ExpResultType        expType;
 
-  assert (pCallExp->opcode == OP_FIELD);
+  assert (pCallExp->opcode == OP_TABVAL);
   assert (pCallExp->pFirstOp->val_type == VAL_EXP_LINK);
   assert (pCallExp->pSecondOp->val_type == VAL_EXP_LINK);
   assert (pCallExp->pThirdOp->val_type == VAL_ID);
@@ -1797,7 +1942,7 @@ translate_exp_field (struct ParserState* const   pState,
       return gResultUnk;
     }
 
-  if ((w_opcode_encode (pInstrs, W_SELF) == NULL) ||
+  if ((w_opcode_encode (pInstrs, W_INDTA) == NULL) ||
       (output_data (pInstrs, (const D_UINT8*)pId->text, pId->length) == NULL) ||
       (output_uint8 (pInstrs, 0) == NULL))
     {
@@ -1809,6 +1954,64 @@ translate_exp_field (struct ParserState* const   pState,
   expType.type  = GET_TYPE (pVarField->type);
 
   MARK_L_VALUE (expType.type);
+
+  return expType;
+}
+
+static struct ExpResultType
+translate_exp_field (struct ParserState* const   pState,
+                     struct Statement* const     pStmt,
+                     struct SemExpression* const pCallExp)
+{
+  const struct DeclaredVar*   pVarField  = NULL;
+  struct OutStream* const     pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
+  struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
+  struct SemId* const         pId        = &pCallExp->pSecondOp->val.u_id;
+  struct ExpResultType        tableType;
+  struct ExpResultType        expType;
+
+  assert (pCallExp->opcode == OP_TABVAL);
+  assert (pCallExp->pFirstOp->val_type == VAL_EXP_LINK);
+  assert (pCallExp->pSecondOp->val_type == VAL_ID);
+
+  tableType = translate_exp_tree (pState, pStmt, pFirstExp);
+  if (IS_TABLE (tableType.type) == FALSE)
+    {
+      w_log_msg (pState,
+                pState->bufferPos,
+                MSG_MEMSEL_NA,
+                type_to_text (tableType.type));
+
+      pState->abortError = TRUE;
+      return gResultUnk;
+    }
+
+  if (tableType.extra != NULL)
+    pVarField = find_field (pId->text, pId->length, tableType.extra);
+
+  if (pVarField == NULL)
+    {
+      D_CHAR temp[128];
+
+      copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
+      w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_ERD, temp);
+
+      pState->abortError = TRUE;
+      return gResultUnk;
+    }
+
+  if ((w_opcode_encode (pInstrs, W_SELF) == NULL) ||
+      (output_data (pInstrs, (const D_UINT8*)pId->text, pId->length) == NULL) ||
+      (output_uint8 (pInstrs, 0) == NULL))
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  expType.extra = NULL;
+  expType.type  = GET_TYPE (pVarField->type);
+
+  MARK_FIELD (expType.type);
 
   return expType;
 }
@@ -1831,6 +2034,8 @@ translate_exp_tree (struct ParserState* const   pState,
     return translate_exp_leaf (pState, pStmt, pTreeHead->pFirstOp);
   else if (pTreeHead->opcode == OP_CALL)
     return translate_exp_call (pState, pStmt, pTreeHead);
+  else if (pTreeHead->opcode == OP_TABVAL)
+    return translate_exp_tabval (pState, pStmt, pTreeHead);
   else if (pTreeHead->opcode == OP_FIELD)
     return translate_exp_field (pState, pStmt, pTreeHead);
 

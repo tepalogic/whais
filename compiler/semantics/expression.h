@@ -59,9 +59,9 @@ enum EXP_OPERATION
 
   OP_GROUP,     /* (...) */
   OP_INDEX,     /* [...] */
-  OP_FIELD,     /* table */
+  OP_TABVAL,
+  OP_FIELD,
   OP_ATTR,
-  OP_C_ATTR,    /* { ... } */
   OP_CALL,
 
   OP_MAX

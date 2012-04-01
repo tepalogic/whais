@@ -66,7 +66,7 @@ create_type_spec (struct ParserState* pState, D_UINT16 type)
   return result;
 }
 
-D_BOOL
+static D_BOOL
 process_table_decls (struct ParserState* pState,
                      struct DeclaredVar* pVar,
                      void*               pExtra)
@@ -76,6 +76,33 @@ process_table_decls (struct ParserState* pState,
   assert (IS_TABLE (pVar->type));
 
   pVar->extra = (struct DeclaredVar*) pExtra;
+
+  return result;
+}
+
+static D_BOOL
+process_field_decls (struct ParserState* pState,
+                     struct DeclaredVar* pVar)
+{
+  D_BOOL result = TRUE;
+
+  assert (IS_FIELD (pVar->type));
+
+  if (IS_ARRAY (GET_FIELD_TYPE (pVar->type)))
+    {
+      assert ((GET_BASIC_TYPE (pVar->type) > T_UNKNOWN) &&
+              (GET_BASIC_TYPE (pVar->type) <= T_UNDETERMINED));
+
+      if (GET_BASIC_TYPE (pVar->type) == T_UNDETERMINED)
+        {
+          D_CHAR tname[128];
+
+          copy_text_truncate (tname, pVar->label, sizeof tname, pVar->labelLength);
+          w_log_msg (pState, pState->bufferPos, MSG_FIELD_INV_ARRAY, tname);
+
+          result = FALSE;
+        }
+    }
 
   return result;
 }
@@ -122,10 +149,15 @@ install_declaration (struct ParserState* pState,
       var.extra       = NULL;
       var.offset      = 0;
 
-      if ((var.type & T_TABLE_MASK) &&
+      if (IS_TABLE (var.type) &&
           (process_table_decls (pState, &var, pType->val.u_tspec.extra) == FALSE))
         {
           result = NULL;        /* something went wrong along the way */
+        }
+      else if (IS_FIELD (var.type) &&
+          (process_field_decls(pState, &var) == FALSE))
+        {
+          result = NULL; /* something went wrong along the way */
         }
       else if ((result = stmt_add_declaration (stmt, &var, parameter)) == NULL)
         {
@@ -133,7 +165,7 @@ install_declaration (struct ParserState* pState,
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
           pState->abortError = TRUE;
         }
-      else if (var.type & T_TABLE_MASK )
+      else if (IS_TABLE (var.type))
         {
           /* Set a sentinel for the extra field. */
           struct DeclaredVar *it = result->extra;
@@ -232,7 +264,7 @@ install_field_declaration (struct ParserState*       pState,
   /* check for fields with the same name */
   while (pIt != NULL)
     {
-      assert ((pIt->type & T_TABLE_FIELD_MASK) != 0);
+      assert (IS_TABLE_FIELD (pIt->type) != 0);
       if ((pIt->labelLength == pSemId->length) &&
           (strncmp (pIt->label, pSemId->text, pIt->labelLength) == 0))
         {

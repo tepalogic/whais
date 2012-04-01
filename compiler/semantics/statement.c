@@ -346,8 +346,8 @@ find_type_spec (const D_UINT8*         pTypeBuffer,
 }
 
 D_BOOL
-type_spec_cmp (const struct TypeSpec* pSpec_1,
-               const struct TypeSpec* pSpec_2)
+type_spec_cmp (const struct TypeSpec* const pSpec_1,
+               const struct TypeSpec* const pSpec_2)
 {
   return (pSpec_1->type == pSpec_2->type) &&
          (pSpec_1->dataSize == pSpec_2->dataSize) &&

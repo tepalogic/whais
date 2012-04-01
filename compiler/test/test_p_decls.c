@@ -55,14 +55,15 @@ check_container_field (struct DeclaredVar *extra, D_CHAR * field,
   unsigned int f_len = strlen (field);
   while (extra != NULL)
     {
-      if ((extra->type | T_TABLE_FIELD_MASK) == 0)
+      if (IS_TABLE_FIELD (extra->type) == FALSE)
         {
           break;
         }
       if ((extra->labelLength == f_len) &&
           (strncmp (field, extra->label, f_len) == 0))
         {
-          if (extra->type == (type | T_TABLE_FIELD_MASK))
+          if ((GET_FIELD_TYPE (extra->type) == type) &&
+              IS_TABLE_FIELD (extra->type))
             {
               result = TRUE;
             }
@@ -125,7 +126,7 @@ general_proc_check (struct Statement *glb_stmt,
   while (count < get_array_count (&(proc_stmt->decls)))
     {
       struct DeclaredVar *var = get_item (&(proc_stmt->decls), count);
-      if ((var->type & T_TABLE_FIELD_MASK) == 0)
+      if (IS_TABLE_FIELD (var->type) == FALSE)
         {
           nlocals++;
         }
@@ -147,6 +148,7 @@ check_procs_decl (struct ParserState *state)
   struct Statement *proc = NULL;
   struct DeclaredVar *tmp_var = NULL;
   struct DeclaredVar *tmp_table = NULL;
+  D_UINT type = T_INT16;
 
   if ((glb_stmt->pParentStmt != NULL) || (glb_stmt->type != STMT_GLOBAL))
     {
@@ -196,7 +198,9 @@ check_procs_decl (struct ParserState *state)
       /* return type not properly encoded */
       return FALSE;
     }
-  if ((tmp_var->type != (T_ARRAY_MASK | T_TEXT)) || (tmp_var->extra != NULL))
+  if ((GET_BASIC_TYPE (tmp_var->type) != T_TEXT) ||
+      (IS_ARRAY (tmp_var->type) == FALSE) ||
+      (tmp_var->extra != NULL))
     {
       return FALSE;
     }
@@ -244,7 +248,9 @@ check_procs_decl (struct ParserState *state)
       /* return type not properly encoded */
       return FALSE;
     }
-  if ((tmp_var->type != (T_TABLE_MASK)) || (tmp_var->extra == NULL))
+  if ((IS_TABLE (tmp_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (tmp_var->type) != 0) ||
+      (tmp_var->extra == NULL))
     {
       return FALSE;
     }
@@ -273,7 +279,8 @@ check_procs_decl (struct ParserState *state)
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) ||
-      (tmp_var->type != (T_ARRAY_MASK | T_UNDETERMINED)))
+      (GET_BASIC_TYPE (tmp_var->type) != T_UNDETERMINED) ||
+      (IS_ARRAY (tmp_var->type) == FALSE))
     {
       return FALSE;
     }
@@ -282,14 +289,14 @@ check_procs_decl (struct ParserState *state)
   tmp_table = tmp_var;
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var4", tmp_var->labelLength) != 0) ||
-      (tmp_var->type != T_TABLE_MASK))
+      (IS_TABLE (tmp_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (tmp_var->type) != 0))
     {
       return FALSE;
     }
   if (!(check_container_field (tmp_var->extra, "f1", T_REAL) &&
         check_container_field (tmp_var->extra, "f2", T_UINT32) &&
-        check_container_field (tmp_var->extra, "f3",
-                               (T_ARRAY_MASK | T_INT16))))
+        check_container_field (tmp_var->extra, "f3", MARK_ARRAY (type))))
     {
       return FALSE;
     }

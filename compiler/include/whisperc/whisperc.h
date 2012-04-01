@@ -38,7 +38,7 @@ typedef enum DBS_FIELD_TYPE VARTYPES;
 
 #define T_L_VALUE             0x1000        /* Mask applied to suggest if this is a genuine l-value */
 
-#define IS_ARRAY(type)          (((type) & T_ARRAY_MASK) != 0)
+#define IS_ARRAY(type)          ((((type) & (T_FIELD_MASK | T_ARRAY_MASK)) == T_ARRAY_MASK))
 #define IS_FIELD(type)          (((type) & T_FIELD_MASK) != 0)
 #define IS_TABLE(type)          (((type) & T_TABLE_MASK) != 0)
 #define IS_TABLE_FIELD(type)    (((type) & T_TABLE_FIELD_MASK) != 0)
@@ -51,8 +51,8 @@ typedef enum DBS_FIELD_TYPE VARTYPES;
 #define MARK_L_VALUE(type)      ((type) |= T_L_VALUE)
 
 #define GET_TYPE(type)          ((type) & ~(T_L_VALUE | T_TABLE_FIELD_MASK))
+#define GET_FIELD_TYPE(type)    ((type) & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD_MASK))
 #define GET_BASIC_TYPE(type)    ((type) & 0xFF)
-#define GET_FIELD_TYPE(type)    ((type) & ~T_TABLE_FIELD_MASK)
 
 
 typedef const void* WHC_HANDLER;

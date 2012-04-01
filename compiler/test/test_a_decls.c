@@ -90,6 +90,7 @@ check_vars_decl (struct ParserState *state)
   struct DeclaredVar *decl_var = NULL;
   D_UINT count;
   D_UINT temp_pos;
+  D_UINT type;
 
   if (state->globalStmt.type != STMT_GLOBAL ||
       state->globalStmt.pParentStmt != NULL)
@@ -105,52 +106,52 @@ check_vars_decl (struct ParserState *state)
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar01_", 7, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_INT32 | T_ARRAY_MASK)))
+  type     = T_INT32;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar02_", 7, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_REAL | T_ARRAY_MASK)))
+  type     = T_REAL;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
   temp_pos = decl_var->typeSpecOff;
 
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar03", 6, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_UNDETERMINED | T_ARRAY_MASK)))
+  type     = T_UNDETERMINED;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar04", 6, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_TEXT | T_ARRAY_MASK)))
+  type     = T_TEXT;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY ((type))))
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "__array__", 9, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_UNDETERMINED | T_ARRAY_MASK)))
+  type     = T_UNDETERMINED;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "__array_2_", 10, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_TEXT | T_ARRAY_MASK)))
+  type     = T_TEXT;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar031", 7, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->globalStmt, decl_var, (T_REAL | T_ARRAY_MASK))
-      || temp_pos != decl_var->typeSpecOff)
+  type     = T_REAL;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)) ||
+      (temp_pos != decl_var->typeSpecOff))
     {
       return FALSE;
     }

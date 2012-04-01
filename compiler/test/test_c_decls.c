@@ -69,13 +69,9 @@ check_type_spec_fill (const struct TypeSpec *ts,
   if (fname == NULL)
     {
       if (ts->dataSize != 2)
-        {
-          return FALSE;
-        }
+        return FALSE;
       else
-        {
-          return TRUE;
-        }
+        return TRUE;
     }
 
   while (count < (ts->dataSize - 2))
@@ -115,14 +111,15 @@ check_container_field (struct Statement *stmt,
   while (extra != NULL)
     {
       result = FALSE;                /* changed to TRUE if everything is good */
-      if ((extra->type & T_TABLE_FIELD_MASK) == 0)
+      if (IS_TABLE_FIELD (extra->type) == FALSE)
         {
           break;
         }
       if ((extra->labelLength == f_len) &&
           (strncmp (field, extra->label, f_len) == 0))
         {
-          if (extra->type == (type | T_TABLE_FIELD_MASK))
+          if ( (GET_FIELD_TYPE (extra->type) == type) &&
+               IS_TABLE_FIELD (extra->type))
             {
               result = TRUE;
             }
@@ -159,14 +156,18 @@ check_vars_decl (struct ParserState *state)
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "vTable", 6, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
+  if (decl_var == NULL ||
+      (IS_TABLE (decl_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != 0) ||
       decl_var->extra != decl_var)
     {
       return FALSE;
     }
 
   decl_var = stmt_find_declaration (&state->globalStmt, "vTable2", 7, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
+  if (decl_var == NULL ||
+      (IS_TABLE (decl_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != 0) ||
       decl_var->extra == decl_var)
     {
       return FALSE;
@@ -174,7 +175,9 @@ check_vars_decl (struct ParserState *state)
   table_1 = decl_var;
 
   decl_var = stmt_find_declaration (&state->globalStmt, "vTable3", 7, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
+  if (decl_var == NULL ||
+      (IS_TABLE (decl_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != 0) ||
       (decl_var->extra != table_1->extra) ||
       (decl_var->typeSpecOff != table_1->typeSpecOff))
     {

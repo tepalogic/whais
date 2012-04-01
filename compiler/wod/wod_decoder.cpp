@@ -344,8 +344,8 @@ const FDECODE_OPCODE wod_dec_w_stui8  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stui16 = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stui32 = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stui64 = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stro   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stta   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_stf    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sta    = wod_dec_w_ldnull;
 
 static D_UINT
@@ -457,13 +457,23 @@ const FDECODE_OPCODE wod_dec_w_jmp = wod_dec_w_jf;
 
 const FDECODE_OPCODE wod_dec_w_indt = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_inda = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_indr = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_self = wod_dec_w_ldt;
+const FDECODE_OPCODE wod_dec_w_indf = wod_dec_w_ldnull;
+
+static D_UINT
+wod_dec_w_indta (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+{
+  strcpy (pOp1 + MAX_OP_STRING - 5, "...");
+  strncpy (pOp1, _RC(const D_CHAR*, pInArgs), MAX_OP_STRING - 5);
+  pOp2[0] = 0;
+
+  return strlen (_RC(const D_CHAR*, pInArgs));
+}
+const FDECODE_OPCODE wod_dec_w_self = wod_dec_w_indta;
 
 static D_UINT
 wod_dec_w_bsync (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  D_CHAR t_str[MAX_OP_STRING];
 
   const D_UINT8 value = pInArgs[0];
 
@@ -516,8 +526,8 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_stui16,
   wod_dec_w_stui32,
   wod_dec_w_stui64,
-  wod_dec_w_stro,
   wod_dec_w_stta,
+  wod_dec_w_stf,
   wod_dec_w_sta,
 
   wod_dec_w_call,
@@ -621,7 +631,8 @@ FDECODE_OPCODE wod_decode_table[] = {
 
   wod_dec_w_indt,
   wod_dec_w_inda,
-  wod_dec_w_indr,
+  wod_dec_w_indf,
+  wod_dec_w_indta,
   wod_dec_w_self,
 
   wod_dec_w_bsync,
@@ -668,8 +679,8 @@ const D_CHAR *wod_str_table[] = {
   "stui16",
   "stui32",
   "stui64",
-  "stro",
   "stta",
+  "stf"
   "sta",
 
   "call",
@@ -773,7 +784,8 @@ const D_CHAR *wod_str_table[] = {
 
   "indt",
   "inda",
-  "indr",
+  "indf",
+  "indta"
   "self",
 
   "bsync",

@@ -263,6 +263,7 @@ static TOKEN_SEMANTIC keywords[] = {
                                       {"ENDSYNC", ENDSYNC},
                                       {"EXTERN", EXTERN},
                                       {"FALSE", W_FALSE},
+                                      {"FIELD", FIELD},
                                       {"FOREACH", FOREACH},
                                       {"HIRESTIME", HIRESTIME},
                                       {"IF", IF},

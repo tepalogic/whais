@@ -38,6 +38,7 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token ENDPROC
 %token ENDSYNC
 %token EXTERN
+%token FIELD
 %token FOREACH
 %token HIRESTIME
 %token IF
@@ -83,7 +84,7 @@ void yyerror(struct ParserState *state,  const char *msg);
 %right NOT
 %right INC DEC
 
-%left  '[' ']'
+%left  '[' ']' '.'
 %left  '(' ')'
 
 
@@ -125,6 +126,8 @@ type_spec: basic_type_spec
 			{ $$ = $1; }
          | array_type_spec
          	{ $$ = $1; }
+         | field_type_spec
+            { $$ = $1; } 
          | table_type_spec
          	{ $$ = $1; }
 ;
@@ -166,7 +169,7 @@ basic_type_spec: BOOL
 ;
 
 array_type_spec: ARRAY array_of_clause
-            		{	$$ = $2; ($$)->val.u_tspec.type |= T_ARRAY_MASK; }
+            		{	$$ = $2; MARK_ARRAY (($$)->val.u_tspec.type); }
 ;
 
 array_of_clause: /* empty */
@@ -177,9 +180,23 @@ array_of_clause: /* empty */
                		{ $$ = $2; }
 ;
 
+field_type_spec: FIELD field_of_clause
+                    {   $$ = $2; MARK_FIELD (($$)->val.u_tspec.type); }
+;
+
+field_of_clause: /* empty */
+                    { $$ = create_type_spec(state, T_UNDETERMINED); 
+                      CHK_SEM_ERROR;
+                    }
+               | OF basic_type_spec
+                    { $$ = $2; }
+               | OF array_type_spec
+                    { $$ = $2; }
+;
+
 
 table_type_spec: TABLE cont_clause
-				 { $2->val.u_tspec.type = T_TABLE_MASK; $$ = $2 };
+				 { MARK_TABLE ($2->val.u_tspec.type); $$ = $2 };
 ;
 
 cont_clause: /* empty */
@@ -411,17 +428,17 @@ exp : const_exp
         }
     | exp '[' exp ',' IDENTIFIER ']'
         {
-            $$ = create_exp_link(state, $1, $3, $5, OP_FIELD); 
+            $$ = create_exp_link(state, $1, $3, $5, OP_TABVAL); 
+            CHK_SEM_ERROR;
+        }
+    | exp '.' IDENTIFIER
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_FIELD);
             CHK_SEM_ERROR;
         }
     | exp '=' exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_ATTR);
-            CHK_SEM_ERROR;
-        }
-    | exp '=' '{' parameters_list '}'
-        {
-            $$ = create_exp_link(state, $1, $3, NULL, OP_C_ATTR);
             CHK_SEM_ERROR;
         }
     | IDENTIFIER '(' parameters_list ')'

@@ -48,13 +48,14 @@ struct MsgCodeEntry
 #define MSG_INT_ERR (MSG_NO_MEM + 1)
 
 /* declaration related errors, base 250 */
-#define DCLS_MSGS        250
-#define MSG_VAR_DEFINED  DCLS_MSGS
-#define MSG_VAR_NFOUND   (MSG_VAR_DEFINED + 1)
-#define MSG_NOT_TABLE    (MSG_VAR_NFOUND + 1)
-#define MSG_SAME_FIELD   (MSG_NOT_TABLE + 1)
-#define MSG_PROC_ADECL   (MSG_SAME_FIELD + 1)
-#define MSG_COMPILER_ERR (MSG_PROC_ADECL + 1)
+#define DCLS_MSGS               250
+#define MSG_VAR_DEFINED         DCLS_MSGS
+#define MSG_VAR_NFOUND          (MSG_VAR_DEFINED + 1)
+#define MSG_NOT_TABLE           (MSG_VAR_NFOUND + 1)
+#define MSG_SAME_FIELD          (MSG_NOT_TABLE + 1)
+#define MSG_FIELD_INV_ARRAY     (MSG_SAME_FIELD + 1)
+#define MSG_PROC_ADECL          (MSG_FIELD_INV_ARRAY + 1)
+#define MSG_COMPILER_ERR        (MSG_PROC_ADECL + 1)
 
 /* expression semantic related errors, base 500 */
 #define EXPS_MSGS               500

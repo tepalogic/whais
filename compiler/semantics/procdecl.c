@@ -67,11 +67,11 @@ find_proc_decl(struct ParserState* pState,
 
 YYSTYPE add_prcdcl_list(YYSTYPE pList, YYSTYPE pIdentifier, YYSTYPE pType)
 {
+  struct SemTypeSpec typeDesc = pType->val.u_tspec;
+
   assert(pList == NULL || pList->val_type == VAL_PRCDCL_LIST);
   assert(pIdentifier->val_type == VAL_ID);
   assert(pType->val_type == VAL_TYPE_SPEC);
-
-  struct SemTypeSpec typeDesc = pType->val.u_tspec;
 
   /* reconvert s_type to a VAL_PRCDCL_LIST */
   pType->val_type         = VAL_PRCDCL_LIST;
@@ -190,7 +190,7 @@ set_proc_rettype(struct ParserState* const pState, struct SemValue* const pType)
         {
           while (pVarIt->extra != NULL)
             {
-              assert(pVarIt->type & T_TABLE_FIELD_MASK);
+              assert(IS_TABLE_FIELD (pVarIt->type));
               pVarIt = pVarIt->extra;
             }
           pVarIt->extra = pRetVar;

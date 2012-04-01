@@ -67,7 +67,7 @@ my_postman (POSTMAN_BAG bag,
 D_CHAR test_prog_1[] = ""
   "PROCEDURE Proc_1 (v1 AS BOOL) RETURN BOOL\n "
   "DO\n "
-  "LET table_1 AS TABLE OF (field AS UNSIGNED INT64, field AS DATE);\n "
+  "LET table_1 AS TABLE OF (field_t AS UNSIGNED INT64, field_t AS DATE);\n "
   "RETURN v1;\n "
   "ENDPROC\n ";
 

@@ -324,8 +324,8 @@ wod_dump_code (const D_UINT8* pCode,
           rOutputStream << "\t";
         }
 
-      D_CHAR        operand1[24];
-      D_CHAR        operand2[24];
+      D_CHAR        operand1[MAX_OP_STRING];
+      D_CHAR        operand2[MAX_OP_STRING];
       enum W_OPCODE opcode     = W_NA;
       D_UINT        instr_size = whc_decode_opcode (pCode, &opcode);
 

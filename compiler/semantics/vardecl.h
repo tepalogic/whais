@@ -89,9 +89,5 @@ install_field_declaration (struct ParserState*       pState,
                            YYSTYPE                   pVar,
                            YYSTYPE                   pType,
                            struct DeclaredVar* const pExtra);
-D_BOOL
-process_table_decls (struct ParserState*     pState,
-                         struct DeclaredVar* pVar,
-                         void*               extra);
 
 #endif /* VARDECL_H */

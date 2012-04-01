@@ -70,6 +70,7 @@ enum W_OPCODE
   W_STUI32,
   W_STUI64,
   W_STTA,
+  W_STF,
   W_STA,
 
   W_CALL,
@@ -173,6 +174,8 @@ enum W_OPCODE
 
   W_INDT,
   W_INDA,
+  W_INDF,
+  W_INDTA,
   W_SELF,
 
   W_BSYNC,

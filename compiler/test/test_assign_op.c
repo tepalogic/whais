@@ -50,8 +50,8 @@ check_used_vals (struct ParserState *state)
 }
 
 D_CHAR proc_decl_buffer[] =
-  "LET tab_glb AS TABLE OF ( field AS DATE); "
-  "LET tab_glb2 AS TABLE OF ( field2 AS TEXT, field AS DATE); "
+  "LET tab_glb AS TABLE OF ( field_t AS DATE); "
+  "LET tab_glb2 AS TABLE OF ( field2 AS TEXT, field_t AS DATE); "
   "PROCEDURE ProcId1 (v1 AS CHARACTER, v2 AS CHARACTER) RETURN CHARACTER "
   "DO "
   "RETURN v1 = v2; "
@@ -202,7 +202,7 @@ D_CHAR proc_decl_buffer[] =
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId31 (v1 AS TABLE OF (field AS DATE, f2 AS TEXT), v2 AS TABLE OF (field as DATE, f3 AS REAL)) RETURN TABLE "
+  "PROCEDURE ProcId31 (v1 AS TABLE OF (field_t AS DATE, f2 AS TEXT), v2 AS TABLE OF (field_t as DATE, f3 AS REAL)) RETURN TABLE "
   "DO "
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
@@ -272,11 +272,11 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
       op_expect = W_STT;
       break;
     default:
-      if ((v1->type & T_TABLE_MASK) != 0)
+      if (IS_TABLE (v1->type))
         {
           op_expect = W_STTA;
         }
-      else if ((v1->type & T_ARRAY_MASK) != 0)
+      else if (IS_ARRAY (v1->type))
         {
           op_expect = W_STA;
         }
