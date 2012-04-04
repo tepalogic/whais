@@ -152,6 +152,7 @@ are_compatible_fields (const struct DeclaredVar* const pFirstField,
 static const D_CHAR*
 array_to_text (D_UINT type)
 {
+  assert (IS_ARRAY (type));
   type = GET_BASIC_TYPE (type);
 
   assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
@@ -195,7 +196,7 @@ array_to_text (D_UINT type)
 static const D_CHAR*
 field_to_text (D_UINT type)
 {
-  assert (IS_FIELD (type) == type);
+  assert (IS_FIELD (type));
 
   type = GET_BASIC_TYPE (type);
 
@@ -1197,6 +1198,7 @@ translate_exp_store (struct ParserState* const         pState,
   const D_UINT            ftype       = GET_TYPE (firstType->type);
   const D_UINT            stype       = GET_TYPE (secondType->type);
   enum W_OPCODE           opcode      = W_NA;
+  struct ExpResultType    result;
 
   if (IS_L_VALUE (firstType->type) == FALSE)
     {
@@ -1230,11 +1232,8 @@ translate_exp_store (struct ParserState* const         pState,
           assert (temp_ftype <= T_UNDETERMINED);
           assert (temp_stype <= T_UNDETERMINED);
 
-          if ((temp_ftype == T_UNDETERMINED) ||
-              (W_NA != store_op[temp_ftype][temp_stype]))
-            {
-              opcode = W_STA;
-            }
+          if ((temp_ftype == T_UNDETERMINED) || (temp_ftype == temp_stype))
+            opcode = W_STA;
         }
     }
   else
@@ -1265,7 +1264,10 @@ translate_exp_store (struct ParserState* const         pState,
       return gResultUnk;
     }
 
-  return *firstType;
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  return result;
 }
 
 static struct ExpResultType
@@ -1288,7 +1290,7 @@ translate_exp_index (struct ParserState* const         pState,
                  pState->bufferPos,
                  MSG_INDEX_EAT,
                  type_to_text (ftype));
-
+      pState->abortError = TRUE;
       return gResultUnk;
     }
 
@@ -1298,6 +1300,7 @@ translate_exp_index (struct ParserState* const         pState,
                  pState->bufferPos,
                  MSG_INDEX_ENI,
                  type_to_text (stype));
+      pState->abortError = TRUE;
       return gResultUnk;
     }
   else if (IS_FIELD (ftype))
@@ -1337,6 +1340,7 @@ translate_exp_index (struct ParserState* const         pState,
   if (w_opcode_encode (pCodeStream, opcode) == NULL)
     {
       w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      pState->abortError = TRUE;
       return gResultUnk;
     }
 
@@ -1776,7 +1780,8 @@ translate_exp_call (struct ParserState* const   pState,
                      MSG_PROC_ARG_COUNT,
                      copy_text_truncate (temp, pProc->spec.proc.name,
                                          sizeof temp,
-                                         pProc->spec.proc.nameLength), argCount);
+                                         pProc->spec.proc.nameLength),
+                                         argCount);
           return gResultUnk;
         }
       else
@@ -1784,21 +1789,24 @@ translate_exp_call (struct ParserState* const   pState,
 
       if (result.type != T_UNDETERMINED)
         {
-          if (IS_TABLE (result.type) == FALSE)
+          if (IS_FIELD (result.type))
             {
-              const D_UINT        arg_t  = GET_BASIC_TYPE (argType.type);
-              const D_UINT        res_t  = GET_BASIC_TYPE (result.type);
-              const enum W_OPCODE tempOp = store_op[arg_t][res_t];
+              const D_BOOL isArgArray = IS_ARRAY (GET_FIELD_TYPE (argType.type));
+              const D_BOOL isArgUndet = isArgArray ?
+                                          FALSE :
+                                          (GET_BASIC_TYPE (argType.type) == T_UNDETERMINED);
 
-              assert (arg_t <= T_UNDETERMINED);
-              assert (res_t <= T_UNDETERMINED);
+              assert ((isArgArray == FALSE) || (isArgUndet == FALSE));
 
-              if (IS_ARRAY (result.type) != IS_ARRAY (argType.type))
+              if ((IS_FIELD (argType.type) == FALSE) ||
+                  ((GET_FIELD_TYPE (result.type) != GET_FIELD_TYPE (argType.type)) &&
+                    (isArgUndet == FALSE)))
                 {
                   w_log_msg (pState,
                              pState->bufferPos,
                              MSG_PROC_ARG_NA,
-                             copy_text_truncate (temp, pProc->spec.proc.name,
+                             copy_text_truncate (temp,
+                                                 pProc->spec.proc.name,
                                                  sizeof temp,
                                                  pProc->spec.proc.nameLength),
                              argCount,
@@ -1808,10 +1816,20 @@ translate_exp_call (struct ParserState* const   pState,
                   pState->abortError = TRUE;
                   return gResultUnk;
                 }
-              else if (W_NA == tempOp)
+            }
+          else if (IS_TABLE (result.type) == FALSE)
+            {
+              if (IS_ARRAY (result.type) == IS_ARRAY (argType.type))
                 {
-                  if ( (IS_ARRAY (argType.type) == FALSE) ||
-                       (GET_BASIC_TYPE (argType.type) != T_UNDETERMINED))
+                  const D_UINT        arg_t  = GET_BASIC_TYPE (argType.type);
+                  const D_UINT        res_t  = GET_BASIC_TYPE (result.type);
+                  const enum W_OPCODE tempOp = store_op[arg_t][res_t];
+
+                  assert (arg_t <= T_UNDETERMINED);
+                  assert (res_t <= T_UNDETERMINED);
+
+                  if (((IS_ARRAY (result.type) == FALSE) && (W_NA == tempOp)) ||
+                     (IS_ARRAY (result.type) && (arg_t != T_UNDETERMINED) && (arg_t != res_t)))
                     {
                       w_log_msg (pState,
                                  pState->bufferPos,
@@ -1826,6 +1844,21 @@ translate_exp_call (struct ParserState* const   pState,
 
                       return gResultUnk;
                     }
+                }
+              else
+                {
+                  w_log_msg (pState,
+                             pState->bufferPos,
+                             MSG_PROC_ARG_NA,
+                             copy_text_truncate (temp,
+                                                 pProc->spec.proc.name,
+                                                 sizeof temp,
+                                                 pProc->spec.proc.nameLength),
+                             argCount,
+                             type_to_text (argType.type),
+                             type_to_text (result.type));
+
+                  return gResultUnk;
                 }
             }
           else if (are_compatible_tables (pState, &argType, &result, FALSE) == FALSE)
@@ -1905,6 +1938,11 @@ translate_exp_tabval (struct ParserState* const   pState,
   assert (pCallExp->pThirdOp->val_type == VAL_ID);
 
   tableType = translate_exp_tree (pState, pStmt, pFirstExp);
+  if (tableType.type == T_UNKNOWN)
+    {
+      assert (pState->abortError);
+      return gResultUnk;
+    }
   if (IS_TABLE (tableType.type) == FALSE)
     {
       w_log_msg (pState,
@@ -1917,6 +1955,12 @@ translate_exp_tabval (struct ParserState* const   pState,
     }
 
   expType = translate_exp_tree (pState, pStmt, pSecondExp);
+  if (expType.type == T_UNKNOWN)
+    {
+      assert (pState->abortError);
+      return gResultUnk;
+    }
+
   if ( ! is_integer (GET_TYPE (expType.type)))
     {
       w_log_msg (pState,
@@ -1942,18 +1986,28 @@ translate_exp_tabval (struct ParserState* const   pState,
       return gResultUnk;
     }
 
-  if ((w_opcode_encode (pInstrs, W_INDTA) == NULL) ||
-      (output_data (pInstrs, (const D_UINT8*)pId->text, pId->length) == NULL) ||
-      (output_uint8 (pInstrs, 0) == NULL))
-    {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-      return gResultUnk;
-    }
+  {
+    const D_INT32 constPos = add_text_const (pStmt,
+                                             (const D_UINT8*)pId->text,
+                                             pId->length);
+
+    if ((constPos < 0) ||
+        (w_opcode_encode (pInstrs, W_INDTA) == NULL) ||
+        (output_uint32 (pInstrs, constPos) == NULL))
+      {
+        w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        return gResultUnk;
+      }
+  }
 
   expType.extra = NULL;
   expType.type  = GET_TYPE (pVarField->type);
 
   MARK_L_VALUE (expType.type);
+
+  free_sem_value (pCallExp->pFirstOp);
+  free_sem_value (pCallExp->pSecondOp);
+  free_sem_value (pCallExp->pThirdOp);
 
   return expType;
 }
@@ -1970,11 +2024,17 @@ translate_exp_field (struct ParserState* const   pState,
   struct ExpResultType        tableType;
   struct ExpResultType        expType;
 
-  assert (pCallExp->opcode == OP_TABVAL);
+  assert (pCallExp->opcode == OP_FIELD);
   assert (pCallExp->pFirstOp->val_type == VAL_EXP_LINK);
   assert (pCallExp->pSecondOp->val_type == VAL_ID);
 
   tableType = translate_exp_tree (pState, pStmt, pFirstExp);
+  if (tableType.type == T_UNKNOWN)
+    {
+      assert (pState->abortError);
+      return gResultUnk;
+    }
+
   if (IS_TABLE (tableType.type) == FALSE)
     {
       w_log_msg (pState,
@@ -2000,18 +2060,27 @@ translate_exp_field (struct ParserState* const   pState,
       return gResultUnk;
     }
 
-  if ((w_opcode_encode (pInstrs, W_SELF) == NULL) ||
-      (output_data (pInstrs, (const D_UINT8*)pId->text, pId->length) == NULL) ||
-      (output_uint8 (pInstrs, 0) == NULL))
-    {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-      return gResultUnk;
-    }
+  {
+    const D_INT32 constPos = add_text_const (pStmt,
+                                             (const D_UINT8*)pId->text,
+                                             pId->length);
+
+    if ((constPos < 0) ||
+        (w_opcode_encode (pInstrs, W_SELF) == NULL) ||
+        (output_uint32 (pInstrs, constPos) == NULL))
+      {
+        w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        return gResultUnk;
+      }
+  }
 
   expType.extra = NULL;
   expType.type  = GET_TYPE (pVarField->type);
 
   MARK_FIELD (expType.type);
+
+  free_sem_value (pCallExp->pFirstOp);
+  free_sem_value (pCallExp->pSecondOp);
 
   return expType;
 }
@@ -2046,6 +2115,7 @@ translate_exp_tree (struct ParserState* const   pState,
                                   &(pTreeHead->pFirstOp->val.u_exp));
   if (firstType.type == T_UNKNOWN)
     {
+      assert (pState->abortError);
       /* something went wrong, and the error
        * should be already logged  */
       return gResultUnk;
@@ -2170,39 +2240,63 @@ translate_return_exp (struct ParserState* pState, YYSTYPE exp)
 
   if (expType.type != T_UNDETERMINED)
     {
-      if (IS_TABLE (retType.type) != IS_TABLE (expType.type))
+      /* The expression was not evaluated to NULL. */
+
+      if ((IS_TABLE (retType.type) != IS_TABLE (expType.type)) ||
+          (IS_FIELD (retType.type) != IS_FIELD (expType.type)) ||
+          (IS_ARRAY (retType.type) != IS_ARRAY (expType.type)))
         {
           w_log_msg (pState,
                      pState->bufferPos,
                      MSG_PROC_RET_NA_EXT,
-                     type_to_text (retType.type),
-                     type_to_text (expType.type));
+                     type_to_text (GET_TYPE (retType.type)),
+                     type_to_text (GET_TYPE (expType.type)));
           pState->abortError = TRUE;
         }
-      else if ( IS_TABLE (retType.type) == FALSE)
+      else if (IS_FIELD (retType.type))
         {
-          const D_UINT        baseExpType   = GET_BASIC_TYPE (expType.type);
-          const D_UINT        baseRetType   = GET_BASIC_TYPE (retType.type);
-          const enum W_OPCODE temp_op       = store_op[baseRetType][baseExpType];
-
-          assert (baseExpType <= T_UNDETERMINED);
-          assert (baseRetType <= T_UNDETERMINED);
-
-          if ( IS_ARRAY (retType.type) != IS_ARRAY (expType.type))
+          if ((GET_FIELD_TYPE (retType.type) != T_UNDETERMINED) &&
+              (GET_FIELD_TYPE (retType.type) != GET_FIELD_TYPE (expType.type)))
             {
               w_log_msg (pState,
                          pState->bufferPos,
                          MSG_PROC_RET_NA_EXT,
-                         type_to_text (retType.type),
-                         type_to_text (expType.type));
+                         type_to_text (GET_TYPE (retType.type)),
+                         type_to_text (GET_TYPE (expType.type)));
               pState->abortError = TRUE;
             }
-          else if (temp_op == W_NA)
+        }
+      else if ( IS_TABLE (retType.type) == FALSE)
+        {
+          if (IS_ARRAY (retType.type) == FALSE)
             {
-              if ( (IS_ARRAY (retType.type) == FALSE) ||
-                   (GET_BASIC_TYPE (retType.type) != T_UNDETERMINED))
+              const D_UINT        baseExpType   = GET_BASIC_TYPE (expType.type);
+              const D_UINT        baseRetType   = GET_BASIC_TYPE (retType.type);
+              const enum W_OPCODE temp_op       = store_op[baseRetType][baseExpType];
+
+              assert (IS_ARRAY (expType.type) == FALSE);
+              assert (baseExpType <= T_UNDETERMINED);
+              assert (baseRetType <= T_UNDETERMINED);
+
+
+              if (temp_op == W_NA)
                 {
-                  w_log_msg (pState, pState->bufferPos,
+                  w_log_msg (pState,
+                             pState->bufferPos,
+                             MSG_PROC_RET_NA_EXT,
+                             type_to_text (retType.type),
+                             type_to_text (expType.type));
+                  pState->abortError = TRUE;
+                }
+            }
+          else
+            {
+              assert (IS_ARRAY (expType.type));
+              if ((GET_BASIC_TYPE (retType.type) != T_UNDETERMINED) &&
+                  (GET_BASIC_TYPE (retType.type) != GET_BASIC_TYPE (expType.type)))
+                {
+                  w_log_msg (pState,
+                             pState->bufferPos,
                              MSG_PROC_RET_NA_EXT,
                              type_to_text (retType.type),
                              type_to_text (expType.type));

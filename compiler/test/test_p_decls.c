@@ -82,6 +82,7 @@ D_CHAR proc_decl_buffer[] =
   "PROCEDURE ProcId1 () RETURN TEXT "
   "DO "
   "LET dummy_var1 as REAL; "
+  "LET dummy_var2 as FIELD OF INT64; "
   "RETURN NULL; "
   "ENDPROC\n\n"
   ""
@@ -89,16 +90,21 @@ D_CHAR proc_decl_buffer[] =
   "RETURN ARRAY OF TEXT "
   "DO "
   "LET dummy_var1 as TEXT; "
+  "LET dummy_var2 as FIELD; "
   "RETURN NULL; "
   "ENDPROC "
   ""
-  "PROCEDURE ProcId_3_ (Var1 as REAL, Var2 as TEXT, Var3 as ARRAY, "
-  "                  Var4 AS TABLE OF ( f1 AS REAL, f2 as UNSIGNED INT32, "
-  "                                     f3 as ARRAY OF INT16), Var5 AS INT64) "
-  "RETURN TABLE OF (f1 as TEXT, f2 as DATETIME) "
+  "PROCEDURE ProcId_3_ (Var1 as REAL, "
+  "                   Var2 as TEXT, Var3 as ARRAY, "
+  "                   Var4 AS TABLE OF ( f1 AS REAL, f2 as UNSIGNED INT32, "
+  "                                      f3 as ARRAY OF INT16),"
+  "                   Var5 AS INT64,"
+  "                   Var6 AS FIELD OF HIRESTIME) "
+  "RETURN TABLE OF (f1 as TEXT, f2 as DATETIME, f3 as REAL) "
   "DO "
   "LET f1 as TEXT; "
   "LET f2 as REAL; "
+  "LET f3 as FIELD OF ARRAY OF REAL; "
   "RETURN NULL; "
   "ENDPROC";
 
@@ -163,7 +169,7 @@ check_procs_decl (struct ParserState *state)
     }
 
   proc = get_item (proc_decls, 0);
-  if (!general_proc_check (glb_stmt, proc, "ProcId1", 0, 1))
+  if (!general_proc_check (glb_stmt, proc, "ProcId1", 0, 2))
     {
       return FALSE;
     }
@@ -186,8 +192,16 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
+  tmp_var = stmt_find_declaration (proc, "dummy_var2",
+                                   strlen ("dummy_var2"), FALSE, FALSE);
+  if ((IS_FIELD(tmp_var->type) == FALSE) ||
+       (GET_FIELD_TYPE (tmp_var->type) != T_INT64))
+    {
+      return FALSE;
+    }
+
   proc = get_item (proc_decls, 1);
-  if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 1))
+  if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 2))
     {
       return FALSE;
     }
@@ -211,6 +225,15 @@ check_procs_decl (struct ParserState *state)
     {
       return FALSE;
     }
+
+  tmp_var = stmt_find_declaration (proc, "dummy_var2",
+                                   strlen ("dummy_var2"), FALSE, FALSE);
+  if ((IS_FIELD(tmp_var->type) == FALSE) ||
+       (GET_FIELD_TYPE (tmp_var->type) != T_UNDETERMINED))
+    {
+      return FALSE;
+    }
+
   /* check parameters */
   tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
   if ((tmp_var->labelLength != 4) ||
@@ -237,7 +260,7 @@ check_procs_decl (struct ParserState *state)
     }
 
   proc = get_item (proc_decls, 2);
-  if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 5, 2))
+  if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 6, 3))
     {
       return FALSE;
     }
@@ -308,6 +331,17 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 6);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var6", tmp_var->labelLength) != 0) ||
+      (tmp_var->extra != NULL) ||
+      (IS_FIELD (tmp_var->type) == FALSE) ||
+      (GET_FIELD_TYPE (tmp_var->type) != T_HIRESTIME))
+    {
+      return FALSE;
+    }
+
+
   /* check local declarations */
   if (tmp_table !=
       stmt_find_declaration (proc, "Var4", strlen ("Var4"), FALSE, FALSE))
@@ -322,6 +356,14 @@ check_procs_decl (struct ParserState *state)
     }
   tmp_var = stmt_find_declaration (proc, "f2", strlen ("f2"), FALSE, FALSE);
   if (tmp_var->type != T_REAL)
+    {
+      return FALSE;
+    }
+
+  tmp_var = stmt_find_declaration (proc, "f3", strlen ("f3"), FALSE, FALSE);
+  if ((IS_FIELD(tmp_var->type) == FALSE) ||
+       (IS_ARRAY (GET_FIELD_TYPE (tmp_var->type)) == FALSE) ||
+       (GET_BASIC_TYPE (tmp_var->type) != T_REAL))
     {
       return FALSE;
     }

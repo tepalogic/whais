@@ -103,7 +103,7 @@ static const struct MsgCodeEntry messages[] = {
   {MSG_MEMSEL_ERD, MSG_ERROR_EVENT,
    "Field \'%s\' is selected from a table that does not contains its declaration."},
   {MSG_MEMSEL_NA, MSG_ERROR_EVENT,
-   "Could not select a member of a \'%s\'. You need a table to use this operator."},
+   "Could not select a member of a \'%s\'. A table is needed!"},
   {MSG_STORE_NA, MSG_ERROR_EVENT,
    "To a variable of type '%s' can not be assigned a value of type '%s'."},
   {MSG_STORE_ELV, MSG_ERROR_EVENT,

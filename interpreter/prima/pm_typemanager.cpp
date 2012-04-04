@@ -40,10 +40,10 @@ struct TypeSpec
   static const D_UINT8  TYPE_SPEC_END_MARK = ';';
 
   D_UINT16 type;
-  D_UINT16 data_len;
+  D_UINT16 dataSize;
   D_UINT8  data[2];    /* keep this last */
 
-  D_UINT16 GetSize () const { return data_len + sizeof (type) + sizeof (data_len); }
+  D_UINT16 GetSize () const { return dataSize + sizeof (type) + sizeof (dataSize); }
 
   bool operator== (const TypeSpec& second) const
     {
@@ -101,12 +101,12 @@ TypeManager::AddTypeDescription (const D_UINT8* const pTypeDescription)
     return result;
 
   result = m_TypesDescriptions.size ();
+
   const TypeSpec* const pSpec = _RC (const TypeSpec*, pTypeDescription);
 
   m_TypesDescriptions.insert (m_TypesDescriptions.end (),
                               pTypeDescription,
                               pTypeDescription + pSpec->GetSize ());
-
   return result;
 }
 
@@ -134,7 +134,7 @@ create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescrip
   vector<DBSFieldDescriptor> vFields;
   D_INT                      typeIt = 0;
 
-  while (typeIt < spec.data_len - 2)
+  while (typeIt < spec.dataSize - 2)
     {
       DBSFieldDescriptor field;
       D_UINT16           type;
@@ -142,7 +142,7 @@ create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescrip
       field.m_pFieldName = _RC (D_CHAR*, &spec.data[typeIt]);
 
       typeIt += strlen (field.m_pFieldName) + 1;
-      assert (typeIt < spec.data_len - 2);
+      assert (typeIt < spec.dataSize - 2);
 
       type   =  spec.data[typeIt + 1]; type <<= 8; type += spec.data[typeIt];
       typeIt += 2;
@@ -377,7 +377,7 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTypeDescription)
 bool
 TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
 {
-  const TypeSpec& spec = *_RC (const TypeSpec*, pTypeDescription);
+  const TypeSpec& spec   = *_RC (const TypeSpec*, pTypeDescription);
   bool            result = true;
 
   if (((spec.type == T_UNKNOWN) || (spec.type > T_UNDETERMINED)) &&
@@ -386,14 +386,36 @@ TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
     {
       result = false;
     }
-  else if ((spec.data[spec.data_len - 2] != spec.TYPE_SPEC_END_MARK) ||
-           (spec.data[spec.data_len - 1] != 0))
+  else if ((spec.data[spec.dataSize - 2] != spec.TYPE_SPEC_END_MARK) ||
+           (spec.data[spec.dataSize - 1] != 0))
     {
       result = false;
     }
+  else if (IS_FIELD (spec.type))
+    {
+      const D_UINT16 fieldType = GET_FIELD_TYPE (spec.type);
+      if (spec.dataSize != 2)
+        result = false;
+      else if (IS_ARRAY (fieldType))
+        {
+          if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN ||
+              GET_BASIC_TYPE (fieldType) >= T_UNDETERMINED)
+            {
+              result = false;
+            }
+        }
+      else
+        {
+          if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN ||
+              GET_BASIC_TYPE (fieldType) > T_UNDETERMINED)
+            {
+              result = false;
+            }
+        }
+    }
   else if (IS_ARRAY (spec.type))
     {
-      if ( (spec.data_len != 2) ||
+      if ( (spec.dataSize != 2) ||
            (GET_BASIC_TYPE (spec.type) == T_UNKNOWN) ||
            (GET_BASIC_TYPE (spec.type) > T_UNDETERMINED) ||
            (GET_BASIC_TYPE (spec.type) == T_TEXT) )
@@ -405,7 +427,7 @@ TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
     {
       D_UINT index = 0;
 
-      while ((index < (D_UINT) (spec.data_len - 2)) && (result != FALSE))
+      while ((index < (D_UINT) (spec.dataSize - 2)) && (result != FALSE))
         {
           D_UINT   id_len = strlen ((char *) &spec.data[index]);
           D_UINT16 type;
@@ -436,6 +458,6 @@ TypeManager::GetTypeLength (const D_UINT8* pTypeDescription)
 
   const TypeSpec& ts = *_RC (const TypeSpec*, pTypeDescription);
 
-  return ts.data_len + sizeof (ts) - sizeof (ts.data);
+  return ts.dataSize + sizeof (ts) - sizeof (ts.data);
 }
 

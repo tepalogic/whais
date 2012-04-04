@@ -271,6 +271,7 @@ is_type_spec_valid (const struct TypeSpec* pType)
   D_BOOL result = TRUE;
 
   if (((pType->type == T_UNKNOWN) || (pType->type > T_UNDETERMINED)) &&
+      (IS_FIELD (pType->type) == FALSE) &&
       (IS_ARRAY (pType->type) == FALSE) &&
       (IS_TABLE (pType->type) == FALSE))
     {
@@ -280,6 +281,28 @@ is_type_spec_valid (const struct TypeSpec* pType)
            (pType->data[pType->dataSize - 1] != 0))
     {
       result = FALSE;
+    }
+  else if (IS_FIELD (pType->type))
+    {
+      const D_UINT16 fieldType = GET_FIELD_TYPE (pType->type);
+      if (pType->dataSize != 2)
+        result = FALSE;
+      else if (IS_ARRAY (fieldType))
+        {
+          if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN ||
+              GET_BASIC_TYPE (fieldType) >= T_UNDETERMINED)
+            {
+              result = FALSE;
+            }
+        }
+      else
+        {
+          if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN ||
+              GET_BASIC_TYPE (fieldType) > T_UNDETERMINED)
+            {
+              result = FALSE;
+            }
+        }
     }
   else if (IS_ARRAY (pType->type))
     {
@@ -357,8 +380,8 @@ type_spec_cmp (const struct TypeSpec* const pSpec_1,
 }
 
 static D_UINT
-type_spec_fill_field (struct OutStream* const   pStream,
-                      const struct DeclaredVar* pFieldList)
+type_spec_fill_table_field (struct OutStream* const   pStream,
+                            const struct DeclaredVar* pFieldList)
 {
   D_UINT result = 0;
 
@@ -400,7 +423,7 @@ type_spec_fill_table (struct OutStream* const        pStream,
   if ((output_uint16 (pStream, pVar->type) != NULL) &&
       (output_uint16 (pStream, 0) != NULL))
     {
-      result = type_spec_fill_field (pStream, pVar->extra);
+      result = type_spec_fill_table_field (pStream, pVar->extra);
     }
   else
     result = TYPE_SPEC_ERROR;
@@ -428,6 +451,32 @@ type_spec_fill_array (struct OutStream* const         pStream,
   struct TypeSpec spec;
 
   assert (IS_ARRAY (pVar->type));
+
+  spec.type     = pVar->type;
+  spec.dataSize = 2;
+  spec.data[0]  = TYPE_SPEC_END_MARK;
+  spec.data[1]  = 0;
+
+  if ((output_uint16 (pStream, spec.type) != NULL) &&
+      (output_uint16 (pStream, spec.dataSize) != NULL) &&
+      (output_data (pStream, spec.data, sizeof spec.data) != NULL))
+    {
+      result = 2 * sizeof  (D_UINT16) + sizeof (spec.data);
+    }
+  else
+    result = TYPE_SPEC_ERROR;
+
+  return result;
+}
+
+static D_UINT
+type_spec_fill_field (struct OutStream* const         pStream,
+                      const struct DeclaredVar* const pVar)
+{
+  D_UINT          result = 0;
+  struct TypeSpec spec;
+
+  assert (IS_FIELD (pVar->type));
 
   spec.type     = pVar->type;
   spec.dataSize = 2;
@@ -487,10 +536,12 @@ type_spec_fill (struct OutStream* const         pStream,
 
   init_outstream (&temporalStream, OUTSTREAM_INCREMENT_SIZE);
 
-  if ( (IS_ARRAY (pVar->type) || IS_TABLE (pVar->type)) == FALSE)
+  if ( (IS_FIELD (pVar->type) || IS_ARRAY (pVar->type) || IS_TABLE (pVar->type)) == FALSE)
     result = type_spec_fill_basic (&temporalStream, pVar);
   else if (IS_TABLE (pVar->type))
     result = type_spec_fill_table (&temporalStream, pVar);
+  else if (IS_FIELD (pVar->type))
+    result = type_spec_fill_field (&temporalStream, pVar);
   else if (IS_ARRAY (pVar->type))
     result = type_spec_fill_array (&temporalStream, pVar);
   else

@@ -118,6 +118,29 @@ D_CHAR test_prog_4[] = ""
   "LET some_var as DATE;"
   "Proc_1 ( some_var, TRUE ); \n" "RETURN some_var; \n" "ENDPROC \n";
 
+D_CHAR test_prog_5[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF DATE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as FIELD OF ARRAY OF DATE;"
+  "Proc_1 ( some_var, 10 ); \n" "RETURN some_var; \n" "ENDPROC \n";
+
+D_CHAR test_prog_6[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF DATE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as FIELD;"
+  "Proc_1 ( some_var, 10 ); \n" "RETURN some_var; \n" "ENDPROC \n";
+
+
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 {
@@ -170,6 +193,14 @@ main ()
                                                      MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
                                                      MSG_PROC_ARG_NA,
                                                      MSG_ERROR_EVENT);
   if (test_result == FALSE)

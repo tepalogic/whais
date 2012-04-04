@@ -65,15 +65,24 @@ my_postman (POSTMAN_BAG bag,
 }
 
 D_CHAR test_prog_1[] = ""
-  "PROCEDURE Proc_1 () RETURN BOOL\n "
+  "PROCEDURE Proc_1 () RETURN FIELD\n "
   "DO\n "
-  "LET test_table AS TABLE WITH (field1 AS INT8, field2 AS UNSIGNED INT8);\n "
-  "LET test_row AS ROW OF TABLE test_table;\n "
-  "RETURN test_row.field3;\n " "ENDPROC\n ";
+  "LET test_table AS TABLE OF (field1 AS INT8, field2 AS UNSIGNED INT8);\n "
+  "RETURN test_table.field3;\n " "ENDPROC\n ";
 
 D_CHAR test_prog_2[] = ""
   "PROCEDURE Proc_1 () RETURN BOOL\n "
-  "DO\n " "LET test AS BOOL; \n " "RETURN test[10, some_field];\n " "ENDPROC\n ";
+  "DO\n "
+  "LET test AS BOOL; \n "
+  "RETURN test[10, some_field];\n "
+  "ENDPROC\n ";
+
+D_CHAR test_prog_3[] = ""
+  "PROCEDURE Proc_1 () RETURN BOOL\n "
+  "DO\n "
+  "LET test AS BOOL; \n "
+  "RETURN test.some_field;\n "
+  "ENDPROC\n ";
 
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
@@ -116,6 +125,7 @@ main ()
   printf ("Testing for received error messages...\n");
   test_result = test_for_error (test_prog_1, MSG_MEMSEL_ERD, MSG_ERROR_EVENT);
   test_result = test_result && test_for_error (test_prog_2, MSG_MEMSEL_NA, MSG_ERROR_EVENT);
+  test_result = test_result && test_for_error (test_prog_3, MSG_MEMSEL_NA, MSG_ERROR_EVENT);
 
   if (test_result == FALSE)
     {

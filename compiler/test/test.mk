@@ -198,3 +198,14 @@ UNIT_EXES+=test_msg_gen
 test_msg_gen_SRC=test/test_msg_gen.c 
 test_msg_gen_LIB=compiler/compiler utils/utils custom/custom
 test_msg_gen_INC=utils/include custom/include
+
+UNIT_EXES+=test_self_op
+test_self_op_SRC=test/test_self_op.c 
+test_self_op_LIB=compiler/compiler utils/utils custom/custom
+test_self_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_msg_memsel
+test_msg_memsel_SRC=test/test_msg_memsel.c 
+test_msg_memsel_LIB=compiler/compiler utils/utils custom/custom
+test_msg_memsel_INC=utils/include custom/include
+

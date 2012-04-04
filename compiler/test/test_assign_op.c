@@ -217,10 +217,27 @@ D_CHAR proc_decl_buffer[] =
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId34 (v1 AS ARRAY OF INT8, v2 AS ARRAY OF INT16) RETURN ARRAY "
+  "PROCEDURE ProcId34 (v1 AS FIELD, v2 AS FIELD OF ARRAY OF DATETIME) RETURN FIELD "
   "DO "
   "RETURN v1 = v2; "
-  "ENDPROC\n\n" "";
+  "ENDPROC\n\n"
+  ""
+  "PROCEDURE ProcId35 (v1 AS FIELD OF ARRAY OF DATETIME, v2 AS FIELD OF ARRAY OF DATETIME) RETURN FIELD OF ARRAY OF DATETIME "
+  "DO "
+  "RETURN v1 = v2; "
+  "ENDPROC\n\n"
+  ""
+  "PROCEDURE ProcId36 (v1 AS FIELD, v2 AS FIELD OF TEXT) RETURN FIELD "
+  "DO "
+  "RETURN v1 = v2; "
+  "ENDPROC\n\n"
+  ""
+  "PROCEDURE ProcId37 (v1 AS FIELD OF TEXT, v2 AS FIELD OF TEXT) RETURN FIELD "
+  "DO "
+  "RETURN v1 = v2; "
+  "ENDPROC\n\n"
+  "";
+
 
 static D_BOOL
 check_procedure (struct ParserState *state, D_CHAR * proc_name)
@@ -273,13 +290,11 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
       break;
     default:
       if (IS_TABLE (v1->type))
-        {
-          op_expect = W_STTA;
-        }
+        op_expect = W_STTA;
+      else if (IS_FIELD (v1->type))
+        op_expect = W_STF;
       else if (IS_ARRAY (v1->type))
-        {
-          op_expect = W_STA;
-        }
+        op_expect = W_STA;
       else
         {
           /* we should not be here */
@@ -306,7 +321,7 @@ check_all_procs (struct ParserState *state)
   D_UINT count;
   D_CHAR proc_name[25];
 
-  for (count = 1; count <= 34; ++count)
+  for (count = 1; count <= 37; ++count)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)

@@ -11,7 +11,10 @@ extern int yyparse (struct ParserState *);
 
 
 D_CHAR buffer[] =
-  "LET vTable  AS TABLE;\n"
+  "LET field1 AS FIELD;\n"
+  "LET field2 AS FIELD OF ARRAY OF DATE;\n"
+  "LET field3 AS FIELD OF INT8;\n"
+  "LET vTable AS TABLE;\n"
   "LET vTable2, vTable3 AS TABLE OF (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n";
 
 
@@ -39,12 +42,12 @@ free_state (struct ParserState *state)
 }
 
 static D_BOOL
-check_used_vals (struct ParserState *state)
+check_used_vals (struct ParserState* pState)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  D_INT vals_count = get_array_count (&pState->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->parsedValues, vals_count);
+      struct SemValue *val = get_item (&pState->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -56,8 +59,9 @@ check_used_vals (struct ParserState *state)
 }
 
 static D_BOOL
-check_type_spec_fill (const struct TypeSpec *ts,
-                      const D_CHAR * fname, const D_UINT type)
+check_type_spec_fill (const struct TypeSpec* ts,
+                      const D_CHAR*          fname,
+                      const D_UINT           type)
 {
   const D_UINT8 *it = ts->data;
   D_UINT count = 0;
@@ -151,6 +155,38 @@ check_vars_decl (struct ParserState *state)
 
   if (state->globalStmt.type != STMT_GLOBAL ||
       state->globalStmt.pParentStmt != NULL)
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "field1", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_FIELD (decl_var->type) == FALSE) ||
+      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
+      (GET_FIELD_TYPE (decl_var->type) != T_UNDETERMINED) ||
+      decl_var->extra != NULL)
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "field2", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_FIELD (decl_var->type) == FALSE) ||
+      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
+      (IS_ARRAY (GET_FIELD_TYPE (decl_var->type)) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != T_DATE) ||
+      decl_var->extra != NULL)
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "field3", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_FIELD (decl_var->type) == FALSE) ||
+      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
+      (IS_ARRAY (GET_FIELD_TYPE (decl_var->type)) != FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != T_INT8) ||
+      decl_var->extra != NULL)
     {
       return FALSE;
     }
