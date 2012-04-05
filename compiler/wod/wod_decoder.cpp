@@ -455,20 +455,11 @@ const FDECODE_OPCODE wod_dec_w_jt  = wod_dec_w_jf;
 const FDECODE_OPCODE wod_dec_w_jtc = wod_dec_w_jf;
 const FDECODE_OPCODE wod_dec_w_jmp = wod_dec_w_jf;
 
-const FDECODE_OPCODE wod_dec_w_indt = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_inda = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_indf = wod_dec_w_ldnull;
-
-static D_UINT
-wod_dec_w_indta (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
-{
-  strcpy (pOp1 + MAX_OP_STRING - 5, "...");
-  strncpy (pOp1, _RC(const D_CHAR*, pInArgs), MAX_OP_STRING - 5);
-  pOp2[0] = 0;
-
-  return strlen (_RC(const D_CHAR*, pInArgs));
-}
-const FDECODE_OPCODE wod_dec_w_self = wod_dec_w_indta;
+const FDECODE_OPCODE wod_dec_w_indt  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_inda  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_indf  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_indta = wod_dec_w_ldlo32;
+const FDECODE_OPCODE wod_dec_w_self  = wod_dec_w_ldlo32;
 
 static D_UINT
 wod_dec_w_bsync (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
@@ -680,7 +671,7 @@ const D_CHAR *wod_str_table[] = {
   "stui32",
   "stui64",
   "stta",
-  "stf"
+  "stf",
   "sta",
 
   "call",
@@ -785,7 +776,7 @@ const D_CHAR *wod_str_table[] = {
   "indt",
   "inda",
   "indf",
-  "indta"
+  "indta",
   "self",
 
   "bsync",

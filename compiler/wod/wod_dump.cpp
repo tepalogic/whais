@@ -140,9 +140,20 @@ wod_dump_const_area (WICompiledUnit& rUnit, std::ostream& rOutputStream)
 }
 
 static void
-wod_dump_basic_type_info (std::ostream& rOutStream, D_UINT16 type)
+wod_dump_nontable_type_info (std::ostream& rOutStream, D_UINT16 type)
 {
   assert ((IS_TABLE (type) == FALSE) && (IS_TABLE_FIELD (type) == FALSE));
+
+  if (IS_FIELD (type))
+    {
+      rOutStream << "FIELD";
+
+      type = GET_FIELD_TYPE (type);
+      if (type != T_UNDETERMINED)
+        rOutStream << " OF ";
+      else
+        return;
+    }
 
   if (IS_ARRAY (type))
     {
@@ -214,7 +225,7 @@ wod_dump_basic_type_info (std::ostream& rOutStream, D_UINT16 type)
 }
 
 static void
-wod_dump_rectable_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
+wod_dump_table_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
 {
   const D_UINT16 type = from_le_int16 (pTypeDesc);
   pTypeDesc += sizeof (D_UINT16);
@@ -243,7 +254,7 @@ wod_dump_rectable_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStrea
           D_UINT16 type = from_le_int16 (pTypeDesc);
 
           pTypeDesc += sizeof (D_UINT16);
-          wod_dump_basic_type_info (rOutputStream, type);
+          wod_dump_nontable_type_info (rOutputStream, type);
         }
       rOutputStream << " )";
     }
@@ -264,9 +275,9 @@ wod_dump_type_info (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
     }
 
   if (IS_TABLE (type) == FALSE)
-    return wod_dump_basic_type_info (rOutputStream, type);
+    return wod_dump_nontable_type_info (rOutputStream, type);
   else
-    return wod_dump_rectable_type_inf (pTypeDesc, rOutputStream);
+    return wod_dump_table_type_inf (pTypeDesc, rOutputStream);
 }
 
 void
