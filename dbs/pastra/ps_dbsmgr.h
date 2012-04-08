@@ -59,11 +59,13 @@ public:
   void RemoveFromStorage ();
 
   const std::string& GetDir () { return m_DbsDirectory; }
+  D_UINT64           GetMaxFileSize () { return m_MaxFileSize; }
 protected:
   typedef std::map<std::string, PSTable*> TABLES;
 
   void SyncToFile ();
 
+  D_UINT64          m_MaxFileSize;
   WSynchronizer     m_Sync;
   const std::string m_Name;
   std::string       m_DbsDirectory;

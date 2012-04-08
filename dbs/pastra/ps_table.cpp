@@ -58,16 +58,20 @@ static const D_UINT PS_TABLE_ELEMS_SIZE_OFF        = 12; //Size of the fields de
 static const D_UINT PS_TABLE_ELEMS_SIZE_LEN        = 4;
 static const D_UINT PS_TABLE_RECORDS_COUNT_OFF     = 16; //Number of allocated records.
 static const D_UINT PS_TABLE_RECORDS_COUNT_LEN     = 8;
-static const D_UINT PS_TABLE_VARSTORAGE_SIZE_OFF   = 24; //Size of variable storage file
+static const D_UINT PS_TABLE_MAX_FILE_SIZE_OFF     = 24; //The maximum file size allowe for this table
+static const D_UINT PS_TABLE_MAX_FILE_SIZE_LEN     = 8;
+static const D_UINT PS_TABLE_MAINTABLE_SIZE_OFF    = 32; //Size of variable storage
+static const D_UINT PS_TABLE_MAINTABLE_SIZE_LEN    = 8;
+static const D_UINT PS_TABLE_VARSTORAGE_SIZE_OFF   = 40; //Size of variable storage
 static const D_UINT PS_TABLE_VARSTORAGE_SIZE_LEN   = 8;
-static const D_UINT PS_TABLE_BT_ROOT_OFF           = 32; //The root node of BTree holding the removed rows.
+static const D_UINT PS_TABLE_BT_ROOT_OFF           = 48; //The root node of BTree holding the removed rows.
 static const D_UINT PS_TABLE_BT_ROOT_LEN           = 4;
-static const D_UINT PS_TABLE_BT_HEAD_OFF           = 36; //First node pointing to the removed BT nodes.
+static const D_UINT PS_TABLE_BT_HEAD_OFF           = 52; //First node pointing to the removed BT nodes.
 static const D_UINT PS_TABLE_BT_HEAD_LEN           = 4;
-static const D_UINT PS_TABLE_ROW_SIZE_OFF          = 40; //Size of a row.
+static const D_UINT PS_TABLE_ROW_SIZE_OFF          = 56; //Size of a row.
 static const D_UINT PS_TABLE_ROW_SIZE_LEN          = 4;
 
-static const D_UINT PS_RESEVED_FOR_FUTURE_OFF = 44;
+static const D_UINT PS_RESEVED_FOR_FUTURE_OFF = 60;
 static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_FUTURE_OFF;
 
 static const D_UINT MAX_FIELD_VALUE_ALIGN = 16; /* Bytes. */
@@ -291,9 +295,11 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 	padds.erase(padds.begin());
     }
 }
-
-static WFile
-create_table_file (const string& baseFileName, const DBSFieldDescriptor* pFields, D_UINT fieldsCount)
+static void
+create_table_file (const D_UINT64            maxFileSize,
+                   const D_CHAR*             pBaseFileName,
+                   const DBSFieldDescriptor* pFields,
+                   D_UINT                    fieldsCount)
 {
 
   //Check the arguments
@@ -314,27 +320,30 @@ create_table_file (const string& baseFileName, const DBSFieldDescriptor* pFields
   arrange_field_entries(vect, apFieldDescription.get(), rowSize);
   pFields = &vect.front();
 
-  WFile tableFile(baseFileName.c_str(), WHC_FILECREATE_NEW | WHC_FILERDWR | WHC_FILESYNC);
+  WFile tableFile(pBaseFileName, WHC_FILECREATE_NEW | WHC_FILERDWR);
 
   auto_ptr<D_UINT8> apBuffer(new D_UINT8[PS_HEADER_SIZE]);
-  D_UINT8 * const pBuffer = apBuffer.get();
+  D_UINT8* const    pBuffer = apBuffer.get();
 
   memcpy (pBuffer, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
-  _RC (D_UINT32 *, pBuffer + PS_TABLE_FIELDS_COUNT_OFF)[0] = fieldsCount;
-  _RC (D_UINT32 *, pBuffer + PS_TABLE_ELEMS_SIZE_OFF)[0] = descriptorsSize;
-  _RC (D_UINT64 *, pBuffer + PS_TABLE_RECORDS_COUNT_OFF)[0] = 0;
-  _RC (D_UINT64 *, pBuffer + PS_TABLE_VARSTORAGE_SIZE_OFF)[0] = 0;
-  _RC (D_UINT32 *, pBuffer + PS_TABLE_ROW_SIZE_OFF)[0] = rowSize;
-  _RC (NODE_INDEX *, pBuffer + PS_TABLE_BT_ROOT_OFF)[0] = NIL_NODE;
-  _RC (NODE_INDEX *, pBuffer + PS_TABLE_BT_HEAD_OFF)[0] = NIL_NODE;
+  *_RC (D_UINT32*, pBuffer + PS_TABLE_FIELDS_COUNT_OFF)    = fieldsCount;
+  *_RC (D_UINT32*, pBuffer + PS_TABLE_ELEMS_SIZE_OFF)      = descriptorsSize;
+  *_RC (D_UINT64*, pBuffer + PS_TABLE_RECORDS_COUNT_OFF)   = 0;
+  *_RC (D_UINT64*, pBuffer + PS_TABLE_VARSTORAGE_SIZE_OFF) = 0;
+  *_RC (D_UINT32*, pBuffer + PS_TABLE_ROW_SIZE_OFF)        = rowSize;
+  *_RC (NODE_INDEX*, pBuffer + PS_TABLE_BT_ROOT_OFF)       = NIL_NODE;
+  *_RC (NODE_INDEX*, pBuffer + PS_TABLE_BT_HEAD_OFF)       = NIL_NODE;
+  *_RC (D_UINT64*, pBuffer + PS_TABLE_MAX_FILE_SIZE_OFF)   = maxFileSize;
+  *_RC (D_UINT64*, pBuffer + PS_TABLE_MAINTABLE_SIZE_OFF)  = ~0;
+
 
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_HEAD_LEN);
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_ROOT_LEN);
 
   memset(pBuffer + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
-  //Write the first header part!
+  //Write the first header part to reserve the space!
   tableFile.Write(pBuffer, PS_HEADER_SIZE);
 
   //Write the field descriptors;
@@ -349,12 +358,13 @@ create_table_file (const string& baseFileName, const DBSFieldDescriptor* pFields
       assert ((tableFile.Tell() < sizeof dump));
 
       tableFile.Write (dump, sizeof dump - toFill);
-
-
     }
   assert ((tableFile.Tell() == tableFile.GetSize()));
 
-  return tableFile;
+  *_RC (D_UINT64*, pBuffer + PS_TABLE_MAINTABLE_SIZE_OFF) = tableFile.GetSize ();
+
+  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Write (pBuffer, PS_HEADER_SIZE);
 }
 
 static string
@@ -676,6 +686,7 @@ PSTableRmNode::GetSentinelKey () const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 PSTable::PSTable (DbsHandler& dbsHandler, const string& tableName) :
+  m_MaxFileSize (0),
   m_RowsCount (0),
   m_RootNode (NIL_NODE),
   m_FirstUnallocatedRoot (NIL_NODE),
@@ -684,7 +695,7 @@ PSTable::PSTable (DbsHandler& dbsHandler, const string& tableName) :
   m_FieldsCount (0),
   m_BaseFileName (dbsHandler.GetDir() + tableName),
   m_FieldsDescriptors(NULL),
-  m_MainTableFile (m_BaseFileName.c_str(), WHC_FILEOPEN_EXISTING | WHC_FILERDWR | WHC_FILESYNC),
+  m_apMainTable (NULL),
   m_apFixedFields (NULL),
   m_apVariableFields (NULL),
   m_RowCache (*this),
@@ -694,6 +705,7 @@ PSTable::PSTable (DbsHandler& dbsHandler, const string& tableName) :
 {
   InitFromFile ();
 
+  assert (m_apMainTable.get () != NULL);
   assert (m_RootNode != NIL_NODE);
 
   m_RowCache.Init (m_RowSize, 4096, 1024);
@@ -708,6 +720,7 @@ PSTable::PSTable (DbsHandler&               dbsHandler,
 		  const DBSFieldDescriptor* pFields,
 		  const D_UINT              fieldsCount,
 		  const bool                temporal) :
+  m_MaxFileSize (0),
   m_RowsCount (0),
   m_RootNode (NIL_NODE),
   m_FirstUnallocatedRoot (NIL_NODE),
@@ -716,7 +729,7 @@ PSTable::PSTable (DbsHandler&               dbsHandler,
   m_FieldsCount (0),
   m_BaseFileName ((temporal ? DBSGetTempDir () : dbsHandler.GetDir()) + tableName),
   m_FieldsDescriptors(NULL),
-  m_MainTableFile (create_table_file (m_BaseFileName, pFields, fieldsCount)),
+  m_apMainTable (NULL),
   m_apFixedFields (NULL),
   m_apVariableFields (NULL),
   m_RowCache (*this),
@@ -724,7 +737,13 @@ PSTable::PSTable (DbsHandler&               dbsHandler,
   m_IndexSync (),
   m_Removed (false)
 {
+  create_table_file (dbsHandler.GetMaxFileSize (),
+                     m_BaseFileName.c_str (),
+                     pFields,
+                     fieldsCount);
   InitFromFile ();
+
+  assert (m_apMainTable.get () != NULL);
 
   m_RowCache.Init (m_RowSize, 4096, 1024);
 
@@ -1136,9 +1155,9 @@ PSTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
     }
   else
     {
-      assert (m_MainTableFile.GetSize () % GetRawNodeSize () == 0);
+      assert (m_apMainTable->GetContainerSize () % GetRawNodeSize () == 0);
 
-      nodeIndex = m_MainTableFile.GetSize () / GetRawNodeSize ();
+      nodeIndex = m_apMainTable->GetContainerSize () / GetRawNodeSize ();
     }
 
   if (parent != NIL_NODE)
@@ -1189,19 +1208,21 @@ PSTable::GetNode (const NODE_INDEX node)
 {
   std::auto_ptr <PSTableRmNode> apNode (new PSTableRmNode (*this, node));
 
-  assert (m_MainTableFile.GetSize() % GetRawNodeSize () == 0);
+  assert (m_apMainTable->GetContainerSize () % GetRawNodeSize () == 0);
 
-  if (m_MainTableFile.GetSize() > node * GetRawNodeSize ())
+  if (m_apMainTable->GetContainerSize () > node * GetRawNodeSize ())
     {
-      m_MainTableFile.Seek (apNode->GetNodeId() * GetRawNodeSize (), WHC_SEEK_BEGIN);
-      m_MainTableFile.Read (apNode->GetRawData (), GetRawNodeSize ());
+      m_apMainTable->RetrieveData (apNode->GetNodeId () * GetRawNodeSize (),
+                                   GetRawNodeSize (),
+                                   apNode->GetRawData ());
     }
   else
     {
       //Reserve space for this node
-      assert (m_MainTableFile.GetSize() == (node * GetRawNodeSize ()));
-      m_MainTableFile.Seek (0, WHC_SEEK_END);
-      m_MainTableFile.Write (apNode->GetRawData (), GetRawNodeSize ());
+      assert (m_apMainTable->GetContainerSize () == (node * GetRawNodeSize ()));
+      m_apMainTable->StoreData (m_apMainTable->GetContainerSize (),
+                                GetRawNodeSize (),
+                                apNode->GetRawData ());
     }
 
   return apNode.release ();
@@ -1214,8 +1235,9 @@ PSTable::StoreNode (I_BTreeNode* const pNode)
   if (pNode->IsDirty() == false)
     return ;
 
-  m_MainTableFile.Seek (pNode->GetNodeId() * GetRawNodeSize (), WHC_SEEK_BEGIN);
-  m_MainTableFile.Write (pNode->GetRawData(), GetRawNodeSize ());
+  m_apMainTable->StoreData (pNode->GetNodeId() * GetRawNodeSize (),
+                            GetRawNodeSize (),
+                            pNode->GetRawData ());
 
   return;
 }
@@ -1306,56 +1328,69 @@ PSTable::SyncToFile ()
   if (m_Removed)
     return ; //We were removed. We were removed.
 
+  //TODO: You need to set the units correct after you add the part with container
+
   D_UINT8 aTableHdr[PS_HEADER_SIZE];
 
   memcpy (aTableHdr, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
-  _RC (D_UINT32 *, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF)[0] = m_FieldsCount;
-  _RC (D_UINT32 *, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)[0] = m_DescriptorsSize;
-  _RC (D_UINT64 *, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)[0] = m_RowsCount;
-  _RC (D_UINT64 *, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF)[0] =
+  *_RC (D_UINT32*, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF)    = m_FieldsCount;
+  *_RC (D_UINT32*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)      = m_DescriptorsSize;
+  *_RC (D_UINT64*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)   = m_RowsCount;
+  *_RC (D_UINT64*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF) =
       (m_apVariableFields.get() != NULL) ? m_apVariableFields->GetRawSize() : 0;
-  _RC (D_UINT32 *, aTableHdr + PS_TABLE_ROW_SIZE_OFF)[0] = m_RowSize;
-  _RC (NODE_INDEX *, aTableHdr + PS_TABLE_BT_ROOT_OFF)[0] = m_RootNode;
-  _RC (NODE_INDEX *, aTableHdr + PS_TABLE_BT_HEAD_OFF)[0] = m_FirstUnallocatedRoot;
-
+  *_RC (D_UINT32*, aTableHdr + PS_TABLE_ROW_SIZE_OFF)        = m_RowSize;
+  *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF)       = m_RootNode;
+  *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF)       = m_FirstUnallocatedRoot;
+  *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF)   = m_MaxFileSize;
+  *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF)  = m_apMainTable->GetContainerSize ();
 
   memset(aTableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
-  m_MainTableFile.Seek (0, WHC_SEEK_BEGIN);
-  m_MainTableFile.Write (aTableHdr, sizeof aTableHdr);
-  m_MainTableFile.Write (m_FieldsDescriptors.get (), m_DescriptorsSize);
+  m_apMainTable->StoreData (0, sizeof aTableHdr, aTableHdr);
+  m_apMainTable->StoreData (sizeof aTableHdr, m_DescriptorsSize, m_FieldsDescriptors.get ());
 }
 
 void
 PSTable::InitFromFile ()
 {
-  D_UINT8 aTableHdr[PS_HEADER_SIZE];
+  D_UINT64   mainTableSize = 0;
+  D_UINT8    aTableHdr[PS_HEADER_SIZE];
 
-  m_MainTableFile.Seek(0, WHC_SEEK_BEGIN);
-  m_MainTableFile.Read(aTableHdr, PS_HEADER_SIZE);
+
+  WFile mainTableFile (m_BaseFileName.c_str(), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
+
+  mainTableFile.Seek(0, WHC_SEEK_BEGIN);
+  mainTableFile.Read(aTableHdr, PS_HEADER_SIZE);
 
   if (memcmp(aTableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
     throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
 
   //Retrieve the header information.
-  m_FieldsCount = _RC (D_UINT32 *, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF)[0];
-  m_DescriptorsSize = _RC (D_UINT32 *, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)[0];
-  m_RowsCount = _RC (D_UINT64 *, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)[0];
-  m_VariableStorageSize = _RC (D_UINT64 *, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF)[0];
-  m_RowSize = _RC (D_UINT32 *, aTableHdr + PS_TABLE_ROW_SIZE_OFF)[0];
-  m_RootNode = _RC (NODE_INDEX *, aTableHdr + PS_TABLE_BT_ROOT_OFF)[0];
-  m_FirstUnallocatedRoot = _RC (NODE_INDEX *, aTableHdr + PS_TABLE_BT_HEAD_OFF)[0];
+  m_FieldsCount          = *_RC (D_UINT32*, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF);
+  m_DescriptorsSize      = *_RC (D_UINT32*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF);
+  m_RowsCount            = *_RC (D_UINT64*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF);
+  m_VariableStorageSize  = *_RC (D_UINT64*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF);
+  m_RowSize              = *_RC (D_UINT32*, aTableHdr + PS_TABLE_ROW_SIZE_OFF);
+  m_RootNode             = *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF);
+  m_FirstUnallocatedRoot = *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF);
+  m_MaxFileSize          = *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
+  mainTableSize          = *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
 
-  //TODO: You need to add code to check for a proper shutdown
-  //TODO: You need extra check on removing nodes
-
-  if ((m_FieldsCount == 0) || (m_DescriptorsSize < (sizeof(PSFieldDescriptor) * m_FieldsCount)))
-    throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
+  if ((m_FieldsCount == 0) ||
+      (m_DescriptorsSize < (sizeof(PSFieldDescriptor) * m_FieldsCount)) ||
+      (mainTableSize < PS_HEADER_SIZE))
+    {
+      throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
+    }
 
   //Cache the field descriptors in memory
   m_FieldsDescriptors.reset(new D_UINT8[m_DescriptorsSize]);
-  m_MainTableFile.Read(_CC(D_UINT8 *, m_FieldsDescriptors.get ()), m_DescriptorsSize);
+  mainTableFile.Read(_CC(D_UINT8 *, m_FieldsDescriptors.get ()), m_DescriptorsSize);
+
+  m_apMainTable.reset (new FileContainer (m_BaseFileName.c_str(),
+                                          m_MaxFileSize,
+                                          (mainTableSize + m_MaxFileSize - 1) / m_MaxFileSize));
 }
 
 D_UINT64
@@ -1377,8 +1412,7 @@ PSTable::RemoveFromDatabase ()
     if (m_vIndexNodeMgrs[fieldIndex]  != NULL)
       m_vIndexNodeMgrs[fieldIndex]->MarkForRemoval ();
 
-  m_MainTableFile.Close();
-  whc_fremove(m_BaseFileName.c_str());
+  m_apMainTable->MarkForRemoval ();
 
   m_Removed = true;
 }

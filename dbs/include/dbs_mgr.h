@@ -29,7 +29,8 @@
 #include "dbs_table.h"
 
 
-static D_UINT32 DEFAULT_MAX_FILE_SIZE = 0X80000000; /* 2GB */
+static const D_UINT64 DEFAULT_MAX_FILE_SIZE = 0X80000000; /* 2GB */
+static const D_UINT64 MINIMUM_MAX_FILE_SIZE = DEFAULT_MAX_FILE_SIZE;
 
 
 struct DBSFieldDescriptor;
@@ -57,7 +58,7 @@ public:
 void
 DBSInit (const D_CHAR * const pDBSDirectory,
          const D_CHAR * const pTempDir,
-         D_UINT64 maxFileSize = DEFAULT_MAX_FILE_SIZE);
+         D_UINT64             maxFileSize = DEFAULT_MAX_FILE_SIZE);
 
 void
 DBSShoutdown ();
@@ -72,7 +73,9 @@ D_UINT64
 DBSGetMaxFileSize ();
 
 void
-DBSCreateDatabase (const D_CHAR* const pName, const D_CHAR* pDbsDirectory);
+DBSCreateDatabase (const D_CHAR* const pName,
+                   const D_CHAR*       pDbsDirectory,
+                   D_UINT64            maxFileSize = 0);
 
 I_DBSHandler&
 DBSRetrieveDatabase (const D_CHAR* const pName);

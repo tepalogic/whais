@@ -57,8 +57,10 @@ static const D_UINT PS_DBS_DIRECTORY_OFF  = 12;
 static const D_UINT PS_DBS_DIRECTORY_LEN  = 2;
 static const D_UINT PS_DBS_NUM_TABLES_OFF = 14;
 static const D_UINT PS_DBS_NUM_TABLES_LEN = 2;
+static const D_UINT PS_DBS_MAX_FILE_OFF   = 16;
+static const D_UINT PS_DBS_MAX_FILE_LEN   = 8;
 
-static const D_UINT PS_DBS_HEADER_SIZE = 16;
+static const D_UINT PS_DBS_HEADER_SIZE = 24;
 
 struct DbsElement
 {
@@ -124,6 +126,9 @@ DBSInit (const D_CHAR* const pDBSDirectory, const D_CHAR* const pTempDir, D_UINT
   if (apDbsManager_.get () != NULL)
     throw DBSException (NULL, _EXTRA (DBSException::ALLREADY_INITED));
 
+  if (maxFileSize < MINIMUM_MAX_FILE_SIZE)
+    maxFileSize = MINIMUM_MAX_FILE_SIZE;
+
   apDbsManager_.reset (new DbsManager (pDBSDirectory, pTempDir, maxFileSize));
 }
 
@@ -162,10 +167,21 @@ DBSGetMaxFileSize ()
 }
 
 void
-DBSCreateDatabase (const D_CHAR* const pName, const D_CHAR* pDbsDirectory)
+DBSCreateDatabase (const D_CHAR* const pName,
+                  const D_CHAR*        pDbsDirectory,
+                  D_UINT64             maxFileSize)
 {
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
   if (pDbsDirectory == NULL)
     pDbsDirectory = DBSGetWorkingDir ();
+
+  if (maxFileSize == 0)
+    maxFileSize = DBSGetMaxFileSize ();
+
+  if (maxFileSize < MINIMUM_MAX_FILE_SIZE)
+    maxFileSize = MINIMUM_MAX_FILE_SIZE;
 
   string fileName;
 
@@ -194,6 +210,7 @@ DBSCreateDatabase (const D_CHAR* const pName, const D_CHAR* pDbsDirectory)
   *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
   *_RC (D_UINT16*, cpHeader + PS_DBS_DIRECTORY_OFF)  = PS_DBS_HEADER_SIZE;
   *_RC (D_UINT16*, cpHeader + PS_DBS_NUM_TABLES_OFF) = 0;
+  *_RC (D_UINT64*, cpHeader + PS_DBS_MAX_FILE_OFF)   = maxFileSize;
 
   dbsFile.Write (cpHeader, PS_DBS_HEADER_SIZE);
   dbsFile.Write (_RC (const D_UINT8*, pDbsDirectory), strlen (pDbsDirectory) + 1);
@@ -280,6 +297,7 @@ DBSRemoveDatabase (const D_CHAR* const pName)
 
 DbsHandler::DbsHandler (const string& name) :
     I_DBSHandler (),
+    m_MaxFileSize (0),
     m_Sync (),
     m_Name (name),
     m_DbsDirectory (),
@@ -304,7 +322,9 @@ DbsHandler::DbsHandler (const string& name) :
       ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
     throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
 
-  m_DbsDirectory = string (_RC (D_CHAR*, pBuffer) + *_RC (D_UINT16*, pBuffer + PS_DBS_DIRECTORY_OFF));
+  m_MaxFileSize  = *_RC (D_UINT64*, pBuffer + PS_DBS_MAX_FILE_OFF);
+  m_DbsDirectory = string (_RC (D_CHAR*, pBuffer) +
+                           *_RC (D_UINT16*, pBuffer + PS_DBS_DIRECTORY_OFF));
 
   D_UINT16 tablesCount = *_RC (D_UINT16*, pBuffer + PS_DBS_NUM_TABLES_OFF);
 
@@ -318,6 +338,7 @@ DbsHandler::DbsHandler (const string& name) :
 }
 
 DbsHandler::DbsHandler (const DbsHandler& source) :
+    m_MaxFileSize (source.m_MaxFileSize),
     m_Sync (),
     m_Name (source.m_Name),
     m_DbsDirectory (source.m_DbsDirectory),
@@ -486,6 +507,7 @@ DbsHandler::SyncToFile ()
   *_RC (D_UINT16*, aBuffer + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
   *_RC (D_UINT16*, aBuffer + PS_DBS_DIRECTORY_OFF)  = PS_DBS_HEADER_SIZE;
   *_RC (D_UINT16*, aBuffer + PS_DBS_NUM_TABLES_OFF) = m_Tables.size ();
+  *_RC (D_UINT64*, aBuffer + PS_DBS_MAX_FILE_OFF)   = GetMaxFileSize ();
 
   string fileName (m_DbsDirectory + m_Name + DBS_FILE_EXT);
   WFile outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);

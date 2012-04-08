@@ -294,6 +294,7 @@ protected:
   virtual void         StoreNode (I_BTreeNode *const pNode);
 
   //Data members
+  D_UINT64                              m_MaxFileSize;
   D_UINT64                              m_VariableStorageSize;
   D_UINT64                              m_RowsCount;
   NODE_INDEX                            m_RootNode;
@@ -303,11 +304,11 @@ protected:
   D_UINT32                              m_DescriptorsSize;
   D_UINT16                              m_FieldsCount;
   std::string                           m_BaseFileName;
-  std::auto_ptr <D_UINT8>               m_FieldsDescriptors;
-  WFile                                 m_MainTableFile;
-  std::auto_ptr <FileContainer>         m_apFixedFields;
-  std::auto_ptr <VariableLengthStore>   m_apVariableFields;
-  std::vector <FieldIndexNodeManager*>  m_vIndexNodeMgrs;
+  std::auto_ptr<D_UINT8>                m_FieldsDescriptors;
+  std::auto_ptr<FileContainer>          m_apMainTable;
+  std::auto_ptr<FileContainer>          m_apFixedFields;
+  std::auto_ptr<VariableLengthStore>    m_apVariableFields;
+  std::vector<FieldIndexNodeManager*>   m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
   WSynchronizer                         m_Sync;
   WSynchronizer                         m_IndexSync;
