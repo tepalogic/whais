@@ -72,7 +72,6 @@ public:
 
   static D_INT GetSize (DBS_FIELD_TYPE type, bool isArray);
   static D_INT GetAlignment (DBS_FIELD_TYPE, bool isArray);
-
 };
 
 };

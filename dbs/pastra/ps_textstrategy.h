@@ -156,7 +156,7 @@ protected:
 
 class RowFieldText : public GenericText
 {
-  friend class PSTable;
+  friend class TemplateTable;
 public:
   RowFieldText (VariableLengthStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
 
@@ -198,7 +198,7 @@ private:
 
 class TemporalText : public GenericText
 {
-  friend class PSTable;
+  friend class TemplateTable;
 public:
   TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount = ~0);
 

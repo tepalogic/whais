@@ -331,7 +331,7 @@ DbsHandler::DbsHandler (const string& name) :
   pBuffer += *_RC (D_UINT16*, pBuffer + PS_DBS_DIRECTORY_OFF) + m_DbsDirectory.size () + 1;
   while (tablesCount-- > 0)
     {
-      m_Tables.insert (pair < string, PSTable* >(_RC (D_CHAR*, pBuffer), NULL));
+      m_Tables.insert (pair < string, TemplateTable* >(_RC (D_CHAR*, pBuffer), NULL));
       pBuffer += strlen (_RC (D_CHAR*, pBuffer));
     }
 
@@ -374,9 +374,8 @@ DbsHandler::RetrievePersistentTable (D_UINT index)
     }
 
   if (it->second == NULL)
-    it->second = new PSTable (*this, it->first);
+    it->second = new TemplateTable (*this, it->first);
 
-  it->second->m_ReferenceCount++;
   return *it->second;
 
 }
@@ -392,9 +391,8 @@ DbsHandler::RetrievePersistentTable (const D_CHAR* pTableName)
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
 
   if (it->second == NULL)
-    it->second = new PSTable (*this, it->first);
+    it->second = new TemplateTable (*this, it->first);
 
-  it->second->m_ReferenceCount++;
   return *it->second;
 }
 
@@ -414,11 +412,11 @@ DbsHandler::AddTable (const D_CHAR* const       pTableName,
   if (it != m_Tables.end ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_EXISTS));
 
-  m_Tables.insert (pair<string, PSTable*> (tableName, NULL));
+  m_Tables.insert (pair<string, TemplateTable*> (tableName, NULL));
   it = m_Tables.find (tableName);
   try
     {
-      it->second = new PSTable (*this, it->first, pFields, fieldsCount);
+      it->second = new TemplateTable (*this, it->first, pFields, fieldsCount);
     }
   catch (...)
     {
@@ -435,20 +433,18 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
 
   if (hndTable.IsTemporal ())
     {
-      delete &_SC (PSTemporalTable&, hndTable);
+      delete &_SC (TemporalTable&, hndTable);
       return;
     }
 
   WSynchronizerRAII syncHolder (m_Sync);
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
-    if (&hndTable == _SC (I_DBSTable *, it->second))
+    if (&hndTable == _SC (I_DBSTable*, it->second))
       {
-        if (--it->second->m_ReferenceCount == 0)
-          {
-            delete it->second;
-            it->second = NULL;
-          }
+        delete it->second;
+        it->second = NULL;
+
         return;
       }
 }
@@ -464,12 +460,9 @@ DbsHandler::DeleteTable (const D_CHAR * const pTableName)
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
 
   if (it->second == NULL)
-    it->second = new PSTable (*this, it->first);
+    it->second = new TemplateTable (*this, it->first);
 
-  if (it->second->m_ReferenceCount > 0)
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_IN_USE));
-
-  PSTable *const cpTable = it->second;
+  TemplateTable *const cpTable = it->second;
   cpTable->RemoveFromDatabase ();
   delete cpTable;
 
@@ -481,7 +474,7 @@ I_DBSTable&
 DbsHandler::CreateTempTable (const DBSFieldDescriptor* pFields,
                              const D_UINT              fieldsCount)
 {
-  return *(new PSTemporalTable (*this, pFields, fieldsCount));
+  return *(new TemporalTable (*this, pFields, fieldsCount));
 }
 
 void
@@ -531,7 +524,7 @@ DbsHandler::RemoveFromStorage ()
       assert (it->first.c_str () != NULL);
       assert (it->second == NULL);
 
-      auto_ptr<PSTable> table (new PSTable (*this, it->first));
+      auto_ptr<TemplateTable> table (new TemplateTable (*this, it->first));
       table->RemoveFromDatabase ();
     }
 

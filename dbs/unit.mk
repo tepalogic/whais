@@ -7,7 +7,7 @@ pastra_INC:=utils/include
 pastra_SRC=pastra/ps_values.cpp pastra/ps_container.cpp pastra/ps_table.cpp\
 		   pastra/ps_dbsmgr.cpp pastra/ps_valintep.cpp pastra/ps_varstorage.cpp\
 		   pastra/ps_blockcache.cpp pastra/ps_textstrategy.cpp pastra/ps_arraystrategy.cpp\
-		   pastra/ps_btree_index.cpp pastra/ps_btree_fields.cpp
+		   pastra/ps_btree_index.cpp pastra/ps_btree_fields.cpp pastra/ps_templatetable.cpp
 		   
 
 ifeq ($(BUILD_TESTS),yes)
