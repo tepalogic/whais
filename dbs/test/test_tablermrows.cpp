@@ -21,7 +21,7 @@ struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_UINT32, false}
 };
 
-static const D_UINT gElemsCount = 100000000; /* Scale this down for debug purposes! */
+static const D_UINT gElemsCount = 5000000; /* Scale this down for debug purposes! */
 
 bool
 fill_table (I_DBSTable &table)
@@ -184,7 +184,8 @@ main ()
 
   I_DBSHandler & handler = DBSRetrieveDatabase (db_name);
   handler.AddTable ("t_test_tab", field_desc, sizeof field_desc / sizeof (field_desc[0]));
-  I_DBSTable &table = handler.RetrievePersistentTable ("t_test_tab");
+  I_DBSTable& table        = handler.RetrievePersistentTable ("t_test_tab");
+  I_DBSTable& spawnedTable = table.Spawn ();
 
   success = success && fill_table (table);
   success = success && remove_first_rows (table);
@@ -192,6 +193,14 @@ main ()
   success = success && test_for_radius_rows (table);
 
   handler.ReleaseTable (table);
+
+  success = success && fill_table (spawnedTable);
+  success = success && remove_first_rows (spawnedTable);
+  success = success && restore_first_rows (spawnedTable);
+  success = success && test_for_radius_rows (spawnedTable);
+
+  handler.ReleaseTable (spawnedTable);
+
   DBSReleaseDatabase (handler);
   DBSRemoveDatabase (db_name);
   DBSShoutdown ();

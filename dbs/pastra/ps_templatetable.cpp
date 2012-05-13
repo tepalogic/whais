@@ -548,9 +548,9 @@ PrototypeTable::StoreItems (const D_UINT8* pSrcBuffer,
 }
 
 void
-PrototypeTable::RetrieveItems (D_UINT8 *pDestBuffer,
-                        D_UINT64 firstItem,
-                        D_UINT   itemsCount)
+PrototypeTable::RetrieveItems (D_UINT8* pDestBuffer,
+                              D_UINT64  firstItem,
+                              D_UINT    itemsCount)
 {
   if (itemsCount + firstItem > m_RowsCount)
     itemsCount = m_RowsCount - firstItem;

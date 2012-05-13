@@ -93,3 +93,8 @@ UNIT_EXES+=l_test_richrealbtindex
 l_test_richrealbtindex_SRC=test/test_richrealbtindex.cpp
 l_test_richrealbtindex_LIB=dbs/pastra utils/utils custom/custom
 l_test_richrealbtindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_temptableindex
+l_test_temptableindex_SRC=test/test_temptableindex.cpp
+l_test_temptableindex_LIB=dbs/pastra utils/utils custom/custom
+l_test_temptableindex_INC=utils/include custom/include

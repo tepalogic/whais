@@ -40,7 +40,7 @@ operator!= (const DBSFieldDescriptor & field_1,
 }
 
 static bool
-test_fields (I_DBSTable & table)
+test_fields (I_DBSTable& table)
 {
 
   DBSFieldDescriptor field_d;
@@ -133,15 +133,24 @@ main ()
 
         DBSInit (dir.c_str (), dir.c_str ());
       }
-      I_DBSHandler & handler = DBSRetrieveDatabase ("baza_date_1");
-      I_DBSTable & table = handler.RetrievePersistentTable ("table_1");
+      I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
+      I_DBSTable& table = handler.RetrievePersistentTable ("table_1");
 
       if (table.GetFieldsCount () != descCount)
         success = false;
       else
         {
           success = test_fields (table);
+
+          if (success)
+            {
+              I_DBSTable& spawnedTable = table.Spawn ();
+              success = test_fields (spawnedTable);
+              handler.ReleaseTable (spawnedTable);
+            }
+
           handler.ReleaseTable (table);
+
           DBSReleaseDatabase (handler);
           DBSRemoveDatabase ("baza_date_1");
           DBSShoutdown ();

@@ -391,14 +391,11 @@ TempContainer::GetContainerSize () const
 
   if (m_FileContainer.get () != NULL)
     {
-      D_UINT64 result = m_FileContainer->GetContainerSize ();
+      const D_UINT64 result = m_FileContainer->GetContainerSize ();
 
       assert (result >= m_CacheStartPos);
 
-      if (m_CacheStartPos == result)
-        result = m_CacheEndPos;
-
-      return result;
+      return MAX (result, m_CacheEndPos);
     }
 
   assert (m_CacheStartPos == 0);

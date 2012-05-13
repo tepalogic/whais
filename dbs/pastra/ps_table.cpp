@@ -446,6 +446,12 @@ PersistentTable::IsTemporal () const
   return false;
 }
 
+I_DBSTable&
+PersistentTable::Spawn () const
+{
+  return *(new TemporalTable (*this));
+}
+
 void
 PersistentTable::InitFromFile ()
 {
@@ -698,12 +704,21 @@ TemporalTable::~TemporalTable ()
   Flush ();
   if (m_apVariableFields.get () != NULL)
     m_apVariableFields->Flush ();
+
+  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+    delete m_vIndexNodeMgrs [fieldIndex];
 }
 
 bool
 TemporalTable::IsTemporal () const
 {
   return true;
+}
+
+I_DBSTable&
+TemporalTable::Spawn () const
+{
+  return *(new TemporalTable (*this));
 }
 
 void

@@ -47,11 +47,12 @@ public:
   {
   }
 
-  virtual ~ I_DBSTable ()
+  virtual ~I_DBSTable ()
   {
   }
 
   virtual bool               IsTemporal () const = 0;
+  virtual I_DBSTable&        Spawn () const = 0;
   virtual D_UINT             GetFieldsCount () = 0;
   virtual DBSFieldDescriptor GetFieldDescriptor (D_UINT fieldIndex) = 0;
   virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName) = 0;

@@ -46,7 +46,8 @@ public:
   void RemoveFromDatabase ();
 
   //Implementations for I_DBSTable
-  virtual bool IsTemporal () const;
+  virtual bool        IsTemporal () const;
+  virtual I_DBSTable& Spawn () const;
 
 private:
   void InitFromFile ();
@@ -82,7 +83,9 @@ public:
 
   virtual ~TemporalTable ();
 
-  virtual bool IsTemporal () const;
+  //Implementations for I_DBSTable
+  virtual bool        IsTemporal () const;
+  virtual I_DBSTable& Spawn () const;
 
 protected:
   virtual void                 Flush ();
