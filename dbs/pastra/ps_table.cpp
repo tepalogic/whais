@@ -293,23 +293,6 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 }
 
-
-static string
-get_temp_table_name ()
-{
-  static D_UINT64      countTemporalTables = 0;
-  static WSynchronizer sync;
-  string               result (PS_TEMP_TABLE_SUFFIX);
-
-  sync.Enter ();
-  D_UINT64 currentCount = countTemporalTables++;
-  sync.Leave ();
-
-  append_int_to_str (result, currentCount);
-
-  return result;
-}
-
 static void
 create_table_file (const D_UINT64            maxFileSize,
                    const D_CHAR*             pBaseFileName,
@@ -385,7 +368,7 @@ create_table_file (const D_UINT64            maxFileSize,
 
 PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
                                   const string& tableName)
- : PrototypeTable (),
+ : PrototypeTable (dbsHandler),
    m_MaxFileSize (0),
    m_VariableStorageSize (0),
    m_BaseFileName (dbsHandler.GetDir() + tableName),
@@ -400,7 +383,6 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_INCONSITENCY));
 
   assert (m_apMainTable.get () != NULL);
-  assert (m_RootNode != NIL_NODE);
 
   m_RowCache.Init (m_RowSize, 4096, 1024);
 
@@ -414,7 +396,7 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
                                   const DBSFieldDescriptor* pFields,
                                   const D_UINT              fieldsCount,
                                   const bool                temporal)
-  : PrototypeTable (),
+  : PrototypeTable (dbsHandler),
     m_MaxFileSize (0),
     m_VariableStorageSize (0),
     m_BaseFileName (dbsHandler.GetDir() + tableName),
@@ -436,16 +418,6 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
   InitVariableStorages ();
   InitIndexedFields ();
 
-  assert (m_RootNode == NIL_NODE);
-
-  BTreeNodeHandler rootNode (RetrieveNode (AllocateNode (NIL_NODE, 0)));
-  rootNode->SetNext (NIL_NODE);
-  rootNode->SetPrev (NIL_NODE);
-  rootNode->SetKeysCount (0);
-  rootNode->SetLeaf (true);
-  rootNode->InsertKey (rootNode->GetSentinelKey ());
-
-  SetRootNodeId (rootNode->GetNodeId());
 }
 
 PersistentTable::~PersistentTable ()
@@ -466,6 +438,12 @@ PersistentTable::~PersistentTable ()
         delete m_vIndexNodeMgrs [fieldIndex];
       }
   MakeHeaderPersistent ();
+}
+
+bool
+PersistentTable::IsTemporal () const
+{
+  return false;
 }
 
 void
@@ -615,11 +593,20 @@ PersistentTable::RemoveFromDatabase ()
   m_Removed = true;
 }
 
-string&
-PersistentTable::TableBaseName ()
+I_DataContainer*
+PersistentTable::CreateIndexContainer (const D_UINT fieldIndex)
 {
   assert (m_BaseFileName.size () > 0);
-  return m_BaseFileName;
+
+  string containerNameBase = m_BaseFileName;
+
+  containerNameBase += "_idf";
+  containerNameBase += fieldIndex;
+  containerNameBase += "bt";
+
+  return new FileContainer (containerNameBase.c_str (),
+                            DBSGetMaxFileSize(),
+                            0);
 }
 
 void
@@ -655,24 +642,120 @@ PersistentTable::VariableFieldsStore ()
 ////////////////////TemporalTable////////////////////////////////////////////////////////////
 
 
-OldTemporalTable::OldTemporalTable (DbsHandler&               dbsHandler,
-                                    const DBSFieldDescriptor* pFields,
-                                    const D_UINT              fieldsCount)
-  : PersistentTable (dbsHandler, get_temp_table_name (), pFields, fieldsCount, true)
+TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
+                              const DBSFieldDescriptor* pFields,
+                              const D_UINT              fieldsCount)
+  : PrototypeTable (dbsHandler),
+    m_apMainTable (NULL),
+    m_apFixedFields (NULL),
+    m_apVariableFields (NULL)
 {
+
+  //Check the arguments
+  if ((pFields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
+    throw(DBSException(NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED)));
+
+  //Compute the table header descriptor size
+  const D_UINT32 descriptorsSize = sizeof(FieldDescriptor) * fieldsCount +
+                                   get_strlens_till_index(pFields, fieldsCount);
+
+  //Validate the optimally rearrange the fields for minimum row size
+  D_UINT rowSize = 0;
+  validate_field_descriptors(pFields, fieldsCount);
+
+  vector<DBSFieldDescriptor> vect(pFields + 0, pFields + fieldsCount);
+  auto_ptr<D_UINT8> apFieldDescription(new D_UINT8[descriptorsSize]);
+
+  arrange_field_entries(vect, apFieldDescription.get(), rowSize);
+  pFields = &vect.front();
+
+  m_FieldsCount     = fieldsCount;
+  m_DescriptorsSize = descriptorsSize;
+  m_RowSize         = rowSize;
+  m_FieldsDescriptors.reset (apFieldDescription.release ());
+
+  m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
+                           m_FieldsCount,
+                           NULL);
+  m_RowCache.Init (m_RowSize, 4096, 1024);
 }
 
-OldTemporalTable::~OldTemporalTable ()
+TemporalTable::TemporalTable (const PrototypeTable& prototype)
+  : PrototypeTable (prototype),
+    m_apMainTable (NULL),
+    m_apFixedFields (NULL),
+    m_apVariableFields (NULL)
 {
-  FlushNodes ();
-  RemoveFromDatabase ();
+
+  m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
+                           m_FieldsCount,
+                           NULL);
+  m_RowCache.Init (m_RowSize, 4096, 1024);
+}
+
+TemporalTable::~TemporalTable ()
+{
+  Flush ();
+  if (m_apVariableFields.get () != NULL)
+    m_apVariableFields->Flush ();
 }
 
 bool
-OldTemporalTable::IsTemporal () const
+TemporalTable::IsTemporal () const
 {
   return true;
 }
 
+void
+TemporalTable::Flush ()
+{
+  if (m_apVariableFields.get () != NULL)
+    m_apVariableFields->Flush ();
+
+  PrototypeTable::Flush ();
+}
+
+void
+TemporalTable::MakeHeaderPersistent ()
+{
+  //Do nothing!
+}
+
+I_DataContainer*
+TemporalTable::CreateIndexContainer (const D_UINT)
+{
+  return new TempContainer (m_Dbs.GetDir ().c_str (), 4096);
+}
+
+I_DataContainer&
+TemporalTable::MainTableContainer ()
+{
+
+  if (m_apMainTable.get () == NULL)
+    m_apMainTable.reset (new TempContainer (m_Dbs.GetDir ().c_str (), 4096));
+
+  return *m_apMainTable.get ();
+}
+
+I_DataContainer&
+TemporalTable::FixedFieldsContainer ()
+{
+  if (m_apFixedFields.get () == NULL)
+    m_apFixedFields.reset (new TempContainer (m_Dbs.GetDir ().c_str (), 4096));
+
+  return *m_apFixedFields.get ();
+}
+
+VariableLengthStore&
+TemporalTable::VariableFieldsStore ()
+{
+  if (m_apVariableFields.get () == NULL)
+    {
+      m_apVariableFields.reset (new VariableLengthStore ());
+      m_apVariableFields->Init (m_Dbs.GetDir ().c_str (), 4096);
+    }
+
+  return *m_apVariableFields.get ();
+}
 
 

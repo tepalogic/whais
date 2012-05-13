@@ -45,16 +45,18 @@ public:
 
   void RemoveFromDatabase ();
 
+  //Implementations for I_DBSTable
+  virtual bool IsTemporal () const;
+
 private:
   void InitFromFile ();
   void InitIndexedFields ();
   void InitVariableStorages();
 
-
 protected:
   virtual void                 Flush ();
   virtual void                 MakeHeaderPersistent ();
-  virtual std::string&         TableBaseName ();
+  virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex);
   virtual I_DataContainer&     FixedFieldsContainer ();
   virtual I_DataContainer&     MainTableContainer ();
   virtual VariableLengthStore& VariableFieldsStore ();
@@ -69,16 +71,31 @@ protected:
   bool                                  m_Removed;
 };
 
-class OldTemporalTable : public PersistentTable
+class TemporalTable : public PrototypeTable
 {
 public:
 
-  OldTemporalTable (DbsHandler&               dbsHandler,
-                    const DBSFieldDescriptor* pFields,
-                    const D_UINT              fieldsCount);
-  virtual ~OldTemporalTable ();
+  TemporalTable (DbsHandler&               dbsHandler,
+                 const DBSFieldDescriptor* pFields,
+                 const D_UINT              fieldsCount);
+  TemporalTable (const PrototypeTable& protoype);
+
+  virtual ~TemporalTable ();
 
   virtual bool IsTemporal () const;
+
+protected:
+  virtual void                 Flush ();
+  virtual void                 MakeHeaderPersistent ();
+  virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex);
+  virtual I_DataContainer&     FixedFieldsContainer ();
+  virtual I_DataContainer&     MainTableContainer ();
+  virtual VariableLengthStore& VariableFieldsStore ();
+
+  //Data members
+  std::auto_ptr<TempContainer>       m_apMainTable;
+  std::auto_ptr<TempContainer>       m_apFixedFields;
+  std::auto_ptr<VariableLengthStore> m_apVariableFields;
 };
 
 }

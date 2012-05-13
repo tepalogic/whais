@@ -433,7 +433,7 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
 
   if (hndTable.IsTemporal ())
     {
-      delete &_SC (OldTemporalTable&, hndTable);
+      delete &_SC (TemporalTable&, hndTable);
       return;
     }
 
@@ -474,7 +474,7 @@ I_DBSTable&
 DbsHandler::CreateTempTable (const DBSFieldDescriptor* pFields,
                              const D_UINT              fieldsCount)
 {
-  return *(new OldTemporalTable (*this, pFields, fieldsCount));
+  return *(new TemporalTable (*this, pFields, fieldsCount));
 }
 
 void

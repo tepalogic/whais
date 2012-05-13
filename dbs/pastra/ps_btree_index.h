@@ -183,7 +183,7 @@ public:
   virtual NODE_INDEX AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
   virtual void       FreeNode (const NODE_INDEX node) = 0;
 
-  virtual NODE_INDEX  GetRootNodeId () const = 0;
+  virtual NODE_INDEX  GetRootNodeId () = 0;
   virtual void        SetRootNodeId (const NODE_INDEX node) = 0;
 
 protected:

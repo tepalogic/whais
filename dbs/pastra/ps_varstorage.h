@@ -81,6 +81,8 @@ public:
   VariableLengthStore ();
   ~VariableLengthStore ();
 
+  void Init (const D_CHAR*  tempDir,
+             const D_UINT32 reservedMem);
   void Init (const D_CHAR*  pContainerBaseName,
              const D_UINT64 uContainerSize,
              const D_UINT64 uMaxFileSize);
@@ -138,7 +140,8 @@ public:
                               D_UINT64 firstItem,
                               D_UINT itemsCount);
 
-protected:
+private:
+  void       FinishInit ();
   D_UINT64   AllocateEntry (const D_UINT64 prevEntry);
   D_UINT64   ExtentFreeList ();
   void       RemoveRecord (D_UINT64 recordFirstEntry);
@@ -146,11 +149,11 @@ protected:
   void       ExtractFromFreeList (const D_UINT64 entry);
   void       AddToFreeList (const D_UINT64 entry);
 
-  std::auto_ptr<FileContainer> m_apEntriesContainer;
-  BlockCache                   m_EntrysCache;
-  D_UINT64                     m_FirstFreeEntry;
-  D_UINT64                     m_EntrysCount;
-  WSynchronizer                m_Sync;
+  std::auto_ptr<I_DataContainer> m_apEntriesContainer;
+  BlockCache                     m_EntrysCache;
+  D_UINT64                       m_FirstFreeEntry;
+  D_UINT64                       m_EntrysCount;
+  WSynchronizer                  m_Sync;
 };
 
 }

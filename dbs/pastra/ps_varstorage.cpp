@@ -79,20 +79,34 @@ VariableLengthStore::~VariableLengthStore ()
 {
 }
 
+void VariableLengthStore::Init (const D_CHAR*  tempDir,
+                                const D_UINT32 reservedMem)
+{
+
+  m_apEntriesContainer.reset (new TempContainer (tempDir, reservedMem));
+  m_EntrysCount = 0;
+
+  FinishInit ();
+}
+
 void
 VariableLengthStore::Init (const D_CHAR*  pContainerBaseName,
                            const D_UINT64 uContainerSize,
                            const D_UINT64 uMaxFileSize)
 {
-
   assert (uMaxFileSize != 0);
 
   const D_UINT64 uUnitsCount = (uContainerSize + uMaxFileSize- 1) / uMaxFileSize;
 
   m_apEntriesContainer.reset (new FileContainer (pContainerBaseName, uMaxFileSize, uUnitsCount));
-
   m_EntrysCount = m_apEntriesContainer->GetContainerSize () / sizeof (StoreEntry);
 
+  FinishInit ();
+}
+
+void
+VariableLengthStore::FinishInit ()
+{
   if (m_EntrysCount == 0)
     {
       StoreEntry sEntry;

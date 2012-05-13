@@ -33,10 +33,12 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-PrototypeTable::PrototypeTable ()
-  : m_RowsCount (0),
+PrototypeTable::PrototypeTable (DbsHandler& dbs)
+  : m_Dbs (dbs),
+    m_RowsCount (0),
     m_RootNode (NIL_NODE),
     m_FirstUnallocatedRoot (NIL_NODE),
+    m_RowSize (0),
     m_DescriptorsSize (0),
     m_FieldsCount (0),
     m_FieldsDescriptors(NULL),
@@ -47,12 +49,15 @@ PrototypeTable::PrototypeTable ()
 }
 
 PrototypeTable::PrototypeTable (const PrototypeTable& prototype)
-  : m_RowsCount (0),
+  : m_Dbs (prototype.m_Dbs),
+    m_RowsCount (0),
     m_RootNode (NIL_NODE),
     m_FirstUnallocatedRoot (NIL_NODE),
+    m_RowSize (prototype.m_RowSize),
     m_DescriptorsSize (prototype.m_DescriptorsSize),
     m_FieldsCount (prototype.m_FieldsCount),
     m_FieldsDescriptors(),
+    m_vIndexNodeMgrs (),
     m_RowCache (*this),
     m_Sync (),
     m_IndexSync ()
@@ -75,12 +80,6 @@ PrototypeTable::Flush ()
 
   m_RowCache.Flush ();
   FlushNodes ();
-}
-
-bool
-PrototypeTable::IsTemporal () const
-{
-  return false;
 }
 
 D_UINT
@@ -245,7 +244,6 @@ PrototypeTable::CreateFieldIndex (const D_UINT                      fieldIndex,
                                   CREATE_INDEX_CALLBACK_FUNC* const cb_func,
                                   CallBackIndexData* const          pCbData)
 {
-  //TODO:: You might want to handle this special for temporal tables
   if (PrototypeTable::IsFieldIndexed(fieldIndex))
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_INDEXED));
 
@@ -259,22 +257,14 @@ PrototypeTable::CreateFieldIndex (const D_UINT                      fieldIndex,
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
 
   const D_UINT nodeSizeKB  = 16; //16KB
-  string containerNameBase = TableBaseName ();
 
-  containerNameBase += "_idf";
-  containerNameBase += fieldIndex;
-  containerNameBase += "bt";
-
-  auto_ptr <I_DataContainer> apIndexContainer (new FileContainer (containerNameBase.c_str (),
-                                                                  DBSGetMaxFileSize(),
-                                                                  0));
-
-  auto_ptr <FieldIndexNodeManager> apFieldMgr (new FieldIndexNodeManager (apIndexContainer,
-                                                                          nodeSizeKB * 1024,
-                                                                          0x400000, //4MB
-                                                                          _SC (DBS_FIELD_TYPE,
-                                                                               field.m_TypeDesc),
-                                                                          true));
+  auto_ptr<I_DataContainer>       apIndexContainer (CreateIndexContainer (fieldIndex));
+  auto_ptr<FieldIndexNodeManager> apFieldMgr (new FieldIndexNodeManager (apIndexContainer,
+                                                                         nodeSizeKB * 1024,
+                                                                         0x400000, //4MB
+                                                                         _SC (DBS_FIELD_TYPE,
+                                                                              field.m_TypeDesc),
+                                                                         true));
 
   BTreeNodeHandler rootNode (apFieldMgr->RetrieveNode (apFieldMgr->AllocateNode (NIL_NODE, 0)));
   rootNode->SetNext (NIL_NODE);
@@ -284,7 +274,7 @@ PrototypeTable::CreateFieldIndex (const D_UINT                      fieldIndex,
   rootNode->InsertKey (rootNode->GetSentinelKey ());
 
   apFieldMgr->SetRootNodeId (rootNode->GetNodeId());
-  BTree fieldTree (* apFieldMgr.get ());
+  BTree fieldTree (*apFieldMgr.get ());
 
   for (D_UINT64 rowIndex = 0; rowIndex < m_RowsCount; ++rowIndex)
     {
@@ -476,8 +466,20 @@ PrototypeTable::FreeNode (const NODE_INDEX nodeId)
 }
 
 NODE_INDEX
-PrototypeTable::GetRootNodeId () const
+PrototypeTable::GetRootNodeId ()
 {
+  if (m_RootNode == NIL_NODE)
+    {
+      BTreeNodeHandler rootNode (RetrieveNode (AllocateNode (NIL_NODE, 0)));
+      rootNode->SetNext (NIL_NODE);
+      rootNode->SetPrev (NIL_NODE);
+      rootNode->SetKeysCount (0);
+      rootNode->SetLeaf (true);
+      rootNode->InsertKey (rootNode->GetSentinelKey ());
+
+      SetRootNodeId (rootNode->GetNodeId());
+    }
+
   return m_RootNode;
 }
 

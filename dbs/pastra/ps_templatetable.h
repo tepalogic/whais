@@ -59,7 +59,7 @@ class PrototypeTable : public I_DBSTable, public I_BlocksManager, public I_BTree
 {
 
 public:
-  PrototypeTable ();
+  PrototypeTable (DbsHandler& dbs);
   PrototypeTable (const PrototypeTable& prototype);
 
   virtual ~PrototypeTable ();
@@ -68,7 +68,7 @@ public:
   virtual D_UINT      GetRawNodeSize () const;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
-  virtual NODE_INDEX  GetRootNodeId () const;
+  virtual NODE_INDEX  GetRootNodeId ();
   virtual void        SetRootNodeId (const NODE_INDEX node);
 
   //Implementations for I_PSBlocksManager
@@ -76,7 +76,6 @@ public:
   virtual void RetrieveItems (D_UINT8* pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount);
 
   //Implementations for I_DBSTable
-  virtual bool               IsTemporal () const;
   virtual D_UINT             GetFieldsCount ();
   virtual DBSFieldDescriptor GetFieldDescriptor (D_UINT fieldIndex);
   virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName);
@@ -286,12 +285,13 @@ protected:
   //TODO:: Template Methods
   virtual void                 Flush ();
   virtual void                 MakeHeaderPersistent () = 0;
-  virtual std::string&         TableBaseName () = 0;
+  virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex) = 0;
   virtual I_DataContainer&     FixedFieldsContainer () = 0;
   virtual I_DataContainer&     MainTableContainer () = 0;
   virtual VariableLengthStore& VariableFieldsStore () = 0;
 
   //Data members
+  DbsHandler                            m_Dbs;
   D_UINT64                              m_RowsCount;
   NODE_INDEX                            m_RootNode;
   NODE_INDEX                            m_FirstUnallocatedRoot;

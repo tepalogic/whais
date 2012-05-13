@@ -956,7 +956,7 @@ public:
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
 
-  virtual NODE_INDEX  GetRootNodeId () const;
+  virtual NODE_INDEX  GetRootNodeId ();
   virtual void        SetRootNodeId (const NODE_INDEX node);
 
 protected:
@@ -973,7 +973,7 @@ protected:
   const D_UINT                          m_MaxCachedMem;
   NODE_INDEX                            m_RootNode;
   NODE_INDEX                            m_FirstFreeNode;
-  std::auto_ptr <I_DataContainer>       m_Container;
+  std::auto_ptr<I_DataContainer>        m_Container;
   const DBS_FIELD_TYPE                  m_FieldType;
 
 private:

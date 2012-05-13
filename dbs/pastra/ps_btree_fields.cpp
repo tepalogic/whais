@@ -113,7 +113,7 @@ FieldIndexNodeManager::FreeNode (const NODE_INDEX nodeId)
 }
 
 NODE_INDEX
-FieldIndexNodeManager::GetRootNodeId () const
+FieldIndexNodeManager::GetRootNodeId ()
 {
   return m_RootNode;
 }
