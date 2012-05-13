@@ -81,10 +81,12 @@ public:
   VariableLengthStore ();
   ~VariableLengthStore ();
 
-  void Init (const D_CHAR * pContainerBaseName,
-             D_UINT64 uContainerSize,
-             D_UINT uMaxFileSize);
+  void Init (const D_CHAR*  pContainerBaseName,
+             const D_UINT64 uContainerSize,
+             const D_UINT64 uMaxFileSize);
 
+
+  void Flush ();
   void MarkForRemoval ();
 
   D_UINT64 AddRecord (const D_UINT8* pBuffer,

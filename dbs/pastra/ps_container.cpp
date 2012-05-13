@@ -59,8 +59,8 @@ pastra::append_int_to_str (std::string& dest, D_UINT64 number)
 }
 
 FileContainer::FileContainer (const D_CHAR*  pFileNameBase,
-                              const D_UINT32 uMaxFileSize,
-                              const D_UINT32 uUnitsCount)
+                              const D_UINT64 uMaxFileSize,
+                              const D_UINT64 uUnitsCount)
   : m_uMaxFileUnitSize (uMaxFileSize),
     m_FilesHandles (),
     m_FileNameBase (pFileNameBase),
@@ -86,14 +86,15 @@ FileContainer::FileContainer (const D_CHAR*  pFileNameBase,
   // Check for structural consistency
   for (D_UINT uCounter = 0; uCounter < uUnitsCount; ++uCounter)
     {
-      WFile & rContainerUnit = m_FilesHandles[uCounter];
+      WFile& rContainerUnit = m_FilesHandles[uCounter];
 
-      if (rContainerUnit.GetSize () != uMaxFileSize)
-        if ((uCounter != (uUnitsCount - 1)) || (rContainerUnit.GetSize ()
-                                                > uMaxFileSize))
+      if ((rContainerUnit.GetSize () != uMaxFileSize) &&
+          ((uCounter != (uUnitsCount - 1)) || (rContainerUnit.GetSize () > uMaxFileSize)))
+        {
           throw WFileContainerException ("Inconsistent container!",
                                          _EXTRA
                                          (WFileContainerException::CONTAINTER_INVALID));
+        }
     }
 
 }

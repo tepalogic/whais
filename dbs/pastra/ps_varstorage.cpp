@@ -80,9 +80,9 @@ VariableLengthStore::~VariableLengthStore ()
 }
 
 void
-VariableLengthStore::Init (const D_CHAR* pContainerBaseName,
-                           D_UINT64      uContainerSize,
-                           D_UINT        uMaxFileSize)
+VariableLengthStore::Init (const D_CHAR*  pContainerBaseName,
+                           const D_UINT64 uContainerSize,
+                           const D_UINT64 uMaxFileSize)
 {
 
   assert (uMaxFileSize != 0);
@@ -119,6 +119,14 @@ VariableLengthStore::Init (const D_CHAR* pContainerBaseName,
   assert ((m_apEntriesContainer->GetContainerSize() % sizeof (StoreEntry)) == 0);
 
   assert (m_EntrysCount > 0);
+}
+
+void
+VariableLengthStore::Flush ()
+{
+  WSynchronizerRAII syncHolder (m_Sync);
+
+  m_EntrysCache.Flush ();
 }
 
 void
@@ -671,7 +679,7 @@ VariableLengthStore::ExtentFreeList ()
   ++m_EntrysCount;
 
   //Reload the content of item's block.
-  m_EntrysCache.ForceItemUpdate (m_FirstFreeEntry);
+  m_EntrysCache.RefreshItem (m_FirstFreeEntry);
 
   StoredItem  cachedItem = m_EntrysCache.RetriveItem (0);
   StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());

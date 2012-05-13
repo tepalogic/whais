@@ -21,7 +21,7 @@ struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_UINT32, false}
 };
 
-static const D_UINT gElemsCount = 100000000; /* Scale this down for debugin purposes! */
+static const D_UINT gElemsCount = 100000000; /* Scale this down for debug purposes! */
 
 bool
 fill_table (I_DBSTable &table)

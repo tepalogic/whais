@@ -70,12 +70,12 @@ public:
 };
 
 
-class FileContainer:public I_DataContainer
+class FileContainer : public I_DataContainer
 {
 public:
-  FileContainer (const D_CHAR* pFileNameBase,
-                 const D_UINT32 uMaxFileSize,
-                 const D_UINT32 uUnitsCount);
+  FileContainer (const D_CHAR*  pFileNameBase,
+                 const D_UINT64 uMaxFileSize,
+                 const D_UINT64 uUnitsCount);
 
   virtual ~FileContainer ();
 
@@ -90,7 +90,7 @@ protected:
   void ExtendContainer ();
 
 protected:
-  const D_UINT32       m_uMaxFileUnitSize;
+  const D_UINT64       m_uMaxFileUnitSize;
   std::vector< WFile > m_FilesHandles;
   std::string          m_FileNameBase;
   bool                 m_IsMarked;

@@ -135,22 +135,21 @@ public:
   BlockCache (I_BlocksManager& rBlockManager);
   ~BlockCache ();
 
-  void Init (const D_UINT itemSize, const D_UINT blockSize, const D_UINT maxBlockCount);
-
+  void       Init (const D_UINT itemSize,
+                   const D_UINT blockSize,
+                   const D_UINT maxBlockCount);
+  void       Flush ();
   StoredItem RetriveItem (const D_UINT64 item);
-  void       ForceItemUpdate (const D_UINT64 item);
+  void       RefreshItem (const D_UINT64 item);
 
-
-protected:
-  I_BlocksManager& mManager;
-  D_UINT           mItemSize;
-  D_UINT           mMaxBlocks;
-  D_UINT           mBlockSize;
-
-  std::map <D_UINT64, class BlockEntry> mCachedBlocks;
 
 private:
-  D_UINT mNextToClear;
+  I_BlocksManager& m_Manager;
+  D_UINT           m_ItemSize;
+  D_UINT           m_MaxBlocks;
+  D_UINT           m_BlockSize;
+
+  std::map <D_UINT64, class BlockEntry> m_CachedBlocks;
 };
 
 }

@@ -164,6 +164,8 @@ test_nulliness()
         result = false;
       else if (textVarRaw.GetCharAtIndex(1).m_IsNull == false)
         result = false;
+
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -224,8 +226,6 @@ test_text_append ()
 
       D_UINT64 allocated_entry = 0;
 
-
-
       const DBSText originalText (_RC(const D_UINT8*, pOriginalText));
       const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
 
@@ -235,6 +235,7 @@ test_text_append ()
         allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText),
                                              (sizeof charValues / sizeof (D_UINT32)));
 
+        storage.Flush ();
       }
 
       if (originalText.GetCharactersCount() != charsCount)
@@ -245,20 +246,23 @@ test_text_append ()
           storage.Init(temp_file_base.c_str(), (originalText.GetRawUtf8Count() + 713 - 1) / 713, 713);
           storage.MarkForRemoval();
 
-          DBSText destinationText (*(new RowFieldText(storage, allocated_entry, originalText.GetRawUtf8Count())));
+          {
+            DBSText destinationText (*(new RowFieldText(storage, allocated_entry, originalText.GetRawUtf8Count())));
 
-          if (destinationText.GetCharactersCount() != originalText.GetCharactersCount())
-            result = false;
-          else if (destinationText.GetRawUtf8Count() != originalText.GetRawUtf8Count())
-            result = false;
-          else
-            {
-              for (D_UINT index = 0; index < charsCount; ++index)
-                if ( destinationText.GetCharAtIndex(index).m_IsNull ||
-                    (destinationText.GetCharAtIndex(index).m_Value != originalText.GetCharAtIndex(index).m_Value) ||
-                    (destinationText.GetCharAtIndex(index).m_Value != charValues[index]))
-                    result = false;
-            }
+            if (destinationText.GetCharactersCount() != originalText.GetCharactersCount())
+              result = false;
+            else if (destinationText.GetRawUtf8Count() != originalText.GetRawUtf8Count())
+              result = false;
+            else
+              {
+                for (D_UINT index = 0; index < charsCount; ++index)
+                  if ( destinationText.GetCharAtIndex(index).m_IsNull ||
+                      (destinationText.GetCharAtIndex(index).m_Value != originalText.GetCharAtIndex(index).m_Value) ||
+                      (destinationText.GetCharAtIndex(index).m_Value != charValues[index]))
+                      result = false;
+              }
+          }
+          storage.Flush ();
         }
     }
 
@@ -322,8 +326,8 @@ test_character_insertion ()
               else if (originalText.GetCharAtIndex(charsCount / 2).m_Value != 0x211356)
                 result = false;
 
+              storage.Flush ();
             }
-
         }
     }
 

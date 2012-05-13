@@ -204,11 +204,11 @@ row_of_clause: /* empty */
 ;
 
 table_type_spec: TABLE rec_with_clause
-				 { $2->val.u_tspec.type = T_TABLE_MASK; $$ = $2 };
+				 { $2->val.u_tspec.type = T_TABLE_MASK; $$ = $2; }
 ;
 
 record_type_spec: RECORD rec_with_clause
-				{ $2->val.u_tspec.type = T_RECORD_MASK; $$ = $2 };
+				{ $2->val.u_tspec.type = T_RECORD_MASK; $$ = $2; }
 ;
 
 rec_with_clause: /* empty */
@@ -314,7 +314,7 @@ local_block_statement: /* empty */
 procedure_parameter_decl: /* empty */
                         { $$ = NULL; }
                         | list_of_paramaters_decl
-                        { $$ = $1 }
+                        { $$ = $1; }
 ;
 
 list_of_paramaters_decl: IDENTIFIER AS type_spec

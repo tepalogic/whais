@@ -170,7 +170,7 @@ test_for_one_field (I_DBSHandler &rDbs)
   rDbs.AddTable ("t_test_tab", &temp, 1);
   I_DBSTable &table = rDbs.RetrievePersistentTable ("t_test_tab");
 
-  D_UINT rowSize = (_RC (pastra::TemplateTable &, table)).GetRowSize ();
+  D_UINT rowSize = (_RC (pastra::PrototypeTable &, table)).GetRowSize ();
 
 
   //Check if we added the byte to keep the null bit.
@@ -221,9 +221,9 @@ test_for_fields (I_DBSHandler &rDbs,
       result && (fieldIndex < fieldsCount);
       ++fieldIndex)
     {
-      FieldDescriptor& descr = _SC(TemplateTable &, table).GetFieldDescriptorInternal (fieldIndex);
+      FieldDescriptor& descr = _SC(PrototypeTable &, table).GetFieldDescriptorInternal (fieldIndex);
 
-      if (descr.m_NullBitIndex >= _SC(TemplateTable &, table).GetRowSize () * 8)
+      if (descr.m_NullBitIndex >= _SC(PrototypeTable &, table).GetRowSize () * 8)
         {
           result = false;
           break;

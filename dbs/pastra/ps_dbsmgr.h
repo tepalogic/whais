@@ -34,7 +34,8 @@
 namespace pastra
 {
 
-class TemplateTable;
+//Some classes forward declarations
+class PersistentTable;
 
 class DbsHandler : public I_DBSHandler
 {
@@ -61,7 +62,7 @@ public:
   const std::string& GetDir () { return m_DbsDirectory; }
   D_UINT64           GetMaxFileSize () { return m_MaxFileSize; }
 protected:
-  typedef std::map<std::string, TemplateTable*> TABLES;
+  typedef std::map<std::string, PersistentTable*> TABLES;
 
   void SyncToFile ();
 

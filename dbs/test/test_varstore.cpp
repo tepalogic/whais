@@ -100,6 +100,8 @@ bool test_record_create ()
         else if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
           result = false;
       }
+
+    storage.Flush ();
   }
 
   if (result)
@@ -120,6 +122,8 @@ bool test_record_create ()
         result = false;
       else if (test_record (&storage, pattern2, 41, firstEntries[1], sizeof pattern2) == false)
         result = false;
+
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -162,6 +166,8 @@ test_record_removal ()
         if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
           result = false;
       }
+
+    storage.Flush ();
   }
 
   if (result)
@@ -178,6 +184,8 @@ test_record_removal ()
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
         result = false;
+
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -200,7 +208,6 @@ bool test_record_update ()
 
     VariableLengthStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
-
 
     if (result)
       {
@@ -225,6 +232,8 @@ bool test_record_update ()
         else if (test_record (&storage, pattern2, 11, firstEntries[0], sizeof pattern2) == false)
           result = false;
       }
+
+    storage.Flush ();
   }
 
   if (result)
@@ -248,6 +257,7 @@ bool test_record_update ()
       else if (test_record (&storage, pattern3, 21, firstEntries[0], sizeof pattern3) == false)
         result = false;
 
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -315,6 +325,8 @@ test_record_container_update ()
         result = false;
         break;
       }
+
+    storage.Flush ();
    }
   while (0);
 
@@ -377,6 +389,8 @@ test_record_record_update ()
         result = false;
         break;
       }
+
+    storage.Flush ();
    }
   while (0);
 

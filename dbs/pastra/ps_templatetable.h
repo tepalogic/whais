@@ -55,19 +55,14 @@ struct FieldDescriptor
 };
 
 
-class TemplateTable : public I_DBSTable, public I_BlocksManager, public I_BTreeNodeManager
+class PrototypeTable : public I_DBSTable, public I_BlocksManager, public I_BTreeNodeManager
 {
 
 public:
-  TemplateTable (DbsHandler& dbsHandler, const std::string& tableName);
-  TemplateTable (DbsHandler&               dbsHandler,
-                 const std::string&        tableName,
-                 const DBSFieldDescriptor* pFields,
-                 const D_UINT              fieldsCount,
-                 const bool                temporal = false);
-  virtual ~TemplateTable ();
+  PrototypeTable ();
+  PrototypeTable (const PrototypeTable& prototype);
 
-  void     RemoveFromDatabase ();
+  virtual ~PrototypeTable ();
 
   //Implementations for I_BTreeNodeManager
   virtual D_UINT      GetRawNodeSize () const;
@@ -276,12 +271,6 @@ private:
                                          D_UINT64       maxCount,
                                          const D_UINT   filedIndex);
 
-  void InitIndexedFields ();
-  void InitVariableStorages();
-  void InitFromFile ();
-  void SyncToFile ();
-protected:
-
   D_UINT64 IncreaseRowCount ();
   void     CheckRowToReuse (const D_UINT64 rowIndex);
   void     CheckRowToDelete (const D_UINT64 rowIndex);
@@ -293,25 +282,27 @@ protected:
   virtual I_BTreeNode* GetNode (const NODE_INDEX node);
   virtual void         StoreNode (I_BTreeNode *const pNode);
 
+protected:
+  //TODO:: Template Methods
+  virtual void                 Flush ();
+  virtual void                 MakeHeaderPersistent () = 0;
+  virtual std::string&         TableBaseName () = 0;
+  virtual I_DataContainer&     FixedFieldsContainer () = 0;
+  virtual I_DataContainer&     MainTableContainer () = 0;
+  virtual VariableLengthStore& VariableFieldsStore () = 0;
+
   //Data members
-  D_UINT64                              m_MaxFileSize;
-  D_UINT64                              m_VariableStorageSize;
   D_UINT64                              m_RowsCount;
   NODE_INDEX                            m_RootNode;
   NODE_INDEX                            m_FirstUnallocatedRoot;
   D_UINT32                              m_RowSize;
   D_UINT32                              m_DescriptorsSize;
   D_UINT16                              m_FieldsCount;
-  std::string                           m_BaseFileName;
   std::auto_ptr<D_UINT8>                m_FieldsDescriptors;
-  std::auto_ptr<FileContainer>          m_apMainTable;
-  std::auto_ptr<FileContainer>          m_apFixedFields;
-  std::auto_ptr<VariableLengthStore>    m_apVariableFields;
   std::vector<FieldIndexNodeManager*>   m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
   WSynchronizer                         m_Sync;
   WSynchronizer                         m_IndexSync;
-  bool                                  m_Removed;
 };
 
 class TableRmKey : public I_BTreeKey
@@ -328,7 +319,7 @@ class TableRmNode : public I_BTreeNode
 public:
   static const D_UINT RAW_NODE_SIZE = 16384;
 
-  TableRmNode (TemplateTable &table, const NODE_INDEX nodeId);
+  TableRmNode (PrototypeTable &table, const NODE_INDEX nodeId);
   virtual ~TableRmNode ();
 
   //Implementation of I_BTreeNode
@@ -348,7 +339,6 @@ public:
   virtual const I_BTreeKey& GetSentinelKey () const;
 
 protected:
-
   std::auto_ptr <D_UINT8> m_cpNodeData;
 };
 

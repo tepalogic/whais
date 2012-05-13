@@ -331,7 +331,7 @@ DbsHandler::DbsHandler (const string& name) :
   pBuffer += *_RC (D_UINT16*, pBuffer + PS_DBS_DIRECTORY_OFF) + m_DbsDirectory.size () + 1;
   while (tablesCount-- > 0)
     {
-      m_Tables.insert (pair < string, TemplateTable* >(_RC (D_CHAR*, pBuffer), NULL));
+      m_Tables.insert (pair < string, PersistentTable* >(_RC (D_CHAR*, pBuffer), NULL));
       pBuffer += strlen (_RC (D_CHAR*, pBuffer));
     }
 
@@ -374,7 +374,7 @@ DbsHandler::RetrievePersistentTable (D_UINT index)
     }
 
   if (it->second == NULL)
-    it->second = new TemplateTable (*this, it->first);
+    it->second = new PersistentTable (*this, it->first);
 
   return *it->second;
 
@@ -391,7 +391,7 @@ DbsHandler::RetrievePersistentTable (const D_CHAR* pTableName)
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
 
   if (it->second == NULL)
-    it->second = new TemplateTable (*this, it->first);
+    it->second = new PersistentTable (*this, it->first);
 
   return *it->second;
 }
@@ -412,11 +412,11 @@ DbsHandler::AddTable (const D_CHAR* const       pTableName,
   if (it != m_Tables.end ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_EXISTS));
 
-  m_Tables.insert (pair<string, TemplateTable*> (tableName, NULL));
+  m_Tables.insert (pair<string, PersistentTable*> (tableName, NULL));
   it = m_Tables.find (tableName);
   try
     {
-      it->second = new TemplateTable (*this, it->first, pFields, fieldsCount);
+      it->second = new PersistentTable (*this, it->first, pFields, fieldsCount);
     }
   catch (...)
     {
@@ -433,7 +433,7 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
 
   if (hndTable.IsTemporal ())
     {
-      delete &_SC (TemporalTable&, hndTable);
+      delete &_SC (OldTemporalTable&, hndTable);
       return;
     }
 
@@ -460,9 +460,9 @@ DbsHandler::DeleteTable (const D_CHAR * const pTableName)
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
 
   if (it->second == NULL)
-    it->second = new TemplateTable (*this, it->first);
+    it->second = new PersistentTable (*this, it->first);
 
-  TemplateTable *const cpTable = it->second;
+  PersistentTable* const cpTable = it->second;
   cpTable->RemoveFromDatabase ();
   delete cpTable;
 
@@ -474,7 +474,7 @@ I_DBSTable&
 DbsHandler::CreateTempTable (const DBSFieldDescriptor* pFields,
                              const D_UINT              fieldsCount)
 {
-  return *(new TemporalTable (*this, pFields, fieldsCount));
+  return *(new OldTemporalTable (*this, pFields, fieldsCount));
 }
 
 void
@@ -524,7 +524,7 @@ DbsHandler::RemoveFromStorage ()
       assert (it->first.c_str () != NULL);
       assert (it->second == NULL);
 
-      auto_ptr<TemplateTable> table (new TemplateTable (*this, it->first));
+      auto_ptr<PersistentTable> table (new PersistentTable (*this, it->first));
       table->RemoveFromDatabase ();
     }
 

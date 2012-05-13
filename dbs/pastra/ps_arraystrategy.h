@@ -104,7 +104,7 @@ protected:
 
 class TemporalArray : public I_ArrayStrategy
 {
-  friend class TemplateTable;
+  friend class PrototypeTable;
 public:
   TemporalArray (const DBS_FIELD_TYPE elemsType);
   virtual ~TemporalArray ();
@@ -123,7 +123,7 @@ protected:
 
 class RowFieldArray : public I_ArrayStrategy
 {
-  friend class TemplateTable;
+  friend class PrototypeTable;
 public:
   RowFieldArray (VariableLengthStore &storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type);
   ~RowFieldArray ();
