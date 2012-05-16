@@ -44,7 +44,7 @@ bool test_pattern (D_UINT8 *pattern, D_UINT size, D_UINT8 seed)
   return true;
 }
 
-bool test_record (VariableLengthStore *storage,
+bool test_record (VLVarsStore* storage,
                   D_UINT8*const pattern,
                   D_UINT seed,
                   D_UINT firstEntry,
@@ -68,7 +68,7 @@ bool test_record_create ()
     std::string temp_file_base = DBSGetWorkingDir();
     temp_file_base += "t_ps_varstore";
 
-    VariableLengthStore storage;
+    VLVarsStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
 
     init_pattern (pattern1, sizeof pattern1, 31);
@@ -113,7 +113,7 @@ bool test_record_create ()
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VariableLengthStore storage;
+      VLVarsStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
@@ -146,7 +146,7 @@ test_record_removal ()
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
-    VariableLengthStore storage;
+    VLVarsStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
     if (result)
@@ -179,7 +179,7 @@ test_record_removal ()
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VariableLengthStore storage;
+      VLVarsStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
@@ -206,7 +206,7 @@ bool test_record_update ()
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
-    VariableLengthStore storage;
+    VLVarsStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
     if (result)
@@ -245,7 +245,7 @@ bool test_record_update ()
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VariableLengthStore storage;
+      VLVarsStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
       storage.MarkForRemoval ();
 
@@ -282,9 +282,9 @@ test_record_container_update ()
     temp_file_base += "t_ps_varstore";
 
     TempContainer container (DBSGetTempDir(), 1024);
-    container.StoreData (0, sizeof testBuffer, testBuffer);
+    container.Write (0, sizeof testBuffer, testBuffer);
 
-    VariableLengthStore storage;
+    VLVarsStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
@@ -295,24 +295,24 @@ test_record_container_update ()
         result = false;
         break;
       }
-    storage.UpdateRecord (entry, 0, container, 0, container.GetContainerSize());
+    storage.UpdateRecord (entry, 0, container, 0, container.Size());
     D_UINT8 temp[128];
     assert (sizeof temp == sizeof testBuffer);
 
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord(entry, 0, container.GetContainerSize(), temp);
+    storage.GetRecord(entry, 0, container.Size(), temp);
     if ((memcmp(temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.GetContainerSize()))
+        (sizeof temp  != container.Size()))
       {
         result = false;
         break;
       }
 
-    storage.UpdateRecord (entry, sizeof testBuffer, container, 0, container.GetContainerSize());
+    storage.UpdateRecord (entry, sizeof testBuffer, container, 0, container.Size());
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord(entry, 0, container.GetContainerSize(), temp);
+    storage.GetRecord(entry, 0, container.Size(), temp);
     if ((memcmp(temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.GetContainerSize()))
+        (sizeof temp  != container.Size()))
       {
         result = false;
         break;
@@ -347,13 +347,13 @@ test_record_record_update ()
     temp_file_base += "t_ps_varstore";
 
     TempContainer container (DBSGetTempDir(), 1024);
-    container.StoreData (0, sizeof testBuffer, testBuffer);
+    container.Write (0, sizeof testBuffer, testBuffer);
 
-    VariableLengthStore storage;
+    VLVarsStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
-    const D_UINT64 entry = storage.AddRecord (container,  0, container.GetContainerSize());
+    const D_UINT64 entry = storage.AddRecord (container,  0, container.Size());
 
     if (entry == 0)
       {
@@ -364,19 +364,19 @@ test_record_record_update ()
     assert (sizeof temp == sizeof testBuffer);
 
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord(entry, 0, container.GetContainerSize(), temp);
+    storage.GetRecord(entry, 0, container.Size(), temp);
     if ((memcmp(temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.GetContainerSize()))
+        (sizeof temp  != container.Size()))
       {
         result = false;
         break;
       }
 
-    storage.UpdateRecord (entry, sizeof testBuffer, storage, entry, 0, container.GetContainerSize());
+    storage.UpdateRecord (entry, sizeof testBuffer, storage, entry, 0, container.Size());
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord(entry, 0, container.GetContainerSize(), temp);
+    storage.GetRecord(entry, 0, container.Size(), temp);
     if ((memcmp(temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.GetContainerSize()))
+        (sizeof temp  != container.Size()))
       {
         result = false;
         break;

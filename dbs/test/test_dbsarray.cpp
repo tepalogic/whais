@@ -80,7 +80,7 @@ bool test_bool_array ()
 }
 
 template <typename T, typename Tint> bool
-test_integers_array (const char *type)
+test_integers_array (const char* type)
 {
   std::cout << "Testing " << type << " array... ";
   bool result = true;

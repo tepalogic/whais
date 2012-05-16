@@ -33,12 +33,12 @@ create_container (D_UINT max_file_size, const D_UINT container_size)
       D_UINT write_size = MIN (sizeof (buffer), left_to_write);
 
       memset (buffer, marker, sizeof buffer);
-      container.StoreData (current_pos, write_size, buffer);
+      container.Write (current_pos, write_size, buffer);
       marker = (marker + 1) & 0xFF;
       left_to_write -= write_size;
       current_pos += write_size;
     }
-  return container.GetContainerSize () == container_size;
+  return container.Size () == container_size;
 }
 
 static bool
@@ -52,13 +52,13 @@ check_container (D_UINT max_file_size,
   D_UINT8 marker = marker_start;
   D_UINT left_to_read = container_size;
 
-  if (container.GetContainerSize () != container_size)
+  if (container.Size () != container_size)
     return false;
 
   while (left_to_read > 0)
     {
       D_UINT read_size = MIN (sizeof (buffer), left_to_read);
-      container.RetrieveData (current_pos, read_size, buffer);
+      container.Read (current_pos, read_size, buffer);
 
       for (D_UINT index = 0; index < read_size; ++index)
         if (buffer[index] != marker)
@@ -76,16 +76,16 @@ colapse_container (D_UINT max_file_size, const D_UINT container_size)
   D_UINT64 current_pos = 0;
   FileContainer container (fileName, max_file_size,
                            (container_size / max_file_size) + 1);
-  D_UINT64 new_container_size = container.GetContainerSize ();
+  D_UINT64 new_container_size = container.Size ();
 
   if (new_container_size != container_size)
     return false;
 
-  while (current_pos < container.GetContainerSize ())
+  while (current_pos < container.Size ())
     {
       D_UINT64 to_delete = MIN (sizeof buffer,
-                                container.GetContainerSize () - current_pos);
-      container.ColapseContent (current_pos, current_pos + to_delete);
+                                container.Size () - current_pos);
+      container.Colapse (current_pos, current_pos + to_delete);
       current_pos += to_delete;
       new_container_size -= to_delete;
     }
@@ -108,34 +108,34 @@ check_temp_container (D_UINT uTestContainerSize)
       D_UINT write_size = MIN (uStepSize, left_to_write);
 
       memset (buffer, marker, sizeof buffer);
-      container.StoreData (current_pos, write_size, buffer);
+      container.Write (current_pos, write_size, buffer);
       marker = (marker + 1) & 0xFF;
       left_to_write -= write_size;
       current_pos += write_size;
     }
 
-  if (container.GetContainerSize () != uTestContainerSize)
+  if (container.Size () != uTestContainerSize)
     return false;
 
-  container.ColapseContent (uTestContainerSize - uStepSize,
+  container.Colapse (uTestContainerSize - uStepSize,
                             uTestContainerSize);
 
-  if (container.GetContainerSize () != (uTestContainerSize - uStepSize))
+  if (container.Size () != (uTestContainerSize - uStepSize))
     return false;
 
-  container.ColapseContent (0, uStepSize);
+  container.Colapse (0, uStepSize);
 
-  if (container.GetContainerSize () != (uTestContainerSize - 2 * uStepSize))
+  if (container.Size () != (uTestContainerSize - 2 * uStepSize))
     return false;
 
-  D_UINT left_to_read = container.GetContainerSize ();
+  D_UINT left_to_read = container.Size ();
   marker = 1;
   current_pos = 0;
 
   while (left_to_read > 0)
     {
       D_UINT read_size = MIN (uStepSize, left_to_read);
-      container.RetrieveData (current_pos, read_size, buffer);
+      container.Read (current_pos, read_size, buffer);
 
       for (D_UINT index = 0; index < read_size; ++index)
         if (buffer[index] != marker)

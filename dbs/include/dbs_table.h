@@ -38,7 +38,7 @@ struct CallBackIndexData
   D_UINT64      m_RowsCount;
 };
 
-typedef void CREATE_INDEX_CALLBACK_FUNC (CallBackIndexData *cb_data);
+typedef void CREATE_INDEX_CALLBACK_FUNC (CallBackIndexData* cb_data);
 
 class I_DBSTable
 {
@@ -68,8 +68,8 @@ public:
   virtual void RemoveFieldIndex (const D_UINT fieldIndex) = 0;
   virtual bool IsFieldIndexed (const D_UINT fieldIndex) const = 0;
 
-  virtual void SetEntry (const DBSBool &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
-  virtual void SetEntry (const DBSChar &rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSBool& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
+  virtual void SetEntry (const DBSChar& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
   virtual void SetEntry (const DBSDate& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
   virtual void SetEntry (const DBSDateTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;
   virtual void SetEntry (const DBSHiresTime& rSource, const D_UINT64 rowIndex, const D_UINT fieldIndex) = 0;

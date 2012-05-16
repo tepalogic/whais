@@ -139,7 +139,7 @@ test_nulliness()
       std::string temp_file_base = DBSGetWorkingDir();
       temp_file_base += "t_cont_1";
 
-      VariableLengthStore storage;
+      VLVarsStore storage;
       storage.Init(temp_file_base.c_str(), 0, 713);
       storage.MarkForRemoval();
 
@@ -183,7 +183,7 @@ static const D_UINT32 charValues[] = { 0x54, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73,
                                        0x6e, 0x79, 0x20, 0x70, 0x72, 0x6f, 0x62, 0x6c, 0x65, 0x6d, 0x73,
                                        0x20, 0x77, 0x69, 0x74, 0x68, 0x20, 0x69, 0x74, 0x2e };
 
-static const D_CHAR *pOriginalText = "This is a text to test! Let's hope it will work just fine and we "
+static const D_CHAR* pOriginalText = "This is a text to test! Let's hope it will work just fine and we "
                                      "won't have any problems with it.";
 
 static bool
@@ -230,7 +230,7 @@ test_text_append ()
       const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
 
       {
-        VariableLengthStore storage;
+        VLVarsStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
         allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText),
                                              (sizeof charValues / sizeof (D_UINT32)));
@@ -242,7 +242,7 @@ test_text_append ()
         result = false;
       else
         {
-          VariableLengthStore storage;
+          VLVarsStore storage;
           storage.Init(temp_file_base.c_str(), (originalText.GetRawUtf8Count() + 713 - 1) / 713, 713);
           storage.MarkForRemoval();
 
@@ -312,7 +312,7 @@ test_character_insertion ()
               temp_file_base += "ps_t_text";
               D_UINT64 allocated_entry = 0;
 
-              VariableLengthStore storage;
+              VLVarsStore storage;
               storage.Init(temp_file_base.c_str(), 0, 713);
               storage.MarkForRemoval();
               allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText), sizeof (charValues) / sizeof (D_UINT32));

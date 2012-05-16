@@ -39,34 +39,34 @@ StoreEntry::StoreEntry () :
 }
 
 D_UINT
-StoreEntry::ReadEntryData (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const
+StoreEntry::Read (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const
 {
 
   assert (IsDeleted() == false);
 
-  if (count + offset > GetRawDataSize() )
-    count = GetRawDataSize() - offset;
+  if (count + offset > Size() )
+    count = Size() - offset;
 
   memcpy (pBuffer, m_aRawData + offset, count);
   return count;
 }
 
 D_UINT
-StoreEntry::UpdateEntryData (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer)
+StoreEntry::Write (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer)
 {
 
   assert (IsDeleted() == false);
 
-  if (count + offset > GetRawDataSize() )
-    count = GetRawDataSize() - offset;
+  if (count + offset > Size() )
+    count = Size() - offset;
 
   memcpy (m_aRawData + offset, pBuffer, count);
   return count;
 }
 
 
-VariableLengthStore::VariableLengthStore () :
-    I_BlocksManager (),
+VLVarsStore::VLVarsStore ()
+  : I_BlocksManager (),
     m_apEntriesContainer (NULL),
     m_EntrysCache (*this),
     m_FirstFreeEntry (0),
@@ -75,11 +75,11 @@ VariableLengthStore::VariableLengthStore () :
 {
 }
 
-VariableLengthStore::~VariableLengthStore ()
+VLVarsStore::~VLVarsStore ()
 {
 }
 
-void VariableLengthStore::Init (const D_CHAR*  tempDir,
+void VLVarsStore::Init (const D_CHAR*  tempDir,
                                 const D_UINT32 reservedMem)
 {
 
@@ -90,7 +90,7 @@ void VariableLengthStore::Init (const D_CHAR*  tempDir,
 }
 
 void
-VariableLengthStore::Init (const D_CHAR*  pContainerBaseName,
+VLVarsStore::Init (const D_CHAR*  pContainerBaseName,
                            const D_UINT64 uContainerSize,
                            const D_UINT64 uMaxFileSize)
 {
@@ -99,13 +99,13 @@ VariableLengthStore::Init (const D_CHAR*  pContainerBaseName,
   const D_UINT64 uUnitsCount = (uContainerSize + uMaxFileSize- 1) / uMaxFileSize;
 
   m_apEntriesContainer.reset (new FileContainer (pContainerBaseName, uMaxFileSize, uUnitsCount));
-  m_EntrysCount = m_apEntriesContainer->GetContainerSize () / sizeof (StoreEntry);
+  m_EntrysCount = m_apEntriesContainer->Size () / sizeof (StoreEntry);
 
   FinishInit ();
 }
 
 void
-VariableLengthStore::FinishInit ()
+VLVarsStore::FinishInit ()
 {
   if (m_EntrysCount == 0)
     {
@@ -117,7 +117,7 @@ VariableLengthStore::FinishInit ()
       sEntry.SetPrevEntry (0);
       sEntry.SetNextEntry (StoreEntry::LAST_DELETED_ENTRY);
 
-      m_apEntriesContainer.get ()->StoreData (0, sizeof sEntry, _RC(D_UINT8*, &sEntry));
+      m_apEntriesContainer.get ()->Write (0, sizeof sEntry, _RC(D_UINT8*, &sEntry));
       m_EntrysCount++;
     }
   m_EntrysCache.Init (sizeof (StoreEntry), 1024, 1024);
@@ -130,13 +130,13 @@ VariableLengthStore::FinishInit ()
 
   m_FirstFreeEntry = pEntryHdr->GetNextEntry ();
 
-  assert ((m_apEntriesContainer->GetContainerSize() % sizeof (StoreEntry)) == 0);
+  assert ((m_apEntriesContainer->Size() % sizeof (StoreEntry)) == 0);
 
   assert (m_EntrysCount > 0);
 }
 
 void
-VariableLengthStore::Flush ()
+VLVarsStore::Flush ()
 {
   WSynchronizerRAII syncHolder (m_Sync);
 
@@ -144,14 +144,14 @@ VariableLengthStore::Flush ()
 }
 
 void
-VariableLengthStore::MarkForRemoval ()
+VLVarsStore::MarkForRemoval ()
 {
   m_apEntriesContainer.get ()->MarkForRemoval ();
 }
 
 D_UINT64
-VariableLengthStore::AddRecord (const D_UINT8* pBuffer,
-                                const D_UINT64 count)
+VLVarsStore::AddRecord (const D_UINT8* pBuffer,
+                        const D_UINT64 count)
 {
   D_UINT64 resultEntry = 0;
   {
@@ -178,10 +178,10 @@ VariableLengthStore::AddRecord (const D_UINT8* pBuffer,
 }
 
 D_UINT64
-VariableLengthStore::AddRecord (VariableLengthStore& sourceStore,
-                                D_UINT64             sourceFirstEntry,
-                                D_UINT64             sourceOffset,
-                                D_UINT64             sourceCount)
+VLVarsStore::AddRecord (VLVarsStore& sourceStore,
+                        D_UINT64     sourceFirstEntry,
+                        D_UINT64     sourceOffset,
+                        D_UINT64     sourceCount)
 
 {
   D_UINT64 resultEntry = 0;
@@ -207,9 +207,9 @@ VariableLengthStore::AddRecord (VariableLengthStore& sourceStore,
 
 
 D_UINT64
-VariableLengthStore::AddRecord (I_DataContainer& sourceContainer,
-                                D_UINT64         sourceOffset,
-                                D_UINT64         sourceCount)
+VLVarsStore::AddRecord (I_DataContainer& sourceContainer,
+                        D_UINT64         sourceOffset,
+                        D_UINT64         sourceCount)
 
 {
   D_UINT64 resultEntry = 0;
@@ -234,12 +234,11 @@ VariableLengthStore::AddRecord (I_DataContainer& sourceContainer,
 }
 
 void
-VariableLengthStore::GetRecord (D_UINT64 recordFirstEntry,
-                                D_UINT64 offset,
-                                D_UINT64 count,
-                                D_UINT8* pBuffer)
+VLVarsStore::GetRecord (D_UINT64 recordFirstEntry,
+                        D_UINT64 offset,
+                        D_UINT64 count,
+                        D_UINT8* pBuffer)
 {
-
   do
     {
       WSynchronizerRAII synchHolder(m_Sync);
@@ -252,10 +251,10 @@ VariableLengthStore::GetRecord (D_UINT64 recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      if (offset < cpEntry->GetRawDataSize())
+      if (offset < cpEntry->Size())
         break;
 
-      offset           -= cpEntry->GetRawDataSize();
+      offset           -= cpEntry->Size();
       recordFirstEntry = cpEntry->GetNextEntry();
     }
   while (true);
@@ -272,24 +271,23 @@ VariableLengthStore::GetRecord (D_UINT64 recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      const D_UINT64 chunkSize = min (count, cpEntry->GetRawDataSize() - offset);
+      const D_UINT64 chunkSize = min (count, cpEntry->Size() - offset);
 
-      cpEntry->ReadEntryData (offset, chunkSize, pBuffer);
+      cpEntry->Read (offset, chunkSize, pBuffer);
 
       count -= chunkSize, pBuffer += chunkSize;
-      offset = (offset + chunkSize) % cpEntry->GetRawDataSize();
+      offset = (offset + chunkSize) % cpEntry->Size();
 
       recordFirstEntry = cpEntry->GetNextEntry();
     }
 }
 
 void
-VariableLengthStore::UpdateRecord (D_UINT64       recordFirstEntry,
-                                   D_UINT64       offset,
-                                   D_UINT64       count,
-                                   const D_UINT8* pBuffer)
+VLVarsStore::UpdateRecord (D_UINT64       recordFirstEntry,
+                           D_UINT64       offset,
+                           D_UINT64       count,
+                           const D_UINT8* pBuffer)
 {
-
   D_UINT64 prevEntry = recordFirstEntry;
 
   do
@@ -309,10 +307,10 @@ VariableLengthStore::UpdateRecord (D_UINT64       recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      if (offset < cpEntry->GetRawDataSize())
+      if (offset < cpEntry->Size())
         break;
 
-      offset           -= cpEntry->GetRawDataSize();
+      offset           -= cpEntry->Size();
       prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
 
@@ -331,26 +329,25 @@ VariableLengthStore::UpdateRecord (D_UINT64       recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      const D_UINT64 chunkSize = cpEntry->UpdateEntryData (offset, count, pBuffer);
+      const D_UINT64 chunkSize = cpEntry->Write (offset, count, pBuffer);
       assert (chunkSize > 0);
 
 
       count  -= chunkSize, pBuffer += chunkSize;
-      offset = (offset + chunkSize) % cpEntry->GetRawDataSize();
+      offset = (offset + chunkSize) % cpEntry->Size();
 
       prevEntry = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
     }
-
 }
 
 void
-VariableLengthStore::UpdateRecord (D_UINT64             recordFirstEntry,
-                                   D_UINT64             offset,
-                                   VariableLengthStore& sourceStore,
-                                   D_UINT64             sourceFirstEntry,
-                                   D_UINT64             sourceOffset,
-                                   D_UINT64             sourceCount)
+VLVarsStore::UpdateRecord (D_UINT64     recordFirstEntry,
+                           D_UINT64     offset,
+                           VLVarsStore& sourceStore,
+                           D_UINT64     sourceFirstEntry,
+                           D_UINT64     sourceOffset,
+                           D_UINT64     sourceCount)
 {
   D_UINT64 prevEntry       = recordFirstEntry;
   D_UINT64 sourcePrevEntry = sourceFirstEntry;
@@ -372,10 +369,10 @@ VariableLengthStore::UpdateRecord (D_UINT64             recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      if (offset < cpEntry->GetRawDataSize())
+      if (offset < cpEntry->Size())
         break;
 
-      offset           -= cpEntry->GetRawDataSize();
+      offset           -= cpEntry->Size();
       prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
 
@@ -399,10 +396,10 @@ VariableLengthStore::UpdateRecord (D_UINT64             recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      if (sourceOffset < cpEntry->GetRawDataSize())
+      if (sourceOffset < cpEntry->Size())
         break;
 
-      sourceOffset     -= cpEntry->GetRawDataSize();
+      sourceOffset     -= cpEntry->Size();
       sourceFirstEntry = cpEntry->GetNextEntry();
     }
   while (true);
@@ -427,9 +424,9 @@ VariableLengthStore::UpdateRecord (D_UINT64             recordFirstEntry,
         StoredItem  cachedItem = sourceStore.m_EntrysCache.RetriveItem (sourceFirstEntry);
         StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
-        assert (cpEntry->GetRawDataSize() <= sizeof tempBuffer);
+        assert (cpEntry->Size() <= sizeof tempBuffer);
 
-        tempValid        = cpEntry->ReadEntryData(sourceOffset, sourceCount, tempBuffer);
+        tempValid        = cpEntry->Read(sourceOffset, sourceCount, tempBuffer);
         sourcePrevEntry  = sourceFirstEntry;
         sourceFirstEntry = cpEntry->GetNextEntry();
       }
@@ -441,38 +438,38 @@ VariableLengthStore::UpdateRecord (D_UINT64             recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      const D_UINT64 chunkSize = cpEntry->UpdateEntryData (offset, tempValid, tempBuffer);
+      const D_UINT64 chunkSize = cpEntry->Write (offset, tempValid, tempBuffer);
       assert (chunkSize > 0);
 
       sourceCount -= chunkSize;
 
       offset += chunkSize;
-      if (offset >= cpEntry->GetRawDataSize())
+      if (offset >= cpEntry->Size())
         {
           prevEntry = recordFirstEntry;
           recordFirstEntry = cpEntry->GetNextEntry();
 
-          offset -= cpEntry->GetRawDataSize();
+          offset -= cpEntry->Size();
         }
 
       sourceOffset += chunkSize;
-      if (sourceOffset < cpEntry->GetRawDataSize())
+      if (sourceOffset < cpEntry->Size())
         {
           /* Revert the sourceFirstEntry! */
           sourceFirstEntry = sourcePrevEntry;
         }
       else
-        sourceOffset -= cpEntry->GetRawDataSize(); //Bogus! Is not its 'cpEntry'!
+        sourceOffset -= cpEntry->Size(); //Bogus! Is not its 'cpEntry'!
 
     }
 }
 
 void
-VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
-                                   D_UINT64         offset,
-                                   I_DataContainer& sourceContainer,
-                                   D_UINT64         sourceOffset,
-                                   D_UINT64         sourceCount)
+VLVarsStore::UpdateRecord (D_UINT64         recordFirstEntry,
+                           D_UINT64         offset,
+                           I_DataContainer& sourceContainer,
+                           D_UINT64         sourceOffset,
+                           D_UINT64         sourceCount)
 {
 
   D_UINT64 prevEntry = recordFirstEntry;
@@ -494,10 +491,10 @@ VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
 
       assert (cpEntry->IsDeleted() == false);
 
-      if (offset < cpEntry->GetRawDataSize())
+      if (offset < cpEntry->Size())
         break;
 
-      offset           -= cpEntry->GetRawDataSize();
+      offset           -= cpEntry->Size();
       prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
 
@@ -517,17 +514,17 @@ VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
       assert (cpEntry->IsDeleted() == false);
 
       D_UINT8 tempBuffer[64];
-      D_UINT  tempValid = MIN (cpEntry->GetRawDataSize() - offset, sourceCount);
+      D_UINT  tempValid = MIN (cpEntry->Size() - offset, sourceCount);
 
-      assert (cpEntry->GetRawDataSize() < sizeof tempBuffer);
+      assert (cpEntry->Size() < sizeof tempBuffer);
 
-      sourceContainer.RetrieveData (sourceOffset, tempValid, tempBuffer);
+      sourceContainer.Read (sourceOffset, tempValid, tempBuffer);
 
-      const D_UINT64 chunkSize = cpEntry->UpdateEntryData (offset, tempValid, tempBuffer);
+      const D_UINT64 chunkSize = cpEntry->Write (offset, tempValid, tempBuffer);
       assert (chunkSize == tempValid);
 
       sourceCount -= tempValid, sourceOffset += tempValid;
-      offset      = (offset + tempValid) % cpEntry->GetRawDataSize();
+      offset      = (offset + tempValid) % cpEntry->Size();
 
       prevEntry        = recordFirstEntry;
       recordFirstEntry = cpEntry->GetNextEntry();
@@ -535,7 +532,7 @@ VariableLengthStore::UpdateRecord (D_UINT64         recordFirstEntry,
 }
 
 void
-VariableLengthStore::IncrementRecordRef (const D_UINT64 recordFirstEntry)
+VLVarsStore::IncrementRecordRef (const D_UINT64 recordFirstEntry)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
@@ -551,7 +548,7 @@ VariableLengthStore::IncrementRecordRef (const D_UINT64 recordFirstEntry)
 }
 
 void
-VariableLengthStore::DecrementRecordRef (const D_UINT64 recordFirstEntry)
+VLVarsStore::DecrementRecordRef (const D_UINT64 recordFirstEntry)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
@@ -572,41 +569,42 @@ VariableLengthStore::DecrementRecordRef (const D_UINT64 recordFirstEntry)
 }
 
 D_UINT64
-VariableLengthStore::GetRawSize() const
+VLVarsStore::GetRawSize() const
 {
   if (m_apEntriesContainer.get() == NULL)
     return 0;
 
-  return m_apEntriesContainer->GetContainerSize();
+  return m_apEntriesContainer->Size();
 }
 
 void
-VariableLengthStore::StoreItems (const D_UINT8 *pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount)
+VLVarsStore::StoreItems (const D_UINT8* pSrcBuffer,
+                         D_UINT64       firstItem,
+                         D_UINT         itemsCount)
 {
   if (firstItem + itemsCount > m_EntrysCount)
     itemsCount = m_EntrysCount - firstItem;
 
-  const D_UINT64 start = firstItem * sizeof (StoreEntry);
-  const D_UINT64 count = itemsCount * sizeof (StoreEntry);
+  const D_UINT64 start = firstItem* sizeof (StoreEntry);
+  const D_UINT64 count = itemsCount* sizeof (StoreEntry);
 
-  m_apEntriesContainer->StoreData (start, count, pSrcBuffer);
+  m_apEntriesContainer->Write (start, count, pSrcBuffer);
 }
 
 void
-VariableLengthStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount)
+VLVarsStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount)
 {
-
   if (firstItem + itemsCount > m_EntrysCount)
     itemsCount = m_EntrysCount - firstItem;
 
-  const D_UINT64 start = firstItem * sizeof (StoreEntry);
-  const D_UINT64 count = itemsCount * sizeof (StoreEntry);
+  const D_UINT64 start = firstItem* sizeof (StoreEntry);
+  const D_UINT64 count = itemsCount* sizeof (StoreEntry);
 
-  m_apEntriesContainer->RetrieveData (start, count, pDestBuffer);
+  m_apEntriesContainer->Read (start, count, pDestBuffer);
 }
 
 D_UINT64
-VariableLengthStore::AllocateEntry (const D_UINT64 prevEntry)
+VLVarsStore::AllocateEntry (const D_UINT64 prevEntry)
 {
   D_UINT64 foundFree = m_FirstFreeEntry;
 
@@ -672,7 +670,7 @@ VariableLengthStore::AllocateEntry (const D_UINT64 prevEntry)
 }
 
 D_UINT64
-VariableLengthStore::ExtentFreeList ()
+VLVarsStore::ExtentFreeList ()
 {
   assert (m_FirstFreeEntry == StoreEntry::LAST_DELETED_ENTRY);
   StoreEntry addEntry;
@@ -683,12 +681,12 @@ VariableLengthStore::ExtentFreeList ()
 
   addEntry.MarkAsFirstEntry (false);
 
-  D_UINT64 insertPos = m_apEntriesContainer.get ()->GetContainerSize();
+  D_UINT64 insertPos = m_apEntriesContainer.get ()->Size();
   m_FirstFreeEntry = insertPos / sizeof (addEntry);
 
 
   assert ((insertPos % sizeof (addEntry)) == 0);
-  m_apEntriesContainer.get ()->StoreData (insertPos, sizeof (addEntry), _RC(D_UINT8*, &addEntry));
+  m_apEntriesContainer.get ()->Write (insertPos, sizeof (addEntry), _RC(D_UINT8*, &addEntry));
 
   ++m_EntrysCount;
 
@@ -704,7 +702,7 @@ VariableLengthStore::ExtentFreeList ()
 }
 
 void
-VariableLengthStore::RemoveRecord (D_UINT64 recordFirstEntry)
+VLVarsStore::RemoveRecord (D_UINT64 recordFirstEntry)
 {
   StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
   const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
@@ -727,7 +725,7 @@ VariableLengthStore::RemoveRecord (D_UINT64 recordFirstEntry)
 }
 
 void
-VariableLengthStore::ExtractFromFreeList (const D_UINT64 freeEntry)
+VLVarsStore::ExtractFromFreeList (const D_UINT64 freeEntry)
 {
   StoredItem  cachedItem = m_EntrysCache.RetriveItem (freeEntry);
   StoreEntry* pEntHdr    = _RC( StoreEntry*, cachedItem.GetDataForUpdate());
@@ -770,7 +768,7 @@ VariableLengthStore::ExtractFromFreeList (const D_UINT64 freeEntry)
 }
 
 void
-VariableLengthStore::AddToFreeList (const D_UINT64 entry)
+VLVarsStore::AddToFreeList (const D_UINT64 entry)
 {
   assert (m_EntrysCount > entry);
 
@@ -778,7 +776,7 @@ VariableLengthStore::AddToFreeList (const D_UINT64 entry)
   StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
 
   StoredItem neighborCachedItem = cachedItem; //Just to have a valid initialization
-  StoreEntry *pNeighborEntHdr = NULL;
+  StoreEntry* pNeighborEntHdr = NULL;
 
   assert (entry > 0);
   assert (pEntHdr->IsDeleted() == false);
@@ -860,6 +858,4 @@ VariableLengthStore::AddToFreeList (const D_UINT64 entry)
   assert (pEntHdr->IsFirstEntry() == false);
 
   pEntHdr->SetNextEntry (entry);
-
 }
-

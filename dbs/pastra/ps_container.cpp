@@ -102,11 +102,11 @@ FileContainer::FileContainer (const D_CHAR*  pFileNameBase,
 FileContainer::~FileContainer ()
 {
   if (m_IsMarked)
-    ColapseContent (0, GetContainerSize() );
+    Colapse (0, Size() );
 }
 
 void
-FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource)
+FileContainer::Write (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource)
 {
   D_UINT64     uContainerIndex  = uPosition / m_uMaxFileUnitSize;
   D_UINT64     uUnitPosition    = uPosition % m_uMaxFileUnitSize;
@@ -129,7 +129,7 @@ FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* p
 
   assert (uWriteLength <= uLength);
 
-  WFile & rUnitContainer = m_FilesHandles[uContainerIndex];
+  WFile& rUnitContainer = m_FilesHandles[uContainerIndex];
 
   if (rUnitContainer.GetSize () < uUnitPosition)
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
@@ -139,17 +139,17 @@ FileContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* p
 
   //Let write the rest
   if (uWriteLength < uLength)
-    StoreData (uPosition + uWriteLength, uLength - uWriteLength, puDataSource + uWriteLength);
+    Write (uPosition + uWriteLength, uLength - uWriteLength, puDataSource + uWriteLength);
 }
 
 void
-FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination)
+FileContainer::Read (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination)
 {
   D_UINT64     uContainerIndex  = uPosition / m_uMaxFileUnitSize;
   D_UINT64     uUnitPosition    = uPosition % m_uMaxFileUnitSize;
   const D_UINT uContainersCount = m_FilesHandles.size ();
 
-  if ((uContainerIndex > uContainersCount) || (uPosition + uLength > GetContainerSize ()))
+  if ((uContainerIndex > uContainersCount) || (uPosition + uLength > Size ()))
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
   WFile rUnitContainer = m_FilesHandles[uContainerIndex];
@@ -164,16 +164,16 @@ FileContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDa
 
   //Lets read the rest
   if (uReadLength != uLength)
-    RetrieveData (uPosition + uReadLength, uLength - uReadLength, puDataDestination + uReadLength);
+    Read (uPosition + uReadLength, uLength - uReadLength, puDataDestination + uReadLength);
 
 }
 
 void
-FileContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
+FileContainer::Colapse (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
 {
   const D_UINT   cuBufferSize   = 4096;	//4KB
   const D_UINT64 uIntervalSize  = uEndPosition - uStartPosition;
-  const D_UINT64 uContainerSize = GetContainerSize ();
+  const D_UINT64 uContainerSize = Size ();
 
   if ((uEndPosition < uStartPosition) || (uEndPosition > uContainerSize))
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_PARAMETERS));
@@ -189,8 +189,8 @@ FileContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
       if (uStepSize + uEndPosition > uContainerSize)
         uStepSize = uContainerSize - uEndPosition;
 
-      RetrieveData (uEndPosition, uStepSize, aBuffer.get ());
-      StoreData (uStartPosition, uStepSize, aBuffer.get ());
+      Read (uEndPosition, uStepSize, aBuffer.get ());
+      Write (uStartPosition, uStepSize, aBuffer.get ());
 
       uEndPosition   += uStepSize;
       uStartPosition += uStepSize;
@@ -224,7 +224,7 @@ FileContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
 }
 
 D_UINT64
-FileContainer::GetContainerSize () const
+FileContainer::Size () const
 {
   if (m_FilesHandles.size () == 0)
     return 0;
@@ -287,9 +287,9 @@ TempContainer::~TempContainer ()
 }
 
 void
-TempContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource)
+TempContainer::Write (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource)
 {
-  if (uPosition > GetContainerSize ())
+  if (uPosition > Size ())
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
   while (uLength > 0)
@@ -315,9 +315,9 @@ TempContainer::StoreData (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* p
 }
 
 void
-TempContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination)
+TempContainer::Read (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination)
 {
-  if (uPosition + uLength > GetContainerSize ())
+  if (uPosition + uLength > Size ())
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
   while (uLength > 0)
@@ -339,12 +339,12 @@ TempContainer::RetrieveData (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDa
 }
 
 void
-TempContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
+TempContainer::Colapse (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
 {
   if (uStartPosition > uEndPosition)
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_PARAMETERS));
 
-  if (uEndPosition > GetContainerSize ())
+  if (uEndPosition > Size ())
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_PARAMETERS));
 
   if (m_FileContainer.get () != NULL)
@@ -352,13 +352,13 @@ TempContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
       //Flush the buffer first!
       if (m_DirtyCache)
         {
-          m_FileContainer->StoreData (m_CacheStartPos, m_CacheEndPos - m_CacheStartPos, m_Cache.get ());
+          m_FileContainer->Write (m_CacheStartPos, m_CacheEndPos - m_CacheStartPos, m_Cache.get ());
           m_DirtyCache = false;
         }
 
-      m_FileContainer->ColapseContent (uStartPosition, uEndPosition);
+      m_FileContainer->Colapse (uStartPosition, uEndPosition);
 
-      if (m_FileContainer->GetContainerSize () < uStartPosition)
+      if (m_FileContainer->Size () < uStartPosition)
         FillCache (0);
       else
         FillCache (uStartPosition);
@@ -372,7 +372,7 @@ TempContainer::ColapseContent (D_UINT64 uStartPosition, D_UINT64 uEndPosition)
       m_CacheEndPos -= (uEndPosition - uStartPosition);
     }
 
-  if ((m_FileContainer.get () != NULL) && (m_CacheSize > m_FileContainer->GetContainerSize()))
+  if ((m_FileContainer.get () != NULL) && (m_CacheSize > m_FileContainer->Size()))
     m_FileContainer.reset (NULL);
 
 }
@@ -384,14 +384,14 @@ TempContainer::MarkForRemoval ()
 }
 
 D_UINT64
-TempContainer::GetContainerSize () const
+TempContainer::Size () const
 {
   assert ((m_CacheStartPos % m_CacheSize) == 0);
   assert (m_CacheStartPos <= m_CacheEndPos);
 
   if (m_FileContainer.get () != NULL)
     {
-      const D_UINT64 result = m_FileContainer->GetContainerSize ();
+      const D_UINT64 result = m_FileContainer->Size ();
 
       assert (result >= m_CacheStartPos);
 
@@ -434,7 +434,7 @@ TempContainer::FillCache (D_UINT64 position)
 
 
       m_FileContainer.reset (new FileTempContainer (baseFile.c_str (), DBSGetMaxFileSize ()));
-      m_FileContainer->StoreData (0, m_CacheEndPos, m_Cache.get ());
+      m_FileContainer->Write (0, m_CacheEndPos, m_Cache.get ());
 
       m_CacheStartPos = m_CacheEndPos = position;
       m_DirtyCache    = false;
@@ -445,13 +445,13 @@ TempContainer::FillCache (D_UINT64 position)
     {
       if (m_DirtyCache)
         {
-          m_FileContainer->StoreData (m_CacheStartPos, m_CacheEndPos - m_CacheStartPos, m_Cache.get ());
+          m_FileContainer->Write (m_CacheStartPos, m_CacheEndPos - m_CacheStartPos, m_Cache.get ());
           m_DirtyCache = false;
         }
 
-      const D_UINT toRead = MIN (m_CacheSize, m_FileContainer->GetContainerSize() - position);
+      const D_UINT toRead = MIN (m_CacheSize, m_FileContainer->Size() - position);
 
-      m_FileContainer->RetrieveData (position, toRead, m_Cache.get ());
+      m_FileContainer->Read (position, toRead, m_Cache.get ());
       m_CacheStartPos = position;
       m_CacheEndPos   = m_CacheStartPos + toRead;
     }

@@ -60,7 +60,7 @@ protected:
   virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex);
   virtual I_DataContainer&     FixedFieldsContainer ();
   virtual I_DataContainer&     MainTableContainer ();
-  virtual VariableLengthStore& VariableFieldsStore ();
+  virtual VLVarsStore&         VariableFieldsStore ();
 
   //Data members
   D_UINT64                              m_MaxFileSize;
@@ -68,7 +68,7 @@ protected:
   std::string                           m_BaseFileName;
   std::auto_ptr<FileContainer>          m_apMainTable;
   std::auto_ptr<FileContainer>          m_apFixedFields;
-  std::auto_ptr<VariableLengthStore>    m_apVariableFields;
+  std::auto_ptr<VLVarsStore>            m_apVariableFields;
   bool                                  m_Removed;
 };
 
@@ -93,12 +93,12 @@ protected:
   virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex);
   virtual I_DataContainer&     FixedFieldsContainer ();
   virtual I_DataContainer&     MainTableContainer ();
-  virtual VariableLengthStore& VariableFieldsStore ();
+  virtual VLVarsStore&         VariableFieldsStore ();
 
   //Data members
   std::auto_ptr<TempContainer>       m_apMainTable;
   std::auto_ptr<TempContainer>       m_apFixedFields;
-  std::auto_ptr<VariableLengthStore> m_apVariableFields;
+  std::auto_ptr<VLVarsStore>         m_apVariableFields;
 };
 
 }

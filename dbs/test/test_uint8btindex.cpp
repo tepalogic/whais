@@ -30,10 +30,10 @@ D_UINT _removedRows = _rowsCount / 10;
 
 
 bool
-fill_table_with_values (I_DBSTable &table,
+fill_table_with_values (I_DBSTable& table,
                         const D_UINT32 rowCount,
                         D_UINT64 seed,
-                        DBSArray &tableValues)
+                        DBSArray& tableValues)
 {
   bool     result = true;
 
@@ -99,7 +99,7 @@ fill_table_with_values (I_DBSTable &table,
 }
 
 bool
-fill_table_with_first_nulls (I_DBSTable &table, const D_UINT32 rowCount)
+fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
@@ -207,7 +207,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 }
 
 void
-callback_index_create (CallBackIndexData *const pData)
+callback_index_create (CallBackIndexData* const pData)
 {
   std::cout << '\r' << pData->m_RowIndex << '(' << pData->m_RowsCount << ')';
 }
@@ -289,13 +289,13 @@ main ()
     DBSCreateDatabase (db_name, dir.c_str ());
   }
 
-  I_DBSHandler & handler = DBSRetrieveDatabase (db_name);
+  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
   handler.AddTable ("t_test_tab", field_desc, sizeof field_desc / sizeof (field_desc[0]));
 
   {
     DBSArray tableValues (_SC (DBSUInt8*, NULL));
     {
-      I_DBSTable &table = handler.RetrievePersistentTable (tb_name);
+      I_DBSTable& table = handler.RetrievePersistentTable (tb_name);
 
       success = success && fill_table_with_values (table, _rowsCount, 0, tableValues);
       success = success && fill_table_with_first_nulls (table, _removedRows);

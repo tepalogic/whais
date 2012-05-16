@@ -42,13 +42,13 @@ public:
   I_DBSHandler () {}
   virtual ~I_DBSHandler () {}
 
-  virtual D_UINT      GetPesistentTablesCount () = 0;
+  virtual D_UINT      PesistentTablesCount () = 0;
   virtual I_DBSTable& RetrievePersistentTable (D_UINT index) = 0;
   virtual I_DBSTable& RetrievePersistentTable (const D_CHAR* pTableName) = 0;
   virtual void        AddTable (const D_CHAR* const       pTableName,
                                 const DBSFieldDescriptor* pFields,
                                 const D_UINT              fieldsCount) = 0;
-  virtual void        DeleteTable (const D_CHAR * const pTableName) = 0;
+  virtual void        DeleteTable (const D_CHAR* const pTableName) = 0;
   virtual I_DBSTable& CreateTempTable (const DBSFieldDescriptor* pFields,
                                        const D_UINT              fieldsCount) = 0;
 
@@ -56,8 +56,8 @@ public:
 };
 
 void
-DBSInit (const D_CHAR * const pDBSDirectory,
-         const D_CHAR * const pTempDir,
+DBSInit (const D_CHAR* const pDBSDirectory,
+         const D_CHAR* const pTempDir,
          D_UINT64             maxFileSize = DEFAULT_MAX_FILE_SIZE);
 
 void

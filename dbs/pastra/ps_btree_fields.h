@@ -41,13 +41,13 @@ template <class DBS_T>
 class T_BTreeKey : public I_BTreeKey
 {
 public:
-  T_BTreeKey (const DBS_T &value, const D_UINT64 index) :
+  T_BTreeKey (const DBS_T& value, const D_UINT64 index) :
       m_RowPart (index),
       m_ValuePart (value)
       {
       }
 
-  bool operator< (const T_BTreeKey &key) const
+  bool operator< (const T_BTreeKey& key) const
   {
     if (m_ValuePart < key.m_ValuePart)
       return true;
@@ -91,20 +91,20 @@ typedef T_BTreeKey <DBSRichReal>  RichRealBTreeKey;
 class I_BTreeFieldIndexNode : public I_BTreeNode
 {
 public:
-   I_BTreeFieldIndexNode (I_BTreeNodeManager &nodesManager) :
+   I_BTreeFieldIndexNode (I_BTreeNodeManager& nodesManager) :
      I_BTreeNode (nodesManager)
    {
    }
    virtual ~I_BTreeFieldIndexNode () {}
 
-   virtual void GetKeysRows (DBSArray &output, KEY_INDEX fromPos, KEY_INDEX toPos) const = 0;
+   virtual void GetRows (DBSArray& output, KEY_INDEX fromPos, KEY_INDEX toPos) const = 0;
 };
 
 template <class T, class DBS_T, D_UINT typeSize = sizeof (T)>
 class T_BTreeNode : public I_BTreeFieldIndexNode
 {
 public:
-  T_BTreeNode (I_BTreeNodeManager &nodesManager, const NODE_INDEX nodeId) :
+  T_BTreeNode (I_BTreeNodeManager& nodesManager, const NODE_INDEX nodeId) :
     I_BTreeFieldIndexNode (nodesManager),
     m_apNodeData (new D_UINT8 [nodesManager.GetRawNodeSize ()])
   {
@@ -118,7 +118,7 @@ public:
 
   //Implementations of I_BTreeNode interface
 
-  virtual D_UINT GetKeysPerNode () const
+  virtual D_UINT KeysPerNode () const
   {
     assert (sizeof (NodeHeader) % 16 == 0);
 
@@ -138,7 +138,7 @@ public:
     return result;
   }
 
-  virtual KEY_INDEX GetFirstKey (const I_BTreeNode &parent) const
+  virtual KEY_INDEX GetFirstKey (const I_BTreeNode& parent) const
   {
     assert (GetKeysCount () > 0);
 
@@ -147,7 +147,7 @@ public:
     parent.FindBiggerOrEqual (GetKey (0), result);
 
     assert (parent.IsEqual (GetKey (0), result));
-    assert (GetNodeId () == parent.GetChildNode (result));
+    assert (NodeId () == parent.GetChildNode (result));
 
     return result;
   }
@@ -159,16 +159,16 @@ public:
     assert (IsLeaf () == false);
 
     const D_UINT64 *const   pRowParts   = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
-    const D_UINT8 *const    pValueParts = _RC (const D_UINT8*, pRowParts + GetKeysPerNode ());
-    const NODE_INDEX *const pChildNodes = _RC (const NODE_INDEX*,
-                                               pValueParts + GetKeysPerNode () * typeSize);
+    const D_UINT8 *const    pValueParts = _RC (const D_UINT8*, pRowParts + KeysPerNode ());
+    const NODE_INDEX* const pChildNodes = _RC (const NODE_INDEX*,
+                                               pValueParts + KeysPerNode () * typeSize);
 
     return pChildNodes [keyIndex];
   }
 
-  virtual void ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex)
+  virtual void ResetKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex)
   {
-    const T_BTreeNode &node = _SC (const T_BTreeNode&, childNode);
+    const T_BTreeNode& node = _SC (const T_BTreeNode&, childNode);
 
     const T_BTreeKey<DBS_T> zeroKey  = node.GetKey (0);
 
@@ -185,14 +185,14 @@ public:
     assert (IsLeaf () == false);
 
     D_UINT64 *const   pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-    D_UINT8 *const    pValueParts = _RC (D_UINT8*, pRowParts + GetKeysPerNode ());
-    NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*,
-                                         pValueParts + GetKeysPerNode () * typeSize);
+    D_UINT8 *const    pValueParts = _RC (D_UINT8*, pRowParts + KeysPerNode ());
+    NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*,
+                                         pValueParts + KeysPerNode () * typeSize);
 
     pChildNodes [keyIndex] = childNode;
   }
 
-  virtual KEY_INDEX InsertKey (const I_BTreeKey &key)
+  virtual KEY_INDEX InsertKey (const I_BTreeKey& key)
   {
     assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
@@ -213,8 +213,8 @@ public:
     else
       ++keyIndex;
 
-    D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-    T *const        pValueParts = _RC (T*, pRowParts + GetKeysPerNode ());
+    D_UINT64* const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
+    T* const        pValueParts = _RC (T*, pRowParts + KeysPerNode ());
     const D_UINT    lastKey     = GetKeysCount () - 1;
 
     make_array_room (pRowParts, lastKey, keyIndex, 1);
@@ -222,7 +222,7 @@ public:
 
     if (IsLeaf () == false)
       {
-        NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pValueParts + GetKeysPerNode ());
+        NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pValueParts + KeysPerNode ());
         make_array_room (pChildNodes, lastKey, keyIndex, 1);
       }
 
@@ -241,9 +241,9 @@ public:
     assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
     const D_UINT      lastKey     = GetKeysCount () - 1;
-    D_UINT64 *const   pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-    T *const          pValuePart  = _RC (T*, pRowParts + GetKeysPerNode ());
-    NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pValuePart + GetKeysPerNode ());
+    D_UINT64* const   pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
+    T* const          pValuePart  = _RC (T*, pRowParts + KeysPerNode ());
+    NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pValuePart + KeysPerNode ());
 
     remove_array_elemes (pRowParts, lastKey, keyIndex, 1);
     remove_array_elemes (pValuePart, lastKey, keyIndex, 1);
@@ -293,7 +293,7 @@ public:
     SetKeysCount (splitKeyIndex);
     assert (GetNullKeysCount () <= GetKeysCount ());
 
-    allocatedNode->SetNext (GetNodeId());
+    allocatedNode->SetNext (NodeId());
     allocatedNode->SetPrev (GetPrev());
     SetPrev (allocatedNodeId);
     if (allocatedNode->GetPrev() != NIL_NODE)
@@ -309,7 +309,7 @@ public:
       {
         assert (GetNext() != NIL_NODE);
         BTreeNodeHandler   nextNode (m_NodesManager.RetrieveNode (GetNext ()));
-        T_BTreeNode *const pNextNode    = _SC (T_BTreeNode*,  &(*nextNode));
+        T_BTreeNode* const pNextNode    = _SC (T_BTreeNode*,  &(*nextNode));
         const KEY_INDEX    oldKeysCount = pNextNode->GetKeysCount ();
 
         assert ((pNextNode->GetNullKeysCount() == 0) ||
@@ -334,14 +334,14 @@ public:
           }
 
         assert (pNextNode->GetNullKeysCount () <= pNextNode->GetKeysCount ());
-        assert (pNextNode->GetKeysCount () <= pNextNode->GetKeysPerNode());
+        assert (pNextNode->GetKeysCount () <= pNextNode->KeysPerNode());
       }
     else
       {
         assert (GetPrev () != NIL_NODE);
 
         BTreeNodeHandler   prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
-        T_BTreeNode *const pPrevNode    = _SC (T_BTreeNode*, &(*prevNode));
+        T_BTreeNode* const pPrevNode    = _SC (T_BTreeNode*, &(*prevNode));
         const KEY_INDEX    oldKeysCount = GetKeysCount ();
 
         SetKeysCount (oldKeysCount + pPrevNode->GetKeysCount ());
@@ -358,15 +358,15 @@ public:
         if (GetPrev () != NIL_NODE)
           {
             BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
-            prevNode->SetNext (GetNodeId ());
+            prevNode->SetNext (NodeId ());
           }
 
         assert (GetNullKeysCount () <= GetKeysCount() );
-        assert (GetKeysCount () <= GetKeysPerNode());
+        assert (GetKeysCount () <= KeysPerNode());
       }
   }
 
-  virtual bool IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const
+  virtual bool IsLess (const I_BTreeKey& key, KEY_INDEX keyIndex) const
   {
     assert (keyIndex  < GetKeysCount ());
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
@@ -374,7 +374,7 @@ public:
     return theKey < GetKey (keyIndex);
   }
 
-  virtual bool IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const
+  virtual bool IsEqual (const I_BTreeKey& key, KEY_INDEX keyIndex) const
   {
     assert (keyIndex  < GetKeysCount ());
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
@@ -382,7 +382,7 @@ public:
     return theKey == GetKey (keyIndex);
   }
 
-  virtual bool IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const
+  virtual bool IsBigger (const I_BTreeKey& key, KEY_INDEX keyIndex) const
   {
     assert (keyIndex  < GetKeysCount ());
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
@@ -390,14 +390,14 @@ public:
     return theKey > GetKey (keyIndex);
   }
 
-  virtual const I_BTreeKey& GetSentinelKey () const
+  virtual const I_BTreeKey& SentinelKey () const
   {
     static T_BTreeKey<DBS_T> _sentinel (DBS_T (~0), ~0);
 
     return _sentinel;
   }
 
-  virtual void GetKeysRows (DBSArray &output, KEY_INDEX fromPos, KEY_INDEX toPos) const
+  virtual void GetRows (DBSArray& output, KEY_INDEX fromPos, KEY_INDEX toPos) const
   {
     assert (fromPos >= toPos);
     assert (fromPos < GetKeysCount ());
@@ -405,7 +405,7 @@ public:
 
     const D_UINT64* const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 
-    if ((toPos == 0) && IsEqual (GetSentinelKey (), toPos))
+    if ((toPos == 0) && IsEqual (SentinelKey (), toPos))
       ++toPos;
 
     while (fromPos >= toPos)
@@ -428,7 +428,7 @@ protected:
     if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
       return T_BTreeKey<DBS_T> (DBS_T (), pRowParts [keyIndex]);
 
-    const T *const pValueParts = _RC (const T*, pRowParts + GetKeysPerNode ());
+    const T* const pValueParts = _RC (const T*, pRowParts + KeysPerNode ());
 
     return T_BTreeKey<DBS_T> (DBS_T (pValueParts[keyIndex]), pRowParts [keyIndex]);
   }
@@ -442,7 +442,7 @@ protected:
 
     if (keyIndex < GetKeysCount() - GetNullKeysCount ())
       {
-        T *const pValueParts = _RC (T*, pRowParts + GetKeysPerNode ());
+        T* const pValueParts = _RC (T*, pRowParts + KeysPerNode ());
         pValueParts[keyIndex] = key.m_ValuePart.m_Value;
       }
 
@@ -455,7 +455,7 @@ protected:
 
 //Specialization for DBSBool
 template <> inline const I_BTreeKey&
-T_BTreeNode <bool, DBSBool, 1>::GetSentinelKey () const
+T_BTreeNode <bool, DBSBool, 1>::SentinelKey () const
 {
   static BoolBTreeKey _sentinel (DBSBool (true), ~0);
   return _sentinel;
@@ -463,7 +463,7 @@ T_BTreeNode <bool, DBSBool, 1>::GetSentinelKey () const
 
 //Specializations for DBSDate
 template <> inline const I_BTreeKey&
-T_BTreeNode <void, DBSDate, 4>::GetSentinelKey () const
+T_BTreeNode <void, DBSDate, 4>::SentinelKey () const
 {
   static DateBTreeKey _sentinel (DBSDate (0x7FFF, 12, 31), ~0);
   return _sentinel;
@@ -481,16 +481,16 @@ T_BTreeNode <void, DBSDate, 4>::GetKey (const KEY_INDEX keyIndex) const
   if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     return DateBTreeKey (DBSDate (), pRowParts [keyIndex]);
 
-  const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + GetKeysPerNode ());
-  const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + GetKeysPerNode ());
-  const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + GetKeysPerNode ());
+  const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + KeysPerNode ());
+  const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + KeysPerNode ());
+  const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + KeysPerNode ());
 
   return DateBTreeKey (DBSDate (pYearParts [keyIndex], pMonthParts [keyIndex], pDayParts [keyIndex]),
                        pRowParts [keyIndex]);
 }
 
 template<> inline void
-T_BTreeNode <void, DBSDate, 4>::SetKey (const DateBTreeKey &key,const KEY_INDEX keyIndex)
+T_BTreeNode <void, DBSDate, 4>::SetKey (const DateBTreeKey& key,const KEY_INDEX keyIndex)
 {
   assert (keyIndex < GetKeysCount ());
   assert (GetKeysCount () <= GetKeysCount ());
@@ -499,9 +499,9 @@ T_BTreeNode <void, DBSDate, 4>::SetKey (const DateBTreeKey &key,const KEY_INDEX 
 
   if (keyIndex < GetKeysCount() - GetNullKeysCount ())
     {
-      D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
-      D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-      D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
+      D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + KeysPerNode ());
+      D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+      D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
 
       pYearParts[keyIndex]  = key.m_ValuePart.m_Year;
       pMonthParts[keyIndex] = key.m_ValuePart.m_Month;
@@ -512,11 +512,11 @@ T_BTreeNode <void, DBSDate, 4>::SetKey (const DateBTreeKey &key,const KEY_INDEX 
 }
 
 template <> inline KEY_INDEX
-T_BTreeNode <void, DBSDate, 4>::InsertKey (const I_BTreeKey &key)
+T_BTreeNode <void, DBSDate, 4>::InsertKey (const I_BTreeKey& key)
 {
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
-  const DateBTreeKey &theKey  = _SC (const DateBTreeKey&, key);
+  const DateBTreeKey& theKey  = _SC (const DateBTreeKey&, key);
   KEY_INDEX          keyIndex = ~0;
 
   if (GetKeysCount () == 0)
@@ -534,9 +534,9 @@ T_BTreeNode <void, DBSDate, 4>::InsertKey (const I_BTreeKey &key)
     ++keyIndex;
 
   D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
-  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
+  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + KeysPerNode ());
+  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
 
@@ -547,7 +547,7 @@ T_BTreeNode <void, DBSDate, 4>::InsertKey (const I_BTreeKey &key)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pDayParts + GetKeysPerNode ());
+      NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pDayParts + KeysPerNode ());
       make_array_room (pChildNodes, lastKey, keyIndex, 1);
     }
 
@@ -568,9 +568,9 @@ T_BTreeNode <void, DBSDate, 4>::RemoveKey (const KEY_INDEX keyIndex)
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
   D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
-  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
+  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + KeysPerNode ());
+  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
 
   remove_array_elemes (pRowParts, lastKey, keyIndex, 1);
   remove_array_elemes (pYearParts, lastKey, keyIndex, 1);
@@ -579,7 +579,7 @@ T_BTreeNode <void, DBSDate, 4>::RemoveKey (const KEY_INDEX keyIndex)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pDayParts + GetKeysPerNode ());
+      NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pDayParts + KeysPerNode ());
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
     }
 
@@ -591,7 +591,7 @@ T_BTreeNode <void, DBSDate, 4>::RemoveKey (const KEY_INDEX keyIndex)
 
 //Specialization for DateTime
 template <> inline const I_BTreeKey&
-T_BTreeNode <void, DBSDateTime, 7>::GetSentinelKey () const
+T_BTreeNode <void, DBSDateTime, 7>::SentinelKey () const
 {
   static DateTimeBTreeKey _sentinel (DBSDateTime (0x7FFF, 12, 31, 23, 59, 59), ~0);
   return _sentinel;
@@ -609,12 +609,12 @@ T_BTreeNode <void, DBSDateTime, 7>::GetKey (const KEY_INDEX keyIndex) const
   if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     return DateTimeBTreeKey (DBSDateTime (), pRowParts [keyIndex]);
 
-  const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + GetKeysPerNode ());
-  const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + GetKeysPerNode ());
-  const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + GetKeysPerNode ());
-  const D_UINT8 *const  pHourParts  = _RC (const D_UINT8*, pDayParts + GetKeysPerNode ());
-  const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
-  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + GetKeysPerNode ());
+  const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pRowParts + KeysPerNode ());
+  const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + KeysPerNode ());
+  const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + KeysPerNode ());
+  const D_UINT8 *const  pHourParts  = _RC (const D_UINT8*, pDayParts + KeysPerNode ());
+  const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + KeysPerNode ());
+  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + KeysPerNode ());
 
   return DateTimeBTreeKey (DBSDateTime (pYearParts[keyIndex],
                                         pMonthParts[keyIndex],
@@ -626,7 +626,7 @@ T_BTreeNode <void, DBSDateTime, 7>::GetKey (const KEY_INDEX keyIndex) const
 }
 
 template<> inline void
-T_BTreeNode <void, DBSDateTime, 7>::SetKey (const DateTimeBTreeKey &key,const KEY_INDEX keyIndex)
+T_BTreeNode <void, DBSDateTime, 7>::SetKey (const DateTimeBTreeKey& key,const KEY_INDEX keyIndex)
 {
   assert (keyIndex < GetKeysCount ());
   assert (GetKeysCount () <= GetKeysCount ());
@@ -635,12 +635,12 @@ T_BTreeNode <void, DBSDateTime, 7>::SetKey (const DateTimeBTreeKey &key,const KE
 
   if (keyIndex < GetKeysCount() - GetNullKeysCount ())
     {
-      D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
-      D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-      D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
-      D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
-      D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
+      D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + KeysPerNode ());
+      D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+      D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
+      D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + KeysPerNode ());
+      D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + KeysPerNode ());
+      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + KeysPerNode ());
 
       pYearParts[keyIndex]  = key.m_ValuePart.m_Year;
       pMonthParts[keyIndex] = key.m_ValuePart.m_Month;
@@ -654,11 +654,11 @@ T_BTreeNode <void, DBSDateTime, 7>::SetKey (const DateTimeBTreeKey &key,const KE
 }
 
 template <> inline KEY_INDEX
-T_BTreeNode <void, DBSDateTime, 7>::InsertKey (const I_BTreeKey &key)
+T_BTreeNode <void, DBSDateTime, 7>::InsertKey (const I_BTreeKey& key)
 {
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
-  const DateTimeBTreeKey &theKey  = _SC (const DateTimeBTreeKey&, key);
+  const DateTimeBTreeKey& theKey  = _SC (const DateTimeBTreeKey&, key);
   KEY_INDEX              keyIndex = ~0;
 
   if (GetKeysCount () == 0)
@@ -676,12 +676,12 @@ T_BTreeNode <void, DBSDateTime, 7>::InsertKey (const I_BTreeKey &key)
     ++keyIndex;
 
   D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
-  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
-  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
-  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
+  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + KeysPerNode ());
+  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
+  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + KeysPerNode ());
+  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + KeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + KeysPerNode ());
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
 
@@ -695,7 +695,7 @@ T_BTreeNode <void, DBSDateTime, 7>::InsertKey (const I_BTreeKey &key)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pSecParts + GetKeysPerNode ());
+      NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pSecParts + KeysPerNode ());
       make_array_room (pChildNodes, lastKey, keyIndex, 1);
     }
 
@@ -716,12 +716,12 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
   D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + GetKeysPerNode ());
-  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
-  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
-  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
+  D_INT16 *const  pYearParts  = _RC (D_INT16*, pRowParts + KeysPerNode ());
+  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
+  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + KeysPerNode ());
+  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + KeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + KeysPerNode ());
 
   remove_array_elemes (pRowParts, lastKey, keyIndex, 1);
   remove_array_elemes (pYearParts, lastKey, keyIndex, 1);
@@ -733,7 +733,7 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pSecParts + GetKeysPerNode ());
+      NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pSecParts + KeysPerNode ());
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
     }
 
@@ -746,7 +746,7 @@ T_BTreeNode <void, DBSDateTime, 7>::RemoveKey (const KEY_INDEX keyIndex)
 //Specialization of DBSHiresTime
 
 template <> inline const I_BTreeKey&
-T_BTreeNode <void, DBSHiresTime, 11>::GetSentinelKey () const
+T_BTreeNode <void, DBSHiresTime, 11>::SentinelKey () const
 {
   static HiresTimeBTreeKey _sentinel (DBSHiresTime (0x7FFF, 12, 31, 23, 59, 59, 999999999), ~0);
   return _sentinel;
@@ -763,13 +763,13 @@ T_BTreeNode <void, DBSHiresTime, 11>::GetKey (const KEY_INDEX keyIndex) const
   if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
     return HiresTimeBTreeKey (DBSHiresTime (), pRowParts [keyIndex]);
 
-  const D_UINT32 *const pMicroParts = _RC (const D_UINT32*, pRowParts + GetKeysPerNode ());
-  const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pMicroParts + GetKeysPerNode ());
-  const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + GetKeysPerNode ());
-  const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + GetKeysPerNode ());
-  const D_UINT8 *const  pHourParts  = _RC (const D_UINT8*, pDayParts + GetKeysPerNode ());
-  const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + GetKeysPerNode ());
-  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + GetKeysPerNode ());
+  const D_UINT32 *const pMicroParts = _RC (const D_UINT32*, pRowParts + KeysPerNode ());
+  const D_INT16 *const  pYearParts  = _RC (const D_INT16*, pMicroParts + KeysPerNode ());
+  const D_UINT8 *const  pMonthParts = _RC (const D_UINT8*, pYearParts + KeysPerNode ());
+  const D_UINT8 *const  pDayParts   = _RC (const D_UINT8*, pMonthParts + KeysPerNode ());
+  const D_UINT8 *const  pHourParts  = _RC (const D_UINT8*, pDayParts + KeysPerNode ());
+  const D_UINT8 *const  pMinParts   = _RC (const D_UINT8*, pHourParts + KeysPerNode ());
+  const D_UINT8 *const  pSecParts   = _RC (const D_UINT8*, pMinParts + KeysPerNode ());
 
   return HiresTimeBTreeKey (DBSHiresTime (pYearParts[keyIndex],
                                           pMonthParts[keyIndex],
@@ -782,7 +782,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::GetKey (const KEY_INDEX keyIndex) const
 }
 
 template<> inline void
-T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey &key, const KEY_INDEX keyIndex)
+T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey& key, const KEY_INDEX keyIndex)
 {
   assert (keyIndex < GetKeysCount ());
   assert (GetKeysCount () <= GetKeysCount ());
@@ -791,13 +791,13 @@ T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey &key, cons
 
   if (keyIndex < GetKeysCount() - GetNullKeysCount ())
     {
-      D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + GetKeysPerNode ());
-      D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + GetKeysPerNode ());
-      D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-      D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
-      D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
-      D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
+      D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + KeysPerNode ());
+      D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + KeysPerNode ());
+      D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+      D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
+      D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + KeysPerNode ());
+      D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + KeysPerNode ());
+      D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + KeysPerNode ());
 
       pMicroParts[keyIndex] = key.m_ValuePart.m_Microsec;
       pYearParts[keyIndex]  = key.m_ValuePart.m_Year;
@@ -812,11 +812,11 @@ T_BTreeNode <void, DBSHiresTime, 11>::SetKey (const HiresTimeBTreeKey &key, cons
 }
 
 template <> inline KEY_INDEX
-T_BTreeNode <void, DBSHiresTime, 11>::InsertKey (const I_BTreeKey &key)
+T_BTreeNode <void, DBSHiresTime, 11>::InsertKey (const I_BTreeKey& key)
 {
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
-  const HiresTimeBTreeKey &theKey  = _SC (const HiresTimeBTreeKey&, key);
+  const HiresTimeBTreeKey& theKey  = _SC (const HiresTimeBTreeKey&, key);
   KEY_INDEX               keyIndex = ~0;
 
   if (GetKeysCount () == 0)
@@ -834,13 +834,13 @@ T_BTreeNode <void, DBSHiresTime, 11>::InsertKey (const I_BTreeKey &key)
     ++keyIndex;
 
   D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-  D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + GetKeysPerNode ());
-  D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + GetKeysPerNode ());
-  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
-  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
-  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
+  D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + KeysPerNode ());
+  D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + KeysPerNode ());
+  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
+  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + KeysPerNode ());
+  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + KeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + KeysPerNode ());
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
 
@@ -855,7 +855,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::InsertKey (const I_BTreeKey &key)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pSecParts + GetKeysPerNode ());
+      NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pSecParts + KeysPerNode ());
       make_array_room (pChildNodes, lastKey, keyIndex, 1);
     }
 
@@ -876,13 +876,13 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
 
   const D_UINT    lastKey     = GetKeysCount () - 1;
   D_UINT64 *const pRowParts   = _RC (D_UINT64*, GetRawData () + sizeof (NodeHeader));
-  D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + GetKeysPerNode ());
-  D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + GetKeysPerNode ());
-  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + GetKeysPerNode ());
-  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + GetKeysPerNode ());
-  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + GetKeysPerNode ());
-  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + GetKeysPerNode ());
-  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + GetKeysPerNode ());
+  D_UINT32 *const pMicroParts = _RC (D_UINT32*, pRowParts + KeysPerNode ());
+  D_INT16 *const  pYearParts  = _RC (D_INT16*, pMicroParts + KeysPerNode ());
+  D_UINT8 *const  pMonthParts = _RC (D_UINT8*, pYearParts + KeysPerNode ());
+  D_UINT8 *const  pDayParts   = _RC (D_UINT8*, pMonthParts + KeysPerNode ());
+  D_UINT8 *const  pHourParts  = _RC (D_UINT8*, pDayParts + KeysPerNode ());
+  D_UINT8 *const  pMinParts   = _RC (D_UINT8*, pHourParts + KeysPerNode ());
+  D_UINT8 *const  pSecParts   = _RC (D_UINT8*, pMinParts + KeysPerNode ());
 
   remove_array_elemes (pRowParts, lastKey, keyIndex, 1);
   remove_array_elemes (pMicroParts, lastKey, keyIndex, 1);
@@ -895,7 +895,7 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pChildNodes = _RC (NODE_INDEX*, pSecParts + GetKeysPerNode ());
+      NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*, pSecParts + KeysPerNode ());
       remove_array_elemes (pChildNodes, lastKey, keyIndex, 1);
     }
 
@@ -907,14 +907,14 @@ T_BTreeNode <void, DBSHiresTime, 11>::RemoveKey (const KEY_INDEX keyIndex)
 
 
 template <> inline const I_BTreeKey&
-T_BTreeNode <float, DBSReal, sizeof (float)>::GetSentinelKey () const
+T_BTreeNode <float, DBSReal, sizeof (float)>::SentinelKey () const
 {
   static RealBTreeKey _sentinel (DBSReal (std::numeric_limits<float>::infinity ()), ~0);
   return _sentinel;
 }
 
 template <> inline const I_BTreeKey&
-T_BTreeNode <long double, DBSRichReal, sizeof (long double)>::GetSentinelKey () const
+T_BTreeNode <long double, DBSRichReal, sizeof (long double)>::SentinelKey () const
 {
   static RichRealBTreeKey _sentinel (DBSRichReal (std::numeric_limits<long double>::infinity ()),
                                      ~0);
@@ -962,7 +962,7 @@ public:
 protected:
   virtual D_UINT       GetMaxCachedNodes ();
   virtual I_BTreeNode* GetNode (const NODE_INDEX node);
-  virtual void         StoreNode (I_BTreeNode *const node);
+  virtual void         StoreNode (I_BTreeNode* const node);
 
   void         InitContainer ();
   void         UpdateContainer ();

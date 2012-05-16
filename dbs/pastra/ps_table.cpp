@@ -182,11 +182,11 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 
       for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
         {
-          D_INT currIndexSize = PSValInterp::GetSize(
+          D_INT currIndexSize = PSValInterp::Size(
                                                       rvFields[schIndex].m_FieldType,
                                                       rvFields[schIndex].isArray);
 
-          D_INT currReqAlign = PSValInterp::GetAlignment(
+          D_INT currReqAlign = PSValInterp::Alignment(
                                                          rvFields[schIndex].m_FieldType,
                                                          rvFields[schIndex].isArray);
 
@@ -278,7 +278,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 
   //Round the row size so the first element of the next row is alligned
-  D_INT32 needExtraAlign = PSValInterp::GetAlignment( rvFields[0].m_FieldType, rvFields[0].isArray);
+  D_INT32 needExtraAlign = PSValInterp::Alignment( rvFields[0].m_FieldType, rvFields[0].isArray);
   needExtraAlign -= get_next_alignment(uOutRowSize);
   if (needExtraAlign > 0)
     uOutRowSize += needExtraAlign;
@@ -371,7 +371,7 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
  : PrototypeTable (dbsHandler),
    m_MaxFileSize (0),
    m_VariableStorageSize (0),
-   m_BaseFileName (dbsHandler.GetDir() + tableName),
+   m_BaseFileName (dbsHandler.WorkingDir() + tableName),
    m_apMainTable (NULL),
    m_apFixedFields (NULL),
    m_apVariableFields (NULL),
@@ -379,7 +379,7 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
 {
   InitFromFile ();
 
-  if (m_MaxFileSize != dbsHandler.GetMaxFileSize ())
+  if (m_MaxFileSize != dbsHandler.MaxFileSize ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_INCONSITENCY));
 
   assert (m_apMainTable.get () != NULL);
@@ -399,13 +399,13 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
   : PrototypeTable (dbsHandler),
     m_MaxFileSize (0),
     m_VariableStorageSize (0),
-    m_BaseFileName (dbsHandler.GetDir() + tableName),
+    m_BaseFileName (dbsHandler.WorkingDir() + tableName),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
     m_apVariableFields (NULL),
     m_Removed (false)
 {
-  create_table_file (dbsHandler.GetMaxFileSize (),
+  create_table_file (dbsHandler.MaxFileSize (),
                      m_BaseFileName.c_str (),
                      pFields,
                      fieldsCount);
@@ -510,7 +510,7 @@ PersistentTable::InitVariableStorages ()
 
         if (fieldDesc.isArray || (fieldDesc.m_FieldType == T_TEXT))
           {
-            m_apVariableFields.reset (new VariableLengthStore ());
+            m_apVariableFields.reset (new VLVarsStore ());
             m_apVariableFields->Init ((m_BaseFileName + PS_TABLE_VARFIELDS_EXT).c_str(),
                                       m_VariableStorageSize,
                                       m_MaxFileSize);
@@ -573,12 +573,12 @@ PersistentTable::MakeHeaderPersistent ()
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF)       = m_RootNode;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF)       = m_FirstUnallocatedRoot;
   *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF)   = m_MaxFileSize;
-  *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF)  = m_apMainTable->GetContainerSize ();
+  *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF)  = m_apMainTable->Size ();
 
   memset(aTableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
-  m_apMainTable->StoreData (0, sizeof aTableHdr, aTableHdr);
-  m_apMainTable->StoreData (sizeof aTableHdr, m_DescriptorsSize, m_FieldsDescriptors.get ());
+  m_apMainTable->Write (0, sizeof aTableHdr, aTableHdr);
+  m_apMainTable->Write (sizeof aTableHdr, m_DescriptorsSize, m_FieldsDescriptors.get ());
 }
 
 void
@@ -638,7 +638,7 @@ PersistentTable::MainTableContainer ()
   return *m_apMainTable.get ();
 }
 
-VariableLengthStore&
+VLVarsStore&
 PersistentTable::VariableFieldsStore ()
 {
   assert (m_apVariableFields.get () != NULL);
@@ -739,7 +739,7 @@ TemporalTable::MakeHeaderPersistent ()
 I_DataContainer*
 TemporalTable::CreateIndexContainer (const D_UINT)
 {
-  return new TempContainer (m_Dbs.GetDir ().c_str (), 4096);
+  return new TempContainer (m_Dbs.WorkingDir ().c_str (), 4096);
 }
 
 I_DataContainer&
@@ -747,7 +747,7 @@ TemporalTable::MainTableContainer ()
 {
 
   if (m_apMainTable.get () == NULL)
-    m_apMainTable.reset (new TempContainer (m_Dbs.GetDir ().c_str (), 4096));
+    m_apMainTable.reset (new TempContainer (m_Dbs.WorkingDir ().c_str (), 4096));
 
   return *m_apMainTable.get ();
 }
@@ -756,18 +756,18 @@ I_DataContainer&
 TemporalTable::FixedFieldsContainer ()
 {
   if (m_apFixedFields.get () == NULL)
-    m_apFixedFields.reset (new TempContainer (m_Dbs.GetDir ().c_str (), 4096));
+    m_apFixedFields.reset (new TempContainer (m_Dbs.WorkingDir ().c_str (), 4096));
 
   return *m_apFixedFields.get ();
 }
 
-VariableLengthStore&
+VLVarsStore&
 TemporalTable::VariableFieldsStore ()
 {
   if (m_apVariableFields.get () == NULL)
     {
-      m_apVariableFields.reset (new VariableLengthStore ());
-      m_apVariableFields->Init (m_Dbs.GetDir ().c_str (), 4096);
+      m_apVariableFields.reset (new VLVarsStore ());
+      m_apVariableFields->Init (m_Dbs.WorkingDir ().c_str (), 4096);
     }
 
   return *m_apVariableFields.get ();

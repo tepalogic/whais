@@ -68,7 +68,7 @@ FieldIndexNodeManager::MarkForRemoval ()
 D_UINT64
 FieldIndexNodeManager::GetIndexRawSize () const
 {
-  return m_Container->GetContainerSize ();
+  return m_Container->Size ();
 }
 
 NODE_INDEX
@@ -85,8 +85,8 @@ FieldIndexNodeManager::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKe
     }
   else
     {
-      assert (m_Container->GetContainerSize() % GetRawNodeSize () == 0);
-      nodeIndex = m_Container->GetContainerSize() / GetRawNodeSize ();
+      assert (m_Container->Size() % GetRawNodeSize () == 0);
+      nodeIndex = m_Container->Size() / GetRawNodeSize ();
     }
 
   if (parent != NIL_NODE)
@@ -108,7 +108,7 @@ FieldIndexNodeManager::FreeNode (const NODE_INDEX nodeId)
   node->MarkAsRemoved();
   node->SetNext (m_FirstFreeNode);
 
-  m_FirstFreeNode = node->GetNodeId();
+  m_FirstFreeNode = node->NodeId();
   UpdateContainer ();
 }
 
@@ -142,32 +142,32 @@ FieldIndexNodeManager::GetNode (const NODE_INDEX nodeId)
 
   std::auto_ptr <I_BTreeNode> apNode (NodeFactory (nodeId));
 
-  assert (m_Container->GetContainerSize () % GetRawNodeSize () == 0);
+  assert (m_Container->Size () % GetRawNodeSize () == 0);
 
-  if (m_Container->GetContainerSize () > nodeId * GetRawNodeSize ())
-    m_Container->RetrieveData (nodeId * GetRawNodeSize (), GetRawNodeSize (), apNode->GetRawData ());
+  if (m_Container->Size () > nodeId * GetRawNodeSize ())
+    m_Container->Read (nodeId * GetRawNodeSize (), GetRawNodeSize (), apNode->GetRawData ());
   else
     {
-      assert (m_Container->GetContainerSize () == nodeId * GetRawNodeSize ());
+      assert (m_Container->Size () == nodeId * GetRawNodeSize ());
       //Reserve the required space
-      m_Container->StoreData (nodeId * GetRawNodeSize (), GetRawNodeSize (), apNode->GetRawData ());
+      m_Container->Write (nodeId * GetRawNodeSize (), GetRawNodeSize (), apNode->GetRawData ());
     }
 
   return apNode.release ();
 }
 
 void
-FieldIndexNodeManager::StoreNode (I_BTreeNode *const pNode)
+FieldIndexNodeManager::StoreNode (I_BTreeNode* const pNode)
 {
 
-  assert (pNode->GetNodeId() > 0);
-  assert (m_Container->GetContainerSize () > pNode->GetNodeId () * GetRawNodeSize());
-  assert (m_Container->GetContainerSize() % GetRawNodeSize () == 0);
+  assert (pNode->NodeId() > 0);
+  assert (m_Container->Size () > pNode->NodeId () * GetRawNodeSize());
+  assert (m_Container->Size() % GetRawNodeSize () == 0);
 
   if (pNode->IsDirty() == false)
     return;
 
-  m_Container->StoreData (pNode->GetNodeId() * GetRawNodeSize (),
+  m_Container->Write (pNode->NodeId() * GetRawNodeSize (),
                           GetRawNodeSize (),
                           pNode->GetRawData ());
 }
@@ -180,7 +180,7 @@ FieldIndexNodeManager::InitContainer ()
   apNode->SetNext (NIL_NODE);
   apNode->SetPrev (NIL_NODE);
 
-  m_Container->StoreData (0, GetRawNodeSize (), apNode->GetRawData ());
+  m_Container->Write (0, GetRawNodeSize (), apNode->GetRawData ());
 }
 
 void
@@ -192,14 +192,14 @@ FieldIndexNodeManager::UpdateContainer ()
   apNode->SetNext (m_FirstFreeNode);
   apNode->SetPrev (m_RootNode);
 
-  m_Container->StoreData (0, GetRawNodeSize (), apNode->GetRawData ());
+  m_Container->Write (0, GetRawNodeSize (), apNode->GetRawData ());
 }
 
 void
 FieldIndexNodeManager::InitFromContainer ()
 {
   std::auto_ptr <I_BTreeNode> apNode (NodeFactory (0));
-  m_Container->RetrieveData (0, GetRawNodeSize (), apNode->GetRawData ());
+  m_Container->Read (0, GetRawNodeSize (), apNode->GetRawData ());
 
   m_FirstFreeNode = apNode->GetNext ();
   m_RootNode      = apNode->GetPrev ();
@@ -208,7 +208,7 @@ FieldIndexNodeManager::InitFromContainer ()
 I_BTreeNode *
 FieldIndexNodeManager::NodeFactory (const NODE_INDEX nodeId)
 {
-  I_BTreeNode *result = NULL;
+  I_BTreeNode* result = NULL;
   switch (m_FieldType)
   {
   case T_BOOL:

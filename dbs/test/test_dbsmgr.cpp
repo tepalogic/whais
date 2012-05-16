@@ -31,8 +31,8 @@ static const DBSFieldDescriptor field_descs[] =
 static const D_UINT descCount = sizeof (field_descs) / sizeof field_descs[0];
 
 bool
-operator!= (const DBSFieldDescriptor & field_1,
-            const DBSFieldDescriptor & field_2)
+operator!= (const DBSFieldDescriptor& field_1,
+            const DBSFieldDescriptor& field_2)
 {
   return (field_1.m_FieldType != field_2.m_FieldType) ||
          (field_1.isArray != field_2.isArray) ||
@@ -114,9 +114,9 @@ main ()
     DBSCreateDatabase ("baza_date_1", dir.c_str ());
   }
 
-  I_DBSHandler & handler = DBSRetrieveDatabase ("baza_date_1");
+  I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
   handler.AddTable ("table_1", field_descs, descCount);
-  I_DBSTable & table = handler.RetrievePersistentTable ("table_1");
+  I_DBSTable& table = handler.RetrievePersistentTable ("table_1");
   handler.ReleaseTable (table);
   DBSReleaseDatabase (handler);
   DBSShoutdown ();

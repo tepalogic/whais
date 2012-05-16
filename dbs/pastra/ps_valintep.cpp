@@ -27,15 +27,15 @@
 
 #include "ps_valintep.h"
 
-static void new_bool (DBSBool *object, bool value);
-static void new_char (DBSChar *object, D_UINT32 value);
-static void new_date (DBSDate *object, D_INT32 year, D_UINT8 month, D_UINT8 day);
-static void new_datetime (DBSDateTime *object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds);
-static void new_hirestime (DBSHiresTime *object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds, D_UINT32 microsec);
+static void new_bool (DBSBool* object, bool value);
+static void new_char (DBSChar* object, D_UINT32 value);
+static void new_date (DBSDate* object, D_INT32 year, D_UINT8 month, D_UINT8 day);
+static void new_datetime (DBSDateTime* object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds);
+static void new_hirestime (DBSHiresTime* object, D_INT32 year, D_UINT8 month, D_UINT8 day, D_UINT8 hours, D_UINT8 minutes, D_UINT8 seconds, D_UINT32 microsec);
 template <class T_OBJ, class T_VAL>
-static void new_integer (T_OBJ *object, T_VAL value);
+static void new_integer (T_OBJ* object, T_VAL value);
 template <class T_OBJ, class T_REAL>
-static void new_real (T_OBJ *object, T_REAL value);
+static void new_real (T_OBJ* object, T_REAL value);
 
 using namespace std;
 using namespace pastra;
@@ -70,7 +70,7 @@ static const D_INT PS_ARRAY_ALIGN              = 8;
 
 
 void
-PSValInterp::Store (const DBSBool &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSBool& rSource, D_UINT8 *pDestination)
 {
   if (rSource.m_Value == false)
     pDestination[0] = 0;
@@ -79,13 +79,13 @@ PSValInterp::Store (const DBSBool &rSource, D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Store (const DBSChar &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSChar& rSource, D_UINT8 *pDestination)
 {
   _RC(D_UINT32 *, pDestination)[0] = rSource.m_Value;
 }
 
 void
-PSValInterp::Store (const DBSDate &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSDate& rSource, D_UINT8 *pDestination)
 {
 
   _RC(D_UINT16 *, pDestination)[0] = rSource.m_Year;
@@ -94,7 +94,7 @@ PSValInterp::Store (const DBSDate &rSource, D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Store (const DBSDateTime &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSDateTime& rSource, D_UINT8 *pDestination)
 {
   _RC(D_UINT16 *, pDestination)[0] = rSource.m_Year;
   pDestination[2] = rSource.m_Month;
@@ -105,7 +105,7 @@ PSValInterp::Store (const DBSDateTime &rSource, D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Store (const DBSHiresTime &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSHiresTime& rSource, D_UINT8 *pDestination)
 {
   _RC(D_UINT32 *, pDestination)[0] = rSource.m_Microsec;
   _RC(D_UINT16 *, pDestination)[2] = rSource.m_Year;
@@ -141,12 +141,12 @@ PSValInterp::Store (const DBSInt64 &rSource, D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Store (const DBSReal &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSReal& rSource, D_UINT8 *pDestination)
 {
   *_RC(float*, pDestination) = rSource.m_Value;
 }
 void
-PSValInterp::Store (const DBSRichReal &rSource, D_UINT8 *pDestination)
+PSValInterp::Store (const DBSRichReal& rSource, D_UINT8 *pDestination)
 {
   _RC(long double*, pDestination)[0] = rSource.m_Value;
 }
@@ -179,20 +179,20 @@ PSValInterp::Store (const DBSUInt64 &rSource, D_UINT8 *pDestination)
 /////////////////////////////MARKER
 
 void
-PSValInterp::Retrieve (DBSBool *pOutValue, const D_UINT8 *pSource)
+PSValInterp::Retrieve (DBSBool* pOutValue, const D_UINT8 *pSource)
 {
   new_bool (pOutValue, *pSource != 0);
   assert ((*pSource == 0) || (*pSource == 1));
 }
 
 void
-PSValInterp::Retrieve (DBSChar *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSChar* pOutValue, const D_UINT8 *pDestination)
 {
   new_char (pOutValue, _RC(const D_UINT32 *, pDestination)[0]);
 }
 
 void
-PSValInterp::Retrieve (DBSDate *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSDate* pOutValue, const D_UINT8 *pDestination)
 {
 
   D_INT16 year = _RC (const D_UINT16 *, pDestination)[0];
@@ -203,7 +203,7 @@ PSValInterp::Retrieve (DBSDate *pOutValue, const D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Retrieve (DBSDateTime *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSDateTime* pOutValue, const D_UINT8 *pDestination)
 {
   D_INT16 year = _RC (const D_UINT16 *, pDestination)[0];
   D_UINT8 month = pDestination[2];
@@ -216,7 +216,7 @@ PSValInterp::Retrieve (DBSDateTime *pOutValue, const D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Retrieve (DBSHiresTime *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSHiresTime* pOutValue, const D_UINT8 *pDestination)
 {
   D_INT32 microsec = _RC (const D_UINT32 *, pDestination)[0];
   D_INT16 year = _RC (const D_UINT16 *, pDestination)[2];
@@ -255,12 +255,12 @@ PSValInterp::Retrieve (DBSInt64 *pOutValue, const D_UINT8 *pDestination)
 }
 
 void
-PSValInterp::Retrieve (DBSReal *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSReal* pOutValue, const D_UINT8 *pDestination)
 {
   new_real (pOutValue, _RC (const float*, pDestination)[0]);
 }
 void
-PSValInterp::Retrieve (DBSRichReal *pOutValue, const D_UINT8 *pDestination)
+PSValInterp::Retrieve (DBSRichReal* pOutValue, const D_UINT8 *pDestination)
 {
   new_real (pOutValue, _RC (const long double*, pDestination)[0]);
 }
@@ -290,7 +290,7 @@ PSValInterp::Retrieve (DBSUInt64 *pOutValue, const D_UINT8 *pDestination)
 }
 
 D_INT
-PSValInterp::GetSize (DBS_FIELD_TYPE type, bool isArray)
+PSValInterp::Size (DBS_FIELD_TYPE type, bool isArray)
 {
   if (isArray)
     return PS_ARRAY_SIZE;
@@ -332,7 +332,7 @@ PSValInterp::GetSize (DBS_FIELD_TYPE type, bool isArray)
 }
 
 D_INT
-PSValInterp::GetAlignment (DBS_FIELD_TYPE type, bool isArray)
+PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
 {
   if (isArray)
     return PS_ARRAY_ALIGN;
@@ -378,28 +378,28 @@ PSValInterp::GetAlignment (DBS_FIELD_TYPE type, bool isArray)
 #endif
 
 void
-new_bool (DBSBool *object, bool value)
+new_bool (DBSBool* object, bool value)
 {
   object->~DBSBool ();
   new (object) DBSBool(value);
 }
 
 void
-new_char (DBSChar *object, D_UINT32 value)
+new_char (DBSChar* object, D_UINT32 value)
 {
   object->~DBSChar ();
   new (object) DBSChar (value);
 }
 
 void
-new_date (DBSDate *object, D_INT32 year, D_UINT8 month, D_UINT8 day)
+new_date (DBSDate* object, D_INT32 year, D_UINT8 month, D_UINT8 day)
 {
   object->~DBSDate ();
   new (object) DBSDate (year, month, day);
 }
 
 void
-new_datetime (DBSDateTime *object,
+new_datetime (DBSDateTime* object,
               D_INT32 year,
               D_UINT8 month,
               D_UINT8 day,
@@ -412,7 +412,7 @@ new_datetime (DBSDateTime *object,
 }
 
 void
-new_hirestime (DBSHiresTime *object,
+new_hirestime (DBSHiresTime* object,
                D_INT32 year,
                D_UINT8 month,
                D_UINT8 day,
@@ -427,7 +427,7 @@ new_hirestime (DBSHiresTime *object,
 
 template <class T_OBJ, class T_VAL>
 static void
-new_integer (T_OBJ *object, T_VAL value)
+new_integer (T_OBJ* object, T_VAL value)
 {
   object->~T_OBJ ();
   new (object) T_OBJ (value);
@@ -435,7 +435,7 @@ new_integer (T_OBJ *object, T_VAL value)
 
 template <class T_OBJ, class T_REAL>
 static void
-new_real (T_OBJ *object, T_REAL value)
+new_real (T_OBJ* object, T_REAL value)
 {
   object->~T_OBJ ();
   new (object) T_OBJ (value);

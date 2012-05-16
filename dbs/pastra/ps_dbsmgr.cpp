@@ -352,7 +352,7 @@ DbsHandler::~DbsHandler ()
 }
 
 D_UINT
-DbsHandler::GetPesistentTablesCount ()
+DbsHandler::PesistentTablesCount ()
 {
   return m_Tables.size ();
 }
@@ -450,7 +450,7 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
 }
 
 void
-DbsHandler::DeleteTable (const D_CHAR * const pTableName)
+DbsHandler::DeleteTable (const D_CHAR* const pTableName)
 {
   WSynchronizerRAII syncHolder (m_Sync);
 
@@ -500,7 +500,7 @@ DbsHandler::SyncToFile ()
   *_RC (D_UINT16*, aBuffer + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
   *_RC (D_UINT16*, aBuffer + PS_DBS_DIRECTORY_OFF)  = PS_DBS_HEADER_SIZE;
   *_RC (D_UINT16*, aBuffer + PS_DBS_NUM_TABLES_OFF) = m_Tables.size ();
-  *_RC (D_UINT64*, aBuffer + PS_DBS_MAX_FILE_OFF)   = GetMaxFileSize ();
+  *_RC (D_UINT64*, aBuffer + PS_DBS_MAX_FILE_OFF)   = MaxFileSize ();
 
   string fileName (m_DbsDirectory + m_Name + DBS_FILE_EXT);
   WFile outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);

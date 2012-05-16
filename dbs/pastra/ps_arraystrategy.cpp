@@ -49,7 +49,7 @@ I_ArrayStrategy::~I_ArrayStrategy()
 }
 
 D_UINT
-I_ArrayStrategy::GetReferenceCount() const
+I_ArrayStrategy::ReferenceCount() const
 {
   return m_ReferenceCount;
 }
@@ -71,20 +71,20 @@ I_ArrayStrategy::DecrementReferenceCount ()
 }
 
 void
-I_ArrayStrategy::Clone (I_ArrayStrategy &strategy)
+I_ArrayStrategy::Clone (I_ArrayStrategy& strategy)
 {
-  assert (strategy.GetElementsType() == m_ElementsType);
+  assert (strategy.Type() == m_ElementsType);
   assert (this != &strategy);
 
   D_UINT64 currentPosition = 0;
-  D_UINT64 cloneSize = strategy.GetRawDataSize();
+  D_UINT64 cloneSize = strategy.RawSize();
   while (cloneSize > 0)
     {
       D_UINT8   cloneBuff [128];
       D_UINT64  toClone = MIN (sizeof cloneBuff, cloneSize);
 
-      strategy.ReadRawData (currentPosition, toClone, cloneBuff);
-      WriteRawData (currentPosition, toClone, cloneBuff);
+      strategy.ReadRaw (currentPosition, toClone, cloneBuff);
+      WriteRaw (currentPosition, toClone, cloneBuff);
 
       cloneSize -= toClone, currentPosition += toClone;
     }
@@ -125,7 +125,7 @@ NullArray::~NullArray ()
 }
 
 D_UINT
-NullArray::GetReferenceCount () const
+NullArray::ReferenceCount () const
 {
   return ~0; //All 1s (e.g. but not 0 to force new allocation when is modified).
 }
@@ -143,27 +143,27 @@ NullArray::DecrementReferenceCount ()
 }
 
 void
-NullArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
+NullArray::ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
 {
   //Some does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 void
-NullArray::WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
+NullArray::WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
 {
   //Some does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 void
-NullArray::CollapseRawData (const D_UINT64 offset, const D_UINT64 count)
+NullArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 {
   //Some does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 D_UINT64
-NullArray::GetRawDataSize () const
+NullArray::RawSize () const
 {
   return 0;
 }
@@ -241,20 +241,20 @@ TemporalArray::~TemporalArray ()
 }
 
 void
-TemporalArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
+TemporalArray::ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
 {
-  m_Storage.RetrieveData (offset, length, pData);
+  m_Storage.Read (offset, length, pData);
 }
 void
-TemporalArray::WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
+TemporalArray::WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
 {
-  m_Storage.StoreData (offset, length, pData);
+  m_Storage.Write (offset, length, pData);
 }
 
 D_UINT64
-TemporalArray::GetRawDataSize () const
+TemporalArray::RawSize () const
 {
-  return m_Storage.GetContainerSize() ;
+  return m_Storage.Size() ;
 }
 
 TemporalArray&
@@ -264,13 +264,13 @@ TemporalArray::GetTemporal ()
 }
 
 void
-TemporalArray::CollapseRawData (const D_UINT64 offset, const D_UINT64 count)
+TemporalArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 {
-  m_Storage.ColapseContent (offset, offset + count);
+  m_Storage.Colapse (offset, offset + count);
 }
 
 
-RowFieldArray::RowFieldArray (VariableLengthStore &storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type) :
+RowFieldArray::RowFieldArray (VLVarsStore& storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type) :
     I_ArrayStrategy (type),
     m_FirstRecordEntry (firstRecordEntry),
     m_Storage (storage)
@@ -289,7 +289,7 @@ RowFieldArray::~RowFieldArray ()
 }
 
 D_UINT
-RowFieldArray::GetReferenceCount () const
+RowFieldArray::ReferenceCount () const
 {
   return ~0; //All 1s (e.g. but not 1 force new allocation when is modified).
 }
@@ -307,30 +307,30 @@ RowFieldArray::GetRowValue()
 }
 
 void
-RowFieldArray::ReadRawData (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
+RowFieldArray::ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
 {
   m_Storage.GetRecord(m_FirstRecordEntry, offset + sizeof (D_UINT64), length, pData);
 }
 void
-RowFieldArray::WriteRawData (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
+RowFieldArray::WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
 {
   //We are not allowed to modify the row entry directly
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 D_UINT64
-RowFieldArray::GetRawDataSize () const
+RowFieldArray::RawSize () const
 {
-  D_INT64 storageSize = PSValInterp::GetAlignment (m_ElementsType, false);
+  D_INT64 storageSize = PSValInterp::Alignment (m_ElementsType, false);
 
-  while (storageSize < PSValInterp::GetSize(m_ElementsType, false))
-    storageSize += PSValInterp::GetAlignment (m_ElementsType, false);
+  while (storageSize < PSValInterp::Size(m_ElementsType, false))
+    storageSize += PSValInterp::Alignment (m_ElementsType, false);
 
   return m_ElementsCount * storageSize;
 }
 
 void
-RowFieldArray::CollapseRawData (const D_UINT64 offset, const D_UINT64 count)
+RowFieldArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 {
   //We are not allowed to modify the row entry directly
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));

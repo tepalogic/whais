@@ -38,40 +38,40 @@ private:
   ~PSValInterp ();
 
 public:
-  static void Store (const DBSBool &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSChar &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSDate &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSDateTime &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSHiresTime &rSource, D_UINT8 *pDestination);
+  static void Store (const DBSBool& rSource, D_UINT8 *pDestination);
+  static void Store (const DBSChar& rSource, D_UINT8 *pDestination);
+  static void Store (const DBSDate& rSource, D_UINT8 *pDestination);
+  static void Store (const DBSDateTime& rSource, D_UINT8 *pDestination);
+  static void Store (const DBSHiresTime& rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt8 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt16 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt32 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSInt64 &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSReal &rSource, D_UINT8 *pDestination);
-  static void Store (const DBSRichReal &rSource, D_UINT8 *pDestination);
+  static void Store (const DBSReal& rSource, D_UINT8 *pDestination);
+  static void Store (const DBSRichReal& rSource, D_UINT8 *pDestination);
   static void Store (const DBSUInt8 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSUInt16 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSUInt32 &rSource, D_UINT8 *pDestination);
   static void Store (const DBSUInt64 &rSource, D_UINT8 *pDestination);
 
-  static void Retrieve (DBSBool *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSChar *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSDate *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSDateTime *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSHiresTime *pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSBool* pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSChar* pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSDate* pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSDateTime* pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSHiresTime* pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt8 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt16 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt32 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSInt64 *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSReal *pOutValue, const D_UINT8 *pSource);
-  static void Retrieve (DBSRichReal *pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSReal* pOutValue, const D_UINT8 *pSource);
+  static void Retrieve (DBSRichReal* pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSUInt8 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSUInt16 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSUInt32 *pOutValue, const D_UINT8 *pSource);
   static void Retrieve (DBSUInt64 *pOutValue, const D_UINT8 *pSource);
 
-  static D_INT GetSize (DBS_FIELD_TYPE type, bool isArray);
-  static D_INT GetAlignment (DBS_FIELD_TYPE, bool isArray);
+  static D_INT Size (DBS_FIELD_TYPE type, bool isArray);
+  static D_INT Alignment (DBS_FIELD_TYPE, bool isArray);
 };
 
 };

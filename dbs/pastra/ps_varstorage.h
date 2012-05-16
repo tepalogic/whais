@@ -55,18 +55,18 @@ public:
                                              (m_NextEntry |= FIRST_RECORD_ENTRY) :
                                              (m_NextEntry &= ~FIRST_RECORD_ENTRY); }
 
-  bool IsDeleted () const { return (m_NextEntry & ENTRY_DELETED_MASK) != 0; }
-  bool IsFirstEntry () const { return (m_NextEntry & FIRST_RECORD_ENTRY) != 0; }
+  bool IsDeleted () const { return (m_NextEntry& ENTRY_DELETED_MASK) != 0; }
+  bool IsFirstEntry () const { return (m_NextEntry& FIRST_RECORD_ENTRY) != 0; }
 
   D_UINT64 GetPrevEntry () const { return m_PrevEntry; }
   void     SetPrevEntry (D_UINT64 content) { m_PrevEntry = content; }
   D_UINT64 GetNextEntry () const { return m_NextEntry & ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY); }
   void     SetNextEntry (D_UINT64 content) { m_NextEntry &= (ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY); m_NextEntry |= content; }
 
-  D_UINT  ReadEntryData (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const ;
-  D_UINT  UpdateEntryData (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer);
+  D_UINT  Read (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const ;
+  D_UINT  Write (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer);
 
-  static D_UINT8  GetRawDataSize () { return ENTRY_SIZE; }
+  static D_UINT8  Size () { return ENTRY_SIZE; }
 
 private:
   D_UINT64 m_PrevEntry;
@@ -74,12 +74,12 @@ private:
   D_UINT8  m_aRawData[ENTRY_SIZE];
 };
 
-class VariableLengthStore : public I_BlocksManager
+class VLVarsStore : public I_BlocksManager
 {
 public:
 
-  VariableLengthStore ();
-  ~VariableLengthStore ();
+  VLVarsStore ();
+  ~VLVarsStore ();
 
   void Init (const D_CHAR*  tempDir,
              const D_UINT32 reservedMem);
@@ -94,12 +94,12 @@ public:
   D_UINT64 AddRecord (const D_UINT8* pBuffer,
                       const D_UINT64 count);
 
-  D_UINT64 AddRecord (VariableLengthStore &sourceStore,
+  D_UINT64 AddRecord (VLVarsStore& sourceStore,
                       D_UINT64 sourceFirstEntry,
                       D_UINT64 sourceOffset,
                       D_UINT64 sourceCount);
 
-  D_UINT64 AddRecord (I_DataContainer &sourceContainer,
+  D_UINT64 AddRecord (I_DataContainer& sourceContainer,
                       D_UINT64 sourceOffset,
                       D_UINT64 sourceCount);
 
@@ -115,14 +115,14 @@ public:
 
   void     UpdateRecord (D_UINT64 recordFirstEntry,
                          D_UINT64 offset,
-                         VariableLengthStore &sourceStore,
+                         VLVarsStore& sourceStore,
                          D_UINT64 sourceFirstEntry,
                          D_UINT64 sourceOffset,
                          D_UINT64 sourceCount);
 
   void     UpdateRecord (D_UINT64 recordFirstEntry,
                          D_UINT64 offset,
-                         I_DataContainer &sourceContainer,
+                         I_DataContainer& sourceContainer,
                          D_UINT64 sourceOffset,
                          D_UINT64 sourceCount);
 

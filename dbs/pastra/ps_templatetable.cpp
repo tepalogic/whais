@@ -91,7 +91,7 @@ PrototypeTable::GetFieldsCount ()
 DBSFieldDescriptor
 PrototypeTable::GetFieldDescriptor (D_UINT fieldIndex)
 {
-  const FieldDescriptor * const pDesc = _RC(const FieldDescriptor*, m_FieldsDescriptors.get ());
+  const FieldDescriptor* const pDesc = _RC(const FieldDescriptor*, m_FieldsDescriptors.get ());
 
   if (fieldIndex >= m_FieldsCount)
     throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
@@ -149,7 +149,7 @@ PrototypeTable::AddRow ()
     {
       D_UINT writeChunk = MIN (toWrite, sizeof (dummyValue));
 
-      FixedFieldsContainer ().StoreData (lastRowPosition, writeChunk, dummyValue);
+      FixedFieldsContainer ().Write (lastRowPosition, writeChunk, dummyValue);
 
       toWrite         -= writeChunk;
       lastRowPosition += writeChunk;
@@ -223,8 +223,8 @@ PrototypeTable::MarkRowForReuse (D_UINT64 rowIndex)
 }
 
 template <class T> static void
-insert_row_field (PrototypeTable &table,
-                  BTree &tree,
+insert_row_field (PrototypeTable& table,
+                  BTree& tree,
                   const D_UINT64 rowIndex,
                   const D_UINT fieldIndex)
 {
@@ -271,9 +271,9 @@ PrototypeTable::CreateFieldIndex (const D_UINT                      fieldIndex,
   rootNode->SetPrev (NIL_NODE);
   rootNode->SetKeysCount (0);
   rootNode->SetLeaf (true);
-  rootNode->InsertKey (rootNode->GetSentinelKey ());
+  rootNode->InsertKey (rootNode->SentinelKey ());
 
-  apFieldMgr->SetRootNodeId (rootNode->GetNodeId());
+  apFieldMgr->SetRootNodeId (rootNode->NodeId());
   BTree fieldTree (*apFieldMgr.get ());
 
   for (D_UINT64 rowIndex = 0; rowIndex < m_RowsCount; ++rowIndex)
@@ -436,10 +436,10 @@ PrototypeTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
     }
   else
     {
-      assert (MainTableContainer ().GetContainerSize () % GetRawNodeSize () == 0);
+      assert (MainTableContainer ().Size () % GetRawNodeSize () == 0);
 
       //TODO: Rename the GetContainerSize method to Size ()
-      nodeIndex = MainTableContainer ().GetContainerSize () / GetRawNodeSize ();
+      nodeIndex = MainTableContainer ().Size () / GetRawNodeSize ();
     }
 
   if (parent != NIL_NODE)
@@ -461,7 +461,7 @@ PrototypeTable::FreeNode (const NODE_INDEX nodeId)
   node->MarkAsRemoved();
   node->SetNext (m_FirstUnallocatedRoot);
 
-  m_FirstUnallocatedRoot = node->GetNodeId();
+  m_FirstUnallocatedRoot = node->NodeId();
   MakeHeaderPersistent ();
 }
 
@@ -475,9 +475,9 @@ PrototypeTable::GetRootNodeId ()
       rootNode->SetPrev (NIL_NODE);
       rootNode->SetKeysCount (0);
       rootNode->SetLeaf (true);
-      rootNode->InsertKey (rootNode->GetSentinelKey ());
+      rootNode->InsertKey (rootNode->SentinelKey ());
 
-      SetRootNodeId (rootNode->GetNodeId());
+      SetRootNodeId (rootNode->NodeId());
     }
 
   return m_RootNode;
@@ -502,19 +502,19 @@ PrototypeTable::GetNode (const NODE_INDEX node)
 {
   std::auto_ptr <TableRmNode> apNode (new TableRmNode (*this, node));
 
-  assert (MainTableContainer ().GetContainerSize () % GetRawNodeSize () == 0);
+  assert (MainTableContainer ().Size () % GetRawNodeSize () == 0);
 
-  if (MainTableContainer ().GetContainerSize () > node * GetRawNodeSize ())
+  if (MainTableContainer ().Size () > node * GetRawNodeSize ())
     {
-      MainTableContainer ().RetrieveData (apNode->GetNodeId () * GetRawNodeSize (),
+      MainTableContainer ().Read (apNode->NodeId () * GetRawNodeSize (),
                                           GetRawNodeSize (),
                                           apNode->GetRawData ());
     }
   else
     {
       //Reserve space for this node
-      assert (MainTableContainer ().GetContainerSize () == (node * GetRawNodeSize ()));
-      MainTableContainer ().StoreData (MainTableContainer ().GetContainerSize (),
+      assert (MainTableContainer ().Size () == (node * GetRawNodeSize ()));
+      MainTableContainer ().Write (MainTableContainer ().Size (),
                                        GetRawNodeSize (),
                                        apNode->GetRawData ());
     }
@@ -529,7 +529,7 @@ PrototypeTable::StoreNode (I_BTreeNode* const pNode)
   if (pNode->IsDirty() == false)
     return ;
 
-  MainTableContainer ().StoreData (pNode->GetNodeId() * GetRawNodeSize (),
+  MainTableContainer ().Write (pNode->NodeId() * GetRawNodeSize (),
                                    GetRawNodeSize (),
                                    pNode->GetRawData ());
 
@@ -544,7 +544,7 @@ PrototypeTable::StoreItems (const D_UINT8* pSrcBuffer,
   if (itemsCount + firstItem > m_RowsCount)
     itemsCount = m_RowsCount - firstItem;
 
-  FixedFieldsContainer ().StoreData( firstItem * m_RowSize, itemsCount * m_RowSize, pSrcBuffer);
+  FixedFieldsContainer ().Write( firstItem * m_RowSize, itemsCount * m_RowSize, pSrcBuffer);
 }
 
 void
@@ -555,7 +555,7 @@ PrototypeTable::RetrieveItems (D_UINT8* pDestBuffer,
   if (itemsCount + firstItem > m_RowsCount)
     itemsCount = m_RowsCount - firstItem;
 
-  FixedFieldsContainer ().RetrieveData( firstItem * m_RowSize, itemsCount * m_RowSize, pDestBuffer);
+  FixedFieldsContainer ().Read (firstItem * m_RowSize, itemsCount * m_RowSize, pDestBuffer);
 }
 
 
@@ -860,11 +860,11 @@ PrototypeTable::SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, cons
 
   if (rSource.IsNull() == false)
     {
-      I_ArrayStrategy &array = rSource;
+      I_ArrayStrategy& array = rSource;
       if (array.IsRowValue())
         {
           RowFieldArray& value = array.GetRowValue();
-          newFieldValueSize    = value.GetRawDataSize();
+          newFieldValueSize    = value.RawSize();
           newFirstEntry        = VariableFieldsStore ().AddRecord (value.m_Storage,
                                                                    value.m_FirstRecordEntry,
                                                                    0,
@@ -873,9 +873,9 @@ PrototypeTable::SetEntry (const DBSArray& rSource, const D_UINT64 rowIndex, cons
       else
         {
           TemporalArray& value = array.GetTemporal ();
-          newFieldValueSize    = value.GetRawDataSize();
+          newFieldValueSize    = value.RawSize();
 
-          const D_UINT64 elemsCount = value.GetElementsCount();
+          const D_UINT64 elemsCount = value.Count();
           newFirstEntry             = VariableFieldsStore ().AddRecord (_RC(const D_UINT8*, &elemsCount),
                                                                         sizeof elemsCount);
           VariableFieldsStore ().UpdateRecord (newFirstEntry,
@@ -1037,15 +1037,15 @@ PrototypeTable::GetEntry (DBSUInt64& rDestination, const D_UINT64 rowIndex, cons
 }
 
 static RowFieldText*
-allocate_row_field_text (VariableLengthStore& store,
-                         const D_UINT64       firstRecordEntry,
-                         const D_UINT64       valueSize)
+allocate_row_field_text (VLVarsStore&   store,
+                         const D_UINT64 firstRecordEntry,
+                         const D_UINT64 valueSize)
 {
   return new RowFieldText (store, firstRecordEntry, valueSize);
 }
 
 static RowFieldArray*
-allocate_row_field_array (VariableLengthStore& store,
+allocate_row_field_array (VLVarsStore&         store,
                           const D_UINT64       firstRecordEntry,
                           const DBS_FIELD_TYPE type)
 {
@@ -1473,14 +1473,14 @@ PrototypeTable::RetrieveEntry (T& rDestination, const D_UINT64 rowIndex, const D
       ((field.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, rDestination))))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
-  T *const      pDest    = &rDestination;
+  T* const      pDest    = &rDestination;
   const D_UINT  byte_off = field.m_NullBitIndex / 8;
   const D_UINT8 bit_off  = field.m_NullBitIndex % 8;
 
   WSynchronizerRAII syncHolder (m_Sync);
 
   StoredItem           cachedItem = m_RowCache.RetriveItem (rowIndex);
-  const D_UINT8 *const pRawData   = cachedItem.GetDataForRead();
+  const D_UINT8* const pRawData   = cachedItem.GetDataForRead();
 
   if (pRawData[byte_off] & (1 << bit_off))
     {
@@ -1509,7 +1509,7 @@ PrototypeTable::MatchRowsWithIndex (const D_UINT   fieldIndex,
 
   toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
 
-  FieldIndexNodeManager *const pNodeMgr = m_vIndexNodeMgrs[fieldIndex];
+  FieldIndexNodeManager* const pNodeMgr = m_vIndexNodeMgrs[fieldIndex];
   DBSArray                     result (_SC (DBSUInt64*, NULL));
   NODE_INDEX                   node;
   KEY_INDEX                    key;
@@ -1580,7 +1580,7 @@ PrototypeTable::MatchRowsWithIndex (const D_UINT   fieldIndex,
           else
             maxCount -= (key - toKey + 1);
 
-          pNode->GetKeysRows (result, key, toKey);
+          pNode->GetRows (result, key, toKey);
 
           if (lastNode || (pNode->GetNext() == NIL_NODE) || (maxCount == 0))
             break;
@@ -1642,7 +1642,7 @@ PrototypeTable::MatchRows (const T&       min,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-TableRmNode::TableRmNode (PrototypeTable &table, const NODE_INDEX nodeId) :
+TableRmNode::TableRmNode (PrototypeTable& table, const NODE_INDEX nodeId) :
     I_BTreeNode (table),
     m_cpNodeData (new D_UINT8 [table.GetRawNodeSize ()])
 {
@@ -1660,7 +1660,7 @@ TableRmNode::~TableRmNode ()
 }
 
 D_UINT
-TableRmNode::GetKeysPerNode () const
+TableRmNode::KeysPerNode () const
 {
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
 
@@ -1680,14 +1680,14 @@ TableRmNode::GetFirstKey (const I_BTreeNode& parent) const
   assert (GetKeysCount() > 0);
 
   KEY_INDEX               result;
-  const NODE_INDEX *const pKeys = _RC ( const NODE_INDEX*, GetRawData () + sizeof (NodeHeader));
+  const NODE_INDEX* const pKeys = _RC ( const NODE_INDEX*, GetRawData () + sizeof (NodeHeader));
 
   const TableRmKey key (pKeys[0]);
 
   parent.FindBiggerOrEqual (key, result);
 
   assert (parent.IsEqual (key, result));
-  assert (GetNodeId () == parent.GetChildNode (result));
+  assert (NodeId () == parent.GetChildNode (result));
 
   return result;
 }
@@ -1699,20 +1699,20 @@ TableRmNode::GetChildNode (const KEY_INDEX keyIndex) const
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
   assert (IsLeaf () == false);
 
-  const D_UINT firstKeyOff = sizeof (NodeHeader) + TableRmNode::GetKeysPerNode() * sizeof (D_UINT64);
-  const NODE_INDEX *const cpFirstKey = _RC (const NODE_INDEX *, GetRawData () + firstKeyOff);
+  const D_UINT firstKeyOff = sizeof (NodeHeader) + TableRmNode::KeysPerNode() * sizeof (D_UINT64);
+  const NODE_INDEX* const cpFirstKey = _RC (const NODE_INDEX *, GetRawData () + firstKeyOff);
 
   return cpFirstKey [keyIndex];
 }
 
 void
-TableRmNode::ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex)
+TableRmNode::ResetKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex)
 {
-  assert (childNode.GetNodeId () == GetChildNode (keyIndex));
+  assert (childNode.NodeId () == GetChildNode (keyIndex));
 
-  const TableRmNode &child       = _SC (const TableRmNode&, childNode);
-  NODE_INDEX *const pKeys          = _RC (NODE_INDEX*, GetRawData () + sizeof (NodeHeader));
-  const NODE_INDEX *const pSrcKeys = _RC ( const NODE_INDEX*,
+  const TableRmNode& child         = _SC (const TableRmNode&, childNode);
+  NODE_INDEX* const pKeys          = _RC (NODE_INDEX*, GetRawData () + sizeof (NodeHeader));
+  const NODE_INDEX* const pSrcKeys = _RC ( const NODE_INDEX*,
                                            child.GetRawData () + sizeof (NodeHeader));
 
   pKeys [keyIndex] = pSrcKeys [0];
@@ -1726,8 +1726,8 @@ TableRmNode::SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode)
   assert (sizeof (NodeHeader) % sizeof (D_UINT64) == 0);
   assert (IsLeaf () == false);
 
-  const D_UINT firstKeyOff = sizeof (NodeHeader) + TableRmNode::GetKeysPerNode() * sizeof (D_UINT64);
-  NODE_INDEX *const cpFirstKey = _RC (NODE_INDEX *, GetRawData () + firstKeyOff);
+  const D_UINT firstKeyOff = sizeof (NodeHeader) + TableRmNode::KeysPerNode() * sizeof (D_UINT64);
+  NODE_INDEX* const cpFirstKey = _RC (NODE_INDEX *, GetRawData () + firstKeyOff);
 
   cpFirstKey [keyIndex] = childNode;
 }
@@ -1740,7 +1740,7 @@ TableRmNode::InsertKey (const I_BTreeKey& key)
       KEY_INDEX keyIndex;
       KEY_INDEX lastKey = GetKeysCount () - 1;
 
-      assert (lastKey < (GetKeysPerNode() - 1));
+      assert (lastKey < (KeysPerNode() - 1));
 
       if (FindBiggerOrEqual (key, keyIndex) == false)
         keyIndex = 0;
@@ -1757,7 +1757,7 @@ TableRmNode::InsertKey (const I_BTreeKey& key)
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX *const pNodes = _RC (NODE_INDEX*, pRows + TableRmNode::GetKeysPerNode());
+          NODE_INDEX* const pNodes = _RC (NODE_INDEX*, pRows + TableRmNode::KeysPerNode());
           make_array_room (pNodes, lastKey, keyIndex, 1);
         }
 
@@ -1777,14 +1777,14 @@ TableRmNode::RemoveKey (const KEY_INDEX keyIndex)
 {
   D_UINT lastKey = GetKeysCount () - 1;
 
-  assert (lastKey < (GetKeysPerNode() - 1));
+  assert (lastKey < (KeysPerNode() - 1));
 
   D_UINT64* const pRows = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   remove_array_elemes (pRows, lastKey, keyIndex, 1);
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX *const pNodes = _RC (NODE_INDEX*, pRows + TableRmNode::GetKeysPerNode());
+      NODE_INDEX* const pNodes = _RC (NODE_INDEX*, pRows + TableRmNode::KeysPerNode());
       remove_array_elemes (pNodes, lastKey, keyIndex, 1);
     }
 
@@ -1809,7 +1809,7 @@ TableRmNode::Split ( const NODE_INDEX parentId)
   allocatedNode->MarkAsUsed();
 
 
-  TableRmNode *const pRawAllocNode = _SC (TableRmNode*, &(*allocatedNode));
+  TableRmNode* const pRawAllocNode   = _SC (TableRmNode*, &(*allocatedNode));
   D_UINT64* const pSplitRows         = _RC (D_UINT64*,
                                             pRawAllocNode->GetRawData () + sizeof (NodeHeader));
 
@@ -1818,8 +1818,8 @@ TableRmNode::Split ( const NODE_INDEX parentId)
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX* const pNodes      = _RC (NODE_INDEX*, pRows + GetKeysPerNode ());
-      NODE_INDEX* const pSplitNodes = _RC (NODE_INDEX*, pSplitRows + GetKeysPerNode ());
+      NODE_INDEX* const pNodes      = _RC (NODE_INDEX*, pRows + KeysPerNode ());
+      NODE_INDEX* const pSplitNodes = _RC (NODE_INDEX*, pSplitRows + KeysPerNode ());
 
       for (D_UINT index = splitKey; index < GetKeysCount (); ++index)
         pSplitNodes [index - splitKey] = pNodes [index];
@@ -1828,7 +1828,7 @@ TableRmNode::Split ( const NODE_INDEX parentId)
   allocatedNode->SetKeysCount (GetKeysCount() - splitKey);
   SetKeysCount (splitKey);
 
-  allocatedNode->SetNext (GetNodeId());
+  allocatedNode->SetNext (NodeId());
   allocatedNode->SetPrev (GetPrev());
   SetPrev (allocatedNodeId);
   if (allocatedNode->GetPrev() != NIL_NODE)
@@ -1844,13 +1844,13 @@ TableRmNode::Join (bool toRight)
   assert (NeedsJoining ());
 
   D_UINT64 *const   pRows  = _RC (D_UINT64 *, GetRawData () + sizeof (NodeHeader));
-  NODE_INDEX *const pNodes = _RC (NODE_INDEX *, pRows + TableRmNode::GetKeysPerNode ());
+  NODE_INDEX* const pNodes = _RC (NODE_INDEX *, pRows + TableRmNode::KeysPerNode ());
 
   if (toRight)
     {
       assert (GetNext () != NIL_NODE);
       BTreeNodeHandler     nextNode (m_NodesManager.RetrieveNode (GetNext ()));
-      TableRmNode *const pNextNode = _SC (TableRmNode*, &(*nextNode));
+      TableRmNode* const pNextNode = _SC (TableRmNode*, &(*nextNode));
       D_UINT64 *const      pDestRows = _RC (D_UINT64 *, pNextNode->GetRawData () + sizeof (NodeHeader));
 
       for (D_UINT index = 0; index < GetKeysCount (); ++index)
@@ -1858,8 +1858,8 @@ TableRmNode::Join (bool toRight)
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX *const pDestNodes = _RC (NODE_INDEX*,
-                                              pDestRows + TableRmNode::GetKeysPerNode ());
+          NODE_INDEX* const pDestNodes = _RC (NODE_INDEX*,
+                                              pDestRows + TableRmNode::KeysPerNode ());
 
           for (D_UINT index = 0; index < GetKeysCount(); ++index)
             pDestNodes [index + pNextNode->GetKeysCount ()] = pNodes [index];
@@ -1879,7 +1879,7 @@ TableRmNode::Join (bool toRight)
       assert (GetPrev () != NIL_NODE);
 
       BTreeNodeHandler     prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
-      TableRmNode *const pPrevNode = _SC (TableRmNode*, &(*prevNode));
+      TableRmNode* const pPrevNode = _SC (TableRmNode*, &(*prevNode));
       D_UINT64 *const      pSrcRows  = _RC (D_UINT64 *, pPrevNode->GetRawData () + sizeof (NodeHeader));
 
       for (D_UINT index = 0; index < prevNode->GetKeysCount(); ++index)
@@ -1887,8 +1887,8 @@ TableRmNode::Join (bool toRight)
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX *const pSrcNodes = _RC (NODE_INDEX*,
-                                             pSrcRows + TableRmNode::GetKeysPerNode ());
+          NODE_INDEX* const pSrcNodes = _RC (NODE_INDEX*,
+                                             pSrcRows + TableRmNode::KeysPerNode ());
 
           for (D_UINT index = 0; index < prevNode->GetKeysCount (); ++index)
             pNodes [index + GetKeysCount ()] = pSrcNodes [index];
@@ -1899,7 +1899,7 @@ TableRmNode::Join (bool toRight)
       if (GetPrev () != NIL_NODE)
         {
           BTreeNodeHandler prevNode (m_NodesManager.RetrieveNode (GetPrev ()));
-          prevNode->SetNext (GetNodeId ());
+          prevNode->SetNext (NodeId ());
         }
     }
 }
@@ -1923,7 +1923,7 @@ TableRmNode::IsEqual (const I_BTreeKey& key, KEY_INDEX keyIndex) const
 }
 
 bool
-TableRmNode::IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const
+TableRmNode::IsBigger (const I_BTreeKey& key, KEY_INDEX keyIndex) const
 {
   const D_UINT64 *const pRows = _RC ( const D_UINT64 *, GetRawData () + sizeof (NodeHeader));
   const TableRmKey    tKey ( * _SC( const  TableRmKey*, &key));
@@ -1932,7 +1932,7 @@ TableRmNode::IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const
 }
 
 const I_BTreeKey&
-TableRmNode::GetSentinelKey () const
+TableRmNode::SentinelKey () const
 {
   static TableRmKey _key (~0);
 

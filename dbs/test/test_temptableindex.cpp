@@ -29,10 +29,10 @@ D_UINT _removedRows = _rowsCount / 10;
 
 
 bool
-fill_table_with_values (I_DBSTable &table,
+fill_table_with_values (I_DBSTable& table,
                         const D_UINT32 rowCount,
                         D_UINT64 seed,
-                        DBSArray &tableValues)
+                        DBSArray& tableValues)
 {
   bool     result = true;
 
@@ -98,7 +98,7 @@ fill_table_with_values (I_DBSTable &table,
 }
 
 bool
-fill_table_with_first_nulls (I_DBSTable &table, const D_UINT32 rowCount)
+fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
@@ -144,7 +144,7 @@ fill_table_with_first_nulls (I_DBSTable &table, const D_UINT32 rowCount)
 }
 
 void
-callback_index_create (CallBackIndexData *const pData)
+callback_index_create (CallBackIndexData* const pData)
 {
   std::cout << '\r' << pData->m_RowIndex << '(' << pData->m_RowsCount << ')';
 }

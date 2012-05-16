@@ -24,7 +24,7 @@ struct DBSFieldDescriptor field_desc[] = {
 static const D_UINT gElemsCount = 5000000; /* Scale this down for debug purposes! */
 
 bool
-fill_table (I_DBSTable &table)
+fill_table (I_DBSTable& table)
 {
   std::cout << "Fill table with " << gElemsCount << " elements ... " << std::endl;
 
@@ -50,7 +50,7 @@ fill_table (I_DBSTable &table)
 }
 
 bool
-remove_first_rows (I_DBSTable &table)
+remove_first_rows (I_DBSTable& table)
 {
   std::cout << "Deleting " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
@@ -83,7 +83,7 @@ remove_first_rows (I_DBSTable &table)
 }
 
 bool
-restore_first_rows (I_DBSTable &table)
+restore_first_rows (I_DBSTable& table)
 {
   std::cout << "Restore the first " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
@@ -115,7 +115,7 @@ restore_first_rows (I_DBSTable &table)
 }
 
 bool
-test_for_radius_rows (I_DBSTable &table)
+test_for_radius_rows (I_DBSTable& table)
 {
   std::cout << "Delete rows symmetrically ... " << std::endl;
   bool result = true;
@@ -182,7 +182,7 @@ main ()
     DBSCreateDatabase (db_name, dir.c_str ());
   }
 
-  I_DBSHandler & handler = DBSRetrieveDatabase (db_name);
+  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
   handler.AddTable ("t_test_tab", field_desc, sizeof field_desc / sizeof (field_desc[0]));
   I_DBSTable& table        = handler.RetrievePersistentTable ("t_test_tab");
   I_DBSTable& spawnedTable = table.Spawn ();

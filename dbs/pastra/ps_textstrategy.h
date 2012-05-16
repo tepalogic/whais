@@ -43,40 +43,29 @@ public:
   I_TextStrategy () {};
   virtual ~I_TextStrategy() {};
 
-  virtual D_UINT64 GetReferenceCount () const = 0;
+  virtual D_UINT64 ReferenceCount () const = 0;
+  virtual void     IncreaseReferenceCount () = 0;
+  virtual void     DecreaseReferenceCount () = 0;
 
-  virtual void IncreaseReferenceCount () = 0;
+  virtual D_UINT64 CharsCount () = 0;
+  virtual D_UINT64 BytesCount () const = 0;
 
-  virtual void DecreaseReferenceCount () = 0;
+  virtual void    Duplicate (I_TextStrategy& source) = 0;
+  virtual DBSChar CharAt (D_UINT64 index) = 0;
+  virtual void    Append (const D_UINT32 charValue) = 0;
+  virtual void    Append (I_TextStrategy& text) = 0;
+  virtual void    Truncate (D_UINT64 newCharCount) = 0;
 
-  virtual D_UINT64 GetCharactersCount () = 0;
+  virtual void ReadUtf8 (const D_UINT64 offset,
+                         const D_UINT64 count,
+                         D_UINT8 *const pBuffDest) = 0;
+  virtual void WriteUtf8 (const D_UINT64 offset,
+                          const D_UINT64 count,
+                          const D_UINT8 *const pBuffSrc) = 0;
+  virtual void TruncateUtf8 (const D_UINT64 newSize) = 0;
 
-  virtual D_UINT64 GetBytesCount () const = 0;
-
-  virtual void Duplicate (I_TextStrategy &source) = 0;
-
-  virtual DBSChar GetCharacterAtIndex (D_UINT64 index) = 0;
-
-  virtual void Append (const D_UINT32 charValue) = 0;
-
-  virtual void Append (I_TextStrategy &text) = 0;
-
-  virtual void Truncate (D_UINT64 newCharCount) = 0;
-
-  virtual void RawReadUtf8Data (const D_UINT64 offset,
-                                const D_UINT64 count,
-                                D_UINT8 *const pBuffDest) = 0;
-
-  virtual void RawWriteUtf8Data (const D_UINT64 offset,
-                                 const D_UINT64 count,
-                                 const D_UINT8 *const pBuffSrc) = 0;
-
-  virtual void RawTruncateUtf8Data (const D_UINT64 newSize) = 0;
-
-  virtual bool IsRowValue() const = 0;
-
+  virtual bool                  IsRowValue() const = 0;
   virtual pastra::TemporalText& GetTemporal () = 0;
-
   virtual pastra::RowFieldText& GetRowValue () = 0;
 
 protected:
@@ -91,34 +80,25 @@ public:
   GenericText (D_UINT64 bytesSize);
 
   //Implementations of public I_TextStrategy
-  virtual D_UINT64 GetReferenceCount () const;
+  virtual D_UINT64 ReferenceCount () const;
 
   virtual void IncreaseReferenceCount ();
-
   virtual void DecreaseReferenceCount ();
 
-  virtual D_UINT64 GetCharactersCount ();
+  virtual D_UINT64 CharsCount ();
+  virtual D_UINT64 BytesCount () const;
 
-  virtual D_UINT64 GetBytesCount () const;
+  virtual void    Duplicate (I_TextStrategy& source);
+  virtual DBSChar CharAt (D_UINT64 index);
+  virtual void    Append (const D_UINT32 charValue);
+  virtual void    Append (I_TextStrategy& text);
+  virtual void    Truncate (D_UINT64 newCharCount);
 
-  virtual void Duplicate (I_TextStrategy &source);
-
-  virtual DBSChar GetCharacterAtIndex (D_UINT64 index);
-
-  virtual void Append (const D_UINT32 charValue);
-
-  virtual void Append (I_TextStrategy& text);
-
-  virtual void Truncate (D_UINT64 newCharCount);
-
-  virtual bool IsRowValue() const;
-
+  virtual bool          IsRowValue() const;
   virtual TemporalText& GetTemporal ();
-
   virtual RowFieldText& GetRowValue ();
 
 protected:
-
   virtual ~GenericText () {};
   virtual void ClearMyself () = 0;
 
@@ -131,17 +111,17 @@ class NullText : public GenericText
 public:
   //Implementations of I_TextStrategy
 
-  virtual D_UINT64 GetReferenceCount () const;
-  virtual void IncreaseReferenceCount ();
-  virtual void DecreaseReferenceCount ();
+  virtual D_UINT64 ReferenceCount () const;
+  virtual void     IncreaseReferenceCount ();
+  virtual void     DecreaseReferenceCount ();
 
-  virtual void RawReadUtf8Data (const D_UINT64 offset,
-                                const D_UINT64 count,
-                                D_UINT8 *const pBuffDest);
-  virtual void RawWriteUtf8Data (const D_UINT64 offset,
-                                 const D_UINT64 count,
-                                 const D_UINT8 *const pBuffSrc);
-  virtual void RawTruncateUtf8Data (const D_UINT64 newSize);
+  virtual void ReadUtf8 (const D_UINT64 offset,
+                         const D_UINT64 count,
+                         D_UINT8 *const pBuffDest);
+  virtual void WriteUtf8 (const D_UINT64 offset,
+                          const D_UINT64 count,
+                          const D_UINT8 *const pBuffSrc);
+  virtual void TruncateUtf8 (const D_UINT64 newSize);
 
   static NullText& GetSingletoneInstace ();
 
@@ -158,28 +138,24 @@ class RowFieldText : public GenericText
 {
   friend class PrototypeTable;
 public:
-  RowFieldText (VariableLengthStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
+  RowFieldText (VLVarsStore& storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
 
 protected:
-  virtual D_UINT64 GetReferenceCount () const;
-
-  virtual void IncreaseReferenceCount ();
-
-  virtual void DecreaseReferenceCount ();
+  virtual D_UINT64 ReferenceCount () const;
+  virtual void     IncreaseReferenceCount ();
+  virtual void     DecreaseReferenceCount ();
 
   //Implementations of I_TextStrategy
-  virtual void RawReadUtf8Data (const D_UINT64 offset,
-                                const D_UINT64 count,
-                                D_UINT8 *const pBuffDest);
+  virtual void ReadUtf8 (const D_UINT64 offset,
+                         const D_UINT64 count,
+                         D_UINT8 *const pBuffDest);
+  virtual void WriteUtf8 (const D_UINT64 offset,
+                          const D_UINT64 count,
+                          const D_UINT8 *const pBuffSrc);
 
-  virtual void RawWriteUtf8Data (const D_UINT64 offset,
-                                 const D_UINT64 count,
-                                 const D_UINT8 *const pBuffSrc);
+  virtual void TruncateUtf8 (const D_UINT64 newSize);
 
-  virtual void RawTruncateUtf8Data (const D_UINT64 newSize);
-
-  virtual bool IsRowValue() const;
-
+  virtual bool          IsRowValue() const;
   virtual RowFieldText& GetRowValue ();
 
 protected:
@@ -188,7 +164,7 @@ protected:
   virtual void ClearMyself ();
 
   const D_UINT64       m_FirstEntry;
-  VariableLengthStore& m_Storage;
+  VLVarsStore& m_Storage;
 
 private:
   RowFieldText (const RowFieldText&);
@@ -204,17 +180,15 @@ public:
 
 protected:
   //Implementations of I_TextStrategy
-  virtual void RawReadUtf8Data (const D_UINT64 offset,
-                                const D_UINT64 count,
-                                D_UINT8 *const pBuffDest);
-  virtual void RawWriteUtf8Data (const D_UINT64 offset,
-                                 const D_UINT64 count,
-                                 const D_UINT8 *const pBuffSrc);
-
-  virtual void RawTruncateUtf8Data (const D_UINT64 newSize);
+  virtual void ReadUtf8 (const D_UINT64 offset,
+                         const D_UINT64 count,
+                         D_UINT8 *const pBuffDest);
+  virtual void WriteUtf8 (const D_UINT64 offset,
+                          const D_UINT64 count,
+                          const D_UINT8 *const pBuffSrc);
+  virtual void TruncateUtf8 (const D_UINT64 newSize);
 
   virtual TemporalText& GetTemporal();
-
 
 protected:
   virtual ~TemporalText ();

@@ -173,14 +173,14 @@ DBSText::DBSText (const D_UINT8 *pUtf8String) :
 
 }
 
-DBSText::DBSText (I_TextStrategy &text) :
+DBSText::DBSText (I_TextStrategy& text) :
     m_pText (& NullText::GetSingletoneInstace())
 {
   text.IncreaseReferenceCount ();
   m_pText = &text;
 }
 
-DBSText::DBSText (const DBSText &sourceText) :
+DBSText::DBSText (const DBSText& sourceText) :
     m_pText (& NullText::GetSingletoneInstace())
 {
   sourceText.m_pText->IncreaseReferenceCount();
@@ -189,12 +189,12 @@ DBSText::DBSText (const DBSText &sourceText) :
 }
 
 DBSText &
-DBSText::operator= (const DBSText &sourceText)
+DBSText::operator= (const DBSText& sourceText)
 {
   if (this == &sourceText)
     return *this;
 
-  I_TextStrategy *const pText = m_pText;
+  I_TextStrategy* const pText = m_pText;
 
   sourceText.m_pText->IncreaseReferenceCount();
   m_pText = sourceText.m_pText;
@@ -205,7 +205,7 @@ DBSText::operator= (const DBSText &sourceText)
 }
 
 bool
-DBSText::operator== (const DBSText &text)
+DBSText::operator== (const DBSText& text)
 {
   if (IsNull() != text.IsNull())
     return false;
@@ -249,19 +249,19 @@ DBSText::~DBSText ()
 bool
 DBSText::IsNull () const
 {
-  return (m_pText->GetBytesCount() == 0);
+  return (m_pText->BytesCount() == 0);
 }
 
 D_UINT64
 DBSText::GetCharactersCount () const
 {
-  return m_pText->GetCharactersCount();
+  return m_pText->CharsCount();
 }
 
 D_UINT64
 DBSText::GetRawUtf8Count () const
 {
-  return m_pText->GetBytesCount();
+  return m_pText->BytesCount();
 }
 
 void
@@ -270,8 +270,8 @@ DBSText::GetRawUtf8 (D_UINT64 offset, D_UINT64 count, D_UINT8 *const pBuffer) co
   if (IsNull())
     return;
 
-  count = min (count, m_pText->GetBytesCount());
-  m_pText->RawReadUtf8Data (offset, count, pBuffer);
+  count = min (count, m_pText->BytesCount());
+  m_pText->ReadUtf8 (offset, count, pBuffer);
 }
 
 void
@@ -280,7 +280,7 @@ DBSText::Append (const DBSChar& character)
   if ((character.m_IsNull) || (character.m_Value == 0))
     return ;
 
-  if (m_pText->GetReferenceCount() > 1)
+  if (m_pText->ReferenceCount() > 1)
     {
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
@@ -290,7 +290,7 @@ DBSText::Append (const DBSChar& character)
       m_pText = newText.release ();
     }
 
-  assert (m_pText->GetReferenceCount() != 0);
+  assert (m_pText->ReferenceCount() != 0);
 
   m_pText->Append (character.m_Value);
 }
@@ -301,7 +301,7 @@ DBSText::Append (const DBSText& text)
   if (text.IsNull())
     return;
 
-  if (m_pText->GetReferenceCount() > 1)
+  if (m_pText->ReferenceCount() > 1)
     {
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
@@ -317,13 +317,13 @@ DBSText::Append (const DBSText& text)
 DBSChar
 DBSText::GetCharAtIndex(const D_UINT64 index) const
 {
-  return m_pText->GetCharacterAtIndex (index);
+  return m_pText->CharAt (index);
 }
 
 void
 DBSText::SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index)
 {
-  const D_UINT64 charsCount = m_pText->GetCharactersCount();
+  const D_UINT64 charsCount = m_pText->CharsCount();
 
   if (charsCount <= index)
     throw DBSException (NULL, _EXTRA (DBSException::STRING_INDEX_TOO_BIG));
@@ -333,7 +333,7 @@ DBSText::SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index)
 
   for (D_UINT64 it = 0; it < charsCount; ++it)
     if (index != it)
-      newText->Append (m_pText->GetCharacterAtIndex (it).m_Value);
+      newText->Append (m_pText->CharAt (it).m_Value);
     else
       {
         if ((rCharacter.m_IsNull) || (rCharacter.m_Value == 0))
@@ -367,8 +367,8 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
   D_UINT64 currentOffset = 0;
   D_UINT   valueIncrement = 0;
 
-  while (valueIncrement < _SC(D_UINT,  PSValInterp::GetSize (array[0], false)))
-    valueIncrement += PSValInterp::GetAlignment (array[0], false);
+  while (valueIncrement < _SC(D_UINT,  PSValInterp::Size (array[0], false)))
+    valueIncrement += PSValInterp::Alignment (array[0], false);
 
   for (D_UINT64 index = 0; index < count; ++index)
     {
@@ -380,8 +380,8 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
       assert (valueIncrement <= (sizeof rawStorage));
 
       PSValInterp::Store (array[index], rawStorage);
-      prOutStrategy->WriteRawData(currentOffset, valueIncrement, rawStorage);
-      prOutStrategy->IncrementElementsCount();
+      prOutStrategy->WriteRaw(currentOffset, valueIncrement, rawStorage);
+      prOutStrategy->IncrementCount();
       currentOffset += valueIncrement;
     }
 
@@ -519,21 +519,21 @@ DBSArray::operator= (const DBSArray& rSource)
 D_UINT64
 DBSArray::GetElementsCount () const
 {
-  return m_pArray->GetElementsCount();
+  return m_pArray->Count();
 }
 
 DBS_FIELD_TYPE
 DBSArray::GetElementsType () const
 {
-  return m_pArray->GetElementsType();
+  return m_pArray->Type();
 }
 
 static D_INT
 get_aligned_elem_size (DBS_FIELD_TYPE type)
 {
   D_INT result = 0;
-  while (result < PSValInterp::GetSize(type, false))
-    result += PSValInterp::GetAlignment (type, false);
+  while (result < PSValInterp::Size(type, false))
+    result += PSValInterp::Alignment (type, false);
 
   return result;
 }
@@ -541,12 +541,12 @@ get_aligned_elem_size (DBS_FIELD_TYPE type)
 static void
 prepare_array_strategy (I_ArrayStrategy*& pArrayStrategy)
 {
-  assert (pArrayStrategy->GetReferenceCount() > 0);
+  assert (pArrayStrategy->ReferenceCount() > 0);
 
-  if (pArrayStrategy->GetReferenceCount() == 1)
+  if (pArrayStrategy->ReferenceCount() == 1)
     return ; //Do not change anything
 
-  auto_ptr <I_ArrayStrategy> newStrategy (new TemporalArray (pArrayStrategy->GetElementsType()));
+  auto_ptr <I_ArrayStrategy> newStrategy (new TemporalArray (pArrayStrategy->Type()));
 
   newStrategy->Clone (*pArrayStrategy);
   pArrayStrategy->DecrementReferenceCount();
@@ -557,7 +557,7 @@ prepare_array_strategy (I_ArrayStrategy*& pArrayStrategy)
 template <class T> inline D_UINT64
 add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
 {
-  if (pArrayStrategy->GetElementsType() != element)
+  if (pArrayStrategy->Type() != element)
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
   else if (element.IsNull())
     throw DBSException (NULL, _EXTRA (DBSException::NULL_ARRAY_ELEMENT));
@@ -570,13 +570,13 @@ add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
 
   assert (storageSize <= sizeof rawElement);
   PSValInterp::Store (element, rawElement);
-  pArrayStrategy->WriteRawData (pArrayStrategy->GetRawDataSize(), storageSize, rawElement);
+  pArrayStrategy->WriteRaw (pArrayStrategy->RawSize(), storageSize, rawElement);
 
-  assert ((pArrayStrategy->GetRawDataSize() % storageSize) == 0);
+  assert ((pArrayStrategy->RawSize() % storageSize) == 0);
 
-  pArrayStrategy->IncrementElementsCount();
+  pArrayStrategy->IncrementCount();
 
-  return (pArrayStrategy->GetElementsCount() - 1);
+  return (pArrayStrategy->Count() - 1);
 }
 
 D_UINT64
@@ -672,9 +672,9 @@ DBSArray::AddElement (const DBSInt64& value)
 template <class T> void
 get_array_element (T& outElement, I_ArrayStrategy* const pArrayStrategy, const D_UINT64 index)
 {
-  if (pArrayStrategy->GetElementsCount() <= index)
+  if (pArrayStrategy->Count() <= index)
     throw DBSException (NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
-  else if (pArrayStrategy->GetElementsType() != outElement)
+  else if (pArrayStrategy->Type() != outElement)
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
   static const D_UINT storageSize = get_aligned_elem_size (outElement);
@@ -683,7 +683,7 @@ get_array_element (T& outElement, I_ArrayStrategy* const pArrayStrategy, const D
 
   assert (sizeof rawElement >= storageSize);
 
-  pArrayStrategy->ReadRawData (index * storageSize, storageSize, rawElement);
+  pArrayStrategy->ReadRaw (index* storageSize, storageSize, rawElement);
   PSValInterp::Retrieve (&outElement, rawElement);
 }
 
@@ -781,22 +781,22 @@ DBSArray::GetElement (DBSInt64& outValue, const D_UINT64 index) const
 template <class T>  inline void
 set_array_element (I_ArrayStrategy*& pArrayStrategy, const T& value, const D_UINT64 index)
 {
-  if (index >= pArrayStrategy->GetElementsCount())
+  if (index >= pArrayStrategy->Count())
     throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (pArrayStrategy);
-  static const D_UINT storageSize = get_aligned_elem_size (pArrayStrategy->GetElementsType());
+  static const D_UINT storageSize = get_aligned_elem_size (pArrayStrategy->Type());
 
   if (value.IsNull())
     {
-      pArrayStrategy->CollapseRawData (index * storageSize, storageSize);
-      pArrayStrategy->DecrementElementsCount ();
+      pArrayStrategy->CollapseRaw (index* storageSize, storageSize);
+      pArrayStrategy->DecrementCount ();
     }
   else
     {
       D_UINT8 rawElement[MAX_VALUE_RAW_STORAGE];
       PSValInterp::Store (value, rawElement);
-      pArrayStrategy->WriteRawData(storageSize * index, storageSize, rawElement);
+      pArrayStrategy->WriteRaw(storageSize* index, storageSize, rawElement);
     }
 }
 
@@ -895,15 +895,15 @@ DBSArray::SetElement (const DBSInt64& newValue, const D_UINT64 index)
 void
 DBSArray::RemoveElement (const D_UINT64 index)
 {
-  if (index >= m_pArray->GetElementsCount())
+  if (index >= m_pArray->Count())
     throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (m_pArray);
 
-  const D_UINT storageSize = get_aligned_elem_size (m_pArray->GetElementsType());
+  const D_UINT storageSize = get_aligned_elem_size (m_pArray->Type());
 
-  m_pArray->CollapseRawData (index*storageSize, storageSize);
-  m_pArray->DecrementElementsCount();
+  m_pArray->CollapseRaw (index*storageSize, storageSize);
+  m_pArray->DecrementCount();
 }
 
 

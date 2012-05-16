@@ -29,7 +29,7 @@
 using namespace pastra;
 using namespace std;
 
-BlockCache::BlockCache (I_BlocksManager &rBlockManagr) :
+BlockCache::BlockCache (I_BlocksManager& rBlockManagr) :
     m_Manager (rBlockManagr),
     m_ItemSize (0),
     m_MaxBlocks (0),

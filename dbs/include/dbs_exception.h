@@ -30,8 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class DBSException:public WException
 {
 public:
-  DBSException (const D_CHAR * pMessage,
-                const D_CHAR * pFile,
+  DBSException (const D_CHAR* pMessage,
+                const D_CHAR* pFile,
                 D_UINT32 uLine,
                 D_UINT32 extra):WException (pMessage, pFile, uLine, extra)
   {

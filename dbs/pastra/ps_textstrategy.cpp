@@ -204,7 +204,7 @@ GenericText::GenericText (D_UINT64 bytesSize) :
 }
 
 D_UINT64
-GenericText::GetReferenceCount () const
+GenericText::ReferenceCount () const
 {
   return m_ReferenceCount;
 }
@@ -227,7 +227,7 @@ GenericText::DecreaseReferenceCount ()
 
 
 D_UINT64
-GenericText::GetCharactersCount()
+GenericText::CharsCount()
 {
 
   D_UINT64 offset = 0;
@@ -236,7 +236,7 @@ GenericText::GetCharactersCount()
   while (offset < m_BytesSize)
     {
       D_UINT8 aUtf8Char;
-      RawReadUtf8Data (offset, 1, &aUtf8Char);
+      ReadUtf8 (offset, 1, &aUtf8Char);
       const D_UINT charSize = get_utf8_char_size (aUtf8Char);
 
       if ((charSize == 0) || (charSize + offset > m_BytesSize))
@@ -249,17 +249,17 @@ GenericText::GetCharactersCount()
 }
 
 D_UINT64
-GenericText::GetBytesCount() const
+GenericText::BytesCount() const
 {
   return m_BytesSize;
 }
 
 void
-GenericText::Duplicate (I_TextStrategy &source)
+GenericText::Duplicate (I_TextStrategy& source)
 {
 
   D_UINT64 offset = 0;
-  D_UINT64 count = source.GetBytesCount();
+  D_UINT64 count = source.BytesCount();
 
   Truncate (0);
   m_BytesSize = 0;
@@ -268,17 +268,17 @@ GenericText::Duplicate (I_TextStrategy &source)
     {
         D_UINT8 dataChunk[512];
         const D_UINT64 chunkToTansfer = MIN (sizeof dataChunk, count);
-        source.RawReadUtf8Data (offset, chunkToTansfer, dataChunk);
-        RawWriteUtf8Data (offset, chunkToTansfer, dataChunk);
+        source.ReadUtf8 (offset, chunkToTansfer, dataChunk);
+        WriteUtf8 (offset, chunkToTansfer, dataChunk);
 
         m_BytesSize += chunkToTansfer, offset += chunkToTansfer, count -= chunkToTansfer;
     }
 }
 
 DBSChar
-GenericText::GetCharacterAtIndex (D_UINT64 index)
+GenericText::CharAt (D_UINT64 index)
 {
-  if (index >= GetCharactersCount() )
+  if (index >= CharsCount() )
     return DBSChar (); //Null char!
 
   D_UINT64 offset = 0;
@@ -287,7 +287,7 @@ GenericText::GetCharacterAtIndex (D_UINT64 index)
   while (index > 0)
     {
       D_UINT8 utf8Char;
-      RawReadUtf8Data (offset, 1, &utf8Char);
+      ReadUtf8 (offset, 1, &utf8Char);
       offset += get_utf8_char_size (utf8Char);
       -- index;
 
@@ -295,7 +295,7 @@ GenericText::GetCharacterAtIndex (D_UINT64 index)
     }
 
   D_UINT8 aUtf8Char[UTF8_MAX_BYTES_COUNT];
-  RawReadUtf8Data (offset,
+  ReadUtf8 (offset,
                    MIN (m_BytesSize - offset, sizeof aUtf8Char),
                    aUtf8Char);
 
@@ -313,15 +313,15 @@ GenericText::Append (const D_UINT32 charValue)
   D_UINT8 aUtf8Encoding[UTF8_MAX_BYTES_COUNT];
   D_UINT encodeSize = encode_utf8_char (charValue, aUtf8Encoding);
 
-  RawWriteUtf8Data (m_BytesSize, encodeSize, aUtf8Encoding);
+  WriteUtf8 (m_BytesSize, encodeSize, aUtf8Encoding);
   m_BytesSize += encodeSize;
 
 }
 
 void
-GenericText::Append (I_TextStrategy &text)
+GenericText::Append (I_TextStrategy& text)
 {
-  D_UINT64 toAppend = text.GetBytesCount ();
+  D_UINT64 toAppend = text.BytesCount ();
   D_UINT64 appendOffset = 0;
 
   while (toAppend > 0)
@@ -329,8 +329,8 @@ GenericText::Append (I_TextStrategy &text)
       D_UINT8 chunkData [512];
       D_UINT64 chunkSize = MIN (sizeof chunkData, toAppend);
 
-      text.RawReadUtf8Data (appendOffset, chunkSize, chunkData);
-      RawWriteUtf8Data (m_BytesSize, chunkSize, chunkData);
+      text.ReadUtf8 (appendOffset, chunkSize, chunkData);
+      WriteUtf8 (m_BytesSize, chunkSize, chunkData);
 
       m_BytesSize += chunkSize, appendOffset += chunkSize, toAppend -= chunkSize;
     }
@@ -339,21 +339,21 @@ GenericText::Append (I_TextStrategy &text)
 void
 GenericText::Truncate (D_UINT64 newCharCount)
 {
-  if (newCharCount >= GetCharactersCount ())
+  if (newCharCount >= CharsCount ())
     return;
 
   D_UINT offset = 0;
   while (newCharCount > 0)
     {
       D_UINT8 utf8Char;
-      RawReadUtf8Data (offset, 1, &utf8Char);
+      ReadUtf8 (offset, 1, &utf8Char);
       offset += get_utf8_char_size (utf8Char);
       -- newCharCount;
 
       assert (offset < m_BytesSize);
     }
 
-  RawTruncateUtf8Data (offset);
+  TruncateUtf8 (offset);
   m_BytesSize = offset;
 }
 
@@ -394,7 +394,7 @@ NullText::~NullText ()
 
 
 D_UINT64
-NullText::GetReferenceCount () const
+NullText::ReferenceCount () const
 {
   return ~0; //Do not allow one to change us!
 }
@@ -412,19 +412,19 @@ NullText::DecreaseReferenceCount ()
 }
 
 void
-NullText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
+NullText::ReadUtf8 (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 void
-NullText::RawWriteUtf8Data (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
+NullText::WriteUtf8 (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 void
-NullText::RawTruncateUtf8Data (const D_UINT64 newSize)
+NullText::TruncateUtf8 (const D_UINT64 newSize)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
@@ -442,7 +442,7 @@ NullText::GetSingletoneInstace ()
   return nullTextInstance;
 }
 
-RowFieldText::RowFieldText (VariableLengthStore &storage, D_UINT64 firstEntry, D_UINT64 bytesSize) :
+RowFieldText::RowFieldText (VLVarsStore& storage, D_UINT64 firstEntry, D_UINT64 bytesSize) :
     GenericText (bytesSize),
     m_FirstEntry (firstEntry),
     m_Storage (storage)
@@ -458,7 +458,7 @@ RowFieldText::~RowFieldText ()
 }
 
 D_UINT64
-RowFieldText::GetReferenceCount () const
+RowFieldText::ReferenceCount () const
 {
   return ~0; //Do not allow one to change us!
 }
@@ -476,21 +476,21 @@ RowFieldText::DecreaseReferenceCount ()
 }
 
 void
-RowFieldText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8* const pBuffDest)
+RowFieldText::ReadUtf8 (const D_UINT64 offset, const D_UINT64 count, D_UINT8* const pBuffDest)
 {
   assert (m_FirstEntry > 0);
   m_Storage.GetRecord (m_FirstEntry, offset, count, pBuffDest);
 }
 
 void
-RowFieldText::RawWriteUtf8Data (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
+RowFieldText::WriteUtf8 (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
 {
   assert (m_FirstEntry > 0);
   m_Storage.UpdateRecord (m_FirstEntry, offset, count, pBuffSrc);
 }
 
 void
-RowFieldText::RawTruncateUtf8Data (const D_UINT64 newSize)
+RowFieldText::TruncateUtf8 (const D_UINT64 newSize)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
@@ -521,7 +521,7 @@ TemporalText::TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount) :
     return;
 
   m_BytesSize = get_utf8_string_size (pUtf8String, bytesCount);
-  m_Storage.StoreData (0, m_BytesSize, pUtf8String);
+  m_Storage.Write (0, m_BytesSize, pUtf8String);
 }
 
 TemporalText::~TemporalText()
@@ -530,24 +530,24 @@ TemporalText::~TemporalText()
 }
 
 void
-TemporalText::RawReadUtf8Data (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
+TemporalText::ReadUtf8 (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
 {
-  assert (m_BytesSize == m_Storage.GetContainerSize ());
-  m_Storage.RetrieveData (offset, count, pBuffDest);
+  assert (m_BytesSize == m_Storage.Size ());
+  m_Storage.Read (offset, count, pBuffDest);
 }
 
 void
-TemporalText::RawWriteUtf8Data (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
+TemporalText::WriteUtf8 (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
 {
-  assert (m_BytesSize == m_Storage.GetContainerSize ());
-  m_Storage.StoreData (offset, count, pBuffSrc);
+  assert (m_BytesSize == m_Storage.Size ());
+  m_Storage.Write (offset, count, pBuffSrc);
 }
 
 void
-TemporalText::RawTruncateUtf8Data (const D_UINT64 newSize)
+TemporalText::TruncateUtf8 (const D_UINT64 newSize)
 {
-  assert (m_BytesSize == m_Storage.GetContainerSize ());
-  m_Storage.ColapseContent (newSize, m_BytesSize);
+  assert (m_BytesSize == m_Storage.Size ());
+  m_Storage.Colapse (newSize, m_BytesSize);
 }
 
 TemporalText&

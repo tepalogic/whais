@@ -80,14 +80,14 @@ protected:
 class StoredItem
 {
 public:
-  StoredItem (BlockEntry &blockEntry, D_UINT itemOffset) :
+  StoredItem (BlockEntry& blockEntry, D_UINT itemOffset) :
     m_BlockEntry (&blockEntry),
     m_ItemOffset (itemOffset)
   {
     m_BlockEntry->RegisterUser ();
   }
 
-  StoredItem (const StoredItem &rSource) :
+  StoredItem (const StoredItem& rSource) :
     m_BlockEntry (rSource.m_BlockEntry),
     m_ItemOffset (rSource.m_ItemOffset)
   {
@@ -99,7 +99,7 @@ public:
     m_BlockEntry->ReleaseUser ();
   }
 
-  StoredItem& operator= (const StoredItem &rSource)
+  StoredItem& operator= (const StoredItem& rSource)
   {
     if (this == &rSource)
       return *this;

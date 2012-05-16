@@ -979,7 +979,7 @@ public:
 
   DBSText (const DBSText& sourceText);
   DBSText& operator= (const DBSText& sourceText);
-  bool operator== (const DBSText &text);
+  bool operator== (const DBSText& text);
 
   virtual ~DBSText ();
 
@@ -1001,7 +1001,7 @@ public:
   operator I_TextStrategy&() const { return *m_pText; }
 
 private:
-  I_TextStrategy *m_pText;
+  I_TextStrategy* m_pText;
 };
 
 class I_ArrayStrategy;
@@ -1029,7 +1029,7 @@ public:
 
   virtual ~DBSArray ();
 
-  DBSArray (const DBSArray &rSource);
+  DBSArray (const DBSArray& rSource);
   DBSArray& operator= (const DBSArray& rSource);
 
   bool           IsNull () const { return GetElementsCount() == 0; }

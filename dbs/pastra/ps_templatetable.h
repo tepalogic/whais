@@ -279,7 +279,7 @@ private:
   //Implementations for I_BTreeNodeManager
   virtual D_UINT       GetMaxCachedNodes ();
   virtual I_BTreeNode* GetNode (const NODE_INDEX node);
-  virtual void         StoreNode (I_BTreeNode *const pNode);
+  virtual void         StoreNode (I_BTreeNode* const pNode);
 
 protected:
   //TODO:: Template Methods
@@ -288,7 +288,7 @@ protected:
   virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex) = 0;
   virtual I_DataContainer&     FixedFieldsContainer () = 0;
   virtual I_DataContainer&     MainTableContainer () = 0;
-  virtual VariableLengthStore& VariableFieldsStore () = 0;
+  virtual VLVarsStore&         VariableFieldsStore () = 0;
 
   //Data members
   DbsHandler                            m_Dbs;
@@ -319,24 +319,24 @@ class TableRmNode : public I_BTreeNode
 public:
   static const D_UINT RAW_NODE_SIZE = 16384;
 
-  TableRmNode (PrototypeTable &table, const NODE_INDEX nodeId);
+  TableRmNode (PrototypeTable& table, const NODE_INDEX nodeId);
   virtual ~TableRmNode ();
 
   //Implementation of I_BTreeNode
-  virtual D_UINT     GetKeysPerNode () const;
-  virtual KEY_INDEX  GetFirstKey (const I_BTreeNode &parent) const;
+  virtual D_UINT     KeysPerNode () const;
+  virtual KEY_INDEX  GetFirstKey (const I_BTreeNode& parent) const;
   virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const;
-  virtual void       ResetKeyNode (const I_BTreeNode &childNode, const KEY_INDEX keyIndex);
+  virtual void       ResetKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex);
   virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode);
-  virtual KEY_INDEX  InsertKey (const I_BTreeKey &key);
+  virtual KEY_INDEX  InsertKey (const I_BTreeKey& key);
   virtual void       RemoveKey (const KEY_INDEX keyIndex);
   virtual void       Split (const NODE_INDEX parentId);
   virtual void       Join (bool toRight);
-  virtual bool       IsLess (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
-  virtual bool       IsEqual (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
-  virtual bool       IsBigger (const I_BTreeKey &key, KEY_INDEX keyIndex) const;
+  virtual bool       IsLess (const I_BTreeKey& key, KEY_INDEX keyIndex) const;
+  virtual bool       IsEqual (const I_BTreeKey& key, KEY_INDEX keyIndex) const;
+  virtual bool       IsBigger (const I_BTreeKey& key, KEY_INDEX keyIndex) const;
 
-  virtual const I_BTreeKey& GetSentinelKey () const;
+  virtual const I_BTreeKey& SentinelKey () const;
 
 protected:
   std::auto_ptr <D_UINT8> m_cpNodeData;

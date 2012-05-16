@@ -40,8 +40,8 @@ get_next_alignment (D_INT size)
 }
 
 bool
-operator!= (const DBSFieldDescriptor & field_1,
-            const DBSFieldDescriptor & field_2)
+operator!= (const DBSFieldDescriptor& field_1,
+            const DBSFieldDescriptor& field_2)
 {
   return (field_1.m_FieldType != field_2.m_FieldType) ||
          (field_1.isArray != field_2.isArray) ||
@@ -49,7 +49,7 @@ operator!= (const DBSFieldDescriptor & field_1,
 }
 
 bool
-test_for_no_args (I_DBSHandler &rDbs)
+test_for_no_args (I_DBSHandler& rDbs)
 {
   bool result = false;
 
@@ -59,7 +59,7 @@ test_for_no_args (I_DBSHandler &rDbs)
   {
     rDbs.AddTable ("test_dummy", NULL, 10);
   }
-  catch (DBSException &e)
+  catch (DBSException& e)
   {
     if (e.GetExtra() == DBSException::INVALID_PARAMETERS)
       result = true;
@@ -76,7 +76,7 @@ test_for_no_args (I_DBSHandler &rDbs)
       rDbs.AddTable ("test_dummy", &temp, 0);
     result = false;
   }
-  catch (DBSException &e)
+  catch (DBSException& e)
   {
     if (e.GetExtra() == DBSException::INVALID_PARAMETERS)
       result = true;
@@ -89,7 +89,7 @@ test_for_no_args (I_DBSHandler &rDbs)
 }
 
 bool
-test_for_invalid_fields (I_DBSHandler &rDbs)
+test_for_invalid_fields (I_DBSHandler& rDbs)
 {
   bool result = false;
   DBSFieldDescriptor temp;
@@ -104,7 +104,7 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
   {
     rDbs.AddTable("test_dummy", &temp, 1);
   }
-  catch (DBSException &e)
+  catch (DBSException& e)
   {
     if (e.GetExtra () == DBSException::FIELD_TYPE_INVALID)
       result = true;
@@ -119,7 +119,7 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
       rDbs.AddTable("test_dummy", &temp, 1);
     result = false;
   }
-  catch (DBSException &e)
+  catch (DBSException& e)
   {
     if (e.GetExtra () == DBSException::FIELD_NAME_INVALID)
       result = true;
@@ -142,7 +142,7 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
       rDbs.AddTable("test_dummy", more_temps, 3);
     result = false;
   }
-  catch (DBSException &e)
+  catch (DBSException& e)
   {
     if (e.GetExtra () == DBSException::FIELD_NAME_DUPLICATED)
       result = true;
@@ -156,7 +156,7 @@ test_for_invalid_fields (I_DBSHandler &rDbs)
 }
 
 bool
-test_for_one_field (I_DBSHandler &rDbs)
+test_for_one_field (I_DBSHandler& rDbs)
 {
   bool result = true;
 
@@ -168,16 +168,16 @@ test_for_one_field (I_DBSHandler &rDbs)
   temp.isArray = false;
 
   rDbs.AddTable ("t_test_tab", &temp, 1);
-  I_DBSTable &table = rDbs.RetrievePersistentTable ("t_test_tab");
+  I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
   D_UINT rowSize = (_RC (pastra::PrototypeTable &, table)).GetRowSize ();
 
 
   //Check if we added the byte to keep the null bit.
-  if (_SC (D_INT, rowSize + 1) <= pastra::PSValInterp::GetSize(T_INT16, false))
+  if (_SC (D_INT, rowSize + 1) <= pastra::PSValInterp::Size(T_INT16, false))
     result = false;
   else if (get_next_alignment (rowSize) <
-      pastra::PSValInterp::GetAlignment (T_INT16, false))
+      pastra::PSValInterp::Alignment (T_INT16, false))
     result = false;
 
   rDbs.ReleaseTable (table);
@@ -200,8 +200,8 @@ struct StorageInterval
   };
 
 bool
-test_for_fields (I_DBSHandler &rDbs,
-                 const DBSFieldDescriptor *pDesc,
+test_for_fields (I_DBSHandler& rDbs,
+                 const DBSFieldDescriptor* pDesc,
                  const D_UINT32 fieldsCount)
 {
   bool result = true;
@@ -209,7 +209,7 @@ test_for_fields (I_DBSHandler &rDbs,
   std::cout << "Test with fields with count " << fieldsCount << " ... ";
 
   rDbs.AddTable ("t_test_tab", pDesc, fieldsCount);
-  I_DBSTable &table = rDbs.RetrievePersistentTable ("t_test_tab");
+  I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
   std::vector <D_UINT32 > nullPositions;
   std::vector <StorageInterval> storage;
@@ -246,8 +246,8 @@ test_for_fields (I_DBSHandler &rDbs,
 
       D_UINT elem_start = descr.m_StoreIndex;
       D_UINT elem_end = elem_start +
-          PSValInterp::GetSize (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
-                                (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0);
+          PSValInterp::Size (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc& PS_TABLE_FIELD_TYPE_MASK),
+                                (descr.m_TypeDesc& PS_TABLE_ARRAY_MASK) != 0);
 
       for (D_UINT index = 0; index < storage.size (); ++index)
         {
@@ -267,9 +267,9 @@ test_for_fields (I_DBSHandler &rDbs,
       if (result && (elem_start > 0))
         {
           if ( get_next_alignment (elem_start) >
-            PSValInterp::GetSize (_SC (DBS_FIELD_TYPE,
-                                   descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
-                                   (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0))
+            PSValInterp::Size (_SC (DBS_FIELD_TYPE,
+                                   descr.m_TypeDesc& PS_TABLE_FIELD_TYPE_MASK),
+                                   (descr.m_TypeDesc& PS_TABLE_ARRAY_MASK) != 0))
             result = false;
             break;
         }
@@ -353,7 +353,7 @@ main ()
     DBSCreateDatabase (db_name, dir.c_str ());
   }
 
-  I_DBSHandler & handler = DBSRetrieveDatabase (db_name);
+  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
 
   success = test_for_no_args (handler);
   success = success && test_for_invalid_fields (handler);
