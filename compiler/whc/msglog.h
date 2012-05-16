@@ -33,8 +33,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-	    D_UINT buff_pos,
-	    D_UINT msg_id,
-	    D_UINT msgType, const D_CHAR * msgFormat, va_list args);
+            D_UINT            buffOff,
+            D_UINT            msgId,
+            D_UINT            msgType,
+            const D_CHAR*     msgFormat,
+            va_list           args);
 
 #endif /* MSGLOG_H_ */

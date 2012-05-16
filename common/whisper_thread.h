@@ -30,33 +30,49 @@ extern "C"
 {
 #endif
 
-void wh_sync_init (WH_SYNC *hnd);
+void
+wh_sync_init (WH_SYNC* pSync);
 
-void wh_sync_destroy (WH_SYNC *hnd);
+void
+wh_sync_destroy (WH_SYNC* pSync);
 
-void wh_sync_enter (WH_SYNC *hnd);
+void
+wh_sync_enter (WH_SYNC* pSync);
 
-void wh_sync_leave (WH_SYNC *hnd);
+void
+wh_sync_leave (WH_SYNC* pSync);
 
-D_INT wh_cond_value_init (WH_COND_VALUE* pCondValue);
+D_INT
+wh_cond_value_init (WH_COND_VALUE* pCondValue);
 
-D_INT wh_cond_value_wait (WH_COND_VALUE* pCondValue, WH_SYNC* pSync);
+D_INT
+wh_cond_value_wait (WH_COND_VALUE* pCondValue,
+                    WH_SYNC*       pSync);
 
-D_INT wh_cond_value_signal (WH_COND_VALUE* pCondValue);
+D_INT
+wh_cond_value_signal (WH_COND_VALUE* pCondValue);
 
-D_INT wh_cond_value_broadcast (WH_COND_VALUE* pCondValue);
+D_INT
+wh_cond_value_broadcast (WH_COND_VALUE* pCondValue);
 
-D_INT wh_cond_value_destroy (WH_COND_VALUE* pCondValue);
+D_INT
+wh_cond_value_destroy (WH_COND_VALUE* pCondValue);
 
 typedef void (*WH_THREAD_ROUTINE) (void*);
 
-D_INT wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void *args);
+D_INT
+wh_thread_create (WH_THREAD*        pThread,
+                  WH_THREAD_ROUTINE routine,
+                  void*             args);
 
-D_INT wh_thread_join (WH_THREAD thread);
+D_INT
+wh_thread_join (WH_THREAD thread);
 
-void  wh_yield ();
+void
+wh_yield ();
 
-void  wh_sleep (D_UINT millisecs);
+void
+wh_sleep (D_UINT millisecs);
 
 #ifdef __cplusplus
 }

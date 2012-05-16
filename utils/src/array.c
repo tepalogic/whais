@@ -28,9 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "array.h"
 
-struct UArray *
-init_array_ex (struct UArray *array,
-	       size_t item_size, D_UINT increment, D_UINT alignment)
+struct UArray*
+init_array_ex (struct UArray* pOutArray,
+               size_t         itemSize,
+               D_UINT         increment,
+               D_UINT         alignment)
 {
 
   if ((alignment > sizeof (D_UINTMAX)) || (alignment == 0))
@@ -40,117 +42,116 @@ init_array_ex (struct UArray *array,
       return NULL;
     }
 
-  if (array != NULL)
+  if (pOutArray != NULL)
     {
-      memset (array, 0, sizeof (array[0]));
-      array->increment_count = increment;
-      array->user_item_size = item_size;
+      memset (pOutArray, 0, sizeof (pOutArray[0]));
+      pOutArray->incrementCount = increment;
+      pOutArray->userItemSize   = itemSize;
 
       /* round the item size for proper alignment */
-      item_size += (--alignment);
-      item_size &= ~(alignment);
-      array->item_size = item_size;
+      itemSize += (--alignment);
+      itemSize &= ~(alignment);
+
+      pOutArray->realItemSize   = itemSize;
     }
 
-  return array;
+  return pOutArray;
 }
 
 static D_BOOL
-increment_array (struct UArray *array)
+increment_array (struct UArray* pArray)
 {
-  D_INT8 **temp = mem_realloc (array->arrays,
-			       (array->arrays_count + 1) * sizeof (temp[0]));
+  D_INT8 **temp = mem_realloc (pArray->arraysList,
+                               (pArray->arraysCount + 1) * sizeof (temp[0]));
   if (temp == NULL)
-    {
-      return FALSE;
-    }
-  array->arrays = temp;
-  temp[array->arrays_count] =
-    mem_alloc (array->item_size * array->increment_count);
-  if (temp[array->arrays_count] == NULL)
-    {
-      return FALSE;
-    }
-  array->arrays_count++;
-  array->reserved_items += array->increment_count;
+    return FALSE;
+
+  pArray->arraysList        = temp;
+  temp[pArray->arraysCount] = mem_alloc (pArray->realItemSize * pArray->incrementCount);
+
+  if (temp[pArray->arraysCount] == NULL)
+    return FALSE;
+
+  pArray->arraysCount++;
+  pArray->itemsReserved += pArray->incrementCount;
+
   return TRUE;
 }
 
-void *
-add_item (struct UArray *array, const void *data)
+void*
+add_item (struct UArray* pArray, const void *pData)
 {
   void *dest_data;
 
-  if ((array->reserved_items <= array->stored_items) &&
-      (increment_array (array) == FALSE))
+  if ((pArray->itemsReserved <= pArray->itemsCount) &&
+      (increment_array (pArray) == FALSE))
     {
       /* not enough memory space */
       return NULL;
     }
-  array->stored_items++;
-  dest_data = get_item (array, array->stored_items - 1);
 
-  memcpy (dest_data, data, array->user_item_size);
+  pArray->itemsCount++;
+  dest_data = get_item (pArray, pArray->itemsCount - 1);
+
+  memcpy (dest_data, pData, pArray->userItemSize);
   return dest_data;
 }
 
-void *
-get_item (const struct UArray *array, D_UINT index)
+void*
+get_item (const struct UArray* pArray, D_UINT index)
 {
   D_UINT seg, offset;
 
-  if (index >= array->stored_items)
+  if (index >= pArray->itemsCount)
     {
       /* the array is not so big */
       return NULL;
     }
 
-  seg = index / array->increment_count;
-  offset = index % array->increment_count;
-  offset *= array->item_size;
+  seg    = index / pArray->incrementCount;
+  offset = index % pArray->incrementCount;
+  offset *= pArray->realItemSize;
 
-  return &(array->arrays[seg][offset]);
+  return &(pArray->arraysList[seg][offset]);
 }
 
 D_UINT
-get_array_count (const struct UArray * array)
+get_array_count (const struct UArray* pArray)
 {
-  return array->stored_items;
+  return pArray->itemsCount;
 }
 
 void
-set_array_count (struct UArray *array, D_UINT new_count)
+set_array_count (struct UArray* pArray, D_UINT newCount)
 {
-  if (new_count < array->stored_items)
+  if (newCount < pArray->itemsCount)
     {
-      D_UINT start_seg, it;
-      array->stored_items = new_count;
-      start_seg = new_count / array->increment_count;
-      if (new_count % array->increment_count != 0)
-	{
-	  start_seg++;
-	}
-      array->reserved_items = start_seg * array->increment_count;
-      for (it = start_seg; it < array->arrays_count; it++)
-	{
-	  mem_free (array->arrays[start_seg]);
-	}
-      array->arrays_count = start_seg;
+      D_UINT startSeg, iterator;
+
+      pArray->itemsCount = newCount;
+      startSeg           = newCount / pArray->incrementCount;
+
+      if (newCount % pArray->incrementCount != 0)
+        startSeg++;
+
+      pArray->itemsReserved = startSeg * pArray->incrementCount;
+
+      for (iterator = startSeg; iterator < pArray->arraysCount; iterator++)
+        mem_free (pArray->arraysList[startSeg]);
+
+      pArray->arraysCount = startSeg;
     }
   /* else: One should increase it when elements are added */
 }
 
 void
-destroy_array (struct UArray *array)
+destroy_array (struct UArray* pArray)
 {
   D_UINT count = 0;
 
-  for (count = 0; count < array->arrays_count; count++)
-    {
-      mem_free (array->arrays[count]);
-    }
-  if (array->arrays != NULL)
-    {
-      mem_free (array->arrays);
-    }
+  for (count = 0; count < pArray->arraysCount; count++)
+    mem_free (pArray->arraysList[count]);
+
+  if (pArray->arraysList != NULL)
+    mem_free (pArray->arraysList);
 }

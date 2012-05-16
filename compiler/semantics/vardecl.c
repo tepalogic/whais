@@ -25,12 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
+#include "whisper.h"
+
 #include "wlog.h"
 #include "statement.h"
 #include "vardecl.h"
 
 YYSTYPE
-add_idlist (YYSTYPE list, YYSTYPE id)
+add_id_to_list (YYSTYPE list, YYSTYPE id)
 {
   struct SemId temp;
 
@@ -50,7 +52,7 @@ add_idlist (YYSTYPE list, YYSTYPE id)
 YYSTYPE
 create_type_spec (struct ParserState* pState, D_UINT16 type)
 {
-  struct SemValue *result = get_sem_value (pState);
+  struct SemValue *result = alloc_sem_value (pState);
 
   if (result != NULL)
     {
@@ -65,75 +67,41 @@ create_type_spec (struct ParserState* pState, D_UINT16 type)
 }
 
 static D_BOOL
-process_row_decl (struct ParserState* pState,
-		  struct DeclaredVar* pVar,
-		  struct SemValue*    pSemVal)
+process_table_decls (struct ParserState* pState,
+                     struct DeclaredVar* pVar,
+                     void*               pExtra)
 {
-  struct Statement *const pStmt  = pState->current_stmt;
-  struct SemId*           pId    = (pSemVal == NULL) ? NULL : (&(pSemVal->val.u_id));
-  D_BOOL                  result = TRUE;
+  D_BOOL result = TRUE;
 
-  assert (pSemVal == NULL || pSemVal->val_type == VAL_ID);
+  assert (IS_TABLE (pVar->type));
 
-  if (pId == NULL)
-    pVar->extra = NULL;
-  else
-    {
-      D_CHAR tname[128];
-      struct DeclaredVar* pFoundVar = stmt_find_declaration (pStmt,
-                                                            pId->text,
-                                                            pId->length,
-                                                            TRUE,
-                                                            TRUE);
-
-      if (pFoundVar == NULL)
-	{
-	  copy_text_truncate (tname, pId->text, sizeof tname, pId->length);
-	  w_log_msg (pState, pState->buffer_pos, MSG_VAR_NFOUND, tname);
-	  pState->err_sem = TRUE;
-	  result          = FALSE;
-	}
-      else if (pFoundVar->type != T_TABLE_MASK)
-	{
-	  copy_text_truncate (tname, pId->text, sizeof tname, pId->length);
-	  w_log_msg (pState, pState->buffer_pos, MSG_NOT_TABLE, tname);
-	  pState->err_sem = TRUE;
-	  result          = FALSE;
-	}
-      else
-        pVar->extra = pFoundVar;
-
-      /* mark this for reuse */
-      pSemVal->val_type = VAL_REUSE;
-    }
+  pVar->extra = (struct DeclaredVar*) pExtra;
 
   return result;
 }
 
-D_BOOL
-process_container_decls (struct ParserState* pState,
-                         struct DeclaredVar* pVar,
-			 void*               pExtra)
+static D_BOOL
+process_field_decls (struct ParserState* pState,
+                     struct DeclaredVar* pVar)
 {
   D_BOOL result = TRUE;
 
-  switch (pVar->type)
-    {
-    case T_ROW_MASK:
-      {
-	struct SemValue *const ex_row = (struct SemValue *) pExtra;
-	result = process_row_decl (pState, pVar, ex_row);
-      }
-      break;
-    case T_TABLE_MASK:
-    case T_RECORD_MASK:
-      pVar->extra = (struct DeclaredVar *) pExtra;
-      break;
-    default:
-      assert (FALSE); /* we should not be here */
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_INT_ERR);
+  assert (IS_FIELD (pVar->type));
 
-      return FALSE;
+  if (IS_ARRAY (GET_FIELD_TYPE (pVar->type)))
+    {
+      assert ((GET_BASIC_TYPE (pVar->type) > T_UNKNOWN) &&
+              (GET_BASIC_TYPE (pVar->type) <= T_UNDETERMINED));
+
+      if (GET_BASIC_TYPE (pVar->type) == T_UNDETERMINED)
+        {
+          D_CHAR tname[128];
+
+          copy_text_truncate (tname, pVar->label, sizeof tname, pVar->labelLength);
+          w_log_msg (pState, pState->bufferPos, MSG_FIELD_INV_ARRAY, tname);
+
+          result = FALSE;
+        }
     }
 
   return result;
@@ -141,90 +109,96 @@ process_container_decls (struct ParserState* pState,
 
 struct DeclaredVar *
 install_declaration (struct ParserState* pState,
-		     YYSTYPE             sem_var,
-		     YYSTYPE             sem_type,
-		     D_BOOL              parameter,
-		     D_BOOL              unique)
+                     YYSTYPE             pVar,
+                     YYSTYPE             pType,
+                     D_BOOL              parameter,
+                     D_BOOL              unique)
 {
   struct DeclaredVar*     result = NULL;
   struct DeclaredVar*     pDecl  = NULL;
-  struct SemId* const     pId    = &(sem_var->val.u_id);
-  struct Statement* const stmt   = pState->current_stmt;
+  struct SemId* const     pId    = &(pVar->val.u_id);
+  struct Statement* const stmt   = pState->pCurrentStmt;
 
-  assert (sem_var->val_type == VAL_ID);
-  assert (sem_type->val_type == VAL_TYPE_SPEC);
+  assert (pVar->val_type == VAL_ID);
+  assert (pType->val_type == VAL_TYPE_SPEC);
 
   if (unique)
     {
-      assert ((sem_type->val.u_tspec.type & T_FIELD_MASK) == 0);
+      assert (IS_TABLE_FIELD (pType->val.u_tspec.type) == FALSE);
       pDecl = stmt_find_declaration (stmt, pId->text, pId->length, FALSE, FALSE);
     }
   else
     {
-      assert ((sem_type->val.u_tspec.type & T_FIELD_MASK) != 0);
+      assert (IS_TABLE_FIELD (pType->val.u_tspec.type));
     }
 
   if (pDecl != NULL)
     {
       /* Already declared! */
       D_CHAR text[128];
-      copy_text_truncate (text, pDecl->label, sizeof text, pDecl->l_label);
-      w_log_msg (pState, pState->buffer_pos, MSG_VAR_DEFINED, text);
+      copy_text_truncate (text, pDecl->label, sizeof text, pDecl->labelLength);
+      w_log_msg (pState, pState->bufferPos, MSG_VAR_DEFINED, text);
     }
   else
     {
       struct DeclaredVar var;
-      var.label   = pId->text;
-      var.l_label = pId->length;
-      var.type    = sem_type->val.u_tspec.type;
-      var.extra   = NULL;
-      var.offset  = 0;
 
-      if ((var.type & T_CONTAINER_MASK) &&
-	  (process_container_decls (pState, &var, sem_type->val.u_tspec.extra) == FALSE))
-	{
-	  result = NULL;	/* something went wrong along the way */
-	}
+      var.label       = pId->text;
+      var.labelLength = pId->length;
+      var.type        = pType->val.u_tspec.type;
+      var.extra       = NULL;
+      var.offset      = 0;
+
+      if (IS_TABLE (var.type) &&
+          (process_table_decls (pState, &var, pType->val.u_tspec.extra) == FALSE))
+        {
+          result = NULL;        /* something went wrong along the way */
+        }
+      else if (IS_FIELD (var.type) &&
+          (process_field_decls(pState, &var) == FALSE))
+        {
+          result = NULL; /* something went wrong along the way */
+        }
       else if ((result = stmt_add_declaration (stmt, &var, parameter)) == NULL)
-	{
-	  /* no more memory */
-	  w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-	  pState->err_sem = TRUE;
-	}
-      else if (((var.type & (T_TABLE_MASK | T_RECORD_MASK)) != 0))
-	{
-	  /* Set a sentinel for the extra field. */
-	  struct DeclaredVar *it = result->extra;
+        {
+          /* no more memory */
+          w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          pState->abortError = TRUE;
+        }
+      else if (IS_TABLE (var.type))
+        {
+          /* Set a sentinel for the extra field. */
+          struct DeclaredVar *it = result->extra;
 
-	  if (it == NULL)
+          if (it == NULL)
             result->extra = result;
-	  else
-	    {
-	      while (it->extra && ((it->extra->type & T_FIELD_MASK) != 0))
+          else
+            {
+              while (it->extra && IS_TABLE_FIELD (it->extra->type))
                 it = it->extra;
 
-	      it->extra = result;
-	    }
+              it->extra = result;
+            }
 
-	}
+        }
     }
 
-  if (result && pState->extern_decl)
+  if (result && pState->externDeclaration)
     {
-      assert (pState->current_stmt == &pState->global_stmt);
-      assert (result->var_id & GLOBAL_DECL);
+      assert (pState->pCurrentStmt == &pState->globalStmt);
+      assert (result->varId & GLOBAL_DECL);
 
-      result->var_id |= EXTERN_DECL;
+      MARK_AS_EXTERNAL (result->varId);
     }
   else if (result &&
-           ((result->var_id & T_FIELD_MASK) == 0) &&
-           ((result->var_id & GLOBAL_DECL) != 0) )
+           (IS_TABLE_FIELD (result->type) == FALSE) &&
+           (IS_GLOBAL (result->varId)))
     {
-      assert (pState->current_stmt == &pState->global_stmt);
+      assert (pState->pCurrentStmt == &pState->globalStmt);
 
       /* Defined globals are referenced by default. */
-      result->var_id &= ~NOTREF_DECL;
-      result->var_id |= pState->global_stmt.locals_used++;
+      result->varId |= pState->globalStmt.localsUsed++;
+      MARK_AS_REFERENCED (result->varId);
     }
 
   return result;
@@ -232,93 +206,93 @@ install_declaration (struct ParserState* pState,
 
 YYSTYPE
 install_list_declrs (struct ParserState* pState,
-                     YYSTYPE             sem_vars,
-		     YYSTYPE             sem_type)
+                     YYSTYPE             pVarsList,
+                     YYSTYPE             pType)
 {
-  struct SemIdList *it;
-  YYSTYPE result = NULL;
+  YYSTYPE           result = NULL;
+  struct SemIdList* pIt    = &pVarsList->val.u_idlist;
 
-  assert (sem_vars->val_type == VAL_ID_LIST);
-  assert (sem_type->val_type == VAL_TYPE_SPEC);
-
-  it = &sem_vars->val.u_idlist;
+  assert (pVarsList->val_type == VAL_ID_LIST);
+  assert (pType->val_type == VAL_TYPE_SPEC);
 
   /* we do not need this anymore */
-  sem_vars->val_type = VAL_REUSE;
+  free_sem_value (pVarsList);
 
-  while (it != NULL)
+  while (pIt != NULL)
     {
       struct SemValue id;
 
       id.val_type = VAL_ID;
-      id.val.u_id = it->id;
+      id.val.u_id = pIt->id;
 
-      if ((result = (YYSTYPE) install_declaration (pState, &id, sem_type, FALSE, TRUE)) == NULL)
-        break;		/* some error has been encountered */
+      if ((result = (YYSTYPE)install_declaration (pState, &id, pType, FALSE, TRUE)) == NULL)
+        break;                /* some error has been encountered */
 
       /* next in list */
-      if (it->next != NULL)
-	{
-	  assert (it->next->val_type == VAL_ID_LIST);
+      if (pIt->next != NULL)
+        {
+          assert (pIt->next->val_type == VAL_ID_LIST);
 
-	  /* mark this as free for reuse */
-	  it->next->val_type = VAL_REUSE;
-
-	  it = &(it->next->val.u_idlist);
-	}
+          free_sem_value (pIt->next);
+          pIt = &(pIt->next->val.u_idlist);
+        }
       else
-        it = NULL;
+        pIt = NULL;
     }
 
   /* mark this as free for reuse */
-  sem_type->val_type = VAL_REUSE;
+  free_sem_value (pType);
+
   return result;
 }
 
 YYSTYPE
 install_field_declaration (struct ParserState*       pState,
-			   YYSTYPE                   sem_var,
-			   YYSTYPE                   sem_type,
-			   struct DeclaredVar* const pExtra)
+                           YYSTYPE                   pVar,
+                           YYSTYPE                   pType,
+                           struct DeclaredVar* const pExtra)
 {
   struct DeclaredVar* result = NULL;
   struct DeclaredVar* pPrev  = NULL;
-  struct DeclaredVar* pIt = pExtra;
-  struct SemId*       pSemId = &sem_var->val.u_id;
+  struct DeclaredVar* pIt    = pExtra;
+  struct SemId*       pSemId = &pVar->val.u_id;
 
-  assert (sem_type->val_type == VAL_TYPE_SPEC);
-  assert ((sem_type->val.u_tspec.type & T_FIELD_MASK) != 0);
-  assert (sem_var->val_type == VAL_ID);
+  assert (pType->val_type == VAL_TYPE_SPEC);
+  assert (IS_TABLE_FIELD (pType->val.u_tspec.type));
+  assert (pVar->val_type == VAL_ID);
 
   /* check for fields with the same name */
   while (pIt != NULL)
     {
-      assert ((pIt->type & T_FIELD_MASK) != 0);
-      if ((pIt->l_label == pSemId->length) &&
-	  (strncmp (pIt->label, pSemId->text, pIt->l_label) == 0))
-	{
-	  D_CHAR tname[128];
+      assert (IS_TABLE_FIELD (pIt->type) != 0);
+      if ((pIt->labelLength == pSemId->length) &&
+          (strncmp (pIt->label, pSemId->text, pIt->labelLength) == 0))
+        {
+          D_CHAR tname[128];
 
-	  copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
-	  w_log_msg (pState, pState->buffer_pos, MSG_SAME_FIELD, tname);
+          copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
+          w_log_msg (pState, pState->bufferPos, MSG_SAME_FIELD, tname);
 
-	  pState->err_sem = TRUE;
-	  return NULL;
-	}
+          pState->abortError = TRUE;
+          return NULL;
+        }
       /* next one */
       pIt = pIt->extra;
     }
-  result = install_declaration (pState, sem_var, sem_type, FALSE, FALSE);
+  result = install_declaration (pState, pVar, pType, FALSE, FALSE);
 
   result->extra = NULL;
   pIt           = pExtra;
   while (pIt != NULL)
     {
       /* Insert this alphabetically to make sure we avoid equivalent fields declarations. */
-      const D_INT compare = strncmp (pIt->label, result->label, MIN (pIt->l_label, result->l_label));
-      if ((compare > 0) || ((compare == 0) && (pIt->l_label >= result->l_label)))
+      const D_INT compare = strncmp (pIt->label,
+                                     result->label,
+                                     MIN (pIt->labelLength, result->labelLength));
+      if ((compare > 0) ||
+          ((compare == 0) && (pIt->labelLength >= result->labelLength)))
         {
-          assert ((compare > 0) || (pIt->l_label > result->l_label));
+          assert ((compare > 0) || (pIt->labelLength > result->labelLength));
 
           if (pPrev == NULL)
             {
@@ -328,8 +302,10 @@ install_field_declaration (struct ParserState*       pState,
           else
             {
               assert (pPrev->extra == pIt);
+
               result->extra = pPrev->extra;
-              result = pExtra;
+              result        = pExtra;
+
               break;
             }
         }
@@ -342,9 +318,8 @@ install_field_declaration (struct ParserState*       pState,
         }
     }
 
-  /* Mark for reuse! */
-  sem_var->val_type = VAL_REUSE;
-  sem_type->val_type = VAL_REUSE;
+  free_sem_value (pVar);
+  free_sem_value (pType);
 
   return (YYSTYPE) result;
 }

@@ -2,7 +2,7 @@
 UTILS - Common routines used trough WHISPER project
 Copyright (C) 2009  Iulian Popa
 
-Address: Str Olimp nr. 6 
+Address: Str Olimp nr. 6
          Pantelimon Ilfov,
          Romania
 Phone:   +40721939650
@@ -27,43 +27,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-/* 
- * UArray - stores an array of arbitrary elements. The goal of using this 
+/*
+ * UArray - stores an array of arbitrary elements. The goal of using this
  * structure is to optimise the memory access/usage.
  */
 struct UArray
 {
-  size_t item_size;
-  size_t user_item_size;
-  /* Number of elements stored */
-  D_UINT stored_items;
-  /* Number of reserved elements */
-  D_UINT reserved_items;
+  size_t realItemSize;
+  size_t userItemSize;
+  D_UINT itemsCount;
+  D_UINT itemsReserved;
 
   /* Array of pointers to the array's elements */
-  D_INT8 **arrays;
-  D_UINT increment_count;
-  D_UINT arrays_count;
-  D_UINT arrays_used;
+  D_INT8** arraysList;
+  D_UINT   incrementCount;
+  D_UINT   arraysCount;
+  D_UINT   arraysUsed;
 };
 
-#define ARRAY_INCRMENT_SIZE     512	/* in bytes here */
-#define init_array(a, x) init_array_ex((a), (x),\
-        (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\
-        sizeof(D_UINTMAX))
+#define ARRAY_INCRMENT_SIZE     512        /* in bytes here */
+#define init_array(a, x) init_array_ex((a),\
+                                       (x),\
+                                       (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\
+                                       sizeof(D_UINTMAX))
 
-struct UArray *init_array_ex (struct UArray *array,
-			      size_t item_size,
-			      D_UINT increment, D_UINT alignmentr);
+struct UArray*
+init_array_ex (struct UArray* pArray,
+               size_t         item_size,
+               D_UINT         increment,
+               D_UINT         alignmentr);
 
-void *add_item (struct UArray *array, const void *data);
+void*
+add_item (struct UArray* pArray, const void* data);
 
-void *get_item (const struct UArray *array, D_UINT item);
+void *
+get_item (const struct UArray* pArray, D_UINT item);
 
-D_UINT get_array_count (const struct UArray *array);
+D_UINT get_array_count (const struct UArray* pArray);
 
-void set_array_count (struct UArray *array, D_UINT new_count);
+void set_array_count (struct UArray* pArray, D_UINT new_count);
 
-void destroy_array (struct UArray *array);
+void destroy_array (struct UArray* pArray);
 
 #endif /* UARRAY_H */

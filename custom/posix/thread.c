@@ -34,30 +34,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 void
-wh_sync_init (WH_SYNC *hnd)
+wh_sync_init (WH_SYNC* pSync)
 {
-  const D_UINT result = pthread_mutex_init (hnd, NULL);
+  const D_UINT result = pthread_mutex_init (pSync, NULL);
   assert (result == 0);
 }
 
 void
-wh_sync_destroy (WH_SYNC *hnd)
+wh_sync_destroy (WH_SYNC* pSync)
 {
-  const D_UINT result = pthread_mutex_destroy (hnd);
+  const D_UINT result = pthread_mutex_destroy (pSync);
   assert (result == 0);
 }
 
 void
-wh_sync_enter (WH_SYNC *hnd)
+wh_sync_enter (WH_SYNC* pSync)
 {
-  const D_UINT result = pthread_mutex_lock (hnd);
+  const D_UINT result = pthread_mutex_lock (pSync);
   assert (result == 0);
 }
 
 void
-wh_sync_leave (WH_SYNC *hnd)
+wh_sync_leave (WH_SYNC* pSync)
 {
-  const int result = pthread_mutex_unlock (hnd);
+  const int result = pthread_mutex_unlock (pSync);
   assert (result == 0);
 }
 
@@ -69,7 +69,8 @@ wh_cond_value_init (WH_COND_VALUE* pCondValue)
 }
 
 D_INT
-wh_cond_value_wait (WH_COND_VALUE* pCondValue, WH_SYNC* pSync)
+wh_cond_value_wait (WH_COND_VALUE* pCondValue,
+                    WH_SYNC*       pSync)
 {
   return pthread_cond_wait (pCondValue, pSync);
 }
@@ -94,7 +95,9 @@ wh_cond_value_destroy (WH_COND_VALUE* pCondValue)
 }
 
 D_INT
-wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
+wh_thread_create (WH_THREAD*       pThread,
+                 WH_THREAD_ROUTINE routine,
+                 void*             args)
 {
   return pthread_create (pThread, NULL, (void* (*)(void*))routine, args);
 }

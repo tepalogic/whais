@@ -32,11 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_fileio.h"
 
 WH_FILE_HND
-whc_fopen (const D_CHAR* fname, D_UINT mode)
+whc_fopen (const D_CHAR* pFileName, D_UINT mode)
 {
-  DWORD dwDesiredAccess = 0;
-  DWORD dwCreation = 0;
-  DWORD dwFlagsAndAttr = 0;
+  DWORD       dwDesiredAccess = 0;
+  DWORD       dwCreation      = 0;
+  DWORD       dwFlagsAndAttr  = 0;
   WH_FILE_HND result;
 
   if (mode & WHC_FILECREATE_NEW)
@@ -52,8 +52,13 @@ whc_fopen (const D_CHAR* fname, D_UINT mode)
   dwDesiredAccess |= (mode & WHC_FILEREAD) ? GENERIC_READ : 0;
   dwDesiredAccess |= (mode & WHC_FILEWRITE) ? GENERIC_WRITE : 0;
 
-  result = CreateFile (fname, dwDesiredAccess, 0, NULL,
-                       dwCreation, dwFlagsAndAttr, NULL);
+  result = CreateFile (pFileName,
+                       dwDesiredAccess,
+                       0,
+                       NULL,
+                       dwCreation,
+                       dwFlagsAndAttr,
+                       NULL);
   result = (result == INVALID_HANDLE_VALUE) ? NULL : result;
   return result;
 }
@@ -103,7 +108,7 @@ whc_fseek (WH_FILE_HND f_hnd, D_INT64 where, D_INT whence)
 }
 
 D_BOOL
-whc_fread (WH_FILE_HND f_hnd, D_UINT8* buffer, D_UINT size)
+whc_fread (WH_FILE_HND f_hnd, D_UINT8* pBuffer, D_UINT size)
 {
   D_BOOL result = TRUE;
   D_UINT actual_count = 0;
@@ -111,13 +116,13 @@ whc_fread (WH_FILE_HND f_hnd, D_UINT8* buffer, D_UINT size)
   while (actual_count < size)
     {
       DWORD count;
-      if (!ReadFile (f_hnd, buffer + actual_count,
-		     size - actual_count, &count, NULL))
-	{
-	  /* the errno is already set for this */
-	  result = FALSE;
-	  break;
-	}
+      if (!ReadFile (f_hnd, pBuffer + actual_count,
+                     size - actual_count, &count, NULL))
+        {
+          /* the errno is already set for this */
+          result = FALSE;
+          break;
+        }
       actual_count += count;
     }
 
@@ -128,39 +133,44 @@ whc_fread (WH_FILE_HND f_hnd, D_UINT8* buffer, D_UINT size)
 }
 
 D_BOOL
-whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8 * buffer, D_UINT size)
+whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8* pBuffer, D_UINT size)
 {
 
-  D_BOOL result = TRUE;
-  D_UINT actual_count = 0;
+  D_BOOL result     = TRUE;
+  D_UINT actualCount = 0;
 
-  while (actual_count < size)
+  while (actualCount < size)
     {
       DWORD count;
-      if (!WriteFile (f_hnd, buffer + actual_count,
-		      size - actual_count, &count, NULL))
-	{
-	  /* the errno is already set for this */
-	  result = FALSE;
-	  break;
-	}
-      actual_count += count;
+      if (!WriteFile (f_hnd,
+                      pBuffer + actualCount,
+                      size - actualCount,
+                      &count,
+                      NULL))
+        {
+          /* the errno is already set for this */
+          result = FALSE;
+          break;
+        }
+      actualCount += count;
     }
 
-  assert ((result == TRUE) || (actual_count < size));
-  assert ((result == FALSE) || (size == actual_count));
+  assert ((result == TRUE) || (actualCount < size));
+  assert ((result == FALSE) || (size == actualCount));
 
   return result;
 }
 
 D_BOOL
-whc_ftell (WH_FILE_HND f_hnd, D_UINT64* output)
+whc_ftell (WH_FILE_HND f_hnd, D_UINT64* pOutSize)
 {
 
   const LARGE_INTEGER sTemp = { 0, };
 
-  if (!SetFilePointerEx (f_hnd, sTemp,
-                         (LARGE_INTEGER*) output, FILE_CURRENT))
+  if (!SetFilePointerEx (f_hnd,
+                         sTemp,
+                         (LARGE_INTEGER*)pOutSize,
+                         FILE_CURRENT))
     return FALSE;
 
   return TRUE;
@@ -174,15 +184,15 @@ whc_fsync (WH_FILE_HND f_hnd)
 }
 
 D_BOOL
-whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64* output)
+whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64* pOutSize)
 {
-  return GetFileSizeEx (f_hnd, (LARGE_INTEGER*) output);
+  return GetFileSizeEx (f_hnd, (LARGE_INTEGER*) pOutSize);
 }
 
 D_BOOL
-whc_fsetsize (WH_FILE_HND f_hnd, D_UINT64 output)
+whc_fsetsize (WH_FILE_HND f_hnd, D_UINT64 newSize)
 {
-  if (whc_fseek (f_hnd, output, WHC_SEEK_BEGIN)
+  if (whc_fseek (f_hnd, newSize, WHC_SEEK_BEGIN)
       && (SetEndOfFile (f_hnd) != 0))
     return TRUE;
   return FALSE;
@@ -201,20 +211,19 @@ whc_fgetlasterror ()
 }
 
 D_BOOL
-whc_ferrtostrs (D_UINT64 error_code, D_CHAR *str, D_UINT str_size)
+whc_ferrtostrs (D_UINT64 error_code, D_CHAR* str, D_UINT strSize)
 {
-  return FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			(DWORD) error_code,
-			MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-			str, str_size, NULL) != 0;
+  return FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                        NULL,
+                        (DWORD) error_code,
+                        MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+                        str, strSize, NULL) != 0;
 }
 
 D_BOOL
-whc_fremove (const D_CHAR *fname)
+whc_fremove (const D_CHAR *pFileName)
 {
-  return DeleteFile (fname);
+  return DeleteFile (pFileName);
 }
 
 const D_CHAR*
@@ -224,8 +233,8 @@ whc_get_directory_delimiter ()
 }
 
 D_BOOL
-whc_is_path_absolute (const D_CHAR* path)
+whc_is_path_absolute (const D_CHAR* pPath)
 {
-  assert (path != NULL);
-  return (path[1] == ':');
+  assert (pPath != NULL);
+  return (pPath[1] == ':');
 }

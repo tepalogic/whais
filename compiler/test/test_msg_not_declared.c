@@ -30,13 +30,13 @@ get_buffer_line_from_pos (const char *buffer, D_UINT buff_pos)
   while (count < buff_pos)
     {
       if (buffer[count] == '\n')
-	{
-	  ++result;
-	}
+        {
+          ++result;
+        }
       else if (buffer[count] == 0)
-	{
-	  assert (0);
-	}
+        {
+          assert (0);
+        }
       ++count;
     }
   return result;
@@ -48,9 +48,9 @@ static char *MSG_PREFIX[] = {
 
 void
 my_postman (POSTMAN_BAG bag,
-	    D_UINT buff_pos,
-	    D_UINT msg_id,
-	    const D_UINT msgType, const D_CHAR * msgFormat, va_list args)
+            D_UINT buff_pos,
+            D_UINT msg_id,
+            const D_UINT msgType, const D_CHAR * msgFormat, va_list args)
 {
   const char *buffer = (const char *) bag;
   D_INT buff_line = get_buffer_line_from_pos (buffer, buff_pos);
@@ -74,12 +74,6 @@ D_CHAR test_prog_2[] = ""
   "PROCEDURE Proc_2( v1 AS DATE)\n RETURN DATE "
   "DO\n " "v2 = v1;\n " "RETURN v2;\n " "ENDPROC\n " "\n " "";
 
-D_CHAR test_prog_3[] = ""
-  "PROCEDURE Proc_3( v1 AS DATE)\n RETURN DATE "
-  "DO\n "
-  "LET v2 AS ROW OF TABLE some_missing_table;\n "
-  "RETURN v1;\n " "ENDPROC\n " "\n " "";
-
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 {
@@ -88,8 +82,8 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 
   last_msg_code = 0xFF, last_msg_type = 0XFF;
   handler = whc_hnd_create (test_buffer,
-			    strlen (test_buffer),
-			    &my_postman, (WHC_MESSENGER_ARG) test_buffer);
+                            strlen (test_buffer),
+                            &my_postman, (WHC_MESSENGER_ARG) test_buffer);
 
   if (handler != NULL)
     {
@@ -99,15 +93,15 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
   else
     {
       if ((last_msg_code != err_expected) || (last_msg_type != err_type))
-	{
-	  test_result = FALSE;
-	}
+        {
+          test_result = FALSE;
+        }
     }
 
   if (test_get_mem_used () != 0)
     {
       printf ("Current memory usage: %u bytes! It should be 0.",
-	      test_get_mem_used ());
+              test_get_mem_used ());
       test_result = FALSE;
     }
   return test_result;
@@ -120,14 +114,8 @@ main ()
 
   printf ("Testing for received error messages...\n");
   test_result = test_for_error (test_prog_1, MSG_VAR_NFOUND, MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_2,
-						     MSG_VAR_NFOUND,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
-						     MSG_VAR_NFOUND,
-						     MSG_ERROR_EVENT);
+  test_result = test_result && test_for_error (test_prog_2, MSG_VAR_NFOUND, MSG_ERROR_EVENT);
+
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");

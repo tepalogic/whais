@@ -2,7 +2,7 @@
 UTILS - Common routines used trough WHISPER project
 Copyright (C) 2009  Iulian Popa
 
-Address: Str Olimp nr. 6 
+Address: Str Olimp nr. 6
          Pantelimon Ilfov,
          Romania
 Phone:   +40721939650
@@ -31,10 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct OutStream
 {
-  D_UINT8 *output;
-  D_UINT size;
-  D_UINT increment;
-  D_UINT allocated;
+  D_UINT8* data;
+  D_UINT   dataSize;
+  D_UINT   increment;
+  D_UINT   reserved;
 };
 
 #ifdef __cplusplus
@@ -42,42 +42,44 @@ extern "C"
 {
 #endif
 
-  struct OutStream *init_outstream (struct OutStream *os, D_UINT inc_size);
+struct OutStream*
+init_outstream (struct OutStream* pStream, D_UINT increment);
 
-  struct OutStream *data_outstream (struct OutStream *os,
-				    const D_UINT8 * data, D_UINT data_size);
+void
+destroy_outstream (struct OutStream* pStream);
 
-  void destroy_outstream (struct OutStream *os);
+struct OutStream*
+output_data (struct OutStream* pStream, const D_UINT8* pData, D_UINT dataSize);
 
-  INLINE static struct OutStream *uint8_outstream (struct OutStream *os,
-						   D_UINT8 val)
-  {
-    return data_outstream (os, &val, sizeof val);
-  }
+INLINE static struct OutStream*
+output_uint8 (struct OutStream* pStream, D_UINT8 value)
+{
+  return output_data (pStream, &value, sizeof value);
+}
 
-  INLINE static struct OutStream *uint16_outstream (struct OutStream *os,
-						    D_UINT16 val)
-  {
-    return data_outstream (os, (D_UINT8 *) & val, sizeof val);
-  }
+INLINE static struct OutStream*
+output_uint16 (struct OutStream* pStream, D_UINT16 value)
+{
+  return output_data (pStream, (D_UINT8*)&value, sizeof value);
+}
 
-  INLINE static struct OutStream *uint32_outstream (struct OutStream *os,
-						    D_UINT32 val)
-  {
-    return data_outstream (os, (D_UINT8 *) & val, sizeof val);
-  }
+INLINE static struct OutStream*
+output_uint32 (struct OutStream* pStream, D_UINT32 value)
+{
+  return output_data (pStream, (D_UINT8*)&value, sizeof value);
+}
 
-  INLINE static struct OutStream *uint64_outstream (struct OutStream *os,
-						    D_UINT64 val)
-  {
-    return data_outstream (os, (D_UINT8 *) & val, sizeof val);
-  }
+INLINE static struct OutStream*
+output_uint64 (struct OutStream* pStream, D_UINT64 value)
+{
+  return output_data (pStream, (D_UINT8*)&value, sizeof value);
+}
 
-#define get_buffer_outstream(os) ((os)->output)
-#define get_size_outstream(os) ((os)->size)
+#define get_buffer_outstream(pStream) ((pStream)->data)
+#define get_size_outstream(pStream) ((pStream)->dataSize)
 
 #ifdef __cplusplus
-}				/* extern "C" */
+}                                /* extern "C" */
 #endif
 
 #endif /* OUTSTREAM_H */

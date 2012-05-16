@@ -134,7 +134,7 @@ struct DBSChar
   operator DBS_FIELD_TYPE () const { return T_CHAR; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT32 m_Value;		//4 bytes to hold an UTF-8 character
+  const D_UINT32 m_Value;                //4 bytes to hold an UTF-8 character
   const bool     m_IsNull;
 };
 

@@ -74,4 +74,4 @@ protected:
 };
 
 }
-#endif				/* PS_DBSMGR_H_ */
+#endif                                /* PS_DBSMGR_H_ */

@@ -50,30 +50,35 @@ get_postman_bag (void)
 }
 
 void
-LOGMSG (D_UINT buff_pos, D_UINT msgCode, D_UINT msgType, D_CHAR * msgFormat,
-	va_list args)
+LOGMSG (D_UINT  buffPos,
+        D_UINT  msgCode,
+        D_UINT  msgType,
+        D_CHAR* pMessage,
+        va_list args)
 {
-  __postman (__postman_bag, buff_pos, msgCode, msgType, msgFormat, args);
+  __postman (__postman_bag, buffPos, msgCode, msgType, pMessage, args);
 }
 
 D_CHAR *
-copy_text_truncate (D_CHAR * dest,
-		    const D_CHAR * src, D_UINT dest_max, D_UINT src_len)
+copy_text_truncate (D_CHAR*       dest,
+                    const D_CHAR* src,
+                    D_UINT        destMax,
+                    D_UINT        srcLen)
 {
 
-  assert (dest_max > 4);	/* make sure we can hold the '...' string */
+  assert (destMax > 4);        /* make sure we can hold the '...' string */
 
-  if (src_len > dest_max)
+  if (srcLen > destMax)
     {
-      src_len = dest_max - 4;
-      strncpy (dest, src, src_len);
-      dest[src_len] = 0;
+      srcLen = destMax - 4;
+      strncpy (dest, src, srcLen);
+      dest[srcLen] = 0;
       strcat (dest, "...");
     }
   else
     {
-      strncpy (dest, src, src_len);
-      dest[src_len] = 0;
+      strncpy (dest, src, srcLen);
+      dest[srcLen] = 0;
     }
 
   return dest;

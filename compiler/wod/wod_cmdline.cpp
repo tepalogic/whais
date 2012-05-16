@@ -35,63 +35,61 @@ using namespace std;
 #define VER_MINOR       4
 
 static inline bool
-isStrEqual (const D_CHAR * str1, const D_CHAR * str2)
+isStrEqual (const D_CHAR* str1, const D_CHAR* str2)
 {
   return::strcmp (str1, str2) == 0;
 }
 
-WodCmdLineParser::WodCmdLineParser (D_INT argc, D_CHAR ** argv):mArgCount (argc),
-mArgs (argv),
-mSourceFile (NULL), mOutStream (&cout), mDisplayHelp (false)
+WodCmdLineParser::WodCmdLineParser (D_INT argc, D_CHAR ** argv) :
+    m_ArgCount (argc),
+    m_Args (argv),
+    m_SourceFile (NULL),
+    m_OutStream (&cout),
+    m_ShowHelp (false)
 {
   Parse ();
 }
 
 WodCmdLineParser::~WodCmdLineParser ()
 {
-  if (mOutStream != &cout)
-    delete mOutStream;
+  if (m_OutStream != &cout)
+    delete m_OutStream;
 }
 
 void
 WodCmdLineParser::Parse ()
 {
   int index = 1;
-  if (index >= mArgCount)
+  if (index >= m_ArgCount)
     throw WodCmdLineException ("No arguments! Use --help first!", _EXTRA(0));
 
-  while (index < mArgCount)
+  while (index < m_ArgCount)
     {
-      if (isStrEqual (mArgs[index], "-h")
-	  || isStrEqual (mArgs[index], "--help"))
-	{
-	  mDisplayHelp = true;
-	  ++index;
-	}
-      else if (isStrEqual (mArgs[index], "-o"))
-	{
-	  if (mOutStream != &cout)
-	    throw WodCmdLineException ("Parameter '-o' is given twice",
-	        _EXTRA(0));
+      if (isStrEqual (m_Args[index], "-h") ||
+          isStrEqual (m_Args[index], "--help"))
+        {
+          m_ShowHelp = true;
+          ++index;
+        }
+      else if (isStrEqual (m_Args[index], "-o"))
+        {
+          if (m_OutStream != &cout)
+            throw WodCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
 
-	  if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
-	    throw WodCmdLineException ("Missing file name argument for "
-				       "for parameter -o", _EXTRA(0));
-	  else
-	  mOutStream = new ofstream (mArgs[index++]);
-	}
-      else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
-	{
-	  if ((void *) mSourceFile != NULL)
-	    throw
-	      WodCmdLineException ("The source file was already specified!",
-	          _EXTRA(0));
+          if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
+            throw WodCmdLineException ("Missing file name argument for parameter -o", _EXTRA(0));
+          else
+            m_OutStream = new ofstream (m_Args[index++]);
+        }
+      else if ((m_Args[index][0] != '-') && (m_Args[index][0] != '\\'))
+        {
+          if ((void *) m_SourceFile != NULL)
+            throw WodCmdLineException ("The source file was already specified!", _EXTRA(0));
 
-	  mSourceFile = mArgs[index++];
-	}
+          m_SourceFile = m_Args[index++];
+        }
       else
-	throw WodCmdLineException ("Unknown arguments! Use --help first!",
-	    _EXTRA(0));
+        throw WodCmdLineException ("Unknown arguments! Use --help first!", _EXTRA(0));
     }
   CheckArguments ();
 }
@@ -99,12 +97,12 @@ WodCmdLineParser::Parse ()
 void
 WodCmdLineParser::CheckArguments ()
 {
-  if (mDisplayHelp)
+  if (m_ShowHelp)
     {
       DisplayUsage ();
       exit (0);
     }
-  else if (mSourceFile == NULL)
+  else if (m_SourceFile == NULL)
     throw WodCmdLineException ("No given input file!", _EXTRA(0));
 }
 
@@ -115,5 +113,5 @@ WodCmdLineParser::DisplayUsage () const
 
   cout << "Whisper Object Dumper ver. " << VER_MAJOR << '.' << VER_MINOR;
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
-    << "Usage: " << "wod input_file [-o output_file] [--help | -h]" << endl;
+       << "Usage: wod input_file [-o output_file] [--help | -h]" << endl;
 }

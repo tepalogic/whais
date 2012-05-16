@@ -20,7 +20,7 @@ static const D_CHAR admin[] = "administrator";
 static const D_UINT8 firstCode[] =
     "LET gb0 AS DATE;\n"
     "LET gb1 AS UNSIGNED INT32;\n"
-    "LET tab1 AS TABLE WITH (t_field AS int8, vasile as TEXT);\n"
+    "LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
     "\n"
     "PROCEDURE proced_1 (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
@@ -35,7 +35,7 @@ static const D_UINT8 firstCode[] =
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
-    "tab1[p3].vasile = p1v1;\n"
+    "tab1[p3, vasile] = p1v1;\n"
     "\n"
     "RETURN gb0;\n"
     "\n"

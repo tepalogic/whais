@@ -32,15 +32,15 @@
 #include "whisper.h"
 
 /* A handler for a string store */
-typedef void *StringStoreHnd;
+typedef void* StringStoreHnd;
 
 StringStoreHnd
 create_string_store ();
 
 void
-release_string_store (StringStoreHnd * handle);
+release_string_store (StringStoreHnd* pStore);
 
-D_CHAR *
-alloc_str (StringStoreHnd handle, D_UINT length);
+D_CHAR*
+alloc_str (StringStoreHnd store, D_UINT length);
 
 #endif /* STRSTORE_H */

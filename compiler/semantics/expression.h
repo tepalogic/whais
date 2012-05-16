@@ -57,30 +57,33 @@ enum EXP_OPERATION
   OP_OR,
   OP_XOR,
 
-  OP_GROUP,			/* (...) */
-  OP_INDEX,			/* [...] */
-  OP_MEMBER,			/* table/row.field */
+  OP_GROUP,     /* (...) */
+  OP_INDEX,     /* [...] */
+  OP_TABVAL,
+  OP_FIELD,
   OP_ATTR,
-  OP_C_ATTR,			/* { ... } */
   OP_CALL,
 
   OP_MAX
 };
 
 YYSTYPE
-create_exp_link (struct ParserState *state,
-		 YYSTYPE first_op, YYSTYPE second_op, enum EXP_OPERATION op);
+create_exp_link (struct ParserState* pState,
+                 YYSTYPE             firstOp,
+                 YYSTYPE             secondOp,
+                 YYSTYPE             thirdOp,
+                 enum EXP_OPERATION  opcode);
 
 YYSTYPE
-translate_exp (struct ParserState *state, YYSTYPE exp);
+translate_exp (struct ParserState* pState, YYSTYPE exp);
 
 YYSTYPE
-translate_return_exp (struct ParserState *state, YYSTYPE exp);
+translate_return_exp (struct ParserState* pState, YYSTYPE exp);
 
 D_BOOL
-translate_bool_exp (struct ParserState *state, YYSTYPE exp);
+translate_bool_exp (struct ParserState* pState, YYSTYPE exp);
 
 YYSTYPE
-create_arg_link (struct ParserState *state, YYSTYPE arg, YYSTYPE next);
+create_arg_link (struct ParserState* pState, YYSTYPE arg, YYSTYPE next);
 
 #endif /* EXPRESSION_H */

@@ -13,38 +13,38 @@ static void
 init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
 {
   state->buffer = buffer;
-  state->strs = create_string_store ();
-  state->buffer_len = strlen (buffer);
-  init_array (&state->vals, sizeof (struct SemValue));
+  state->strings = create_string_store ();
+  state->bufferSize = strlen (buffer);
+  init_array (&state->parsedValues, sizeof (struct SemValue));
 
-  init_glbl_stmt (&state->global_stmt);
-  state->current_stmt = &state->global_stmt;
+  init_glbl_stmt (&state->globalStmt);
+  state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
 free_state (struct ParserState *state)
 {
-  release_string_store (state->strs);
-  clear_glbl_stmt (&(state->global_stmt));
-  destroy_array (&state->vals);
+  release_string_store (state->strings);
+  clear_glbl_stmt (&(state->globalStmt));
+  destroy_array (&state->parsedValues);
 
 }
 
 static D_BOOL
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->vals);
+  D_INT vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->vals, vals_count);
+      struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR buffer[] =
@@ -56,29 +56,29 @@ D_CHAR buffer[] =
 
 static D_BOOL
 check_declared_var (struct Statement *stm,
-		    struct DeclaredVar *var, D_UINT type)
+                    struct DeclaredVar *var, D_UINT type)
 {
-  struct OutStream *os = &stm->spec.glb.type_desc;
-  if ((var == NULL) ||		/* var not found */
-      (var->type != type) ||	/* invalid type */
-      ((var->var_id & GLOBAL_DECL)) == 0)
+  struct OutStream *os = &stm->spec.glb.typesDescs;
+  if ((var == NULL) ||                /* var not found */
+      (var->type != type) ||        /* invalid type */
+      ((var->varId & GLOBAL_DECL)) == 0)
     {
       return FALSE;
     }
 
-  if ((var->type_spec_pos >= get_size_outstream (os)))
+  if ((var->typeSpecOff >= get_size_outstream (os)))
     {
       return FALSE;
     }
   else
     {
       struct TypeSpec *ts = (struct TypeSpec *)
-	&(get_buffer_outstream (os)[var->type_spec_pos]);
+        &(get_buffer_outstream (os)[var->typeSpecOff]);
       if ((ts->type != type) ||
-	  (ts->data_len != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
-	{
-	  return FALSE;
-	}
+          (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
+        {
+          return FALSE;
+        }
     }
 
   return TRUE;
@@ -90,67 +90,68 @@ check_vars_decl (struct ParserState *state)
   struct DeclaredVar *decl_var = NULL;
   D_UINT count;
   D_UINT temp_pos;
+  D_UINT type;
 
-  if (state->global_stmt.type != STMT_GLOBAL ||
-      state->global_stmt.parent != NULL)
+  if (state->globalStmt.type != STMT_GLOBAL ||
+      state->globalStmt.pParentStmt != NULL)
     {
       return FALSE;
     }
 
-  count = get_array_count (&(state->global_stmt.decls));
+  count = get_array_count (&(state->globalStmt.decls));
   if (count != 7)
     {
       /* error: more declarations?!? */
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar01_", 7, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_INT32 | T_ARRAY_MASK)))
+  decl_var = stmt_find_declaration (&state->globalStmt, "aVar01_", 7, FALSE, FALSE);
+  type     = T_INT32;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar02_", 7, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_REAL | T_ARRAY_MASK)))
+  decl_var = stmt_find_declaration (&state->globalStmt, "aVar02_", 7, FALSE, FALSE);
+  type     = T_REAL;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
-  temp_pos = decl_var->type_spec_pos;
+  temp_pos = decl_var->typeSpecOff;
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar03", 6, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_UNDETERMINED | T_ARRAY_MASK)))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar04", 6, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_TEXT | T_ARRAY_MASK)))
+  decl_var = stmt_find_declaration (&state->globalStmt, "aVar03", 6, FALSE, FALSE);
+  type     = T_UNDETERMINED;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "__array__", 9, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_UNDETERMINED | T_ARRAY_MASK)))
+  decl_var = stmt_find_declaration (&state->globalStmt, "aVar04", 6, FALSE, FALSE);
+  type     = T_TEXT;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY ((type))))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "__array_2_", 10, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_TEXT | T_ARRAY_MASK)))
+  decl_var = stmt_find_declaration (&state->globalStmt, "__array__", 9, FALSE, FALSE);
+  type     = T_UNDETERMINED;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "aVar031", 7, FALSE, FALSE);
-  if (!check_declared_var
-      (&state->global_stmt, decl_var, (T_REAL | T_ARRAY_MASK))
-      || temp_pos != decl_var->type_spec_pos)
+  decl_var = stmt_find_declaration (&state->globalStmt, "__array_2_", 10, FALSE, FALSE);
+  type     = T_TEXT;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "aVar031", 7, FALSE, FALSE);
+  type     = T_REAL;
+  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)) ||
+      (temp_pos != decl_var->typeSpecOff))
     {
       return FALSE;
     }
@@ -181,15 +182,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing declarations...");

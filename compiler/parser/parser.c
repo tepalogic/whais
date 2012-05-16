@@ -31,40 +31,42 @@
 
 #include <assert.h>
 
-struct SemValue *
-get_sem_value (struct ParserState *state)
+struct SemValue*
+alloc_sem_value (struct ParserState* const pState)
 {
-  struct SemValue *result = NULL;
-  D_UINT iter = 0;
-  D_UINT stored_vals = get_array_count (&state->vals);
+  struct SemValue* result      = NULL;
+  D_UINT           iter        = 0;
+  D_UINT           stored_vals = get_array_count (&pState->parsedValues);
 
   while (iter < stored_vals)
     {
-      result = get_item (&state->vals, iter);
+      result = get_item (&pState->parsedValues, iter);
       assert (result != NULL);
+
       if (result->val_type == VAL_REUSE)
-	break;			/* found something to be reused */
+        break;                        /* found something to be reused */
       iter++;
     }
-  if (result == NULL || result->val_type != VAL_REUSE)
+   if (result == NULL || result->val_type != VAL_REUSE)
     {
       static struct SemValue dummy;
-      result = (struct SemValue *) add_item (&state->vals, &dummy);
+      result = (struct SemValue *) add_item (&pState->parsedValues, &dummy);
     }
+
   return result;
 }
 
-struct SemValue *
-get_bool_sem_value (struct ParserState *state, D_BOOL value)
+struct SemValue*
+alloc_boolean_sem_value (struct ParserState* const pState, const D_BOOL initialValue)
 {
-  struct SemValue *val = get_sem_value (state);
+  struct SemValue *val = alloc_sem_value (pState);
 
   if (val == NULL)
-    w_log_msg (state, IGNORE_BUFFER_POS, state->buffer_pos, MSG_NO_MEM);
+    w_log_msg (pState, IGNORE_BUFFER_POS, pState->bufferPos, MSG_NO_MEM);
   else
     {
-      val->val_type = VAL_C_BOOL;
-      val->val.u_bool.value = value;
+      val->val_type         = VAL_C_BOOL;
+      val->val.u_bool.value = (initialValue != 0);
     }
 
   return val;

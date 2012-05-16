@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE		/* for old GNU libc header files */
+#define _GNU_SOURCE                /* for old GNU libc header files */
 #endif
 
 #include <assert.h>
@@ -36,35 +36,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "whisper_fileio.h"
 
-#define POSIX_FAIL_RET        (~0)	/* -1 */
+#define POSIX_FAIL_RET        (~0)        /* -1 */
 
 
 WH_FILE_HND
-whc_fopen (const D_CHAR * fname, D_UINT mode)
+whc_fopen (const D_CHAR* pFileName, D_UINT mode)
 {
-  int open_mode = O_LARGEFILE;
-  const int mode_t = (S_IRUSR | S_IWUSR | S_IRGRP);
-  WH_FILE_HND result = -1;
+  int         openMode = O_LARGEFILE;
+  const int   accMode  = (S_IRUSR | S_IWUSR | S_IRGRP);
+  WH_FILE_HND result   = -1;
 
   if (mode & WHC_FILECREATE_NEW)
-    open_mode |= O_CREAT | O_EXCL;
+    openMode |= O_CREAT | O_EXCL;
   else if (mode & WHC_FILECREATE)
-    open_mode |= O_CREAT;
+    openMode |= O_CREAT;
   else
-    open_mode |= 0; /* WHC_FILEOPEN_EXISTING */
+    openMode |= 0; /* WHC_FILEOPEN_EXISTING */
 
-  open_mode |= (mode & WHC_FILEDIRECT) ? O_DIRECT : 0;
-  open_mode |= (mode & WHC_FILESYNC) ? O_SYNC : 0;
+  openMode |= (mode & WHC_FILEDIRECT) ? O_DIRECT : 0;
+  openMode |= (mode & WHC_FILESYNC) ? O_SYNC : 0;
 
   if ((mode & WHC_FILERDWR) == WHC_FILERDWR)
-    open_mode |= O_RDWR;
+    openMode |= O_RDWR;
   else
     {
-      open_mode |= (mode & WHC_FILEREAD) ? O_RDONLY : 0;
-      open_mode |= (mode & WHC_FILEWRITE) ? O_WRONLY : 0;
+      openMode |= (mode & WHC_FILEREAD) ? O_RDONLY : 0;
+      openMode |= (mode & WHC_FILEWRITE) ? O_WRONLY : 0;
     }
 
-  result =  open (fname, open_mode, mode_t);
+  result =  open (pFileName, openMode, accMode);
   return (result < 0) ? 0 : result;
 }
 
@@ -96,15 +96,16 @@ whc_fseek (WH_FILE_HND f_hnd, D_INT64 where, D_INT whence)
 }
 
 D_BOOL
-whc_fread (WH_FILE_HND f_hnd, D_UINT8 * buffer, D_UINT size)
+whc_fread (WH_FILE_HND f_hnd, D_UINT8* pBuffer, D_UINT size)
 {
-  D_BOOL result = TRUE;
-  D_UINT actual_count = 0;
+  D_BOOL result      = TRUE;
+  D_UINT actualCount = 0;
 
-  while (actual_count < size)
+  while (actualCount < size)
     {
-      D_UINT count = read (f_hnd, buffer + actual_count,
-                           size - actual_count);
+      D_UINT count = read (f_hnd,
+                           pBuffer + actualCount,
+                           size - actualCount);
       if (count == POSIX_FAIL_RET)
         {
           /* the errno is already set for this */
@@ -115,27 +116,28 @@ whc_fread (WH_FILE_HND f_hnd, D_UINT8 * buffer, D_UINT size)
         {
           /* Reading past the end of file is not considered an
            * error in POSIX, but we do! */
-          errno = ENODATA;
+          errno  = ENODATA;
           result = FALSE;
           break;
         }
-      actual_count += count;
+      actualCount += count;
     }
 
-  assert ((result == TRUE) || (actual_count < size));
-  assert ((result == FALSE) || (size == actual_count));
+  assert ((result == TRUE) || (actualCount < size));
+  assert ((result == FALSE) || (size == actualCount));
   return result;
 }
 
 D_BOOL
-whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8 * buffer, D_UINT size)
+whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8* pBuffer, D_UINT size)
 {
   D_BOOL result = TRUE;
   D_UINT actual_count = 0;
 
   while (actual_count < size)
     {
-      D_UINT count = write (f_hnd, buffer + actual_count,
+      D_UINT count = write (f_hnd,
+                            pBuffer + actual_count,
                             size - actual_count);
       if (count == POSIX_FAIL_RET)
         {
@@ -152,11 +154,11 @@ whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8 * buffer, D_UINT size)
 }
 
 D_BOOL
-whc_ftell (WH_FILE_HND f_hnd, D_UINT64 * output)
+whc_ftell (WH_FILE_HND f_hnd, D_UINT64* pOutPosition)
 {
-  *output = lseek64 (f_hnd, 0, SEEK_CUR);
+  *pOutPosition = lseek64 (f_hnd, 0, SEEK_CUR);
 
-  return (*output != POSIX_FAIL_RET);
+  return (*pOutPosition != POSIX_FAIL_RET);
 }
 
 D_BOOL
@@ -166,14 +168,14 @@ whc_fsync (WH_FILE_HND f_hnd)
 }
 
 D_BOOL
-whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64 * output)
+whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64* pOutSize)
 {
   struct stat64 buf;
 
   if (fstat64 (f_hnd, &buf) == POSIX_FAIL_RET)
     return FALSE;
 
-  *output = buf.st_size;
+  *pOutSize = buf.st_size;
   return TRUE;
 }
 
@@ -199,15 +201,15 @@ whc_fgetlasterror ()
 }
 
 D_BOOL
-whc_ferrtostrs (D_UINT64 error_code, D_CHAR * str, D_UINT str_size)
+whc_ferrtostrs (D_UINT64 error_code, D_CHAR* str, D_UINT strSize)
 {
-  return (strerror_r ((int) error_code, str, str_size) != NULL);
+  return (strerror_r ((int) error_code, str, strSize) != NULL);
 }
 
 D_BOOL
-whc_fremove (const D_CHAR * fname)
+whc_fremove (const D_CHAR* pFileName)
 {
-  if (unlink (fname) == 0)
+  if (unlink (pFileName) == 0)
     return TRUE;
   /* else */
   return FALSE;
@@ -220,8 +222,8 @@ whc_get_directory_delimiter ()
 }
 
 D_BOOL
-whc_is_path_absolute (const D_CHAR* path)
+whc_is_path_absolute (const D_CHAR* pPath)
 {
-  assert (path != NULL);
-  return ((path[0] == '/') || (path[0] == '~'));
+  assert (pPath != NULL);
+  return ((pPath[0] == '/') || (pPath[0] == '~'));
 }

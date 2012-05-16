@@ -11,13 +11,12 @@ extern int yyparse (struct ParserState *);
 
 
 D_CHAR buffer[] =
-  "LET vRecord AS RECORD;\n"
-  "LET vTable  AS TABLE;\n"
-  "LET vRow    AS ROW;\n"
-  "LET vRow1   AS ROW OF TABLE vTable;\n"
-  "LET vRecord1 AS RECORD WITH (v1 AS TEXT, v2 AS INT8, v3 AS ARRAY, v4 AS ARRAY OF UNSIGNED INT8);\n"
-  "LET vTable2, vTable3 AS TABLE WITH (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n"
-  "LET vRow3 AS ROW OF TABLE vTable3;\n";
+  "LET field1 AS FIELD;\n"
+  "LET field2 AS FIELD OF ARRAY OF DATE;\n"
+  "LET field3 AS FIELD OF INT8;\n"
+  "LET vTable AS TABLE;\n"
+  "LET vTable2, vTable3 AS TABLE OF (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n";
+
 
 extern D_BOOL is_type_spec_valid (const struct TypeSpec *spec);
 
@@ -25,43 +24,44 @@ static void
 init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
 {
   state->buffer = buffer;
-  state->strs = create_string_store ();
-  state->buffer_len = strlen (buffer);
-  init_array (&state->vals, sizeof (struct SemValue));
+  state->strings = create_string_store ();
+  state->bufferSize = strlen (buffer);
+  init_array (&state->parsedValues, sizeof (struct SemValue));
 
-  init_glbl_stmt (&state->global_stmt);
-  state->current_stmt = &state->global_stmt;
+  init_glbl_stmt (&state->globalStmt);
+  state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
 free_state (struct ParserState *state)
 {
-  release_string_store (state->strs);
-  clear_glbl_stmt (&(state->global_stmt));
-  destroy_array (&state->vals);
+  release_string_store (state->strings);
+  clear_glbl_stmt (&(state->globalStmt));
+  destroy_array (&state->parsedValues);
 
 }
 
 static D_BOOL
-check_used_vals (struct ParserState *state)
+check_used_vals (struct ParserState* pState)
 {
-  D_INT vals_count = get_array_count (&state->vals);
+  D_INT vals_count = get_array_count (&pState->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->vals, vals_count);
+      struct SemValue *val = get_item (&pState->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 static D_BOOL
-check_type_spec_fill (const struct TypeSpec *ts,
-		      const D_CHAR * fname, const D_UINT type)
+check_type_spec_fill (const struct TypeSpec* ts,
+                      const D_CHAR*          fname,
+                      const D_UINT           type)
 {
   const D_UINT8 *it = ts->data;
   D_UINT count = 0;
@@ -72,69 +72,41 @@ check_type_spec_fill (const struct TypeSpec *ts,
 
   if (fname == NULL)
     {
-      if (ts->data_len != 2)
-	{
-	  return FALSE;
-	}
+      if (ts->dataSize != 2)
+        return FALSE;
       else
-	{
-	  return TRUE;
-	}
+        return TRUE;
     }
 
-  while (count < (ts->data_len - 2))
+  while (count < (ts->dataSize - 2))
     {
       D_UINT16 temp = strlen ((D_CHAR *) it) + 1;
       if (strcmp ((D_CHAR *) it, fname) != 0)
-	{
-	  it += temp;
-	  count += temp;
-	  it += sizeof (D_UINT16);
-	  count += sizeof (D_UINT16);
-	}
+        {
+          it += temp;
+          count += temp;
+          it += sizeof (D_UINT16);
+          count += sizeof (D_UINT16);
+        }
       else
-	{
-	  D_UINT16 *ts_type = (D_UINT16 *) (it + temp);
-	  if (*ts_type == type)
-	    {
-	      return TRUE;
-	    }
-	  else
-	    {
-	      return FALSE;
-	    }
-	}
+        {
+          D_UINT16 *ts_type = (D_UINT16 *) (it + temp);
+          if (*ts_type == type)
+            {
+              return TRUE;
+            }
+          else
+            {
+              return FALSE;
+            }
+        }
     }
   return FALSE;
 }
 
 static D_BOOL
-check_row_decl (struct Statement *stmt,
-		struct DeclaredVar *var, struct DeclaredVar *table)
-{
-  if (var->extra != table)
-    {
-      return FALSE;
-    }
-  else if (var->extra != NULL)
-    {
-      D_UINT32 table_spec = ~0;
-      D_UINT8 *const buffer =
-	get_buffer_outstream (&stmt->spec.glb.type_desc);
-      struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->type_spec_pos);
-      table_spec = *((D_UINT32 *) ts->data);
-      if (table_spec != table->var_id)
-	{
-	  return FALSE;
-	}
-    }
-
-  return TRUE;
-}
-
-static D_BOOL
 check_container_field (struct Statement *stmt,
-		       struct DeclaredVar *var, D_CHAR * field, D_UINT32 type)
+                       struct DeclaredVar *var, D_CHAR * field, D_UINT32 type)
 {
   struct DeclaredVar *extra = var->extra;
   D_CHAR result = TRUE;
@@ -142,21 +114,22 @@ check_container_field (struct Statement *stmt,
 
   while (extra != NULL)
     {
-      result = FALSE;		/* changed to TRUE if everything is good */
-      if ((extra->type & T_FIELD_MASK) == 0)
-	{
-	  break;
-	}
-      if ((extra->l_label == f_len) &&
-	  (strncmp (field, extra->label, f_len) == 0))
-	{
-	  if (extra->type == (type | T_FIELD_MASK))
-	    {
-	      result = TRUE;
-	    }
+      result = FALSE;                /* changed to TRUE if everything is good */
+      if (IS_TABLE_FIELD (extra->type) == FALSE)
+        {
+          break;
+        }
+      if ((extra->labelLength == f_len) &&
+          (strncmp (field, extra->label, f_len) == 0))
+        {
+          if ( (GET_FIELD_TYPE (extra->type) == type) &&
+               IS_TABLE_FIELD (extra->type))
+            {
+              result = TRUE;
+            }
 
-	  break;
-	}
+          break;
+        }
 
       /* use the next field */
       extra = extra->extra;
@@ -165,8 +138,8 @@ check_container_field (struct Statement *stmt,
   if (result != FALSE)
     {
       D_UINT8 *const buffer =
-	get_buffer_outstream (&stmt->spec.glb.type_desc);
-      struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->type_spec_pos);
+        get_buffer_outstream (&stmt->spec.glb.typesDescs);
+      struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->typeSpecOff);
       result = check_type_spec_fill (ts, field, type);
     }
 
@@ -179,107 +152,90 @@ check_vars_decl (struct ParserState *state)
   struct DeclaredVar *decl_var = NULL;
   struct DeclaredVar *table_1 = NULL;
   struct DeclaredVar *table_2 = NULL;
-  struct DeclaredVar *table_3 = NULL;
 
-  if (state->global_stmt.type != STMT_GLOBAL ||
-      state->global_stmt.parent != NULL)
+  if (state->globalStmt.type != STMT_GLOBAL ||
+      state->globalStmt.pParentStmt != NULL)
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRecord", 7, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_RECORD_MASK ||
+  decl_var = stmt_find_declaration (&state->globalStmt, "field1", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_FIELD (decl_var->type) == FALSE) ||
+      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
+      (GET_FIELD_TYPE (decl_var->type) != T_UNDETERMINED) ||
+      decl_var->extra != NULL)
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "field2", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_FIELD (decl_var->type) == FALSE) ||
+      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
+      (IS_ARRAY (GET_FIELD_TYPE (decl_var->type)) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != T_DATE) ||
+      decl_var->extra != NULL)
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "field3", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_FIELD (decl_var->type) == FALSE) ||
+      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
+      (IS_ARRAY (GET_FIELD_TYPE (decl_var->type)) != FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != T_INT8) ||
+      decl_var->extra != NULL)
+    {
+      return FALSE;
+    }
+
+  decl_var = stmt_find_declaration (&state->globalStmt, "vTable", 6, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_TABLE (decl_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != 0) ||
       decl_var->extra != decl_var)
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vTable", 6, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
-      decl_var->extra != decl_var)
-    {
-      return FALSE;
-    }
-  else
-    {
-      table_1 = decl_var;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRow", 4, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_ROW_MASK ||
-      (decl_var->extra != NULL) ||
-      (!check_row_decl (&state->global_stmt, decl_var, NULL)))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRow1", 5, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_ROW_MASK ||
-      (decl_var->extra != table_1) ||
-      (!check_row_decl (&state->global_stmt, decl_var, table_1)))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt,
-				    "vRecord1", 8, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_RECORD_MASK ||
+  decl_var = stmt_find_declaration (&state->globalStmt, "vTable2", 7, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_TABLE (decl_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != 0) ||
       decl_var->extra == decl_var)
     {
       return FALSE;
     }
+  table_1 = decl_var;
 
-  if (!(check_container_field (&state->global_stmt, decl_var, "v1", T_TEXT) &&
-	check_container_field (&state->global_stmt, decl_var, "v2", T_INT8) &&
-	check_container_field (&state->global_stmt, decl_var, "v3",
-			       T_ARRAY_MASK | T_UNDETERMINED)
-	&& check_container_field (&state->global_stmt, decl_var, "v4",
-				  T_ARRAY_MASK | T_UINT8)))
+  decl_var = stmt_find_declaration (&state->globalStmt, "vTable3", 7, FALSE, FALSE);
+  if (decl_var == NULL ||
+      (IS_TABLE (decl_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (decl_var->type) != 0) ||
+      (decl_var->extra != table_1->extra) ||
+      (decl_var->typeSpecOff != table_1->typeSpecOff))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->global_stmt, "vTable2", 7, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
-      decl_var->extra == decl_var)
-    {
-      return FALSE;
-    }
   table_2 = decl_var;
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vTable3", 7, FALSE, FALSE);
-  if (decl_var == NULL || decl_var->type != T_TABLE_MASK ||
-      (decl_var->extra != table_2->extra) ||
-      (decl_var->type_spec_pos != table_2->type_spec_pos))
-    {
-      return FALSE;
-    }
-  table_3 = decl_var;
-  if (table_3->extra != table_2->extra)
+  if (table_2->extra != table_1->extra)
     {
       return FALSE;
     }
 
-  if (!(check_container_field (&state->global_stmt, decl_var, "v2", T_DATE) &&
-	check_container_field (&state->global_stmt, decl_var, "t2",
-			       T_DATETIME)
-	&& check_container_field (&state->global_stmt, decl_var, "t3",
-				  T_INT16)))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->global_stmt, "vRow3", 5, FALSE, FALSE);
-  if ((decl_var == NULL) || (decl_var->type != T_ROW_MASK) ||
-      (decl_var->extra != table_3) ||
-      (!check_row_decl (&state->global_stmt, decl_var, table_3)))
-
+  if (!(check_container_field (&state->globalStmt, decl_var, "v2", T_DATE) &&
+        check_container_field (&state->globalStmt, decl_var, "t2",
+                               T_DATETIME)
+        && check_container_field (&state->globalStmt, decl_var, "t3",
+                                  T_INT16)))
     {
       return FALSE;
     }
 
   return TRUE;
-
 }
 
 int
@@ -305,15 +261,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing declarations...");

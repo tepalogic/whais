@@ -30,13 +30,13 @@ get_buffer_line_from_pos (const char *buffer, D_UINT buff_pos)
   while (count < buff_pos)
     {
       if (buffer[count] == '\n')
-	{
-	  ++result;
-	}
+        {
+          ++result;
+        }
       else if (buffer[count] == 0)
-	{
-	  assert (0);
-	}
+        {
+          assert (0);
+        }
       ++count;
     }
   return result;
@@ -48,9 +48,9 @@ static char *MSG_PREFIX[] = {
 
 void
 my_postman (POSTMAN_BAG bag,
-	    D_UINT buff_pos,
-	    D_UINT msg_id,
-	    D_UINT msgType, const D_CHAR * msgFormat, va_list args)
+            D_UINT buff_pos,
+            D_UINT msg_id,
+            D_UINT msgType, const D_CHAR * msgFormat, va_list args)
 {
   const char *buffer = (const char *) bag;
   D_INT buff_line = get_buffer_line_from_pos (buffer, buff_pos);
@@ -67,8 +67,9 @@ my_postman (POSTMAN_BAG bag,
 D_CHAR test_prog_1[] = ""
   "PROCEDURE Proc_1 (v1 AS BOOL) RETURN BOOL\n "
   "DO\n "
-  "LET table_1 AS TABLE WITH (field AS UNSIGNED INT64, field AS DATE);\n "
-  "LET one_row AS ROW OF TABLE table_1;\n " "RETURN v1;\n " "ENDPROC\n ";
+  "LET table_1 AS TABLE OF (field_t AS UNSIGNED INT64, field_t AS DATE);\n "
+  "RETURN v1;\n "
+  "ENDPROC\n ";
 
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
@@ -78,8 +79,8 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 
   last_msg_code = 0xFF, last_msg_type = 0XFF;
   handler = whc_hnd_create (test_buffer,
-			    strlen (test_buffer),
-			    &my_postman, (WHC_MESSENGER_ARG) test_buffer);
+                            strlen (test_buffer),
+                            &my_postman, (WHC_MESSENGER_ARG) test_buffer);
 
   if (handler != NULL)
     {
@@ -89,15 +90,15 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
   else
     {
       if ((last_msg_code != err_expected) || (last_msg_type != err_type))
-	{
-	  test_result = FALSE;
-	}
+        {
+          test_result = FALSE;
+        }
     }
 
   if (test_get_mem_used () != 0)
     {
       printf ("Current memory usage: %u bytes! It should be 0.",
-	      test_get_mem_used ());
+              test_get_mem_used ());
       test_result = FALSE;
     }
   return test_result;

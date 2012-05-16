@@ -15,38 +15,38 @@ static void
 init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
 {
   state->buffer = buffer;
-  state->strs = create_string_store ();
-  state->buffer_len = strlen (buffer);
-  init_array (&state->vals, sizeof (struct SemValue));
+  state->strings = create_string_store ();
+  state->bufferSize = strlen (buffer);
+  init_array (&state->parsedValues, sizeof (struct SemValue));
 
-  init_glbl_stmt (&state->global_stmt);
-  state->current_stmt = &state->global_stmt;
+  init_glbl_stmt (&state->globalStmt);
+  state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
 free_state (struct ParserState *state)
 {
-  release_string_store (state->strs);
-  clear_glbl_stmt (&(state->global_stmt));
-  destroy_array (&state->vals);
+  release_string_store (state->strings);
+  clear_glbl_stmt (&(state->globalStmt));
+  destroy_array (&state->parsedValues);
 
 }
 
 static D_BOOL
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->vals);
+  D_INT vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->vals, vals_count);
+      struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 D_CHAR proc_decl_buffer[] =
@@ -83,16 +83,7 @@ D_CHAR proc_decl_buffer[] =
   "RETURN TRUE; "
   "ENDPROC "
   " "
-  "PROCEDURE ProcId3( v1 AS RECORD, "
-  "          v2 AS RECORD WITH ( var1 AS REAL, "
-  "                      var2 AS ARRAY, "
-  "                      var3 AS ARRAY OF UNSIGNED INT16)) "
-  "RETURN BOOL "
-  "DO "
-  "RETURN TRUE; "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcId4 (v1 AS TABLE WITH ( v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8), "
+  "PROCEDURE ProcId3 (v1 AS TABLE OF ( v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8), "
   "          v2 AS TABLE) "
   "RETURN BOOL "
   "DO "
@@ -147,42 +138,26 @@ D_CHAR proc_decl_buffer[] =
   "PROCEDURE ProcIdTst3() "
   "RETURN BOOL "
   "DO "
-  "LET v1 AS RECORD WITH (f1 AS INT8, f2 AS INT64); "
-  "LET v2 AS RECORD WITH (var1 AS REAL, var2 AS ARRAY, var3 AS ARRAY OF UNSIGNED INT16); "
+  "LET v1 AS TABLE OF (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
+  "LET v2 AS TABLE; "
   "RETURN ProcId3(v1, v2); "
   "ENDPROC "
   " "
   "PROCEDURE ProcIdTst3_1() "
   "RETURN BOOL "
   "DO "
-  "LET v1 AS RECORD; "
-  "LET v2 AS RECORD WITH (var1 AS RICHREAL, var2 AS ARRAY OF INT8, var3 AS ARRAY OF UNSIGNED INT32); "
-  "RETURN ProcId3(v1, v2); "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcIdTst4() "
-  "RETURN BOOL "
-  "DO "
-  "LET v1 AS TABLE WITH (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
-  "LET v2 AS TABLE; "
-  "RETURN ProcId4(v1, v2); "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcIdTst4_1() "
-  "RETURN BOOL "
-  "DO "
-  "LET v1 AS TABLE WITH (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
-  "LET v2 AS TABLE WITH (v1 AS HIRESTIME, v2 AS TEXT, v3 AS ARRAY OF BOOL); "
-  "RETURN ProcId4(v1, v2); " "ENDPROC " "\n" "";
+  "LET v1 AS TABLE OF (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
+  "LET v2 AS TABLE OF (v1 AS HIRESTIME, v2 AS TEXT, v3 AS ARRAY OF BOOL); "
+  "RETURN ProcId3(v1, v2); " "ENDPROC " "\n" "";
 
 static D_BOOL
 check_procedure (struct ParserState *state,
-		 D_CHAR * proc_name, D_CHAR * called_proc, D_UINT nargs)
+                 D_CHAR * proc_name, D_CHAR * called_proc, D_UINT nargs)
 {
   struct Statement *stmt = find_proc_decl (state, proc_name,
-					   strlen (proc_name), FALSE);
+                                           strlen (proc_name), FALSE);
   struct Statement *called_stmt = find_proc_decl (state, called_proc,
-						  strlen (called_proc), FALSE);
+                                                  strlen (called_proc), FALSE);
   D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
   D_UINT code_size = get_size_outstream (stmt_query_instrs (stmt));
   D_UINT count = 0;
@@ -197,10 +172,10 @@ check_procedure (struct ParserState *state,
     {
       const D_UINT offset = count * 2;
       if ((w_opcode_decode (code + offset) != W_LDLO8) ||
-	  (code[offset + 1] != (count + 1)))
-	{
-	  return FALSE;
-	}
+          (code[offset + 1] != (count + 1)))
+        {
+          return FALSE;
+        }
     }
   count = nargs * 2;
   if ((code[count] != W_CALL))
@@ -238,9 +213,6 @@ check_procedure_calls (struct ParserState *state)
   result &= check_procedure (state, "ProcIdTst3", "ProcId3", 2);
   result &= check_procedure (state, "ProcIdTst3_1", "ProcId3", 2);
 
-  result &= check_procedure (state, "ProcIdTst4", "ProcId4", 2);
-  result &= check_procedure (state, "ProcIdTst4_1", "ProcId4", 2);
-
   return result;
 
 }
@@ -268,15 +240,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
   printf ("Testing function calls...");
   if (check_procedure_calls (&state) == FALSE)

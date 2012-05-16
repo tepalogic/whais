@@ -33,26 +33,22 @@ static const D_CHAR *MSG_PREFIX[] = {
 };
 
 static D_UINT
-get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+get_line_from_buffer (const D_CHAR* pBuffer, D_UINT bufferOff)
 {
   D_UINT count = 0;
   D_INT result = 1;
 
-  if (buff_pos == WHC_IGNORE_BUFFER_POS)
-    {
-      return -1;
-    }
+  if (bufferOff == WHC_IGNORE_BUFFER_POS)
+    return -1;
 
-  while (count < buff_pos)
+  while (count < bufferOff)
     {
-      if (buffer[count] == '\n')
-	{
-	  ++result;
-	}
-      else if (buffer[count] == 0)
-	{
-	  assert (0);
-	}
+      if (pBuffer[count] == '\n')
+        ++result;
+      else if (pBuffer[count] == 0)
+        {
+          assert (0);
+        }
       ++count;
     }
   return result;
@@ -60,15 +56,17 @@ get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-	    D_UINT buff_pos,
-	    D_UINT msg_id,
-	    D_UINT msgType, const D_CHAR * msgFormat, va_list args)
+            D_UINT            buffOff,
+            D_UINT            msgId,
+            D_UINT            msgType,
+            const D_CHAR*     msgFormat,
+            va_list           args)
 {
-  const D_CHAR *buffer = (const D_CHAR *) data;
-  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+  const D_CHAR* pBuffer  = (const D_CHAR*)data;
+  D_INT         buffLine = get_line_from_buffer (pBuffer, buffOff);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
-  fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
+  fprintf (stderr, "%d : line %d: ", msgId, buffLine);
   vfprintf (stderr, msgFormat, args);
   fprintf (stderr, "\n");
 }

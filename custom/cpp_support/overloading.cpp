@@ -27,14 +27,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #undef new
 
 void*
-operator new (size_t size, const D_CHAR *file, D_UINT line)
+operator new (size_t size, const D_CHAR* pFile, D_UINT line)
 {
 #ifndef ENABLE_MEMORY_TRACE
-  (void)file;
+  (void)pFile;
   (void)line;
   void *ptr = custom_mem_alloc (size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, file, line);
+  void *ptr = custom_trace_mem_alloc (size, pFile, line);
 #endif
 
   if (ptr == NULL)
@@ -43,14 +43,14 @@ operator new (size_t size, const D_CHAR *file, D_UINT line)
 }
 
 void*
-operator new [] (size_t size, const D_CHAR *file, D_UINT line)
+operator new [] (size_t size, const D_CHAR* pFile, D_UINT line)
 {
 #ifndef ENABLE_MEMORY_TRACE
-  (void)file;
+  (void)pFile;
   (void)line;
   void *ptr = custom_mem_alloc (size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, file, line);
+  void *ptr = custom_trace_mem_alloc (size, pFile, line);
 #endif
 
   if (ptr == NULL)
@@ -88,7 +88,7 @@ operator new [] (size_t size)
 
 
 void
-operator delete (void *ptr)
+operator delete (void* ptr)
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
@@ -99,7 +99,7 @@ operator delete (void *ptr)
 }
 
 void
-operator delete (void *ptr, const D_CHAR*, D_UINT)
+operator delete (void* ptr, const D_CHAR*, D_UINT)
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
@@ -110,7 +110,7 @@ operator delete (void *ptr, const D_CHAR*, D_UINT)
 }
 
 void
-operator delete [] (void *ptr)
+operator delete [] (void* ptr)
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
@@ -121,7 +121,7 @@ operator delete [] (void *ptr)
 }
 
 void
-operator delete[] (void *ptr, const D_CHAR*, D_UINT )
+operator delete[] (void* ptr, const D_CHAR*, D_UINT )
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE

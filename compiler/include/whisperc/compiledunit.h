@@ -32,7 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class WICompiledUnit
 {
 public:
-  virtual ~ WICompiledUnit ()
+  WICompiledUnit ()
+  {
+  }
+
+  virtual ~WICompiledUnit ()
   {
   };
 
@@ -57,8 +61,8 @@ public:
   virtual D_UINT         GetProcNameSize (D_UINT proc_item) = 0;
   virtual const D_CHAR*  RetriveProcName (D_UINT proc_item) = 0;
   virtual D_UINT         GetProcLocalTypeIndex (D_UINT item_proc,
-			          		D_UINT item_local) = 0;
-  virtual D_BOOL        IsProcExternal (D_UINT item_proc) = 0;
+                                                D_UINT item_local) = 0;
+  virtual D_BOOL         IsProcExternal (D_UINT item_proc) = 0;
 };
 
 class WCompiledUnitException : public WException
@@ -67,11 +71,11 @@ public:
   WCompiledUnitException (const D_CHAR* pMessage,
                           const D_CHAR* pFile,
                           D_UINT32      line,
-                          D_UINT32      extra)
-    : WException (pMessage, pFile, line, extra)
+                          D_UINT32      extra) :
+    WException (pMessage, pFile, line, extra)
   {
   }
-  virtual ~ WCompiledUnitException ()
+  virtual ~WCompiledUnitException ()
   {
   };
 
@@ -79,13 +83,14 @@ public:
   virtual EXPCEPTION_TYPE GetType () { return UNIT_COMPILE_EXCEPTION; }
 };
 
-class WBufferCompiledUnit:public WICompiledUnit
+class WBufferCompiledUnit : public WICompiledUnit
 {
 public:
-  WBufferCompiledUnit (const D_UINT8 * buffer,
-		       D_UINT buffer_size,
-		       WHC_MESSENGER callback, WHC_MESSENGER_ARG context);
-  virtual ~ WBufferCompiledUnit ();
+  WBufferCompiledUnit (const D_UINT8*    pBuffer,
+                       D_UINT            bufferSize,
+                       WHC_MESSENGER     messenger,
+                       WHC_MESSENGER_ARG messengerContext);
+  virtual ~WBufferCompiledUnit ();
 
   virtual D_UINT         GetTypeInformationSize ();
   virtual const D_UINT8* RetriveTypeInformation ();
@@ -112,8 +117,8 @@ public:
   virtual D_BOOL         IsProcExternal (D_UINT item_proc);
 
 private:
-    WBufferCompiledUnit (WBufferCompiledUnit &);
-    WBufferCompiledUnit & operator= (WBufferCompiledUnit &);
+    WBufferCompiledUnit (WBufferCompiledUnit&);
+    WBufferCompiledUnit& operator= (WBufferCompiledUnit&);
 
 private:
     WHC_HANDLER m_Handler;
@@ -123,7 +128,7 @@ class WFileCompiledUnit : public WICompiledUnit
 {
 
 public:
-  explicit WFileCompiledUnit (const D_CHAR * file_name);
+  explicit WFileCompiledUnit (const D_CHAR* pFileName);
   virtual ~WFileCompiledUnit ();
 
   virtual D_UINT         GetTypeInformationSize ();
@@ -151,8 +156,6 @@ public:
   virtual D_BOOL         IsProcExternal (D_UINT item_proc);
 
 private:
-  typedef D_UINT8 *PD_UINT8;
-
   WFileCompiledUnit (WFileCompiledUnit&);
   WFileCompiledUnit& operator= (WFileCompiledUnit&);
 
@@ -172,7 +175,7 @@ private:
   std::auto_ptr<D_UINT8>  m_ConstArea;
   std::auto_ptr<D_UINT8>  m_Globals;
   std::auto_ptr<D_UINT8>  m_Procs;
-  std::auto_ptr<PD_UINT8> m_ProcData;
+  std::auto_ptr<D_UINT8*> m_ProcData;
 };
 
 #endif /* COMPILEDUNIT_H_ */

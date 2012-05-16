@@ -13,19 +13,16 @@ extern int yylex (YYSTYPE * lvalp, struct ParserState *state);
 
 const char tokens[] =
   " ArRaY   aS #comment\n  BOOL \t brEak CHARACTER  Continue DATE DATETIME   DO"
-  " elSE  \t \n \n ELSEIF  END ENDPROC \n ENDsync\t ExTerN false FOREACH HIrESTIME   IF IN"
-  " InT8\n\n\t\tINT16 \n  \t\t\tINT32 INT64 LET OF NULL real RECORD RETURN"
-  "\t\t \nRICHREAL      ROW PROCEDURE \nSynC\n\tTABLE \n TEXT THEN tRUE "
-  " UNTIL  \n###bau#bau\n#bau\n#hello\n\n#bau again\n   UNSIGNED  wHIle  WITH ";
+  " elSE  \t \n \n ELSEIF  END ENDPROC \n ENDsync\t ExTerN false fielD FOREACH HIrESTIME   IF IN"
+  " InT8\n\n\t\tINT16 \n  \t\t\tINT32 INT64 LET OF NULL real RETURN"
+  "\t\t \nRICHREAL      PROCEDURE \nSynC\n\tTABLE \n TEXT THEN tRUE "
+  " UNTIL  \n###bau#bau\n#bau\n#hello\n\n#bau again\n   UNSIGNED  wHIle";
 const int tokens_values[] =
   { ARRAY, AS, BOOL, BREAK, CHARACTER, CONTINUE, DATE, DATETIME, DO,
-  ELSE, ELSEIF, END, ENDPROC, ENDSYNC, EXTERN, W_FALSE, FOREACH, HIRESTIME,
-    IF, IN,
-  INT8,
-  INT16, INT32, INT64, LET, OF, WHISPER_NULL, REAL, RECORD, RETURN, RICHREAL,
-  ROW, PROCEDURE, SYNC, TABLE, TEXT, THEN, W_TRUE, UNTIL, UNSIGNED, WHILE,
-  WITH,
-};
+    ELSE, ELSEIF, END, ENDPROC, ENDSYNC, EXTERN, W_FALSE, FIELD, FOREACH, HIRESTIME,
+    IF, IN, INT8, INT16, INT32, INT64, LET, OF, WHISPER_NULL, REAL, RETURN, RICHREAL,
+    PROCEDURE, SYNC, TABLE, TEXT, THEN, W_TRUE, UNTIL, UNSIGNED, WHILE
+  };
 
 static int
 test_tokens (void)
@@ -36,21 +33,21 @@ test_tokens (void)
   YYSTYPE lvalp;
 
   state.buffer = tokens;
-  state.buffer_len = strlen (tokens);
+  state.bufferSize = strlen (tokens);
 
   printf ("Testing keywords...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if (tokens_values[count++] != result ||
-	  get_array_count (&(state.vals)) != 0)
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          get_array_count (&(state.parsedValues)) != 0)
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
     }
-  if ((count != (WITH - ARRAY + 1)) ||
+  if ((count != (W_TRUE - ARRAY + 1)) ||
       (count != sizeof (tokens_values) / sizeof (tokens_values[0])) ||
-      (state.buffer_pos != sizeof (tokens)))
+      (state.bufferPos != sizeof (tokens)))
     {
       printf ("FAIL\n");
       return -2;
@@ -82,22 +79,22 @@ test_buff_ids (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_ids;
-  init_array (&state.vals, sizeof (struct SemValue));
+  init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing identifiers...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != IDENTIFIER) ||
-	  (lvalp->val_type != VAL_ID) ||
-	  (lvalp->val.u_id.length != ids_vals[count].length) ||
-	  (strncmp (lvalp->val.u_id.text, ids_vals[count].text, ids_vals[count].length) != 0))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_ID) ||
+          (lvalp->val.u_id.length != ids_vals[count].length) ||
+          (strncmp (lvalp->val.u_id.text, ids_vals[count].text, ids_vals[count].length) != 0))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
-  if (count != get_array_count (&(state.vals)))
+  if (count != get_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -121,21 +118,21 @@ test_buff_integers (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_integers;
-  init_array (&state.vals, sizeof (struct SemValue));
+  init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing integers...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_INTEGER) ||
-	  (lvalp->val_type != VAL_C_INT) ||
-	  (lvalp->val.u_int.value != int_vals[count].value))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_INT) ||
+          (lvalp->val.u_int.value != int_vals[count].value))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
-  if (count != get_array_count (&(state.vals)))
+  if (count != get_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -165,22 +162,22 @@ test_buff_reals (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_reals;
-  init_array (&state.vals, sizeof (struct SemValue));
+  init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing reals...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_REAL) ||
-	  (lvalp->val_type != VAL_C_REAL) ||
-	  (lvalp->val.u_real.int_part != real_vals[count].int_part) ||
-	  (lvalp->val.u_real.frac_part != real_vals[count].frac_part))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_REAL) ||
+          (lvalp->val.u_real.integerPart != real_vals[count].integerPart) ||
+          (lvalp->val.u_real.fractionalPart != real_vals[count].fractionalPart))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
-  if (count != get_array_count (&(state.vals)))
+  if (count != get_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -207,21 +204,21 @@ test_buff_chars (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_chars;
-  init_array (&state.vals, sizeof (struct SemValue));
+  init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing chars...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_CHARACTER) ||
-	  (lvalp->val_type != VAL_C_CHAR) ||
-	  (lvalp->val.u_char.value != char_vals[count].value))
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_CHAR) ||
+          (lvalp->val.u_char.value != char_vals[count].value))
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
-  if (count != get_array_count (&(state.vals)))
+  if (count != get_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -248,22 +245,22 @@ test_buff_dates (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_dates;
-  init_array (&state.vals, sizeof (struct SemValue));
+  init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing dates...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_TIME) ||
-	  (lvalp->val_type != VAL_C_TIME) ||
-	  memcmp (&lvalp->val.u_time,
-		  &date_vals[count], sizeof date_vals[0]) != 0)
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_TIME) ||
+          memcmp (&lvalp->val.u_time,
+                  &date_vals[count], sizeof date_vals[0]) != 0)
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
-  if (count != get_array_count (&(state.vals)))
+  if (count != get_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -307,23 +304,23 @@ test_buff_strs (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_strs;
-  init_array (&state.vals, sizeof (struct SemValue));
-  state.strs = create_string_store ();
+  init_array (&state.parsedValues, sizeof (struct SemValue));
+  state.strings = create_string_store ();
   printf ("Testing string...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if ((result != WHISPER_TEXT) ||
-	  (lvalp->val_type != VAL_C_TEXT) ||
-	  memcmp (lvalp->val.u_text.text, strs_vals[count],
-		  lvalp->val.u_text.length) != 0)
-	{
-	  printf ("FAIL\n");
-	  return -1;
-	}
+          (lvalp->val_type != VAL_C_TEXT) ||
+          memcmp (lvalp->val.u_text.text, strs_vals[count],
+                  lvalp->val.u_text.length) != 0)
+        {
+          printf ("FAIL\n");
+          return -1;
+        }
       count++;
     }
 
-  if (count != get_array_count (&(state.vals)))
+  if (count != get_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;

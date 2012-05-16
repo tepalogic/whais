@@ -13,62 +13,63 @@ static void
 init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
 {
   state->buffer = buffer;
-  state->strs = create_string_store ();
-  state->buffer_len = strlen (buffer);
-  init_array (&state->vals, sizeof (struct SemValue));
+  state->strings = create_string_store ();
+  state->bufferSize = strlen (buffer);
+  init_array (&state->parsedValues, sizeof (struct SemValue));
 
-  init_glbl_stmt (&state->global_stmt);
-  state->current_stmt = &state->global_stmt;
+  init_glbl_stmt (&state->globalStmt);
+  state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
 free_state (struct ParserState *state)
 {
-  release_string_store (state->strs);
-  clear_glbl_stmt (&(state->global_stmt));
-  destroy_array (&state->vals);
+  release_string_store (state->strings);
+  clear_glbl_stmt (&(state->globalStmt));
+  destroy_array (&state->parsedValues);
 
 }
 
 static D_BOOL
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->vals);
+  D_INT vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->vals, vals_count);
+      struct SemValue *val = get_item (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
-	{
-	  return TRUE;		/* found value still in use */
-	}
+        {
+          return TRUE;                /* found value still in use */
+        }
 
     }
 
-  return FALSE;			/* no value in use */
+  return FALSE;                        /* no value in use */
 }
 
 static D_BOOL
 check_container_field (struct DeclaredVar *extra, D_CHAR * field,
-		       unsigned type)
+                       unsigned type)
 {
   D_CHAR result = FALSE;
   unsigned int f_len = strlen (field);
   while (extra != NULL)
     {
-      if ((extra->type | T_FIELD_MASK) == 0)
-	{
-	  break;
-	}
-      if ((extra->l_label == f_len) &&
-	  (strncmp (field, extra->label, f_len) == 0))
-	{
-	  if (extra->type == (type | T_FIELD_MASK))
-	    {
-	      result = TRUE;
-	    }
+      if (IS_TABLE_FIELD (extra->type) == FALSE)
+        {
+          break;
+        }
+      if ((extra->labelLength == f_len) &&
+          (strncmp (field, extra->label, f_len) == 0))
+        {
+          if ((GET_FIELD_TYPE (extra->type) == type) &&
+              IS_TABLE_FIELD (extra->type))
+            {
+              result = TRUE;
+            }
 
-	  break;
-	}
+          break;
+        }
 
       /* use the next field */
       extra = extra->extra;
@@ -81,6 +82,7 @@ D_CHAR proc_decl_buffer[] =
   "PROCEDURE ProcId1 () RETURN TEXT "
   "DO "
   "LET dummy_var1 as REAL; "
+  "LET dummy_var2 as FIELD OF INT64; "
   "RETURN NULL; "
   "ENDPROC\n\n"
   ""
@@ -88,35 +90,41 @@ D_CHAR proc_decl_buffer[] =
   "RETURN ARRAY OF TEXT "
   "DO "
   "LET dummy_var1 as TEXT; "
+  "LET dummy_var2 as FIELD; "
   "RETURN NULL; "
   "ENDPROC "
   ""
-  "PROCEDURE ProcId_3_ (Var1 as REAL, Var2 as TEXT, Var3 as ARRAY, "
-  "                  Var4 AS TABLE WITH ( f1 AS REAL, f2 as UNSIGNED INT32, "
-  "                                       f3 as ARRAY OF INT16), Var5 AS INT64) "
-  "RETURN TABLE WITH (f1 as TEXT, f2 as DATETIME) "
+  "PROCEDURE ProcId_3_ (Var1 as REAL, "
+  "                   Var2 as TEXT, Var3 as ARRAY, "
+  "                   Var4 AS TABLE OF ( f1 AS REAL, f2 as UNSIGNED INT32, "
+  "                                      f3 as ARRAY OF INT16),"
+  "                   Var5 AS INT64,"
+  "                   Var6 AS FIELD OF HIRESTIME) "
+  "RETURN TABLE OF (f1 as TEXT, f2 as DATETIME, f3 as REAL) "
   "DO "
   "LET f1 as TEXT; "
   "LET f2 as REAL; "
-  "LET v1 as ROW OF TABLE Var4; " "RETURN NULL; " "ENDPROC";
+  "LET f3 as FIELD OF ARRAY OF REAL; "
+  "RETURN NULL; "
+  "ENDPROC";
 
 static D_BOOL
 general_proc_check (struct Statement *glb_stmt,
-		    struct Statement *proc_stmt,
-		    D_CHAR * proc_name, D_INT parameters, D_INT local_vars)
+                    struct Statement *proc_stmt,
+                    D_CHAR * proc_name, D_INT parameters, D_INT local_vars)
 {
   D_UINT count = 0;
   D_UINT nlocals = 0;
   if ((proc_stmt->type != STMT_PROC) ||
-      (proc_stmt->parent != glb_stmt) ||
-      (proc_stmt->spec.proc.nlength != strlen (proc_name)) ||
-      (strncmp (proc_stmt->spec.proc.name, proc_name, proc_stmt->spec.proc.nlength) != 0))
+      (proc_stmt->pParentStmt != glb_stmt) ||
+      (proc_stmt->spec.proc.nameLength != strlen (proc_name)) ||
+      (strncmp (proc_stmt->spec.proc.name, proc_name, proc_stmt->spec.proc.nameLength) != 0))
     {
       /* what is this? */
       return FALSE;
     }
 
-  if (get_array_count (&(proc_stmt->spec.proc.param_list)) != parameters + 1)
+  if (get_array_count (&(proc_stmt->spec.proc.paramsList)) != parameters + 1)
     {
       return FALSE;
     }
@@ -124,10 +132,10 @@ general_proc_check (struct Statement *glb_stmt,
   while (count < get_array_count (&(proc_stmt->decls)))
     {
       struct DeclaredVar *var = get_item (&(proc_stmt->decls), count);
-      if ((var->type & T_FIELD_MASK) == 0)
-	{
-	  nlocals++;
-	}
+      if (IS_TABLE_FIELD (var->type) == FALSE)
+        {
+          nlocals++;
+        }
       count++;
     }
 
@@ -141,13 +149,14 @@ general_proc_check (struct Statement *glb_stmt,
 static D_BOOL
 check_procs_decl (struct ParserState *state)
 {
-  struct Statement *const glb_stmt = &(state->global_stmt);
-  struct UArray *const proc_decls = &(glb_stmt->spec.glb.proc_decls);
+  struct Statement *const glb_stmt = &(state->globalStmt);
+  struct UArray *const proc_decls = &(glb_stmt->spec.glb.procsDecls);
   struct Statement *proc = NULL;
   struct DeclaredVar *tmp_var = NULL;
   struct DeclaredVar *tmp_table = NULL;
+  D_UINT type = T_INT16;
 
-  if ((glb_stmt->parent != NULL) || (glb_stmt->type != STMT_GLOBAL))
+  if ((glb_stmt->pParentStmt != NULL) || (glb_stmt->type != STMT_GLOBAL))
     {
       /* not a global statement */
       return FALSE;
@@ -160,13 +169,13 @@ check_procs_decl (struct ParserState *state)
     }
 
   proc = get_item (proc_decls, 0);
-  if (!general_proc_check (glb_stmt, proc, "ProcId1", 0, 1))
+  if (!general_proc_check (glb_stmt, proc, "ProcId1", 0, 2))
     {
       return FALSE;
     }
   /*check return type */
-  tmp_var = get_item (&(proc->spec.proc.param_list), 0);
-  if ((tmp_var->label != NULL) || (tmp_var->l_label != 0))
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
+  if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
       return FALSE;
@@ -177,141 +186,169 @@ check_procs_decl (struct ParserState *state)
     }
   /* check local declarations */
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
-				   strlen ("dummy_var1"), FALSE, FALSE);
+                                   strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_REAL)
     {
       return FALSE;
     }
 
+  tmp_var = stmt_find_declaration (proc, "dummy_var2",
+                                   strlen ("dummy_var2"), FALSE, FALSE);
+  if ((IS_FIELD(tmp_var->type) == FALSE) ||
+       (GET_FIELD_TYPE (tmp_var->type) != T_INT64))
+    {
+      return FALSE;
+    }
+
   proc = get_item (proc_decls, 1);
-  if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 1))
+  if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 2))
     {
       return FALSE;
     }
   /*check return type */
-  tmp_var = get_item (&(proc->spec.proc.param_list), 0);
-  if ((tmp_var->label != NULL) || (tmp_var->l_label != 0))
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
+  if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
       return FALSE;
     }
-  if ((tmp_var->type != (T_ARRAY_MASK | T_TEXT)) || (tmp_var->extra != NULL))
+  if ((GET_BASIC_TYPE (tmp_var->type) != T_TEXT) ||
+      (IS_ARRAY (tmp_var->type) == FALSE) ||
+      (tmp_var->extra != NULL))
     {
       return FALSE;
     }
   /* check local declarations */
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
-				   strlen ("dummy_var1"), FALSE, FALSE);
+                                   strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
     {
       return FALSE;
     }
+
+  tmp_var = stmt_find_declaration (proc, "dummy_var2",
+                                   strlen ("dummy_var2"), FALSE, FALSE);
+  if ((IS_FIELD(tmp_var->type) == FALSE) ||
+       (GET_FIELD_TYPE (tmp_var->type) != T_UNDETERMINED))
+    {
+      return FALSE;
+    }
+
   /* check parameters */
-  tmp_var = get_item (&(proc->spec.proc.param_list), 1);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var1", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var1", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_INT8))
     {
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.param_list), 2);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var2", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 2);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var2", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_TEXT))
     {
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.param_list), 3);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var3", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 3);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_DATETIME))
     {
       return FALSE;
     }
 
   proc = get_item (proc_decls, 2);
-  if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 5, 3))
+  if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 6, 3))
     {
       return FALSE;
     }
   /*check return type */
-  tmp_var = get_item (&(proc->spec.proc.param_list), 0);
-  if ((tmp_var->label != NULL) || (tmp_var->l_label != 0))
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
+  if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
       return FALSE;
     }
-  if ((tmp_var->type != (T_TABLE_MASK)) || (tmp_var->extra == NULL))
+  if ((IS_TABLE (tmp_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (tmp_var->type) != 0) ||
+      (tmp_var->extra == NULL))
     {
       return FALSE;
     }
   if (!(check_container_field (tmp_var->extra, "f1", T_TEXT) &&
-	check_container_field (tmp_var->extra, "f2", T_DATETIME)))
+        check_container_field (tmp_var->extra, "f2", T_DATETIME)))
     {
       return FALSE;
     }
 
   /*check parameters  declarations */
-  tmp_var = get_item (&(proc->spec.proc.param_list), 1);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var1", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var1", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_REAL))
     {
       return FALSE;
     }
-  tmp_var = get_item (&(proc->spec.proc.param_list), 2);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var2", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 2);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var2", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_TEXT))
     {
       return FALSE;
     }
-  tmp_var = get_item (&(proc->spec.proc.param_list), 3);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var3", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 3);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) ||
-      (tmp_var->type != (T_ARRAY_MASK | T_UNDETERMINED)))
+      (GET_BASIC_TYPE (tmp_var->type) != T_UNDETERMINED) ||
+      (IS_ARRAY (tmp_var->type) == FALSE))
     {
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.param_list), 4);
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 4);
   tmp_table = tmp_var;
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var4", tmp_var->l_label) != 0) ||
-      (tmp_var->type != T_TABLE_MASK))
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var4", tmp_var->labelLength) != 0) ||
+      (IS_TABLE (tmp_var->type) == FALSE) ||
+      (GET_BASIC_TYPE (tmp_var->type) != 0))
     {
       return FALSE;
     }
   if (!(check_container_field (tmp_var->extra, "f1", T_REAL) &&
-	check_container_field (tmp_var->extra, "f2", T_UINT32) &&
-	check_container_field (tmp_var->extra, "f3",
-			       (T_ARRAY_MASK | T_INT16))))
+        check_container_field (tmp_var->extra, "f2", T_UINT32) &&
+        check_container_field (tmp_var->extra, "f3", MARK_ARRAY (type))))
     {
       return FALSE;
     }
-  tmp_var = get_item (&(proc->spec.proc.param_list), 5);
-  if ((tmp_var->l_label != 4) ||
-      (strncmp (tmp_var->label, "Var5", tmp_var->l_label) != 0) ||
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 5);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var5", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_INT64))
     {
       return FALSE;
     }
 
+  tmp_var = get_item (&(proc->spec.proc.paramsList), 6);
+  if ((tmp_var->labelLength != 4) ||
+      (strncmp (tmp_var->label, "Var6", tmp_var->labelLength) != 0) ||
+      (tmp_var->extra != NULL) ||
+      (IS_FIELD (tmp_var->type) == FALSE) ||
+      (GET_FIELD_TYPE (tmp_var->type) != T_HIRESTIME))
+    {
+      return FALSE;
+    }
+
+
   /* check local declarations */
   if (tmp_table !=
       stmt_find_declaration (proc, "Var4", strlen ("Var4"), FALSE, FALSE))
     {
-      return FALSE;		/* no transparency between local vars and parameters */
+      return FALSE;                /* no transparency between local vars and parameters */
     }
 
-  tmp_var = stmt_find_declaration (proc, "v1", strlen ("v1"), FALSE, FALSE);
-  if ((tmp_var->type != T_ROW_MASK) || (tmp_var->extra != tmp_table))
-    {
-      return FALSE;
-    }
   tmp_var = stmt_find_declaration (proc, "f1", strlen ("f1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
     {
@@ -319,6 +356,14 @@ check_procs_decl (struct ParserState *state)
     }
   tmp_var = stmt_find_declaration (proc, "f2", strlen ("f2"), FALSE, FALSE);
   if (tmp_var->type != T_REAL)
+    {
+      return FALSE;
+    }
+
+  tmp_var = stmt_find_declaration (proc, "f3", strlen ("f3"), FALSE, FALSE);
+  if ((IS_FIELD(tmp_var->type) == FALSE) ||
+       (IS_ARRAY (GET_FIELD_TYPE (tmp_var->type)) == FALSE) ||
+       (GET_BASIC_TYPE (tmp_var->type) != T_REAL))
     {
       return FALSE;
     }
@@ -349,15 +394,15 @@ main ()
     {
       printf ("Testing garbage vals...");
       if (check_used_vals (&state))
-	{
-	  /* those should no be here */
-	  printf ("FAILED\n");
-	  test_result = FALSE;
-	}
+        {
+          /* those should no be here */
+          printf ("FAILED\n");
+          test_result = FALSE;
+        }
       else
-	{
-	  printf ("PASSED\n");
-	}
+        {
+          printf ("PASSED\n");
+        }
     }
 
   printf ("Testing procedure declarations...");

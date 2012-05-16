@@ -37,14 +37,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <memory>
 
 
-void* operator new (size_t size, const D_CHAR *file, D_UINT line);
+void* operator new (size_t size, const D_CHAR* pFile, D_UINT line);
 void* operator new (size_t size);
-void  operator delete (void *ptr);
-void  operator delete (void *ptr, const D_CHAR *, D_UINT);
-void* operator new [] (size_t size, const D_CHAR *file, D_UINT line);
+void  operator delete (void* ptr);
+void  operator delete (void* ptr, const D_CHAR*, D_UINT);
+void* operator new [] (size_t size, const D_CHAR* pFile, D_UINT line);
 void* operator new [] (size_t size);
-void  operator delete [] (void *ptr);
-void  operator delete [] (void *ptr, const D_CHAR *, D_UINT);
+void  operator delete [] (void* ptr);
+void  operator delete [] (void* ptr, const D_CHAR*, D_UINT);
 
 template <class T> static inline void
 _placement_new (void* place, const T& value)
@@ -86,23 +86,35 @@ extern "C"
 #define mem_realloc(x, y) custom_trace_mem_realloc((x), (y), __FILE__, __LINE__)
 #define mem_free(x) custom_trace_mem_free((x), __FILE__, __LINE__)
 
-#endif				/* ENABLE_MEMORY_TRACE */
+#endif                                /* ENABLE_MEMORY_TRACE */
 
-void *custom_trace_mem_alloc (size_t size, const char *file, D_UINT line);
+void*
+custom_trace_mem_alloc (size_t      size,
+                        const char* pFile,
+                        D_UINT      line);
 
-void *custom_trace_mem_realloc (void *old_ptr,
-                                size_t new_size,
-                                const char *file, D_UINT line);
+void*
+custom_trace_mem_realloc (void*       oldPtr,
+                          size_t      newSize,
+                          const char* pFile,
+                          D_UINT      line);
 
-void custom_trace_mem_free (void *ptr, const char *file, D_UINT line);
+void custom_trace_mem_free (void*       ptr,
+                            const char* pFile,
+                            D_UINT      line);
 
-void *custom_mem_alloc (size_t size);
-void *custom_mem_realloc (void *old_ptr, size_t new_size);
-void custom_mem_free (void *ptr);
+void*
+custom_mem_alloc (size_t size);
+
+void*
+custom_mem_realloc (void* oldPtr, size_t newSize);
+
+void
+custom_mem_free (void* ptr);
 
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif				/* WHISPER_MEMORY_H */
+#endif                                /* WHISPER_MEMORY_H */

@@ -2,7 +2,7 @@
 WHISPERC - A compiler for whisper programs
 Copyright (C) 2008  Iulian Popa
 
-Address: Str Olimp nr. 6 
+Address: Str Olimp nr. 6
          Pantelimon Ilfov,
          Rommania
 Phone:   +40721939650

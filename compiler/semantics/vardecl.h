@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef VARDECL_H
 #define VARDECL_H
 
+#include "whisper.h"
+
 #include "../parser/parser.h"
 
 /* careful whit this to be the same as in
@@ -42,48 +44,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RETRIVE_ID(x) ((x) & ~(GLOBAL_DECL | EXTERN_DECL | NOTREF_DECL))
 
+#define IS_GLOBAL(x)     (((x) & GLOBAL_DECL) != 0)
+#define IS_EXTERNAL(x)   (((x) & EXTERN_DECL) != 0)
+#define IS_REFERENCED(x) (((x) & NOTREF_DECL) == 0)
+
+#define MARK_AS_GLOBAL(x)           ((x) |= GLOBAL_DECL)
+#define MARK_AS_EXTERNAL(x)         ((x) |= EXTERN_DECL)
+#define MARK_AS_NOT_REFERENCED(x)   ((x) |= NOTREF_DECL)
+#define MARK_AS_REFERENCED(x)       ((x) &= ~NOTREF_DECL)
+
 
 struct DeclaredVar
 {
-  const D_CHAR *label;		/* not necessarily null terminated */
-  struct DeclaredVar *extra;	/* only for rows, tables and records it's
-				   list to/next field entries */
-  D_UINT32 type_spec_pos;
-  D_UINT32 var_id;
-
-  D_UINT32 offset;		/* offset position */
-
-  D_UINT16 l_label;		/* label's length */
-  D_UINT16 type;		/* type of this variable */
+  const D_CHAR*       label;        /* not necessarily  null terminated */
+  struct DeclaredVar* extra;        /* only for tables, list to/next field entries */
+  D_UINT32            typeSpecOff;
+  D_UINT32            varId;
+  D_UINT32            offset;       /* offset position */
+  D_UINT16            labelLength;  /* label's length */
+  D_UINT16            type;         /* type of this variable */
 };
 
 YYSTYPE
-add_idlist (YYSTYPE list, YYSTYPE id);
+add_id_to_list (YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
-create_type_spec (struct ParserState *pState,
+create_type_spec (struct ParserState* pState,
                   D_UINT16            type);
 
 struct DeclaredVar *
 install_declaration (struct ParserState* pState,
-                     YYSTYPE             sem_var,
-                     YYSTYPE             sem_type,
+                     YYSTYPE             pVar,
+                     YYSTYPE             pType,
                      D_BOOL              paramter,
                      D_BOOL              unique);
 
 YYSTYPE
 install_list_declrs (struct ParserState* pState,
-		     YYSTYPE             sem_vars,
-		     YYSTYPE             sem_type);
+                     YYSTYPE             pVars,
+                     YYSTYPE             pType);
 
 YYSTYPE
 install_field_declaration (struct ParserState*       pState,
-			   YYSTYPE                   sem_var,
-			   YYSTYPE                   sem_type,
-			   struct DeclaredVar* const pExtra);
-D_BOOL
-process_container_decls (struct ParserState* pState,
-                         struct DeclaredVar* pVar,
-                         void*               extra);
+                           YYSTYPE                   pVar,
+                           YYSTYPE                   pType,
+                           struct DeclaredVar* const pExtra);
 
 #endif /* VARDECL_H */

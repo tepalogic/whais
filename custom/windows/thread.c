@@ -28,27 +28,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_thread.h"
 
 void
-wh_sync_init (WH_SYNC *hnd)
+wh_sync_init (WH_SYNC* pSync)
 {
-  InitializeCriticalSection (hnd);
+  InitializeCriticalSection (pSync);
 }
 
 void
-wh_sync_destroy (WH_SYNC *hnd)
+wh_sync_destroy (WH_SYNC* pSync)
 {
-  DeleteCriticalSection (hnd);
+  DeleteCriticalSection (pSync);
 }
 
 void
-wh_sync_enter (WH_SYNC *hnd)
+wh_sync_enter (WH_SYNC* pSync)
 {
-  EnterCriticalSection (hnd);
+  EnterCriticalSection (pSync);
 }
 
 void
-wh_sync_leave (WH_SYNC *hnd)
+wh_sync_leave (WH_SYNC* pSync)
 {
-  LeaveCriticalSection (hnd);
+  LeaveCriticalSection (pSync);
 }
 
 D_INT

@@ -26,60 +26,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "outstream.h"
 
-struct OutStream *
-init_outstream (struct OutStream *os, D_UINT inc_size)
+struct OutStream*
+init_outstream (struct OutStream* pOutStream, D_UINT increment)
 {
-  os->size = 0;
-  os->increment = (inc_size != 0) ? inc_size : OUTSTREAM_INCREMENT_SIZE;
-  os->output = NULL;
+  pOutStream->dataSize  = 0;
+  pOutStream->increment = (increment != 0) ? increment : OUTSTREAM_INCREMENT_SIZE;
+  pOutStream->data      = NULL;
+  pOutStream->reserved = 0;
 
-  os->allocated = 0;
-
-  return os;
-}
-
-struct OutStream *
-data_outstream (struct OutStream *os, const D_UINT8 * data, D_UINT data_size)
-{
-  assert (os->allocated >= os->size);
-
-  if (data_size + os->size > os->allocated)
-    {
-      /* output buffer needs to be enlarged */
-
-      D_UINT8 *temp;
-      D_UINT increment = data_size + os->size - os->allocated;
-      if (increment > os->increment)
-	{
-	  /* The increment defined previously is not enough to hold the new
-	   * data. Avoid this problem in future */
-	  os->increment = increment;
-	}
-      temp = mem_realloc (os->output, os->increment + os->allocated);
-      if (temp == NULL)
-	{
-	  return NULL;		/* not enough memory */
-	}
-
-      os->output = temp;
-      os->allocated += os->increment;
-    }
-
-  /* add the data at the end */
-  while (data_size-- > 0)
-    {
-      os->output[os->size++] = *data++;
-    }
-
-  return os;
+  return pOutStream;
 }
 
 void
-destroy_outstream (struct OutStream *os)
+destroy_outstream (struct OutStream* pStream)
 {
-  if (os->output != NULL)
+  if (pStream->data != NULL)
+    mem_free (pStream->data);
+
+  pStream->data = NULL;
+}
+
+struct OutStream*
+output_data (struct OutStream *pStream, const D_UINT8* pData, D_UINT dataSize)
+{
+  assert (pStream->reserved >= pStream->dataSize);
+
+  if (dataSize + pStream->dataSize > pStream->reserved)
     {
-      mem_free (os->output);
+      /* output buffer needs to be enlarged */
+
+      D_UINT8* temp;
+      D_UINT   increment = dataSize + pStream->dataSize - pStream->reserved;
+      if (increment > pStream->increment)
+        {
+          /* The increment defined previously is not enough to hold the new
+           * data. Avoid this problem in future */
+          pStream->increment = increment;
+        }
+
+      temp = mem_realloc (pStream->data, pStream->increment + pStream->reserved);
+      if (temp == NULL)
+        return NULL;                /* not enough memory */
+
+      pStream->data     = temp;
+      pStream->reserved += pStream->increment;
     }
-  os->output = NULL;
+
+  /* add the data at the end */
+  while (dataSize-- > 0)
+    pStream->data[pStream->dataSize++] = *pData++;
+
+  return pStream;
 }

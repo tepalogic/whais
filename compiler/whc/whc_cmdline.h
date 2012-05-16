@@ -31,15 +31,15 @@ class WhcCmdLineParser
 {
 public:
   WhcCmdLineParser (int argc, char **argv);
-   ~WhcCmdLineParser ();
+  ~WhcCmdLineParser ();
 
-  const char *GetSourceFile () const
+  const char* GetSourceFile () const
   {
-    return mSourceFile;
+    return m_SourceFile;
   }
-  const char *GetOutputFile () const
+  const char* GetOutputFile () const
   {
-    return mOutputFile;
+    return m_OutputFile;
   }
 
 private:
@@ -48,23 +48,28 @@ private:
   void CheckArguments ();
 
 private:
-  int mArgCount;
-  char **mArgs;
-  const char *mSourceFile;
-  const char *mOutputFile;
-  const char *mProc;
-  bool mDisplayHelp;
-  bool mAllocatedOutputFileName;
+  int         m_ArgCount;
+  char**      m_Args;
+  const char* m_SourceFile;
+  const char* m_OutputFile;
+  bool        m_ShowHelp;
+  bool        m_OutputFileOwn;
 };
 
-class WhcCmdLineException:public WException
+class WhcCmdLineException : public WException
 {
 public:
-  WhcCmdLineException (const D_CHAR *message,
-      const D_CHAR *file, D_UINT32 line, D_UINT32 extra)
-  : WException (message, file, line, extra) {}
+  WhcCmdLineException (const D_CHAR* pMessage,
+                       const D_CHAR* pFile,
+                       D_UINT32      line,
+                       D_UINT32      extra) :
+    WException (pMessage, pFile, line, extra)
+  {
+  }
 
-  virtual ~ WhcCmdLineException () {};
+  virtual ~WhcCmdLineException ()
+  {
+  };
 
   virtual WException*     Clone () { return new WhcCmdLineException (*this); }
   virtual EXPCEPTION_TYPE GetType () { return COMPILER_CMD_LINE_EXCEPTION; }

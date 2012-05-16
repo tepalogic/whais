@@ -31,48 +31,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
-#define T_ARRAY_MASK    0x0100	/* a mask to tell that variable is an array */
+#define T_ARRAY_MASK          0x0100        /* a mask to tell that variable is an array */
+#define T_FIELD_MASK          0x0200
+#define T_TABLE_MASK          0x0400        /*the variable is a table */
+#define T_TABLE_FIELD_MASK    0x0800        /*the variable is a table */
 
-#define T_RECORD_MASK   0x0200	/*the variable is a set */
-#define T_ROW_MASK      0x0400	/*the variable is a row of a table */
-#define T_TABLE_MASK    0x0800	/*the variable is a table */
-#define T_CONTAINER_MASK  (T_ROW_MASK | T_TABLE_MASK | T_RECORD_MASK)
+#define T_L_VALUE             0x1000        /* Mask applied to suggest if this is a genuine l-value */
 
-#define T_FIELD_MASK   0x1000	/* this variable was not declared directly
-				   and it is a field of a record,
-				   a raw or table */
-#define T_L_VALUE      0x2000	/* Mask applied to suggest if this is a
-				   genuine l-value */
+#define IS_ARRAY(type)          ((((type) & (T_FIELD_MASK | T_ARRAY_MASK)) == T_ARRAY_MASK))
+#define IS_FIELD(type)          (((type) & T_FIELD_MASK) != 0)
+#define IS_TABLE(type)          (((type) & T_TABLE_MASK) != 0)
+#define IS_TABLE_FIELD(type)    (((type) & T_TABLE_FIELD_MASK) != 0)
+#define IS_L_VALUE(type)        (((type) & T_L_VALUE) != 0)
+
+#define MARK_ARRAY(type)        ((type) |= T_ARRAY_MASK)
+#define MARK_FIELD(type)        ((type) |= T_FIELD_MASK)
+#define MARK_TABLE(type)        ((type) |= T_TABLE_MASK)
+#define MARK_TABLE_FIELD(type)  ((type) |= T_TABLE_FIELD_MASK)
+#define MARK_L_VALUE(type)      ((type) |= T_L_VALUE)
+
+#define GET_TYPE(type)          ((type) & ~(T_L_VALUE | T_TABLE_FIELD_MASK))
+#define GET_FIELD_TYPE(type)    ((type) & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD_MASK))
+#define GET_BASIC_TYPE(type)    ((type) & 0xFF)
+
 
 typedef const void* WHC_HANDLER;
 typedef const void* WHC_PROC_HANDLER;
 typedef const void* WHC_MESSENGER_ARG;
-typedef void (*WHC_MESSENGER) (WHC_MESSENGER_ARG data,
-			       unsigned int buff_pos,
-			       unsigned int msg_id,
-			       unsigned int msg_type,
-			       const char *msg_format, va_list args);
+typedef void        (*WHC_MESSENGER) (WHC_MESSENGER_ARG data,
+                                      unsigned int      buffPos,
+                                      unsigned int      msgId,
+                                      unsigned int      msgType,
+                                      const char*       pMessage,
+                                      va_list           args);
 
 #define WHC_IGNORE_BUFFER_POS      (D_UINT)(-1)
 
 typedef struct
 {
-  const char *name;		/* global variable name */
-  unsigned int name_len;	/* length of the name */
-  const unsigned char *type;	/* describe the type of the variable */
-  unsigned char defined;	/* 0 for externally declared global variables */
+  const char*          m_Name;       /* global variable name */
+  unsigned int         m_NameLength; /* length of the name */
+  const unsigned char* m_Type;       /* describe the type of the variable */
+  unsigned char        m_Defined;    /* 0 for externally declared global variables */
 } WHC_GLBVAR_DESC;
 
 typedef struct
 {
-  const char *name;
-  unsigned int name_len;
-  unsigned int param_count;
-  unsigned int locals_count;
-  unsigned int syncs_count;
-  unsigned int instrs_size;
-  const unsigned char *instrs;
-  unsigned char defined;
+  const char*          m_Name;
+  unsigned int         m_NameLength;
+  unsigned int         m_ParamsCount;
+  unsigned int         m_LocalsCount;
+  unsigned int         m_SyncsCount;
+  unsigned int         m_CodeSize;
+  const unsigned char* m_Code;
+  unsigned char        m_Defined;
 } WHC_PROC_DESC;
 
 #ifdef __cplusplus
@@ -81,9 +93,10 @@ extern "C"
 #endif
 
 WHC_HANDLER
-whc_hnd_create (const char *buffer,
-                unsigned buffer_len,
-                WHC_MESSENGER msg_func, WHC_MESSENGER_ARG data);
+whc_hnd_create (const char*       pBuffer,
+                unsigned          bufferSize,
+                WHC_MESSENGER     messenger,
+                WHC_MESSENGER_ARG messengerContext);
 
 void
 whc_hnd_destroy (WHC_HANDLER hnd);
@@ -92,41 +105,53 @@ unsigned int
 whc_get_globals_count (WHC_HANDLER hnd);
 
 unsigned int
-whc_get_global (WHC_HANDLER hnd, unsigned int glb_id, WHC_GLBVAR_DESC * output);
+whc_get_global (WHC_HANDLER      hnd,
+                unsigned int     globalId,
+                WHC_GLBVAR_DESC* pOutDescript);
 
 unsigned int
 whc_get_procs_count (WHC_HANDLER hnd);
 
 unsigned int
-whc_get_proc (WHC_HANDLER hnd, unsigned int proc_id, WHC_PROC_DESC * output);
+whc_get_proc (WHC_HANDLER  hnd,
+            unsigned int   procId,
+            WHC_PROC_DESC* pOutDesc);
 
 WHC_PROC_HANDLER
-whc_get_proc_hnd (WHC_HANDLER hnd, unsigned int proc_id);
+whc_get_proc_hnd (WHC_HANDLER  hnd,
+                  unsigned int procId);
 
 void
-whc_release_proc_hnd (WHC_HANDLER hnd, WHC_PROC_HANDLER h_proc);
+whc_release_proc_hnd (WHC_HANDLER      hnd,
+                      WHC_PROC_HANDLER hProc);
 
 const unsigned char*
-whc_get_proc_rettype (WHC_HANDLER hnd, WHC_PROC_HANDLER h_proc);
+whc_get_proc_rettype (WHC_HANDLER      hnd,
+                      WHC_PROC_HANDLER hProc);
 
-const unsigned char *
-whc_get_local_type (WHC_HANDLER hnd, WHC_PROC_HANDLER h_proc,
-                    unsigned int local);
+const unsigned char*
+whc_get_local_type (WHC_HANDLER      hnd,
+                    WHC_PROC_HANDLER hProc,
+                    unsigned int     localId);
 
 unsigned int
-whc_get_typedec_pool (WHC_HANDLER hnd, const unsigned char **types);
+whc_get_typedec_pool (WHC_HANDLER           hnd,
+                      const unsigned char** pOutPTypes);
 
 unsigned int
-whc_get_const_area (WHC_HANDLER hnd, const unsigned char **consts);
+whc_get_const_area (WHC_HANDLER           hnd,
+                    const unsigned char** pOutPConsts);
 
 void
-whc_get_libver (unsigned int *major, unsigned int *minor);
+whc_get_libver (unsigned int* pOutMajor,
+                unsigned int* pOutMinor);
 
 void
-whc_get_lang_ver (unsigned int *major, unsigned int *minor);
+whc_get_lang_ver (unsigned int* pOutMajor,
+                  unsigned int* pOutMinor);
 
 #ifdef __cplusplus
-}				/* extern "C" */
+}       /* extern "C" */
 #endif
 
-#endif				/* WHISPERC_H */
+#endif  /* WHISPERC_H */

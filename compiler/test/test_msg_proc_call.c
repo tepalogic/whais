@@ -30,13 +30,13 @@ get_buffer_line_from_pos (const char *buffer, D_UINT buff_pos)
   while (count < buff_pos)
     {
       if (buffer[count] == '\n')
-	{
-	  ++result;
-	}
+        {
+          ++result;
+        }
       else if (buffer[count] == 0)
-	{
-	  assert (0);
-	}
+        {
+          assert (0);
+        }
       ++count;
     }
   return result;
@@ -48,9 +48,9 @@ static char *MSG_PREFIX[] = {
 
 void
 my_postman (POSTMAN_BAG bag,
-	    D_UINT buff_pos,
-	    D_UINT msg_id,
-	    D_UINT msgType, const D_CHAR * msgFormat, va_list args)
+            D_UINT buff_pos,
+            D_UINT msg_id,
+            D_UINT msgType, const D_CHAR * msgFormat, va_list args)
 {
   const char *buffer = (const char *) bag;
   D_INT buff_line = get_buffer_line_from_pos (buffer, buff_pos);
@@ -70,80 +70,44 @@ my_postman (POSTMAN_BAG bag,
 }
 
 D_CHAR test_prog_1[] = ""
-  "LET table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16); \n"
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
-  " \n"
-  "PROCEDURE Proc_1 ( row_arg AS ROW OF TABLE table_1) RETURN INT16 \n"
-  "DO \n"
-  "RETURN row_arg.f2; \n"
-  "ENDPROC \n"
+  "LET table_2 AS TABLE OF ( f1 as DATE); \n"
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( one_row ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
+  "Proc_1 ( 0 ); \n"
+  "RETURN table_2[10, f1]; \n"
+  "ENDPROC \n";
 
 D_CHAR test_prog_2[] = ""
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
+  "LET table_1 AS TABLE OF ( f1 as DATE, f2 as INT16); \n"
+  " \n"
+  "PROCEDURE Proc_1 ( proc_arg AS INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN proc_arg; \n"
+  "ENDPROC \n"
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( one_row ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
+  "LET proc_arg  AS INT16; \n"
+  "LET some_arg AS TEXT; \n"
+  "Proc_1 ( proc_arg, some_arg ); \n"
+  "RETURN table_1[0, f1]; \n"
+  "ENDPROC \n";
 
 D_CHAR test_prog_3[] = ""
-  "LET table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16); \n"
+  "LET table_1 AS TABLE OF ( f1 as DATE, f2 as INT16); \n"
+  "LET table_2 AS TABLE OF ( f1 as DATE); \n"
   " \n"
-  "PROCEDURE Proc_1 ( row_arg AS ROW OF TABLE table_1) RETURN INT16 \n"
+  "PROCEDURE Proc_1 ( proc_arg AS INT16) RETURN INT16 \n"
   "DO \n"
-  "RETURN row_arg.f2; \n"
+  "RETURN proc_arg; \n"
   "ENDPROC \n"
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "LET one_row  AS ROW OF TABLE table_1; \n"
-  "LET some_arg AS TEXT; \n"
-  "Proc_1 ( one_row, some_arg ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
+  "Proc_1 ( ); \n" "RETURN '2010/01/01'; \n" "ENDPROC \n";
 
 D_CHAR test_prog_4[] = ""
-  "LET table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16); \n"
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
-  " \n"
-  "PROCEDURE Proc_1 ( row_arg AS ROW OF TABLE table_1) RETURN INT16 \n"
-  "DO \n"
-  "RETURN row_arg.f2; \n"
-  "ENDPROC \n"
-  " \n"
-  "PROCEDURE Proc_1_2 () RETURN DATE \n"
-  "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
-
-D_CHAR test_prog_5[] = ""
-  "PROCEDURE Proc_1 ( table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16)) RETURN INT16 \n"
-  "DO \n"
-  "RETURN table_1[0].f2; \n"
-  "ENDPROC \n"
-  " \n"
-  "PROCEDURE Proc_1_2 () RETURN DATE \n"
-  "DO \n"
-  "LET one_rec AS RECORD WITH (f1 AS DATE); \n"
-  "Proc_1 ( one_rec); \n" "RETURN one_rec.f1; \n" "ENDPROC \n";
-
-D_CHAR test_prog_6[] = ""
-  "LET table_2 AS TABLE WITH ( f1 as DATE); \n"
-  " \n"
-  "PROCEDURE Proc_1 ( table_1 AS TABLE WITH ( f1 as DATE, f2 as INT16)) RETURN INT16 \n"
-  "DO \n"
-  "RETURN table_1[3].f2; \n"
-  "ENDPROC \n"
-  " \n"
-  "PROCEDURE Proc_1_2 () RETURN DATE \n"
-  "DO \n"
-  "LET one_row  AS ROW OF TABLE table_2; \n"
-  "Proc_1 ( one_row ); \n" "RETURN one_row.f1; \n" "ENDPROC \n";
-
-D_CHAR test_prog_7[] = ""
   "PROCEDURE Proc_1 ( v1 as DATE, v2 as INT16) RETURN INT16 \n"
   "DO \n"
   "RETURN v2; \n"
@@ -154,6 +118,29 @@ D_CHAR test_prog_7[] = ""
   "LET some_var as DATE;"
   "Proc_1 ( some_var, TRUE ); \n" "RETURN some_var; \n" "ENDPROC \n";
 
+D_CHAR test_prog_5[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF DATE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as FIELD OF ARRAY OF DATE;"
+  "Proc_1 ( some_var, 10 ); \n" "RETURN some_var; \n" "ENDPROC \n";
+
+D_CHAR test_prog_6[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF DATE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as FIELD;"
+  "Proc_1 ( some_var, 10 ); \n" "RETURN some_var; \n" "ENDPROC \n";
+
+
 D_BOOL
 test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 {
@@ -162,8 +149,8 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 
   last_msg_code = 0xFF, last_msg_type = 0XFF;
   handler = whc_hnd_create (test_buffer,
-			    strlen (test_buffer),
-			    &my_postman, (WHC_MESSENGER_ARG) test_buffer);
+                            strlen (test_buffer),
+                            &my_postman, (WHC_MESSENGER_ARG) test_buffer);
 
   if (handler != NULL)
     {
@@ -173,15 +160,15 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
   else
     {
       if ((last_msg_code != err_expected) || (last_msg_type != err_type))
-	{
-	  test_result = FALSE;
-	}
+        {
+          test_result = FALSE;
+        }
     }
 
   if (test_get_mem_used () != 0)
     {
       printf ("Current memory usage: %u bytes! It should be 0.",
-	      test_get_mem_used ());
+              test_get_mem_used ());
       test_result = FALSE;
     }
   return test_result;
@@ -193,30 +180,29 @@ main ()
   D_BOOL test_result = TRUE;
 
   printf ("Testing for received error messages...\n");
-  test_result = test_for_error (test_prog_1, MSG_NO_FIELD, MSG_ERROR_EVENT);
   test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_2, MSG_NO_PROC,
-						     MSG_ERROR_EVENT);
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_1, MSG_NO_PROC,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_2,
+                                                     MSG_PROC_MORE_ARGS,
+                                                     MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
-						     MSG_PROC_MORE_ARGS,
-						     MSG_ERROR_EVENT);
+                                                     MSG_PROC_LESS_ARGS,
+                                                     MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
-						     MSG_PROC_LESS_ARGS,
-						     MSG_ERROR_EVENT);
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
-						     MSG_CONTAINER_NA,
-						     MSG_ERROR_EVENT);
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
-						     MSG_CONTAINER_NA,
-						     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
-						     MSG_PROC_ARG_NA,
-						     MSG_ERROR_EVENT);
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");

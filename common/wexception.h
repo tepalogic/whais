@@ -45,46 +45,49 @@ enum EXPCEPTION_TYPE
 class WException
 {
 public:
-  WException (const D_CHAR *message,
-      const D_CHAR *file,
-      D_UINT32 line,
-      D_UINT32 extra)
-  : mErrorMessage (message),
-    mFile (file),
-    mLine (line),
-    mExtra (extra)
+  WException (const D_CHAR* pMessage,
+              const D_CHAR* pFile,
+              D_UINT32      line,
+              D_UINT32      extra) :
+    m_ErrorMessage (pMessage),
+    m_File (pFile),
+    m_Line (line),
+    m_Extra (extra)
   {
   }
-  virtual ~WException () {};
+
+  virtual ~WException ()
+  {
+  };
 
   D_UINT32 GetExtra ()
   {
-    return mExtra;
+    return m_Extra;
   };
 
   const D_CHAR* GetDescription ()
   {
-    return mErrorMessage;
+    return m_ErrorMessage;
   }
 
   const D_CHAR* GetFile ()
   {
-    return mFile;
+    return m_File;
   }
 
   D_UINT32 GetLine ()
   {
-    return mLine;
+    return m_Line;
   }
 
   virtual WException*     Clone () = 0;
   virtual EXPCEPTION_TYPE GetType () = 0;
 
 private:
-  const D_CHAR* mErrorMessage;
-  const D_CHAR* mFile;
-  D_UINT32 mLine;
-  D_UINT32 mExtra;
+  const D_CHAR* m_ErrorMessage;
+  const D_CHAR* m_File;
+  D_UINT32      m_Line;
+  D_UINT32      m_Extra;
 };
 
 // Macro used to expand the CMD line

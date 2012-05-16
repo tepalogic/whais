@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define CONTROL_BYTE    0xAC    /* all correct */
 
-extern W_ALLOCATED_MEMORY *gpListHead;
+extern W_ALLOCATED_MEMORY* gpListHead;
 
 void *
 custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)

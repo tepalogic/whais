@@ -182,13 +182,11 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 
       for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
         {
-          D_INT currIndexSize = PSValInterp::Size(
-                                                      rvFields[schIndex].m_FieldType,
-                                                      rvFields[schIndex].isArray);
+          D_INT currIndexSize = PSValInterp::Size (rvFields[schIndex].m_FieldType,
+                                                   rvFields[schIndex].isArray);
 
-          D_INT currReqAlign = PSValInterp::Alignment(
-                                                         rvFields[schIndex].m_FieldType,
-                                                         rvFields[schIndex].isArray);
+          D_INT currReqAlign = PSValInterp::Alignment (rvFields[schIndex].m_FieldType,
+                                                       rvFields[schIndex].isArray);
 
           D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
                                       (currReqAlign - currentAlignment) : 0;
@@ -772,5 +770,4 @@ TemporalTable::VariableFieldsStore ()
 
   return *m_apVariableFields.get ();
 }
-
 
