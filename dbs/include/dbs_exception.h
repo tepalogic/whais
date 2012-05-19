@@ -75,7 +75,7 @@ public:
   };
 
   virtual WException*     Clone () { return new DBSException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return DBS_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return DBS_EXCEPTION; }
 };
 
 #endif /* DBS_EXCEPTION_H_ */

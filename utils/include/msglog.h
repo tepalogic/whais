@@ -55,9 +55,10 @@ LOGMSG (D_UINT  buff_pos,
         va_list args);
 
 /* utils for LOGMSG arguments */
-D_CHAR *copy_text_truncate (D_CHAR*        dest,
-                            const D_CHAR*  src,
-                            D_UINT         dest_max,
-                            D_UINT         src_len);
+D_CHAR*
+copy_text_truncate (D_CHAR*       dest,
+                   const D_CHAR*  src,
+                   D_UINT         destMax,
+                   D_UINT         srcLength);
 
 #endif /*MSGLOG_H_ */

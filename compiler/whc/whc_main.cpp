@@ -40,9 +40,9 @@ using namespace std;
 D_UINT8 whc_header[WHC_TABLE_SIZE] = { 0, };
 
 static void
-fill_globals_table (WICompiledUnit&   rUnit,
-                    struct OutStream* pSymbolsStream,
-                    struct OutStream* pGlblsTableStream)
+fill_globals_table (WICompiledUnit&      rUnit,
+                    struct OutputStream* pSymbolsStream,
+                    struct OutputStream* pGlblsTableStream)
 {
   const D_UINT globals_count = rUnit.GetGlobalsCount ();
 
@@ -68,10 +68,10 @@ fill_globals_table (WICompiledUnit&   rUnit,
 }
 
 static void
-process_procedures_table (WICompiledUnit& rUnit,
-                          WFile&          rDestFile,
-                          OutStream*      pSymbolsStream,
-                          OutStream*      pProcTableStream)
+process_procedures_table (WICompiledUnit&    rUnit,
+                          WFile&             rDestFile,
+                          OutputStream*      pSymbolsStream,
+                          OutputStream*      pProcTableStream)
 {
   const D_UINT proc_count = rUnit.GetProceduresCount ();
 
@@ -132,14 +132,14 @@ main (int argc, char **argv)
   D_UINT            langVerMaj;
   D_UINT            langVerMin;
   auto_ptr<D_UINT8> buffer (NULL);
-  OutStream         symbolsStream;
-  OutStream         glbsTableStream;
-  OutStream         procsTableStream;
+  OutputStream      symbolsStream;
+  OutputStream      glbsTableStream;
+  OutputStream      procsTableStream;
 
   whc_get_lang_ver (&langVerMaj, &langVerMin);
-  init_outstream (&symbolsStream, OUTSTREAM_INCREMENT_SIZE);
-  init_outstream (&glbsTableStream, OUTSTREAM_INCREMENT_SIZE);
-  init_outstream (&procsTableStream, OUTSTREAM_INCREMENT_SIZE);
+  init_outstream (OUTSTREAM_INCREMENT_SIZE, &symbolsStream);
+  init_outstream (OUTSTREAM_INCREMENT_SIZE, &glbsTableStream);
+  init_outstream (OUTSTREAM_INCREMENT_SIZE, &procsTableStream);
 
   try
   {

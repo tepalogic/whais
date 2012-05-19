@@ -76,7 +76,7 @@ public:
   };
 
   virtual WException*     Clone () { return new WodCmdLineException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return DUMP_CMD_LINE_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return DUMP_CMD_LINE_EXCEPTION; }
 };
 
 #endif /* WOD_CMDLINE_H_ */

@@ -59,26 +59,25 @@ LOGMSG (D_UINT  buffPos,
   __postman (__postman_bag, buffPos, msgCode, msgType, pMessage, args);
 }
 
-D_CHAR *
+D_CHAR*
 copy_text_truncate (D_CHAR*       dest,
                     const D_CHAR* src,
                     D_UINT        destMax,
-                    D_UINT        srcLen)
+                    D_UINT        srcLength)
 {
+  assert (destMax > 4);  /* make sure we can hold the '...' string */
 
-  assert (destMax > 4);        /* make sure we can hold the '...' string */
-
-  if (srcLen > destMax)
+  if (srcLength > destMax)
     {
-      srcLen = destMax - 4;
-      strncpy (dest, src, srcLen);
-      dest[srcLen] = 0;
+      srcLength = destMax - 4;
+      strncpy (dest, src, srcLength);
+      dest[srcLength] = 0;
       strcat (dest, "...");
     }
   else
     {
-      strncpy (dest, src, srcLen);
-      dest[srcLen] = 0;
+      strncpy (dest, src, srcLength);
+      dest[srcLength] = 0;
     }
 
   return dest;

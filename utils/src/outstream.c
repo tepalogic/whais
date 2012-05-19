@@ -26,19 +26,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "outstream.h"
 
-struct OutStream*
-init_outstream (struct OutStream* pOutStream, D_UINT increment)
+struct OutputStream*
+init_outstream (const D_UINT increment, struct OutputStream* pOutStream)
 {
   pOutStream->dataSize  = 0;
   pOutStream->increment = (increment != 0) ? increment : OUTSTREAM_INCREMENT_SIZE;
   pOutStream->data      = NULL;
-  pOutStream->reserved = 0;
+  pOutStream->reserved  = 0;
 
   return pOutStream;
 }
 
 void
-destroy_outstream (struct OutStream* pStream)
+destroy_outstream (struct OutputStream* pStream)
 {
   if (pStream->data != NULL)
     mem_free (pStream->data);
@@ -46,8 +46,8 @@ destroy_outstream (struct OutStream* pStream)
   pStream->data = NULL;
 }
 
-struct OutStream*
-output_data (struct OutStream *pStream, const D_UINT8* pData, D_UINT dataSize)
+struct OutputStream*
+output_data (struct OutputStream *pStream, const D_UINT8* pData, D_UINT dataSize)
 {
   assert (pStream->reserved >= pStream->dataSize);
 

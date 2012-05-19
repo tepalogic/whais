@@ -66,7 +66,7 @@ WFile::Write (const D_UINT8* pBuffer, D_UINT size)
 }
 
 void
-WFile::Seek (D_INT64 where, D_INT whence)
+WFile::Seek (const D_INT64 where, const D_INT whence)
 {
   if (!whc_fseek (m_Handle, where, whence))
     throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
@@ -100,7 +100,7 @@ D_UINT64 WFile::GetSize () const
 }
 
 void
-WFile::SetSize (D_UINT64 size)
+WFile::SetSize (const D_UINT64 size)
 {
   if (!whc_fsetsize (m_Handle, size))
     throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));

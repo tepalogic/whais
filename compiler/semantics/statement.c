@@ -36,8 +36,8 @@ init_glbl_stmt (struct Statement* pStmt)
   memset (pStmt, 0, sizeof (*pStmt));
   pStmt->type = STMT_GLOBAL;
 
-  init_outstream (&(pStmt->spec.glb.typesDescs), 0);
-  init_outstream (&(pStmt->spec.glb.constsArea), 0);
+  init_outstream (0, &(pStmt->spec.glb.typesDescs));
+  init_outstream (0, &(pStmt->spec.glb.constsArea));
   init_array (&pStmt->spec.glb.procsDecls, sizeof (struct Statement));
   init_array (&pStmt->decls, sizeof (struct DeclaredVar));
 
@@ -86,7 +86,7 @@ init_proc_stmt (struct Statement* pParentStmt,
   init_array (stmt_query_branch_stack (pOutStmt), sizeof (struct Branch));
   init_array (stmt_query_loop_stack (pOutStmt), sizeof (struct Loop));
 
-  init_outstream (stmt_query_instrs (pOutStmt), 0);
+  init_outstream (0, stmt_query_instrs (pOutStmt));
 
   /* reserve space for return type */
   if (add_item (&(pOutStmt->spec.proc.paramsList), &retType) == NULL)
@@ -202,7 +202,7 @@ stmt_add_declaration (struct Statement*   pStmt,
                       struct DeclaredVar* pVar,
                       D_BOOL              parameter)
 {
-  struct OutStream *pOutStream = NULL;
+  struct OutputStream *pOutStream = NULL;
 
   if (IS_TABLE_FIELD (pVar->type))
       pVar->varId = ~0; /* Set the id to a generic value! */
@@ -380,8 +380,8 @@ type_spec_cmp (const struct TypeSpec* const pSpec_1,
 }
 
 static D_UINT
-type_spec_fill_table_field (struct OutStream* const   pStream,
-                            const struct DeclaredVar* pFieldList)
+type_spec_fill_table_field (struct OutputStream* const pStream,
+                            const struct DeclaredVar*  pFieldList)
 {
   D_UINT result = 0;
 
@@ -410,7 +410,7 @@ type_spec_fill_table_field (struct OutStream* const   pStream,
 }
 
 static D_UINT
-type_spec_fill_table (struct OutStream* const        pStream,
+type_spec_fill_table (struct OutputStream* const     pStream,
                       const struct DeclaredVar*const pVar)
 {
   D_UINT result  = 0;
@@ -444,7 +444,7 @@ type_spec_fill_table (struct OutStream* const        pStream,
 }
 
 static D_UINT
-type_spec_fill_array (struct OutStream* const         pStream,
+type_spec_fill_array (struct OutputStream* const      pStream,
                       const struct DeclaredVar* const pVar)
 {
   D_UINT          result = 0;
@@ -470,7 +470,7 @@ type_spec_fill_array (struct OutStream* const         pStream,
 }
 
 static D_UINT
-type_spec_fill_field (struct OutStream* const         pStream,
+type_spec_fill_field (struct OutputStream* const      pStream,
                       const struct DeclaredVar* const pVar)
 {
   D_UINT          result = 0;
@@ -496,7 +496,7 @@ type_spec_fill_field (struct OutStream* const         pStream,
 }
 
 static D_UINT
-type_spec_fill_basic (struct OutStream* const         pStream,
+type_spec_fill_basic (struct OutputStream* const      pStream,
                       const struct DeclaredVar* const pVar)
 {
   D_UINT          result = 0;
@@ -520,12 +520,12 @@ type_spec_fill_basic (struct OutStream* const         pStream,
 }
 
 D_UINT
-type_spec_fill (struct OutStream* const         pStream,
+type_spec_fill (struct OutputStream* const      pStream,
                 const struct DeclaredVar* const pVar)
 {
 
   D_UINT           result = 0;
-  struct OutStream temporalStream;
+  struct OutputStream temporalStream;
 
   if (IS_TABLE_FIELD (pVar->type))
     {
@@ -534,7 +534,7 @@ type_spec_fill (struct OutStream* const         pStream,
       return 0;
     }
 
-  init_outstream (&temporalStream, OUTSTREAM_INCREMENT_SIZE);
+  init_outstream (OUTSTREAM_INCREMENT_SIZE, &temporalStream);
 
   if ( (IS_FIELD (pVar->type) || IS_ARRAY (pVar->type) || IS_TABLE (pVar->type)) == FALSE)
     result = type_spec_fill_basic (&temporalStream, pVar);
@@ -581,9 +581,9 @@ add_text_const (struct Statement* const pStmt,
                 const D_UINT8* const    pText,
                 const D_UINT            testSize)
 {
-  struct OutStream *pStream  = (pStmt->type == STMT_GLOBAL) ?
-                                 &pStmt->spec.glb.constsArea :
-                                 &pStmt->pParentStmt->spec.glb.constsArea;
+  struct OutputStream *pStream  = (pStmt->type == STMT_GLOBAL) ?
+                                   &pStmt->spec.glb.constsArea :
+                                   &pStmt->pParentStmt->spec.glb.constsArea;
   const D_UINT8* pStreamBuff = get_buffer_outstream (pStream);
   const D_UINT   streamSize  = get_size_outstream (pStream);
   D_INT          iterator;

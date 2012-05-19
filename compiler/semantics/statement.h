@@ -47,26 +47,26 @@ struct StatementGlobalSymbol
 
 struct _GlobalStatmentSpec
 {
-  struct OutStream typesDescs;  /* describes the variable types */
-  struct OutStream constsArea;
-  struct UArray    procsDecls;  /* for GLOBAL statement contains the list
+  struct OutputStream typesDescs;  /* describes the variable types */
+  struct OutputStream constsArea;
+  struct UArray       procsDecls;  /* for GLOBAL statement contains the list
                                    of procedures */
-  D_UINT32         procsCount;
+  D_UINT32            procsCount;
 };
 
 struct _ProcStatementSpec
 {
-  const D_CHAR*    name;         /* name of the procedure */
-  D_UINT           nameLength;   /* length of the name */
-  struct UArray    paramsList;   /* Used only for procedures
+  const D_CHAR*      name;         /* name of the procedure */
+  D_UINT             nameLength;   /* length of the name */
+  struct UArray      paramsList;   /* Used only for procedures
                                     0 - special case for return type
                                     1 - first parameter, 2 second parameter */
-  struct OutStream code;         /* the execution path for procedure
+  struct OutputStream code;         /* the execution path for procedure
                                     statements */
-  struct UArray    branchStack;  /* keep track of conditional branches */
-  struct UArray    loopStack;    /* keep the track of looping statements */
-  D_UINT32         procId;       /* ID of the procedure in the import table */
-  D_UINT16         syncTracker;
+  struct UArray       branchStack;  /* keep track of conditional branches */
+  struct UArray       loopStack;    /* keep the track of looping statements */
+  D_UINT32            procId;       /* ID of the procedure in the import table */
+  D_UINT16            syncTracker;
 };
 
 struct Statement
@@ -116,7 +116,7 @@ D_UINT32
 stmt_get_import_id (const struct Statement* const pProc);
 
 /* some inline functions to access statement members */
-static INLINE struct OutStream*
+static INLINE struct OutputStream*
 stmt_query_instrs (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
@@ -157,7 +157,7 @@ type_spec_cmp (const struct TypeSpec* const pSpec_1,
                const struct TypeSpec* const pSpec_2);
 
 D_UINT
-type_spec_fill (struct OutStream* const         pOutStream,
+type_spec_fill (struct OutputStream* const      pOutStream,
                 const struct DeclaredVar* const pVar);
 
 D_INT

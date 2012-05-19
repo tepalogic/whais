@@ -146,7 +146,7 @@ public:
   }
 
   virtual WException*     Clone () { return new WFileContainerException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return FILE_CONTAINER_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return FILE_CONTAINER_EXCEPTION; }
 
   enum
   {

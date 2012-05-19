@@ -72,7 +72,7 @@ public:
   };
 
   virtual WException*     Clone () { return new WhcCmdLineException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return COMPILER_CMD_LINE_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return COMPILER_CMD_LINE_EXCEPTION; }
 };
 
 // Declaration of error codes

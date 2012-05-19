@@ -329,9 +329,9 @@ translate_exp_inc (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType)
 {
 
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  enum W_OPCODE           opcode      = W_NA;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  enum W_OPCODE              opcode      = W_NA;
 
   assert (pStmt->type == STMT_PROC);
 
@@ -366,9 +366,9 @@ static struct ExpResultType
 translate_exp_dec (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  enum W_OPCODE           opcode      = W_NA;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  enum W_OPCODE              opcode      = W_NA;
 
   assert (pStmt->type == STMT_PROC);
 
@@ -403,9 +403,9 @@ static struct ExpResultType
 translate_exp_not (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType)
 {
-  struct Statement* const pStmt        = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  enum W_OPCODE           opcode       = W_NA;
+  struct Statement* const    pStmt        = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
+  enum W_OPCODE              opcode       = W_NA;
 
   assert (pStmt->type == STMT_PROC);
 
@@ -435,10 +435,10 @@ translate_exp_add (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((GET_TYPE (firstType->type) < T_END_OF_TYPES) &&
       (GET_TYPE (secondType->type) < T_END_OF_TYPES))
@@ -503,12 +503,12 @@ translate_exp_sub (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
@@ -566,12 +566,12 @@ translate_exp_mul (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = mul_op[ftype][stype];
@@ -628,12 +628,12 @@ translate_exp_div (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
@@ -691,12 +691,12 @@ translate_exp_mod (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = mod_op[ftype][stype];
@@ -730,12 +730,12 @@ translate_exp_less (struct ParserState* const         pState,
                     const struct ExpResultType* const firstType,
                     const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = less_op[ftype][stype];
@@ -772,12 +772,12 @@ translate_exp_less_equal (struct ParserState* const         pState,
                           const struct ExpResultType* const firstType,
                           const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = less_eq_op[ftype][stype];
@@ -814,12 +814,12 @@ translate_exp_grater (struct ParserState* const         pState,
                       const struct ExpResultType* const firstType,
                       const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = grater_op[ftype][stype];
@@ -856,12 +856,12 @@ translate_exp_grater_equal (struct ParserState* const         pState,
                             const struct ExpResultType* const firstType,
                             const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = grater_eq_op[ftype][stype];
@@ -898,12 +898,12 @@ translate_exp_equals (struct ParserState* const         pState,
                       const struct ExpResultType* const firstType,
                       const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = equals_op[ftype][stype];
@@ -940,12 +940,12 @@ translate_exp_not_equals (struct ParserState* const         pState,
                           const struct ExpResultType* const firstType,
                           const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = not_equals_op[ftype][stype];
@@ -982,12 +982,12 @@ translate_exp_or (struct ParserState* const         pState,
                   const struct ExpResultType* const firstType,
                   const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = or_op[ftype][stype];
@@ -1031,12 +1031,12 @@ translate_exp_and (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = and_op[ftype][stype];
@@ -1078,12 +1078,12 @@ translate_exp_xor (struct ParserState* const        pState,
                    const struct ExpResultType* const firstType,
                    const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = xor_op[ftype][stype];
@@ -1193,12 +1193,12 @@ translate_exp_store (struct ParserState* const         pState,
                      const struct ExpResultType* const firstType,
                      const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if (IS_L_VALUE (firstType->type) == FALSE)
     {
@@ -1275,12 +1275,12 @@ translate_exp_index (struct ParserState* const         pState,
                      const struct ExpResultType* const firstType,
                      const struct ExpResultType* const secondType)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            ftype       = GET_TYPE (firstType->type);
-  const D_UINT            stype       = GET_TYPE (secondType->type);
-  enum W_OPCODE           opcode      = W_NA;
-  struct ExpResultType    result;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
 
   if ((IS_FIELD (ftype) == FALSE) &&
       (IS_ARRAY (ftype) == FALSE) &&
@@ -1454,7 +1454,7 @@ translate_exp_leaf (struct ParserState* const pState,
                     struct Statement*         pStmt,
                     struct SemValue* const    expression)
 {
-  struct OutStream* const    pCodeStream = stmt_query_instrs (pStmt);
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const struct ExpResultType r_unk       = { NULL, T_UNKNOWN };
   const struct ExpResultType r_undet     = { NULL, T_UNDETERMINED };
   struct ExpResultType       result      = gResultUnk;
@@ -1709,13 +1709,13 @@ translate_exp_call (struct ParserState* const   pState,
                     struct Statement* const     pStmt,
                     struct SemExpression* const callExp)
 {
-  struct OutStream* const   pCodeStream = stmt_query_instrs (pStmt);
-  const struct Statement*   pProc       = NULL;
-  const struct DeclaredVar* pProcVar    = NULL;
-  struct SemValue*          pExpArg     = NULL;
-  D_UINT                    argCount    = 0;
-  struct ExpResultType      result;
-  D_CHAR                    temp[128];
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const struct Statement*    pProc       = NULL;
+  const struct DeclaredVar*  pProcVar    = NULL;
+  struct SemValue*           pExpArg     = NULL;
+  D_UINT                     argCount    = 0;
+  struct ExpResultType       result;
+  D_CHAR                     temp[128];
 
   assert (callExp->pFirstOp->val_type == VAL_ID);
   assert ((callExp->pSecondOp == NULL) ||
@@ -1925,7 +1925,7 @@ translate_exp_tabval (struct ParserState* const   pState,
                       struct SemExpression* const pCallExp)
 {
   const struct DeclaredVar*   pVarField  = NULL;
-  struct OutStream* const     pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
+  struct OutputStream* const  pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
   struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
   struct SemExpression* const pSecondExp = &pCallExp->pSecondOp->val.u_exp;
   struct SemId* const         pId        = &pCallExp->pThirdOp->val.u_id;
@@ -2018,7 +2018,7 @@ translate_exp_field (struct ParserState* const   pState,
                      struct SemExpression* const pCallExp)
 {
   const struct DeclaredVar*   pVarField  = NULL;
-  struct OutStream* const     pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
+  struct OutputStream* const  pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
   struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
   struct SemId* const         pId        = &pCallExp->pSecondOp->val.u_id;
   struct ExpResultType        tableType;
@@ -2090,12 +2090,12 @@ translate_exp_tree (struct ParserState* const   pState,
                     struct Statement* const     pStmt,
                     struct SemExpression* const pTreeHead)
 {
-  struct OutStream* const pCodeStream        = stmt_query_instrs (pState->pCurrentStmt);
-  D_BOOL                  needsJmpCorrection = FALSE;
-  D_INT                   jmpPosition;
-  D_INT                   jmpDataPos;
-  struct ExpResultType    firstType;
-  struct ExpResultType    secondType;
+  struct OutputStream* const pCodeStream        = stmt_query_instrs (pState->pCurrentStmt);
+  D_BOOL                     needsJmpCorrection = FALSE;
+  D_INT                      jmpPosition;
+  D_INT                      jmpDataPos;
+  struct ExpResultType       firstType;
+  struct ExpResultType       secondType;
 
   assert (pState->pCurrentStmt->type == STMT_PROC);
 
@@ -2195,8 +2195,8 @@ translate_exp_tree (struct ParserState* const   pState,
 YYSTYPE
 translate_exp (struct ParserState* pState, YYSTYPE exp)
 {
-  struct Statement* const pCurrStmt   = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pCurrStmt);
+  struct Statement* const    pCurrStmt   = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pCurrStmt);
 
   assert (exp->val_type = VAL_EXP_LINK);
   assert (pCurrStmt->type == STMT_PROC);
@@ -2215,7 +2215,7 @@ YYSTYPE
 translate_return_exp (struct ParserState* pState, YYSTYPE exp)
 {
   struct Statement* const         pCurrStmt   = pState->pCurrentStmt;
-  struct OutStream* const         pCodeStream = stmt_query_instrs (pCurrStmt);
+  struct OutputStream* const      pCodeStream = stmt_query_instrs (pCurrStmt);
   const struct DeclaredVar* const pRetVar     = stmt_get_param (pCurrStmt, 0);
 
   struct ExpResultType retType = gResultUnk;

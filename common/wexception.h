@@ -81,7 +81,7 @@ public:
   }
 
   virtual WException*     Clone () = 0;
-  virtual EXPCEPTION_TYPE GetType () = 0;
+  virtual EXPCEPTION_TYPE Type () = 0;
 
 private:
   const D_CHAR* m_ErrorMessage;

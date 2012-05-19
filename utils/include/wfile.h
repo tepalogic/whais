@@ -33,8 +33,8 @@ public:
   explicit WFileException (const D_CHAR* pMessage,
                            const D_CHAR* pFile,
                            D_UINT32      line,
-                           D_UINT32      extra) :
-    WException (pMessage, pFile, line, extra)
+                           D_UINT32      extra)
+    : WException (pMessage, pFile, line, extra)
   {
   }
   virtual ~WFileException ()
@@ -42,7 +42,7 @@ public:
   };
 
   virtual WException*     Clone () { return new WFileException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return FILE_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return FILE_EXCEPTION; }
 };
 
 class WFile
@@ -54,14 +54,15 @@ public:
 
   void     Read (D_UINT8* pBuffer, D_UINT size);
   void     Write (const D_UINT8* pBuffer, D_UINT size);
-  void     Seek (D_INT64 where, D_INT whence);
+  void     Seek (const D_INT64 where, const D_INT whence);
   D_UINT64 Tell ();
   void     Sync ();
   D_UINT64 GetSize () const;
-  void     SetSize (D_UINT64 size);
+  void     SetSize (const D_UINT64 size);
   void     Close ();
 
   WFile&   operator= (const WFile&);
+
 private:
   WH_FILE_HND m_Handle;
 };

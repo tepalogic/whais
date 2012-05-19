@@ -231,10 +231,10 @@ unsigned int
 whc_get_typedec_pool (WHC_HANDLER hnd, const unsigned char** pOutPTypes)
 {
 
-  struct ParserState* const     pState       = (struct ParserState*) hnd;
-  const struct Statement* const pGlbStm      = &pState->globalStmt;
-  const struct OutStream* const pTypeDescs   = &pGlbStm->spec.glb.typesDescs;
-  const unsigned                typeDescSize = get_size_outstream (pTypeDescs);
+  struct ParserState* const        pState       = (struct ParserState*) hnd;
+  const struct Statement* const    pGlbStm      = &pState->globalStmt;
+  const struct OutputStream* const pTypeDescs   = &pGlbStm->spec.glb.typesDescs;
+  const unsigned                   typeDescSize = get_size_outstream (pTypeDescs);
 
   assert (pGlbStm->type == STMT_GLOBAL);
 
@@ -246,10 +246,10 @@ whc_get_typedec_pool (WHC_HANDLER hnd, const unsigned char** pOutPTypes)
 unsigned int
 whc_get_const_area (WHC_HANDLER hnd, const unsigned char** pOutPConsts)
 {
-  struct ParserState* const     pState     = (struct ParserState*) hnd;
-  const struct Statement* const pGlbStm    = &pState->globalStmt;
-  const struct OutStream* const pConsts    = &pGlbStm->spec.glb.constsArea;
-  const unsigned                constsSize = get_size_outstream (pConsts);
+  struct ParserState* const        pState     = (struct ParserState*) hnd;
+  const struct Statement* const    pGlbStm    = &pState->globalStmt;
+  const struct OutputStream* const pConsts    = &pGlbStm->spec.glb.constsArea;
+  const unsigned                   constsSize = get_size_outstream (pConsts);
 
   assert (pGlbStm->type == STMT_GLOBAL);
 

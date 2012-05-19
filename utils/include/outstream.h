@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define OUTSTREAM_INCREMENT_SIZE    512
 
-struct OutStream
+struct OutputStream
 {
   D_UINT8* data;
   D_UINT   dataSize;
@@ -42,35 +42,35 @@ extern "C"
 {
 #endif
 
-struct OutStream*
-init_outstream (struct OutStream* pStream, D_UINT increment);
+struct OutputStream*
+init_outstream (const D_UINT increment, struct OutputStream* pOutStream);
 
 void
-destroy_outstream (struct OutStream* pStream);
+destroy_outstream (struct OutputStream* pStream);
 
-struct OutStream*
-output_data (struct OutStream* pStream, const D_UINT8* pData, D_UINT dataSize);
+struct OutputStream*
+output_data (struct OutputStream* pStream, const D_UINT8* pData, D_UINT dataSize);
 
-INLINE static struct OutStream*
-output_uint8 (struct OutStream* pStream, D_UINT8 value)
+INLINE static struct OutputStream*
+output_uint8 (struct OutputStream* pStream, D_UINT8 value)
 {
   return output_data (pStream, &value, sizeof value);
 }
 
-INLINE static struct OutStream*
-output_uint16 (struct OutStream* pStream, D_UINT16 value)
+INLINE static struct OutputStream*
+output_uint16 (struct OutputStream* pStream, D_UINT16 value)
 {
   return output_data (pStream, (D_UINT8*)&value, sizeof value);
 }
 
-INLINE static struct OutStream*
-output_uint32 (struct OutStream* pStream, D_UINT32 value)
+INLINE static struct OutputStream*
+output_uint32 (struct OutputStream* pStream, D_UINT32 value)
 {
   return output_data (pStream, (D_UINT8*)&value, sizeof value);
 }
 
-INLINE static struct OutStream*
-output_uint64 (struct OutStream* pStream, D_UINT64 value)
+INLINE static struct OutputStream*
+output_uint64 (struct OutputStream* pStream, D_UINT64 value)
 {
   return output_data (pStream, (D_UINT8*)&value, sizeof value);
 }

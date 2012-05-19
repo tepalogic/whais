@@ -61,7 +61,7 @@ public:
   };
 
   virtual WException*     Clone () { return new WDumpException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return DUMP_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return DUMP_EXCEPTION; }
 };
 
 typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8* pInArgs,

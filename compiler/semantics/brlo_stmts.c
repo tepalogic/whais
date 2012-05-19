@@ -36,10 +36,10 @@ begin_if_stmt (struct ParserState* const pState,
                YYSTYPE                   expression,
                enum BRANCH_TYPE          branchType)
 {
-  struct Statement* const pStmt        = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  struct UArray* const    pBranchStack = stmt_query_branch_stack (pStmt);
-  struct Branch           branch;
+  struct Statement* const    pStmt        = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
+  struct UArray* const       pBranchStack = stmt_query_branch_stack (pStmt);
+  struct Branch              branch;
 
   if ( ! translate_bool_exp (pState, expression))
     {
@@ -72,12 +72,12 @@ begin_if_stmt (struct ParserState* const pState,
 void
 begin_else_stmt (struct ParserState* const pState)
 {
-  struct Statement* const pStmt        = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  struct UArray* const    pBranchStack = stmt_query_branch_stack (pStmt);
-  D_UINT                  branchId     = get_array_count (pBranchStack) - 1;
-  struct Branch*          pBranchIt    = get_item (pBranchStack, branchId);
-  D_INT32                 jumpOffest   = 0;
+  struct Statement* const    pStmt        = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
+  struct UArray* const       pBranchStack = stmt_query_branch_stack (pStmt);
+  D_UINT                     branchId     = get_array_count (pBranchStack) - 1;
+  struct Branch*             pBranchIt    = get_item (pBranchStack, branchId);
+  D_INT32                    jumpOffest   = 0;
 
   /* last if or elseif statement needs to know where to exit */
   if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
@@ -109,11 +109,11 @@ begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
 void
 finalize_if_stmt (struct ParserState* const pState)
 {
-  struct Statement* const pStmt        = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  struct UArray* const    pBranchStack = stmt_query_branch_stack (pStmt);
-  D_UINT                  branchId     = get_array_count (pBranchStack);
-  const struct Branch*    pBranchIt    = NULL;
+  struct Statement* const    pStmt        = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
+  struct UArray* const       pBranchStack = stmt_query_branch_stack (pStmt);
+  D_UINT                     branchId     = get_array_count (pBranchStack);
+  const struct Branch*       pBranchIt    = NULL;
 
   do
     {
@@ -151,10 +151,10 @@ finalize_if_stmt (struct ParserState* const pState)
 void
 begin_while_stmt (struct ParserState* const pState, YYSTYPE exp)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  struct UArray* const    pLoopStack  = stmt_query_loop_stack (pStmt);
-  struct Loop         loop;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct UArray* const       pLoopStack  = stmt_query_loop_stack (pStmt);
+  struct Loop                loop;
 
   loop.type     = LE_WHILE_BEGIN;
   loop.startPos = get_size_outstream (pCodeStream);
@@ -186,15 +186,15 @@ begin_while_stmt (struct ParserState* const pState, YYSTYPE exp)
 void
 finalize_while_stmt (struct ParserState* const pState)
 {
-  struct Statement* const pStmt            = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream      = stmt_query_instrs (pStmt);
-  D_UINT8* const          pCode            = get_buffer_outstream (pCodeStream);
-  struct UArray* const    pLoopStack       = stmt_query_loop_stack (pStmt);
-  D_UINT                  loopId           = get_array_count (pLoopStack);
-  const struct Loop*      pLoopIt          = NULL;
-  D_INT32                 endWhileLoop     = get_size_outstream (pCodeStream);
-  D_INT32                 endWhileStmtPos  = 0;
-  D_INT32                 offset           = 0;
+  struct Statement* const    pStmt           = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream     = stmt_query_instrs (pStmt);
+  D_UINT8* const             pCode           = get_buffer_outstream (pCodeStream);
+  struct UArray* const       pLoopStack      = stmt_query_loop_stack (pStmt);
+  D_UINT                     loopId          = get_array_count (pLoopStack);
+  const struct Loop*         pLoopIt         = NULL;
+  D_INT32                    endWhileLoop    = get_size_outstream (pCodeStream);
+  D_INT32                    endWhileStmtPos = 0;
+  D_INT32                    offset          = 0;
 
   if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
       (output_uint32 (pCodeStream, 0) == NULL))
@@ -238,10 +238,10 @@ finalize_while_stmt (struct ParserState* const pState)
 void
 begin_until_stmt (struct ParserState* const pState)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  struct UArray* const    pLoopStack  = stmt_query_loop_stack (pStmt);
-  struct Loop             loop;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct UArray* const       pLoopStack  = stmt_query_loop_stack (pStmt);
+  struct Loop                loop;
 
   loop.type     = LE_UNTIL_BEGIN;
   loop.startPos = get_size_outstream (pCodeStream);
@@ -254,15 +254,15 @@ begin_until_stmt (struct ParserState* const pState)
 void
 finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp)
 {
-  struct Statement* const pStmt           = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream     = stmt_query_instrs (pStmt);
-  D_UINT8 *const          pCode           = get_buffer_outstream (pCodeStream);
-  struct UArray* const    pLoopStack      = stmt_query_loop_stack (pStmt);
-  D_UINT                  loopId          = get_array_count (pLoopStack);
-  struct Loop*            pLoopIt         = NULL;
-  D_INT32                 untilExpPos     = get_size_outstream (pCodeStream);
-  D_INT32                 endUntilStmtPos = 0;
-  D_INT32                 offset          = 0;
+  struct Statement* const    pStmt           = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream     = stmt_query_instrs (pStmt);
+  D_UINT8 *const             pCode           = get_buffer_outstream (pCodeStream);
+  struct UArray* const       pLoopStack      = stmt_query_loop_stack (pStmt);
+  D_UINT                     loopId          = get_array_count (pLoopStack);
+  struct Loop*               pLoopIt         = NULL;
+  D_INT32                    untilExpPos     = get_size_outstream (pCodeStream);
+  D_INT32                    endUntilStmtPos = 0;
+  D_INT32                    offset          = 0;
 
   if ( ! translate_bool_exp (pState, exp))
     {
@@ -313,10 +313,10 @@ finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp)
 void
 handle_break_stmt (struct ParserState* const pState)
 {
-  struct Statement* const pStmt      = pState->pCurrentStmt;
-  struct OutStream* const pCode      = stmt_query_instrs (pStmt);
-  struct UArray* const    pLoopStack = stmt_query_loop_stack (pStmt);
-  struct Loop             loop;
+  struct Statement* const    pStmt      = pState->pCurrentStmt;
+  struct OutputStream* const pCode      = stmt_query_instrs (pStmt);
+  struct UArray* const       pLoopStack = stmt_query_loop_stack (pStmt);
+  struct Loop                loop;
 
   if (get_array_count (pLoopStack) == 0)
     {
@@ -346,12 +346,12 @@ handle_break_stmt (struct ParserState* const pState)
 void
 handle_continue_stmt (struct ParserState* const pState)
 {
-  struct Statement* const pStmt       = pState->pCurrentStmt;
-  struct OutStream* const pCodeStream = stmt_query_instrs (pStmt);
-  struct UArray* const    pLoopStack  = stmt_query_loop_stack (pStmt);
-  D_UINT                  loopId      = get_array_count (pLoopStack);
-  const struct Loop*      pLoopIt     = NULL;
-  struct Loop             loop;
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct UArray* const       pLoopStack  = stmt_query_loop_stack (pStmt);
+  D_UINT                     loopId      = get_array_count (pLoopStack);
+  const struct Loop*         pLoopIt     = NULL;
+  struct Loop                loop;
 
   while (loopId != 0)
     {
@@ -404,9 +404,9 @@ handle_continue_stmt (struct ParserState* const pState)
 void
 begin_sync_stmt (struct ParserState* const pState)
 {
-  struct Statement *const pStmt       = pState->pCurrentStmt;
-  struct OutStream *const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            stmtsCount  = pStmt->spec.proc.syncTracker / 2;
+  struct Statement *const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream *const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               stmtsCount  = pStmt->spec.proc.syncTracker / 2;
 
   if (pStmt->spec.proc.syncTracker & 1)
     {
@@ -435,9 +435,9 @@ begin_sync_stmt (struct ParserState* const pState)
 void
 finalize_sync_stmt (struct ParserState* const pState)
 {
-  struct Statement *const pStmt       = pState->pCurrentStmt;
-  struct OutStream *const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT            stmtsCount  = pStmt->spec.proc.syncTracker / 2;
+  struct Statement *const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream *const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               stmtsCount  = pStmt->spec.proc.syncTracker / 2;
 
   assert (pStmt->spec.proc.syncTracker & 1);
 

@@ -58,7 +58,7 @@ static D_BOOL
 check_declared_var (struct Statement *stm,
                     struct DeclaredVar *var, D_UINT type)
 {
-  struct OutStream *os = &stm->spec.glb.typesDescs;
+  struct OutputStream *os = &stm->spec.glb.typesDescs;
   if ((var == NULL) ||                /* var not found */
       (var->type != type) ||        /* invalid type */
       ((var->varId & GLOBAL_DECL)) == 0)

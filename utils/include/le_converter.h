@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 static INLINE void
-to_le_int16 (D_UINT8* pValue)
+to_le_int16 (D_UINT8* pInOutValue)
 {
   D_UINT8        temp;
   const D_UINT16 le_machine = 0x1;
@@ -39,13 +39,13 @@ to_le_int16 (D_UINT8* pValue)
   if (*((D_UINT8 *) & le_machine))
     return;     /* no need for conversion */
 
-  temp      = pValue[0];
-  pValue[0] = pValue[1];
-  pValue[1] = temp;
+  temp           = pInOutValue[0];
+  pInOutValue[0] = pInOutValue[1];
+  pInOutValue[1] = temp;
 }
 
 static INLINE void
-to_le_int32 (D_UINT8* pValue)
+to_le_int32 (D_UINT8* pInOutValue)
 {
   D_UINT8        temp;
   const D_UINT16 le_machine = 0x1;
@@ -53,16 +53,16 @@ to_le_int32 (D_UINT8* pValue)
   if (*((D_UINT8 *) & le_machine))
     return;     /* no need for conversion */
 
-  temp      = pValue[0];
-  pValue[0] = pValue[3];
-  pValue[3] = temp;
-  temp      = pValue[1];
-  pValue[1] = pValue[2];
-  pValue[2] = temp;
+  temp           = pInOutValue[0];
+  pInOutValue[0] = pInOutValue[3];
+  pInOutValue[3] = temp;
+  temp           = pInOutValue[1];
+  pInOutValue[1] = pInOutValue[2];
+  pInOutValue[2] = temp;
 }
 
 static INLINE void
-to_le_int64 (D_UINT8* pValue)
+to_le_int64 (D_UINT8* pInOutValue)
 {
   D_UINT8        temp;
   const D_UINT16 le_machine = 0x1;
@@ -71,18 +71,18 @@ to_le_int64 (D_UINT8* pValue)
   if (*((D_UINT8 *) & le_machine))
     return;     /* no need for conversion */
 
-  temp      = pValue[0];
-  pValue[0] = pValue[7];
-  pValue[7] = temp;
-  temp      = pValue[1];
-  pValue[1] = pValue[6];
-  pValue[6] = temp;
-  temp      = pValue[2];
-  pValue[2] = pValue[5];
-  pValue[5] = temp;
-  temp      = pValue[3];
-  pValue[3] = pValue[4];
-  pValue[4] = temp;
+  temp           = pInOutValue[0];
+  pInOutValue[0] = pInOutValue[7];
+  pInOutValue[7] = temp;
+  temp           = pInOutValue[1];
+  pInOutValue[1] = pInOutValue[6];
+  pInOutValue[6] = temp;
+  temp           = pInOutValue[2];
+  pInOutValue[2] = pInOutValue[5];
+  pInOutValue[5] = temp;
+  temp           = pInOutValue[3];
+  pInOutValue[3] = pInOutValue[4];
+  pInOutValue[4] = temp;
 }
 
 static INLINE D_UINT16

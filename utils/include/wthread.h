@@ -123,7 +123,7 @@ public:
   virtual ~WThreadException () {};
 
   virtual WException*     Clone () { return new WThreadException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return THREAD_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return THREAD_EXCEPTION; }
 
   enum
   {

@@ -60,13 +60,16 @@ init_array_ex (struct UArray* pArray,
 void*
 add_item (struct UArray* pArray, const void* data);
 
-void *
+void*
 get_item (const struct UArray* pArray, D_UINT item);
 
-D_UINT get_array_count (const struct UArray* pArray);
+D_UINT
+get_array_count (const struct UArray* pArray);
 
-void set_array_count (struct UArray* pArray, D_UINT new_count);
+void
+set_array_count (struct UArray* pArray, D_UINT new_count);
 
-void destroy_array (struct UArray* pArray);
+void
+destroy_array (struct UArray* pArray);
 
 #endif /* UARRAY_H */

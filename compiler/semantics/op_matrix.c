@@ -372,8 +372,8 @@ const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 
 static const D_UINT16 SECOND_BYTE_MARK = 0x80;
 
-struct OutStream*
-w_opcode_encode (struct OutStream* pStream, const enum W_OPCODE opcode)
+struct OutputStream*
+w_opcode_encode (struct OutputStream* pStream, const enum W_OPCODE opcode)
 {
   D_UINT16 tempOpcode = opcode;
 

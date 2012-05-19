@@ -80,7 +80,7 @@ public:
   };
 
   virtual WException*     Clone () { return new WCompiledUnitException (*this); }
-  virtual EXPCEPTION_TYPE GetType () { return UNIT_COMPILE_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return UNIT_COMPILE_EXCEPTION; }
 };
 
 class WBufferCompiledUnit : public WICompiledUnit
