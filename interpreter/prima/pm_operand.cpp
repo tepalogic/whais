@@ -1388,7 +1388,9 @@ TableOperand::~TableOperand ()
     delete m_pTable;
 }
 
+///////////////////GlobalValue//////////////////////////////////////
 
+WSynchronizer GlobalValue::sm_Sync;
 
 //////////////////GlobalOperand/////////////////////////////////////
 
@@ -1618,5 +1620,4 @@ GlobalOperand::GetRowOp ()
 {
   return m_Value.GetRowOp ();
 }
-
 

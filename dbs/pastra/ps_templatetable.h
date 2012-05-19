@@ -282,7 +282,6 @@ private:
   virtual void         StoreNode (I_BTreeNode* const pNode);
 
 protected:
-  //TODO:: Template Methods
   virtual void                 Flush ();
   virtual void                 MakeHeaderPersistent () = 0;
   virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex) = 0;

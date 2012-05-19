@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <string.h>
+#include <iostream>
 
 #include "wthread.h"
 
@@ -463,5 +464,5 @@ CommonSession::~CommonSession ()
 void
 CommonSession::LogMessage (const LOG_LEVEL level, std::string& message)
 {
-  //TODO: Needs to be implemented
+  std::cerr << "Level: " << level << ": " << message << std::endl;
 }

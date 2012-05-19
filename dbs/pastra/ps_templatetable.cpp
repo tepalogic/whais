@@ -438,7 +438,6 @@ PrototypeTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
     {
       assert (MainTableContainer ().Size () % GetRawNodeSize () == 0);
 
-      //TODO: Rename the GetContainerSize method to Size ()
       nodeIndex = MainTableContainer ().Size () / GetRawNodeSize ();
     }
 

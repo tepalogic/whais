@@ -25,6 +25,8 @@
 #ifndef PM_OPERAND_H_
 #define PM_OPERAND_H_
 
+#include "utils/include/wthread.h"
+
 #include "interpreter.h"
 #include "operands.h"
 
@@ -63,17 +65,14 @@ public:
   template <class DBS_T>
   void GetValue (DBS_T& outValue)
   {
-    //TODO: Make sure this is multi thread safe
+    WSynchronizerRAII dummy (sm_Sync);
     m_Operand.GetOperand ().GetValue (outValue);
   }
 
   template <class DBS_T>
   void SetValue (const DBS_T& value)
   {
-    //TODO: Make sure this is multi thread safe:
-    //      Check the DBS_X opertor= to be thread safe by seting null condition LAST
-    //      Check the conversion operator by setting the null FIRST
-    //      Array and text strategys are not safe!
+    WSynchronizerRAII dummy(sm_Sync);
     m_Operand.GetOperand ().SetValue (value);
   }
 
@@ -87,8 +86,9 @@ public:
     return m_Operand.GetOperand ().GetRowOp ();
   }
 
-protected:
+private:
   GlobalOperandStorage m_Operand;
+  static WSynchronizer sm_Sync;
 };
 
 class GlobalOperand : public I_Operand

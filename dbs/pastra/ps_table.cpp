@@ -552,11 +552,8 @@ PersistentTable::InitIndexedFields ()
 void
 PersistentTable::MakeHeaderPersistent ()
 {
-
   if (m_Removed)
     return ; //We were removed. We were removed.
-
-  //TODO: You need to set the units correct after you add the part with container
 
   D_UINT8 aTableHdr[PS_HEADER_SIZE];
 
