@@ -92,7 +92,7 @@ FieldIndexNodeManager::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKe
   if (parent != NIL_NODE)
     {
       BTreeNodeHandler parentNode (RetrieveNode (parent));
-      parentNode->SetChildNode (parentKey, nodeIndex);
+      parentNode->SetKeyNode (parentKey, nodeIndex);
 
       assert (parentNode->IsLeaf() == false);
     }

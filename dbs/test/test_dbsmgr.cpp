@@ -15,7 +15,7 @@
 #include "../include/dbs_exception.h"
 
 
-static const DBSFieldDescriptor field_descs[] =
+static DBSFieldDescriptor field_descs[] =
 {
   {"Field_1", T_BOOL, false},
   {"AnotherField", T_INT32, true},
@@ -115,7 +115,7 @@ main ()
   }
 
   I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
-  handler.AddTable ("table_1", field_descs, descCount);
+  handler.AddTable ("table_1", descCount, field_descs);
   I_DBSTable& table = handler.RetrievePersistentTable ("table_1");
   handler.ReleaseTable (table);
   DBSReleaseDatabase (handler);

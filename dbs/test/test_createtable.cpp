@@ -57,7 +57,7 @@ test_for_no_args (I_DBSHandler& rDbs)
 
   try
   {
-    rDbs.AddTable ("test_dummy", NULL, 10);
+    rDbs.AddTable ("test_dummy", 10, NULL);
   }
   catch (DBSException& e)
   {
@@ -73,7 +73,7 @@ test_for_no_args (I_DBSHandler& rDbs)
     temp.isArray = false;
 
     if (result)
-      rDbs.AddTable ("test_dummy", &temp, 0);
+      rDbs.AddTable ("test_dummy", 0, &temp);
     result = false;
   }
   catch (DBSException& e)
@@ -102,7 +102,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
 
   try
   {
-    rDbs.AddTable("test_dummy", &temp, 1);
+    rDbs.AddTable("test_dummy", 1, &temp);
   }
   catch (DBSException& e)
   {
@@ -116,7 +116,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
   try
   {
     if( result )
-      rDbs.AddTable("test_dummy", &temp, 1);
+      rDbs.AddTable("test_dummy", 1, &temp);
     result = false;
   }
   catch (DBSException& e)
@@ -139,7 +139,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
     more_temps[2] = temp;
 
     if( result )
-      rDbs.AddTable("test_dummy", more_temps, 3);
+      rDbs.AddTable("test_dummy", 3, more_temps);
     result = false;
   }
   catch (DBSException& e)
@@ -167,7 +167,7 @@ test_for_one_field (I_DBSHandler& rDbs)
   temp.m_FieldType = T_INT16;
   temp.isArray = false;
 
-  rDbs.AddTable ("t_test_tab", &temp, 1);
+  rDbs.AddTable ("t_test_tab", 1, &temp);
   I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
   D_UINT rowSize = (_RC (pastra::PrototypeTable &, table)).GetRowSize ();
@@ -201,14 +201,14 @@ struct StorageInterval
 
 bool
 test_for_fields (I_DBSHandler& rDbs,
-                 const DBSFieldDescriptor* pDesc,
+                 DBSFieldDescriptor* pDesc,
                  const D_UINT32 fieldsCount)
 {
   bool result = true;
 
   std::cout << "Test with fields with count " << fieldsCount << " ... ";
 
-  rDbs.AddTable ("t_test_tab", pDesc, fieldsCount);
+  rDbs.AddTable ("t_test_tab", fieldsCount, pDesc);
   I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
   std::vector <D_UINT32 > nullPositions;

@@ -92,44 +92,44 @@ public:
   void MarkForRemoval ();
 
   D_UINT64 AddRecord (const D_UINT8* pBuffer,
-                      const D_UINT64 count);
+                      const D_UINT64 size);
 
   D_UINT64 AddRecord (VLVarsStore& sourceStore,
-                      D_UINT64 sourceFirstEntry,
-                      D_UINT64 sourceOffset,
-                      D_UINT64 sourceCount);
+                      D_UINT64     sourceFirstEntry,
+                      D_UINT64     sourceFrom,
+                      D_UINT64     sourceSize);
 
   D_UINT64 AddRecord (I_DataContainer& sourceContainer,
-                      D_UINT64 sourceOffset,
-                      D_UINT64 sourceCount);
+                      D_UINT64         sourceFrom,
+                      D_UINT64         sourceSize);
 
   void     GetRecord (D_UINT64 recordFirstEntry,
                       D_UINT64 offset,
-                      D_UINT64 count,
-                      D_UINT8 *pBuffer);
+                      D_UINT64 size,
+                      D_UINT8* pBuffer);
 
-  void     UpdateRecord (D_UINT64 recordFirstEntry,
-                         D_UINT64 offset,
-                         D_UINT64 count,
-                         const D_UINT8 *pBuffer);
+  void     UpdateRecord (D_UINT64       recordFirstEntry,
+                         D_UINT64       offset,
+                         D_UINT64       size,
+                         const D_UINT8* pBuffer);
 
-  void     UpdateRecord (D_UINT64 recordFirstEntry,
-                         D_UINT64 offset,
+  void     UpdateRecord (D_UINT64     recordFirstEntry,
+                         D_UINT64     offset,
                          VLVarsStore& sourceStore,
-                         D_UINT64 sourceFirstEntry,
-                         D_UINT64 sourceOffset,
-                         D_UINT64 sourceCount);
+                         D_UINT64     sourceFirstEntry,
+                         D_UINT64     sourceOffset,
+                         D_UINT64     sourceCount);
 
-  void     UpdateRecord (D_UINT64 recordFirstEntry,
-                         D_UINT64 offset,
+  void     UpdateRecord (D_UINT64         recordFirstEntry,
+                         D_UINT64         offset,
                          I_DataContainer& sourceContainer,
-                         D_UINT64 sourceOffset,
-                         D_UINT64 sourceCount);
+                         D_UINT64         sourceOffset,
+                         D_UINT64         sourceCount);
 
   void     IncrementRecordRef (const D_UINT64 recordFirstEntry);
   void     DecrementRecordRef (const D_UINT64 recordFirstEntry);
 
-  D_UINT64 GetRawSize () const;
+  D_UINT64 Size () const;
 
   //Implementations for I_BlocksManager
   virtual void StoreItems (const D_UINT8 *pSrcBuffer,

@@ -51,8 +51,7 @@ public:
   bool  IsDirty () const { return (m_Flags & BLOCK_ENTRY_DIRTY) != 0;}
   bool  IsInUse () const { return m_ReferenceCount > 0;  }
 
-
-protected:
+private:
   friend class StoredItem;
   friend class BlockCache;
 
@@ -60,9 +59,9 @@ protected:
   void  RegisterUser () { m_ReferenceCount++; }
   void  ReleaseUser () {  assert ( m_ReferenceCount > 0); m_ReferenceCount--; }
 
-  explicit BlockEntry (D_UINT64 baseItemIndex, D_UINT8* pData) :
-      m_BaseItemIndex (baseItemIndex),
-      m_BlockData (pData),
+  explicit BlockEntry (D_UINT64 baseItem, D_UINT8* pData) :
+      m_BaseItem (baseItem),
+      m_Data (pData),
       m_ReferenceCount (0),
       m_Flags (0)
   {
@@ -71,8 +70,8 @@ protected:
 
   static const D_UINT32 BLOCK_ENTRY_DIRTY = 0x00000001;
 
-  const D_UINT64 m_BaseItemIndex;
-  D_UINT8* const m_BlockData;
+  const D_UINT64 m_BaseItem;
+  D_UINT8* const m_Data;
   D_UINT32       m_ReferenceCount;
   D_UINT32       m_Flags;
 };
@@ -116,12 +115,12 @@ public:
   D_UINT8* GetDataForUpdate () const
   {
     m_BlockEntry->MarkDirty ();
-    return m_BlockEntry->m_BlockData + m_ItemOffset;
+    return m_BlockEntry->m_Data + m_ItemOffset;
   }
 
   const D_UINT8* GetDataForRead () const
   {
-    return m_BlockEntry->m_BlockData + m_ItemOffset;
+    return m_BlockEntry->m_Data + m_ItemOffset;
   }
 
 protected:

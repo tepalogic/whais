@@ -32,7 +32,7 @@ using namespace std;
 
 I_BTreeNode::I_BTreeNode (I_BTreeNodeManager& nodesManager) :
     m_Header (NULL),
-    m_NodesManager (nodesManager)
+    m_NodesMgr (nodesManager)
 {
 }
 
@@ -102,7 +102,7 @@ I_BTreeNode::GetChildNode (const I_BTreeKey& key) const
       (IsEqual (key, outKey) == false))
     throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-  return GetChildNode (outKey);
+  return GetKeyNode (outKey);
 }
 
 void
@@ -131,7 +131,7 @@ I_BTreeNode::RemoveKey (const I_BTreeKey& key)
 void
 I_BTreeNode::Release ()
 {
-  m_NodesManager.ReleaseNode (NodeId ());
+  m_NodesMgr.ReleaseNode (NodeId ());
 }
 
 
@@ -180,7 +180,7 @@ I_BTreeNodeManager::Split (NODE_INDEX parentId, const NODE_INDEX nodeId)
       parentNode->SetNext (NIL_NODE);
       parentNode->SetPrev (NIL_NODE);
       parentNode->InsertKey (node->SentinelKey ());
-      parentNode->SetChildNode (0, nodeId);
+      parentNode->SetKeyNode (0, nodeId);
       SetRootNodeId (parentId);
 
       assert (parentNode->GetKeysCount() == 1);
@@ -207,7 +207,7 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
       assert (parentNode->IsLeaf() == false);
 
       BTreeNodeHandler node (RetrieveNode (nodeId));
-      const KEY_INDEX  keyIndex = node->GetFirstKey (*parentNode);
+      const KEY_INDEX  keyIndex = node->GetParentKeyIndex (*parentNode);
 
       if (keyIndex != 0)
         {
@@ -227,7 +227,7 @@ I_BTreeNodeManager::Join  (const NODE_INDEX parentId, const NODE_INDEX nodeId)
 
           splitNode = node->NodeId ();
 
-          assert (leftNode == parentNode->GetChildNode (keyIndex + 1));
+          assert (leftNode == parentNode->GetKeyNode (keyIndex + 1));
 
           node->Join (false);
           parentNode->RemoveKey (keyIndex + 1);
@@ -339,7 +339,7 @@ BTree::FindBiggerOrEqual (const I_BTreeKey& key,
       if ( node->IsLeaf())
         break;
 
-      outNode = node->GetChildNode (outKeyIndex);
+      outNode = node->GetKeyNode (outKeyIndex);
       node    = m_NodesManager.RetrieveNode (outNode);
     }
   while (true);
@@ -373,9 +373,9 @@ BTree::RemoveKey (const I_BTreeKey& key)
 
   if (node->IsLeaf () == false)
     {
-      if (node->GetChildNode( node->GetKeysCount () - 1) == node->GetChildNode (0))
+      if (node->GetKeyNode( node->GetKeysCount () - 1) == node->GetKeyNode (0))
         {
-          m_NodesManager.SetRootNodeId (node->GetChildNode (0));
+          m_NodesManager.SetRootNodeId (node->GetKeyNode (0));
           m_NodesManager.FreeNode (node->NodeId ());
         }
     }
@@ -426,7 +426,7 @@ BTree::RecursiveInsertNodeKey (const NODE_INDEX parentId,
           assert (false);
         }
         tryAgain = RecursiveInsertNodeKey (nodeId,
-                                           node->GetChildNode (outKeyIndex),
+                                           node->GetKeyNode (outKeyIndex),
                                            key,
                                            outNode,
                                            outKeyIndex);
@@ -455,7 +455,7 @@ BTree::RecursiveDeleteNodeKey (I_BTreeNode& node, const I_BTreeKey& key)
     }
   else
     {
-      BTreeNodeHandler childNode (m_NodesManager.RetrieveNode (node.GetChildNode (keyIndex)));
+      BTreeNodeHandler childNode (m_NodesManager.RetrieveNode (node.GetKeyNode (keyIndex)));
 
       if (childNode->NeedsJoining ())
         {
@@ -465,7 +465,7 @@ BTree::RecursiveDeleteNodeKey (I_BTreeNode& node, const I_BTreeKey& key)
       else if (RecursiveDeleteNodeKey (*childNode, key))
         {
           assert (node.IsEqual (key, keyIndex));
-          node.ResetKeyNode (*childNode, keyIndex);
+          node.AdjustKeyNode (*childNode, keyIndex);
         }
       else if (node.IsEqual (key, keyIndex))
         {

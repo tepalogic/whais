@@ -351,14 +351,14 @@ DbsHandler::~DbsHandler ()
   Discard ();
 }
 
-D_UINT
+TABLE_INDEX
 DbsHandler::PesistentTablesCount ()
 {
   return m_Tables.size ();
 }
 
 I_DBSTable&
-DbsHandler::RetrievePersistentTable (D_UINT index)
+DbsHandler::RetrievePersistentTable (TABLE_INDEX index)
 {
   WSynchronizerRAII syncHolder (m_Sync);
 
@@ -397,13 +397,13 @@ DbsHandler::RetrievePersistentTable (const D_CHAR* pTableName)
 }
 
 void
-DbsHandler::AddTable (const D_CHAR* const       pTableName,
-                      const DBSFieldDescriptor* pFields,
-                      const D_UINT              fieldsCount)
+DbsHandler::AddTable (const D_CHAR* const pTableName,
+                      const FIELD_INDEX   fieldsCount,
+                      DBSFieldDescriptor* pInOutFields)
 {
   WSynchronizerRAII syncHolder (m_Sync);
 
-  if ((pTableName == NULL) || (pFields == NULL) || (fieldsCount == 0))
+  if ((pTableName == NULL) || (pInOutFields == NULL) || (fieldsCount == 0))
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_PARAMETERS));
 
   string           tableName (pTableName);
@@ -416,7 +416,10 @@ DbsHandler::AddTable (const D_CHAR* const       pTableName,
   it = m_Tables.find (tableName);
   try
     {
-      it->second = new PersistentTable (*this, it->first, pFields, fieldsCount);
+      it->second = new PersistentTable (*this,
+                                        it->first,
+                                        pInOutFields,
+                                        fieldsCount);
     }
   catch (...)
     {
@@ -471,10 +474,12 @@ DbsHandler::DeleteTable (const D_CHAR* const pTableName)
 }
 
 I_DBSTable&
-DbsHandler::CreateTempTable (const DBSFieldDescriptor* pFields,
-                             const D_UINT              fieldsCount)
+DbsHandler::CreateTempTable (const FIELD_INDEX   fieldsCount,
+                             DBSFieldDescriptor* pInOutFields)
 {
-  return *(new TemporalTable (*this, pFields, fieldsCount));
+  return *(new TemporalTable (*this,
+                               pInOutFields,
+                               fieldsCount));
 }
 
 void

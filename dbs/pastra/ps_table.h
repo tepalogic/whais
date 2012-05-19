@@ -57,19 +57,19 @@ private:
 protected:
   virtual void                 Flush ();
   virtual void                 MakeHeaderPersistent ();
-  virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex);
+  virtual I_DataContainer*     CreateIndexContainer (const FIELD_INDEX field);
   virtual I_DataContainer&     FixedFieldsContainer ();
   virtual I_DataContainer&     MainTableContainer ();
   virtual VLVarsStore&         VariableFieldsStore ();
 
   //Data members
-  D_UINT64                              m_MaxFileSize;
-  D_UINT64                              m_VariableStorageSize;
-  std::string                           m_BaseFileName;
-  std::auto_ptr<FileContainer>          m_apMainTable;
-  std::auto_ptr<FileContainer>          m_apFixedFields;
-  std::auto_ptr<VLVarsStore>            m_apVariableFields;
-  bool                                  m_Removed;
+  D_UINT64                     m_MaxFileSize;
+  D_UINT64                     m_VariableStorageSize;
+  std::string                  m_BaseFileName;
+  std::auto_ptr<FileContainer> m_apMainTable;
+  std::auto_ptr<FileContainer> m_apFixedFields;
+  std::auto_ptr<VLVarsStore>   m_apVariableFields;
+  bool                         m_Removed;
 };
 
 class TemporalTable : public PrototypeTable
@@ -78,7 +78,7 @@ public:
 
   TemporalTable (DbsHandler&               dbsHandler,
                  const DBSFieldDescriptor* pFields,
-                 const D_UINT              fieldsCount);
+                 const FIELD_INDEX         fieldsCount);
   TemporalTable (const PrototypeTable& protoype);
 
   virtual ~TemporalTable ();
@@ -90,15 +90,15 @@ public:
 protected:
   virtual void                 Flush ();
   virtual void                 MakeHeaderPersistent ();
-  virtual I_DataContainer*     CreateIndexContainer (const D_UINT fieldIndex);
+  virtual I_DataContainer*     CreateIndexContainer (const FIELD_INDEX field);
   virtual I_DataContainer&     FixedFieldsContainer ();
   virtual I_DataContainer&     MainTableContainer ();
   virtual VLVarsStore&         VariableFieldsStore ();
 
   //Data members
-  std::auto_ptr<TempContainer>       m_apMainTable;
-  std::auto_ptr<TempContainer>       m_apFixedFields;
-  std::auto_ptr<VLVarsStore>         m_apVariableFields;
+  std::auto_ptr<TempContainer> m_apMainTable;
+  std::auto_ptr<TempContainer> m_apFixedFields;
+  std::auto_ptr<VLVarsStore>   m_apVariableFields;
 };
 
 }

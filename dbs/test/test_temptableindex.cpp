@@ -226,8 +226,8 @@ main ()
 
   {
     DBSArray    tableValues (_SC (DBSUInt64*, NULL));
-    I_DBSTable& table = handler.CreateTempTable (field_desc,
-                                                 sizeof field_desc / sizeof (field_desc[0]));
+    I_DBSTable& table = handler.CreateTempTable (sizeof field_desc / sizeof (field_desc[0]),
+                                                 field_desc);
 
     success = success && fill_table_with_values (table, _rowsCount, 0, tableValues);
     success = success && fill_table_with_first_nulls (table, _removedRows);

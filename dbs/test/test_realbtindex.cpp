@@ -300,7 +300,7 @@ main ()
   }
 
   I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
-  handler.AddTable ("t_test_tab", field_desc, sizeof field_desc / sizeof (field_desc[0]));
+  handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
 
   {
     DBSArray tableValues (_SC (DBSReal*, NULL));

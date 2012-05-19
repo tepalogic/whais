@@ -432,7 +432,7 @@ test_fixed_values_table (I_DBSHandler& rDbs)
 
   INIT_VECTORS;
 
-  rDbs.AddTable (tb_name, field_descs, FIXED_DESC_FIELDS_COUNT);
+  rDbs.AddTable (tb_name, FIXED_DESC_FIELDS_COUNT, field_descs);
   print_table_fields (rDbs, tb_name);
 
   result = result && test_fixed_value_field (rDbs, vectBool);
@@ -755,7 +755,7 @@ test_variable_values_table (I_DBSHandler& rDbs)
 
   INIT_VECTORS;
 
-  rDbs.AddTable (tb_name, field_descs + FIXED_DESC_FIELDS_COUNT, VAR_DESC_FIELDS_COUNT);
+  rDbs.AddTable (tb_name, VAR_DESC_FIELDS_COUNT, field_descs + FIXED_DESC_FIELDS_COUNT);
   print_table_fields (rDbs, tb_name);
 
   result = result && test_variable_field_array (rDbs, vectBool);
@@ -792,7 +792,7 @@ test_full_value_table (I_DBSHandler& rDbs)
 
   INIT_VECTORS;
 
-  rDbs.AddTable (tb_name, field_descs, TOTAL_DESC_FIELDS_COUNT);
+  rDbs.AddTable (tb_name, TOTAL_DESC_FIELDS_COUNT, field_descs);
   print_table_fields (rDbs, tb_name);
 
   result = result && test_fixed_value_field (rDbs, vectBool);
@@ -850,7 +850,7 @@ test_full_value_temp_table (I_DBSHandler& rDbs)
 
   INIT_VECTORS;
 
-  I_DBSTable& table = rDbs.CreateTempTable (field_descs, TOTAL_DESC_FIELDS_COUNT);
+  I_DBSTable& table = rDbs.CreateTempTable (TOTAL_DESC_FIELDS_COUNT, field_descs);
 
   result = result && test_fixed_value_field (table, vectBool);
   result = result && test_fixed_value_field (table, vectChar);

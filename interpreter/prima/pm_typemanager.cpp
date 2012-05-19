@@ -153,7 +153,8 @@ create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescrip
       vFields.push_back (field);
     }
 
-  I_DBSTable& table = dbsHndler.CreateTempTable (&vFields[0], vFields.size ());
+  I_DBSTable& table = dbsHndler.CreateTempTable (vFields.size (),
+                                                 &vFields[0]);
   assert (table.GetFieldsCount () == vFields.size ());
 
   typeIt = 0;

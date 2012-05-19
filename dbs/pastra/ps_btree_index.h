@@ -76,11 +76,11 @@ public:
   virtual bool NeedsJoining () const;
 
 
-  virtual KEY_INDEX  GetFirstKey (const I_BTreeNode& parent) const = 0;
+  virtual KEY_INDEX  GetParentKeyIndex (const I_BTreeNode& parent) const = 0;
   virtual NODE_INDEX GetChildNode (const I_BTreeKey& key) const;
-  virtual NODE_INDEX GetChildNode (const KEY_INDEX keyIndex) const = 0;
-  virtual void       ResetKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex) = 0;
-  virtual void       SetChildNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode) = 0;
+  virtual NODE_INDEX GetKeyNode (const KEY_INDEX keyIndex) const = 0;
+  virtual void       AdjustKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex) = 0;
+  virtual void       SetKeyNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode) = 0;
   virtual void       SetData (const KEY_INDEX keyIndex, const D_UINT8 *data);
 
   virtual KEY_INDEX InsertKey (const I_BTreeKey& key) = 0;
@@ -116,8 +116,8 @@ public:
 protected:
   friend class I_BTreeNodeManager;
 
-  NodeHeader         *m_Header;
-  I_BTreeNodeManager& m_NodesManager;
+  NodeHeader*         m_Header;
+  I_BTreeNodeManager& m_NodesMgr;
 };
 
 class BTreeNodeHandler

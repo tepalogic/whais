@@ -27,6 +27,10 @@
 
 #include "whisper.h"
 
+typedef D_UINT8         FIELD_INDEX;
+typedef D_UINT8         TABLE_INDEX;
+typedef D_UINT8         ROW_INDEX;
+
 enum DBS_FIELD_TYPE
 {
   T_UNKNOWN = 0,

@@ -422,7 +422,7 @@ PersistentTable::~PersistentTable ()
 {
   Flush ();
 
-  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+  for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     if (m_vIndexNodeMgrs[fieldIndex] != NULL)
       {
         FieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
@@ -500,7 +500,7 @@ PersistentTable::InitVariableStorages ()
                          m_MaxFileSize,
                          ((m_RowSize * m_RowsCount) + m_MaxFileSize - 1) / m_MaxFileSize));
 
-  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+  for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     {
         DBSFieldDescriptor fieldDesc = GetFieldDescriptor (fieldIndex);
 
@@ -520,7 +520,7 @@ PersistentTable::InitVariableStorages ()
 void
 PersistentTable::InitIndexedFields ()
 {
-  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+  for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     {
       FieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
@@ -563,7 +563,7 @@ PersistentTable::MakeHeaderPersistent ()
   *_RC (D_UINT32*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)      = m_DescriptorsSize;
   *_RC (D_UINT64*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)   = m_RowsCount;
   *_RC (D_UINT64*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF) =
-      (m_apVariableFields.get() != NULL) ? m_apVariableFields->GetRawSize() : 0;
+      (m_apVariableFields.get() != NULL) ? m_apVariableFields->Size() : 0;
   *_RC (D_UINT32*, aTableHdr + PS_TABLE_ROW_SIZE_OFF)        = m_RowSize;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF)       = m_RootNode;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF)       = m_FirstUnallocatedRoot;
@@ -585,7 +585,7 @@ PersistentTable::RemoveFromDatabase ()
   if (m_apVariableFields.get() != NULL)
     m_apVariableFields->MarkForRemoval();
 
-  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex )
+  for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex )
     if (m_vIndexNodeMgrs[fieldIndex]  != NULL)
       m_vIndexNodeMgrs[fieldIndex]->MarkForRemoval ();
 
@@ -595,14 +595,14 @@ PersistentTable::RemoveFromDatabase ()
 }
 
 I_DataContainer*
-PersistentTable::CreateIndexContainer (const D_UINT fieldIndex)
+PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 {
   assert (m_BaseFileName.size () > 0);
 
   string containerNameBase = m_BaseFileName;
 
   containerNameBase += "_idf";
-  containerNameBase += fieldIndex;
+  containerNameBase += field;
   containerNameBase += "bt";
 
   return new FileContainer (containerNameBase.c_str (),
@@ -645,7 +645,7 @@ PersistentTable::VariableFieldsStore ()
 
 TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
                               const DBSFieldDescriptor* pFields,
-                              const D_UINT              fieldsCount)
+                              const FIELD_INDEX         fieldsCount)
   : PrototypeTable (dbsHandler),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
@@ -675,6 +675,7 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
   m_RowSize         = rowSize;
   m_FieldsDescriptors.reset (apFieldDescription.release ());
 
+  //TODO: Vezo care e treaba!
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
                            m_FieldsCount,
                            NULL);
@@ -700,7 +701,7 @@ TemporalTable::~TemporalTable ()
   if (m_apVariableFields.get () != NULL)
     m_apVariableFields->Flush ();
 
-  for (D_UINT fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
+  for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     delete m_vIndexNodeMgrs [fieldIndex];
 }
 
@@ -732,7 +733,7 @@ TemporalTable::MakeHeaderPersistent ()
 }
 
 I_DataContainer*
-TemporalTable::CreateIndexContainer (const D_UINT)
+TemporalTable::CreateIndexContainer (const FIELD_INDEX)
 {
   return new TempContainer (m_Dbs.WorkingDir ().c_str (), 4096);
 }

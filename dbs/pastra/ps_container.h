@@ -43,15 +43,16 @@ append_int_to_str (std::string& dest, D_UINT64 number);
 class DataContainerException : public WException
 {
 public:
-  DataContainerException (const D_CHAR* message, const D_CHAR* file, D_UINT32 line, D_UINT32 extra)
-    :
-      WException (message, file, line, extra)
+  DataContainerException (const D_CHAR* message,
+                          const D_CHAR* file,
+                          D_UINT32      line,
+                          D_UINT32      extra)
+    : WException (message, file, line, extra)
   {
   }
   virtual ~DataContainerException ()
   {
   }
-  ;
 };
 
 class I_DataContainer
@@ -62,9 +63,9 @@ public:
   virtual ~ I_DataContainer ()
   {}
 
-  virtual void     Write (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource) = 0;
-  virtual void     Read (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination) = 0;
-  virtual void     Colapse (D_UINT64 uStartPosition, D_UINT64 uEndPosition) = 0;
+  virtual void     Write (D_UINT64 to, D_UINT64 size, const D_UINT8* pSource) = 0;
+  virtual void     Read (D_UINT64 from, D_UINT64 size, D_UINT8* pDest) = 0;
+  virtual void     Colapse (D_UINT64 from, D_UINT64 to) = 0;
   virtual D_UINT64 Size () const = 0;
   virtual void     MarkForRemoval () = 0;
 };
@@ -74,23 +75,22 @@ class FileContainer : public I_DataContainer
 {
 public:
   FileContainer (const D_CHAR*  pFileNameBase,
-                 const D_UINT64 uMaxFileSize,
-                 const D_UINT64 uUnitsCount);
+                 const D_UINT64 maxFileSize,
+                 const D_UINT64 unitsCount);
 
   virtual ~FileContainer ();
 
   // WIDataContainer virtual functions
-  virtual void     Write (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource);
-  virtual void     Read (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination);
-  virtual void     Colapse (D_UINT64 uStartPosition, D_UINT64 uEndPosition);
+  virtual void     Write (D_UINT64 to, D_UINT64 size, const D_UINT8* pSource);
+  virtual void     Read (D_UINT64 from, D_UINT64 size, D_UINT8* pDest);
+  virtual void     Colapse (D_UINT64 from, D_UINT64 to);
   virtual D_UINT64 Size () const;
   virtual void     MarkForRemoval ();
 
-protected:
+private:
   void ExtendContainer ();
 
-protected:
-  const D_UINT64       m_uMaxFileUnitSize;
+  const D_UINT64       m_MaxFileUnitSize;
   std::vector< WFile > m_FilesHandles;
   std::string          m_FileNameBase;
   bool                 m_IsMarked;
@@ -100,7 +100,7 @@ class FileTempContainer : public FileContainer
 {
 public:
   FileTempContainer (const D_CHAR*  pFileNameBase,
-                     const D_UINT32 uMaxFileSize);
+                     const D_UINT32 maxFileSize);
   virtual ~FileTempContainer ();
 };
 
@@ -111,13 +111,13 @@ public:
   virtual ~TempContainer ();
 
   // WIDataContainer virtual functions
-  virtual void     Write (D_UINT64 uPosition, D_UINT64 uLength, const D_UINT8* puDataSource);
-  virtual void     Read (D_UINT64 uPosition, D_UINT64 uLength, D_UINT8* puDataDestination);
-  virtual void     Colapse (D_UINT64 uStartPosition, D_UINT64 uEndPosition);
+  virtual void     Write (D_UINT64 to, D_UINT64 size, const D_UINT8* pSource);
+  virtual void     Read (D_UINT64 from, D_UINT64 size, D_UINT8* pDest);
+  virtual void     Colapse (D_UINT64 from, D_UINT64 to);
   virtual D_UINT64 Size () const;
   virtual void     MarkForRemoval ();
 
-protected:
+private:
   void  FillCache (D_UINT64 position);
 
   std::auto_ptr<FileTempContainer> m_FileContainer;
@@ -135,9 +135,11 @@ class WFileContainerException : public DataContainerException
 {
 public:
   explicit
-  WFileContainerException (const D_CHAR* message, const D_CHAR* file, D_UINT32 line, D_UINT32 extra)
-    :
-      DataContainerException (message, file, line, extra)
+  WFileContainerException (const D_CHAR* message,
+                           const D_CHAR* file,
+                           D_UINT32      line,
+                           D_UINT32      extra)
+    : DataContainerException (message, file, line, extra)
   {
   }
 
