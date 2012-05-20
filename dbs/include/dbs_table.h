@@ -104,29 +104,29 @@ public:
   virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSText& outValue) = 0;
   virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSArray& outValue) = 0;
 
-  virtual DBSArray GetMatchingRows (const DBSBool&  min,
-                                    const DBSBool&  max,
-                                    const ROW_INDEX fromRow,
-                                    const ROW_INDEX toRow,
-                                    const ROW_INDEX ignoreFirst,
-                                    const ROW_INDEX maxCount,
-                                    const ROW_INDEX field) = 0;
+  virtual DBSArray GetMatchingRows (const DBSBool&    min,
+                                    const DBSBool&    max,
+                                    const ROW_INDEX   fromRow,
+                                    const ROW_INDEX   toRow,
+                                    const ROW_INDEX   ignoreFirst,
+                                    const ROW_INDEX   maxCount,
+                                    const FIELD_INDEX field) = 0;
 
-  virtual DBSArray GetMatchingRows (const DBSChar&  min,
-                                    const DBSChar&  max,
-                                    const ROW_INDEX fromRow,
-                                    const ROW_INDEX toRow,
-                                    const ROW_INDEX ignoreFirst,
-                                    const ROW_INDEX maxCount,
-                                    const ROW_INDEX field) = 0;
+  virtual DBSArray GetMatchingRows (const DBSChar&    min,
+                                    const DBSChar&    max,
+                                    const ROW_INDEX   fromRow,
+                                    const ROW_INDEX   toRow,
+                                    const ROW_INDEX   ignoreFirst,
+                                    const ROW_INDEX   maxCount,
+                                    const FIELD_INDEX field) = 0;
 
-  virtual DBSArray GetMatchingRows (const DBSDate&  min,
-                                    const DBSDate&  max,
-                                    const ROW_INDEX fromRow,
-                                    const ROW_INDEX toRow,
-                                    const ROW_INDEX ignoreFirst,
-                                    const ROW_INDEX maxCount,
-                                    const ROW_INDEX field) = 0;
+  virtual DBSArray GetMatchingRows (const DBSDate&    min,
+                                    const DBSDate&    max,
+                                    const ROW_INDEX   fromRow,
+                                    const ROW_INDEX   toRow,
+                                    const ROW_INDEX   ignoreFirst,
+                                    const ROW_INDEX   maxCount,
+                                    const FIELD_INDEX field) = 0;
 
   virtual DBSArray GetMatchingRows (const DBSDateTime& min,
                                     const DBSDateTime& max,

@@ -358,16 +358,17 @@ DbsHandler::PesistentTablesCount ()
 }
 
 I_DBSTable&
-DbsHandler::RetrievePersistentTable (TABLE_INDEX index)
+DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
 {
+  TABLE_INDEX       iterator = index;
   WSynchronizerRAII syncHolder (m_Sync);
 
-  if (index >= m_Tables.size ())
+  if (iterator >= m_Tables.size ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
 
   TABLES::iterator it = m_Tables.begin ();
 
-  while (index-- > 0)
+  while (iterator-- > 0)
     {
       assert (it != m_Tables.end ());
       ++it;

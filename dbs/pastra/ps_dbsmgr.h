@@ -45,7 +45,7 @@ public:
   virtual ~DbsHandler ();
 
   virtual TABLE_INDEX  PesistentTablesCount ();
-  virtual I_DBSTable&  RetrievePersistentTable (TABLE_INDEX index);
+  virtual I_DBSTable&  RetrievePersistentTable (const TABLE_INDEX index);
   virtual I_DBSTable&  RetrievePersistentTable (const D_CHAR* pTableName);
   virtual void         ReleaseTable (I_DBSTable&);
   virtual void         AddTable (const D_CHAR* const pTableName,
