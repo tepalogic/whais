@@ -401,7 +401,7 @@ public:
   {
     assert (fromPos >= toPos);
     assert (fromPos < GetKeysCount ());
-    assert (output.GetElementsType() == T_UINT64);
+    assert (output.ElementsType() == T_UINT64);
 
     const D_UINT64* const pRowParts = _RC (const D_UINT64*, GetRawData () + sizeof (NodeHeader));
 

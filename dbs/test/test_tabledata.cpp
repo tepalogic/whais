@@ -321,7 +321,7 @@ add_fixed_values_vector_to_table (I_DBSTable& table, std::vector<T> &vectValues)
       if (table.GetAllocatedRows() <= index)
         table.AddRow();
 
-      table.SetEntry (vectValues[index], index, fieldIndex);
+      table.SetEntry (index, fieldIndex, vectValues[index]);
     }
 
   return fieldIndex;
@@ -334,7 +334,7 @@ test_fixed_values_vector (I_DBSTable& table, const D_UINT fieldIndex, std::vecto
 
   for (D_UINT rowIndex = 0; rowIndex < table.GetAllocatedRows(); ++rowIndex)
     {
-      table.GetEntry(fieldValue, rowIndex, fieldIndex);
+      table.GetEntry(rowIndex, fieldIndex, fieldValue);
       if (! (fieldValue == vectValues[rowIndex]))
         return false;
     }
@@ -353,7 +353,7 @@ test_fixed_values_vector_reverse (I_DBSTable& table,
   do
     {
       rowIndex--;
-      table.GetEntry(fieldValue, rowIndex, fieldIndex);
+      table.GetEntry (rowIndex, fieldIndex, fieldValue);
       if (! (fieldValue == vectValues[rowIndex]))
         return false;
     }
@@ -462,7 +462,7 @@ test_fixed_values_table (I_DBSHandler& rDbs)
 template <class T> bool
 check_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 {
-  if (array.GetElementsType() != source[0])
+  if (array.ElementsType() != source[0])
     return false;
 
   D_UINT arrayIndex = 0;
@@ -489,7 +489,7 @@ check_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 template <class T> bool
 fill_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 {
-  if (array.GetElementsType() != source[0])
+  if (array.ElementsType() != source[0])
     return false;
 
   for (D_UINT elIndex = 0; elIndex < source.size (); ++elIndex)
@@ -529,7 +529,7 @@ add_vectors_values_to_table (I_DBSTable& table, std::vector<T> &testVect)
       if (fill_value_array (testVect, valueArray, rowIndex) == false)
         return ~0;
 
-      table.SetEntry (valueArray, rowIndex, fieldIndex);
+      table.SetEntry (rowIndex, fieldIndex, valueArray);
     }
 
   return fieldIndex;
@@ -542,7 +542,7 @@ test_vector_values_table (I_DBSTable& table, D_UINT fieldIndex, std::vector<T> &
     {
 
       DBSArray testArray (_SC(T*, NULL));
-      table.GetEntry (testArray, rowIndex, fieldIndex);
+      table.GetEntry (rowIndex, fieldIndex, testArray);
 
       if (testVect[rowIndex].IsNull ())
         {
@@ -649,13 +649,13 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
         {
           if (rowIndex >= table.GetAllocatedRows())
             table.AddRow();
-          table.SetEntry (vectText[rowIndex], rowIndex, fieldIndex);
+          table.SetEntry (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
       for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           DBSText testValue(NULL);
-          table.GetEntry (testValue, rowIndex, fieldIndex);
+          table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
               result = false;
@@ -674,7 +674,7 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
         {
           --rowIndex;
           DBSText testValue(NULL);
-          table.GetEntry (testValue, rowIndex, fieldIndex);
+          table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
               result = false;
@@ -714,13 +714,13 @@ test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
         {
           if (rowIndex >= table.GetAllocatedRows())
             table.AddRow();
-          table.SetEntry (vectText[rowIndex], rowIndex, fieldIndex);
+          table.SetEntry (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
       for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           DBSText testValue(NULL);
-          table.GetEntry (testValue, rowIndex, fieldIndex);
+          table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
               result = false;
@@ -735,7 +735,7 @@ test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
         {
           --rowIndex;
           DBSText testValue(NULL);
-          table.GetEntry (testValue, rowIndex, fieldIndex);
+          table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
               result = false;

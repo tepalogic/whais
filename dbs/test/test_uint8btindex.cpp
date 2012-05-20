@@ -51,7 +51,7 @@ fill_table_with_values (I_DBSTable& table,
         }
 
       std::cout << "\r" << index << "(" << rowCount << ")";
-      table.SetEntry (value, index, 0);
+      table.SetEntry (index, 0, value);
       tableValues.AddElement (value);
 
     }
@@ -64,8 +64,8 @@ fill_table_with_values (I_DBSTable& table,
                                            0,
                                            ~0,
                                            0);
-  if ((values.GetElementsCount() != tableValues.GetElementsCount ()) ||
-      (values.GetElementsCount () != rowCount))
+  if ((values.ElementsCount() != tableValues.ElementsCount ()) ||
+      (values.ElementsCount () != rowCount))
     {
       result = false;
     }
@@ -78,7 +78,7 @@ fill_table_with_values (I_DBSTable& table,
       values.GetElement (rowIndex, checkIndex);
       assert (rowIndex.IsNull() == false);
 
-      table.GetEntry (rowValue, rowIndex.m_Value, 0);
+      table.GetEntry (rowIndex.m_Value, 0, rowValue);
 
       DBSUInt8 generated;
       tableValues.GetElement (generated, rowIndex.m_Value);
@@ -108,7 +108,7 @@ fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
 
   for (D_UINT64 index = 0; index < rowCount; ++index)
     {
-      table.SetEntry (nullValue, index, 0);
+      table.SetEntry (index, 0, nullValue);
 
       std::cout << "\r" << index << "(" << rowCount << ")";
     }
@@ -130,13 +130,13 @@ fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
         result = false;
 
       DBSUInt8 rowValue;
-      table.GetEntry (rowValue, index, 0);
+      table.GetEntry (index, 0, rowValue);
 
       if (rowValue.IsNull() == false)
         result = false;
     }
 
-  if (values.GetElementsCount() != rowCount)
+  if (values.ElementsCount() != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -169,7 +169,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
         result = false;
 
       DBSUInt8 rowValue;
-      table.GetEntry (rowValue, index, 0);
+      table.GetEntry (index, 0, rowValue);
 
       if (rowValue.IsNull() == false)
         result = false;
@@ -189,7 +189,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
       values.GetElement (element, index - _removedRows);
 
       DBSUInt8 rowValue;
-      table.GetEntry (rowValue, element.m_Value, 0);
+      table.GetEntry (element.m_Value, 0, rowValue);
 
       if (rowValue.IsNull() == true)
         result = false;
@@ -228,7 +228,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
       DBSUInt8 rowValue;
       tableValues.GetElement (rowValue, index);
 
-      table.SetEntry (rowValue, index, 0);
+      table.SetEntry (index, 0, rowValue);
     }
 
 
@@ -242,7 +242,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                             ~0,
                                             0);
 
-  if (values.GetElementsCount() != _rowsCount)
+  if (values.ElementsCount() != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -252,7 +252,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
   for (D_UINT64 index = 0; (index < _rowsCount) && result; ++index)
     {
       DBSUInt8 rowValue ;
-      table.GetEntry (rowValue, index, 0);
+      table.GetEntry (index, 0, rowValue);
 
       if (rowValue.IsNull() == true)
         result = false;

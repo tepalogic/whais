@@ -90,41 +90,41 @@ public:
   virtual void RemoveFieldIndex (const FIELD_INDEX field);
   virtual bool IsFieldIndexed (const FIELD_INDEX field) const;
 
-  virtual void SetEntry (const DBSChar& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSBool& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSDate& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSDateTime& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSHiresTime& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSInt8& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSInt16& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSInt32& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSInt64& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSReal& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSRichReal& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSUInt8& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSUInt16& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSUInt32& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSUInt64& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSText& rSource, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void SetEntry (const DBSArray& rSource, const ROW_INDEX row, const FIELD_INDEX field);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSBool& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSChar& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSDate& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSDateTime& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSHiresTime& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt8& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt16& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt32& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt64& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSReal& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSRichReal& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt8& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt16& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt32& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt64& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSText& value);
+  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSArray& value);
 
-  virtual void GetEntry (DBSChar& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSBool& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSDate& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSDateTime& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSHiresTime& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSInt8& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSInt16& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSInt32& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSInt64& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSReal& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSRichReal& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSUInt8& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSUInt16& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSUInt32& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSUInt64& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSText& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
-  virtual void GetEntry (DBSArray& rDestination, const ROW_INDEX row, const FIELD_INDEX field);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSBool& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSChar& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSDate& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSDateTime& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSHiresTime& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt8& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt16& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt32& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt64& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSReal& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSRichReal& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt8& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt16& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt32& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt64& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSText& outValue);
+  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSArray& outValue);
 
   virtual DBSArray GetMatchingRows (const DBSBool&    min,
                                     const DBSBool&    max,
@@ -251,8 +251,12 @@ public:
   FieldDescriptor& GetFieldDescriptorInternal (const D_CHAR* const pFieldName) const;
 
 private:
-  template <class T> void     StoreEntry (const T &, const ROW_INDEX, const FIELD_INDEX);
-  template <class T> void     RetrieveEntry (T &, const ROW_INDEX, const FIELD_INDEX);
+  template <class T> void     StoreEntry (const ROW_INDEX,
+                                          const FIELD_INDEX,
+                                          const T&);
+  template <class T> void     RetrieveEntry (const ROW_INDEX,
+                                             const FIELD_INDEX,
+                                             T&);
   template <class T> DBSArray MatchRowsWithIndex (const T&          min,
                                                   const T&          max,
                                                   const ROW_INDEX   fromRow,

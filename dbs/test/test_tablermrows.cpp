@@ -40,7 +40,7 @@ fill_table (I_DBSTable& table)
           break;
         }
 
-      table.SetEntry (fieldValue, rowIndex, 0);
+      table.SetEntry (rowIndex, 0, fieldValue);
 
       std::cout << index + 1 << " (" << gElemsCount << ")\r";
     }
@@ -66,7 +66,7 @@ remove_first_rows (I_DBSTable& table)
       else
         {
           DBSUInt32 fieldValue;
-          table.SetEntry (fieldValue, rowIndex, 0);
+          table.SetEntry (rowIndex, 0, fieldValue);
         }
 
       if (table.AddReusedRow() != rowIndex)
@@ -93,7 +93,7 @@ restore_first_rows (I_DBSTable& table)
   for (D_UINT32 rowIndex = 1; rowIndex <= count; ++rowIndex)
     {
       DBSUInt32 fieldValue (rowIndex);
-      table.SetEntry (fieldValue, rowIndex, 0);
+      table.SetEntry (rowIndex, 0, fieldValue);
 
       if ((rowIndex < count) && (table.AddReusedRow() != (rowIndex + 1)))
         {
@@ -125,8 +125,8 @@ test_for_radius_rows (I_DBSTable& table)
   for (D_UINT rowIndex = 0; rowIndex < count; ++rowIndex)
     {
       DBSUInt32 fieldValue;
-      table.SetEntry (fieldValue, (gElemsCount / 2) - rowIndex, 0);
-      table.SetEntry (fieldValue, (gElemsCount / 2) + count - rowIndex, 0);
+      table.SetEntry ((gElemsCount / 2) - rowIndex, 0, fieldValue);
+      table.SetEntry ((gElemsCount / 2) + count - rowIndex, 0, fieldValue);
 
       if (table.AddReusedRow() != ((gElemsCount / 2) - rowIndex))
         {
@@ -153,7 +153,7 @@ test_for_radius_rows (I_DBSTable& table)
               break;
             }
           DBSUInt32 fieldValue (rowIndex);
-          table.SetEntry (fieldValue, rowIndex, 0);
+          table.SetEntry (rowIndex, 0, fieldValue);
 
           std::cout << rowIndex - ((gElemsCount / 2) - count + 1) << " (" << count * 2 << ")\r";
 

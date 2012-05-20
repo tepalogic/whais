@@ -41,7 +41,7 @@ bool test_bool_array ()
       else if  (anotherArray.AddElement(DBSBool (false)) != 1)
         result = false;
 
-      if ( ! (anotherArray.IsNull() == false) && (anotherArray.GetElementsCount() != 2) )
+      if ( ! (anotherArray.IsNull() == false) && (anotherArray.ElementsCount() != 2) )
         result = false;
 
       DBSBool tv;
@@ -67,7 +67,7 @@ bool test_bool_array ()
       const DBSBool nullBull;
       anotherArray.SetElement (nullBull, 0);
       anotherArray.GetElement( tv, 0);
-      if ((tv.IsNull()) || (tv.m_Value == false) || (anotherArray.GetElementsCount() > 1))
+      if ((tv.IsNull()) || (tv.m_Value == false) || (anotherArray.ElementsCount() > 1))
         result = false;
 
       anotherArray.SetElement (nullBull, 0);
@@ -91,7 +91,7 @@ test_integers_array (const char* type)
 
   for (D_UINT64 index = 1; index < 10000; index += 13)
     {
-      if (testArray.GetElementsCount () != elementsCount)
+      if (testArray.ElementsCount () != elementsCount)
         {
           result = false;
           break;
@@ -108,7 +108,7 @@ test_integers_array (const char* type)
       testArray.SetElement (nullValue, elementsCount - 2);
       elementsCount -= 2;
 
-      if (testArray.GetElementsCount() != elementsCount)
+      if (testArray.ElementsCount() != elementsCount)
         result = false;
     }
 
@@ -152,7 +152,7 @@ test_dates_array ()
 
   for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
-      if (testArray.GetElementsCount () != elementsCount)
+      if (testArray.ElementsCount () != elementsCount)
         {
           result = false;
           break;
@@ -217,7 +217,7 @@ test_datetimes_array ()
 
   for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
-      if (testArray.GetElementsCount () != elementsCount)
+      if (testArray.ElementsCount () != elementsCount)
         {
           result = false;
           break;
@@ -293,7 +293,7 @@ test_hiresdate_array ()
 
   for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
-      if (testArray.GetElementsCount () != elementsCount)
+      if (testArray.ElementsCount () != elementsCount)
         {
           result = false;
           break;

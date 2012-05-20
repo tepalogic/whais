@@ -228,7 +228,7 @@ insert_row_field (PrototypeTable&  table,
                   const FIELD_INDEX field)
 {
   T rowValue;
-  table.GetEntry (rowValue, row, field);
+  table.GetEntry (row, field, rowValue);
 
 
   NODE_INDEX dummyNode;
@@ -657,112 +657,114 @@ PrototypeTable::ReleaseIndexField (FieldDescriptor* const pFieldDesc)
 }
 
 void
-PrototypeTable::SetEntry (const DBSChar& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSChar& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSBool& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSBool& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSDate& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSDate& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSDateTime& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSDateTime& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSHiresTime& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSHiresTime& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSInt8& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt8& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSInt16& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt16& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSInt32& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt32& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSInt64& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt64& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSReal& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSReal& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSRichReal& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSRichReal& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSUInt8& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt8& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSUInt16& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt16& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSUInt32& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt32& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSUInt64& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt64& value)
 {
-  StoreEntry (rSource, row, field);
+  StoreEntry (row, field, value);
 }
 
 void
-PrototypeTable::SetEntry (const DBSText& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSText& value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    {
+      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    }
 
   D_UINT64                 newFirstEntry     = ~0;
   D_UINT64                 newFieldValueSize = 0;
   const D_UINT8            bitsSet           = ~0;
   bool                     fieldValueWasNull = false;
 
-  if (rSource.IsNull() == false)
+  if (value.IsNull() == false)
     {
-      I_TextStrategy& text = rSource;
+      I_TextStrategy& text = value;
       if (text.IsRowValue ())
         {
           RowFieldText& value = text.GetRowValue();
@@ -799,9 +801,9 @@ PrototypeTable::SetEntry (const DBSText& rSource, const ROW_INDEX row, const FIE
   if ((pRawData [byte_off] & (1 << bit_off)) != 0)
     fieldValueWasNull = true;
 
-  if (fieldValueWasNull && rSource.IsNull ())
+  if (fieldValueWasNull && value.IsNull ())
     return ;
-  else if ( (fieldValueWasNull == false) && rSource.IsNull())
+  else if ( (fieldValueWasNull == false) && value.IsNull())
     {
       pRawData [byte_off] |= (1 << bit_off);
 
@@ -810,7 +812,7 @@ PrototypeTable::SetEntry (const DBSText& rSource, const ROW_INDEX row, const FIE
 
       return;
     }
-  else if (rSource.IsNull() == false)
+  else if (value.IsNull() == false)
     {
       if (pRawData [byte_off] == bitsSet)
         {
@@ -842,22 +844,24 @@ PrototypeTable::SetEntry (const DBSText& rSource, const ROW_INDEX row, const FIE
 }
 
 void
-PrototypeTable::SetEntry (const DBSArray& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSArray& value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ( ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, rSource.GetElementsType())))
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, value.ElementsType())))
+    {
+      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    }
 
   D_UINT64      newFirstEntry     = ~0;
   D_UINT64      newFieldValueSize = 0;
   const D_UINT8 bitsSet           = ~0;
   bool          fieldValueWasNull = false;
 
-  if (rSource.IsNull() == false)
+  if (value.IsNull() == false)
     {
-      I_ArrayStrategy& array = rSource;
+      I_ArrayStrategy& array = value;
       if (array.IsRowValue())
         {
           RowFieldArray& value = array.GetRowValue();
@@ -901,9 +905,9 @@ PrototypeTable::SetEntry (const DBSArray& rSource, const ROW_INDEX row, const FI
   if ((pRawData [byte_off] & (1 << bit_off)) != 0)
     fieldValueWasNull = true;
 
-  if (fieldValueWasNull && rSource.IsNull ())
+  if (fieldValueWasNull && value.IsNull ())
     return ;
-  else if ( (fieldValueWasNull == false) && rSource.IsNull())
+  else if ( (fieldValueWasNull == false) && value.IsNull())
     {
       pRawData [byte_off] |= (1 << bit_off);
 
@@ -912,7 +916,7 @@ PrototypeTable::SetEntry (const DBSArray& rSource, const ROW_INDEX row, const FI
 
       return ;
     }
-  else if (rSource.IsNull() == false)
+  else if (value.IsNull() == false)
     {
       if (pRawData [byte_off] == bitsSet)
         {
@@ -928,7 +932,7 @@ PrototypeTable::SetEntry (const DBSArray& rSource, const ROW_INDEX row, const FI
       //to allow other threads gain access to 'm_Sync' faster.
       RowFieldArray   oldEntryRAII (VariableFieldsStore (),
                                     *fieldFirstEntry,
-                                    rSource.GetElementsType ());
+                                    value.ElementsType ());
 
       VariableFieldsStore ().DecrementRecordRef (*fieldFirstEntry);
       *fieldFirstEntry = newFirstEntry;
@@ -944,93 +948,93 @@ PrototypeTable::SetEntry (const DBSArray& rSource, const ROW_INDEX row, const FI
 }
 
 void
-PrototypeTable::GetEntry (DBSChar& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSChar& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSBool& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSBool& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSDate& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSDate& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSDateTime& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSDateTime& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSHiresTime& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSHiresTime& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSInt8& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt8& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSInt16& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt16& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSInt32& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt32& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSInt64& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt64& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSReal& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSReal& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSRichReal& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSRichReal& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSUInt8& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt8& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSUInt16& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt16& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSUInt32& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt32& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 void
-PrototypeTable::GetEntry (DBSUInt64& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt64& outValue)
 {
-  RetrieveEntry (rDestination, row, field);
+  RetrieveEntry (row, field, outValue);
 }
 
 static RowFieldText*
@@ -1050,13 +1054,15 @@ allocate_row_field_array (VLVarsStore&         store,
 }
 
 void
-PrototypeTable::GetEntry (DBSText& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSText& outValue)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    {
+      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    }
 
   WSynchronizerRAII syncHolder (m_Sync);
 
@@ -1070,12 +1076,12 @@ PrototypeTable::GetEntry (DBSText& rDestination, const ROW_INDEX row, const FIEL
   const D_UINT  byte_off = desc.m_NullBitIndex / 8;
   const D_UINT8 bit_off  = desc.m_NullBitIndex % 8;
 
-  rDestination.~DBSText ();
+  outValue.~DBSText ();
   if (pRawData[byte_off] & (1 << bit_off))
-    _placement_new (&rDestination, DBSText (NULL));
+    _placement_new (&outValue, DBSText (NULL));
   else
     {
-      _placement_new (&rDestination,
+      _placement_new (&outValue,
                       DBSText (*allocate_row_field_text (VariableFieldsStore (),
                                                          fieldFirstEntry,
                                                          fieldValueSize)));
@@ -1083,13 +1089,13 @@ PrototypeTable::GetEntry (DBSText& rDestination, const ROW_INDEX row, const FIEL
 }
 
 void
-PrototypeTable::GetEntry (DBSArray& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSArray& outValue)
 {
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ( ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, rDestination.GetElementsType())))
+      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, outValue.ElementsType())))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
   WSynchronizerRAII syncHolder (m_Sync);
@@ -1103,55 +1109,55 @@ PrototypeTable::GetEntry (DBSArray& rDestination, const ROW_INDEX row, const FIE
   const D_UINT  byte_off = desc.m_NullBitIndex / 8;
   const D_UINT8 bit_off  = desc.m_NullBitIndex % 8;
 
-  rDestination.~DBSArray ();
+  outValue.~DBSArray ();
   if (pRawData[byte_off] & (1 << bit_off))
     {
       switch (desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK)
       {
       case T_BOOL:
-        _placement_new (&rDestination, DBSArray(_SC(DBSBool *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSBool *, NULL)));
         break;
       case T_CHAR:
-        _placement_new (&rDestination, DBSArray(_SC(DBSChar *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSChar *, NULL)));
         break;
       case T_DATE:
-        _placement_new (&rDestination, DBSArray(_SC(DBSDate *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSDate *, NULL)));
         break;
       case T_DATETIME:
-        _placement_new (&rDestination, DBSArray(_SC(DBSDateTime *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSDateTime *, NULL)));
         break;
       case T_HIRESTIME:
-        _placement_new (&rDestination, DBSArray(_SC(DBSHiresTime *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSHiresTime *, NULL)));
         break;
       case T_UINT8:
-        _placement_new (&rDestination, DBSArray(_SC(DBSUInt8 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSUInt8 *, NULL)));
         break;
       case T_UINT16:
-        _placement_new (&rDestination, DBSArray(_SC(DBSUInt16 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSUInt16 *, NULL)));
         break;
       case T_UINT32:
-        _placement_new (&rDestination, DBSArray(_SC(DBSUInt32 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSUInt32 *, NULL)));
         break;
       case T_UINT64:
-        _placement_new (&rDestination, DBSArray(_SC(DBSUInt64 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSUInt64 *, NULL)));
         break;
       case T_REAL:
-        _placement_new (&rDestination, DBSArray(_SC(DBSReal *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSReal *, NULL)));
         break;
       case T_RICHREAL:
-        _placement_new (&rDestination, DBSArray(_SC(DBSRichReal *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSRichReal *, NULL)));
         break;
       case T_INT8:
-        _placement_new (&rDestination, DBSArray(_SC(DBSInt8 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSInt8 *, NULL)));
         break;
       case T_INT16:
-        _placement_new (&rDestination, DBSArray(_SC(DBSInt16 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSInt16 *, NULL)));
         break;
       case T_INT32:
-        _placement_new (&rDestination, DBSArray(_SC(DBSInt32 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSInt32 *, NULL)));
         break;
       case T_INT64:
-        _placement_new (&rDestination, DBSArray(_SC(DBSInt64 *, NULL)));
+        _placement_new (&outValue, DBSArray(_SC(DBSInt64 *, NULL)));
         break;
       default:
         assert (0);
@@ -1159,7 +1165,7 @@ PrototypeTable::GetEntry (DBSArray& rDestination, const ROW_INDEX row, const FIE
     }
   else
     {
-      _placement_new (&rDestination,
+      _placement_new (&outValue,
                       DBSArray (*allocate_row_field_array (VariableFieldsStore (),
                                                            fieldFirstEntry,
                                                            _SC (DBS_FIELD_TYPE,
@@ -1394,14 +1400,16 @@ PrototypeTable::GetMatchingRows (const DBSRichReal& min,
 }
 
 template <class T> void
-PrototypeTable::StoreEntry (const T& rSource, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::StoreEntry (const ROW_INDEX   row,
+                            const FIELD_INDEX field,
+                            const T&          value)
 {
 
   //Check if we are trying to write a different value
   T currentValue;
-  RetrieveEntry (currentValue, row, field);
+  RetrieveEntry (row, field, currentValue);
 
-  if (currentValue == rSource)
+  if (currentValue == value)
     return; //Nothing to change
 
   const D_UINT8      bitsSet  = ~0;
@@ -1416,7 +1424,7 @@ PrototypeTable::StoreEntry (const T& rSource, const ROW_INDEX row, const FIELD_I
 
   assert (desc.m_NullBitIndex > 0);
 
-  if (rSource.IsNull ())
+  if (value.IsNull ())
     {
       assert ((pRawData [byte_off] & (1 << bit_off)) == 0);
 
@@ -1432,7 +1440,7 @@ PrototypeTable::StoreEntry (const T& rSource, const ROW_INDEX row, const FIELD_I
 
       pRawData [byte_off] &= ~(1 << bit_off);
 
-      PSValInterp::Store (rSource, pRawData + desc.m_StoreIndex);
+      PSValInterp::Store (pRawData + desc.m_StoreIndex, value);
     }
 
   syncHolder.Leave ();
@@ -1450,7 +1458,9 @@ PrototypeTable::StoreEntry (const T& rSource, const ROW_INDEX row, const FIELD_I
           BTree fieldIndexTree (*m_vIndexNodeMgrs[field]);
 
           fieldIndexTree.RemoveKey (T_BTreeKey<T> (currentValue, row));
-          fieldIndexTree.InsertKey (T_BTreeKey<T> (rSource, row), dummyNode, dummyKey);
+          fieldIndexTree.InsertKey (T_BTreeKey<T> (value, row),
+                                    dummyNode,
+                                    dummyKey);
         }
       catch (...)
         {
@@ -1462,15 +1472,17 @@ PrototypeTable::StoreEntry (const T& rSource, const ROW_INDEX row, const FIELD_I
 }
 
 template <class T> void
-PrototypeTable::RetrieveEntry (T& rDestination, const ROW_INDEX row, const FIELD_INDEX field)
+PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
+                               const FIELD_INDEX field,
+                               T&                outValue)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, rDestination))))
+      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, outValue))))
     throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
 
-  T* const      pDest    = &rDestination;
+  T* const      pDest    = &outValue;
   const D_UINT  byte_off = desc.m_NullBitIndex / 8;
   const D_UINT8 bit_off  = desc.m_NullBitIndex % 8;
 
@@ -1485,7 +1497,7 @@ PrototypeTable::RetrieveEntry (T& rDestination, const ROW_INDEX row, const FIELD
       _placement_new (pDest, T ());
     }
   else
-    PSValInterp::Retrieve (pDest, pRawData + desc.m_StoreIndex);
+    PSValInterp::Retrieve (pRawData + desc.m_StoreIndex, pDest);
 }
 
 
@@ -1618,7 +1630,7 @@ PrototypeTable::MatchRows (const T&          min,
 
   for (ROW_INDEX row = fromRow; (row <= toRow) && (maxCount > 0); ++row)
     {
-      GetEntry (rowValue, field, row);
+      GetEntry (field, row, rowValue);
 
       if ( (rowValue < min) || (max < rowValue))
         continue;

@@ -1032,9 +1032,9 @@ public:
   DBSArray (const DBSArray& rSource);
   DBSArray& operator= (const DBSArray& rSource);
 
-  bool           IsNull () const { return GetElementsCount() == 0; }
-  D_UINT64       GetElementsCount () const;
-  DBS_FIELD_TYPE GetElementsType () const;
+  bool           IsNull () const { return ElementsCount() == 0; }
+  D_UINT64       ElementsCount () const;
+  DBS_FIELD_TYPE ElementsType () const;
 
   D_UINT64 AddElement (const DBSBool& value);
   D_UINT64 AddElement (const DBSChar& value);

@@ -71,7 +71,7 @@ test_array_with_dates (void *)
 
   array.Sort ();
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 0;
 
   DBSDate lastValue;
@@ -99,7 +99,7 @@ test_array_with_datetimes (void *)
 
   array.Sort ();
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 2;
 
   DBSDateTime lastValue;
@@ -127,7 +127,7 @@ test_array_with_hirestimes (void *)
 
   array.Sort ();
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 4;
 
   DBSHiresTime lastValue;
@@ -155,7 +155,7 @@ test_array_with_int8 (void *)
 
   array.Sort ();
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 6;
 
   DBSUInt8 lastValue;
@@ -184,7 +184,7 @@ test_array_with_dates_r (void *)
 
   array.Sort (true);
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 8;
 
   DBSDate lastValue;
@@ -213,7 +213,7 @@ test_array_with_datetimes_r (void *)
 
   array.Sort (true);
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 10;
 
   DBSDateTime lastValue;
@@ -241,7 +241,7 @@ test_array_with_hirestimes_r (void *)
 
   array.Sort (true);
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 12;
 
   DBSHiresTime lastValue;
@@ -270,7 +270,7 @@ test_array_with_int8_r (void *)
 
   array.Sort (true);
 
-  if (array.GetElementsCount () != _elemsCount)
+  if (array.ElementsCount () != _elemsCount)
     throw 14;
 
   DBSUInt8 lastValue;

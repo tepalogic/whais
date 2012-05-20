@@ -379,7 +379,7 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
 
       assert (valueIncrement <= (sizeof rawStorage));
 
-      PSValInterp::Store (array[index], rawStorage);
+      PSValInterp::Store (rawStorage, array[index]);
       prOutStrategy->WriteRaw(currentOffset, valueIncrement, rawStorage);
       prOutStrategy->IncrementCount();
       currentOffset += valueIncrement;
@@ -504,7 +504,7 @@ DBSArray::operator= (const DBSArray& rSource)
   if (&rSource == this)
     return *this;
 
-  if (rSource.GetElementsType() != GetElementsType())
+  if (rSource.ElementsType() != ElementsType())
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
   I_ArrayStrategy* pTemp = m_pArray;
@@ -517,13 +517,13 @@ DBSArray::operator= (const DBSArray& rSource)
 }
 
 D_UINT64
-DBSArray::GetElementsCount () const
+DBSArray::ElementsCount () const
 {
   return m_pArray->Count();
 }
 
 DBS_FIELD_TYPE
-DBSArray::GetElementsType () const
+DBSArray::ElementsType () const
 {
   return m_pArray->Type();
 }
@@ -569,7 +569,7 @@ add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
   D_UINT8 rawElement[MAX_VALUE_RAW_STORAGE];
 
   assert (storageSize <= sizeof rawElement);
-  PSValInterp::Store (element, rawElement);
+  PSValInterp::Store (rawElement, element);
   pArrayStrategy->WriteRaw (pArrayStrategy->RawSize(), storageSize, rawElement);
 
   assert ((pArrayStrategy->RawSize() % storageSize) == 0);
@@ -684,7 +684,7 @@ get_array_element (T& outElement, I_ArrayStrategy* const pArrayStrategy, const D
   assert (sizeof rawElement >= storageSize);
 
   pArrayStrategy->ReadRaw (index* storageSize, storageSize, rawElement);
-  PSValInterp::Retrieve (&outElement, rawElement);
+  PSValInterp::Retrieve (rawElement, &outElement);
 }
 
 void
@@ -795,7 +795,7 @@ set_array_element (I_ArrayStrategy*& pArrayStrategy, const T& value, const D_UIN
   else
     {
       D_UINT8 rawElement[MAX_VALUE_RAW_STORAGE];
-      PSValInterp::Store (value, rawElement);
+      PSValInterp::Store (rawElement, value);
       pArrayStrategy->WriteRaw(storageSize* index, storageSize, rawElement);
     }
 }
@@ -911,7 +911,7 @@ template <class DBS_T> D_INT64
 partition (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
 {
   assert (from < to);
-  assert (to < _SC(D_INT64, array.GetElementsCount()));
+  assert (to < _SC(D_INT64, array.ElementsCount()));
 
   const D_INT64 pivotIndex = (from + to) / 2;
   DBS_T         leftEl;
@@ -999,7 +999,7 @@ template <class DBS_T> D_INT64
 partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
 {
   assert (from < to);
-  assert (to < _SC(D_INT64, array.GetElementsCount()));
+  assert (to < _SC(D_INT64, array.ElementsCount()));
 
   const D_INT64 pivotIndex = (from + to) / 2;
   DBS_T         leftEl;
@@ -1128,52 +1128,52 @@ quick_sort (DBSArray&  array, D_INT64 from, D_INT64 to, const bool reverse)
 void
 DBSArray::Sort (bool reverse)
 {
-  switch (GetElementsType ())
+  switch (ElementsType ())
   {
   case T_BOOL:
-    quick_sort<DBSBool> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSBool> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_CHAR:
-    quick_sort<DBSChar> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSChar> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_DATE:
-    quick_sort<DBSDate> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSDate> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_DATETIME:
-    quick_sort<DBSDateTime> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSDateTime> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_HIRESTIME:
-    quick_sort<DBSHiresTime> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSHiresTime> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_UINT8:
-    quick_sort<DBSUInt8> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSUInt8> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_UINT16:
-    quick_sort<DBSUInt16> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSUInt16> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_UINT32:
-    quick_sort<DBSUInt32> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSUInt32> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_UINT64:
-    quick_sort<DBSUInt64> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSUInt64> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_REAL:
-    quick_sort<DBSReal> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSReal> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_RICHREAL:
-    quick_sort<DBSRichReal> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSRichReal> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_INT8:
-    quick_sort<DBSInt8> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSInt8> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_INT16:
-    quick_sort<DBSInt16> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSInt16> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_INT32:
-    quick_sort<DBSInt32> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSInt32> (*this, 0, ElementsCount () - 1, reverse);
     break;
   case T_INT64:
-    quick_sort<DBSInt64> (*this, 0, GetElementsCount () - 1, reverse);
+    quick_sort<DBSInt64> (*this, 0, ElementsCount () - 1, reverse);
     break;
   default:
     assert (false);
