@@ -6,8 +6,9 @@
  */
 
 #include <assert.h>
-#include <iostream>
+#include <stdlib.h>
 #include <string.h>
+#include <iostream>
 #include <vector>
 
 #include "test/test_fmw.h"
@@ -21,7 +22,7 @@ struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_UINT32, false}
 };
 
-static const D_UINT gElemsCount = 5000000; /* Scale this down for debug purposes! */
+static D_UINT gElemsCount = 5000000; /* Scale this down for debug purposes! */
 
 bool
 fill_table (I_DBSTable& table)
@@ -165,12 +166,16 @@ test_for_radius_rows (I_DBSTable& table)
 }
 
 const D_CHAR db_name[] = "t_baza_date_1";
+
 int
-main ()
+main (int argc, char **argv)
 {
-  // VC++ allocates memory when the C++ runtime is initialized
-  // We need not to test against it!
-  std::cout << "Print a message to not confuse the memory tracker: " << (D_UINT) 0x3456 << "\n";
+  if (argc > 1)
+    {
+      gElemsCount = atol (argv[1]);
+    }
+
+  std::cout << "Executing the test with " << gElemsCount << " number of rows\n";
   D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
 

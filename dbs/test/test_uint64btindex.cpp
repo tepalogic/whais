@@ -6,8 +6,9 @@
  */
 
 #include <assert.h>
-#include <iostream>
+#include <stdlib.h>
 #include <string.h>
+#include <iostream>
 #include <vector>
 
 #include "utils/include/random.h"
@@ -27,7 +28,6 @@ const D_CHAR tb_name[] = "t_test_tab";
 
 D_UINT _rowsCount   = 5000000;
 D_UINT _removedRows = _rowsCount / 10;
-
 
 bool
 fill_table_with_values (I_DBSTable& table,
@@ -272,14 +272,17 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 }
 
 int
-main ()
+main (int argc, char **argv)
 {
-  // VC++ allocates memory when the C++ runtime is initialized
-  // We need not to test against it!
-  std::cout << "Print a message to not confuse the memory tracker: " << (D_UINT) 0x3456 << "\n";
+  if (argc > 1)
+    {
+      _rowsCount = atol (argv[1]);
+    }
+  _removedRows = _rowsCount / 10;
+
+  std::cout << "Executing the test with " << _rowsCount<< " number of rows\n";
   D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
-
 
   {
     std::string dir = ".";
