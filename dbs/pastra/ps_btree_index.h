@@ -189,10 +189,11 @@ public:
 protected:
   struct CachedData
   {
-    CachedData (I_BTreeNode* pNode, const D_INT refCount) :
-      m_pNode (pNode),
-      m_ReferenceCount (refCount)
-    {}
+    CachedData (I_BTreeNode* pNode)
+      : m_pNode (pNode),
+        m_ReferenceCount (0)
+    {
+    }
 
     I_BTreeNode* m_pNode;
     D_INT        m_ReferenceCount;

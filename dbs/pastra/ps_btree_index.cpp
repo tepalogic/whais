@@ -246,12 +246,15 @@ I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
 
   if (it == m_NodesKeeper.end ())
     {
-      auto_ptr <I_BTreeNode> apNode (GetNode (node));
-      m_NodesKeeper.insert ( pair <NODE_INDEX, CachedData> (node, CachedData (apNode.get (), 0)));
+      auto_ptr<I_BTreeNode>        apNode (GetNode (node));
+      pair<NODE_INDEX, CachedData> cachedNode (node,
+                                               CachedData (apNode.get ()));
+      m_NodesKeeper.insert (cachedNode);
 
       apNode.release();
 
       it = m_NodesKeeper.find (node);
+      assert (it != m_NodesKeeper.end ());
     }
 
   it->second.m_ReferenceCount++;
