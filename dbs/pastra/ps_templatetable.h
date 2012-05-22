@@ -273,7 +273,6 @@ private:
                                          ROW_INDEX         maxCount,
                                          const FIELD_INDEX filedIndex);
 
-  ROW_INDEX IncreaseRowCount ();
   void      CheckRowToReuse (const ROW_INDEX row);
   void      CheckRowToDelete (const ROW_INDEX row);
   void      AquireIndexField (FieldDescriptor* const pFieldDesc);

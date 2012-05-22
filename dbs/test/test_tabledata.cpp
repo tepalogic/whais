@@ -312,7 +312,7 @@ add_fixed_values_vector_to_table (I_DBSTable& table, std::vector<T> &vectValues)
       ++fieldIndex;
     }
 
-  if (fieldIndex >= table.GetFieldsCount())
+  if (fieldIndex >= table.GetFieldsCount ())
     return ~0;
 
 

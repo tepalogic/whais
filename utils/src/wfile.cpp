@@ -29,12 +29,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-WFile::WFile (const D_CHAR* pFileName, D_UINT mode) :
-  m_Handle (0)
+WFile::WFile (const D_CHAR* pFileName, D_UINT mode)
+  : m_Handle (0)
 {
   m_Handle = whc_fopen (pFileName, mode);
   if (m_Handle == 0)
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror()));
+    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 WFile::WFile (const WFile &rSource) :
@@ -55,21 +55,21 @@ void
 WFile::Read (D_UINT8* pBuffer, D_UINT size)
 {
   if (!whc_fread (m_Handle, pBuffer, size))
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 void
 WFile::Write (const D_UINT8* pBuffer, D_UINT size)
 {
   if (!whc_fwrite (m_Handle, pBuffer, size))
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 void
 WFile::Seek (const D_INT64 where, const D_INT whence)
 {
   if (!whc_fseek (m_Handle, where, whence))
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 D_UINT64 WFile::Tell ()
@@ -94,7 +94,7 @@ D_UINT64 WFile::GetSize () const
   D_UINT64 size;
 
   if (!whc_ftellsize (m_Handle, &size))
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 
   return size;
 }
@@ -103,7 +103,7 @@ void
 WFile::SetSize (const D_UINT64 size)
 {
   if (!whc_fsetsize (m_Handle, size))
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 void
@@ -116,7 +116,7 @@ WFile::Close ()
   else
     {
       m_Handle = 0;
-      throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+      throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
     }
 }
 

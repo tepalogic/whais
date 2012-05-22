@@ -42,7 +42,6 @@ PrototypeTable::PrototypeTable (DbsHandler& dbs)
     m_DescriptorsSize (0),
     m_FieldsCount (0),
     m_FieldsDescriptors(NULL),
-    m_RowCache (*this),
     m_Sync (),
     m_IndexSync ()
 {
@@ -58,7 +57,6 @@ PrototypeTable::PrototypeTable (const PrototypeTable& prototype)
     m_FieldsCount (prototype.m_FieldsCount),
     m_FieldsDescriptors(),
     m_vIndexNodeMgrs (),
-    m_RowCache (*this),
     m_Sync (),
     m_IndexSync ()
 {
@@ -142,9 +140,11 @@ PrototypeTable::AddRow ()
   D_UINT   toWrite         = m_RowSize;
   D_UINT8  dummyValue[128];
 
+  m_RowCache.FlushItem (m_RowsCount - 1);
+
   memset(dummyValue, 0xFF, sizeof(dummyValue));
 
-  while (toWrite)
+  while (toWrite > 0)
     {
       D_UINT writeChunk = MIN (toWrite, sizeof (dummyValue));
 
@@ -160,7 +160,7 @@ PrototypeTable::AddRow ()
 
   removedRows.InsertKey (TableRmKey (m_RowsCount), dummyNode, dummyKey);
 
-  IncreaseRowCount ();
+  m_RowCache.RefreshItem (m_RowsCount++);
 
   assert (m_RowsCount > 0);
 
@@ -552,16 +552,9 @@ PrototypeTable::RetrieveItems (D_UINT8* pDestBuffer,
   if (itemsCount + firstItem > m_RowsCount)
     itemsCount = m_RowsCount - firstItem;
 
-  FixedFieldsContainer ().Read (firstItem * m_RowSize, itemsCount * m_RowSize, pDestBuffer);
-}
-
-
-
-ROW_INDEX
-PrototypeTable::IncreaseRowCount ()
-{
-  m_RowCache.RefreshItem (m_RowsCount++);
-  return m_RowsCount;
+  FixedFieldsContainer ().Read (firstItem * m_RowSize,
+                                itemsCount * m_RowSize,
+                                pDestBuffer);
 }
 
 void
@@ -589,7 +582,7 @@ PrototypeTable::CheckRowToDelete (const ROW_INDEX row)
       NODE_INDEX   dumyNode;
       KEY_INDEX    dummyKey;
       BTree        removedNodes (*this);
-      TableRmKey    key (row);
+      TableRmKey   key (row);
 
       removedNodes.InsertKey (key, dumyNode, dummyKey);
     }
@@ -1489,7 +1482,7 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
   WSynchronizerRAII syncHolder (m_Sync);
 
   StoredItem           cachedItem = m_RowCache.RetriveItem (row);
-  const D_UINT8* const pRawData   = cachedItem.GetDataForRead();
+  const D_UINT8* const pRawData   = cachedItem.GetDataForRead ();
 
   if (pRawData[byte_off] & (1 << bit_off))
     {

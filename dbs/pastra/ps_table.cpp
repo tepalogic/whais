@@ -297,26 +297,25 @@ create_table_file (const D_UINT64            maxFileSize,
                    const DBSFieldDescriptor* pFields,
                    D_UINT                    fieldsCount)
 {
-
   //Check the arguments
   if ((pFields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
-    throw(DBSException(NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED)));
+    throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
 
   //Compute the table header descriptor size
-  const D_UINT32 descriptorsSize = sizeof(FieldDescriptor) * fieldsCount +
+  const D_UINT32 descriptorsSize = sizeof (FieldDescriptor) * fieldsCount +
                                    get_strlens_till_index(pFields, fieldsCount);
 
   //Validate the optimally rearrange the fields for minimum row size
   D_UINT rowSize = 0;
-  validate_field_descriptors(pFields, fieldsCount);
+  validate_field_descriptors (pFields, fieldsCount);
 
-  vector<DBSFieldDescriptor> vect(pFields + 0, pFields + fieldsCount);
-  auto_ptr<D_UINT8> apFieldDescription(new D_UINT8[descriptorsSize]);
+  vector<DBSFieldDescriptor> vect (pFields + 0, pFields + fieldsCount);
+  auto_ptr<D_UINT8> apFieldDescription (new D_UINT8[descriptorsSize]);
 
   arrange_field_entries(vect, apFieldDescription.get(), rowSize);
   pFields = &vect.front();
 
-  WFile tableFile(pBaseFileName, WHC_FILECREATE_NEW | WHC_FILERDWR);
+  WFile tableFile (pBaseFileName, WHC_FILECREATE_NEW | WHC_FILERDWR);
 
   auto_ptr<D_UINT8> apBuffer(new D_UINT8[PS_HEADER_SIZE]);
   D_UINT8* const    pBuffer = apBuffer.get();
@@ -382,7 +381,7 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
 
   assert (m_apMainTable.get () != NULL);
 
-  m_RowCache.Init (m_RowSize, 4096, 1024);
+  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
 
   InitVariableStorages ();
   InitIndexedFields ();
@@ -411,7 +410,7 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
 
   assert (m_apMainTable.get () != NULL);
 
-  m_RowCache.Init (m_RowSize, 4096, 1024);
+  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
 
   InitVariableStorages ();
   InitIndexedFields ();
@@ -679,7 +678,7 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
                            m_FieldsCount,
                            NULL);
-  m_RowCache.Init (m_RowSize, 4096, 1024);
+  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
 }
 
 TemporalTable::TemporalTable (const PrototypeTable& prototype)
@@ -692,7 +691,7 @@ TemporalTable::TemporalTable (const PrototypeTable& prototype)
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
                            m_FieldsCount,
                            NULL);
-  m_RowCache.Init (m_RowSize, 4096, 1024);
+  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
 }
 
 TemporalTable::~TemporalTable ()

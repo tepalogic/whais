@@ -48,30 +48,29 @@ public:
 class BlockEntry
 {
 public:
-  bool  IsDirty () const { return (m_Flags & BLOCK_ENTRY_DIRTY) != 0;}
-  bool  IsInUse () const { return m_ReferenceCount > 0;  }
-
-private:
-  friend class StoredItem;
-  friend class BlockCache;
-
-  void  MarkDirty () { m_Flags |= BLOCK_ENTRY_DIRTY; }
-  void  RegisterUser () { m_ReferenceCount++; }
-  void  ReleaseUser () {  assert ( m_ReferenceCount > 0); m_ReferenceCount--; }
-
-  explicit BlockEntry (D_UINT64 baseItem, D_UINT8* pData) :
-      m_BaseItem (baseItem),
-      m_Data (pData),
+  explicit BlockEntry (D_UINT8* const pData) :
+      m_pData (pData),
       m_ReferenceCount (0),
       m_Flags (0)
   {
     assert (pData != NULL);
   }
 
+  bool  IsDirty () const { return (m_Flags & BLOCK_ENTRY_DIRTY) != 0;}
+  bool  IsInUse () const { return m_ReferenceCount > 0;  }
+
+  void  MarkDirty () { m_Flags |= BLOCK_ENTRY_DIRTY; }
+  void  MarkClean () { m_Flags &= ~BLOCK_ENTRY_DIRTY; }
+
+  void  RegisterUser () { m_ReferenceCount++; }
+  void  ReleaseUser () {  assert ( m_ReferenceCount > 0); m_ReferenceCount--; }
+
+  D_UINT8* Data () { return m_pData; }
+
+private:
   static const D_UINT32 BLOCK_ENTRY_DIRTY = 0x00000001;
 
-  const D_UINT64 m_BaseItem;
-  D_UINT8* const m_Data;
+  D_UINT8* const m_pData;
   D_UINT32       m_ReferenceCount;
   D_UINT32       m_Flags;
 };
@@ -115,12 +114,12 @@ public:
   D_UINT8* GetDataForUpdate () const
   {
     m_BlockEntry->MarkDirty ();
-    return m_BlockEntry->m_Data + m_ItemOffset;
+    return m_BlockEntry->Data () + m_ItemOffset;
   }
 
   const D_UINT8* GetDataForRead () const
   {
-    return m_BlockEntry->m_Data + m_ItemOffset;
+    return m_BlockEntry->Data () + m_ItemOffset;
   }
 
 protected:
@@ -131,19 +130,20 @@ protected:
 class BlockCache
 {
 public:
-  BlockCache (I_BlocksManager& rBlockManager);
+  BlockCache ();
   ~BlockCache ();
 
-  void       Init (const D_UINT itemSize,
-                   const D_UINT blockSize,
-                   const D_UINT maxBlockCount);
+  void       Init (I_BlocksManager& blocksMgr,
+                   const D_UINT     itemSize,
+                   const D_UINT     blockSize,
+                   const D_UINT     maxBlockCount);
   void       Flush ();
-  StoredItem RetriveItem (const D_UINT64 item);
+  void       FlushItem (const D_UINT64 item);
   void       RefreshItem (const D_UINT64 item);
-
+  StoredItem RetriveItem (const D_UINT64 item);
 
 private:
-  I_BlocksManager& m_Manager;
+  I_BlocksManager* m_pManager;
   D_UINT           m_ItemSize;
   D_UINT           m_MaxBlocks;
   D_UINT           m_BlockSize;

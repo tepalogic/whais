@@ -68,7 +68,6 @@ StoreEntry::Write (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer)
 VLVarsStore::VLVarsStore ()
   : I_BlocksManager (),
     m_apEntriesContainer (NULL),
-    m_EntrysCache (*this),
     m_FirstFreeEntry (0),
     m_EntrysCount (0),
     m_Sync ()
@@ -96,9 +95,11 @@ VLVarsStore::Init (const D_CHAR*  pContainerBaseName,
 {
   assert (maxFileSize != 0);
 
-  const D_UINT64 uUnitsCount = (containerSize + maxFileSize- 1) / maxFileSize;
+  const D_UINT64 unitsCount = (containerSize + maxFileSize- 1) / maxFileSize;
 
-  m_apEntriesContainer.reset (new FileContainer (pContainerBaseName, maxFileSize, uUnitsCount));
+  m_apEntriesContainer.reset (new FileContainer (pContainerBaseName,
+                                                 maxFileSize,
+                                                 unitsCount));
   m_EntrysCount = m_apEntriesContainer->Size () / sizeof (StoreEntry);
 
   FinishInit ();
@@ -117,10 +118,12 @@ VLVarsStore::FinishInit ()
       sEntry.SetPrevEntry (0);
       sEntry.SetNextEntry (StoreEntry::LAST_DELETED_ENTRY);
 
-      m_apEntriesContainer.get ()->Write (0, sizeof sEntry, _RC(D_UINT8*, &sEntry));
+      m_apEntriesContainer.get ()->Write (0,
+                                          sizeof sEntry,
+                                          _RC(D_UINT8*, &sEntry));
       m_EntrysCount++;
     }
-  m_EntrysCache.Init (sizeof (StoreEntry), 1024, 1024);
+  m_EntrysCache.Init (*this, sizeof (StoreEntry), 1024, 1024);
 
   StoredItem              cachedItem = m_EntrysCache.RetriveItem (0);
   const StoreEntry* const pEntryHdr  = _RC(const StoreEntry *, cachedItem.GetDataForRead ());
@@ -585,8 +588,8 @@ VLVarsStore::StoreItems (const D_UINT8* pSrcBuffer,
   if (firstItem + itemsCount > m_EntrysCount)
     itemsCount = m_EntrysCount - firstItem;
 
-  const D_UINT64 start = firstItem* sizeof (StoreEntry);
-  const D_UINT64 count = itemsCount* sizeof (StoreEntry);
+  const D_UINT64 start = firstItem * sizeof (StoreEntry);
+  const D_UINT64 count = itemsCount * sizeof (StoreEntry);
 
   m_apEntriesContainer->Write (start, count, pSrcBuffer);
 }
@@ -597,8 +600,8 @@ VLVarsStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT ite
   if (firstItem + itemsCount > m_EntrysCount)
     itemsCount = m_EntrysCount - firstItem;
 
-  const D_UINT64 start = firstItem* sizeof (StoreEntry);
-  const D_UINT64 count = itemsCount* sizeof (StoreEntry);
+  const D_UINT64 start = firstItem * sizeof (StoreEntry);
+  const D_UINT64 count = itemsCount * sizeof (StoreEntry);
 
   m_apEntriesContainer->Read (start, count, pDestBuffer);
 }
@@ -682,8 +685,11 @@ VLVarsStore::ExtentFreeList ()
   addEntry.MarkAsFirstEntry (false);
 
   D_UINT64 insertPos = m_apEntriesContainer.get ()->Size();
-  m_FirstFreeEntry = insertPos / sizeof (addEntry);
 
+  m_FirstFreeEntry   = insertPos / sizeof (addEntry);
+
+  //Flush the current content
+  m_EntrysCache.FlushItem (m_FirstFreeEntry - 1);
 
   assert ((insertPos % sizeof (addEntry)) == 0);
   m_apEntriesContainer.get ()->Write (insertPos, sizeof (addEntry), _RC(D_UINT8*, &addEntry));

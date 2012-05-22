@@ -131,7 +131,7 @@ whc_fread (WH_FILE_HND f_hnd, D_UINT8* pBuffer, D_UINT size)
 D_BOOL
 whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8* pBuffer, D_UINT size)
 {
-  D_BOOL result = TRUE;
+  D_BOOL result       = TRUE;
   D_UINT actual_count = 0;
 
   while (actual_count < size)

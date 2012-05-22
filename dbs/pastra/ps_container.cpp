@@ -150,7 +150,7 @@ FileContainer::Read (D_UINT64 from, D_UINT64 size, D_UINT8* pDest)
   if ((unitIndex > unitsCount) || (from + size > Size ()))
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
-  WFile unitFile = m_FilesHandles[unitIndex];
+  WFile& unitFile = m_FilesHandles[unitIndex];
 
   D_UINT64 actualSize = size;
 
@@ -243,7 +243,7 @@ FileContainer::MarkForRemoval()
 void
 FileContainer::ExtendContainer ()
 {
-  D_UINT      count   = m_FilesHandles.size ();
+  D_UINT      count    = m_FilesHandles.size ();
   std::string fileName = m_FileNameBase;
 
   if (count != 0)
