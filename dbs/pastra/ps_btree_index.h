@@ -47,7 +47,7 @@ static const NODE_INDEX NIL_NODE = ~0;
 class I_BTreeNode
 {
 public:
-  I_BTreeNode (I_BTreeNodeManager& nodesManager);
+  I_BTreeNode (I_BTreeNodeManager& nodesManager, const NODE_INDEX node);
   virtual ~I_BTreeNode ();
 
   bool       IsLeaf () const { return m_Header->m_Leaf != 0; }
@@ -57,18 +57,40 @@ public:
   NODE_INDEX GetNext () const { return m_Header->m_Right; }
   NODE_INDEX GetPrev () const { return m_Header->m_Left; }
   D_UINT16   GetNullKeysCount () const { return m_Header->m_NullKeysCount; };
-  D_UINT8*   GetRawData () const { return _RC (D_UINT8*, m_Header); }
 
+  const D_UINT8*  DataToRead () const
+  {
+    return _RC (const D_UINT8*, (m_Header.get () + 1));
+  }
+  D_UINT8*        DataToWrite ()
+  {
+    MarkDirty ();
+    return _RC (D_UINT8*, (m_Header.get () + 1));
+  }
+  D_UINT8*  RawData () const
+  {
+    return _RC (D_UINT8*, m_Header.get ());
+  }
+
+  void MarkDirty () {  m_Header->m_Dirty = 1; }
+  void MarkClean () {  m_Header->m_Dirty = 0; }
   void SetLeaf (bool leaf) { m_Header->m_Leaf = (leaf == false) ? 0 : 1; }
-  void MarkAsRemoved() { m_Header->m_Removed = 1, m_Header->m_Dirty = 1;};
-  void MarkAsUsed() { m_Header->m_Removed = 0, m_Header->m_Dirty = 1;};
-  void SetNext (const NODE_INDEX next) { m_Header->m_Right = next, m_Header->m_Dirty = 1; }
-  void SetPrev (const NODE_INDEX prev) { m_Header->m_Left = prev, m_Header->m_Dirty = 1; }
-  void SetNullKeysCount (const D_UINT16 count) { m_Header->m_NullKeysCount = count,
-                                                 m_Header->m_Dirty = 1; };
+  void MarkAsRemoved() { m_Header->m_Removed = 1; MarkDirty (); }
+  void MarkAsUsed() { m_Header->m_Removed = 0; MarkDirty (); };
+  void SetNext (const NODE_INDEX next) { m_Header->m_Right = next; MarkDirty (); }
+  void SetPrev (const NODE_INDEX prev) { m_Header->m_Left = prev; MarkDirty ();; }
+  void SetNullKeysCount (const D_UINT16 count)
+  {
+    m_Header->m_NullKeysCount = count;
+    MarkDirty ();
+  };
 
   D_UINT GetKeysCount () const { return m_Header->m_KeysCount; }
-  void   SetKeysCount (D_UINT count) { m_Header->m_KeysCount = count; m_Header->m_Dirty = 1; }
+  void   SetKeysCount (D_UINT count)
+  {
+    m_Header->m_KeysCount = count;
+    MarkDirty ();
+  }
 
   virtual D_UINT KeysPerNode () const = 0;
 
@@ -78,9 +100,10 @@ public:
 
   virtual KEY_INDEX  GetParentKeyIndex (const I_BTreeNode& parent) const = 0;
   virtual NODE_INDEX GetChildNode (const I_BTreeKey& key) const;
-  virtual NODE_INDEX GetKeyNode (const KEY_INDEX keyIndex) const = 0;
-  virtual void       AdjustKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex) = 0;
-  virtual void       SetKeyNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode) = 0;
+  virtual NODE_INDEX GetNodeOfKey (const KEY_INDEX keyIndex) const = 0;
+  virtual void       AdjustKeyNode (const I_BTreeNode& childNode,
+                                    const KEY_INDEX    keyIndex) = 0;
+  virtual void       SetNodeOfKey (const KEY_INDEX keyIndex, const NODE_INDEX childNode) = 0;
   virtual void       SetData (const KEY_INDEX keyIndex, const D_UINT8 *data);
 
   virtual KEY_INDEX InsertKey (const I_BTreeKey& key) = 0;
@@ -96,9 +119,10 @@ public:
 
   virtual const I_BTreeKey& SentinelKey () const = 0;
 
-  bool FindBiggerOrEqual (const I_BTreeKey& key, KEY_INDEX& outIndex) const;
-  void Release ();
+  bool   FindBiggerOrEqual (const I_BTreeKey& key, KEY_INDEX& outIndex) const;
+  void   Release ();
 
+protected:
   struct NodeHeader
   {
     D_UINT64  m_Left          : 32;
@@ -109,29 +133,28 @@ public:
     D_UINT64  m_Leaf          : 1;
     D_UINT64  m_Dirty         : 1;
     D_UINT64  m_Removed       : 1;
-    D_UINT64  _unused_1       : 61; //To make sure this is aligned well
-    D_UINT64  _unused_2;
+    D_UINT64  _reserved       : 61; //To make sure this is aligned well
+    D_UINT64  _unused;
   };
 
-protected:
-  friend class I_BTreeNodeManager;
+  I_BTreeNodeManager&       m_NodesMgr;
 
-  NodeHeader*         m_Header;
-  I_BTreeNodeManager& m_NodesMgr;
+private:
+  std::auto_ptr<NodeHeader> m_Header;
 };
 
-class BTreeNodeHandler
+class BTreeNodeRAI
 {
 public:
-  BTreeNodeHandler (I_BTreeNode* node) :
+  BTreeNodeRAI (I_BTreeNode* node) :
     m_pTreeNode (node)
   {}
 
-  BTreeNodeHandler (I_BTreeNode& node) :
+  BTreeNodeRAI (I_BTreeNode& node) :
     m_pTreeNode (&node)
   {}
 
-  ~BTreeNodeHandler ()
+  ~BTreeNodeRAI ()
   {
     m_pTreeNode->Release ();
   }
@@ -159,8 +182,8 @@ public:
     }
 
 private:
-  BTreeNodeHandler (const BTreeNodeHandler &);
-  BTreeNodeHandler& operator= (const BTreeNodeHandler &);
+  BTreeNodeRAI (const BTreeNodeRAI &);
+  BTreeNodeRAI& operator= (const BTreeNodeRAI &);
 
   I_BTreeNode* m_pTreeNode;
 };
@@ -179,7 +202,7 @@ public:
   void         ReleaseNode (I_BTreeNode* pNode) { ReleaseNode (pNode->NodeId()); }
   void         FlushNodes ();
 
-  virtual D_UINT     GetRawNodeSize () const = 0;
+  virtual D_UINT     RawNodeSize () const = 0;
   virtual NODE_INDEX AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
   virtual void       FreeNode (const NODE_INDEX node) = 0;
 
@@ -191,17 +214,17 @@ protected:
   {
     CachedData (I_BTreeNode* pNode)
       : m_pNode (pNode),
-        m_ReferenceCount (0)
+        m_RefsCount (0)
     {
     }
 
     I_BTreeNode* m_pNode;
-    D_INT        m_ReferenceCount;
+    D_UINT       m_RefsCount;
   };
 
-  virtual D_UINT       GetMaxCachedNodes () = 0;
-  virtual I_BTreeNode* GetNode (const NODE_INDEX node) = 0;
-  virtual void         StoreNode (I_BTreeNode* const pNode) = 0;
+  virtual D_UINT       MaxCachedNodes () = 0;
+  virtual I_BTreeNode* LoadNode (const NODE_INDEX node) = 0;
+  virtual void         SaveNode (I_BTreeNode* const pNode) = 0;
 
   WSynchronizer                     m_Sync;
   std::map <NODE_INDEX, CachedData> m_NodesKeeper;
@@ -217,10 +240,12 @@ public:
                           NODE_INDEX& outNode,
                           KEY_INDEX  &outKeyIndex);
 
-  void InsertKey (const I_BTreeKey& key, NODE_INDEX& outNode, KEY_INDEX& outKeyIndex);
+  void InsertKey (const I_BTreeKey& key,
+                  NODE_INDEX&       outNode,
+                  KEY_INDEX&        outKeyIndex);
   void RemoveKey (const I_BTreeKey& key);
 
-protected:
+private:
   bool RecursiveInsertNodeKey (const NODE_INDEX parentId,
                                const NODE_INDEX nodeId,
                                const I_BTreeKey& key,

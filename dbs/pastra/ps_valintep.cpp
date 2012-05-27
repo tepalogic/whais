@@ -53,8 +53,8 @@ static const D_INT PS_INT8_ALIGN               = 1;
 static const D_INT PS_INT16_ALIGN              = 2;
 static const D_INT PS_INT32_ALIGN              = 4;
 static const D_INT PS_INT64_ALIGN              = 8;
-static const D_INT PS_REAL_ALIGN               = sizeof (float);
-static const D_INT PS_RICHREAL_ALIGN           = sizeof (long double);
+static const D_INT PS_REAL_ALIGN               = 0; //Based on system implementation
+static const D_INT PS_RICHREAL_ALIGN           = 0; //Based on system implementation
 static const D_INT PS_TEXT_ALIGN               = 8;
 static const D_INT PS_ARRAY_ALIGN              = 8;
 
@@ -398,9 +398,29 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
   case T_HIRESTIME:
     return PS_HIRESDATE_ALIGN;
   case T_REAL:
-    return PS_REAL_ALIGN;
+    {
+      if (PS_REAL_SIZE >= 4 && PS_REAL_SIZE < 8)
+        return 4;
+      else if (PS_REAL_SIZE == 8)
+        return 8;
+      else
+        {
+          assert (false);
+          throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+        }
+    }
   case T_RICHREAL:
-    return PS_RICHREAL_ALIGN;
+    {
+      if (PS_RICHREAL_SIZE >= 8 && PS_RICHREAL_SIZE < 16)
+        return 8;
+      else if (PS_RICHREAL_SIZE == 16)
+        return 16;
+      else
+        {
+          assert (false);
+          throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+        }
+    }
   case T_UINT8:
   case T_INT8:
     return PS_INT8_ALIGN;
@@ -416,8 +436,8 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
   case T_TEXT:
     return PS_TEXT_ALIGN;
   default:
-    assert (0);
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    assert (false);
+    throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
   }
 }
 

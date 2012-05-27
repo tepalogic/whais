@@ -65,7 +65,7 @@ public:
   virtual ~PrototypeTable ();
 
   //Implementations for I_BTreeNodeManager
-  virtual D_UINT      GetRawNodeSize () const;
+  virtual D_UINT      RawNodeSize () const;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
   virtual NODE_INDEX  GetRootNodeId ();
@@ -279,9 +279,9 @@ private:
   void      ReleaseIndexField (FieldDescriptor* const pFieldDesc);
 
   //Implementations for I_BTreeNodeManager
-  virtual D_UINT       GetMaxCachedNodes ();
-  virtual I_BTreeNode* GetNode (const NODE_INDEX node);
-  virtual void         StoreNode (I_BTreeNode* const pNode);
+  virtual D_UINT       MaxCachedNodes ();
+  virtual I_BTreeNode* LoadNode (const NODE_INDEX node);
+  virtual void         SaveNode (I_BTreeNode* const pNode);
 
 protected:
   virtual void                 Flush ();
@@ -326,9 +326,9 @@ public:
   //Implementation of I_BTreeNode
   virtual D_UINT     KeysPerNode () const;
   virtual KEY_INDEX  GetParentKeyIndex (const I_BTreeNode& parent) const;
-  virtual NODE_INDEX GetKeyNode (const KEY_INDEX keyIndex) const;
+  virtual NODE_INDEX GetNodeOfKey (const KEY_INDEX keyIndex) const;
   virtual void       AdjustKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex);
-  virtual void       SetKeyNode (const KEY_INDEX keyIndex, const NODE_INDEX childNode);
+  virtual void       SetNodeOfKey (const KEY_INDEX keyIndex, const NODE_INDEX childNode);
   virtual KEY_INDEX  InsertKey (const I_BTreeKey& key);
   virtual void       RemoveKey (const KEY_INDEX keyIndex);
   virtual void       Split (const NODE_INDEX parentId);
@@ -338,9 +338,6 @@ public:
   virtual bool       IsBigger (const I_BTreeKey& key, KEY_INDEX keyIndex) const;
 
   virtual const I_BTreeKey& SentinelKey () const;
-
-protected:
-  std::auto_ptr <D_UINT8> m_cpNodeData;
 };
 
 }
