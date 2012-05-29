@@ -52,7 +52,7 @@ FieldIndexNodeManager::~FieldIndexNodeManager()
   FlushNodes ();
 }
 
-D_UINT
+D_UINT64
 FieldIndexNodeManager::RawNodeSize () const
 {
   return m_NodeSize;

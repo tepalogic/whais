@@ -202,7 +202,7 @@ public:
   void         ReleaseNode (I_BTreeNode* pNode) { ReleaseNode (pNode->NodeId()); }
   void         FlushNodes ();
 
-  virtual D_UINT     RawNodeSize () const = 0;
+  virtual D_UINT64   RawNodeSize () const = 0;
   virtual NODE_INDEX AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
   virtual void       FreeNode (const NODE_INDEX node) = 0;
 

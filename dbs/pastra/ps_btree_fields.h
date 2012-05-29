@@ -946,7 +946,7 @@ public:
   D_UINT64 GetIndexRawSize () const;
 
   //Implementations of I_BTreeNodeManager
-  virtual D_UINT      RawNodeSize () const;
+  virtual D_UINT64    RawNodeSize () const;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
 

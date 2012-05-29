@@ -414,7 +414,7 @@ PrototypeTable::GetFieldDescriptorInternal(const D_CHAR* const pFieldName) const
   throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
 }
 
-D_UINT
+D_UINT64
 PrototypeTable::RawNodeSize () const
 {
   return TableRmNode::RAW_NODE_SIZE;

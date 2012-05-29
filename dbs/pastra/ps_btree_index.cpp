@@ -275,14 +275,14 @@ I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
         {
           assert (it->second.m_pNode->NodeId() == it->first);
 
-          if (it->second.m_RefsCount == 0)
+          if ((it->second.m_RefsCount == 0) && (it->first != GetRootNodeId ()))
             {
               SaveNode (it->second.m_pNode);
               delete it->second.m_pNode;
-              m_NodesKeeper.erase (it++);
+              m_NodesKeeper.erase (it);
+              break;
             }
-          else
-            ++it;
+          ++it;
         }
     }
 
