@@ -36,6 +36,7 @@ fill_table_with_values (I_DBSTable& table,
                         DBSArray& tableValues)
 {
   bool     result = true;
+  DBSUInt64 prev;
 
   table.CreateFieldIndex (0, NULL, NULL);
   std::cout << "Filling table with values ... " << std::endl;
@@ -50,7 +51,12 @@ fill_table_with_values (I_DBSTable& table,
           break;
         }
 
-      std::cout << "\r" << index << "(" << rowCount << ")";
+      if (((index * 100) % rowCount) == 0)
+        {
+          std::cout << (index * 100) / rowCount << "%\r";
+          std::cout.flush ();
+        }
+
       table.SetEntry (index, 0, value);
       tableValues.AddElement (value);
 
@@ -84,13 +90,20 @@ fill_table_with_values (I_DBSTable& table,
       tableValues.GetElement (generated, rowIndex.m_Value);
       assert (generated.IsNull() == false);
 
-      if ((rowValue == generated) == false)
+      if (((rowValue == generated) == false) ||
+          (rowValue < prev))
         {
           result = false;
           break;
         }
+      else
+        prev = rowValue;
 
-      std::cout << "\r" << checkIndex << "(" << rowCount << ")";
+      if (((checkIndex * 100) % rowCount) == 0)
+        {
+          std::cout << (checkIndex * 100) / rowCount << "%\r";
+          std::cout.flush ();
+        }
     }
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -110,7 +123,11 @@ fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
     {
       table.SetEntry (index, 0, nullValue);
 
-      std::cout << "\r" << index << "(" << rowCount << ")";
+      if (((index * 100) % rowCount) == 0)
+        {
+          std::cout << (index * 100) / rowCount << "%\r";
+          std::cout.flush ();
+        }
     }
 
   DBSArray values = table.GetMatchingRows (nullValue,
@@ -209,7 +226,11 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 void
 callback_index_create (CallBackIndexData* const pData)
 {
-  std::cout << '\r' << pData->m_RowIndex << '(' << pData->m_RowsCount << ')';
+  if (((pData->m_RowIndex * 100) % pData->m_RowsCount) == 0)
+    {
+      std::cout << (pData->m_RowIndex * 100) / pData->m_RowsCount << "%\r";
+      std::cout.flush ();
+    }
 }
 
 bool
@@ -262,7 +283,11 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
       if ((rowValue == generatedValue) == false)
         result = false;
 
-      std::cout << '\r' << index << '(' << _rowsCount << ')';
+      if (((index * 100) % _rowsCount) == 0)
+        {
+          std::cout << (index * 100) / _rowsCount << "%\r";
+          std::cout.flush ();
+        }
     }
 
   dbsHnd.ReleaseTable (table);

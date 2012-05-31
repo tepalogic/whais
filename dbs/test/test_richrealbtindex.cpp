@@ -71,7 +71,6 @@ fill_table_with_values (I_DBSTable& table,
 
       table.SetEntry (index, 0, value);
       tableValues.AddElement (value);
-
     }
 
   std::cout << std::endl << "Check table values ... " << std::endl;
