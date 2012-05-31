@@ -39,8 +39,8 @@ static const D_INT PS_INT8_SIZE                = 1;
 static const D_INT PS_INT16_SIZE               = 2;
 static const D_INT PS_INT32_SIZE               = 4;
 static const D_INT PS_INT64_SIZE               = 8;
-static const D_INT PS_REAL_SIZE                = sizeof (float);
-static const D_INT PS_RICHREAL_SIZE            = sizeof (long double);
+static const D_INT PS_REAL_SIZE                = sizeof (REAL_T);
+static const D_INT PS_RICHREAL_SIZE            = sizeof (RICHREAL_T);
 static const D_INT PS_TEXT_SIZE                = 16;
 static const D_INT PS_ARRAY_SIZE               = 16;
 
@@ -115,9 +115,9 @@ new_integer (T_VAL value, T_OBJ* pOutValue)
 
 template <class T_OBJ, class T_REAL>
 static void
-new_real (T_REAL value, T_OBJ* pValue)
+new_real (T_REAL value, T_OBJ* pOutValue)
 {
-  _placement_new (pValue, T_OBJ (value));
+  _placement_new (pOutValue, T_OBJ (value));
 }
 
 void
@@ -191,12 +191,12 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSInt64 &value)
 void
 PSValInterp::Store (D_UINT8* pLocation, const DBSReal& value)
 {
-  *_RC(float*, pLocation) = value.m_Value;
+  _RC(REAL_T*, pLocation)[0] = value.m_Value;
 }
 void
 PSValInterp::Store (D_UINT8* pLocation, const DBSRichReal& value)
 {
-  _RC(long double*, pLocation)[0] = value.m_Value;
+  _RC(RICHREAL_T*, pLocation)[0] = value.m_Value;
 }
 
 void
@@ -305,12 +305,12 @@ PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt64* pOutValue)
 void
 PSValInterp::Retrieve (const D_UINT8* pLocation, DBSReal* pOutValue)
 {
-  new_real (_RC (const float*, pLocation)[0], pOutValue);
+  new_real (_RC (const REAL_T*, pLocation)[0], pOutValue);
 }
 void
 PSValInterp::Retrieve (const D_UINT8* pLocation, DBSRichReal* pOutValue)
 {
-  new_real (_RC (const long double*, pLocation)[0], pOutValue);
+  new_real (_RC (const RICHREAL_T*, pLocation)[0], pOutValue);
 }
 
 void
@@ -399,7 +399,7 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
     return PS_HIRESDATE_ALIGN;
   case T_REAL:
     {
-      if (PS_REAL_SIZE >= 4 && PS_REAL_SIZE < 8)
+      if (PS_REAL_SIZE == 4)
         return 4;
       else if (PS_REAL_SIZE == 8)
         return 8;
@@ -411,7 +411,9 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
     }
   case T_RICHREAL:
     {
-      if (PS_RICHREAL_SIZE >= 8 && PS_RICHREAL_SIZE < 16)
+      if ((PS_RICHREAL_SIZE == 4) || (PS_RICHREAL_SIZE == 12))
+        return 4;
+      else if (PS_RICHREAL_SIZE == 8)
         return 8;
       else if (PS_RICHREAL_SIZE == 16)
         return 16;

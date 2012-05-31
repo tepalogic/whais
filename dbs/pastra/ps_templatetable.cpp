@@ -1708,6 +1708,7 @@ void
 TableRmNode::AdjustKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex)
 {
   assert (childNode.NodeId () == GetNodeOfKey (keyIndex));
+  assert (IsLeaf() == false);
 
   const TableRmNode& child         = _SC (const TableRmNode&, childNode);
   NODE_INDEX* const pKeys          = _RC (NODE_INDEX*, DataToWrite ());

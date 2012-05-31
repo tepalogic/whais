@@ -31,8 +31,8 @@ using namespace pastra;
 using namespace std;
 
 I_BTreeNode::I_BTreeNode (I_BTreeNodeManager& nodesManager,
-                          const NODE_INDEX    node) :
-    m_NodesMgr (nodesManager),
+                          const NODE_INDEX    node)
+  : m_NodesMgr (nodesManager),
     m_Header (_RC (NodeHeader*, new D_UINT8 [m_NodesMgr.RawNodeSize ()]))
 {
   assert (node != NIL_NODE);
@@ -389,11 +389,11 @@ BTree::RemoveKey (const I_BTreeKey& key)
 }
 
 bool
-BTree::RecursiveInsertNodeKey (const NODE_INDEX parentId,
-                               const NODE_INDEX nodeId,
+BTree::RecursiveInsertNodeKey (const NODE_INDEX  parentId,
+                               const NODE_INDEX  nodeId,
                                const I_BTreeKey& key,
-                               NODE_INDEX       &outNode,
-                               KEY_INDEX        &outKeyIndex)
+                               NODE_INDEX&       outNode,
+                               KEY_INDEX&        outKeyIndex)
 {
   BTreeNodeRAI node (m_NodesManager.RetrieveNode (nodeId));
 
@@ -407,13 +407,13 @@ BTree::RecursiveInsertNodeKey (const NODE_INDEX parentId,
     {
       if (node->FindBiggerOrEqual (key, outKeyIndex) == false)
         {
-          // The sentinel shall be here!
+          //The sentinel shall be here!
           assert (0);
         }
       else if (node->IsEqual (key, outKeyIndex))
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-      outKeyIndex ++;
+      outKeyIndex++;
 
       assert (outKeyIndex < node->KeysPerNode () - 1);
 
@@ -462,7 +462,8 @@ BTree::RecursiveDeleteNodeKey (I_BTreeNode& node, const I_BTreeKey& key)
     }
   else
     {
-      BTreeNodeRAI childNode (m_NodesManager.RetrieveNode (node.GetNodeOfKey (keyIndex)));
+      const NODE_INDEX childNodeId = node.GetNodeOfKey (keyIndex);
+      BTreeNodeRAI childNode (m_NodesManager.RetrieveNode (childNodeId));
 
       if (childNode->NeedsJoining ())
         {

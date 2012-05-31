@@ -32,13 +32,13 @@ FieldIndexNodeManager::FieldIndexNodeManager (std::auto_ptr <I_DataContainer> &c
                                               const D_UINT nodeSize,
                                               const D_UINT maxCacheMem,
                                               const DBS_FIELD_TYPE fieldType,
-                                              const bool create) :
-  m_NodeSize (nodeSize),
-  m_MaxCachedMem (maxCacheMem),
-  m_RootNode (NIL_NODE),
-  m_FirstFreeNode (NIL_NODE),
-  m_Container (container.release ()),
-  m_FieldType (fieldType)
+                                              const bool create)
+  : m_NodeSize (nodeSize),
+    m_MaxCachedMem (maxCacheMem),
+    m_RootNode (NIL_NODE),
+    m_FirstFreeNode (NIL_NODE),
+    m_Container (container.release ()),
+    m_FieldType (fieldType)
 {
 
   if (create)

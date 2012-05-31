@@ -31,13 +31,13 @@ const D_CHAR tb_name[] = "t_test_tab";
 D_UINT _rowsCount   = 5000000;
 D_UINT _removedRows = _rowsCount / 10;
 
-static DBSRichReal _max_date (std::numeric_limits<long double>::infinity ());
+static DBSRichReal _max_date (std::numeric_limits<RICHREAL_T>::infinity ());
 
 DBSRichReal
 get_random_real ()
 {
 
-  return DBSRichReal (_SC (long double, w_rnd () & 0xFFFFFF) / (w_rnd () % (0xFF + 1)) );
+  return DBSRichReal (_SC (RICHREAL_T, w_rnd () & 0xFFFFFF) / (w_rnd () % (0xFF + 1)) );
 }
 
 

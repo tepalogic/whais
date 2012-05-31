@@ -203,7 +203,8 @@ public:
   void         FlushNodes ();
 
   virtual D_UINT64   RawNodeSize () const = 0;
-  virtual NODE_INDEX AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey) = 0;
+  virtual NODE_INDEX AllocateNode (const NODE_INDEX parent,
+                                   const KEY_INDEX  parentKey) = 0;
   virtual void       FreeNode (const NODE_INDEX node) = 0;
 
   virtual NODE_INDEX  GetRootNodeId () = 0;
@@ -263,7 +264,7 @@ make_array_room (T* const pArray,
                  const D_UINT fromIndex,
                  const D_UINT elemsCount)
 {
-  D_INT iterator = lastIndex; // Unsigned as we need to check against underflow.
+  D_INT iterator = lastIndex; //Unsigned to check against underflow.
 
   while (iterator >= _SC(D_INT, fromIndex))
     {

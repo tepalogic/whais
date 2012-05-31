@@ -1264,8 +1264,8 @@ RealOperand::GetValue (DBSReal& outValue) const
 void
 RealOperand::GetValue (DBSRichReal& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)       = m_Value.m_IsNull;
-  _CC (long double&, outValue.m_Value) = _SC (long double, m_Value.m_Value);
+  _CC (bool&, outValue.m_IsNull)      = m_Value.m_IsNull;
+  _CC (RICHREAL_T&, outValue.m_Value) = _SC (RICHREAL_T, m_Value.m_Value);
 }
 
 void
@@ -1285,7 +1285,7 @@ void
 RichRealOperand::GetValue (DBSReal& outValue) const
 {
   _CC (bool&, outValue.m_IsNull) = m_Value.m_IsNull;
-  _CC (float&, outValue.m_Value) = _SC (float, m_Value.m_Value);
+  _CC (REAL_T&, outValue.m_Value) = _SC (REAL_T, m_Value.m_Value);
 }
 
 void

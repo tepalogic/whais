@@ -29,13 +29,13 @@ const D_CHAR tb_name[] = "t_test_tab";
 D_UINT _rowsCount   = 5000000;
 D_UINT _removedRows = _rowsCount / 10;
 
-static DBSReal _max_date (std::numeric_limits<float>::infinity ());
+static DBSReal _max_date (std::numeric_limits<REAL_T>::infinity ());
 
 DBSReal
 get_random_real ()
 {
 
-  return DBSReal (_SC (float, w_rnd () & 0xFFFFFF) / (w_rnd () % (0xFF + 1)) );
+  return DBSReal (_SC (REAL_T, w_rnd () & 0xFFFFFF) / (w_rnd () % (0xFF + 1)) );
 }
 
 

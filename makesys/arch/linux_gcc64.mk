@@ -11,7 +11,7 @@ LD:=g++
 AR:=ar
 
 ifeq ($(FLAVOR),debug)
-CC_FLAGS?=-Wall -Wno-format -g -c -ansi
+CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 

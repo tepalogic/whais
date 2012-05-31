@@ -29,6 +29,9 @@
 #include "dbs_types.h"
 #include "dbs_exception.h"
 
+typedef float       REAL_T;
+typedef long double RICHREAL_T;
+
 bool
 DBSIsDateValid (D_INT year, D_UINT mounth, D_UINT day);
 
@@ -872,7 +875,7 @@ struct DBSReal
     m_IsNull (true)
   {}
 
-  explicit DBSReal (const float value) :
+  explicit DBSReal (const REAL_T value) :
       m_Value (value),
       m_IsNull (false)
   {}
@@ -884,8 +887,8 @@ struct DBSReal
 
   DBSReal& operator= (const DBSReal& source)
   {
-    _CC( float&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull) = source.m_IsNull;
+    _CC( REAL_T&, m_Value)  = source.m_Value;
+    _CC( bool&,   m_IsNull) = source.m_IsNull;
     return *this;
   }
 
@@ -913,7 +916,7 @@ struct DBSReal
   operator DBS_FIELD_TYPE () const { return T_REAL; }
   bool IsNull () const { return m_IsNull; }
 
-  const float  m_Value;
+  const REAL_T m_Value;
   const bool   m_IsNull;
 };
 
@@ -924,7 +927,7 @@ struct DBSRichReal
     m_IsNull (true)
   {}
 
-  explicit DBSRichReal (const long double value) :
+  explicit DBSRichReal (const RICHREAL_T value) :
       m_Value (value),
       m_IsNull (false)
   {}
@@ -936,8 +939,8 @@ struct DBSRichReal
 
   DBSRichReal& operator= (const DBSRichReal& source)
   {
-    _CC( long double&, m_Value) = source.m_Value;
-    _CC( bool&,   m_IsNull)     = source.m_IsNull;
+    _CC( RICHREAL_T&, m_Value)  = source.m_Value;
+    _CC( bool&,       m_IsNull) = source.m_IsNull;
     return *this;
   }
 
@@ -965,8 +968,8 @@ struct DBSRichReal
   operator DBS_FIELD_TYPE () const { return T_RICHREAL; }
   bool IsNull () const { return m_IsNull; }
 
-  const long double m_Value;
-  const bool        m_IsNull;
+  const RICHREAL_T m_Value;
+  const bool       m_IsNull;
 };
 
 

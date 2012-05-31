@@ -4,6 +4,7 @@
 #This will ensure that every one ignores the same file
 #.gitignore
 
+.settings/
 bin/
 compiler/parser/whisper.output
 compiler/parser/whisper.tab.c
