@@ -421,7 +421,7 @@ PrototypeTable::RawNodeSize () const
 }
 
 NODE_INDEX
-PrototypeTable::AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey)
+PrototypeTable::AllocateNode (const NODE_INDEX parent, const KEY_INDEX parentKey)
 {
   NODE_INDEX nodeIndex = m_FirstUnallocatedRoot;
 

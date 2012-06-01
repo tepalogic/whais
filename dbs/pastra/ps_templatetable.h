@@ -66,7 +66,8 @@ public:
 
   //Implementations for I_BTreeNodeManager
   virtual D_UINT64    RawNodeSize () const;
-  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent, KEY_INDEX parentKey);
+  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent,
+                                    const KEY_INDEX  parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
   virtual NODE_INDEX  GetRootNodeId ();
   virtual void        SetRootNodeId (const NODE_INDEX node);

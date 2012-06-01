@@ -23,6 +23,9 @@ using namespace pastra;
 static D_INT
 get_next_alignment (D_INT size)
 {
+  if (size == 12)
+    return 4; //Special case of sizeof (RICHREAL_T) == 12.
+
   D_INT result = 1;
 
   assert (size > 0);
@@ -246,8 +249,8 @@ test_for_fields (I_DBSHandler& rDbs,
 
       D_UINT elem_start = descr.m_StoreIndex;
       D_UINT elem_end = elem_start +
-          PSValInterp::Size (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc& PS_TABLE_FIELD_TYPE_MASK),
-                                (descr.m_TypeDesc& PS_TABLE_ARRAY_MASK) != 0);
+          PSValInterp::Size (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
+                                (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0);
 
       for (D_UINT index = 0; index < storage.size (); ++index)
         {
@@ -263,16 +266,6 @@ test_for_fields (I_DBSHandler& rDbs,
             }
         }
       storage.push_back (StorageInterval (elem_start, elem_end - 1));
-
-      if (result && (elem_start > 0))
-        {
-          if ( get_next_alignment (elem_start) >
-            PSValInterp::Size (_SC (DBS_FIELD_TYPE,
-                                   descr.m_TypeDesc& PS_TABLE_FIELD_TYPE_MASK),
-                                   (descr.m_TypeDesc& PS_TABLE_ARRAY_MASK) != 0))
-            result = false;
-            break;
-        }
 
       if (result)
         {

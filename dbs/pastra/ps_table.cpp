@@ -219,11 +219,6 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
                   if (strcmp (rvFields[foundIndex].m_pFieldName, rvFields[schIndex].m_pFieldName) > 0)
                     {
                       //New best choice!
-                      assert (foundReqAlign == currReqAlign);
-                      assert (foundResultedAlign == currResultedAlign);
-                      assert (foundReqPaddsCount == currReqPaddsCount);
-                      assert (foundSize == currIndexSize);
-
                       foundIndex = schIndex;
                     }
                   else
