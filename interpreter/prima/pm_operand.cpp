@@ -31,6 +31,12 @@ using namespace prima;
 
 ////////////////////////////I_Operand//////////////////////////////
 
+bool
+I_Operand::IsNull () const
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
 void
 I_Operand::GetValue (DBSBool& outValue) const
 {
@@ -98,12 +104,6 @@ I_Operand::GetValue (DBSRichReal& outValue) const
 }
 
 void
-I_Operand::GetValue (DBSText& outValue) const
-{
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
-}
-
-void
 I_Operand::GetValue (DBSUInt8& outValue) const
 {
   throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
@@ -123,12 +123,6 @@ I_Operand::GetValue (DBSUInt32& outValue) const
 
 void
 I_Operand::GetValue (DBSUInt64& outValue) const
-{
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
-}
-
-void
-I_Operand::GetValue (DBSArray& outValue) const
 {
   throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
@@ -200,12 +194,6 @@ I_Operand::SetValue (const DBSRichReal& outValue)
 }
 
 void
-I_Operand::SetValue (const DBSText& outValue)
-{
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
-}
-
-void
 I_Operand::SetValue (const DBSUInt8& outValue)
 {
   throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
@@ -229,28 +217,150 @@ I_Operand::SetValue (const DBSUInt64& outValue)
   throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
+
+FIELD_INDEX
+I_Operand::GetField ()
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
+DBSArray&
+I_Operand::GetArray ()
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
+DBSText&
+I_Operand::GetText ()
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
+I_DBSTable&
+I_Operand::GetTable ()
+{
+  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+static void assign_null (T& output)
+{
+  output = T();
+}
+
+NullOperand::~NullOperand ()
+{
+}
+
+bool
+NullOperand::IsNull () const
+{
+  return true;
+}
+
 void
-I_Operand::SetValue (const DBSArray& outValue)
+NullOperand::GetValue (DBSBool& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSChar& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSDate& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSDateTime& outValue) const
 {
   throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
 }
 
-TableOperand&
-I_Operand::GetTableOp ()
+void
+NullOperand::GetValue (DBSHiresTime& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  assign_null (outValue);
 }
 
-RowOperand&
-I_Operand::GetRowOp ()
+void
+NullOperand::GetValue (DBSInt8& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  assign_null (outValue);
 }
+
+void
+NullOperand::GetValue (DBSInt16& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSInt32& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSInt64& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSReal& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSRichReal& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSUInt8& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSUInt16& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSUInt32& outValue) const
+{
+  assign_null (outValue);
+}
+
+void
+NullOperand::GetValue (DBSUInt64& outValue) const
+{
+  assign_null (outValue);
+}
+
 
 ////////////////////BoolOperand///////////////////////////////////
 
 BoolOperand::~BoolOperand ()
 {
+}
+
+bool
+BoolOperand::IsNull () const
+{
+  return m_Value.IsNull ();
 }
 
 void
@@ -269,6 +379,12 @@ BoolOperand::SetValue (const DBSBool& value)
 
 CharOperand::~CharOperand ()
 {
+}
+
+bool
+CharOperand::IsNull () const
+{
+  return m_Value.IsNull ();
 }
 
 void
@@ -297,6 +413,12 @@ CharOperand::SetValue (const DBSChar& value)
 
 DateOperand::~DateOperand ()
 {
+}
+
+bool
+DateOperand::IsNull () const
+{
+  return m_Value.IsNull ();
 }
 
 void
@@ -358,6 +480,12 @@ DateTimeOperand::~DateTimeOperand ()
 {
 }
 
+bool
+DateTimeOperand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
 void
 DateTimeOperand::GetValue (DBSDate& outValue) const
 {
@@ -409,6 +537,12 @@ DateTimeOperand::SetValue (const DBSDateTime& value)
 }
 
 ///////////////////////////HiresTimeOperand/////////////////////////////////
+
+bool
+HiresTimeOperand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
 
 HiresTimeOperand::~HiresTimeOperand ()
 {
@@ -464,6 +598,12 @@ HiresTimeOperand::SetValue (const DBSHiresTime& value)
 }
 
 ////////////////////////////UInt8Operand//////////////////////////////////
+
+bool
+UInt8Operand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
 
 UInt8Operand::~UInt8Operand ()
 {
@@ -568,6 +708,13 @@ UInt16Operand::~UInt16Operand ()
 {
 }
 
+bool
+UInt16Operand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
+
 void
 UInt16Operand::GetValue (DBSInt8& outValue) const
 {
@@ -667,6 +814,13 @@ UInt32Operand::~UInt32Operand ()
 {
 }
 
+bool
+UInt32Operand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
+
 void
 UInt32Operand::GetValue (DBSInt8& outValue) const
 {
@@ -765,6 +919,13 @@ UInt64Operand::~UInt64Operand ()
 {
 }
 
+bool
+UInt64Operand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
+
 void
 UInt64Operand::GetValue (DBSInt8& outValue) const
 {
@@ -861,6 +1022,12 @@ UInt64Operand::SetValue (const DBSUInt64& value)
 
 Int8Operand::~Int8Operand ()
 {
+}
+
+bool
+Int8Operand::IsNull () const
+{
+  return m_Value.IsNull ();
 }
 
 void
@@ -961,6 +1128,12 @@ Int16Operand::~Int16Operand ()
 {
 }
 
+bool
+Int16Operand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
 void
 Int16Operand::GetValue (DBSInt8& outValue) const
 {
@@ -1057,6 +1230,12 @@ Int16Operand::SetValue (const DBSInt16& value)
 
 Int32Operand::~Int32Operand ()
 {
+}
+
+bool
+Int32Operand::IsNull () const
+{
+  return m_Value.IsNull ();
 }
 
 void
@@ -1157,6 +1336,12 @@ Int64Operand::~Int64Operand ()
 {
 }
 
+bool
+Int64Operand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
 void
 Int64Operand::GetValue (DBSInt8& outValue) const
 {
@@ -1255,6 +1440,12 @@ RealOperand::~RealOperand ()
 {
 }
 
+bool
+RealOperand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
 void
 RealOperand::GetValue (DBSReal& outValue) const
 {
@@ -1281,6 +1472,12 @@ RichRealOperand::~RichRealOperand ()
 {
 }
 
+bool
+RichRealOperand::IsNull () const
+{
+  return m_Value.IsNull ();
+}
+
 void
 RichRealOperand::GetValue (DBSReal& outValue) const
 {
@@ -1305,35 +1502,45 @@ TextOperand::~TextOperand ()
 {
 }
 
-void
-TextOperand::GetValue (DBSText& outValue) const
+bool
+TextOperand::IsNull () const
 {
-  outValue = m_Value;
+  return m_Value.IsNull ();
 }
 
-void
-TextOperand::SetValue (const DBSText& value)
+DBSText&
+TextOperand::GetText ()
 {
-  m_Value = value;
+  return m_Value;
 }
+
 
 //////////////////////CharTextOperand////////////////////////////////
-CharTextOperand::CharTextOperand (DBSText &text, const D_UINT64 elIndex) :
-    I_Operand (),
-    m_Index (elIndex),
-    m_Text (text)
-
+CharTextOperand::~CharTextOperand ()
 {
 }
 
-CharTextOperand::~CharTextOperand ()
+bool
+CharTextOperand::IsNull () const
 {
+  //A text could not hold NULL characters!
+  return false;
 }
 
 void
 CharTextOperand::GetValue (DBSChar& outValue) const
 {
-  m_Text.GetCharAtIndex (m_Index);
+  outValue = m_Text.GetCharAtIndex (m_Index);
+}
+
+void
+CharTextOperand::GetValue (DBSText& outValue) const
+{
+  DBSChar ch = m_Text.GetCharAtIndex (m_Index);
+  DBSText text;
+
+  text.Append (ch);
+  outValue = text;
 }
 
 void
@@ -1349,50 +1556,64 @@ ArrayOperand::~ArrayOperand ()
 {
 }
 
-void
-ArrayOperand::GetValue (DBSArray& outValue) const
+bool
+ArrayOperand::IsNull () const
 {
-  outValue = m_Value;
+  return m_Value.IsNull ();
 }
 
-void
-ArrayOperand::SetValue (const DBSArray& value)
+DBSArray&
+ArrayOperand::GetArray ()
 {
-  m_Value = value;
+  return m_Value;
 }
 
 //////////////////////TableOperand//////////////////////////////////////
-
-TableOperand::TableOperand (I_DBSHandler* const pDbsHnd, I_DBSTable* const pTable) :
-    I_Operand (),
-    m_pDbsHandler (pDbsHnd),
-    m_pTable (pTable)
-
-{
-  assert (m_pDbsHandler != NULL);
-  assert (m_pTable != NULL);
-}
-
-//The copy does not own the object.
-//Make sure this is deallocated, before 'source'.
-TableOperand::TableOperand (const TableOperand& source) :
-    I_Operand (),
-    m_pDbsHandler (NULL),
-    m_pTable (source.m_pTable)
-{
-}
-
 TableOperand::~TableOperand ()
 {
-  if (m_pDbsHandler != NULL)
-    delete m_pTable;
+  m_DbsHandler.ReleaseTable (m_Table);
 }
 
-///////////////////GlobalValue//////////////////////////////////////
+bool
+TableOperand::IsNull () const
+{
+  return (m_Table.GetAllocatedRows () == 0);
+}
 
-WSynchronizer GlobalValue::sm_Sync;
+I_DBSTable&
+TableOperand::GetTable ()
+{
+  return m_Table;
+}
 
-//////////////////GlobalOperand/////////////////////////////////////
+////////////////////FieldOperand//////////////////////////////////////////
+
+FieldOperand::~FieldOperand ()
+{
+}
+
+
+bool
+FieldOperand::IsNull () const
+{
+  return (m_pTable == NULL);
+}
+
+FIELD_INDEX
+FieldOperand::GetField ()
+{
+  return m_Field;
+}
+
+I_DBSTable&
+FieldOperand::GetTable ()
+{
+  assert (m_pTable != NULL);
+
+  return *m_pTable;
+}
+
+//////////////////GlobalOperand///////////////////////////////////////////
 
 GlobalOperand::GlobalOperand (GlobalValue& value) :
     I_Operand (),
@@ -1472,12 +1693,6 @@ GlobalOperand::GetValue (DBSRichReal& outValue) const
 }
 
 void
-GlobalOperand::GetValue (DBSText& outValue) const
-{
-  m_Value.GetValue (outValue);
-}
-
-void
 GlobalOperand::GetValue (DBSUInt8& outValue) const
 {
   m_Value.GetValue (outValue);
@@ -1497,12 +1712,6 @@ GlobalOperand::GetValue (DBSUInt32& outValue) const
 
 void
 GlobalOperand::GetValue (DBSUInt64& outValue) const
-{
-  m_Value.GetValue (outValue);
-}
-
-void
-GlobalOperand::GetValue (DBSArray& outValue) const
 {
   m_Value.GetValue (outValue);
 }
@@ -1574,12 +1783,6 @@ GlobalOperand::SetValue (const DBSRichReal& outValue)
 }
 
 void
-GlobalOperand::SetValue (const DBSText& outValue)
-{
-  m_Value.SetValue (outValue);
-}
-
-void
 GlobalOperand::SetValue (const DBSUInt8& outValue)
 {
   m_Value.SetValue (outValue);
@@ -1603,21 +1806,27 @@ GlobalOperand::SetValue (const DBSUInt64& outValue)
   m_Value.SetValue (outValue);
 }
 
-void
-GlobalOperand::SetValue (const DBSArray& outValue)
+FIELD_INDEX
+GlobalOperand::GetField ()
 {
-  m_Value.SetValue (outValue);
+  return m_Value.GetField ();
 }
 
-TableOperand&
-GlobalOperand::GetTableOp ()
+DBSArray&
+GlobalOperand::GetArray ()
 {
-  return m_Value.GetTableOp ();
+  return m_Value.GetArray ();
 }
 
-RowOperand&
-GlobalOperand::GetRowOp ()
+DBSText&
+GlobalOperand::GetText ()
 {
-  return m_Value.GetRowOp ();
+  return m_Value.GetText ();
+}
+
+I_DBSTable&
+GlobalOperand::GetTable ()
+{
+  return m_Value.GetTable ();
 }
 

@@ -269,7 +269,7 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTypeDescription)
       I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
                                                        pInOutTypeDescription);
 
-      return GlobalValue (TableOperand (&m_Session.GetDBSHandler(), &table));
+      return GlobalValue (TableOperand (m_Session.GetDBSHandler(), table));
     }
   assert (false);
   return GlobalValue (I_Operand ());
@@ -368,7 +368,7 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTypeDescription)
       I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
                                                        pInOutTypeDescription);
 
-      return StackValue (TableOperand (&m_Session.GetDBSHandler(), &table));
+      return StackValue (TableOperand (m_Session.GetDBSHandler(), table));
     }
 
   assert (false);
