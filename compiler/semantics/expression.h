@@ -41,6 +41,9 @@ enum EXP_OPERATION
   OP_DEC,
   OP_NOT,
 
+  OP_INULL,
+  OP_NNULL,
+
   OP_POW,
   OP_ADD,
   OP_SUB,

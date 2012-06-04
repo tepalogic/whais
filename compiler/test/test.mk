@@ -209,3 +209,7 @@ test_msg_memsel_SRC=test/test_msg_memsel.c
 test_msg_memsel_LIB=compiler/compiler utils/utils custom/custom
 test_msg_memsel_INC=utils/include custom/include
 
+UNIT_EXES+=test_nulls_op
+test_nulls_op_SRC=test/test_nulls_op.c 
+test_nulls_op_LIB=compiler/compiler utils/utils custom/custom
+test_nulls_op_INC=utils/include custom/include
