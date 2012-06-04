@@ -73,6 +73,9 @@ enum W_OPCODE
   W_STF,
   W_STA,
 
+  W_INULL,
+  W_NNULL,
+
   W_CALL,
   W_RET,
 

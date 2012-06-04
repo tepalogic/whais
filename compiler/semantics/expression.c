@@ -50,6 +50,50 @@ create_exp_link (struct ParserState* pState,
       return NULL;
     }
 
+  /* First deal with special case for NULL checking */
+  if ((opcode == OP_EQ) || (opcode == OP_NE))
+    {
+      const struct SemExpression* pExp = &firstOp->val.u_exp;
+
+      assert (firstOp->val_type == VAL_EXP_LINK);
+      assert (secondOp->val_type == VAL_EXP_LINK);
+
+      if ((pExp->opcode == OP_NULL) && (pExp->pFirstOp == NULL))
+        {
+          assert (pExp->pSecondOp == NULL);
+          assert (pExp->pThirdOp == NULL);
+          assert (thirdOp == NULL);
+
+          result->val_type            = VAL_EXP_LINK;
+          result->val.u_exp.pFirstOp  = secondOp;
+          result->val.u_exp.pSecondOp = NULL;
+          result->val.u_exp.pThirdOp  = NULL;
+          result->val.u_exp.opcode    = (opcode == OP_EQ) ? OP_INULL : OP_NNULL;
+
+          free_sem_value (firstOp);
+
+          return result;
+        }
+
+      pExp = &secondOp->val.u_exp;
+      if ((pExp->opcode == OP_NULL) && (pExp->pFirstOp == NULL))
+        {
+          assert (pExp->pSecondOp == NULL);
+          assert (pExp->pThirdOp == NULL);
+          assert (thirdOp == NULL);
+
+          result->val_type            = VAL_EXP_LINK;
+          result->val.u_exp.pFirstOp  = firstOp;
+          result->val.u_exp.pSecondOp = NULL;
+          result->val.u_exp.pThirdOp  = NULL;
+          result->val.u_exp.opcode    = (opcode == OP_EQ) ? OP_INULL : OP_NNULL;
+
+          free_sem_value (secondOp);
+
+          return result;
+        }
+    }
+
   result->val_type            = VAL_EXP_LINK;
   result->val.u_exp.pFirstOp  = firstOp;
   result->val.u_exp.pSecondOp = secondOp;
@@ -429,6 +473,26 @@ translate_exp_not (struct ParserState* const         pState,
 
   return *firstType;
 }
+
+static struct ExpResultType
+translate_exp_chknull (struct ParserState* const pState,
+                       const D_BOOL              trueIfNull)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const struct ExpResultType result      = {NULL, T_BOOL};
+
+  assert (pStmt->type == STMT_PROC);
+
+  if (w_opcode_encode (pCodeStream, trueIfNull ? W_INULL : W_NNULL) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  return result;
+}
+
 
 static struct ExpResultType
 translate_exp_add (struct ParserState* const         pState,
@@ -1245,6 +1309,8 @@ translate_exp_store (struct ParserState* const         pState,
         opcode = W_STTA;
       else if (IS_ARRAY (ftype))
         opcode = W_STA;
+      else if (IS_FIELD (ftype))
+        opcode = W_STF;
     }
 
   if (opcode == W_NA)
@@ -1405,6 +1471,15 @@ translate_exp_opcode (struct ParserState* const   pState,
     case OP_NE:
       result = translate_exp_not_equals (pState, firstType, secondType);
       break;
+
+    case OP_INULL:
+      result = translate_exp_chknull (pState, TRUE);
+      break;
+
+    case OP_NNULL:
+      result = translate_exp_chknull (pState, FALSE);
+      break;
+
 
     case OP_INC:
       result = translate_exp_inc (pState, firstType);
@@ -2090,8 +2165,8 @@ translate_exp_tree (struct ParserState* const   pState,
                     struct Statement* const     pStmt,
                     struct SemExpression* const pTreeHead)
 {
-  struct OutputStream* const pCodeStream        = stmt_query_instrs (pState->pCurrentStmt);
-  D_BOOL                     needsJmpCorrection = FALSE;
+  struct OutputStream* const pCodeStream    = stmt_query_instrs (pState->pCurrentStmt);
+  D_BOOL                     needsJmpAdjust = FALSE;
   D_INT                      jmpPosition;
   D_INT                      jmpDataPos;
   struct ExpResultType       firstType;
@@ -2138,7 +2213,7 @@ translate_exp_tree (struct ParserState* const   pState,
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
             }
-          needsJmpCorrection = TRUE;
+          needsJmpAdjust = TRUE;
         }
       else if (pTreeHead->opcode == OP_AND)
         {
@@ -2148,7 +2223,7 @@ translate_exp_tree (struct ParserState* const   pState,
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
             }
-          needsJmpCorrection = TRUE;
+          needsJmpAdjust = TRUE;
         }
       jmpDataPos = get_size_outstream (pCodeStream) - sizeof (D_UINT32);
     }
@@ -2175,7 +2250,7 @@ translate_exp_tree (struct ParserState* const   pState,
                                      &firstType,
                                      &secondType);
 
-  if (needsJmpCorrection && (GET_TYPE (secondType.type) == T_BOOL))
+  if (needsJmpAdjust && (GET_TYPE (secondType.type) == T_BOOL))
     {
       /* lets correct some jumps offsets */
       D_INT                currentPos = get_size_outstream (pCodeStream) - jmpPosition;

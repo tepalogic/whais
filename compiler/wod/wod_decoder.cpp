@@ -348,6 +348,9 @@ const FDECODE_OPCODE wod_dec_w_stta   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stf    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sta    = wod_dec_w_ldnull;
 
+const FDECODE_OPCODE wod_dec_w_inull  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_nnull  = wod_dec_w_ldnull;
+
 static D_UINT
 wod_dec_w_call (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 {
@@ -521,6 +524,9 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_stf,
   wod_dec_w_sta,
 
+  wod_dec_w_inull,
+  wod_dec_w_nnull,
+
   wod_dec_w_call,
   wod_dec_w_ret,
 
@@ -673,6 +679,9 @@ const D_CHAR *wod_str_table[] = {
   "stta",
   "stf",
   "sta",
+
+  "inull",
+  "nnull",
 
   "call",
   "ret",
