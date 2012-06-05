@@ -57,15 +57,15 @@ public:
   {
   }
 
-  D_UINT32           AddGlobal (const D_UINT8*     pIdentifier,
-                                const D_UINT       identifierLength,
+  D_UINT32           AddGlobal (const D_UINT8*     pName,
+                                const D_UINT       nameLength,
                                 const GlobalValue& value,
-                                const D_UINT32     typeOffset);
-  D_UINT32           FindGlobal (const D_UINT8 *const pIdentifier,
-                                 const D_UINT         identifierLength);
+                                const D_UINT32     tiOffset);
+  D_UINT32           FindGlobal (const D_UINT8 *const pName,
+                                 const D_UINT         nameLength);
 
-  GlobalValue&       GetGlobal (const D_UINT64 globalIndex);
-  const D_UINT8*     GetGlobalTypeDesctiption (const D_UINT64 globalIndex);
+  GlobalValue&       GetGlobal (const D_UINT64 index);
+  const D_UINT8*     GetGlobalTI (const D_UINT64 index);
 
   static const D_UINT32 INVALID_ENTRY = ~0;
 
@@ -73,13 +73,11 @@ private:
   GlobalsManager (const GlobalsManager&);
   GlobalsManager& operator= (const GlobalsManager);
 
-protected:
   Session&                 m_Session;
   std::vector<D_UINT8>     m_Identifiers;
   std::vector<GlobalValue> m_Storage;
   std::vector<GlobalEntry> m_GlobalsEntrys;
 };
-
 
 }
 

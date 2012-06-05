@@ -626,7 +626,9 @@ template <class OP_T, class DBS_T>
 class TableValueOperand : public I_Operand
 {
 public:
-  TableValueOperand (I_DBSTable& table, const ROW_INDEX row, const FIELD_INDEX field)
+  TableValueOperand (I_DBSTable&       table,
+                     const ROW_INDEX   row,
+                     const FIELD_INDEX field)
     : I_Operand(),
       m_Row (row),
       m_Table (table),

@@ -34,212 +34,212 @@ using namespace prima;
 bool
 I_Operand::IsNull () const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSBool& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSChar& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSDate& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSDateTime& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSHiresTime& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSInt8& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSInt16& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSInt32& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSInt64& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSReal& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSRichReal& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSUInt8& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSUInt16& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSUInt32& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::GetValue (DBSUInt64& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSBool& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSChar& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSDate& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSDateTime& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSHiresTime& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSInt8& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSInt16& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSInt32& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSInt64& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSReal& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSRichReal& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSUInt8& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSUInt16& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSUInt32& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
 I_Operand::SetValue (const DBSUInt64& outValue)
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 FIELD_INDEX
 I_Operand::GetField ()
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 DBSArray&
 I_Operand::GetArray ()
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 DBSText&
 I_Operand::GetText ()
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 I_DBSTable&
 I_Operand::GetTable ()
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -281,7 +281,7 @@ NullOperand::GetValue (DBSDate& outValue) const
 void
 NullOperand::GetValue (DBSDateTime& outValue) const
 {
-  throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_OP_REQUEST));
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void

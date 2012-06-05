@@ -43,7 +43,10 @@ struct TypeSpec
   D_UINT16 dataSize;
   D_UINT8  data[2];    /* keep this last */
 
-  D_UINT16 GetSize () const { return dataSize + sizeof (type) + sizeof (dataSize); }
+  D_UINT16 GetSize () const
+  {
+    return dataSize + sizeof (type) + sizeof (dataSize);
+  }
 
   bool operator== (const TypeSpec& second) const
     {
@@ -65,19 +68,20 @@ TypeManager::~TypeManager ()
 }
 
 D_UINT32
-TypeManager::FindTypeDescription (const D_UINT8* const pTypeDescription)
+TypeManager::FindType (const D_UINT8* const pTI)
 {
-  assert (IsTypeDescriptionValid (pTypeDescription));
+  assert (IsTypeValid (pTI));
 
-  const TypeSpec* const pSpec = _RC (const TypeSpec*, pTypeDescription);
+  const TypeSpec* const pSpec = _RC (const TypeSpec*, pTI);
 
   D_UINT32 result = 0;
 
   while (result < m_TypesDescriptions.size ())
     {
-      assert (IsTypeDescriptionValid (&m_TypesDescriptions[result]));
+      assert (IsTypeValid (&m_TypesDescriptions[result]));
 
-      const TypeSpec* const pSpecIt = _RC (const TypeSpec*, &m_TypesDescriptions[result]);
+      const TypeSpec* const pSpecIt = _RC (const TypeSpec*,
+                                           &m_TypesDescriptions[result]);
 
       if (*pSpecIt == *pSpec)
         return result;
@@ -91,43 +95,44 @@ TypeManager::FindTypeDescription (const D_UINT8* const pTypeDescription)
 }
 
 D_UINT32
-TypeManager::AddTypeDescription (const D_UINT8* const pTypeDescription)
+TypeManager::AddType (const D_UINT8* const pTI)
 {
-  assert (IsTypeDescriptionValid (pTypeDescription));
+  assert (IsTypeValid (pTI));
 
-  D_UINT32 result = FindTypeDescription (pTypeDescription);
+  D_UINT32 result = FindType (pTI);
 
   if (result != INVALID_OFFSET)
     return result;
 
   result = m_TypesDescriptions.size ();
 
-  const TypeSpec* const pSpec = _RC (const TypeSpec*, pTypeDescription);
+  const TypeSpec* const pSpec = _RC (const TypeSpec*, pTI);
 
   m_TypesDescriptions.insert (m_TypesDescriptions.end (),
-                              pTypeDescription,
-                              pTypeDescription + pSpec->GetSize ());
+                              pTI,
+                              pTI + pSpec->GetSize ());
   return result;
 }
 
 const D_UINT8*
-TypeManager::GetTypeDescription (const D_UINT32 offset) const
+TypeManager::GetType (const D_UINT32 offset) const
 {
   assert ((offset == 0) || (offset < m_TypesDescriptions.size ()));
 
   const D_UINT8 *const pTypeDescription = &m_TypesDescriptions[offset];
 
-  assert (IsTypeDescriptionValid (pTypeDescription));
+  assert (IsTypeValid (pTypeDescription));
 
   return pTypeDescription;
 }
 
 static I_DBSTable&
-create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescription)
+create_non_persistent_table (I_DBSHandler&  dbsHndler,
+                             D_UINT8* const pInOutTI)
 {
-  assert (TypeManager::IsTypeDescriptionValid (pInOutTypeDescription));
+  assert (TypeManager::IsTypeValid (pInOutTI));
 
-  TypeSpec& spec  = *_RC(TypeSpec*, pInOutTypeDescription);
+  TypeSpec& spec  = *_RC(TypeSpec*, pInOutTI);
 
   assert (IS_TABLE (spec.type));
 
@@ -177,11 +182,11 @@ create_non_persistent_table (I_DBSHandler& dbsHndler, D_UINT8* pInOutTypeDescrip
 }
 
 GlobalValue
-TypeManager::CreateGlobalValue (D_UINT8* pInOutTypeDescription)
+TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
 {
-  assert (TypeManager::IsTypeDescriptionValid (pInOutTypeDescription));
+  assert (TypeManager::IsTypeValid (pInOutTI));
 
-  TypeSpec& spec = *_RC(TypeSpec*, pInOutTypeDescription);
+  TypeSpec& spec = *_RC(TypeSpec*, pInOutTI);
 
   if ((spec.type > T_UNKNOWN) && (spec.type < T_UNDETERMINED))
     {
@@ -267,7 +272,7 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTypeDescription)
   else if (IS_TABLE (spec.type))
     {
       I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
-                                                       pInOutTypeDescription);
+                                                       pInOutTI);
 
       return GlobalValue (TableOperand (m_Session.GetDBSHandler(), table));
     }
@@ -276,11 +281,11 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTypeDescription)
 }
 
 StackValue
-TypeManager::CreateLocalValue (D_UINT8* pInOutTypeDescription)
+TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
 {
-  assert (TypeManager::IsTypeDescriptionValid (pInOutTypeDescription));
+  assert (TypeManager::IsTypeValid (pInOutTI));
 
-  const TypeSpec& spec = *_RC(const TypeSpec*, pInOutTypeDescription);
+  const TypeSpec& spec = *_RC(const TypeSpec*, pInOutTI);
 
   if ((spec.type > T_UNKNOWN) && (spec.type < T_UNDETERMINED))
     {
@@ -366,7 +371,7 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTypeDescription)
   else if (IS_TABLE (spec.type))
     {
       I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
-                                                       pInOutTypeDescription);
+                                                       pInOutTI);
 
       return StackValue (TableOperand (m_Session.GetDBSHandler(), table));
     }
@@ -376,9 +381,9 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTypeDescription)
 }
 
 bool
-TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
+TypeManager::IsTypeValid (const D_UINT8* pTI)
 {
-  const TypeSpec& spec   = *_RC (const TypeSpec*, pTypeDescription);
+  const TypeSpec& spec   = *_RC (const TypeSpec*, pTI);
   bool            result = true;
 
   if (((spec.type == T_UNKNOWN) || (spec.type > T_UNDETERMINED)) &&
@@ -453,11 +458,11 @@ TypeManager::IsTypeDescriptionValid (const D_UINT8* pTypeDescription)
 }
 
 D_UINT
-TypeManager::GetTypeLength (const D_UINT8* pTypeDescription)
+TypeManager::GetTypeLength (const D_UINT8* pTI)
 {
-  assert (IsTypeDescriptionValid (pTypeDescription));
+  assert (IsTypeValid (pTI));
 
-  const TypeSpec& ts = *_RC (const TypeSpec*, pTypeDescription);
+  const TypeSpec& ts = *_RC (const TypeSpec*, pTI);
 
   return ts.dataSize + sizeof (ts) - sizeof (ts.data);
 }

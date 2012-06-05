@@ -33,35 +33,35 @@
 #include "compiler/include/whisperc/compiledunit.h"
 
 
-class InterpreterException : public WException
+class InterException : public WException
 {
 public:
-  explicit InterpreterException (const D_CHAR*  message,
+  explicit InterException (const D_CHAR*  message,
                                  const D_CHAR*  file,
                                  const D_UINT32 line,
-                                 const D_UINT32 extra) :
-     WException (message, file, line, extra)
+                                 const D_UINT32 extra)
+    : WException (message, file, line, extra)
   {
   }
 
-  virtual ~InterpreterException ()
+  virtual ~InterException ()
   {
   }
 
-  virtual InterpreterException* Clone () { return new InterpreterException (*this); }
+  virtual InterException* Clone () { return new InterException (*this); }
   virtual EXPCEPTION_TYPE       Type () { return INTERPRETER_EXCEPTION; }
 
   enum
   {
     INVALID_OP_CONVERSION,
-    INVALID_OP_REQUEST,
-    INVALID_GLOBAL_REQUEST,
-    INVALID_TYPE_DESCRIPTION,
+    INVALID_OP_REQ,
+    INVALID_GLOBAL_REQ,
+    INVALID_TYPE_DESC,
     DUPLICATE_DEFINITION,
     EXTERNAL_FIRST,
     EXTERNAL_MISMATCH,
-    INVALID_PROC_REQUEST,
-    INVALID_PROC_LOCAL_REQUEST,
+    INVALID_PROC_REQ,
+    INVALID_LOCAL_REQ,
 
     ALREADY_INITED,
     NOT_INITED,
@@ -104,7 +104,7 @@ I_Session&
 GetInstance (const D_CHAR* const name);
 
 void
-ReleaseInterpreterInstance (I_Session& hInstance);
+ReleaseInstance (I_Session& hInstance);
 
 void
 CleanInterpreter (const bool force = false);

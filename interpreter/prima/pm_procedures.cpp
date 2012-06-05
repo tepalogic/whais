@@ -33,8 +33,8 @@ using namespace std;
 using namespace prima;
 
 D_UINT32
-ProcedureManager::AddProcedure (const D_UINT8*    pIndentifier,
-                                const D_UINT      identifierLength,
+ProcedureManager::AddProcedure (const D_UINT8*    pName,
+                                const D_UINT      nameLength,
                                 const D_UINT32    localsCount,
                                 const D_UINT32    argsCount,
                                 const D_UINT32    syncCount,
@@ -43,7 +43,7 @@ ProcedureManager::AddProcedure (const D_UINT8*    pIndentifier,
                                 const D_UINT8*    pCode,
                                 const D_UINT32    codeSize)
 {
-  assert (GetProcedure (pIndentifier, identifierLength) == INVALID_ENTRY);
+  assert (GetProcedure (pName, nameLength) == INVALID_ENTRY);
   assert (argsCount < localsCount);
 
   ProcedureEntry entry;
@@ -65,105 +65,106 @@ ProcedureManager::AddProcedure (const D_UINT8*    pIndentifier,
   m_LocalsValues.insert (m_LocalsValues.end (),
                          pLocalValues,
                          pLocalValues + (localsCount - argsCount));
-  m_Identifiers.insert (m_Identifiers.end (), pIndentifier, pIndentifier + identifierLength);
+  m_Identifiers.insert (m_Identifiers.end (), pName, pName + nameLength);
   m_Identifiers.push_back (0);
   m_Definitions.insert (m_Definitions.end (), pCode, pCode + codeSize);
-  m_LocalsTypes.insert (m_LocalsTypes.end (), pTypesOffset, pTypesOffset + localsCount);
+  m_LocalsTypes.insert (m_LocalsTypes.end (),
+                        pTypesOffset,
+                        pTypesOffset + localsCount);
   m_ProcsEntrys.push_back (entry);
-
 
   return result;
 }
 
-const D_UINT32
-ProcedureManager::GetLocalsCount (const D_UINT procIndex)
-{
-  assert (procIndex < m_ProcsEntrys.size ());
-
-  if (procIndex >= m_ProcsEntrys.size ())
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_REQUEST));
-
-  return m_ProcsEntrys[procIndex].m_LocalsCount;
-}
-
-const D_UINT32
-ProcedureManager::GetArgsCount (const D_UINT procIndex)
-{
-  assert (procIndex < m_ProcsEntrys.size ());
-
-  if (procIndex >= m_ProcsEntrys.size ())
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_REQUEST));
-
-  return m_ProcsEntrys[procIndex].m_ArgsCount;
-}
-
 D_UINT32
-ProcedureManager::GetProcedure (const D_UINT8* pIndetifier, const D_UINT identifierLength)
+ProcedureManager::GetProcedure (const D_UINT8* pName,
+                                const D_UINT   nameLength)
 {
   for (D_UINT32 index = 0; index < m_ProcsEntrys.size (); ++index)
     {
-      if (strncmp (_RC (const D_CHAR*, pIndetifier),
+      if (strncmp (_RC (const D_CHAR*, pName),
                    _RC (const D_CHAR*,
                         &m_Identifiers[m_ProcsEntrys[index].m_IdIndex]),
-                   identifierLength) == 0)
+                   nameLength) == 0)
         return index;
     }
 
   return INVALID_ENTRY;
 }
 
-const StackValue&
-ProcedureManager::GetLocalValue (const D_UINT procIndex, const D_UINT32 localIndex)
+const D_UINT32
+ProcedureManager::LocalsCount (const D_UINT procedure)
 {
-  assert (procIndex < m_ProcsEntrys.size ());
+  assert (procedure < m_ProcsEntrys.size ());
 
-  if (procIndex >= m_ProcsEntrys.size ())
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_REQUEST));
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
 
-  const ProcedureEntry& entry = m_ProcsEntrys[procIndex];
+  return m_ProcsEntrys[procedure].m_LocalsCount;
+}
 
-  assert (localIndex < entry.m_LocalsCount);
-  assert ((localIndex == 0) || (localIndex >= entry.m_ArgsCount));
+const D_UINT32
+ProcedureManager::ArgsCount (const D_UINT procedure)
+{
+  assert (procedure < m_ProcsEntrys.size ());
 
-  if ((localIndex >= entry.m_LocalsCount) ||
-      ((localIndex != 0) && (localIndex < entry.m_ArgsCount)) )
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_LOCAL_REQUEST));
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
 
-  if (localIndex == 0)
+  return m_ProcsEntrys[procedure].m_ArgsCount;
+}
+
+const StackValue&
+ProcedureManager::LocalValue (const D_UINT procedure, const D_UINT32 local)
+{
+  assert (procedure < m_ProcsEntrys.size ());
+
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+
+  const ProcedureEntry& entry = m_ProcsEntrys[procedure];
+
+  assert (local < entry.m_LocalsCount);
+  assert ((local == 0) || (local >= entry.m_ArgsCount));
+
+  if ((local >= entry.m_LocalsCount) ||
+      ((local != 0) && (local < entry.m_ArgsCount)) )
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+
+  if (local == 0)
     return m_LocalsValues[entry.m_LocalsIndex];
 
-  return m_LocalsValues[entry.m_LocalsIndex + (localIndex - entry.m_ArgsCount)];
+  return m_LocalsValues[entry.m_LocalsIndex + (local - entry.m_ArgsCount)];
 }
 
 const D_UINT8*
-ProcedureManager::GetLocalType (const D_UINT procIndex, const D_UINT32 localIndex)
+ProcedureManager::LocalType (const D_UINT procedure, const D_UINT32 local)
 {
-  assert (procIndex < m_ProcsEntrys.size ());
+  assert (procedure < m_ProcsEntrys.size ());
 
-  if (procIndex >= m_ProcsEntrys.size ())
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_REQUEST));
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
 
-  const ProcedureEntry& entry = m_ProcsEntrys[procIndex];
+  const ProcedureEntry& entry = m_ProcsEntrys[procedure];
 
-  assert (localIndex < entry.m_LocalsCount);
+  assert (local < entry.m_LocalsCount);
 
-  if (localIndex >= entry.m_LocalsCount)
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_LOCAL_REQUEST));
+  if (local >= entry.m_LocalsCount)
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
 
   const TypeManager& typeMgr = m_Session.GetTypeManager ();
-  return typeMgr.GetTypeDescription (m_LocalsTypes[entry.m_TypeOff + localIndex]);
-
+  return typeMgr.GetType (m_LocalsTypes[entry.m_TypeOff + local]);
 }
 
 const D_UINT8*
-ProcedureManager::GetCode (const D_UINT procIndex, D_UINT64* pOutCodeSize)
+ProcedureManager::Code (const D_UINT procedure, D_UINT64* pOutCodeSize)
 {
-  assert (procIndex < m_ProcsEntrys.size ());
+  assert (procedure < m_ProcsEntrys.size ());
 
-  if (procIndex >= m_ProcsEntrys.size ())
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_PROC_REQUEST));
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
 
-  const ProcedureEntry& entry = m_ProcsEntrys[procIndex];
+  const ProcedureEntry& entry = m_ProcsEntrys[procedure];
 
   if (pOutCodeSize != NULL)
     *pOutCodeSize = entry.m_CodeSize;

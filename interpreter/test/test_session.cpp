@@ -247,9 +247,9 @@ check_global_def_err (I_Session& testSession)
     testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with external global not defined!" << std::endl;
   }
-  catch (InterpreterException& e)
+  catch (InterException& e)
   {
-      if (e.GetExtra () == InterpreterException::EXTERNAL_FIRST)
+      if (e.GetExtra () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found global with out defintion OK" << std::endl;
           result = true;
@@ -279,9 +279,9 @@ check_global_doubledef_err (I_Session& testSession)
     testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with global defined twice !" << std::endl;
   }
-  catch (InterpreterException& e)
+  catch (InterException& e)
   {
-      if (e.GetExtra () == InterpreterException::DUPLICATE_DEFINITION)
+      if (e.GetExtra () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -311,9 +311,9 @@ check_global_diffdef_err (I_Session& testSession)
     testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with two different type globals defined!" << std::endl;
   }
-  catch (InterpreterException& e)
+  catch (InterException& e)
   {
-      if (e.GetExtra () == InterpreterException::EXTERNAL_MISMATCH)
+      if (e.GetExtra () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -344,9 +344,9 @@ check_proc_def_err (I_Session& testSession)
     testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with external procedure not defined!" << std::endl;
   }
-  catch (InterpreterException& e)
+  catch (InterException& e)
   {
-      if (e.GetExtra () == InterpreterException::EXTERNAL_FIRST)
+      if (e.GetExtra () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found procedure with out defintion OK" << std::endl;
           result = true;
@@ -376,9 +376,9 @@ check_proc_doubledef_err (I_Session& testSession)
     testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with procedure defined twice !" << std::endl;
   }
-  catch (InterpreterException& e)
+  catch (InterException& e)
   {
-      if (e.GetExtra () == InterpreterException::DUPLICATE_DEFINITION)
+      if (e.GetExtra () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -408,9 +408,9 @@ check_proc_diffdef_err (I_Session& testSession)
     testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with two procedures with different signatures !" << std::endl;
   }
-  catch (InterpreterException& e)
+  catch (InterException& e)
   {
-      if (e.GetExtra () == InterpreterException::EXTERNAL_MISMATCH)
+      if (e.GetExtra () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -457,7 +457,7 @@ main ()
     success = success && check_proc_doubledef_err (commonSession);
     success = success && check_proc_diffdef_err (commonSession);
 
-    ReleaseInterpreterInstance (commonSession);
+    ReleaseInstance (commonSession);
   }
 
   CleanInterpreter ();

@@ -87,7 +87,7 @@ InitInterpreter ()
   WSynchronizerRAII syncHolder (gSync);
 
   if (gmSessions.size () != 0)
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::ALREADY_INITED));
+    throw InterException (NULL, _EXTRA (InterException::ALREADY_INITED));
 
   static I_DBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName);
 
@@ -100,7 +100,7 @@ GetInstance (const D_CHAR* const pName)
   WSynchronizerRAII syncHolder (gSync);
 
   if (gmSessions.size () == 0)
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::NOT_INITED));
+    throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
 
 
   if (pName == NULL)
@@ -111,7 +111,7 @@ GetInstance (const D_CHAR* const pName)
       return session.GetSession ();
     }
   else if (strcmp (pName, gDBSName) == 0)
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_SESSION));
+    throw InterException (NULL, _EXTRA (InterException::INVALID_SESSION));
 
   map<string, SessionHandler>::iterator it = gmSessions.find (pName);
   if (it != gmSessions.end ())
@@ -132,12 +132,12 @@ GetInstance (const D_CHAR* const pName)
 }
 
 void
-ReleaseInterpreterInstance (I_Session& hInstance)
+ReleaseInstance (I_Session& hInstance)
 {
   WSynchronizerRAII syncHolder (gSync);
 
   if (gmSessions.size () == 0)
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::NOT_INITED));
+    throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
 
   map<string, SessionHandler>::iterator it = gmSessions.begin ();
   while (it != gmSessions.end ())
@@ -161,7 +161,7 @@ CleanInterpreter (const bool forced)
   WSynchronizerRAII syncHolder (gSync);
 
   if (gmSessions.size () == 0)
-    throw InterpreterException (NULL, _EXTRA (InterpreterException::NOT_INITED));
+    throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
 
   map<string, SessionHandler>::iterator it = gmSessions.begin ();
 
@@ -172,7 +172,7 @@ CleanInterpreter (const bool forced)
       if (forced)
         session.ForceSessionRelease ();
       else if (session.GetRefCount() != 0)
-        throw InterpreterException (NULL, _EXTRA (InterpreterException::SESSION_IN_USE));
+        throw InterException (NULL, _EXTRA (InterException::SESSION_IN_USE));
 
       ++it;
     }
@@ -244,7 +244,7 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
             memcpy (apTypeDesc.get (), pLocalTypeDesc, typeDescSize);
 
             const StackValue value      = typeMgr.CreateLocalValue (apTypeDesc.get ());
-            const D_UINT32   typeOffset = typeMgr.AddTypeDescription (apTypeDesc.get ());
+            const D_UINT32   typeOffset = typeMgr.AddType (apTypeDesc.get ());
 
             typesOffset.push_back (typeOffset);
 
@@ -287,9 +287,9 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
                             const D_UINT8* pTypeDescriptor,
                             const bool     external)
 {
-  assert (TypeManager::IsTypeDescriptionValid (pTypeDescriptor));
+  assert (TypeManager::IsTypeValid (pTypeDescriptor));
 
-  if (TypeManager::IsTypeDescriptionValid (pTypeDescriptor) == false)
+  if (TypeManager::IsTypeValid (pTypeDescriptor) == false)
     {
       string message = "Could not add the global variable ";
 
@@ -299,7 +299,7 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
 
       LogMessage (LOG_INT_ERROR, message);
 
-      throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_TYPE_DESCRIPTION));
+      throw InterException (NULL, _EXTRA (InterException::INVALID_TYPE_DESC));
     }
 
   GlobalsManager& glbsMgr = GetGlobalsManager ();
@@ -309,7 +309,7 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
   memcpy (apTypeDescriptor.get (), pTypeDescriptor, TypeManager::GetTypeLength (pTypeDescriptor));
 
   GlobalValue    value      = typeMgr.CreateGlobalValue (apTypeDescriptor.get ());
-  const D_UINT32 typeOffset = typeMgr.AddTypeDescription (apTypeDescriptor.get ());
+  const D_UINT32 typeOffset = typeMgr.AddType (apTypeDescriptor.get ());
   const D_UINT32 glbEntry   = glbsMgr.FindGlobal (pIdentifier, identifierLength);
 
   if (glbEntry == glbsMgr.INVALID_ENTRY)
@@ -322,7 +322,7 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
           message += "'.";
 
           LogMessage (LOG_INT_ERROR, message);
-          throw InterpreterException (NULL, _EXTRA (InterpreterException::EXTERNAL_FIRST));
+          throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
         }
 
       return glbsMgr.AddGlobal (pIdentifier, identifierLength, value, typeOffset);
@@ -330,7 +330,7 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
   else if (external)
     {
       if (memcmp (apTypeDescriptor.get (),
-                  glbsMgr.GetGlobalTypeDesctiption (glbEntry),
+                  glbsMgr.GetGlobalTI (glbEntry),
                   TypeManager::GetTypeLength (apTypeDescriptor.get ()) ) != 0)
         {
           string message = "External declaration of global value '";
@@ -338,7 +338,7 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
           message += "' has a different type than its definition.";
 
           LogMessage (LOG_INT_ERROR, message);
-          throw InterpreterException (NULL, _EXTRA (InterpreterException::EXTERNAL_MISMATCH));
+          throw InterException (NULL, _EXTRA (InterException::EXTERNAL_MISMATCH));
         }
     }
   else
@@ -349,7 +349,7 @@ Session::DefineGlobalValue (const D_UINT8* pIdentifier,
 
       LogMessage (LOG_INT_ERROR, message);
 
-      throw InterpreterException (NULL, _EXTRA (InterpreterException::DUPLICATE_DEFINITION));
+      throw InterException (NULL, _EXTRA (InterException::DUPLICATE_DEFINITION));
     }
 
   return glbEntry;
@@ -375,10 +375,10 @@ Session::DefineProcedure (const D_UINT8*    pIdentifier,
 
   for (D_UINT localIndex = 0; localIndex < localsCount; ++ localIndex)
     {
-      const D_UINT8 *pTypeDescriptor = typeMgr.GetTypeDescription (pTypesOffset[localIndex]);
-      assert (TypeManager::IsTypeDescriptionValid (pTypeDescriptor));
+      const D_UINT8 *pTypeDescriptor = typeMgr.GetType (pTypesOffset[localIndex]);
+      assert (TypeManager::IsTypeValid (pTypeDescriptor));
 
-      if (TypeManager::IsTypeDescriptionValid (pTypeDescriptor) == false)
+      if (TypeManager::IsTypeValid (pTypeDescriptor) == false)
         {
           string message = "Could not define the procedure ";
 
@@ -388,7 +388,7 @@ Session::DefineProcedure (const D_UINT8*    pIdentifier,
 
           LogMessage (LOG_INT_ERROR, message);
 
-          throw InterpreterException (NULL, _EXTRA (InterpreterException::INVALID_TYPE_DESCRIPTION));
+          throw InterException (NULL, _EXTRA (InterException::INVALID_TYPE_DESC));
         }
     }
   ProcedureManager& procMgr   = GetProcedureManager ();
@@ -403,16 +403,16 @@ Session::DefineProcedure (const D_UINT8*    pIdentifier,
           message += "'.";
 
           LogMessage (LOG_INT_ERROR, message);
-          throw InterpreterException (NULL, _EXTRA (InterpreterException::EXTERNAL_FIRST));
+          throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
         }
 
-      bool argsMatch = (argsCount == procMgr.GetArgsCount (procIndex));
+      bool argsMatch = (argsCount == procMgr.ArgsCount (procIndex));
 
       for (D_UINT localIndex = 0; (localIndex <= argsCount) && argsMatch; ++localIndex)
         {
-          const D_UINT8 *pTypeDescriptor = typeMgr.GetTypeDescription (pTypesOffset[localIndex]);
+          const D_UINT8 *pTypeDescriptor = typeMgr.GetType (pTypesOffset[localIndex]);
           if (memcmp (pTypeDescriptor,
-                      procMgr.GetLocalType (procIndex, localIndex),
+                      procMgr.LocalType (procIndex, localIndex),
                       TypeManager::GetTypeLength (pTypeDescriptor) ) != 0)
             argsMatch = false;
         }
@@ -424,7 +424,7 @@ Session::DefineProcedure (const D_UINT8*    pIdentifier,
           message += "' has a different signature than its definition.";
 
           LogMessage (LOG_INT_ERROR, message);
-          throw InterpreterException (NULL, _EXTRA (InterpreterException::EXTERNAL_MISMATCH));
+          throw InterException (NULL, _EXTRA (InterException::EXTERNAL_MISMATCH));
 
         }
 
@@ -438,7 +438,7 @@ Session::DefineProcedure (const D_UINT8*    pIdentifier,
 
       LogMessage (LOG_INT_ERROR, message);
 
-      throw InterpreterException (NULL, _EXTRA (InterpreterException::DUPLICATE_DEFINITION));
+      throw InterException (NULL, _EXTRA (InterException::DUPLICATE_DEFINITION));
     }
 
   return procMgr.AddProcedure (pIdentifier,

@@ -42,24 +42,22 @@ public:
   TypeManager (Session& session);
   ~TypeManager ();
 
-  D_UINT32 FindTypeDescription (const D_UINT8* const pTypeDescription);
-  D_UINT32 AddTypeDescription (const D_UINT8* const pTypeDescription);
+  D_UINT32 FindType (const D_UINT8* const pTI);
+  D_UINT32 AddType (const D_UINT8* const pTI);
 
-  const D_UINT8* GetTypeDescription (const D_UINT32 offset) const;
+  const D_UINT8* GetType (const D_UINT32 offset) const;
 
-  GlobalValue CreateGlobalValue (D_UINT8* pInOutTypeDescription);
-  StackValue  CreateLocalValue (D_UINT8* pInOutTypeDescription);
+  GlobalValue CreateGlobalValue (D_UINT8* const pInOutTI);
+  StackValue  CreateLocalValue (D_UINT8* const pInOutTI);
 
-  static bool   IsTypeDescriptionValid (const D_UINT8* pTypeDescription);
-  static D_UINT GetTypeLength (const D_UINT8* pTypeDescription);
+  static bool   IsTypeValid (const D_UINT8* pTI);
+  static D_UINT GetTypeLength (const D_UINT8* pTI);
 
   static const D_UINT32 INVALID_OFFSET = 0xFFFFFFFF;
 
 private:
   TypeManager (const TypeManager&);
   TypeManager& operator= (const TypeManager&);
-
-protected:
 
   Session&             m_Session;
   std::vector<D_UINT8> m_TypesDescriptions;

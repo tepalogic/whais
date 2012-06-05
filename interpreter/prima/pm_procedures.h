@@ -59,8 +59,8 @@ public:
     {
     }
 
-  D_UINT32 AddProcedure (const D_UINT8*    pIndentifier,
-                         const D_UINT      identifierLength,
+  D_UINT32 AddProcedure (const D_UINT8*    pName,
+                         const D_UINT      nameLength,
                          const D_UINT32    localsCount,
                          const D_UINT32    argsCount,
                          const D_UINT32    syncCount,
@@ -68,14 +68,14 @@ public:
                          const D_UINT32*   pTypesOffset,
                          const D_UINT8*    pCode,
                          const D_UINT32    codeSize);
-  D_UINT32 GetProcedure (const D_UINT8* pIdentifier,
-                         const D_UINT   identifierLength);
+  D_UINT32 GetProcedure (const D_UINT8* pName,
+                         const D_UINT   nameLength);
 
-  const D_UINT32    GetLocalsCount (const D_UINT procIndex);
-  const D_UINT32    GetArgsCount (const D_UINT procIndex);
-  const StackValue& GetLocalValue (const D_UINT procIndex, const D_UINT32 localIndex);
-  const D_UINT8*    GetLocalType (const D_UINT procIndex, const D_UINT32 localIndex);
-  const D_UINT8*    GetCode (const D_UINT procIndex, D_UINT64* pOutCodeSize);
+  const D_UINT32    LocalsCount (const D_UINT procedure);
+  const D_UINT32    ArgsCount (const D_UINT procedure);
+  const StackValue& LocalValue (const D_UINT procedure, const D_UINT32 local);
+  const D_UINT8*    LocalType (const D_UINT procedure, const D_UINT32 local);
+  const D_UINT8*    Code (const D_UINT procedure, D_UINT64* pOutCodeSize);
 
   static const D_UINT32 INVALID_ENTRY = ~0;
 
