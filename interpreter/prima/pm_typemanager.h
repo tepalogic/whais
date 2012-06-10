@@ -34,12 +34,12 @@
 namespace prima
 {
 
-class Session;
+class NameSpace;
 
 class TypeManager
 {
 public:
-  TypeManager (Session& session);
+  TypeManager (NameSpace& space);
   ~TypeManager ();
 
   D_UINT32 FindType (const D_UINT8* const pTI);
@@ -59,7 +59,7 @@ private:
   TypeManager (const TypeManager&);
   TypeManager& operator= (const TypeManager&);
 
-  Session&             m_Session;
+  NameSpace&           m_NameSpace;
   std::vector<D_UINT8> m_TypesDescriptions;
 };
 
@@ -69,5 +69,5 @@ private:
 
 }
 
-
 #endif /* PR_TYPEMANAGER_H_ */
+

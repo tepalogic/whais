@@ -60,7 +60,6 @@ ProcedureManager::AddProcedure (const D_UINT8*    pName,
 
   const D_UINT32 result = m_ProcsEntrys.size ();
 
-
   m_SyncStmts.insert (m_SyncStmts.end(), syncCount, false);
   m_LocalsValues.insert (m_LocalsValues.end (),
                          pLocalValues,
@@ -93,8 +92,9 @@ ProcedureManager::GetProcedure (const D_UINT8* pName,
 }
 
 const D_UINT32
-ProcedureManager::LocalsCount (const D_UINT procedure)
+ProcedureManager::LocalsCount (const D_UINT procEntry)
 {
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
   assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
@@ -104,8 +104,9 @@ ProcedureManager::LocalsCount (const D_UINT procedure)
 }
 
 const D_UINT32
-ProcedureManager::ArgsCount (const D_UINT procedure)
+ProcedureManager::ArgsCount (const D_UINT procEntry)
 {
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
   assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
@@ -115,8 +116,9 @@ ProcedureManager::ArgsCount (const D_UINT procedure)
 }
 
 const StackValue&
-ProcedureManager::LocalValue (const D_UINT procedure, const D_UINT32 local)
+ProcedureManager::LocalValue (const D_UINT procEntry, const D_UINT32 local)
 {
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
   assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
@@ -138,8 +140,9 @@ ProcedureManager::LocalValue (const D_UINT procedure, const D_UINT32 local)
 }
 
 const D_UINT8*
-ProcedureManager::LocalType (const D_UINT procedure, const D_UINT32 local)
+ProcedureManager::LocalTI (const D_UINT procEntry, const D_UINT32 local)
 {
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
   assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
@@ -152,13 +155,14 @@ ProcedureManager::LocalType (const D_UINT procedure, const D_UINT32 local)
   if (local >= entry.m_LocalsCount)
     throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
 
-  const TypeManager& typeMgr = m_Session.GetTypeManager ();
+  const TypeManager& typeMgr = m_NameSpace.GetTypeManager ();
   return typeMgr.GetType (m_LocalsTypes[entry.m_TypeOff + local]);
 }
 
 const D_UINT8*
-ProcedureManager::Code (const D_UINT procedure, D_UINT64* pOutCodeSize)
+ProcedureManager::Code (const D_UINT procEntry, D_UINT64* pOutCodeSize)
 {
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
   assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
@@ -171,3 +175,4 @@ ProcedureManager::Code (const D_UINT procedure, D_UINT64* pOutCodeSize)
 
   return &m_Definitions[entry.m_CodeIndex];
 }
+

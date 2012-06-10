@@ -45,19 +45,25 @@ struct ProcedureEntry
   D_UINT32 m_CodeSize;
 };
 
-class Session;
+class NameSpace;
+
 class ProcedureManager
 {
 public:
-  ProcedureManager (Session& session) :
-    m_Session (session)
-    {
-
-    }
+  ProcedureManager (NameSpace& space)
+    : m_NameSpace (space),
+      m_ProcsEntrys (),
+      m_Identifiers (),
+      m_LocalsValues (),
+      m_LocalsTypes (),
+      m_Definitions (),
+      m_SyncStmts ()
+  {
+  }
 
   ~ProcedureManager ()
-    {
-    }
+  {
+  }
 
   D_UINT32 AddProcedure (const D_UINT8*    pName,
                          const D_UINT      nameLength,
@@ -71,21 +77,35 @@ public:
   D_UINT32 GetProcedure (const D_UINT8* pName,
                          const D_UINT   nameLength);
 
-  const D_UINT32    LocalsCount (const D_UINT procedure);
-  const D_UINT32    ArgsCount (const D_UINT procedure);
-  const StackValue& LocalValue (const D_UINT procedure, const D_UINT32 local);
-  const D_UINT8*    LocalType (const D_UINT procedure, const D_UINT32 local);
-  const D_UINT8*    Code (const D_UINT procedure, D_UINT64* pOutCodeSize);
+  const D_UINT32    LocalsCount (const D_UINT procEntry);
+  const D_UINT32    ArgsCount (const D_UINT procEntry);
+  const StackValue& LocalValue (const D_UINT procEntry, const D_UINT32 local);
+  const D_UINT8*    LocalTI (const D_UINT procEntry, const D_UINT32 local);
+  const D_UINT8*    Code (const D_UINT procEntry, D_UINT64* pOutCodeSize);
 
-  static const D_UINT32 INVALID_ENTRY = ~0;
+  static bool IsValid (const D_UINT32 entry)
+  {
+    return entry != INVALID_ENTRY;
+  }
+
+  static bool IsGlobalEntry (const D_UINT32 entry)
+  {
+    return IsValid (entry) && ((entry & GLOBAL_ID) != 0);
+  }
+
+  static void MarkAsGlobalEntry (D_UINT32& entry)
+  {
+    entry |= GLOBAL_ID;
+  }
 
 private:
   ProcedureManager (const ProcedureManager&);
   ProcedureManager& operator= (const ProcedureManager&);
 
-protected:
-  Session& m_Session;
+  static const D_UINT32 GLOBAL_ID     = 0x80000000;
+  static const D_UINT32 INVALID_ENTRY = 0xFFFFFFFF;
 
+  NameSpace&                  m_NameSpace;
   std::vector<ProcedureEntry> m_ProcsEntrys;
   std::vector<D_UINT8>        m_Identifiers;
   std::vector<StackValue>     m_LocalsValues;

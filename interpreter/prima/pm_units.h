@@ -40,25 +40,21 @@ struct UnitEntry
   D_UINT8  m_UnitData[1];
 };
 
-class Session;
 class UnitsManager
 {
 public:
-  UnitsManager (Session& session) :
-    m_Session (session),
-    m_Units ()
+  UnitsManager ()
+    : m_Units ()
   {
   }
 
   ~UnitsManager ();
 
-  D_UINT32 LoadUnit (const D_UINT32 glbsCount,
-                     const D_UINT32 procsCount,
-                     const D_UINT8* pConstData,
-                     const D_UINT32 constAreaSize);
-
+  D_UINT32 AddUnit (const D_UINT32 glbsCount,
+                    const D_UINT32 procsCount,
+                    const D_UINT8* pConstData,
+                    const D_UINT32 constAreaSize);
   void     RemoveLastUnit ();
-
   void     SetGlobalIndex (const D_UINT32 unitIndex,
                            const D_UINT32 unitGlbIndex,
                            const D_UINT32 glbMgrIndex);
@@ -70,12 +66,11 @@ public:
   D_UINT32 GetProcIndex (const D_UINT32 unitIndex,
                          const D_UINT32 unitProcIndex);
 
-protected:
-  Session&                m_Session;
+private:
   std::vector<UnitEntry*> m_Units;
 };
-
 
 }
 
 #endif /* PM_UNITS_H_ */
+

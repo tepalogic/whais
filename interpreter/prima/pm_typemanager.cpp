@@ -57,8 +57,8 @@ struct TypeSpec
     }
 };
 
-TypeManager::TypeManager (Session& session) :
-    m_Session (session),
+TypeManager::TypeManager (NameSpace& space)
+  : m_NameSpace (space),
     m_TypesDescriptions ()
 {
 }
@@ -271,10 +271,11 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
     }
   else if (IS_TABLE (spec.type))
     {
-      I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
-                                                       pInOutTI);
+      I_DBSTable& table = create_non_persistent_table (
+                                             m_NameSpace.GetDBSHandler (),
+                                             pInOutTI);
 
-      return GlobalValue (TableOperand (m_Session.GetDBSHandler(), table));
+      return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(), table));
     }
   assert (false);
   return GlobalValue (I_Operand ());
@@ -370,10 +371,11 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
     }
   else if (IS_TABLE (spec.type))
     {
-      I_DBSTable& table = create_non_persistent_table (m_Session.GetDBSHandler (),
-                                                       pInOutTI);
+      I_DBSTable& table = create_non_persistent_table (
+                                             m_NameSpace.GetDBSHandler (),
+                                             pInOutTI);
 
-      return StackValue (TableOperand (m_Session.GetDBSHandler(), table));
+      return StackValue (TableOperand (m_NameSpace.GetDBSHandler(), table));
     }
 
   assert (false);

@@ -38,12 +38,11 @@ UnitsManager::~UnitsManager ()
 }
 
 D_UINT32
-UnitsManager::LoadUnit (const D_UINT32 glbsCount,
-                        const D_UINT32 procsCount,
-                        const D_UINT8* pConstData,
-                        const D_UINT32 constAreaSize)
+UnitsManager::AddUnit (const D_UINT32 glbsCount,
+                       const D_UINT32 procsCount,
+                       const D_UINT8* pConstData,
+                       const D_UINT32 constAreaSize)
 {
-
   const D_UINT entrySize = sizeof (UnitEntry) +
                            (glbsCount + procsCount) * sizeof (D_UINT32) +
                            constAreaSize;
@@ -100,7 +99,8 @@ UnitsManager::SetProcIndex (const D_UINT32 unitIndex,
 
   assert (unitProcIndex < pEntry->m_ProcsCount);
 
- _RC (D_UINT32*, pEntry->m_UnitData)[pEntry->m_GlbsCount + unitProcIndex] = procMgrIndex;
+  D_UINT32* const pUnitData = _RC (D_UINT32*, pEntry->m_UnitData);
+  pUnitData[pEntry->m_GlbsCount + unitProcIndex] = procMgrIndex;
 
 }
 
@@ -128,6 +128,7 @@ UnitsManager::GetProcIndex (const D_UINT32 unitIndex,
 
   assert (unitProcIndex < pEntry->m_ProcsCount);
 
-  return _RC (D_UINT32*, pEntry->m_UnitData)[pEntry->m_GlbsCount + unitProcIndex];
+  D_UINT32* const pUnitData = _RC (D_UINT32*, pEntry->m_UnitData);
+  return pUnitData[pEntry->m_GlbsCount + unitProcIndex];
 
 }

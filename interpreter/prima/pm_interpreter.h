@@ -35,11 +35,11 @@
 namespace prima
 {
 
-class Session : public I_Session
+class NameSpace
 {
 public:
-  Session (I_DBSHandler& dbsHandler);
-  virtual ~Session ();
+  NameSpace (I_DBSHandler& dbsHandler);
+  ~NameSpace ();
 
   I_DBSHandler&     GetDBSHandler () { return m_DbsHandler; }
   TypeManager&      GetTypeManager () { return m_TypeManager; }
@@ -47,16 +47,72 @@ public:
   ProcedureManager& GetProcedureManager () { return m_ProcsManager; }
   UnitsManager&     GetUnitsManager () { return m_UnitsManager; }
 
+private:
+  I_DBSHandler&    m_DbsHandler;
+  TypeManager      m_TypeManager;
+  GlobalsManager   m_GlbsManager;
+  ProcedureManager m_ProcsManager;
+  UnitsManager     m_UnitsManager;
+};
+
+class NameSpaceHolder
+{
+public:
+  explicit NameSpaceHolder (NameSpace* pSpace = NULL)
+    : m_pSpace (pSpace),
+      m_RefsCount (0)
+  {
+    assert (m_pSpace != NULL);
+  }
+
+  ~NameSpaceHolder ()
+  {
+    assert (m_RefsCount == 0);
+    if (m_pSpace != NULL)
+      {
+        DBSReleaseDatabase (m_pSpace->GetDBSHandler());
+        delete m_pSpace;
+      }
+  }
+
+  NameSpaceHolder (const NameSpaceHolder& source)
+    : m_pSpace (source.m_pSpace),
+      m_RefsCount (source.m_RefsCount)
+  {
+    _CC (NameSpace*&, source.m_pSpace) = NULL;
+    _CC (D_UINT64&, source.m_RefsCount)  = 0;
+  }
+
+  NameSpace& Get () { assert (m_RefsCount > 0); return *m_pSpace; }
+  D_UINT64   RefsCount () { return m_RefsCount; }
+  void       IncRefsCount () { ++m_RefsCount; }
+  void       DecRefsCount () { assert (m_RefsCount > 0); --m_RefsCount; }
+  void       ForceRelease () { m_RefsCount = 0; }
+
+private:
+  const NameSpaceHolder& operator= (const NameSpaceHolder& source);
+
+  NameSpace* m_pSpace;
+  D_UINT64   m_RefsCount;
+};
+
+class Session : public I_Session
+{
+public:
+  Session (NameSpaceHolder& globalNames, NameSpaceHolder& privateNames);
+  virtual ~Session ();
+
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
   virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 
-protected:
-  D_UINT32 DefineGlobalValue (const D_UINT8* pIdentifier,
-                              const D_UINT   identifierLength,
-                              const D_UINT8* pTypeDescriptor,
+
+private:
+  D_UINT32 DefineGlobalValue (const D_UINT8* pName,
+                              const D_UINT   nameLength,
+                              const D_UINT8* pTI,
                               const bool     external);
-  D_UINT32 DefineProcedure (const D_UINT8*    pIdentfier,
-                            const D_UINT      identifierLength,
+  D_UINT32 DefineProcedure (const D_UINT8*    pName,
+                            const D_UINT      nameLength,
                             const D_UINT32    localsCount,
                             const D_UINT32    argsCount,
                             const D_UINT32    syncCount,
@@ -66,20 +122,15 @@ protected:
                             const D_UINT32    codeSize,
                             const bool        external);
 
-  I_DBSHandler&    m_DbsHandler;
-  TypeManager      m_TypeManager;
-  GlobalsManager   m_GlbsManager;
-  ProcedureManager m_ProcsManager;
-  UnitsManager     m_UnitsManager;
-};
+  D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
+  const D_UINT8* FindGlobalTI (const D_UINT32 entry);
 
-class CommonSession : public Session
-{
-public:
-  CommonSession (I_DBSHandler& dbsHandler);
-  virtual ~CommonSession ();
+  D_UINT32       FindProcedure (const D_UINT8* pName, const D_UINT nameLength);
+  D_UINT         ArgsCount (const D_UINT32 procedure);
+  const D_UINT8* FindLocalTI (const D_UINT32 procedure, const D_UINT32 local);
 
-  virtual void LogMessage (const LOG_LEVEL level, std::string& message);
+  NameSpaceHolder& m_GlobalNames;
+  NameSpaceHolder& m_PrivateNames;
 };
 
 }

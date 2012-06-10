@@ -79,8 +79,11 @@ GlobalsManager::FindGlobal (const D_UINT8* pName,
 }
 
 GlobalValue&
-GlobalsManager::GetGlobal (const D_UINT64 index)
+GlobalsManager::GetGlobal (const D_UINT32 entry)
 {
+  const D_UINT32 index = entry & ~GLOBAL_ID;
+
+  assert (IsValid (entry));
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
   assert (index < m_GlobalsEntrys.size ());
 
@@ -91,18 +94,22 @@ GlobalsManager::GetGlobal (const D_UINT64 index)
 }
 
 const D_UINT8*
-GlobalsManager::GetGlobalTI (const D_UINT64 index)
+GlobalsManager::GetGlobalTI (const D_UINT32 entry)
 {
+  const D_UINT32 index = entry & ~GLOBAL_ID;
+
+  assert (IsValid (entry));
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
   assert (index < m_GlobalsEntrys.size ());
 
   if (index >= m_GlobalsEntrys.size ())
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
 
-  TypeManager&   typeMgr = m_Session.GetTypeManager ();
+  TypeManager&   typeMgr = m_Names.GetTypeManager ();
   const D_UINT8* pType   = typeMgr.GetType (m_GlobalsEntrys[index].m_TypeOffset);
 
   assert (typeMgr.IsTypeValid (pType));
 
   return pType;
 }
+

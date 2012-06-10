@@ -34,7 +34,7 @@
 namespace prima
 {
 
-class Session;
+class NameSpace;
 
 struct GlobalEntry
 {
@@ -45,11 +45,11 @@ struct GlobalEntry
 class GlobalsManager
 {
 public:
-  GlobalsManager (Session& session) :
-    m_Session (session),
-    m_Identifiers (),
-    m_Storage (),
-    m_GlobalsEntrys ()
+  GlobalsManager (NameSpace& space)
+    : m_Names (space),
+      m_Identifiers (),
+      m_Storage (),
+      m_GlobalsEntrys ()
   {
   }
 
@@ -64,16 +64,32 @@ public:
   D_UINT32           FindGlobal (const D_UINT8 *const pName,
                                  const D_UINT         nameLength);
 
-  GlobalValue&       GetGlobal (const D_UINT64 index);
-  const D_UINT8*     GetGlobalTI (const D_UINT64 index);
+  GlobalValue&       GetGlobal (const D_UINT32 entry);
+  const D_UINT8*     GetGlobalTI (const D_UINT32 entry);
 
-  static const D_UINT32 INVALID_ENTRY = ~0;
+  static bool IsValid (const D_UINT32 entry)
+  {
+    return entry != INVALID_ENTRY;
+  }
+
+  static bool IsGlobalEntry (const D_UINT32 entry)
+  {
+    return IsValid (entry) && ((entry & GLOBAL_ID) != 0);
+  }
+
+  static void MarkAsGlobalEntry (D_UINT32& entry)
+  {
+    entry |= GLOBAL_ID;
+  }
 
 private:
   GlobalsManager (const GlobalsManager&);
   GlobalsManager& operator= (const GlobalsManager);
 
-  Session&                 m_Session;
+  static const D_UINT32 GLOBAL_ID     = 0x80000000;
+  static const D_UINT32 INVALID_ENTRY = 0xFFFFFFFF;
+
+  NameSpace&               m_Names;
   std::vector<D_UINT8>     m_Identifiers;
   std::vector<GlobalValue> m_Storage;
   std::vector<GlobalEntry> m_GlobalsEntrys;

@@ -49,7 +49,7 @@ public:
   }
 
   virtual InterException* Clone () { return new InterException (*this); }
-  virtual EXPCEPTION_TYPE       Type () { return INTERPRETER_EXCEPTION; }
+  virtual EXPCEPTION_TYPE Type () { return INTERPRETER_EXCEPTION; }
 
   enum
   {
@@ -95,13 +95,11 @@ public:
   virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
 };
 
-
-
 void
 InitInterpreter ();
 
 I_Session&
-GetInstance (const D_CHAR* const name);
+GetInstance (const D_CHAR* pName);
 
 void
 ReleaseInstance (I_Session& hInstance);
@@ -110,3 +108,4 @@ void
 CleanInterpreter (const bool force = false);
 
 #endif /* INTERPRETER_H_ */
+
