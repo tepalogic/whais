@@ -43,7 +43,7 @@ custom_trace_mem_realloc (void*       oldPtr,
                           D_UINT      line)
 {
   /* avoid unused variable warnings */
-  file = 0;
+  pFile = 0;
   line = 0;
 
   return custom_mem_realloc (oldPtr, newSize);

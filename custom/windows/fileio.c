@@ -232,6 +232,12 @@ whc_get_directory_delimiter ()
   return "\\";
 }
 
+const D_CHAR*
+whc_get_current_directory ()
+{
+  return ".\\";
+}
+
 D_BOOL
 whc_is_path_absolute (const D_CHAR* pPath)
 {
