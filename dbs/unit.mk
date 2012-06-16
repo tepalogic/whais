@@ -9,7 +9,7 @@ pastra_SRC=pastra/ps_values.cpp pastra/ps_container.cpp pastra/ps_table.cpp\
 		   pastra/ps_blockcache.cpp pastra/ps_textstrategy.cpp pastra/ps_arraystrategy.cpp\
 		   pastra/ps_btree_index.cpp pastra/ps_btree_fields.cpp pastra/ps_templatetable.cpp
 
-wcmd_SRC=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp
+wcmd_SRC=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp wcmd/wcmd_tabcomds.cpp
 wcmd_LIB=dbs/pastra utils/utils custom/custom
 		   
 

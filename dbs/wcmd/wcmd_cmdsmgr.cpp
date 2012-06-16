@@ -54,7 +54,14 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
 
       while (it != sCommands.end ())
         {
-          cout << it->first << "\t\t" << it->second.m_pCmdDesc << endl;
+          const streamsize prevWidth = cout.width (20);
+          const char       prevFill  = cout.fill (' ');
+
+          cout << left << it->first;
+          cout.width (prevWidth);
+          cout.fill (prevFill);
+          cout << it->second.m_pCmdDesc << endl;
+
           ++it;
         }
       return true;

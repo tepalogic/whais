@@ -56,6 +56,7 @@ public:
   virtual FIELD_INDEX        GetFieldsCount () = 0;
   virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field) = 0;
   virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName) = 0;
+  virtual FIELD_INDEX        GetFieledIndex (const D_CHAR* const pFieldName) = 0;
   virtual ROW_INDEX          GetAllocatedRows () = 0;
 
   virtual ROW_INDEX AddRow () = 0;

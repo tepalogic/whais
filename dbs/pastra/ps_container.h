@@ -107,7 +107,7 @@ public:
 class TempContainer : public I_DataContainer
 {
 public:
-  TempContainer (const D_CHAR* pTempDirectory, D_UINT uReservedMemory);
+  TempContainer (const D_CHAR* pTempDirectory, const D_UINT uReservedMemory);
   virtual ~TempContainer ();
 
   // WIDataContainer virtual functions

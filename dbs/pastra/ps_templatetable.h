@@ -55,7 +55,9 @@ struct FieldDescriptor
 };
 
 
-class PrototypeTable : public I_DBSTable, public I_BlocksManager, public I_BTreeNodeManager
+class PrototypeTable : public I_DBSTable,
+                       public I_BlocksManager,
+                       public I_BTreeNodeManager
 {
 
 public:
@@ -80,6 +82,7 @@ public:
   virtual FIELD_INDEX        GetFieldsCount ();
   virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field);
   virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName);
+  virtual FIELD_INDEX        GetFieledIndex (const D_CHAR* const pFieldName);
   virtual ROW_INDEX          GetAllocatedRows ();
   virtual ROW_INDEX          AddRow ();
   virtual ROW_INDEX          AddReusedRow ();
@@ -293,7 +296,7 @@ protected:
   virtual VLVarsStore&         VariableFieldsStore () = 0;
 
   //Data members
-  DbsHandler                            m_Dbs;
+  DbsHandler&                           m_Dbs;
   ROW_INDEX                             m_RowsCount;
   NODE_INDEX                            m_RootNode;
   NODE_INDEX                            m_FirstUnallocatedRoot;

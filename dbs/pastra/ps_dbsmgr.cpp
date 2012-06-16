@@ -332,7 +332,7 @@ DbsHandler::DbsHandler (const string& name) :
   while (tablesCount-- > 0)
     {
       m_Tables.insert (pair < string, PersistentTable* >(_RC (D_CHAR*, pBuffer), NULL));
-      pBuffer += strlen (_RC (D_CHAR*, pBuffer));
+      pBuffer += strlen (_RC (D_CHAR*, pBuffer)) + 1;
     }
 
 }
@@ -352,7 +352,7 @@ DbsHandler::~DbsHandler ()
 }
 
 TABLE_INDEX
-DbsHandler::PesistentTablesCount ()
+DbsHandler::PersistentTablesCount ()
 {
   return m_Tables.size ();
 }
@@ -453,6 +453,29 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
       }
 }
 
+const D_CHAR*
+DbsHandler::TableName (const TABLE_INDEX index)
+{
+  TABLE_INDEX       iterator = index;
+  WSynchronizerRAII syncHolder (m_Sync);
+
+  if (iterator >= m_Tables.size ())
+    throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
+
+  TABLES::iterator it = m_Tables.begin ();
+
+  while (iterator-- > 0)
+    {
+      assert (it != m_Tables.end ());
+      ++it;
+    }
+
+  if (it->second == NULL)
+    it->second = new PersistentTable (*this, it->first);
+
+  return it->first.c_str ();
+}
+
 void
 DbsHandler::DeleteTable (const D_CHAR* const pTableName)
 {
@@ -515,7 +538,7 @@ DbsHandler::SyncToFile ()
   outFile.Write (_RC (const D_UINT8*, m_DbsDirectory.c_str ()), m_DbsDirectory.size () + 1);
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
-    outFile.Write (_RC (const D_UINT8 *, it->first.c_str ()), it->first.size () + 1);
+    outFile.Write (_RC (const D_UINT8 *, it->first.c_str ()), it->first.length () + 1);
 }
 
 void
