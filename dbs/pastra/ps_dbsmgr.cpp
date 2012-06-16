@@ -124,7 +124,7 @@ void
 DBSInit (const D_CHAR* const pDBSDirectory, const D_CHAR* const pTempDir, D_UINT64 maxFileSize)
 {
   if (apDbsManager_.get () != NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::ALLREADY_INITED));
+    throw DBSException (NULL, _EXTRA (DBSException::ALREADY_INITED));
 
   if (maxFileSize < MINIMUM_MAX_FILE_SIZE)
     maxFileSize = MINIMUM_MAX_FILE_SIZE;

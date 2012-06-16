@@ -48,11 +48,11 @@ public:
   WException (const D_CHAR* pMessage,
               const D_CHAR* pFile,
               D_UINT32      line,
-              D_UINT32      extra) :
-    m_ErrorMessage (pMessage),
-    m_File (pFile),
-    m_Line (line),
-    m_Extra (extra)
+              D_UINT32      extra)
+    : m_ErrorMessage (pMessage),
+      m_File (pFile),
+      m_Line (line),
+      m_Extra (extra)
   {
   }
 
@@ -60,12 +60,12 @@ public:
   {
   };
 
-  D_UINT32 GetExtra ()
+  D_UINT32 GetExtra () const
   {
     return m_Extra;
   };
 
-  const D_CHAR* GetDescription ()
+  const D_CHAR* Message () const
   {
     return m_ErrorMessage;
   }
@@ -80,8 +80,9 @@ public:
     return m_Line;
   }
 
-  virtual WException*     Clone () = 0;
-  virtual EXPCEPTION_TYPE Type () = 0;
+  virtual WException*     Clone () const = 0;
+  virtual EXPCEPTION_TYPE Type () const = 0;
+  virtual const D_CHAR*   Description () const = 0;
 
 private:
   const D_CHAR* m_ErrorMessage;

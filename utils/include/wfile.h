@@ -41,8 +41,12 @@ public:
   {
   };
 
-  virtual WException*     Clone () { return new WFileException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return FILE_EXCEPTION; }
+  virtual WException*     Clone () const { return new WFileException (*this); }
+  virtual EXPCEPTION_TYPE Type () const { return FILE_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    return "File IO error.";
+  }
 };
 
 class WFile

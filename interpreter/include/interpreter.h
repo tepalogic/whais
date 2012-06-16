@@ -39,8 +39,8 @@ public:
   explicit InterpreterException (const D_CHAR*  message,
                                  const D_CHAR*  file,
                                  const D_UINT32 line,
-                                 const D_UINT32 extra) :
-     WException (message, file, line, extra)
+                                 const D_UINT32 extra)
+    : WException (message, file, line, extra)
   {
   }
 
@@ -48,8 +48,48 @@ public:
   {
   }
 
-  virtual InterpreterException* Clone () { return new InterpreterException (*this); }
-  virtual EXPCEPTION_TYPE       Type () { return INTERPRETER_EXCEPTION; }
+  virtual InterpreterException* Clone () const
+  {
+    return new InterpreterException (*this);
+  }
+  virtual EXPCEPTION_TYPE       Type () const { return INTERPRETER_EXCEPTION; }
+  virtual const D_CHAR*         Description () const
+  {
+    switch (GetExtra ())
+      {
+        case INVALID_OP_CONVERSION:
+          return "Invalid operand conversion.";
+        case INVALID_OP_REQUEST:
+          return "Invalid operand request.";
+        case INVALID_GLOBAL_REQUEST:
+          return "Invalid global value request.";
+        case INVALID_TYPE_DESCRIPTION:
+          return "Invalid type description.";
+        case DUPLICATE_DEFINITION:
+          return "Definition two global symbols with the same name.";
+        case EXTERNAL_FIRST:
+          return "An external declaration of a symbol encountered before "
+                 "it's definition.";
+        case EXTERNAL_MISMATCH:
+          return "Declaration of an external symbol is different from "
+                 "its definition.";
+        case INVALID_PROC_REQUEST:
+           return "Invalid procedure request.";
+        case INVALID_PROC_LOCAL_REQUEST:
+           return "Invalid local value request.";
+        case ALREADY_INITED:
+           return "Already initialized.";
+        case NOT_INITED:
+           return "Not initialized.";
+         case INVALID_SESSION:
+           return "Invalid session.";
+         case SESSION_IN_USE:
+             return "Session in use.";
+         default:
+             assert (false);
+             return "Unknown exception.";
+      }
+  }
 
   enum
   {

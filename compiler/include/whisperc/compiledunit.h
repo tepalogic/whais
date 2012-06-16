@@ -71,16 +71,24 @@ public:
   WCompiledUnitException (const D_CHAR* pMessage,
                           const D_CHAR* pFile,
                           D_UINT32      line,
-                          D_UINT32      extra) :
-    WException (pMessage, pFile, line, extra)
+                          D_UINT32      extra)
+    : WException (pMessage, pFile, line, extra)
   {
   }
+
   virtual ~WCompiledUnitException ()
   {
   };
 
-  virtual WException*     Clone () { return new WCompiledUnitException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return UNIT_COMPILE_EXCEPTION; }
+  virtual WException*     Clone () const
+  {
+    return new WCompiledUnitException (*this);
+  }
+  virtual EXPCEPTION_TYPE Type () const { return UNIT_COMPILE_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    return "Could not compile unit!";
+  }
 };
 
 class WBufferCompiledUnit : public WICompiledUnit

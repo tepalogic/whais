@@ -57,24 +57,24 @@ main (int argc, char **argv)
   }
   catch (WCompiledUnitException& e)
   {
-    std::cerr << e.GetDescription () << std::endl;
+    std::cerr << e.Message () << std::endl;
     retCode = -1;
   }
   catch (WFileException& e)
   {
     std::cerr << "File IO error " << e.GetExtra ();
-    if (e.GetDescription() != NULL)
-      std::cerr << ": " << e.GetDescription () << std::endl;
+    if (e.Message () != NULL)
+      std::cerr << ": " << e.Message () << std::endl;
     else
       std::cerr << '.' << std::endl;
     retCode = -1;
   }
   catch (WodCmdLineException& e)
   {
-    std::cerr << e.GetDescription () << std::endl;
+    std::cerr << e.Message () << std::endl;
   } catch (WException & e)
   {
-    std::cerr << "error : " << e.GetDescription () << std::endl;
+    std::cerr << "error : " << e.Message () << std::endl;
     std::cerr << "file: " << e.GetFile() << " : " << e.GetLine() << std::endl;
     std::cerr << "Extra: " << e.GetExtra() << std::endl;
 

@@ -52,16 +52,20 @@ public:
   WDumpException (const D_CHAR* pMessage,
                   const D_CHAR* pFile,
                   D_UINT32      line,
-                  D_UINT32      extra) :
-    WException (pMessage, pFile, line, extra)
+                  D_UINT32      extra)
+    : WException (pMessage, pFile, line, extra)
   {
   }
   virtual ~ WDumpException ()
   {
   };
 
-  virtual WException*     Clone () { return new WDumpException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return DUMP_EXCEPTION; }
+  virtual WException*     Clone () const { return new WDumpException (*this); }
+  virtual EXPCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    return "General exception by object dumper.";
+  }
 };
 
 typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8* pInArgs,
