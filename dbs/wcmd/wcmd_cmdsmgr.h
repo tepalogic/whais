@@ -26,8 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WCMD_CMDSMGR_H_
 
 #include <string>
+#include <iostream>
 
 #include "whisper.h"
+#include "wexception.h"
 
 typedef void* ENTRY_CMD_CONTEXT;
 typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
@@ -54,6 +56,9 @@ FindCmdEntry (const D_CHAR* pCommand);
 
 const std::string
 CmdLineNextToken (const std::string& cmdLine, size_t& ioPosition);
+
+void
+printException (std::ostream& outputStream, const WException& e);
 
 #endif // WCMD_CMDSMGR_H_
 

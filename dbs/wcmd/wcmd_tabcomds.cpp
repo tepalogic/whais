@@ -162,6 +162,7 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   vector<DBSFieldDescriptor> fields;
   vector<string>             fieldsNames;
   string                     tableName;
+  bool                       result   = true;
 
 
   assert (token == "table_add");
@@ -171,7 +172,7 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   tableName = CmdLineNextToken (cmdLine, linePos);
 
-  if (level > VL_DEBUG)
+  if (level > VL_INFO)
     cout << "Adding table " << tableName << "...\n";
 
   if (linePos >= cmdLine.length ())
@@ -242,7 +243,7 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       fields.push_back (desc);
 
-      if (level >= VL_DEBUG)
+      if (level >= VL_INFO)
         {
           cout << " ... ";
           print_field_desc (desc, false);
@@ -252,10 +253,21 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
   while (linePos < cmdLine.length ());
 
-  dbsHnd.AddTable (tableName.c_str (),
-                   fields.size (),
-                   &(fields.front ()));
-  return true;
+  try
+  {
+    dbsHnd.AddTable (tableName.c_str (), fields.size (), &(fields.front ()));
+  }
+  catch (const WException& e)
+  {
+    if (level >= VL_ERROR)
+      cout << "Failed to add table: " << tableName << endl;
+
+    printException (cout, e);
+
+    result =  false;
+  }
+
+  return result;
 
 invalid_args:
   if (level >= VL_ERROR)
@@ -271,25 +283,39 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
+  bool                 result  = true;
 
   assert (token == "table_remove");
   if (linePos >= cmdLine.length ())
     goto invalid_args;
 
-  if (level > VL_DEBUG)
+  if (level > VL_INFO)
     cout << "Removing tables\n";
 
   do
     {
-      token = CmdLineNextToken (cmdLine, linePos);
-      dbsHnd.DeleteTable (token.c_str ());
+      try
+      {
+        token = CmdLineNextToken (cmdLine, linePos);
+        dbsHnd.DeleteTable (token.c_str ());
 
-      if (level >= VL_DEBUG)
-        cout << "  ... " << token << endl;
+        if (level >= VL_INFO)
+          cout << "  ... " << token << endl;
+      }
+      catch (const WException& e)
+      {
+        if (level >= VL_ERROR)
+          cout << "Failed to remove table: " << token << endl;
+
+        printException (cout, e);
+
+        result =  false;
+        break;
+      }
     }
   while (linePos < cmdLine.length ());
 
-  return true;
+  return result;
 
 invalid_args:
   if (level >= VL_ERROR)
@@ -306,51 +332,64 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
+  bool                 result  = true;
 
   assert (token == "table");
 
-  if (linePos >= cmdLine.length ())
-    {
-      const TABLE_INDEX tablesCount = dbsHnd.PersistentTablesCount ();
+  try
+  {
+    if (linePos >= cmdLine.length ())
+      {
+        const TABLE_INDEX tablesCount = dbsHnd.PersistentTablesCount ();
 
-      if (level >= VL_DEBUG)
-        cout << "Retrieved " << tablesCount << " persistent tables.\n";
+        if (level >= VL_INFO)
+          cout << "Retrieved " << tablesCount << " persistent tables.\n";
 
-      for (TABLE_INDEX index = 0; index < tablesCount; ++index)
-        cout << dbsHnd.TableName (index) << endl;
-    }
-  else
-    {
-      do
-        {
-          token = CmdLineNextToken (cmdLine, linePos);
+        for (TABLE_INDEX index = 0; index < tablesCount; ++index)
+          cout << dbsHnd.TableName (index) << endl;
+      }
+    else
+      {
+        do
+          {
+            token = CmdLineNextToken (cmdLine, linePos);
 
-          I_DBSTable&       table      = dbsHnd.RetrievePersistentTable (
-                                                              token.c_str ());
-          const FIELD_INDEX fieldCount = table.GetFieldsCount ();
+            I_DBSTable&       table      = dbsHnd.RetrievePersistentTable (
+                                                                token.c_str ());
+            const FIELD_INDEX fieldCount = table.GetFieldsCount ();
 
-          cout << "Table '"<< token << "' fields description:\n";
+            cout << "Table '"<< token << "' fields description:\n";
 
-          for (FIELD_INDEX index = 0; index < fieldCount; ++index)
-            {
-              DBSFieldDescriptor desc = table.GetFieldDescriptor (index);
-              print_field_desc (desc, table.IsFieldIndexed (index));
-            }
+            for (FIELD_INDEX index = 0; index < fieldCount; ++index)
+              {
+                DBSFieldDescriptor desc = table.GetFieldDescriptor (index);
+                print_field_desc (desc, table.IsFieldIndexed (index));
+              }
 
-          dbsHnd.ReleaseTable (table);
+            dbsHnd.ReleaseTable (table);
 
-        }
-      while (linePos < cmdLine.length ());
-    }
+          }
+        while (linePos < cmdLine.length ());
+      }
+  }
+  catch (const WException& e)
+  {
+    printException (cout, e);
 
-    return true;
+    result = false;
+  }
+
+  return result;
 }
 
 static void
 create_index_call_back (CallBackIndexData* cbData)
 {
   if (cbData->m_RowsCount == 0)
-    return;
+    {
+      cout << "100%";
+      return;
+    }
 
   if (((cbData->m_RowIndex * 100) % cbData->m_RowsCount) == 0)
     {
@@ -367,43 +406,70 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
   I_DBSTable*          pTable  = NULL;
+  bool                 result  = true;
 
   assert (token == "table_index");
 
   if (linePos >= cmdLine.length ())
     goto invalid_args;
 
-  token  = CmdLineNextToken (cmdLine, linePos);
-  pTable = &dbsHnd.RetrievePersistentTable (token.c_str ());
+  try
+  {
+    token  = CmdLineNextToken (cmdLine, linePos);
+    pTable = &dbsHnd.RetrievePersistentTable (token.c_str ());
+  }
+  catch (const WException& e)
+  {
+    if (level >= VL_INFO)
+      cout << "Failed to open table: " << token << endl;
+
+    printException (cout, e);
+
+    return false;
+  }
+
 
   if (linePos >= cmdLine.length ())
     goto invalid_args;
 
   do
     {
-      token = CmdLineNextToken (cmdLine, linePos);
+      try
+      {
+        token = CmdLineNextToken (cmdLine, linePos);
 
-      const FIELD_INDEX field = pTable->GetFieledIndex (token.c_str ());
+        const FIELD_INDEX field = pTable->GetFieledIndex (token.c_str ());
 
-      if ( ! pTable->IsFieldIndexed (field))
-        {
-          if (level >= VL_INFO)
-            {
-              CallBackIndexData data;
-              pTable->CreateFieldIndex (field,
-                                        create_index_call_back,
-                                        &data);
-              cout << endl;
-            }
-          else
-            pTable->CreateFieldIndex (field, NULL, NULL);
-        }
+        if ( ! pTable->IsFieldIndexed (field))
+          {
+            if (level >= VL_INFO)
+              {
+                CallBackIndexData data;
+                pTable->CreateFieldIndex (field,
+                                          create_index_call_back,
+                                          &data);
+                cout << endl;
+              }
+            else
+              pTable->CreateFieldIndex (field, NULL, NULL);
+          }
+      }
+      catch (const WException& e)
+      {
+        if (level >= VL_INFO)
+          cout << "Failed to create index for field: " << token << endl;
+
+        printException (cout, e);
+
+        result = false;
+        break;
+      }
     }
   while (linePos < cmdLine.length ());
 
   dbsHnd.ReleaseTable (*pTable);
 
-  return true;
+  return result;
 
 invalid_args:
 
@@ -424,40 +490,66 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
   I_DBSTable*          pTable  = NULL;
+  bool                 result  = true;
 
   assert (token == "table_rmindex");
 
   if (linePos >= cmdLine.length ())
     goto invalid_args;
 
-  token  = CmdLineNextToken (cmdLine, linePos);
-  pTable = &dbsHnd.RetrievePersistentTable (token.c_str ());
+  try
+  {
+    token  = CmdLineNextToken (cmdLine, linePos);
+    pTable = &dbsHnd.RetrievePersistentTable (token.c_str ());
+  }
+  catch (const WException& e)
+  {
+    if (level >= VL_INFO)
+      cout << "Failed to open table: " << token << endl;
+
+    printException (cout, e);
+
+    return false;
+  }
 
   if (linePos >= cmdLine.length ())
     goto invalid_args;
 
   do
     {
-      token = CmdLineNextToken (cmdLine, linePos);
+      try
+      {
+        token = CmdLineNextToken (cmdLine, linePos);
 
-      const FIELD_INDEX field = pTable->GetFieledIndex (token.c_str ());
+        const FIELD_INDEX field = pTable->GetFieledIndex (token.c_str ());
 
-      if (pTable->IsFieldIndexed (field))
-        {
-          if (level >= VL_DEBUG)
-            cout << "Removing index for " << token << ".\n";
+        if (pTable->IsFieldIndexed (field))
+          {
+            if (level >= VL_INFO)
+              cout << "Removing index for " << token << ".\n";
 
-          pTable->RemoveFieldIndex (field);
-        }
-      else
-        if (level > VL_DEBUG)
-          cout << "Ignoring field " << token << ".\n";
+            pTable->RemoveFieldIndex (field);
+          }
+        else
+          if (level > VL_INFO)
+            cout << "Ignoring field " << token << ".\n";
+      }
+      catch (const WException& e)
+      {
+        if (level >= VL_INFO)
+          cout << "Failed to renove index for field: " << token << endl;
+
+        printException (cout, e);
+
+        result = false;
+        break;
+      }
     }
   while (linePos < cmdLine.length ());
 
   dbsHnd.ReleaseTable (*pTable);
 
-  return true;
+  return result;
 
 invalid_args:
 

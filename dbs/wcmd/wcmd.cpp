@@ -241,7 +241,7 @@ CreateDB ()
   const VERBOSE_LEVEL level  = GetVerbosityLevel ();
   const string&       workDB = GetWorkingDB ();
 
-  if (level >= VL_DEBUG)
+  if (level >= VL_INFO)
     cout << "Creating database: " << workDB << " ... ";
 
   DBSCreateDatabase (workDB.c_str (),
@@ -249,7 +249,7 @@ CreateDB ()
                      GetMaximumFileSize ());
 
 
-  if (level >= VL_DEBUG)
+  if (level >= VL_INFO)
     cout << "done." << endl;
 }
 
@@ -259,13 +259,13 @@ OpenDB ()
   const VERBOSE_LEVEL level  = GetVerbosityLevel ();
   const string&       workDB = GetWorkingDB ();
 
-  if (level >= VL_DEBUG)
+  if (level >= VL_INFO)
     cout << "Opening database: " << workDB << " ... ";
 
   I_DBSHandler& dbsHnd = DBSRetrieveDatabase (workDB.c_str ());
   SetDbsHandler (dbsHnd);
 
-  if (level >= VL_DEBUG)
+  if (level >= VL_INFO)
     cout << "done." << endl;
 }
 
@@ -275,18 +275,19 @@ RemoveDB ()
   const VERBOSE_LEVEL level  = GetVerbosityLevel ();
   const string&       workDB = GetWorkingDB ();
 
-  if (level >= VL_DEBUG)
+  if (level >= VL_INFO)
     cout << "Removing database: " << workDB << " ... ";
 
   DBSRemoveDatabase (workDB.c_str ());
 
-  if (level >= VL_DEBUG)
+  if (level >= VL_INFO)
     cout << "done." << endl;
 }
 
 D_INT
 main (const D_INT argc, D_CHAR *argv[])
 {
+  D_INT         result     = 0;
   D_INT         currentArg = 1;
   bool          createDB   = false;
   bool          removeDB   = false;
@@ -395,27 +396,67 @@ main (const D_INT argc, D_CHAR *argv[])
         }
     }
 
-  InitDBS ();
+  try
+  {
+    InitDBS ();
+  }
+  catch (const WException& e)
+  {
+    printException (cout, e);
+    return e.GetExtra ();
+  }
+  catch (...)
+  {
+    cout << "Fatal error ... Unknow exception was throwed.\n";
+    return 0xFF;
+  }
 
-  if (removeDB == false)
-    {
-      if (createDB)
-        CreateDB ();
+  try
+  {
+    if (removeDB == false)
+      {
+        if (createDB)
+          CreateDB ();
 
-      OpenDB ();
+        OpenDB ();
 
-      AddOfflineTableCommands ();
+        AddOfflineTableCommands ();
 
-      if (script != "")
-        ExecuteCommandBatch (script);
-      else
-        ExecuteInteractively ();
-    }
-  else
-    RemoveDB ();
+        if (script != "")
+          ExecuteCommandBatch (script);
+        else
+          ExecuteInteractively ();
+      }
+    else
+      RemoveDB ();
+  }
+  catch (const WException& e)
+  {
+    printException (cout, e);
 
-  StopDBS ();
+    result = e.GetExtra ();
+  }
+  catch (...)
+  {
+    cout << "Fatal error ... Unknow exception was throwed.\n";
+    result = 0xFF;
+  }
 
-  return 0;
+  try
+  {
+    StopDBS ();
+  }
+  catch (const WException& e)
+  {
+    printException (cout, e);
+    result = (result != 0) ? result : e.GetExtra ();
+  }
+  catch (...)
+  {
+    cout << "Fatal error ... Unknow exception was throwed.\n";
+    result = (result != 0)  ? result : 0xFF;
+  }
+
+  return result;
 }
 

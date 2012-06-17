@@ -27,8 +27,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 
 #include "wcmd_cmdsmgr.h"
+#include "wcmd_optglbs.h"
 
 using namespace std;
+
+static const D_UINT MAX_DECODED_STRING = 256;
 
 map<string, CmdEntry> sCommands;
 static const D_CHAR descHelp[]    = "Display help on available commands.";
@@ -148,6 +151,48 @@ CmdLineNextToken (const string& cmdLine, size_t& ioPosition)
   ioPosition = lastPos + 1;
 
   return result;
+}
+
+void
+printException (ostream& outputStream, const WException& e)
+{
+  const VERBOSE_LEVEL level = GetVerbosityLevel ();
+
+  if (e.Type () == DBS_EXCEPTION)
+    {
+      if (level >= VL_DEBUG)
+        outputStream << "Exception throwed from DBS framework.\n";
+
+      if (level >= VL_ERROR)
+        outputStream << e.Description () <<endl;
+    }
+  else if (e.Type () == FILE_EXCEPTION)
+    {
+      if (level >= VL_DEBUG)
+        outputStream << "Filesystem IO exception throwed.\n";
+
+      if (level >= VL_ERROR)
+        {
+          D_CHAR errorDesc[MAX_DECODED_STRING];
+
+          whc_ferrtostrs (e.GetExtra (), errorDesc, sizeof errorDesc);
+          outputStream << errorDesc << endl;
+        }
+    }
+  else
+    {
+      assert (false);
+      outputStream << "Unknown exception throwed.\n";
+    }
+
+  if ((level >= VL_ERROR) && (e.Message() != NULL))
+    outputStream << e.Message () << endl;
+
+  if (level >= VL_DEBUG)
+    {
+      outputStream << "file: " << e.GetFile () << endl;
+      outputStream << "line: " << e.GetLine () << endl;
+    }
 }
 
 

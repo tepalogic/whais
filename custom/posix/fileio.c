@@ -203,7 +203,20 @@ whc_fgetlasterror ()
 D_BOOL
 whc_ferrtostrs (D_UINT64 error_code, D_CHAR* str, D_UINT strSize)
 {
-  return (strerror_r ((int) error_code, str, strSize) != NULL);
+  const D_CHAR* const pMessage = strerror_r ((int) error_code, str, strSize);
+
+  assert (strSize > 0);
+  assert (str != NULL);
+
+  str [0] = 0;
+
+  if (pMessage != NULL)
+    {
+      strncpy (str, pMessage, strSize);
+      return TRUE;
+    }
+
+  return FALSE;
 }
 
 D_BOOL

@@ -70,12 +70,12 @@ public:
     return m_ErrorMessage;
   }
 
-  const D_CHAR* GetFile ()
+  const D_CHAR* GetFile () const
   {
     return m_File;
   }
 
-  D_UINT32 GetLine ()
+  D_UINT32 GetLine () const
   {
     return m_Line;
   }

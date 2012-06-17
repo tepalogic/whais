@@ -106,7 +106,7 @@ public:
         case TABLE_INCONSITENCY:
           return "Tables is inconsistent.";
         case TABLE_NOT_FOUND:
-          return "Table not fund.";
+          return "Table not found.";
         case TABLE_EXISTS:
           return "Table already exists.";
         case TABLE_IN_USE:
