@@ -60,6 +60,7 @@ static const D_CHAR usageDescription[] =
 "    -u, --use db_name      Select 'db_name' as the target database.\n"
 "\n"
 "    -d  --dir directory    Sets the working directory.\n"
+"    -o  --dbdir directory  Sets the directory where the DB content resides.\n"
 "    -m, --file_size size   Specify the maximum file size. Not all file\n"
 "                           support the same maximum file systems, and this\n"
 "                           is used to specify the respective limit. It also\n"
@@ -236,7 +237,7 @@ StopDBS ()
 
 
 static void
-CreateDB ()
+CreateDB (const string& dbDirectory)
 {
   const VERBOSE_LEVEL level  = GetVerbosityLevel ();
   const string&       workDB = GetWorkingDB ();
@@ -245,9 +246,8 @@ CreateDB ()
     cout << "Creating database: " << workDB << " ... ";
 
   DBSCreateDatabase (workDB.c_str (),
-                     GetWorkingDirectory ().c_str (),
+                     dbDirectory.c_str (),
                      GetMaximumFileSize ());
-
 
   if (level >= VL_INFO)
     cout << "done." << endl;
@@ -292,6 +292,7 @@ main (const D_INT argc, D_CHAR *argv[])
   bool          createDB   = false;
   bool          removeDB   = false;
   string        script;
+  string        dbDirectory;
 
   if (argc == currentArg)
     {
@@ -355,6 +356,18 @@ main (const D_INT argc, D_CHAR *argv[])
             }
           SetWorkingDirectory (argv[currentArg++]);
         }
+      else if ((strcmp (argv[currentArg], "-o") == 0) ||
+               (strcmp (argv[currentArg], "--dbdir" ) == 0))
+        {
+          ++currentArg;
+          if (currentArg == argc)
+            {
+              PrintWrongUsage ();
+              return EINVAL;
+            }
+
+          dbDirectory = argv[currentArg++];
+        }
       else if ((strcmp (argv[currentArg], "-v") == 0) ||
                (strcmp (argv[currentArg], "--verbose" ) == 0))
         {
@@ -416,8 +429,9 @@ main (const D_INT argc, D_CHAR *argv[])
     if (removeDB == false)
       {
         if (createDB)
-          CreateDB ();
-
+          CreateDB ( (dbDirectory.length () != 0) ?
+                        dbDirectory :
+                        GetWorkingDirectory ());
         OpenDB ();
 
         AddOfflineTableCommands ();

@@ -79,7 +79,9 @@ typedef map<string, DbsElement> DATABASES_MAP;
 
 class DbsManager
 {
-  friend void          DBSInit (const D_CHAR* const, const D_CHAR* const, D_UINT64 maxFileSize);
+  friend void          DBSInit (const D_CHAR* const,
+                                const D_CHAR* const,
+                                D_UINT64 );
   friend void          DBSShoutdown ();
   friend const D_CHAR* DBSGetWorkingDir ();
   friend const D_CHAR* DBSGetTempDir ();
@@ -92,19 +94,25 @@ class DbsManager
 private:
   DbsManager (const D_CHAR* const pDBSDirectory,
               const D_CHAR* const pTempDir,
-              D_UINT64            maxFileSize) :
-      m_Sync (),
+              D_UINT64            maxFileSize)
+    : m_Sync (),
       m_WorkingDir (pDBSDirectory),
       m_TempDir (pTempDir),
       m_Databases (),
       m_MaxFileSize (maxFileSize)
   {
 
-    if (pDBSDirectory[strlen (pDBSDirectory) - 1] != whc_get_directory_delimiter ()[0])
-      m_WorkingDir += whc_get_directory_delimiter ();
+    if (pDBSDirectory[strlen (pDBSDirectory) - 1] !=
+        whc_get_directory_delimiter ()[0])
+      {
+        m_WorkingDir += whc_get_directory_delimiter ();
+      }
 
-    if (pTempDir[strlen (pTempDir) - 1] != whc_get_directory_delimiter ()[0])
-      m_TempDir += whc_get_directory_delimiter ();
+    if (pTempDir[strlen (pTempDir) - 1] !=
+        whc_get_directory_delimiter ()[0])
+      {
+        m_TempDir += whc_get_directory_delimiter ();
+      }
   }
 
   ~DbsManager ()
@@ -121,7 +129,9 @@ private:
 static auto_ptr<DbsManager> apDbsManager_;
 
 void
-DBSInit (const D_CHAR* const pDBSDirectory, const D_CHAR* const pTempDir, D_UINT64 maxFileSize)
+DBSInit (const D_CHAR* const pDBSDirectory,
+         const D_CHAR* const pTempDir,
+         D_UINT64            maxFileSize)
 {
   if (apDbsManager_.get () != NULL)
     throw DBSException (NULL, _EXTRA (DBSException::ALREADY_INITED));
@@ -183,28 +193,26 @@ DBSCreateDatabase (const D_CHAR* const pName,
   if (maxFileSize < MINIMUM_MAX_FILE_SIZE)
     maxFileSize = MINIMUM_MAX_FILE_SIZE;
 
-  string fileName;
-
-  if ((pName != NULL) && whc_is_path_absolute (pDbsDirectory))
+  string dbsDirectory = pDbsDirectory;
+  if ((dbsDirectory[dbsDirectory.length ()] - 1) !=
+      whc_get_directory_delimiter ()[0])
     {
-      fileName += pDbsDirectory;
-      fileName += whc_get_directory_delimiter ();
-    }
-  else
-    {
-      fileName += DBSGetWorkingDir ();
-      fileName += pDbsDirectory;
-      fileName += whc_get_directory_delimiter ();
+      dbsDirectory += whc_get_directory_delimiter ();
     }
 
+
+  string fileName = DBSGetWorkingDir ();
   fileName += pName;
   fileName += DBS_FILE_EXT;
 
-  WFile             dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
+  WFile             dbsFile (fileName.c_str (),
+                             WHC_FILECREATE_NEW | WHC_FILEWRITE);
   auto_ptr<D_UINT8> apBufferHeader (new D_UINT8[PS_DBS_HEADER_SIZE]);
   D_UINT8* const    cpHeader = apBufferHeader.get ();
 
-  memcpy (cpHeader + PS_DBS_SIGNATURE_OFF, DBS_FILE_SIGNATURE, PS_DBS_SIGNATURE_LEN);
+  memcpy (cpHeader + PS_DBS_SIGNATURE_OFF,
+          DBS_FILE_SIGNATURE,
+          PS_DBS_SIGNATURE_LEN);
 
   *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
   *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
@@ -213,7 +221,8 @@ DBSCreateDatabase (const D_CHAR* const pName,
   *_RC (D_UINT64*, cpHeader + PS_DBS_MAX_FILE_OFF)   = maxFileSize;
 
   dbsFile.Write (cpHeader, PS_DBS_HEADER_SIZE);
-  dbsFile.Write (_RC (const D_UINT8*, pDbsDirectory), strlen (pDbsDirectory) + 1);
+  dbsFile.Write (_RC (const D_UINT8*, dbsDirectory.c_str ()),
+                 dbsDirectory.length () + 1);
 }
 
 I_DBSHandler&
@@ -531,7 +540,7 @@ DbsHandler::SyncToFile ()
   *_RC (D_UINT16*, aBuffer + PS_DBS_NUM_TABLES_OFF) = m_Tables.size ();
   *_RC (D_UINT64*, aBuffer + PS_DBS_MAX_FILE_OFF)   = MaxFileSize ();
 
-  string fileName (m_DbsDirectory + m_Name + DBS_FILE_EXT);
+  string fileName (DBSGetWorkingDir () + m_Name + DBS_FILE_EXT);
   WFile outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
   outFile.SetSize (0);
   outFile.Write (aBuffer, sizeof aBuffer);
@@ -558,6 +567,6 @@ DbsHandler::RemoveFromStorage ()
     }
 
   //Remove the database file
-  const string fileName (m_DbsDirectory + m_Name + DBS_FILE_EXT);
+  const string fileName (DBSGetWorkingDir () + m_Name + DBS_FILE_EXT);
   whc_fremove (fileName.c_str ());
 }
