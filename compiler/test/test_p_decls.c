@@ -90,7 +90,6 @@ D_CHAR proc_decl_buffer[] =
   "RETURN ARRAY OF TEXT "
   "DO "
   "LET dummy_var1 as TEXT; "
-  "LET dummy_var2 as FIELD; "
   "RETURN NULL; "
   "ENDPROC "
   ""
@@ -201,7 +200,7 @@ check_procs_decl (struct ParserState *state)
     }
 
   proc = get_item (proc_decls, 1);
-  if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 2))
+  if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 1))
     {
       return FALSE;
     }
@@ -222,14 +221,6 @@ check_procs_decl (struct ParserState *state)
   tmp_var = stmt_find_declaration (proc, "dummy_var1",
                                    strlen ("dummy_var1"), FALSE, FALSE);
   if (tmp_var->type != T_TEXT)
-    {
-      return FALSE;
-    }
-
-  tmp_var = stmt_find_declaration (proc, "dummy_var2",
-                                   strlen ("dummy_var2"), FALSE, FALSE);
-  if ((IS_FIELD(tmp_var->type) == FALSE) ||
-       (GET_FIELD_TYPE (tmp_var->type) != T_UNDETERMINED))
     {
       return FALSE;
     }

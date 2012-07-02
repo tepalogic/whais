@@ -50,7 +50,6 @@ check_used_vals (struct ParserState *state)
 D_CHAR buffer[] =
   "LET aVar01_ AS ARRAY OF INT32;\n"
   "LET aVar02_ AS ARRAY OF REAL;\n"
-  "LET aVar03, __array__ AS ARRAY;\n"
   "LET aVar031 AS ARRAY OF REAL;\n"
   "LET aVar04, __array_2_ AS ARRAY OF TEXT;\n";
 
@@ -99,7 +98,7 @@ check_vars_decl (struct ParserState *state)
     }
 
   count = get_array_count (&(state->globalStmt.decls));
-  if (count != 7)
+  if (count != 5)
     {
       /* error: more declarations?!? */
       return FALSE;
@@ -120,23 +119,9 @@ check_vars_decl (struct ParserState *state)
     }
   temp_pos = decl_var->typeSpecOff;
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "aVar03", 6, FALSE, FALSE);
-  type     = T_UNDETERMINED;
-  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
-    {
-      return FALSE;
-    }
-
   decl_var = stmt_find_declaration (&state->globalStmt, "aVar04", 6, FALSE, FALSE);
   type     = T_TEXT;
   if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY ((type))))
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->globalStmt, "__array__", 9, FALSE, FALSE);
-  type     = T_UNDETERMINED;
-  if (!check_declared_var (&state->globalStmt, decl_var, MARK_ARRAY (type)))
     {
       return FALSE;
     }

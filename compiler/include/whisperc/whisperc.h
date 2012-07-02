@@ -31,16 +31,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
-#define T_ARRAY_MASK          0x0100        /* a mask to tell that variable is an array */
-#define T_FIELD_MASK          0x0200
-#define T_TABLE_MASK          0x0400        /*the variable is a table */
-#define T_TABLE_FIELD_MASK    0x0800        /*the variable is a table */
+#define T_ARRAY_MASK          0x0100    /* The variable is an array */
+#define T_FIELD_MASK          0x0200    /* A 'field of' variable */
+#define T_TABLE_MASK          0x0400    /* The variable is a table */
 
-#define T_L_VALUE             0x1000        /* Mask applied to suggest if this is a genuine l-value */
+#define T_TABLE_FIELD_MASK    0x0800    /* The variable is a table */
+#define T_L_VALUE             0x1000    /* Is a genuine l-value */
 
 #define IS_ARRAY(type)          ((((type) & (T_FIELD_MASK | T_ARRAY_MASK)) == T_ARRAY_MASK))
 #define IS_FIELD(type)          (((type) & T_FIELD_MASK) != 0)
 #define IS_TABLE(type)          (((type) & T_TABLE_MASK) != 0)
+
 #define IS_TABLE_FIELD(type)    (((type) & T_TABLE_FIELD_MASK) != 0)
 #define IS_L_VALUE(type)        (((type) & T_L_VALUE) != 0)
 

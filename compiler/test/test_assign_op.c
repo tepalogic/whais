@@ -202,7 +202,7 @@ D_CHAR proc_decl_buffer[] =
   "RETURN v1 = v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId31 (v1 AS TABLE OF (field_t AS DATE, f2 AS TEXT), v2 AS TABLE OF (field_t as DATE, f3 AS REAL)) RETURN TABLE "
+  "PROCEDURE ProcId31 (v1 AS TABLE OF (field_t AS DATE, f2 AS TEXT), v2 AS TABLE OF (field_t as DATE, f2 AS TEXT)) RETURN TABLE "
   "DO "
   "RETURN v1 = v2; "
   "ENDPROC\n\n"

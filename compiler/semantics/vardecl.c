@@ -97,7 +97,10 @@ process_field_decls (struct ParserState* pState,
         {
           D_CHAR tname[128];
 
-          copy_text_truncate (tname, pVar->label, sizeof tname, pVar->labelLength);
+          copy_text_truncate (tname,
+                              pVar->label,
+                              sizeof tname,
+                              pVar->labelLength);
           w_log_msg (pState, pState->bufferPos, MSG_FIELD_INV_ARRAY, tname);
 
           result = FALSE;
@@ -108,11 +111,11 @@ process_field_decls (struct ParserState* pState,
 }
 
 struct DeclaredVar *
-install_declaration (struct ParserState* pState,
-                     YYSTYPE             pVar,
-                     YYSTYPE             pType,
-                     D_BOOL              parameter,
-                     D_BOOL              unique)
+install_declaration (struct ParserState* const pState,
+                     YYSTYPE                   pVar,
+                     YYSTYPE                   pType,
+                     const D_BOOL              parameter,
+                     const D_BOOL              unique)
 {
   struct DeclaredVar*     result = NULL;
   struct DeclaredVar*     pDecl  = NULL;
@@ -150,7 +153,7 @@ install_declaration (struct ParserState* pState,
       var.offset      = 0;
 
       if (IS_TABLE (var.type) &&
-          (process_table_decls (pState, &var, pType->val.u_tspec.extra) == FALSE))
+          ( ! process_table_decls (pState, &var, pType->val.u_tspec.extra)))
         {
           result = NULL;        /* something went wrong along the way */
         }
@@ -171,7 +174,23 @@ install_declaration (struct ParserState* pState,
           struct DeclaredVar *it = result->extra;
 
           if (it == NULL)
-            result->extra = result;
+            {
+              if ( ! parameter)
+                {
+                  /* Already declared! */
+                  D_CHAR text[128];
+                  copy_text_truncate (text,
+                                      var.label,
+                                      sizeof text,
+                                      var.labelLength);
+                  w_log_msg (pState,
+                             pState->bufferPos,
+                             MSG_TABLE_INCOMPLETE,
+                             text);
+                  pState->abortError = TRUE;
+                }
+              result->extra = result;
+            }
           else
             {
               while (it->extra && IS_TABLE_FIELD (it->extra->type))
@@ -179,7 +198,43 @@ install_declaration (struct ParserState* pState,
 
               it->extra = result;
             }
-
+        }
+      else if (IS_ARRAY (var.type) && (! parameter))
+        {
+          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN) ||
+              (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
+            {
+              /* Already declared! */
+              D_CHAR text[128];
+              copy_text_truncate (text,
+                                  var.label,
+                                  sizeof text,
+                                  var.labelLength);
+              w_log_msg (pState,
+                         pState->bufferPos,
+                         MSG_ARRAY_INCOMPLETE,
+                         text);
+              pState->abortError = TRUE;
+            }
+        }
+      else if (IS_FIELD (var.type) && (! parameter))
+        {
+          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN) ||
+              (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
+            {
+              assert (IS_ARRAY (var.type) == FALSE);
+              /* Already declared! */
+              D_CHAR text[128];
+              copy_text_truncate (text,
+                                  var.label,
+                                  sizeof text,
+                                  var.labelLength);
+              w_log_msg (pState,
+                         pState->bufferPos,
+                         MSG_FIELD_INCOMPLETE,
+                         text);
+              pState->abortError = TRUE;
+            }
         }
     }
 
@@ -225,7 +280,8 @@ install_list_declrs (struct ParserState* pState,
       id.val_type = VAL_ID;
       id.val.u_id = pIt->id;
 
-      if ((result = (YYSTYPE)install_declaration (pState, &id, pType, FALSE, TRUE)) == NULL)
+      result = (YYSTYPE)install_declaration (pState, &id, pType, FALSE, TRUE);
+      if (result == NULL)
         break;                /* some error has been encountered */
 
       /* next in list */
@@ -270,7 +326,10 @@ install_field_declaration (struct ParserState*       pState,
         {
           D_CHAR tname[128];
 
-          copy_text_truncate (tname, pSemId->text, sizeof tname, pSemId->length);
+          copy_text_truncate (tname,
+                              pSemId->text,
+                              sizeof tname,
+                              pSemId->length);
           w_log_msg (pState, pState->bufferPos, MSG_SAME_FIELD, tname);
 
           pState->abortError = TRUE;
@@ -285,10 +344,12 @@ install_field_declaration (struct ParserState*       pState,
   pIt           = pExtra;
   while (pIt != NULL)
     {
-      /* Insert this alphabetically to make sure we avoid equivalent fields declarations. */
+      /* Insert this alphabetically to make sure
+       * we avoid equivalent fields declarations. */
       const D_INT compare = strncmp (pIt->label,
                                      result->label,
-                                     MIN (pIt->labelLength, result->labelLength));
+                                     MIN (pIt->labelLength,
+                                          result->labelLength));
       if ((compare > 0) ||
           ((compare == 0) && (pIt->labelLength >= result->labelLength)))
         {

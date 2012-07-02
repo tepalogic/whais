@@ -102,9 +102,9 @@ stmt_find_declaration (struct Statement* pStmt,
                        const D_BOOL      refferenced);
 
 struct DeclaredVar*
-stmt_add_declaration (struct Statement*   pStmt,
-                      struct DeclaredVar* pVar,
-                      D_BOOL              parameter);
+stmt_add_declaration (struct Statement* const   pStmt,
+                      struct DeclaredVar*       pVar,
+                      const D_BOOL              parameter);
 
 const struct DeclaredVar*
 stmt_get_param (const struct Statement* const pStmt, D_UINT param);

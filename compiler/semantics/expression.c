@@ -1187,8 +1187,7 @@ translate_exp_xor (struct ParserState* const        pState,
 static D_BOOL
 are_compatible_tables (struct ParserState* const         pState,
                        const struct ExpResultType* const pFirstType,
-                       const struct ExpResultType* const pSecondType,
-                       D_BOOL                            ignoreUnfoundFields)
+                       const struct ExpResultType* const pSecondType)
 {
   const struct DeclaredVar* pFirstField  = NULL;
   const struct DeclaredVar* pSecondField = NULL;
@@ -1219,17 +1218,14 @@ are_compatible_tables (struct ParserState* const         pState,
 
       if (pFoundField == NULL)
         {
-          if ( ! ignoreUnfoundFields)
-            {
-              w_log_msg (pState,
-                         pState->bufferPos,
-                         MSG_NO_FIELD,
-                         copy_text_truncate (temp, pFirstField->label,
-                                             sizeof temp,
-                                             pFirstField->labelLength));
+          w_log_msg (pState,
+                     pState->bufferPos,
+                     MSG_NO_FIELD,
+                     copy_text_truncate (temp, pFirstField->label,
+                                         sizeof temp,
+                                         pFirstField->labelLength));
 
-              return FALSE;
-            }
+          return FALSE;
         }
       else if (are_compatible_fields (pFirstField, pFoundField) == FALSE)
         {
@@ -1277,7 +1273,7 @@ translate_exp_store (struct ParserState* const         pState,
         opcode = store_op[ftype][stype];
       else if (IS_TABLE (ftype) && IS_TABLE (stype))
         {
-          if ( ! are_compatible_tables (pState, firstType, secondType, TRUE))
+          if ( ! are_compatible_tables (pState, firstType, secondType))
             return gResultUnk;
 
           opcode = W_STTA;
@@ -1936,7 +1932,7 @@ translate_exp_call (struct ParserState* const   pState,
                   return gResultUnk;
                 }
             }
-          else if (are_compatible_tables (pState, &argType, &result, FALSE) == FALSE)
+          else if ( ! are_compatible_tables (pState, &argType, &result))
             {
               /* The two containers's types are not compatible.
                * The error was already logged. */
@@ -2379,7 +2375,7 @@ translate_return_exp (struct ParserState* pState, YYSTYPE exp)
                 }
             }
         }
-      else if (are_compatible_tables (pState, &retType, &expType, FALSE) == FALSE)
+      else if ( ! are_compatible_tables (pState, &retType, &expType))
         {
           /* The two containers types are not compatible.
            * The error was already logged. */

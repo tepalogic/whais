@@ -121,29 +121,13 @@ D_CHAR proc_decl_buffer[] =
   "PROCEDURE ProcIdTst2() "
   "RETURN BOOL "
   "DO "
-  "LET v1 AS ARRAY; "
-  "LET v2 AS ARRAY OF TEXT; "
-  "RETURN ProcId2(v1, v2); "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcIdTst2_1() "
-  "RETURN BOOL "
-  "DO "
-  "LET v1 AS ARRAY OF DATETIME; "
+  "LET v1 AS ARRAY OF DATE; "
   "LET v2 AS ARRAY OF TEXT; "
   "RETURN ProcId2(v1, v2); "
   "ENDPROC "
   " "
   " "
-  "PROCEDURE ProcIdTst3() "
-  "RETURN BOOL "
-  "DO "
-  "LET v1 AS TABLE OF (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
-  "LET v2 AS TABLE; "
-  "RETURN ProcId3(v1, v2); "
-  "ENDPROC "
-  " "
-  "PROCEDURE ProcIdTst3_1() "
+  "PROCEDURE ProcIdTst3 () "
   "RETURN BOOL "
   "DO "
   "LET v1 AS TABLE OF (v1 AS DATE, v2 AS INT8, v3 as ARRAY OF INT8); "
@@ -206,12 +190,9 @@ check_procedure_calls (struct ParserState *state)
   result &= check_procedure (state, "ProcIdTst0", "ProcId0", 0);
 
   result &= check_procedure (state, "ProcIdTst1", "ProcId1", 16);
-
   result &= check_procedure (state, "ProcIdTst2", "ProcId2", 2);
-  result &= check_procedure (state, "ProcIdTst2_1", "ProcId2", 2);
-
   result &= check_procedure (state, "ProcIdTst3", "ProcId3", 2);
-  result &= check_procedure (state, "ProcIdTst3_1", "ProcId3", 2);
+
 
   return result;
 

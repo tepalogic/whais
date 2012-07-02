@@ -113,12 +113,6 @@ test_index_op_SRC=test/test_index_op.c
 test_index_op_LIB=compiler/compiler utils/utils custom/custom
 test_index_op_INC=utils/include custom/include
 
-
-;UNIT_EXES+=test_self_op
-;test_self_op_SRC=test/test_self_op.c 
-;test_self_op_LIB=compiler/compiler utils/utils custom/custom
-;test_self_op_INC=utils/include custom/include
-
 UNIT_EXES+=test_assign_op
 test_assign_op_SRC=test/test_assign_op.c 
 test_assign_op_LIB=compiler/compiler utils/utils custom/custom
@@ -149,11 +143,6 @@ test_msg_not_declared_SRC=test/test_msg_not_declared.c
 test_msg_not_declared_LIB=compiler/compiler utils/utils custom/custom
 test_msg_not_declared_INC=utils/include custom/include
 
-;UNIT_EXES+=test_msg_not_table
-;test_msg_not_table_SRC=test/test_msg_not_table.c 
-;test_msg_not_table_LIB=compiler/compiler utils/utils custom/custom
-;test_msg_not_table_INC=utils/include custom/include
-
 UNIT_EXES+=test_msg_same_field
 test_msg_same_field_SRC=test/test_msg_same_field.c 
 test_msg_same_field_LIB=compiler/compiler utils/utils custom/custom
@@ -178,11 +167,6 @@ UNIT_EXES+=test_msg_index
 test_msg_index_SRC=test/test_msg_index.c 
 test_msg_index_LIB=compiler/compiler utils/utils custom/custom
 test_msg_index_INC=utils/include custom/include
-
-;UNIT_EXES+=test_msg_memsel
-;test_msg_memsel_SRC=test/test_msg_memsel.c 
-;test_msg_memsel_LIB=compiler/compiler utils/utils custom/custom
-;test_msg_memsel_INC=utils/include custom/include
 
 UNIT_EXES+=test_msg_store
 test_msg_store_SRC=test/test_msg_store.c 

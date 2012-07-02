@@ -73,11 +73,11 @@ create_type_spec (struct ParserState* pState,
                   D_UINT16            type);
 
 struct DeclaredVar *
-install_declaration (struct ParserState* pState,
-                     YYSTYPE             pVar,
-                     YYSTYPE             pType,
-                     D_BOOL              paramter,
-                     D_BOOL              unique);
+install_declaration (struct ParserState* const pState,
+                     YYSTYPE                   pVar,
+                     YYSTYPE                   pType,
+                     const D_BOOL              paramter,
+                     const D_BOOL              unique);
 
 YYSTYPE
 install_list_declrs (struct ParserState* pState,

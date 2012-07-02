@@ -11,10 +11,8 @@ extern int yyparse (struct ParserState *);
 
 
 D_CHAR buffer[] =
-  "LET field1 AS FIELD;\n"
   "LET field2 AS FIELD OF ARRAY OF DATE;\n"
   "LET field3 AS FIELD OF INT8;\n"
-  "LET vTable AS TABLE;\n"
   "LET vTable2, vTable3 AS TABLE OF (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n";
 
 
@@ -159,16 +157,6 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "field1", 6, FALSE, FALSE);
-  if (decl_var == NULL ||
-      (IS_FIELD (decl_var->type) == FALSE) ||
-      (IS_TABLE_FIELD (decl_var->type) != FALSE) ||
-      (GET_FIELD_TYPE (decl_var->type) != T_UNDETERMINED) ||
-      decl_var->extra != NULL)
-    {
-      return FALSE;
-    }
-
   decl_var = stmt_find_declaration (&state->globalStmt, "field2", 6, FALSE, FALSE);
   if (decl_var == NULL ||
       (IS_FIELD (decl_var->type) == FALSE) ||
@@ -187,15 +175,6 @@ check_vars_decl (struct ParserState *state)
       (IS_ARRAY (GET_FIELD_TYPE (decl_var->type)) != FALSE) ||
       (GET_BASIC_TYPE (decl_var->type) != T_INT8) ||
       decl_var->extra != NULL)
-    {
-      return FALSE;
-    }
-
-  decl_var = stmt_find_declaration (&state->globalStmt, "vTable", 6, FALSE, FALSE);
-  if (decl_var == NULL ||
-      (IS_TABLE (decl_var->type) == FALSE) ||
-      (GET_BASIC_TYPE (decl_var->type) != 0) ||
-      decl_var->extra != decl_var)
     {
       return FALSE;
     }

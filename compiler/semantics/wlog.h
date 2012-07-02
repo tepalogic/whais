@@ -54,7 +54,10 @@ struct MsgCodeEntry
 #define MSG_NOT_TABLE           (MSG_VAR_NFOUND + 1)
 #define MSG_SAME_FIELD          (MSG_NOT_TABLE + 1)
 #define MSG_FIELD_INV_ARRAY     (MSG_SAME_FIELD + 1)
-#define MSG_PROC_ADECL          (MSG_FIELD_INV_ARRAY + 1)
+#define MSG_TABLE_INCOMPLETE    (MSG_FIELD_INV_ARRAY + 1)
+#define MSG_ARRAY_INCOMPLETE    (MSG_TABLE_INCOMPLETE + 1)
+#define MSG_FIELD_INCOMPLETE    (MSG_ARRAY_INCOMPLETE + 1)
+#define MSG_PROC_ADECL          (MSG_FIELD_INCOMPLETE + 1)
 #define MSG_COMPILER_ERR        (MSG_PROC_ADECL + 1)
 
 /* expression semantic related errors, base 500 */
@@ -104,6 +107,7 @@ struct MsgCodeEntry
 #define MSG_CONTINUE_NOLOOP     (MSG_BREAK_NOLOOP + 1)
 #define MSG_SYNC_NA             (MSG_CONTINUE_NOLOOP + 1)
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
+
 
 void
 w_log_msg (struct ParserState *pState, D_UINT buffPos, D_UINT msgCode, ...);

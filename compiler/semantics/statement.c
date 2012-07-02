@@ -198,9 +198,9 @@ stmt_find_declaration (struct Statement* pStmt,
 }
 
 struct DeclaredVar*
-stmt_add_declaration (struct Statement*   pStmt,
-                      struct DeclaredVar* pVar,
-                      D_BOOL              parameter)
+stmt_add_declaration (struct Statement* const   pStmt,
+                      struct DeclaredVar*       pVar,
+                      const D_BOOL              parameter)
 {
   struct OutputStream *pOutStream = NULL;
 
