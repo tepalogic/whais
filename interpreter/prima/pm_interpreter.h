@@ -103,8 +103,18 @@ public:
   virtual ~Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
+  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
+                                 StackValue&         stack);
   virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 
+  D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
+  GlobalValue&   GetGlobalValue (const D_UINT32 globalId);
+  const D_UINT8* FindGlobalTI (const D_UINT32 globalId);
+
+  D_UINT32       FindProcedure (const D_UINT8* pName, const D_UINT nameLength);
+  D_UINT         ArgsCount (const D_UINT32 procId);
+  const D_UINT8* FindLocalTI (const D_UINT32 procId, const D_UINT32 local);
+  Unit&          ProcUnit (const D_UINT32 procId);
 
 private:
   D_UINT32 DefineGlobalValue (const D_UINT8* pName,
@@ -121,13 +131,6 @@ private:
                             const D_UINT8*    pCode,
                             const D_UINT32    codeSize,
                             const bool        external);
-
-  D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
-  const D_UINT8* FindGlobalTI (const D_UINT32 entry);
-
-  D_UINT32       FindProcedure (const D_UINT8* pName, const D_UINT nameLength);
-  D_UINT         ArgsCount (const D_UINT32 procedure);
-  const D_UINT8* FindLocalTI (const D_UINT32 procedure, const D_UINT32 local);
 
   NameSpaceHolder& m_GlobalNames;
   NameSpaceHolder& m_PrivateNames;

@@ -31,7 +31,7 @@
 using namespace pastra;
 using namespace std;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 PrototypeTable::PrototypeTable (DbsHandler& dbs)
   : m_Dbs (dbs),
@@ -60,7 +60,6 @@ PrototypeTable::PrototypeTable (const PrototypeTable& prototype)
     m_Sync (),
     m_IndexSync ()
 {
-  //TODO: In future make the two prototypes to share the same memory for fields.
   m_FieldsDescriptors.reset (new D_UINT8 [m_DescriptorsSize]);
   memcpy (m_FieldsDescriptors.get (),
           prototype.m_FieldsDescriptors.get (),
@@ -89,7 +88,8 @@ PrototypeTable::GetFieldsCount ()
 DBSFieldDescriptor
 PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
 {
-  const FieldDescriptor* const pDesc = _RC(const FieldDescriptor*, m_FieldsDescriptors.get ());
+  const FieldDescriptor* const pDesc = _RC(const FieldDescriptor*,
+                                           m_FieldsDescriptors.get ());
 
   if (field >= m_FieldsCount)
     throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
@@ -97,8 +97,11 @@ PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
   DBSFieldDescriptor result;
 
   result.isArray      = (pDesc[field].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-  result.m_FieldType  = _SC (DBS_FIELD_TYPE, pDesc[field].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK);
-  result.m_pFieldName = _RC (const D_CHAR *, pDesc) + pDesc[field].m_NameOffset;
+  result.m_FieldType  = _SC (DBS_FIELD_TYPE,
+                               pDesc[field].m_TypeDesc &
+                               PS_TABLE_FIELD_TYPE_MASK);
+  result.m_pFieldName = _RC (const D_CHAR *, pDesc) +
+                        pDesc[field].m_NameOffset;
 
   return result;
 }
@@ -106,18 +109,23 @@ PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
 DBSFieldDescriptor
 PrototypeTable::GetFieldDescriptor (const D_CHAR* const pFieldName)
 {
-  const FieldDescriptor* const pDesc    = _RC(const FieldDescriptor*, m_FieldsDescriptors.get ());
-  D_UINT64                     iterator = m_FieldsCount * sizeof(FieldDescriptor);
+  const FieldDescriptor* const pDesc = _RC(const FieldDescriptor*,
+                                       m_FieldsDescriptors.get ());
+  D_UINT64 iterator = m_FieldsCount * sizeof(FieldDescriptor);
 
   for (FIELD_INDEX index = 0; index < m_FieldsCount; ++index)
     {
-      if (strcmp(_RC (const D_CHAR *, m_FieldsDescriptors.get() + iterator), pFieldName) == 0)
+      if (strcmp(_RC (const D_CHAR *, m_FieldsDescriptors.get() + iterator),
+                 pFieldName) == 0)
         {
           DBSFieldDescriptor result;
 
           result.m_pFieldName = _RC (const D_CHAR*, pDesc) + iterator;
-          result.isArray      = (pDesc[index].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-          result.m_FieldType  = _SC (DBS_FIELD_TYPE, pDesc[index].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK);
+          result.isArray =
+            (pDesc[index].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
+          result.m_FieldType = _SC (DBS_FIELD_TYPE,
+                                      pDesc[index].m_TypeDesc &
+                                      PS_TABLE_FIELD_TYPE_MASK);
 
           return result;
         }
@@ -206,9 +214,10 @@ PrototypeTable::MarkRowForReuse (const ROW_INDEX row)
 
     while (fieldsCount-- > 0)
       {
-        const FieldDescriptor&   field    = GetFieldDescriptorInternal (fieldsCount);
-        D_UINT                   byte_off = field.m_NullBitIndex / 8;
-        D_UINT8                  bit_off  = field.m_NullBitIndex % 8;
+        const FieldDescriptor& field    = GetFieldDescriptorInternal (
+                                                                fieldsCount);
+        D_UINT                 byte_off = field.m_NullBitIndex / 8;
+        D_UINT8                bit_off  = field.m_NullBitIndex % 8;
 
         pRawData[byte_off] |= (1 << bit_off);
       }
@@ -1937,8 +1946,4 @@ TableRmNode::SentinelKey () const
 
   return _key;
 }
-
-
-
-
 

@@ -64,22 +64,22 @@ public:
   D_UINT32           FindGlobal (const D_UINT8 *const pName,
                                  const D_UINT         nameLength);
 
-  GlobalValue&       GetGlobal (const D_UINT32 entry);
-  const D_UINT8*     GetGlobalTI (const D_UINT32 entry);
+  GlobalValue&       GetGlobal (const D_UINT32 glbId);
+  const D_UINT8*     GetGlobalTI (const D_UINT32 glbId);
 
-  static bool IsValid (const D_UINT32 entry)
+  static bool IsValid (const D_UINT32 glbId)
   {
-    return entry != INVALID_ENTRY;
+    return glbId != INVALID_ENTRY;
   }
 
-  static bool IsGlobalEntry (const D_UINT32 entry)
+  static bool IsGlobalEntry (const D_UINT32 glbId)
   {
-    return IsValid (entry) && ((entry & GLOBAL_ID) != 0);
+    return IsValid (glbId) && ((glbId & GLOBAL_ID) != 0);
   }
 
-  static void MarkAsGlobalEntry (D_UINT32& entry)
+  static void MarkAsGlobalEntry (D_UINT32& glbId)
   {
-    entry |= GLOBAL_ID;
+    glbId |= GLOBAL_ID;
   }
 
 private:

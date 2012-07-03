@@ -55,7 +55,9 @@ struct FieldDescriptor
 };
 
 
-class PrototypeTable : public I_DBSTable, public I_BlocksManager, public I_BTreeNodeManager
+class PrototypeTable : public I_DBSTable,
+                       public I_BlocksManager,
+                       public I_BTreeNodeManager
 {
 
 public:

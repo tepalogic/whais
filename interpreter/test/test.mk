@@ -8,3 +8,9 @@ test_namespaces_SRC=test/test_namespaces.cpp
 test_namespaces_LIB=dbs/pastra  custom/custom interpreter/prima compiler/compiler utils/utils
 test_namespaces_INC=utils/include custom/include dbs/include compiler/include
 
+UNIT_EXES+=test_operations
+test_operations_SRC=test/test_operations.cpp
+test_operations_LIB=dbs/pastra  custom/custom interpreter/prima compiler/compiler utils/utils
+test_operations_INC=utils/include custom/include dbs/include compiler/include
+
+

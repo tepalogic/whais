@@ -186,9 +186,12 @@ NullArray::GetSingletoneInstace (const DBS_FIELD_TYPE type)
   static NullArray _int16Instance (T_INT16);
   static NullArray _int32Instance (T_INT32);
   static NullArray _int64Instance (T_INT64);
+  static NullArray _genericInstance (T_UNDETERMINED);
 
   switch (type)
   {
+  case T_UNDETERMINED:
+    return _genericInstance;
   case T_BOOL:
     return _boolInstance;
   case T_CHAR:

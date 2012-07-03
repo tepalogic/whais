@@ -79,11 +79,11 @@ GlobalsManager::FindGlobal (const D_UINT8* pName,
 }
 
 GlobalValue&
-GlobalsManager::GetGlobal (const D_UINT32 entry)
+GlobalsManager::GetGlobal (const D_UINT32 glbId)
 {
-  const D_UINT32 index = entry & ~GLOBAL_ID;
+  const D_UINT32 index = glbId & ~GLOBAL_ID;
 
-  assert (IsValid (entry));
+  assert (IsValid (glbId));
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
   assert (index < m_GlobalsEntrys.size ());
 
@@ -94,11 +94,11 @@ GlobalsManager::GetGlobal (const D_UINT32 entry)
 }
 
 const D_UINT8*
-GlobalsManager::GetGlobalTI (const D_UINT32 entry)
+GlobalsManager::GetGlobalTI (const D_UINT32 glbId)
 {
-  const D_UINT32 index = entry & ~GLOBAL_ID;
+  const D_UINT32 index = glbId & ~GLOBAL_ID;
 
-  assert (IsValid (entry));
+  assert (IsValid (glbId));
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
   assert (index < m_GlobalsEntrys.size ());
 

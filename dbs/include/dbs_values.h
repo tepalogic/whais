@@ -1012,6 +1012,7 @@ class DBSArray
 {
 public:
 
+  DBSArray ();
   explicit DBSArray (const DBSBool* array, D_UINT64 count = 0);
   explicit DBSArray (const DBSChar* array, D_UINT64 count = 0);
   explicit DBSArray (const DBSDate* array, D_UINT64 count = 0);

@@ -26,12 +26,12 @@
 #define OPERANDS_H_
 
 #include <assert.h>
+#include <vector>
 
 #include "dbs/include/dbs_mgr.h"
 #include "dbs/include/dbs_values.h"
 
-
-static const D_UINT MAX_OP_QWORDS = 3;
+static const D_UINT MAX_OP_QWORDS = sizeof (DBSRichReal) + 2 * sizeof (void*);
 
 class I_Operand
 {
@@ -61,6 +61,8 @@ public:
   virtual void GetValue (DBSUInt16& outValue) const;
   virtual void GetValue (DBSUInt32& outValue) const;
   virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DBSArray& outValue) const;
 
   virtual void SetValue (const DBSBool& value);
   virtual void SetValue (const DBSChar& value);
@@ -77,11 +79,11 @@ public:
   virtual void SetValue (const DBSUInt16& value);
   virtual void SetValue (const DBSUInt32& value);
   virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DBSText& value);
+  virtual void SetValue (const DBSArray& value);
 
-  //Special treatement for these
+  //Special treatment for these
   virtual FIELD_INDEX   GetField ();
-  virtual DBSArray&     GetArray ();
-  virtual DBSText&      GetText ();
   virtual I_DBSTable&   GetTable ();
 };
 
@@ -103,11 +105,51 @@ public:
   {
   }
 
+  void Clear ()
+  {
+    GetOperand ().~I_Operand ();
+  }
+
   I_Operand& GetOperand () { return *_RC (I_Operand*, m_Storage);  }
 
 private:
   D_UINT64 m_Storage [MAX_OP_QWORDS];
 };
 
-#endif /* OPERANDS_H_ */
+class SessionStack
+{
+public:
+  SessionStack ();
+  ~SessionStack ();
 
+  void  Push (StackValue& value);
+  void  Push ();
+  void  Push (DBSBool& value);
+  void  Push (DBSChar& value);
+  void  Push (DBSDate& value);
+  void  Push (DBSDateTime& value);
+  void  Push (DBSHiresTime& value);
+  void  Push (DBSInt8& value);
+  void  Push (DBSInt16& value);
+  void  Push (DBSInt32& value);
+  void  Push (DBSInt64& value);
+  void  Push (DBSReal& value);
+  void  Push (DBSRichReal& value);
+  void  Push (DBSUInt8& value);
+  void  Push (DBSUInt16& value);
+  void  Push (DBSUInt32& value);
+  void  Push (DBSUInt64& value);
+  void  Push (DBSText& value);
+  void  Push (DBSArray& value);
+
+  void  Pop (const D_UINT count);
+
+  size_t Size () const;
+
+  StackValue& operator[] (const D_UINT index);
+
+private:
+  std::vector<StackValue> m_Stack;
+};
+
+#endif /* OPERANDS_H_ */

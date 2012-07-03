@@ -32,14 +32,15 @@
 #include "dbs/include/dbs_mgr.h"
 #include "compiler/include/whisperc/compiledunit.h"
 
+#include "operands.h"
 
 class InterException : public WException
 {
 public:
   explicit InterException (const D_CHAR*  message,
-                                 const D_CHAR*  file,
-                                 const D_UINT32 line,
-                                 const D_UINT32 extra)
+                           const D_CHAR*  file,
+                           const D_UINT32 line,
+                           const D_UINT32 extra)
     : WException (message, file, line, extra)
   {
   }
@@ -66,10 +67,15 @@ public:
     ALREADY_INITED,
     NOT_INITED,
     INVALID_SESSION,
-    SESSION_IN_USE
+    SESSION_IN_USE,
+
+    STACK_CORRUPTED,
+
+    INVALID_UNIT_GLB_INDEX,
+    INVALID_UNIT_PROC_INDEX,
+    INVALID_UNIT_DATA_OFF,
   };
 };
-
 
 enum LOG_LEVEL
 {
@@ -92,6 +98,8 @@ public:
   }
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
+  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
+                                 StackValue&         stack) = 0;
   virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
 };
 

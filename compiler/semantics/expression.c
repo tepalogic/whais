@@ -2100,10 +2100,10 @@ translate_exp_leaf (struct ParserState* const pState,
     }
   else if (expression->val_type == VAL_C_REAL)
     {
-      result.type = T_REAL;
+      result.type = T_RICHREAL;
       if ((w_opcode_encode (pCodeStream, W_LDR) == NULL) ||
           (output_uint64 (pCodeStream, expression->val.u_real.integerPart) == NULL) ||
-          (output_uint64 (pCodeStream, expression->val.u_real.fractionalPart) == NULL))
+          (output_uint8 (pCodeStream, expression->val.u_real.fractionalPart) == NULL))
 
         {
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);

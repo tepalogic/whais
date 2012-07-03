@@ -426,7 +426,6 @@ parse_real_value (const char*      pBuffer,
   const D_UINT oldLen            = bufferLen;
   D_BOOL       foundDecimalPoint = FALSE;
   D_BOOL       negative          = FALSE;
-  D_UINT       fractionNible     = 15;
 
   assert (pBuffer != NULL);
   assert (bufferLen != 0);
@@ -435,7 +434,9 @@ parse_real_value (const char*      pBuffer,
   pOutReal->integerPart    = 0;
   pOutReal->fractionalPart = 0;
 
-  if (pBuffer[0] == '-' && bufferLen > 1 && is_numeric (pBuffer[1], FALSE))
+  if ((pBuffer[0] == '-') &&
+      (bufferLen > 1) &&
+      is_numeric (pBuffer[1], FALSE))
     {
       negative = TRUE;
       pBuffer++;
@@ -449,13 +450,11 @@ parse_real_value (const char*      pBuffer,
       if (*pBuffer >= '0' && *pBuffer <= '9')
         {
           digit += (*pBuffer - '0');
-          if (foundDecimalPoint == FALSE)
-            {
-              pOutReal->integerPart *= 10;
-              pOutReal->integerPart += digit;
-            }
-          else
-            pOutReal->fractionalPart |= (((D_UINT64) digit & 0x0F) << (fractionNible-- * 4));
+          pOutReal->integerPart *= 10;
+          pOutReal->integerPart += digit;
+
+          if (foundDecimalPoint)
+            pOutReal->fractionalPart--;
         }
       else if (*pBuffer == '.')
         {

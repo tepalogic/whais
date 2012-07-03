@@ -26,10 +26,68 @@
 #include <memory.h>
 
 #include "pm_units.h"
+#include "interpreter.h"
 
 using namespace std;
 using namespace prima;
 
+////////////////////////////////Unit///////////////////////////////////////////
+
+void
+Unit::SetGlobalId (const D_UINT32 globalIndex, const D_UINT32 globalId)
+{
+  if (globalIndex >= m_GlbsCount)
+    throw InterException (NULL,
+                          _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
+
+  _RC (D_UINT32*, m_UnitData)[globalIndex] = globalId;
+}
+
+void
+Unit::SetProcId (const D_UINT32 procIndex, const D_UINT32 procId)
+{
+  if (procIndex >= m_ProcsCount)
+    throw InterException (NULL,
+                          _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
+
+  _RC (D_UINT32*, m_UnitData)[m_GlbsCount + procIndex] = procId;
+}
+
+D_UINT32
+Unit::GetGlobalId (const D_UINT32 globalIndex) const
+{
+  if (globalIndex >= m_GlbsCount)
+    throw InterException (NULL,
+                          _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
+
+  return _RC (const D_UINT32*, m_UnitData)[globalIndex];
+}
+
+D_UINT32
+Unit::GetProcId (const D_UINT32 procIndex) const
+{
+  if (procIndex >= m_ProcsCount)
+    throw InterException (NULL,
+                          _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
+
+  return _RC (const D_UINT32*, m_UnitData)[m_GlbsCount + procIndex];
+}
+
+const D_UINT8*
+Unit::GetConstData (const D_UINT32 offset) const
+{
+  if (offset >= m_ConstSize)
+    throw InterException (NULL,
+                          _EXTRA (InterException::INVALID_UNIT_DATA_OFF));
+
+  const D_UINT8* pData = m_UnitData;
+
+  pData += (m_GlbsCount + m_ProcsCount) * sizeof (D_UINT32) + offset;
+
+  return pData;
+}
+
+/////////////////////////////////UnitsManager//////////////////////////////////
 
 UnitsManager::~UnitsManager ()
 {
@@ -43,11 +101,11 @@ UnitsManager::AddUnit (const D_UINT32 glbsCount,
                        const D_UINT8* pConstData,
                        const D_UINT32 constAreaSize)
 {
-  const D_UINT entrySize = sizeof (UnitEntry) +
+  const D_UINT entrySize = sizeof (Unit) +
                            (glbsCount + procsCount) * sizeof (D_UINT32) +
                            constAreaSize;
   auto_ptr<D_UINT8> apUnitData (new D_UINT8[entrySize]);
-  UnitEntry* const  pEntry = _RC (UnitEntry*, apUnitData.get ());
+  Unit* const  pEntry = _RC (Unit*, apUnitData.get ());
 
   pEntry->m_GlbsCount  = glbsCount;
   pEntry->m_ProcsCount = procsCount;
@@ -80,12 +138,7 @@ UnitsManager::SetGlobalIndex (const D_UINT32 unitIndex,
 {
   assert (unitIndex < m_Units.size ());
 
-  UnitEntry* const pEntry = _RC (UnitEntry*, m_Units[unitIndex]);
-
-  assert (unitGlbIndex < pEntry->m_GlbsCount);
-
- _RC (D_UINT32*, pEntry->m_UnitData)[unitGlbIndex] = glbMgrIndex;
-
+  m_Units[unitIndex]->SetGlobalId (unitGlbIndex, glbMgrIndex);
 }
 
 void
@@ -95,40 +148,24 @@ UnitsManager::SetProcIndex (const D_UINT32 unitIndex,
 {
   assert (unitIndex < m_Units.size ());
 
-  UnitEntry* const pEntry = _RC (UnitEntry*, m_Units[unitIndex]);
-
-  assert (unitProcIndex < pEntry->m_ProcsCount);
-
-  D_UINT32* const pUnitData = _RC (D_UINT32*, pEntry->m_UnitData);
-  pUnitData[pEntry->m_GlbsCount + unitProcIndex] = procMgrIndex;
-
+  m_Units[unitIndex]->SetProcId (unitProcIndex, procMgrIndex);
 }
 
 D_UINT32
 UnitsManager::GetGlobalIndex (const D_UINT32 unitIndex,
-                              const D_UINT32 unitGlbIndex)
+                              const D_UINT32 unitGlbIndex) const
 {
   assert (unitIndex < m_Units.size ());
 
-  UnitEntry* const pEntry = _RC (UnitEntry*, m_Units[unitIndex]);
-
-  assert (unitGlbIndex < pEntry->m_GlbsCount);
-
- return _RC (D_UINT32*, pEntry->m_UnitData)[unitGlbIndex];
-
+ return m_Units[unitIndex]->GetGlobalId (unitGlbIndex);
 }
 
 D_UINT32
 UnitsManager::GetProcIndex (const D_UINT32 unitIndex,
-                            const D_UINT32 unitProcIndex)
+                            const D_UINT32 unitProcIndex) const
 {
   assert (unitIndex < m_Units.size ());
 
-  UnitEntry* const pEntry = _RC (UnitEntry*, m_Units[unitIndex]);
-
-  assert (unitProcIndex < pEntry->m_ProcsCount);
-
-  D_UINT32* const pUnitData = _RC (D_UINT32*, pEntry->m_UnitData);
-  return pUnitData[pEntry->m_GlbsCount + unitProcIndex];
-
+  return m_Units[unitIndex]->GetProcId (unitProcIndex);
 }
+

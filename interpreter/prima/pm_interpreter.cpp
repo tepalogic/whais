@@ -241,9 +241,99 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
   }
 }
 
+
+void
+Session::ExecuteProcedure (const D_CHAR* const pProcName,
+                           StackValue&         stack)
+{
+  //TODO: You need to implement this.
+}
+
 void
 Session::LogMessage (const LOG_LEVEL level, std::string& message)
 {
+}
+
+D_UINT32
+Session::FindGlobal (const D_UINT8* pName, const D_UINT nameLength)
+{
+  GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
+  D_UINT32        result  = pGlbMgr->FindGlobal (pName, nameLength);
+
+  assert (GlobalsManager::IsGlobalEntry (result) == false);
+
+  if (GlobalsManager::IsValid (result) == false)
+    {
+      pGlbMgr = &m_GlobalNames.Get ().GetGlobalsManager ();
+      result  = pGlbMgr->FindGlobal (pName, nameLength);
+
+      assert (GlobalsManager::IsGlobalEntry (result) == false);
+
+      GlobalsManager::MarkAsGlobalEntry (result);
+    }
+
+  return result;
+}
+
+GlobalValue&
+Session::GetGlobalValue (const D_UINT32 glbId)
+{
+  GlobalsManager& pGlbMgr = GlobalsManager::IsGlobalEntry (glbId) ?
+                            m_GlobalNames.Get ().GetGlobalsManager () :
+                            m_PrivateNames.Get ().GetGlobalsManager ();
+
+  return pGlbMgr.GetGlobal (glbId);
+}
+
+const D_UINT8*
+Session::FindGlobalTI (const D_UINT32 glbId)
+{
+  GlobalsManager& pGlbMgr = GlobalsManager::IsGlobalEntry (glbId) ?
+                            m_GlobalNames.Get ().GetGlobalsManager () :
+                            m_PrivateNames.Get ().GetGlobalsManager ();
+
+  return pGlbMgr.GetGlobalTI (glbId);
+}
+
+D_UINT32
+Session::FindProcedure (const D_UINT8* pName, const D_UINT nameLength)
+{
+  ProcedureManager* pProMgr = &m_PrivateNames.Get ().GetProcedureManager ();
+  D_UINT32          result  = pProMgr->GetProcedure (pName, nameLength);
+
+  assert (ProcedureManager::IsGlobalEntry (result) == false);
+
+  if ( ! ProcedureManager::IsValid (result))
+    {
+      pProMgr = &m_GlobalNames.Get ().GetProcedureManager ();
+      result  = pProMgr->GetProcedure (pName, nameLength);
+
+      assert (ProcedureManager::IsGlobalEntry (result) == false);
+
+      ProcedureManager::MarkAsGlobalEntry (result);
+    }
+
+  return result;
+}
+
+D_UINT
+Session::ArgsCount (const D_UINT32 procId)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  return pProcMgr.ArgsCount (procId);
+}
+
+const D_UINT8*
+Session::FindLocalTI (const D_UINT32 procId, const D_UINT32 local)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  return pProcMgr.LocalTI (procId, local);
 }
 
 D_UINT32
@@ -434,77 +524,5 @@ Session::DefineProcedure (const D_UINT8*    pName,
                                pTypesOffset,
                                pCode,
                                codeSize);
-}
-
-D_UINT32
-Session::FindGlobal (const D_UINT8* pName, const D_UINT nameLength)
-{
-  GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
-  D_UINT32        result  = pGlbMgr->FindGlobal (pName, nameLength);
-
-  assert (GlobalsManager::IsGlobalEntry (result) == false);
-
-  if (GlobalsManager::IsValid (result) == false)
-    {
-      pGlbMgr = &m_GlobalNames.Get ().GetGlobalsManager ();
-      result  = pGlbMgr->FindGlobal (pName, nameLength);
-
-      assert (GlobalsManager::IsGlobalEntry (result) == false);
-
-      GlobalsManager::MarkAsGlobalEntry (result);
-    }
-
-  return result;
-}
-
-const D_UINT8*
-Session::FindGlobalTI (const D_UINT32 entry)
-{
-  GlobalsManager& pGlbMgr = GlobalsManager::IsGlobalEntry (entry) ?
-                            m_GlobalNames.Get ().GetGlobalsManager () :
-                            m_PrivateNames.Get ().GetGlobalsManager ();
-
-  return pGlbMgr.GetGlobalTI (entry);
-}
-
-D_UINT32
-Session::FindProcedure (const D_UINT8* pName, const D_UINT nameLength)
-{
-  ProcedureManager* pProMgr = &m_PrivateNames.Get ().GetProcedureManager ();
-  D_UINT32          result  = pProMgr->GetProcedure (pName, nameLength);
-
-  assert (ProcedureManager::IsGlobalEntry (result) == false);
-
-  if ( ! ProcedureManager::IsValid (result))
-    {
-      pProMgr = &m_GlobalNames.Get ().GetProcedureManager ();
-      result  = pProMgr->GetProcedure (pName, nameLength);
-
-      assert (ProcedureManager::IsGlobalEntry (result) == false);
-
-      ProcedureManager::MarkAsGlobalEntry (result);
-    }
-
-  return result;
-}
-
-D_UINT
-Session::ArgsCount (const D_UINT32 procedure)
-{
-  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procedure) ?
-                               m_GlobalNames.Get ().GetProcedureManager () :
-                               m_PrivateNames.Get ().GetProcedureManager ();
-
-  return pProcMgr.ArgsCount (procedure);
-}
-
-const D_UINT8*
-Session::FindLocalTI (const D_UINT32 procedure, const D_UINT32 local)
-{
-  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procedure) ?
-                               m_GlobalNames.Get ().GetProcedureManager () :
-                               m_PrivateNames.Get ().GetProcedureManager ();
-
-  return pProcMgr.LocalTI (procedure, local);
 }
 

@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../../utils/include/le_converter.h"
 
 static const D_UINT MAX_INT64_LENGTH = 25;        //log (MAX_UINT64) = 19.34
+static const D_UINT MAX_RREAL_LENGTH = 64;        //log (MAX_UINT64) = 19.34
 
 static const D_CHAR*
 int_to_ascii (D_UINT64 value,
@@ -252,32 +253,16 @@ wod_dec_w_ldht (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 static D_UINT
 wod_dec_w_ldr (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  D_CHAR t_str[MAX_RREAL_LENGTH];
 
   D_UINT64 real_part = from_le_int64 (pInArgs);
-  D_UINT64 frac_part = from_le_int64 (pInArgs + sizeof (D_UINT64));
+  D_INT8   frac_part = *(pInArgs + sizeof (D_UINT64));
 
   strcpy (pOp1, int_to_ascii (real_part, t_str, FALSE));
-  strcat (pOp1, ".");
+  strcat (pOp1, "E");
+  strcat (pOp1, int_to_ascii (frac_part, t_str, FALSE));
 
-  if (frac_part == 0)
-    strcat (pOp1, "0");
-  else
-    {
-      D_UINT operand_pos = strlen (pOp1);
-      while (frac_part != 0)
-        {
-          const D_UINT8 tempValue = ((frac_part >> 7) & 0xFF);
-
-          int8_str_conv (pOp1, tempValue);
-
-          operand_pos += 2;
-          frac_part   <<= 8;
-        }
-    }
-  pOp2[0] = 0;
-
-  return (2 * sizeof (D_UINT64));
+  return (sizeof (D_INT8) + sizeof (D_UINT64));
 }
 
 static FDECODE_OPCODE wod_dec_w_ldt  = wod_dec_w_ldi32;

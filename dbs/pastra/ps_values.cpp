@@ -389,98 +389,103 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
   apArray.release ();
 }
 
-DBSArray::DBSArray (const DBSBool* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray ()
+  : m_pArray (&NullArray::GetSingletoneInstace (T_UNDETERMINED))
+{
+}
+
+DBSArray::DBSArray (const DBSBool* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSChar* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSChar* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSDate* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSDate* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSDateTime* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSDateTime* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSHiresTime* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSHiresTime* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSUInt8* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSUInt8* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSUInt16* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSUInt16* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSUInt32* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSUInt32* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSUInt64* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSUInt64* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSReal* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSReal* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSRichReal* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSRichReal* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSInt8* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSInt8* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSInt16* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSInt16* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSInt32* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSInt32* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (const DBSInt64* array, D_UINT64 count) :
-    m_pArray (NULL)
+DBSArray::DBSArray (const DBSInt64* array, D_UINT64 count)
+  : m_pArray (NULL)
 {
   init_array (array, count, m_pArray);
 }
 
-DBSArray::DBSArray (I_ArrayStrategy& strategy) :
-    m_pArray (NULL)
+DBSArray::DBSArray (I_ArrayStrategy& strategy)
+  : m_pArray (NULL)
 {
   strategy.IncrementReferenceCount();
   m_pArray = &strategy;
@@ -504,8 +509,11 @@ DBSArray::operator= (const DBSArray& rSource)
   if (&rSource == this)
     return *this;
 
-  if (rSource.ElementsType() != ElementsType())
-    throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+  if ((ElementsType() != T_UNDETERMINED) &&
+      rSource.ElementsType () != ElementsType ())
+    {
+      throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+    }
 
   I_ArrayStrategy* pTemp = m_pArray;
   rSource.m_pArray->IncrementReferenceCount();

@@ -30,6 +30,8 @@
 #include "interpreter.h"
 #include "operands.h"
 
+#include "pm_table.h"
+
 namespace prima
 {
 
@@ -60,6 +62,8 @@ public:
   virtual void GetValue (DBSUInt16& outValue) const;
   virtual void GetValue (DBSUInt32& outValue) const;
   virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DBSArray& outValue) const;
 };
 
 class BoolOperand : public I_Operand
@@ -463,7 +467,8 @@ public:
 
   virtual ~TextOperand ();
 
-  virtual DBSText& GetText ();
+  virtual void GetValue (DBSText& outValue) const;
+  virtual void SetValue (const DBSText& value);
 
 private:
   DBSText m_Value;
@@ -505,7 +510,8 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual DBSArray& GetArray ();
+  virtual void GetValue (DBSArray& outValue) const;
+  virtual void SetValue (const DBSArray& value);
 
 private:
   DBSArray m_Value;
@@ -578,39 +584,86 @@ class TableOperand : public I_Operand
 public:
   TableOperand (I_DBSHandler& dbsHnd, I_DBSTable& table)
     : I_Operand (),
-      m_DbsHandler (dbsHnd),
-      m_Table (table)
+      m_pRefTable (new TableReference (dbsHnd, table))
   {
+    m_pRefTable->IncrementRefCount ();
+  }
+
+  TableOperand (const TableOperand& source)
+    : I_Operand (),
+      m_pRefTable (source.m_pRefTable)
+  {
+    m_pRefTable->IncrementRefCount ();
   }
 
   virtual ~TableOperand ();
+
+  const TableOperand& operator= (const TableOperand& pSource)
+  {
+    if (this != &pSource)
+      {
+        m_pRefTable->DecrementRefCount ();
+        m_pRefTable = pSource.m_pRefTable;
+        m_pRefTable->IncrementRefCount ();
+      }
+    return *this;
+  }
 
   virtual bool IsNull () const;
 
   virtual I_DBSTable& GetTable ();
 
+  TableReference& GetTableRef () const
+  {
+    assert (m_pRefTable != NULL);
+
+    return *m_pRefTable;
+  }
+
 private:
-  I_DBSHandler&  m_DbsHandler;
-  I_DBSTable&    m_Table;
+  TableReference* m_pRefTable;
 };
 
 class FieldOperand : public I_Operand
 {
 public:
   FieldOperand ()
-    : m_pTable (NULL),
+    : m_pRefTable (NULL),
       m_Field ()
   {
   }
-
-  FieldOperand (I_DBSTable& table, const FIELD_INDEX field)
+  FieldOperand (TableOperand& tableOp, const FIELD_INDEX field)
     : I_Operand (),
-      m_pTable (&table),
+      m_pRefTable (&tableOp.GetTableRef ()),
       m_Field (field)
   {
+    m_pRefTable->IncrementRefCount ();
+  }
+  FieldOperand (const FieldOperand& source)
+    : m_pRefTable (source.m_pRefTable),
+      m_Field (source.m_Field)
+  {
+    m_pRefTable->IncrementRefCount ();
+  }
+  virtual ~FieldOperand ();
+
+  const FieldOperand& operator= (const FieldOperand& source)
+  {
+    if (this != &source)
+      {
+        if (m_pRefTable != NULL)
+          m_pRefTable->DecrementRefCount ();
+
+        m_pRefTable = source.m_pRefTable;
+        m_Field     = source.m_Field;
+
+        m_pRefTable->IncrementRefCount ();
+      }
+
+    return *this;
   }
 
-  virtual ~FieldOperand ();
+
 
   virtual bool IsNull () const;
 
@@ -618,8 +671,8 @@ public:
   virtual I_DBSTable& GetTable ();
 
 private:
-  I_DBSTable* const m_pTable;
-  const FIELD_INDEX m_Field;
+  TableReference* m_pRefTable;
+  FIELD_INDEX     m_Field;
 };
 
 template <class OP_T, class DBS_T>
@@ -665,7 +718,7 @@ private:
   {
     DBS_T value;
 
-    m_Table.GetEntry (value, m_Row, m_Field);
+    m_Table.GetEntry (m_Row, m_Field, value);
 
     return OP_T (value);
   }
@@ -718,7 +771,8 @@ public:
 
   const GlobalValue& operator= (const GlobalValue& source)
   {
-    assert (this != &source);
+    if (this == &source)
+      return *this;
 
     for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];
@@ -750,18 +804,6 @@ public:
     return GetOperand ().GetField ();
   }
 
-  DBSArray& GetArray ()
-  {
-    WSynchronizerRAII dummy(m_Sync);
-    return GetOperand ().GetArray ();
-  }
-
-  DBSText& GetText ()
-  {
-    WSynchronizerRAII dummy(m_Sync);
-    return GetOperand ().GetText ();
-  }
-
   I_DBSTable& GetTable ()
   {
     WSynchronizerRAII dummy(m_Sync);
@@ -777,6 +819,7 @@ private:
 
 class GlobalOperand : public I_Operand
 {
+public:
   GlobalOperand (GlobalValue& global);
   ~GlobalOperand ();
 
@@ -795,6 +838,8 @@ class GlobalOperand : public I_Operand
   virtual void GetValue (DBSUInt16& outValue) const;
   virtual void GetValue (DBSUInt32& outValue) const;
   virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DBSArray& outValue) const;
 
   virtual void SetValue (const DBSBool& value);
   virtual void SetValue (const DBSChar& value);
@@ -811,17 +856,66 @@ class GlobalOperand : public I_Operand
   virtual void SetValue (const DBSUInt16& value);
   virtual void SetValue (const DBSUInt32& value);
   virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DBSText& value);
+  virtual void SetValue (const DBSArray& value);
 
   virtual FIELD_INDEX   GetField ();
-  virtual DBSArray&     GetArray ();
-  virtual DBSText&      GetText ();
   virtual I_DBSTable&   GetTable ();
 
 private:
   GlobalValue& m_Value;
 };
 
+class LocalOperand : public I_Operand
+{
+public:
+  LocalOperand (StackValue& localValue);
+  ~LocalOperand ();
+
+  virtual void GetValue (DBSBool& outValue) const;
+  virtual void GetValue (DBSChar& outValue) const;
+  virtual void GetValue (DBSDate& outValue) const;
+  virtual void GetValue (DBSDateTime& outValue) const;
+  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DBSInt8& outValue) const;
+  virtual void GetValue (DBSInt16& outValue) const;
+  virtual void GetValue (DBSInt32& outValue) const;
+  virtual void GetValue (DBSInt64& outValue) const;
+  virtual void GetValue (DBSReal& outValue) const;
+  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DBSUInt8& outValue) const;
+  virtual void GetValue (DBSUInt16& outValue) const;
+  virtual void GetValue (DBSUInt32& outValue) const;
+  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DBSArray& outValue) const;
+
+  virtual void SetValue (const DBSBool& value);
+  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DBSDate& value);
+  virtual void SetValue (const DBSDateTime& value);
+  virtual void SetValue (const DBSHiresTime& value);
+  virtual void SetValue (const DBSInt8& value);
+  virtual void SetValue (const DBSInt16& value);
+  virtual void SetValue (const DBSInt32& value);
+  virtual void SetValue (const DBSInt64& value);
+  virtual void SetValue (const DBSReal& value);
+  virtual void SetValue (const DBSRichReal& value);
+  virtual void SetValue (const DBSUInt8& value);
+  virtual void SetValue (const DBSUInt16& value);
+  virtual void SetValue (const DBSUInt32& value);
+  virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DBSText& value);
+  virtual void SetValue (const DBSArray& value);
+
+  virtual FIELD_INDEX   GetField ();
+  virtual I_DBSTable&   GetTable ();
+
+private:
+  StackValue& m_LocalValue;
+};
+
 }
 
-
 #endif /* PM_OPERAND_H_ */
+
