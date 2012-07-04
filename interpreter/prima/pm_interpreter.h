@@ -108,13 +108,17 @@ public:
   virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 
   D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
-  GlobalValue&   GetGlobalValue (const D_UINT32 globalId);
+  StackValue     GetGlobalValue (const D_UINT32 globalId);
   const D_UINT8* FindGlobalTI (const D_UINT32 globalId);
 
   D_UINT32       FindProcedure (const D_UINT8* pName, const D_UINT nameLength);
-  D_UINT         ArgsCount (const D_UINT32 procId);
+  D_UINT32       ArgsCount (const D_UINT32 procId);
+  D_UINT32       LocalsCount (const D_UINT32 procId);
   const D_UINT8* FindLocalTI (const D_UINT32 procId, const D_UINT32 local);
   Unit&          ProcUnit (const D_UINT32 procId);
+  const D_UINT8* ProcCode (const D_UINT32 procId);
+  D_UINT64       ProcCodeSize (const D_UINT32 procId);
+  StackValue     ProcLocalValue (const D_UINT32 procId, const D_UINT32 local);
 
 private:
   D_UINT32 DefineGlobalValue (const D_UINT8* pName,
@@ -130,7 +134,8 @@ private:
                             const D_UINT32*   pTypesOffset,
                             const D_UINT8*    pCode,
                             const D_UINT32    codeSize,
-                            const bool        external);
+                            const bool        external,
+                            Unit&             unit);
 
   NameSpaceHolder& m_GlobalNames;
   NameSpaceHolder& m_PrivateNames;

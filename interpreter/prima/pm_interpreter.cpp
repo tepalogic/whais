@@ -229,7 +229,8 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
                                   &typesOffset[0],
                                   unit.RetriveProcCodeArea (procIt),
                                   unit.GetProcCodeAreaSize (procIt),
-                                  external);
+                                  external,
+                                  unitMgr.GetUnit (unitIndex));
 
         unitMgr.SetProcIndex (unitIndex, procIt, procIndex);
       }
@@ -240,7 +241,6 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
       throw;
   }
 }
-
 
 void
 Session::ExecuteProcedure (const D_CHAR* const pProcName,
@@ -275,14 +275,15 @@ Session::FindGlobal (const D_UINT8* pName, const D_UINT nameLength)
   return result;
 }
 
-GlobalValue&
+StackValue
 Session::GetGlobalValue (const D_UINT32 glbId)
 {
   GlobalsManager& pGlbMgr = GlobalsManager::IsGlobalEntry (glbId) ?
                             m_GlobalNames.Get ().GetGlobalsManager () :
                             m_PrivateNames.Get ().GetGlobalsManager ();
 
-  return pGlbMgr.GetGlobal (glbId);
+  GlobalOperand glbOp (pGlbMgr.GetGlobal (glbId));
+  return StackValue (glbOp);
 }
 
 const D_UINT8*
@@ -316,7 +317,7 @@ Session::FindProcedure (const D_UINT8* pName, const D_UINT nameLength)
   return result;
 }
 
-D_UINT
+D_UINT32
 Session::ArgsCount (const D_UINT32 procId)
 {
   ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
@@ -324,6 +325,16 @@ Session::ArgsCount (const D_UINT32 procId)
                                m_PrivateNames.Get ().GetProcedureManager ();
 
   return pProcMgr.ArgsCount (procId);
+}
+
+D_UINT32
+Session::LocalsCount (const D_UINT32 procId)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  return pProcMgr.LocalsCount (procId);
 }
 
 const D_UINT8*
@@ -334,6 +345,47 @@ Session::FindLocalTI (const D_UINT32 procId, const D_UINT32 local)
                                m_PrivateNames.Get ().GetProcedureManager ();
 
   return pProcMgr.LocalTI (procId, local);
+}
+
+Unit&
+Session::ProcUnit (const D_UINT32 procId)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+  return pProcMgr.GetUnit (procId);
+}
+
+const D_UINT8*
+Session::ProcCode (const D_UINT32 procId)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  return pProcMgr.Code (procId, NULL);
+}
+
+D_UINT64
+Session::ProcCodeSize (const D_UINT32 procId)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+  D_UINT64 codeSize;
+  pProcMgr.Code (procId, &codeSize);
+
+  return codeSize;
+}
+
+StackValue
+Session::ProcLocalValue (const D_UINT32 procId, const D_UINT32 local)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  return pProcMgr.LocalValue (procId, local);
 }
 
 D_UINT32
@@ -429,7 +481,8 @@ Session::DefineProcedure (const D_UINT8*    pName,
                           const D_UINT32*   pTypesOffset,
                           const D_UINT8*    pCode,
                           const D_UINT32    codeSize,
-                          const bool        external)
+                          const bool        external,
+                          Unit&             unit)
 {
   assert (argsCount < localsCount);
   assert (localsCount > 0);
@@ -523,6 +576,7 @@ Session::DefineProcedure (const D_UINT8*    pName,
                                pLocalValues,
                                pTypesOffset,
                                pCode,
-                               codeSize);
+                               codeSize,
+                               unit);
 }
 

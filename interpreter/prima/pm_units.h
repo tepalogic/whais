@@ -62,6 +62,7 @@ public:
                     const D_UINT8* pConstData,
                     const D_UINT32 constAreaSize);
   void     RemoveLastUnit ();
+  Unit&    GetUnit (const D_UINT32 unitIndex);
   void     SetGlobalIndex (const D_UINT32 unitIndex,
                            const D_UINT32 unitGlbIndex,
                            const D_UINT32 glbMgrIndex);

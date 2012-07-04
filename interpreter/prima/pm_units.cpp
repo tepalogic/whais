@@ -131,6 +131,14 @@ UnitsManager::RemoveLastUnit ()
   m_Units.pop_back ();
 }
 
+Unit&
+UnitsManager::GetUnit (const D_UINT32 unitIndex)
+{
+  assert (unitIndex < m_Units.size ());
+
+  return *m_Units[unitIndex];
+}
+
 void
 UnitsManager::SetGlobalIndex (const D_UINT32 unitIndex,
                               const D_UINT32 unitGlbIndex,

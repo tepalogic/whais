@@ -321,12 +321,9 @@ op_func_ldgb8 (Processor& processor, D_INT64& offset)
 
   const D_UINT8  globalIndex = *pData;
   const D_UINT32 glbId       = processor.GetUnit ().GetGlobalId (globalIndex);
-  GlobalValue&   glbValue    = processor.GetSession ().GetGlobalValue (glbId);
+  StackValue     glbValue    = processor.GetSession ().GetGlobalValue (glbId);
 
-  GlobalOperand glbOp (glbValue);
-  StackValue    value (glbOp);
-
-  processor.GetStack ().Push (value);
+  processor.GetStack ().Push (glbValue);
 
   offset += sizeof (D_UINT8);
 }
@@ -340,12 +337,9 @@ op_func_ldgb16 (Processor& processor, D_INT64& offset)
 
   const D_UINT16 globalIndex = load_le_uint16 (pData);
   const D_UINT32 glbId       = processor.GetUnit ().GetGlobalId (globalIndex);
-  GlobalValue&   glbValue    = processor.GetSession ().GetGlobalValue (glbId);
+  StackValue     glbValue    = processor.GetSession ().GetGlobalValue (glbId);
 
-  GlobalOperand glbOp (glbValue);
-  StackValue    value (glbOp);
-
-  processor.GetStack ().Push (value);
+  processor.GetStack ().Push (glbValue);
 
   offset += sizeof (D_UINT16);
 }
@@ -359,12 +353,9 @@ op_func_ldgb32 (Processor& processor, D_INT64& offset)
 
   const D_UINT32 globalIndex = load_le_uint32 (pData);
   const D_UINT32 glbId       = processor.GetUnit ().GetGlobalId (globalIndex);
-  GlobalValue&   glbValue    = processor.GetSession ().GetGlobalValue (glbId);
+  StackValue     glbValue    = processor.GetSession ().GetGlobalValue (glbId);
 
-  GlobalOperand glbOp (glbValue);
-  StackValue    value (glbOp);
-
-  processor.GetStack ().Push (value);
+  processor.GetStack ().Push (glbValue);
 
   offset += sizeof (D_UINT32);
 }
@@ -385,7 +376,7 @@ op_func_stXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (processor.GetStack ().Size () - 2));
+          (stackSize - 2));
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
   I_Operand& dest   = stack[stackSize - 2].GetOperand ();
@@ -404,7 +395,7 @@ op_func_stta (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (processor.GetStack ().Size () - 2));
+          (stackSize - 2));
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
   I_Operand& dest   = stack[stackSize - 2].GetOperand ();
@@ -436,7 +427,7 @@ op_func_stf (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (processor.GetStack ().Size () - 2));
+          (stackSize - 2));
 
   FieldOperand& src  = _SC (FieldOperand&, stack[stackSize - 1].GetOperand ());
   FieldOperand& dest = _SC (FieldOperand&, stack[stackSize - 2].GetOperand ());
@@ -453,7 +444,7 @@ op_func_inull (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (processor.GetStack ().Size () - 2));
+          (stackSize - 1));
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
   StackValue result ( BoolOperand (DBSBool (source.IsNull ())));
@@ -476,6 +467,63 @@ op_func_nnull (Processor& processor, D_INT64& offset)
   stack[stackSize - 1] = result;
 }
 
+static void
+op_func_call (Processor& processor, D_INT64& offset)
+{
+  const D_UINT8* const pData = processor.Code () +
+                               processor.CurrentOffset () +
+                               offset;
+
+  const D_UINT32 prcMgrId = load_le_uint32 (pData);
+  offset += sizeof (D_UINT32);
+
+  Session&      session         = processor.GetSession ();
+  SessionStack& stack           = processor.GetStack ();
+  const D_UINT  procLocalsCount = session.LocalsCount (prcMgrId);
+
+  for (D_UINT32 localIndex = session.ArgsCount (prcMgrId) + 1;
+       localIndex < procLocalsCount;
+       ++localIndex)
+    {
+      StackValue localValue = session.ProcLocalValue (prcMgrId, localIndex);
+      stack.Push (localValue);
+    }
+
+  Unit&                procUnit     = session.ProcUnit (prcMgrId);
+  const D_UINT8* const pProcCode    = session.ProcCode (prcMgrId);
+  const D_UINT32       procCodeSize = session.ProcCodeSize (prcMgrId);
+
+  Processor procedure (session,
+                       stack,
+                       procUnit,
+                       pProcCode,
+                       procCodeSize,
+                       procLocalsCount);
+  try
+  {
+      procedure.Run ();
+  }
+  catch (...)
+  {
+      assert (false);
+      //TODO: We need to implement this!
+      throw;
+  }
+}
+
+static void
+op_func_ret (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) < stackSize);
+
+  StackValue result = stack[stackSize - 1];
+
+  stack.Pop (stackSize - processor.StackBegin());
+  stack.Push (result);
+}
 
 typedef void (*OP_FUNC) (Processor& processor, D_INT64& ioOffset);
 
@@ -524,6 +572,9 @@ static OP_FUNC operations[] = {
 
                                 op_func_inull,
                                 op_func_nnull,
+
+                                op_func_call,
+                                op_func_ret
                               };
 
 /////////////////////////////Processor/////////////////////////////////////////

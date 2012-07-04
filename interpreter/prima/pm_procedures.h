@@ -32,6 +32,7 @@
 namespace prima
 {
 
+class Unit;
 struct ProcedureEntry
 {
   D_UINT32 m_LocalsCount;
@@ -43,6 +44,7 @@ struct ProcedureEntry
   D_UINT32 m_TypeOff;
   D_UINT32 m_CodeIndex;
   D_UINT32 m_CodeSize;
+  Unit*    m_pUnit;
 };
 
 class NameSpace;
@@ -73,15 +75,20 @@ public:
                          const StackValue* pLocalValues,
                          const D_UINT32*   pTypesOffset,
                          const D_UINT8*    pCode,
-                         const D_UINT32    codeSize);
+                         const D_UINT32    codeSize,
+                         Unit&             unit);
   D_UINT32 GetProcedure (const D_UINT8* pName,
-                         const D_UINT   nameLength);
+                         const D_UINT   nameLength) const;
 
-  const D_UINT32    LocalsCount (const D_UINT procEntry);
-  const D_UINT32    ArgsCount (const D_UINT procEntry);
-  const StackValue& LocalValue (const D_UINT procEntry, const D_UINT32 local);
-  const D_UINT8*    LocalTI (const D_UINT procEntry, const D_UINT32 local);
-  const D_UINT8*    Code (const D_UINT procEntry, D_UINT64* pOutCodeSize);
+  Unit&    GetUnit (const D_UINT procEntry) const;
+  D_UINT32 LocalsCount (const D_UINT procEntry) const;
+  D_UINT32 ArgsCount (const D_UINT procEntry) const;
+
+  const StackValue& LocalValue (const D_UINT   procEntry,
+                                const D_UINT32 local) const;
+  const D_UINT8*    LocalTI (const D_UINT   procEntry,
+                             const D_UINT32 local) const;
+  const D_UINT8*    Code (const D_UINT procEntry, D_UINT64* pOutCodeSize) const;
 
   static bool IsValid (const D_UINT32 entry)
   {
