@@ -204,7 +204,7 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
       return FALSE;
     }
 
-  if (code_size < 4)
+  if (code_size < 5)
     {
       return FALSE;
     }

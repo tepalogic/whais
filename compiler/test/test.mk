@@ -98,16 +98,6 @@ test_not_op_SRC=test/test_not_op.c
 test_not_op_LIB=compiler/compiler utils/utils custom/custom
 test_not_op_INC=utils/include custom/include
 
-UNIT_EXES+=test_inc_op
-test_inc_op_SRC=test/test_inc_op.c 
-test_inc_op_LIB=compiler/compiler utils/utils custom/custom
-test_inc_op_INC=utils/include custom/include
-
-UNIT_EXES+=test_dec_op
-test_dec_op_SRC=test/test_dec_op.c 
-test_dec_op_LIB=compiler/compiler utils/utils custom/custom
-test_dec_op_INC=utils/include custom/include
-
 UNIT_EXES+=test_index_op
 test_index_op_SRC=test/test_index_op.c 
 test_index_op_LIB=compiler/compiler utils/utils custom/custom
@@ -153,16 +143,6 @@ test_msg_proc_adecl_SRC=test/test_msg_proc_adecl.c
 test_msg_proc_adecl_LIB=compiler/compiler utils/utils custom/custom
 test_msg_proc_adecl_INC=utils/include custom/include
 
-UNIT_EXES+=test_msg_incs
-test_msg_incs_SRC=test/test_msg_incs.c 
-test_msg_incs_LIB=compiler/compiler utils/utils custom/custom
-test_msg_incs_INC=utils/include custom/include
-
-UNIT_EXES+=test_msg_decs
-test_msg_decs_SRC=test/test_msg_decs.c 
-test_msg_decs_LIB=compiler/compiler utils/utils custom/custom
-test_msg_decs_INC=utils/include custom/include
-
 UNIT_EXES+=test_msg_index
 test_msg_index_SRC=test/test_msg_index.c 
 test_msg_index_LIB=compiler/compiler utils/utils custom/custom
@@ -197,3 +177,49 @@ UNIT_EXES+=test_nulls_op
 test_nulls_op_SRC=test/test_nulls_op.c 
 test_nulls_op_LIB=compiler/compiler utils/utils custom/custom
 test_nulls_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_sadd_op
+test_sadd_op_SRC=test/test_sadd_op.c 
+test_sadd_op_LIB=compiler/compiler utils/utils custom/custom
+test_sadd_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_ssub_op
+test_ssub_op_SRC=test/test_ssub_op.c 
+test_ssub_op_LIB=compiler/compiler utils/utils custom/custom
+test_ssub_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_smul_op
+test_smul_op_SRC=test/test_smul_op.c 
+test_smul_op_LIB=compiler/compiler utils/utils custom/custom
+test_smul_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_sdiv_op
+test_sdiv_op_SRC=test/test_sdiv_op.c 
+test_sdiv_op_LIB=compiler/compiler utils/utils custom/custom
+test_sdiv_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_smod_op
+test_smod_op_SRC=test/test_smod_op.c 
+test_smod_op_LIB=compiler/compiler utils/utils custom/custom
+test_smod_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_sand_op
+test_sand_op_SRC=test/test_sand_op.c 
+test_sand_op_LIB=compiler/compiler utils/utils custom/custom
+test_sand_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_sxor_op
+test_sxor_op_SRC=test/test_sxor_op.c 
+test_sxor_op_LIB=compiler/compiler utils/utils custom/custom
+test_sxor_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_sor_op
+test_sor_op_SRC=test/test_sor_op.c 
+test_sor_op_LIB=compiler/compiler utils/utils custom/custom
+test_sor_op_INC=utils/include custom/include
+
+UNIT_EXES+=test_msg_sops
+test_msg_sops_SRC=test/test_msg_sops.c 
+test_msg_sops_LIB=compiler/compiler utils/utils custom/custom
+test_msg_sops_INC=utils/include custom/include
+

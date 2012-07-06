@@ -371,7 +371,6 @@ const FDECODE_OPCODE wod_dec_w_addrr  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_addt   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_and    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_andb   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_dec    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_div    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_divr   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_divrr  = wod_dec_w_ldnull;
@@ -400,7 +399,6 @@ const FDECODE_OPCODE wod_dec_w_gtht   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtr    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtrr   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtt    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_inc    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_le     = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_lec    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_led    = wod_dec_w_ldnull;
@@ -431,6 +429,7 @@ const FDECODE_OPCODE wod_dec_w_ner    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_nerr   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_net    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_not    = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_notb   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_or     = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_orb    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sub    = wod_dec_w_ldnull;
@@ -479,6 +478,31 @@ wod_dec_w_bsync (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 }
 
 const FDECODE_OPCODE wod_dec_w_esync = wod_dec_w_bsync;
+
+const FDECODE_OPCODE wod_dec_w_sadd   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_saddrr = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_saddc  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_saddt  = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_ssub   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_ssubrr = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_smul   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_smulrr = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_sdiv   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sdivrr = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_smod   = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_sand  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sandb = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_sxor  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sxorb = wod_dec_w_ldnull;
+
+const FDECODE_OPCODE wod_dec_w_sor  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sorb = wod_dec_w_ldnull;
 
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
@@ -538,8 +562,6 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_and,
   wod_dec_w_andb,
 
-  wod_dec_w_dec,
-
   wod_dec_w_div,
   wod_dec_w_divr,
   wod_dec_w_divrr,
@@ -571,8 +593,6 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_gtr,
   wod_dec_w_gtrr,
   wod_dec_w_gtt,
-
-  wod_dec_w_inc,
 
   wod_dec_w_le,
   wod_dec_w_lec,
@@ -609,6 +629,7 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_net,
 
   wod_dec_w_not,
+  wod_dec_w_notb,
 
   wod_dec_w_or,
   wod_dec_w_orb,
@@ -633,7 +654,32 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_self,
 
   wod_dec_w_bsync,
-  wod_dec_w_esync
+  wod_dec_w_esync,
+
+  wod_dec_w_sadd,
+  wod_dec_w_saddrr,
+  wod_dec_w_saddc,
+  wod_dec_w_saddt,
+
+  wod_dec_w_ssub,
+  wod_dec_w_ssubrr,
+
+  wod_dec_w_smul,
+  wod_dec_w_smulrr,
+
+  wod_dec_w_sdiv,
+  wod_dec_w_sdivrr,
+
+  wod_dec_w_smod,
+
+  wod_dec_w_sand,
+  wod_dec_w_sandb,
+
+  wod_dec_w_sxor,
+  wod_dec_w_sxorb,
+
+  wod_dec_w_sor,
+  wod_dec_w_sorb
 };
 
 const D_CHAR *wod_str_table[] = {
@@ -694,8 +740,6 @@ const D_CHAR *wod_str_table[] = {
   "and",
   "andb",
 
-  "dec",
-
   "div",
   "divr",
   "divrr",
@@ -727,8 +771,6 @@ const D_CHAR *wod_str_table[] = {
   "gtr",
   "gtrr",
   "gtt",
-
-  "inc",
 
   "le",
   "lec",
@@ -765,6 +807,7 @@ const D_CHAR *wod_str_table[] = {
   "net",
 
   "not",
+  "notb",
 
   "or",
   "orb",
@@ -789,5 +832,30 @@ const D_CHAR *wod_str_table[] = {
   "self",
 
   "bsync",
-  "esync"
+  "esync",
+
+  "sadd",
+  "saddrr",
+  "saddc",
+  "saddt",
+
+  "ssub",
+  "ssubrr",
+
+  "smul",
+  "smulrr",
+
+  "sdiv",
+  "sdivrr",
+
+  "smod",
+
+  "sand",
+  "sandb",
+
+  "sxor",
+  "sxorb",
+
+  "sor",
+  "sorb"
 };

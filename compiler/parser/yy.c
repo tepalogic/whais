@@ -152,24 +152,13 @@ get_next_token (const char*  pBuffer,
 
       result = TK_IDENTIFIER;
     }
-  else if (*pBuffer == '+')
-    {
-      pBuffer++;
-      if (*pBuffer == '+')
-        pBuffer++;
+  else if (*pBuffer == '<' || *pBuffer == '>' || *pBuffer == '!' ||
 
-      result = TK_OPERATOR;
-    }
-  else if (*pBuffer == '-')
-    {
-      pBuffer++;
+           *pBuffer == '+' || *pBuffer == '-' ||
+           *pBuffer == '*' || *pBuffer == '/' || *pBuffer == '%' ||
+           *pBuffer == '&' || *pBuffer == '^' || *pBuffer == '|' ||
 
-      if (*pBuffer == '-')
-        pBuffer++;
-
-      result = TK_OPERATOR;
-    }
-  else if (*pBuffer == '<' || *pBuffer == '>' || *pBuffer == '!' || *pBuffer == '=')
+           *pBuffer == '=')
     {
       pBuffer++;
 
@@ -333,8 +322,14 @@ static TOKEN_SEMANTIC composed_operators[] = {
                                                {"!=", NE},
                                                {"<=", LE},
                                                {">=", GE},
-                                               {"++", INC},
-                                               {"--", DEC},
+                                               {"+=", SADD},
+                                               {"-=", SSUB},
+                                               {"*=", SMUL},
+                                               {"/=", SDIV},
+                                               {"%=", SMOD},
+                                               {"&=", SAND},
+                                               {"^=", SXOR},
+                                               {"|=", SOR},
                                                {NULL, 0}
                                              };
 

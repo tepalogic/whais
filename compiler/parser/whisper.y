@@ -75,14 +75,14 @@ void yyerror(struct ParserState *state,  const char *msg);
 //Operator precedence and associativity
 
 
-%right '='
+%right '=' SADD SSUB SMUL SDIV SMOD SAND SXOR SOR
 %left  EQ NE
 %left  AND OR XOR
 %left  '<' '>' LE GE
 %left  '+' '-'
 %left  '*' '/' '%'
 %right NOT
-%right INC DEC
+// %right INC DEC
 
 %left  '[' ']' '.'
 %left  '(' ')'
@@ -330,17 +330,12 @@ exp : const_exp
             $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
             CHK_SEM_ERROR;
         }
-    | INC exp 
+     | NOT exp
         {
-            $$ = create_exp_link(state, $2, NULL, NULL, OP_INC);
+            $$ = create_exp_link(state, $2, NULL, NULL, OP_NOT);
             CHK_SEM_ERROR;
         }
-    | DEC exp 
-        {
-            $$ = create_exp_link(state, $2, NULL, NULL, OP_DEC);
-            CHK_SEM_ERROR;
-        }
-    | NOT exp
+     | '~' exp
         {
             $$ = create_exp_link(state, $2, NULL, NULL, OP_NOT);
             CHK_SEM_ERROR;
@@ -405,12 +400,27 @@ exp : const_exp
             $$ = create_exp_link(state, $1, $3, NULL, OP_AND);
             CHK_SEM_ERROR;
         }
+    | exp '&' exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_AND);
+            CHK_SEM_ERROR;
+        }
     | exp OR  exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_OR);
             CHK_SEM_ERROR;
         }
+    | exp '|'  exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_OR);
+            CHK_SEM_ERROR;
+        }
     | exp XOR exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_XOR);
+            CHK_SEM_ERROR;
+        }
+    | exp '^' exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_XOR);
             CHK_SEM_ERROR;
@@ -438,6 +448,46 @@ exp : const_exp
     | exp '=' exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_ATTR);
+            CHK_SEM_ERROR;
+        }
+    | exp SADD exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SADD);
+            CHK_SEM_ERROR;
+        }
+    | exp SSUB exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SSUB);
+            CHK_SEM_ERROR;
+        }
+    | exp SMUL exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SMUL);
+            CHK_SEM_ERROR;
+        }
+    | exp SDIV exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SDIV);
+            CHK_SEM_ERROR;
+        }
+    | exp SMOD exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SMOD);
+            CHK_SEM_ERROR;
+        }
+    | exp SAND exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SAND);
+            CHK_SEM_ERROR;
+        }
+    | exp SXOR exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SXOR);
+            CHK_SEM_ERROR;
+        }
+    | exp SOR exp
+        {
+            $$ = create_exp_link(state, $1, $3, NULL, OP_SOR);
             CHK_SEM_ERROR;
         }
     | IDENTIFIER '(' parameters_list ')'

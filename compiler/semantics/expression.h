@@ -37,8 +37,6 @@ enum EXP_OPERATION
 {
   OP_NULL = 0,
 
-  OP_INC,
-  OP_DEC,
   OP_NOT,
 
   OP_INULL,
@@ -64,7 +62,17 @@ enum EXP_OPERATION
   OP_INDEX,     /* [...] */
   OP_TABVAL,
   OP_FIELD,
+
   OP_ATTR,
+
+  OP_SADD,
+  OP_SSUB,
+  OP_SMUL,
+  OP_SDIV,
+  OP_SMOD,
+  OP_SAND,
+  OP_SXOR,
+  OP_SOR,
   OP_CALL,
 
   OP_MAX

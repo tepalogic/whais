@@ -62,11 +62,7 @@ struct MsgCodeEntry
 
 /* expression semantic related errors, base 500 */
 #define EXPS_MSGS               500
-#define MSG_INC_NA              EXPS_MSGS
-#define MSG_INC_ELV             (MSG_INC_NA + 1)
-#define MSG_DEC_NA              (MSG_INC_ELV + 1)
-#define MSG_DEC_ELV             (MSG_DEC_NA + 1)
-#define MSG_NOT_NA              (MSG_DEC_ELV + 1)
+#define MSG_NOT_NA              (EXPS_MSGS + 1)
 #define MSG_ADD_NA              (MSG_NOT_NA + 1)
 #define MSG_ADD_SIGN            (MSG_ADD_NA + 1)
 #define MSG_SUB_NA              (MSG_ADD_SIGN + 1)
@@ -92,7 +88,23 @@ struct MsgCodeEntry
 #define MSG_MEMSEL_NA           (MSG_MEMSEL_ERD + 1)
 #define MSG_STORE_NA            (MSG_MEMSEL_NA + 1)
 #define MSG_STORE_ELV           (MSG_STORE_NA + 1)
-#define MSG_NO_FIELD            (MSG_STORE_ELV + 1)
+#define MSG_SADD_NA             (MSG_STORE_ELV + 1)
+#define MSG_SADD_ELV            (MSG_SADD_NA + 1)
+#define MSG_SSUB_NA             (MSG_SADD_ELV + 1)
+#define MSG_SSUB_ELV            (MSG_SSUB_NA + 1)
+#define MSG_SMUL_NA             (MSG_SSUB_ELV + 1)
+#define MSG_SMUL_ELV            (MSG_SMUL_NA + 1)
+#define MSG_SDIV_NA             (MSG_SMUL_ELV + 1)
+#define MSG_SDIV_ELV            (MSG_SDIV_NA + 1)
+#define MSG_SMOD_NA             (MSG_SDIV_ELV + 1)
+#define MSG_SMOD_ELV            (MSG_SMOD_NA + 1)
+#define MSG_SAND_NA             (MSG_SMOD_ELV + 1)
+#define MSG_SAND_ELV            (MSG_SAND_NA + 1)
+#define MSG_SXOR_NA             (MSG_SAND_ELV + 1)
+#define MSG_SXOR_ELV            (MSG_SXOR_NA + 1)
+#define MSG_SOR_NA              (MSG_SXOR_ELV + 1)
+#define MSG_SOR_ELV             (MSG_SOR_NA + 1)
+#define MSG_NO_FIELD            (MSG_SOR_ELV + 1)
 #define MSG_FIELD_NA            (MSG_NO_FIELD + 1)
 #define MSG_NO_PROC             (MSG_FIELD_NA + 1)
 #define MSG_PROC_MORE_ARGS      (MSG_NO_PROC + 1)
@@ -107,7 +119,6 @@ struct MsgCodeEntry
 #define MSG_CONTINUE_NOLOOP     (MSG_BREAK_NOLOOP + 1)
 #define MSG_SYNC_NA             (MSG_CONTINUE_NOLOOP + 1)
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
-
 
 void
 w_log_msg (struct ParserState *pState, D_UINT buffPos, D_UINT msgCode, ...);

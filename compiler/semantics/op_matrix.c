@@ -25,21 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "opcodes.h"
 #include "vardecl.h"
 
-const enum W_OPCODE inc_op[T_END_OF_TYPES] =
-{
-  W_NA, W_NA, W_INC, W_NA, W_NA, W_NA, W_INC, W_INC, W_INC, W_INC, W_NA, W_NA,  W_NA, W_INC, W_INC, W_INC, W_INC, W_NA
-};
-
-const enum W_OPCODE dec_op[T_END_OF_TYPES] =
-{
-  W_NA, W_NA, W_DEC, W_NA, W_NA, W_NA, W_DEC, W_DEC, W_DEC, W_DEC, W_NA, W_NA, W_NA, W_DEC, W_DEC, W_DEC, W_DEC, W_NA
-};
-
-const enum W_OPCODE not_op[T_END_OF_TYPES] =
-{
-  W_NA, W_NOT, W_NA, W_NA, W_NA, W_NA, W_NOT, W_NOT, W_NOT, W_NOT, W_NA, W_NA, W_NA, W_NOT, W_NOT, W_NOT, W_NOT, W_NA
-};
-
 const enum W_OPCODE add_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 {
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA},
@@ -377,10 +362,13 @@ w_opcode_encode (struct OutputStream* pStream, const enum W_OPCODE opcode)
 {
   D_UINT16 tempOpcode = opcode;
 
-  if (tempOpcode > SECOND_BYTE_MARK)
+  if (tempOpcode >= SECOND_BYTE_MARK)
     {
-      tempOpcode &= (SECOND_BYTE_MARK << 8);
-      return output_uint16 (pStream, tempOpcode);
+      tempOpcode |= (SECOND_BYTE_MARK << 8);
+
+     if (output_uint8 (pStream, (D_UINT8)((tempOpcode >> 8) & 0xFF)) == NULL)
+       return NULL;
+     return output_uint8 (pStream, (D_UINT8)(tempOpcode & 0xFF));
     }
 
   return output_uint8 (pStream, (D_UINT8)tempOpcode);
@@ -391,9 +379,8 @@ w_opcode_decode (const D_UINT8* pCode)
 {
   if (*pCode & SECOND_BYTE_MARK)
     {
-      D_UINT16 opcode = ((*pCode & ~SECOND_BYTE_MARK) << 8);
-
-      opcode += *(++pCode);
+      D_UINT16 opcode = (*pCode++ & ~SECOND_BYTE_MARK);
+      opcode += *pCode;
 
       return opcode;
     }
@@ -402,14 +389,14 @@ w_opcode_decode (const D_UINT8* pCode)
 }
 
 unsigned int
-whc_decode_opcode (const unsigned char* pCode, enum W_OPCODE* pOutOpcode)
+whc_decode_opcode (const unsigned char* pCode, enum W_OPCODE* const pOutOpcode)
 {
   if (*pCode & SECOND_BYTE_MARK)
     {
-      D_UINT16 tempOpcode = ((*pCode & ~SECOND_BYTE_MARK) << 8);
+      D_UINT16 opcode = (*pCode++ & ~SECOND_BYTE_MARK);
+      opcode += *pCode;
 
-      tempOpcode  += *(++pCode);
-      *pOutOpcode  = tempOpcode;
+      *pOutOpcode  = opcode;
 
       return 2;
     }

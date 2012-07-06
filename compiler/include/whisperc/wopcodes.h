@@ -87,8 +87,6 @@ enum W_OPCODE
   W_AND,
   W_ANDB,
 
-  W_DEC,
-
   W_DIV,
   W_DIVR,
   W_DIVRR,
@@ -120,8 +118,6 @@ enum W_OPCODE
   W_GTR,
   W_GTRR,
   W_GTT,
-
-  W_INC,
 
   W_LE,
   W_LEC,
@@ -158,6 +154,7 @@ enum W_OPCODE
   W_NET,
 
   W_NOT,
+  W_NOTB,
 
   W_OR,
   W_ORB,
@@ -184,6 +181,31 @@ enum W_OPCODE
   W_BSYNC,
   W_ESYNC,
 
+  W_SADD,
+  W_SADDRR,
+  W_SADDC,
+  W_SADDT,
+
+  W_SSUB,
+  W_SSUBRR,
+
+  W_SMUL,
+  W_SMULRR,
+
+  W_SDIV,
+  W_SDIVRR,
+
+  W_SMOD,
+
+  W_SAND,
+  W_SANDB,
+
+  W_SXOR,
+  W_SXORB,
+
+  W_SOR,
+  W_SORB,
+
   W_OP_END_MARK
 };
 
@@ -193,8 +215,8 @@ extern "C"
 #endif
 
 unsigned int
-whc_decode_opcode (const unsigned char* pCode,
-                    enum W_OPCODE*      pOutOpcode);
+whc_decode_opcode (const unsigned char*  pCode,
+                    enum W_OPCODE* const pOutOpcode);
 #ifdef __cplusplus
 }
 #endif

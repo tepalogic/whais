@@ -369,92 +369,20 @@ type_to_text (D_UINT type)
 }
 
 static struct ExpResultType
-translate_exp_inc (struct ParserState* const         pState,
-                   const struct ExpResultType* const firstType)
-{
-
-  struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  enum W_OPCODE              opcode      = W_NA;
-
-  assert (pStmt->type == STMT_PROC);
-
-  if (IS_L_VALUE (firstType->type) == FALSE)
-    {
-      w_log_msg (pState, pState->bufferPos, MSG_INC_ELV);
-      return gResultUnk;
-    }
-
-  if (GET_TYPE (firstType->type) < T_END_OF_TYPES)
-    opcode = inc_op [GET_TYPE (firstType->type)];
-
-  if (opcode == W_NA)
-    {
-      w_log_msg (pState,
-                 pState->bufferPos,
-                 MSG_INC_NA,
-                 type_to_text (firstType->type));
-      return gResultUnk;
-    }
-
-  if (w_opcode_encode (pCodeStream, opcode) == NULL)
-    {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-      return gResultUnk;
-    }
-
-  return *firstType;
-}
-
-static struct ExpResultType
-translate_exp_dec (struct ParserState* const         pState,
-                   const struct ExpResultType* const firstType)
-{
-  struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  enum W_OPCODE              opcode      = W_NA;
-
-  assert (pStmt->type == STMT_PROC);
-
-  if (IS_L_VALUE (firstType->type) == FALSE)
-    {
-      w_log_msg (pState, pState->bufferPos, MSG_DEC_ELV);
-      return gResultUnk;
-    }
-
-  if (GET_TYPE (firstType->type)  < T_END_OF_TYPES)
-    opcode = dec_op[GET_TYPE (firstType->type)];
-
-  if (opcode == W_NA)
-    {
-      w_log_msg (pState,
-                 pState->bufferPos,
-                 MSG_DEC_NA,
-                 type_to_text (firstType->type));
-      return gResultUnk;
-    }
-
-  if (w_opcode_encode (pCodeStream, opcode) == NULL)
-    {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-      return gResultUnk;
-    }
-
-  return *firstType;
-}
-
-static struct ExpResultType
 translate_exp_not (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType)
 {
   struct Statement* const    pStmt        = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
   enum W_OPCODE              opcode       = W_NA;
+  const D_UINT               ftype        = GET_TYPE (firstType->type);
 
   assert (pStmt->type == STMT_PROC);
 
-  if (GET_TYPE (firstType->type) < T_END_OF_TYPES)
-    opcode = not_op[GET_TYPE (firstType->type)];
+  if (ftype == T_BOOL)
+    opcode = W_NOTB;
+  else if (is_integer (ftype))
+    opcode = W_NOT;
 
   if (opcode == W_NA)
     {
@@ -1333,6 +1261,427 @@ translate_exp_store (struct ParserState* const         pState,
 }
 
 static struct ExpResultType
+translate_exp_sadd (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SADD_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype))
+    {
+      if (is_integer(stype))
+        opcode = W_SADD;
+    }
+  else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
+    {
+      if (is_integer (stype))
+        opcode = W_SADD;
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SADDRR;
+    }
+  else if (ftype == T_TEXT)
+    {
+      if (stype == T_CHAR)
+        opcode = W_SADDC;
+      else if (stype == T_TEXT)
+        opcode = W_SADDT;
+    }
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SADD_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_ssub (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SSUB_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype))
+    {
+      if (is_integer(stype))
+        opcode = W_SSUB;
+    }
+  else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
+    {
+      if (is_integer (stype))
+        opcode = W_SSUB;
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SSUBRR;
+    }
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SSUB_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_smul (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SMUL_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype))
+    {
+      if (is_integer(stype))
+        opcode = W_SMUL;
+    }
+  else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
+    {
+      if (is_integer (stype))
+        opcode = W_SMUL;
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SMULRR;
+    }
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SMUL_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_sdiv (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SDIV_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype))
+    {
+      if (is_integer(stype))
+        opcode = W_SDIV;
+    }
+  else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
+    {
+      if (is_integer (stype))
+        opcode = W_SDIV;
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SDIVRR;
+    }
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SDIV_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_smod (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SMOD_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype) && is_integer(stype))
+    opcode = W_SMOD;
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SMOD_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_sand (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SAND_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype) && is_integer(stype))
+    opcode = W_SAND;
+  else if ((ftype == T_BOOL) && (stype == T_BOOL))
+    opcode = W_SANDB;
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SAND_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_sxor (struct ParserState* const         pState,
+                    const struct ExpResultType* const firstType,
+                    const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SXOR_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype) && is_integer(stype))
+    opcode = W_SXOR;
+  else if ((ftype == T_BOOL) && (stype == T_BOOL))
+    opcode = W_SXORB;
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SXOR_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
+translate_exp_sor (struct ParserState* const         pState,
+                   const struct ExpResultType* const firstType,
+                   const struct ExpResultType* const secondType)
+{
+  struct Statement* const    pStmt       = pState->pCurrentStmt;
+  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  const D_UINT               ftype       = GET_TYPE (firstType->type);
+  const D_UINT               stype       = GET_TYPE (secondType->type);
+  enum W_OPCODE              opcode      = W_NA;
+  struct ExpResultType       result;
+
+  if (IS_L_VALUE (firstType->type) == FALSE)
+    {
+      w_log_msg (pState, pState->bufferPos, MSG_SOR_ELV);
+      return gResultUnk;
+    }
+
+  if (is_integer (ftype) && is_integer(stype))
+    opcode = W_SOR;
+  else if ((ftype == T_BOOL) && (stype == T_BOOL))
+    opcode = W_SORB;
+
+  if (opcode == W_NA)
+    {
+      w_log_msg (pState,
+                 pState->bufferPos,
+                 MSG_SOR_NA,
+                 type_to_text (ftype),
+                 type_to_text (stype));
+
+      return gResultUnk;
+    }
+
+  if (w_opcode_encode (pCodeStream, opcode) == NULL)
+    {
+      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return gResultUnk;
+    }
+
+  result.type  = GET_TYPE (firstType->type);
+  result.extra = firstType->extra;
+
+  MARK_L_VALUE (result.type);
+
+  return result;
+}
+
+static struct ExpResultType
 translate_exp_index (struct ParserState* const         pState,
                      const struct ExpResultType* const firstType,
                      const struct ExpResultType* const secondType)
@@ -1476,15 +1825,6 @@ translate_exp_opcode (struct ParserState* const   pState,
       result = translate_exp_chknull (pState, FALSE);
       break;
 
-
-    case OP_INC:
-      result = translate_exp_inc (pState, firstType);
-      break;
-
-    case OP_DEC:
-      result = translate_exp_dec (pState, firstType);
-      break;
-
     case OP_NOT:
       result = translate_exp_not (pState, firstType);
       break;
@@ -1511,6 +1851,38 @@ translate_exp_opcode (struct ParserState* const   pState,
 
     case OP_ATTR:
       result = translate_exp_store (pState, firstType, secondType);
+      break;
+
+    case OP_SADD:
+      result = translate_exp_sadd (pState, firstType, secondType);
+      break;
+
+    case OP_SSUB:
+      result = translate_exp_ssub (pState, firstType, secondType);
+      break;
+
+    case OP_SMUL:
+      result = translate_exp_smul (pState, firstType, secondType);
+      break;
+
+    case OP_SDIV:
+      result = translate_exp_sdiv (pState, firstType, secondType);
+      break;
+
+    case OP_SMOD:
+      result = translate_exp_smod (pState, firstType, secondType);
+      break;
+
+    case OP_SAND:
+      result = translate_exp_sand (pState, firstType, secondType);
+      break;
+
+    case OP_SXOR:
+      result = translate_exp_sxor (pState, firstType, secondType);
+      break;
+
+    case OP_SOR:
+      result = translate_exp_sor (pState, firstType, secondType);
       break;
 
     default:
