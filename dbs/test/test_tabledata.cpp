@@ -306,8 +306,11 @@ add_fixed_values_vector_to_table (I_DBSTable& table, std::vector<T> &vectValues)
   while (fieldIndex < table.GetFieldsCount())
     {
       DBSFieldDescriptor desc = table.GetFieldDescriptor (fieldIndex);
-      if ((desc.m_FieldType == vectValues[0]) && (desc.isArray == false))
-        break;
+      if ((desc.m_FieldType == vectValues[0].GetDBSType ()) &&
+          (desc.isArray == false))
+        {
+          break;
+        }
 
       ++fieldIndex;
     }
@@ -462,7 +465,7 @@ test_fixed_values_table (I_DBSHandler& rDbs)
 template <class T> bool
 check_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 {
-  if (array.ElementsType() != source[0])
+  if (array.ElementsType() != source[0].GetDBSType ())
     return false;
 
   D_UINT arrayIndex = 0;
@@ -489,7 +492,7 @@ check_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 template <class T> bool
 fill_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 {
-  if (array.ElementsType() != source[0])
+  if (array.ElementsType() != source[0].GetDBSType ())
     return false;
 
   for (D_UINT elIndex = 0; elIndex < source.size (); ++elIndex)
@@ -511,8 +514,11 @@ add_vectors_values_to_table (I_DBSTable& table, std::vector<T> &testVect)
   for (; fieldIndex < table.GetFieldsCount(); ++fieldIndex)
     {
       struct DBSFieldDescriptor fieldDesc = table.GetFieldDescriptor (fieldIndex);
-      if (fieldDesc.isArray && (fieldDesc.m_FieldType == testVect[0]))
-        break;
+      if (fieldDesc.isArray &&
+          (fieldDesc.m_FieldType == testVect[0].GetDBSType ()))
+        {
+          break;
+        }
     }
 
   if (fieldIndex >= table.GetFieldsCount())

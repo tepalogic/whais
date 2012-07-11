@@ -353,7 +353,8 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
   if (count == 0)
     {
       assert (array == NULL);
-      prOutStrategy = & NullArray::GetSingletoneInstace (array[0]);
+      prOutStrategy = & NullArray::GetSingletoneInstace (
+                                                       array[0].GetDBSType ());
 
       return; // We finished here!
     }
@@ -361,14 +362,16 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
   if (array == NULL)
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_PARAMETERS));
 
-  auto_ptr <TemporalArray> apArray (new TemporalArray (array[0]));
+  auto_ptr <TemporalArray> apArray (new TemporalArray (array[0].GetDBSType ()));
   prOutStrategy = apArray.get ();
 
   D_UINT64 currentOffset = 0;
   D_UINT   valueIncrement = 0;
 
-  while (valueIncrement < _SC(D_UINT,  PSValInterp::Size (array[0], false)))
-    valueIncrement += PSValInterp::Alignment (array[0], false);
+  while (valueIncrement < _SC(D_UINT,  PSValInterp::Size (
+                                                        array[0].GetDBSType (),
+                                                        false)))
+  valueIncrement += PSValInterp::Alignment (array[0].GetDBSType (), false);
 
   for (D_UINT64 index = 0; index < count; ++index)
     {
@@ -565,12 +568,13 @@ prepare_array_strategy (I_ArrayStrategy*& pArrayStrategy)
 template <class T> inline D_UINT64
 add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
 {
-  if (pArrayStrategy->Type() != element)
+  if (pArrayStrategy->Type() != element.GetDBSType ())
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
   else if (element.IsNull())
     throw DBSException (NULL, _EXTRA (DBSException::NULL_ARRAY_ELEMENT));
 
-  static const D_UINT storageSize = get_aligned_elem_size (element);
+  static const D_UINT storageSize = get_aligned_elem_size (
+                                                    element.GetDBSType ());
 
   prepare_array_strategy (pArrayStrategy);
 
@@ -682,10 +686,11 @@ get_array_element (T& outElement, I_ArrayStrategy* const pArrayStrategy, const D
 {
   if (pArrayStrategy->Count() <= index)
     throw DBSException (NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
-  else if (pArrayStrategy->Type() != outElement)
+  else if (pArrayStrategy->Type() != outElement.GetDBSType ())
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
-  static const D_UINT storageSize = get_aligned_elem_size (outElement);
+  static const D_UINT storageSize = get_aligned_elem_size (
+                                                    outElement.GetDBSType ());
 
   D_UINT8 rawElement[MAX_VALUE_RAW_STORAGE];
 
@@ -1019,13 +1024,13 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorte
   array.GetElement (leftEl, from);
 
   alreadySorted = false;
-  if ((leftEl > pivot) || (leftEl == pivot))
+  if ((leftEl < pivot) == false)
     {
       temp = leftEl;
       while (from < to)
         {
           array.GetElement (leftEl, from + 1);
-          if (((leftEl > pivot) || (leftEl == pivot)) && ((temp > leftEl) || (temp == leftEl)))
+          if (((leftEl < pivot) == false) && ((temp < leftEl) == false))
             {
               ++from;
               temp = leftEl;

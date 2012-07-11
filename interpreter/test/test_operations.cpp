@@ -74,7 +74,7 @@ test_op_ldc (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSChar (0x53525150))
+  if ((value == DBSChar (0x53525150)) == false)
     return false;
 
   return true;
@@ -97,7 +97,7 @@ test_op_ldi8 (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt8 (0xD8))
+  if ((value == DBSInt8 (0xD8)) == false)
     return false;
 
   return true;
@@ -121,7 +121,7 @@ test_op_ldi16 (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt16 (0xB4A1))
+  if ((value == DBSInt16 (0xB4A1)) == false)
     return false;
 
   return true;
@@ -147,7 +147,7 @@ test_op_ldi32 (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt32 (0x3421D4F1))
+  if ((value == DBSInt32 (0x3421D4F1)) == false)
     return false;
 
   return true;
@@ -177,7 +177,7 @@ test_op_ldi64 (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt64 (0x383736353421D4F1))
+  if ((value == DBSInt64 (0x383736353421D4F1)) == false)
     return false;
 
   return true;
@@ -203,7 +203,7 @@ test_op_ldd (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSDate (0xD1F1, 0x06, 0x05))
+  if ((value == DBSDate (0xD1F1, 0x06, 0x05)) == false)
     return false;
 
   return true;
@@ -232,7 +232,7 @@ test_op_lddt (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSDateTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23))
+  if ((value == DBSDateTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23)) == false)
     return false;
 
   return true;
@@ -265,7 +265,8 @@ test_op_ldht (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x01020304))
+  if ((value ==
+      DBSHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x01020304)) == false)
     return false;
 
   return true;
@@ -296,7 +297,7 @@ test_op_ldr (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSRichReal ((RICHREAL_T)5 / 100))
+  if ((value == DBSRichReal ((RICHREAL_T)5 / 100)) == false)
     return false;
 
   return true;
@@ -330,7 +331,7 @@ test_op_ldt (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSText ((D_UINT8*)someText + 2))
+  if ((value == DBSText ((D_UINT8*)someText + 2)) == false)
     return false;
 
   return true;
@@ -352,7 +353,7 @@ test_op_ldbt (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSBool (true))
+  if ((value == DBSBool (true)) == false)
     return false;
 
   return true;
@@ -374,7 +375,7 @@ test_op_ldbf (Session& session)
     return false;
 
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSBool (false))
+  if ((value == DBSBool (false)) == false)
     return false;
 
   return true;

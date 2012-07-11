@@ -160,37 +160,32 @@ D_CHAR proc_decl_buffer[] =
   "RETURN v1 > v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId23 (v1 AS TEXT, v2 AS TEXT) RETURN BOOL "
+  "PROCEDURE ProcId23 (v1 AS DATE, v2 AS DATE) RETURN BOOL "
   "DO "
   "RETURN v1 > v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId24 (v1 AS DATE, v2 AS DATE) RETURN BOOL "
+  "PROCEDURE ProcId24 (v1 AS DATE, v2 AS DATETIME) RETURN BOOL "
   "DO "
   "RETURN v1 > v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId25 (v1 AS DATE, v2 AS DATETIME) RETURN BOOL "
+  "PROCEDURE ProcId25 (v1 AS DATE, v2 AS HIRESTIME) RETURN BOOL "
   "DO "
   "RETURN v1 > v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId26 (v1 AS DATE, v2 AS HIRESTIME) RETURN BOOL "
+  "PROCEDURE ProcId26 (v1 AS DATETIME, v2 AS DATETIME) RETURN BOOL "
   "DO "
   "RETURN v1 > v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId27 (v1 AS DATETIME, v2 AS DATETIME) RETURN BOOL "
+  "PROCEDURE ProcId27 (v1 AS DATETIME, v2 AS HIRESTIME) RETURN BOOL "
   "DO "
   "RETURN v1 > v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId28 (v1 AS DATETIME, v2 AS HIRESTIME) RETURN BOOL "
-  "DO "
-  "RETURN v1 > v2; "
-  "ENDPROC\n\n"
-  ""
-  "PROCEDURE ProcId29 (v1 AS HIRESTIME, v2 AS HIRESTIME) RETURN BOOL "
+  "PROCEDURE ProcId28 (v1 AS HIRESTIME, v2 AS HIRESTIME) RETURN BOOL "
   "DO " "RETURN v1 > v2; " "ENDPROC\n\n" "" "";
 
 static D_BOOL
@@ -252,9 +247,6 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
     case T_RICHREAL:
       op_expect = W_GTRR;
       break;
-    case T_TEXT:
-      op_expect = W_GTT;
-      break;
     default:
       /* we should not be here */
       return FALSE;
@@ -278,7 +270,7 @@ check_all_procs (struct ParserState *state)
   D_UINT count;
   D_CHAR proc_name[25];
 
-  for (count = 1; count <= 29; ++count)
+  for (count = 1; count <= 28; ++count)
     {
       sprintf (proc_name, "ProcId%d", count);
       if (check_procedure (state, proc_name) == FALSE)

@@ -82,7 +82,8 @@ struct DBSBool
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_BOOL; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_BOOL; }
+
   bool IsNull () const { return m_IsNull; }
 
   const bool m_Value;
@@ -134,7 +135,8 @@ struct DBSChar
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_CHAR; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_CHAR; }
+
   bool IsNull () const { return m_IsNull; }
 
   const D_UINT32 m_Value;                //4 bytes to hold an UTF-8 character
@@ -203,7 +205,7 @@ struct DBSDate
 
   }
 
-  operator DBS_FIELD_TYPE () const { return T_DATE; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_DATE; }
   bool IsNull () const { return m_IsNull; }
 
   const D_INT16 m_Year;
@@ -306,7 +308,7 @@ struct DBSDateTime
   }
 
 
-  operator DBS_FIELD_TYPE () const { return T_DATETIME; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_DATETIME; }
   bool IsNull () const { return m_IsNull; }
 
   const D_INT16 m_Year;
@@ -423,7 +425,7 @@ struct DBSHiresTime
   }
 
 
-  operator DBS_FIELD_TYPE () const { return T_HIRESTIME; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_HIRESTIME; }
   bool IsNull () const { return m_IsNull; }
 
   const D_UINT32 m_Microsec;
@@ -483,7 +485,7 @@ struct DBSUInt8
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_UINT8; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT8; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -537,7 +539,7 @@ struct DBSUInt16
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_UINT16; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT16; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -591,7 +593,7 @@ struct DBSUInt32
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_UINT32; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT32; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -644,7 +646,7 @@ struct DBSUInt64
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_UINT64; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT64; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -698,7 +700,7 @@ struct DBSInt8
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_INT8; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_INT8; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -752,7 +754,7 @@ struct DBSInt16
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_INT16; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_INT16; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -806,7 +808,7 @@ struct DBSInt32
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_INT32; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_INT32; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -860,7 +862,7 @@ struct DBSInt64
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_INT64; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_INT64; }
 
   bool IsNull () const { return m_IsNull; }
 
@@ -913,7 +915,8 @@ struct DBSReal
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_REAL; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_REAL; }
+
   bool IsNull () const { return m_IsNull; }
 
   const REAL_T m_Value;
@@ -965,7 +968,8 @@ struct DBSRichReal
     return (m_Value == source.m_Value);
   }
 
-  operator DBS_FIELD_TYPE () const { return T_RICHREAL; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_RICHREAL; }
+
   bool IsNull () const { return m_IsNull; }
 
   const RICHREAL_T m_Value;
@@ -999,7 +1003,7 @@ public:
   DBSChar GetCharAtIndex(const D_UINT64 index) const;
   void    SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index);
 
-  operator DBS_FIELD_TYPE () const { return T_TEXT; }
+  DBS_FIELD_TYPE  GetDBSType() const { return T_TEXT; }
 
   operator I_TextStrategy&() const { return *m_pText; }
 

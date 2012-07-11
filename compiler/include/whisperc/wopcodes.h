@@ -108,7 +108,6 @@ enum W_OPCODE
   W_GEHT,
   W_GER,
   W_GERR,
-  W_GET,
 
   W_GT,
   W_GTC,
@@ -117,7 +116,6 @@ enum W_OPCODE
   W_GTHT,
   W_GTR,
   W_GTRR,
-  W_GTT,
 
   W_LE,
   W_LEC,
@@ -126,7 +124,6 @@ enum W_OPCODE
   W_LEHT,
   W_LER,
   W_LERR,
-  W_LET,
 
   W_LT,
   W_LTC,
@@ -135,7 +132,6 @@ enum W_OPCODE
   W_LTHT,
   W_LTR,
   W_LTRR,
-  W_LTT,
 
   W_MOD,
 

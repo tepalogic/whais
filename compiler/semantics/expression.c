@@ -750,8 +750,7 @@ translate_exp_less (struct ParserState* const         pState,
 
   assert ((opcode == W_LT) || (opcode == W_LTR) || (opcode == W_LTRR) ||
           (opcode == W_LTC) || (opcode == W_LTD) || (opcode == W_LTDT) ||
-          (opcode == W_LTHT) || (opcode == W_LTR) || (opcode == W_LTRR) ||
-          (opcode == W_LTT));
+          (opcode == W_LTHT) || (opcode == W_LTR) || (opcode == W_LTRR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -792,8 +791,7 @@ translate_exp_less_equal (struct ParserState* const         pState,
 
   assert ((opcode == W_LE) || (opcode == W_LER) || (opcode == W_LERR) ||
           (opcode == W_LEC) || (opcode == W_LED) || (opcode == W_LEDT) ||
-          (opcode == W_LEHT) || (opcode == W_LER) || (opcode == W_LERR) ||
-          (opcode == W_LET));
+          (opcode == W_LEHT) || (opcode == W_LER) || (opcode == W_LERR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -834,8 +832,7 @@ translate_exp_grater (struct ParserState* const         pState,
 
   assert ((opcode == W_GT) || (opcode == W_GTR) || (opcode == W_GTRR) ||
           (opcode == W_GTC) || (opcode == W_GTD) || (opcode == W_GTDT) ||
-          (opcode == W_GTHT) || (opcode == W_GTR) || (opcode == W_GTRR) ||
-          (opcode == W_GTT));
+          (opcode == W_GTHT) || (opcode == W_GTR) || (opcode == W_GTRR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -876,8 +873,7 @@ translate_exp_grater_equal (struct ParserState* const         pState,
 
   assert ((opcode == W_GE) || (opcode == W_GER) || (opcode == W_GERR) ||
           (opcode == W_GEC) || (opcode == W_GED) || (opcode == W_GEDT) ||
-          (opcode == W_GEHT) || (opcode == W_GER) || (opcode == W_GERR) ||
-          (opcode == W_GET));
+          (opcode == W_GEHT) || (opcode == W_GER) || (opcode == W_GERR));
 
   result.type  = T_BOOL;
   result.extra = NULL;

@@ -1484,8 +1484,11 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, outValue))))
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+        ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+        _SC(D_UINT, outValue.GetDBSType ())))
+    {
+      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    }
 
   T* const      pDest    = &outValue;
   const D_UINT  byte_off = desc.m_NullBitIndex / 8;
@@ -1518,8 +1521,11 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, _SC(DBS_FIELD_TYPE, min))))
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+        ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+        _SC(D_UINT, min.GetDBSType ())))
+    {
+      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    }
 
   toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
 

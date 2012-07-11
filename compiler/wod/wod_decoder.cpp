@@ -375,7 +375,6 @@ const FDECODE_OPCODE wod_dec_w_gedt   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_geht   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ger    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gerr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_get    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gt     = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtc    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtd    = wod_dec_w_ldnull;
@@ -383,7 +382,6 @@ const FDECODE_OPCODE wod_dec_w_gtdt   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtht   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtr    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_gtrr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtt    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_le     = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_lec    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_led    = wod_dec_w_ldnull;
@@ -391,7 +389,6 @@ const FDECODE_OPCODE wod_dec_w_ledt   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_leht   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ler    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_lerr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_let    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_lt     = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ltc    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ltd    = wod_dec_w_ldnull;
@@ -399,7 +396,6 @@ const FDECODE_OPCODE wod_dec_w_ltdt   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ltht   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ltr    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_ltrr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltt    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_mod    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_mul    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_mulr   = wod_dec_w_ldnull;
@@ -568,7 +564,6 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_geht,
   wod_dec_w_ger,
   wod_dec_w_gerr,
-  wod_dec_w_get,
 
   wod_dec_w_gt,
   wod_dec_w_gtc,
@@ -577,7 +572,6 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_gtht,
   wod_dec_w_gtr,
   wod_dec_w_gtrr,
-  wod_dec_w_gtt,
 
   wod_dec_w_le,
   wod_dec_w_lec,
@@ -586,7 +580,6 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_leht,
   wod_dec_w_ler,
   wod_dec_w_lerr,
-  wod_dec_w_let,
 
   wod_dec_w_lt,
   wod_dec_w_ltc,
@@ -595,7 +588,6 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_ltht,
   wod_dec_w_ltr,
   wod_dec_w_ltrr,
-  wod_dec_w_ltt,
 
   wod_dec_w_mod,
 
@@ -746,7 +738,6 @@ const D_CHAR *wod_str_table[] = {
   "geht",
   "ger",
   "gerr",
-  "get",
 
   "gt",
   "gtc",
@@ -755,7 +746,6 @@ const D_CHAR *wod_str_table[] = {
   "gtht",
   "gtr",
   "gtrr",
-  "gtt",
 
   "le",
   "lec",
@@ -764,7 +754,6 @@ const D_CHAR *wod_str_table[] = {
   "leht",
   "ler",
   "lerr",
-  "let",
 
   "lt",
   "ltc",
@@ -773,7 +762,6 @@ const D_CHAR *wod_str_table[] = {
   "ltht",
   "ltr",
   "ltrr",
-  "ltt",
 
   "mod",
 
