@@ -573,29 +573,7 @@ UInt8FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt8FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt8FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt8FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt8 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -617,29 +595,7 @@ UInt8FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt8FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt8FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt8FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt8 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -814,29 +770,7 @@ UInt16FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt16FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt16FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt16FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt16 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -858,29 +792,7 @@ UInt16FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt16FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt16FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt16FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt16 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1054,29 +966,7 @@ UInt32FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt32FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt32FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt32FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt32 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1098,29 +988,7 @@ UInt32FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt32FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt32FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt32FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt32 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1294,29 +1162,7 @@ UInt64FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt64FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt64FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt64FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt64 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1338,29 +1184,7 @@ UInt64FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt64FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 UInt64FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-UInt64FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt64 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1534,29 +1358,7 @@ Int8FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int8FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int8FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int8FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt8 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1578,29 +1380,7 @@ Int8FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int8FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int8FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt8 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int8FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt8 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1775,29 +1555,7 @@ Int16FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int16FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int16FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int16FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt16 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -1819,29 +1577,7 @@ Int16FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int16FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int16FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt16 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int16FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt16 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -2015,29 +1751,7 @@ Int32FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int32FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int32FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int32FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt32 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -2059,29 +1773,7 @@ Int32FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int32FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int32FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt32 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int32FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt32 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -2255,29 +1947,7 @@ Int64FieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int64FieldElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_add (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int64FieldElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int64FieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt64 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);
@@ -2299,29 +1969,7 @@ Int64FieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int64FieldElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
 Int64FieldElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt64 currValue;
-  m_Table.GetEntry (m_Row, m_Field, currValue);
-
-  currValue = internal_div (currValue, value);
-
-  m_Table.SetEntry (m_Row, m_Field, currValue);
-}
-
-void
-Int64FieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt64 currValue;
   m_Table.GetEntry (m_Row, m_Field, currValue);

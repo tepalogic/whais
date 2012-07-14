@@ -463,33 +463,7 @@ UInt8ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt8ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt8ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt8ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt8 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -515,33 +489,7 @@ UInt8ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt8ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt8ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt8ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt8 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -735,33 +683,7 @@ UInt16ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt16ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt16ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt16ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt16 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -787,33 +709,7 @@ UInt16ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt16ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt16ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt16ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt16 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1006,33 +902,7 @@ UInt32ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt32ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt32ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt32ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt32 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1058,33 +928,7 @@ UInt32ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt32ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt32ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt32ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt32 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1277,33 +1121,7 @@ UInt64ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt64ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSUInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt64ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSUInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt64ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSUInt64 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1329,33 +1147,7 @@ UInt64ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt64ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSUInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 UInt64ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSUInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-UInt64ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSUInt64 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1548,33 +1340,7 @@ Int8ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int8ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int8ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int8ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt8 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1600,33 +1366,7 @@ Int8ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int8ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int8ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int8ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt8 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1820,33 +1560,7 @@ Int16ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int16ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int16ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int16ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt16 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -1872,33 +1586,7 @@ Int16ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int16ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int16ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int16ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt16 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -2091,33 +1779,7 @@ Int32ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int32ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int32ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int32ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt32 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -2143,33 +1805,7 @@ Int32ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int32ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int32ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int32ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt32 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -2362,33 +1998,7 @@ Int64ArrayElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int64ArrayElOperand::SelfAdd (const DBSRichReal& value)
-{
-  DBSInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_add (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int64ArrayElOperand::SelfSub (const DBSInt64& value)
-{
-  DBSInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_sub (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int64ArrayElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSInt64 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);
@@ -2414,33 +2024,7 @@ Int64ArrayElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int64ArrayElOperand::SelfMul (const DBSRichReal& value)
-{
-  DBSInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_mul (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
 Int64ArrayElOperand::SelfDiv (const DBSInt64& value)
-{
-  DBSInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-
-  currValue = internal_div (currValue, value);
-
-  m_Array.SetElement (currValue, m_ElementIndex);
-}
-
-void
-Int64ArrayElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSInt64 currValue;
   m_Array.GetElement (currValue, m_ElementIndex);

@@ -859,19 +859,7 @@ UInt8Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt8Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 UInt8Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-UInt8Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -883,19 +871,7 @@ UInt8Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt8Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 UInt8Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-UInt8Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -1037,19 +1013,7 @@ UInt16Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt16Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 UInt16Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-UInt16Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -1061,19 +1025,7 @@ UInt16Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt16Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 UInt16Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-UInt16Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -1214,19 +1166,7 @@ UInt32Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt32Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 UInt32Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-UInt32Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -1238,19 +1178,7 @@ UInt32Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt32Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 UInt32Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-UInt32Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -1392,19 +1320,7 @@ UInt64Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt64Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 UInt64Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-UInt64Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -1416,19 +1332,7 @@ UInt64Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt64Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 UInt64Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-UInt64Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -1568,19 +1472,7 @@ Int8Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int8Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 Int8Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-Int8Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -1592,19 +1484,7 @@ Int8Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int8Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 Int8Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-Int8Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -1745,19 +1625,7 @@ Int16Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int16Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 Int16Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-Int16Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -1769,19 +1637,7 @@ Int16Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int16Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 Int16Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-Int16Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -1922,19 +1778,7 @@ Int32Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int32Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 Int32Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-Int32Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -1946,19 +1790,7 @@ Int32Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int32Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 Int32Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-Int32Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }
@@ -2098,19 +1930,7 @@ Int64Operand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int64Operand::SelfAdd (const DBSRichReal& value)
-{
-  m_Value = internal_add (m_Value, value);
-}
-
-void
 Int64Operand::SelfSub (const DBSInt64& value)
-{
-  m_Value = internal_sub (m_Value, value);
-}
-
-void
-Int64Operand::SelfSub (const DBSRichReal& value)
 {
   m_Value = internal_sub (m_Value, value);
 }
@@ -2122,19 +1942,7 @@ Int64Operand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int64Operand::SelfMul (const DBSRichReal& value)
-{
-  m_Value = internal_mul (m_Value, value);
-}
-
-void
 Int64Operand::SelfDiv (const DBSInt64& value)
-{
-  m_Value = internal_div (m_Value, value);
-}
-
-void
-Int64Operand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
 }

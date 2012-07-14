@@ -276,16 +276,12 @@ public:
   virtual void SetValue (const DBSUInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -324,16 +320,12 @@ public:
   virtual void SetValue (const DBSUInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -372,16 +364,12 @@ public:
   virtual void SetValue (const DBSUInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -420,16 +408,12 @@ public:
   virtual void SetValue (const DBSUInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -468,16 +452,12 @@ public:
   virtual void SetValue (const DBSInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -516,16 +496,12 @@ public:
   virtual void SetValue (const DBSInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -563,16 +539,12 @@ public:
   virtual void SetValue (const DBSInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -610,16 +582,12 @@ public:
   virtual void SetValue (const DBSInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -920,16 +888,12 @@ class UInt8ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSUInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -969,16 +933,12 @@ class UInt16ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSUInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1018,16 +978,12 @@ class UInt32ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSUInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1067,16 +1023,12 @@ class UInt64ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSUInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1116,16 +1068,12 @@ class Int8ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1165,16 +1113,12 @@ class Int16ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1214,16 +1158,12 @@ class Int32ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1263,16 +1203,12 @@ class Int64ArrayElOperand : public I_Operand
   virtual void SetValue (const DBSInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1600,16 +1536,12 @@ public:
   virtual void SetValue (const DBSUInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1653,16 +1585,12 @@ public:
   virtual void SetValue (const DBSUInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1706,16 +1634,12 @@ public:
   virtual void SetValue (const DBSUInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1759,16 +1683,12 @@ public:
   virtual void SetValue (const DBSUInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1812,16 +1732,12 @@ public:
   virtual void SetValue (const DBSInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1865,16 +1781,12 @@ public:
   virtual void SetValue (const DBSInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1918,16 +1830,12 @@ public:
   virtual void SetValue (const DBSInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -1971,16 +1879,12 @@ public:
   virtual void SetValue (const DBSInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2343,16 +2247,12 @@ public:
   virtual void SetValue (const DBSUInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2399,16 +2299,12 @@ public:
   virtual void SetValue (const DBSUInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2455,16 +2351,12 @@ public:
   virtual void SetValue (const DBSUInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2511,16 +2403,12 @@ public:
   virtual void SetValue (const DBSUInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2567,16 +2455,12 @@ public:
   virtual void SetValue (const DBSInt8& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2623,16 +2507,12 @@ public:
   virtual void SetValue (const DBSInt16& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2679,16 +2559,12 @@ public:
   virtual void SetValue (const DBSInt32& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
@@ -2735,16 +2611,12 @@ public:
   virtual void SetValue (const DBSInt64& value);
 
   virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
 
   virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
 
   virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
 
   virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
 
   virtual void SelfMod (const DBSInt64& value);
 
