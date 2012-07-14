@@ -6,7 +6,8 @@ UNIT_LIBS:=prima
 prima_INC:=utils/include
 prima_SRC= prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
            prima/pm_typemanager.cpp prima/pm_procedures.cpp prima/pm_units.cpp\
-	   prima/pm_processor.cpp
+           prima/pm_processor.cpp prima/pm_operand_arrayfields.cpp\
+           prima/pm_operand_fields.cpp prima/pm_operand_array.cpp\
 		   
 
 ifeq ($(BUILD_TESTS),yes)

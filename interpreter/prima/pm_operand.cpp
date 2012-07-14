@@ -29,6 +29,7 @@
 using namespace std;
 using namespace prima;
 
+
 ////////////////////////////////////////I_Operand//////////////////////////////
 
 bool
@@ -241,6 +242,107 @@ I_Operand::SetValue (const DBSArray& value)
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
+void
+I_Operand::SelfAdd (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfAdd (const DBSRichReal& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfAdd (const DBSChar& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfAdd (const DBSText& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+void
+I_Operand::SelfSub (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfSub (const DBSRichReal& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfMul (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfMul (const DBSRichReal& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfDiv (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfDiv (const DBSRichReal& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfMod (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfAnd (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfAnd (const DBSBool& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfXor (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfXor (const DBSBool& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfOr (const DBSInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_Operand::SelfOr (const DBSBool& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
 FIELD_INDEX
 I_Operand::GetField ()
 {
@@ -252,6 +354,15 @@ I_Operand::GetTable ()
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
+
+StackValue
+I_Operand::GetValueAt (const D_UINT64 index) const
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -395,6 +506,24 @@ void
 BoolOperand::SetValue (const DBSBool& value)
 {
   m_Value = value;
+}
+
+void
+BoolOperand::SelfAnd (const DBSBool& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+BoolOperand::SelfXor (const DBSBool& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+BoolOperand::SelfOr (const DBSBool& value)
+{
+  m_Value = internal_xor (m_Value, value);
 }
 
 ////////////////////////////////CharOperand////////////////////////////////////
@@ -723,6 +852,78 @@ UInt8Operand::SetValue (const DBSUInt8& value)
   m_Value = value;
 }
 
+void
+UInt8Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt8Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt8Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt8Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt8Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt8Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt8Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt8Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt8Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt8Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+UInt8Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+UInt8Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
 
 ////////////////////////////////UInt16Operand//////////////////////////////////
 
@@ -829,6 +1030,77 @@ UInt16Operand::SetValue (const DBSUInt16& value)
   m_Value = value;
 }
 
+void
+UInt16Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt16Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt16Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt16Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt16Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt16Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt16Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt16Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt16Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt16Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+UInt16Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+UInt16Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
 
 ////////////////////////////////UInt32Operand//////////////////////////////////
 
@@ -935,6 +1207,79 @@ UInt32Operand::SetValue (const DBSUInt32& value)
   m_Value = value;
 }
 
+void
+UInt32Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt32Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt32Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt32Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt32Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt32Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt32Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt32Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt32Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt32Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+UInt32Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+UInt32Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+
 ////////////////////////////////UInt64Operand//////////////////////////////////
 
 UInt64Operand::~UInt64Operand ()
@@ -1038,6 +1383,78 @@ void
 UInt64Operand::SetValue (const DBSUInt64& value)
 {
   m_Value = value;
+}
+
+void
+UInt64Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt64Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+UInt64Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt64Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+UInt64Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt64Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+UInt64Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt64Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt64Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+UInt64Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+UInt64Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+UInt64Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
 }
 
 //////////////////////////////////Int8Operand//////////////////////////////////
@@ -1144,6 +1561,79 @@ Int8Operand::SetValue (const DBSInt8& value)
   m_Value = value;
 }
 
+void
+Int8Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int8Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int8Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int8Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int8Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int8Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int8Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int8Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int8Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int8Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+Int8Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+Int8Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+
 /////////////////////////////////Int16Operand//////////////////////////////////
 
 Int16Operand::~Int16Operand ()
@@ -1248,6 +1738,79 @@ Int16Operand::SetValue (const DBSInt16& value)
   m_Value = value;
 }
 
+void
+Int16Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int16Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int16Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int16Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int16Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int16Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int16Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int16Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int16Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int16Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+Int16Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+Int16Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+
 /////////////////////////////////Int32Operand//////////////////////////////////
 
 Int32Operand::~Int32Operand ()
@@ -1350,6 +1913,78 @@ void
 Int32Operand::SetValue (const DBSInt32& value)
 {
   m_Value = value;
+}
+
+void
+Int32Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int32Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int32Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int32Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int32Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int32Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int32Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int32Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int32Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int32Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+Int32Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+Int32Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
 }
 
 /////////////////////////////////Int64Operand//////////////////////////////////
@@ -1456,6 +2091,78 @@ Int64Operand::SetValue (const DBSInt64& value)
   m_Value = value;
 }
 
+void
+Int64Operand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int64Operand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+Int64Operand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int64Operand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+Int64Operand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int64Operand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+Int64Operand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int64Operand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int64Operand::SelfMod (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+Int64Operand::SelfAnd (const DBSInt64& value)
+{
+  m_Value = internal_and (m_Value, value);
+}
+
+void
+Int64Operand::SelfXor (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
+void
+Int64Operand::SelfOr (const DBSInt64& value)
+{
+  m_Value = internal_xor (m_Value, value);
+}
+
 /////////////////////////////////RealOperand///////////////////////////////////
 
 RealOperand::~RealOperand ()
@@ -1487,6 +2194,53 @@ RealOperand::SetValue (const DBSReal& value)
   m_Value = value;
 }
 
+void
+RealOperand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+RealOperand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+RealOperand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+RealOperand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+RealOperand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+RealOperand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+RealOperand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+RealOperand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
 
 ///////////////////////////////RichRealOperand/////////////////////////////////
 
@@ -1519,6 +2273,54 @@ RichRealOperand::SetValue (const DBSRichReal& value)
   m_Value = value;
 }
 
+void
+RichRealOperand::SelfAdd (const DBSInt64& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+RichRealOperand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value = internal_add (m_Value, value);
+}
+
+void
+RichRealOperand::SelfSub (const DBSInt64& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+RichRealOperand::SelfSub (const DBSRichReal& value)
+{
+  m_Value = internal_sub (m_Value, value);
+}
+
+void
+RichRealOperand::SelfMul (const DBSInt64& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+RichRealOperand::SelfMul (const DBSRichReal& value)
+{
+  m_Value = internal_mul (m_Value, value);
+}
+
+void
+RichRealOperand::SelfDiv (const DBSInt64& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
+void
+RichRealOperand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value = internal_div (m_Value, value);
+}
+
 //////////////////////////////TextOperand//////////////////////////////////////
 
 TextOperand::~TextOperand ()
@@ -1542,6 +2344,19 @@ TextOperand::SetValue (const DBSText& value)
 {
   m_Value = value;
 }
+
+void
+TextOperand::SelfAdd (const DBSChar& value)
+{
+  m_Value.Append (value);
+}
+
+void
+TextOperand::SelfAdd (const DBSText& value)
+{
+  m_Value.Append (value);
+}
+
 
 ///////////////////////////////CharTextOperand/////////////////////////////////
 
@@ -1576,78 +2391,6 @@ void
 CharTextOperand::SetValue (const DBSChar& value)
 {
   m_Text.SetCharAtIndex (value, m_Index);
-}
-
-///////////////////////////ArrayOperand////////////////////////////////////////
-
-ArrayOperand::~ArrayOperand ()
-{
-}
-
-bool
-ArrayOperand::IsNull () const
-{
-  return m_Value.IsNull ();
-}
-
-void
-ArrayOperand::GetValue (DBSArray& outValue) const
-{
-  outValue = m_Value;
-}
-
-void
-ArrayOperand::SetValue (const DBSArray& value)
-{
-  m_Value = value;
-}
-
-/////////////////////////////TableOperand//////////////////////////////////////
-
-TableOperand::~TableOperand ()
-{
-  m_pRefTable->DecrementRefCount ();
-}
-
-bool
-TableOperand::IsNull () const
-{
-  return (m_pRefTable->GetTable ().GetAllocatedRows () == 0);
-}
-
-I_DBSTable&
-TableOperand::GetTable ()
-{
-  return m_pRefTable->GetTable ();
-}
-
-/////////////////////////FieldOperand//////////////////////////////////////////
-
-FieldOperand::~FieldOperand ()
-{
-  if (m_pRefTable != NULL)
-    m_pRefTable->DecrementRefCount ();
-}
-
-
-bool
-FieldOperand::IsNull () const
-{
-  return (m_pRefTable == NULL);
-}
-
-FIELD_INDEX
-FieldOperand::GetField ()
-{
-  return m_Field;
-}
-
-I_DBSTable&
-FieldOperand::GetTable ()
-{
-  assert (m_pRefTable != NULL);
-
-  return m_pRefTable->GetTable ();
 }
 
 ///////////////////////GlobalOperand///////////////////////////////////////////
@@ -1865,6 +2608,107 @@ void
 GlobalOperand::SetValue (const DBSArray& outValue)
 {
   m_Value.SetValue (outValue);
+}
+
+void
+GlobalOperand::SelfAdd (const DBSInt64& value)
+{
+  m_Value.SelfAdd (value);
+}
+
+void
+GlobalOperand::SelfAdd (const DBSRichReal& value)
+{
+  m_Value.SelfAdd (value);
+}
+
+void
+GlobalOperand::SelfAdd (const DBSChar& value)
+{
+  m_Value.SelfAdd (value);
+}
+
+void
+GlobalOperand::SelfAdd (const DBSText& value)
+{
+  m_Value.SelfAdd (value);
+}
+void
+GlobalOperand::SelfSub (const DBSInt64& value)
+{
+  m_Value.SelfSub (value);
+}
+
+void
+GlobalOperand::SelfSub (const DBSRichReal& value)
+{
+  m_Value.SelfSub (value);
+}
+
+void
+GlobalOperand::SelfMul (const DBSInt64& value)
+{
+  m_Value.SelfMul (value);
+}
+
+void
+GlobalOperand::SelfMul (const DBSRichReal& value)
+{
+  m_Value.SelfMul (value);
+}
+
+void
+GlobalOperand::SelfDiv (const DBSInt64& value)
+{
+  m_Value.SelfDiv (value);
+}
+
+void
+GlobalOperand::SelfDiv (const DBSRichReal& value)
+{
+  m_Value.SelfDiv (value);
+}
+
+void
+GlobalOperand::SelfMod (const DBSInt64& value)
+{
+  m_Value.SelfMod (value);
+}
+
+void
+GlobalOperand::SelfAnd (const DBSInt64& value)
+{
+  m_Value.SelfAnd (value);
+}
+
+void
+GlobalOperand::SelfAnd (const DBSBool& value)
+{
+  m_Value.SelfAnd (value);
+}
+
+void
+GlobalOperand::SelfXor (const DBSInt64& value)
+{
+  m_Value.SelfXor (value);
+}
+
+void
+GlobalOperand::SelfXor (const DBSBool& value)
+{
+  m_Value.SelfXor (value);
+}
+
+void
+GlobalOperand::SelfOr (const DBSInt64& value)
+{
+  m_Value.SelfOr (value);
+}
+
+void
+GlobalOperand::SelfOr (const DBSBool& value)
+{
+  m_Value.SelfOr (value);
 }
 
 FIELD_INDEX
@@ -2093,6 +2937,107 @@ void
 LocalOperand::SetValue (const DBSArray& outValue)
 {
   m_LocalValue.GetOperand ().SetValue (outValue);
+}
+
+void
+LocalOperand::SelfAdd (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfAdd (value);
+}
+
+void
+LocalOperand::SelfAdd (const DBSRichReal& value)
+{
+  m_LocalValue.GetOperand ().SelfAdd (value);
+}
+
+void
+LocalOperand::SelfAdd (const DBSChar& value)
+{
+  m_LocalValue.GetOperand ().SelfAdd (value);
+}
+
+void
+LocalOperand::SelfAdd (const DBSText& value)
+{
+  m_LocalValue.GetOperand ().SelfAdd (value);
+}
+void
+LocalOperand::SelfSub (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfSub (value);
+}
+
+void
+LocalOperand::SelfSub (const DBSRichReal& value)
+{
+  m_LocalValue.GetOperand ().SelfSub (value);
+}
+
+void
+LocalOperand::SelfMul (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfMul (value);
+}
+
+void
+LocalOperand::SelfMul (const DBSRichReal& value)
+{
+  m_LocalValue.GetOperand ().SelfMul (value);
+}
+
+void
+LocalOperand::SelfDiv (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfDiv (value);
+}
+
+void
+LocalOperand::SelfDiv (const DBSRichReal& value)
+{
+  m_LocalValue.GetOperand ().SelfDiv (value);
+}
+
+void
+LocalOperand::SelfMod (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfMod (value);
+}
+
+void
+LocalOperand::SelfAnd (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfAnd (value);
+}
+
+void
+LocalOperand::SelfAnd (const DBSBool& value)
+{
+  m_LocalValue.GetOperand ().SelfAnd (value);
+}
+
+void
+LocalOperand::SelfXor (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfXor (value);
+}
+
+void
+LocalOperand::SelfXor (const DBSBool& value)
+{
+  m_LocalValue.GetOperand ().SelfXor (value);
+}
+
+void
+LocalOperand::SelfOr (const DBSInt64& value)
+{
+  m_LocalValue.GetOperand ().SelfOr (value);
+}
+
+void
+LocalOperand::SelfOr (const DBSBool& value)
+{
+  m_LocalValue.GetOperand ().SelfOr (value);
 }
 
 FIELD_INDEX

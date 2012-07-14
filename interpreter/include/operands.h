@@ -33,6 +33,8 @@
 
 static const D_UINT MAX_OP_QWORDS = sizeof (DBSRichReal) + 2 * sizeof (void*);
 
+class StackValue;
+
 class I_Operand
 {
 public:
@@ -82,9 +84,35 @@ public:
   virtual void SetValue (const DBSText& value);
   virtual void SetValue (const DBSArray& value);
 
+  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DBSChar& value);
+  virtual void SelfAdd (const DBSText& value);
+
+  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DBSRichReal& value);
+
+  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DBSRichReal& value);
+
+  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DBSRichReal& value);
+
+  virtual void SelfMod (const DBSInt64& value);
+
+  virtual void SelfAnd (const DBSInt64& value);
+  virtual void SelfAnd (const DBSBool& value);
+
+  virtual void SelfXor (const DBSInt64& value);
+  virtual void SelfXor (const DBSBool& value);
+
+  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfOr (const DBSBool& value);
+
   //Special treatment for these
   virtual FIELD_INDEX   GetField ();
   virtual I_DBSTable&   GetTable ();
+  virtual StackValue    GetValueAt (const D_UINT64 index) const;
 };
 
 class StackValue
