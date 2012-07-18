@@ -119,51 +119,51 @@ decode_utf8_char (const D_UINT8 *pSource, D_UINT32 &outChar)
 }
 
 static D_UINT
-encode_utf8_char (D_UINT32 inChar, D_UINT8 *pDestination)
+encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
 {
-  if (inChar < 0x80)
+  if (ch < 0x80)
     {
-      pDestination[0] = _SC(D_UINT8, inChar & 0xFF);
+      pDest[0] = _SC(D_UINT8, ch & 0xFF);
       return 1;
     }
-  else if (inChar < 0x800)
+  else if (ch < 0x800)
     {
-      pDestination[0] = _SC (D_UINT8, (inChar >> 6) & 0xFF) | UTF8_11BIT_MASK;
-      pDestination[1] = _SC (D_UINT8, inChar & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[0] = _SC (D_UINT8, (ch >> 6) & 0xFF) | UTF8_11BIT_MASK;
+      pDest[1] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
       return 2;
     }
-  else if (inChar < 0x10000)
+  else if (ch < 0x10000)
     {
-      pDestination[0] = _SC (D_UINT8, (inChar >> 12) & 0xFF) | UTF8_16BIT_MASK;
-      pDestination[1] = _SC (D_UINT8, (inChar >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[2] = _SC (D_UINT8, inChar & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[0] = _SC (D_UINT8, (ch >> 12) & 0xFF) | UTF8_16BIT_MASK;
+      pDest[1] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[2] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
       return 3;
     }
-  else if (inChar < 0x200000)
+  else if (ch < 0x200000)
     {
-      pDestination[0] = _SC (D_UINT8, (inChar >> 18) & 0xFF) | UTF8_21BIT_MASK;
-      pDestination[1] = _SC (D_UINT8, (inChar >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[2] = _SC (D_UINT8, (inChar >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[3] = _SC (D_UINT8, inChar & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[0] = _SC (D_UINT8, (ch >> 18) & 0xFF) | UTF8_21BIT_MASK;
+      pDest[1] = _SC (D_UINT8, (ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[2] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[3] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
       return 4;
     }
-  else if (inChar < 0x4000000)
+  else if (ch < 0x4000000)
     {
-      pDestination[0] = _SC (D_UINT8, (inChar >> 24) & 0xFF) | UTF8_26BIT_MASK;
-      pDestination[1] = _SC (D_UINT8, (inChar >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[2] = _SC (D_UINT8, (inChar >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[3] = _SC (D_UINT8, (inChar >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[4] = _SC (D_UINT8, inChar & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[0] = _SC (D_UINT8, (ch >> 24) & 0xFF) | UTF8_26BIT_MASK;
+      pDest[1] = _SC (D_UINT8, (ch >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[2] = _SC (D_UINT8, (ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[3] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[4] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
       return 5;
     }
-  else if (inChar < 0x80000000)
+  else if (ch < 0x80000000)
     {
-      pDestination[0] = _SC (D_UINT8, (inChar >> 30) & 0xFF) | UTF8_31BIT_MASK;
-      pDestination[1] = _SC (D_UINT8, (inChar >> 24) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[2] = _SC (D_UINT8, (inChar >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[3] = _SC (D_UINT8, (inChar >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[4] = _SC (D_UINT8, (inChar >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDestination[5] = _SC (D_UINT8, inChar & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[0] = _SC (D_UINT8, (ch >> 30) & 0xFF) | UTF8_31BIT_MASK;
+      pDest[1] = _SC (D_UINT8, (ch >> 24) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[2] = _SC (D_UINT8, (ch >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[3] = _SC (D_UINT8, (ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[4] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      pDest[5] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
       return 6;
     }
 
@@ -171,39 +171,44 @@ encode_utf8_char (D_UINT32 inChar, D_UINT8 *pDestination)
 }
 
 static D_UINT64
-get_utf8_string_size (const D_UINT8 *pUtf8String, D_UINT64 maxLength)
+get_utf8_string_size (const D_UINT8 *pUtf8Str, D_UINT64 maxLength)
 {
   D_UINT64 result = 0;
 
-  while ((maxLength > 0) && (pUtf8String[0] != 0))
+  while ((maxLength > 0) && (pUtf8Str[0] != 0))
     {
-      const D_UINT charSize = get_utf8_char_size(pUtf8String[0]);
+      const D_UINT charSize = get_utf8_char_size(pUtf8Str[0]);
       bool validChar = true;
 
       if ((charSize == 0) || (charSize > MIN (6, maxLength)))
         validChar = false;
       else
         for (D_UINT index = 1; (index < charSize) && validChar; ++index)
-          if ((pUtf8String[index] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG)
+          if ((pUtf8Str[index] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG)
             validChar = false;
 
       if (!validChar)
         throw DBSException (NULL, _EXTRA(DBSException::INVALID_UTF8_STRING));
 
-      result += charSize, maxLength -= charSize, pUtf8String += charSize;
+      result += charSize, maxLength -= charSize, pUtf8Str += charSize;
     }
 
   return result;
 }
 
-GenericText::GenericText (D_UINT64 bytesSize) :
-    m_BytesSize (bytesSize),
-    m_ReferenceCount (0)
+GenericText::GenericText (D_UINT64 bytesSize)
+  : m_BytesSize (bytesSize),
+    m_ReferenceCount (0),
+    m_ShareCount (0)
 
 {
 }
 
-D_UINT64
+GenericText::~GenericText ()
+{
+}
+
+D_UINT
 GenericText::ReferenceCount () const
 {
   return m_ReferenceCount;
@@ -212,12 +217,14 @@ GenericText::ReferenceCount () const
 void
 GenericText::IncreaseReferenceCount ()
 {
+  assert (m_ShareCount == 0);
   ++m_ReferenceCount;
 }
 
 void
 GenericText::DecreaseReferenceCount ()
 {
+  assert (m_ShareCount == 0);
   assert (m_ReferenceCount > 0);
   -- m_ReferenceCount;
 
@@ -225,6 +232,27 @@ GenericText::DecreaseReferenceCount ()
     ClearMyself ();
 }
 
+D_UINT
+GenericText::ShareCount () const
+{
+  return m_ShareCount;
+}
+
+void
+GenericText::IncreaseShareCount ()
+{
+  assert (m_ReferenceCount == 1);
+  ++m_ShareCount;
+}
+
+void
+GenericText::DecreaseShareCount ()
+{
+  assert (m_ShareCount > 0);
+  assert (m_ReferenceCount == 1);
+
+  -- m_ShareCount;
+}
 
 D_UINT64
 GenericText::CharsCount()
@@ -262,7 +290,7 @@ GenericText::Duplicate (I_TextStrategy& source)
   D_UINT64 count = source.BytesCount();
 
   Truncate (0);
-  m_BytesSize = 0;
+  assert (m_BytesSize == 0);
 
   while (count > 0)
     {
@@ -271,7 +299,9 @@ GenericText::Duplicate (I_TextStrategy& source)
         source.ReadUtf8 (offset, chunkToTansfer, dataChunk);
         WriteUtf8 (offset, chunkToTansfer, dataChunk);
 
-        m_BytesSize += chunkToTansfer, offset += chunkToTansfer, count -= chunkToTansfer;
+        m_BytesSize += chunkToTansfer,
+        offset += chunkToTansfer,
+        count -= chunkToTansfer;
     }
 }
 
@@ -332,7 +362,9 @@ GenericText::Append (I_TextStrategy& text)
       text.ReadUtf8 (appendOffset, chunkSize, chunkData);
       WriteUtf8 (m_BytesSize, chunkSize, chunkData);
 
-      m_BytesSize += chunkSize, appendOffset += chunkSize, toAppend -= chunkSize;
+      m_BytesSize  += chunkSize;
+      appendOffset += chunkSize;
+      toAppend     -= chunkSize;
     }
 }
 
@@ -348,7 +380,7 @@ GenericText::Truncate (D_UINT64 newCharCount)
       D_UINT8 utf8Char;
       ReadUtf8 (offset, 1, &utf8Char);
       offset += get_utf8_char_size (utf8Char);
-      -- newCharCount;
+      --newCharCount;
 
       assert (offset < m_BytesSize);
     }
@@ -369,7 +401,7 @@ GenericText::GetTemporal()
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 
   //Avoid compiler warning! But never will execute!
-  return * _RC(TemporalText *, this);
+  return *_RC(TemporalText*, this);
 }
 
 RowFieldText&
@@ -378,7 +410,7 @@ GenericText::GetRowValue()
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 
   //Avoid compiler warning! But never will execute!
-  return * _RC(RowFieldText *, this);
+  return *_RC(RowFieldText*, this);
 }
 
 
@@ -393,7 +425,7 @@ NullText::~NullText ()
 }
 
 
-D_UINT64
+D_UINT
 NullText::ReferenceCount () const
 {
   return ~0; //Do not allow one to change us!
@@ -411,14 +443,36 @@ NullText::DecreaseReferenceCount ()
   //This is a singleton. Do nothing!
 }
 
+D_UINT
+NullText::ShareCount () const
+{
+  return 0; //Do not allow one to change us!
+}
+
 void
-NullText::ReadUtf8 (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
+NullText::IncreaseShareCount ()
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 void
-NullText::WriteUtf8 (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
+NullText::DecreaseShareCount ()
+{
+  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+}
+
+void
+NullText::ReadUtf8 (const D_UINT64 offset,
+                    const D_UINT64 count,
+                    D_UINT8* const pBuffDest)
+{
+  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+}
+
+void
+NullText::WriteUtf8 (const D_UINT64       offset,
+                     const D_UINT64       count,
+                     const D_UINT8* const pBuffSrc)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
@@ -442,8 +496,10 @@ NullText::GetSingletoneInstace ()
   return nullTextInstance;
 }
 
-RowFieldText::RowFieldText (VLVarsStore& storage, D_UINT64 firstEntry, D_UINT64 bytesSize) :
-    GenericText (bytesSize),
+RowFieldText::RowFieldText (VLVarsStore& storage,
+                            D_UINT64 firstEntry,
+                            D_UINT64 bytesSize)
+  : GenericText (bytesSize),
     m_FirstEntry (firstEntry),
     m_Storage (storage)
 {
@@ -452,12 +508,11 @@ RowFieldText::RowFieldText (VLVarsStore& storage, D_UINT64 firstEntry, D_UINT64 
 
 RowFieldText::~RowFieldText ()
 {
-  assert (m_ReferenceCount == 0);
-  
+  assert ((m_ReferenceCount == 0) && (m_ShareCount == 0));
   m_Storage.DecrementRecordRef (m_FirstEntry);
 }
 
-D_UINT64
+D_UINT
 RowFieldText::ReferenceCount () const
 {
   return ~0; //Do not allow one to change us!
@@ -475,15 +530,38 @@ RowFieldText::DecreaseReferenceCount ()
   GenericText::DecreaseReferenceCount ();
 }
 
+D_UINT
+RowFieldText::ShareCount () const
+{
+  return 0; //Do not allow one to change us!
+}
+
 void
-RowFieldText::ReadUtf8 (const D_UINT64 offset, const D_UINT64 count, D_UINT8* const pBuffDest)
+RowFieldText::IncreaseShareCount ()
+{
+  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+}
+
+void
+RowFieldText::DecreaseShareCount ()
+{
+  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+}
+
+
+void
+RowFieldText::ReadUtf8 (const D_UINT64 offset,
+                        const D_UINT64 count,
+                        D_UINT8* const pBuffDest)
 {
   assert (m_FirstEntry > 0);
   m_Storage.GetRecord (m_FirstEntry, offset, count, pBuffDest);
 }
 
 void
-RowFieldText::WriteUtf8 (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
+RowFieldText::WriteUtf8 (const D_UINT64      offset,
+                         const D_UINT64      count,
+                         const D_UINT8*const pBuffSrc)
 {
   assert (m_FirstEntry > 0);
   m_Storage.UpdateRecord (m_FirstEntry, offset, count, pBuffSrc);
@@ -513,8 +591,8 @@ RowFieldText::ClearMyself ()
   delete this;
 }
 
-TemporalText::TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount) :
-    GenericText (0),
+TemporalText::TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount)
+  : GenericText (0),
     m_Storage (DBSGetTempDir (), TEXT_MEMORY_RESERVE)
 {
   if (pUtf8String == NULL)
@@ -526,18 +604,21 @@ TemporalText::TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount) :
 
 TemporalText::~TemporalText()
 {
-
 }
 
 void
-TemporalText::ReadUtf8 (const D_UINT64 offset, const D_UINT64 count, D_UINT8 *const pBuffDest)
+TemporalText::ReadUtf8 (const D_UINT64 offset,
+                        const D_UINT64 count,
+                        D_UINT8* const pBuffDest)
 {
   assert (m_BytesSize == m_Storage.Size ());
   m_Storage.Read (offset, count, pBuffDest);
 }
 
 void
-TemporalText::WriteUtf8 (const D_UINT64 offset, const D_UINT64 count, const D_UINT8 *const pBuffSrc)
+TemporalText::WriteUtf8 (const D_UINT64 offset,
+                         const D_UINT64 count,
+                         const D_UINT8* const pBuffSrc)
 {
   assert (m_BytesSize == m_Storage.Size ());
   m_Storage.Write (offset, count, pBuffSrc);

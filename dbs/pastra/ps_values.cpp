@@ -58,18 +58,20 @@ is_leap_year (const D_INT year)
 }
 
 static bool
-is_valid_date (D_INT year, D_UINT month, D_UINT day)
+is_valid_date (const D_INT year, const D_UINT month, const D_UINT day)
 {
-  static D_UINT monthDays[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  const D_UINT mnth = month - 1;
+  static D_UINT monthDays[12] =
+                              {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-  if (--month > 11)
+  if (mnth > 11)
     return false;
   else if (day == 0)
     return false;
 
-  if ((month != 1) && (day > monthDays [month]))
+  if ((mnth != 1) && (day > monthDays [mnth]))
     return false;
-  else if (month == 1)
+  else if (mnth == 1)
     {
       if (is_leap_year (year) && (day > (monthDays[1] + 1)))
         return false;
@@ -81,7 +83,12 @@ is_valid_date (D_INT year, D_UINT month, D_UINT day)
 }
 
 static bool
-is_valid_datetime (D_INT year, D_UINT month, D_UINT day, D_UINT hour, D_UINT min, D_UINT sec)
+is_valid_datetime (const D_INT  year,
+                   const D_UINT month,
+                   const D_UINT day,
+                   const D_UINT hour,
+                   const D_UINT min,
+                   const D_UINT sec)
 {
   if (is_valid_date (year, month, day) == false)
     return false;
@@ -93,13 +100,13 @@ is_valid_datetime (D_INT year, D_UINT month, D_UINT day, D_UINT hour, D_UINT min
 }
 
 static bool
-is_valid_hiresdate (D_INT year,
-                    D_UINT month,
-                    D_UINT day,
-                    D_UINT hour,
-                    D_UINT min,
-                    D_UINT sec,
-                    D_UINT microsec)
+is_valid_hiresdate (const D_INT  year,
+                    const D_UINT month,
+                    const D_UINT day,
+                    const D_UINT hour,
+                    const D_UINT min,
+                    const D_UINT sec,
+                    const D_UINT microsec)
 {
   if (is_valid_datetime (year, month, day, hour, min, sec) == false)
     return false;
@@ -110,8 +117,8 @@ is_valid_hiresdate (D_INT year,
   return true;
 }
 
-DBSDate::DBSDate (D_INT32 year, D_UINT8 month, D_UINT8 day) :
-    m_Year (year),
+DBSDate::DBSDate (const D_INT32 year, const D_UINT8 month, const D_UINT8 day)
+  : m_Year (year),
     m_Month (month),
     m_Day (day),
     m_IsNull (false)
@@ -120,13 +127,13 @@ DBSDate::DBSDate (D_INT32 year, D_UINT8 month, D_UINT8 day) :
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATE));
 }
 
-DBSDateTime::DBSDateTime (D_INT32 year,
-                          D_UINT8 month,
-                          D_UINT8 day,
-                          D_UINT8 hour,
-                          D_UINT8 minutes,
-                          D_UINT8 seconds) :
-    m_Year (year),
+DBSDateTime::DBSDateTime (const D_INT32 year,
+                          const D_UINT8 month,
+                          const D_UINT8 day,
+                          const D_UINT8 hour,
+                          const D_UINT8 minutes,
+                          const D_UINT8 seconds)
+  : m_Year (year),
     m_Month (month),
     m_Day (day),
     m_Hour (hour),
@@ -139,14 +146,14 @@ DBSDateTime::DBSDateTime (D_INT32 year,
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
 }
 
-DBSHiresTime::DBSHiresTime (D_INT32 year,
-                            D_UINT8 month,
-                            D_UINT8 day,
-                            D_UINT8 hour,
-                            D_UINT8 minutes,
-                            D_UINT8 seconds,
-                            D_UINT32 microsec) :
-    m_Microsec (microsec),
+DBSHiresTime::DBSHiresTime (const D_INT32 year,
+                            const D_UINT8 month,
+                            const D_UINT8 day,
+                            const D_UINT8 hour,
+                            const D_UINT8 minutes,
+                            const D_UINT8 seconds,
+                            const D_UINT32 microsec)
+  : m_Microsec (microsec),
     m_Year (year),
     m_Month (month),
     m_Day (day),
@@ -156,12 +163,20 @@ DBSHiresTime::DBSHiresTime (D_INT32 year,
     m_IsNull (false)
 {
   if ((m_IsNull == false) &&
-      (is_valid_hiresdate (year, month, day, hour, minutes, seconds, microsec) == false))
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
+      (is_valid_hiresdate (year,
+                           month,
+                           day,
+                           hour,
+                           minutes,
+                           seconds,
+                           microsec) == false))
+    {
+      throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
+    }
 }
 
-DBSText::DBSText (const D_UINT8 *pUtf8String) :
-    m_pText (& NullText::GetSingletoneInstace())
+DBSText::DBSText (const D_UINT8 *pUtf8String)
+  : m_pText (& NullText::GetSingletoneInstace())
 {
   if ((pUtf8String != NULL) && (*pUtf8String != 0))
     {
@@ -169,23 +184,48 @@ DBSText::DBSText (const D_UINT8 *pUtf8String) :
       apText.get ()->IncreaseReferenceCount();
 
       m_pText = apText.release ();
+      assert (m_pText->ReferenceCount () == 1);
+      assert (m_pText->ShareCount () == 0);
     }
 
 }
 
-DBSText::DBSText (I_TextStrategy& text) :
-    m_pText (& NullText::GetSingletoneInstace())
+DBSText::DBSText (I_TextStrategy& text)
+  : m_pText (NULL)
 {
-  text.IncreaseReferenceCount ();
+  if (text.ShareCount () == 0)
+    text.IncreaseReferenceCount ();
+  else
+    {
+      assert (text.ReferenceCount () == 1);
+      text.IncreaseShareCount ();
+    }
+
   m_pText = &text;
 }
 
-DBSText::DBSText (const DBSText& sourceText) :
-    m_pText (& NullText::GetSingletoneInstace())
+DBSText::DBSText (const DBSText& sourceText)
+  : m_pText (NULL)
 {
-  sourceText.m_pText->IncreaseReferenceCount();
+  if (sourceText.m_pText->ShareCount() > 0)
+    {
+      assert (sourceText.m_pText->ReferenceCount () == 1);
 
-  m_pText = sourceText.m_pText;
+      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate (*sourceText.m_pText);
+
+      m_pText = newText.release ();
+      assert (m_pText->ShareCount () == 0);
+      assert (m_pText->ReferenceCount () == 1);
+    }
+  else
+    {
+      sourceText.m_pText->IncreaseReferenceCount ();
+      m_pText = sourceText.m_pText;
+    }
+
+  assert (m_pText != NULL);
 }
 
 DBSText &
@@ -196,10 +236,28 @@ DBSText::operator= (const DBSText& sourceText)
 
   I_TextStrategy* const pText = m_pText;
 
-  sourceText.m_pText->IncreaseReferenceCount();
-  m_pText = sourceText.m_pText;
+  if (sourceText.m_pText->ShareCount() > 0)
+    {
+      assert (sourceText.m_pText->ReferenceCount () == 1);
 
-  pText->DecreaseReferenceCount ();
+      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate (*sourceText.m_pText);
+
+      m_pText = newText.release ();
+      assert (m_pText->ShareCount () == 0);
+      assert (m_pText->ReferenceCount () == 1);
+    }
+  else
+    {
+      sourceText.m_pText->IncreaseReferenceCount();
+      m_pText = sourceText.m_pText;
+    }
+
+  if (pText->ShareCount () > 0)
+    pText->DecreaseShareCount ();
+  else
+    pText->DecreaseReferenceCount ();
 
   return *this;
 }
@@ -207,6 +265,9 @@ DBSText::operator= (const DBSText& sourceText)
 bool
 DBSText::operator== (const DBSText& text)
 {
+  if (m_pText == text.m_pText)
+    return true;
+
   if (IsNull() != text.IsNull())
     return false;
 
@@ -243,7 +304,10 @@ DBSText::operator== (const DBSText& text)
 
 DBSText::~DBSText ()
 {
-  m_pText->DecreaseReferenceCount();
+  if (m_pText->ShareCount () > 0)
+    m_pText->DecreaseShareCount ();
+  else
+    m_pText->DecreaseReferenceCount();
 }
 
 bool
@@ -265,7 +329,9 @@ DBSText::GetRawUtf8Count () const
 }
 
 void
-DBSText::GetRawUtf8 (D_UINT64 offset, D_UINT64 count, D_UINT8 *const pBuffer) const
+DBSText::GetRawUtf8 (D_UINT64 offset,
+                     D_UINT64 count,
+                     D_UINT8* const pBuffer) const
 {
   if (IsNull())
     return;
@@ -288,6 +354,9 @@ DBSText::Append (const DBSChar& character)
 
       m_pText->DecreaseReferenceCount();
       m_pText = newText.release ();
+
+      assert (m_pText->ShareCount () == 0);
+      assert (m_pText->ReferenceCount () == 1);
     }
 
   assert (m_pText->ReferenceCount() != 0);
@@ -309,6 +378,9 @@ DBSText::Append (const DBSText& text)
 
       m_pText->DecreaseReferenceCount();
       m_pText = newText.release ();
+
+      assert (m_pText->ShareCount () == 0);
+      assert (m_pText->ReferenceCount () == 1);
     }
 
   m_pText->Append (*text.m_pText);
@@ -332,18 +404,53 @@ DBSText::SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index)
   newText->IncreaseReferenceCount();
 
   for (D_UINT64 it = 0; it < charsCount; ++it)
-    if (index != it)
-      newText->Append (m_pText->CharAt (it).m_Value);
-    else
-      {
-        if ((rCharacter.m_IsNull) || (rCharacter.m_Value == 0))
-          break ;
+    {
+      if (index == it)
+        {
+          if ((rCharacter.m_IsNull) || (rCharacter.m_Value == 0))
+            break ;
 
-        newText->Append (rCharacter.m_Value);
-      }
+          newText->Append (rCharacter.m_Value);
+        }
+      else
+        newText->Append (m_pText->CharAt (it).m_Value);
+    }
 
-  m_pText->DecreaseReferenceCount();
-  m_pText = newText.release ();
+  if (m_pText->ShareCount () > 0)
+    {
+      assert (m_pText->ReferenceCount() == 1);
+      m_pText->Duplicate (*newText.get ());
+    }
+  else
+    {
+      m_pText->DecreaseReferenceCount ();
+      m_pText = newText.release ();
+    }
+}
+
+void
+DBSText::SetMirror (DBSText& mirror)
+{
+  if (m_pText->ReferenceCount () > 1)
+    {
+      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate (*m_pText);
+      m_pText->DecreaseReferenceCount ();
+
+      m_pText = newText.release ();
+
+      assert (m_pText->ShareCount () == 0);
+      assert (m_pText->ReferenceCount () == 1);
+    }
+
+  if (mirror.m_pText->ShareCount () > 0)
+    mirror.m_pText->DecreaseShareCount ();
+  else
+    mirror.m_pText->DecreaseReferenceCount ();
+
+  m_pText->IncreaseShareCount ();
+  mirror.m_pText = m_pText;
 }
 
 
@@ -389,6 +496,10 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
     }
 
   prOutStrategy->IncrementReferenceCount();
+
+  assert (prOutStrategy->ShareCount () == 0);
+  assert (prOutStrategy->ReferenceCount () == 1);
+
   apArray.release ();
 }
 
@@ -490,21 +601,45 @@ DBSArray::DBSArray (const DBSInt64* array, D_UINT64 count)
 DBSArray::DBSArray (I_ArrayStrategy& strategy)
   : m_pArray (NULL)
 {
-  strategy.IncrementReferenceCount();
+  if (strategy.ShareCount () == 0)
+    strategy.IncrementReferenceCount();
+  else
+   strategy.IncrementShareCount ();
+
   m_pArray = &strategy;
+}
+
+DBSArray::DBSArray (const DBSArray& rSource)
+  : m_pArray (NULL)
+{
+  if (rSource.m_pArray->ShareCount () == 0)
+    {
+      m_pArray = rSource.m_pArray;
+      m_pArray->IncrementReferenceCount ();
+    }
+  else
+    {
+      assert (rSource.m_pArray->ReferenceCount() == 1);
+
+      auto_ptr<I_ArrayStrategy> newStrategy (
+          new TemporalArray (rSource.m_pArray->Type ()));
+
+      newStrategy->Clone (*rSource.m_pArray);
+      newStrategy->IncrementReferenceCount ();
+      m_pArray = newStrategy.release ();
+
+      assert (m_pArray->ShareCount() == 0);
+      assert (m_pArray->ReferenceCount() == 1);
+    }
 }
 
 DBSArray::~DBSArray ()
 {
-  m_pArray->DecrementReferenceCount ();
+  if (m_pArray->ShareCount () == 0)
+    m_pArray->DecrementReferenceCount ();
+  else
+    m_pArray->DecrementShareCount ();
 }
-
-DBSArray::DBSArray (const DBSArray& rSource) :
-    m_pArray (rSource.m_pArray)
-{
-  m_pArray->IncrementReferenceCount ();
-}
-
 
 DBSArray &
 DBSArray::operator= (const DBSArray& rSource)
@@ -519,10 +654,31 @@ DBSArray::operator= (const DBSArray& rSource)
     }
 
   I_ArrayStrategy* pTemp = m_pArray;
-  rSource.m_pArray->IncrementReferenceCount();
-  m_pArray = rSource.m_pArray;
 
-  pTemp->DecrementReferenceCount();
+  if (rSource.m_pArray->ShareCount () == 0)
+    {
+      m_pArray = rSource.m_pArray;
+      m_pArray->IncrementReferenceCount ();
+    }
+  else
+    {
+      assert (rSource.m_pArray->ReferenceCount() == 1);
+
+      auto_ptr<I_ArrayStrategy> newStrategy (
+          new TemporalArray (rSource.m_pArray->Type ()));
+
+      newStrategy->Clone (*rSource.m_pArray);
+      newStrategy->IncrementReferenceCount ();
+      m_pArray = newStrategy.release ();
+
+      assert (m_pArray->ShareCount() == 0);
+      assert (m_pArray->ReferenceCount() == 1);
+    }
+
+  if (pTemp->ShareCount () == 0)
+    pTemp->DecrementReferenceCount ();
+  else
+    pTemp->DecrementShareCount ();
 
   return *this;
 }
@@ -552,18 +708,24 @@ get_aligned_elem_size (DBS_FIELD_TYPE type)
 static void
 prepare_array_strategy (I_ArrayStrategy*& pArrayStrategy)
 {
-  assert (pArrayStrategy->ReferenceCount() > 0);
+  assert (pArrayStrategy->ReferenceCount () > 0);
+  assert ((pArrayStrategy->ShareCount () == 0) ||
+          (pArrayStrategy->ReferenceCount () == 1));
 
   if (pArrayStrategy->ReferenceCount() == 1)
     return ; //Do not change anything
 
-  auto_ptr<I_ArrayStrategy> newStrategy (
-                                new TemporalArray (pArrayStrategy->Type()));
+  auto_ptr <I_ArrayStrategy> newStrategy (
+                                new TemporalArray (pArrayStrategy->Type())
+                                         );
 
   newStrategy->Clone (*pArrayStrategy);
   pArrayStrategy->DecrementReferenceCount();
   pArrayStrategy = newStrategy.release();
   pArrayStrategy->IncrementReferenceCount();
+
+  assert (pArrayStrategy->ShareCount () == 0);
+  assert (pArrayStrategy->ReferenceCount () == 1);
 }
 
 template <class T> inline D_UINT64
@@ -592,7 +754,9 @@ add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
 
   assert (storageSize <= sizeof rawElement);
   PSValInterp::Store (rawElement, element);
-  pArrayStrategy->WriteRaw (pArrayStrategy->RawSize(), storageSize, rawElement);
+  pArrayStrategy->WriteRaw (pArrayStrategy->RawSize(),
+                            storageSize,
+                            rawElement);
 
   assert ((pArrayStrategy->RawSize() % storageSize) == 0);
 
@@ -692,7 +856,9 @@ DBSArray::AddElement (const DBSInt64& value)
 }
 
 template <class T> void
-get_array_element (T& outElement, I_ArrayStrategy* const pArrayStrategy, const D_UINT64 index)
+get_array_element (T&                     outElement,
+                   I_ArrayStrategy* const pArrayStrategy,
+                   const D_UINT64         index)
 {
   if (pArrayStrategy->Count() <= index)
     throw DBSException (NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
@@ -802,13 +968,16 @@ DBSArray::GetElement (DBSInt64& outValue, const D_UINT64 index) const
 
 
 template <class T>  inline void
-set_array_element (I_ArrayStrategy*& pArrayStrategy, const T& value, const D_UINT64 index)
+set_array_element (I_ArrayStrategy*& pArrayStrategy,
+                   const T&          value,
+                   const D_UINT64    index)
 {
   if (index >= pArrayStrategy->Count())
     throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (pArrayStrategy);
-  static const D_UINT storageSize = get_aligned_elem_size (pArrayStrategy->Type());
+  static const D_UINT storageSize = get_aligned_elem_size (
+                                                    pArrayStrategy->Type());
 
   if (value.IsNull())
     {
@@ -946,13 +1115,13 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
   array.GetElement (leftEl, from);
 
   alreadySorted = false;
-  if ((leftEl < pivot) || (leftEl == pivot))
+  if (leftEl <= pivot)
     {
       temp = leftEl;
       while (from < to)
         {
           array.GetElement (leftEl, from + 1);
-          if (((leftEl < pivot) || (leftEl == pivot)) && ((temp < leftEl) || (temp == leftEl)))
+          if ((leftEl <= pivot) && (temp <= leftEl))
             {
               ++from;
               temp = leftEl;
@@ -1019,7 +1188,10 @@ partition (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
 }
 
 template <class DBS_T> D_INT64
-partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorted)
+partition_reverse (DBSArray& array,
+                   D_INT64   from,
+                   D_INT64   to,
+                   bool&     alreadySorted)
 {
   assert (from < to);
   assert (to < _SC(D_INT64, array.ElementsCount()));
@@ -1034,13 +1206,13 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorte
   array.GetElement (leftEl, from);
 
   alreadySorted = false;
-  if ((leftEl < pivot) == false)
+  if (leftEl >= pivot)
     {
       temp = leftEl;
       while (from < to)
         {
           array.GetElement (leftEl, from + 1);
-          if (((leftEl < pivot) == false) && ((temp < leftEl) == false))
+          if ((leftEl >= pivot) && (temp >= leftEl))
             {
               ++from;
               temp = leftEl;
@@ -1108,7 +1280,11 @@ partition_reverse (DBSArray& array, D_INT64 from, D_INT64 to, bool& alreadySorte
 
 struct _partition_t
 {
-  _partition_t (D_UINT64 from, D_UINT64 to) : m_From (from), m_To (to) {}
+  _partition_t (D_UINT64 from, D_UINT64 to)
+    : m_From (from),
+      m_To (to)
+  {
+  }
   D_INT64 m_From;
   D_INT64 m_To;
 };
@@ -1133,9 +1309,15 @@ quick_sort (DBSArray&  array, D_INT64 from, D_INT64 to, const bool reverse)
       bool    alreadySorted;
 
       if (reverse)
-        pivot = partition_reverse<DBS_T> (array, current.m_From, current.m_To, alreadySorted);
+        pivot = partition_reverse<DBS_T> (array,
+                                          current.m_From,
+                                          current.m_To,
+                                          alreadySorted);
       else
-        pivot = partition<DBS_T> (array, current.m_From, current.m_To, alreadySorted);
+        pivot = partition<DBS_T> (array,
+                                  current.m_From,
+                                  current.m_To,
+                                  alreadySorted);
 
       if (alreadySorted == false)
         {
@@ -1206,5 +1388,33 @@ DBSArray::Sort (bool reverse)
 void
 DBSArray::SetMirror (DBSArray& mirror)
 {
-  prepare_array_strategy (m_pArray);
+  if (m_pArray->ReferenceCount() == 1)
+    m_pArray->IncrementShareCount ();
+  else
+    {
+      assert (m_pArray->ShareCount () == 0);
+
+      auto_ptr<I_ArrayStrategy> newStrategy (
+          new TemporalArray (m_pArray->Type ()));
+
+      newStrategy->Clone (*m_pArray);
+      newStrategy->IncrementReferenceCount ();
+      m_pArray->DecrementReferenceCount ();
+      m_pArray = newStrategy.release ();
+
+      assert (m_pArray->ShareCount() == 0);
+      assert (m_pArray->ReferenceCount() == 1);
+
+      m_pArray->IncrementShareCount ();
+    }
+
+  assert (m_pArray->ReferenceCount () == 1);
+
+  if (mirror.m_pArray->ShareCount () == 0)
+    mirror.m_pArray->DecrementReferenceCount ();
+  else
+    mirror.m_pArray->DecrementShareCount ();
+
+  mirror.m_pArray = m_pArray;
 }
+

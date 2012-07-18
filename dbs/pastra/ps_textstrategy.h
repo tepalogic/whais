@@ -36,16 +36,19 @@ namespace pastra
   class RowFieldText;
 }
 
-
 class I_TextStrategy
 {
 public:
   I_TextStrategy () {};
   virtual ~I_TextStrategy() {};
 
-  virtual D_UINT64 ReferenceCount () const = 0;
-  virtual void     IncreaseReferenceCount () = 0;
-  virtual void     DecreaseReferenceCount () = 0;
+  virtual D_UINT ReferenceCount () const = 0;
+  virtual void   IncreaseReferenceCount () = 0;
+  virtual void   DecreaseReferenceCount () = 0;
+
+  virtual D_UINT ShareCount () const = 0;
+  virtual void   IncreaseShareCount () = 0;
+  virtual void   DecreaseShareCount () = 0;
 
   virtual D_UINT64 CharsCount () = 0;
   virtual D_UINT64 BytesCount () const = 0;
@@ -80,10 +83,13 @@ public:
   GenericText (D_UINT64 bytesSize);
 
   //Implementations of public I_TextStrategy
-  virtual D_UINT64 ReferenceCount () const;
+  virtual D_UINT ReferenceCount () const;
+  virtual void   IncreaseReferenceCount ();
+  virtual void   DecreaseReferenceCount ();
 
-  virtual void IncreaseReferenceCount ();
-  virtual void DecreaseReferenceCount ();
+  virtual D_UINT ShareCount () const;
+  virtual void   IncreaseShareCount ();
+  virtual void   DecreaseShareCount ();
 
   virtual D_UINT64 CharsCount ();
   virtual D_UINT64 BytesCount () const;
@@ -99,21 +105,25 @@ public:
   virtual RowFieldText& GetRowValue ();
 
 protected:
-  virtual ~GenericText () {};
+  virtual ~GenericText ();
   virtual void ClearMyself () = 0;
 
   D_UINT64 m_BytesSize;
-  D_UINT64 m_ReferenceCount;
+  D_UINT   m_ReferenceCount;
+  D_UINT   m_ShareCount;
 };
 
 class NullText : public GenericText
 {
 public:
   //Implementations of I_TextStrategy
+  virtual D_UINT ReferenceCount () const;
+  virtual void   IncreaseReferenceCount ();
+  virtual void   DecreaseReferenceCount ();
 
-  virtual D_UINT64 ReferenceCount () const;
-  virtual void     IncreaseReferenceCount ();
-  virtual void     DecreaseReferenceCount ();
+  virtual D_UINT ShareCount () const;
+  virtual void   IncreaseShareCount ();
+  virtual void   DecreaseShareCount ();
 
   virtual void ReadUtf8 (const D_UINT64 offset,
                          const D_UINT64 count,
@@ -141,9 +151,13 @@ public:
   RowFieldText (VLVarsStore& storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
 
 protected:
-  virtual D_UINT64 ReferenceCount () const;
-  virtual void     IncreaseReferenceCount ();
-  virtual void     DecreaseReferenceCount ();
+  virtual D_UINT ReferenceCount () const;
+  virtual void   IncreaseReferenceCount ();
+  virtual void   DecreaseReferenceCount ();
+
+  virtual D_UINT ShareCount () const;
+  virtual void   IncreaseShareCount ();
+  virtual void   DecreaseShareCount ();
 
   //Implementations of I_TextStrategy
   virtual void ReadUtf8 (const D_UINT64 offset,

@@ -354,6 +354,212 @@ test_hiresdate_array ()
   return result;
 }
 
+bool
+test_array_mirroring ()
+{
+  static D_UINT32 firstVals[] = {10, 1, 233, 0x4545};
+  static D_UINT32 secondVals[] = {0, 12, 45};
+  std::cout << "Testing array mirroring ...";
+  bool result = true;
+
+  DBSArray array1 ((DBSUInt32*)NULL);
+  DBSArray array2 ((DBSUInt32*)NULL);
+
+  array1.AddElement (DBSUInt32 (firstVals[0]));
+  array1.AddElement (DBSUInt32 (firstVals[1]));
+  array1.AddElement (DBSUInt32 (firstVals[2]));
+
+  array2.AddElement (DBSUInt32 (secondVals[0]));
+  array2.AddElement (DBSUInt32 (secondVals[1]));
+  array2.AddElement (DBSUInt32 (secondVals[2]));
+
+  if (array2.ElementsCount () != array1.ElementsCount ())
+    result = false;
+
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != secondVals[index])
+        {
+          result = false;
+          continue;
+       }
+    }
+
+  array2 = array1;
+
+  if (array2.ElementsCount () != array1.ElementsCount ())
+    result = false;
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+    }
+
+  array1.SetElement(DBSUInt32 (0xFFFF), 0);
+  if (array2.ElementsCount () != array1.ElementsCount ())
+    result = false;
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (index == 0)
+        {
+          if (temp.m_Value != 0xFFFF)
+            {
+              result = false;
+              continue;
+            }
+        }
+      else if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+    }
+
+  array2.SetMirror (array1);
+  if (array2.ElementsCount () != array1.ElementsCount ())
+    result = false;
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+    }
+
+  array1.AddElement (DBSUInt32 (firstVals [3]));
+  if (array2.ElementsCount () != array1.ElementsCount ())
+    result = false;
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+    }
+
+  DBSArray array3((DBSUInt32*) NULL);
+  array3 = array1;
+
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+
+      array3.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+    }
+
+  array3.SetElement (DBSUInt32 (0), 0);
+  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+    {
+      DBSUInt32 temp;
+      array1.GetElement (temp, index);
+
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+        }
+
+      array2.GetElement (temp, index);
+      if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+
+      array3.GetElement (temp, index);
+      if ((index == 0))
+        {
+          if (temp.m_Value != 0)
+            {
+              result = false;
+              continue;
+            }
+        }
+      else if (temp.m_Value != firstVals[index])
+        {
+          result = false;
+          continue;
+       }
+
+    }
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  return result;
+}
 
 int
 main ()
@@ -378,6 +584,7 @@ main ()
   success = success && test_dates_array ();
   success = success && test_datetimes_array ();
   success = success && test_hiresdate_array ();
+  success = success && test_array_mirroring ();
 
 
   DBSShoutdown ();
