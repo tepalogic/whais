@@ -1,6 +1,6 @@
 UNIT_EXES+=test_session
 test_session_SRC=test/test_session.cpp
-test_session_LIB=dbs/pastra  custom/custom interpreter/prima compiler/compiler utils/utils
+test_session_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
 test_session_INC=utils/include custom/include dbs/include compiler/include
 
 UNIT_EXES+=test_namespaces
@@ -10,7 +10,13 @@ test_namespaces_INC=utils/include custom/include dbs/include compiler/include
 
 UNIT_EXES+=test_operations
 test_operations_SRC=test/test_operations.cpp
-test_operations_LIB=dbs/pastra  custom/custom interpreter/prima compiler/compiler utils/utils
+test_operations_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
 test_operations_INC=utils/include custom/include dbs/include compiler/include
+
+UNIT_EXES+=test_bool_operand
+test_bool_operand_SRC=test/test_bool_operand.cpp
+test_bool_operand_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
+test_bool_operand_INC=utils/include custom/include dbs/include compiler/include
+
 
 

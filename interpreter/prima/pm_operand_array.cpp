@@ -55,6 +55,51 @@ ArrayOperand::SetValue (const DBSArray& value)
   m_Value = value;
 }
 
+StackValue
+ArrayOperand::GetValueAt (const D_UINT64 index)
+{
+  if (index >= m_Value.ElementsCount ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_ROW_INDEX));
+
+  switch (m_Value.ElementsType ())
+  {
+  case T_BOOL:
+    return StackValue (BoolArrayElOperand (m_Value, index));
+  case T_CHAR:
+    return StackValue (CharArrayElOperand (m_Value, index));
+  case T_DATE:
+    return StackValue (DateArrayElOperand (m_Value, index));
+  case T_DATETIME:
+    return StackValue (DateTimeArrayElOperand (m_Value, index));
+  case T_HIRESTIME:
+    return StackValue (HiresTimeArrayElOperand (m_Value, index));
+  case T_UINT8:
+    return StackValue (UInt8ArrayElOperand (m_Value, index));
+  case T_UINT16:
+    return StackValue (UInt16ArrayElOperand (m_Value, index));
+  case T_UINT32:
+    return StackValue (UInt16ArrayElOperand (m_Value, index));
+  case T_UINT64:
+    return StackValue (UInt64ArrayElOperand (m_Value, index));
+  case T_INT8:
+    return StackValue (Int8ArrayElOperand (m_Value, index));
+  case T_INT16:
+    return StackValue (Int16ArrayElOperand (m_Value, index));
+  case T_INT32:
+    return StackValue (Int16ArrayElOperand (m_Value, index));
+  case T_INT64:
+    return StackValue (Int64ArrayElOperand (m_Value, index));
+  case T_REAL:
+    return StackValue (RealArrayElOperand (m_Value, index));
+  case T_RICHREAL:
+    return StackValue (RichRealArrayElOperand (m_Value, index));
+  default:
+    assert (false);
+  }
+
+  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+}
+
 //////////////////////////BoolArrayElOperand///////////////////////////////////
 
 BoolArrayElOperand::~BoolArrayElOperand ()

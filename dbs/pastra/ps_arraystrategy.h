@@ -55,6 +55,10 @@ public:
   virtual void   IncrementReferenceCount ();
   virtual void   DecrementReferenceCount ();
 
+  virtual D_UINT ShareCount () const;
+  virtual void   IncrementShareCount ();
+  virtual void   DecrementShareCount ();
+
   virtual void     ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) = 0;
   virtual void     WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData) = 0;
   virtual void     CollapseRaw (const D_UINT64 offset, const D_UINT64 count) = 0;
@@ -70,6 +74,7 @@ public:
 protected:
   D_UINT64              m_ElementsCount;
   D_UINT                m_ReferenceCount;
+  D_UINT                m_ShareCount;
   const DBS_FIELD_TYPE  m_ElementsType;
 
 private:

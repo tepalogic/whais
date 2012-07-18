@@ -112,7 +112,7 @@ public:
   //Special treatment for these
   virtual FIELD_INDEX   GetField ();
   virtual I_DBSTable&   GetTable ();
-  virtual StackValue    GetValueAt (const D_UINT64 index) const;
+  virtual StackValue    GetValueAt (const D_UINT64 index);
 };
 
 class StackValue

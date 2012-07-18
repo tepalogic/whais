@@ -39,6 +39,7 @@ static D_UINT ARRAY_MEMORY_RESERVE = 4096; //4KB
 I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType) :
     m_ElementsCount (0),
     m_ReferenceCount (0),
+    m_ShareCount (1),
     m_ElementsType (elemsType)
 {
 }
@@ -69,6 +70,26 @@ I_ArrayStrategy::DecrementReferenceCount ()
   if (m_ReferenceCount == 0)
     delete this;
 }
+
+D_UINT
+I_ArrayStrategy::ShareCount () const
+{
+  return m_ShareCount;
+}
+
+void
+I_ArrayStrategy::IncrementShareCount ()
+{
+  ++ m_ShareCount;
+}
+
+void
+I_ArrayStrategy::DecrementShareCount ()
+{
+  -- m_ShareCount;
+  assert (m_ShareCount > 0);
+}
+
 
 void
 I_ArrayStrategy::Clone (I_ArrayStrategy& strategy)

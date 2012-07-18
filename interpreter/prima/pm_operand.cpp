@@ -356,7 +356,7 @@ I_Operand::GetTable ()
 }
 
 StackValue
-I_Operand::GetValueAt (const D_UINT64 index) const
+I_Operand::GetValueAt (const D_UINT64 index)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }

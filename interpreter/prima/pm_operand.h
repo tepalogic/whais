@@ -730,6 +730,8 @@ public:
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
 
+  virtual StackValue GetValueAt (const D_UINT64 index);
+
 private:
   DBSArray m_Value;
 };
@@ -863,6 +865,7 @@ private:
 
 class UInt8ArrayElOperand : public I_Operand
 {
+public:
   UInt8ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -908,6 +911,7 @@ private:
 
 class UInt16ArrayElOperand : public I_Operand
 {
+public:
   UInt16ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -953,6 +957,7 @@ private:
 
 class UInt32ArrayElOperand : public I_Operand
 {
+public:
   UInt32ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -998,6 +1003,7 @@ private:
 
 class UInt64ArrayElOperand : public I_Operand
 {
+public:
   UInt64ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1043,6 +1049,7 @@ private:
 
 class Int8ArrayElOperand : public I_Operand
 {
+public:
   Int8ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1088,6 +1095,7 @@ private:
 
 class Int16ArrayElOperand : public I_Operand
 {
+public:
   Int16ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1133,6 +1141,7 @@ private:
 
 class Int32ArrayElOperand : public I_Operand
 {
+public:
   Int32ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1178,6 +1187,7 @@ private:
 
 class Int64ArrayElOperand : public I_Operand
 {
+public:
   Int64ArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1223,6 +1233,7 @@ private:
 
 class RealArrayElOperand : public I_Operand
 {
+public:
   RealArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1258,6 +1269,7 @@ private:
 
 class RichRealArrayElOperand : public I_Operand
 {
+public:
   RichRealArrayElOperand (DBSArray& array, const D_UINT64 index)
     : I_Operand (),
       m_ElementIndex (index),
@@ -1290,7 +1302,6 @@ private:
   const D_UINT64 m_ElementIndex;
   DBSArray&      m_Array;
 };
-
 
 class TableOperand : public I_Operand
 {

@@ -1095,6 +1095,8 @@ public:
   void RemoveElement (const D_UINT64 index);
   void Sort (bool reverse = false);
 
+  void SetMirror (DBSArray& mirror);
+
   operator I_ArrayStrategy&() const { return *m_pArray; }
 
 private:

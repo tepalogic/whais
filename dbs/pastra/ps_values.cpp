@@ -557,7 +557,8 @@ prepare_array_strategy (I_ArrayStrategy*& pArrayStrategy)
   if (pArrayStrategy->ReferenceCount() == 1)
     return ; //Do not change anything
 
-  auto_ptr <I_ArrayStrategy> newStrategy (new TemporalArray (pArrayStrategy->Type()));
+  auto_ptr<I_ArrayStrategy> newStrategy (
+                                new TemporalArray (pArrayStrategy->Type()));
 
   newStrategy->Clone (*pArrayStrategy);
   pArrayStrategy->DecrementReferenceCount();
@@ -569,7 +570,16 @@ template <class T> inline D_UINT64
 add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
 {
   if (pArrayStrategy->Type() != element.GetDBSType ())
-    throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+    {
+      if (pArrayStrategy->Type () != T_UNDETERMINED)
+        throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+
+      assert (pArrayStrategy ==
+              &NullArray::GetSingletoneInstace (T_UNDETERMINED));
+      pArrayStrategy = &NullArray::GetSingletoneInstace (element.GetDBSType ());
+
+      return add_array_element (element, pArrayStrategy);
+    }
   else if (element.IsNull())
     throw DBSException (NULL, _EXTRA (DBSException::NULL_ARRAY_ELEMENT));
 
@@ -1191,4 +1201,10 @@ DBSArray::Sort (bool reverse)
   default:
     assert (false);
   }
+}
+
+void
+DBSArray::SetMirror (DBSArray& mirror)
+{
+  prepare_array_strategy (m_pArray);
 }
