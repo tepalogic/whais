@@ -36,8 +36,9 @@ using namespace std;
 
 static D_UINT ARRAY_MEMORY_RESERVE = 4096; //4KB
 
-I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType) :
-    m_ElementsCount (0),
+I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType)
+  : m_ElementsCount (0),
+    m_ShareCount (0),
     m_ReferenceCount (0),
     m_ElementsType (elemsType)
 {
@@ -46,6 +47,7 @@ I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType) :
 I_ArrayStrategy::~I_ArrayStrategy()
 {
   assert (m_ReferenceCount == 0);
+  assert (m_ShareCount == 0);
 }
 
 D_UINT
@@ -57,17 +59,42 @@ I_ArrayStrategy::ReferenceCount() const
 void
 I_ArrayStrategy::IncrementReferenceCount ()
 {
-  ++ m_ReferenceCount;
+  assert (m_ShareCount == 0);
+  ++m_ReferenceCount;
 }
 
 void
 I_ArrayStrategy::DecrementReferenceCount ()
 {
   assert (m_ReferenceCount > 0);
+  assert (m_ShareCount == 0);
 
-  -- m_ReferenceCount;
+  --m_ReferenceCount;
   if (m_ReferenceCount == 0)
     delete this;
+}
+
+
+D_UINT
+I_ArrayStrategy::ShareCount () const
+{
+  return m_ShareCount;
+}
+
+void
+I_ArrayStrategy::IncrementShareCount ()
+{
+  assert (m_ReferenceCount == 1);
+  ++m_ShareCount;
+}
+
+void
+I_ArrayStrategy::DecrementShareCount ()
+{
+  assert (m_ReferenceCount == 1);
+  assert (m_ShareCount > 0);
+
+  --m_ShareCount;
 }
 
 void
@@ -115,8 +142,8 @@ I_ArrayStrategy::GetRowValue()
 }
 
 
-NullArray::NullArray (const DBS_FIELD_TYPE elemsType) :
-    I_ArrayStrategy (elemsType)
+NullArray::NullArray (const DBS_FIELD_TYPE elemsType)
+  : I_ArrayStrategy (elemsType)
 {
 }
 
@@ -127,7 +154,7 @@ NullArray::~NullArray ()
 D_UINT
 NullArray::ReferenceCount () const
 {
-  return ~0; //All 1s (e.g. but not 0 to force new allocation when is modified).
+  return ~0; //To force new allocation when it will be modified.
 }
 
 void
@@ -142,23 +169,47 @@ NullArray::DecrementReferenceCount ()
   return ; //Do nothing as we are a singletone that lifes for ever.
 }
 
-void
-NullArray::ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
+D_UINT
+NullArray::ShareCount () const
 {
-  //Some does not know what is doing!
+  return 0;
+}
+
+void
+NullArray::IncrementShareCount ()
+{
+  //Someone does not know what is doing!
+  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+}
+
+void
+NullArray::DecrementShareCount ()
+{
+  //Someone does not know what is doing!
+  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+}
+
+void
+NullArray::ReadRaw (const D_UINT64 offset,
+                    const D_UINT64 length,
+                    D_UINT8*const  pData)
+{
+  //Someone does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 void
-NullArray::WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
+NullArray::WriteRaw (const D_UINT64       offset,
+                     const D_UINT64       length,
+                     const D_UINT8* const pData)
 {
-  //Some does not know what is doing!
+  //Someone does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 void
 NullArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 {
-  //Some does not know what is doing!
+  //Someone does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
@@ -241,12 +292,16 @@ TemporalArray::~TemporalArray ()
 }
 
 void
-TemporalArray::ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
+TemporalArray::ReadRaw (const D_UINT64 offset,
+                        const D_UINT64 length,
+                        D_UINT8 *const pData)
 {
   m_Storage.Read (offset, length, pData);
 }
 void
-TemporalArray::WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
+TemporalArray::WriteRaw (const D_UINT64       offset,
+                         const D_UINT64       length,
+                         const D_UINT8 *const pData)
 {
   m_Storage.Write (offset, length, pData);
 }
@@ -270,15 +325,20 @@ TemporalArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 }
 
 
-RowFieldArray::RowFieldArray (VLVarsStore& storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type) :
-    I_ArrayStrategy (type),
+RowFieldArray::RowFieldArray (VLVarsStore&   storage,
+                              D_UINT64       firstRecordEntry,
+                              DBS_FIELD_TYPE type)
+  : I_ArrayStrategy (type),
     m_FirstRecordEntry (firstRecordEntry),
     m_Storage (storage)
 {
   assert (m_FirstRecordEntry > 0);
 
   m_Storage.IncrementRecordRef (m_FirstRecordEntry);
-  m_Storage.GetRecord (firstRecordEntry, 0, sizeof (m_ElementsCount), _RC(D_UINT8*, &m_ElementsCount));
+  m_Storage.GetRecord (firstRecordEntry,
+                       0,
+                       sizeof (m_ElementsCount),
+                       _RC(D_UINT8*, &m_ElementsCount));
 }
 
 RowFieldArray::~RowFieldArray ()
@@ -307,12 +367,19 @@ RowFieldArray::GetRowValue()
 }
 
 void
-RowFieldArray::ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData)
+RowFieldArray::ReadRaw (const D_UINT64 offset,
+                        const D_UINT64 length,
+                        D_UINT8* const pData)
 {
-  m_Storage.GetRecord(m_FirstRecordEntry, offset + sizeof (D_UINT64), length, pData);
+  m_Storage.GetRecord (m_FirstRecordEntry,
+                       offset + sizeof (D_UINT64),
+                       length,
+                       pData);
 }
 void
-RowFieldArray::WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData)
+RowFieldArray::WriteRaw (const D_UINT64       offset,
+                         const D_UINT64       length,
+                         const D_UINT8 *const pData)
 {
   //We are not allowed to modify the row entry directly
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));

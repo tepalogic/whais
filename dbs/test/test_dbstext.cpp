@@ -266,7 +266,6 @@ test_text_append ()
         }
     }
 
-
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
 }
@@ -274,7 +273,6 @@ test_text_append ()
 static bool
 test_character_insertion ()
 {
-
   std::cout << "Testing for text insertion ... ";
   bool result = true;
 
@@ -335,6 +333,38 @@ test_character_insertion ()
   return result;
 }
 
+bool
+test_text_mirroring ()
+{
+  std::cout << "Testing for text mirroring ... ";
+  bool result = true;
+
+  const DBSText arbiter (_RC(const D_UINT8*, "Love is all you need!"));
+  const DBSText arbiter2 (_RC(const D_UINT8*, "B"));
+
+  DBSText firstText (_RC(const D_UINT8*, "A"));
+  DBSText secondText (firstText);
+
+  if (firstText != secondText)
+    result = false;
+
+  secondText = arbiter;
+  if ((firstText == secondText) || (secondText != arbiter))
+    result = false;
+
+  firstText.SetMirror (secondText);
+  if (firstText != secondText)
+    result = false;
+
+
+  secondText.SetCharAtIndex (DBSChar ('B'), 0);
+  if ((secondText != firstText) || (secondText != arbiter2))
+    result = false;
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  return result;
+}
+
 
 int
 main ()
@@ -354,6 +384,7 @@ main ()
   success = success && test_nulliness ();
   success = success && test_text_append ();
   success = success && test_character_insertion ();
+  success = success && test_text_mirroring ();
 
   DBSShoutdown ();
   D_UINT mem_usage = test_get_mem_used () - prealloc_mem;

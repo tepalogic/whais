@@ -54,10 +54,19 @@ public:
   virtual D_UINT ReferenceCount () const;
   virtual void   IncrementReferenceCount ();
   virtual void   DecrementReferenceCount ();
+  virtual D_UINT ShareCount () const;
+  virtual void   IncrementShareCount ();
+  virtual void   DecrementShareCount ();
 
-  virtual void     ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData) = 0;
-  virtual void     WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData) = 0;
-  virtual void     CollapseRaw (const D_UINT64 offset, const D_UINT64 count) = 0;
+  //Implements of I_ArrayStrategy
+  virtual void     ReadRaw (const D_UINT64 offset,
+                            const D_UINT64 length,
+                            D_UINT8 *const pData) = 0;
+  virtual void     WriteRaw (const D_UINT64       offset,
+                             const D_UINT64       length,
+                             const D_UINT8 *const pData) = 0;
+  virtual void     CollapseRaw (const D_UINT64 offset,
+                                const D_UINT64 count) = 0;
   virtual D_UINT64 RawSize () const = 0 ;
 
   void Clone (I_ArrayStrategy& strategy);
@@ -69,6 +78,7 @@ public:
 
 protected:
   D_UINT64              m_ElementsCount;
+  D_UINT                m_ShareCount;
   D_UINT                m_ReferenceCount;
   const DBS_FIELD_TYPE  m_ElementsType;
 
@@ -94,10 +104,18 @@ protected:
   virtual D_UINT ReferenceCount () const;
   virtual void   IncrementReferenceCount ();
   virtual void   DecrementReferenceCount ();
+  virtual D_UINT ShareCount () const;
+  virtual void   IncrementShareCount ();
+  virtual void   DecrementShareCount ();
 
   //Implements of I_ArrayStrategy
-  virtual void     ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData);
-  virtual void     WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData);
+  //Implements of I_ArrayStrategy
+  virtual void     ReadRaw (const D_UINT64 offset,
+                            const D_UINT64 length,
+                            D_UINT8 *const pData);
+  virtual void     WriteRaw (const D_UINT64       offset,
+                             const D_UINT64       length,
+                             const D_UINT8 *const pData);
   virtual void     CollapseRaw (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 RawSize () const;
 };
@@ -110,9 +128,13 @@ public:
   virtual ~TemporalArray ();
 
 protected:
-   //Implements of I_ArrayStrategy
-  virtual void     ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData);
-  virtual void     WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData);
+  //Implements of I_ArrayStrategy
+  virtual void     ReadRaw (const D_UINT64 offset,
+                            const D_UINT64 length,
+                            D_UINT8 *const pData);
+  virtual void     WriteRaw (const D_UINT64       offset,
+                             const D_UINT64       length,
+                             const D_UINT8 *const pData);
   virtual void     CollapseRaw (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 RawSize () const;
 
@@ -125,7 +147,9 @@ class RowFieldArray : public I_ArrayStrategy
 {
   friend class PrototypeTable;
 public:
-  RowFieldArray (VLVarsStore& storage, D_UINT64 firstRecordEntry, DBS_FIELD_TYPE type);
+  RowFieldArray (VLVarsStore& storage,
+                 D_UINT64 firstRecordEntry,
+                 DBS_FIELD_TYPE type);
   ~RowFieldArray ();
 
 protected:
@@ -135,8 +159,12 @@ protected:
   virtual pastra::RowFieldArray& GetRowValue();
 
   //Implements of I_ArrayStrategy
-  virtual void     ReadRaw (const D_UINT64 offset, const D_UINT64 length, D_UINT8 *const pData);
-  virtual void     WriteRaw (const D_UINT64 offset, const D_UINT64 length, const D_UINT8 *const pData);
+  virtual void     ReadRaw (const D_UINT64 offset,
+                            const D_UINT64 length,
+                            D_UINT8 *const pData);
+  virtual void     WriteRaw (const D_UINT64       offset,
+                             const D_UINT64       length,
+                             const D_UINT8 *const pData);
   virtual void     CollapseRaw (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 RawSize () const;
 
@@ -145,7 +173,6 @@ protected:
 private:
   RowFieldArray (const RowFieldArray&);
   RowFieldArray& operator= (const RowFieldArray&);
-
 };
 
 }
