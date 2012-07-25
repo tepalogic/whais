@@ -55,40 +55,40 @@ test_fields (I_DBSTable& table)
   if (table.GetFieldsCount () != descCount)
     return false;
 
-  field_d = table.GetFieldDescriptor ("Field_1");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("Field_1"));
   if (field_d != field_descs[0])
     return false;
 
-  field_d = table.GetFieldDescriptor ("AnotherField");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("AnotherField"));
   if (field_d != field_descs[1])
     return false;
 
-  field_d = table.GetFieldDescriptor ("dumy2field_");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("dumy2field_"));
   if (field_d != field_descs[2])
     return false;
 
-  field_d = table.GetFieldDescriptor ("dumy21field_");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("dumy21field_"));
   if (field_d != field_descs[3])
     return false;
 
-  field_d = table.GetFieldDescriptor ("dumy22field_");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("dumy22field_"));
   if (field_d != field_descs[4])
     return false;
 
 
-  field_d = table.GetFieldDescriptor ("f_data");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_data"));
   if (field_d != field_descs[5])
     return false;
 
-  field_d = table.GetFieldDescriptor ("f_int16");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_int16"));
   if (field_d != field_descs[6])
     return false;
 
-  field_d = table.GetFieldDescriptor ("f_hirestime");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_hirestime"));
   if (field_d != field_descs[7])
     return false;
 
-  field_d = table.GetFieldDescriptor ("f_int8");
+  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_int8"));
   if (field_d != field_descs[8])
     return false;
 

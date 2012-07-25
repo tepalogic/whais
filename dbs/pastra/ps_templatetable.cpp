@@ -87,6 +87,28 @@ PrototypeTable::GetFieldsCount ()
   return m_FieldsCount;
 }
 
+FIELD_INDEX
+PrototypeTable::GetFieldIndex (const D_CHAR* pFieldName)
+{
+  const FieldDescriptor* const pDesc = _RC (const FieldDescriptor*,
+                                            m_FieldsDescriptors.get ());
+  D_UINT64 iterator = m_FieldsCount * sizeof(FieldDescriptor);
+
+  for (FIELD_INDEX index = 0; index < m_FieldsCount; ++index)
+    {
+      if (strcmp(_RC (const D_CHAR*,
+                 m_FieldsDescriptors.get() + iterator),
+                 pFieldName) == 0)
+        {
+          return index;
+        }
+      iterator += strlen(_RC(const D_CHAR*, pDesc) + iterator) + 1;
+    }
+
+  throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+}
+
+
 DBSFieldDescriptor
 PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
 {
@@ -108,35 +130,6 @@ PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
   return result;
 }
 
-DBSFieldDescriptor
-PrototypeTable::GetFieldDescriptor (const D_CHAR* const pFieldName)
-{
-  const FieldDescriptor* const pDesc = _RC (const FieldDescriptor*,
-                                            m_FieldsDescriptors.get ());
-  D_UINT64 iterator = m_FieldsCount * sizeof(FieldDescriptor);
-
-  for (FIELD_INDEX index = 0; index < m_FieldsCount; ++index)
-    {
-      if (strcmp(_RC (const D_CHAR*,
-                 m_FieldsDescriptors.get() + iterator),
-                 pFieldName) == 0)
-        {
-          DBSFieldDescriptor result;
-
-          result.m_pFieldName = _RC (const D_CHAR*, pDesc) + iterator;
-          result.isArray =
-              (pDesc[index].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-          result.m_FieldType = _SC (
-                           DBS_FIELD_TYPE,
-                           pDesc[index].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK
-                                   );
-          return result;
-        }
-      iterator += strlen(_RC(const D_CHAR*, pDesc) + iterator) + 1;
-    }
-
-  throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
-}
 
 ROW_INDEX
 PrototypeTable::GetAllocatedRows ()
@@ -201,8 +194,6 @@ PrototypeTable::AddReusedRow ()
                                          pNode->DataToRead ());
       result = pRows [keyIndex];
     }
-
-  assert (result > 0);
 
   return result;
 }
@@ -410,28 +401,6 @@ PrototypeTable::GetFieldDescriptorInternal(const FIELD_INDEX field) const
     throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
 
   return pDesc[field];
-}
-
-FieldDescriptor&
-PrototypeTable::GetFieldDescriptorInternal(const D_CHAR* const pFieldName) const
-{
-
-  FieldDescriptor* const pDesc    = _RC (FieldDescriptor*,
-                                         m_FieldsDescriptors.get ());
-  D_UINT64               iterator = m_FieldsCount * sizeof(FieldDescriptor);
-
-  for (FIELD_INDEX index = 0; index < m_FieldsCount; ++index)
-    {
-      if (strcmp (_RC(const D_CHAR*, m_FieldsDescriptors.get() + iterator),
-                  pFieldName) == 0)
-        {
-          return pDesc[index];
-        }
-
-      iterator += strlen( _RC(const D_CHAR*, pDesc) + iterator) + 1;
-    }
-
-  throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
 }
 
 D_UINT64
@@ -1210,9 +1179,13 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if ( ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
-          ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
-           _SC(D_UINT, outValue.ElementsType())))
+  if (((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0)
+      ||
+          (((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+              _SC(D_UINT, outValue.ElementsType()))
+          &&
+          (outValue.ElementsType () != T_UNDETERMINED)))
+
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }

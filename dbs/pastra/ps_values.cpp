@@ -429,7 +429,7 @@ DBSText::SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index)
 }
 
 void
-DBSText::SetMirror (DBSText& mirror)
+DBSText::SetMirror (DBSText& mirror) const
 {
   if (m_pText->ReferenceCount () > 1)
     {
@@ -438,7 +438,7 @@ DBSText::SetMirror (DBSText& mirror)
       newText.get()->Duplicate (*m_pText);
       m_pText->DecreaseReferenceCount ();
 
-      m_pText = newText.release ();
+      _CC (DBSText*, this)->m_pText = newText.release ();
 
       assert (m_pText->ShareCount () == 0);
       assert (m_pText->ReferenceCount () == 1);
@@ -1386,7 +1386,7 @@ DBSArray::Sort (bool reverse)
 }
 
 void
-DBSArray::SetMirror (DBSArray& mirror)
+DBSArray::SetMirror (DBSArray& mirror) const
 {
   if (m_pArray->ReferenceCount() == 1)
     m_pArray->IncrementShareCount ();
@@ -1400,7 +1400,7 @@ DBSArray::SetMirror (DBSArray& mirror)
       newStrategy->Clone (*m_pArray);
       newStrategy->IncrementReferenceCount ();
       m_pArray->DecrementReferenceCount ();
-      m_pArray = newStrategy.release ();
+      _CC (DBSArray*, this)->m_pArray = newStrategy.release ();
 
       assert (m_pArray->ShareCount() == 0);
       assert (m_pArray->ReferenceCount() == 1);

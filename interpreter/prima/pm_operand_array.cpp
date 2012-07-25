@@ -78,7 +78,7 @@ ArrayOperand::GetValueAt (const D_UINT64 index)
   case T_UINT16:
     return StackValue (UInt16ArrayElOperand (m_Value, index));
   case T_UINT32:
-    return StackValue (UInt16ArrayElOperand (m_Value, index));
+    return StackValue (UInt32ArrayElOperand (m_Value, index));
   case T_UINT64:
     return StackValue (UInt64ArrayElOperand (m_Value, index));
   case T_INT8:
@@ -86,7 +86,7 @@ ArrayOperand::GetValueAt (const D_UINT64 index)
   case T_INT16:
     return StackValue (Int16ArrayElOperand (m_Value, index));
   case T_INT32:
-    return StackValue (Int16ArrayElOperand (m_Value, index));
+    return StackValue (Int32ArrayElOperand (m_Value, index));
   case T_INT64:
     return StackValue (Int64ArrayElOperand (m_Value, index));
   case T_REAL:
@@ -100,11 +100,13 @@ ArrayOperand::GetValueAt (const D_UINT64 index)
   throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
 }
 
-//////////////////////////BoolArrayElOperand///////////////////////////////////
+//////////////////////////////ArrayElOperand///////////////////////////////////
 
-BoolArrayElOperand::~BoolArrayElOperand ()
+BaseArrayElOperand::~BaseArrayElOperand ()
 {
 }
+
+//////////////////////////BoolArrayElOperand///////////////////////////////////
 
 bool
 BoolArrayElOperand::IsNull () const
@@ -165,10 +167,6 @@ BoolArrayElOperand::SelfOr (const DBSBool& value)
 
 //////////////////////////CharArrayElOperand///////////////////////////////////
 
-CharArrayElOperand::~CharArrayElOperand ()
-{
-}
-
 bool
 CharArrayElOperand::IsNull () const
 {
@@ -204,10 +202,6 @@ CharArrayElOperand::SetValue (const DBSChar& value)
 }
 
 //////////////////////////DateArrayElOperand///////////////////////////////////
-
-DateArrayElOperand::~DateArrayElOperand ()
-{
-}
 
 bool
 DateArrayElOperand::IsNull () const
@@ -266,10 +260,6 @@ DateArrayElOperand::SetValue (const DBSDate& value)
 }
 
 /////////////////////////DateTimeArrayElOperand////////////////////////////////
-
-DateTimeArrayElOperand::~DateTimeArrayElOperand ()
-{
-}
 
 bool
 DateTimeArrayElOperand::IsNull () const
@@ -331,10 +321,6 @@ HiresTimeArrayElOperand::IsNull () const
   return false;
 }
 
-HiresTimeArrayElOperand::~HiresTimeArrayElOperand ()
-{
-}
-
 void
 HiresTimeArrayElOperand::GetValue (DBSDate& outValue) const
 {
@@ -380,10 +366,6 @@ HiresTimeArrayElOperand::SetValue (const DBSHiresTime& value)
 }
 
 //////////////////////////UInt8ArrayElOperand//////////////////////////////////
-
-UInt8ArrayElOperand::~UInt8ArrayElOperand ()
-{
-}
 
 bool
 UInt8ArrayElOperand::IsNull () const
@@ -599,10 +581,6 @@ UInt8ArrayElOperand::SelfOr (const DBSInt64& value)
 }
 
 /////////////////////////UInt16ArrayElOperand//////////////////////////////////
-
-UInt16ArrayElOperand::~UInt16ArrayElOperand ()
-{
-}
 
 bool
 UInt16ArrayElOperand::IsNull () const
@@ -820,10 +798,6 @@ UInt16ArrayElOperand::SelfOr (const DBSInt64& value)
 
 /////////////////////////UInt32ArrayElOperand//////////////////////////////////
 
-UInt32ArrayElOperand::~UInt32ArrayElOperand ()
-{
-}
-
 bool
 UInt32ArrayElOperand::IsNull () const
 {
@@ -1038,10 +1012,6 @@ UInt32ArrayElOperand::SelfOr (const DBSInt64& value)
 }
 
 /////////////////////////UInt64ArrayElOperand//////////////////////////////////
-
-UInt64ArrayElOperand::~UInt64ArrayElOperand ()
-{
-}
 
 bool
 UInt64ArrayElOperand::IsNull () const
@@ -1258,10 +1228,6 @@ UInt64ArrayElOperand::SelfOr (const DBSInt64& value)
 
 //////////////////////////Int8ArrayElOperand//////////////////////////////////
 
-Int8ArrayElOperand::~Int8ArrayElOperand ()
-{
-}
-
 bool
 Int8ArrayElOperand::IsNull () const
 {
@@ -1271,11 +1237,8 @@ Int8ArrayElOperand::IsNull () const
 void
 Int8ArrayElOperand::GetValue (DBSInt8& outValue) const
 {
-  DBSInt8 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-  outValue = DBSInt8 (currValue.m_Value);
+  m_Array.GetElement (outValue, m_ElementIndex);
+  assert (outValue.IsNull() == false);
 }
 
 void
@@ -1331,8 +1294,11 @@ Int8ArrayElOperand::GetValue (DBSReal& outValue) const
 void
 Int8ArrayElOperand::GetValue (DBSUInt8& outValue) const
 {
-  m_Array.GetElement (outValue, m_ElementIndex);
-  assert (outValue.IsNull () == false);
+  DBSInt8 currValue;
+  m_Array.GetElement (currValue, m_ElementIndex);
+
+  assert (currValue.IsNull () == false);
+  outValue = DBSUInt8 (currValue.m_Value);
 }
 
 void
@@ -1477,10 +1443,6 @@ Int8ArrayElOperand::SelfOr (const DBSInt64& value)
 
 /////////////////////////Int16ArrayElOperand//////////////////////////////////
 
-Int16ArrayElOperand::~Int16ArrayElOperand ()
-{
-}
-
 bool
 Int16ArrayElOperand::IsNull () const
 {
@@ -1500,11 +1462,8 @@ Int16ArrayElOperand::GetValue (DBSInt8& outValue) const
 void
 Int16ArrayElOperand::GetValue (DBSInt16& outValue) const
 {
-  DBSInt16 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-  outValue = DBSInt16 (currValue.m_Value);
+  m_Array.GetElement (outValue, m_ElementIndex);
+  assert (outValue.IsNull () == false);
 }
 
 void
@@ -1561,8 +1520,11 @@ Int16ArrayElOperand::GetValue (DBSUInt8& outValue) const
 void
 Int16ArrayElOperand::GetValue (DBSUInt16& outValue) const
 {
-  m_Array.GetElement (outValue, m_ElementIndex);
-  assert (outValue.IsNull () == false);
+  DBSInt16 currValue;
+  m_Array.GetElement (currValue, m_ElementIndex);
+
+  assert (currValue.IsNull () == false);
+  outValue = DBSUInt16 (currValue.m_Value);
 }
 
 void
@@ -1697,10 +1659,6 @@ Int16ArrayElOperand::SelfOr (const DBSInt64& value)
 
 /////////////////////////Int32ArrayElOperand//////////////////////////////////
 
-Int32ArrayElOperand::~Int32ArrayElOperand ()
-{
-}
-
 bool
 Int32ArrayElOperand::IsNull () const
 {
@@ -1730,11 +1688,8 @@ Int32ArrayElOperand::GetValue (DBSInt16& outValue) const
 void
 Int32ArrayElOperand::GetValue (DBSInt32& outValue) const
 {
-  DBSInt32 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-  outValue = DBSInt32 (currValue.m_Value);
+  m_Array.GetElement (outValue, m_ElementIndex);
+  assert (outValue.IsNull () == false);
 }
 
 void
@@ -1790,8 +1745,11 @@ Int32ArrayElOperand::GetValue (DBSUInt16& outValue) const
 void
 Int32ArrayElOperand::GetValue (DBSUInt32& outValue) const
 {
-  m_Array.GetElement (outValue, m_ElementIndex);
-  assert (outValue.IsNull () == false);
+  DBSInt32 currValue;
+  m_Array.GetElement (currValue, m_ElementIndex);
+
+  assert (currValue.IsNull () == false);
+  outValue = DBSUInt32 (currValue.m_Value);
 }
 
 void
@@ -1916,10 +1874,6 @@ Int32ArrayElOperand::SelfOr (const DBSInt64& value)
 
 /////////////////////////Int64ArrayElOperand//////////////////////////////////
 
-Int64ArrayElOperand::~Int64ArrayElOperand ()
-{
-}
-
 bool
 Int64ArrayElOperand::IsNull () const
 {
@@ -1959,11 +1913,8 @@ Int64ArrayElOperand::GetValue (DBSInt32& outValue) const
 void
 Int64ArrayElOperand::GetValue (DBSInt64& outValue) const
 {
-  DBSInt64 currValue;
-  m_Array.GetElement (currValue, m_ElementIndex);
-
-  assert (currValue.IsNull () == false);
-  outValue = DBSInt64 (currValue.m_Value);
+  m_Array.GetElement (outValue, m_ElementIndex);
+  assert (outValue.IsNull () == false);
 }
 
 void
@@ -2019,8 +1970,11 @@ Int64ArrayElOperand::GetValue (DBSUInt32& outValue) const
 void
 Int64ArrayElOperand::GetValue (DBSUInt64& outValue) const
 {
-  m_Array.GetElement (outValue, m_ElementIndex);
-  assert (outValue.IsNull () == false);
+  DBSInt64 currValue;
+  m_Array.GetElement (currValue, m_ElementIndex);
+
+  assert (currValue.IsNull () == false);
+  outValue = DBSUInt64 (currValue.m_Value);
 }
 
 void
@@ -2135,10 +2089,6 @@ Int64ArrayElOperand::SelfOr (const DBSInt64& value)
 
 
 /////////////////////////RealArrayElOperand//////////////////////////////////
-
-RealArrayElOperand::~RealArrayElOperand ()
-{
-}
 
 bool
 RealArrayElOperand::IsNull () const
@@ -2274,10 +2224,6 @@ RealArrayElOperand::SelfDiv (const DBSRichReal& value)
 }
 
 /////////////////////////RichRealArrayElOperand////////////////////////////////
-
-RichRealArrayElOperand::~RichRealArrayElOperand ()
-{
-}
 
 bool
 RichRealArrayElOperand::IsNull () const

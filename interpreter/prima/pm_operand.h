@@ -687,21 +687,33 @@ public:
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
 
+  virtual StackValue  GetValueAt (const D_UINT64 index);
+
 private:
   DBSText m_Value;
 };
 
-class CharTextOperand : public I_Operand
+class CharTextElOperand : public I_Operand
 {
 public:
-  CharTextOperand (DBSText &text, const D_UINT64 index)
+  CharTextElOperand (DBSText &text, const D_UINT64 index)
     : I_Operand (),
       m_Index (index),
-      m_Text (text)
+      m_Text ()
   {
+    text.SetMirror (m_Text);
   }
 
-  virtual ~CharTextOperand ();
+  CharTextElOperand (const CharTextElOperand& source)
+    : I_Operand (),
+      m_Index (source.m_Index),
+      m_Text ()
+  {
+    source.m_Text.SetMirror (m_Text);
+  }
+
+
+  virtual ~CharTextElOperand ();
 
   virtual bool IsNull () const;
 
@@ -712,7 +724,7 @@ public:
 
 private:
   const D_UINT64 m_Index;
-  DBSText&       m_Text;
+  DBSText        m_Text;
 };
 
 class ArrayOperand : public I_Operand
@@ -736,17 +748,41 @@ private:
   DBSArray m_Value;
 };
 
-class BoolArrayElOperand : public I_Operand
+class BaseArrayElOperand : public I_Operand
+{
+protected:
+  BaseArrayElOperand (DBSArray& array, const D_UINT64 index)
+    : I_Operand (),
+      m_ElementIndex (index),
+      m_Array  ()
+  {
+    array.SetMirror (m_Array);
+  }
+
+  BaseArrayElOperand (const BaseArrayElOperand& source)
+    : I_Operand (),
+      m_ElementIndex (source.m_ElementIndex),
+      m_Array ()
+  {
+    source.m_Array.SetMirror (m_Array);
+  }
+
+  virtual ~BaseArrayElOperand ();
+
+  const D_UINT64 m_ElementIndex;
+  DBSArray       m_Array;
+
+private:
+  BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
+};
+
+class BoolArrayElOperand : public BaseArrayElOperand
 {
 public:
   BoolArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~BoolArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -757,24 +793,15 @@ public:
   virtual void SelfAnd (const DBSBool& value);
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
-
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class CharArrayElOperand : public I_Operand
+class CharArrayElOperand : public BaseArrayElOperand
 {
 public:
   CharArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~CharArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -782,23 +809,15 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class DateArrayElOperand : public I_Operand
+class DateArrayElOperand : public BaseArrayElOperand
 {
 public:
   DateArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~DateArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -807,23 +826,15 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDate& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class DateTimeArrayElOperand : public I_Operand
+class DateTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
   DateTimeArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~DateTimeArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -832,23 +843,15 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDateTime& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class HiresTimeArrayElOperand : public I_Operand
+class HiresTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
   HiresTimeArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~HiresTimeArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -857,23 +860,15 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class UInt8ArrayElOperand : public I_Operand
+class UInt8ArrayElOperand : public BaseArrayElOperand
 {
 public:
   UInt8ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~UInt8ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -903,23 +898,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class UInt16ArrayElOperand : public I_Operand
+class UInt16ArrayElOperand : public BaseArrayElOperand
 {
 public:
   UInt16ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~UInt16ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -949,23 +936,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class UInt32ArrayElOperand : public I_Operand
+class UInt32ArrayElOperand : public BaseArrayElOperand
 {
 public:
   UInt32ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~UInt32ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -995,23 +974,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class UInt64ArrayElOperand : public I_Operand
+class UInt64ArrayElOperand : public BaseArrayElOperand
 {
 public:
   UInt64ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~UInt64ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1041,23 +1012,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class Int8ArrayElOperand : public I_Operand
+class Int8ArrayElOperand : public BaseArrayElOperand
 {
 public:
   Int8ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~Int8ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1087,23 +1050,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class Int16ArrayElOperand : public I_Operand
+class Int16ArrayElOperand : public BaseArrayElOperand
 {
 public:
   Int16ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~Int16ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1133,23 +1088,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class Int32ArrayElOperand : public I_Operand
+class Int32ArrayElOperand : public BaseArrayElOperand
 {
 public:
   Int32ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~Int32ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1179,23 +1126,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class Int64ArrayElOperand : public I_Operand
+class Int64ArrayElOperand : public BaseArrayElOperand
 {
 public:
   Int64ArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~Int64ArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1225,23 +1164,15 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class RealArrayElOperand : public I_Operand
+class RealArrayElOperand : public BaseArrayElOperand
 {
 public:
   RealArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~RealArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1261,23 +1192,15 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
-class RichRealArrayElOperand : public I_Operand
+class RichRealArrayElOperand : public BaseArrayElOperand
 {
 public:
   RichRealArrayElOperand (DBSArray& array, const D_UINT64 index)
-    : I_Operand (),
-      m_ElementIndex (index),
-      m_Array (array)
+    : BaseArrayElOperand (array, index)
   {
   }
-
-  virtual ~RichRealArrayElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1297,10 +1220,6 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
-
-private:
-  const D_UINT64 m_ElementIndex;
-  DBSArray&      m_Array;
 };
 
 class TableOperand : public I_Operand
@@ -1369,6 +1288,7 @@ public:
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
+  virtual StackValue  GetValueAt (const D_UINT64 index);
 
 private:
   TableReference* m_pRefTable;
@@ -1376,19 +1296,47 @@ private:
   D_UINT32        m_FieldType;
 };
 
-class BoolFieldElOperand : public I_Operand
+class BaseFieldElOperand : public I_Operand
 {
-public:
-  BoolFieldElOperand (I_DBSTable&       table,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+protected:
+  BaseFieldElOperand (TableReference*   pTableRef,
+                  const ROW_INDEX   row,
+                  const FIELD_INDEX field)
     : m_Row (row),
-      m_Table (table),
+      m_pRefTable (pTableRef),
       m_Field (field)
   {
+    m_pRefTable->IncrementRefCount ();
   }
 
-  virtual ~BoolFieldElOperand ();
+  BaseFieldElOperand (const BaseFieldElOperand& source)
+    : I_Operand (),
+      m_Row (source.m_Row),
+      m_pRefTable (source.m_pRefTable),
+      m_Field (source.m_Field)
+  {
+    m_pRefTable->IncrementRefCount ();
+  }
+
+  virtual ~BaseFieldElOperand ();
+
+  const ROW_INDEX   m_Row;
+  TableReference*   m_pRefTable;
+  const FIELD_INDEX m_Field;
+
+private:
+  BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
+};
+
+class BoolFieldElOperand : public BaseFieldElOperand
+{
+public:
+  BoolFieldElOperand (TableReference*   pTableRef,
+                      const ROW_INDEX   row,
+                      const FIELD_INDEX field)
+    : BaseFieldElOperand (pTableRef, row, field)
+  {
+  }
 
   virtual bool IsNull () const;
 
@@ -1399,26 +1347,17 @@ public:
   virtual void SelfAnd (const DBSBool& value);
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class CharFieldElOperand : public I_Operand
+class CharFieldElOperand : public BaseFieldElOperand
 {
 public:
-  CharFieldElOperand (I_DBSTable&       table,
+  CharFieldElOperand (TableReference*   pTableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~CharFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1426,26 +1365,17 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class DateFieldElOperand : public I_Operand
+class DateFieldElOperand : public BaseFieldElOperand
 {
 public:
-  DateFieldElOperand (I_DBSTable&       table,
+  DateFieldElOperand (TableReference*   pTableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~DateFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1454,26 +1384,18 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDate& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class DateTimeFieldElOperand : public I_Operand
+class DateTimeFieldElOperand : public BaseFieldElOperand
 {
 public:
-  DateTimeFieldElOperand (I_DBSTable&       table,
+
+  DateTimeFieldElOperand (TableReference*   pTableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~DateTimeFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1482,26 +1404,17 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDateTime& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class HiresTimeFieldElOperand : public I_Operand
+class HiresTimeFieldElOperand : public BaseFieldElOperand
 {
 public:
-  HiresTimeFieldElOperand (I_DBSTable&       table,
+  HiresTimeFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~HiresTimeFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1510,26 +1423,17 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt8FieldElOperand : public I_Operand
+class UInt8FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt8FieldElOperand (I_DBSTable&       table,
+  UInt8FieldElOperand (TableReference*   pTableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~UInt8FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1559,26 +1463,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt16FieldElOperand : public I_Operand
+class UInt16FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt16FieldElOperand (I_DBSTable&       table,
+  UInt16FieldElOperand (TableReference*   pTableRef,
                         const ROW_INDEX   row,
                         const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~UInt16FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1608,26 +1503,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt32FieldElOperand : public I_Operand
+class UInt32FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt32FieldElOperand (I_DBSTable&       table,
+  UInt32FieldElOperand (TableReference*   pTableRef,
                         const ROW_INDEX   row,
                         const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~UInt32FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1657,26 +1543,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt64FieldElOperand : public I_Operand
+class UInt64FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt64FieldElOperand (I_DBSTable&       table,
+  UInt64FieldElOperand (TableReference*   pTableRef,
                         const ROW_INDEX   row,
                         const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~UInt64FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1706,26 +1583,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int8FieldElOperand : public I_Operand
+class Int8FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int8FieldElOperand (I_DBSTable&       table,
+  Int8FieldElOperand (TableReference*   pTableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~Int8FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1755,26 +1623,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int16FieldElOperand : public I_Operand
+class Int16FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int16FieldElOperand (I_DBSTable&       table,
+  Int16FieldElOperand (TableReference*   pTableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~Int16FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1804,26 +1663,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int32FieldElOperand : public I_Operand
+class Int32FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int32FieldElOperand (I_DBSTable&       table,
+  Int32FieldElOperand (TableReference*   pTableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~Int32FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1853,26 +1703,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int64FieldElOperand : public I_Operand
+class Int64FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int64FieldElOperand (I_DBSTable&       table,
+  Int64FieldElOperand (TableReference*   pTableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~Int64FieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1902,26 +1743,17 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class RealFieldElOperand : public I_Operand
+class RealFieldElOperand : public BaseFieldElOperand
 {
 public:
-  RealFieldElOperand (I_DBSTable&       table,
-                       const ROW_INDEX   row,
-                       const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+  RealFieldElOperand (TableReference*   pTableRef,
+                      const ROW_INDEX   row,
+                      const FIELD_INDEX field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~RealFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1941,26 +1773,17 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class RichRealFieldElOperand : public I_Operand
+class RichRealFieldElOperand : public BaseFieldElOperand
 {
 public:
-  RichRealFieldElOperand (I_DBSTable&       table,
+  RichRealFieldElOperand (TableReference*   pTableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~RichRealFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -1980,25 +1803,17 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
-
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class TextFieldElOperand : public I_Operand
+class TextFieldElOperand : public BaseFieldElOperand
 {
 public:
-  TextFieldElOperand (I_DBSTable&       table,
+  TextFieldElOperand (TableReference*   pTableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-  virtual ~TextFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2008,52 +1823,38 @@ public:
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
 
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
+  virtual StackValue GetValueAt (const D_UINT64 index);
 };
 
-class ArrayFieldElOperand : public I_Operand
+class ArrayFieldElOperand : public BaseFieldElOperand
 {
 public:
-  ArrayFieldElOperand (I_DBSTable&      table,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
-    : m_Row (row),
-      m_Table (table),
-      m_Field (field)
+  ArrayFieldElOperand (TableReference*   pTableRef,
+                       const ROW_INDEX   row,
+                       const FIELD_INDEX field)
+    : BaseFieldElOperand (pTableRef, row, field)
   {
   }
-
-  virtual ~ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
 
-private:
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
+  virtual StackValue  GetValueAt (const D_UINT64 index);
 };
 
-class CharTextFieldElOperand : public I_Operand
+class CharTextFieldElOperand : public BaseFieldElOperand
 {
 public:
-  CharTextFieldElOperand (I_DBSTable&       table,
+  CharTextFieldElOperand (TableReference*   pTableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field,
                           const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseFieldElOperand (pTableRef, row, field),
+      m_Index (index)
   {
   }
-
-  virtual ~CharTextFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2064,27 +1865,53 @@ public:
 
 private:
   const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-
-class BoolArrayFieldElOperand : public I_Operand
+class BaseArrayFieldElOperand : public I_Operand
 {
-public:
-  BoolArrayFieldElOperand (I_DBSTable&       table,
+protected:
+  BaseArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+     : m_Index (index),
+       m_Row (row),
+       m_pRefTable (pTableRef),
+       m_Field (field)
   {
+    m_pRefTable->IncrementRefCount ();
   }
 
-  virtual ~BoolArrayFieldElOperand ();
+  BaseArrayFieldElOperand (const BaseArrayFieldElOperand& source)
+     : m_Index (source.m_Index),
+       m_Row (source.m_Row),
+       m_pRefTable (source.m_pRefTable),
+       m_Field (source.m_Field)
+  {
+    m_pRefTable->IncrementRefCount ();
+  }
+
+  virtual ~BaseArrayFieldElOperand ();
+
+  const D_UINT64    m_Index;
+  const ROW_INDEX   m_Row;
+  TableReference*   m_pRefTable;
+  const FIELD_INDEX m_Field;
+
+private:
+  BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
+};
+
+class BoolArrayFieldElOperand : public BaseArrayFieldElOperand
+{
+public:
+  BoolArrayFieldElOperand (TableReference*   pTableRef,
+                           const ROW_INDEX   row,
+                           const FIELD_INDEX field,
+                           const D_UINT64    index)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+  {
+  }
 
   virtual bool IsNull () const;
 
@@ -2095,29 +1922,18 @@ public:
   virtual void SelfAnd (const DBSBool& value);
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class CharArrayFieldElOperand : public I_Operand
+class CharArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  CharArrayFieldElOperand (I_DBSTable&       table,
+  CharArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~CharArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2125,29 +1941,18 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class DateArrayFieldElOperand : public I_Operand
+class DateArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  DateArrayFieldElOperand (I_DBSTable&       table,
-                                const ROW_INDEX   row,
-                                const FIELD_INDEX field,
-                                const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+  DateArrayFieldElOperand (TableReference*   pTableRef,
+                           const ROW_INDEX   row,
+                           const FIELD_INDEX field,
+                           const D_UINT64    index)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~DateArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2156,29 +1961,18 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDate& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class DateTimeArrayFieldElOperand : public I_Operand
+class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  DateTimeArrayFieldElOperand (I_DBSTable&       table,
+  DateTimeArrayFieldElOperand (TableReference*   pTableRef,
                                const ROW_INDEX   row,
                                const FIELD_INDEX field,
                                const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~DateTimeArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2187,29 +1981,18 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDateTime& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class HiresTimeArrayFieldElOperand : public I_Operand
+class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  HiresTimeArrayFieldElOperand (I_DBSTable&       table,
+  HiresTimeArrayFieldElOperand (TableReference*   pTableRef,
                                 const ROW_INDEX   row,
                                 const FIELD_INDEX field,
                                 const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~HiresTimeArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2218,29 +2001,18 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt8ArrayFieldElOperand : public I_Operand
+class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt8ArrayFieldElOperand (I_DBSTable&       table,
+  UInt8ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~UInt8ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2270,29 +2042,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt16ArrayFieldElOperand : public I_Operand
+class UInt16ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt16ArrayFieldElOperand (I_DBSTable&       table,
+  UInt16ArrayFieldElOperand (TableReference*   pTableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
                              const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~UInt16ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2322,29 +2083,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt32ArrayFieldElOperand : public I_Operand
+class UInt32ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt32ArrayFieldElOperand (I_DBSTable&       table,
+  UInt32ArrayFieldElOperand (TableReference*   pTableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
                              const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~UInt32ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2374,29 +2124,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class UInt64ArrayFieldElOperand : public I_Operand
+class UInt64ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt64ArrayFieldElOperand (I_DBSTable&       table,
+  UInt64ArrayFieldElOperand (TableReference*   pTableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
                              const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~UInt64ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2426,29 +2165,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int8ArrayFieldElOperand : public I_Operand
+class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int8ArrayFieldElOperand (I_DBSTable&       table,
+  Int8ArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~Int8ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2478,29 +2206,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int16ArrayFieldElOperand : public I_Operand
+class Int16ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int16ArrayFieldElOperand (I_DBSTable&       table,
+  Int16ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~Int16ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2530,29 +2247,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int32ArrayFieldElOperand : public I_Operand
+class Int32ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int32ArrayFieldElOperand (I_DBSTable&       table,
+  Int32ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~Int32ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2582,29 +2288,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class Int64ArrayFieldElOperand : public I_Operand
+class Int64ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int64ArrayFieldElOperand (I_DBSTable&       table,
+  Int64ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~Int64ArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2634,29 +2329,18 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class RealArrayFieldElOperand : public I_Operand
+class RealArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  RealArrayFieldElOperand (I_DBSTable&   table,
+  RealArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const D_UINT64    index)
-    : m_Index (index),
-      m_Row (row),
-      m_Table (table),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~RealArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2676,29 +2360,18 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
-
-private:
-  const D_UINT64    m_Index;
-  const ROW_INDEX   m_Row;
-  I_DBSTable&       m_Table;
-  const FIELD_INDEX m_Field;
 };
 
-class RichRealArrayFieldElOperand : public I_Operand
+class RichRealArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  RichRealArrayFieldElOperand (I_DBSTable&       table,
+  RichRealArrayFieldElOperand (TableReference*   pTableRef,
                                const ROW_INDEX   row,
                                const FIELD_INDEX field,
                                const D_UINT64    index)
-    : m_Index (index),
-      m_Table (table),
-      m_Row (row),
-      m_Field (field)
+    : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
-
-  virtual ~RichRealArrayFieldElOperand ();
 
   virtual bool IsNull () const;
 
@@ -2718,14 +2391,7 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
-
-private:
-  const D_UINT64    m_Index;
-  I_DBSTable&       m_Table;
-  const ROW_INDEX   m_Row;
-  const FIELD_INDEX m_Field;
 };
-
 
 class GlobalValue
 {

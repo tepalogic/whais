@@ -80,8 +80,8 @@ public:
 
   //Implementations for I_DBSTable
   virtual FIELD_INDEX        GetFieldsCount ();
+  virtual FIELD_INDEX        GetFieldIndex (const D_CHAR* pFieldName);
   virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field);
-  virtual DBSFieldDescriptor GetFieldDescriptor (const D_CHAR* const pFieldName);
   virtual ROW_INDEX          GetAllocatedRows ();
   virtual ROW_INDEX          AddRow ();
   virtual ROW_INDEX          AddReusedRow ();
@@ -251,7 +251,6 @@ public:
 
   D_UINT           GetRowSize () const;
   FieldDescriptor& GetFieldDescriptorInternal (const FIELD_INDEX fieldIndex) const;
-  FieldDescriptor& GetFieldDescriptorInternal (const D_CHAR* const pFieldName) const;
 
 private:
   template <class T> void     StoreEntry (const ROW_INDEX,

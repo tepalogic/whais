@@ -20,8 +20,9 @@ get_test_array ()
 {
   DBSArray array;
 
-  array.AddElement (DBSBool (true));
-  array.AddElement (DBSBool (false));
+  array.AddElement (DBSChar ('A'));
+  array.AddElement (DBSChar ('B'));
+  array.AddElement (DBSChar (0x234151));
 
   return array;
 }
@@ -256,9 +257,10 @@ test_op_invalid_conv (I_Operand& op)
 {
   bool result = true;
 
-  result = result && test_operand_for_conv<DBSBool> (op);
+  result = result && test_operand_for_conv<DBSChar> (op);
+  result = result && test_operand_for_conv<DBSText> (op);
 
-  result = result && test_operand_for_exceptions<DBSChar> (op);
+  result = result && test_operand_for_exceptions<DBSBool> (op);
   result = result && test_operand_for_exceptions<DBSDate> (op);
   result = result && test_operand_for_exceptions<DBSDateTime> (op);
   result = result && test_operand_for_exceptions<DBSHiresTime> (op);
@@ -272,7 +274,6 @@ test_op_invalid_conv (I_Operand& op)
   result = result && test_operand_for_exceptions<DBSInt64> (op);
   result = result && test_operand_for_exceptions<DBSReal> (op);
   result = result && test_operand_for_exceptions<DBSRichReal> (op);
-  result = result && test_operand_for_exceptions<DBSText> (op);
   result = result && test_operand_for_exceptions<DBSArray> (op);
 
   result = result && (! test_self_add<DBSChar> (op));
@@ -290,13 +291,13 @@ test_op_invalid_conv (I_Operand& op)
 
   result = result && (! test_self_mod<DBSInt64> (op));
 
-  result = result && (test_self_and<DBSBool> (op));
+  result = result && (! test_self_and<DBSBool> (op));
   result = result && (! test_self_and<DBSInt64> (op));
 
-  result = result && (test_self_xor<DBSBool> (op));
+  result = result && (! test_self_xor<DBSBool> (op));
   result = result && (! test_self_xor<DBSInt64> (op));
 
-  result = result && (test_self_or<DBSBool> (op));
+  result = result && (! test_self_or<DBSBool> (op));
   result = result && (! test_self_or<DBSInt64> (op));
 
   try
@@ -506,6 +507,134 @@ test_array_tableread_value (I_DBSHandler& dbsHnd,
   return result;
 }
 
+bool
+test_text_char ()
+{
+  bool result = true;
+  const D_CHAR textC[] = "This is a test text!";
+  const D_CHAR textC_2[] = "Here is a test text!";
+
+  DBSText testText (_RC (const D_UINT8*, textC));
+  TextOperand textOp (testText);
+
+  if (testText.GetCharactersCount () != (sizeof textC - 1))
+    result = false;
+
+  for (D_UINT index = 0; result && (index < sizeof textC - 1); ++index)
+    {
+      StackValue sv = textOp.GetValueAt (index);
+      I_Operand& charOp = sv.GetOperand ();
+
+      DBSChar c;
+      charOp.GetValue (c);
+
+      if ( c.IsNull () || (c.m_Value != _SC (D_UINT, textC[index])))
+        result = false;
+
+      result &= test_op_invalid_conv (charOp);
+
+      if (index == 0)
+        charOp.SetValue (DBSChar ('H'));
+      else if (index == 1)
+        charOp.SetValue (DBSChar ('e'));
+      else if (index == 2)
+        charOp.SetValue (DBSChar ('r'));
+      else if (index == 3)
+        charOp.SetValue (DBSChar ('e'));
+
+      sv.Clear ();
+    }
+
+
+  DBSText resultText;
+  textOp.GetValue (resultText);
+
+  if (resultText != DBSText (_RC (const D_UINT8*, textC_2)))
+    result = false;
+
+  return result;
+}
+
+bool
+test_tabletext_char (I_DBSHandler& dbsHnd)
+{
+  bool result = true;
+  const NullOperand nullOp;
+  StackValue stackTextField (nullOp) ;
+
+  DBSFieldDescriptor fd[2];
+
+  fd[0].isArray      = false;
+  fd[0].m_FieldType  = T_TEXT;
+  fd[0].m_pFieldName = "text_type";
+
+  I_DBSTable& testTable = dbsHnd.CreateTempTable (1, fd);
+  const ROW_INDEX row = testTable.AddReusedRow ();
+  {
+    assert (row == 0);
+    TableOperand tableOp (dbsHnd, testTable);
+    FieldOperand fieldArrayOp (tableOp, testTable.GetFieldIndex ("text_type"));
+
+    stackTextField = fieldArrayOp.GetValueAt (0);
+   }
+
+  const D_CHAR textC[] = "This is a test text!";
+  const D_CHAR textC_2[] = "Here is a test text!";
+
+  DBSText testText (_RC (const D_UINT8*, textC));
+  stackTextField.GetOperand ().SetValue (testText);
+
+  DBSText resultText;
+  testTable.GetEntry (0, 0, resultText);
+
+  if (resultText != testText)
+    result = false;
+
+  if (testText.GetCharactersCount () != (sizeof textC - 1))
+    result = false;
+
+  for (D_UINT index = 0; result && (index < sizeof textC - 1); ++index)
+    {
+      StackValue sv = stackTextField.GetOperand ().GetValueAt (index);
+      I_Operand& charOp = sv.GetOperand ();
+
+      DBSChar c;
+      charOp.GetValue (c);
+
+      if ( c.IsNull () || (c.m_Value != _SC (D_UINT, textC[index])))
+        result = false;
+
+      result &= test_op_invalid_conv (charOp);
+
+      if (index == 0)
+        charOp.SetValue (DBSChar ('H'));
+      else if (index == 1)
+        charOp.SetValue (DBSChar ('e'));
+      else if (index == 2)
+        charOp.SetValue (DBSChar ('r'));
+      else if (index == 3)
+        charOp.SetValue (DBSChar ('e'));
+
+      sv.Clear ();
+    }
+
+  testTable.GetEntry (0, 0, resultText);
+
+  if (resultText != DBSText (_RC (const D_UINT8*, textC_2)))
+    result = false;
+
+
+  //TODO: Fix this condition!
+  //resultText points to a row record in text. Race condition if the
+  //resulted text is released after the table itself.
+  //Just assign a dummy value to force the release earlier.
+  resultText = DBSText ();
+
+
+  stackTextField.Clear ();
+
+  return result;
+}
 
 int
 main ()
@@ -526,14 +655,17 @@ main ()
 
   {
     I_DBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
-    BoolOperand op (DBSBool (true));
+    CharOperand op (DBSChar ('Z'));
     success = success && test_op_invalid_conv (op);
-    success = success && test_null_write (op, DBSBool (true));
+    success = success && test_null_write (op, DBSChar ('T'));
     success = success && test_array_read_value (get_test_array (),
-                                                DBSBool(true));
+                                                DBSChar ('T'));
     success = success && test_array_tableread_value (dbsHnd,
                                                      get_test_array (),
-                                                     DBSBool(false));
+                                                     DBSChar ('T'));
+
+    success = success && test_text_char ();
+    success = success && test_tabletext_char (dbsHnd);
 
     DBSReleaseDatabase (dbsHnd);
   }

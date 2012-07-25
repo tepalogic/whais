@@ -2165,28 +2165,33 @@ TextOperand::SelfAdd (const DBSText& value)
   m_Value.Append (value);
 }
 
+StackValue
+TextOperand::GetValueAt (const D_UINT64 index)
+{
+  return StackValue (CharTextElOperand (m_Value, index));
+}
 
 ///////////////////////////////CharTextOperand/////////////////////////////////
 
-CharTextOperand::~CharTextOperand ()
+CharTextElOperand::~CharTextElOperand ()
 {
 }
 
 bool
-CharTextOperand::IsNull () const
+CharTextElOperand::IsNull () const
 {
   //A text could not hold NULL characters!
   return false;
 }
 
 void
-CharTextOperand::GetValue (DBSChar& outValue) const
+CharTextElOperand::GetValue (DBSChar& outValue) const
 {
   outValue = m_Text.GetCharAtIndex (m_Index);
 }
 
 void
-CharTextOperand::GetValue (DBSText& outValue) const
+CharTextElOperand::GetValue (DBSText& outValue) const
 {
   DBSChar ch = m_Text.GetCharAtIndex (m_Index);
   DBSText text;
@@ -2196,7 +2201,7 @@ CharTextOperand::GetValue (DBSText& outValue) const
 }
 
 void
-CharTextOperand::SetValue (const DBSChar& value)
+CharTextElOperand::SetValue (const DBSChar& value)
 {
   m_Text.SetCharAtIndex (value, m_Index);
 }

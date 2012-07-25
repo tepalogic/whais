@@ -20,8 +20,10 @@ get_test_array ()
 {
   DBSArray array;
 
-  array.AddElement (DBSBool (true));
-  array.AddElement (DBSBool (false));
+  array.AddElement (DBSDateTime (2002, 2, 14, 0, 0, 0));
+  array.AddElement (DBSDateTime (2012, 12, 25, 23, 59, 59));
+  array.AddElement (DBSDateTime (-12, 10, 10, 18, 0, 1));
+  array.AddElement (DBSDateTime (-1024, 2, 2, 8, 1, 0));
 
   return array;
 }
@@ -256,12 +258,12 @@ test_op_invalid_conv (I_Operand& op)
 {
   bool result = true;
 
-  result = result && test_operand_for_conv<DBSBool> (op);
+  result = result && test_operand_for_conv<DBSDate> (op);
+  result = result && test_operand_for_conv<DBSDateTime> (op);
+  result = result && test_operand_for_conv<DBSHiresTime> (op);
 
+  result = result && test_operand_for_exceptions<DBSBool> (op);
   result = result && test_operand_for_exceptions<DBSChar> (op);
-  result = result && test_operand_for_exceptions<DBSDate> (op);
-  result = result && test_operand_for_exceptions<DBSDateTime> (op);
-  result = result && test_operand_for_exceptions<DBSHiresTime> (op);
   result = result && test_operand_for_exceptions<DBSUInt8> (op);
   result = result && test_operand_for_exceptions<DBSUInt16> (op);
   result = result && test_operand_for_exceptions<DBSUInt32> (op);
@@ -290,13 +292,13 @@ test_op_invalid_conv (I_Operand& op)
 
   result = result && (! test_self_mod<DBSInt64> (op));
 
-  result = result && (test_self_and<DBSBool> (op));
+  result = result && (! test_self_and<DBSBool> (op));
   result = result && (! test_self_and<DBSInt64> (op));
 
-  result = result && (test_self_xor<DBSBool> (op));
+  result = result && (! test_self_xor<DBSBool> (op));
   result = result && (! test_self_xor<DBSInt64> (op));
 
-  result = result && (test_self_or<DBSBool> (op));
+  result = result && (! test_self_or<DBSBool> (op));
   result = result && (! test_self_or<DBSInt64> (op));
 
   try
@@ -526,14 +528,16 @@ main ()
 
   {
     I_DBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
-    BoolOperand op (DBSBool (true));
+    DateTimeOperand op (DBSDateTime (0, 1, 1, 0, 0, 0));
     success = success && test_op_invalid_conv (op);
-    success = success && test_null_write (op, DBSBool (true));
+    success = success && test_null_write (op, DBSDateTime (0,1,1, 0, 59, 0));
     success = success && test_array_read_value (get_test_array (),
-                                                DBSBool(true));
-    success = success && test_array_tableread_value (dbsHnd,
-                                                     get_test_array (),
-                                                     DBSBool(false));
+                                                DBSDateTime (0,1,1, 0, 59, 0));
+    success = success && test_array_tableread_value (
+                                                dbsHnd,
+                                                get_test_array (),
+                                                DBSDateTime (0,1,1, 0, 59, 0)
+                                                     );
 
     DBSReleaseDatabase (dbsHnd);
   }

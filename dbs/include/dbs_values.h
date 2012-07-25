@@ -200,11 +200,11 @@ struct DBSDate
                     const D_UINT8 month,
                     const D_UINT8 day);
 
-  DBSDate (const DBSDate& source) :
-    m_Year (source.m_Year),
-    m_Month (source.m_Month),
-    m_Day (source.m_Day),
-    m_IsNull (source.m_IsNull)
+  DBSDate (const DBSDate& source)
+    : m_Year (source.m_Year),
+      m_Month (source.m_Month),
+      m_Day (source.m_Day),
+      m_IsNull (source.m_IsNull)
   {
   }
 
@@ -1335,7 +1335,7 @@ public:
   DBSChar GetCharAtIndex(const D_UINT64 index) const;
   void    SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index);
 
-  void SetMirror (DBSText& mirror);
+  void SetMirror (DBSText& mirror) const;
 
   DBS_FIELD_TYPE  GetDBSType() const { return T_TEXT; }
   operator I_TextStrategy&() const { return *m_pText; }
@@ -1427,7 +1427,7 @@ public:
 
   void RemoveElement (const D_UINT64 index);
   void Sort (bool reverse = false);
-  void SetMirror (DBSArray& mirror);
+  void SetMirror (DBSArray& mirror) const;
 
   operator I_ArrayStrategy&() const { return *m_pArray; }
 

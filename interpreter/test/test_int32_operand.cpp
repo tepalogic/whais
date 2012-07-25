@@ -20,12 +20,14 @@ get_test_array ()
 {
   DBSArray array;
 
-  array.AddElement (DBSBool (true));
-  array.AddElement (DBSBool (false));
+  array.AddElement (DBSInt32 (0xFF));
+  array.AddElement (DBSInt32 (0));
+  array.AddElement (DBSInt32 (-10234145));
+  array.AddElement (DBSInt32 (0x1012));
+  array.AddElement (DBSInt32 (0x10122334));
 
   return array;
 }
-
 template <typename DBS_T> bool
 test_self_add (I_Operand& op)
 {
@@ -256,48 +258,48 @@ test_op_invalid_conv (I_Operand& op)
 {
   bool result = true;
 
-  result = result && test_operand_for_conv<DBSBool> (op);
+  result = result && test_operand_for_conv<DBSUInt8> (op);
+  result = result && test_operand_for_conv<DBSUInt16> (op);
+  result = result && test_operand_for_conv<DBSUInt32> (op);
+  result = result && test_operand_for_conv<DBSUInt64> (op);
+  result = result && test_operand_for_conv<DBSInt8> (op);
+  result = result && test_operand_for_conv<DBSInt16> (op);
+  result = result && test_operand_for_conv<DBSInt32> (op);
+  result = result && test_operand_for_conv<DBSInt64> (op);
+  result = result && test_operand_for_conv<DBSReal> (op);
+  result = result && test_operand_for_conv<DBSRichReal> (op);
 
+  result = result && test_operand_for_exceptions<DBSBool> (op);
   result = result && test_operand_for_exceptions<DBSChar> (op);
   result = result && test_operand_for_exceptions<DBSDate> (op);
   result = result && test_operand_for_exceptions<DBSDateTime> (op);
   result = result && test_operand_for_exceptions<DBSHiresTime> (op);
-  result = result && test_operand_for_exceptions<DBSUInt8> (op);
-  result = result && test_operand_for_exceptions<DBSUInt16> (op);
-  result = result && test_operand_for_exceptions<DBSUInt32> (op);
-  result = result && test_operand_for_exceptions<DBSUInt64> (op);
-  result = result && test_operand_for_exceptions<DBSInt8> (op);
-  result = result && test_operand_for_exceptions<DBSInt16> (op);
-  result = result && test_operand_for_exceptions<DBSInt32> (op);
-  result = result && test_operand_for_exceptions<DBSInt64> (op);
-  result = result && test_operand_for_exceptions<DBSReal> (op);
-  result = result && test_operand_for_exceptions<DBSRichReal> (op);
   result = result && test_operand_for_exceptions<DBSText> (op);
   result = result && test_operand_for_exceptions<DBSArray> (op);
 
   result = result && (! test_self_add<DBSChar> (op));
-  result = result && (! test_self_add<DBSInt64> (op));
-  result = result && (! test_self_add<DBSRichReal> (op));
+  result = result && test_self_add<DBSInt64> (op);
+  result = result && ( ! test_self_add<DBSRichReal> (op));
 
-  result = result && (! test_self_sub<DBSInt64> (op));
-  result = result && (! test_self_sub<DBSRichReal> (op));
+  result = result && test_self_sub<DBSInt64> (op);
+  result = result && ( ! test_self_sub<DBSRichReal> (op));
 
-  result = result && (! test_self_mul<DBSInt64> (op));
-  result = result && (! test_self_mul<DBSRichReal> (op));
+  result = result && test_self_mul<DBSInt64> (op);
+  result = result && ( ! test_self_mul<DBSRichReal> (op));
 
-  result = result && ( ! test_self_div<DBSInt64> (op));
+  result = result && test_self_div<DBSInt64> (op);
   result = result && ( ! test_self_div<DBSRichReal> (op));
 
-  result = result && (! test_self_mod<DBSInt64> (op));
+  result = result && test_self_mod<DBSInt64> (op);
 
-  result = result && (test_self_and<DBSBool> (op));
-  result = result && (! test_self_and<DBSInt64> (op));
+  result = result && ( ! test_self_and<DBSBool> (op));
+  result = result && test_self_and<DBSInt64> (op);
 
-  result = result && (test_self_xor<DBSBool> (op));
-  result = result && (! test_self_xor<DBSInt64> (op));
+  result = result && ( ! test_self_xor<DBSBool> (op));
+  result = result && test_self_xor<DBSInt64> (op);
 
-  result = result && (test_self_or<DBSBool> (op));
-  result = result && (! test_self_or<DBSInt64> (op));
+  result = result && ( ! test_self_or<DBSBool> (op));
+  result = result && test_self_or<DBSInt64> (op);
 
   try
   {
@@ -526,14 +528,14 @@ main ()
 
   {
     I_DBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
-    BoolOperand op (DBSBool (true));
+    Int32Operand op (DBSInt32 (10));
     success = success && test_op_invalid_conv (op);
-    success = success && test_null_write (op, DBSBool (true));
+    success = success && test_null_write (op, DBSInt32 (3));
     success = success && test_array_read_value (get_test_array (),
-                                                DBSBool(true));
+                                                DBSInt32 (3));
     success = success && test_array_tableread_value (dbsHnd,
                                                      get_test_array (),
-                                                     DBSBool(false));
+                                                     DBSInt32 (3));
 
     DBSReleaseDatabase (dbsHnd);
   }
