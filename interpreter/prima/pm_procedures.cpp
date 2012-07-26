@@ -32,17 +32,27 @@
 using namespace std;
 using namespace prima;
 
+ProcedureManager::~ProcedureManager ()
+{
+  for (vector<StackValue>::iterator it = m_LocalsValues.begin ();
+      it != m_LocalsValues.end ();
+      ++it)
+    {
+      it->Clear ();
+    }
+}
+
 D_UINT32
-ProcedureManager::AddProcedure (const D_UINT8*    pName,
-                                const D_UINT      nameLength,
-                                const D_UINT32    localsCount,
-                                const D_UINT32    argsCount,
-                                const D_UINT32    syncCount,
-                                const StackValue* pLocalValues,
-                                const D_UINT32*   pTypesOffset,
-                                const D_UINT8*    pCode,
-                                const D_UINT32    codeSize,
-                                Unit&             unit)
+ProcedureManager::AddProcedure (const D_UINT8*      pName,
+                                const D_UINT        nameLength,
+                                const D_UINT32      localsCount,
+                                const D_UINT32      argsCount,
+                                const D_UINT32      syncCount,
+                                vector<StackValue>& localValues,
+                                const D_UINT32*     pTypesOffset,
+                                const D_UINT8*      pCode,
+                                const D_UINT32      codeSize,
+                                Unit&               unit)
 {
   assert (GetProcedure (pName, nameLength) == INVALID_ENTRY);
   assert (argsCount < localsCount);
@@ -64,8 +74,8 @@ ProcedureManager::AddProcedure (const D_UINT8*    pName,
 
   m_SyncStmts.insert (m_SyncStmts.end(), syncCount, false);
   m_LocalsValues.insert (m_LocalsValues.end (),
-                         pLocalValues,
-                         pLocalValues + (localsCount - argsCount));
+                         &localValues[0],
+                         &localValues[0] + (localsCount - argsCount));
   m_Identifiers.insert (m_Identifiers.end (), pName, pName + nameLength);
   m_Identifiers.push_back (0);
   m_Definitions.insert (m_Definitions.end (), pCode, pCode + codeSize);

@@ -200,8 +200,8 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
         for (D_UINT localIt = 0; localIt < localsCount; ++localIt)
           {
             const D_UINT8* const pLocalTI =
-              unit.RetriveTypeInformation () +
-              unit.GetProcLocalTypeIndex (procIt, localIt);
+                                  unit.RetriveTypeInformation () +
+                                  unit.GetProcLocalTypeIndex (procIt, localIt);
 
             const D_UINT sizeTI = TypeManager::GetTypeLength (pLocalTI);
             auto_ptr<D_UINT8> apTI (new D_UINT8 [sizeTI]);
@@ -219,20 +219,35 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
               values.push_back (value);
           }
 
-        const D_UINT32 procIndex = DefineProcedure (
-                                  pName,
-                                  nameLength,
-                                  localsCount,
-                                  argsCount,
-                                  unit.GetProcSyncStatementsCount (procIt),
-                                  &values[0],
-                                  &typesOffset[0],
-                                  unit.RetriveProcCodeArea (procIt),
-                                  unit.GetProcCodeAreaSize (procIt),
-                                  external,
-                                  unitMgr.GetUnit (unitIndex));
+        try
+        {
+            const D_UINT32 procIndex = DefineProcedure (
+                                    pName,
+                                    nameLength,
+                                    localsCount,
+                                    argsCount,
+                                    unit.GetProcSyncStatementsCount (procIt),
+                                    values,
+                                    &typesOffset[0],
+                                    unit.RetriveProcCodeArea (procIt),
+                                    unit.GetProcCodeAreaSize (procIt),
+                                    external,
+                                    unitMgr.GetUnit (unitIndex)
+                                                         );
 
-        unitMgr.SetProcIndex (unitIndex, procIt, procIndex);
+            unitMgr.SetProcIndex (unitIndex, procIt, procIndex);
+        }
+        catch (...)
+        {
+            for (vector<StackValue>::iterator it = values.begin ();
+                 it != values.end ();
+                 ++it)
+              {
+                it->Clear ();
+              }
+
+            throw;
+        }
       }
   }
   catch (...)
@@ -413,9 +428,9 @@ Session::DefineGlobalValue (const D_UINT8* pName,
   auto_ptr<D_UINT8> apTI (new D_UINT8[TypeManager::GetTypeLength (pTI)]);
   memcpy (apTI.get (), pTI, TypeManager::GetTypeLength (pTI));
 
-  TypeManager&   typeMgr    = m_PrivateNames.Get ().GetTypeManager ();
-  GlobalValue    value      = typeMgr.CreateGlobalValue (apTI.get ());
-  const D_UINT32 glbEntry   = FindGlobal (pName, nameLength);
+  TypeManager&   typeMgr  = m_PrivateNames.Get ().GetTypeManager ();
+  GlobalValue    value    = typeMgr.CreateGlobalValue (apTI.get ());
+  const D_UINT32 glbEntry = FindGlobal (pName, nameLength);
 
   if (GlobalsManager::IsValid (glbEntry) == false)
     {
@@ -432,8 +447,8 @@ Session::DefineGlobalValue (const D_UINT8* pName,
           throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
         }
 
-      const D_UINT32   typeOff = typeMgr.AddType (apTI.get ());
-      GlobalsManager&  glbMgr  = m_PrivateNames.Get ().GetGlobalsManager ();
+      const D_UINT32  typeOff = typeMgr.AddType (apTI.get ());
+      GlobalsManager& glbMgr  = m_PrivateNames.Get ().GetGlobalsManager ();
 
       return glbMgr.AddGlobal (pName, nameLength, value, typeOff);
     }
@@ -472,17 +487,17 @@ Session::DefineGlobalValue (const D_UINT8* pName,
 }
 
 D_UINT32
-Session::DefineProcedure (const D_UINT8*    pName,
-                          const D_UINT      nameLength,
-                          const D_UINT32    localsCount,
-                          const D_UINT32    argsCount,
-                          const D_UINT32    syncCount,
-                          const StackValue* pLocalValues,
-                          const D_UINT32*   pTypesOffset,
-                          const D_UINT8*    pCode,
-                          const D_UINT32    codeSize,
-                          const bool        external,
-                          Unit&             unit)
+Session::DefineProcedure (const D_UINT8*      pName,
+                          const D_UINT        nameLength,
+                          const D_UINT32      localsCount,
+                          const D_UINT32      argsCount,
+                          const D_UINT32      syncCount,
+                          vector<StackValue>& localValues,
+                          const D_UINT32*     pTypesOffset,
+                          const D_UINT8*      pCode,
+                          const D_UINT32      codeSize,
+                          const bool          external,
+                          Unit&               unit)
 {
   assert (argsCount < localsCount);
   assert (localsCount > 0);
@@ -573,7 +588,7 @@ Session::DefineProcedure (const D_UINT8*    pName,
                                localsCount,
                                argsCount,
                                syncCount,
-                               pLocalValues,
+                               localValues,
                                pTypesOffset,
                                pCode,
                                codeSize,

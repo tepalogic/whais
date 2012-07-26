@@ -65,22 +65,23 @@ public:
     assert (m_pSpace != NULL);
   }
 
-  ~NameSpaceHolder ()
-  {
-    assert (m_RefsCount == 0);
-    if (m_pSpace != NULL)
-      {
-        DBSReleaseDatabase (m_pSpace->GetDBSHandler());
-        delete m_pSpace;
-      }
-  }
-
   NameSpaceHolder (const NameSpaceHolder& source)
     : m_pSpace (source.m_pSpace),
       m_RefsCount (source.m_RefsCount)
   {
     _CC (NameSpace*&, source.m_pSpace) = NULL;
     _CC (D_UINT64&, source.m_RefsCount)  = 0;
+  }
+
+  ~NameSpaceHolder ()
+  {
+    assert (m_RefsCount == 0);
+    if (m_pSpace != NULL)
+      {
+        I_DBSHandler& dbsHandler = m_pSpace->GetDBSHandler ();
+        delete m_pSpace;
+        DBSReleaseDatabase (dbsHandler);
+      }
   }
 
   NameSpace& Get () { assert (m_RefsCount > 0); return *m_pSpace; }
@@ -125,17 +126,17 @@ private:
                               const D_UINT   nameLength,
                               const D_UINT8* pTI,
                               const bool     external);
-  D_UINT32 DefineProcedure (const D_UINT8*    pName,
-                            const D_UINT      nameLength,
-                            const D_UINT32    localsCount,
-                            const D_UINT32    argsCount,
-                            const D_UINT32    syncCount,
-                            const StackValue* pLocalValues,
-                            const D_UINT32*   pTypesOffset,
-                            const D_UINT8*    pCode,
-                            const D_UINT32    codeSize,
-                            const bool        external,
-                            Unit&             unit);
+  D_UINT32 DefineProcedure (const D_UINT8*           pName,
+                            const D_UINT             nameLength,
+                            const D_UINT32           localsCount,
+                            const D_UINT32           argsCount,
+                            const D_UINT32           syncCount,
+                            std::vector<StackValue>& localValues,
+                            const D_UINT32*          pTypesOffset,
+                            const D_UINT8*           pCode,
+                            const D_UINT32           codeSize,
+                            const bool               external,
+                            Unit&                    unit);
 
   NameSpaceHolder& m_GlobalNames;
   NameSpaceHolder& m_PrivateNames;

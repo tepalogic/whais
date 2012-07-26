@@ -25,6 +25,8 @@
 #ifndef PM_PROCEDURES_H_
 #define PM_PROCEDURES_H_
 
+#include <vector>
+
 #include "whisper.h"
 
 #include "pm_operand.h"
@@ -63,20 +65,18 @@ public:
   {
   }
 
-  ~ProcedureManager ()
-  {
-  }
+  ~ProcedureManager ();
 
-  D_UINT32 AddProcedure (const D_UINT8*    pName,
-                         const D_UINT      nameLength,
-                         const D_UINT32    localsCount,
-                         const D_UINT32    argsCount,
-                         const D_UINT32    syncCount,
-                         const StackValue* pLocalValues,
-                         const D_UINT32*   pTypesOffset,
-                         const D_UINT8*    pCode,
-                         const D_UINT32    codeSize,
-                         Unit&             unit);
+  D_UINT32 AddProcedure (const D_UINT8*           pName,
+                         const D_UINT             nameLength,
+                         const D_UINT32           localsCount,
+                         const D_UINT32           argsCount,
+                         const D_UINT32           syncCount,
+                         std::vector<StackValue>& localValues,
+                         const D_UINT32*          pTypesOffset,
+                         const D_UINT8*           pCode,
+                         const D_UINT32           codeSize,
+                         Unit&                    unit);
   D_UINT32 GetProcedure (const D_UINT8* pName,
                          const D_UINT   nameLength) const;
 

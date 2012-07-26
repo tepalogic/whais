@@ -46,7 +46,7 @@ static const D_UINT8 commonCode[] =
     "\n"
     "PROCEDURE c_proc_2 () RETURN HIRESTIME\n"
     "DO\n"
-    "LET dummy AS ARRAY;\n"
+    "LET dummy AS ARRAY OF INT64;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p1 as INT8;\n"
     "LET p2 as UNSIGNED INT8;\n"
@@ -72,7 +72,7 @@ static const D_UINT8 db1Code_Fail_1 [] =
     "\n"
     "PROCEDURE proc_3 () RETURN HIRESTIME\n"
     "DO\n"
-    "LET dummy  AS ARRAY;\n"
+    "LET dummy  AS ARRAY OF BOOL;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p3 as INT64;\n"
     "\n"
@@ -95,7 +95,7 @@ static const D_UINT8 db1Code_Fail_2 [] =
     "\n"
     "PROCEDURE proc_3 () RETURN HIRESTIME\n"
     "DO\n"
-    "LET dummy  AS ARRAY;\n"
+    "LET dummy  AS ARRAY OF DATE;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p3 as INT64;\n"
     "\n"
@@ -117,7 +117,7 @@ static const D_UINT8 db1Code_Fail_3 [] =
     "\n"
     "PROCEDURE proc_2 () RETURN BOOL\n"
     "DO\n"
-    "LET dummy AS ARRAY;\n"
+    "LET dummy AS ARRAY OF DATETIME;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p1 as INT8;\n"
     "LET p2 as UNSIGNED INT8;\n"
@@ -189,7 +189,7 @@ static const D_UINT8 db1_Code_1 [] =
     "\n"
     "PROCEDURE private_proc () RETURN HIRESTIME\n"
     "DO\n"
-    "LET dummy  AS ARRAY;\n"
+    "LET dummy  AS ARRAY OF INT16;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p3 as INT64;\n"
     "\n"
@@ -318,7 +318,7 @@ test_fault (I_Session& session,
   {
       if (e.GetExtra () == expectedCode)
         {
-          std::cout << "Got the expected except code OK" << std::endl;
+          std::cout << "Got the expected exception code OK" << std::endl;
           result = true;
         }
       else
@@ -406,7 +406,6 @@ main ()
     I_Session& db2Session    = GetInstance (test_db2);
 
     success = true;
-
     success = success && load_common_session (commonSession);
     success = success && test_fault (db1Session,
                                      db1Code_Fail_1,

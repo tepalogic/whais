@@ -53,13 +53,11 @@ public:
   {
   }
 
-  ~GlobalsManager ()
-  {
-  }
+  ~GlobalsManager ();
 
   D_UINT32           AddGlobal (const D_UINT8*     pName,
                                 const D_UINT       nameLength,
-                                const GlobalValue& value,
+                                GlobalValue&       value,
                                 const D_UINT32     tiOffset);
   D_UINT32           FindGlobal (const D_UINT8 *const pName,
                                  const D_UINT         nameLength);

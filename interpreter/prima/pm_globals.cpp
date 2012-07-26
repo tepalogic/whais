@@ -31,11 +31,21 @@
 using namespace std;
 using namespace prima;
 
+GlobalsManager::~GlobalsManager ()
+{
+
+  for (vector<GlobalValue>::iterator it = m_Storage.begin ();
+       it != m_Storage.end ();
+       ++it)
+    {
+      it->GetOperand ().~I_Operand();
+    }
+}
 
 D_UINT32
 GlobalsManager::AddGlobal (const D_UINT8*     pName,
                            const D_UINT       nameLength,
-                           const GlobalValue& value,
+                           GlobalValue&       value,
                            const D_UINT32     typeOffset)
 {
   assert (FindGlobal (pName, nameLength) == INVALID_ENTRY);
@@ -48,6 +58,7 @@ GlobalsManager::AddGlobal (const D_UINT8*     pName,
   m_Identifiers.push_back (0);
 
   m_Storage.push_back (value);
+  value.Release ();
 
   const GlobalEntry entry = {IdOffset, typeOffset};
   m_GlobalsEntrys.push_back (entry);

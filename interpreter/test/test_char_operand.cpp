@@ -630,7 +630,6 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
   //Just assign a dummy value to force the release earlier.
   resultText = DBSText ();
 
-
   stackTextField.Clear ();
 
   return result;

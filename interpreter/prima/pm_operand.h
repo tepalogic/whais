@@ -2399,6 +2399,7 @@ public:
   template <class OP_T>
   explicit GlobalValue (const OP_T& op)
     : m_Sync (),
+      m_OperandOwner (true),
       m_Storage ()
   {
     const I_Operand& compileTest = op;
@@ -2410,6 +2411,7 @@ public:
 
   GlobalValue (const GlobalValue& source)
     : m_Sync (),
+      m_OperandOwner (source.m_OperandOwner),
       m_Storage ()
   {
     for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
@@ -2421,6 +2423,7 @@ public:
     if (this == &source)
       return *this;
 
+    m_OperandOwner = source.m_OperandOwner;
     for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];
 
@@ -2429,6 +2432,8 @@ public:
 
   ~GlobalValue ()
   {
+    if (m_OperandOwner)
+      GetOperand ().~I_Operand ();
   }
 
   template <class DBS_T>
@@ -2513,11 +2518,13 @@ public:
     GetOperand ().SelfOr (value);
   }
 
-
   I_Operand& GetOperand () { return *_RC (I_Operand*, m_Storage);  }
+
+  void Release () { assert (m_OperandOwner); m_OperandOwner = false; }
 
 private:
   WSynchronizer m_Sync;
+  bool          m_OperandOwner;
   D_UINT64      m_Storage[MAX_OP_QWORDS];
 };
 

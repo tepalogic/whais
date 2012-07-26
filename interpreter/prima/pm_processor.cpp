@@ -53,7 +53,7 @@ load_le_uint32 (const D_UINT8* const pSrc)
 inline static D_UINT64
 load_le_uint64 (const D_UINT8* const pSrc)
 {
-  D_UINT32 result = pSrc[7];
+  D_UINT64 result = pSrc[7];
   result <<= 8; result |= pSrc[6];
   result <<= 8; result |= pSrc[5];
   result <<= 8; result |= pSrc[4];
