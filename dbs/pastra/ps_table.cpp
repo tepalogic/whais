@@ -480,6 +480,7 @@ PersistentTable::InitFromFile ()
   //Cache the field descriptors in memory
   m_FieldsDescriptors.reset(new D_UINT8[m_DescriptorsSize]);
   mainTableFile.Read(_CC(D_UINT8 *, m_FieldsDescriptors.get ()), m_DescriptorsSize);
+  mainTableFile.Close ();
 
   m_apMainTable.reset (new FileContainer (m_BaseFileName.c_str(),
                                           m_MaxFileSize,

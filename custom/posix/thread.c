@@ -62,39 +62,6 @@ wh_sync_leave (WH_SYNC* pSync)
 }
 
 D_INT
-wh_cond_value_init (WH_COND_VALUE* pCondValue)
-{
-  assert (pCondValue != NULL);
-  return WOP_OK;
-}
-
-D_INT
-wh_cond_value_wait (WH_COND_VALUE* pCondValue,
-                    WH_SYNC*       pSync)
-{
-  return pthread_cond_wait (pCondValue, pSync);
-}
-
-D_INT
-wh_cond_value_signal (WH_COND_VALUE* pCondValue)
-{
-  return pthread_cond_signal (pCondValue);
-}
-
-D_INT
-wh_cond_value_broadcast (WH_COND_VALUE* pCondValue)
-{
-  return pthread_cond_broadcast (pCondValue);
-}
-
-D_INT
-wh_cond_value_destroy (WH_COND_VALUE* pCondValue)
-{
-  assert (pCondValue != NULL);
-  return WOP_OK;
-}
-
-D_INT
 wh_thread_create (WH_THREAD*       pThread,
                  WH_THREAD_ROUTINE routine,
                  void*             args)

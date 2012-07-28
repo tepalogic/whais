@@ -168,8 +168,8 @@ DBSGetMaxFileSize ()
 
 void
 DBSCreateDatabase (const D_CHAR* const pName,
-                  const D_CHAR*        pDbsDirectory,
-                  D_UINT64             maxFileSize)
+                   const D_CHAR*        pDbsDirectory,
+                   D_UINT64             maxFileSize)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -185,7 +185,8 @@ DBSCreateDatabase (const D_CHAR* const pName,
 
   string fileName;
 
-  if ((pName != NULL) && whc_is_path_absolute (pDbsDirectory))
+  if ((pName != NULL)
+      && whc_is_path_absolute (pDbsDirectory))
     {
       fileName += pDbsDirectory;
       fileName += whc_get_directory_delimiter ();
@@ -200,11 +201,14 @@ DBSCreateDatabase (const D_CHAR* const pName,
   fileName += pName;
   fileName += DBS_FILE_EXT;
 
-  WFile             dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
+  WFile             dbsFile (fileName.c_str (),
+                             WHC_FILECREATE_NEW | WHC_FILEWRITE);
   auto_ptr<D_UINT8> apBufferHeader (new D_UINT8[PS_DBS_HEADER_SIZE]);
   D_UINT8* const    cpHeader = apBufferHeader.get ();
 
-  memcpy (cpHeader + PS_DBS_SIGNATURE_OFF, DBS_FILE_SIGNATURE, PS_DBS_SIGNATURE_LEN);
+  memcpy (cpHeader + PS_DBS_SIGNATURE_OFF,
+          DBS_FILE_SIGNATURE,
+          PS_DBS_SIGNATURE_LEN);
 
   *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
   *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
@@ -213,7 +217,8 @@ DBSCreateDatabase (const D_CHAR* const pName,
   *_RC (D_UINT64*, cpHeader + PS_DBS_MAX_FILE_OFF)   = maxFileSize;
 
   dbsFile.Write (cpHeader, PS_DBS_HEADER_SIZE);
-  dbsFile.Write (_RC (const D_UINT8*, pDbsDirectory), strlen (pDbsDirectory) + 1);
+  dbsFile.Write (_RC (const D_UINT8*, pDbsDirectory),
+                 strlen (pDbsDirectory) + 1);
 }
 
 I_DBSHandler&
@@ -230,7 +235,10 @@ DBSRetrieveDatabase (const D_CHAR* const pName)
 
   if (it == rMap.end ())
     {
-      rMap.insert (pair<string, DbsElement> (pName, DbsElement (DbsHandler (string (pName)))));
+      rMap.insert (
+          pair<string, DbsElement> (pName,
+                                    DbsElement (DbsHandler (string (pName))))
+                  );
       it = rMap.find (pName);
       assert (it != rMap.end ());
     }
@@ -282,7 +290,10 @@ DBSRemoveDatabase (const D_CHAR* const pName)
 
   if (it == rMap.end ())
     {
-      rMap.insert (pair<string, DbsElement> (pName, DbsElement (DbsHandler (string (pName)))));
+      rMap.insert (
+          pair<string, DbsElement> (pName,
+                                    DbsElement (DbsHandler (string (pName))))
+                  );
       it = rMap.find (pName);
       assert (it != rMap.end ());
     }
@@ -328,10 +339,13 @@ DbsHandler::DbsHandler (const string& name) :
 
   D_UINT16 tablesCount = *_RC (D_UINT16*, pBuffer + PS_DBS_NUM_TABLES_OFF);
 
-  pBuffer += *_RC (D_UINT16*, pBuffer + PS_DBS_DIRECTORY_OFF) + m_DbsDirectory.size () + 1;
+  pBuffer += *_RC (D_UINT16*, pBuffer + PS_DBS_DIRECTORY_OFF) +
+             m_DbsDirectory.size () + 1;
   while (tablesCount-- > 0)
     {
-      m_Tables.insert (pair < string, PersistentTable* >(_RC (D_CHAR*, pBuffer), NULL));
+      m_Tables.insert (
+          pair<string, PersistentTable*>(_RC (D_CHAR*, pBuffer), NULL)
+                      );
       pBuffer += strlen (_RC (D_CHAR*, pBuffer));
     }
 
@@ -512,10 +526,14 @@ DbsHandler::SyncToFile ()
   WFile outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
   outFile.SetSize (0);
   outFile.Write (aBuffer, sizeof aBuffer);
-  outFile.Write (_RC (const D_UINT8*, m_DbsDirectory.c_str ()), m_DbsDirectory.size () + 1);
+  outFile.Write (_RC (const D_UINT8*, m_DbsDirectory.c_str ()),
+                 m_DbsDirectory.size () + 1);
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
-    outFile.Write (_RC (const D_UINT8 *, it->first.c_str ()), it->first.size () + 1);
+    {
+      outFile.Write (_RC (const D_UINT8 *, it->first.c_str ()),
+                     it->first.size () + 1);
+    }
 }
 
 void

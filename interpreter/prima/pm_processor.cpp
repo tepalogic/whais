@@ -836,6 +836,27 @@ op_func_notXX (Processor& processor, D_INT64& offset)
   stack.Push (result);
 }
 
+template <> void
+op_func_notXX<DBSBool> (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 1));
+
+  DBSBool operand;
+  stack[stackSize - 1].GetOperand ().GetValue (operand);
+
+  DBSBool result;
+  if (operand.IsNull () == false)
+    result = DBSBool (! operand.m_Value);
+
+  stack.Pop (1);
+  stack.Push (result);
+}
+
+
 template <class DBS_T> static void
 op_func_orXX (Processor& processor, D_INT64& offset)
 {
@@ -1174,7 +1195,8 @@ Processor::Run ()
 
       D_INT64 offset = whc_decode_opcode (m_pCode + m_CodePos, &opcode);
 
-      assert (opcode < (sizeof operations / sizeof operations[0]));
+      assert (opcode < _SC (D_INT,
+                            (sizeof operations / sizeof operations[0])));
       assert (opcode != 0);
       assert ((offset > 0) && (offset < 3));
 
