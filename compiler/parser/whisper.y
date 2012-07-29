@@ -77,11 +77,11 @@ void yyerror(struct ParserState *state,  const char *msg);
 
 %right '=' SADD SSUB SMUL SDIV SMOD SAND SXOR SOR
 %left  EQ NE
-%left  AND OR XOR
+%left  AND '&' OR '|' XOR '^'
 %left  '<' '>' LE GE
 %left  '+' '-'
 %left  '*' '/' '%'
-%right NOT
+%right NOT '~'
 // %right INC DEC
 
 %left  '[' ']' '.'

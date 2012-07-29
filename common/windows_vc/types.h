@@ -36,7 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "windows.h"
 typedef HANDLE              WH_FILE_HND;
 typedef CRITICAL_SECTION    WH_SYNC;
-typedef CONDITION_VARIABLE  WH_COND_VALUE;
 typedef HANDLE              WH_THREAD;
 #endif
 

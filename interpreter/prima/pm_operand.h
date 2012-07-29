@@ -2481,8 +2481,7 @@ public:
   template <class OP_T>
   explicit GlobalValue (const OP_T& op)
     : m_Sync (),
-      m_OperandOwner (true),
-      m_Storage ()
+      m_OperandOwner (true)
   {
     const I_Operand& compileTest = op;
     (void)compileTest; //Just to make sure OP_T is a valid type!
@@ -2493,8 +2492,7 @@ public:
 
   GlobalValue (const GlobalValue& source)
     : m_Sync (),
-      m_OperandOwner (source.m_OperandOwner),
-      m_Storage ()
+      m_OperandOwner (source.m_OperandOwner)
   {
     for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];

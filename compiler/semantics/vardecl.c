@@ -201,8 +201,8 @@ install_declaration (struct ParserState* const pState,
         }
       else if (IS_ARRAY (var.type) && (! parameter))
         {
-          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN) ||
-              (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
+          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN)
+              || (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
             {
               /* Already declared! */
               D_CHAR text[128];
@@ -219,12 +219,13 @@ install_declaration (struct ParserState* const pState,
         }
       else if (IS_FIELD (var.type) && (! parameter))
         {
-          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN) ||
-              (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
+          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN)
+              || (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
             {
+              D_CHAR text[128];
+
               assert (IS_ARRAY (var.type) == FALSE);
               /* Already declared! */
-              D_CHAR text[128];
               copy_text_truncate (text,
                                   var.label,
                                   sizeof text,
@@ -245,9 +246,9 @@ install_declaration (struct ParserState* const pState,
 
       MARK_AS_EXTERNAL (result->varId);
     }
-  else if (result &&
-           (IS_TABLE_FIELD (result->type) == FALSE) &&
-           (IS_GLOBAL (result->varId)))
+  else if (result
+           && (IS_TABLE_FIELD (result->type) == FALSE)
+           &&  IS_GLOBAL (result->varId))
     {
       assert (pState->pCurrentStmt == &pState->globalStmt);
 

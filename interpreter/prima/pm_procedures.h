@@ -34,7 +34,7 @@
 namespace prima
 {
 
-class Unit;
+struct Unit;
 struct ProcedureEntry
 {
   D_UINT32 m_LocalsCount;

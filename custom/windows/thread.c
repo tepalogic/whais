@@ -52,55 +52,14 @@ wh_sync_leave (WH_SYNC* pSync)
 }
 
 D_INT
-wh_cond_value_init (WH_COND_VALUE* pCondValue)
-{
-  InitializeConditionVariable (pCondValue);
-  return WOP_OK;
-}
-
-D_INT
-wh_cond_value_wait (WH_COND_VALUE* pCondValue, WH_SYNC* pSync)
-{
-  if (SleepConditionVariableCS (pCondValue, pSync, INFINITE) != 0)
-    {
-      D_INT result = GetLastError ();
-      if (result == WOP_OK)
-        result = WOP_UNKNOW;
-
-      return result;
-    }
-
-  return WOP_OK;
-}
-
-D_INT
-wh_cond_value_signal (WH_COND_VALUE* pCondValue)
-{
-  WakeConditionVariable (pCondValue);
-
-  return WOP_OK;
-}
-
-D_INT
-wh_cond_value_broadcast (WH_COND_VALUE* pCondValue)
-{
-  WakeAllConditionVariable (pCondValue);
-
-  return WOP_OK;
-}
-
-D_INT
-wh_cond_value_destroy (WH_COND_VALUE* pCondValue)
-{
-  assert (pCondValue != NULL);
-  return WOP_OK;
-}
-
-D_INT
 wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
 {
-  *pThread = CreateThread (NULL, 0, (LPTHREAD_START_ROUTINE)routine, args, 0, NULL);
-
+  *pThread = CreateThread (NULL,
+                           0,
+                           (LPTHREAD_START_ROUTINE)routine,
+                           args,
+                           0,
+                           NULL);
   if (*pThread == NULL)
     {
       D_INT result = GetLastError ();
