@@ -121,6 +121,9 @@ public:
   D_UINT64       ProcCodeSize (const D_UINT32 procId);
   StackValue     ProcLocalValue (const D_UINT32 procId, const D_UINT32 local);
 
+  void AquireProcSync (const D_UINT32 procId, const D_UINT32 sync);
+  void ReleaseProcSync (const D_UINT32 procId, const D_UINT32 sync);
+
 private:
   D_UINT32 DefineGlobalValue (const D_UINT8* pName,
                               const D_UINT   nameLength,

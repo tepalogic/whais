@@ -61,7 +61,8 @@ public:
       m_LocalsValues (),
       m_LocalsTypes (),
       m_Definitions (),
-      m_SyncStmts ()
+      m_SyncStmts (),
+      m_Sync ()
   {
   }
 
@@ -89,6 +90,9 @@ public:
   const D_UINT8*    LocalTI (const D_UINT   procEntry,
                              const D_UINT32 local) const;
   const D_UINT8*    Code (const D_UINT procEntry, D_UINT64* pOutCodeSize) const;
+
+  void AquireSync (const D_UINT procEntry, const D_UINT32 sync);
+  void ReleaseSync (const D_UINT procEntry, const D_UINT32 sync);
 
   static bool IsValid (const D_UINT32 entry)
   {
@@ -119,6 +123,7 @@ private:
   std::vector<D_UINT32>       m_LocalsTypes;
   std::vector<D_UINT8>        m_Definitions;
   std::vector<bool>           m_SyncStmts;
+  WSynchronizer               m_Sync;
 };
 
 }

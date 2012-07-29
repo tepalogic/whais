@@ -38,7 +38,8 @@ public:
              const Unit&    procUnit,
              const D_UINT8* pCode,
              const D_UINT64 codeSize,
-             const D_UINT   localsCount)
+             const D_UINT   localsCount,
+             const D_UINT   procId)
     : m_Session (session),
       m_Stack (stack),
       m_ProcUnit (procUnit),
@@ -46,17 +47,17 @@ public:
       m_CodeSize (codeSize),
       m_CodePos (0),
       m_LocalsCount (localsCount),
-      m_StackBegin (stack.Size () - localsCount)
+      m_StackBegin (stack.Size () - localsCount),
+      m_ProcId (procId),
+      m_AquiredSync (~0)
   {
     if (localsCount > stack.Size ())
       throw InterException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
   }
 
-  ~Processor ()
-  {
-  }
-
   void Run ();
+  void AquireSync (const D_UINT8 sync);
+  void ReleaseSync (const D_UINT8 sync);
 
   Session&       GetSession () const { return m_Session; }
   SessionStack&  GetStack () const { return m_Stack; }
@@ -64,6 +65,7 @@ public:
 
   const D_UINT8* Code () const { return m_pCode; }
   D_UINT64       CurrentOffset () const { return m_CodePos; }
+  D_UINT64       CodeSize () const { return m_CodeSize; }
 
   size_t         LocalsCount () const { return m_LocalsCount; }
   size_t         StackBegin () const { return m_StackBegin; }
@@ -77,6 +79,8 @@ private:
   D_UINT64       m_CodePos;
   const D_UINT   m_LocalsCount;
   const size_t   m_StackBegin;
+  const D_UINT32 m_ProcId;
+  D_UINT16       m_AquiredSync;
 };
 
 }

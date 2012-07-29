@@ -142,8 +142,8 @@ NameSpace::~NameSpace ()
 //////////////////////////////////Session//////////////////////////////////////
 
 Session::Session (NameSpaceHolder& globalNames,
-                  NameSpaceHolder& privateNames) :
-    I_Session (),
+                  NameSpaceHolder& privateNames)
+  : I_Session (),
     m_GlobalNames (globalNames),
     m_PrivateNames (privateNames)
 {
@@ -402,6 +402,28 @@ Session::ProcLocalValue (const D_UINT32 procId, const D_UINT32 local)
 
   return pProcMgr.LocalValue (procId, local);
 }
+
+void
+Session::AquireProcSync (const D_UINT32 procId, const D_UINT32 sync)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  pProcMgr.AquireSync (procId, sync);
+}
+
+void
+Session::ReleaseProcSync (const D_UINT32 procId, const D_UINT32 sync)
+{
+  ProcedureManager& pProcMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                               m_GlobalNames.Get ().GetProcedureManager () :
+                               m_PrivateNames.Get ().GetProcedureManager ();
+
+  pProcMgr.ReleaseSync (procId, sync);
+}
+
+
 
 D_UINT32
 Session::DefineGlobalValue (const D_UINT8* pName,

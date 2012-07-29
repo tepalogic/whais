@@ -107,6 +107,12 @@ internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST (firstOp.m_Value ^ secondOp.m_Value);
 }
 
+template <typename T_SRC, typename T_DEST> void
+number_convert (const T_SRC& from, T_DEST& to)
+{
+  to = from.IsNull () ? T_DEST () : T_DEST (from.m_Value);
+}
+
 class NullOperand : public I_Operand
 {
 public:
@@ -687,7 +693,7 @@ public:
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
 
-  virtual StackValue  GetValueAt (const D_UINT64 index);
+  virtual StackValue GetValueAt (const D_UINT64 index);
 
 private:
   DBSText m_Value;
@@ -769,11 +775,29 @@ protected:
 
   virtual ~BaseArrayElOperand ();
 
-  const D_UINT64 m_ElementIndex;
-  DBSArray       m_Array;
+  template <typename DBS_T> void Get (DBS_T& out) const
+  {
+    if (m_Array.ElementsCount () < m_ElementIndex)
+      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
+
+    m_Array.GetElement (out, m_ElementIndex);
+
+    assert (out.IsNull () == false);
+  }
+
+  template <typename DBS_T> void Set (const DBS_T& value)
+  {
+    if (m_Array.ElementsCount () < m_ElementIndex)
+      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
+
+    m_Array.SetElement (value, m_ElementIndex);
+  }
 
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
+
+  const D_UINT64 m_ElementIndex;
+  DBSArray       m_Array;
 };
 
 class BoolArrayElOperand : public BaseArrayElOperand
@@ -1300,8 +1324,8 @@ class BaseFieldElOperand : public I_Operand
 {
 protected:
   BaseFieldElOperand (TableReference*   pTableRef,
-                  const ROW_INDEX   row,
-                  const FIELD_INDEX field)
+                      const ROW_INDEX   row,
+                      const FIELD_INDEX field)
     : m_Row (row),
       m_pRefTable (pTableRef),
       m_Field (field)
@@ -1320,12 +1344,36 @@ protected:
 
   virtual ~BaseFieldElOperand ();
 
+  template <typename DBS_T> void Get (DBS_T& out) const
+  {
+    I_DBSTable& table = m_pRefTable->GetTable ();
+
+    if (table.GetAllocatedRows () <= m_Row)
+      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
+
+    table.GetEntry (m_Row, m_Field, out);
+  }
+
+  template <typename DBS_T> void Set (const DBS_T& value)
+  {
+    I_DBSTable& table = m_pRefTable->GetTable ();
+
+    if (table.GetAllocatedRows () <= m_Row)
+      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
+
+    table.SetEntry (m_Row, m_Field, value);
+  }
+
+private:
+  friend class CharTextFieldElOperand;
+  friend class TextFieldElOperand;
+  friend class ArrayFieldElOperand;
+
+  BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
+
   const ROW_INDEX   m_Row;
   TableReference*   m_pRefTable;
   const FIELD_INDEX m_Field;
-
-private:
-  BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
 };
 
 class BoolFieldElOperand : public BaseFieldElOperand
@@ -1841,7 +1889,7 @@ public:
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
 
-  virtual StackValue  GetValueAt (const D_UINT64 index);
+  virtual StackValue GetValueAt (const D_UINT64 index);
 };
 
 class CharTextFieldElOperand : public BaseFieldElOperand
@@ -1893,13 +1941,47 @@ protected:
 
   virtual ~BaseArrayFieldElOperand ();
 
+  template <typename DBS_T> void Get (DBS_T& outValue) const
+  {
+    I_DBSTable& table = m_pRefTable->GetTable ();
+
+    if (table.GetAllocatedRows () <= m_Row)
+      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
+
+    DBSArray array;
+    table.GetEntry (m_Row, m_Field, array);
+
+    if (array.ElementsCount () <= m_Index)
+      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
+
+    array.GetElement (outValue, m_Index);
+    assert (outValue.IsNull () == false);
+  }
+
+  template <typename DBS_T> void Set (const DBS_T& value)
+  {
+    I_DBSTable& table = m_pRefTable->GetTable ();
+
+    if (table.GetAllocatedRows () <= m_Row)
+      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
+
+    DBSArray array;
+    table.GetEntry (m_Row, m_Field, array);
+
+    if (array.ElementsCount () <= m_Index)
+      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
+
+    array.SetElement (value, m_Index);
+    table.SetEntry (m_Row, m_Field, array);
+  }
+
+private:
+  BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
+
   const D_UINT64    m_Index;
   const ROW_INDEX   m_Row;
   TableReference*   m_pRefTable;
   const FIELD_INDEX m_Field;
-
-private:
-  BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
 };
 
 class BoolArrayFieldElOperand : public BaseArrayFieldElOperand

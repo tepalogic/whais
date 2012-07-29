@@ -42,7 +42,7 @@ test_op_ldnull (Session& session)
   SessionStack stack;
 
   D_UINT opSize = w_encode_opcode (W_LDNULL, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -67,7 +67,7 @@ test_op_ldc (Session& session)
   testCode [opSize + 2] = 0x52;
   testCode [opSize + 1] = 0x51;
   testCode [opSize + 0] = 0x50;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 4, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 4, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -90,7 +90,7 @@ test_op_ldi8 (Session& session)
 
   D_UINT opSize = w_encode_opcode (W_LDI8, testCode);
   testCode [opSize + 0] = 0xD8;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 1, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 1, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -114,7 +114,7 @@ test_op_ldi16 (Session& session)
   D_UINT opSize = w_encode_opcode (W_LDI16, testCode);
   testCode [opSize + 0] = 0xA1;
   testCode [opSize + 1] = 0xB4;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 2, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 2, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -140,7 +140,7 @@ test_op_ldi32 (Session& session)
   testCode [opSize + 1] = 0xD4;
   testCode [opSize + 2] = 0x21;
   testCode [opSize + 3] = 0x34;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 4, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 4, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -170,7 +170,7 @@ test_op_ldi64 (Session& session)
   testCode [opSize + 5] = 0x36;
   testCode [opSize + 6] = 0x37;
   testCode [opSize + 7] = 0x38;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 8, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 8, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -196,7 +196,7 @@ test_op_ldd (Session& session)
   testCode [opSize + 1] = 0x06;
   testCode [opSize + 2] = 0xF1;
   testCode [opSize + 3] = 0xD1;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 4, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 4, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -225,7 +225,7 @@ test_op_lddt (Session& session)
   testCode [opSize + 4] = 0x06;
   testCode [opSize + 5] = 0xF1;
   testCode [opSize + 6] = 0xD1;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 7, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 7, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -258,7 +258,7 @@ test_op_ldht (Session& session)
   testCode [opSize + 8]  = 0x06;
   testCode [opSize + 9]  = 0xF1;
   testCode [opSize + 10] = 0xD1;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 11, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 11, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -290,7 +290,7 @@ test_op_ldr (Session& session)
   testCode [opSize + 6]  = 0x00;
   testCode [opSize + 7]  = 0x00;
   testCode [opSize + 8]  = 0xFE;
-  Processor proc (session, stack, unusedUnit, testCode, opSize + 9, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize + 9, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -324,7 +324,7 @@ test_op_ldt (Session& session)
   testCode [opSize + 1]  = 0x00;
   testCode [opSize + 2]  = 0x00;
   testCode [opSize + 3]  = 0x00;
-  Processor proc (session, stack, unit, testCode, opSize + 4, 0);
+  Processor proc (session, stack, unit, testCode, opSize + 4, 0, 1);
   proc.Run ();
 
   if (stack.Size () != 1)
@@ -345,7 +345,7 @@ test_op_ldbt (Session& session)
   SessionStack stack;
 
   D_UINT opSize = w_encode_opcode (W_LDBT, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
   proc.Run ();
 
   DBSBool value;
@@ -367,7 +367,7 @@ test_op_ldbf (Session& session)
   SessionStack stack;
 
   D_UINT opSize = w_encode_opcode (W_LDBF, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0);
+  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
   proc.Run ();
 
   DBSBool value;

@@ -202,3 +202,58 @@ ProcedureManager::Code (const D_UINT procEntry, D_UINT64* pOutCodeSize) const
   return &m_Definitions[entry.m_CodeIndex];
 }
 
+void
+ProcedureManager::AquireSync (const D_UINT procEntry, const D_UINT32 sync)
+{
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
+  assert (procedure < m_ProcsEntrys.size ());
+
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+
+  const ProcedureEntry& entry = m_ProcsEntrys[procedure];
+
+  assert (sync < entry.m_SyncCount);
+
+  if (sync >= entry.m_SyncCount)
+    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+
+  do
+    {
+      WSynchronizerRAII holder (m_Sync);
+      const bool aquired = m_SyncStmts[entry.m_SyncIndex + sync];
+      if (aquired)
+        {
+          //Some one has taken this prior! Prepare to try again!
+          holder.Leave ();
+          wh_yield ();
+        }
+      else
+        {
+          m_SyncStmts[entry.m_SyncIndex + sync] = true;
+          break;
+        }
+    }
+  while (true);
+}
+
+void
+ProcedureManager::ReleaseSync (const D_UINT procEntry, const D_UINT32 sync)
+{
+  const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
+  assert (procedure < m_ProcsEntrys.size ());
+
+  if (procedure >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+
+  const ProcedureEntry& entry = m_ProcsEntrys[procedure];
+
+  assert (sync < entry.m_SyncCount);
+
+  if (sync >= entry.m_SyncCount)
+    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+
+  assert (m_SyncStmts[entry.m_SyncIndex + sync] == true);
+  m_SyncStmts[entry.m_SyncIndex + sync] = false;
+}
+

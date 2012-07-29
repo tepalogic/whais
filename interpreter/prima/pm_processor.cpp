@@ -498,17 +498,9 @@ op_func_call (Processor& processor, D_INT64& offset)
                        procUnit,
                        pProcCode,
                        procCodeSize,
-                       procLocalsCount);
-  try
-  {
-      procedure.Run ();
-  }
-  catch (...)
-  {
-      assert (false);
-      //TODO: We need to implement this!
-      throw;
-  }
+                       procLocalsCount,
+                       prcMgrId);
+  procedure.Run ();
 }
 
 static void
@@ -523,6 +515,8 @@ op_func_ret (Processor& processor, D_INT64& offset)
 
   stack.Pop (stackSize - processor.StackBegin());
   stack.Push (result);
+
+  offset = processor.CodeSize (); //Signal the procedure return
 }
 
 template <class DBS_T> static void
@@ -1022,6 +1016,270 @@ op_func_jmp (Processor& processor, D_INT64& offset)
   offset += jmpOffset;
 }
 
+template <D_UINT EXCEPTION_CODE> void
+op_func_ind (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  DBSUInt64 index;
+  stack[stackSize - 1].GetOperand ().GetValue (index);
+
+  if (index.IsNull ())
+    throw InterException (NULL, _EXTRA (EXCEPTION_CODE));
+
+  StackValue result =
+      stack[stackSize - 2].GetOperand ().GetValueAt (index.m_Value);
+
+  stack.Pop (2);
+  stack.Push (result);
+}
+
+static void
+op_func_indta (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  DBSUInt64 index;
+  stack[stackSize - 1].GetOperand ().GetValue (index);
+
+  if (index.IsNull ())
+    throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_NULL));
+
+  TableOperand& tableOp = _SC (TableOperand&,
+                                stack[stackSize - 2].GetOperand ());
+
+  const D_UINT8* const  pData = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const D_UINT32        textOff  = load_le_uint32 (pData);
+  const D_UINT8* const  pTextSrc = processor.GetUnit ().GetConstData (textOff);
+
+  offset += sizeof (D_UINT32);
+
+  FIELD_INDEX field = tableOp.GetTable ().GetFieldIndex (_RC (const D_CHAR*,
+                                                              pTextSrc));
+
+  FieldOperand fieldOp (tableOp, field);
+  StackValue   result = fieldOp.GetValueAt (index.m_Value);
+
+  stack.Pop (2);
+  stack.Push (result);
+}
+
+static void
+op_func_self (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 1));
+
+  TableOperand& tableOp = _SC (TableOperand&,
+                                stack[stackSize - 1].GetOperand ());
+
+  const D_UINT8* const  pData = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const D_UINT32        textOff  = load_le_uint32 (pData);
+  const D_UINT8* const  pTextSrc = processor.GetUnit ().GetConstData (textOff);
+
+  offset += sizeof (D_UINT32);
+
+  FIELD_INDEX field = tableOp.GetTable ().GetFieldIndex (_RC (const D_CHAR*,
+                                                              pTextSrc));
+
+  FieldOperand fieldOp (tableOp, field);
+  StackValue   result (fieldOp);
+
+  stack.Pop (1);
+  stack.Push (result);
+}
+
+static void
+op_func_bsync (Processor& processor, D_INT64& offset)
+{
+  const D_UINT8* const  pData = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const D_UINT8 syncStmt = *pData;
+  offset += sizeof (D_UINT8);
+
+  processor.AquireSync (syncStmt);
+}
+
+static void
+op_func_esync (Processor& processor, D_INT64& offset)
+{
+  const D_UINT8* const  pData = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const D_UINT8 syncStmt = *pData;
+  offset += sizeof (D_UINT8);
+
+  processor.ReleaseSync (syncStmt);
+}
+
+template <class DBS_T> static void
+op_func_sadd (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfAdd (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_ssub (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfSub (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_smul (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfMul (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_sdiv (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfDiv (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_smod (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfMod (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_sand (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfAnd (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_sxor (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfXor (delta);
+
+  stack.Pop (1);
+}
+
+template <class DBS_T> static void
+op_func_sor (Processor& processor, D_INT64& offset)
+{
+  SessionStack& stack     = processor.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+          (stackSize - 2));
+
+  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+
+  DBS_T delta;
+  stack[stackSize - 1].GetOperand ().GetValue (delta);
+
+  destOp.SelfOr (delta);
+
+  stack.Pop (1);
+}
+
 
 
 typedef void (*OP_FUNC) (Processor& processor, D_INT64& ioOffset);
@@ -1159,7 +1417,41 @@ static OP_FUNC operations[] = {
                                 op_func_jfc,
                                 op_func_jt,
                                 op_func_jtc,
-                                op_func_jmp
+                                op_func_jmp,
+
+                                op_func_ind<InterException::TEXT_INDEX_NULL>,
+                                op_func_ind<InterException::ARRAY_INDEX_NULL>,
+                                op_func_ind<InterException::ROW_INDEX_NULL>,
+                                op_func_indta,
+                                op_func_self,
+
+                                op_func_bsync,
+                                op_func_esync,
+
+                                op_func_sadd<DBSInt64>,
+                                op_func_sadd<DBSRichReal>,
+                                op_func_sadd<DBSChar>,
+                                op_func_sadd<DBSText>,
+
+                                op_func_ssub<DBSInt64>,
+                                op_func_ssub<DBSRichReal>,
+
+                                op_func_smul<DBSInt64>,
+                                op_func_smul<DBSRichReal>,
+
+                                op_func_sdiv<DBSInt64>,
+                                op_func_sdiv<DBSRichReal>,
+
+                                op_func_smod<DBSInt64>,
+
+                                op_func_sand<DBSInt64>,
+                                op_func_sand<DBSBool>,
+
+                                op_func_sxor<DBSInt64>,
+                                op_func_sxor<DBSBool>,
+
+                                op_func_sor<DBSInt64>,
+                                op_func_sor<DBSBool>
                               };
 
 /////////////////////////////Processor/////////////////////////////////////////
@@ -1169,19 +1461,55 @@ Processor::Run ()
 {
   W_OPCODE opcode;
 
-  while (m_CodePos < m_CodeSize)
-    {
+  try
+  {
+    while (m_CodePos < m_CodeSize)
+      {
+        D_INT64 offset = whc_decode_opcode (m_pCode + m_CodePos, &opcode);
 
-      D_INT64 offset = whc_decode_opcode (m_pCode + m_CodePos, &opcode);
+        assert (opcode < (sizeof operations / sizeof operations[0]));
+        assert (opcode != 0);
+        assert ((offset > 0) && (offset < 3));
 
-      assert (opcode < (sizeof operations / sizeof operations[0]));
-      assert (opcode != 0);
-      assert ((offset > 0) && (offset < 3));
+        operations[opcode] (*this, offset);
 
-      operations[opcode] (*this, offset);
-      m_CodePos += offset;
+        m_CodePos += offset;
+        assert ((m_CodePos <= m_CodeSize)
+                || (_SC (D_UINT64, offset) == m_CodeSize));
+      }
+  }
+  catch (...)
+  {
+      if (m_AquiredSync != ~0)
+        ReleaseSync (m_AquiredSync);
 
-      assert (m_CodePos <= m_CodeSize);
-    }
+      assert (m_Stack.Size () >= m_StackBegin);
+
+      m_Stack.Pop (m_Stack.Size () - m_StackBegin);
+      throw;
+  }
+
+  //After a procedure execution, only the return value should be present
+  //on the stack
+  assert (m_Stack.Size () == (m_StackBegin + 1));
 }
 
+void
+Processor::AquireSync (const D_UINT8 sync)
+{
+  if (m_AquiredSync != ~0)
+    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+
+  m_Session.AquireProcSync (m_ProcId, sync);
+  m_AquiredSync = sync;
+}
+
+void
+Processor::ReleaseSync (const D_UINT8 sync)
+{
+  if (m_AquiredSync != sync)
+    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+
+  m_Session.ReleaseProcSync (m_ProcId, sync);
+  m_AquiredSync = ~0;
+}

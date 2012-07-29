@@ -132,13 +132,11 @@ FieldOperand::GetTable ()
 StackValue
 FieldOperand::GetValueAt (const D_UINT64 index)
 {
-  if (index >= m_pRefTable->GetTable ().GetAllocatedRows ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_ROW_INDEX));
 
-  if ((m_FieldType == T_UNKNOWN) ||
-      (m_pRefTable == NULL))
+  if ((m_FieldType == T_UNKNOWN) || (m_pRefTable == NULL))
     {
-      throw InterException (NULL, _EXTRA (InterException::FIELD_TYPE_MISMATCH));
+      throw InterException (NULL,
+                            _EXTRA (InterException::FIELD_TYPE_MISMATCH));
     }
 
   if (IS_ARRAY (m_FieldType))
@@ -183,14 +181,20 @@ FieldOperand::GetValueAt (const D_UINT64 index)
   throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
 }
 
-//////////////////////////BoolFieldElOperand///////////////////////////////////
+///////////////////////BaseFieldElOperand//////////////////////////////////////
 
+BaseFieldElOperand::~BaseFieldElOperand ()
+{
+  m_pRefTable->DecrementRefCount ();
+}
+
+//////////////////////////BoolFieldElOperand///////////////////////////////////
 
 bool
 BoolFieldElOperand::IsNull () const
 {
   DBSBool currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -198,43 +202,46 @@ BoolFieldElOperand::IsNull () const
 void
 BoolFieldElOperand::GetValue (DBSBool& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 BoolFieldElOperand::SetValue (const DBSBool& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 BoolFieldElOperand::SelfAnd (const DBSBool& value)
 {
   DBSBool currValue;
+  Get (currValue);
 
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
   currValue = internal_and (currValue, value);
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+
+  Set (currValue);
 }
 
 void
 BoolFieldElOperand::SelfXor (const DBSBool& value)
 {
   DBSBool currValue;
+  Get (currValue);
 
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
   currValue = internal_xor (currValue, value);
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+
+  Set (currValue);
 }
 
 void
 BoolFieldElOperand::SelfOr (const DBSBool& value)
 {
   DBSBool currValue;
+  Get (currValue);
 
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
   currValue = internal_or (currValue, value);
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+
+  Set (currValue);
 }
 
 //////////////////////////CharFieldElOperand///////////////////////////////////
@@ -243,7 +250,7 @@ bool
 CharFieldElOperand::IsNull () const
 {
   DBSChar currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -251,26 +258,23 @@ CharFieldElOperand::IsNull () const
 void
 CharFieldElOperand::GetValue (DBSChar& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
-
+  Get (outValue);
 }
 
 void
 CharFieldElOperand::GetValue (DBSText& outValue) const
 {
-  DBSChar currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  DBSChar ch;
+  Get (ch);
 
-  const DBSText result;
-  outValue = result;
-
-  outValue.Append (currValue);
+  outValue = DBSText ();
+  outValue.Append (ch);
 }
 
 void
 CharFieldElOperand::SetValue (const DBSChar& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 //////////////////////////DateFieldElOperand///////////////////////////////////
@@ -279,7 +283,7 @@ bool
 DateFieldElOperand::IsNull () const
 {
   DBSDate currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -287,55 +291,48 @@ DateFieldElOperand::IsNull () const
 void
 DateFieldElOperand::GetValue (DBSDate& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
-
+  Get (outValue);
 }
 
 void
 DateFieldElOperand::GetValue (DBSDateTime& outValue) const
 {
   DBSDate currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  if (! currValue.IsNull() )
-    {
-      const DBSDateTime temp (currValue.m_Year,
-                              currValue.m_Month,
-                              currValue.m_Day,
-                              0,
-                              0,
-                              0);
-      outValue = temp;
-    }
-  else
+  if (currValue.IsNull ())
     outValue = DBSDateTime ();
+  else
+    outValue = DBSDateTime (currValue.m_Year,
+                            currValue.m_Month,
+                            currValue.m_Day,
+                            0,
+                            0,
+                            0);
 }
 
 void
 DateFieldElOperand::GetValue (DBSHiresTime& outValue) const
 {
   DBSDate currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  if (! currValue.IsNull())
-    {
-      const DBSHiresTime temp (currValue.m_Year,
-                               currValue.m_Month,
-                               currValue.m_Day,
-                               0,
-                               0,
-                               0,
-                               0);
-      outValue = temp;
-    }
-  else
+  if (currValue.IsNull ())
     outValue = DBSHiresTime ();
+  else
+    outValue = DBSHiresTime (currValue.m_Year,
+                             currValue.m_Month,
+                             currValue.m_Day,
+                             0,
+                             0,
+                             0,
+                             0);
 }
 
 void
 DateFieldElOperand::SetValue (const DBSDate& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 /////////////////////////DateTimeFieldElOperand////////////////////////////////
@@ -344,7 +341,7 @@ bool
 DateTimeFieldElOperand::IsNull () const
 {
   DBSDateTime currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -353,51 +350,42 @@ void
 DateTimeFieldElOperand::GetValue (DBSDate& outValue) const
 {
   DBSDateTime currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  if (! currValue.IsNull ())
-    {
-      const DBSDate temp (currValue.m_Year,
-                          currValue.m_Month,
-                          currValue.m_Day);
-      outValue = temp;
-    }
-  else
+  if (currValue.IsNull ())
     outValue = DBSDate ();
+  else
+    outValue = DBSDate (currValue.m_Year, currValue.m_Month, currValue.m_Day);
 }
 
 void
 DateTimeFieldElOperand::GetValue (DBSDateTime& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
-
+  Get (outValue);
 }
 
 void
 DateTimeFieldElOperand::GetValue (DBSHiresTime& outValue) const
 {
   DBSDateTime currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  if (! currValue.IsNull ())
-    {
-      const DBSHiresTime temp (currValue.m_Year,
-                               currValue.m_Month,
-                               currValue.m_Day,
-                               currValue.m_Hour,
-                               currValue.m_Minutes,
-                               currValue.m_Seconds,
-                               0);
-      outValue = temp;
-    }
-  else
+  if (currValue.IsNull ())
     outValue = DBSHiresTime ();
+  else
+    outValue = DBSHiresTime (currValue.m_Year,
+                             currValue.m_Month,
+                             currValue.m_Day,
+                             currValue.m_Hour,
+                             currValue.m_Minutes,
+                             currValue.m_Seconds,
+                             0);
 }
 
 void
 DateTimeFieldElOperand::SetValue (const DBSDateTime& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 ///////////////////////HiresTimeFieldElOperand/////////////////////////////////
@@ -406,7 +394,7 @@ bool
 HiresTimeFieldElOperand::IsNull () const
 {
   DBSHiresTime currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -415,49 +403,41 @@ void
 HiresTimeFieldElOperand::GetValue (DBSDate& outValue) const
 {
   DBSHiresTime currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  if (! currValue.IsNull ())
-    {
-      const DBSDate temp (currValue.m_Year,
-                          currValue.m_Month,
-                          currValue.m_Day);
-      outValue = temp;
-    }
-  else
+  if (currValue.IsNull ())
     outValue = DBSDate ();
+  else
+    outValue = DBSDate (currValue.m_Year, currValue.m_Month, currValue.m_Day);
 }
 
 void
 HiresTimeFieldElOperand::GetValue (DBSDateTime& outValue) const
 {
   DBSHiresTime currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  if (! currValue.IsNull ())
-    {
-  const DBSDateTime temp (currValue.m_Year,
-                          currValue.m_Month,
-                          currValue.m_Day,
-                          currValue.m_Hour,
-                          currValue.m_Minutes,
-                          currValue.m_Seconds);
-  outValue = temp;
-    }
-  else
+  if (currValue.IsNull ())
     outValue = DBSDateTime ();
+  else
+    outValue = DBSDateTime (currValue.m_Year,
+                            currValue.m_Month,
+                            currValue.m_Day,
+                            currValue.m_Hour,
+                            currValue.m_Minutes,
+                            currValue.m_Seconds);
 }
 
 void
 HiresTimeFieldElOperand::GetValue (DBSHiresTime& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 HiresTimeFieldElOperand::SetValue (const DBSHiresTime& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 //////////////////////////UInt8FieldElOperand//////////////////////////////////
@@ -466,7 +446,7 @@ bool
 UInt8FieldElOperand::IsNull () const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -475,186 +455,181 @@ void
 UInt8FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt8FieldElOperand::SetValue (const DBSUInt8& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 UInt8FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_and (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_xor (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt8FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSUInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_or (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////UInt16FieldElOperand//////////////////////////////////
@@ -663,7 +638,7 @@ bool
 UInt16FieldElOperand::IsNull () const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -672,185 +647,181 @@ void
 UInt16FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSUInt8 () : DBSUInt8 (currValue.m_Value);
-
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt16FieldElOperand::SetValue (const DBSUInt16& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 UInt16FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt16FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSUInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////UInt32FieldElOperand//////////////////////////////////
@@ -859,7 +830,7 @@ bool
 UInt32FieldElOperand::IsNull () const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -868,184 +839,181 @@ void
 UInt32FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSUInt8 () : DBSUInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 UInt32FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt32FieldElOperand::SetValue (const DBSUInt32& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 UInt32FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt32FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSUInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////UInt64FieldElOperand//////////////////////////////////
@@ -1054,7 +1022,7 @@ bool
 UInt64FieldElOperand::IsNull () const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -1063,185 +1031,181 @@ void
 UInt64FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSUInt8 () : DBSUInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 UInt64FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 UInt64FieldElOperand::SetValue (const DBSUInt64& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 UInt64FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 UInt64FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSUInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 //////////////////////////Int8FieldElOperand//////////////////////////////////
@@ -1250,7 +1214,7 @@ bool
 Int8FieldElOperand::IsNull () const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -1258,188 +1222,182 @@ Int8FieldElOperand::IsNull () const
 void
 Int8FieldElOperand::GetValue (DBSInt8& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt8 () : DBSUInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int8FieldElOperand::SetValue (const DBSInt8& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 Int8FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int8FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSInt8 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////Int16FieldElOperand//////////////////////////////////
@@ -1448,7 +1406,7 @@ bool
 Int16FieldElOperand::IsNull () const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -1457,185 +1415,181 @@ void
 Int16FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSInt16& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSUInt8 () : DBSUInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int16FieldElOperand::SetValue (const DBSInt16& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 Int16FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int16FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSInt16 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////Int32FieldElOperand//////////////////////////////////
@@ -1644,7 +1598,7 @@ bool
 Int32FieldElOperand::IsNull () const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -1653,185 +1607,181 @@ void
 Int32FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSInt32& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSInt64& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt64 () : DBSInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSUInt8 () : DBSUInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int32FieldElOperand::SetValue (const DBSInt32& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 Int32FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int32FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSInt32 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////Int64FieldElOperand//////////////////////////////////
@@ -1840,7 +1790,7 @@ bool
 Int64FieldElOperand::IsNull () const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -1849,185 +1799,181 @@ void
 Int64FieldElOperand::GetValue (DBSInt8& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt8 () : DBSInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSInt16& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt16 () : DBSInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSInt32& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSInt32 () : DBSInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSInt64& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSReal () : DBSReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSUInt8& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ? DBSUInt8 () : DBSUInt8 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSUInt16& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt16 () : DBSUInt16 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSUInt32& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt32 () : DBSUInt32 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::GetValue (DBSUInt64& outValue) const
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSUInt64 () : DBSUInt64 (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 Int64FieldElOperand::SetValue (const DBSInt64& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 Int64FieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfMod (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mod (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfAnd (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_and (currValue, value);
+  currValue = internal_and(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfXor (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_xor (currValue, value);
+  currValue = internal_xor(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 Int64FieldElOperand::SelfOr (const DBSInt64& value)
 {
   DBSInt64 currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  currValue = internal_or (currValue, value);
+  currValue = internal_or(currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////RealFieldElOperand//////////////////////////////////
@@ -2036,7 +1982,7 @@ bool
 RealFieldElOperand::IsNull () const
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -2044,111 +1990,110 @@ RealFieldElOperand::IsNull () const
 void
 RealFieldElOperand::GetValue (DBSReal& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 RealFieldElOperand::GetValue (DBSRichReal& outValue) const
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
-  outValue = currValue.IsNull () ?
-              DBSRichReal () : DBSRichReal (currValue.m_Value);
+  number_convert (currValue, outValue);
 }
 
 void
 RealFieldElOperand::SetValue (const DBSReal& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 RealFieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfAdd (const DBSRichReal& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfMul (const DBSRichReal& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RealFieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////RichRealFieldElOperand////////////////////////////////
@@ -2157,7 +2102,7 @@ bool
 RichRealFieldElOperand::IsNull () const
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -2166,109 +2111,107 @@ void
 RichRealFieldElOperand::GetValue (DBSReal& outValue) const
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
-
-  outValue = currValue.IsNull () ? DBSReal () : DBSReal (currValue.m_Value);
+  Get (currValue);
 }
 
 void
 RichRealFieldElOperand::GetValue (DBSRichReal& outValue) const
 {
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, outValue);
+  Get (outValue);
 }
 
 void
 RichRealFieldElOperand::SetValue (const DBSRichReal& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 RichRealFieldElOperand::SelfAdd (const DBSInt64& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfAdd (const DBSRichReal& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_add (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfSub (const DBSInt64& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfSub (const DBSRichReal& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_sub (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfMul (const DBSInt64& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfMul (const DBSRichReal& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_mul (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfDiv (const DBSInt64& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 RichRealFieldElOperand::SelfDiv (const DBSRichReal& value)
 {
   DBSRichReal currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue = internal_div (currValue, value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 /////////////////////////TextFieldElOperand////////////////////////////////
@@ -2277,7 +2220,7 @@ bool
 TextFieldElOperand::IsNull () const
 {
   DBSText currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -2285,38 +2228,35 @@ TextFieldElOperand::IsNull () const
 void
 TextFieldElOperand::GetValue (DBSText& outValue) const
 {
-  DBSText currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
-
-  currValue = outValue;
+  Get (outValue);
 }
 
 void
 TextFieldElOperand::SetValue (const DBSText& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 void
 TextFieldElOperand::SelfAdd (const DBSChar& value)
 {
   DBSText currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue.Append (value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 void
 TextFieldElOperand::SelfAdd (const DBSText& value)
 {
   DBSText currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   currValue.Append (value);
 
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, currValue);
+  Set (currValue);
 }
 
 StackValue
@@ -2334,7 +2274,7 @@ bool
 ArrayFieldElOperand::IsNull () const
 {
   DBSArray currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
+  Get (currValue);
 
   return currValue.IsNull ();
 }
@@ -2342,16 +2282,13 @@ ArrayFieldElOperand::IsNull () const
 void
 ArrayFieldElOperand::GetValue (DBSArray& outValue) const
 {
-  DBSArray currValue;
-  m_pRefTable->GetTable().GetEntry (m_Row, m_Field, currValue);
-
-  currValue = outValue;
+  Get (outValue);
 }
 
 void
 ArrayFieldElOperand::SetValue (const DBSArray& value)
 {
-  m_pRefTable->GetTable().SetEntry (m_Row, m_Field, value);
+  Set (value);
 }
 
 StackValue
