@@ -423,6 +423,12 @@ Session::ReleaseProcSync (const D_UINT32 procId, const D_UINT32 sync)
   pProcMgr.ReleaseSync (procId, sync);
 }
 
+I_DBSHandler&
+Session::DBSHandler ()
+{
+  return m_PrivateNames.Get ().GetDBSHandler ();
+}
+
 
 
 D_UINT32

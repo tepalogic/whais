@@ -150,7 +150,6 @@ public:
   SessionStack ();
   ~SessionStack ();
 
-  void  Push (StackValue& value);
   void  Push ();
   void  Push (DBSBool& value);
   void  Push (DBSChar& value);
@@ -169,6 +168,9 @@ public:
   void  Push (DBSUInt64& value);
   void  Push (DBSText& value);
   void  Push (DBSArray& value);
+  void  Push (I_DBSHandler& dbs, I_DBSTable& table);
+
+  void  Push (StackValue& value);
 
   void  Pop (const D_UINT count);
 

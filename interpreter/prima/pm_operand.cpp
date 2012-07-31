@@ -2879,12 +2879,6 @@ SessionStack::~SessionStack ()
 }
 
 void
-SessionStack::Push (StackValue& value)
-{
-  m_Stack.push_back (value);
-}
-
-void
 SessionStack::Push ()
 {
   NullOperand stackOp;
@@ -3045,6 +3039,22 @@ SessionStack::Push (DBSArray& value)
 
   Push (stackValue);
 }
+
+void
+SessionStack::Push (I_DBSHandler& dbsHnd, I_DBSTable& table)
+{
+  TableOperand stackOp(dbsHnd, table);
+  StackValue stackValue (stackOp);
+
+  Push (stackValue);
+}
+
+void
+SessionStack::Push (StackValue& value)
+{
+  m_Stack.push_back (value);
+}
+
 
 void
 SessionStack::Pop (const D_UINT count)

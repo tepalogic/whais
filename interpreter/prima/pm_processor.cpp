@@ -415,7 +415,7 @@ op_func_stta (Processor& processor, D_INT64& offset)
       TableOperand& srcTableOp  = _SC (TableOperand&, source);
       TableOperand& destTableOp = _SC (TableOperand&, dest);
 
-      srcTableOp = destTableOp;
+      destTableOp = srcTableOp;
     }
 
   stack.Pop (1);
@@ -433,7 +433,7 @@ op_func_stf (Processor& processor, D_INT64& offset)
   FieldOperand& src  = _SC (FieldOperand&, stack[stackSize - 1].GetOperand ());
   FieldOperand& dest = _SC (FieldOperand&, stack[stackSize - 2].GetOperand ());
 
-  src = dest;
+  dest = src;
 
   stack.Pop (1);
 }
@@ -1329,7 +1329,7 @@ static OP_FUNC operations[] = {
                                 op_func_ldgb8,
                                 op_func_ldgb16,
                                 op_func_ldgb32,
-                                op_func_cts,
+                                op_func_cts, //
 
                                 op_func_stXX<DBSBool>,
                                 op_func_stXX<DBSChar>,
@@ -1351,11 +1351,11 @@ static OP_FUNC operations[] = {
                                 op_func_stf,
                                 op_func_stXX<DBSArray>,
 
-                                op_func_inull,
-                                op_func_nnull,
+                                op_func_inull, //
+                                op_func_nnull, //
 
-                                op_func_call,
-                                op_func_ret,
+                                op_func_call, //
+                                op_func_ret, //
 
                                 op_func_addXX<DBSInt64>,
                                 op_func_addXX<DBSRichReal>,

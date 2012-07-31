@@ -1297,7 +1297,7 @@ class FieldOperand : public I_Operand
 public:
   FieldOperand ()
     : m_pRefTable (NULL),
-      m_Field (),
+      m_Field (~0),
       m_FieldType (T_UNDETERMINED)
   {
   }

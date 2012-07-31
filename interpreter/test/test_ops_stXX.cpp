@@ -267,9 +267,106 @@ test_op_stt (Session& session)
 }
 
 static bool
+test_op_stta (Session& session)
+{
+  std::cout << "Testing table assignment...\n";
+  D_UINT8 testCode[32] = {0,};
+  SessionStack stack;
+
+  const DBSUInt32 firstVal (0x31);
+  const DBSUInt32 secondVal (0x32);
+
+  DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
+
+  I_DBSTable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  I_DBSTable& secondTable = session.DBSHandler ().CreateTempTable (1, &fd);
+
+  secondTable.SetEntry (secondTable.AddReusedRow (), 0, firstVal);
+  secondTable.SetEntry (secondTable.AddReusedRow (), 0, secondVal);
+
+  D_UINT opSize = w_encode_opcode (W_STTA, testCode);
+  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+
+  stack.Push (session.DBSHandler (), firstTable);
+  stack.Push (session.DBSHandler (), secondTable);
+
+  if (stack[0].GetOperand ().IsNull () == false)
+    return false;
+
+  if (stack[1].GetOperand ().IsNull ())
+    return false;
+
+  proc.Run ();
+
+  if (stack.Size () != 1)
+    return false;
+
+  if (stack[0].GetOperand ().IsNull ())
+    return false;
+
+  I_DBSTable& result = stack[0].GetOperand ().GetTable ();
+
+  if (&result != &secondTable)
+    return false;
+
+  return true;
+}
+
+static bool
+test_op_stf (Session& session)
+{
+  std::cout << "Testing field assignment...\n";
+  D_UINT8 testCode[32] = {0,};
+  SessionStack stack;
+
+  const DBSUInt32 firstVal (0x31);
+  const DBSUInt32 secondVal (0x32);
+
+  DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
+
+  I_DBSTable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  TableOperand tableOp (session.DBSHandler (), firstTable);
+
+  FieldOperand op;
+  FieldOperand op2 (tableOp, 0);
+  StackValue   sv1 (op);
+  StackValue   sv2 (op2);
+
+  D_UINT opSize = w_encode_opcode (W_STF, testCode);
+  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+
+  stack.Push (sv1);
+  stack.Push (sv2);
+
+  if (stack[0].GetOperand ().IsNull () == false)
+    return false;
+
+  if (stack[1].GetOperand ().IsNull ())
+    return false;
+
+  proc.Run ();
+
+  if (stack.Size () != 1)
+    return false;
+
+  if (stack[0].GetOperand ().IsNull ())
+    return false;
+
+  I_DBSTable& result = stack[0].GetOperand ().GetTable ();
+
+  if (&result != &firstTable)
+    return false;
+
+  if (stack[0].GetOperand ().GetField () != 0)
+    return false;
+
+  return true;
+}
+
+static bool
 test_op_sta (Session& session)
 {
-  std::cout << "Testing text assignment...\n";
+  std::cout << "Testing attay assignment...\n";
   D_UINT8 testCode[32] = {0,};
   SessionStack stack;
 
@@ -312,8 +409,6 @@ test_op_sta (Session& session)
 
   return true;
 }
-
-
 
 
 int
@@ -395,6 +490,8 @@ main ()
                                            "rich real"
                                                    );
     success = success && test_op_stt (_SC (Session&, commonSession));
+    success = success && test_op_stta (_SC (Session&, commonSession));
+    success = success && test_op_stf (_SC (Session&, commonSession));
     success = success && test_op_sta (_SC (Session&, commonSession));
 
 

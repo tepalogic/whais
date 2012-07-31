@@ -124,6 +124,8 @@ public:
   void AquireProcSync (const D_UINT32 procId, const D_UINT32 sync);
   void ReleaseProcSync (const D_UINT32 procId, const D_UINT32 sync);
 
+  I_DBSHandler& DBSHandler ();
+
 private:
   D_UINT32 DefineGlobalValue (const D_UINT8* pName,
                               const D_UINT   nameLength,
