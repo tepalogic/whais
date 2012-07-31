@@ -87,6 +87,9 @@ public:
 
     FIELD_TYPE_MISMATCH,
 
+
+    DIVIDE_BY_ZERO,
+
     INTERNAL_ERROR
   };
 };

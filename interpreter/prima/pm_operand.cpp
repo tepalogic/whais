@@ -2888,7 +2888,7 @@ SessionStack::Push ()
 }
 
 void
-SessionStack::Push (DBSBool& value)
+SessionStack::Push (const DBSBool& value)
 {
   BoolOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -2897,7 +2897,7 @@ SessionStack::Push (DBSBool& value)
 }
 
 void
-SessionStack::Push (DBSChar& value)
+SessionStack::Push (const DBSChar& value)
 {
   CharOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -2906,7 +2906,7 @@ SessionStack::Push (DBSChar& value)
 }
 
 void
-SessionStack::Push (DBSDate& value)
+SessionStack::Push (const DBSDate& value)
 {
   DateOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -2915,7 +2915,7 @@ SessionStack::Push (DBSDate& value)
 }
 
 void
-SessionStack::Push (DBSDateTime& value)
+SessionStack::Push (const DBSDateTime& value)
 {
   DateTimeOperand stackOp (value);
   StackValue      stackValue (stackOp);
@@ -2924,7 +2924,7 @@ SessionStack::Push (DBSDateTime& value)
 }
 
 void
-SessionStack::Push (DBSHiresTime& value)
+SessionStack::Push (const DBSHiresTime& value)
 {
   HiresTimeOperand stackOp (value);
   StackValue       stackValue (stackOp);
@@ -2933,7 +2933,7 @@ SessionStack::Push (DBSHiresTime& value)
 }
 
 void
-SessionStack::Push (DBSInt8& value)
+SessionStack::Push (const DBSInt8& value)
 {
   Int8Operand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -2942,7 +2942,7 @@ SessionStack::Push (DBSInt8& value)
 }
 
 void
-SessionStack::Push (DBSInt16& value)
+SessionStack::Push (const DBSInt16& value)
 {
   Int16Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -2951,7 +2951,7 @@ SessionStack::Push (DBSInt16& value)
 }
 
 void
-SessionStack::Push (DBSInt32& value)
+SessionStack::Push (const DBSInt32& value)
 {
   Int32Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -2960,7 +2960,7 @@ SessionStack::Push (DBSInt32& value)
 }
 
 void
-SessionStack::Push (DBSInt64& value)
+SessionStack::Push (const DBSInt64& value)
 {
   Int64Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -2969,7 +2969,7 @@ SessionStack::Push (DBSInt64& value)
 }
 
 void
-SessionStack::Push (DBSUInt8& value)
+SessionStack::Push (const DBSUInt8& value)
 {
   UInt8Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -2978,7 +2978,7 @@ SessionStack::Push (DBSUInt8& value)
 }
 
 void
-SessionStack::Push (DBSUInt16& value)
+SessionStack::Push (const DBSUInt16& value)
 {
   UInt16Operand stackOp (value);
   StackValue    stackValue (stackOp);
@@ -2987,7 +2987,7 @@ SessionStack::Push (DBSUInt16& value)
 }
 
 void
-SessionStack::Push (DBSUInt32& value)
+SessionStack::Push (const DBSUInt32& value)
 {
   UInt32Operand stackOp (value);
   StackValue    stackValue (stackOp);
@@ -2996,7 +2996,7 @@ SessionStack::Push (DBSUInt32& value)
 }
 
 void
-SessionStack::Push (DBSUInt64& value)
+SessionStack::Push (const DBSUInt64& value)
 {
   UInt64Operand stackOp (value);
   StackValue    stackValue (stackOp);
@@ -3005,7 +3005,7 @@ SessionStack::Push (DBSUInt64& value)
 }
 
 void
-SessionStack::Push (DBSReal& value)
+SessionStack::Push (const DBSReal& value)
 {
   RealOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3014,7 +3014,7 @@ SessionStack::Push (DBSReal& value)
 }
 
 void
-SessionStack::Push (DBSRichReal& value)
+SessionStack::Push (const DBSRichReal& value)
 {
   RichRealOperand stackOp (value);
   StackValue      stackValue (stackOp);
@@ -3023,7 +3023,7 @@ SessionStack::Push (DBSRichReal& value)
 }
 
 void
-SessionStack::Push (DBSText& value)
+SessionStack::Push (const DBSText& value)
 {
   TextOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3032,7 +3032,7 @@ SessionStack::Push (DBSText& value)
 }
 
 void
-SessionStack::Push (DBSArray& value)
+SessionStack::Push (const DBSArray& value)
 {
   ArrayOperand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -3050,7 +3050,7 @@ SessionStack::Push (I_DBSHandler& dbsHnd, I_DBSTable& table)
 }
 
 void
-SessionStack::Push (StackValue& value)
+SessionStack::Push (const StackValue& value)
 {
   m_Stack.push_back (value);
 }

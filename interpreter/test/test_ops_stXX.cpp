@@ -494,11 +494,6 @@ main ()
     success = success && test_op_stf (_SC (Session&, commonSession));
     success = success && test_op_sta (_SC (Session&, commonSession));
 
-
-
-
-
-
     ReleaseInstance (commonSession);
   }
 

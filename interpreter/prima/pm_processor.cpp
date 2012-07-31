@@ -621,6 +621,9 @@ op_func_divXX (Processor& processor, D_INT64& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
+  if (secondOp == DBS_T (0))
+    throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
+
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
@@ -752,6 +755,9 @@ op_func_mod (Processor& processor, D_INT64& offset)
 
   DBSInt64 secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+
+  if (secondOp == DBSInt64 (0))
+    throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
 
   DBSInt64 result;
   if (firstOp.IsNull ())
@@ -1358,6 +1364,7 @@ static OP_FUNC operations[] = {
                                 op_func_ret, //
 
                                 op_func_addXX<DBSInt64>,
+                                op_func_addXX<DBSReal>,
                                 op_func_addXX<DBSRichReal>,
                                 op_func_addt,
 
@@ -1371,6 +1378,7 @@ static OP_FUNC operations[] = {
                                 op_func_eqXX<DBSInt64>,
                                 op_func_eqXX<DBSBool>,
                                 op_func_eqXX<DBSChar>,
+                                op_func_eqXX<DBSDate>,
                                 op_func_eqXX<DBSDateTime>,
                                 op_func_eqXX<DBSHiresTime>,
                                 op_func_eqXX<DBSReal>,
@@ -1378,32 +1386,32 @@ static OP_FUNC operations[] = {
                                 op_func_eqXX<DBSText>,
 
                                 op_func_geXX<DBSInt64>,
-                                op_func_geXX<DBSBool>,
                                 op_func_geXX<DBSChar>,
+                                op_func_geXX<DBSDate>,
                                 op_func_geXX<DBSDateTime>,
                                 op_func_geXX<DBSHiresTime>,
                                 op_func_geXX<DBSReal>,
                                 op_func_geXX<DBSRichReal>,
 
                                 op_func_gtXX<DBSInt64>,
-                                op_func_gtXX<DBSBool>,
                                 op_func_gtXX<DBSChar>,
+                                op_func_gtXX<DBSDate>,
                                 op_func_gtXX<DBSDateTime>,
                                 op_func_gtXX<DBSHiresTime>,
                                 op_func_gtXX<DBSReal>,
                                 op_func_gtXX<DBSRichReal>,
 
                                 op_func_leXX<DBSInt64>,
-                                op_func_leXX<DBSBool>,
                                 op_func_leXX<DBSChar>,
+                                op_func_leXX<DBSDate>,
                                 op_func_leXX<DBSDateTime>,
                                 op_func_leXX<DBSHiresTime>,
                                 op_func_leXX<DBSReal>,
                                 op_func_leXX<DBSRichReal>,
 
                                 op_func_ltXX<DBSInt64>,
-                                op_func_ltXX<DBSBool>,
                                 op_func_ltXX<DBSChar>,
+                                op_func_ltXX<DBSDate>,
                                 op_func_ltXX<DBSDateTime>,
                                 op_func_ltXX<DBSHiresTime>,
                                 op_func_ltXX<DBSReal>,
@@ -1418,6 +1426,7 @@ static OP_FUNC operations[] = {
                                 op_func_neXX<DBSInt64>,
                                 op_func_neXX<DBSBool>,
                                 op_func_neXX<DBSChar>,
+                                op_func_neXX<DBSDate>,
                                 op_func_neXX<DBSDateTime>,
                                 op_func_neXX<DBSHiresTime>,
                                 op_func_neXX<DBSReal>,

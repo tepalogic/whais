@@ -151,26 +151,26 @@ public:
   ~SessionStack ();
 
   void  Push ();
-  void  Push (DBSBool& value);
-  void  Push (DBSChar& value);
-  void  Push (DBSDate& value);
-  void  Push (DBSDateTime& value);
-  void  Push (DBSHiresTime& value);
-  void  Push (DBSInt8& value);
-  void  Push (DBSInt16& value);
-  void  Push (DBSInt32& value);
-  void  Push (DBSInt64& value);
-  void  Push (DBSReal& value);
-  void  Push (DBSRichReal& value);
-  void  Push (DBSUInt8& value);
-  void  Push (DBSUInt16& value);
-  void  Push (DBSUInt32& value);
-  void  Push (DBSUInt64& value);
-  void  Push (DBSText& value);
-  void  Push (DBSArray& value);
+  void  Push (const DBSBool& value);
+  void  Push (const DBSChar& value);
+  void  Push (const DBSDate& value);
+  void  Push (const DBSDateTime& value);
+  void  Push (const DBSHiresTime& value);
+  void  Push (const DBSInt8& value);
+  void  Push (const DBSInt16& value);
+  void  Push (const DBSInt32& value);
+  void  Push (const DBSInt64& value);
+  void  Push (const DBSReal& value);
+  void  Push (const DBSRichReal& value);
+  void  Push (const DBSUInt8& value);
+  void  Push (const DBSUInt16& value);
+  void  Push (const DBSUInt32& value);
+  void  Push (const DBSUInt64& value);
+  void  Push (const DBSText& value);
+  void  Push (const DBSArray& value);
   void  Push (I_DBSHandler& dbs, I_DBSTable& table);
 
-  void  Push (StackValue& value);
+  void  Push (const StackValue& value);
 
   void  Pop (const D_UINT count);
 
