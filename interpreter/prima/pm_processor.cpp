@@ -376,7 +376,7 @@ op_func_stXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
   I_Operand& dest   = stack[stackSize - 2].GetOperand ();
@@ -395,10 +395,11 @@ op_func_stta (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
   I_Operand& dest   = stack[stackSize - 2].GetOperand ();
+
   if (source.IsNull ())
     {
       if (dest.IsNull() != false)
@@ -427,7 +428,7 @@ op_func_stf (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   FieldOperand& src  = _SC (FieldOperand&, stack[stackSize - 1].GetOperand ());
   FieldOperand& dest = _SC (FieldOperand&, stack[stackSize - 2].GetOperand ());
@@ -444,12 +445,13 @@ op_func_inull (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+           stackSize);
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
-  StackValue result ( BoolOperand (DBSBool (source.IsNull ())));
+  DBSBool result (source.IsNull ());
 
-  stack[stackSize - 1] = result;
+  stack.Pop (1);
+  stack.Push (result);
 }
 
 static void
@@ -459,12 +461,13 @@ op_func_nnull (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+           stackSize);
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
-  StackValue result ( BoolOperand (DBSBool (source.IsNull () == false)));
+  DBSBool result (! source.IsNull ());
 
-  stack[stackSize - 1] = result;
+  stack.Pop (1);
+  stack.Push (result);
 }
 
 static void
@@ -526,7 +529,7 @@ op_func_addXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -553,7 +556,7 @@ op_func_addt (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBSText firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -583,7 +586,7 @@ op_func_andXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -610,7 +613,7 @@ op_func_divXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -637,7 +640,7 @@ op_func_eqXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -658,7 +661,7 @@ op_func_geXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -679,7 +682,7 @@ op_func_gtXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -700,7 +703,7 @@ op_func_leXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -721,7 +724,7 @@ op_func_ltXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -742,7 +745,7 @@ op_func_mod (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBSInt64 firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -769,7 +772,7 @@ op_func_mulXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -796,7 +799,7 @@ op_func_neXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -817,7 +820,7 @@ op_func_notXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize);
 
   DBS_T operand;
   stack[stackSize - 1].GetOperand ().GetValue (operand);
@@ -837,7 +840,7 @@ op_func_notXX<DBSBool> (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize);
 
   DBSBool operand;
   stack[stackSize - 1].GetOperand ().GetValue (operand);
@@ -858,7 +861,7 @@ op_func_orXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -885,7 +888,7 @@ op_func_subXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -912,7 +915,7 @@ op_func_xorXX (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBS_T firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
@@ -939,7 +942,7 @@ op_func_jf (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize);
 
   DBSBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
@@ -962,7 +965,7 @@ op_func_jfc (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize);
 
   DBSBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
@@ -986,7 +989,7 @@ op_func_jt (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize - 1);
 
   DBSBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
@@ -1009,7 +1012,7 @@ op_func_jtc (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize - 1);
 
   DBSBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
@@ -1044,7 +1047,7 @@ op_func_ind (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBSUInt64 index;
   stack[stackSize - 1].GetOperand ().GetValue (index);
@@ -1066,7 +1069,7 @@ op_func_indta (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   DBSUInt64 index;
   stack[stackSize - 1].GetOperand ().GetValue (index);
@@ -1102,7 +1105,7 @@ op_func_self (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+          stackSize);
 
   TableOperand& tableOp = _SC (TableOperand&,
                                 stack[stackSize - 1].GetOperand ());
@@ -1156,7 +1159,7 @@ op_func_sadd (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1175,7 +1178,7 @@ op_func_ssub (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1194,7 +1197,7 @@ op_func_smul (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1213,7 +1216,7 @@ op_func_sdiv (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1232,7 +1235,7 @@ op_func_smod (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1251,7 +1254,7 @@ op_func_sand (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1270,7 +1273,7 @@ op_func_sxor (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1289,7 +1292,7 @@ op_func_sor (Processor& processor, D_INT64& offset)
   const size_t  stackSize = stack.Size ();
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 2));
+          (stackSize - 1));
 
   I_Operand& destOp = stack[stackSize - 2].GetOperand ();
 
@@ -1502,12 +1505,11 @@ Processor::Run ()
   }
   catch (...)
   {
-      if (m_AquiredSync != ~0)
+      if (m_AquiredSync != NO_INDEX)
         ReleaseSync (m_AquiredSync);
 
       assert (m_Stack.Size () >= m_StackBegin);
 
-      m_Stack.Pop (m_Stack.Size () - m_StackBegin);
       throw;
   }
 
@@ -1519,8 +1521,8 @@ Processor::Run ()
 void
 Processor::AquireSync (const D_UINT8 sync)
 {
-  if (m_AquiredSync != ~0)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+  if (m_AquiredSync != NO_INDEX)
+    throw InterException (NULL, _EXTRA (InterException::NEESTED_SYNC_REQ));
 
   m_Session.AquireProcSync (m_ProcId, sync);
   m_AquiredSync = sync;
@@ -1530,8 +1532,8 @@ void
 Processor::ReleaseSync (const D_UINT8 sync)
 {
   if (m_AquiredSync != sync)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+    throw InterException (NULL, _EXTRA (InterException::SYNC_NOT_AQUIRED));
 
   m_Session.ReleaseProcSync (m_ProcId, sync);
-  m_AquiredSync = ~0;
+  m_AquiredSync = NO_INDEX;
 }

@@ -8,11 +8,6 @@ test_namespaces_SRC=test/test_namespaces.cpp
 test_namespaces_LIB=dbs/pastra  custom/custom interpreter/prima compiler/compiler utils/utils
 test_namespaces_INC=utils/include custom/include dbs/include compiler/include
 
-UNIT_EXES+=test_operations
-test_operations_SRC=test/test_operations.cpp
-test_operations_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
-test_operations_INC=utils/include custom/include dbs/include compiler/include
-
 UNIT_EXES+=test_bool_operand
 test_bool_operand_SRC=test/test_bool_operand.cpp
 test_bool_operand_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
@@ -88,3 +83,12 @@ test_char_operand_SRC=test/test_char_operand.cpp
 test_char_operand_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
 test_char_operand_INC=utils/include custom/include dbs/include compiler/include
 
+UNIT_EXES+=test_ops_ldXX
+test_ops_ldXX_SRC=test/test_ops_ldXX.cpp
+test_ops_ldXX_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
+test_ops_ldXX_INC=utils/include custom/include dbs/include compiler/include
+
+UNIT_EXES+=test_ops_stXX
+test_ops_stXX_SRC=test/test_ops_stXX.cpp
+test_ops_stXX_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
+test_ops_stXX_INC=utils/include custom/include dbs/include compiler/include

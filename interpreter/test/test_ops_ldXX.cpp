@@ -15,7 +15,6 @@ using namespace prima;
 
 static const D_CHAR admin[] = "administrator";
 
-
 static Unit unusedUnit = {0, };
 
 static D_UINT

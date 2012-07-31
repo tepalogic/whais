@@ -49,7 +49,7 @@ public:
       m_LocalsCount (localsCount),
       m_StackBegin (stack.Size () - localsCount),
       m_ProcId (procId),
-      m_AquiredSync (~0)
+      m_AquiredSync (NO_INDEX)
   {
     if (localsCount > stack.Size ())
       throw InterException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
@@ -81,6 +81,8 @@ private:
   const size_t   m_StackBegin;
   const D_UINT32 m_ProcId;
   D_UINT16       m_AquiredSync;
+
+  static const D_UINT16 NO_INDEX = 0xFFFF;
 };
 
 }
