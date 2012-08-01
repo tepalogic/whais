@@ -175,13 +175,29 @@ DBSHiresTime::DBSHiresTime (const D_INT32 year,
     }
 }
 
+DBSText::DBSText (const D_CHAR* pText)
+  : m_pText (& NullText::GetSingletoneInstace())
+{
+  if ((pText != NULL) && (*pText != 0))
+    {
+      std::auto_ptr<I_TextStrategy> apText (
+                                 new TemporalText (_RC (const D_UINT8*, pText))
+                                           );
+      apText.get ()->IncreaseReferenceCount ();
+
+      m_pText = apText.release ();
+      assert (m_pText->ReferenceCount () == 1);
+      assert (m_pText->ShareCount () == 0);
+    }
+}
+
 DBSText::DBSText (const D_UINT8 *pUtf8String)
   : m_pText (& NullText::GetSingletoneInstace())
 {
   if ((pUtf8String != NULL) && (*pUtf8String != 0))
     {
-      std::auto_ptr <I_TextStrategy> apText (new TemporalText (pUtf8String));
-      apText.get ()->IncreaseReferenceCount();
+      std::auto_ptr<I_TextStrategy> apText (new TemporalText (pUtf8String));
+      apText.get ()->IncreaseReferenceCount ();
 
       m_pText = apText.release ();
       assert (m_pText->ReferenceCount () == 1);
@@ -263,7 +279,7 @@ DBSText::operator= (const DBSText& sourceText)
 }
 
 bool
-DBSText::operator== (const DBSText& text)
+DBSText::operator== (const DBSText& text) const
 {
   if (m_pText == text.m_pText)
     return true;

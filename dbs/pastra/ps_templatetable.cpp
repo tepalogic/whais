@@ -1155,7 +1155,7 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
 
   outValue.~DBSText ();
   if (pRawData[byte_off] & (1 << bit_off))
-    _placement_new (&outValue, DBSText (NULL));
+    _placement_new (&outValue, DBSText ());
   else
     {
       _placement_new (

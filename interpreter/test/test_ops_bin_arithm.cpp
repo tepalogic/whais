@@ -66,6 +66,38 @@ test_op_addXX (Session& session,
   return result == DBS_T (first.m_Value + second.m_Value);
 }
 
+static bool
+test_op_addt (Session& session,
+              const D_CHAR* pDesc,
+              DBSText first,
+              DBSText second)
+{
+  std::cout << "Testing " << pDesc << " addition...\n";
+  D_UINT8 testCode[32] = {0,};
+  SessionStack stack;
+
+  D_UINT opSize = w_encode_opcode (W_ADDT, testCode);
+  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+
+  stack.Push (first);
+  stack.Push (second);
+
+  proc.Run ();
+
+  if (stack.Size () != 1)
+    return false;
+
+  DBSText result;
+  stack[0].GetOperand ().GetValue (result);
+
+  if (result.IsNull ())
+    return false;
+
+  first.Append (second);
+
+  return result == first;
+}
+
 template <typename DBS_T> bool
 test_op_subXX (Session& session,
                const D_CHAR* desc,
@@ -221,6 +253,20 @@ main ()
     I_Session& commonSession = GetInstance (NULL);
 
     //Addition
+
+    success = success && test_op_addt (_SC (Session&, commonSession),
+                                        "text (first null)",
+                                        DBSText (),
+                                        DBSText ("World!"));
+    success = success && test_op_addt (_SC (Session&, commonSession),
+                                        "text (second null)",
+                                        DBSText ("Hello, "),
+                                        DBSText ());
+
+    success = success && test_op_addt (_SC (Session&, commonSession),
+                                        "text (no nulls)",
+                                        DBSText ("Hello, "),
+                                        DBSText ("World!"));
 
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "integer",

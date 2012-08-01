@@ -139,7 +139,7 @@ static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
   vectRichReal.push_back (DBSRichReal ());\
 \
   vectText.push_back (DBSText (_RC(D_UINT8*, text1)));\
-  vectText.push_back (DBSText (NULL));\
+  vectText.push_back (DBSText ());\
   vectText.push_back (DBSText (_RC(D_UINT8*, text2)));\
   vectText.push_back (DBSText (_RC(D_UINT8*, text3)));\
   vectText.push_back (DBSText (_RC(D_UINT8*, text4)));
@@ -660,7 +660,7 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
 
       for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
-          DBSText testValue(NULL);
+          DBSText testValue;
           table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
@@ -679,7 +679,7 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
       for (D_UINT rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
         {
           --rowIndex;
-          DBSText testValue(NULL);
+          DBSText testValue;
           table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
@@ -725,7 +725,7 @@ test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
 
       for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
-          DBSText testValue(NULL);
+          DBSText testValue;
           table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {
@@ -740,7 +740,7 @@ test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
       for (D_UINT rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
         {
           --rowIndex;
-          DBSText testValue(NULL);
+          DBSText testValue;
           table.GetEntry (rowIndex, fieldIndex, testValue);
           if (! (testValue == vectText[rowIndex]))
             {

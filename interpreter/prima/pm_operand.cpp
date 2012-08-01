@@ -3055,7 +3055,6 @@ SessionStack::Push (const StackValue& value)
   m_Stack.push_back (value);
 }
 
-
 void
 SessionStack::Pop (const D_UINT count)
 {

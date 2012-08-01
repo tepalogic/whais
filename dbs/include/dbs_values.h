@@ -1311,13 +1311,17 @@ class I_TextStrategy;
 class DBSText
 {
 public:
-  explicit DBSText (const D_UINT8* pUtf8String = NULL);
+  explicit DBSText (const D_CHAR* pText = NULL);
+  explicit DBSText (const D_UINT8* pUtf8String);
   explicit DBSText (I_TextStrategy& text);
 
   DBSText (const DBSText& sourceText);
   DBSText& operator= (const DBSText& sourceText);
-  bool operator== (const DBSText& text);
-  bool operator!= (const DBSText& text) { return (*this == text) == false; }
+  bool operator== (const DBSText& text) const ;
+  bool operator!= (const DBSText& text) const
+  {
+    return (*this == text) == false;
+  }
 
   virtual ~DBSText ();
 
