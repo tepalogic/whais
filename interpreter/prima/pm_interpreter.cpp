@@ -76,13 +76,15 @@ GetInstance (const D_CHAR* pName)
       I_DBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName);
       gmNameSpaces.insert (NameSpacePair (
                               pName,
-                              NameSpaceHolder (new NameSpace (glbDbsHnd))));
+                              NameSpaceHolder (new NameSpace (glbDbsHnd))
+                                         ));
     }
 
   it = gmNameSpaces.find (pName);
   assert (it != gmNameSpaces.end ());
 
-  //TODO: remember to fix this!
+  //TODO: Investigate a potential mechanism to avoid allocating session on heap
+  //      You need this in order to handle reqested for force shout down.
   return *(new Session (gmNameSpaces.find (gDBSName)->second, it->second));
 }
 
@@ -94,8 +96,6 @@ ReleaseInstance (I_Session& hInstance)
   if (gmNameSpaces.size () == 0)
     throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
 
-  //TODO: remember to fix this when the session handling mechanism will be
-  //employed
   Session* const inst = _SC (Session*, &hInstance);
   delete inst;
 }

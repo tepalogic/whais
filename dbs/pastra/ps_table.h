@@ -68,7 +68,7 @@ protected:
   std::string                  m_BaseFileName;
   std::auto_ptr<FileContainer> m_apMainTable;
   std::auto_ptr<FileContainer> m_apFixedFields;
-  std::auto_ptr<VLVarsStore>   m_apVariableFields;
+  VLVarsStore*                 m_pVariableFields;
   bool                         m_Removed;
 };
 
@@ -98,7 +98,7 @@ protected:
   //Data members
   std::auto_ptr<TempContainer> m_apMainTable;
   std::auto_ptr<TempContainer> m_apFixedFields;
-  std::auto_ptr<VLVarsStore>   m_apVariableFields;
+  VLVarsStore*                 m_pVariableFields;
 };
 
 }

@@ -341,6 +341,8 @@ RowFieldArray::RowFieldArray (VLVarsStore&   storage,
                        0,
                        sizeof (m_ElementsCount),
                        _RC(D_UINT8*, &m_ElementsCount));
+
+  m_Storage.RegisterReference ();
 }
 
 RowFieldArray::~RowFieldArray ()
@@ -348,6 +350,8 @@ RowFieldArray::~RowFieldArray ()
   assert (m_ReferenceCount == 0);
 
   m_Storage.DecrementRecordRef (m_FirstRecordEntry);
+  m_Storage.Flush ();
+  m_Storage.ReleaseReference();
 }
 
 D_UINT
