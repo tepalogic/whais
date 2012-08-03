@@ -2445,12 +2445,7 @@ TextFieldElOperand::CopyValue () const
 {
   DBSText value;
   GetValue (value);
-  {
-    DBSText dummyMirror;
-    value.SetMirror (dummyMirror); //Force the complete read of the value
-                                   //from table. The result should survive
-                                   //after this operand is cleared.
-  }
+
   return StackValue (TextOperand (value));
 }
 
@@ -2575,11 +2570,6 @@ ArrayFieldElOperand::CopyValue () const
 {
   DBSArray value;
   GetValue (value);
-  {
-    DBSArray dummyMirror;
-    value.SetMirror (dummyMirror); //Force the complete read of the value
-                                   //from table. The result should survive
-                                   //after this operand is cleared.
-  }
+
   return StackValue (ArrayOperand (value));
 }
