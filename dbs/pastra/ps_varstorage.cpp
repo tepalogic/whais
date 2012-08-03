@@ -54,7 +54,6 @@ StoreEntry::Read (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const
 D_UINT
 StoreEntry::Write (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer)
 {
-
   assert (IsDeleted() == false);
 
   if (count + offset > Size() )
@@ -70,18 +69,38 @@ VLVarsStore::VLVarsStore ()
     m_apEntriesContainer (NULL),
     m_FirstFreeEntry (0),
     m_EntrysCount (0),
+    m_RefsCount (0),
     m_Sync ()
 {
 }
 
-VLVarsStore::~VLVarsStore ()
+void
+VLVarsStore::RegisterReference ()
 {
+  WSynchronizerRAII hold (m_Sync);
+
+  ++m_RefsCount;
+}
+
+void
+VLVarsStore::ReleaseReference ()
+{
+  {
+    WSynchronizerRAII hold (m_Sync);
+
+    assert (m_RefsCount > 0);
+
+    if (--m_RefsCount > 0)
+      return ; //Nothing for us to do here!
+  }
+
+  //We are the last ones that hold this object
+  delete this;
 }
 
 void VLVarsStore::Init (const D_CHAR*  tempDir,
                         const D_UINT32 reservedMem)
 {
-
   m_apEntriesContainer.reset (new TempContainer (tempDir, reservedMem));
   m_EntrysCount = 0;
 

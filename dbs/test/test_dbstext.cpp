@@ -141,6 +141,7 @@ test_nulliness()
 
       VLVarsStore storage;
       storage.Init(temp_file_base.c_str(), 0, 713);
+      storage.RegisterReference ();
       storage.MarkForRemoval();
 
       D_UINT64 allocated_entry = storage.AddRecord (NULL, 0);
@@ -232,6 +233,8 @@ test_text_append ()
       {
         VLVarsStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
+        storage.RegisterReference ();
+
         allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText),
                                              (sizeof charValues / sizeof (D_UINT32)));
 
@@ -244,6 +247,7 @@ test_text_append ()
         {
           VLVarsStore storage;
           storage.Init(temp_file_base.c_str(), (originalText.GetRawUtf8Count() + 713 - 1) / 713, 713);
+          storage.RegisterReference ();
           storage.MarkForRemoval();
 
           {
@@ -312,6 +316,8 @@ test_character_insertion ()
 
               VLVarsStore storage;
               storage.Init(temp_file_base.c_str(), 0, 713);
+              storage.RegisterReference ();
+
               storage.MarkForRemoval();
               allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText), sizeof (charValues) / sizeof (D_UINT32));
               DBSText originalText (*(new RowFieldText(storage, allocated_entry, sizeof (charValues) / sizeof (D_UINT32))));

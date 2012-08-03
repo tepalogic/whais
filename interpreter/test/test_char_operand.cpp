@@ -623,13 +623,6 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
   if (resultText != DBSText (_RC (const D_UINT8*, textC_2)))
     result = false;
 
-
-  //TODO: Fix this condition!
-  //resultText points to a row record in text. Race condition if the
-  //resulted text is released after the table itself.
-  //Just assign a dummy value to force the release earlier.
-  resultText = DBSText ();
-
   stackTextField.Clear ();
 
   return result;

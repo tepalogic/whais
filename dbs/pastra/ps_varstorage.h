@@ -51,7 +51,7 @@ public:
   void MarkAsDeleted (const bool deleted) { deleted ?
                                             (m_NextEntry |= ENTRY_DELETED_MASK) :
                                             (m_NextEntry &= ~ENTRY_DELETED_MASK); }
-  void MarkAsFirstEntry (const bool first) { first ? 
+  void MarkAsFirstEntry (const bool first) { first ?
                                              (m_NextEntry |= FIRST_RECORD_ENTRY) :
                                              (m_NextEntry &= ~FIRST_RECORD_ENTRY); }
 
@@ -77,17 +77,16 @@ private:
 class VLVarsStore : public I_BlocksManager
 {
 public:
-
   VLVarsStore ();
-  ~VLVarsStore ();
+
+  void RegisterReference ();
+  void ReleaseReference ();
 
   void Init (const D_CHAR*  tempDir,
              const D_UINT32 reservedMem);
   void Init (const D_CHAR*  pContainerBaseName,
              const D_UINT64 uContainerSize,
              const D_UINT64 uMaxFileSize);
-
-
   void Flush ();
   void MarkForRemoval ();
 
@@ -153,6 +152,7 @@ private:
   BlockCache                     m_EntrysCache;
   D_UINT64                       m_FirstFreeEntry;
   D_UINT64                       m_EntrysCount;
+  D_UINT64                       m_RefsCount;
   WSynchronizer                  m_Sync;
 };
 

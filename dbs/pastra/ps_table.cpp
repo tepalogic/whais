@@ -112,8 +112,9 @@ validate_field_name (const D_CHAR* pFieldName)
             || ((pFieldName[0] >= 'A') && (pFieldName[0] <= 'Z'))
             || ((pFieldName[0] >= '0') && (pFieldName[0] <= '9'))
             || (pFieldName[0] >= '_')))
-        throw DBSException(NULL, _EXTRA (DBSException::FIELD_NAME_INVALID));
-
+        {
+          throw DBSException(NULL, _EXTRA (DBSException::FIELD_NAME_INVALID));
+        }
       ++pFieldName;
     }
 }
@@ -130,17 +131,25 @@ validate_field_descriptors (const DBSFieldDescriptor* const pFields,
       for (D_UINT secondIt = firstIt; secondIt < fieldsCount; ++secondIt)
         if (firstIt == secondIt)
           continue;
-        else if (strcmp(pFields[firstIt].m_pFieldName, pFields[secondIt].m_pFieldName) == 0)
-          throw DBSException (
-                              pFields[firstIt].m_pFieldName,
-                              _EXTRA (DBSException::FIELD_NAME_DUPLICATED));
+        else if (strcmp(pFields[firstIt].m_pFieldName,
+                 pFields[secondIt].m_pFieldName) == 0)
+          {
+            throw DBSException (
+                                pFields[firstIt].m_pFieldName,
+                                _EXTRA (DBSException::FIELD_NAME_DUPLICATED));
+          }
 
-      if ((pFields[firstIt].m_FieldType == T_UNKNOWN) ||
-          (pFields[firstIt].m_FieldType >= T_END_OF_TYPES))
-        throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+      if ((pFields[firstIt].m_FieldType == T_UNKNOWN)
+          || (pFields[firstIt].m_FieldType >= T_END_OF_TYPES))
+        {
+          throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+        }
 
-      else if (pFields[firstIt].isArray && (pFields[firstIt].m_FieldType == T_TEXT))
-        throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+      else if (pFields[firstIt].isArray
+               && (pFields[firstIt].m_FieldType == T_TEXT))
+        {
+          throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+        }
     }
 }
 
@@ -165,7 +174,8 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 
   vector<PaddInterval> padds;
 
-  FieldDescriptor* const pFieldDesc = _RC (FieldDescriptor*, pOutFieldsDescription);
+  FieldDescriptor* const pFieldDesc = _RC (FieldDescriptor*,
+                                           pOutFieldsDescription);
   const D_INT nullBitsRequested = rvFields.size ();      //One for each field.
   D_INT       paddingBytesCount = 0;
   D_INT       currentAlignment  = MAX_FIELD_VALUE_ALIGN; //Force the best choice
@@ -177,20 +187,25 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       D_INT foundIndex         = -1;    //-1 Nothing found!
       D_INT foundReqAlign      = 1;     //Worst requested align
       D_INT foundResultedAlign = 1;     //Worst resulted align
-      D_INT foundReqPaddsCount = MAX_FIELD_VALUE_ALIGN - 1; //Worst number of bytes required to padd
+      D_INT foundReqPaddsCount = MAX_FIELD_VALUE_ALIGN - 1;
       D_INT foundSize          = 0;
 
       for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
         {
-          D_INT currIndexSize = PSValInterp::Size (rvFields[schIndex].m_FieldType,
-                                                   rvFields[schIndex].isArray);
+          D_INT currIndexSize = PSValInterp::Size (
+                                               rvFields[schIndex].m_FieldType,
+                                               rvFields[schIndex].isArray
+                                                  );
 
-          D_INT currReqAlign = PSValInterp::Alignment (rvFields[schIndex].m_FieldType,
-                                                       rvFields[schIndex].isArray);
-
+          D_INT currReqAlign = PSValInterp::Alignment (
+                                      rvFields[schIndex].m_FieldType,
+                                      rvFields[schIndex].isArray
+                                                      );
           D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
                                       (currReqAlign - currentAlignment) : 0;
-          D_INT currResultedAlign = get_next_alignment (currReqPaddsCount + currIndexSize + uOutRowSize);
+          D_INT currResultedAlign = get_next_alignment (
+                          currReqPaddsCount + currIndexSize + uOutRowSize
+                                                       );
 
           //Lets check if is better than what we have found until now
           if (foundReqPaddsCount > currReqPaddsCount)
@@ -204,8 +219,9 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
             }
           else if (foundReqPaddsCount == currReqPaddsCount)
             {
-              if ((foundReqAlign < currReqAlign) ||
-                  ((foundReqAlign == currReqAlign) && (foundResultedAlign < currResultedAlign)))
+              if ((foundReqAlign < currReqAlign)
+                  || ((foundReqAlign == currReqAlign)
+                      && (foundResultedAlign < currResultedAlign)))
                 {
                   //New best choice!
                   foundIndex         = schIndex;
@@ -214,9 +230,11 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
                   foundReqPaddsCount = currReqPaddsCount;
                   foundSize          = currIndexSize;
                 }
-              else if ((foundReqAlign == currReqAlign) && (foundResultedAlign == currResultedAlign))
+              else if ((foundReqAlign == currReqAlign)
+                        && (foundResultedAlign == currResultedAlign))
                 {
-                  if (strcmp (rvFields[foundIndex].m_pFieldName, rvFields[schIndex].m_pFieldName) > 0)
+                  if (strcmp (rvFields[foundIndex].m_pFieldName,
+                              rvFields[schIndex].m_pFieldName) > 0)
                     {
                       //New best choice!
                       foundIndex = schIndex;
@@ -238,10 +256,15 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       rvFields[foundIndex]    = rvFields[fieldIndex];
       rvFields[fieldIndex]    = temp;
 
-      pFieldDesc[fieldIndex].m_NameOffset = get_strlens_till_index (&rvFields.front(), fieldIndex);
-      pFieldDesc[fieldIndex].m_NameOffset += sizeof(FieldDescriptor) * rvFields.size();
+      pFieldDesc[fieldIndex].m_NameOffset = get_strlens_till_index (
+                                                            &rvFields.front(),
+                                                            fieldIndex
+                                                                   );
+      pFieldDesc[fieldIndex].m_NameOffset += sizeof(FieldDescriptor) *
+                                             rvFields.size();
 
-      strcpy(_RC (D_CHAR *, pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
+      strcpy(_RC (D_CHAR*,
+                  pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
              _RC (const D_CHAR *, temp.m_pFieldName));
 
       pFieldDesc[fieldIndex].m_Aquired         = 0;
@@ -263,7 +286,8 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 
   //Increase the row size if we need more bytes to keep the null bits.
-  const D_INT32 extraPaddBytesNeeded = ((nullBitsRequested + 7) / 8) - paddingBytesCount;
+  const D_INT32 extraPaddBytesNeeded = ((nullBitsRequested + 7) / 8) -
+                                       paddingBytesCount;
   if (extraPaddBytesNeeded > 0)
     {
       padds.push_back(PaddInterval(uOutRowSize, extraPaddBytesNeeded));
@@ -271,7 +295,8 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 
   //Round the row size so the first element of the next row is alligned
-  D_INT32 needExtraAlign = PSValInterp::Alignment( rvFields[0].m_FieldType, rvFields[0].isArray);
+  D_INT32 needExtraAlign = PSValInterp::Alignment( rvFields[0].m_FieldType,
+                                                   rvFields[0].isArray);
   needExtraAlign -= get_next_alignment(uOutRowSize);
   if (needExtraAlign > 0)
     uOutRowSize += needExtraAlign;
@@ -366,7 +391,7 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
    m_BaseFileName (dbsHandler.WorkingDir() + tableName),
    m_apMainTable (NULL),
    m_apFixedFields (NULL),
-   m_apVariableFields (NULL),
+   m_pVariableFields (NULL),
    m_Removed (false)
 {
   InitFromFile ();
@@ -394,7 +419,7 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
     m_BaseFileName (dbsHandler.WorkingDir() + tableName),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
-    m_apVariableFields (NULL),
+    m_pVariableFields (NULL),
     m_Removed (false)
 {
   create_table_file (dbsHandler.MaxFileSize (),
@@ -430,6 +455,9 @@ PersistentTable::~PersistentTable ()
         delete m_vIndexNodeMgrs [fieldIndex];
       }
   MakeHeaderPersistent ();
+
+  if (m_pVariableFields != NULL)
+    m_pVariableFields->ReleaseReference ();
 }
 
 bool
@@ -451,7 +479,8 @@ PersistentTable::InitFromFile ()
   D_UINT8    aTableHdr[PS_HEADER_SIZE];
 
 
-  WFile mainTableFile (m_BaseFileName.c_str(), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
+  WFile mainTableFile (m_BaseFileName.c_str(),
+                       WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
 
   mainTableFile.Seek(0, WHC_SEEK_BEGIN);
   mainTableFile.Read(aTableHdr, PS_HEADER_SIZE);
@@ -479,34 +508,45 @@ PersistentTable::InitFromFile ()
 
   //Cache the field descriptors in memory
   m_FieldsDescriptors.reset(new D_UINT8[m_DescriptorsSize]);
-  mainTableFile.Read(_CC(D_UINT8 *, m_FieldsDescriptors.get ()), m_DescriptorsSize);
+  mainTableFile.Read(_CC (D_UINT8*, m_FieldsDescriptors.get ()),
+                     m_DescriptorsSize);
   mainTableFile.Close ();
 
-  m_apMainTable.reset (new FileContainer (m_BaseFileName.c_str(),
-                                          m_MaxFileSize,
-                                          (mainTableSize + m_MaxFileSize - 1) / m_MaxFileSize));
+  m_apMainTable.reset (new FileContainer (
+                          m_BaseFileName.c_str(),
+                          m_MaxFileSize,
+                          (mainTableSize + m_MaxFileSize - 1) / m_MaxFileSize
+                                         ));
 }
 
 void
 PersistentTable::InitVariableStorages ()
 {
   m_apFixedFields.reset (
-      new FileContainer((m_BaseFileName + PS_TABLE_FIXFIELDS_EXT).c_str(),
-                         m_MaxFileSize,
-                         ((m_RowSize * m_RowsCount) + m_MaxFileSize - 1) / m_MaxFileSize));
+      new FileContainer(
+          (m_BaseFileName + PS_TABLE_FIXFIELDS_EXT).c_str(),
+          m_MaxFileSize,
+          ((m_RowSize * m_RowsCount) + m_MaxFileSize - 1) / m_MaxFileSize
+                       )
+                        );
 
   for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     {
         DBSFieldDescriptor fieldDesc = GetFieldDescriptor (fieldIndex);
 
-        assert ((fieldDesc.m_FieldType > T_UNKNOWN) && (fieldDesc.m_FieldType < T_UNDETERMINED));
+        assert ((fieldDesc.m_FieldType > T_UNKNOWN)
+                && (fieldDesc.m_FieldType < T_UNDETERMINED));
 
         if (fieldDesc.isArray || (fieldDesc.m_FieldType == T_TEXT))
           {
-            m_apVariableFields.reset (new VLVarsStore ());
-            m_apVariableFields->Init ((m_BaseFileName + PS_TABLE_VARFIELDS_EXT).c_str(),
-                                      m_VariableStorageSize,
-                                      m_MaxFileSize);
+            auto_ptr<VLVarsStore> hold (new VLVarsStore);
+
+            hold->Init ((m_BaseFileName + PS_TABLE_VARFIELDS_EXT).c_str(),
+                        m_VariableStorageSize,
+                        m_MaxFileSize);
+            m_pVariableFields = hold.release ();
+            m_pVariableFields->RegisterReference ();
+
             break; //We finished here!
           }
     }
@@ -532,15 +572,18 @@ PersistentTable::InitIndexedFields ()
       containerNameBase += fieldIndex;
       containerNameBase += "bt";
 
-      auto_ptr <I_DataContainer> apIndexContainer (new FileContainer (containerNameBase.c_str (),
-                                                                      m_MaxFileSize,
-                                                                      field.m_IndexUnitsCount ));
-
-      m_vIndexNodeMgrs.push_back (new FieldIndexNodeManager (apIndexContainer,
-                                                             field.m_IndexNodeSizeKB * 1024,
-                                                             0x400000, //4MB
-                                                             _SC (DBS_FIELD_TYPE, field.m_TypeDesc),
-                                                             false));
+      auto_ptr<I_DataContainer> apIndexContainer (
+                              new FileContainer (containerNameBase.c_str (),
+                                                 m_MaxFileSize,
+                                                 field.m_IndexUnitsCount )
+                                                 );
+      m_vIndexNodeMgrs.push_back (
+            new FieldIndexNodeManager (apIndexContainer,
+                                       field.m_IndexNodeSizeKB * 1024,
+                                       0x400000, //4MB
+                                       _SC (DBS_FIELD_TYPE, field.m_TypeDesc),
+                                       false)
+                                  );
     }
 }
 
@@ -558,7 +601,7 @@ PersistentTable::MakeHeaderPersistent ()
   *_RC (D_UINT32*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)      = m_DescriptorsSize;
   *_RC (D_UINT64*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)   = m_RowsCount;
   *_RC (D_UINT64*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF) =
-      (m_apVariableFields.get() != NULL) ? m_apVariableFields->Size() : 0;
+      (m_pVariableFields != NULL) ? m_pVariableFields->Size () : 0;
   *_RC (D_UINT32*, aTableHdr + PS_TABLE_ROW_SIZE_OFF)        = m_RowSize;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF)       = m_RootNode;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF)       = m_FirstUnallocatedRoot;
@@ -568,7 +611,9 @@ PersistentTable::MakeHeaderPersistent ()
   memset(aTableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
   m_apMainTable->Write (0, sizeof aTableHdr, aTableHdr);
-  m_apMainTable->Write (sizeof aTableHdr, m_DescriptorsSize, m_FieldsDescriptors.get ());
+  m_apMainTable->Write (sizeof aTableHdr,
+                        m_DescriptorsSize,
+                        m_FieldsDescriptors.get ());
 }
 
 void
@@ -577,8 +622,8 @@ PersistentTable::RemoveFromDatabase ()
   if (m_apFixedFields.get() != NULL)
     m_apFixedFields->MarkForRemoval();
 
-  if (m_apVariableFields.get() != NULL)
-    m_apVariableFields->MarkForRemoval();
+  if (m_pVariableFields != NULL)
+    m_pVariableFields->MarkForRemoval();
 
   for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex )
     if (m_vIndexNodeMgrs[fieldIndex]  != NULL)
@@ -608,8 +653,8 @@ PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 void
 PersistentTable::Flush ()
 {
-  if (m_apVariableFields.get () != NULL)
-    m_apVariableFields->Flush ();
+  if (m_pVariableFields != NULL)
+    m_pVariableFields->Flush ();
 
   PrototypeTable::Flush ();
 }
@@ -631,11 +676,11 @@ PersistentTable::MainTableContainer ()
 VLVarsStore&
 PersistentTable::VariableFieldsStore ()
 {
-  assert (m_apVariableFields.get () != NULL);
-  return *m_apVariableFields.get ();
+  assert (m_pVariableFields != NULL);
+  return *m_pVariableFields;
 }
 
-////////////////////TemporalTable////////////////////////////////////////////////////////////
+////////////////////TemporalTable//////////////////////////////////////////////
 
 
 TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
@@ -644,7 +689,7 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
   : PrototypeTable (dbsHandler),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
-    m_apVariableFields (NULL)
+    m_pVariableFields (NULL)
 {
 
   //Check the arguments
@@ -653,9 +698,10 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
 
   //Compute the table header descriptor size
   const D_UINT32 descriptorsSize = sizeof(FieldDescriptor) * fieldsCount +
-                                   get_strlens_till_index(pFields, fieldsCount);
+                                   get_strlens_till_index(pFields,
+                                                          fieldsCount);
 
-  //Validate the optimally rearrange the fields for minimum row size
+  //Optimally rearrange the fields for minimum row size
   D_UINT rowSize = 0;
   validate_field_descriptors(pFields, fieldsCount);
 
@@ -670,7 +716,6 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
   m_RowSize         = rowSize;
   m_FieldsDescriptors.reset (apFieldDescription.release ());
 
-  //TODO: Vezo care e treaba!
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
                            m_FieldsCount,
                            NULL);
@@ -681,7 +726,7 @@ TemporalTable::TemporalTable (const PrototypeTable& prototype)
   : PrototypeTable (prototype),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
-    m_apVariableFields (NULL)
+    m_pVariableFields (NULL)
 {
 
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
@@ -693,11 +738,12 @@ TemporalTable::TemporalTable (const PrototypeTable& prototype)
 TemporalTable::~TemporalTable ()
 {
   Flush ();
-  if (m_apVariableFields.get () != NULL)
-    m_apVariableFields->Flush ();
 
   for (FIELD_INDEX fieldIndex = 0; fieldIndex < m_FieldsCount; ++fieldIndex)
     delete m_vIndexNodeMgrs [fieldIndex];
+
+  if (m_pVariableFields != NULL)
+    m_pVariableFields->ReleaseReference ();
 }
 
 bool
@@ -715,8 +761,8 @@ TemporalTable::Spawn () const
 void
 TemporalTable::Flush ()
 {
-  if (m_apVariableFields.get () != NULL)
-    m_apVariableFields->Flush ();
+  if (m_pVariableFields != NULL)
+    m_pVariableFields->Flush ();
 
   PrototypeTable::Flush ();
 }
@@ -738,7 +784,8 @@ TemporalTable::MainTableContainer ()
 {
 
   if (m_apMainTable.get () == NULL)
-    m_apMainTable.reset (new TempContainer (m_Dbs.WorkingDir ().c_str (), 4096));
+    m_apMainTable.reset (new TempContainer (m_Dbs.WorkingDir ().c_str (),
+                                            4096));
 
   return *m_apMainTable.get ();
 }
@@ -747,7 +794,8 @@ I_DataContainer&
 TemporalTable::FixedFieldsContainer ()
 {
   if (m_apFixedFields.get () == NULL)
-    m_apFixedFields.reset (new TempContainer (m_Dbs.WorkingDir ().c_str (), 4096));
+    m_apFixedFields.reset (new TempContainer (m_Dbs.WorkingDir ().c_str (),
+                                              4096));
 
   return *m_apFixedFields.get ();
 }
@@ -755,12 +803,15 @@ TemporalTable::FixedFieldsContainer ()
 VLVarsStore&
 TemporalTable::VariableFieldsStore ()
 {
-  if (m_apVariableFields.get () == NULL)
+  if (m_pVariableFields == NULL)
     {
-      m_apVariableFields.reset (new VLVarsStore ());
-      m_apVariableFields->Init (m_Dbs.WorkingDir ().c_str (), 4096);
+      auto_ptr<VLVarsStore> hold (new VLVarsStore ());
+      hold->Init (m_Dbs.WorkingDir ().c_str (), 4096);
+
+      m_pVariableFields = hold.release ();
+      m_pVariableFields->RegisterReference ();
     }
 
-  return *m_apVariableFields.get ();
+  return *m_pVariableFields;
 }
 

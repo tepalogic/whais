@@ -504,12 +504,15 @@ RowFieldText::RowFieldText (VLVarsStore& storage,
     m_Storage (storage)
 {
   m_Storage.IncrementRecordRef (m_FirstEntry);
+  m_Storage.RegisterReference ();
 }
 
 RowFieldText::~RowFieldText ()
 {
   assert ((m_ReferenceCount == 0) && (m_ShareCount == 0));
   m_Storage.DecrementRecordRef (m_FirstEntry);
+  m_Storage.Flush ();
+  m_Storage.ReleaseReference ();
 }
 
 D_UINT
