@@ -31,7 +31,8 @@
 #include "dbs/include/dbs_mgr.h"
 #include "dbs/include/dbs_values.h"
 
-static const D_UINT MAX_OP_QWORDS = sizeof (DBSRichReal) + 2 * sizeof (void*);
+//TODO: Make sure you compute this limit properly  for all architectures
+static const D_UINT MAX_OP_QWORDS = 6;
 
 class StackValue;
 
@@ -46,73 +47,75 @@ public:
   {
   }
 
-  virtual bool IsNull () const;
+  virtual bool IsNull () const = 0;
 
-  virtual void GetValue (DBSBool& outValue) const;
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void GetValue (DBSArray& outValue) const;
+  virtual void GetValue (DBSBool& outValue) const = 0;
+  virtual void GetValue (DBSChar& outValue) const = 0;
+  virtual void GetValue (DBSDate& outValue) const = 0;
+  virtual void GetValue (DBSDateTime& outValue) const = 0;
+  virtual void GetValue (DBSHiresTime& outValue) const = 0;
+  virtual void GetValue (DBSInt8& outValue) const = 0;
+  virtual void GetValue (DBSInt16& outValue) const = 0;
+  virtual void GetValue (DBSInt32& outValue) const = 0;
+  virtual void GetValue (DBSInt64& outValue) const = 0;
+  virtual void GetValue (DBSReal& outValue) const = 0;
+  virtual void GetValue (DBSRichReal& outValue) const = 0;
+  virtual void GetValue (DBSUInt8& outValue) const = 0;
+  virtual void GetValue (DBSUInt16& outValue) const = 0;
+  virtual void GetValue (DBSUInt32& outValue) const = 0;
+  virtual void GetValue (DBSUInt64& outValue) const = 0;
+  virtual void GetValue (DBSText& outValue) const = 0;
+  virtual void GetValue (DBSArray& outValue) const = 0;
 
-  virtual void SetValue (const DBSBool& value);
-  virtual void SetValue (const DBSChar& value);
-  virtual void SetValue (const DBSDate& value);
-  virtual void SetValue (const DBSDateTime& value);
-  virtual void SetValue (const DBSHiresTime& value);
-  virtual void SetValue (const DBSInt8& value);
-  virtual void SetValue (const DBSInt16& value);
-  virtual void SetValue (const DBSInt32& value);
-  virtual void SetValue (const DBSInt64& value);
-  virtual void SetValue (const DBSReal& value);
-  virtual void SetValue (const DBSRichReal& value);
-  virtual void SetValue (const DBSUInt8& value);
-  virtual void SetValue (const DBSUInt16& value);
-  virtual void SetValue (const DBSUInt32& value);
-  virtual void SetValue (const DBSUInt64& value);
-  virtual void SetValue (const DBSText& value);
-  virtual void SetValue (const DBSArray& value);
+  virtual void SetValue (const DBSBool& value) = 0;
+  virtual void SetValue (const DBSChar& value) = 0;
+  virtual void SetValue (const DBSDate& value) = 0;
+  virtual void SetValue (const DBSDateTime& value) = 0;
+  virtual void SetValue (const DBSHiresTime& value) = 0;
+  virtual void SetValue (const DBSInt8& value) = 0;
+  virtual void SetValue (const DBSInt16& value) = 0;
+  virtual void SetValue (const DBSInt32& value) = 0;
+  virtual void SetValue (const DBSInt64& value) = 0;
+  virtual void SetValue (const DBSReal& value) = 0;
+  virtual void SetValue (const DBSRichReal& value) = 0;
+  virtual void SetValue (const DBSUInt8& value) = 0;
+  virtual void SetValue (const DBSUInt16& value) = 0;
+  virtual void SetValue (const DBSUInt32& value) = 0;
+  virtual void SetValue (const DBSUInt64& value) = 0;
+  virtual void SetValue (const DBSText& value) = 0;
+  virtual void SetValue (const DBSArray& value) = 0;
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
-  virtual void SelfAdd (const DBSChar& value);
-  virtual void SelfAdd (const DBSText& value);
+  virtual void SelfAdd (const DBSInt64& value) = 0;
+  virtual void SelfAdd (const DBSRichReal& value) = 0;
+  virtual void SelfAdd (const DBSChar& value) = 0;
+  virtual void SelfAdd (const DBSText& value) = 0;
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DBSInt64& value) = 0;
+  virtual void SelfSub (const DBSRichReal& value) = 0;
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DBSInt64& value) = 0;
+  virtual void SelfMul (const DBSRichReal& value) = 0;
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DBSInt64& value) = 0;
+  virtual void SelfDiv (const DBSRichReal& value) = 0;
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DBSInt64& value) = 0;
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfAnd (const DBSBool& value);
+  virtual void SelfAnd (const DBSInt64& value) = 0;
+  virtual void SelfAnd (const DBSBool& value) = 0;
 
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfXor (const DBSBool& value);
+  virtual void SelfXor (const DBSInt64& value) = 0;
+  virtual void SelfXor (const DBSBool& value) = 0;
 
-  virtual void SelfOr (const DBSInt64& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfOr (const DBSInt64& value) = 0;
+  virtual void SelfOr (const DBSBool& value) = 0;
 
   //Special treatment for these
-  virtual FIELD_INDEX   GetField ();
-  virtual I_DBSTable&   GetTable ();
-  virtual StackValue    GetValueAt (const D_UINT64 index);
+  virtual FIELD_INDEX   GetField () = 0;
+  virtual I_DBSTable&   GetTable () = 0;
+  virtual StackValue    GetValueAt (const D_UINT64 index) = 0;
+
+  virtual StackValue CopyValue () const = 0;
 };
 
 class StackValue

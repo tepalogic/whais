@@ -33,27 +33,7 @@ namespace prima
 class Processor
 {
 public:
-  Processor (Session&       session,
-             SessionStack&  stack,
-             const Unit&    procUnit,
-             const D_UINT8* pCode,
-             const D_UINT64 codeSize,
-             const D_UINT   localsCount,
-             const D_UINT   procId)
-    : m_Session (session),
-      m_Stack (stack),
-      m_ProcUnit (procUnit),
-      m_pCode (pCode),
-      m_CodeSize (codeSize),
-      m_CodePos (0),
-      m_LocalsCount (localsCount),
-      m_StackBegin (stack.Size () - localsCount),
-      m_ProcId (procId),
-      m_AquiredSync (NO_INDEX)
-  {
-    if (localsCount > stack.Size ())
-      throw InterException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
-  }
+  Processor (Session& session, SessionStack& stack, const D_UINT32 procId);
 
   void Run ();
   void AquireSync (const D_UINT8 sync);

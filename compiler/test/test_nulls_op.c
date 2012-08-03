@@ -106,7 +106,7 @@ check_procedure (struct ParserState* state,
       return FALSE;
     }
   else if ((w_opcode_decode (code) != W_LDLO8) ||
-           (code[1] != 1) ||
+           (code[1] != 0) ||
            (w_opcode_decode (code + 2) != opcode))
     {
       return FALSE;

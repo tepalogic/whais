@@ -85,6 +85,14 @@ CharTextFieldElOperand::SetValue (const DBSChar& value)
   table.SetEntry (m_Row, m_Field, text);
 }
 
+StackValue
+CharTextFieldElOperand::CopyValue () const
+{
+  DBSChar ch;
+  Get (ch);
+
+  return StackValue (CharOperand (ch));
+}
 
 ///////////////////////////BaseArrayFieldElOperand//////////////////////////////
 
@@ -146,6 +154,15 @@ BoolArrayFieldElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
+StackValue
+BoolArrayFieldElOperand::CopyValue () const
+{
+  DBSBool value;
+  Get (value);
+
+  return StackValue (BoolOperand (value));
+}
+
 //////////////////////////CharArrayFieldElOperand///////////////////////////////////
 
 bool
@@ -175,6 +192,16 @@ CharArrayFieldElOperand::SetValue (const DBSChar& value)
 {
   Set (value);
 }
+
+StackValue
+CharArrayFieldElOperand::CopyValue () const
+{
+  DBSChar ch;
+  Get (ch);
+
+  return StackValue (CharOperand (ch));
+}
+
 
 //////////////////////////DateArrayFieldElOperand///////////////////////////////////
 
@@ -225,6 +252,16 @@ DateArrayFieldElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
+StackValue
+DateArrayFieldElOperand::CopyValue () const
+{
+  DBSDate value;
+  Get (value);
+
+  return StackValue (DateOperand (value));
+}
+
+
 /////////////////////////DateTimeArrayFieldElOperand////////////////////////////////
 
 bool
@@ -269,6 +306,15 @@ DateTimeArrayFieldElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
+StackValue
+DateTimeArrayFieldElOperand::CopyValue () const
+{
+  DBSDateTime value;
+  Get (value);
+
+  return StackValue (DateTimeOperand (value));
+}
+
 ///////////////////////HiresTimeArrayFieldElOperand/////////////////////////////////
 
 bool
@@ -310,6 +356,15 @@ void
 HiresTimeArrayFieldElOperand::SetValue (const DBSHiresTime& value)
 {
   Set (value);
+}
+
+StackValue
+HiresTimeArrayFieldElOperand::CopyValue () const
+{
+  DBSHiresTime value;
+  Get (value);
+
+  return StackValue (HiresTimeOperand (value));
 }
 
 //////////////////////////UInt8ArrayFieldElOperand//////////////////////////////////
@@ -501,7 +556,17 @@ UInt8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-/////////////////////////UInt16ArrayFieldElOperand//////////////////////////////////
+StackValue
+UInt8ArrayFieldElOperand::CopyValue () const
+{
+  DBSUInt8 value;
+  Get (value);
+
+  return StackValue (UInt8Operand (value));
+}
+
+
+/////////////////////////UInt16ArrayFieldElOperand/////////////////////////////
 
 bool
 UInt16ArrayFieldElOperand::IsNull () const
@@ -690,6 +755,16 @@ UInt16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+UInt16ArrayFieldElOperand::CopyValue () const
+{
+  DBSUInt16 value;
+  Get (value);
+
+  return StackValue (UInt16Operand (value));
+}
+
+
 /////////////////////////UInt32ArrayFieldElOperand//////////////////////////////////
 
 bool
@@ -877,6 +952,15 @@ UInt32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+StackValue
+UInt32ArrayFieldElOperand::CopyValue () const
+{
+  DBSUInt32 value;
+  Get (value);
+
+  return StackValue (UInt32Operand (value));
 }
 
 /////////////////////////UInt64ArrayFieldElOperand//////////////////////////////////
@@ -1068,6 +1152,15 @@ UInt64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+UInt64ArrayFieldElOperand::CopyValue () const
+{
+  DBSUInt64 value;
+  Get (value);
+
+  return StackValue (UInt64Operand (value));
+}
+
 //////////////////////////Int8ArrayFieldElOperand//////////////////////////////////
 
 bool
@@ -1257,7 +1350,17 @@ Int8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-/////////////////////////Int16ArrayFieldElOperand//////////////////////////////////
+StackValue
+Int8ArrayFieldElOperand::CopyValue () const
+{
+  DBSInt8 value;
+  Get (value);
+
+  return StackValue (Int8Operand (value));
+}
+
+
+/////////////////////Int16ArrayFieldElOperand//////////////////////////////////
 
 bool
 Int16ArrayFieldElOperand::IsNull () const
@@ -1446,7 +1549,16 @@ Int16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-/////////////////////////Int32ArrayFieldElOperand//////////////////////////////////
+StackValue
+Int16ArrayFieldElOperand::CopyValue () const
+{
+  DBSInt16 value;
+  Get (value);
+
+  return StackValue (Int16Operand (value));
+}
+
+/////////////////////Int32ArrayFieldElOperand//////////////////////////////////
 
 bool
 Int32ArrayFieldElOperand::IsNull () const
@@ -1635,7 +1747,16 @@ Int32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-/////////////////////////Int64ArrayFieldElOperand//////////////////////////////////
+StackValue
+Int32ArrayFieldElOperand::CopyValue () const
+{
+  DBSInt32 value;
+  Get (value);
+
+  return StackValue (Int32Operand (value));
+}
+
+/////////////////////Int64ArrayFieldElOperand//////////////////////////////////
 
 bool
 Int64ArrayFieldElOperand::IsNull () const
@@ -1824,7 +1945,16 @@ Int64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-/////////////////////////RealArrayFieldElOperand//////////////////////////////////
+StackValue
+Int64ArrayFieldElOperand::CopyValue () const
+{
+  DBSInt64 value;
+  Get (value);
+
+  return StackValue (Int64Operand (value));
+}
+
+/////////////////////////RealArrayFieldElOperand///////////////////////////////
 
 bool
 RealArrayFieldElOperand::IsNull () const
@@ -1941,7 +2071,17 @@ RealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-/////////////////////////RichRealArrayFieldElOperand////////////////////////////////
+StackValue
+RealArrayFieldElOperand::CopyValue () const
+{
+  DBSReal value;
+  Get (value);
+
+  return StackValue (RealOperand (value));
+}
+
+
+////////////////////RichRealArrayFieldElOperand////////////////////////////////
 
 bool
 RichRealArrayFieldElOperand::IsNull () const
@@ -2055,3 +2195,13 @@ RichRealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
 
   Set (currValue);
 }
+
+StackValue
+RichRealArrayFieldElOperand::CopyValue () const
+{
+  DBSRichReal value;
+  Get (value);
+
+  return StackValue (RichRealOperand (value));
+}
+

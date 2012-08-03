@@ -155,8 +155,8 @@ check_procedure (struct ParserState *state,
   for (count = 0; count < nargs; ++count)
     {
       const D_UINT offset = count * 2;
-      if ((w_opcode_decode (code + offset) != W_LDLO8) ||
-          (code[offset + 1] != (count + 1)))
+      if ((w_opcode_decode (code + offset) != W_LDLO8)
+          || (code[offset + 1] != count))
         {
           return FALSE;
         }

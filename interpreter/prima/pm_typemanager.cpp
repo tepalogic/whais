@@ -278,7 +278,7 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
       return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(), table));
     }
   assert (false);
-  return GlobalValue (I_Operand ());
+  return GlobalValue (NullOperand ());
 }
 
 StackValue
@@ -379,7 +379,7 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
     }
 
   assert (false);
-  return StackValue (I_Operand ());
+  return StackValue (NullOperand ());
 }
 
 bool

@@ -102,3 +102,8 @@ UNIT_EXES+=test_ops_bin_comp
 test_ops_bin_comp_SRC=test/test_ops_bin_comp.cpp
 test_ops_bin_comp_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
 test_ops_bin_comp_INC=utils/include custom/include dbs/include compiler/include
+
+UNIT_EXES+=test_ops_generic
+test_ops_generic_SRC=test/test_ops_generic.cpp
+test_ops_generic_LIB=dbs/pastra custom/custom interpreter/prima compiler/compiler utils/utils
+test_ops_generic_INC=utils/include custom/include dbs/include compiler/include

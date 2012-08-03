@@ -31,6 +31,7 @@
 #include "dbs/include/dbs_mgr.h"
 
 #include "pm_interpreter.h"
+#include "pm_processor.h"
 
 using namespace std;
 using namespace prima;
@@ -257,11 +258,23 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
   }
 }
 
+
 void
-Session::ExecuteProcedure (const D_CHAR* const pProcName,
-                           StackValue&         stack)
+Session::ExecuteProcedure (const D_UINT8* const pProcName,
+                           SessionStack&        stack)
 {
-  //TODO: You need to implement this.
+  const D_UINT32 procId = FindProcedure (
+                                  pProcName,
+                                  strlen (_RC (const D_CHAR*, pProcName))
+                                        );
+
+  Processor proc (*this, stack, procId);
+
+  proc.Run ();
+
+  //TODO: 1. Check to see if you need some clean up work!
+  //      2. How will be handled the situation when a wrong number of parameters
+  //         or with different types will be supplied?
 }
 
 void

@@ -15,7 +15,61 @@ using namespace prima;
 
 static const D_CHAR admin[] = "administrator";
 
-static Unit unusedUnit = {0, };
+static const D_UINT8 procName[] = "p1";
+
+const D_UINT8 dummyProgram[] = ""
+    "PROCEDURE p1 (a1 AS INT8, a2 AS INT8) RETURN BOOL\n"
+    "DO\n"
+      "LET hd1, hd2 AS HIRESTIME\n;"
+      "\n"
+      "hd1 = '2012/12/12 13:00:00.100';\n"
+      "hd2 = '2012/12/11 13:00:00';\n"
+      "RETURN hd1 < hd2;\n"
+    "ENDPROC\n"
+    "\n";
+
+static const D_CHAR *MSG_PREFIX[] = {
+                                      "", "error ", "warning ", "error "
+                                    };
+
+static D_UINT
+get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+{
+  D_UINT count = 0;
+  D_INT result = 1;
+
+  if (buff_pos == WHC_IGNORE_BUFFER_POS)
+    return -1;
+
+  while (count < buff_pos)
+    {
+      if (buffer[count] == '\n')
+        ++result;
+      else if (buffer[count] == 0)
+        {
+          assert (0);
+        }
+      ++count;
+    }
+  return result;
+}
+
+void
+my_postman (WHC_MESSENGER_ARG data,
+            D_UINT            buff_pos,
+            D_UINT            msg_id,
+            D_UINT            msgType,
+            const D_CHAR*     pMsgFormat,
+            va_list           args)
+{
+  const D_CHAR *buffer = (const D_CHAR *) data;
+  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+
+  fprintf (stderr, MSG_PREFIX[msgType]);
+  fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
+  vfprintf (stderr, pMsgFormat, args);
+  fprintf (stderr, "\n");
+};
 
 static D_UINT
 w_encode_opcode (W_OPCODE opcode, D_UINT8* pOutCode)
@@ -41,16 +95,23 @@ test_op_eqXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " equality ...\n";
-  D_UINT8 testCode[32] = {0,};
+  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+
+  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (opcode, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+  D_UINT8 opSize = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode (opcode, testCode + opSize);
+  w_encode_opcode (W_RET, testCode + opSize);
 
   stack.Push (first);
   stack.Push (second);
 
-  proc.Run ();
+  session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
     return false;
@@ -72,16 +133,23 @@ test_op_neXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " inequality ...\n";
-  D_UINT8 testCode[32] = {0,};
+  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+
+  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (opcode, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+  D_UINT8 opSize = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode (opcode, testCode + opSize);
+  w_encode_opcode (W_RET, testCode + opSize);
 
   stack.Push (first);
   stack.Push (second);
 
-  proc.Run ();
+  session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
     return false;
@@ -103,16 +171,23 @@ test_op_ltXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " less than ...\n";
-  D_UINT8 testCode[32] = {0,};
+  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+
+  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (opcode, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+  D_UINT8 opSize = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode (opcode, testCode + opSize);
+  w_encode_opcode (W_RET, testCode + opSize);
 
   stack.Push (first);
   stack.Push (second);
 
-  proc.Run ();
+  session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
     return false;
@@ -134,16 +209,23 @@ test_op_leXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " less or equal than ...\n";
-  D_UINT8 testCode[32] = {0,};
+  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+
+  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (opcode, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+  D_UINT8 opSize = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode (opcode, testCode + opSize);
+  w_encode_opcode (W_RET, testCode + opSize);
 
   stack.Push (first);
   stack.Push (second);
 
-  proc.Run ();
+  session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
     return false;
@@ -165,16 +247,23 @@ test_op_gtXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " greater than ...\n";
-  D_UINT8 testCode[32] = {0,};
+  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+
+  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (opcode, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+  D_UINT8 opSize = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode (opcode, testCode + opSize);
+  w_encode_opcode (W_RET, testCode + opSize);
 
   stack.Push (first);
   stack.Push (second);
 
-  proc.Run ();
+  session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
     return false;
@@ -196,16 +285,23 @@ test_op_geXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " greater or equal than ...\n";
-  D_UINT8 testCode[32] = {0,};
+  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+
+  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (opcode, testCode);
-  Processor proc (session, stack, unusedUnit, testCode, opSize, 0, 1);
+  D_UINT8 opSize = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode (opcode, testCode + opSize);
+  w_encode_opcode (W_RET, testCode + opSize);
 
   stack.Push (first);
   stack.Push (second);
 
-  proc.Run ();
+  session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
     return false;
@@ -241,6 +337,13 @@ main ()
 
   {
     I_Session& commonSession = GetInstance (NULL);
+
+    WBufferCompiledUnit dummy (dummyProgram,
+                               sizeof dummyProgram,
+                               my_postman,
+                               dummyProgram);
+
+    commonSession.LoadCompiledUnit (dummy);
 
     //Equality
     success = success && test_op_eqXX (_SC (Session&, commonSession),

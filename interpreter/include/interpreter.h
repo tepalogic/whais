@@ -115,8 +115,8 @@ public:
   }
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
-  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
-                                 StackValue&         stack) = 0;
+  virtual void ExecuteProcedure (const D_UINT8* const pProcName,
+                                 SessionStack&        stack) = 0;
   virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
 };
 

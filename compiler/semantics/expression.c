@@ -1944,6 +1944,8 @@ translate_exp_leaf (struct ParserState* const pState,
             }
           assert (pStmt->type == STMT_GLOBAL);
         }
+      else
+        value -= 1; /* Don't count the return value! */
 
       result.extra = pVar->extra;
       result.type  = pVar->type;

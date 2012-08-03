@@ -48,10 +48,28 @@ TableOperand::GetTable ()
   return m_pRefTable->GetTable ();
 }
 
+StackValue
+TableOperand::CopyValue () const
+{
+  return StackValue (*this);
+}
+
+TableOperand
+TableOperand::GetTableOp ()
+{
+  return *this;
+}
+
+void
+TableOperand::CopyTableOp (const TableOperand& source)
+{
+  *this = source;
+}
+
 /////////////////////////FieldOperand//////////////////////////////////////////
 
 FieldOperand::FieldOperand (TableOperand& tableOp, const FIELD_INDEX field)
-  : I_Operand (),
+  : I_PMOperand (),
     m_pRefTable (&tableOp.GetTableRef ()),
     m_Field (field)
 {
@@ -181,6 +199,25 @@ FieldOperand::GetValueAt (const D_UINT64 index)
   throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
 }
 
+
+StackValue
+FieldOperand::CopyValue () const
+{
+  return StackValue (*this);
+}
+
+FieldOperand
+FieldOperand::GetFieldOp ()
+{
+  return *this;
+}
+
+void
+FieldOperand::CopyFieldOp (const FieldOperand& source)
+{
+  *this = source;
+}
+
 ///////////////////////BaseFieldElOperand//////////////////////////////////////
 
 BaseFieldElOperand::~BaseFieldElOperand ()
@@ -244,6 +281,15 @@ BoolFieldElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
+StackValue
+BoolFieldElOperand::CopyValue () const
+{
+  DBSBool value;
+  Get (value);
+
+  return StackValue (BoolOperand (value));
+}
+
 //////////////////////////CharFieldElOperand///////////////////////////////////
 
 bool
@@ -275,6 +321,15 @@ void
 CharFieldElOperand::SetValue (const DBSChar& value)
 {
   Set (value);
+}
+
+StackValue
+CharFieldElOperand::CopyValue () const
+{
+  DBSChar ch;
+  Get (ch);
+
+  return StackValue (CharOperand (ch));
 }
 
 //////////////////////////DateFieldElOperand///////////////////////////////////
@@ -335,6 +390,15 @@ DateFieldElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
+StackValue
+DateFieldElOperand::CopyValue () const
+{
+  DBSDate value;
+  Get (value);
+
+  return StackValue (DateOperand (value));
+}
+
 /////////////////////////DateTimeFieldElOperand////////////////////////////////
 
 bool
@@ -388,6 +452,15 @@ DateTimeFieldElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
+StackValue
+DateTimeFieldElOperand::CopyValue () const
+{
+  DBSDateTime value;
+  Get (value);
+
+  return StackValue (DateTimeOperand (value));
+}
+
 ///////////////////////HiresTimeFieldElOperand/////////////////////////////////
 
 bool
@@ -438,6 +511,15 @@ void
 HiresTimeFieldElOperand::SetValue (const DBSHiresTime& value)
 {
   Set (value);
+}
+
+StackValue
+HiresTimeFieldElOperand::CopyValue () const
+{
+  DBSHiresTime value;
+  Get (value);
+
+  return StackValue (HiresTimeOperand (value));
 }
 
 //////////////////////////UInt8FieldElOperand//////////////////////////////////
@@ -632,6 +714,15 @@ UInt8FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+UInt8FieldElOperand::CopyValue () const
+{
+  DBSUInt8 value;
+  Get (value);
+
+  return StackValue (UInt8Operand (value));
+}
+
 /////////////////////////UInt16FieldElOperand//////////////////////////////////
 
 bool
@@ -822,6 +913,15 @@ UInt16FieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+StackValue
+UInt16FieldElOperand::CopyValue () const
+{
+  DBSUInt16 value;
+  Get (value);
+
+  return StackValue (UInt16Operand (value));
 }
 
 /////////////////////////UInt32FieldElOperand//////////////////////////////////
@@ -1016,6 +1116,15 @@ UInt32FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+UInt32FieldElOperand::CopyValue () const
+{
+  DBSUInt32 value;
+  Get (value);
+
+  return StackValue (UInt32Operand (value));
+}
+
 /////////////////////////UInt64FieldElOperand//////////////////////////////////
 
 bool
@@ -1206,6 +1315,15 @@ UInt64FieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+StackValue
+UInt64FieldElOperand::CopyValue () const
+{
+  DBSUInt64 value;
+  Get (value);
+
+  return StackValue (UInt64Operand (value));
 }
 
 //////////////////////////Int8FieldElOperand//////////////////////////////////
@@ -1400,6 +1518,15 @@ Int8FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+Int8FieldElOperand::CopyValue () const
+{
+  DBSInt8 value;
+  Get (value);
+
+  return StackValue (Int8Operand (value));
+}
+
 /////////////////////////Int16FieldElOperand//////////////////////////////////
 
 bool
@@ -1590,6 +1717,15 @@ Int16FieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+StackValue
+Int16FieldElOperand::CopyValue () const
+{
+  DBSInt16 value;
+  Get (value);
+
+  return StackValue (Int16Operand (value));
 }
 
 /////////////////////////Int32FieldElOperand//////////////////////////////////
@@ -1784,6 +1920,15 @@ Int32FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+Int32FieldElOperand::CopyValue () const
+{
+  DBSInt32 value;
+  Get (value);
+
+  return StackValue (Int32Operand (value));
+}
+
 /////////////////////////Int64FieldElOperand//////////////////////////////////
 
 bool
@@ -1976,6 +2121,15 @@ Int64FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+StackValue
+Int64FieldElOperand::CopyValue () const
+{
+  DBSInt64 value;
+  Get (value);
+
+  return StackValue (Int64Operand (value));
+}
+
 /////////////////////////RealFieldElOperand//////////////////////////////////
 
 bool
@@ -2096,6 +2250,15 @@ RealFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
+StackValue
+RealFieldElOperand::CopyValue () const
+{
+  DBSReal value;
+  Get (value);
+
+  return StackValue (RealOperand (value));
+}
+
 /////////////////////////RichRealFieldElOperand////////////////////////////////
 
 bool
@@ -2214,6 +2377,15 @@ RichRealFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
+StackValue
+RichRealFieldElOperand::CopyValue () const
+{
+  DBSRichReal value;
+  Get (value);
+
+  return StackValue (RichRealOperand (value));
+}
+
 /////////////////////////TextFieldElOperand////////////////////////////////
 
 bool
@@ -2267,6 +2439,21 @@ TextFieldElOperand::GetValueAt (const D_UINT64 index)
                                              m_Field,
                                              index));
 }
+
+StackValue
+TextFieldElOperand::CopyValue () const
+{
+  DBSText value;
+  GetValue (value);
+  {
+    DBSText dummyMirror;
+    value.SetMirror (dummyMirror); //Force the complete read of the value
+                                   //from table. The result should survive
+                                   //after this operand is cleared.
+  }
+  return StackValue (TextOperand (value));
+}
+
 
 ///////////////////////////ArrayFieldElOperand//////////////////////////////////
 
@@ -2381,4 +2568,18 @@ ArrayFieldElOperand::GetValueAt (const D_UINT64 index)
   }
 
   throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+}
+
+StackValue
+ArrayFieldElOperand::CopyValue () const
+{
+  DBSArray value;
+  GetValue (value);
+  {
+    DBSArray dummyMirror;
+    value.SetMirror (dummyMirror); //Force the complete read of the value
+                                   //from table. The result should survive
+                                   //after this operand is cleared.
+  }
+  return StackValue (ArrayOperand (value));
 }

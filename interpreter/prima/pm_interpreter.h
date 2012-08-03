@@ -104,8 +104,8 @@ public:
   virtual ~Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
-  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
-                                 StackValue&         stack);
+  virtual void ExecuteProcedure (const D_UINT8* const pProcName,
+                                 SessionStack&        stack);
   virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 
   D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
