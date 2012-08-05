@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONTROL_BYTE    0xAC    /* all correct */
 
 extern W_ALLOCATED_MEMORY *gpListHead;
+extern D_UINT64            gMemAllocations;
 
 void *
 custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
@@ -45,8 +46,10 @@ custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
   else
     return result;
 
-  result->line = line;
-  result->file = file;
+  //TODO: Make memory allocation test framework thread safe.
+  result->line  = line;
+  result->file  = file;
+  result->count = ++gMemAllocations;
 
   if (gpListHead == NULL)
     {

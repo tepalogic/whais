@@ -269,6 +269,10 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
         assert (false);
       }
     }
+  else if (IS_FIELD (spec.type))
+    {
+      return GlobalValue (FieldOperand (GET_FIELD_TYPE (spec.type)));
+    }
   else if (IS_TABLE (spec.type))
     {
       I_DBSTable& table = create_non_persistent_table (
@@ -369,6 +373,10 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
         assert (false);
       }
     }
+  else if (IS_FIELD (spec.type))
+    {
+      return StackValue (FieldOperand (GET_FIELD_TYPE (spec.type)));
+    }
   else if (IS_TABLE (spec.type))
     {
       I_DBSTable& table = create_non_persistent_table (
@@ -388,14 +396,15 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
   const TypeSpec& spec   = *_RC (const TypeSpec*, pTI);
   bool            result = true;
 
-  if (((spec.type == T_UNKNOWN) || (spec.type > T_UNDETERMINED)) &&
-      (IS_ARRAY (spec.type) == false) &&
-      (IS_TABLE (spec.type) == false))
+  if (((spec.type == T_UNKNOWN) || (spec.type > T_UNDETERMINED))
+      && (IS_ARRAY (spec.type) == false)
+      && (IS_TABLE (spec.type) == false)
+      && (IS_FIELD (spec.type) == false))
     {
       result = false;
     }
-  else if ((spec.data[spec.dataSize - 2] != spec.TYPE_SPEC_END_MARK) ||
-           (spec.data[spec.dataSize - 1] != 0))
+  else if ((spec.data[spec.dataSize - 2] != spec.TYPE_SPEC_END_MARK)
+           || (spec.data[spec.dataSize - 1] != 0))
     {
       result = false;
     }
@@ -406,8 +415,9 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
         result = false;
       else if (IS_ARRAY (fieldType))
         {
-          if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN ||
-              GET_BASIC_TYPE (fieldType) >= T_UNDETERMINED)
+          if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
+              || (GET_BASIC_TYPE (fieldType) >= T_UNDETERMINED)
+              || (GET_BASIC_TYPE (fieldType) == T_TEXT)) // Not supported yet!
             {
               result = false;
             }
@@ -423,10 +433,10 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
     }
   else if (IS_ARRAY (spec.type))
     {
-      if ( (spec.dataSize != 2) ||
-           (GET_BASIC_TYPE (spec.type) == T_UNKNOWN) ||
-           (GET_BASIC_TYPE (spec.type) > T_UNDETERMINED) ||
-           (GET_BASIC_TYPE (spec.type) == T_TEXT) )
+      if ( (spec.dataSize != 2)
+          || (GET_BASIC_TYPE (spec.type) == T_UNKNOWN)
+          || (GET_BASIC_TYPE (spec.type) > T_UNDETERMINED)
+          || (GET_BASIC_TYPE (spec.type) == T_TEXT)) // Not supported yet!
         {
           result = false;
         }

@@ -1451,11 +1451,13 @@ private:
 class FieldOperand : public I_PMOperand
 {
 public:
-  FieldOperand ()
+  FieldOperand (const D_UINT32 fieldType = T_UNDETERMINED)
     : m_pRefTable (NULL),
       m_Field (~0),
-      m_FieldType (T_UNDETERMINED)
+      m_FieldType (fieldType)
   {
+    assert (GET_BASIC_TYPE (fieldType) <= T_UNDETERMINED);
+    assert (GET_BASIC_TYPE (fieldType) > T_UNKNOWN);
   }
 
   FieldOperand (TableOperand& tableOp, const FIELD_INDEX field);

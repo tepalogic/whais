@@ -771,6 +771,9 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
+  if (row >= m_RowsCount)
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
     {
@@ -877,6 +880,9 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
                           const DBSArray&   value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
+
+  if (row >= m_RowsCount)
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ( ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
           ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
@@ -1131,6 +1137,9 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
+  if (row >= m_RowsCount)
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
       ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(D_UINT, T_TEXT)))
     {
@@ -1178,6 +1187,9 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
 {
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
+
+  if (row >= m_RowsCount)
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if (((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0)
       ||
@@ -1695,6 +1707,9 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
                                T&                outValue)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
+
+  if (row >= m_RowsCount)
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
         ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=

@@ -360,7 +360,7 @@ op_func_ldgb32 (Processor& processor, D_INT64& offset)
 static void
 op_func_cts (Processor& processor, D_INT64& offset)
 {
-  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           processor.GetStack ().Size ());
 
   processor.GetStack ().Pop (1);
@@ -909,7 +909,7 @@ op_func_jf (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
   DBSBool firstOp;
@@ -922,8 +922,10 @@ op_func_jf (Processor& processor, D_INT64& offset)
                                    offset;
 
       const D_INT32 jmpOffset = _SC (D_INT32, load_le_uint32 (pData));
-      offset += jmpOffset;
+      offset = jmpOffset;
     }
+  else
+    offset += sizeof (D_UINT32);
 }
 
 static void
@@ -932,7 +934,7 @@ op_func_jfc (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
   DBSBool firstOp;
@@ -946,8 +948,10 @@ op_func_jfc (Processor& processor, D_INT64& offset)
                                    offset;
 
       const D_INT32 jmpOffset = _SC (D_INT32, load_le_uint32 (pData));
-      offset += jmpOffset;
+      offset = jmpOffset;
     }
+  else
+    offset += sizeof (D_UINT32);
 }
 
 static void
@@ -956,21 +960,23 @@ op_func_jt (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          stackSize - 1);
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
+          stackSize);
 
   DBSBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
 
-  if ((firstOp.IsNull() == false) && (firstOp.m_Value != false))
+  if ((firstOp.IsNull() == false) && firstOp.m_Value )
     {
       const D_UINT8* const pData = processor.Code () +
                                    processor.CurrentOffset () +
                                    offset;
 
       const D_INT32 jmpOffset = _SC (D_INT32, load_le_uint32 (pData));
-      offset += jmpOffset;
+      offset = jmpOffset;
     }
+  else
+    offset += sizeof (D_UINT32);
 }
 
 static void
@@ -979,22 +985,24 @@ op_func_jtc (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          stackSize - 1);
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
+          stackSize);
 
   DBSBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
   stack.Pop (1);
 
-  if ((firstOp.IsNull() == false) && (firstOp.m_Value != false))
+  if ((firstOp.IsNull() == false) && firstOp.m_Value)
     {
       const D_UINT8* const pData = processor.Code () +
                                    processor.CurrentOffset () +
                                    offset;
 
       const D_INT32 jmpOffset = _SC (D_INT32, load_le_uint32 (pData));
-      offset += jmpOffset;
+      offset = jmpOffset;
     }
+  else
+    offset += sizeof (D_UINT32);
 }
 
 static void
@@ -1005,7 +1013,7 @@ op_func_jmp (Processor& processor, D_INT64& offset)
                                offset;
 
   const D_INT32 jmpOffset = _SC (D_INT32, load_le_uint32 (pData));
-  offset += jmpOffset;
+  offset = jmpOffset;
 }
 
 template <D_UINT EXCEPTION_CODE> void
@@ -1014,8 +1022,8 @@ op_func_ind (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
+          stackSize);
 
   DBSUInt64 index;
   stack[stackSize - 1].GetOperand ().GetValue (index);
@@ -1036,8 +1044,8 @@ op_func_indta (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
-          (stackSize - 1));
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
+          stackSize);
 
   DBSUInt64 index;
   stack[stackSize - 1].GetOperand ().GetValue (index);
@@ -1045,8 +1053,8 @@ op_func_indta (Processor& processor, D_INT64& offset)
   if (index.IsNull ())
     throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_NULL));
 
-  TableOperand& tableOp = _SC (TableOperand&,
-                                stack[stackSize - 2].GetOperand ());
+  I_PMOperand& op = _SC (I_PMOperand&, stack[stackSize - 2].GetOperand ());
+  TableOperand tableOp = op.GetTableOp ();
 
   const D_UINT8* const  pData = processor.Code () +
                                 processor.CurrentOffset () +
@@ -1072,11 +1080,11 @@ op_func_self (Processor& processor, D_INT64& offset)
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((processor.StackBegin () + processor.LocalsCount ()) <
+  assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  TableOperand& tableOp = _SC (TableOperand&,
-                                stack[stackSize - 1].GetOperand ());
+  I_PMOperand& op = _SC (I_PMOperand&, stack[stackSize - 1].GetOperand ());
+  TableOperand tableOp = op.GetTableOp ();
 
   const D_UINT8* const  pData = processor.Code () +
                                 processor.CurrentOffset () +
@@ -1295,7 +1303,7 @@ static OP_FUNC operations[] = {
                                 op_func_ldgb8,
                                 op_func_ldgb16,
                                 op_func_ldgb32,
-                                op_func_cts, //
+                                op_func_cts,
 
                                 op_func_stXX<DBSBool>,
                                 op_func_stXX<DBSChar>,
@@ -1403,8 +1411,8 @@ static OP_FUNC operations[] = {
                                 op_func_subXX<DBSReal>,
                                 op_func_subXX<DBSRichReal>,
 
-                                op_func_orXX<DBSInt64>,
-                                op_func_orXX<DBSBool>,
+                                op_func_xorXX<DBSInt64>,
+                                op_func_xorXX<DBSBool>,
 
                                 op_func_jf,
                                 op_func_jfc,

@@ -11,7 +11,8 @@
 size_t test_mem_used;
 size_t test_mem_peak;
 
-W_ALLOCATED_MEMORY *gpListHead = NULL;
+W_ALLOCATED_MEMORY* gpListHead      = NULL;
+D_UINT64            gMemAllocations = 0;
 
 /* set the maximum memory usage, 0 for unlimited */
 size_t test_max_mem;
@@ -61,11 +62,15 @@ test_print_unfree_mem (void)
 {
   W_ALLOCATED_MEMORY *pIt = gpListHead;
 
-  printf ("Size\tLine\tFile\n");
+  printf ("Count(low)\tSize\tLine\tFile\n");
 
   while (pIt != NULL)
     {
-      printf ("%d\t%d\t%s\n", (unsigned int)pIt->size, (unsigned int)pIt->line, ((pIt->file == NULL) ? "NULL" : pIt->file));
+      printf ("%d\t%d\t%d\t%s\n",
+              (unsigned int) pIt->count,
+              (unsigned int)pIt->size,
+              (unsigned int)pIt->line,
+              ((pIt->file == NULL) ? "NULL" : pIt->file));
       pIt = pIt->next;
     }
 

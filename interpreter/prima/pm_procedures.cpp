@@ -154,14 +154,17 @@ ProcedureManager::LocalValue (const D_UINT   procEntry,
   assert (local < entry.m_LocalsCount);
   assert ((local == 0) || (local >= entry.m_ArgsCount));
 
-  if ((local >= entry.m_LocalsCount) ||
-      ((local != 0) && (local < entry.m_ArgsCount)) )
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+  if ((local >= entry.m_LocalsCount)
+      || ((local != 0) && (local < entry.m_ArgsCount)) )
+    {
+      throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    }
 
   if (local == 0)
     return m_LocalsValues[entry.m_LocalsIndex];
 
-  return m_LocalsValues[entry.m_LocalsIndex + (local - entry.m_ArgsCount)];
+  return
+    m_LocalsValues [entry.m_LocalsIndex + (local - entry.m_ArgsCount)];
 }
 
 const D_UINT8*

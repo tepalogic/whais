@@ -91,12 +91,18 @@ wod_dec_w_ldnull (const D_UINT8* pInArgs, D_CHAR* pOp1,  D_CHAR* pOp2)
 static D_UINT
 wod_dec_w_ldc (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 {
-  //Does not support any extended character set yet!
+
   pOp1[0] = '\'';
   pOp1[1] = pInArgs[0];
   pOp1[2] = '\'';
   pOp1[3] = pOp2[0] = 0;
-  return 1;
+
+  //Does not support any extended character set yet!
+  assert (pInArgs[1] == 0);
+  assert (pInArgs[1] == pInArgs [2]);
+  assert (pInArgs[2] == pInArgs [3]);
+
+  return 4;
 }
 
 static D_UINT

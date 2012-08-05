@@ -71,7 +71,8 @@ public:
     NULL_ARRAY_ELEMENT,
     INVALID_DATE,
     INVALID_DATETIME,
-    INVALID_HIRESTIME
+    INVALID_HIRESTIME,
+    ROW_NOT_ALLOCATED,
   };
 
   virtual WException*     Clone () { return new DBSException (*this); }

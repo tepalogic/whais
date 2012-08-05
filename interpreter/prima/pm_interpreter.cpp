@@ -208,16 +208,20 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
             auto_ptr<D_UINT8> apTI (new D_UINT8 [sizeTI]);
             memcpy (apTI.get (), pLocalTI, sizeTI);
 
-            const StackValue value   = typeMgr.CreateLocalValue (apTI.get ());
-            const D_UINT32   typeOff = typeMgr.AddType (apTI.get ());
+            //For table type values, the type would be changed to reflect the
+            //order of the fields rearranged by the DBS layer.
+            StackValue     value   = typeMgr.CreateLocalValue (apTI.get ());
+            const D_UINT32 typeOff = typeMgr.AddType (apTI.get ());
 
             typesOffset.push_back (typeOff);
 
             //Keep a copy of stack values for locals ( except the ones of the
             //parameters) to avoid construct them every time when the procedure
             //is called.
-            if ((localIt == 0) || (localIt >= argsCount))
+            if ((localIt == 0) || (localIt > argsCount))
               values.push_back (value);
+            else
+              value.Clear ();
           }
 
         try

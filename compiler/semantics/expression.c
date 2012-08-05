@@ -2038,10 +2038,9 @@ translate_exp_leaf (struct ParserState* const pState,
   else if (expression->val_type == VAL_C_CHAR)
     {
       result.type = T_CHAR;
-      if ((w_opcode_encode (pCodeStream, W_LDC) == NULL) ||
-          (output_data (pCodeStream,
-                           (D_UINT8*)&expression->val.u_char.value,
-                           sizeof (expression->val.u_char.value)) == NULL))
+      D_UINT32 unicodeCh = expression->val.u_char.value;
+      if ((w_opcode_encode (pCodeStream, W_LDC) == NULL)
+          || (output_uint32 (pCodeStream, unicodeCh) == NULL))
         {
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
           return gResultUnk;
