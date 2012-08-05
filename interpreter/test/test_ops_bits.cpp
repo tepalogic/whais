@@ -257,7 +257,7 @@ main ()
   InitInterpreter ();
 
   {
-    const DBSBool  val1_b (true), val2_b (true);
+    const DBSBool  val1_b (true), val2_b (false);
     const DBSInt64 val1_i (11), val2_i (23);
 
     I_Session& commonSession = GetInstance (NULL);
@@ -283,8 +283,8 @@ main ()
     success = success && test_op_orXX (_SC (Session&, commonSession),
                                         "orb",
                                         bool_or,
-                                        val1_b,
-                                        val2_b);
+                                        val2_b,
+                                        val1_b);
     success = success && test_op_not (_SC (Session&, commonSession));
     success = success && test_op_andXX (_SC (Session&, commonSession),
                                         "and",

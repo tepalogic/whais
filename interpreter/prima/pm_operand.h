@@ -77,7 +77,7 @@ internal_mod (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value / secondOp.m_Value);
+  return T_DEST (firstOp.m_Value % secondOp.m_Value);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST

@@ -937,7 +937,7 @@ UInt8Operand::SelfDiv (const DBSInt64& value)
 void
 UInt8Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -1096,7 +1096,7 @@ UInt16Operand::SelfDiv (const DBSInt64& value)
 void
 UInt16Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -1255,7 +1255,7 @@ UInt32Operand::SelfDiv (const DBSInt64& value)
 void
 UInt32Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -1414,7 +1414,7 @@ UInt64Operand::SelfDiv (const DBSInt64& value)
 void
 UInt64Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -1572,7 +1572,7 @@ Int8Operand::SelfDiv (const DBSInt64& value)
 void
 Int8Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -1730,7 +1730,7 @@ Int16Operand::SelfDiv (const DBSInt64& value)
 void
 Int16Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -1888,7 +1888,7 @@ Int32Operand::SelfDiv (const DBSInt64& value)
 void
 Int32Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void
@@ -2046,7 +2046,7 @@ Int64Operand::SelfDiv (const DBSInt64& value)
 void
 Int64Operand::SelfMod (const DBSInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  m_Value = internal_mod (m_Value, value);
 }
 
 void

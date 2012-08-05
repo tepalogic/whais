@@ -74,7 +74,7 @@ my_postman (WHC_MESSENGER_ARG data,
 static D_UINT
 w_encode_opcode (W_OPCODE opcode, D_UINT8* pOutCode)
 {
-  if (opcode > 0x80)
+  if (opcode >= 0x80)
     {
       D_UINT16 temp = opcode;
       temp |= 0x8000;
