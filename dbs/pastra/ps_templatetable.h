@@ -294,7 +294,7 @@ protected:
   virtual VLVarsStore&         VariableFieldsStore () = 0;
 
   //Data members
-  DbsHandler                            m_Dbs;
+  DbsHandler&                           m_Dbs;
   ROW_INDEX                             m_RowsCount;
   NODE_INDEX                            m_RootNode;
   NODE_INDEX                            m_FirstUnallocatedRoot;

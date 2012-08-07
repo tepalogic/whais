@@ -568,15 +568,16 @@ PersistentTable::InitIndexedFields ()
 
       string containerNameBase = m_BaseFileName;
 
-      containerNameBase += "_idf";
-      containerNameBase += fieldIndex;
-      containerNameBase += "bt";
+      containerNameBase += '_';
+      containerNameBase += _RC (D_CHAR*, m_FieldsDescriptors.get ()) +
+                            field.m_NameOffset;
+      containerNameBase += "_bt";
 
-      auto_ptr<I_DataContainer> apIndexContainer (
-                              new FileContainer (containerNameBase.c_str (),
-                                                 m_MaxFileSize,
-                                                 field.m_IndexUnitsCount )
-                                                 );
+      auto_ptr <I_DataContainer> apIndexContainer (
+                               new FileContainer (containerNameBase.c_str (),
+                                                  m_MaxFileSize,
+                                                  field.m_IndexUnitsCount )
+                                                  );
       m_vIndexNodeMgrs.push_back (
             new FieldIndexNodeManager (apIndexContainer,
                                        field.m_IndexNodeSizeKB * 1024,
@@ -639,11 +640,13 @@ PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 {
   assert (m_BaseFileName.size () > 0);
 
+  DBSFieldDescriptor desc = GetFieldDescriptor (field);
+
   string containerNameBase = m_BaseFileName;
 
-  containerNameBase += "_idf";
-  containerNameBase += field;
-  containerNameBase += "bt";
+  containerNameBase += '_';
+  containerNameBase += desc.m_pFieldName;
+  containerNameBase += "_bt";
 
   return new FileContainer (containerNameBase.c_str (),
                             DBSGetMaxFileSize(),

@@ -107,7 +107,7 @@ public:
 class TempContainer : public I_DataContainer
 {
 public:
-  TempContainer (const D_CHAR* pTempDirectory, D_UINT uReservedMemory);
+  TempContainer (const D_CHAR* pTempDirectory, const D_UINT uReservedMemory);
   virtual ~TempContainer ();
 
   // WIDataContainer virtual functions
@@ -147,8 +147,30 @@ public:
   {
   }
 
-  virtual WException*     Clone () { return new WFileContainerException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return FILE_CONTAINER_EXCEPTION; }
+  virtual WException*     Clone () const
+  {
+    return new WFileContainerException (*this);
+  }
+  virtual EXPCEPTION_TYPE Type () const { return FILE_CONTAINER_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    switch (GetExtra ())
+      {
+      case INVALID_PARAMETERS:
+        return "Invalid parameters.";
+      case CONTAINTER_INVALID:
+        return "Container inconsistency detected.";
+      case INVALID_ACCESS_POSITION:
+          return "Container accessed outside bounds.";
+      case FILE_OS_IO_ERROR:
+          return "Container internal file IO error.";
+      default:
+          assert (false);
+          return "Unknown container exception";
+      }
+
+    return NULL;
+  }
 
   enum
   {

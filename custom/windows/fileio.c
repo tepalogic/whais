@@ -213,11 +213,12 @@ whc_fgetlasterror ()
 D_BOOL
 whc_ferrtostrs (D_UINT64 error_code, D_CHAR* str, D_UINT strSize)
 {
-  return FormatMessage (FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                        NULL,
-                        (DWORD) error_code,
-                        MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-                        str, strSize, NULL) != 0;
+  return FormatMessage (
+              FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+              NULL,
+              (DWORD) error_code,
+              MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+              str, strSize, NULL) != 0;
 }
 
 D_BOOL
@@ -230,6 +231,12 @@ const D_CHAR*
 whc_get_directory_delimiter ()
 {
   return "\\";
+}
+
+const D_CHAR*
+whc_get_current_directory ()
+{
+  return ".\\";
 }
 
 D_BOOL

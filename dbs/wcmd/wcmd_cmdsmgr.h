@@ -1,10 +1,10 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
-Copyright (C) 2009  Iulian Popa
+  WCMD - An utility to manage whisper database files.
+  Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
-         Pantelimon Ilfov,
-         Romania
+Pantelimon Ilfov,
+Romania
 Phone:   +40721939650
 e-mail:  popaiulian@gmail.com
 
@@ -22,21 +22,43 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include <stdarg.h>
+#ifndef WCMD_CMDSMGR_H_
+#define WCMD_CMDSMGR_H_
+
+#include <string>
+#include <iostream>
 
 #include "whisper.h"
-#include "../../common/whisper.h"
-#include "../../compiler/include/whisperc/whisperc.h"
+#include "wexception.h"
 
-#ifndef MSGLOG_H_
-#define MSGLOG_H_
+typedef void* ENTRY_CMD_CONTEXT;
+typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
+
+struct CmdEntry
+{
+  const D_CHAR*     m_pCmdText;
+  const D_CHAR*     m_pCmdDesc;
+  const D_CHAR*     m_pExtHelpDesc;
+  ENTRY_CMD         m_cmd;
+  ENTRY_CMD_CONTEXT m_context;
+
+  bool              m_showStatus;
+};
 
 void
-my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buffOff,
-            D_UINT            msgId,
-            D_UINT            msgType,
-            const D_CHAR*     msgFormat,
-            va_list           args);
+InitCmdManager ();
 
-#endif /* MSGLOG_H_ */
+void
+RegisterCommand (const CmdEntry& entry);
+
+const CmdEntry*
+FindCmdEntry (const D_CHAR* pCommand);
+
+const std::string
+CmdLineNextToken (const std::string& cmdLine, size_t& ioPosition);
+
+void
+printException (std::ostream& outputStream, const WException& e);
+
+#endif // WCMD_CMDSMGR_H_
+

@@ -130,7 +130,6 @@ PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
   return result;
 }
 
-
 ROW_INDEX
 PrototypeTable::GetAllocatedRows ()
 {
@@ -261,17 +260,19 @@ PrototypeTable::CreateFieldIndex (const FIELD_INDEX                 field,
 
   const D_UINT nodeSizeKB  = 16; //16KB
 
-  auto_ptr<I_DataContainer> apIndexContainer (CreateIndexContainer (field));
+  auto_ptr<I_DataContainer> apIndexContainer ( CreateIndexContainer (field));
   auto_ptr<FieldIndexNodeManager> apFieldMgr (
-                              new FieldIndexNodeManager (apIndexContainer,
-                                                         nodeSizeKB * 1024,
-                                                         0x400000, //4MB
-                                                         _SC (DBS_FIELD_TYPE,
-                                                             desc.m_TypeDesc),
-                                                             true));
+                            new FieldIndexNodeManager (apIndexContainer,
+                                                       nodeSizeKB * 1024,
+                                                       0x400000, //4MB
+                                                       _SC (DBS_FIELD_TYPE,
+                                                            desc.m_TypeDesc),
+                                                       true)
+                                             );
 
   BTreeNodeRAI rootNode (apFieldMgr->RetrieveNode (
-                                      apFieldMgr->AllocateNode (NIL_NODE, 0)));
+                                     apFieldMgr->AllocateNode (NIL_NODE, 0))
+                                                  );
   rootNode->SetNext (NIL_NODE);
   rootNode->SetPrev (NIL_NODE);
   rootNode->SetKeysCount (0);

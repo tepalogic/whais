@@ -40,17 +40,19 @@ public:
   I_DBSHandler () {}
   virtual ~I_DBSHandler () {}
 
-  virtual TABLE_INDEX  PesistentTablesCount () = 0;
-  virtual I_DBSTable&  RetrievePersistentTable (const TABLE_INDEX index) = 0;
-  virtual I_DBSTable&  RetrievePersistentTable (const D_CHAR* pTableName) = 0;
-  virtual void         AddTable (const D_CHAR* const pTableName,
-                                 const FIELD_INDEX   fieldsCount,
-                                 DBSFieldDescriptor* pInOutFields) = 0;
-  virtual void         DeleteTable (const D_CHAR* const pTableName) = 0;
+  virtual TABLE_INDEX   PersistentTablesCount () = 0;
+  virtual I_DBSTable&   RetrievePersistentTable (const TABLE_INDEX index) = 0;
+  virtual I_DBSTable&   RetrievePersistentTable (const D_CHAR* pTableName) = 0;
+  virtual void          AddTable (const D_CHAR* const pTableName,
+                                  const FIELD_INDEX   fieldsCount,
+                                  DBSFieldDescriptor* pInOutFields) = 0;
+  virtual void          DeleteTable (const D_CHAR* const pTableName) = 0;
 
-  virtual I_DBSTable&  CreateTempTable (const FIELD_INDEX   fieldsCount,
-                                        DBSFieldDescriptor* pInOutFields) = 0;
-  virtual void         ReleaseTable (I_DBSTable&) = 0;
+  virtual I_DBSTable&   CreateTempTable (const FIELD_INDEX   fieldsCount,
+                                         DBSFieldDescriptor* pInOutFields) = 0;
+  virtual void          ReleaseTable (I_DBSTable&) = 0;
+
+  virtual const D_CHAR* TableName (const TABLE_INDEX index) = 0;
 };
 
 void

@@ -86,6 +86,9 @@ whc_fremove (const D_CHAR* pFileName);
 const D_CHAR*
 whc_get_directory_delimiter ();
 
+const D_CHAR*
+whc_get_current_directory ();
+
 D_BOOL
 whc_is_path_absolute (const D_CHAR* pPath);
 

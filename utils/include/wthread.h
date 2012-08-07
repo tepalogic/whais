@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WTHREAD_H_
 #define WTHREAD_H_
 
+#include <assert.h>
 
 #include "whisper.h"
 
@@ -118,12 +119,32 @@ public:
   explicit WThreadException (const D_CHAR* message,
                              const D_CHAR* file,
                              D_UINT32      line,
-                             D_UINT32      extra)  :
-           WException (message, file, line, extra) {}
-  virtual ~WThreadException () {};
+                             D_UINT32      extra)
+    : WException (message, file, line, extra)
+  {
+  }
+  virtual ~WThreadException ()
+  {
+  };
 
-  virtual WException*     Clone () { return new WThreadException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return THREAD_EXCEPTION; }
+  virtual WException*     Clone () const
+  {
+    return new WThreadException (*this);
+  }
+  virtual EXPCEPTION_TYPE Type () const { return THREAD_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    switch (Type ())
+    {
+    case UNKNOWN_EXCEPTION:
+      return "Unknown threading exception.";
+    case FAILEDOP_EXCEPTION:
+      return "Thread related operation has failed.";
+    default:
+      assert (false);
+      return "Unknown threading exception.";
+    }
+  }
 
   enum
   {

@@ -44,7 +44,7 @@ public:
   DbsHandler (const DbsHandler& source);
   virtual ~DbsHandler ();
 
-  virtual TABLE_INDEX  PesistentTablesCount ();
+  virtual TABLE_INDEX  PersistentTablesCount ();
   virtual I_DBSTable&  RetrievePersistentTable (const TABLE_INDEX index);
   virtual I_DBSTable&  RetrievePersistentTable (const D_CHAR* pTableName);
   virtual void         ReleaseTable (I_DBSTable&);
@@ -55,6 +55,7 @@ public:
 
   virtual I_DBSTable&  CreateTempTable (const FIELD_INDEX   fieldsCount,
                                         DBSFieldDescriptor* pInOutFields);
+  virtual const D_CHAR* TableName (const TABLE_INDEX index);
 
   void Discard ();
   void RemoveFromStorage ();
@@ -62,7 +63,7 @@ public:
   const std::string& WorkingDir () { return m_DbsDirectory; }
   D_UINT64           MaxFileSize () { return m_MaxFileSize; }
 
-protected:
+private:
   typedef std::map<std::string, PersistentTable*> TABLES;
 
   void SyncToFile ();

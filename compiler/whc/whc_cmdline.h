@@ -62,8 +62,8 @@ public:
   WhcCmdLineException (const D_CHAR* pMessage,
                        const D_CHAR* pFile,
                        D_UINT32      line,
-                       D_UINT32      extra) :
-    WException (pMessage, pFile, line, extra)
+                       D_UINT32      extra)
+    : WException (pMessage, pFile, line, extra)
   {
   }
 
@@ -71,8 +71,15 @@ public:
   {
   };
 
-  virtual WException*     Clone () { return new WhcCmdLineException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return COMPILER_CMD_LINE_EXCEPTION; }
+  virtual WException*     Clone () const
+  {
+    return new WhcCmdLineException (*this);
+  }
+  virtual EXPCEPTION_TYPE Type () const { return COMPILER_CMD_LINE_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    return "Invalid command line.";
+  }
 };
 
 // Declaration of error codes

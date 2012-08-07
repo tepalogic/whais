@@ -253,7 +253,7 @@ FileContainer::ExtendContainer ()
   m_FilesHandles.push_back (unitFile);
 }
 
-////////////WTempFileContainer///////////////////////////////////////////////
+//////////////WTempFileContainer///////////////////////////////////////////////
 
 FileTempContainer::FileTempContainer (const D_CHAR*  pFileNameBase,
                                       const D_UINT32 uMaxFileSize)
@@ -268,7 +268,8 @@ FileTempContainer::~FileTempContainer ()
 
 //////////////////WTemCotainer/////////////////////////////////////////////////
 
-TempContainer::TempContainer (const D_CHAR* pTempDirectory, D_UINT uReservedMemory)
+TempContainer::TempContainer (const D_CHAR* pTempDirectory,
+                              const D_UINT  uReservedMemory)
   : I_DataContainer (),
     m_FileContainer (NULL),
     m_Cache (new D_UINT8[uReservedMemory]),

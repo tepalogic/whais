@@ -49,8 +49,45 @@ public:
   {
   }
 
-  virtual InterException* Clone () { return new InterException (*this); }
-  virtual EXPCEPTION_TYPE Type () { return INTERPRETER_EXCEPTION; }
+  virtual WException*     Clone () const { return new InterException (*this); }
+  virtual EXPCEPTION_TYPE Type () const { return INTERPRETER_EXCEPTION; }
+  virtual const D_CHAR*   Description () const
+  {
+    switch (GetExtra ())
+      {
+        case INVALID_OP_CONVERSION:
+          return "Invalid operand conversion.";
+        case INVALID_OP_REQ:
+          return "Invalid operand request.";
+        case INVALID_GLOBAL_REQ:
+          return "Invalid global value request.";
+        case INVALID_TYPE_DESC:
+          return "Invalid type description.";
+        case DUPLICATE_DEFINITION:
+          return "Definition two global symbols with the same name.";
+        case EXTERNAL_FIRST:
+          return "An external declaration of a symbol encountered before "
+                 "it's definition.";
+        case EXTERNAL_MISMATCH:
+          return "Declaration of an external symbol is different from "
+                 "its definition.";
+        case INVALID_PROC_REQ:
+           return "Invalid procedure request.";
+        case INVALID_LOCAL_REQ:
+           return "Invalid local value request.";
+        case ALREADY_INITED:
+           return "Already initialized.";
+        case NOT_INITED:
+           return "Not initialized.";
+         case INVALID_SESSION:
+           return "Invalid session.";
+         case SESSION_IN_USE:
+             return "Session in use.";
+         default:
+             assert (false);
+             return "Unknown exception.";
+      }
+  }
 
   enum
   {
@@ -86,7 +123,6 @@ public:
     ROW_INDEX_BIGGER,
 
     FIELD_TYPE_MISMATCH,
-
 
     DIVIDE_BY_ZERO,
 

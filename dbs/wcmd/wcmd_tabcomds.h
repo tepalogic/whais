@@ -1,10 +1,10 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
-Copyright (C) 2009  Iulian Popa
+  WCMD - An utility to manage whisper database files.
+  Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
-         Pantelimon Ilfov,
-         Romania
+Pantelimon Ilfov,
+Romania
 Phone:   +40721939650
 e-mail:  popaiulian@gmail.com
 
@@ -22,21 +22,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include <stdarg.h>
-
-#include "whisper.h"
-#include "../../common/whisper.h"
-#include "../../compiler/include/whisperc/whisperc.h"
-
-#ifndef MSGLOG_H_
-#define MSGLOG_H_
+#ifndef WCMD_TABCMDS_H_
+#define WCMD_TABCMDS_H_
 
 void
-my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buffOff,
-            D_UINT            msgId,
-            D_UINT            msgType,
-            const D_CHAR*     msgFormat,
-            va_list           args);
+AddOfflineTableCommands ();
 
-#endif /* MSGLOG_H_ */
+#endif //WCMD_TABCMDS_H_
+
