@@ -3,6 +3,8 @@
 
 ARCH_OBJ_EXT:=.o
 ARCH_EXE_EXT:=
+ARCH_SHL_PREFIX:=lib
+ARCH_SHL_EXT:=.so
 ARCH_LIB_PREFIX:=lib
 ARCH_LIB_EXT:=.a
 CC:=gcc
@@ -11,13 +13,13 @@ LD:=g++
 AR:=ar
 
 ifeq ($(FLAVOR),debug)
-CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv
+CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv -fvisibility=default -fPIC
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 
 ifeq ($(FLAVOR),release)
 DEFINES+=-DNDEBUG
-CC_FLAGS?=-Wall -c -ansi -O3
+CC_FLAGS?=-Wall -c -ansi -O3 -fvisibility=default -fPIC
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 
@@ -40,19 +42,26 @@ arch_add_defines=$(foreach _def, $(sort $($(1)_DEF) $(DEFINES)),-D$(_def))
 #set the right dependencies for libs
 arch_dependecy_lib=$(foreach _lib,$($(1)_LIB),./bin/$(ARCH)/$(dir $(_lib))lib$(notdir $(_lib)).a)
 
+#set the right dependencies for shared libs 
+arch_dependecy_shlib=$(foreach _lib,$($(1)_SHL),./bin/$(ARCH)/$(dir $(_lib))lib$(notdir $(_lib)).so)
+
 #set the right libraries directories
 arch_add_lib_dirs=$(foreach _dir,$($(1)_LIB_DIR), -L./bin/$(ARCH)/$(_dir))
 
 #set the right libraries adds
-arch_handle_import_libs=$(foreach _lib,$($(1)_LIB),-l$(notdir $(_lib)))
+arch_handle_import_libs=$(foreach _lib,$($(1)_LIB) $($(1)_SHL),-l$(notdir $(_lib)))
 
 #set the right argument to output executables
 arch_set_output_executable=-o ./bin/$(ARCH)/$(1)
 
-#set the right argument to output executables
+#set the right argument to output shared libraries
+arch_set_output_sharedlib=-o ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
+
+#set the right argument to output static libraries
 arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
 #set the right  flags for the linker
 arch_linker_flags= -lpthread
+arch_shl_linker_flags= -shared -Wl,-soname,lib$(1).so$(2) $(arch_linker_flags)
 arch_archiver_flags=rcs
 

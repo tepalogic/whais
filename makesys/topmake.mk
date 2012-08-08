@@ -2,7 +2,7 @@
 
 .PHONY: all prepare_env libs exes clean 
 
-all: prepare_env exes $(EXES) $(LIBS)
+all: prepare_env exes $(EXES) $(SHLS) $(LIBS)
 
 prepare_env:
 	$(ECHO)if [ ! -d ./bin ]; then mkdir ./bin ; fi;

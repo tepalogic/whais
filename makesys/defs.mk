@@ -45,18 +45,44 @@ endef
 #$(2) - name of the UNIT the executable belongs too
 define add_output_executable
 $(1)_SRC=$(sort $($(1)_SRC))
-$(1)_LIB_DIR=$(sort $(foreach _lib, $($(1)_LIB),$(dir $(_lib))))
+$(1)_LIB_DIR=$(sort $(foreach _lib, $($(1)_LIB) $($(1)_SHL),$(dir $(_lib))))
 $(foreach src, $($(1)_SRC), $(eval $(1)_OBJ+=$(call obj_name,$(2),$(src))))
-$(foreach src, $($(1)_SRC), $(eval $(1)_DEP+=$(call obj_name,$(2),$(src))))
+$(foreach src, $($(1)_SRC), $(eval $(1)_DEP+=$(call dep_name,$(2),$(src))))
 $(foreach src, $($(1)_SRC), $(eval $(call create_source_compile_rule,$(1),$(2),$(src))))
 
 
 EXES+=./bin/$(ARCH)/$(2)/$(1)$(ARCH_EXE_EXT)
-./bin/$(ARCH)/$(2)/$(1)$(ARCH_EXE_EXT) : $($(1)_OBJ) $(call arch_dependecy_lib,$(1)) 
+./bin/$(ARCH)/$(2)/$(1)$(ARCH_EXE_EXT) : $($(1)_OBJ) $(call arch_dependecy_shlib,$(1)) $(call arch_dependecy_lib,$(1)) 
 	@echo Building executable $(ARCH)/$(1)  
 	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_linker_flags,$(1)) $$(call arch_add_lib_dirs,$(1))\
 		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_executable,$(2)/$(1))
 endef
+
+#Add an shared library to the build system
+#$(1) - name of the library to add in the build system
+#$(2) - name of the UNIT the executable belongs too
+#$(3) - major version description
+#$(4) - minor version description
+define add_output_shared_lib
+$(1)_SRC=$(sort $($(1)_SRC))
+$(1)_LIB_DIR=$(sort $(foreach _lib, $($(1)_LIB) $($(1)_SHL),$(dir $(_lib))))
+$(foreach src, $($(1)_SRC), $(eval $(1)_OBJ+=$(call obj_name,$(2),$(src))))
+$(foreach src, $($(1)_SRC), $(eval $(1)_DEP+=$(call dep_name,$(2),$(src))))
+$(foreach src, $($(1)_SRC), $(eval $(call create_source_compile_rule,$(1),$(2),$(src))))
+
+
+SHLS+=./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
+SHLS+=$(if $(3),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4),)
+./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) : $($(1)_OBJ) $(call arch_dependecy_shlib,$(1)) $(call arch_dependecy_lib,$(1)) 
+	@echo Building shared lib $(ARCH)/$(1)  
+	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_shl_linker_flags,$(1),$(3),$(4)) $$(call arch_add_lib_dirs,$(1))\
+		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_sharedlib,$(2),$(1))
+
+./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) : ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
+	@cp -rf ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
+endef
+
+
 
 #Add an library on the build system
 #$(1) - name of the library to add in the build system
@@ -64,6 +90,7 @@ endef
 define add_output_library
 $(1)_SRC=$(sort $($(1)_SRC))
 $(foreach src, $($(1)_SRC), $(eval $(1)_OBJ+=$(call obj_name,$(2),$(src))))
+$(foreach src, $($(1)_SRC), $(eval $(1)_DEP+=$(call dep_name,$(2),$(src))))
 $(foreach src, $($(1)_SRC), $(eval $(call create_source_compile_rule,$(1),$(2),$(src))))
 
 
