@@ -2,7 +2,13 @@
 UNIT:=custom
 
 UNIT_EXES:=
-UNIT_LIBS:=custom
+UNIT_LIBS:=
+UNIT_SHLS:=custom
+
+custom_DEF:=CUSTOM_EXPORTING=1
+
+custom_MAJ=.1
+custom_MIN=.0
 
 custom_SRC=cpp_support/overloading.cpp
 
@@ -31,4 +37,5 @@ custom_SRC+=$(SRC_FOLDER)/memory.c
 endif
 
 
+$(foreach shl, $(UNIT_SHLS), $(eval $(call add_output_shared_lib,$(shl),$(UNIT),$($(shl)_MAJ),$($(shl)_MIN))))
 $(foreach lib, $(UNIT_LIBS), $(eval $(call add_output_library,$(lib),$(UNIT))))

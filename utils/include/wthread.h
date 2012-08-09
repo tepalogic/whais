@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "utils_shl.h"
+
 class WSynchronizer
 {
 public:

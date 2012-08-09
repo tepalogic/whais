@@ -42,7 +42,7 @@ enum EXPCEPTION_TYPE
   INTERPRETER_EXCEPTION
 };
 
-class WException
+class SHL_EXPORT_SYMBOL WException
 {
 public:
   WException (const D_CHAR* pMessage,

@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMPILEDUNIT_H_
 #define COMPILEDUNIT_H_
 
-class WICompiledUnit
+class COMPILER_SHL WICompiledUnit
 {
 public:
   WICompiledUnit ()
@@ -65,7 +65,7 @@ public:
   virtual D_BOOL         IsProcExternal (D_UINT item_proc) = 0;
 };
 
-class WCompiledUnitException : public WException
+class COMPILER_SHL WCompiledUnitException : public WException
 {
 public:
   WCompiledUnitException (const D_CHAR* pMessage,
@@ -91,7 +91,7 @@ public:
   }
 };
 
-class WBufferCompiledUnit : public WICompiledUnit
+class COMPILER_SHL WBufferCompiledUnit : public WICompiledUnit
 {
 public:
   WBufferCompiledUnit (const D_UINT8*    pBuffer,
@@ -132,7 +132,7 @@ private:
     WHC_HANDLER m_Handler;
 };
 
-class WFileCompiledUnit : public WICompiledUnit
+class COMPILER_SHL WFileCompiledUnit : public WICompiledUnit
 {
 
 public:

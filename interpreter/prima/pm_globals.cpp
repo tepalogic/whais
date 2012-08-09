@@ -33,12 +33,11 @@ using namespace prima;
 
 GlobalsManager::~GlobalsManager ()
 {
-
   for (vector<GlobalValue>::iterator it = m_Storage.begin ();
        it != m_Storage.end ();
        ++it)
     {
-      it->GetOperand ().~I_Operand();
+      it->GetOperand ().~I_PMOperand();
     }
 }
 

@@ -64,4 +64,8 @@ typedef unsigned __int64 D_UINT64;
 typedef D_INT64          D_INTMAX;
 typedef D_UINT64         D_UINTMAX;
 
+#define SHL_EXPORT_SYMBOL __declspec(dllexport)
+#define SHL_IMPORT_SYMBOL __declspec(dllimport)
+
+
 #endif /* WHISPER_TYPES_H */

@@ -1,6 +1,6 @@
 /******************************************************************************
-WHISPER - An advanced database system
-Copyright (C) 2008  Iulian Popa
+UTILS - Common routines used trough WHISPER project
+Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -22,44 +22,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_THREAD_H_
-#define WHISPER_THREAD_H_
+#ifndef COMPILER_SHL_H_
+#define COMPILER_SHL_H_
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifdef COMPILER_EXPORTING
+  #define COMPILER_SHL SHL_EXPORT_SYMBOL
+#else
+  #define COMPILER_SHL SHL_IMPORT_SYMBOL
 #endif
 
-CUSTOM_SHL void
-wh_sync_init (WH_SYNC* pSync);
 
-CUSTOM_SHL void
-wh_sync_destroy (WH_SYNC* pSync);
-
-CUSTOM_SHL void
-wh_sync_enter (WH_SYNC* pSync);
-
-CUSTOM_SHL void
-wh_sync_leave (WH_SYNC* pSync);
-
-typedef void (*WH_THREAD_ROUTINE) (void*);
-
-CUSTOM_SHL D_INT
-wh_thread_create (WH_THREAD*        pThread,
-                  WH_THREAD_ROUTINE routine,
-                  void*             args);
-
-CUSTOM_SHL D_INT
-wh_thread_join (WH_THREAD thread);
-
-CUSTOM_SHL void
-wh_yield ();
-
-CUSTOM_SHL void
-wh_sleep (D_UINT millisecs);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* WHISPER_THREAD_H_ */
+#endif /* COMPILER_SHL_H_ */

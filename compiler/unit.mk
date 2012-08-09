@@ -5,22 +5,23 @@ UNIT_EXES:=whc wod
 UNIT_SHLS:=compiler
 UNIT_LIBS:=
 
-compiler_INC=utils/include
-
 whc_SRC=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp
-whc_LIB=utils/utils custom/custom
-whc_SHL=compiler/compiler 
+whc_LIB=
+whc_SHL=compiler/compiler utils/utils custom/custom 
 
 wod_SRC=wod/wod_main.cpp wod/wod_cmdline.cpp wod/wod_dump.cpp \
 		wod/wod_decoder.cpp
-wod_LIB=utils/utils custom/custom
-wod_SHL=compiler/compiler 
+wod_LIB=
+wod_SHL=compiler/compiler utils/utils custom/custom
 
+compiler_INC=utils/include
 compiler_SRC=parser/whisper.tab.c parser/parser.c parser/yy.c parser/whisperc.c parser/strstore.c \
 			 semantics/expression.c semantics/op_matrix.c semantics/procdecl.c \
 			 semantics/statement.c semantics/vardecl.c semantics/wlog.c \
 			 semantics/brlo_stmts.c wraper_cpp/compiledunit.cpp
-compiler_LIB=utils/utils custom/custom
+compiler_DEF=COMPILER_EXPORTING=1
+compiler_LIB=
+compiler_SHL=utils/utils custom/custom 
 
 ./$(UNIT)/parser/whisper.tab.c ./$(UNIT)/parser/whisper.tab.h : ./$(UNIT)/parser/whisper.y
 	bison -d $? -o $@

@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "whisperc.h"
+
 enum W_OPCODE
 {
   /* one byte opcodes */
@@ -210,7 +212,7 @@ extern "C"
 {
 #endif
 
-unsigned int
+COMPILER_SHL unsigned int
 whc_decode_opcode (const unsigned char*  pCode,
                     enum W_OPCODE* const pOutOpcode);
 #ifdef __cplusplus

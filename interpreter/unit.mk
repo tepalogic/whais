@@ -2,6 +2,7 @@ UNIT:=interpreter
 
 UNIT_EXES:= 
 UNIT_LIBS:=prima
+UNIT_SHLS:=
 
 prima_INC:=utils/include
 prima_SRC= prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\

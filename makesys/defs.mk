@@ -18,6 +18,13 @@ obj_name=./tmp/$(ARCH)/$(1)/$(notdir $(basename $(2)))$(ARCH_OBJ_EXT)
 #(2) - code source
 dep_name=./tmp/$(ARCH)/$(1)/$(notdir $(basename $(2))).d
 
+#set the right dependencies for libs
+#(1) - the static lib's name
+arch_dependecy_lib=$(foreach _lib,$($(1)_LIB),./bin/$(ARCH)/$(dir $(_lib))$(ARCH_LIB_PREFIX)$(notdir $(_lib))$(ARCH_LIB_EXT))
+
+#set the right dependencies for shared libs 
+#(1) - the shared lib's name
+arch_dependecy_shlib=$(foreach _lib,$($(1)_SHL),./bin/$(ARCH)/$(dir $(_lib))$(ARCH_SHL_PREFIX)$(notdir $(_lib))$(ARCH_SHL_EXT))
 
 #Create de dependency rules required to compile a source file
 #$(1) - name of the library/executable to add in the build system
@@ -79,7 +86,9 @@ SHLS+=$(if $(3),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
 		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_sharedlib,$(2),$(1))
 
 ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) : ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
-	@cp -rf ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
+	#Create the links the other way around for simplicity
+	@ln -s $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
+	@ln -s $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
 endef
 
 

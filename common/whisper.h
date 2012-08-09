@@ -38,6 +38,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* This section contains whisper specific data */
 
+#ifdef CUSTOM_EXPORTING
+#define CUSTOM_SHL SHL_EXPORT_SYMBOL
+#else
+#define CUSTOM_SHL SHL_IMPORT_SYMBOL
+#endif
+
 /* This section will contain some general data */
 #include "general/whisper_macros.h"
 

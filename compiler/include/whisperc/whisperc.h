@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dbs/include/dbs_types.h>
 
+#include "compiler_shl.h"
+
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
 #define T_ARRAY_MASK          0x0100    /* The variable is an array */
@@ -143,11 +145,11 @@ unsigned int
 whc_get_const_area (WHC_HANDLER           hnd,
                     const unsigned char** pOutPConsts);
 
-void
+COMPILER_SHL void
 whc_get_libver (unsigned int* pOutMajor,
                 unsigned int* pOutMinor);
 
-void
+COMPILER_SHL void
 whc_get_lang_ver (unsigned int* pOutMajor,
                   unsigned int* pOutMinor);
 

@@ -2037,8 +2037,9 @@ translate_exp_leaf (struct ParserState* const pState,
     }
   else if (expression->val_type == VAL_C_CHAR)
     {
+      const D_UINT32 unicodeCh = expression->val.u_char.value;
+
       result.type = T_CHAR;
-      D_UINT32 unicodeCh = expression->val.u_char.value;
       if ((w_opcode_encode (pCodeStream, W_LDC) == NULL)
           || (output_uint32 (pCodeStream, unicodeCh) == NULL))
         {

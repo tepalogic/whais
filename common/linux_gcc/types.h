@@ -61,4 +61,8 @@ typedef u_int64_t     D_UINT64;
 typedef D_INT64       D_INTMAX;
 typedef D_UINT64      D_UINTMAX;
 
+#define SHL_EXPORT_SYMBOL __attribute__((visibility("default")))
+#define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))
+
+
 #endif /* WHISPER_TYPES_H */

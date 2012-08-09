@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "utils_shl.h"
+
 /*
  * UArray - stores an array of arbitrary elements. The goal of using this
  * structure is to optimise the memory access/usage.
@@ -51,25 +53,25 @@ struct UArray
                                        (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\
                                        sizeof(D_UINTMAX))
 
-struct UArray*
+UTILS_SHL struct  UArray*
 init_array_ex (struct UArray* pArray,
                size_t         item_size,
                D_UINT         increment,
                D_UINT         alignmentr);
 
-void*
+UTILS_SHL void*
 add_item (struct UArray* pArray, const void* data);
 
-void*
+UTILS_SHL void*
 get_item (const struct UArray* pArray, D_UINT item);
 
-D_UINT
+UTILS_SHL D_UINT
 get_array_count (const struct UArray* pArray);
 
-void
+UTILS_SHL void
 set_array_count (struct UArray* pArray, D_UINT new_count);
 
-void
+UTILS_SHL void
 destroy_array (struct UArray* pArray);
 
 #endif /* UARRAY_H */

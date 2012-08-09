@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include "whisper.h"
-
+#if 0
 //Undefine 'new' because we need to implement the operators
 #undef new
 
@@ -131,3 +131,4 @@ operator delete[] (void* ptr, const D_CHAR*, D_UINT )
 #endif
 }
 
+#endif

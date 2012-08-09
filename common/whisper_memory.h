@@ -36,35 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <new>
 #include <memory>
 
-
-void* operator new (size_t size, const D_CHAR* pFile, D_UINT line);
-void* operator new (size_t size);
-void  operator delete (void* ptr);
-void  operator delete (void* ptr, const D_CHAR*, D_UINT);
-void* operator new [] (size_t size, const D_CHAR* pFile, D_UINT line);
-void* operator new [] (size_t size);
-void  operator delete [] (void* ptr);
-void  operator delete [] (void* ptr, const D_CHAR*, D_UINT);
-
-template <class T> static inline void
-_placement_new (void* place, const T& value)
-{
-  new (place) T (value);
-}
-
-template <class T> static inline void
-_placement_new (void* place, T& value)
-{
-  new (place) T (value);
-}
-
-#ifdef ENABLE_MEMORY_TRACE
-  #define new new(__FILE__, __LINE__)
 #endif
 
-extern "C"
-{
-#endif
 
 /*
  * The memory could be allocated/freed in different ways
@@ -88,33 +61,162 @@ extern "C"
 
 #endif                                /* ENABLE_MEMORY_TRACE */
 
-void*
+
+#ifdef __cplusplus
+  extern "C"
+  {
+#endif
+
+CUSTOM_SHL void*
 custom_trace_mem_alloc (size_t      size,
                         const char* pFile,
                         D_UINT      line);
 
-void*
+CUSTOM_SHL void*
 custom_trace_mem_realloc (void*       oldPtr,
                           size_t      newSize,
                           const char* pFile,
                           D_UINT      line);
 
-void custom_trace_mem_free (void*       ptr,
-                            const char* pFile,
-                            D_UINT      line);
+CUSTOM_SHL void
+custom_trace_mem_free (void*       ptr,
+                       const char* pFile,
+                       D_UINT      line);
 
-void*
+CUSTOM_SHL void*
 custom_mem_alloc (size_t size);
 
-void*
+CUSTOM_SHL void*
 custom_mem_realloc (void* oldPtr, size_t newSize);
 
-void
+CUSTOM_SHL void
 custom_mem_free (void* ptr);
 
 #ifdef __cplusplus
-}
+  } /* extern "C" */
+
+inline void*
+operator new (size_t size, const D_CHAR* pFile, D_UINT line)
+{
+#ifndef ENABLE_MEMORY_TRACE
+  (void)pFile;
+  (void)line;
+  void *ptr = custom_mem_alloc (size);
+#else
+  void *ptr = custom_trace_mem_alloc (size, pFile, line);
 #endif
 
+  if (ptr == NULL)
+    throw std::bad_alloc ();
+  return ptr;
+}
 
-#endif                                /* WHISPER_MEMORY_H */
+inline void*
+operator new [] (size_t size, const D_CHAR* pFile, D_UINT line)
+{
+#ifndef ENABLE_MEMORY_TRACE
+  (void)pFile;
+  (void)line;
+  void *ptr = custom_mem_alloc (size);
+#else
+  void *ptr = custom_trace_mem_alloc (size, pFile, line);
+#endif
+
+  if (ptr == NULL)
+    throw std::bad_alloc ();
+  return ptr;
+}
+
+inline void*
+operator new (size_t size)
+{
+#ifndef ENABLE_MEMORY_TRACE
+  void *ptr = custom_mem_alloc (size);
+#else
+  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+#endif
+
+  if (ptr == NULL)
+    throw std::bad_alloc ();
+  return ptr;
+}
+
+inline void*
+operator new [] (size_t size)
+{
+#ifndef ENABLE_MEMORY_TRACE
+  void *ptr = custom_mem_alloc (size);
+#else
+  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+#endif
+
+  if (ptr == NULL)
+    throw std::bad_alloc ();
+  return ptr;
+}
+
+
+inline void
+operator delete (void* ptr)
+{
+  if (ptr != NULL)
+#ifndef ENABLE_MEMORY_TRACE
+    custom_mem_free(ptr);
+#else
+  custom_trace_mem_free(ptr, NULL, 0);
+#endif
+}
+
+inline void
+operator delete (void* ptr, const D_CHAR*, D_UINT)
+{
+  if (ptr != NULL)
+#ifndef ENABLE_MEMORY_TRACE
+    custom_mem_free(ptr);
+#else
+  custom_trace_mem_free(ptr, NULL, 0);
+#endif
+}
+
+inline void
+operator delete [] (void* ptr)
+{
+  if (ptr != NULL)
+#ifndef ENABLE_MEMORY_TRACE
+    custom_mem_free(ptr);
+#else
+  custom_trace_mem_free(ptr, NULL, 0);
+#endif
+}
+
+inline void
+operator delete[] (void* ptr, const D_CHAR*, D_UINT )
+{
+  if (ptr != NULL)
+#ifndef ENABLE_MEMORY_TRACE
+    custom_mem_free(ptr);
+#else
+    custom_trace_mem_free(ptr, NULL, 0);
+#endif
+}
+
+template <class T> static inline void
+_placement_new (void* place, const T& value)
+{
+  new (place) T (value);
+}
+
+template <class T> static inline void
+_placement_new (void* place, T& value)
+{
+  new (place) T (value);
+}
+
+#ifdef ENABLE_MEMORY_TRACE
+  #define new new(__FILE__, __LINE__)
+#endif
+
+#endif
+
+#endif /* WHISPER_MEMORY_H */
+

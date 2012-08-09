@@ -13,13 +13,13 @@ LD:=g++
 AR:=ar
 
 ifeq ($(FLAVOR),debug)
-CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv -fvisibility=default -fPIC
+CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv -fvisibility=hidden -fPIC
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 
 ifeq ($(FLAVOR),release)
 DEFINES+=-DNDEBUG
-CC_FLAGS?=-Wall -c -ansi -O3 -fvisibility=default -fPIC
+CC_FLAGS?=-Wall -c -ansi -O3 -fvisibility=hidden -fPIC
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 
@@ -39,12 +39,6 @@ arch_add_includes=$(foreach _dir, $(sort $(1)),-I$(_dir))
 #set the right option for defines options
 arch_add_defines=$(foreach _def, $(sort $($(1)_DEF) $(DEFINES)),-D$(_def))
 
-#set the right dependencies for libs
-arch_dependecy_lib=$(foreach _lib,$($(1)_LIB),./bin/$(ARCH)/$(dir $(_lib))lib$(notdir $(_lib)).a)
-
-#set the right dependencies for shared libs 
-arch_dependecy_shlib=$(foreach _lib,$($(1)_SHL),./bin/$(ARCH)/$(dir $(_lib))lib$(notdir $(_lib)).so)
-
 #set the right libraries directories
 arch_add_lib_dirs=$(foreach _dir,$($(1)_LIB_DIR), -L./bin/$(ARCH)/$(_dir))
 
@@ -61,7 +55,7 @@ arch_set_output_sharedlib=-o ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL
 arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
 #set the right  flags for the linker
-arch_linker_flags= -lpthread
+arch_linker_flags= -lgcc -lpthread
 arch_shl_linker_flags= -shared -Wl,-soname,lib$(1).so$(2) $(arch_linker_flags)
 arch_archiver_flags=rcs
 

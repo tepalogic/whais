@@ -44,52 +44,52 @@ extern "C"
 {
 #endif
 
-WH_FILE_HND
+CUSTOM_SHL WH_FILE_HND
 whc_fopen (const D_CHAR* pFileName, D_UINT mode);
 
-WH_FILE_HND
+CUSTOM_SHL WH_FILE_HND
 whc_fdup (WH_FILE_HND f_hnd);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fread (WH_FILE_HND f_hnd, D_UINT8* pBuffer, D_UINT size);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fwrite (WH_FILE_HND f_hnd, const D_UINT8* pBuffer, D_UINT size);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fseek (WH_FILE_HND f_hnd, D_INT64 where, D_INT whence);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_ftell (WH_FILE_HND f_hnd, D_UINT64* pOutPosition);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fsync (WH_FILE_HND f_hnd);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_ftellsize (WH_FILE_HND f_hnd, D_UINT64* pOutSize);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fsetsize (WH_FILE_HND, D_UINT64 newSize);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fclose (WH_FILE_HND f_hnd);
 
-D_UINT32
+CUSTOM_SHL D_UINT32
 whc_fgetlasterror ();
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_ferrtostrs (D_UINT64 errorCode, D_CHAR* str, D_UINT strSize);
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_fremove (const D_CHAR* pFileName);
 
-const D_CHAR*
+CUSTOM_SHL const D_CHAR*
 whc_get_directory_delimiter ();
 
-const D_CHAR*
+CUSTOM_SHL const D_CHAR*
 whc_get_current_directory ();
 
-D_BOOL
+CUSTOM_SHL D_BOOL
 whc_is_path_absolute (const D_CHAR* pPath);
 
 #ifdef __cplusplus
