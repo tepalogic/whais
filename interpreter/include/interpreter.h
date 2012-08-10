@@ -32,6 +32,7 @@
 #include "dbs/include/dbs_mgr.h"
 #include "compiler/include/whisperc/compiledunit.h"
 
+#include "interpreter_shl.h"
 #include "operands.h"
 
 class InterException : public WException

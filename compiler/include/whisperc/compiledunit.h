@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMPILEDUNIT_H_
 #define COMPILEDUNIT_H_
 
+#include "compiler_shl.h"
+
 class COMPILER_SHL WICompiledUnit
 {
 public:
@@ -178,12 +180,16 @@ private:
   D_UINT32 m_SymbolsSize;
   D_UINT32 m_ConstAreaSize;
 
+#pragma warning (disable: 4251)
+  //Ignore this warning at the STL auto_ptr does not
+  //have any static memebers
   std::auto_ptr<D_UINT8>  m_TypeInfo;
   std::auto_ptr<D_UINT8>  m_Symbols;
   std::auto_ptr<D_UINT8>  m_ConstArea;
   std::auto_ptr<D_UINT8>  m_Globals;
   std::auto_ptr<D_UINT8>  m_Procs;
   std::auto_ptr<D_UINT8*> m_ProcData;
+#pragma warning (default: 4251)
 };
 
 #endif /* COMPILEDUNIT_H_ */

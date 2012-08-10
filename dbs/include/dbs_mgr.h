@@ -25,6 +25,7 @@
 #ifndef DBS_MGR_H_
 #define DBS_MGR_H_
 
+#include "dbs_shl.h"
 #include "dbs_types.h"
 #include "dbs_table.h"
 
@@ -34,7 +35,7 @@ static const D_UINT64 MINIMUM_MAX_FILE_SIZE = DEFAULT_MAX_FILE_SIZE;
 struct DBSFieldDescriptor;
 class I_DBSTable;
 
-class I_DBSHandler
+class DBS_SHL I_DBSHandler
 {
 public:
   I_DBSHandler () {}
@@ -55,35 +56,35 @@ public:
   virtual const D_CHAR* TableName (const TABLE_INDEX index) = 0;
 };
 
-void
+DBS_SHL void
 DBSInit (const D_CHAR* const pDBSDirectory,
          const D_CHAR* const pTempDir,
          D_UINT64            maxFileSize = DEFAULT_MAX_FILE_SIZE);
 
-void
+DBS_SHL void
 DBSShoutdown ();
 
-const D_CHAR*
+DBS_SHL const D_CHAR*
 DBSGetWorkingDir ();
 
-const D_CHAR*
+DBS_SHL const D_CHAR*
 DBSGetTempDir ();
 
-D_UINT64
+DBS_SHL D_UINT64
 DBSGetMaxFileSize ();
 
-void
+DBS_SHL void
 DBSCreateDatabase (const D_CHAR* const pName,
                    const D_CHAR*       pDbsDirectory,
                    D_UINT64            maxFileSize = 0);
 
-I_DBSHandler&
+DBS_SHL I_DBSHandler&
 DBSRetrieveDatabase (const D_CHAR* const pName);
 
-void
+DBS_SHL void
 DBSReleaseDatabase (I_DBSHandler& hndDatabase);
 
-void
+DBS_SHL void
 DBSRemoveDatabase (const D_CHAR* const pName);
 
 #endif /* DBS_MGR_H_ */

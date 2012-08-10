@@ -27,6 +27,8 @@
 
 #include "whisper.h"
 
+#include "dbs_shl.h"
+
 typedef D_UINT32         FIELD_INDEX;
 typedef D_UINT32         TABLE_INDEX;
 typedef D_UINT64         ROW_INDEX;

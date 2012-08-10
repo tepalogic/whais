@@ -26,15 +26,12 @@
 
 #include "whisper.h"
 
+#include "dbs_shl.h"
 #include "dbs_types.h"
 #include "dbs_exception.h"
 
 typedef float       REAL_T;
 typedef long double RICHREAL_T;
-
-bool
-DBSIsDateValid (const D_INT year, const D_UINT mounth, const D_UINT day);
-
 
 struct DBSBool
 {
@@ -186,7 +183,7 @@ struct DBSChar
   const bool     m_IsNull;
 };
 
-struct DBSDate
+struct DBS_SHL DBSDate
 {
   DBSDate ()
     : m_Year (),
@@ -196,9 +193,9 @@ struct DBSDate
   {
   }
 
-  explicit DBSDate (const D_INT32 year,
-                    const D_UINT8 month,
-                    const D_UINT8 day);
+  DBSDate (const D_INT32 year,
+           const D_UINT8 month,
+           const D_UINT8 day);
 
   DBSDate (const DBSDate& source)
     : m_Year (source.m_Year),
@@ -281,7 +278,7 @@ struct DBSDate
   const bool    m_IsNull;
 };
 
-struct DBSDateTime
+struct DBS_SHL DBSDateTime
 {
   DBSDateTime ()
     : m_Year (),
@@ -409,7 +406,7 @@ struct DBSDateTime
   const bool    m_IsNull;
 };
 
-struct DBSHiresTime
+struct DBS_SHL DBSHiresTime
 {
 
   DBSHiresTime ()
@@ -1308,7 +1305,7 @@ struct DBSRichReal
 
 
 class I_TextStrategy;
-class DBSText
+class DBS_SHL DBSText
 {
 public:
   explicit DBSText (const D_CHAR* pText = NULL);
@@ -1349,7 +1346,7 @@ private:
 };
 
 class I_ArrayStrategy;
-class DBSArray
+class DBS_SHL DBSArray
 {
 public:
 

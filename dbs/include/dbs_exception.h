@@ -29,7 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-class DBSException : public WException
+#include "dbs_shl.h"
+
+class DBS_SHL DBSException : public WException
 {
 public:
   DBSException (const D_CHAR* pMessage,

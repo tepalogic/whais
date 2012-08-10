@@ -83,12 +83,11 @@ SHLS+=$(if $(3),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
 ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) : $($(1)_OBJ) $(call arch_dependecy_shlib,$(1)) $(call arch_dependecy_lib,$(1)) 
 	@echo Building shared lib $(ARCH)/$(1)  
 	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_shl_linker_flags,$(1),$(3),$(4)) $$(call arch_add_lib_dirs,$(1))\
-		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_sharedlib,$(2),$(1))
+		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_sharedlib,$(1),$(2))
 
 ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) : ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
-	#Create the links the other way around for simplicity
-	@ln -s $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
-	@ln -s $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
+	@ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
+	@ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
 endef
 
 

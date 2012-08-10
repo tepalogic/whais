@@ -31,6 +31,8 @@
 #include "dbs/include/dbs_mgr.h"
 #include "dbs/include/dbs_values.h"
 
+#include "interpreter_shl.h"
+
 //TODO: Make sure you compute this limit properly  for all architectures
 static const D_UINT MAX_OP_QWORDS = 6;
 

@@ -25,6 +25,7 @@
 #ifndef DBS_TABLE_H_
 #define DBS_TABLE_H_
 
+#include "dbs_shl.h"
 #include "dbs_types.h"
 #include "dbs_values.h"
 

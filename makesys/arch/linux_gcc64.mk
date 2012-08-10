@@ -13,13 +13,13 @@ LD:=g++
 AR:=ar
 
 ifeq ($(FLAVOR),debug)
-CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv -fvisibility=hidden -fPIC
+CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv -fvisibility=hidden -fPIC -Wno-unknown-pragmas
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 
 ifeq ($(FLAVOR),release)
 DEFINES+=-DNDEBUG
-CC_FLAGS?=-Wall -c -ansi -O3 -fvisibility=hidden -fPIC
+CC_FLAGS?=-Wall -c -ansi -O3 -fvisibility=hidden -fPIC -Wno-unknown-pragmas
 CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
 endif
 
