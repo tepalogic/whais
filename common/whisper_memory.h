@@ -67,29 +67,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   {
 #endif
 
-CUSTOM_SHL void*
+void*
 custom_trace_mem_alloc (size_t      size,
                         const char* pFile,
                         D_UINT      line);
 
-CUSTOM_SHL void*
+void*
 custom_trace_mem_realloc (void*       oldPtr,
                           size_t      newSize,
                           const char* pFile,
                           D_UINT      line);
 
-CUSTOM_SHL void
+void
 custom_trace_mem_free (void*       ptr,
                        const char* pFile,
                        D_UINT      line);
 
-CUSTOM_SHL void*
+void*
 custom_mem_alloc (size_t size);
 
-CUSTOM_SHL void*
+void*
 custom_mem_realloc (void* oldPtr, size_t newSize);
 
-CUSTOM_SHL void
+void
 custom_mem_free (void* ptr);
 
 #ifdef __cplusplus

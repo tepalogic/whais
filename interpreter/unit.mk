@@ -1,7 +1,7 @@
 UNIT:=interpreter
 
 UNIT_EXES:= 
-UNIT_LIBS:=
+UNIT_LIBS:=slprima
 UNIT_SHLS:=prima
 
 prima_INC:=utils/include
@@ -9,15 +9,18 @@ prima_SRC= prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
            prima/pm_typemanager.cpp prima/pm_procedures.cpp prima/pm_units.cpp\
            prima/pm_processor.cpp prima/pm_operand_arrayfields.cpp\
            prima/pm_operand_fields.cpp prima/pm_operand_array.cpp
-prima_SHL:=utils/utils custom/custom dbs/pastra compiler/compiler
-prima_DEF:=INTERP_EXPORTING=1
+prima_DEF:=USE_INTERP_SHL USE_DBS_SHL
+prima_LIB:=utils/utils custom/custom
+prima_SHL:=dbs/pastra compiler/compiler custom/common
+prima_DEF:=USE_INTERP_SHL
 
+slprima_SRC=$(prima_SRC)
+slprima_INC=$(prima_INC)
 
 prima_MAJ=.1
 prima_MIN=.0
 
 ifeq ($(BUILD_TESTS),yes)
-prima_DEF:=PRIMA_EXPORTING=1
 -include ./$(UNIT)/test/test.mk
 endif
 

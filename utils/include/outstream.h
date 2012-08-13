@@ -27,8 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils_shl.h"
-
 #define OUTSTREAM_INCREMENT_SIZE    512
 
 struct OutputStream
@@ -44,13 +42,13 @@ extern "C"
 {
 #endif
 
-UTILS_SHL struct OutputStream*
+struct OutputStream*
 init_outstream (const D_UINT increment, struct OutputStream* pOutStream);
 
-UTILS_SHL void
+void
 destroy_outstream (struct OutputStream* pStream);
 
-UTILS_SHL struct OutputStream*
+struct OutputStream*
 output_data (struct OutputStream* pStream, const D_UINT8* pData, D_UINT dataSize);
 
 INLINE static struct OutputStream*

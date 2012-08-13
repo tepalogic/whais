@@ -43,7 +43,7 @@ arch_add_defines=$(foreach _def, $(sort $($(1)_DEF) $(DEFINES)),-D$(_def))
 arch_add_lib_dirs=$(foreach _dir,$($(1)_LIB_DIR), -L./bin/$(ARCH)/$(_dir))
 
 #set the right libraries adds
-arch_handle_import_libs=$(foreach _lib,$($(1)_LIB) $($(1)_SHL),-l$(notdir $(_lib)))
+arch_handle_import_libs=$(foreach _lib,$($(1)_LIB),-l$(notdir $(_lib))) $(foreach _lib, $($(1)_SHL),-l$(notdir $(_lib)))
 
 #set the right argument to output executables
 arch_set_output_executable=-o ./bin/$(ARCH)/$(1)

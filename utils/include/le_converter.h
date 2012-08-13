@@ -25,8 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LE_CONVERTER_H_
 #define LE_CONVERTER_H_
 
-#include "utils_shl.h"
-
 #ifdef __cplusplus
 #undef INLINE
 #define INLINE inline

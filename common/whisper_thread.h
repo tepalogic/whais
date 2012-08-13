@@ -30,32 +30,32 @@ extern "C"
 {
 #endif
 
-CUSTOM_SHL void
+void
 wh_sync_init (WH_SYNC* pSync);
 
-CUSTOM_SHL void
+void
 wh_sync_destroy (WH_SYNC* pSync);
 
-CUSTOM_SHL void
+void
 wh_sync_enter (WH_SYNC* pSync);
 
-CUSTOM_SHL void
+void
 wh_sync_leave (WH_SYNC* pSync);
 
 typedef void (*WH_THREAD_ROUTINE) (void*);
 
-CUSTOM_SHL D_INT
+D_INT
 wh_thread_create (WH_THREAD*        pThread,
                   WH_THREAD_ROUTINE routine,
                   void*             args);
 
-CUSTOM_SHL D_INT
+D_INT
 wh_thread_join (WH_THREAD thread);
 
-CUSTOM_SHL void
+void
 wh_yield ();
 
-CUSTOM_SHL void
+void
 wh_sleep (D_UINT millisecs);
 
 #ifdef __cplusplus

@@ -12,6 +12,9 @@ prepare_env:
 	$(ECHO)for unit in $(ALL_UNITS) ; do \
 			if [ ! -d ./bin/$(ARCH)/$$unit ]; then mkdir ./bin/$(ARCH)/$$unit ; fi; \
 			if [ ! -d ./tmp/$(ARCH)/$$unit ]; then mkdir ./tmp/$(ARCH)/$$unit ; fi; \
+        	if [ ! -d ./tmp/$(ARCH)/$$unit/exes ]; then mkdir ./tmp/$(ARCH)/$$unit/exes ; fi;\
+			if [ ! -d ./tmp/$(ARCH)/$$unit/shls ]; then mkdir ./tmp/$(ARCH)/$$unit/shls ; fi;\
+			if [ ! -d ./tmp/$(ARCH)/$$unit/libs ]; then mkdir ./tmp/$(ARCH)/$$unit/libs ; fi;\
 		done ;
 
 clean:

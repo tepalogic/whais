@@ -128,7 +128,7 @@ private:
 
 static auto_ptr<DbsManager> apDbsManager_;
 
-void
+DBS_SHL void
 DBSInit (const D_CHAR* const pDBSDirectory,
          const D_CHAR* const pTempDir,
          D_UINT64            maxFileSize)
@@ -142,7 +142,7 @@ DBSInit (const D_CHAR* const pDBSDirectory,
   apDbsManager_.reset (new DbsManager (pDBSDirectory, pTempDir, maxFileSize));
 }
 
-void
+DBS_SHL void
 DBSShoutdown ()
 {
   if (apDbsManager_.get () == NULL)
@@ -152,7 +152,7 @@ DBSShoutdown ()
   apDbsManager_.reset (NULL);
 }
 
-const D_CHAR*
+DBS_SHL const D_CHAR*
 DBSGetWorkingDir ()
 {
   if (apDbsManager_.get () == NULL)
@@ -161,7 +161,7 @@ DBSGetWorkingDir ()
   return apDbsManager_->m_WorkingDir.c_str ();
 }
 
-const D_CHAR*
+DBS_SHL const D_CHAR*
 DBSGetTempDir ()
 {
   if (apDbsManager_.get () == NULL)
@@ -170,13 +170,13 @@ DBSGetTempDir ()
   return apDbsManager_->m_TempDir.c_str ();
 }
 
-D_UINT64
+DBS_SHL D_UINT64
 DBSGetMaxFileSize ()
 {
   return apDbsManager_->m_MaxFileSize;
 }
 
-void
+DBS_SHL void
 DBSCreateDatabase (const D_CHAR* const pName,
                    const D_CHAR*        pDbsDirectory,
                    D_UINT64             maxFileSize)
@@ -225,7 +225,7 @@ DBSCreateDatabase (const D_CHAR* const pName,
                  dbsDirectory.length () + 1);
 }
 
-I_DBSHandler&
+DBS_SHL  I_DBSHandler&
 DBSRetrieveDatabase (const D_CHAR* const pName)
 {
   if (apDbsManager_.get () == NULL)
@@ -252,7 +252,7 @@ DBSRetrieveDatabase (const D_CHAR* const pName)
   return it->second.m_Dbs;
 }
 
-void
+DBS_SHL void
 DBSReleaseDatabase (I_DBSHandler& hndDatabase)
 {
   if (apDbsManager_.get () == NULL)
@@ -280,7 +280,7 @@ DBSReleaseDatabase (I_DBSHandler& hndDatabase)
     }
 }
 
-void
+DBS_SHL  void
 DBSRemoveDatabase (const D_CHAR* const pName)
 {
   if (apDbsManager_.get () == NULL)

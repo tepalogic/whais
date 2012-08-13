@@ -2,15 +2,17 @@
 UNIT:=custom
 
 UNIT_EXES:=
-UNIT_LIBS:=
-UNIT_SHLS:=custom
+UNIT_SHLS:=common
+UNIT_LIBS:=custom slcommon
 
-custom_DEF:=CUSTOM_EXPORTING=1
 
-custom_MAJ=.1
-custom_MIN=.0
+common_DEF=USE_SHL EXPORT_EXCEP_SHL
+common_SRC=cpp_support/exception.cpp
+common_MAJ=.1
+common_MIN=.0
+common_LIB=custom/custom
 
-custom_SRC=cpp_support/overloading.cpp
+custom_SRC=
 
 ifeq ($(ARCH),linux_gcc64)
 SRC_FOLDER:=posix
@@ -36,6 +38,7 @@ else
 custom_SRC+=$(SRC_FOLDER)/memory.c
 endif
 
+slcommon_SRC=$(common_SRC)
 
 $(foreach shl, $(UNIT_SHLS), $(eval $(call add_output_shared_lib,$(shl),$(UNIT),$($(shl)_MAJ),$($(shl)_MIN))))
 $(foreach lib, $(UNIT_LIBS), $(eval $(call add_output_library,$(lib),$(UNIT))))

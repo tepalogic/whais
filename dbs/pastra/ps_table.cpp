@@ -295,7 +295,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 
   //Round the row size so the first element of the next row is alligned
-  D_INT32 needExtraAlign = PSValInterp::Alignment( rvFields[0].m_FieldType,
+  D_INT32 needExtraAlign = PSValInterp::Alignment (rvFields[0].m_FieldType,
                                                    rvFields[0].isArray);
   needExtraAlign -= get_next_alignment(uOutRowSize);
   if (needExtraAlign > 0)

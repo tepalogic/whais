@@ -1,7 +1,7 @@
 UNIT:=dbs
 
 UNIT_EXES:=wcmd
-UNIT_LIBS:=
+UNIT_LIBS:=slpastra
 UNIT_SHLS:=pastra
 
 pastra_INC:=utils/include
@@ -9,17 +9,22 @@ pastra_SRC:=pastra/ps_values.cpp pastra/ps_container.cpp pastra/ps_table.cpp\
 		   	pastra/ps_dbsmgr.cpp pastra/ps_valintep.cpp pastra/ps_varstorage.cpp\
 		   	pastra/ps_blockcache.cpp pastra/ps_textstrategy.cpp pastra/ps_arraystrategy.cpp\
 		   	pastra/ps_btree_index.cpp pastra/ps_btree_fields.cpp pastra/ps_templatetable.cpp
-pastra_SHL:=utils/utils custom/custom
-pastra_DEF:=DBS_EXPORTING=1
+pastra_LIB:=utils/utils custom/custom
+pastra_SHL:=custom/common
+pastra_DEF:=USE_DBS_SHL DBS_EXPORTING
 
 wcmd_SRC=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp wcmd/wcmd_tabcomds.cpp
-wcmd_SHL=utils/utils custom/custom dbs/pastra
+wcmd_DEF=USE_DBS_SHL
+wcmd_LIB=utils/utils custom/custom
+wcmd_SHL=dbs/pastra custom/common
 		   
 pastra_MAJ=.1
 pastra_MIN=.0
 
+slpastra_SRC=$(pastra_SRC)
+slpastra_INC=$(pastra_INC)
+
 ifeq ($(BUILD_TESTS),yes)
-pastra_DEF+=PASTRA_EXPORTING=1
 -include ./$(UNIT)/test/test.mk
 endif
 

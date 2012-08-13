@@ -29,8 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dbs/include/dbs_types.h>
 
-#include "compiler_shl.h"
-
 typedef enum DBS_FIELD_TYPE VARTYPES;
 
 #define T_ARRAY_MASK          0x0100    /* The variable is an array */

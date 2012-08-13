@@ -42,43 +42,21 @@ enum EXPCEPTION_TYPE
   INTERPRETER_EXCEPTION
 };
 
-class SHL_EXPORT_SYMBOL WException
+class EXCEP_SHL WException
 {
 public:
   WException (const D_CHAR* pMessage,
               const D_CHAR* pFile,
               D_UINT32      line,
-              D_UINT32      extra)
-    : m_ErrorMessage (pMessage),
-      m_File (pFile),
-      m_Line (line),
-      m_Extra (extra)
-  {
-  }
+              D_UINT32      extra);
+  WException (const WException& source);
 
-  virtual ~WException ()
-  {
-  };
+  virtual ~WException ();
 
-  D_UINT32 GetExtra () const
-  {
-    return m_Extra;
-  };
-
-  const D_CHAR* Message () const
-  {
-    return m_ErrorMessage;
-  }
-
-  const D_CHAR* GetFile () const
-  {
-    return m_File;
-  }
-
-  D_UINT32 GetLine () const
-  {
-    return m_Line;
-  }
+  D_UINT32 GetExtra () const;
+  const D_CHAR* Message () const;
+  const D_CHAR* GetFile () const;
+  D_UINT32 GetLine () const;
 
   virtual WException*     Clone () const = 0;
   virtual EXPCEPTION_TYPE Type () const = 0;

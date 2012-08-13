@@ -27,9 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils_shl.h"
-
-class UTILS_SHL WFileException : public WException
+class WFileException : public WException
 {
 public:
   explicit WFileException (const D_CHAR* pMessage,
@@ -51,7 +49,7 @@ public:
   }
 };
 
-class UTILS_SHL WFile
+class WFile
 {
 public:
   explicit WFile (const D_CHAR* pFileName, D_UINT mode = 0);

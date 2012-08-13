@@ -29,8 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMPILEDUNIT_H_
 #define COMPILEDUNIT_H_
 
-#include "compiler_shl.h"
-
 class COMPILER_SHL WICompiledUnit
 {
 public:
@@ -173,7 +171,9 @@ private:
   void LoadProcInMemory (D_UINT proc_item);
 
 private:
+#pragma warning (disable: 4251)
   WFile    m_File;
+#pragma warning (default: 4251)
   D_UINT32 m_GlobalsCount;
   D_UINT32 m_ProcsCount;
   D_UINT32 m_TtySize;

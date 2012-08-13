@@ -27,8 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "stdarg.h"
 
-#include "utils_shl.h"
-
 typedef const void *POSTMAN_BAG;
 
 #define IGNORE_BUFFER_POS      (D_UINT)(~0)
@@ -43,13 +41,13 @@ typedef void (*POSTMAN) (POSTMAN_BAG bag,
 void
 register_postman (POSTMAN man, POSTMAN_BAG handle);
 
-UTILS_SHL  POSTMAN
+POSTMAN
 get_postman (void);
 
 POSTMAN_BAG
 get_postman_bag (void);
 
-UTILS_SHL void
+void
 LOGMSG (D_UINT  buff_pos,
         D_UINT  msgCode,
         D_UINT  msgType,
@@ -57,7 +55,7 @@ LOGMSG (D_UINT  buff_pos,
         va_list args);
 
 /* utils for LOGMSG arguments */
-UTILS_SHL D_CHAR*
+D_CHAR*
 copy_text_truncate (D_CHAR*       dest,
                    const D_CHAR*  src,
                    D_UINT         destMax,

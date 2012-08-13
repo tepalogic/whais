@@ -25,10 +25,8 @@
 #ifndef DBS_TABLE_H_
 #define DBS_TABLE_H_
 
-#include "dbs_shl.h"
 #include "dbs_types.h"
 #include "dbs_values.h"
-
 
 struct CallBackIndexData
 {
@@ -41,7 +39,7 @@ struct CallBackIndexData
 
 typedef void CREATE_INDEX_CALLBACK_FUNC (CallBackIndexData* cb_data);
 
-class I_DBSTable
+class DBS_SHL I_DBSTable
 {
 public:
   I_DBSTable ()
