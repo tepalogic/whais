@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <map>
 
+#include "utils/include/tokenizer.h"
+
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_optglbs.h"
 
@@ -130,27 +132,9 @@ FindCmdEntry (const D_CHAR* pCommand)
 const string
 CmdLineNextToken (const string& cmdLine, size_t& ioPosition)
 {
-  static string spaces = " \t";
+  static string delimiters = " \t";
 
-  ioPosition = cmdLine.find_first_not_of (spaces, ioPosition);
-
-  assert (ioPosition != string::npos);
-  assert (ioPosition < cmdLine.length ());
-
-  size_t lastPos = cmdLine.find_first_of (spaces, ioPosition);
-
-  if (lastPos == string::npos)
-    lastPos = cmdLine.length () - 1;
-  else
-    --lastPos;
-
-  assert (ioPosition <= lastPos);
-
-  string result = cmdLine.substr (ioPosition, lastPos - ioPosition + 1);
-
-  ioPosition = lastPos + 1;
-
-  return result;
+  return NextToken (cmdLine, ioPosition, delimiters);
 }
 
 void

@@ -22,45 +22,35 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_H
-#define WHISPER_H
+#ifndef WHISPER_TIME_H_
+#define WHISPER_TIME_H_
 
-#include <stddef.h>
-
-/* This section includes compiler specific features */
-#ifdef ARCH_LINUX_GCC
-#include "linux_gcc/types.h"
-#endif
-
-#ifdef ARCH_WINDOWS_VC
-#include "windows_vc/types.h"
-#endif
-
-/* This section contains whisper specific data */
+typedef struct
+{
+  D_INT16  year;
+  D_UINT8  month;
+  D_UINT8  day;
+  D_UINT8  hour;
+  D_UINT8  min;
+  D_UINT8  sec;
+}WTime;
 
 
-/* This section will contain some general data */
-#include "general/whisper_macros.h"
-#include "whisper_shl.h"
+typedef D_UINT64 WTICKS;
 
 #ifdef __cplusplus
-#define _DC(type, value)     (dynamic_cast<type> (value))
-#define _CC(type, value)     (const_cast<type> (value))
-#define _SC(type, value)     (static_cast<type> (value))
-#define _RC(type, value)     (reinterpret_cast<type> (value))
-#include "wexception.h"
+extern "C"
+{
 #endif
 
-#include "whisper_memory.h"
-#include "whisper_time.h"
-#if ! (defined(YYTOKENTYPE) || defined (YYBISON))
-/* Avoid some type name redefinition (for Windows) */
-#include "whisper_fileio.h"
-#include "whisper_thread.h"
+WTime
+wh_get_currtime ();
+
+WTICKS
+wh_msec_ticks ();
+
+#ifdef __cplusplus
+}
 #endif
 
-/* General operation status codes */
-#define WOP_OK           0
-#define WOP_UNKNOW      -1
-
-#endif /* WHISPER_H */
+#endif /* WHISPER_TIME_H_ */

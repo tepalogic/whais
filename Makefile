@@ -1,5 +1,5 @@
 
-ALL_UNITS:=utils custom compiler interpreter dbs
+ALL_UNITS:=utils custom compiler interpreter dbs server
 
 VERBOSE ?= no
 FLAVOR  ?= debug
