@@ -100,13 +100,14 @@ private:
 class Session : public I_Session
 {
 public:
-  Session (NameSpaceHolder& globalNames, NameSpaceHolder& privateNames);
+  Session (I_Logger&         log,
+          NameSpaceHolder& globalNames,
+          NameSpaceHolder& privateNames);
   virtual ~Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
   virtual void ExecuteProcedure (const D_UINT8* const pProcName,
                                  SessionStack&        stack);
-  virtual void LogMessage (const LOG_LEVEL level, std::string& message);
 
   D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
   StackValue     GetGlobalValue (const D_UINT32 globalId);

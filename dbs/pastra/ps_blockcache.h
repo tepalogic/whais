@@ -40,8 +40,12 @@ public:
   I_BlocksManager () {}
   virtual ~I_BlocksManager () {}
 
-  virtual void StoreItems (const D_UINT8* pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount) = 0;
-  virtual void RetrieveItems (D_UINT8* pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount) = 0;
+  virtual void StoreItems (const D_UINT8* pSrcBuffer,
+                           D_UINT64       firstItem,
+                           D_UINT         itemsCount) = 0;
+  virtual void RetrieveItems (D_UINT8* pDestBuffer,
+                              D_UINT64 firstItem,
+                              D_UINT   itemsCount) = 0;
 };
 
 

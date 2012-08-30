@@ -24,10 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 
-#include "wthread.h"
-#include "wfile.h"
-
-
+#include "utils/include/wthread.h"
 
 WThread::WThread (WH_THREAD_ROUTINE routine, void* const args) :
   m_Routine (routine),

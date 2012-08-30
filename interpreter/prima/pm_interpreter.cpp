@@ -43,7 +43,7 @@ static const D_CHAR                 gDBSName[] = "administrator";
 static WSynchronizer                gSync;
 static map<string, NameSpaceHolder> gmNameSpaces;
 
-void
+INTERP_SHL void
 InitInterpreter ()
 {
   WSynchronizerRAII syncHolder (gSync);
@@ -57,9 +57,12 @@ InitInterpreter ()
   gmNameSpaces.insert (NameSpacePair (gDBSName, handler));
 }
 
-I_Session&
-GetInstance (const D_CHAR* pName)
+INTERP_SHL I_Session&
+GetInstance (const D_CHAR* pName, I_Logger* pLog)
 {
+  if (pLog == NULL)
+    pLog = &NULL_LOGGER;
+
   WSynchronizerRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
@@ -83,12 +86,14 @@ GetInstance (const D_CHAR* pName)
   it = gmNameSpaces.find (pName);
   assert (it != gmNameSpaces.end ());
 
-  //TODO: Investigate a potential mechanism to avoid allocating session on heap
-  //      You need this in order to handle reqested for force shout down.
-  return *(new Session (gmNameSpaces.find (gDBSName)->second, it->second));
+  //TODO: 1. Investigate a potential mechanism to avoid allocating session on heap
+  //         You need this in order to handle reqested for force shout down.
+  //      2. Throw an excution exception when pLog is null at this point
+  return *(new Session (*pLog,
+                        gmNameSpaces.find (gDBSName)->second, it->second));
 }
 
-void
+INTERP_SHL void
 ReleaseInstance (I_Session& hInstance)
 {
   WSynchronizerRAII syncHolder (gSync);
@@ -100,7 +105,7 @@ ReleaseInstance (I_Session& hInstance)
   delete inst;
 }
 
-void
+INTERP_SHL void
 CleanInterpreter (const bool forced)
 {
   WSynchronizerRAII syncHolder (gSync);
@@ -125,6 +130,7 @@ CleanInterpreter (const bool forced)
 
   gmNameSpaces.clear ();
 }
+
 ////////////////////////////////NameSpace//////////////////////////////////////
 
 NameSpace::NameSpace (I_DBSHandler& dbsHandler)
@@ -140,11 +146,24 @@ NameSpace::~NameSpace ()
 {
 }
 
+
+////////////////////////////////I_Session//////////////////////////////////////
+
+I_Session::I_Session (I_Logger& log)
+  : m_Log (log)
+{
+}
+
+I_Session::~I_Session ()
+{
+}
+
 //////////////////////////////////Session//////////////////////////////////////
 
-Session::Session (NameSpaceHolder& globalNames,
+Session::Session (I_Logger&          log,
+                  NameSpaceHolder& globalNames,
                   NameSpaceHolder& privateNames)
-  : I_Session (),
+  : I_Session (log),
     m_GlobalNames (globalNames),
     m_PrivateNames (privateNames)
 {
@@ -279,11 +298,6 @@ Session::ExecuteProcedure (const D_UINT8* const pProcName,
   //TODO: 1. Check to see if you need some clean up work!
   //      2. How will be handled the situation when a wrong number of parameters
   //         or with different types will be supplied?
-}
-
-void
-Session::LogMessage (const LOG_LEVEL level, std::string& message)
-{
 }
 
 D_UINT32
@@ -464,7 +478,7 @@ Session::DefineGlobalValue (const D_UINT8* pName,
       message.insert (message.size(), _RC (const D_CHAR*, pName), nameLength);
       message += "' do to invalid type description.";
 
-      LogMessage (LOG_INT_ERROR, message);
+      m_Log.Log (LOG_ERROR, message);
 
       throw InterException (NULL, _EXTRA (InterException::INVALID_TYPE_DESC));
     }
@@ -488,7 +502,7 @@ Session::DefineGlobalValue (const D_UINT8* pName,
                           nameLength);
           message += "'.";
 
-          LogMessage (LOG_INT_ERROR, message);
+          m_Log.Log (LOG_ERROR, message);
           throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
         }
 
@@ -511,7 +525,7 @@ Session::DefineGlobalValue (const D_UINT8* pName,
                           nameLength);
           message += "' has a different type than its definition.";
 
-          LogMessage (LOG_INT_ERROR, message);
+          m_Log.Log (LOG_ERROR, message);
           throw InterException (NULL,
                                 _EXTRA (InterException::EXTERNAL_MISMATCH));
         }
@@ -522,8 +536,7 @@ Session::DefineGlobalValue (const D_UINT8* pName,
       message.insert (message.size(), _RC (const D_CHAR*, pName), nameLength);
       message += "'.";
 
-      LogMessage (LOG_INT_ERROR, message);
-
+      m_Log.Log (LOG_ERROR, message);
       throw InterException (NULL,
                             _EXTRA (InterException::DUPLICATE_DEFINITION));
     }
@@ -564,8 +577,7 @@ Session::DefineProcedure (const D_UINT8*      pName,
                           nameLength);
           message += "' do to invalid type description of local value.";
 
-          LogMessage (LOG_INT_ERROR, message);
-
+          m_Log.Log (LOG_ERROR, message);
           throw InterException (NULL,
                                 _EXTRA (InterException::INVALID_TYPE_DESC));
         }
@@ -585,7 +597,7 @@ Session::DefineProcedure (const D_UINT8*      pName,
                           nameLength);
           message += "'.";
 
-          LogMessage (LOG_INT_ERROR, message);
+          m_Log.Log (LOG_ERROR, message);
           throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
         }
 
@@ -608,7 +620,7 @@ Session::DefineProcedure (const D_UINT8*      pName,
                           nameLength);
           message += "' has a different signature than its definition.";
 
-          LogMessage (LOG_INT_ERROR, message);
+          m_Log.Log (LOG_ERROR, message);
           throw InterException (NULL,
                                 _EXTRA (InterException::EXTERNAL_MISMATCH));
 
@@ -622,8 +634,7 @@ Session::DefineProcedure (const D_UINT8*      pName,
       message.insert (message.size(), _RC (const D_CHAR*, pName), nameLength);
       message += "'.";
 
-      LogMessage (LOG_INT_ERROR, message);
-
+      m_Log.Log (LOG_ERROR, message);
       throw InterException (NULL,
                             _EXTRA (InterException::DUPLICATE_DEFINITION));
     }

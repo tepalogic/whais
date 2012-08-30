@@ -385,14 +385,15 @@ create_table_file (const D_UINT64            maxFileSize,
 
 PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
                                   const string& tableName)
- : PrototypeTable (dbsHandler),
-   m_MaxFileSize (0),
-   m_VariableStorageSize (0),
-   m_BaseFileName (dbsHandler.WorkingDir() + tableName),
-   m_apMainTable (NULL),
-   m_apFixedFields (NULL),
-   m_pVariableFields (NULL),
-   m_Removed (false)
+  : PrototypeTable (dbsHandler),
+    m_DbsSettings (DBSGetSeettings ()),
+    m_MaxFileSize (0),
+    m_VariableStorageSize (0),
+    m_BaseFileName (dbsHandler.WorkingDir() + tableName),
+    m_apMainTable (NULL),
+    m_apFixedFields (NULL),
+    m_pVariableFields (NULL),
+    m_Removed (false)
 {
   InitFromFile ();
 
@@ -401,7 +402,14 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
 
   assert (m_apMainTable.get () != NULL);
 
-  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
+  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  assert ((blkSize != 0) && (blkCount != 0));
+
+  while (blkSize < m_RowSize)
+    blkSize *= 2;
+
+  m_RowCache.Init (*this, m_RowSize, blkSize, blkCount);
 
   InitVariableStorages ();
   InitIndexedFields ();
@@ -414,6 +422,7 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
                                   const D_UINT              fieldsCount,
                                   const bool                temporal)
   : PrototypeTable (dbsHandler),
+    m_DbsSettings (DBSGetSeettings ()),
     m_MaxFileSize (0),
     m_VariableStorageSize (0),
     m_BaseFileName (dbsHandler.WorkingDir() + tableName),
@@ -430,7 +439,14 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
 
   assert (m_apMainTable.get () != NULL);
 
-  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
+  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  assert ((blkSize != 0) && (blkCount != 0));
+
+  while (blkSize < m_RowSize)
+    blkSize *= 2;
+
+  m_RowCache.Init (*this, m_RowSize, blkSize, blkCount);
 
   InitVariableStorages ();
   InitIndexedFields ();
@@ -649,7 +665,7 @@ PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
   containerNameBase += "_bt";
 
   return new FileContainer (containerNameBase.c_str (),
-                            DBSGetMaxFileSize(),
+                            m_DbsSettings.m_MaxFileSize,
                             0);
 }
 
@@ -722,7 +738,15 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
                            m_FieldsCount,
                            NULL);
-  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
+
+  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  assert ((blkSize != 0) && (blkCount != 0));
+
+  while (blkSize < m_RowSize)
+    blkSize *= 2;
+
+  m_RowCache.Init (*this, m_RowSize, blkSize, blkCount);
 }
 
 TemporalTable::TemporalTable (const PrototypeTable& prototype)
@@ -735,7 +759,15 @@ TemporalTable::TemporalTable (const PrototypeTable& prototype)
   m_vIndexNodeMgrs.insert (m_vIndexNodeMgrs.begin (),
                            m_FieldsCount,
                            NULL);
-  m_RowCache.Init (*this, m_RowSize, 4096, 1024);
+
+  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  assert ((blkSize != 0) && (blkCount != 0));
+
+  while (blkSize < m_RowSize)
+    blkSize *= 2;
+
+  m_RowCache.Init (*this, m_RowSize, blkSize, blkCount);
 }
 
 TemporalTable::~TemporalTable ()

@@ -219,7 +219,9 @@ InitDBS ()
       cout << " file_size: " << maxFileSize << endl;
     }
 
-  DBSInit (workDir.c_str (), workDir.c_str (), maxFileSize);
+  DBSSettings settings;
+  settings.m_WorkDir = settings.m_TempDir = workDir;
+  DBSInit (settings);
 
   if (GetVerbosityLevel () >= VL_DEBUG)
     cout << "done." << endl;
@@ -245,9 +247,7 @@ CreateDB (const string& dbDirectory)
   if (level >= VL_INFO)
     cout << "Creating database: " << workDB << " ... ";
 
-  DBSCreateDatabase (workDB.c_str (),
-                     dbDirectory.c_str (),
-                     GetMaximumFileSize ());
+  DBSCreateDatabase (workDB.c_str ());
 
   if (level >= VL_INFO)
     cout << "done." << endl;

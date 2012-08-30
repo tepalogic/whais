@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include "whisper.h"
+#include "utils/include/wfile.h"
+#include "utils/include/wthread.h"
 
 WException::WException (const D_CHAR* pMessage,
                         const D_CHAR* pFile,
@@ -70,3 +72,69 @@ WException::GetLine () const
 {
   return m_Line;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+WFileException::WFileException (const D_CHAR* pMessage,
+                                const D_CHAR* pFile,
+                                D_UINT32      line,
+                                D_UINT32      extra)
+  : WException (pMessage, pFile, line, extra)
+{
+}
+
+WException*
+WFileException::Clone () const
+{
+  return new WFileException (*this);
+}
+
+EXPCEPTION_TYPE
+WFileException::Type () const
+{
+  return FILE_EXCEPTION;
+}
+
+const D_CHAR*
+WFileException::Description () const
+{
+  return "File IO error.";
+}
+
+
+///////////////////////////WThreadException/////////////////////////////////////
+WThreadException::WThreadException (const D_CHAR* message,
+                                    const D_CHAR* file,
+                                    D_UINT32      line,
+                                    D_UINT32      extra)
+  : WException (message, file, line, extra)
+{
+}
+
+WException*
+WThreadException::Clone () const
+{
+  return new WThreadException (*this);
+}
+
+EXPCEPTION_TYPE
+WThreadException::Type () const
+{
+  return THREAD_EXCEPTION;
+}
+
+const D_CHAR*
+WThreadException::Description () const
+{
+  switch (Type ())
+  {
+  case UNKNOWN_EXCEPTION:
+    return "Unknown threading exception.";
+  case FAILEDOP_EXCEPTION:
+    return "Thread related operation has failed.";
+  default:
+    assert (false);
+    return "Unknown threading exception.";
+  }
+}
+

@@ -7,7 +7,7 @@ UNIT_LIBS:=custom slcommon
 
 
 common_DEF=USE_SHL EXPORT_EXCEP_SHL
-common_SRC=cpp_support/exception.cpp
+common_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp cpp_support/wfile.cpp 
 common_MAJ=.1
 common_MIN=.0
 common_LIB=custom/custom
@@ -32,6 +32,7 @@ endif
 custom_SRC+=$(SRC_FOLDER)/fileio.c
 custom_SRC+=$(SRC_FOLDER)/thread.c  
 custom_SRC+=$(SRC_FOLDER)/time.c  
+custom_SRC+=$(SRC_FOLDER)/network.c  
 
 ifeq ($(BUILD_TESTS),yes)
 custom_SRC+=$(SRC_FOLDER)/memory_test.c test/test_fmw.c

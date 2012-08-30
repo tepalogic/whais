@@ -136,7 +136,7 @@ test_nulliness()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetWorkingDir();
+      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_cont_1";
 
       VLVarsStore storage;
@@ -222,7 +222,7 @@ test_text_append ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetWorkingDir();
+      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;;
       temp_file_base += "ps_t_text";
 
       D_UINT64 allocated_entry = 0;
@@ -310,7 +310,7 @@ test_character_insertion ()
 
           if (result)
             {
-              std::string temp_file_base = DBSGetWorkingDir();
+              std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
               temp_file_base += "ps_t_text";
               D_UINT64 allocated_entry = 0;
 
@@ -380,12 +380,7 @@ main ()
   D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
 
-  {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
-  }
+  DBSInit (DBSSettings ());
 
   success = success && test_nulliness ();
   success = success && test_text_append ();

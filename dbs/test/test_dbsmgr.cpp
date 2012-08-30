@@ -107,11 +107,8 @@ main ()
   bool success = true;
 
   {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
-    DBSCreateDatabase ("baza_date_1", dir.c_str ());
+    DBSInit (DBSSettings ());
+    DBSCreateDatabase ("baza_date_1");
   }
 
   I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
@@ -127,12 +124,8 @@ main ()
     success = false;
   else
     {
-      {
-        std::string dir = ".";
-        dir += whc_get_directory_delimiter ();
+      DBSInit (DBSSettings ());
 
-        DBSInit (dir.c_str (), dir.c_str ());
-      }
       I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
       I_DBSTable& table = handler.RetrievePersistentTable ("table_1");
 

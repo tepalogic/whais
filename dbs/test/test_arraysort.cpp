@@ -295,12 +295,7 @@ main ()
   D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
 
-  {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
-  }
+  DBSInit (DBSSettings ());
 
   {
     WThread th1 (test_array_with_dates, NULL);

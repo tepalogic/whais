@@ -22,44 +22,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WFILE_H_
-#define WFILE_H_
-
 #include "whisper.h"
 
-class EXCEP_SHL WFileException : public WException
-{
-public:
-  WFileException (const D_CHAR* pMessage,
-                  const D_CHAR* pFile,
-                  D_UINT32      line,
-                  D_UINT32      extra);
 
-  virtual WException*     Clone () const;
-  virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
-};
-
-class EXCEP_SHL WFile
-{
-public:
-  explicit WFile (const D_CHAR* pFileName, D_UINT mode = 0);
-  WFile (const WFile& rSource);
-  ~WFile ();
-
-  void     Read (D_UINT8* pBuffer, D_UINT size);
-  void     Write (const D_UINT8* pBuffer, D_UINT size);
-  void     Seek (const D_INT64 where, const D_INT whence);
-  D_UINT64 Tell ();
-  void     Sync ();
-  D_UINT64 GetSize () const;
-  void     SetSize (const D_UINT64 size);
-  void     Close ();
-
-  WFile&   operator= (const WFile&);
-
-private:
-  WH_FILE_HND m_Handle;
-};
-
-#endif /* WFILE_H_ */

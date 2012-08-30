@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 
-#include "../include/wfile.h"
+#include "utils/include/wfile.h"
 #include "whisper.h"
 
 

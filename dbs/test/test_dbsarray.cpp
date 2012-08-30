@@ -569,12 +569,7 @@ main ()
   D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
 
-  {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
-  }
+  DBSInit (DBSSettings ());
 
   success = success && test_bool_array ();
   success = success && test_integers_array<DBSUInt8, D_UINT8> ("T_UINT8");

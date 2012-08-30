@@ -22,44 +22,44 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WFILE_H_
-#define WFILE_H_
+#ifndef WHISPER_NET_H_
+#define WHISPER_NET_H_
 
-#include "whisper.h"
-
-class EXCEP_SHL WFileException : public WException
+#ifdef __cplusplus
+extern "C"
 {
-public:
-  WFileException (const D_CHAR* pMessage,
-                  const D_CHAR* pFile,
-                  D_UINT32      line,
-                  D_UINT32      extra);
+#endif
 
-  virtual WException*     Clone () const;
-  virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
-};
+D_BOOL
+wh_socket_client (const D_CHAR*    pServer,
+                  const D_UINT     port,
+                  WH_SOCKET* const pOutSocket);
 
-class EXCEP_SHL WFile
-{
-public:
-  explicit WFile (const D_CHAR* pFileName, D_UINT mode = 0);
-  WFile (const WFile& rSource);
-  ~WFile ();
+D_BOOL
+wh_socket_server (const D_UINT     port,
+                  WH_SOCKET* const pOutSocket);
 
-  void     Read (D_UINT8* pBuffer, D_UINT size);
-  void     Write (const D_UINT8* pBuffer, D_UINT size);
-  void     Seek (const D_INT64 where, const D_INT whence);
-  D_UINT64 Tell ();
-  void     Sync ();
-  D_UINT64 GetSize () const;
-  void     SetSize (const D_UINT64 size);
-  void     Close ();
+D_BOOL
+wh_socket_accept (const WH_SOCKET socket, WH_SOCKET *const pConnectSocket);
 
-  WFile&   operator= (const WFile&);
+D_BOOL
+wh_socket_write (const WH_SOCKET socket,
+                 const D_UINT    count,
+                 const D_UINT8*  pBuffer);
 
-private:
-  WH_FILE_HND m_Handle;
-};
 
-#endif /* WFILE_H_ */
+D_BOOL
+wh_socket_read (const WH_SOCKET socket,
+                const D_UINT    count,
+                D_UINT8*        pOutBuffer);
+
+D_BOOL
+wh_socket_close (const WH_SOCKET socket);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif /* WHISPER_NET_H_ */

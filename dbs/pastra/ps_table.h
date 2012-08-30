@@ -63,6 +63,7 @@ protected:
   virtual VLVarsStore&         VariableFieldsStore ();
 
   //Data members
+  const DBSSettings&           m_DbsSettings;
   D_UINT64                     m_MaxFileSize;
   D_UINT64                     m_VariableStorageSize;
   std::string                  m_BaseFileName;

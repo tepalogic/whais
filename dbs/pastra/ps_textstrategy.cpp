@@ -32,8 +32,6 @@
 using namespace std;
 using namespace pastra;
 
-static const D_UINT TEXT_MEMORY_RESERVE = 4096;
-
 static const D_UINT8 UTF8_7BIT_MASK = 0x00;
 static const D_UINT8 UTF8_11BIT_MASK = 0xC0;
 static const D_UINT8 UTF8_16BIT_MASK = 0xE0;
@@ -596,7 +594,8 @@ RowFieldText::ClearMyself ()
 
 TemporalText::TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount)
   : GenericText (0),
-    m_Storage (DBSGetTempDir (), TEXT_MEMORY_RESERVE)
+    m_Storage (DBSGetSeettings ().m_TempDir.c_str(),
+               DBSGetSeettings ().m_VLValueCacheSize)
 {
   if (pUtf8String == NULL)
     return;

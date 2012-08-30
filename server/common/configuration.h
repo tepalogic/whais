@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef CONFIGURATION_H__
+#ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
 #include <string>
@@ -30,22 +30,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "dbs/include/dbs_mgr.h"
+#include "interpreter/include/interpreter.h"
+
 #include "utils/include/logger.h"
 
-struct AdminSettings
+struct ServerSettings
 {
-  AdminSettings ()
+  ServerSettings ()
     : m_ListenPort (0),
       m_TableCacheBlockSize (0),
       m_TableCacheBlockCount (0),
       m_VLBlockSize (0),
       m_VLBlockCount (0),
       m_TempValuesCache (0),
-      m_MaxTableCacheBlockSize (0),
-      m_MaxTableCacheBlockCount (0),
-      m_MaxVLBlockSize (0),
-      m_MaxVLBlockCount (0),
-      m_MaxTempValuesCache (0),
+      m_WorkDirectory (),
       m_TempDirectory (),
       m_LogFile (),
       m_ShowDebugLog (false)
@@ -58,62 +57,53 @@ struct AdminSettings
   D_UINT      m_VLBlockSize;
   D_UINT      m_VLBlockCount;
   D_UINT      m_TempValuesCache;
-  D_UINT      m_MaxTableCacheBlockSize;
-  D_UINT      m_MaxTableCacheBlockCount;
-  D_UINT      m_MaxVLBlockSize;
-  D_UINT      m_MaxVLBlockCount;
-  D_UINT      m_MaxTempValuesCache;
+  std::string m_WorkDirectory;
   std::string m_TempDirectory;
   std::string m_LogFile;
   bool        m_ShowDebugLog;
 };
 
-struct SessionSettings
+struct DBSDescriptors
 {
-  SessionSettings ()
-    : m_TableCacheBlockSize (0),
-      m_TableCacheBlockCount (0),
-      m_VLBlockSize (0),
-      m_VLBlockCount (0),
-      m_DBSDirectory (),
-      m_TempDirectory (),
-      m_ShowDebugLog (false)
+  DBSDescriptors ()
+    : m_DatabaseName (),
+      m_ObjectLibs (),
+      m_NativeLibs (),
+      m_Dbs (NULL),
+      m_Session (NULL)
   {
   }
 
-  D_UINT      m_TableCacheBlockSize;
-  D_UINT      m_TableCacheBlockCount;
-  D_UINT      m_VLBlockSize;
-  D_UINT      m_VLBlockCount;
-  D_UINT      m_TempValuesCache;
-  std::string m_Name;
-  std::string m_DBSDirectory;
-  std::string m_TempDirectory;
-  bool        m_ShowDebugLog;
+  std::string              m_DatabaseName;
+  std::vector<std::string> m_ObjectLibs;
+  std::vector<std::string> m_NativeLibs;
+
+  I_DBSHandler*            m_Dbs;
+  I_Session*               m_Session;
 };
 
-const AdminSettings&
+const std::string&
+GlobalContextDatabase ();
+
+const ServerSettings&
 GetAdminSettings ();
 
 bool
-SeekAtGlobalSection (std::ifstream& config, D_UINT& oSectionLine);
+SeekAtConfigurationSection (std::ifstream& config, D_UINT& oSectionLine);
 
 bool
 FindNextSessionSection (std::ifstream& config, D_UINT& ioSectionLine);
 
 bool
-ParseMainSection (std::ifstream& config, D_UINT& ioSectionLine);
+ParseConfigSection (std::ifstream& config, D_UINT& ioSectionLine);
 
 bool
-ParseSessionSection (Logger&          log,
+ParseSessionSection (I_Logger&        log,
                      std::ifstream&   config,
                      D_UINT&          ioConfigLine,
-                     SessionSettings& output);
+                     DBSDescriptors&  output);
 
 bool
-FixMainSection (Logger& log);
-
-bool
-FixSessionSection (Logger& log, SessionSettings& ioSession);
+FixConfigSection (I_Logger& log);
 
 #endif /* CONFIGURATION_H_ */

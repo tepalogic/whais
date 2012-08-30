@@ -40,7 +40,7 @@ class PersistentTable;
 class DbsHandler : public I_DBSHandler
 {
 public:
-  DbsHandler (const std::string& name);
+  DbsHandler (const DBSSettings& settings, const std::string& name);
   DbsHandler (const DbsHandler& source);
   virtual ~DbsHandler ();
 
@@ -60,19 +60,19 @@ public:
   void Discard ();
   void RemoveFromStorage ();
 
-  const std::string& WorkingDir () { return m_DbsDirectory; }
-  D_UINT64           MaxFileSize () { return m_MaxFileSize; }
+  const std::string& WorkingDir () const { return m_Settings.m_WorkDir; }
+  const std::string& TemporalDir () const { return m_Settings.m_TempDir; }
+  D_UINT64           MaxFileSize () const { return m_Settings.m_MaxFileSize; }
 
 private:
   typedef std::map<std::string, PersistentTable*> TABLES;
 
   void SyncToFile ();
 
-  D_UINT64          m_MaxFileSize;
-  WSynchronizer     m_Sync;
-  const std::string m_Name;
-  std::string       m_DbsDirectory;
-  TABLES            m_Tables;
+  WSynchronizer      m_Sync;
+  const std::string  m_Name;
+  TABLES             m_Tables;
+  const DBSSettings& m_Settings;
 };
 
 }

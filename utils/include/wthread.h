@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-class WSynchronizer
+class EXCEP_SHL WSynchronizer
 {
 public:
   WSynchronizer()
@@ -54,7 +54,7 @@ private:
   WH_SYNC m_Sync;
 };
 
-class WSynchronizerRAII
+class EXCEP_SHL WSynchronizerRAII
 {
 public:
   explicit WSynchronizerRAII (WSynchronizer &rSync) :
@@ -79,7 +79,7 @@ private:
   bool           m_IsEntered;
 };
 
-class WThread
+class EXCEP_SHL WThread
 {
 public:
 
@@ -113,38 +113,16 @@ private:
 };
 
 
-class WThreadException : public WException
+class EXCEP_SHL WThreadException : public WException
 {
 public:
-  explicit WThreadException (const D_CHAR* message,
-                             const D_CHAR* file,
-                             D_UINT32      line,
-                             D_UINT32      extra)
-    : WException (message, file, line, extra)
-  {
-  }
-  virtual ~WThreadException ()
-  {
-  };
-
-  virtual WException*     Clone () const
-  {
-    return new WThreadException (*this);
-  }
-  virtual EXPCEPTION_TYPE Type () const { return THREAD_EXCEPTION; }
-  virtual const D_CHAR*   Description () const
-  {
-    switch (Type ())
-    {
-    case UNKNOWN_EXCEPTION:
-      return "Unknown threading exception.";
-    case FAILEDOP_EXCEPTION:
-      return "Thread related operation has failed.";
-    default:
-      assert (false);
-      return "Unknown threading exception.";
-    }
-  }
+  WThreadException (const D_CHAR* message,
+                    const D_CHAR* file,
+                    D_UINT32      line,
+                    D_UINT32      extra);
+  virtual WException*     Clone () const;
+  virtual EXPCEPTION_TYPE Type () const;
+  virtual const D_CHAR*   Description () const;
 
   enum
   {

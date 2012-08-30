@@ -389,15 +389,12 @@ main ()
   bool success = true;
 
   {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
+    DBSInit (DBSSettings ());
   }
 
-  DBSCreateDatabase (admin, NULL);
-  DBSCreateDatabase (test_db1, NULL);
-  DBSCreateDatabase (test_db2, NULL);
+  DBSCreateDatabase (admin);
+  DBSCreateDatabase (test_db1);
+  DBSCreateDatabase (test_db2);
   InitInterpreter ();
 
   {

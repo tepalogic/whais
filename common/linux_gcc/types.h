@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef int             WH_FILE_HND;
 typedef pthread_mutex_t WH_SYNC;
 typedef pthread_t       WH_THREAD;
+typedef int             WH_SOCKET;
 
 typedef char          D_BOOL;
 

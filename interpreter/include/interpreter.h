@@ -31,6 +31,7 @@
 
 #include "dbs/include/dbs_mgr.h"
 #include "compiler/include/whisperc/compiledunit.h"
+#include "utils/include/logger.h"
 
 #include "operands.h"
 
@@ -130,42 +131,29 @@ public:
   };
 };
 
-enum LOG_LEVEL
-{
-  LOG_GENERAL_INFO  = 0x01,
-  LOG_EXCEPION_DESC = 0x02,
-  LOG_INT_WARNING   = 0x04,
-  LOG_INT_ERROR     = 0x08,
-  LOG_INT_CRITICAL  = 0x10
-};
-
-class I_Session
+class INTERP_SHL I_Session
 {
 public:
-  I_Session ()
-  {
-  }
-
-  virtual ~I_Session ()
-  {
-  }
+  I_Session (I_Logger& log);
+  virtual ~I_Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
   virtual void ExecuteProcedure (const D_UINT8* const pProcName,
                                  SessionStack&        stack) = 0;
-  virtual void LogMessage (const LOG_LEVEL level, std::string& message) = 0;
+protected:
+  I_Logger& m_Log;
 };
 
-void
+INTERP_SHL void
 InitInterpreter ();
 
-I_Session&
-GetInstance (const D_CHAR* pName);
+INTERP_SHL I_Session&
+GetInstance (const D_CHAR* pName, I_Logger* pLog = NULL);
 
-void
+INTERP_SHL void
 ReleaseInstance (I_Session& hInstance);
 
-void
+INTERP_SHL void
 CleanInterpreter (const bool force = false);
 
 #endif /* INTERPRETER_H_ */

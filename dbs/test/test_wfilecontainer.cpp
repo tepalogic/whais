@@ -160,10 +160,7 @@ main ()
   bool success = true;
 
   {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
+    DBSInit (DBSSettings ());
   }
 
   const D_UINT max_file_size = 512 * 1024;

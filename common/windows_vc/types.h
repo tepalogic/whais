@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef HANDLE              WH_FILE_HND;
 typedef CRITICAL_SECTION    WH_SYNC;
 typedef HANDLE              WH_THREAD;
+typedef SOKET               WH_SOCKET
 #endif
 
 typedef char             D_BOOL;

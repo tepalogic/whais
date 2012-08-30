@@ -48,20 +48,31 @@ public:
   StoreEntry ();
   ~StoreEntry () {} ;
 
-  void MarkAsDeleted (const bool deleted) { deleted ?
-                                            (m_NextEntry |= ENTRY_DELETED_MASK) :
-                                            (m_NextEntry &= ~ENTRY_DELETED_MASK); }
-  void MarkAsFirstEntry (const bool first) { first ?
-                                             (m_NextEntry |= FIRST_RECORD_ENTRY) :
-                                             (m_NextEntry &= ~FIRST_RECORD_ENTRY); }
+  void MarkAsDeleted (const bool deleted)
+  {
+    deleted ? (m_NextEntry |= ENTRY_DELETED_MASK) :
+              (m_NextEntry &= ~ENTRY_DELETED_MASK);
+  }
+  void MarkAsFirstEntry (const bool first)
+  {
+    first ? (m_NextEntry |= FIRST_RECORD_ENTRY) :
+            (m_NextEntry &= ~FIRST_RECORD_ENTRY);
+  }
 
   bool IsDeleted () const { return (m_NextEntry& ENTRY_DELETED_MASK) != 0; }
   bool IsFirstEntry () const { return (m_NextEntry& FIRST_RECORD_ENTRY) != 0; }
 
   D_UINT64 GetPrevEntry () const { return m_PrevEntry; }
   void     SetPrevEntry (D_UINT64 content) { m_PrevEntry = content; }
-  D_UINT64 GetNextEntry () const { return m_NextEntry & ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY); }
-  void     SetNextEntry (D_UINT64 content) { m_NextEntry &= (ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY); m_NextEntry |= content; }
+  D_UINT64 GetNextEntry () const
+  {
+    return m_NextEntry & ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
+  }
+  void     SetNextEntry (D_UINT64 content)
+  {
+    m_NextEntry &= (ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
+    m_NextEntry |= content;
+  }
 
   D_UINT  Read (D_UINT offset, D_UINT count, D_UINT8 *pBuffer) const ;
   D_UINT  Write (D_UINT offset, D_UINT count, const D_UINT8 *pBuffer);

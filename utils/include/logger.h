@@ -38,7 +38,16 @@ enum LOG_TYPE
   LOG_DEBUG
 };
 
-class Logger
+class I_Logger
+{
+public:
+  virtual ~I_Logger ();
+
+  virtual void Log (const LOG_TYPE type, const D_CHAR* pStr) = 0;
+  virtual void Log (const LOG_TYPE type, const std::string& str) = 0;
+};
+
+class Logger : public I_Logger
 {
 public:
   Logger (const D_CHAR* const pFile, const bool printStart = true);
@@ -47,8 +56,8 @@ public:
   void Log (const LOG_TYPE type, const std::string& str);
 
 private:
-  Logger (const Logger&);
-  Logger& operator= (const Logger&);
+  Logger (const I_Logger&);
+  Logger& operator= (const I_Logger&);
 
   D_UINT PrintTimeMark (LOG_TYPE type, WTICKS ticks);
 
@@ -57,6 +66,13 @@ private:
   std::ofstream m_OutStream;
 };
 
+class NullLogger : public I_Logger
+{
+public:
+  void Log (const LOG_TYPE type, const D_CHAR* pStr);
+  void Log (const LOG_TYPE type, const std::string& str);
+};
 
+extern NullLogger NULL_LOGGER;
 
 #endif /* LOGGER_H_ */

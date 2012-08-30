@@ -425,13 +425,16 @@ TempContainer::FillCache (D_UINT64 position)
       assert (m_CacheEndPos == m_CacheSize);
       assert (position == m_CacheSize);
 
-      std::string baseFile (DBSGetTempDir ());
+      const DBSSettings& settings = DBSGetSeettings ();
+
+      std::string baseFile (settings.m_WorkDir);
       baseFile += "wtemp";
       append_int_to_str (baseFile, curentId);
       baseFile += ".tmp";
 
 
-      m_FileContainer.reset (new FileTempContainer (baseFile.c_str (), DBSGetMaxFileSize ()));
+      m_FileContainer.reset (new FileTempContainer (baseFile.c_str (),
+                                                    settings.m_MaxFileSize));
       m_FileContainer->Write (0, m_CacheEndPos, m_Cache.get ());
 
       m_CacheStartPos = m_CacheEndPos = position;

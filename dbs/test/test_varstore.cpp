@@ -65,7 +65,7 @@ bool test_record_create ()
   std::cout << "Testing record creation ... ";
 
   {
-    std::string temp_file_base = DBSGetWorkingDir();
+    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
     VLVarsStore storage;
@@ -106,7 +106,7 @@ bool test_record_create ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetWorkingDir();
+      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_ps_varstore";
 
       D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -139,7 +139,7 @@ test_record_removal ()
   std::cout << "Testing record removal ... ";
 
   {
-    std::string temp_file_base = DBSGetWorkingDir();
+    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
     D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -172,7 +172,7 @@ test_record_removal ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetWorkingDir();
+      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_ps_varstore";
 
       D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -199,7 +199,7 @@ bool test_record_update ()
   std::cout << "Testing record update ... ";
 
   {
-    std::string temp_file_base = DBSGetWorkingDir();
+    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
     D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -238,7 +238,7 @@ bool test_record_update ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetWorkingDir();
+      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_ps_varstore";
 
       D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -278,10 +278,10 @@ test_record_container_update ()
 
   do
    {
-    std::string temp_file_base = DBSGetWorkingDir();
+    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
-    TempContainer container (DBSGetTempDir(), 1024);
+    TempContainer container (DBSGetSeettings ().m_WorkDir.c_str (), 1024);
     container.Write (0, sizeof testBuffer, testBuffer);
 
     VLVarsStore storage;
@@ -343,10 +343,10 @@ test_record_record_update ()
 
   do
    {
-    std::string temp_file_base = DBSGetWorkingDir();
+    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
-    TempContainer container (DBSGetTempDir(), 1024);
+    TempContainer container (DBSGetSeettings ().m_WorkDir.c_str (), 1024);
     container.Write (0, sizeof testBuffer, testBuffer);
 
     VLVarsStore storage;
@@ -408,12 +408,7 @@ main ()
   D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
 
-  {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
-  }
+  DBSInit (DBSSettings ());
 
   success = success && test_record_create ();
   success = success && test_record_removal ();

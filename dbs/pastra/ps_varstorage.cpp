@@ -25,6 +25,8 @@
 #include <memory.h>
 #include <assert.h>
 
+#include "dbs_mgr.h"
+
 #include "dbs_exception.h"
 #include "ps_varstorage.h"
 
@@ -142,10 +144,18 @@ VLVarsStore::FinishInit ()
                                           _RC(D_UINT8*, &sEntry));
       m_EntrysCount++;
     }
-  m_EntrysCache.Init (*this, sizeof (StoreEntry), 1024, 1024);
+  D_UINT       blkSize  = DBSSettings ().m_VLStoreCacheBlkSize;
+  const D_UINT blkCount = DBSSettings ().m_VLStoreCacheBlkCount;
+  assert ((blkSize != 0) && (blkCount != 0));
+
+  while (blkSize < sizeof (StoreEntry))
+    blkSize *= 2;
+
+  m_EntrysCache.Init (*this, sizeof (StoreEntry), blkSize, blkCount);
 
   StoredItem              cachedItem = m_EntrysCache.RetriveItem (0);
-  const StoreEntry* const pEntryHdr  = _RC(const StoreEntry *, cachedItem.GetDataForRead ());
+  const StoreEntry* const pEntryHdr  = _RC(const StoreEntry*,
+                                           cachedItem.GetDataForRead ());
 
   assert (pEntryHdr->IsDeleted());
   assert (pEntryHdr->IsFirstEntry() == false);
@@ -181,7 +191,7 @@ VLVarsStore::AddRecord (const D_UINT8* pBuffer,
 
     resultEntry            = AllocateEntry (0);
     StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
-    StoreEntry* pEntryHdr  = _RC (StoreEntry *, cachedItem.GetDataForUpdate ());
+    StoreEntry* pEntryHdr  = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
     pEntryHdr->MarkAsDeleted (false);
     pEntryHdr->MarkAsFirstEntry (true);
@@ -212,7 +222,7 @@ VLVarsStore::AddRecord (VLVarsStore& sourceStore,
 
     resultEntry            = AllocateEntry (0);
     StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
-    StoreEntry* pEntryHdr  = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+    StoreEntry* pEntryHdr  = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
     pEntryHdr->MarkAsDeleted (false);
     pEntryHdr->MarkAsFirstEntry (true);
@@ -222,7 +232,14 @@ VLVarsStore::AddRecord (VLVarsStore& sourceStore,
   }
 
   if ((resultEntry != 0) && (sourceSize > 0))
-    UpdateRecord (resultEntry, 0, sourceStore, sourceFirstEntry, sourceOffset, sourceSize);
+    {
+      UpdateRecord (resultEntry,
+                    0,
+                    sourceStore,
+                    sourceFirstEntry,
+                    sourceOffset,
+                    sourceSize);
+    }
 
   return resultEntry;
 }
@@ -268,8 +285,10 @@ VLVarsStore::GetRecord (D_UINT64 recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+      const StoreEntry* cpEntry = _RC (const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -286,10 +305,15 @@ VLVarsStore::GetRecord (D_UINT64 recordFirstEntry,
       WSynchronizerRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
-              throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+        {
+          throw DBSException (NULL,
+                              _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+        }
 
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+      const StoreEntry* cpEntry = _RC (const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -319,13 +343,20 @@ VLVarsStore::UpdateRecord (D_UINT64       recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
-            throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+            {
+              throw DBSException (
+                              NULL,
+                              _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
+                                  );
+            }
           else
             break;
         }
 
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+      const StoreEntry* cpEntry = _RC (const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -347,7 +378,8 @@ VLVarsStore::UpdateRecord (D_UINT64       recordFirstEntry,
               recordFirstEntry = AllocateEntry (prevEntry);
 
       StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+
+      StoreEntry* cpEntry = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -381,13 +413,20 @@ VLVarsStore::UpdateRecord (D_UINT64     recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
-            throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+            {
+              throw DBSException (
+                            NULL,
+                            _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
+                                  );
+            }
           else
             break;
         }
 
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+      const StoreEntry* cpEntry = _RC (const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -408,13 +447,22 @@ VLVarsStore::UpdateRecord (D_UINT64     recordFirstEntry,
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (sourceOffset != 0)
-            throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+            {
+              throw DBSException (
+                            NULL,
+                            _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
+                                 );
+            }
           else
             break;
         }
 
-      StoredItem        cachedItem = sourceStore.m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = sourceStore.m_EntrysCache.RetriveItem (
+                                                          recordFirstEntry
+                                                                    );
+
+      const StoreEntry* cpEntry = _RC (const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -443,8 +491,10 @@ VLVarsStore::UpdateRecord (D_UINT64     recordFirstEntry,
       {
         WSynchronizerRAII sourceSynchHolder (sourceStore.m_Sync);
 
-        StoredItem  cachedItem = sourceStore.m_EntrysCache.RetriveItem (sourceFirstEntry);
-        StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+        StoredItem  cachedItem = sourceStore.m_EntrysCache.RetriveItem (
+                                                              sourceFirstEntry
+                                                                        );
+        StoreEntry* cpEntry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
         assert (cpEntry->Size() <= sizeof tempBuffer);
 
@@ -456,11 +506,15 @@ VLVarsStore::UpdateRecord (D_UINT64     recordFirstEntry,
       synchHolder.Enter();
 
       StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+      StoreEntry* cpEntry    = _RC (StoreEntry*,
+                                    cachedItem.GetDataForUpdate());
+
 
       assert (cpEntry->IsDeleted() == false);
 
-      const D_UINT64 chunkSize = cpEntry->Write (offset, tempValid, tempBuffer);
+      const D_UINT64 chunkSize = cpEntry->Write (offset,
+                                                 tempValid,
+                                                 tempBuffer);
       assert (chunkSize > 0);
 
       sourceSize -= chunkSize;
@@ -503,13 +557,20 @@ VLVarsStore::UpdateRecord (D_UINT64         recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
-            throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+            {
+              throw DBSException (
+                            NULL,
+                            _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
+                                 );
+            }
           else
             break;
         }
 
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+      const StoreEntry* cpEntry = _RC (const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -531,7 +592,8 @@ VLVarsStore::UpdateRecord (D_UINT64         recordFirstEntry,
               recordFirstEntry = AllocateEntry (prevEntry);
 
       StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      StoreEntry* cpEntry    = _RC (StoreEntry *, cachedItem.GetDataForUpdate());
+
+      StoreEntry* cpEntry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -558,8 +620,9 @@ VLVarsStore::IncrementRecordRef (const D_UINT64 recordFirstEntry)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
-  StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-  StoreEntry* const cpEntry    = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+  StoreEntry* const cpEntry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
   assert (cpEntry->IsFirstEntry ());
   assert (cpEntry->IsDeleted () == false);
@@ -574,8 +637,9 @@ VLVarsStore::DecrementRecordRef (const D_UINT64 recordFirstEntry)
 {
   WSynchronizerRAII synchHolder(m_Sync);
 
-  StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-  StoreEntry* const cpEntry    = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
+
+  StoreEntry* const cpEntry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
   assert (cpEntry->IsFirstEntry ());
   assert (cpEntry->IsDeleted () == false);
@@ -614,7 +678,9 @@ VLVarsStore::StoreItems (const D_UINT8* pSrcBuffer,
 }
 
 void
-VLVarsStore::RetrieveItems (D_UINT8 *pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount)
+VLVarsStore::RetrieveItems (D_UINT8* pDestBuffer,
+                            D_UINT64 firstItem,
+                            D_UINT   itemsCount)
 {
   if (firstItem + itemsCount > m_EntrysCount)
     itemsCount = m_EntrysCount - firstItem;
@@ -633,16 +699,18 @@ VLVarsStore::AllocateEntry (const D_UINT64 prevEntry)
   //Try to find a neighbor for of the previous entry;
   if ((prevEntry + 1) < m_EntrysCount)
     {
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (prevEntry + 1);
-      const StoreEntry* pEntHdr    = _RC( const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = m_EntrysCache.RetriveItem (prevEntry + 1);
+      const StoreEntry* pEntHdr = _RC( const StoreEntry*,
+                                       cachedItem.GetDataForRead());
 
       if (pEntHdr->IsDeleted())
         foundFree = prevEntry + 1;
     }
   else if (prevEntry > 1)
     {
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (prevEntry - 1);
-      const StoreEntry* pEntHdr    = _RC( const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem cachedItem = m_EntrysCache.RetriveItem (prevEntry - 1);
+      const StoreEntry* pEntHdr = _RC(const StoreEntry*,
+                                      cachedItem.GetDataForRead());
 
       if (pEntHdr->IsDeleted())
         foundFree = prevEntry - 1;
@@ -654,12 +722,13 @@ VLVarsStore::AllocateEntry (const D_UINT64 prevEntry)
   ExtractFromFreeList (foundFree);
 
   StoredItem  cachedItem = m_EntrysCache.RetriveItem (foundFree);
-  StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  StoreEntry* pEntHdr    = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
   if (prevEntry > 0)
     {
       StoredItem  prevCachedItem = m_EntrysCache.RetriveItem (prevEntry);
-      StoreEntry* pPrevEntHdr    = _RC( StoreEntry *, prevCachedItem.GetDataForUpdate());
+      StoreEntry* pPrevEntHdr    = _RC (StoreEntry*,
+                                        prevCachedItem.GetDataForUpdate());
 
 
       const D_UINT64 prevNext = pPrevEntHdr->GetNextEntry();
@@ -675,8 +744,10 @@ VLVarsStore::AllocateEntry (const D_UINT64 prevEntry)
 
       if (pEntHdr->GetNextEntry() != StoreEntry::LAST_CHAINED_ENTRY)
         {
-          StoredItem nextCachedItem = m_EntrysCache.RetriveItem (pEntHdr->GetNextEntry());
-          pEntHdr = _RC( StoreEntry *, nextCachedItem.GetDataForUpdate());
+          StoredItem nextCachedItem = m_EntrysCache.RetriveItem (
+                                                      pEntHdr->GetNextEntry()
+                                                                );
+          pEntHdr = _RC (StoreEntry*, nextCachedItem.GetDataForUpdate());
 
           pEntHdr->SetPrevEntry (foundFree);
         }
@@ -711,7 +782,9 @@ VLVarsStore::ExtentFreeList ()
   m_EntrysCache.FlushItem (m_FirstFreeEntry - 1);
 
   assert ((insertPos % sizeof (addEntry)) == 0);
-  m_apEntriesContainer.get ()->Write (insertPos, sizeof (addEntry), _RC(D_UINT8*, &addEntry));
+  m_apEntriesContainer->Write (insertPos,
+                               sizeof (addEntry),
+                               _RC(D_UINT8*, &addEntry));
 
   ++m_EntrysCount;
 
@@ -719,7 +792,7 @@ VLVarsStore::ExtentFreeList ()
   m_EntrysCache.RefreshItem (m_FirstFreeEntry);
 
   StoredItem  cachedItem = m_EntrysCache.RetriveItem (0);
-  StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
+  StoreEntry* pEntHdr    = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
 
   pEntHdr->SetNextEntry (m_FirstFreeEntry);
 
@@ -730,15 +803,19 @@ void
 VLVarsStore::RemoveRecord (D_UINT64 recordFirstEntry)
 {
   StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-  const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+  const StoreEntry* cpEntry    = _RC (const StoreEntry*,
+                                      cachedItem.GetDataForRead());
 
   assert (cpEntry->IsDeleted () == false);
   assert (cpEntry->IsFirstEntry ());
 
   while (recordFirstEntry != StoreEntry::LAST_CHAINED_ENTRY)
     {
-      StoredItem        cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
-      const StoreEntry* cpEntry    = _RC (const StoreEntry *, cachedItem.GetDataForRead());
+      StoredItem        cachedItem = m_EntrysCache.RetriveItem (
+                                                            recordFirstEntry
+                                                               );
+      const StoreEntry* cpEntry    = _RC (const StoreEntry*,
+                                          cachedItem.GetDataForRead());
 
       assert (cpEntry->IsDeleted() == false);
 
@@ -763,7 +840,8 @@ VLVarsStore::ExtractFromFreeList (const D_UINT64 freeEntry)
   const D_UINT64 nextEntry = pEntHdr->GetNextEntry();
 
   assert (prevEntry < m_EntrysCount);
-  assert ((nextEntry == StoreEntry::LAST_DELETED_ENTRY) || (nextEntry < m_EntrysCount));
+  assert ((nextEntry == StoreEntry::LAST_DELETED_ENTRY)
+          || (nextEntry < m_EntrysCount));
 
   pEntHdr->MarkAsDeleted (false);
   pEntHdr->SetPrevEntry (0);
@@ -800,8 +878,9 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
   StoredItem  cachedItem = m_EntrysCache.RetriveItem (entry);
   StoreEntry* pEntHdr    = _RC( StoreEntry *, cachedItem.GetDataForUpdate());
 
-  StoredItem neighborCachedItem = cachedItem; //Just to have a valid initialization
-  StoreEntry* pNeighborEntHdr = NULL;
+  //Just to have a valid initialization
+  StoredItem  neighborCachedItem = cachedItem;
+  StoreEntry* pNeighborEntHdr    = NULL;
 
   assert (entry > 0);
   assert (pEntHdr->IsDeleted() == false);
@@ -813,7 +892,8 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
   if (m_EntrysCount > (entry + 1))
     {
       neighborCachedItem = m_EntrysCache.RetriveItem (entry + 1);
-      pNeighborEntHdr = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
+      pNeighborEntHdr     = _RC (StoreEntry*,
+                                 neighborCachedItem.GetDataForUpdate());
     }
 
   if ((pNeighborEntHdr != NULL) && pNeighborEntHdr->IsDeleted())
@@ -826,7 +906,8 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
       pEntHdr->SetNextEntry (entry + 1);
 
       neighborCachedItem = m_EntrysCache.RetriveItem (prevEntry);
-      pNeighborEntHdr = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
+      pNeighborEntHdr    = _RC (StoreEntry*,
+                                neighborCachedItem.GetDataForUpdate());
 
       assert (pNeighborEntHdr->IsDeleted());
       assert (pNeighborEntHdr->IsFirstEntry() == false);
@@ -845,7 +926,8 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
   if (entry > 1)
     {
       neighborCachedItem = m_EntrysCache.RetriveItem (entry - 1);
-      pNeighborEntHdr    = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
+      pNeighborEntHdr    = _RC (StoreEntry*,
+                                neighborCachedItem.GetDataForUpdate());
 
       if (pNeighborEntHdr->IsDeleted())
         {
@@ -860,7 +942,8 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
             return ;
 
           neighborCachedItem = m_EntrysCache.RetriveItem (nextEntry);
-          pNeighborEntHdr = _RC( StoreEntry *, neighborCachedItem.GetDataForUpdate());
+          pNeighborEntHdr    = _RC (StoreEntry*,
+                                    neighborCachedItem.GetDataForUpdate());
 
           assert (pNeighborEntHdr->IsDeleted());
           assert (pNeighborEntHdr->IsFirstEntry() == false);

@@ -34,8 +34,6 @@
 using namespace pastra;
 using namespace std;
 
-static D_UINT ARRAY_MEMORY_RESERVE = 4096; //4KB
-
 I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType)
   : m_ElementsCount (0),
     m_ShareCount (0),
@@ -282,9 +280,10 @@ NullArray::GetSingletoneInstace (const DBS_FIELD_TYPE type)
 
 
 
-TemporalArray::TemporalArray (DBS_FIELD_TYPE type) :
-    I_ArrayStrategy (type),
-    m_Storage (DBSGetTempDir (), ARRAY_MEMORY_RESERVE)
+TemporalArray::TemporalArray (DBS_FIELD_TYPE type)
+  : I_ArrayStrategy (type),
+    m_Storage (DBSGetSeettings ().m_TempDir.c_str(),
+               DBSGetSeettings ().m_VLValueCacheSize)
 {
 }
 

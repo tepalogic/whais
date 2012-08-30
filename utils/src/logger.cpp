@@ -26,8 +26,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+//A global variable to used every one when you need one
+NullLogger NULL_LOGGER;
+
+I_Logger::~I_Logger ()
+{
+
+}
+
 Logger::Logger (const D_CHAR* const pFile, const bool printStart)
-  : m_StartTick (wh_msec_ticks ()),
+  : I_Logger (),
+    m_StartTick (wh_msec_ticks ()),
     m_Sync (),
     m_OutStream (pFile, ios::app | ios::out)
 {
@@ -126,3 +135,15 @@ Logger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
 
   return 20; //The length of the mark!
 }
+
+void
+NullLogger::Log (const LOG_TYPE, const D_CHAR*)
+{
+}
+
+void
+NullLogger::Log (const LOG_TYPE, const string&)
+{
+}
+
+

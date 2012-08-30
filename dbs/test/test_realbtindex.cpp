@@ -321,11 +321,8 @@ main (int argc, char **argv)
   bool success = true;
 
   {
-    std::string dir = ".";
-    dir += whc_get_directory_delimiter ();
-
-    DBSInit (dir.c_str (), dir.c_str ());
-    DBSCreateDatabase (db_name, dir.c_str ());
+    DBSInit (DBSSettings ());
+    DBSCreateDatabase (db_name);
   }
 
   I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
