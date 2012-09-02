@@ -136,7 +136,8 @@ validate_field_descriptors (const DBSFieldDescriptor* const pFields,
           {
             throw DBSException (
                                 pFields[firstIt].m_pFieldName,
-                                _EXTRA (DBSException::FIELD_NAME_DUPLICATED));
+                                _EXTRA (DBSException::FIELD_NAME_DUPLICATED)
+                               );
           }
 
       if ((pFields[firstIt].m_FieldType == T_UNKNOWN)
@@ -389,7 +390,7 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
     m_DbsSettings (DBSGetSeettings ()),
     m_MaxFileSize (0),
     m_VariableStorageSize (0),
-    m_BaseFileName (dbsHandler.WorkingDir() + tableName),
+    m_BaseFileName (dbsHandler.WorkingDir () + tableName),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
     m_pVariableFields (NULL),
@@ -425,7 +426,7 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
     m_DbsSettings (DBSGetSeettings ()),
     m_MaxFileSize (0),
     m_VariableStorageSize (0),
-    m_BaseFileName (dbsHandler.WorkingDir() + tableName),
+    m_BaseFileName (dbsHandler.WorkingDir () + tableName),
     m_apMainTable (NULL),
     m_apFixedFields (NULL),
     m_pVariableFields (NULL),
@@ -493,7 +494,6 @@ PersistentTable::InitFromFile ()
 {
   D_UINT64   mainTableSize = 0;
   D_UINT8    aTableHdr[PS_HEADER_SIZE];
-
 
   WFile mainTableFile (m_BaseFileName.c_str(),
                        WHC_FILEOPEN_EXISTING | WHC_FILEREAD);

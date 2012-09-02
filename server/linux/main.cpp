@@ -34,14 +34,21 @@ clean_frameworks (Logger& log)
            ++dbsIterator)
         {
           if (dbsIterator->m_Session != NULL)
-            ReleaseInstance (*(dbsIterator->m_Session));
+              ReleaseInstance (*(dbsIterator->m_Session));
 
           if (dbsIterator->m_Dbs != NULL)
             DBSReleaseDatabase (*(dbsIterator->m_Dbs));
 
+          if (dbsIterator->m_pLogger != NULL)
+            {
+              dbsIterator->m_pLogger->Log (LOG_INFO,
+                                           "Database context ended!");
+              delete dbsIterator->m_pLogger;
+            }
+
           ostringstream logEntry;
           logEntry << "Cleaned resourses for database '";
-          logEntry << dbsIterator->m_DatabaseName << "'.\n";
+          logEntry << dbsIterator->m_DbsName << "'.\n";
           log.Log (LOG_INFO, logEntry.str ());
         }
     }
@@ -58,7 +65,6 @@ main (int argc, D_CHAR** argv)
 {
   auto_ptr<ifstream> config (NULL);
   auto_ptr<Logger>   glbLog (NULL);
-
 
   if (argc < 2)
     {
@@ -95,51 +101,45 @@ main (int argc, D_CHAR** argv)
   }
   catch (...)
   {
-      cerr << "Unknown error encountered during main configuration reading!\n";
-      return -1;
+    cerr << "Unknown error encountered during main configuration reading!\n";
+    return -1;
   }
 
   try
   {
     vector<DBSDescriptors>::iterator dbsIterator;
 
-    if ( ! FixConfigSection (*glbLog))
+    if ( ! PrepareConfigSection (*glbLog))
       return -1;
 
     D_UINT configLine = 0;
     config->seekg (0, ios::beg);
-    while (FindNextSessionSection (*config, configLine))
+    while (FindNextDbsSection (*config, configLine))
       {
-        ostringstream   logEntry;
-        DBSDescriptors  dbs;
-        const D_UINT    sectionLine = configLine;
+        DBSDescriptors  dbs (configLine);
 
-        if ( ! ParseSessionSection (*glbLog, *config, configLine, dbs))
+        if ( ! ParseDbsSection (*glbLog, *config, configLine, dbs))
           return -1;
 
-        if (dbs.m_DatabaseName.length () == 0)
-          {
-            logEntry << "The session configuration started at line ";
-            logEntry << sectionLine << " does not have a name!\n";
-            logEntry << "Ignoring entire section!";
-            glbLog->Log (LOG_ERROR, logEntry.str ());
-            continue;
-          }
+        if ( ! PrepareContextSection (*glbLog, dbs))
+          return -1;
+
+        ostringstream   logEntry;
 
         for (dbsIterator = databases.begin ();
              dbsIterator != databases.end ();
              ++dbsIterator)
           {
-            if (dbsIterator->m_DatabaseName == dbs.m_DatabaseName)
+            if (dbsIterator->m_DbsName == dbs.m_DbsName)
               {
-                logEntry << "Duplicate entry '" << dbs.m_DatabaseName;
+                logEntry << "Duplicate entry '" << dbs.m_DbsName;
                 logEntry << "'. Ignoring the last configuration entry.\n";
                 glbLog->Log (LOG_ERROR, logEntry.str ());
                 continue;
               }
           }
 
-        if (dbs.m_DatabaseName == GlobalContextDatabase ())
+        if (dbs.m_DbsName == GlobalContextDatabase ())
           databases.insert (databases.begin (), dbs);
         else
           databases.push_back (dbs);

@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "dbs/include/dbs_mgr.h"
 #include "interpreter/include/interpreter.h"
 #include "compiler/include/whisperc/compiledunit.h"
+#include "utils/include/logger.h"
 
 using namespace std;
 
@@ -39,23 +40,24 @@ LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc)
 {
   ostringstream logEntry;
 
-  logEntry << "Loading database: " << ioDbsDesc.m_DatabaseName;
+
+  logEntry << "Loading database: " << ioDbsDesc.m_DbsName;
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str ("");
 
+  ioDbsDesc.m_Dbs = &DBSRetrieveDatabase (ioDbsDesc.m_DbsName.c_str ());
 
+  std::auto_ptr<I_Logger> apLogger (
+                         new Logger (ioDbsDesc.m_DbsLogFile.c_str (), true)
+                                   );
 
-  ioDbsDesc.m_Dbs = &DBSRetrieveDatabase (ioDbsDesc.m_DatabaseName.c_str ());
-
-  if (ioDbsDesc.m_DatabaseName != GlobalContextDatabase ())
+  if (ioDbsDesc.m_DbsName != GlobalContextDatabase ())
     {
-      ioDbsDesc.m_Session = &GetInstance (ioDbsDesc.m_DatabaseName.c_str (),
-                                          &log);
+      ioDbsDesc.m_Session = &GetInstance (ioDbsDesc.m_DbsName.c_str (),
+                                          apLogger.get ());
     }
   else
     ioDbsDesc.m_Session = &GetInstance (NULL, &log);
-
-  //TODO: Add support here for native libraries.
 
   for (vector<string>::iterator it = ioDbsDesc.m_ObjectLibs.begin ();
        it != ioDbsDesc.m_ObjectLibs.end ();
@@ -68,6 +70,8 @@ LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc)
       WFileCompiledUnit unit (it->c_str ());
       ioDbsDesc.m_Session->LoadCompiledUnit (unit);
     }
+
+  ioDbsDesc.m_pLogger = apLogger.release ();
 
   return true;
 }

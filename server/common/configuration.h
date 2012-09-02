@@ -65,21 +65,29 @@ struct ServerSettings
 
 struct DBSDescriptors
 {
-  DBSDescriptors ()
-    : m_DatabaseName (),
+  DBSDescriptors (const D_UINT configLine)
+    : m_ConfigLine (configLine),
+      m_DbsName (),
+      m_DbsDirectory (),
       m_ObjectLibs (),
       m_NativeLibs (),
       m_Dbs (NULL),
-      m_Session (NULL)
+      m_Session (NULL),
+      m_pLogger (NULL)
   {
   }
 
-  std::string              m_DatabaseName;
+  D_UINT                   m_ConfigLine;
+  std::string              m_DbsName;
+  std::string              m_DbsDirectory;
+  std::string              m_DbsLogFile;
   std::vector<std::string> m_ObjectLibs;
   std::vector<std::string> m_NativeLibs;
 
   I_DBSHandler*            m_Dbs;
   I_Session*               m_Session;
+
+  I_Logger*                m_pLogger;
 };
 
 const std::string&
@@ -89,21 +97,24 @@ const ServerSettings&
 GetAdminSettings ();
 
 bool
-SeekAtConfigurationSection (std::ifstream& config, D_UINT& oSectionLine);
+SeekAtConfigurationSection (std::ifstream& config, D_UINT& oConfigLine);
 
 bool
-FindNextSessionSection (std::ifstream& config, D_UINT& ioSectionLine);
+FindNextDbsSection (std::ifstream& config, D_UINT& ioConfigLine);
 
 bool
-ParseConfigSection (std::ifstream& config, D_UINT& ioSectionLine);
+ParseConfigSection (std::ifstream& config, D_UINT& ioConfigLine);
 
 bool
-ParseSessionSection (I_Logger&        log,
-                     std::ifstream&   config,
-                     D_UINT&          ioConfigLine,
-                     DBSDescriptors&  output);
+ParseDbsSection (I_Logger&        log,
+                 std::ifstream&   config,
+                 D_UINT&          ioConfigLine,
+                 DBSDescriptors&  output);
 
 bool
-FixConfigSection (I_Logger& log);
+PrepareConfigSection (I_Logger& log);
+
+bool
+PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc);
 
 #endif /* CONFIGURATION_H_ */

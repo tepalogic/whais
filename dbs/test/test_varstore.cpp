@@ -337,7 +337,6 @@ test_record_container_update ()
 bool
 test_record_record_update ()
 {
-
   bool result = true;
   std::cout << "Testing record with other record update ... ";
 

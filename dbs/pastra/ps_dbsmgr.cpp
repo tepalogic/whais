@@ -37,7 +37,6 @@
 using namespace pastra;
 using namespace std;
 
-
 static const D_CHAR DBS_FILE_EXT[]       = ".pd";
 static const D_CHAR DBS_FILE_SIGNATURE[] = {
                                               0x50, 0x41, 0x53, 0x54,
@@ -60,9 +59,6 @@ static const D_UINT PS_DBS_MAX_FILE_LEN   = 8;
 
 static const D_UINT PS_DBS_HEADER_SIZE = 24;
 
-
-
-
 struct DbsElement
 {
   D_UINT64   m_RefCount;
@@ -73,8 +69,7 @@ struct DbsElement
     m_Dbs (rDbs)
   {
   }
-}
-;
+};
 
 typedef map<string, DbsElement> DATABASES_MAP;
 
@@ -146,17 +141,21 @@ DBSGetSeettings ()
 }
 
 DBS_SHL void
-DBSCreateDatabase (const D_CHAR* const pName)
+DBSCreateDatabase (const D_CHAR* const pName,
+                   const D_CHAR*       pDbsDirectory)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
 
-  string fileName = apDbsManager_->m_DBSSettings.m_WorkDir;
+  if (pDbsDirectory == NULL)
+    pDbsDirectory = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
+
+  string fileName = pDbsDirectory;
   fileName += pName;
   fileName += DBS_FILE_EXT;
 
-  WFile             dbsFile (fileName.c_str (),
-                             WHC_FILECREATE_NEW | WHC_FILEWRITE);
+  WFile dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
+
   auto_ptr<D_UINT8> apBufferHeader (new D_UINT8[PS_DBS_HEADER_SIZE]);
   D_UINT8* const    cpHeader = apBufferHeader.get ();
 
@@ -174,7 +173,7 @@ DBSCreateDatabase (const D_CHAR* const pName)
 }
 
 DBS_SHL  I_DBSHandler&
-DBSRetrieveDatabase (const D_CHAR* const pName)
+DBSRetrieveDatabase (const D_CHAR* const pName, const D_CHAR* pDatabaseDir)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -187,10 +186,14 @@ DBSRetrieveDatabase (const D_CHAR* const pName)
 
   if (it == rMap.end ())
     {
+      if (pDatabaseDir == NULL)
+        pDatabaseDir = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
+
       rMap.insert (
           pair<string, DbsElement> (
                         pName,
                         DbsElement (DbsHandler (apDbsManager_->m_DBSSettings,
+                                                string (pDatabaseDir),
                                                 string (pName)))
                                    )
                   );
@@ -232,7 +235,7 @@ DBSReleaseDatabase (I_DBSHandler& hndDatabase)
 }
 
 DBS_SHL  void
-DBSRemoveDatabase (const D_CHAR* const pName)
+DBSRemoveDatabase (const D_CHAR* const pName, const D_CHAR* pDatabaseDir)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -245,10 +248,14 @@ DBSRemoveDatabase (const D_CHAR* const pName)
 
   if (it == rMap.end ())
     {
+      if (pDatabaseDir == NULL)
+        pDatabaseDir = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
+
       rMap.insert (
           pair<string, DbsElement> (
                         pName,
                         DbsElement (DbsHandler (apDbsManager_->m_DBSSettings,
+                                                string (pDatabaseDir),
                                                 string (pName)))
                                    )
                   );
@@ -264,15 +271,17 @@ DBSRemoveDatabase (const D_CHAR* const pName)
 }
 
 
-DbsHandler::DbsHandler (const DBSSettings& settings, const string& name)
+DbsHandler::DbsHandler (const DBSSettings& globalSettings,
+                        const std::string& dbsDirectory,
+                        const std::string& dbsName)
   : I_DBSHandler (),
+    m_GlbSettings (globalSettings),
     m_Sync (),
-    m_Name (name),
-    m_Tables (),
-    m_Settings (settings)
+    m_DbsWorkDir (dbsDirectory),
+    m_Name (dbsName),
+    m_Tables ()
 {
-  string fileName = m_Settings.m_WorkDir ;
-  fileName +=  name + DBS_FILE_EXT;
+  string fileName = m_DbsWorkDir + m_Name + DBS_FILE_EXT;
   WFile  inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
 
   auto_ptr<D_UINT8> apBuffer (new D_UINT8[inputFile.GetSize ()]);
@@ -289,11 +298,13 @@ DbsHandler::DbsHandler (const DBSSettings& settings, const string& name)
 
   if ((versionMaj > PS_DBS_VER_MAJ) ||
       ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
-    throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+    {
+      throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+    }
 
   D_UINT64 maxFileSize  = *_RC (D_UINT64*, pBuffer + PS_DBS_MAX_FILE_OFF);
 
-  if (maxFileSize != m_Settings.m_MaxFileSize)
+  if (maxFileSize != m_GlbSettings.m_MaxFileSize)
     throw DBSException (NULL, _EXTRA (DBSException::INAVLID_DATABASE));
 
   D_UINT16 tablesCount = *_RC (D_UINT16*, pBuffer + PS_DBS_NUM_TABLES_OFF);
@@ -310,11 +321,13 @@ DbsHandler::DbsHandler (const DBSSettings& settings, const string& name)
 
 }
 
-DbsHandler::DbsHandler (const DbsHandler&  source)
-  : m_Sync (),
+DbsHandler::DbsHandler (const DbsHandler& source)
+  : I_DBSHandler (),
+    m_GlbSettings (source.m_GlbSettings),
+    m_Sync (),
+    m_DbsWorkDir (source.m_DbsWorkDir),
     m_Name (source.m_Name),
-    m_Tables (source.m_Tables),
-    m_Settings (source.m_Settings)
+    m_Tables (source.m_Tables)
 {
 }
 
