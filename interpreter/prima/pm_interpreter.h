@@ -128,10 +128,12 @@ public:
   I_DBSHandler& DBSHandler ();
 
 private:
-  D_UINT32 DefineGlobalValue (const D_UINT8* pName,
-                              const D_UINT   nameLength,
-                              const D_UINT8* pTI,
-                              const bool     external);
+  void     DefineTablesGlobalValues ();
+  D_UINT32 DefineGlobalValue (const D_UINT8*    pName,
+                              const D_UINT      nameLength,
+                              const D_UINT8*    pTI,
+                              const bool        external,
+                              I_DBSTable* const pPersistentTable);
   D_UINT32 DefineProcedure (const D_UINT8*           pName,
                             const D_UINT             nameLength,
                             const D_UINT32           localsCount,

@@ -47,7 +47,8 @@ public:
 
   const D_UINT8* GetType (const D_UINT32 offset) const;
 
-  GlobalValue CreateGlobalValue (D_UINT8* const pInOutTI);
+  GlobalValue CreateGlobalValue (D_UINT8* const pInOutTI,
+                                 I_DBSTable*    pPersistentTable);
   StackValue  CreateLocalValue (D_UINT8* const pInOutTI);
 
   static bool   IsTypeValid (const D_UINT8* pTI);

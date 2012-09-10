@@ -182,7 +182,8 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
 }
 
 GlobalValue
-TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
+TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
+                                I_DBSTable* pPersistentTable)
 {
   assert (TypeManager::IsTypeValid (pInOutTI));
 
@@ -190,6 +191,7 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
 
   if ((spec.type > T_UNKNOWN) && (spec.type < T_UNDETERMINED))
     {
+      assert (pPersistentTable == NULL);
       switch (spec.type)
       {
       case T_BOOL:
@@ -230,6 +232,7 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
     }
   else if (IS_ARRAY (spec.type))
     {
+      assert (pPersistentTable == NULL);
       switch (GET_BASIC_TYPE (spec.type))
       {
       case T_BOOL:
@@ -271,15 +274,23 @@ TypeManager::CreateGlobalValue (D_UINT8* pInOutTI)
     }
   else if (IS_FIELD (spec.type))
     {
+      assert (pPersistentTable == NULL);
       return GlobalValue (FieldOperand (GET_FIELD_TYPE (spec.type)));
     }
   else if (IS_TABLE (spec.type))
     {
-      I_DBSTable& table = create_non_persistent_table (
+      if (pPersistentTable == NULL)
+        {
+          I_DBSTable& table = create_non_persistent_table (
                                              m_NameSpace.GetDBSHandler (),
-                                             pInOutTI);
-
-      return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(), table));
+                                             pInOutTI
+                                                          );
+          return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(),
+                                            table));
+        }
+      else
+        return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(),
+                                          *pPersistentTable));
     }
   assert (false);
   return GlobalValue (NullOperand ());
@@ -448,11 +459,11 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
       while ((index < (D_UINT) (spec.dataSize - 2)) && (result != FALSE))
         {
           D_UINT   id_len = strlen ((char *) &spec.data[index]);
-          D_UINT16 type;
 
           /* don't check for zero here, because of strlen */
           index += id_len + 1;
-          type = spec.data [index + 1];
+
+          D_UINT16 type = spec.data [index + 1];
           type <<= 8;
           type += spec.data [index];
           /* clear an eventual array mask */
