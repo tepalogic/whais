@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "utils/include/wfile.h"
 #include "utils/include/wthread.h"
+#include "utils/include/wsocket.h"
 
 WException::WException (const D_CHAR* pMessage,
                         const D_CHAR* pFile,
@@ -102,7 +103,8 @@ WFileException::Description () const
 }
 
 
-///////////////////////////WThreadException/////////////////////////////////////
+//////////////////////////WThreadException/////////////////////////////////////
+
 WThreadException::WThreadException (const D_CHAR* message,
                                     const D_CHAR* file,
                                     D_UINT32      line,
@@ -138,3 +140,58 @@ WThreadException::Description () const
   }
 }
 
+
+
+//////////////////////////WSocketException////////////////////////////////////
+
+WSocketException::WSocketException (const D_CHAR* message,
+                                    const D_CHAR* file,
+                                    D_UINT32      line,
+                                    D_UINT32      extra)
+  : WException (message, file, line, extra)
+{
+}
+
+WException*
+WSocketException::Clone () const
+{
+  return new WSocketException (*this);
+}
+
+EXPCEPTION_TYPE
+WSocketException::Type () const
+{
+  return SOCKED_EXCEPTION;
+}
+
+const D_CHAR*
+WSocketException::Description () const
+{
+
+  switch (GetExtra ())
+  {
+  case WH_SOCK_NOTINIT:
+    return "Socket framework not inited.";
+  case WH_SOCK_ENOBUF:
+  case WH_SOCK_NOMEM:
+    return "Insufficient memory to complete socket operation.";
+  case WH_SOCK_NONAME:
+    return "Host name could not be found.";
+  case WH_SOCK_NOSERV:
+    return "Service requested could not be identified.";
+  case WH_SOCK_EPIPE:
+    return "Connection with the remote peer had been interrupted.";
+  case WH_SOCK_NOTRICH:
+    return "The remote host is unreachable.";
+  case WH_SOCK_NOPERM:
+    return "Socket operation not permitted.";
+  case WH_SOCK_ETIMEOUT:
+    return "Socket operation has timeout.";
+  case WH_SOCK_EINVAL:
+    return "Invalid parameters for requested socket operation.";
+  default:
+    assert (false);
+  }
+
+  return "Unknown socket exception";
+}

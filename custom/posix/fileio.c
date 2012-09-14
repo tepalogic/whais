@@ -23,7 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE                /* for old GNU libc header files */
+/* Not exactly POSIX, but we can leave with it. */
+#define _GNU_SOURCE
 #endif
 
 #include <assert.h>

@@ -57,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Avoid some type name redefinition (for Windows) */
 #include "whisper_fileio.h"
 #include "whisper_thread.h"
+#include "whisper_net.h"
 #endif
 
 /* General operation status codes */

@@ -7,7 +7,8 @@ UNIT_LIBS:=custom slcommon
 
 
 common_DEF=USE_SHL EXPORT_EXCEP_SHL
-common_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp cpp_support/wfile.cpp 
+common_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
+			cpp_support/wfile.cpp cpp_support/wsocket.cpp 
 common_MAJ=.1
 common_MIN=.0
 common_LIB=custom/custom
