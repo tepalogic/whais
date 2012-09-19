@@ -156,7 +156,8 @@ WSocket::Write (const D_UINT count, const D_UINT8* const pBuffer)
 void
 WSocket::Close ()
 {
-  assert (m_Owned);
+  if (! m_Owned)
+    return;
 
   wh_socket_close (m_Socket);
   m_Owned = false;

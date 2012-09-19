@@ -1,9 +1,13 @@
 
 #include <errno.h>
 #include <assert.h>
+#include <signal.h>
+#include <memory.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
+
 
 #include "whisper.h"
 
@@ -12,10 +16,9 @@
 
 #include "../common/configuration.h"
 #include "../common/loader.h"
-
+#include "../common/server.h"
 
 using namespace std;
-
 
 static bool sDbsInited         = false;
 static bool sInterpreterInited = false;
@@ -60,6 +63,31 @@ clean_frameworks (Logger& log)
     DBSShoutdown ();
 }
 
+static void
+sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
+{
+  if (sig != SIGINT)
+    return ; //Ignore this!
+
+  StopServer ();
+}
+
+static bool
+set_signals ()
+{
+  struct sigaction action;
+
+  memset (&action, 0, sizeof action);
+  action.sa_flags     = SA_SIGINFO;
+  action.sa_sigaction = &sigterm_hdl;
+
+ if (sigaction (SIGINT, &action, NULL) < 0)
+   return false;
+
+ return true;
+}
+
+
 int
 main (int argc, D_CHAR** argv)
 {
@@ -93,7 +121,7 @@ main (int argc, D_CHAR** argv)
         }
       assert (sectionLine > 0);
 
-      if (ParseConfigSection (*config, sectionLine) == false)
+      if (ParseConfigurationSection (*config, sectionLine) == false)
         return -1;
 
       glbLog.reset (new Logger (GetAdminSettings ().m_LogFile.c_str ()));
@@ -107,18 +135,22 @@ main (int argc, D_CHAR** argv)
 
   try
   {
+    if (! set_signals())
+      throw std::runtime_error ("Signals handlers could not be overwritten.");
+
     vector<DBSDescriptors>::iterator dbsIterator;
 
-    if ( ! PrepareConfigSection (*glbLog))
+    if ( ! PrepareConfigurationSection (*glbLog))
       return -1;
 
     D_UINT configLine = 0;
-    config->seekg (0, ios::beg);
-    while (FindNextDbsSection (*config, configLine))
+    config->clear ();
+    config->seekg (0);
+    while (FindNextContextSection (*config, configLine))
       {
         DBSDescriptors  dbs (configLine);
 
-        if ( ! ParseDbsSection (*glbLog, *config, configLine, dbs))
+        if ( ! ParseContextSection (*glbLog, *config, configLine, dbs))
           return -1;
 
         if ( ! PrepareContextSection (*glbLog, dbs))
@@ -132,8 +164,8 @@ main (int argc, D_CHAR** argv)
           {
             if (dbsIterator->m_DbsName == dbs.m_DbsName)
               {
-                logEntry << "Duplicate entry '" << dbs.m_DbsName;
-                logEntry << "'. Ignoring the last configuration entry.\n";
+                logEntry << "Duplicate entry '" << dbs.m_DbsName << "'. ";
+                logEntry << "Ignoring the last configuration entry.\n";
                 glbLog->Log (LOG_ERROR, logEntry.str ());
                 continue;
               }
@@ -143,6 +175,12 @@ main (int argc, D_CHAR** argv)
           databases.insert (databases.begin (), dbs);
         else
           databases.push_back (dbs);
+      }
+
+    if (databases.size () == 0)
+      {
+        glbLog->Log (LOG_CRITICAL, "No session were configured.");
+        return -1;
       }
 
     const ServerSettings& confSettings = GetAdminSettings ();
@@ -168,6 +206,8 @@ main (int argc, D_CHAR** argv)
       {
         LoadDatabase (*glbLog, *dbsIterator);
       }
+
+    StartServer (*glbLog, databases);
   }
   catch (WException& e)
   {
@@ -212,7 +252,7 @@ main (int argc, D_CHAR** argv)
   {
     assert (false);
 
-    glbLog->Log (LOG_CRITICAL, "Unknow exception!");
+    glbLog->Log (LOG_CRITICAL, "Unknown exception!");
     clean_frameworks (*glbLog);
 
     return -1;

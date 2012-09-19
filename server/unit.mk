@@ -5,7 +5,7 @@ UNIT_EXES:=whisper
 UNIT_SHLS:=
 UNIT_LIBS:=
 
-whisper_SRC=common/configuration.cpp common/loader.cpp
+whisper_SRC=common/configuration.cpp common/loader.cpp common/server.cpp
 whisper_DEF=USE_DBS_SHL USE_INTERP_SHL
 whisper_LIB=utils/utils custom/custom
 whisper_SHL=dbs/pastra interpreter/prima compiler/compiler custom/common

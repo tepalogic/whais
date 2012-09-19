@@ -35,10 +35,10 @@
 using namespace std;
 using namespace prima;
 
+static const D_UINT8  TYPE_SPEC_END_MARK = ';';
+
 struct TypeSpec
 {
-  static const D_UINT8  TYPE_SPEC_END_MARK = ';';
-
   D_UINT16 type;
   D_UINT16 dataSize;
   D_UINT8  data[2];    /* keep this last */
@@ -414,7 +414,7 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
     {
       result = false;
     }
-  else if ((spec.data[spec.dataSize - 2] != spec.TYPE_SPEC_END_MARK)
+  else if ((spec.data[spec.dataSize - 2] != TYPE_SPEC_END_MARK)
            || (spec.data[spec.dataSize - 1] != 0))
     {
       result = false;
@@ -487,6 +487,51 @@ TypeManager::GetTypeLength (const D_UINT8* pTI)
 
   const TypeSpec& ts = *_RC (const TypeSpec*, pTI);
 
-  return ts.dataSize + sizeof (ts) - sizeof (ts.data);
+  return ts.GetSize ();
 }
 
+vector<D_UINT8>
+prima::compute_table_typeinfo (I_DBSTable& table)
+{
+  vector<D_UINT8> data;
+
+  const FIELD_INDEX fieldsCount = table.GetFieldsCount ();
+  for (FIELD_INDEX fieldId = 0; fieldId < fieldsCount; ++fieldId)
+    {
+      DBSFieldDescriptor field = table.GetFieldDescriptor (fieldId);
+
+      const D_UINT nameLen = strlen (field.m_pFieldName) + 1;
+
+      data.insert (data.end (),
+                   field.m_pFieldName,
+                   field.m_pFieldName + nameLen);
+
+      D_UINT16 type = field.m_FieldType;
+      if (field.isArray)
+        MARK_ARRAY (type);
+
+      data.insert (data.end (),
+                   _RC (D_UINT8*, &type),
+                   _RC (D_UINT8*, &type) + 2);
+    }
+
+  data.push_back (TYPE_SPEC_END_MARK);
+  data.push_back (0);
+
+  vector<D_UINT8> result;
+
+  D_UINT16 temp = 0;
+  MARK_TABLE (temp);
+  result.insert (result.end (),
+                 _RC (D_UINT8*, &temp),
+                 _RC (D_UINT8*, &temp) + sizeof (temp));
+
+  temp = data.size ();
+  result.insert (result.end (),
+                 _RC (D_UINT8*, &temp),
+                 _RC (D_UINT8*, &temp) + sizeof (temp));
+
+  result.insert (result.end (), data.begin (), data.end ());
+
+  return result;
+}

@@ -463,49 +463,6 @@ Session::DBSHandler ()
   return m_PrivateNames.Get ().GetDBSHandler ();
 }
 
-vector<D_UINT8>
-compute_table_typeinfo (I_DBSTable& table)
-{
-  vector<D_UINT8> data;
-
-  const FIELD_INDEX fieldsCount = table.GetFieldsCount ();
-  for (FIELD_INDEX fieldId = 0; fieldId < fieldsCount; ++fieldId)
-    {
-      DBSFieldDescriptor field = table.GetFieldDescriptor (fieldId);
-
-      const D_UINT nameLen = strlen (field.m_pFieldName);
-
-      data.insert (data.end (),
-                   field.m_pFieldName,
-                   field.m_pFieldName + nameLen);
-
-      D_UINT16 type = field.m_FieldType;
-      if (field.isArray)
-        MARK_ARRAY (type);
-
-      data.insert (data.end (),
-                   _RC (D_UINT8*, &type),
-                   _RC (D_UINT8*, &type) + 2);
-    }
-
-  vector<D_UINT8> result;
-
-  D_UINT16        temp = 0;
-  MARK_TABLE (temp);
-  result.insert (result.end (),
-                 _RC (D_UINT8*, &temp),
-                 _RC (D_UINT8*, &temp) + sizeof (temp));
-
-  temp = 2 * sizeof (D_UINT16) + data.size ();
-  result.insert (result.end (),
-                 _RC (D_UINT8*, &temp),
-                 _RC (D_UINT8*, &temp) + sizeof (temp));
-
-  result.insert (result.end (), data.begin (), data.end ());
-
-  return result;
-}
-
 void
 Session::DefineTablesGlobalValues ()
 {

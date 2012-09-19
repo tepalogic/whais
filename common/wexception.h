@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #error "This header file should not be included from a C source file!"
 #endif
 
+#include <string>
+
 #ifndef WEXCEPTION_H_
 #define WEXCEPTION_H_
 
@@ -64,10 +66,10 @@ public:
   virtual const D_CHAR*   Description () const = 0;
 
 private:
-  const D_CHAR* m_ErrorMessage;
-  const D_CHAR* m_File;
-  D_UINT32      m_Line;
-  D_UINT32      m_Extra;
+  const std::string m_ErrorMessage;
+  const D_CHAR*     m_File;
+  D_UINT32          m_Line;
+  D_UINT32          m_Extra;
 };
 
 // Macro used to expand the CMD line

@@ -82,24 +82,34 @@ private:
 class EXCEP_SHL WThread
 {
 public:
-
-  WThread (WH_THREAD_ROUTINE routine, void* const args);
+  WThread ();
   ~WThread ();
 
+  void Run (WH_THREAD_ROUTINE routine, void* const args);
   void Join ();
-  void SignalPendingException ();
-  void IgnoreExptionSignals (bool ignore) { m_IgnoreExceptions = ignore; }
-  void DiscardException () { m_UnkExceptSignaled = false; delete m_Exception; m_Exception = NULL;}
-
+  void ThrowPendingException ();
+  void IgnoreExceptions (bool ignore)
+  {
+    m_IgnoreExceptions = ignore;
+  }
+  void DiscardException ()
+  {
+    m_UnkExceptSignaled = false;
+    delete m_Exception;
+    m_Exception = NULL;
+  }
   bool IsEnded () const { return m_Ended; }
-  bool HasExceptionPending () { return ( m_UnkExceptSignaled || (m_Exception != NULL)); }
+  bool HasExceptionPending ()
+  {
+    return ( m_UnkExceptSignaled || (m_Exception != NULL));
+  }
 
 
 protected:
   static void ThreadWrapperRoutine (void* const);
 
-  const WH_THREAD_ROUTINE m_Routine;
-  void* const             m_RoutineArgs;
+  WH_THREAD_ROUTINE       m_Routine;
+  void*                   m_RoutineArgs;
   WException*             m_Exception;
   WH_THREAD               m_ThreadHnd;
   bool                    m_UnkExceptSignaled;
@@ -127,6 +137,7 @@ public:
   enum
   {
     UNKNOWN_EXCEPTION,
+    INUSE_EXCEPTION,
     FAILEDOP_EXCEPTION
   };
 };

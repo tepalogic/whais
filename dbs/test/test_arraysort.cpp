@@ -298,23 +298,16 @@ main ()
   DBSInit (DBSSettings ());
 
   {
-    WThread th1 (test_array_with_dates, NULL);
-    WThread th2 (test_array_with_datetimes, NULL);
-    WThread th3 (test_array_with_hirestimes, NULL);
-    WThread th4 (test_array_with_dates_r, NULL);
-    WThread th5 (test_array_with_datetimes_r, NULL);
-    WThread th6 (test_array_with_hirestimes_r, NULL);
-    WThread th7 (test_array_with_int8, NULL);
-    WThread th8 (test_array_with_int8_r, NULL);
+    WThread th[8];
 
-    th1.Join();
-    th2.Join();
-    th3.Join();
-    th4.Join();
-    th5.Join();
-    th6.Join();
-    th7.Join();
-    th8.Join();
+    th[0].Run (test_array_with_dates, NULL);
+    th[1].Run (test_array_with_datetimes, NULL);
+    th[2].Run (test_array_with_hirestimes, NULL);
+    th[3].Run (test_array_with_dates_r, NULL);
+    th[4].Run (test_array_with_datetimes_r, NULL);
+    th[5].Run (test_array_with_hirestimes_r, NULL);
+    th[6].Run (test_array_with_int8, NULL);
+    th[7].Run (test_array_with_int8_r, NULL);
   }
 
 

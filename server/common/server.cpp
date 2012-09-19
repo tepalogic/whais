@@ -1,0 +1,229 @@
+/******************************************************************************
+WHISPER - An advanced database system
+Copyright (C) 2008  Iulian Popa
+
+Address: Str Olimp nr. 6
+         Pantelimon Ilfov,
+         Romania
+Phone:   +40721939650
+e-mail:  popaiulian@gmail.com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+******************************************************************************/
+
+#include "utils/include/auto_array.h"
+#include "utils/include/wthread.h"
+#include "utils/include/wsocket.h"
+
+#include "server/include/server_protocol.h"
+
+#include "server.h"
+
+using namespace std;
+
+struct UserHandler
+{
+  UserHandler ()
+    : m_pDesc (NULL),
+      m_Thread (),
+      m_Socket (_SC (WH_SOCKET, -1)),
+      m_EndConnetion (true)
+  {
+  }
+  ~UserHandler ()
+  {
+    assert (m_Thread.IsEnded ());
+  }
+
+  const DBSDescriptors* m_pDesc;
+  WThread               m_Thread;
+  WSocket               m_Socket;
+  bool                  m_EndConnetion;
+};
+
+class Listener
+{
+public:
+  Listener ()
+    : m_pInterface (NULL),
+      m_pPort (NULL),
+      m_ListenThread (),
+      m_Socket (_SC (WH_SOCKET, -1)),
+      m_UsersPool (GetAdminSettings ().m_MaxConnections)
+  {
+  }
+
+  ~Listener ()
+  {
+    assert (m_ListenThread.IsEnded ());
+
+    for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
+      m_UsersPool[index].m_Thread.Join ();
+  }
+
+  UserHandler* SearchFreeUser ()
+  {
+    assert (m_UsersPool.Size () > 0);
+
+    for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
+      {
+        if (m_UsersPool[index].m_Thread.IsEnded ())
+          return &m_UsersPool[index];
+      }
+
+    return NULL;
+  }
+
+  void Close ()
+  {
+    m_ListenThread.IgnoreExceptions (true);
+    m_ListenThread.DiscardException ();
+    m_Socket.Close ();
+
+    for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
+      {
+        m_UsersPool[index].m_EndConnetion = true;
+        m_UsersPool[index].m_Socket.Close ();
+      }
+  }
+
+  const D_CHAR*           m_pInterface;
+  const D_CHAR*           m_pPort;
+  WThread                 m_ListenThread;
+  WSocket                 m_Socket;
+  auto_array<UserHandler> m_UsersPool;
+
+private:
+  Listener (const Listener& );
+  Listener& operator= (const Listener&);
+};
+
+static const D_UINT SOCKET_BACK_LOG = 10;
+
+static vector<DBSDescriptors>* spDatabases;
+static Logger*                 spLogger;
+static bool                    sAcceptUsersConnections;
+static bool                    sServerStopped;
+static auto_array<Listener>*   spaListeners;
+
+void
+client_handler_routine (void* args)
+{
+  UserHandler* const pUser = _RC (UserHandler*, args);
+
+  //TODO: Here you need to agree on the connection establishment
+  while (! pUser->m_EndConnetion)
+    {
+      //TODO: This is where you add code to handle the connection
+      //      once it established!
+    }
+
+  pUser->m_Socket.Close ();
+}
+
+void
+listener_routine (void* args)
+{
+  Listener* const pListener = _RC (Listener*, args);
+
+  assert (pListener->m_UsersPool.Size () > 0);
+  assert (pListener->m_ListenThread.IsEnded () == false);
+  assert (pListener->m_ListenThread.HasExceptionPending () == false);
+  assert (pListener->m_pPort != NULL);
+
+  pListener->m_Socket = WSocket (pListener->m_pInterface,
+                                 pListener->m_pPort,
+                                 SOCKET_BACK_LOG);
+
+  bool acceptUserConnections = sAcceptUsersConnections;
+  while (acceptUserConnections)
+    {
+      WSocket client = pListener->m_Socket.Accept ();
+      UserHandler* pUsrHnd = pListener->SearchFreeUser ();
+
+      if (pUsrHnd != NULL)
+        {
+          pUsrHnd->m_Socket = client;
+          pUsrHnd->m_EndConnetion = false;
+          pUsrHnd->m_Thread.Run (client_handler_routine, pUsrHnd);
+        }
+      else
+        {
+          static const D_UINT8 busyResponse [16] =
+              {
+                0x00, 0x10, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+              };
+
+          client.Write (sizeof busyResponse, busyResponse);
+          client.Close ();
+        }
+
+      acceptUserConnections = sAcceptUsersConnections;
+    }
+}
+
+void
+StartServer (Logger& log, vector<DBSDescriptors>& databases)
+{
+  spDatabases = &databases;
+  spLogger    = &log;
+
+  log.Log (LOG_DEBUG, "Server started!");
+
+  assert (databases.size () > 0);
+
+  const ServerSettings& server = GetAdminSettings ();
+  auto_array<Listener> listeners (server.m_Listens.size ());
+
+  spaListeners = &listeners;
+
+  sAcceptUsersConnections = true;
+  sServerStopped          = false;
+
+  for (D_UINT index = 0; index < listeners.Size (); ++index)
+    {
+      Listener* const pEnt = &listeners[index];
+
+      assert (pEnt->m_ListenThread.IsEnded ());
+
+      pEnt->m_pInterface = (server.m_Listens[index].m_Interface.size () == 0) ?
+                           NULL :
+                           server.m_Listens[index].m_Interface.c_str ();
+      pEnt->m_pPort = server.m_Listens[index].m_Service.c_str ();
+      pEnt->m_ListenThread.Run (listener_routine, pEnt);
+    }
+
+  for (D_UINT index = 0; index < listeners.Size (); ++index)
+    listeners[index].m_ListenThread.Join ();
+
+  spaListeners = NULL;
+
+  log.Log (LOG_DEBUG, "Server stopped!");
+}
+
+void
+StopServer ()
+{
+  if ((spaListeners == NULL)  || (spLogger == NULL))
+    return; //Ignore! The server probably did not even start.
+
+  spLogger->Log (LOG_INFO, "Server asked to shutdown.");
+
+  sAcceptUsersConnections = false;
+  sServerStopped          = true;
+
+  for (D_UINT index = 0; index < spaListeners->Size (); ++index)
+    (*spaListeners)[index].Close ();
+}

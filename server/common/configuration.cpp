@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include "configuration.h"
 
@@ -34,20 +35,23 @@ using namespace std;
 
 static const D_CHAR COMMENT_CHAR = '#';
 
+static const D_CHAR DEFAULT_LISTEN_PORT[] = "1761";
+
 static const D_UINT MIN_TABLE_CACHE_BLOCK_SIZE  = 1024;
 static const D_UINT MIN_TABLE_CACHE_BLOCK_COUNT = 128;
 static const D_UINT MIN_VL_BLOCK_SIZE           = 1024;
 static const D_UINT MIN_VL_BLOCK_COUNT          = 128;
 static const D_UINT MIN_TEMP_CACHE              = 128;
 
-static const D_UINT DEFAULT_LISTEN_PORT             = 1761;
+static const D_UINT DEFAULT_MAX_CONNS               = 64;
 static const D_UINT DEFAULT_TABLE_CACHE_BLOCK_SIZE  = 4098;
 static const D_UINT DEFAULT_TABLE_CACHE_BLOCK_COUNT = 1024;
 static const D_UINT DEFAULT_VL_BLOCK_SIZE           = 1024;
 static const D_UINT DEFAULT_VL_BLOCK_COUNT          = 4098;
 static const D_UINT DEFAULT_TEMP_CACHE              = 512;
 
-static const string gEntPort ("port");
+static const string gEntPort ("listen");
+static const string gEntMaxConnections ("max_connections");
 static const string gEntTableBlkSize ("table_block_cache_size");
 static const string gEntTableBlkCount ("table_block_cache_count");
 static const string gEntVlBlkSize ("vl_values_block_size");
@@ -108,7 +112,8 @@ SeekAtConfigurationSection (ifstream& config, D_UINT& oConfigLine)
   static const string delimiters = " \t";
 
   oConfigLine = 0;
-  config.seekg (0, ios::beg);
+  config.clear ();
+  config.seekg (0);
   while (! config.eof ())
     {
       string line;
@@ -130,13 +135,15 @@ SeekAtConfigurationSection (ifstream& config, D_UINT& oConfigLine)
 }
 
 bool
-FindNextDbsSection (std::ifstream& config, D_UINT& ioConfigLine)
+FindNextContextSection (std::ifstream& config, D_UINT& ioConfigLine)
 {
   static const string identifier = "[SESSION]";
   static const string delimiters = " \t";
 
   while (! config.eof ())
     {
+      assert (config.good());
+
       string line;
       getline (config, line);
 
@@ -156,7 +163,7 @@ FindNextDbsSection (std::ifstream& config, D_UINT& ioConfigLine)
 }
 
 bool
-ParseConfigSection (ifstream& config, D_UINT& ioConfigLine)
+ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
 {
   static const string delimiters = " \t=";
 
@@ -176,16 +183,34 @@ ParseConfigSection (ifstream& config, D_UINT& ioConfigLine)
       if (token.at (0) == '[')
         {
           //Another configuration section starts from here.
+          config.clear ();
           config.seekg (- line.length (), ios::cur);
           break;
         }
 
       if (token == gEntPort)
         {
-          token = NextToken (line, pos, delimiters);
-          gMainSettings.m_ListenPort = atoi (token.c_str ());
+          ListenEntry entry;
 
-          if (gMainSettings.m_ListenPort == 0)
+          token = NextToken (line, pos, delimiters);
+          entry.m_Interface = token;
+
+          token = NextToken (line, pos, " \t-@#");
+          entry.m_Service = token;
+
+          if (entry.m_Interface == "*")
+            entry.m_Interface = "";
+          if (entry.m_Service == "")
+            entry.m_Service = DEFAULT_LISTEN_PORT;
+
+          gMainSettings.m_Listens.push_back (entry);
+        }
+      else if (token == gEntMaxConnections)
+        {
+          token = NextToken (line, pos, delimiters);
+          gMainSettings.m_MaxConnections = atoi (token.c_str ());
+
+          if (gMainSettings.m_MaxConnections == 0)
             {
               cerr << "Configuration error at line " << ioConfigLine << ".\n";
               return false;
@@ -380,10 +405,10 @@ ParseConfigSection (ifstream& config, D_UINT& ioConfigLine)
 }
 
 bool
-ParseDbsSection (I_Logger&        log,
-                 ifstream&        config,
-                 D_UINT&          ioConfigLine,
-                 DBSDescriptors&  output)
+ParseContextSection (I_Logger&        log,
+                     ifstream&        config,
+                     D_UINT&          ioConfigLine,
+                     DBSDescriptors&  output)
 {
   ostringstream logEntry;
   static const string delimiters = " \t=";
@@ -404,6 +429,7 @@ ParseDbsSection (I_Logger&        log,
       if (token.at (0) == '[')
         {
           //Another configuration section starts from here.
+          config.clear ();
           config.seekg (- line.length (), ios::cur);
           break;
         }
@@ -588,17 +614,21 @@ ParseDbsSection (I_Logger&        log,
 }
 
 bool
-PrepareConfigSection (I_Logger& log)
+PrepareConfigurationSection (I_Logger& log)
 {
   ostringstream logStream;
 
-  if (gMainSettings.m_ListenPort == 0)
+  if (gMainSettings.m_Listens.size () == 0)
     {
-      gMainSettings.m_ListenPort = DEFAULT_LISTEN_PORT;
-      if (gMainSettings.m_ShowDebugLog)
-        log.Log (LOG_DEBUG, "The listen port is set to default value.");
+      ListenEntry defaultEnt = {"", DEFAULT_LISTEN_PORT};
+      gMainSettings.m_Listens.push_back (defaultEnt);
     }
-  logStream << "Listen port set at " << gMainSettings.m_ListenPort << '.';
+
+  if (gMainSettings.m_MaxConnections == 0)
+    gMainSettings.m_MaxConnections = DEFAULT_MAX_CONNS;
+
+  logStream << "Maximum simultaneous connections per interface set at ";
+  logStream << gMainSettings.m_MaxConnections << ".";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str ("");
 

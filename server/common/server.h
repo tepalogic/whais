@@ -21,16 +21,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
+#ifndef SERVER_H_
+#define SERVER_H_
 
-#ifndef LOADER_H_
-#define LOADER_H_
-
+#include <vector>
 
 #include "whisper.h"
 
+#include "utils/include/logger.h"
+
 #include "configuration.h"
 
-bool
-LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc);
+void
+StartServer (Logger& log, std::vector<DBSDescriptors>& databases);
 
-#endif /* LOADER_H_ */
+void
+StopServer ();
+
+
+
+#endif /* SERVER_H_ */

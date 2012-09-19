@@ -227,10 +227,7 @@ wh_socket_accept (const WH_SOCKET      sd,
                   WH_SOCKET* const     pConnectSocket,
                   enum WH_SOCK_ERROR* const pOutError)
 {
-  struct sockaddr client;
-  socklen_t       sl;
-
-  int csd = accept (sd, &client, &sl);
+  int csd = accept (sd, NULL, NULL);
   if (csd < 0)
     {
       handle_sock_error (errno, pOutError);
@@ -310,7 +307,7 @@ wh_socket_read (const WH_SOCKET           sd,
 void
 wh_socket_close (const WH_SOCKET sd)
 {
-  close (sd);
+  shutdown (sd, SHUT_RDWR);
 }
 
 void

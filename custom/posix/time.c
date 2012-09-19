@@ -58,7 +58,7 @@ wh_msec_ticks ()
   struct timeval tv;
   gettimeofday (&tv, NULL);
 
-  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+  return ((WTICKS)tv.tv_sec * 1000ul) + (WTICKS)(tv.tv_usec / 1000);
 }
 
 

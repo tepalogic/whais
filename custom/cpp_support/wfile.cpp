@@ -34,7 +34,7 @@ WFile::WFile (const D_CHAR* pFileName, D_UINT mode)
 {
   m_Handle = whc_fopen (pFileName, mode);
   if (m_Handle == 0)
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+    throw WFileException (pFileName, _EXTRA (whc_fgetlasterror ()));
 }
 
 WFile::WFile (const WFile &rSource) :

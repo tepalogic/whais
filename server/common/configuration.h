@@ -35,10 +35,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/include/logger.h"
 
+struct ListenEntry
+{
+  std::string m_Interface;
+  std::string m_Service;
+};
+
 struct ServerSettings
 {
   ServerSettings ()
-    : m_ListenPort (0),
+    : m_MaxConnections (0),
       m_TableCacheBlockSize (0),
       m_TableCacheBlockCount (0),
       m_VLBlockSize (0),
@@ -47,11 +53,12 @@ struct ServerSettings
       m_WorkDirectory (),
       m_TempDirectory (),
       m_LogFile (),
+      m_Listens (),
       m_ShowDebugLog (false)
   {
   }
 
-  D_UINT      m_ListenPort;
+  D_UINT      m_MaxConnections;
   D_UINT      m_TableCacheBlockSize;
   D_UINT      m_TableCacheBlockCount;
   D_UINT      m_VLBlockSize;
@@ -60,7 +67,11 @@ struct ServerSettings
   std::string m_WorkDirectory;
   std::string m_TempDirectory;
   std::string m_LogFile;
+
+  std::vector<ListenEntry> m_Listens;
+
   bool        m_ShowDebugLog;
+
 };
 
 struct DBSDescriptors
@@ -100,19 +111,19 @@ bool
 SeekAtConfigurationSection (std::ifstream& config, D_UINT& oConfigLine);
 
 bool
-FindNextDbsSection (std::ifstream& config, D_UINT& ioConfigLine);
+FindNextContextSection (std::ifstream& config, D_UINT& ioConfigLine);
 
 bool
-ParseConfigSection (std::ifstream& config, D_UINT& ioConfigLine);
+ParseConfigurationSection (std::ifstream& config, D_UINT& ioConfigLine);
 
 bool
-ParseDbsSection (I_Logger&        log,
-                 std::ifstream&   config,
-                 D_UINT&          ioConfigLine,
-                 DBSDescriptors&  output);
+ParseContextSection (I_Logger&        log,
+                     std::ifstream&   config,
+                     D_UINT&          ioConfigLine,
+                     DBSDescriptors&  output);
 
 bool
-PrepareConfigSection (I_Logger& log);
+PrepareConfigurationSection (I_Logger& log);
 
 bool
 PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc);

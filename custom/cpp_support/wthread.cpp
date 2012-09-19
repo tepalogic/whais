@@ -26,26 +26,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/include/wthread.h"
 
-WThread::WThread (WH_THREAD_ROUTINE routine, void* const args) :
-  m_Routine (routine),
-  m_RoutineArgs (args),
-  m_Exception (NULL),
-  m_ThreadHnd (0),
-  m_UnkExceptSignaled (false),
-  m_IgnoreExceptions (false),
-  m_Ended (true),
-  m_Joined (true)
+WThread::WThread ()
+  : m_Routine (NULL),
+    m_RoutineArgs (NULL),
+    m_Exception (NULL),
+    m_ThreadHnd (0),
+    m_UnkExceptSignaled (false),
+    m_IgnoreExceptions (false),
+    m_Ended (true)
 {
-  if (wh_thread_create (&m_ThreadHnd, WThread::ThreadWrapperRoutine, this) != WOP_OK)
-    throw WThreadException (NULL, _EXTRA (WThreadException::FAILEDOP_EXCEPTION));
+}
 
-  m_Joined = false;
+void
+WThread::Run (WH_THREAD_ROUTINE routine, void* const args)
+{
+  if ( ! m_Ended)
+    {
+      throw WThreadException (NULL,
+                              _EXTRA (WThreadException::INUSE_EXCEPTION));
+    }
+
+  m_Ended       = false;
+  m_Routine     = routine;
+  m_RoutineArgs = args;
+
+  if (wh_thread_create (&m_ThreadHnd, WThread::ThreadWrapperRoutine, this)
+      != WOP_OK)
+    {
+      m_Ended = true;
+      throw WThreadException (NULL,
+                              _EXTRA (WThreadException::FAILEDOP_EXCEPTION));
+    }
 }
 
 WThread::~WThread ()
 {
-  if ( ! m_Joined)
+  if ( ! m_Ended)
     wh_thread_join (m_ThreadHnd);
+
+  assert (HasExceptionPending() == false);
 
   delete m_Exception;
   //Do not throw exceptions from a destructor. Is not a smart idea at all.
@@ -54,15 +73,16 @@ WThread::~WThread ()
 void
 WThread::Join ()
 {
-  wh_thread_join (m_ThreadHnd);
+  if ( ! m_Ended)
+    wh_thread_join (m_ThreadHnd);
 
-  m_Joined = true;
+  assert (m_Ended);
 
-  SignalPendingException ();
+  ThrowPendingException ();
 }
 
 void
-WThread::SignalPendingException ()
+WThread::ThrowPendingException ()
 {
   assert (m_Ended);
 

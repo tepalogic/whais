@@ -31,7 +31,7 @@ WException::WException (const D_CHAR* pMessage,
                         const D_CHAR* pFile,
                         D_UINT32      line,
                         D_UINT32      extra)
-  : m_ErrorMessage (pMessage),
+  : m_ErrorMessage ((pMessage == NULL) ? "" : pMessage),
     m_File (pFile),
     m_Line (line),
     m_Extra (extra)
@@ -59,7 +59,7 @@ WException::GetExtra () const
 const D_CHAR*
 WException::Message () const
 {
-  return m_ErrorMessage;
+  return m_ErrorMessage.c_str ();
 }
 
 const D_CHAR*

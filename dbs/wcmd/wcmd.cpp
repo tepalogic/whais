@@ -106,7 +106,7 @@ PrintHelpUsage ()
 static void
 PrintWrongUsage ()
 {
-  std::cout << " wcmd: invalid arguemts. Use --help!" << std::endl;
+  std::cout << " wcmd: invalid arguments. Use --help!" << std::endl;
 }
 
 static bool
@@ -420,7 +420,7 @@ main (const D_INT argc, D_CHAR *argv[])
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknow exception was throwed.\n";
+    cout << "Fatal error ... Unknown exception was thrown.\n";
     return 0xFF;
   }
 
@@ -452,7 +452,7 @@ main (const D_INT argc, D_CHAR *argv[])
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknow exception was throwed.\n";
+    cout << "Fatal error ... Unknown exception was thrown.\n";
     result = 0xFF;
   }
 
@@ -467,7 +467,7 @@ main (const D_INT argc, D_CHAR *argv[])
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknow exception was throwed.\n";
+    cout << "Fatal error ... Unknown exception was thrown.\n";
     result = (result != 0)  ? result : 0xFF;
   }
 

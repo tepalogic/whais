@@ -22,15 +22,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef LOADER_H_
-#define LOADER_H_
+#ifndef SERVER_PROTOCOL_H_
+#define SERVER_PROTOCOL_H_
+
+#define FRAME_HDR_SIZE_OFF              0x00
+#define FRAME_HDR_ENCTYPE_OFF           0x02
+#define FRAME_HDR_FRMID                 0x04
+#define FRAME_HDR_CNTRES_OFF            0x08
+#define FRAME_HDR_SRVRES_OFF            0x0C
+#define FRAME_HDR_DATA_OFF              0x10
+
+#define FRAME_ENCTYPE_PLAIN             0x0001
+#define FRAME_ENCTYPE_SHKEY             0x0002
+#define FRAME_ENCTYPE_BUSSY             0xFFFF
 
 
-#include "whisper.h"
-
-#include "configuration.h"
-
-bool
-LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc);
-
-#endif /* LOADER_H_ */
+#endif /* SERVER_PROTOCOL_H_ */

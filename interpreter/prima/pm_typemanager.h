@@ -64,9 +64,8 @@ private:
   std::vector<D_UINT8> m_TypesDescriptions;
 };
 
-
-
-
+std::vector<D_UINT8>
+compute_table_typeinfo (I_DBSTable& table);
 
 }
 
