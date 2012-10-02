@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_optglbs.h"
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_tabcomds.h"
+#include "wcmd_onlinecmds.h"
 
 using namespace std;
 
@@ -59,8 +60,14 @@ static const D_CHAR usageDescription[] =
 "    -r, --remove db_name   Remove the database named 'db_name'.\n"
 "    -u, --use db_name      Select 'db_name' as the target database.\n"
 "\n"
-"    -d  --dir directory    Sets the working directory.\n"
-"    -o  --dbdir directory  Sets the directory where the DB content resides.\n"
+"    -H,  --host hostname   The host name for remote database access.\n"
+"    -P,  --port portnum    The port number where the to connect.\n"
+"    -U,  --user userId     The user id for connection. 0 to connect as\n"
+"                           admin. Anything else to connect as regular user.\n"
+"    -p,  --pass password   The password used to authenticate.\n"
+"\n"
+"    -d, --dir directory    Sets the working directory.\n"
+"    -o, --dbdir directory  Sets the directory where the DB content resides.\n"
 "    -m, --file_size size   Specify the maximum file size. Not all file\n"
 "                           support the same maximum file systems, and this\n"
 "                           is used to specify the respective limit. It also\n"
@@ -84,9 +91,10 @@ static const D_CHAR usageDescription[] =
 "    -l, --license          Prints license terms.\n"
 "\n"
 "Examples:\n"
-"    wcmd --create some_data_base -m 4G\n"
+"    wcmd --create some_database -m 4G\n"
 " or:\n"
-"    wcmd --use some_data_base -d /database/path -s 'list tables'\n"
+"    wcmd --use some_database -d /database/path -s 'list tables'\n"
+"    wcmd -u remote_database -H localhost -P 1761 -U 0 -p 'Some password'\n"
 "\n";
 
 
@@ -209,19 +217,36 @@ ExecuteInteractively ()
 static void
 InitDBS ()
 {
-  const string&  workDir     = GetWorkingDirectory ();
-  const D_UINT64 maxFileSize = GetMaximumFileSize ();
 
-  if (GetVerbosityLevel () >= VL_DEBUG)
+  if (IsDatabaseRemote ())
     {
-      cout << "Starting the DBS framework: " << endl;
-      cout << " directory: " << workDir << endl;
-      cout << " file_size: " << maxFileSize << endl;
+      if (GetVerbosityLevel () >= VL_DEBUG)
+        {
+          cout << "Connecting to remote database as  ";
+          cout << ((GetUserId () == 0) ? "admin" : "regular user") << ":\n";
+          cout << " remote host: " << GetRemoteHostName () << endl;
+          cout << " port:" << GetConnectionPort () << endl;
+          cout << " database: " << GetWorkingDB () << endl;
+          cout << " user id: " << GetUserId () << endl;
+          cout << " password: " << GetUserPassword () << endl;
+        }
     }
+  else
+    {
+      const string&  workDir     = GetWorkingDirectory ();
+      const D_UINT64 maxFileSize = GetMaximumFileSize ();
 
-  DBSSettings settings;
-  settings.m_WorkDir = settings.m_TempDir = workDir;
-  DBSInit (settings);
+      if (GetVerbosityLevel () >= VL_DEBUG)
+        {
+          cout << "Starting the DBS framework: " << endl;
+          cout << " directory: " << workDir << endl;
+          cout << " file_size: " << maxFileSize << endl;
+        }
+
+      DBSSettings settings;
+      settings.m_WorkDir = settings.m_TempDir = workDir;
+      DBSInit (settings);
+    }
 
   if (GetVerbosityLevel () >= VL_DEBUG)
     cout << "done." << endl;
@@ -230,6 +255,9 @@ InitDBS ()
 static void
 StopDBS ()
 {
+  if (IsDatabaseRemote ())
+    return;
+
   DBSShoutdown ();
 
   if (GetVerbosityLevel () >= VL_DEBUG)
@@ -345,6 +373,50 @@ main (const D_INT argc, D_CHAR *argv[])
             }
           SetWorkingDB (argv[currentArg++]);
         }
+      else if ((strcmp (argv[currentArg], "-H") == 0) ||
+               (strcmp (argv[currentArg], "--host" ) == 0))
+        {
+          ++currentArg;
+          if (currentArg == argc)
+            {
+              PrintWrongUsage ();
+              return EINVAL;
+            }
+          SetRemoteHostName (argv[currentArg++]);
+        }
+      else if ((strcmp (argv[currentArg], "-P") == 0) ||
+               (strcmp (argv[currentArg], "--port" ) == 0))
+        {
+          ++currentArg;
+          if (currentArg == argc)
+            {
+              PrintWrongUsage ();
+              return EINVAL;
+            }
+          SetConnectionPort (argv[currentArg++]);
+        }
+      else if ((strcmp (argv[currentArg], "-U") == 0) ||
+               (strcmp (argv[currentArg], "--user" ) == 0))
+        {
+          ++currentArg;
+          if (currentArg == argc)
+            {
+              PrintWrongUsage ();
+              return EINVAL;
+            }
+          SetUserId (atoi (argv[currentArg++]));
+        }
+      else if ((strcmp (argv[currentArg], "-p") == 0) ||
+               (strcmp (argv[currentArg], "--pass" ) == 0))
+        {
+          ++currentArg;
+          if (currentArg == argc)
+            {
+              PrintWrongUsage ();
+              return EINVAL;
+            }
+          SetUserPassword (argv[currentArg++]);
+        }
       else if ((strcmp (argv[currentArg], "-d") == 0) ||
                (strcmp (argv[currentArg], "--dir" ) == 0))
         {
@@ -400,7 +472,6 @@ main (const D_INT argc, D_CHAR *argv[])
               PrintWrongUsage ();
               return EINVAL;
             }
-
         }
       else
         {
@@ -429,12 +500,28 @@ main (const D_INT argc, D_CHAR *argv[])
     if (removeDB == false)
       {
         if (createDB)
-          CreateDB ( (dbDirectory.length () != 0) ?
-                        dbDirectory :
-                        GetWorkingDirectory ());
-        OpenDB ();
+          {
+            CreateDB ((dbDirectory.length () != 0) ?
+                      dbDirectory :
+                      GetWorkingDirectory ());
+          }
 
-        AddOfflineTableCommands ();
+        if (IsDatabaseRemote ())
+          {
+            if (GetUserPassword ().size () == 0)
+              {
+                string password;
+                cout << "Password [" << GetUserId () << "]: ";
+                getline (cin, password);
+                SetUserPassword (password.c_str ());
+              }
+            AddOnlineTableCommands ();
+          }
+        else
+          {
+            OpenDB ();
+            AddOfflineTableCommands ();
+          }
 
         if (script != "")
           ExecuteCommandBatch (script);

@@ -277,6 +277,12 @@ wh_socket_read (const WH_SOCKET           sd,
                 D_UINT* const             pIOCount,
                 enum WH_SOCK_ERROR* const pOutError)
 {
+  if (*pIOCount == 0)
+    {
+      handle_sock_error (EINVAL, pOutError);
+      return FALSE;
+    }
+
   while (TRUE)
     {
       const ssize_t chunk = recv (sd, pOutBuffer, *pIOCount, 0);
@@ -288,14 +294,10 @@ wh_socket_read (const WH_SOCKET           sd,
               return FALSE;
             }
         }
-      else if (*pIOCount == 0)
-        {
-          handle_sock_error (EPIPE, pOutError);
-          return FALSE;
-        }
       else
         {
           assert (chunk <= *pIOCount);
+
           *pIOCount = chunk;
           break;
         }

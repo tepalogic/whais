@@ -22,35 +22,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "utils/include/auto_array.h"
-#include "utils/include/wthread.h"
-#include "utils/include/wsocket.h"
-
 #include "server/include/server_protocol.h"
 
 #include "server.h"
+#include "connection.h"
 
 using namespace std;
-
-struct UserHandler
-{
-  UserHandler ()
-    : m_pDesc (NULL),
-      m_Thread (),
-      m_Socket (_SC (WH_SOCKET, -1)),
-      m_EndConnetion (true)
-  {
-  }
-  ~UserHandler ()
-  {
-    assert (m_Thread.IsEnded ());
-  }
-
-  const DBSDescriptors* m_pDesc;
-  WThread               m_Thread;
-  WSocket               m_Socket;
-  bool                  m_EndConnetion;
-};
 
 class Listener
 {
@@ -59,7 +36,7 @@ public:
     : m_pInterface (NULL),
       m_pPort (NULL),
       m_ListenThread (),
-      m_Socket (_SC (WH_SOCKET, -1)),
+      m_Socket (INVALID_SOCKET),
       m_UsersPool (GetAdminSettings ().m_MaxConnections)
   {
   }
@@ -120,16 +97,27 @@ static auto_array<Listener>*   spaListeners;
 void
 client_handler_routine (void* args)
 {
-  UserHandler* const pUser = _RC (UserHandler*, args);
+  UserHandler* const pClient = _RC (UserHandler*, args);
 
-  //TODO: Here you need to agree on the connection establishment
-  while (! pUser->m_EndConnetion)
-    {
-      //TODO: This is where you add code to handle the connection
-      //      once it established!
-    }
+  assert (pClient != NULL);
+  assert (spDatabases != NULL);
 
-  pUser->m_Socket.Close ();
+  try
+  {
+      ClientConnection connection (*pClient, *spDatabases);
+
+      pClient->m_Socket.Write (11,
+                               _RC(const D_UINT8*, "Autentic!\n"));
+  }
+  catch (ConnectionException& e)
+  {
+      if (pClient->m_pDesc != NULL)
+        pClient->m_pDesc->m_pLogger->Log (LOG_ERROR, e.Message ());
+      else
+        spLogger->Log (LOG_ERROR, e.Message ());
+  }
+
+  pClient->m_Socket.Close ();
 }
 
 void
@@ -160,13 +148,9 @@ listener_routine (void* args)
         }
       else
         {
-          static const D_UINT8 busyResponse [16] =
-              {
-                0x00, 0x10, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-              };
+          static const D_UINT8 busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
 
-          client.Write (sizeof busyResponse, busyResponse);
+          client.Write (sizeof busyResp, busyResp);
           client.Close ();
         }
 

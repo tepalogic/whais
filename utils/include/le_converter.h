@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LE_CONVERTER_H_
 #define LE_CONVERTER_H_
 
+#include "whisper.h"
+
 #ifdef __cplusplus
 #undef INLINE
 #define INLINE inline
@@ -135,5 +137,67 @@ from_le_int64 (const D_UINT8* pValue)
 
   return result;
 }
+
+static INLINE void
+store_le_int16 (const D_UINT16 value, D_UINT8* const pDest)
+{
+  const D_UINT8* pSrc = (const D_UINT8*)&value;
+  const D_UINT16 le_machine = 0x1;
+
+    if (*((D_UINT8*)&le_machine))
+      {
+        D_UINT i;
+        for (i = 0; i < sizeof (value); ++i)
+          pDest[i] = pSrc[i];
+      }
+    else
+      {
+        D_UINT i;
+        for (i = 0; i < sizeof (value); ++i)
+          pDest[i] = pSrc[sizeof (value) - (i + 1)];
+      }
+}
+
+static INLINE void
+store_le_int32 (const D_UINT32 value, D_UINT8* const pDest)
+{
+  const D_UINT8* pSrc = (const D_UINT8*)&value;
+  const D_UINT16 le_machine = 0x1;
+
+    if (*((D_UINT8*)&le_machine))
+      {
+        D_UINT i;
+        for (i = 0; i < sizeof (value); ++i)
+          pDest[i] = pSrc[i];
+      }
+    else
+      {
+        D_UINT i;
+        for (i = 0; i < sizeof (value); ++i)
+          pDest[i] = pSrc[sizeof (value) - (i + 1)];
+      }
+}
+
+static INLINE void
+store_le_int64 (const D_UINT64 value, D_UINT8* const pDest)
+{
+  const D_UINT8* pSrc = (const D_UINT8*)&value;
+  const D_UINT16 le_machine = 0x1;
+
+    if (*((D_UINT8*)&le_machine))
+      {
+        D_UINT i;
+        for (i = 0; i < sizeof (value); ++i)
+          pDest[i] = pSrc[i];
+      }
+    else
+      {
+        D_UINT i;
+        for (i = 0; i < sizeof (value); ++i)
+          pDest[i] = pSrc[sizeof (value) - (i + 1)];
+      }
+}
+
+
 
 #endif /* LE_CONVERTER_H_ */

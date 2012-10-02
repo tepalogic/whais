@@ -64,6 +64,8 @@ static const string gEntTempDir ("temp_directory");
 static const string gEntShowDbg ("show_debug");
 static const string gEntObjectLib ("load_object");
 static const string gEntNativeLib ("load_native");
+static const string gEntRootPasswrd("root_password");
+static const string gEntUserPasswrd("user_password");
 
 static ServerSettings gMainSettings;
 
@@ -601,6 +603,89 @@ ParseContextSection (I_Logger&        log,
              }
            output.m_NativeLibs.push_back (libEntry);
         }
+       else if (token == gEntRootPasswrd)
+        {
+           if (output.m_RootPass.size () > 0)
+             {
+               logEntry << "Configuration error at line ";
+               logEntry << ioConfigLine << ". ";
+               logEntry << "The root password for this database was ";
+               logEntry << "already set.\n";
+               log.Log (LOG_CRITICAL, logEntry.str ());
+               return false;
+             }
+           token = NextToken (line, pos, delimiters);
+
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+             {
+               logEntry << "Configuration error at line ";
+               logEntry << ioConfigLine << ".\n";
+               log.Log (LOG_CRITICAL, logEntry.str ());
+               return false;
+             }
+
+           if ((token.at (0) == '\'') || (token.at (0) == '"'))
+             {
+               const string entry = line.c_str () + pos - token.length ();
+
+               if (get_enclose_entry (logEntry,
+                                      entry,
+                                      token.at (0),
+                                      output.m_RootPass) == false)
+                 {
+                   logEntry << "Unmatched "<< token.at (0);
+                   logEntry << " in configuration file at line ";
+                   logEntry << ioConfigLine << ".\n";
+                   log.Log (LOG_CRITICAL, logEntry.str ());
+                   return false;
+                 }
+
+             }
+           else
+             output.m_RootPass = token;
+        }
+       else if (token == gEntUserPasswrd)
+        {
+           if (output.m_UserPasswd.size () > 0)
+             {
+               logEntry << "Configuration error at line ";
+               logEntry << ioConfigLine << ". ";
+               logEntry << "The user password for this database was ";
+               logEntry << "already set.\n";
+               log.Log (LOG_CRITICAL, logEntry.str ());
+               return false;
+             }
+
+           token = NextToken (line, pos, delimiters);
+
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+             {
+               logEntry << "Configuration error at line ";
+               logEntry << ioConfigLine << ".\n";
+               log.Log (LOG_CRITICAL, logEntry.str ());
+               return false;
+             }
+
+           if ((token.at (0) == '\'') || (token.at (0) == '"'))
+             {
+               const string entry = line.c_str () + pos - token.length ();
+
+               if (get_enclose_entry (logEntry,
+                                      entry,
+                                      token.at (0),
+                                      output.m_UserPasswd) == false)
+                 {
+                   logEntry << "Unmatched "<< token.at (0);
+                   logEntry << " in configuration file at line ";
+                   logEntry << ioConfigLine << ".\n";
+                   log.Log (LOG_CRITICAL, logEntry.str ());
+                   return false;
+                 }
+
+             }
+           else
+             output.m_UserPasswd = token;
+        }
       else
         {
           logEntry << "At line " << ioConfigLine << ": Don't know what to do ";
@@ -762,6 +847,28 @@ PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc)
   assert (ioDesc.m_ConfigLine != 0);
 
   ostringstream logStream;
+
+  if (ioDesc.m_UserPasswd.size () == 0)
+    {
+      logStream << "A user password for the database ";
+      logStream << "section starting at line ";
+      logStream << ioDesc.m_ConfigLine;
+      logStream << " was not set.";
+      log.Log (LOG_ERROR, logStream.str ());
+
+      return false;
+    }
+
+  if (ioDesc.m_RootPass.size () == 0)
+    {
+      logStream << "A root password for the database ";
+      logStream << "section starting at line ";
+      logStream << ioDesc.m_ConfigLine;
+      logStream << " was not set.";
+      log.Log (LOG_ERROR, logStream.str ());
+
+      return false;
+    }
 
   if (ioDesc.m_DbsName.length () == 0)
     {

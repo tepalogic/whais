@@ -68,5 +68,6 @@ typedef D_UINT64         D_UINTMAX;
 #define SHL_EXPORT_SYMBOL __declspec(dllexport)
 #define SHL_IMPORT_SYMBOL __declspec(dllimport)
 
+#define INVALID_SOCKET  ((SOKET)-1)
 
 #endif /* WHISPER_TYPES_H */

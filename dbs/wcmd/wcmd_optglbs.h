@@ -43,6 +43,31 @@ typedef enum
   VL_MAX = VL_DEBUG
 } VERBOSE_LEVEL;
 
+
+const std::string&
+GetRemoteHostName ();
+
+void
+SetRemoteHostName (const D_CHAR* pHostName);
+
+const std::string&
+GetConnectionPort ();
+
+void
+SetConnectionPort (const D_CHAR* pPort);
+
+D_UINT
+GetUserId ();
+
+void
+SetUserId (const D_UINT userId);
+
+const std::string&
+GetUserPassword ();
+
+void
+SetUserPassword (const D_CHAR* pPassword);
+
 const std::string&
 GetWorkingDirectory ();
 
@@ -72,6 +97,9 @@ SetDbsHandler (I_DBSHandler& dbsHandler);
 
 I_DBSHandler&
 GetDBSHandler ();
+
+bool
+IsDatabaseRemote ();
 
 #endif //WCMD_OPTGLBS_H_
 

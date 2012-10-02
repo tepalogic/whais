@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 WSocket::WSocket (const D_CHAR* const pServerName,
                   const D_CHAR* const pService)
-  : m_Socket (),
+  : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
   WH_SOCK_ERROR e = WH_SOCK_OK;
@@ -42,7 +42,7 @@ WSocket::WSocket (const D_CHAR* const pServerName,
 
 WSocket::WSocket (const D_CHAR* const pServerName,
                   const D_UINT16      port)
-  : m_Socket (),
+  : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
   D_CHAR service[16];
@@ -58,7 +58,7 @@ WSocket::WSocket (const D_CHAR* const pServerName,
 WSocket::WSocket (const D_CHAR* const pLocalAddress,
                   const D_CHAR* const pService,
                   const D_UINT        backLog)
-  : m_Socket (),
+  : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
   WH_SOCK_ERROR e = WH_SOCK_OK;
@@ -72,7 +72,7 @@ WSocket::WSocket (const D_CHAR* const pLocalAddress,
 WSocket::WSocket (const D_CHAR* const pLocalAddress,
                   const D_UINT16      port,
                   const D_UINT        backLog)
-  : m_Socket (),
+  : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
   D_CHAR service[16];
@@ -101,7 +101,10 @@ WSocket::WSocket (const WSocket& source)
 WSocket::~WSocket ()
 {
   if (m_Owned)
-    wh_socket_close (m_Socket);
+    {
+      assert (m_Socket != INVALID_SOCKET);
+      wh_socket_close (m_Socket);
+    }
 }
 
 WSocket&
@@ -159,6 +162,10 @@ WSocket::Close ()
   if (! m_Owned)
     return;
 
+  assert (m_Socket != INVALID_SOCKET);
+
   wh_socket_close (m_Socket);
-  m_Owned = false;
+
+  m_Socket = INVALID_SOCKET;
+  m_Owned  = false;
 }

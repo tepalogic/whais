@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WHISPER_TYPES_H
 
 #ifndef ARCH_LINUX_GCC
-#error "Do not compile this file with other compilator than linux's gcc/g++!"
+#error "Do not compile this file with a compilator other than linux's gcc/g++!"
 #endif
 
 #include "sys/types.h"
@@ -65,5 +65,6 @@ typedef D_UINT64      D_UINTMAX;
 #define SHL_EXPORT_SYMBOL __attribute__((visibility("default")))
 #define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))
 
+#define INVALID_SOCKET  ((int)-1)
 
 #endif /* WHISPER_TYPES_H */

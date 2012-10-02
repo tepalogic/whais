@@ -92,6 +92,8 @@ struct DBSDescriptors
   std::string              m_DbsName;
   std::string              m_DbsDirectory;
   std::string              m_DbsLogFile;
+  std::string              m_RootPass;
+  std::string              m_UserPasswd;
   std::vector<std::string> m_ObjectLibs;
   std::vector<std::string> m_NativeLibs;
 

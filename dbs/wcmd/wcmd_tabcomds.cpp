@@ -608,8 +608,5 @@ AddOfflineTableCommands ()
   entry.m_cmd          = cmdTableRmIndex;
 
   RegisterCommand (entry);
-
-
-
 }
 

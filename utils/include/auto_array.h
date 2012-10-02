@@ -48,8 +48,55 @@ public:
     return m_Size;
   }
 
+  void Size (const unsigned int newSize)
+  {
+    if (newSize == 0)
+      {
+        delete m_pT;
+
+        m_pT   = NULL;
+        m_Size = 0;
+
+        return;
+      }
+
+    const unsigned min = (newSize < m_Size) ? newSize : m_Size;
+    T* const pNewArray = new T[newSize];
+
+    try
+    {
+        for (unsigned int i = 0; i < min; ++i)
+          pNewArray[i] = m_pT[i];
+    }
+    catch (...)
+    {
+        delete [] pNewArray;
+        throw;
+    }
+
+    m_Size = newSize;
+    m_pT   = pNewArray;
+  }
+
+  void Reset (const unsigned int newSize)
+  {
+    T* const pNewArray = ((newSize == 0) ? NULL : new T[newSize]);
+    try
+    {
+        delete [] m_pT;
+    }
+    catch (...)
+    {
+        delete [] pNewArray;
+        throw;
+    }
+
+    m_Size = newSize;
+    m_pT   = pNewArray;
+  }
+
 private:
-  T* const     m_pT;
+  T*           m_pT;
   unsigned int m_Size;
 
   auto_array (const auto_array&);

@@ -8,7 +8,6 @@
 #include <sstream>
 #include <stdexcept>
 
-
 #include "whisper.h"
 
 #include "dbs/include/dbs_mgr.h"

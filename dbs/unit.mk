@@ -13,9 +13,10 @@ pastra_LIB:=utils/utils custom/custom
 pastra_SHL:=custom/common
 pastra_DEF:=USE_DBS_SHL DBS_EXPORTING
 
-wcmd_SRC=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp wcmd/wcmd_tabcomds.cpp
+wcmd_SRC=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
+		 wcmd/wcmd_tabcomds.cpp wcmd/wcmd_onlinecmds.cpp
 wcmd_DEF=USE_DBS_SHL
-wcmd_LIB=utils/utils custom/custom
+wcmd_LIB=client/connector utils/utils custom/custom 
 wcmd_SHL=dbs/pastra custom/common
 		   
 pastra_MAJ=.1

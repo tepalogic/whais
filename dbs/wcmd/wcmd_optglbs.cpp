@@ -38,8 +38,71 @@ static VERBOSE_LEVEL sVerbLevel   = VL_ERROR;
 static D_UINT64      sMaxFileSize = 0x80000000; //default: 2GB
 static I_DBSHandler* s_pDBSHnd    = NULL;
 
+static string        sRemoteHost;
+static string        sConnectPort;
+static string        sPassword;
 
-const std::string&
+static D_INT         sUserId  = -1;
+
+static const D_CHAR  DEFAULT_PORT[] = "1761";
+
+static const D_UINT  DEFUALT_USER   = 1;
+
+const string&
+GetRemoteHostName ()
+{
+  return sRemoteHost;
+}
+
+void
+SetRemoteHostName (const D_CHAR* pHostName)
+{
+  sRemoteHost = pHostName;
+}
+
+const string&
+GetConnectionPort ()
+{
+  if (IsDatabaseRemote () && (sConnectPort.size () == 0))
+    sConnectPort = DEFAULT_PORT;
+
+  return sConnectPort;
+}
+
+void
+SetConnectionPort (const D_CHAR* pPort)
+{
+  sConnectPort = pPort;
+}
+
+D_UINT
+GetUserId ()
+{
+  if ((sUserId < 0 ) && IsDatabaseRemote ())
+    sUserId = DEFUALT_USER;
+
+  return sUserId;
+}
+
+void
+SetUserId (const D_UINT userId)
+{
+  sUserId = (userId > 0) ? 1 : 0;
+}
+
+const string&
+GetUserPassword ()
+{
+  return sPassword;
+}
+
+void
+SetUserPassword (const D_CHAR* pPassword)
+{
+  sPassword = pPassword;
+}
+
+const string&
 GetWorkingDirectory ()
 {
   return sWorkingDirectory;
@@ -51,7 +114,7 @@ SetWorkingDirectory (const D_CHAR* pDirectory)
   sWorkingDirectory = pDirectory;
 }
 
-const std::string&
+const string&
 GetWorkingDB ()
 {
   return sDBName;
@@ -139,3 +202,11 @@ GetDBSHandler ()
   return *s_pDBSHnd;
 }
 
+bool
+IsDatabaseRemote ()
+{
+  if (GetRemoteHostName ().size () > 0)
+    return true;
+
+  return false;
+}
