@@ -55,6 +55,8 @@ public:
 
   ~GlobalsManager ();
 
+  D_UINT    Count () const { return m_GlobalsEntrys.size (); };
+
   D_UINT32           AddGlobal (const D_UINT8*     pName,
                                 const D_UINT       nameLength,
                                 GlobalValue&       value,
@@ -63,6 +65,7 @@ public:
                                  const D_UINT         nameLength);
 
   GlobalValue&       GetGlobal (const D_UINT32 glbId);
+  const D_UINT8*     Name (const D_UINT index) const;
   const D_UINT8*     GetGlobalTI (const D_UINT32 glbId);
 
   static bool IsValid (const D_UINT32 glbId)

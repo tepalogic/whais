@@ -22,27 +22,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef CONNECTOR_H_
-#define CONNECTOR_H_
+#ifndef COMMANDS_H_
+#define COMMANDS_H_
 
-#include "whisper.h"
+#include "connection.h"
 
-#include "server/include/server_protocol.h"
+typedef void (*COMMAND_HANDLER)(ClientConnection& conn,
+                                const bool        receivedAll);
 
-struct INTERNAL_HANDLER
-{
-  D_UINT64  cmdInternal;
-  WH_SOCKET socket;
-  D_UINT32  expectedFrameId;
-  D_UINT32  serverCookie;
-  D_UINT32  clientCookie;
-  D_UINT32  encKeySize;
-  D_UINT16  lastCmdRespReceived;
-  D_UINT8   userId;
-  D_UINT8   encType;
-  D_UINT8   data [FRAME_MAX_SIZE];
-  D_UINT8   encriptionKey[1];
-  D_BOOL    lastCmdRespFrameReceived;
-};
+extern COMMAND_HANDLER* gpAdminCommands;
+extern COMMAND_HANDLER* gpUserCommands;
 
-#endif /* CONNECTOR_H_ */
+#endif /* COMMANDS_H_ */

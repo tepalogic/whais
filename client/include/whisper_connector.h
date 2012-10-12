@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
-typedef void* CONNECTOR_HDL;
+typedef void* CONNECTOR_HND;
 
 enum CONNECTOR_STATUS
 {
@@ -39,11 +39,13 @@ enum CONNECTOR_STATUS
   CS_DROPPED,
   CS_ENCTYPE_NOTSUPP,
   CS_UNEXPECTED_FRAME,
+  CS_INVALID_FRAME,
   CS_COMM_OUT_OF_SYNC,
   CS_LARGE_ARGS,
   CS_CONNECTION_TIMEOUT,
   CS_SERVER_BUSY,
-  CS_OS_INTERNAL
+  CS_OS_INTERNAL,
+  CS_UNKNOWN_ERR
 };
 
 #define CONNECTOR_ENC_ALL   (CONNECTOR_ENC_PLAIN | CONNECTOR_ENC_ISX)
@@ -54,9 +56,21 @@ Connect (const char* const   pHost,
          const char* const   pDatabaseName,
          const char* const   pPassword,
          const unsigned int  userId,
-         CONNECTOR_HDL*      pHnd);
+         CONNECTOR_HND*     pHnd);
 void
-Close (CONNECTOR_HDL handler);
+Close (CONNECTOR_HND hnd);
+
+enum CONNECTOR_STATUS
+PingServer (const CONNECTOR_HND hnd);
+
+enum CONNECTOR_STATUS
+ListGlobals (const CONNECTOR_HND hnd, unsigned int* pGlbsCount);
+
+enum CONNECTOR_STATUS
+GlobalFetch (const CONNECTOR_HND hnd, const unsigned char** pGlbName);
+
+enum CONNECTOR_STATUS
+GlobalFetchCancel (const CONNECTOR_HND hnd);
 
 
 #ifdef __cplusplus

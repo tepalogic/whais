@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "server_protocol.h"
+
 #include "utils/include/auto_array.h"
 #include "utils/include/wthread.h"
 #include "utils/include/wsocket.h"
@@ -77,16 +79,37 @@ public:
                     std::vector<DBSDescriptors>& databases);
   ~ClientConnection ();
 
+  D_UINT16  MaxSize () const;
+  D_UINT16  Size () const;
+  void      Size (const D_UINT16 size);
+  D_UINT8*  Data ();
+
+  D_UINT32 ReadCommand (bool& oLastPart);
+  void     AckCommandPart (const bool waitingNext = true);
+
+  void SendCmdResponse (const D_UINT16 respType,
+                        const bool     lastPart,
+                        bool&          oSendNext);
+
+  const DBSDescriptors&  Dbs () { return *m_UserHandler.m_pDesc; }
 private:
-  void ReadClientFrame (D_UINT16& outDataSize);
+  D_UINT8* RawCmdData ();
+
+  void ReciveRawClientFrame ();
+  void SendRawClientFrame (const D_UINT8 type);
 
   UserHandler&        m_UserHandler;
   D_UINT32            m_WaitingFrameId;
   D_UINT32            m_ClientCookie;
   D_UINT32            m_ServerCookie;
-  D_UINT8             m_IncomeType;
+  D_UINT16            m_LastReceivedCmd;
+  D_UINT16            m_FrameSize;
+  D_UINT8             m_EncriptionType;
   D_UINT8             m_Version;
-  auto_array<D_UINT8> m_Array;
+  D_UINT8             m_Data[FRAME_MAX_SIZE];
+
+  ClientConnection (const ClientConnection&);
+  const ClientConnection& operator= (const ClientConnection&);
 };
 
 

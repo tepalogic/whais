@@ -303,6 +303,24 @@ Session::ExecuteProcedure (const D_UINT8* const pProcName,
   //         or with different types will be supplied?
 }
 
+D_UINT
+Session::GlobalValuesCount () const
+{
+  return m_PrivateNames.Get ().GetGlobalsManager().Count();
+}
+
+const D_UINT8*
+Session::GlobalValueName (const D_UINT index) const
+{
+  return m_PrivateNames.Get ().GetGlobalsManager ().Name (index);
+}
+
+const D_UINT8*
+Session::GlobalValueType (const D_UINT index) const
+{
+  return m_PrivateNames.Get ().GetGlobalsManager ().GetGlobalTI (index);
+}
+
 D_UINT32
 Session::FindGlobal (const D_UINT8* pName, const D_UINT nameLength)
 {

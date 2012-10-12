@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server.h"
 #include "connection.h"
+#include "commands.h"
 
 using namespace std;
 
@@ -106,8 +107,45 @@ client_handler_routine (void* args)
   {
       ClientConnection connection (*pClient, *spDatabases);
 
-      pClient->m_Socket.Write (11,
-                               _RC(const D_UINT8*, "Autentic!\n"));
+      while (true)
+        {
+          const COMMAND_HANDLER* pCmds;
+          bool                   lastPart;
+
+          D_UINT16 cmdType = connection.ReadCommand (lastPart);
+
+          if (cmdType == CMD_CLOSE_CONN)
+            break;
+
+          if ((cmdType & 1) != 0)
+            {
+              throw ConnectionException ("Invalid command received.",
+                                         _EXTRA (0));
+            }
+
+          if (cmdType >= USER_CMD_BASE)
+            {
+              cmdType -= USER_CMD_BASE;
+              cmdType /= 2;
+              if (cmdType >= USER_CMDS_COUNT)
+                {
+                  throw ConnectionException ("Invalid user command recieved",
+                                             _EXTRA (0));
+                }
+              pCmds = gpUserCommands;
+            }
+          else
+            {
+              cmdType /= 2;
+              if (cmdType >= ADMIN_CMDS_COUNT)
+                {
+                  throw ConnectionException ("Invalid admin command recieved",
+                                             _EXTRA (0));
+                }
+              pCmds = gpAdminCommands;
+            }
+          pCmds[cmdType] (connection, lastPart);
+        }
   }
   catch (ConnectionException& e)
   {
@@ -118,6 +156,7 @@ client_handler_routine (void* args)
   }
 
   pClient->m_Socket.Close ();
+  pClient->m_EndConnetion = true;
 }
 
 void

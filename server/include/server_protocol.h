@@ -32,9 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FRAME_DATA_OFF                  0x08
 
 #define FRAME_TYPE_NORMAL               0x00
-#define FRAME_TYPE_AUTH_CLNT            0x01
-#define FRAME_TYPE_AUTH_CLNT_RSP        0x02
-#define FARME_TYPE_AUTH_SRV_DONE        0x04
+#define FRAME_TYPE_PARTIAL              0x01
+#define FRAME_TYPE_PARTIAL_ACK          0x02
+#define FRAME_TYPE_PARTIAL_CANCEL       0x03
+#define FRAME_TYPE_AUTH_CLNT            0x04
+#define FRAME_TYPE_AUTH_CLNT_RSP        0x05
 #define FRAME_TYPE_COMM_NOSYNC          0xFD
 #define FRAME_TYPE_TIMEOUT              0xFE
 #define FRAME_TYPE_SERV_BUSY            0xFF
@@ -45,17 +47,71 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PLAIN_CLNT_COOKIE_OFF           0x00
 #define PLAIN_SERV_COOKIE_OFF           0x04
 #define PLAIN_TYPE_OFF                  0x08
-#define PLAIN_RSERVED_OFF               0x09
 #define PLAIN_CRC_OFF                   0x0A
-#define PLAIN_OFF                       0x0C
+#define PLAIN_DATA_OFF                  0x0C
 
 /* Authenticate offsets */
+/*
+ * Auth
+ * {
+ *      version : 32bit map
+ * }
+ *
+ * AuthRsp
+ * {
+ *      version  : 32bit map     // Chosen interface.
+ *      userId   : uint8
+ *      database : char[]
+ *      password : char[]
+ * }
+ */
 #define FRAME_AUTH_CLNT_VER             0x00
 #define FRAME_AUTH_CLNT_USR             0x04
 #define FRAME_AUTH_CLNT_RESERVED        0x05
 #define FRAME_AUTH_CLNT_DATA            0x08
 
+#define FRAME_MAX_SIZE                  0x1000
 
-#define FRAME_MAX_SIZE                  0x4000
+#define CMD_STATUS_OK                   0x00
+#define CMD_STATUS_TOOBIG               0x01
+#define CMD_STATUS_INVAL_ARGS           0x02
+
+#define ADMIN_CMD_BASE                  0x0000
+#define USER_CMD_BASE                   0x1000
+
+/* List database context globals */
+#define CMD_INVALID                     ADMIN_CMD_BASE
+#define CMD_INVALID_RSP                 (CMD_INVALID + 1)
+
+#define CMD_LIST_GLOBALS                (CMD_INVALID_RSP + 1)
+#define CMD_LIST_GLOBALS_RSP            (CMD_LIST_GLOBALS + 1)
+/*
+ * CmdListResponse
+ * {
+ *      status       : uint8
+ *      globalsCount : uint32;
+ *      frameVars    : uint8
+ *      varNames     : char[]
+ * }
+ *
+ * CmdListResponsePartial
+ * {
+ *      status       : uint8
+ *      frameVars    : uint8
+ *      varNames     : char[]
+ * }
+ */
+
+/* Connection close command */
+#define CMD_CLOSE_CONN          USER_CMD_BASE
+#define CMD_CLOSE_CONN_RSP      (CMD_CLOSE_CONN + 1)
+
+/* Ping command */
+#define CMD_PING_SERVER         (CMD_CLOSE_CONN_RSP + 1)
+#define CMD_PING_SERVER_RSP     (CMD_PING_SERVER + 1)
+
+
+#define ADMIN_CMDS_COUNT       ((CMD_LIST_GLOBALS / 2) + 1)
+#define USER_CMDS_COUNT        ((CMD_PING_SERVER - USER_CMD_BASE) / 2 + 1)
 
 #endif /* SERVER_PROTOCOL_H_ */

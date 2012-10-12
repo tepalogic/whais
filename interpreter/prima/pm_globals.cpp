@@ -57,7 +57,6 @@ GlobalsManager::AddGlobal (const D_UINT8*     pName,
   m_Identifiers.push_back (0);
 
   m_Storage.push_back (value);
-  value.Release ();
 
   const GlobalEntry entry = {IdOffset, typeOffset};
   m_GlobalsEntrys.push_back (entry);
@@ -101,6 +100,17 @@ GlobalsManager::GetGlobal (const D_UINT32 glbId)
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   return m_Storage[index];
+}
+
+const D_UINT8*
+GlobalsManager::Name (const D_UINT index) const
+{
+  if (index >= m_Storage.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
+
+  const GlobalEntry& entry      = m_GlobalsEntrys[index];
+
+  return  &m_Identifiers [entry.m_IdOffet];
 }
 
 const D_UINT8*

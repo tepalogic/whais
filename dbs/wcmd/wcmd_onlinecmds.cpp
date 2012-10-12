@@ -47,13 +47,15 @@ translate_status (CONNECTOR_STATUS cs)
   case CS_INVALID_ARGS:
     return "Invalid arguments.";
   case CS_OP_NOTPERMITED:
-    return "Operation not permited.";
+    return "Operation not permitted.";
   case CS_DROPPED:
-    return "Connection dropped by perr.";
+    return "Connection dropped by peer.";
   case CS_ENCTYPE_NOTSUPP:
-    return "Could not agree on supported encrytion type.";
+    return "Could not agree on supported encryption type.";
   case CS_UNEXPECTED_FRAME:
     return "Unexpected communication frame received.";
+  case CS_INVALID_FRAME:
+    return "An frame with invalid content received.";
   case CS_COMM_OUT_OF_SYNC:
     return "Communication is out of sync.";
   case CS_LARGE_ARGS:
@@ -64,6 +66,8 @@ translate_status (CONNECTOR_STATUS cs)
     return "Server is too busy.";
   case CS_OS_INTERNAL:
     return "OS internal error encountered.";
+  case CS_UNKNOWN_ERR:
+    return "An unknown error was encountered.";
   }
 
   return "Unknown error.";
@@ -81,8 +85,10 @@ static bool
 cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
 
-  const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
-  CONNECTOR_HDL conHdl = NULL;
+  CONNECTOR_HND       conHdl    = NULL;
+  unsigned int        glbsCount = 0;
+  const VERBOSE_LEVEL level     = GetVerbosityLevel ();
+
   CONNECTOR_STATUS cs  = Connect (GetRemoteHostName ().c_str (),
                                   GetConnectionPort ().c_str (),
                                   GetWorkingDB ().c_str (),
@@ -91,16 +97,83 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                   &conHdl);
   if (cs != CS_OK)
     {
-      if (level >= VL_INFO)
+      if (level >= VL_DEBUG)
         cout << "Failed to connect: " << translate_status (cs) << endl;
 
+      cout << translate_status (cs) << endl;
       return false;
+    }
+
+  cs = ListGlobals (conHdl, &glbsCount);
+  if (level >= VL_DEBUG)
+    {
+      if (cs == CS_OK)
+        cout << "Got " << glbsCount << " globals.\n";
+      else
+        cout << "Listing globals variables has failed\n";
+    }
+
+  while ((cs == CS_OK) && (glbsCount > 0))
+    {
+      const unsigned char* pGlbName = NULL;
+      cs = GlobalFetch (conHdl, &pGlbName);
+
+      assert (pGlbName != NULL);
+      cout << pGlbName << endl;
+
+      if ((cs != CS_OK) && (level < VL_DEBUG))
+        {
+          cout << "Fetching global value name has failed.\n";
+        }
+      --glbsCount;
     }
 
   Close (conHdl);
 
+  if (cs != CS_OK)
+    cout << translate_status (cs) << endl;
+
+  return (cs == CS_OK) ? true : false;
+}
+
+static const D_CHAR pingShowDesc[]    = "Ping the database sever. ";
+static const D_CHAR pingShowDescExt[] =
+"Ping the database server to check if it is up.\n"
+"Usage:\n"
+"  ping";
+
+static bool
+cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+{
+  CONNECTOR_HND conHdl = NULL;
+  WTICKS ticks  = wh_msec_ticks ();
+  CONNECTOR_STATUS cs  = Connect (GetRemoteHostName ().c_str (),
+                                  GetConnectionPort ().c_str (),
+                                  GetWorkingDB ().c_str (),
+                                  GetUserPassword ().c_str (),
+                                  GetUserId (),
+                                  &conHdl);
+
+  if (cs != CS_OK)
+    goto cmd_ping_exit;
+
+  cs = PingServer (conHdl);
+
+cmd_ping_exit:
+  Close (conHdl);
+  ticks = wh_msec_ticks () - ticks;
+  if (cs != CS_OK)
+    {
+      cout << "Server ping failed : " << translate_status (cs) << endl;
+    }
+
+  cout << "Ping time: " << ticks / 1000 << '.';
+  cout.width (3); cout.fill ('0');
+  cout << ticks % 1000<< "s.\n";
+
   return true;
 }
+
 
 
 void
@@ -114,6 +187,14 @@ AddOnlineTableCommands ()
   entry.m_pCmdDesc     = globalShowDesc;
   entry.m_pExtHelpDesc = globalShowDescExt;
   entry.m_cmd          = cmdGlobalList;
+
+  RegisterCommand (entry);
+
+  entry.m_showStatus   = false;
+  entry.m_pCmdText     = "ping";
+  entry.m_pCmdDesc     = pingShowDesc;
+  entry.m_pExtHelpDesc = pingShowDescExt;
+  entry.m_cmd          = cmdPing;
 
   RegisterCommand (entry);
 }

@@ -2725,6 +2725,8 @@ public:
   {
     for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];
+
+    _CC (bool&, source.m_OperandOwner) = false;
   }
 
   const GlobalValue& operator= (const GlobalValue& source)
@@ -2736,6 +2738,7 @@ public:
     for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];
 
+    _CC (bool&, source.m_OperandOwner) = false;
     return *this;
   }
 
@@ -2870,8 +2873,6 @@ public:
   }
 
   I_PMOperand& GetOperand () { return *_RC (I_PMOperand*, m_Storage);  }
-
-  void Release () { assert (m_OperandOwner); m_OperandOwner = false; }
 
 private:
   WSynchronizer m_Sync;

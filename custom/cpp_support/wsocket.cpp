@@ -87,7 +87,7 @@ WSocket::WSocket (const D_CHAR* const pLocalAddress,
 
 WSocket::WSocket (const WH_SOCKET sd)
   : m_Socket (sd),
-    m_Owned (true)
+    m_Owned ((sd != INVALID_SOCKET) ? true : false)
 {
 }
 
@@ -131,6 +131,8 @@ WSocket::Accept ()
 
   if (! wh_socket_accept (m_Socket, &client, &e))
     throw WSocketException (NULL, _EXTRA (e));
+
+  assert (client != INVALID_SOCKET);
 
   return WSocket (client);
 }

@@ -108,6 +108,10 @@ public:
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
   virtual void ExecuteProcedure (const D_UINT8* const pProcName,
                                  SessionStack&        stack);
+  virtual D_UINT GlobalValuesCount () const;
+
+  virtual const D_UINT8* GlobalValueName (const D_UINT index) const;
+  virtual const D_UINT8* GlobalValueType (const D_UINT index) const;
 
   D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
   StackValue     GetGlobalValue (const D_UINT32 globalId);
