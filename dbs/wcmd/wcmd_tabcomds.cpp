@@ -96,8 +96,6 @@ static const D_CHAR tableRmIndDescExt[] =
 "  table_rmindex table_name field_name ...";
 
 
-
-
 static void
 print_field_desc (const DBSFieldDescriptor& desc, const bool indexed)
 {

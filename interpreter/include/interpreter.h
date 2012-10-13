@@ -144,7 +144,7 @@ public:
   virtual D_UINT GlobalValuesCount () const = 0;
 
   virtual const D_UINT8* GlobalValueName (const D_UINT index) const = 0;
-  virtual const D_UINT8* GlobalValueType (const D_UINT index) const = 0;
+  virtual const D_UINT8* GlobalValueType (const D_UINT8* pName) const = 0;
 
 protected:
   I_Logger& m_Log;

@@ -141,10 +141,84 @@ cmd_list_cancel_op:
   return;
 }
 
+static void
+cmd_glb_desc (ClientConnection& conn, const bool receivedAll)
+{
+  bool sendNext = false;
+  if (conn.Size () < (sizeof (D_UINT16) + 1))
+    {
+      throw ConnectionException (
+                              "Command used to retrieve description of global "
+                              "variables has invalid format.",
+                              _EXTRA (0)
+                                );
+    }
+  else if (receivedAll == false)
+    {
+      conn.AckCommandPart (false);
+      throw ConnectionException (
+                              "Unable to find the description of a global "
+                              "variable because its name is too large.",
+                              _EXTRA (0)
+                                );
+    }
+
+  D_UINT8* const pData    = conn.Data ();
+  const D_UINT16 nameSize = from_le_int16 (pData);
+
+  assert ((nameSize + sizeof (D_UINT16)) == conn.Size());
+
+  const I_Session& session = *conn.Dbs ().m_Session;
+  const D_UINT8*   pGlbTI  = session.GlobalValueType (
+                                          pData + sizeof (D_UINT16)
+                                                     );
+  if (pGlbTI == NULL)
+    {
+      conn.Size (sizeof (D_UINT8));
+      pData[0] = CMD_STATUS_INVAL_ARGS;
+      conn.SendCmdResponse (CMD_GLOBAL_DESC_RSP, true, sendNext);
+
+      assert (sendNext == false);
+      return;
+    }
+
+  const D_UINT dataSize =
+      from_le_int16 (pGlbTI + sizeof (D_UINT16)) + 2 * sizeof (D_UINT16);
+  assert (dataSize > sizeof (D_UINT16));
+
+  D_UINT progress = 0;
+
+  while (progress < dataSize)
+    {
+      D_UINT chunkSize = conn.MaxSize () -
+                         (sizeof (D_UINT16) + sizeof (D_UINT8));
+      if (chunkSize > (dataSize - progress))
+        chunkSize = (dataSize - progress);
+
+      conn.Size (sizeof (D_UINT8) + sizeof (D_UINT16) + chunkSize);
+      pData[0] = CMD_STATUS_OK;
+      store_le_int16 (chunkSize, &pData[sizeof(D_UINT8)]);
+      memcpy (&pData[sizeof (D_UINT8) + sizeof (D_UINT16)],
+              pGlbTI + progress,
+              chunkSize);
+      progress += chunkSize;
+
+      assert (progress <= dataSize);
+
+      conn.SendCmdResponse (CMD_GLOBAL_DESC_RSP,
+                            (progress >= dataSize),
+                            sendNext);
+      if (! sendNext)
+        break;
+    }
+}
+
+
 static COMMAND_HANDLER saAdminCmds[] =
     {
         cmd_invalid,                     // CMD_INVALID
-        cmd_list_glbs                    // CMD_LIST_GLOBALS
+        cmd_list_glbs,                   // CMD_LIST_GLOBALS
+        cmd_glb_desc                     // CMD_GLOBAL_DESC
     };
 
 static COMMAND_HANDLER saUserCmds[] =

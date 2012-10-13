@@ -176,17 +176,16 @@ receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
 static enum CONNECTOR_STATUS
 send_command (struct INTERNAL_HANDLER* const pHnd,
               const D_UINT16                 commandId,
-              const D_UINT16                 dataSize,
               const D_BOOL                   lastPart)
 {
-  D_UINT8*               pData  = raw_data (pHnd);
-  D_UINT32               chkSum = 0;
-  D_UINT16               index  = 0;
-  enum  CONNECTOR_STATUS cs     = CS_OK;
+  D_UINT8*               pData    = raw_data (pHnd);
+  D_UINT32               chkSum   = 0;
+  D_UINT16               index    = 0;
+  const D_UINT16         dataSize = data_size (pHnd);
+  enum  CONNECTOR_STATUS cs       = CS_OK;
 
   assert (pHnd->encType == FRAME_ENCTYPE_PLAIN);
 
-  set_data_size (pHnd, dataSize);
   pHnd->clientCookie = w_rnd ();
 
   for (index = 0; index < dataSize; index++)
@@ -285,9 +284,16 @@ recieve_answer (struct INTERNAL_HANDLER* const pHnd,
     goto recieve_failure;
   }
 
+  pHnd->lastCmdRespReceived        = *respType;
+  pHnd->lastCmdRespFrameReceived   = *lastPart;
+
   return CS_OK;
 
 recieve_failure:
+
+  pHnd->lastCmdRespReceived      = CMD_INVALID_RSP;
+  pHnd->lastCmdRespFrameReceived = FALSE;
+
   wh_socket_close (pHnd->socket);
   pHnd->socket = INVALID_SOCKET;
 
@@ -462,7 +468,8 @@ Close (CONNECTOR_HND hnd)
 
   if (pHnd->socket != INVALID_SOCKET)
     {
-      send_command (pHnd, CMD_CLOSE_CONN, 0, TRUE);
+      set_data_size (pHnd, 0);
+      send_command (pHnd, CMD_CLOSE_CONN, TRUE);
       wh_socket_close (pHnd->socket);
     }
   mem_free (pHnd);
@@ -486,7 +493,8 @@ PingServer (const CONNECTOR_HND hnd)
         goto exit_ping_server;
     }
 
-  if ((cs = send_command (pHnd, CMD_PING_SERVER, 0, TRUE)) != CS_OK)
+  set_data_size (pHnd, 0);
+  if ((cs = send_command (pHnd, CMD_PING_SERVER, TRUE)) != CS_OK)
     goto exit_ping_server;
 
   if ((cs = recieve_answer (pHnd, &type, &lastPart)) != CS_OK)
@@ -504,7 +512,7 @@ exit_ping_server:
 };
 
 enum CONNECTOR_STATUS
-ListGlobals (const CONNECTOR_HND hnd, unsigned int* pGlbsCount)
+ListGlobals (const CONNECTOR_HND hnd, unsigned int* poGlbsCount)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
 
@@ -514,7 +522,7 @@ ListGlobals (const CONNECTOR_HND hnd, unsigned int* pGlbsCount)
 
   enum CONNECTOR_STATUS cs = CS_OK;
 
-  if (hnd == NULL)
+  if ((hnd == NULL) || (poGlbsCount == NULL))
     return CS_INVALID_ARGS;
   else if (pHnd->userId != 0)
     return CS_OP_NOTPERMITED;
@@ -524,7 +532,8 @@ ListGlobals (const CONNECTOR_HND hnd, unsigned int* pGlbsCount)
         goto list_globals_err;
     }
 
-  if ((cs = send_command (pHnd, CMD_LIST_GLOBALS, 0, TRUE)) != CS_OK)
+  set_data_size (pHnd, 0);
+  if ((cs = send_command (pHnd, CMD_LIST_GLOBALS, TRUE)) != CS_OK)
     goto list_globals_err;
 
   if ((cs = recieve_answer (pHnd, &type, &lastPart)) != CS_OK)
@@ -539,17 +548,17 @@ ListGlobals (const CONNECTOR_HND hnd, unsigned int* pGlbsCount)
   if ((cs = translate_server_resp_code (pData[0])) != CS_OK)
     goto list_globals_err;
 
-  *pGlbsCount = from_le_int32 (pData + sizeof (D_UINT8));
+  *poGlbsCount = from_le_int32 (pData + sizeof (D_UINT8));
 
-  if (((*pGlbsCount == 0) && (lastPart == FALSE))
-      || (*pGlbsCount < pData[sizeof (D_UINT8) + sizeof (D_UINT32)]))
+  if (((*poGlbsCount == 0) && (lastPart == FALSE))
+      || (*poGlbsCount < pData[sizeof (D_UINT8) + sizeof (D_UINT32)]))
     {
       cs = CS_INVALID_FRAME;
       goto list_globals_err;
     }
 
-  pHnd->lastCmdRespReceived      = type;
-  pHnd->lastCmdRespFrameReceived = lastPart;
+  assert (pHnd->lastCmdRespReceived == type);
+  assert (pHnd->lastCmdRespFrameReceived == lastPart);
 
   pHnd->cmdInternal = 0;
   pHnd->cmdInternal |= pData[sizeof (D_UINT8) + sizeof (D_UINT32)];
@@ -564,7 +573,7 @@ list_globals_err:
 }
 
 enum CONNECTOR_STATUS
-GlobalFetch (const CONNECTOR_HND hnd, const unsigned char** pGlbName)
+ListGlobalsFetch (const CONNECTOR_HND hnd, const char** poGlbName)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
 
@@ -575,7 +584,7 @@ GlobalFetch (const CONNECTOR_HND hnd, const unsigned char** pGlbName)
 
   enum CONNECTOR_STATUS cs = CS_OK;
 
-  if ((pGlbName == NULL)
+  if ((poGlbName == NULL)
       || (pHnd == NULL)
       || (pHnd->lastCmdRespReceived != CMD_LIST_GLOBALS_RSP))
     {
@@ -593,8 +602,8 @@ GlobalFetch (const CONNECTOR_HND hnd, const unsigned char** pGlbName)
 
   if (fetchedFrameGlbs < frameGlbs)
     {
-      *pGlbName = pData + frameDataIndex;
-      frameDataIndex += strlen ((D_CHAR*)*pGlbName) + 1;
+      *poGlbName = (const char*)pData + frameDataIndex;
+      frameDataIndex += strlen ((D_CHAR*)*poGlbName) + 1;
       ++fetchedFrameGlbs;
     }
   else
@@ -619,15 +628,15 @@ GlobalFetch (const CONNECTOR_HND hnd, const unsigned char** pGlbName)
 
           fetchedFrameGlbs = 1;
           frameDataIndex = sizeof (D_UINT8) + sizeof (D_UINT8);
-          *pGlbName = pData + frameDataIndex;
+          *poGlbName = (const char*)pData + frameDataIndex;
 
-          frameDataIndex += strlen ((D_CHAR*)*pGlbName) + 1;
+          frameDataIndex += strlen ((D_CHAR*)*poGlbName) + 1;
 
           assert (frameDataIndex <= data_size (pHnd));
         }
       else
         {
-          *pGlbName = NULL;
+          *poGlbName = NULL;
           cs = CS_OK;
 
           goto fetch_global_exit;
@@ -646,13 +655,150 @@ fetch_global_exit:
 }
 
 enum CONNECTOR_STATUS
-GlobalFetchCancel (const CONNECTOR_HND hnd)
+ListGlobalsFetchCancel (const CONNECTOR_HND hnd)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
 
   if ((pHnd == NULL)
       || (pHnd->lastCmdRespFrameReceived != FALSE)
       || (pHnd->lastCmdRespReceived != CMD_LIST_GLOBALS_RSP))
+    {
+      return CS_INVALID_ARGS;
+    }
+
+  return ack_answer_part (pHnd, FALSE);
+}
+
+
+enum CONNECTOR_STATUS
+DescribeGlobal (const CONNECTOR_HND    hnd,
+                const char*            pName,
+                unsigned int*          poTypeDescSize)
+{
+  struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
+
+  D_UINT8* pData    = NULL;
+  D_UINT16 type     = CMD_INVALID_RSP;
+  D_UINT16 dataSize = strlen (pName) + sizeof (D_UINT16) + 1;
+  D_BOOL   lastPart;
+
+  enum CONNECTOR_STATUS cs = CS_OK;
+
+  if ((hnd == NULL) || (poTypeDescSize == NULL))
+    return CS_INVALID_ARGS;
+  else if (pHnd->userId != 0)
+    return CS_OP_NOTPERMITED;
+  else if (dataSize > max_data_size (pHnd))
+    return CS_LARGE_ARGS;
+  else if (pHnd->lastCmdRespFrameReceived == FALSE)
+    {
+      if ((cs = ack_answer_part (pHnd, FALSE)) != CS_OK)
+        goto global_desc_exit;
+    }
+
+  set_data_size (pHnd, dataSize);
+  pData = data (pHnd);
+  store_le_int16 (dataSize - sizeof (D_UINT16), pData);
+  strcpy ((D_CHAR*)&pData[sizeof (D_UINT16)], pName);
+
+  if ((cs = send_command (pHnd, CMD_GLOBAL_DESC, TRUE)) != CS_OK)
+    goto global_desc_exit;
+
+  if ((cs = recieve_answer (pHnd, &type, &lastPart)) != CS_OK)
+    goto global_desc_exit;
+  else if (type != CMD_GLOBAL_DESC_RSP)
+    {
+      cs = CS_INVALID_FRAME;
+      goto global_desc_exit;
+    }
+
+  pData = data (pHnd);
+  if ((cs = translate_server_resp_code (pData[0])) != CS_OK)
+    goto global_desc_exit;
+
+  *poTypeDescSize = from_le_int16 (
+                            pData + sizeof (D_UINT8) + (2 * sizeof (D_UINT16))
+                                  );
+  *poTypeDescSize += 2 * sizeof (D_UINT16);
+
+  dataSize = from_le_int16 (pData + sizeof (D_UINT8));
+  pHnd->cmdInternal = dataSize & 0xFFFF;
+
+  return CS_OK;
+
+global_desc_exit:
+  return cs;
+}
+
+enum CONNECTOR_STATUS
+DescribeGlobalFetch (const CONNECTOR_HND    hnd,
+                     const unsigned char**  poGlbTypeInfoChunk,
+                     unsigned int*          poChunkSize)
+{
+  struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
+
+  D_UINT8* pData = NULL;
+  D_UINT16 typeFrameSize;
+  D_UINT16 typeIndex;
+
+  enum CONNECTOR_STATUS cs = CS_OK;
+
+  if ((poGlbTypeInfoChunk == NULL)
+      || (poChunkSize == NULL)
+      || (pHnd == NULL)
+      || (pHnd->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP))
+    {
+      cs = CS_INVALID_ARGS;
+      goto global_desc_fetch_exit;
+    }
+
+  pData            = data (pHnd);
+  typeFrameSize    = pHnd->cmdInternal & 0xFFFF;
+  typeIndex        = (pHnd->cmdInternal >> 16) & 0xFFFF;
+
+  assert (typeFrameSize > 0);
+
+  if (typeIndex == typeFrameSize)
+    {
+      if (pHnd->lastCmdRespFrameReceived)
+        {
+          *poGlbTypeInfoChunk = NULL;
+          *poChunkSize        = 0;
+          return CS_OK;
+        }
+      else if ((cs = ack_answer_part (pHnd, TRUE)) != CS_OK)
+        goto global_desc_fetch_exit;
+
+      pData = data (hnd);
+      if ((cs = translate_server_resp_code (pData[0])) != CS_OK)
+        goto global_desc_fetch_exit;
+
+      typeFrameSize = from_le_int16 (pData + sizeof (D_UINT8));
+      typeIndex     = 0;
+    }
+
+  assert (typeIndex == 0);
+  *poGlbTypeInfoChunk = pData + sizeof (D_UINT8) + sizeof (D_UINT16);
+  *poChunkSize        = typeFrameSize;
+  typeIndex           = typeFrameSize;
+
+  pHnd->cmdInternal =  typeFrameSize;
+  pHnd->cmdInternal |= (typeIndex & 0xFFFF) << 16;
+
+  return CS_OK;
+
+global_desc_fetch_exit:
+  return cs;
+}
+
+enum CONNECTOR_STATUS
+DescribeGlobalFetchCancel (const CONNECTOR_HND hnd)
+{
+  struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
+
+  if ((pHnd == NULL)
+      || (pHnd->lastCmdRespFrameReceived != FALSE)
+      || (pHnd->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP))
     {
       return CS_INVALID_ARGS;
     }

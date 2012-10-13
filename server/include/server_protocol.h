@@ -86,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_LIST_GLOBALS                (CMD_INVALID_RSP + 1)
 #define CMD_LIST_GLOBALS_RSP            (CMD_LIST_GLOBALS + 1)
 /*
- * CmdListResponse
+ * CmdListResponseRsp
  * {
  *      status       : uint8
  *      globalsCount : uint32;
@@ -94,11 +94,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *      varNames     : char[]
  * }
  *
- * CmdListResponsePartial
+ * CmdListResponsePartialRsp
  * {
  *      status       : uint8
  *      frameVars    : uint8
  *      varNames     : char[]
+ * }
+ */
+
+/* Global describe type */
+#define CMD_GLOBAL_DESC                 (CMD_LIST_GLOBALS_RSP + 1)
+#define CMD_GLOBAL_DESC_RSP             (CMD_GLOBAL_DESC + 1)
+
+/*
+ * CmdGlobalDesc
+ * {
+ *     nameSize : uint16
+ *     name     : char[]
+ * }
+ *
+ * CmdGlobalDescRsp, CmdGlobalDescRspPartial
+ * {
+ *      status       : uint8
+ *      typeDescSend : uint16
+ *      typeDesc     : uint8[]
  * }
  */
 
@@ -111,7 +130,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_PING_SERVER_RSP     (CMD_PING_SERVER + 1)
 
 
-#define ADMIN_CMDS_COUNT       ((CMD_LIST_GLOBALS / 2) + 1)
-#define USER_CMDS_COUNT        ((CMD_PING_SERVER - USER_CMD_BASE) / 2 + 1)
+#define ADMIN_CMDS_COUNT        ((CMD_GLOBAL_DESC / 2) + 1)
+#define USER_CMDS_COUNT         ((CMD_PING_SERVER - USER_CMD_BASE) / 2 + 1)
 
 #endif /* SERVER_PROTOCOL_H_ */

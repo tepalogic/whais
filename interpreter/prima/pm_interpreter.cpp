@@ -316,9 +316,21 @@ Session::GlobalValueName (const D_UINT index) const
 }
 
 const D_UINT8*
-Session::GlobalValueType (const D_UINT index) const
+Session::GlobalValueType (const D_UINT8* pName) const
 {
-  return m_PrivateNames.Get ().GetGlobalsManager ().GetGlobalTI (index);
+  GlobalsManager& glbMgr   = m_PrivateNames.Get ().GetGlobalsManager ();
+  const D_UINT    glbCount = glbMgr.Count ();
+
+  for (D_UINT index = 0; index < glbCount; ++index)
+    {
+      if (strcmp (_RC (const D_CHAR*, glbMgr.Name (index)),
+                  _RC (const D_CHAR*, pName)) == 0)
+        {
+          return glbMgr.GetGlobalTI (index);
+        }
+    }
+
+  return NULL;
 }
 
 D_UINT32

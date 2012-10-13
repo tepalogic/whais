@@ -29,6 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "compiler/include/whisperc/whisperc.h"
+#include "utils/include/auto_array.h"
+#include "utils/include/le_converter.h"
 #include "client/include/whisper_connector.h"
 
 #include "wcmd_onlinecmds.h"
@@ -36,6 +39,127 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_optglbs.h"
 
 using namespace std;
+
+const D_CHAR*
+decode_basic_type (const D_UINT16 type)
+{
+  switch (GET_BASIC_TYPE (type))
+  {
+  case T_BOOL:
+    return "BOOL";
+  case T_CHAR:
+    return "CHARACTER";
+  case T_DATE:
+    return "DATE";
+  case T_DATETIME:
+    return "DATETIME";
+  case T_HIRESTIME:
+    return "HIRESTIME";
+  case T_UINT8:
+    return "UNSIGNED INT8";
+  case T_UINT16:
+    return "UNSIGNED INT16";
+  case T_UINT32:
+    return "UNSIGNED INT32";
+  case T_UINT64:
+    return "UNSIGNED INT64";
+  case T_INT8:
+    return "INT8";
+  case T_INT16:
+    return "INT16";
+  case T_INT32:
+    return "INT32";
+  case T_INT64:
+    return "INT64";
+  case T_REAL:
+    return "REAL";
+  case T_RICHREAL:
+    return "RICHREAL";
+  case T_TEXT:
+    return "TEXT";
+  default:
+    assert (false);
+  }
+
+  return NULL;
+}
+
+static string
+decode_glbvar_typeinfo (const D_UINT8* pTypeInfo)
+{
+  string result;
+  bool fieldDesc = false;
+  bool arrayDesc = false;
+
+  D_UINT16       type = from_le_int16 (pTypeInfo);
+  const D_UINT16 size = from_le_int16 (pTypeInfo + sizeof (D_UINT16));
+
+  if (IS_ARRAY(type))
+    {
+      result += "ARRAY";
+      arrayDesc = true;
+    }
+  else if (IS_FIELD (type))
+    {
+      result += "FIELD";
+      fieldDesc = true;
+    }
+  else if (IS_TABLE (type))
+    {
+      result += "TABLE";
+      fieldDesc = true;
+    }
+
+  if (arrayDesc)
+    {
+      if (GET_BASIC_TYPE (type) == T_UNDETERMINED)
+        return result;
+
+      result += " OF ";
+      result += decode_basic_type (GET_BASIC_TYPE (type));
+      return result;
+    }
+
+  if (fieldDesc)
+    {
+      assert (size >= 2);
+      if (size <= 2)
+        return result;
+
+      result += " (";
+      D_UINT16 progress = 0;
+
+      pTypeInfo += 2 * sizeof (D_UINT16);
+      while (progress < size -2 )
+        {
+          result += _RC (const D_CHAR*, pTypeInfo);
+
+          const D_UINT fieldLen = strlen (_RC (const D_CHAR*, pTypeInfo)) + 1;
+          pTypeInfo += fieldLen;
+          type = from_le_int16 (pTypeInfo);
+
+          result += " AS ";
+          if (IS_ARRAY (type))
+            result += " ARRAY OF ";
+          result += decode_basic_type (GET_BASIC_TYPE (type));
+
+          pTypeInfo += 2;
+
+          progress += 2 + fieldLen;
+          if (progress == (size - 2))
+            result += ')';
+          else
+            result += ", ";
+        }
+
+      assert (pTypeInfo[0] == ';');
+      assert (pTypeInfo[1] == 0);
+
+      return result;
+    }
+
+  return decode_basic_type (GET_BASIC_TYPE (type));
+}
 
 const D_CHAR*
 translate_status (CONNECTOR_STATUS cs)
@@ -84,7 +208,9 @@ static const D_CHAR globalShowDescExt[] =
 static bool
 cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-
+  size_t              linePos   = 0;
+  string              token     = CmdLineNextToken (cmdLine, linePos);
+  string              globals;
   CONNECTOR_HND       conHdl    = NULL;
   unsigned int        glbsCount = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
@@ -95,6 +221,9 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                   GetUserPassword ().c_str (),
                                   GetUserId (),
                                   &conHdl);
+
+  assert (token == "global");
+
   if (cs != CS_OK)
     {
       if (level >= VL_DEBUG)
@@ -104,29 +233,85 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  cs = ListGlobals (conHdl, &glbsCount);
-  if (level >= VL_DEBUG)
+  if (linePos >= cmdLine.length ())
     {
-      if (cs == CS_OK)
-        cout << "Got " << glbsCount << " globals.\n";
-      else
-        cout << "Listing globals variables has failed\n";
-    }
-
-  while ((cs == CS_OK) && (glbsCount > 0))
-    {
-      const unsigned char* pGlbName = NULL;
-      cs = GlobalFetch (conHdl, &pGlbName);
-
-      assert (pGlbName != NULL);
-      cout << pGlbName << endl;
-
-      if ((cs != CS_OK) && (level < VL_DEBUG))
+      cs = ListGlobals (conHdl, &glbsCount);
+      if (level >= VL_DEBUG)
         {
-          cout << "Fetching global value name has failed.\n";
+          if (cs == CS_OK)
+            cout << "Got " << glbsCount << " globals.\n";
+          else
+            cout << "Listing globals variables has failed\n";
         }
-      --glbsCount;
+
+      while ((cs == CS_OK) && (glbsCount > 0))
+        {
+          const char* pGlbName = NULL;
+          cs = ListGlobalsFetch (conHdl, &pGlbName);
+
+          assert (pGlbName != NULL);
+          globals += ' ';
+          globals += pGlbName;
+
+          if ((cs != CS_OK) && (level < VL_DEBUG))
+            {
+              cout << "Fetching global value name has failed.\n";
+            }
+          --glbsCount;
+        }
+      linePos = 0;
     }
+  else
+    globals = cmdLine;
+
+  do
+    {
+      unsigned int typeInfoSize = 0;
+      token = CmdLineNextToken (globals, linePos);
+      cs = DescribeGlobal (conHdl, token.c_str (), &typeInfoSize);
+
+      if (cs != CS_OK)
+        {
+          if (level <= VL_DEBUG)
+            {
+              cout << "Failed to fetch type information for '"
+                   << token << "' global variable.\n";
+            }
+          break;
+        }
+      assert (typeInfoSize >= 4);
+      auto_array<D_UINT8> typeStore (typeInfoSize);
+      D_UINT  progress = 0;
+
+      while (progress < typeInfoSize)
+        {
+          const unsigned char *pChunk    = NULL;
+          unsigned int         chunkSize = 0;
+
+          cs = DescribeGlobalFetch (conHdl, &pChunk, &chunkSize);
+          if (cs != CS_OK)
+            {
+              DescribeGlobalFetchCancel (conHdl);
+              break;
+            }
+
+          memcpy (&typeStore[progress], pChunk, chunkSize);
+          progress += chunkSize;
+
+          assert (progress <= typeInfoSize);
+        }
+      if (cs != CS_OK)
+        break;
+
+      const streamsize prevWidth = cout.width (20);
+      const char       prevFill  = cout.fill (' ');
+
+      cout << left << token;
+      cout.width (prevWidth);
+      cout.fill (prevFill);
+      cout << decode_glbvar_typeinfo (&typeStore[0]) << endl;
+    }
+  while (linePos < globals.length ());
 
   Close (conHdl);
 

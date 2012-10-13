@@ -64,13 +64,26 @@ enum CONNECTOR_STATUS
 PingServer (const CONNECTOR_HND hnd);
 
 enum CONNECTOR_STATUS
-ListGlobals (const CONNECTOR_HND hnd, unsigned int* pGlbsCount);
+ListGlobals (const CONNECTOR_HND hnd, unsigned int* poGlbsCount);
 
 enum CONNECTOR_STATUS
-GlobalFetch (const CONNECTOR_HND hnd, const unsigned char** pGlbName);
+ListGlobalsFetch (const CONNECTOR_HND hnd, const char** poGlbName);
 
 enum CONNECTOR_STATUS
-GlobalFetchCancel (const CONNECTOR_HND hnd);
+ListGlobalsFetchCancel (const CONNECTOR_HND hnd);
+
+enum CONNECTOR_STATUS
+DescribeGlobal (const CONNECTOR_HND    hnd,
+                const char*            pName,
+                unsigned int*          poTypeDescSize);
+
+enum CONNECTOR_STATUS
+DescribeGlobalFetch (const CONNECTOR_HND    hnd,
+                     const unsigned char**  poGlbTypeInfoChunk,
+                     unsigned int*          poChunkSize);
+
+enum CONNECTOR_STATUS
+DescribeGlobalFetchCancel (const CONNECTOR_HND hnd);
 
 
 #ifdef __cplusplus
