@@ -1,11 +1,10 @@
 
-#include "string.h"
-#include "stdio.h"
-#include "stdlib.h"
-
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 #include "test/test_fmw.h"
-
 
 /* GLOBAL variables for testing */
 size_t test_mem_used;
@@ -62,13 +61,15 @@ test_print_unfree_mem (void)
 {
   W_ALLOCATED_MEMORY *pIt = gpListHead;
 
-  printf ("Count(low)\tSize\tLine\tFile\n");
+  printf ("%10s %10s %4s %s\n",
+         "Count(low)", "Size", "Line", "File");
 
+  assert (pIt->size >= (sizeof (W_ALLOCATED_MEMORY) + 1));
   while (pIt != NULL)
     {
-      printf ("%d\t%d\t%d\t%s\n",
+      printf ("%10d %10d %4d %s\n",
               (unsigned int) pIt->count,
-              (unsigned int)pIt->size,
+              (unsigned int)pIt->size - (sizeof (W_ALLOCATED_MEMORY) + 1),
               (unsigned int)pIt->line,
               ((pIt->file == NULL) ? "NULL" : pIt->file));
       pIt = pIt->next;

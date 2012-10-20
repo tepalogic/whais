@@ -5,10 +5,12 @@ UNIT_EXES:=
 UNIT_SHLS:=common
 UNIT_LIBS:=custom slcommon
 
+slcommon_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
+	         cpp_support/wfile.cpp cpp_support/wsocket.cpp
+
+common_SRC=$(slcommon_SRC) cpp_support/wmemtracker.cpp 
 
 common_DEF=USE_SHL EXPORT_EXCEP_SHL
-common_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
-			cpp_support/wfile.cpp cpp_support/wsocket.cpp 
 common_MAJ=.1
 common_MIN=.0
 common_LIB=custom/custom
@@ -34,14 +36,11 @@ custom_SRC+=$(SRC_FOLDER)/fileio.c
 custom_SRC+=$(SRC_FOLDER)/thread.c  
 custom_SRC+=$(SRC_FOLDER)/time.c  
 custom_SRC+=$(SRC_FOLDER)/network.c  
+custom_SRC+=$(SRC_FOLDER)/memory.cpp
 
-ifeq ($(BUILD_TESTS),yes)
-custom_SRC+=$(SRC_FOLDER)/memory_test.c test/test_fmw.c
-else
-custom_SRC+=$(SRC_FOLDER)/memory.c
+ifeq ($(MEMORY_TRACE),yes)
+custom_SRC+=$(SRC_FOLDER)/memory_trace.c test/mem_test.c
 endif
-
-slcommon_SRC=$(common_SRC)
 
 $(foreach shl, $(UNIT_SHLS), $(eval $(call add_output_shared_lib,$(shl),$(UNIT),$($(shl)_MAJ),$($(shl)_MIN))))
 $(foreach lib, $(UNIT_LIBS), $(eval $(call add_output_library,$(lib),$(UNIT))))

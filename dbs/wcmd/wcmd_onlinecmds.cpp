@@ -264,6 +264,9 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   else
     globals = cmdLine;
 
+  if (cs != CS_OK)
+    goto cmdGlobalList_exit;
+
   do
     {
       unsigned int typeInfoSize = 0;
@@ -313,6 +316,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
   while (linePos < globals.length ());
 
+cmdGlobalList_exit:
   Close (conHdl);
 
   if (cs != CS_OK)
@@ -350,11 +354,14 @@ cmd_ping_exit:
   if (cs != CS_OK)
     {
       cout << "Server ping failed : " << translate_status (cs) << endl;
+      return false;
     }
-
-  cout << "Ping time: " << ticks / 1000 << '.';
-  cout.width (3); cout.fill ('0');
-  cout << ticks % 1000<< "s.\n";
+  else
+    {
+      cout << "Ping time: " << ticks / 1000 << '.';
+      cout.width (3); cout.fill ('0');
+      cout << right << ticks % 1000<< "s.\n";
+    }
 
   return true;
 }
@@ -367,7 +374,7 @@ AddOnlineTableCommands ()
 
   CmdEntry entry;
 
-  entry.m_showStatus   = true;
+  entry.m_showStatus   = false;
   entry.m_pCmdText     = "global";
   entry.m_pCmdDesc     = globalShowDesc;
   entry.m_pExtHelpDesc = globalShowDescExt;

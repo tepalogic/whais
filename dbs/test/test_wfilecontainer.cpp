@@ -153,10 +153,6 @@ check_temp_container (D_UINT uTestContainerSize)
 int
 main ()
 {
-  // VC++ allocates memory when the C++ runtime is initialised
-  // We need not to test against it!
-  D_UINT mem_usage = test_get_mem_used ();
-
   bool success = true;
 
   {
@@ -193,20 +189,18 @@ main ()
 
   DBSShoutdown ();
 
-  D_UINT mem_peak = test_get_mem_peak ();
-  mem_usage = test_get_mem_used () - mem_usage;
-
-  if (mem_usage != 0)
-    success = false;
-
-  std::cout << "Memory peak: " << mem_peak << " bytes." << std::endl;
-  std::cout << "Current memory usage: " << mem_usage << " bytes." << std::endl;
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;
-      return -1;
+      return 1;
     }
-  else
-    std::cout << "TEST RESULT: PASS" << std::endl;
+
+  std::cout << "TEST RESULT: PASS" << std::endl;
+
   return 0;
 }
+
+#ifdef ENABLE_MEMORY_TRACE
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "T";
+#endif

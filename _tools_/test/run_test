@@ -1,15 +1,35 @@
 #!/bin/bash
 
+E_DIR_EXISTS=1
+E_DIR_NOT_EXISTS=1
+E_COPY_FAIL=1
+
+TEST_DIR=./test_dir
 total_tests=0
 failed_tests=0
 
+function prepare_test_env {
+	if [ -d "$TEST_DIR" ]; then
+		echo "Aborting test '$TEST_DIR' directory exists." ;
+		exit $E_DIR_EXISTS ;
+	fi
+	mkdir "$TEST_DIR" 
+	cp -rf "$1" "$TEST_DIR/$(basename $1)"
+}
+
+function clear_test_env {
+	rm -rf "$TEST_DIR" &> /dev/null
+}
+
 function execute_test {
-   ./$1 > /dev/null
+   test_output=`$TEST_DIR/$(basename $1)`
    error_code=$?
    found_fail=`echo "$test_output" | grep -i 'test.*fail'`
-   if [ -n  "$found_fail" ] || [ "$error_code" -ne 0 ]; then
+   mem_fail=`echo "$test_output" | grep -i 'memory.*fail'`
+   if [ -n  "$found_fail" ] || [ -n "$mem_fail" ] || [ "$error_code" -ne 0 ]; then
       echo -e "Test '\e[0;31m$1\e[0m' has failed:"
       let 'failed_tests+=1'
+      echo "$test_output"
    else
       echo -e "Test '\e[0;32m$1\e[0m' has passed!"
    fi
@@ -27,7 +47,9 @@ fi
 if [ -n "$TEST_FILES" ]; then
    for test_p in $TEST_FILES
    do
+      prepare_test_env $test_p
       execute_test $test_p
+      clear_test_env 
    done
 fi
 
@@ -37,5 +59,4 @@ else
    echo "Executed tests: $total_tests"
    echo "Failed tests:   $failed_tests"
 fi
-
 

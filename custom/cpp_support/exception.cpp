@@ -171,7 +171,7 @@ WSocketException::Description () const
   switch (GetExtra ())
   {
   case WH_SOCK_NOTINIT:
-    return "Socket framework not inited.";
+    return "Socket framework not initialized.";
   case WH_SOCK_ENOBUF:
   case WH_SOCK_NOMEM:
     return "Insufficient memory to complete socket operation.";
@@ -192,6 +192,5 @@ WSocketException::Description () const
   default:
     assert (false);
   }
-
   return "Unknown socket exception";
 }

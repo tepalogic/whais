@@ -592,3 +592,10 @@ WFileCompiledUnit::IsProcExternal (D_UINT item_proc)
                          WHC_PROC_ENTRY_TYPE_OFF) &
          (EXTERN_MASK)) != 0;
 }
+
+
+#if defined (ENABLE_MEMORY_TRACE) && defined (USE_COMPILER_SHL)
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "COMPILER";
+#endif
+

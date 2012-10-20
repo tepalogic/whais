@@ -25,20 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHISPER_MEMORY_H
 #define WHISPER_MEMORY_H
 
-#ifdef __cplusplus
-
-//These headers are include here because we need the standard
-//STL functionality before we override the null operator.
-#include <string>
-#include <vector>
-#include <map>
-
-#include <new>
-#include <memory>
-
-#endif
-
-
 /*
  * The memory could be allocated/freed in different ways
  * depending on the environment you use.
@@ -61,11 +47,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #endif                                /* ENABLE_MEMORY_TRACE */
 
-
 #ifdef __cplusplus
-  extern "C"
-  {
+
+//These headers are include here because we need the standard
+//STL functionality before we override the new operator.
+#include <cstddef>
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
+#include <new>
+
+extern "C"
+{
 #endif
+
+#ifdef ENABLE_MEMORY_TRACE
 
 void*
 custom_trace_mem_alloc (size_t      size,
@@ -82,123 +79,29 @@ void
 custom_trace_mem_free (void*       ptr,
                        const char* pFile,
                        D_UINT      line);
+#endif /* ENABLE_MEMORY_TRACE */
 
-void*
-custom_mem_alloc (size_t size);
+void* custom_mem_alloc (size_t size);
 
-void*
-custom_mem_realloc (void* oldPtr, size_t newSize);
+void* custom_mem_realloc (void* oldPtr, size_t newSize);
 
-void
-custom_mem_free (void* ptr);
+void custom_mem_free (void* ptr);
+
 
 #ifdef __cplusplus
-  } /* extern "C" */
+} /* extern "C" */
 
-inline void*
-operator new (size_t size, const D_CHAR* pFile, D_UINT line)
-{
-#ifndef ENABLE_MEMORY_TRACE
-  (void)pFile;
-  (void)line;
-  void *ptr = custom_mem_alloc (size);
-#else
-  void *ptr = custom_trace_mem_alloc (size, pFile, line);
-#endif
+void*
+operator new (std::size_t size, const D_CHAR* pFile, D_UINT line);
 
-  if (ptr == NULL)
-    throw std::bad_alloc ();
-  return ptr;
-}
+void*
+operator new[] (std::size_t size, const D_CHAR* pFile, D_UINT line);
 
-inline void*
-operator new [] (size_t size, const D_CHAR* pFile, D_UINT line)
-{
-#ifndef ENABLE_MEMORY_TRACE
-  (void)pFile;
-  (void)line;
-  void *ptr = custom_mem_alloc (size);
-#else
-  void *ptr = custom_trace_mem_alloc (size, pFile, line);
-#endif
+void
+operator delete (void* ptr, const D_CHAR*, D_UINT);
 
-  if (ptr == NULL)
-    throw std::bad_alloc ();
-  return ptr;
-}
-
-inline void*
-operator new (size_t size)
-{
-#ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
-#else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
-#endif
-
-  if (ptr == NULL)
-    throw std::bad_alloc ();
-  return ptr;
-}
-
-inline void*
-operator new [] (size_t size)
-{
-#ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
-#else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
-#endif
-
-  if (ptr == NULL)
-    throw std::bad_alloc ();
-  return ptr;
-}
-
-
-inline void
-operator delete (void* ptr)
-{
-  if (ptr != NULL)
-#ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free(ptr);
-#else
-  custom_trace_mem_free(ptr, NULL, 0);
-#endif
-}
-
-inline void
-operator delete (void* ptr, const D_CHAR*, D_UINT)
-{
-  if (ptr != NULL)
-#ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free(ptr);
-#else
-  custom_trace_mem_free(ptr, NULL, 0);
-#endif
-}
-
-inline void
-operator delete [] (void* ptr)
-{
-  if (ptr != NULL)
-#ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free(ptr);
-#else
-  custom_trace_mem_free(ptr, NULL, 0);
-#endif
-}
-
-inline void
-operator delete[] (void* ptr, const D_CHAR*, D_UINT )
-{
-  if (ptr != NULL)
-#ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free(ptr);
-#else
-    custom_trace_mem_free(ptr, NULL, 0);
-#endif
-}
+void
+operator delete[] (void* ptr, const D_CHAR*, D_UINT );
 
 template <class T> static inline void
 _placement_new (void* place, const T& value)
@@ -213,10 +116,77 @@ _placement_new (void* place, T& value)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-  #define new new(__FILE__, __LINE__)
-#endif
 
-#endif
+#define new new(__FILE__, __LINE__)
+
+#include <iostream>
+#include "custom/include/test/test_fmw.h"
+
+class WMemoryTracker
+{
+public:
+
+  WMemoryTracker ()
+  {
+    sm_InitCount++;
+  }
+
+  ~WMemoryTracker ()
+  {
+    if (sm_InitCount == 0)
+      {
+        int a = 1;
+        int b = 0;
+
+        a /= b; //Make sure we scream loud enough.
+      }
+
+    if (--sm_InitCount == 0)
+      PrintMemoryStatistics ();
+  }
+
+  static size_t MaxMemoryUsage ()
+  {
+    return test_get_mem_max ();
+  }
+  static void MaxMemoryUsage (const size_t size)
+  {
+    test_set_mem_max (size);
+  }
+  static size_t GetMemoryUsagePeak ()
+  {
+    return test_get_mem_peak ();
+  }
+
+  static size_t GetCurrentMemoryUsage ()
+  {
+    return test_get_mem_used ();
+  }
+
+private:
+  static void PrintMemoryStatistics ()
+  {
+    std::cout << '(' << sm_Module << ") ";
+    if (GetCurrentMemoryUsage () != 0)
+      {
+        std::cout << "MEMORY: FAILED\n";
+        test_print_unfree_mem();
+      }
+    else
+      std::cout << "MEMORY: OK\n";
+
+    std::cout << "Memory peak  : " << GetMemoryUsagePeak () << " bytes.\n";
+    std::cout << "Memory in use: " << GetCurrentMemoryUsage () << " bytes.\n";
+  }
+
+  static       D_UINT32 sm_InitCount;
+  static const D_CHAR*  sm_Module;
+};
+
+static WMemoryTracker __One_Hidden_Static_For_Compiling_Unit__;
+
+#endif /* ENABLE_MEMORY_TRACE */
+#endif /*  __cplusplus */
 
 #endif /* WHISPER_MEMORY_H */
 

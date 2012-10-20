@@ -1,9 +1,9 @@
 
 ALL_UNITS:=utils custom compiler interpreter dbs server client
 
-VERBOSE ?= no
-FLAVOR  ?= debug
-BUILD_TESTS ?= no
+VERBOSE?=no
+FLAVOR ?=debug
+BUILD_TESTS?=no
 EXES:=
 LIBS:=
 
@@ -21,10 +21,14 @@ INCLUDES+=./ ./common
 
 ifeq ($(BUILD_TESTS),yes)
 DEFINES+=BUILD_TESTS=1
+MEMORY_TRACE?=yes
+endif
+
+ifeq ($(MEMORY_TRACE),yes)
 DEFINES+=ENABLE_MEMORY_TRACE=1
 endif
-DEFINES+=$(ARCH)=0
 
+DEFINES+=$(ARCH)=0
 
 include ./makesys/arch/$(ARCH).mk
 include ./makesys/defs.mk

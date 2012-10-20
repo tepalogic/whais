@@ -11,8 +11,6 @@
 #include <iostream>
 #include <vector>
 
-#include "test/test_fmw.h"
-
 #include "../include/dbs_mgr.h"
 #include "../include/dbs_exception.h"
 
@@ -138,8 +136,6 @@ test_for_radius_rows (I_DBSTable& table)
       std::cout << rowIndex << " (" << count << ")\r";
     }
 
-
-
   if (result)
     {
       std::cout << std::endl << "Restore symmetric rows ... " << std::endl;
@@ -175,10 +171,7 @@ main (int argc, char **argv)
       gElemsCount = atol (argv[1]);
     }
 
-  std::cout << "Executing the test with " << gElemsCount << " number of rows\n";
-  D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
-
   {
     DBSInit (DBSSettings ());
     DBSCreateDatabase (db_name);
@@ -207,29 +200,18 @@ main (int argc, char **argv)
   DBSRemoveDatabase (db_name);
   DBSShoutdown ();
 
-
-  D_UINT mem_usage = test_get_mem_used () - prealloc_mem;
-
-  if (mem_usage)
-    {
-      success = false;
-      test_print_unfree_mem();
-    }
-
-  std::cout << "Memory peak (no prealloc): " <<
-            test_get_mem_peak () - prealloc_mem << " bytes." << std::endl;
-  std::cout << "Preallocated mem: " << prealloc_mem << " bytes." << std::endl;
-  std::cout << "Current memory usage: " << mem_usage << " bytes." << std::
-            endl;
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;
-      return -1;
+      return 1;
     }
-  else
-    std::cout << "TEST RESULT: PASS" << std::endl;
+
+  std::cout << "TEST RESULT: PASS" << std::endl;
 
   return 0;
 }
 
-
+#ifdef ENABLE_MEMORY_TRACE
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "T";
+#endif

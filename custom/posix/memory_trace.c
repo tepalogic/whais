@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern W_ALLOCATED_MEMORY* gpListHead;
 extern D_UINT64            gMemAllocations;
 
-void *
+void*
 custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
 {
   W_ALLOCATED_MEMORY *result = (W_ALLOCATED_MEMORY *)custom_mem_alloc (size);
@@ -69,7 +69,7 @@ custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
   return result + 1;
 }
 
-void *
+void*
 custom_trace_mem_realloc (void *old_ptr,
                           size_t new_size, const char *file, D_UINT line)
 {
@@ -140,7 +140,9 @@ custom_mem_alloc (size_t size)
     {
       /* store the size */
       result->size = size;
-      test_add_used_mem (size);
+
+      assert (size >= (sizeof (W_ALLOCATED_MEMORY) +1));
+      test_add_used_mem (size - (sizeof (W_ALLOCATED_MEMORY) +1 ));
       ((D_UINT8* )result)[size - 1] = CONTROL_BYTE;
       result++;
     }
@@ -187,5 +189,7 @@ custom_mem_free (void *ptr)
     abort ();                   /* blow it up */
 
   free (real_ptr);
-  test_free_used_mem (size);
+
+  assert (size >= ((sizeof (W_ALLOCATED_MEMORY) + 1)));
+  test_free_used_mem (size - (sizeof (W_ALLOCATED_MEMORY) + 1));
 }

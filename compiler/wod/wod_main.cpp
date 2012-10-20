@@ -93,3 +93,9 @@ main (int argc, char **argv)
 
   return retCode;
 }
+
+#ifdef ENABLE_MEMORY_TRACE
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "WOD";
+#endif
+

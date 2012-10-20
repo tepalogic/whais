@@ -9,9 +9,6 @@
 #include <iostream>
 #include <string.h>
 
-#include "test/test_fmw.h"
-
-
 #include "../include/dbs_mgr.h"
 #include "../include/dbs_exception.h"
 #include "../include/dbs_values.h"
@@ -375,9 +372,6 @@ test_text_mirroring ()
 int
 main ()
 {
-  // VC++ allocates memory when the C++ runtime is initialized
-  // We need not to test against it!
-  D_UINT prealloc_mem = test_get_mem_used ();
   bool success = true;
 
   DBSInit (DBSSettings ());
@@ -388,25 +382,19 @@ main ()
   success = success && test_text_mirroring ();
 
   DBSShoutdown ();
-  D_UINT mem_usage = test_get_mem_used () - prealloc_mem;
 
-  if (mem_usage)
-    {
-      success = false;
-      test_print_unfree_mem();
-    }
-
-  std::cout << "Memory peak (no prealloc): " <<
-            test_get_mem_peak () - prealloc_mem << " bytes." << std::endl;
-  std::cout << "Preallocated mem: " << prealloc_mem << " bytes." << std::endl;
-  std::cout << "Current memory usage: " << mem_usage << " bytes." << std::endl;
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;
-      return -1;
+      return 1;
     }
-  else
-    std::cout << "TEST RESULT: PASS" << std::endl;
+
+  std::cout << "TEST RESULT: PASS" << std::endl;
 
   return 0;
 }
+
+#ifdef ENABLE_MEMORY_TRACE
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "T";
+#endif

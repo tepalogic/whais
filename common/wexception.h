@@ -25,10 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #error "This header file should not be included from a C source file!"
 #endif
 
-#include <string>
-
 #ifndef WEXCEPTION_H_
 #define WEXCEPTION_H_
+
+#include "string"
 
 //Base class to handle all exceptions
 enum EXPCEPTION_TYPE
@@ -57,10 +57,10 @@ public:
 
   virtual ~WException ();
 
-  D_UINT32 GetExtra () const;
+  D_UINT32      GetExtra () const;
   const D_CHAR* Message () const;
   const D_CHAR* GetFile () const;
-  D_UINT32 GetLine () const;
+  D_UINT32      GetLine () const;
 
   virtual WException*     Clone () const = 0;
   virtual EXPCEPTION_TYPE Type () const = 0;

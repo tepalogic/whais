@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include "whisper.h"
+
 #include "whisperc.h"
 #include "utils/include/wfile.h"
 

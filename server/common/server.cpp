@@ -250,3 +250,10 @@ StopServer ()
   for (D_UINT index = 0; index < spaListeners->Size (); ++index)
     (*spaListeners)[index].Close ();
 }
+
+
+#ifdef ENABLE_MEMORY_TRACE
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "WHISPER";
+#endif
+

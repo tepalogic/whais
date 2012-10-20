@@ -547,3 +547,8 @@ DbsHandler::RemoveFromStorage ()
   const string fileName (WorkingDir () + m_Name + DBS_FILE_EXT);
   whc_fremove (fileName.c_str ());
 }
+
+#if  defined (ENABLE_MEMORY_TRACE) && defined (USE_DBS_SHL)
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "PASTRA";
+#endif

@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <assert.h>
 
+#include "whisper.h"
+
 #include "../include/whisperc/compiledunit.h"
 
 #include "../../utils/include/wfile.h"
@@ -262,3 +264,8 @@ main (int argc, char **argv)
 
   return retCode;
 }
+
+#ifdef ENABLE_MEMORY_TRACE
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "WHC";
+#endif

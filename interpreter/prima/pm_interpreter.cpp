@@ -713,3 +713,7 @@ Session::DefineProcedure (const D_UINT8*      pName,
                                unit);
 }
 
+#if  defined (ENABLE_MEMORY_TRACE) && defined (USE_INTERP_SHL)
+D_UINT32 WMemoryTracker::sm_InitCount = 0;
+const D_CHAR* WMemoryTracker::sm_Module = "PRIMA";
+#endif

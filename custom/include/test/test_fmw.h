@@ -1,7 +1,7 @@
 #ifndef TEST_FMW_H_
 #define TEST_FMW_H_
 
-#ifndef BUILD_TESTS
+#if !defined(BUILD_TESTS) && !defined(ENABLE_MEMORY_TRACE)
 #error("This header file is only intended to be used in a test environment");
 #endif
 

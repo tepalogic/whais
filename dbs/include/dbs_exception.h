@@ -46,7 +46,7 @@ public:
 
   enum ExceptionCodes
   {
-    OPER_NOT_SUPPORTED                          = 1,
+    OPER_NOT_SUPPORTED           = 1,
     ALREADY_INITED,
     NOT_INITED,
     DATABASE_NOT_SUPP,
