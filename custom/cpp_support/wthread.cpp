@@ -23,8 +23,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include <assert.h>
+#include <errno.h>
 
 #include "utils/include/wthread.h"
+
+WSynchronizer::WSynchronizer ()
+{
+  const D_UINT result = wh_sync_init (&m_Sync);
+  if (result != WOP_OK)
+    throw WSynchException (NULL, _EXTRA (result));
+}
+
+WSynchronizer::~WSynchronizer ()
+{
+  const D_UINT result = wh_sync_destroy (&m_Sync);
+  assert (result == WOP_OK);
+}
+
+void
+WSynchronizer::Enter ()
+{
+  const D_UINT result = wh_sync_enter (&m_Sync);
+  if (result != WOP_OK)
+    throw WSynchException (NULL, _EXTRA (result));
+}
+
+void
+WSynchronizer::Leave ()
+{
+  const D_UINT result = wh_sync_leave (&m_Sync);
+
+  assert (result == WOP_OK);
+}
 
 WThread::WThread ()
   : m_Routine (NULL),
@@ -33,52 +63,61 @@ WThread::WThread ()
     m_ThreadHnd (0),
     m_UnkExceptSignaled (false),
     m_IgnoreExceptions (false),
-    m_Ended (true)
+    m_Ended (true),
+    m_NeedsClean (false)
 {
 }
 
 void
 WThread::Run (WH_THREAD_ROUTINE routine, void* const args)
 {
-  if ( ! m_Ended)
-    {
-      throw WThreadException (NULL,
-                              _EXTRA (WThreadException::INUSE_EXCEPTION));
-    }
+  assert (m_Ended);
+  //Wait for the the previous thread to be cleared
+  //But this should not happen.
+  WaitToEnd ();
+
+  assert (m_NeedsClean == false);
 
   m_Ended       = false;
   m_Routine     = routine;
   m_RoutineArgs = args;
 
-  if (wh_thread_create (&m_ThreadHnd, WThread::ThreadWrapperRoutine, this)
-      != WOP_OK)
+  const D_UINT res = wh_thread_create (&m_ThreadHnd,
+                                       WThread::ThreadWrapperRoutine,
+                                       this);
+  if (res != WOP_OK)
     {
       m_Ended = true;
-      throw WThreadException (NULL,
-                              _EXTRA (WThreadException::FAILEDOP_EXCEPTION));
+      throw WThreadException (NULL, _EXTRA (errno));
     }
+
+  m_NeedsClean = true;
 }
 
 WThread::~WThread ()
 {
-  if ( ! m_Ended)
-    wh_thread_join (m_ThreadHnd);
+  WaitToEnd (false);
 
-  assert (HasExceptionPending() == false);
+  assert (m_NeedsClean == false);
 
+  //If you did not throwed the exception until now,
+  //do not do it from during class destructor.
   delete m_Exception;
-  //Do not throw exceptions from a destructor. Is not a smart idea at all.
 }
 
 void
-WThread::Join ()
+WThread::WaitToEnd (const bool throwPending)
 {
-  if ( ! m_Ended)
-    wh_thread_join (m_ThreadHnd);
+  while (! m_Ended)
+    wh_yield ();
 
-  assert (m_Ended);
+  if (m_NeedsClean)
+    wh_thread_free (m_ThreadHnd);
 
-  ThrowPendingException ();
+  m_NeedsClean = false;
+
+  if (throwPending)
+    ThrowPendingException ();
 }
 
 void
@@ -92,12 +131,12 @@ WThread::ThrowPendingException ()
   if (m_UnkExceptSignaled)
     {
       DiscardException ();
-      throw WThreadException (NULL, _EXTRA(0));
+      throw WThreadException (NULL, _EXTRA (WOP_UNKNOW));
     }
 
   if (m_Exception != NULL)
     {
-      WException* pTemp = m_Exception;
+      WException* pTemp = m_Exception->Clone ();
       DiscardException ();
 
       throw pTemp;
@@ -118,7 +157,7 @@ WThread::ThreadWrapperRoutine (void* const args)
     if (pThread->m_IgnoreExceptions == false)
       pThread->m_Exception = e.Clone ();
   }
-  catch (WException *pE)
+  catch (WException* pE)
   {
     if (pThread->m_IgnoreExceptions == false)
       pThread->m_Exception = pE;

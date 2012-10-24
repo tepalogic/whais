@@ -32,19 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class EXCEP_SHL WSynchronizer
 {
 public:
-  WSynchronizer()
-  {
-    wh_sync_init (&m_Sync);
-  }
+  WSynchronizer();
+  ~WSynchronizer();
 
-  ~WSynchronizer()
-  {
-    wh_sync_destroy (&m_Sync);
-  }
-
-  void Enter() { wh_sync_enter (&m_Sync); }
-
-  void Leave() { wh_sync_leave (&m_Sync); }
+  void Enter();
+  void Leave();
 
 private:
   //Does not support any kind of copy or assignment!
@@ -79,6 +71,19 @@ private:
   bool           m_IsEntered;
 };
 
+class EXCEP_SHL WSynchException : public WException
+{
+public:
+  WSynchException (const D_CHAR* message,
+                   const D_CHAR* file,
+                   D_UINT32      line,
+                   D_UINT32      extra);
+  virtual WException*     Clone () const;
+  virtual EXPCEPTION_TYPE Type () const;
+  virtual const D_CHAR*   Description () const;
+};
+
+
 class EXCEP_SHL WThread
 {
 public:
@@ -86,8 +91,9 @@ public:
   ~WThread ();
 
   void Run (WH_THREAD_ROUTINE routine, void* const args);
-  void Join ();
+  void WaitToEnd (const bool throwPending = true);
   void ThrowPendingException ();
+
   void IgnoreExceptions (bool ignore)
   {
     m_IgnoreExceptions = ignore;
@@ -104,8 +110,7 @@ public:
     return ( m_UnkExceptSignaled || (m_Exception != NULL));
   }
 
-
-protected:
+private:
   static void ThreadWrapperRoutine (void* const);
 
   WH_THREAD_ROUTINE       m_Routine;
@@ -115,9 +120,8 @@ protected:
   bool                    m_UnkExceptSignaled;
   bool                    m_IgnoreExceptions;
   bool                    m_Ended;
-  bool                    m_Joined;
+  bool                    m_NeedsClean;
 
-private:
   WThread (const WThread&);
   WThread& operator= (const WThread&);
 };
@@ -133,13 +137,6 @@ public:
   virtual WException*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
   virtual const D_CHAR*   Description () const;
-
-  enum
-  {
-    UNKNOWN_EXCEPTION,
-    INUSE_EXCEPTION,
-    FAILEDOP_EXCEPTION
-  };
 };
 
 

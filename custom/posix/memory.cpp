@@ -49,10 +49,24 @@ custom_mem_free (void* ptr)
   free (ptr);
 }
 
-} /* extern "C" */
-#endif
+}; /* extern "C" */
+#endif /* ENABLE_MEMORY_TRACE */
 
 #undef new
+
+void*
+operator new (std::size_t size)
+{
+#ifndef ENABLE_MEMORY_TRACE
+  void *ptr = custom_mem_alloc (size);
+#else
+  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+#endif
+
+  if (ptr == NULL)
+    throw std::bad_alloc ();
+  return ptr;
+}
 
 void*
 operator new (std::size_t size, const std::nothrow_t&) throw()
@@ -82,8 +96,9 @@ operator new (std::size_t size, const D_CHAR* pFile, D_UINT line)
   return ptr;
 }
 
+
 void*
-operator new (std::size_t size)
+operator new [] (std::size_t size)
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc (size);
@@ -95,7 +110,6 @@ operator new (std::size_t size)
     throw std::bad_alloc ();
   return ptr;
 }
-
 
 void*
 operator new[] (std::size_t size, const std::nothrow_t&) throw()
@@ -125,19 +139,6 @@ operator new [] (size_t size, const D_CHAR* pFile, D_UINT line)
   return ptr;
 }
 
-void*
-operator new [] (std::size_t size)
-{
-#ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
-#else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
-#endif
-
-  if (ptr == NULL)
-    throw std::bad_alloc ();
-  return ptr;
-}
 
 void
 operator delete (void* ptr)

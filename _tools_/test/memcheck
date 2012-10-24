@@ -1,0 +1,77 @@
+#!/bin/bash
+
+E_OK=0
+E_INVAL=1
+MEM_SIZE_KB=0
+POOL_INTERVAL=5s
+PLOT="n"
+COUNT=-1
+
+
+usage () {
+	echo "$(basename $0): -g -i interval -c count -p proc_id "
+	echo ""
+	echo "Counts the writeable resident memory allocated by the specified process."
+	echo "The output is in Kilobytes."
+	echo "Where:"
+	echo "-g   Cuases the output to be a pair of values (second, used memory) suitable."
+	echo " 	   as input to a ploting program like 'gnuplot'."
+	echo "-i   Sets the pool interval. This should be valid for 'sleep' command."
+	echo "-c   Sets the number of ierations. Will run forever with out it."
+	echo "-p   The process id to count memory of."
+}
+
+die () {
+	echo "$1"
+	exit $E_INVAL
+}
+
+compute_memory () {
+	[ -n "$1" ] || die  "Invalid argument!"
+	[ -d "/proc/$1/" ] || die "Process id is not valid!"
+	MEM_SIZE_KB=`pmap -x "$1" 2> /dev/null | grep -o '[0-9]* *[0-9]* rw' | grep  -o '^[0-9]*' | paste -sd+ | bc`
+	if [[ "$?" -ne "0" || "$MEM_SIZE_KB" -eq "0" ]];
+	then
+		return $E_INVAL;
+	fi
+	return $?
+}
+
+[ "$#" -gt "0" ] || die "You're missing the arguments!"
+
+while getopts "p:i:c:gh" Option
+do
+  case $Option in
+    p     ) PROC_ID="$OPTARG" ;;  
+    i     ) POOL_INTERVAL="$OPTARG" ;;   #This is the pool interval suitable for 'sleep' 
+    c     ) COUNT="$OPTARG"   ;;   	 #This is number of iterations to be performed.
+    g 	  ) PLOT="y" ;;	           	 #The out should be suitable for gnu plot
+    h 	  ) usage  ; exit $E_OK  ;;	 #The out should be suitable for gnu plot
+    \?    ) die "Invalid option $OPTARG" ;;
+    :     ) die "Option -$OPTARG requires an argument" ;;
+  esac
+done
+
+[ -n "$PROC_ID" ] || die "No process id provided. Use '-h'."
+
+#echo "PROC_ID=$PROC_ID"
+#echo "POOL_INTERVAL=$POOL_INTERVAL"
+#echo "PLOT=$PLOT"
+#echo "COUNT=$COUNT"
+
+while [[ "$COUNT" -lt "0" || "$COUNT" -gt "0" ]]
+do
+	compute_memory $PROC_ID
+	[ "$?" -eq "0" ] || die "Couln't count the memory of process $PROC_ID."
+	if [ "$PLOT" = "y" ];
+	then
+		echo -e "$SECONDS\t$MEM_SIZE_KB"
+	else
+		echo "$MEM_SIZE_KB"
+	fi
+	let "COUNT-=1";
+	[ "$COUNT" -ne "0" ] && sleep "$POOL_INTERVAL"
+done
+
+exit $E_OK
+

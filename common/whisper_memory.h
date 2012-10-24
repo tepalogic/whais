@@ -91,17 +91,37 @@ void custom_mem_free (void* ptr);
 #ifdef __cplusplus
 } /* extern "C" */
 
+
+void*
+operator new (std::size_t size);
+
+void*
+operator new (std::size_t size, const std::nothrow_t&) throw();
+
 void*
 operator new (std::size_t size, const D_CHAR* pFile, D_UINT line);
+
+void*
+operator new[] (std::size_t size);
+
+void*
+operator new[] (std::size_t size, const std::nothrow_t&) throw();
 
 void*
 operator new[] (std::size_t size, const D_CHAR* pFile, D_UINT line);
 
 void
+operator delete (void* ptr);
+
+void
 operator delete (void* ptr, const D_CHAR*, D_UINT);
 
 void
+operator delete[] (void* ptr);
+
+void
 operator delete[] (void* ptr, const D_CHAR*, D_UINT );
+
 
 template <class T> static inline void
 _placement_new (void* place, const T& value)
@@ -141,7 +161,8 @@ public:
         a /= b; //Make sure we scream loud enough.
       }
 
-    if (--sm_InitCount == 0)
+
+    if ((--sm_InitCount & 0x7FFFFFFF) == 0)
       PrintMemoryStatistics ();
   }
 
@@ -163,16 +184,31 @@ public:
     return test_get_mem_used ();
   }
 
+  static void PrintMemResume (const bool print)
+  {
+    if (print)
+      sm_InitCount |= 0x80000000;
+    else
+      sm_InitCount &= 0x7FFFFFFF;
+  }
+
+  static bool PrintMemResume ()
+  {
+    return (sm_InitCount & 0x80000000) != 0;
+  }
+
 private:
   static void PrintMemoryStatistics ()
   {
+    if ((GetCurrentMemoryUsage () == 0) && (! PrintMemResume ()))
+      return ;
+
     std::cout << '(' << sm_Module << ") ";
     if (GetCurrentMemoryUsage () != 0)
       {
         std::cout << "MEMORY: FAILED\n";
         test_print_unfree_mem();
       }
-    else
       std::cout << "MEMORY: OK\n";
 
     std::cout << "Memory peak  : " << GetMemoryUsagePeak () << " bytes.\n";

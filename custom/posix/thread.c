@@ -33,46 +33,87 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sched.h>
 #include <unistd.h>
 
-void
+D_UINT
 wh_sync_init (WH_SYNC* pSync)
 {
-  const D_UINT result = pthread_mutex_init (pSync, NULL);
-  assert (result == 0);
+  D_UINT result;
+
+  do
+    result = pthread_mutex_init (pSync, NULL);
+  while (result == (D_UINT)EAGAIN);
+
+  if (result == 0)
+    return WOP_OK;
+
+  return result;
 }
 
-void
+D_UINT
 wh_sync_destroy (WH_SYNC* pSync)
 {
-  const D_UINT result = pthread_mutex_destroy (pSync);
-  assert (result == 0);
+  D_UINT result;
+
+  do
+    result = pthread_mutex_destroy (pSync);
+  while (result == (D_UINT)EAGAIN);
+
+  if (result == 0)
+    return WOP_OK;
+
+  return result;
 }
 
-void
+D_UINT
 wh_sync_enter (WH_SYNC* pSync)
 {
-  const D_UINT result = pthread_mutex_lock (pSync);
-  assert (result == 0);
+  D_UINT result;
+
+  do
+    result = pthread_mutex_lock (pSync);
+  while (result == (D_UINT)EAGAIN);
+
+  if (result == 0)
+    return WOP_OK;
+
+  return result;
 }
 
-void
+D_UINT
 wh_sync_leave (WH_SYNC* pSync)
 {
-  const int result = pthread_mutex_unlock (pSync);
-  assert (result == 0);
+  D_UINT result;
+
+  do
+    result = pthread_mutex_unlock (pSync);
+  while (result == (D_UINT)EAGAIN);
+
+  if (result == 0)
+    return WOP_OK;
+
+  return result;
 }
 
-D_INT
+D_UINT
 wh_thread_create (WH_THREAD*       pThread,
                  WH_THREAD_ROUTINE routine,
                  void*             args)
 {
-  return pthread_create (pThread, NULL, (void* (*)(void*))routine, args);
+  D_UINT result;
+
+  do
+    result = pthread_create (pThread, NULL, (void* (*)(void*))routine, args);
+  while (result == (D_UINT)EAGAIN);
+
+  if (result == 0)
+    result = pthread_detach (*pThread);
+
+  return result;
 }
 
-D_INT
-wh_thread_join (WH_THREAD thread)
+D_UINT
+wh_thread_free (WH_THREAD thread)
 {
-  return pthread_join (thread, NULL);
+  return WOP_OK;
 }
 
 void

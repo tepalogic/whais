@@ -24,8 +24,9 @@ wcmd_INC=
 pastra_MAJ=.1
 pastra_MIN=.0
 
-slpastra_SRC=$(pastra_SRC)
-slpastra_INC=$(pastra_INC)
+slpastra_DEF:=
+slpastra_SRC:=$(pastra_SRC)
+slpastra_INC:=$(pastra_INC)
 
 ifeq ($(BUILD_TESTS),yes)
 -include ./$(UNIT)/test/test.mk

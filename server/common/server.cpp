@@ -22,6 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include <sstream>
+
 #include "server/include/server_protocol.h"
 
 #include "server.h"
@@ -40,14 +42,12 @@ public:
       m_Socket (INVALID_SOCKET),
       m_UsersPool (GetAdminSettings ().m_MaxConnections)
   {
+    m_ListenThread.IgnoreExceptions (true);
   }
 
   ~Listener ()
   {
     assert (m_ListenThread.IsEnded ());
-
-    for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
-      m_UsersPool[index].m_Thread.Join ();
   }
 
   UserHandler* SearchFreeUser ()
@@ -65,12 +65,19 @@ public:
 
   void Close ()
   {
+    //If no exception has be thrown by now, there is
+    //no point to do it now when we are about to close.
     m_ListenThread.IgnoreExceptions (true);
     m_ListenThread.DiscardException ();
+
+    //Cancel any pending IO operations.
     m_Socket.Close ();
 
     for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
       {
+        m_UsersPool[index].m_Thread.IgnoreExceptions (true);
+        m_UsersPool[index].m_Thread.DiscardException ();
+
         m_UsersPool[index].m_EndConnetion = true;
         m_UsersPool[index].m_Socket.Close ();
       }
@@ -129,7 +136,7 @@ client_handler_routine (void* args)
               cmdType /= 2;
               if (cmdType >= USER_CMDS_COUNT)
                 {
-                  throw ConnectionException ("Invalid user command recieved",
+                  throw ConnectionException ("Invalid user command received",
                                              _EXTRA (0));
                 }
               pCmds = gpUserCommands;
@@ -139,7 +146,7 @@ client_handler_routine (void* args)
               cmdType /= 2;
               if (cmdType >= ADMIN_CMDS_COUNT)
                 {
-                  throw ConnectionException ("Invalid admin command recieved",
+                  throw ConnectionException ("Invalid admin command received",
                                              _EXTRA (0));
                 }
               pCmds = gpAdminCommands;
@@ -147,12 +154,70 @@ client_handler_routine (void* args)
           pCmds[cmdType] (connection, lastPart);
         }
   }
+  catch (WSocketException& e)
+  {
+      assert (e.Description() != NULL);
+
+      ostringstream logEntry;
+
+      logEntry << "Unable to deal with error condition.\n";
+      logEntry << "Description:\n\t" << e.Description () << endl;
+
+      if (e.Message ())
+        logEntry << "Message:\n\t" << e.Message () << endl;
+
+      logEntry <<"Extra: " << e.GetExtra () << " (";
+      logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+
+      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+
+      StopServer ();
+  }
   catch (ConnectionException& e)
   {
       if (pClient->m_pDesc != NULL)
         pClient->m_pDesc->m_pLogger->Log (LOG_ERROR, e.Message ());
       else
         spLogger->Log (LOG_ERROR, e.Message ());
+  }
+  catch (WException& e)
+  {
+      ostringstream logEntry;
+
+      logEntry << "Unable to deal with error condition.\n";
+      if (e.Description ())
+        logEntry << "Description:\n\t" << e.Description () << endl;
+
+      if (e.Message ())
+        logEntry << "Message:\n\t" << e.Message () << endl;
+
+      logEntry <<"Extra: " << e.GetExtra () << " (";
+      logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+
+      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+
+      StopServer ();
+  }
+  catch (std::bad_alloc& e)
+  {
+      spLogger->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+
+      StopServer ();
+  }
+  catch (std::exception& e)
+  {
+      ostringstream logEntry;
+
+      logEntry << "General system failure: " << e.what() << endl;
+
+      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+
+      StopServer ();
+  }
+  catch (...)
+  {
+      spLogger->Log (LOG_CRITICAL, "Unknown exception!");
+      StopServer ();
   }
 
   pClient->m_Socket.Close ();
@@ -174,27 +239,92 @@ listener_routine (void* args)
                                  SOCKET_BACK_LOG);
 
   bool acceptUserConnections = sAcceptUsersConnections;
-  while (acceptUserConnections)
-    {
-      WSocket client = pListener->m_Socket.Accept ();
-      UserHandler* pUsrHnd = pListener->SearchFreeUser ();
 
-      if (pUsrHnd != NULL)
+  try
+  {
+    while (acceptUserConnections)
+      {
+        WSocket client = pListener->m_Socket.Accept ();
+        UserHandler* pUsrHnd = pListener->SearchFreeUser ();
+
+        try
         {
-          pUsrHnd->m_Socket = client;
-          pUsrHnd->m_EndConnetion = false;
-          pUsrHnd->m_Thread.Run (client_handler_routine, pUsrHnd);
+          if (pUsrHnd != NULL)
+            {
+              pUsrHnd->m_Socket = client;
+              pUsrHnd->m_EndConnetion = false;
+              pUsrHnd->m_Thread.Run (client_handler_routine, pUsrHnd);
+            }
+          else
+            {
+              static const D_UINT8 busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
+
+              client.Write (sizeof busyResp, busyResp);
+              client.Close ();
+            }
+
+          acceptUserConnections = sAcceptUsersConnections;
         }
-      else
+        catch (WSocketException& e)
         {
-          static const D_UINT8 busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
+            if (sAcceptUsersConnections)
+              {
+                assert (e.Description () != NULL);
+                ostringstream logEntry;
 
-          client.Write (sizeof busyResp, busyResp);
-          client.Close ();
+                logEntry << "Description:\n\t" << e.Description () << endl;
+
+                if (e.Message ())
+                  logEntry << "Message:\n\t" << e.Message () << endl;
+
+                logEntry <<"Extra: " << e.GetExtra () << " (";
+                logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+
+                spLogger->Log (LOG_ERROR, logEntry.str ());
+              }
         }
+      }
+  }
+  catch (WException& e)
+  {
+      assert (e.Description () != NULL);
 
-      acceptUserConnections = sAcceptUsersConnections;
-    }
+      ostringstream logEntry;
+
+      logEntry << "Unable to deal with this error condition at this point.\n";
+      logEntry << "Description:\n\t" << e.Description () << endl;
+
+      if (e.Message ())
+        logEntry << "Message:\n\t" << e.Message () << endl;
+
+      logEntry <<"Extra: " << e.GetExtra () << " (";
+      logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+
+      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+
+      StopServer ();
+  }
+  catch (std::bad_alloc& e)
+  {
+      spLogger->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+
+      StopServer ();
+  }
+  catch (std::exception& e)
+  {
+      ostringstream logEntry;
+
+      logEntry << "General system failure: " << e.what() << endl;
+
+      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+
+      StopServer ();
+  }
+  catch (...)
+  {
+      spLogger->Log (LOG_CRITICAL, "Listener received unexpected exception!");
+      StopServer ();
+  }
 }
 
 void
@@ -229,7 +359,7 @@ StartServer (Logger& log, vector<DBSDescriptors>& databases)
     }
 
   for (D_UINT index = 0; index < listeners.Size (); ++index)
-    listeners[index].m_ListenThread.Join ();
+    listeners[index].m_ListenThread.WaitToEnd (false);
 
   spaListeners = NULL;
 
@@ -256,4 +386,3 @@ StopServer ()
 D_UINT32 WMemoryTracker::sm_InitCount = 0;
 const D_CHAR* WMemoryTracker::sm_Module = "WHISPER";
 #endif
-

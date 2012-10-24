@@ -22,16 +22,17 @@ function clear_test_env {
 }
 
 function execute_test {
-   test_output=`$TEST_DIR/$(basename $1)`
+   echo -n "Test '$1' has "
+   test_output=`cd "$TEST_DIR" ; ./"$(basename $1)"`
    error_code=$?
    found_fail=`echo "$test_output" | grep -i 'test.*fail'`
    mem_fail=`echo "$test_output" | grep -i 'memory.*fail'`
    if [ -n  "$found_fail" ] || [ -n "$mem_fail" ] || [ "$error_code" -ne 0 ]; then
-      echo -e "Test '\e[0;31m$1\e[0m' has failed:"
+      echo -e "'\e[0;31mfailed\e[0m'!"
       let 'failed_tests+=1'
       echo "$test_output"
    else
-      echo -e "Test '\e[0;32m$1\e[0m' has passed!"
+      echo -e "'\e[0;32mpassed\e[0m'!"
    fi
    let 'total_tests+=1'
 }

@@ -56,6 +56,6 @@ arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
 #set the right  flags for the linker
 arch_linker_flags= -pthread
-arch_shl_linker_flags= -shared -Wl,-soname,lib$(1).so$(2) $(arch_linker_flags)
+arch_shl_linker_flags= -shared -Wl,-Bsymbolic,-soname,lib$(1).so$(2) $(arch_linker_flags)
 arch_archiver_flags=rcs
 

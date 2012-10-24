@@ -45,6 +45,7 @@ struct UserHandler
       m_Socket (INVALID_SOCKET),
       m_EndConnetion (true)
   {
+    m_Thread.IgnoreExceptions (true);
   }
 
   ~UserHandler ()

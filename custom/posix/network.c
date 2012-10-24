@@ -310,6 +310,7 @@ void
 wh_socket_close (const WH_SOCKET sd)
 {
   shutdown (sd, SHUT_RDWR);
+  close (sd);
 }
 
 void

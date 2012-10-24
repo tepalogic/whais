@@ -102,6 +102,33 @@ WFileException::Description () const
   return "File IO error.";
 }
 
+//////////////////////////WSynchException/////////////////////////////////////
+
+WSynchException::WSynchException (const D_CHAR* message,
+                                  const D_CHAR* file,
+                                  D_UINT32      line,
+                                  D_UINT32      extra)
+  : WException (message, file, line, extra)
+{
+}
+
+WException*
+WSynchException::Clone () const
+{
+  return new WSynchException (*this);
+}
+
+EXPCEPTION_TYPE
+WSynchException::Type () const
+{
+  return SYNC_EXCEPTION;
+}
+
+const D_CHAR*
+WSynchException::Description () const
+{
+  return "A mutex related exception.";
+}
 
 //////////////////////////WThreadException/////////////////////////////////////
 
@@ -128,19 +155,8 @@ WThreadException::Type () const
 const D_CHAR*
 WThreadException::Description () const
 {
-  switch (Type ())
-  {
-  case UNKNOWN_EXCEPTION:
-    return "Unknown threading exception.";
-  case FAILEDOP_EXCEPTION:
-    return "Thread related operation has failed.";
-  default:
-    assert (false);
-    return "Unknown threading exception.";
-  }
+  return "Thread related exception.";
 }
-
-
 
 //////////////////////////WSocketException////////////////////////////////////
 
@@ -189,8 +205,6 @@ WSocketException::Description () const
     return "Socket operation has timeout.";
   case WH_SOCK_EINVAL:
     return "Invalid parameters for requested socket operation.";
-  default:
-    assert (false);
   }
   return "Unknown socket exception";
 }

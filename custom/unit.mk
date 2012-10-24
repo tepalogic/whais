@@ -39,7 +39,7 @@ custom_SRC+=$(SRC_FOLDER)/network.c
 custom_SRC+=$(SRC_FOLDER)/memory.cpp
 
 ifeq ($(MEMORY_TRACE),yes)
-custom_SRC+=$(SRC_FOLDER)/memory_trace.c test/mem_test.c
+custom_SRC+=test/mem_test.c
 endif
 
 $(foreach shl, $(UNIT_SHLS), $(eval $(call add_output_shared_lib,$(shl),$(UNIT),$($(shl)_MAJ),$($(shl)_MIN))))
