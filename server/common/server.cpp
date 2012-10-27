@@ -198,7 +198,7 @@ client_handler_routine (void* args)
 
       StopServer ();
   }
-  catch (std::bad_alloc& e)
+  catch (std::bad_alloc&)
   {
       spLogger->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
 
@@ -234,21 +234,34 @@ listener_routine (void* args)
   assert (pListener->m_ListenThread.HasExceptionPending () == false);
   assert (pListener->m_pPort != NULL);
 
-  pListener->m_Socket = WSocket (pListener->m_pInterface,
-                                 pListener->m_pPort,
-                                 SOCKET_BACK_LOG);
-
-  bool acceptUserConnections = sAcceptUsersConnections;
-
   try
   {
+      {
+        ostringstream logEntry;
+
+        logEntry << "Listening ";
+        logEntry << pListener->m_pInterface == "" ?
+                    "*" : pListener->m_pInterface;
+        logEntry <<'@' << pListener->m_pPort << ".\n";
+
+        spLogger->Log (LOG_INFO, logEntry.str ());
+      }
+
+    pListener->m_Socket = WSocket (
+          pListener->m_pInterface == "" ?  NULL : pListener->m_pInterface,
+          pListener->m_pPort,
+          SOCKET_BACK_LOG
+                                  );
+
+    bool acceptUserConnections = sAcceptUsersConnections;
+
     while (acceptUserConnections)
       {
-        WSocket client = pListener->m_Socket.Accept ();
-        UserHandler* pUsrHnd = pListener->SearchFreeUser ();
-
         try
         {
+          WSocket client = pListener->m_Socket.Accept ();
+          UserHandler* pUsrHnd = pListener->SearchFreeUser ();
+
           if (pUsrHnd != NULL)
             {
               pUsrHnd->m_Socket = client;
@@ -304,7 +317,7 @@ listener_routine (void* args)
 
       StopServer ();
   }
-  catch (std::bad_alloc& e)
+  catch (std::bad_alloc&)
   {
       spLogger->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
 
@@ -380,7 +393,6 @@ StopServer ()
   for (D_UINT index = 0; index < spaListeners->Size (); ++index)
     (*spaListeners)[index].Close ();
 }
-
 
 #ifdef ENABLE_MEMORY_TRACE
 D_UINT32 WMemoryTracker::sm_InitCount = 0;

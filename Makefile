@@ -34,5 +34,3 @@ include ./makesys/arch/$(ARCH).mk
 include ./makesys/defs.mk
 include $(foreach unit, $(ALL_UNITS), ./$(unit)/unit.mk) 
 include ./makesys/topmake.mk
-
-

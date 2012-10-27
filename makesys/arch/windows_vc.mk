@@ -7,13 +7,13 @@ ARCH_SHL_PREFIX:=
 ARCH_SHL_EXT:=.dll
 ARCH_LIB_PREFIX:=sl
 ARCH_LIB_EXT:=.lib
-CC:='/cygdrive/c/Program Files/Microsoft Visual Studio 9.0/VC/bin/cl.exe'
-CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 9.0/VC/bin/cl.exe'
-LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 9.0/VC/bin/cl.exe'
-AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 9.0/VC/bin/lib.exe'
+CC:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
+CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
+LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
+AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/lib.exe'
 
 ifeq ($(FLAVOR),debug)
-CC_FLAGS?=/LDd /W3 /TC /c  /Y- /arch:SSE2 /GF /ZI /RTC1 /nologo /wd4242 /wd4244
+CC_FLAGS?=/LDd /W3 /TC /c  /Y- /arch:SSE2 /GF /ZI /RTC1 /nologo /wd4242 /wd4244 /wd4355
 CXX_FLAGS?=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc
 endif
 

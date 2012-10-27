@@ -52,7 +52,7 @@ Logger::Logger (const D_CHAR* const pFile, const bool printStart)
 
       m_OutStream << "\n* Start of the day: " << (int)dayStart.year;
       m_OutStream << '-' << (int)dayStart.month + 1;
-      m_OutStream << "-" << (int)dayStart.day;
+      m_OutStream << "-" << (int)dayStart.day + 1;
       m_OutStream << ' ' << (int)dayStart.hour;
       m_OutStream << ':' << (int)dayStart.min;
       m_OutStream << ':' << (int)dayStart.sec << "\n\n";

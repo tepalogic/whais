@@ -30,55 +30,33 @@ extern "C"
 {
 #endif
 
-enum WH_SOCK_ERROR
-{
-  WH_SOCK_OK,
-  WH_SOCK_NOTINIT,
-  WH_SOCK_NOMEM,
-  WH_SOCK_NONAME,
-  WH_SOCK_NOSERV,
-  WH_SOCK_EPIPE,
-  WH_SOCK_ENOBUF,
-  WH_SOCK_NOTRICH,
-  WH_SOCK_NOPERM,
-  WH_SOCK_ETIMEOUT,
-  WH_SOCK_EINVAL,
-  WH_SOCK_UNK
-};
-
-
 D_BOOL
 wh_init_socks ();
 
-D_BOOL
+D_UINT32
 wh_socket_client (const D_CHAR* const       pServer,
                   const D_CHAR* const       pPort,
-                  WH_SOCKET* const          pOutSocket,
-                  enum WH_SOCK_ERROR* const pOutError);
+                  WH_SOCKET* const          pOutSocket);
 
-D_BOOL
+D_UINT32
 wh_socket_server (const D_CHAR* const       pLocalAdress,
                   const D_CHAR* const       pPort,
                   const D_UINT              listenBackLog,
-                  WH_SOCKET* const          pOutSocket,
-                  enum WH_SOCK_ERROR* const pOutError);
+                  WH_SOCKET* const          pOutSocket);
 
-D_BOOL
+D_UINT32
 wh_socket_accept (const WH_SOCKET           sd,
-                  WH_SOCKET* const          pConnectSocket,
-                  enum WH_SOCK_ERROR* const pOutError);
+                  WH_SOCKET* const          pConnectSocket);
 
-D_BOOL
+D_UINT32
 wh_socket_write (const WH_SOCKET           sd,
                  const D_UINT8*            pBuffer,
-                 const D_UINT              count,
-                 enum WH_SOCK_ERROR* const pOutError);
+                 const D_UINT              count);
 
-D_BOOL
+D_UINT32
 wh_socket_read (const WH_SOCKET           sd,
                 D_UINT8*                  pOutBuffer,
-                D_UINT* const             pIOCount,
-                enum WH_SOCK_ERROR* const pOutError);
+                D_UINT* const             pIOCount);
 
 void
 wh_socket_close (const WH_SOCKET socket);

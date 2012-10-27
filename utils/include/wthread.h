@@ -46,7 +46,7 @@ private:
   WH_SYNC m_Sync;
 };
 
-class EXCEP_SHL WSynchronizerRAII
+class WSynchronizerRAII
 {
 public:
   explicit WSynchronizerRAII (WSynchronizer &rSync) :

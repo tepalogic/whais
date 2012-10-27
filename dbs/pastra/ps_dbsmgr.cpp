@@ -314,7 +314,8 @@ DbsHandler::DbsHandler (const DBSSettings& globalSettings,
   while (tablesCount-- > 0)
     {
       m_Tables.insert (
-          pair<string, PersistentTable*>(_RC (D_CHAR*, pBuffer), NULL)
+          pair<string, PersistentTable*> (_RC (D_CHAR*, pBuffer),
+                                          _RC (PersistentTable*, NULL))
                       );
       pBuffer += strlen (_RC (D_CHAR*, pBuffer)) + 1;
     }
@@ -398,7 +399,10 @@ DbsHandler::AddTable (const D_CHAR* const pTableName,
   if (it != m_Tables.end ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_EXISTS));
 
-  m_Tables.insert (pair<string, PersistentTable*> (tableName, NULL));
+  m_Tables.insert (pair<string, PersistentTable*> (
+                                        tableName,
+                                        _RC (PersistentTable*, NULL))
+                                                  );
   it = m_Tables.find (tableName);
   try
     {

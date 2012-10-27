@@ -186,7 +186,7 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
         {
           //Another configuration section starts from here.
           config.clear ();
-          config.seekg (- line.length (), ios::cur);
+          config.seekg ( -1 * _SC(D_INT64, line.length ()), ios::cur);
           break;
         }
 
@@ -194,10 +194,10 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
         {
           ListenEntry entry;
 
-          token = NextToken (line, pos, delimiters);
+          token = NextToken (line, pos, " \t=@#");
           entry.m_Interface = token;
 
-          token = NextToken (line, pos, " \t-@#");
+          token = NextToken (line, pos, " \t@#");
           entry.m_Service = token;
 
           if (entry.m_Interface == "*")
@@ -373,7 +373,7 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
               cerr << "at line " << ioConfigLine << ". ";
               cerr << "Valid value are only 'true' or 'false'.\n";
 
-              return -1;
+              return false;
             }
         }
       else
@@ -432,7 +432,7 @@ ParseContextSection (I_Logger&        log,
         {
           //Another configuration section starts from here.
           config.clear ();
-          config.seekg (- line.length (), ios::cur);
+          config.seekg ( -1 * _SC(D_INT64, line.length ()), ios::cur);
           break;
         }
 

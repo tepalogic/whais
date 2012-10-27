@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef HANDLE              WH_FILE_HND;
 typedef CRITICAL_SECTION    WH_SYNC;
 typedef HANDLE              WH_THREAD;
-typedef SOKET               WH_SOCKET
+typedef SOCKET              WH_SOCKET;
 #endif
 
 typedef char             D_BOOL;
@@ -68,6 +68,6 @@ typedef D_UINT64         D_UINTMAX;
 #define SHL_EXPORT_SYMBOL __declspec(dllexport)
 #define SHL_IMPORT_SYMBOL __declspec(dllimport)
 
-#define INVALID_SOCKET  ((SOKET)-1)
+/* #define INVALID_SOCKET  ((SOCKET)-1) */
 
 #endif /* WHISPER_TYPES_H */

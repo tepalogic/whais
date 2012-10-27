@@ -62,6 +62,8 @@ clean_frameworks (Logger& log)
     DBSShoutdown ();
 }
 
+#ifndef ARCH_WINDOWS_VC
+
 static void
 sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 {
@@ -85,6 +87,22 @@ set_signals ()
 
  return true;
 }
+#else
+
+static BOOL WINAPI
+ServerStopHandler (DWORD)
+{
+  StopServer ();
+
+  return TRUE;
+}
+
+static BOOL
+set_signals ()
+{
+ return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
+}
+#endif
 
 
 int
@@ -107,6 +125,12 @@ main (int argc, D_CHAR** argv)
           cerr << '\'' << argv[1] << "'.\n";
           return EINVAL;
         }
+    }
+
+  if (! wh_init_socks ())
+    {
+      cerr << "Couldn't not init the network socket framework\n";
+      return ENOTSOCK;
     }
 
   try
@@ -229,7 +253,7 @@ main (int argc, D_CHAR** argv)
     return -1;
 
   }
-  catch (std::bad_alloc& e)
+  catch (std::bad_alloc&)
   {
     glbLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
     clean_frameworks (*glbLog);
@@ -258,6 +282,7 @@ main (int argc, D_CHAR** argv)
   }
 
   clean_frameworks (*glbLog);
+  wh_clean_socks ();
 
   return 0;
 }

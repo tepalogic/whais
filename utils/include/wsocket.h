@@ -68,14 +68,14 @@ private:
   WH_SOCKET m_Socket;
   bool      m_Owned;
 
-  struct SocketInitialiser
+  struct EXCEP_SHL SocketInitialiser
   {
     SocketInitialiser ()
     {
       if ( ! wh_init_socks ())
         {
           throw WSocketException ("Network system could not be initialized.",
-                                  _EXTRA (WH_SOCK_NOTINIT));
+                                  _EXTRA (0));
         }
     }
 

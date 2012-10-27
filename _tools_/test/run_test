@@ -39,10 +39,16 @@ function execute_test {
 
 if [ "$1" = "-l" ]; then
 	echo "Executing tests that last longer!"
-	TEST_FILES=`find ./ -name 'l_test_*' -type f -perm -u+x`
+	TEST_FILES=`find ./ -name 'l_test_*.exe'`
+        if [ ! -n "$TEST_FILES" ]; then
+                TEST_FILES=`find ./ -name 'l_test_*' -type f -perm -u+x`
+        fi
 else
 	echo "Executing tests that does not last long!"
-	TEST_FILES=`find ./ -name 'test_*' -type f -perm -u+x`
+	TEST_FILES=`find ./ -name 'test_*.exe'`
+        if [ ! -n "$TEST_FILES" ]; then
+                TEST_FILES=`find ./ -name 'test_*' -type f -perm -u+x`
+        fi
 fi
 
 if [ -n "$TEST_FILES" ]; then

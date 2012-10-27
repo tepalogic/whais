@@ -87,8 +87,8 @@ GetInstance (const D_CHAR* pName, I_Logger* pLog)
   assert (it != gmNameSpaces.end ());
 
   //TODO: 1. Investigate a potential mechanism to avoid allocating session on heap
-  //         You need this in order to handle reqested for force shout down.
-  //      2. Throw an excution exception when pLog is null at this point
+  //         You need this in order to handle requested for force shout down.
+  //      2. Throw an execution exception when pLog is null at this point
   return *(new Session (*pLog,
                         gmNameSpaces.find (gDBSName)->second, it->second));
 }
@@ -536,7 +536,7 @@ Session::DefineGlobalValue (const D_UINT8*    pName,
       string message = "Could not add the global variable ";
 
       message += "'";
-      message.insert (message.size(), _RC (const D_CHAR*, pName), nameLength);
+      message.insert (message.size (), _RC (const D_CHAR*, pName), nameLength);
       message += "' do to invalid type description.";
 
       m_Log.Log (LOG_ERROR, message);

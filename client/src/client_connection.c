@@ -40,10 +40,9 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
     {
       D_UINT chunkSize = FRAME_DATA_OFF - frameSize;
 
-      if ( ! wh_socket_read (pHnd->socket,
-                             &pHnd->data[frameSize],
-                             &chunkSize,
-                             NULL))
+      if (wh_socket_read (pHnd->socket,
+                          &pHnd->data[frameSize],
+                          &chunkSize) != WOP_OK)
         {
           return CS_OS_INTERNAL;
         }
@@ -74,10 +73,9 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
         {
           D_UINT chunkSize = expected - frameSize;
 
-          if ( ! wh_socket_read (pHnd->socket,
-                                 &pHnd->data [frameSize],
-                                 &chunkSize,
-                                 NULL))
+          if (wh_socket_read (pHnd->socket,
+                              &pHnd->data [frameSize],
+                              &chunkSize) != WOP_OK)
             {
               return CS_OS_INTERNAL;
             }

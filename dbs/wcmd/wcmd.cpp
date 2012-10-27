@@ -322,6 +322,13 @@ main (const D_INT argc, D_CHAR *argv[])
   string        script;
   string        dbDirectory;
 
+
+  if (! wh_init_socks ())
+    {
+      cerr << "Couldn't not init the network socket framework\n";
+      return ENOTSOCK;
+    }
+
   if (argc == currentArg)
     {
       PrintWrongUsage ();
@@ -557,6 +564,8 @@ main (const D_INT argc, D_CHAR *argv[])
     cout << "Fatal error ... Unknown exception was thrown.\n";
     result = (result != 0)  ? result : 0xFF;
   }
+
+  wh_clean_socks ();
 
   return result;
 }

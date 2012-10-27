@@ -112,7 +112,7 @@ send_raw_frame (struct INTERNAL_HANDLER* const pHnd,
   pHnd->data[FRAME_TYPE_OFF]    = type;
   store_le_int32 (pHnd->expectedFrameId++, &pHnd->data[FRAME_ID_OFF]);
 
-  if (! wh_socket_write (pHnd->socket, pHnd->data, frameSize, NULL))
+  if (wh_socket_write (pHnd->socket, pHnd->data, frameSize) != WOP_OK)
     return CS_OS_INTERNAL;
 
   return CS_OK;
@@ -127,10 +127,9 @@ receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
   while (frameRead < FRAME_DATA_OFF)
     {
       D_UINT chunkSize = FRAME_DATA_OFF - frameRead;
-      if ( ! wh_socket_read (pHnd->socket,
-                             &pHnd->data [frameRead],
-                             &chunkSize,
-                             NULL))
+      if (wh_socket_read (pHnd->socket,
+                          &pHnd->data [frameRead],
+                          &chunkSize) != WOP_OK)
         {
           return CS_OS_INTERNAL;
         }
@@ -154,10 +153,9 @@ receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
   while (frameRead < frameSize)
     {
       D_UINT chunkSize = frameSize - frameRead;
-      if ( ! wh_socket_read (pHnd->socket,
-                             &pHnd->data [frameRead],
-                             &chunkSize,
-                             NULL))
+      if (wh_socket_read (pHnd->socket,
+                          &pHnd->data [frameRead],
+                          &chunkSize) != WOP_OK)
         {
           return CS_OS_INTERNAL;
         }
@@ -371,7 +369,7 @@ Connect (const char* const   pHost,
   pResult->encType    = FRAME_ENCTYPE_PLAIN;
   memcpy (pResult->encriptionKey, pPassword, passwordLen);
 
-  if ( ! wh_socket_client (pHost, pPort, &pResult->socket, NULL))
+  if (wh_socket_client (pHost, pPort, &pResult->socket) != WOP_OK)
     {
       status = CS_OS_INTERNAL;
       goto fail_ret;
@@ -403,14 +401,14 @@ Connect (const char* const   pHost,
 
   assert (pResult->encType == FRAME_ENCTYPE_PLAIN);
   {
+    D_UINT32 wss;
+
     const D_UINT16 frameSize = FRAME_DATA_OFF +
                                FRAME_AUTH_CLNT_DATA +
                                strlen (pDatabaseName) + 1 +
                                passwordLen + 1;
     D_CHAR* const pAuthData =
         (D_CHAR*)&pResult->data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA];
-
-    enum WH_SOCK_ERROR wss = WH_SOCK_OK;
 
     if (frameSize >= FRAME_MAX_SIZE)
       {
@@ -428,15 +426,9 @@ Connect (const char* const   pHost,
     strcpy (pAuthData, pDatabaseName);
     strcpy (pAuthData + strlen (pDatabaseName) + 1, pPassword);
 
-    if (! wh_socket_write (pResult->socket, pResult->data, frameSize, &wss))
-      {
-        assert (wss != WH_SOCK_OK);
-
-        status = ((wss == WH_SOCK_EPIPE) || (wss == WH_SOCK_ETIMEOUT)) ?
-                 CS_DROPPED :
-                 CS_OS_INTERNAL;
-        goto fail_ret;
-      }
+    wss = wh_socket_write (pResult->socket, pResult->data, frameSize);
+    if (wss != WOP_OK)
+      goto fail_ret;
   }
 
   assert (status == CS_OK);

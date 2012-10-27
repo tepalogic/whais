@@ -22,18 +22,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef _GNU_SOURCE
-/* Not exactly POSIX, but we can leave with it. */
-#define _GNU_SOURCE
-#endif
+#define WIN32_LEAN_AND_MEAN
 
 #include <assert.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/tcp.h>
-#include <unistd.h>
-#include <errno.h>
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h>
+
+// Need to link with Ws2_32.lib
+#pragma comment(lib, "ws2_32.lib")
 
 #include "whisper.h"
 
@@ -42,9 +40,23 @@ wh_init_socks ()
 {
   static D_BOOL _inited = FALSE;
 
+  WORD wVersionRequested;
+  WSADATA wsaData;
+
   assert (_inited == FALSE);
   if (_inited)
     return FALSE;
+
+  wVersionRequested = MAKEWORD(2, 2);
+
+  if (WSAStartup(wVersionRequested, &wsaData) != 0)
+    return FALSE;
+
+  if ((LOBYTE (wsaData.wVersion) != 2) || (HIBYTE (wsaData.wVersion) != 2))
+    {
+        WSACleanup();
+        return FALSE;
+    }
 
   _inited = TRUE;
   return TRUE;
@@ -73,16 +85,17 @@ wh_socket_client (const D_CHAR* const        pServer,
   if (status != 0)
     return status;
 
+
   for (pIt = pResults; pIt != NULL; pIt = pResults->ai_next)
     {
       sd = socket (pIt->ai_family, pIt->ai_socktype, pIt->ai_protocol);
-      if (sd < 0)
+      if (sd == INVALID_SOCKET)
         continue ;
 
-      if (setsockopt (sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) < 0)
+      if (setsockopt (sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
         {
-          status = errno;
-          close (sd);
+          status = WSAGetLastError ();
+          closesocket (sd);
 
           return status;
         }
@@ -90,14 +103,14 @@ wh_socket_client (const D_CHAR* const        pServer,
           break;
       else
         {
-          status = errno;
-          close (sd);
+          status = WSAGetLastError ();
+          closesocket (sd);
 
           return status;
         }
     }
 
-  status = errno;
+  status = WSAGetLastError ();
   freeaddrinfo (pResults);
 
   if (pIt != NULL)
@@ -136,14 +149,14 @@ wh_socket_server (const D_CHAR* const       pLocalAdress,
   for (pIt = pResults; pIt != NULL; pIt = pResults->ai_next)
     {
       sd = socket (pIt->ai_family, pIt->ai_socktype, pIt->ai_protocol);
-      if (sd < 0)
+      if (sd == INVALID_SOCKET)
         continue ;
 
-      if ((setsockopt (sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) < 0)
-          || (setsockopt (sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) < 0))
+      if ((setsockopt (sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
+          || (setsockopt (sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) != 0))
         {
-          status = errno;
-          close (sd);
+          status = WSAGetLastError ();
+          closesocket (sd);
 
           return status;
         }
@@ -151,22 +164,23 @@ wh_socket_server (const D_CHAR* const       pLocalAdress,
         break;
       else
         {
-          status = errno;
-          close (sd);
+          status = WSAGetLastError ();
+          closesocket (sd);
 
           return status;
         }
     }
-  status = errno;
+
+  status = WSAGetLastError ();
   freeaddrinfo (pResults);
 
   if (pIt != NULL)
     {
       /* We have a valid socket */
-      if (listen (sd, listenBackLog) < 0)
+      if (listen (sd, listenBackLog) != 0)
         {
-          status = errno;
-          close (sd);
+          status = WSAGetLastError ();
+          closesocket (sd);
 
           return status;
         }
@@ -182,9 +196,9 @@ D_UINT32
 wh_socket_accept (const WH_SOCKET      sd,
                   WH_SOCKET* const     pConnectSocket)
 {
-  int csd = accept (sd, NULL, NULL);
-  if (csd < 0)
-    return errno;
+  const WH_SOCKET csd = accept (sd, NULL, NULL);
+  if (csd == INVALID_SOCKET)
+    return WSAGetLastError ();
 
   *pConnectSocket = csd;
   return WOP_OK;
@@ -195,17 +209,18 @@ wh_socket_write (const WH_SOCKET      sd,
                  const D_UINT8*       pBuffer,
                  const D_UINT         count)
 {
-  D_UINT wrote = 0;
+  D_UINT   wrote = 0;
 
   assert (count > 0);
 
   while (wrote < count)
     {
-      const ssize_t chunk = send (sd, pBuffer + wrote, count - wrote, 0);
+      const D_INT chunk = send (sd, pBuffer + wrote, count - wrote, 0);
       if (chunk < 0)
         {
-          if (errno != EAGAIN)
-            return errno;
+          const D_UINT32 status = WSAGetLastError ();
+          if (status != WSATRY_AGAIN)
+            return status;
         }
       else
         {
@@ -225,19 +240,20 @@ wh_socket_read (const WH_SOCKET           sd,
                 D_UINT* const             pIOCount)
 {
   if (*pIOCount == 0)
-    return EINVAL;
+    return WSAEINVAL;
 
   while (TRUE)
     {
-      const ssize_t chunk = recv (sd, pOutBuffer, *pIOCount, 0);
+      const D_INT chunk = recv (sd, pOutBuffer, *pIOCount, 0);
       if (chunk < 0)
         {
-          if (errno != EAGAIN)
-            return errno;
+          const D_UINT32 status = WSAGetLastError ();
+          if (status != WSATRY_AGAIN)
+            return status;
         }
       else
         {
-          assert (chunk <= *pIOCount);
+          assert ((D_UINT)chunk <= *pIOCount);
 
           *pIOCount = chunk;
           break;
@@ -250,12 +266,13 @@ wh_socket_read (const WH_SOCKET           sd,
 void
 wh_socket_close (const WH_SOCKET sd)
 {
-  shutdown (sd, SHUT_RDWR);
-  close (sd);
+  shutdown (sd, SD_BOTH);
+  closesocket (sd);
 }
 
 void
 wh_clean_socks ()
 {
+  WSACleanup();
 }
 

@@ -27,31 +27,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "whisper_thread.h"
 
-void
+D_UINT
 wh_sync_init (WH_SYNC* pSync)
 {
   InitializeCriticalSection (pSync);
+
+  return WOP_OK;
 }
 
-void
+D_UINT
 wh_sync_destroy (WH_SYNC* pSync)
 {
   DeleteCriticalSection (pSync);
+
+  return WOP_OK;
 }
 
-void
+D_UINT
 wh_sync_enter (WH_SYNC* pSync)
 {
   EnterCriticalSection (pSync);
+
+  return WOP_OK;
 }
 
-void
+D_UINT
 wh_sync_leave (WH_SYNC* pSync)
 {
   LeaveCriticalSection (pSync);
+
+  return WOP_OK;
 }
 
-D_INT
+D_UINT
 wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
 {
   *pThread = CreateThread (NULL,
@@ -62,31 +70,22 @@ wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
                            NULL);
   if (*pThread == NULL)
     {
-      D_INT result = GetLastError ();
-      if (result == WOP_OK)
-        result = WOP_UNKNOW;
+      const D_UINT result = GetLastError ();
 
-      return result;
+      return (result == WOP_OK) ? WOP_UNKNOW : result;
     }
 
   return WOP_OK;
 }
 
-D_INT
-wh_thread_join (WH_THREAD thread)
+D_UINT
+wh_thread_free (WH_THREAD thread)
 {
-  D_INT result = WOP_OK;
-
-  if (WaitForSingleObject (thread, INFINITE) != WAIT_OBJECT_0)
-    {
-      result = GetLastError ();
-      if (result == WOP_OK)
-        result = WOP_UNKNOW;
-    }
-
+  //Give a chance of the thread to finish!
+  WaitForSingleObject (thread, INFINITE);
   CloseHandle (thread);
 
-  return result;
+  return WOP_OK;
 }
 
 void

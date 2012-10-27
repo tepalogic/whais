@@ -32,9 +32,9 @@ WSocket::WSocket (const D_CHAR* const pServerName,
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  WH_SOCK_ERROR e = WH_SOCK_OK;
+  const D_UINT32 e = wh_socket_client (pServerName, pService, &m_Socket);
 
-  if (! wh_socket_client (pServerName, pService, &m_Socket, &e))
+  if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
 
   m_Owned = true;
@@ -45,11 +45,13 @@ WSocket::WSocket (const D_CHAR* const pServerName,
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  D_CHAR service[16];
-  WH_SOCK_ERROR e = WH_SOCK_OK;
+  D_UINT32 e;
+  D_CHAR   service[16];
 
   sprintf (service, "%u", port);
-  if (! wh_socket_client (pServerName, service, &m_Socket, &e))
+  e = wh_socket_client (pServerName, service, &m_Socket);
+
+  if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
 
   m_Owned = true;
@@ -61,9 +63,12 @@ WSocket::WSocket (const D_CHAR* const pLocalAddress,
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  WH_SOCK_ERROR e = WH_SOCK_OK;
+  const D_UINT32 e = wh_socket_server (pLocalAddress,
+                                       pService,
+                                       backLog,
+                                       &m_Socket);
 
-  if (! wh_socket_server (pLocalAddress, pService, backLog, &m_Socket, &e))
+  if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
 
   m_Owned = true;
@@ -75,11 +80,13 @@ WSocket::WSocket (const D_CHAR* const pLocalAddress,
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  D_CHAR service[16];
-  WH_SOCK_ERROR e = WH_SOCK_OK;
+  D_UINT32 e;
+  D_CHAR   service[16];
 
   sprintf (service, "%u", port);
-  if (! wh_socket_server (pLocalAddress, service, backLog,  &m_Socket, &e))
+  e = wh_socket_server (pLocalAddress, service, backLog, &m_Socket);
+
+  if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
 
   m_Owned = true;
@@ -126,10 +133,10 @@ WSocket::operator= (const WSocket& source)
 WSocket
 WSocket::Accept ()
 {
-  WH_SOCK_ERROR e = WH_SOCK_OK;
-  WH_SOCKET     client;
+  WH_SOCKET      client = INVALID_SOCKET;
+  const D_UINT32 e      = wh_socket_accept (m_Socket, &client);
 
-  if (! wh_socket_accept (m_Socket, &client, &e))
+  if (e != WOP_OK )
     throw WSocketException (NULL, _EXTRA (e));
 
   assert (client != INVALID_SOCKET);
@@ -140,10 +147,10 @@ WSocket::Accept ()
 D_UINT
 WSocket::Read (const D_UINT count, D_UINT8* const pBuffer)
 {
-  WH_SOCK_ERROR e = WH_SOCK_OK;
-  D_UINT result = count;
+  D_UINT         result = count;
+  const D_UINT32 e      = wh_socket_read (m_Socket, pBuffer, &result);
 
-  if (! wh_socket_read (m_Socket, pBuffer, &result, &e))
+  if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
 
   return result;
@@ -152,9 +159,9 @@ WSocket::Read (const D_UINT count, D_UINT8* const pBuffer)
 void
 WSocket::Write (const D_UINT count, const D_UINT8* const pBuffer)
 {
-  WH_SOCK_ERROR e = WH_SOCK_OK;
+  const D_UINT32 e = wh_socket_write (m_Socket, pBuffer, count);
 
-  if (! wh_socket_write (m_Socket, pBuffer, count, &e))
+  if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
 }
 

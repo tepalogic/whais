@@ -184,27 +184,5 @@ const D_CHAR*
 WSocketException::Description () const
 {
 
-  switch (GetExtra ())
-  {
-  case WH_SOCK_NOTINIT:
-    return "Socket framework not initialized.";
-  case WH_SOCK_ENOBUF:
-  case WH_SOCK_NOMEM:
-    return "Insufficient memory to complete socket operation.";
-  case WH_SOCK_NONAME:
-    return "Host name could not be found.";
-  case WH_SOCK_NOSERV:
-    return "Service requested could not be identified.";
-  case WH_SOCK_EPIPE:
-    return "Connection with the remote peer had been interrupted.";
-  case WH_SOCK_NOTRICH:
-    return "The remote host is unreachable.";
-  case WH_SOCK_NOPERM:
-    return "Socket operation not permitted.";
-  case WH_SOCK_ETIMEOUT:
-    return "Socket operation has timeout.";
-  case WH_SOCK_EINVAL:
-    return "Invalid parameters for requested socket operation.";
-  }
-  return "Unknown socket exception";
+  return "Network socket related exception";
 }

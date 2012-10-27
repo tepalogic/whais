@@ -74,8 +74,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
     m_LastReceivedCmd (CMD_INVALID),
     m_FrameSize (0),
     m_EncriptionType (FRAME_ENCTYPE_PLAIN),
-    m_Version (1),
-    m_Data ()
+    m_Version (1)
 {
   m_UserHandler.m_pDesc = NULL;
   const D_UINT16 authFrameLen = FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA;
@@ -112,7 +111,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
     {
       if (it->m_DbsName == dbsName)
         {
-          m_UserHandler.m_pDesc = it.base ();
+          m_UserHandler.m_pDesc = &it[0];
           break;
         }
     }

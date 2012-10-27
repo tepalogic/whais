@@ -68,7 +68,11 @@ public:
   virtual const D_CHAR*   Description () const = 0;
 
 private:
+
+#pragma warning( disable : 4251 )
   const std::string m_ErrorMessage;
+#pragma warning( default : 4251)
+
   const D_CHAR*     m_File;
   D_UINT32          m_Line;
   D_UINT32          m_Extra;
