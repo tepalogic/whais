@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "connector.h"
 
-enum CONNECTOR_STATUS
+D_UINT
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                 D_UINT16* const              pOutSize);
 

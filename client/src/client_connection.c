@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "client_connection.h"
 
 
-enum CONNECTOR_STATUS
+D_UINT
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                 D_UINT16* const              pOutSize)
 {
@@ -40,12 +40,11 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
     {
       D_UINT chunkSize = FRAME_DATA_OFF - frameSize;
 
-      if (wh_socket_read (pHnd->socket,
-                          &pHnd->data[frameSize],
-                          &chunkSize) != WOP_OK)
-        {
-          return CS_OS_INTERNAL;
-        }
+      const D_UINT32 status = wh_socket_read (pHnd->socket,
+                                              &pHnd->data[frameSize],
+                                              &chunkSize);
+      if (status != WOP_OK)
+        return CS_OS_ERR_BASE + status;
       else if (chunkSize == 0)
         return CS_DROPPED;
 
@@ -73,12 +72,11 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
         {
           D_UINT chunkSize = expected - frameSize;
 
-          if (wh_socket_read (pHnd->socket,
-                              &pHnd->data [frameSize],
-                              &chunkSize) != WOP_OK)
-            {
-              return CS_OS_INTERNAL;
-            }
+          const D_UINT32 status = wh_socket_read (pHnd->socket,
+                                                  &pHnd->data[frameSize],
+                                                  &chunkSize);
+          if (status != WOP_OK)
+            return CS_OS_ERR_BASE + status;
           else if (chunkSize == 0)
             return CS_DROPPED;
 

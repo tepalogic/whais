@@ -82,7 +82,7 @@ data (struct INTERNAL_HANDLER* const pHnd)
   return &pHnd->data[FRAME_DATA_OFF + PLAIN_DATA_OFF];
 }
 
-static enum CONNECTOR_STATUS
+static D_INT
 translate_server_resp_code (const D_UINT8 code)
 {
   switch (code)
@@ -96,13 +96,14 @@ translate_server_resp_code (const D_UINT8 code)
   }
 
   assert (0);
-  return CS_UNKNOWN_ERR;
+  return CS_GENERAL_ERR;
 }
 
-static enum CONNECTOR_STATUS
+static D_UINT
 send_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                 const D_UINT8                  type)
 {
+  D_UINT32 status = 0;
   const D_UINT16 frameSize = from_le_int16 (&pHnd->data[FRAME_SIZE_OFF]);
 
   assert (pHnd->encType == FRAME_ENCTYPE_PLAIN);
@@ -112,13 +113,14 @@ send_raw_frame (struct INTERNAL_HANDLER* const pHnd,
   pHnd->data[FRAME_TYPE_OFF]    = type;
   store_le_int32 (pHnd->expectedFrameId++, &pHnd->data[FRAME_ID_OFF]);
 
-  if (wh_socket_write (pHnd->socket, pHnd->data, frameSize) != WOP_OK)
-    return CS_OS_INTERNAL;
+  status = wh_socket_write (pHnd->socket, pHnd->data, frameSize);
+  if (status != WOP_OK)
+    return CS_OS_ERR_BASE + status;
 
   return CS_OK;
 }
 
-static enum CONNECTOR_STATUS
+static D_UINT
 receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
 {
   D_UINT16 frameSize;
@@ -127,12 +129,12 @@ receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
   while (frameRead < FRAME_DATA_OFF)
     {
       D_UINT chunkSize = FRAME_DATA_OFF - frameRead;
-      if (wh_socket_read (pHnd->socket,
-                          &pHnd->data [frameRead],
-                          &chunkSize) != WOP_OK)
-        {
-          return CS_OS_INTERNAL;
-        }
+
+      const D_UINT32 status  = wh_socket_read (pHnd->socket,
+                                               &pHnd->data [frameRead],
+                                               &chunkSize);
+      if (status != WOP_OK)
+        return CS_OS_ERR_BASE + status;
       else if (chunkSize == 0)
         return CS_DROPPED;
 
@@ -153,12 +155,11 @@ receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
   while (frameRead < frameSize)
     {
       D_UINT chunkSize = frameSize - frameRead;
-      if (wh_socket_read (pHnd->socket,
-                          &pHnd->data [frameRead],
-                          &chunkSize) != WOP_OK)
-        {
-          return CS_OS_INTERNAL;
-        }
+      const D_UINT32 status = wh_socket_read (pHnd->socket,
+                                              &pHnd->data [frameRead],
+                                              &chunkSize);
+      if (status != WOP_OK)
+        return CS_OS_ERR_BASE + status;
       else if (chunkSize == 0)
         return CS_DROPPED;
 
@@ -171,7 +172,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const pHnd)
   return CS_OK;
 }
 
-static enum CONNECTOR_STATUS
+static D_UINT
 send_command (struct INTERNAL_HANDLER* const pHnd,
               const D_UINT16                 commandId,
               const D_BOOL                   lastPart)
@@ -180,7 +181,7 @@ send_command (struct INTERNAL_HANDLER* const pHnd,
   D_UINT32               chkSum   = 0;
   D_UINT16               index    = 0;
   const D_UINT16         dataSize = data_size (pHnd);
-  enum  CONNECTOR_STATUS cs       = CS_OK;
+  D_UINT                 cs       = CS_OK;
 
   assert (pHnd->encType == FRAME_ENCTYPE_PLAIN);
 
@@ -233,12 +234,12 @@ send_failure:
   return cs;
 }
 
-static enum CONNECTOR_STATUS
+static D_UINT
 recieve_answer (struct INTERNAL_HANDLER* const pHnd,
                 D_UINT16* const                respType,
                 D_BOOL* const                  lastPart)
 {
-  enum CONNECTOR_STATUS cs        = receive_raw_frame (pHnd);
+  D_UINT                cs        = receive_raw_frame (pHnd);
   D_UINT32              chkSum    = 0;
   const D_UINT16        dataSize  = data_size (pHnd);
   D_UINT16              index     = 0;
@@ -298,7 +299,7 @@ recieve_failure:
   return cs;
 }
 
-static enum CONNECTOR_STATUS
+static D_UINT
 ack_answer_part (struct INTERNAL_HANDLER* const pHnd,
                  const  D_BOOL                  getNextPart)
 {
@@ -318,7 +319,7 @@ ack_answer_part (struct INTERNAL_HANDLER* const pHnd,
     {
       D_UINT16 type = CMD_INVALID_RSP;
 
-      enum CONNECTOR_STATUS cs = send_raw_frame (pHnd, FRAME_TYPE_PARTIAL_ACK);
+      D_UINT cs = send_raw_frame (pHnd, FRAME_TYPE_PARTIAL_ACK);
       if (cs != CS_OK)
         return cs;
 
@@ -333,7 +334,7 @@ ack_answer_part (struct INTERNAL_HANDLER* const pHnd,
   return send_raw_frame (pHnd, FRAME_TYPE_PARTIAL_CANCEL);
 };
 
-enum CONNECTOR_STATUS
+D_UINT
 Connect (const char* const   pHost,
          const char* const   pPort,
          const char* const   pDatabaseName,
@@ -344,7 +345,7 @@ Connect (const char* const   pHost,
   struct INTERNAL_HANDLER* pResult     = NULL;
   const D_UINT             passwordLen = strlen (pPassword);
   D_UINT16                 frameSize   = 0;
-  enum CONNECTOR_STATUS    status      = CS_OK;
+  D_UINT32                 status      = CS_OK;
 
   if ((pHost == NULL)
       || (pPort == NULL)
@@ -369,9 +370,10 @@ Connect (const char* const   pHost,
   pResult->encType    = FRAME_ENCTYPE_PLAIN;
   memcpy (pResult->encriptionKey, pPassword, passwordLen);
 
-  if (wh_socket_client (pHost, pPort, &pResult->socket) != WOP_OK)
+  status = wh_socket_client (pHost, pPort, &pResult->socket);
+  if (status != WOP_OK)
     {
-      status = CS_OS_INTERNAL;
+      status += CS_OS_ERR_BASE;
       goto fail_ret;
     }
 
@@ -467,7 +469,7 @@ Close (CONNECTOR_HND hnd)
   mem_free (pHnd);
 }
 
-enum CONNECTOR_STATUS
+D_UINT
 PingServer (const CONNECTOR_HND hnd)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
@@ -475,7 +477,7 @@ PingServer (const CONNECTOR_HND hnd)
   D_UINT16 type;
   D_BOOL   lastPart;
 
-  enum CONNECTOR_STATUS cs = CS_OK;
+  D_UINT cs = CS_OK;
 
   if (hnd == NULL)
     return CS_INVALID_ARGS;
@@ -503,7 +505,7 @@ exit_ping_server:
   return cs;
 };
 
-enum CONNECTOR_STATUS
+D_UINT
 ListGlobals (const CONNECTOR_HND hnd, unsigned int* poGlbsCount)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
@@ -512,7 +514,7 @@ ListGlobals (const CONNECTOR_HND hnd, unsigned int* poGlbsCount)
   D_UINT16 type;
   D_BOOL   lastPart;
 
-  enum CONNECTOR_STATUS cs = CS_OK;
+  D_UINT cs = CS_OK;
 
   if ((hnd == NULL) || (poGlbsCount == NULL))
     return CS_INVALID_ARGS;
@@ -564,7 +566,7 @@ list_globals_err:
   return cs;
 }
 
-enum CONNECTOR_STATUS
+D_UINT
 ListGlobalsFetch (const CONNECTOR_HND hnd, const char** poGlbName)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
@@ -574,7 +576,7 @@ ListGlobalsFetch (const CONNECTOR_HND hnd, const char** poGlbName)
   D_UINT8  frameGlbs;
   D_UINT8  fetchedFrameGlbs;
 
-  enum CONNECTOR_STATUS cs = CS_OK;
+  D_UINT cs = CS_OK;
 
   if ((poGlbName == NULL)
       || (pHnd == NULL)
@@ -646,7 +648,7 @@ fetch_global_exit:
   return cs;
 }
 
-enum CONNECTOR_STATUS
+D_UINT
 ListGlobalsFetchCancel (const CONNECTOR_HND hnd)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;
@@ -662,7 +664,7 @@ ListGlobalsFetchCancel (const CONNECTOR_HND hnd)
 }
 
 
-enum CONNECTOR_STATUS
+D_UINT
 DescribeGlobal (const CONNECTOR_HND    hnd,
                 const char*            pName,
                 unsigned int*          poTypeDescSize)
@@ -674,7 +676,7 @@ DescribeGlobal (const CONNECTOR_HND    hnd,
   D_UINT16 dataSize = strlen (pName) + sizeof (D_UINT16) + 1;
   D_BOOL   lastPart;
 
-  enum CONNECTOR_STATUS cs = CS_OK;
+  D_UINT cs = CS_OK;
 
   if ((hnd == NULL) || (poTypeDescSize == NULL))
     return CS_INVALID_ARGS;
@@ -722,7 +724,7 @@ global_desc_exit:
   return cs;
 }
 
-enum CONNECTOR_STATUS
+D_UINT
 DescribeGlobalFetch (const CONNECTOR_HND    hnd,
                      const unsigned char**  poGlbTypeInfoChunk,
                      unsigned int*          poChunkSize)
@@ -733,7 +735,7 @@ DescribeGlobalFetch (const CONNECTOR_HND    hnd,
   D_UINT16 typeFrameSize;
   D_UINT16 typeIndex;
 
-  enum CONNECTOR_STATUS cs = CS_OK;
+  D_UINT cs = CS_OK;
 
   if ((poGlbTypeInfoChunk == NULL)
       || (poChunkSize == NULL)
@@ -783,7 +785,7 @@ global_desc_fetch_exit:
   return cs;
 }
 
-enum CONNECTOR_STATUS
+D_UINT
 DescribeGlobalFetchCancel (const CONNECTOR_HND hnd)
 {
   struct INTERNAL_HANDLER* pHnd = (struct INTERNAL_HANDLER*)hnd;

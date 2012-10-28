@@ -70,9 +70,10 @@ wh_socket_client (const D_CHAR* const        pServer,
   struct addrinfo  hints    = {0, };
   struct addrinfo* pResults = NULL;
   struct addrinfo* pIt      = NULL;
-  D_UINT32         status   = -1;
-  D_UINT8          sd       = -1;
-  const D_UINT8    on       = 1;
+  D_UINT32         status   = ~0;
+  D_INT            sd       = -1;
+  const D_INT      on       = 1;
+
 
   assert (pServer != NULL);
   assert (pPort != NULL);
@@ -132,9 +133,9 @@ wh_socket_server (const D_CHAR* const       pLocalAdress,
   struct addrinfo  hints    = {0, };
   struct addrinfo* pResults = NULL;
   struct addrinfo* pIt      = NULL;
-  D_UINT32         status   = -1;
-  D_UINT8          sd       = -1;
-  const D_UINT8    on       = 1;
+  D_UINT32         status   = ~0;
+  D_INT            sd       = -1;
+  const D_INT      on       = 1;
 
   assert (pPort != NULL);
 

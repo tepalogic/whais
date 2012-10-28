@@ -31,26 +31,23 @@ extern "C" {
 
 typedef void* CONNECTOR_HND;
 
-enum CONNECTOR_STATUS
-{
-  CS_OK,
-  CS_INVALID_ARGS,
-  CS_OP_NOTPERMITED,
-  CS_DROPPED,
-  CS_ENCTYPE_NOTSUPP,
-  CS_UNEXPECTED_FRAME,
-  CS_INVALID_FRAME,
-  CS_COMM_OUT_OF_SYNC,
-  CS_LARGE_ARGS,
-  CS_CONNECTION_TIMEOUT,
-  CS_SERVER_BUSY,
-  CS_OS_INTERNAL,
-  CS_UNKNOWN_ERR
-};
+static const unsigned int  CS_OK                 = 0;
+static const unsigned int  CS_INVALID_ARGS       = 1;
+static const unsigned int  CS_OP_NOTPERMITED     = 2;
+static const unsigned int  CS_DROPPED            = 3;
+static const unsigned int  CS_ENCTYPE_NOTSUPP    = 4;
+static const unsigned int  CS_UNEXPECTED_FRAME   = 5;
+static const unsigned int  CS_INVALID_FRAME      = 6;
+static const unsigned int  CS_COMM_OUT_OF_SYNC   = 7;
+static const unsigned int  CS_LARGE_ARGS         = 8;
+static const unsigned int  CS_CONNECTION_TIMEOUT = 9;
+static const unsigned int  CS_SERVER_BUSY        = 10;
+static const unsigned int  CS_GENERAL_ERR        = 11;
+static const unsigned int  CS_OS_ERR_BASE        = 12;
 
 #define CONNECTOR_ENC_ALL   (CONNECTOR_ENC_PLAIN | CONNECTOR_ENC_ISX)
 
-enum CONNECTOR_STATUS
+unsigned int
 Connect (const char* const   pHost,
          const char* const   pPort,
          const char* const   pDatabaseName,
@@ -60,29 +57,29 @@ Connect (const char* const   pHost,
 void
 Close (CONNECTOR_HND hnd);
 
-enum CONNECTOR_STATUS
+unsigned int
 PingServer (const CONNECTOR_HND hnd);
 
-enum CONNECTOR_STATUS
+unsigned int
 ListGlobals (const CONNECTOR_HND hnd, unsigned int* poGlbsCount);
 
-enum CONNECTOR_STATUS
+unsigned int
 ListGlobalsFetch (const CONNECTOR_HND hnd, const char** poGlbName);
 
-enum CONNECTOR_STATUS
+unsigned int
 ListGlobalsFetchCancel (const CONNECTOR_HND hnd);
 
-enum CONNECTOR_STATUS
+unsigned int
 DescribeGlobal (const CONNECTOR_HND    hnd,
                 const char*            pName,
                 unsigned int*          poTypeDescSize);
 
-enum CONNECTOR_STATUS
+unsigned int
 DescribeGlobalFetch (const CONNECTOR_HND    hnd,
                      const unsigned char**  poGlbTypeInfoChunk,
                      unsigned int*          poChunkSize);
 
-enum CONNECTOR_STATUS
+unsigned int
 DescribeGlobalFetchCancel (const CONNECTOR_HND hnd);
 
 

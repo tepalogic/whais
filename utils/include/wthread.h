@@ -117,6 +117,7 @@ private:
   void*                   m_RoutineArgs;
   WException*             m_Exception;
   WH_THREAD               m_ThreadHnd;
+  WSynchronizer           m_Sync;
   bool                    m_UnkExceptSignaled;
   bool                    m_IgnoreExceptions;
   bool                    m_Ended;

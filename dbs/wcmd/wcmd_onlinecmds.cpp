@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cstdio>
 
 #include "whisper.h"
 
@@ -162,8 +163,18 @@ decode_glbvar_typeinfo (const D_UINT8* pTypeInfo)
 }
 
 const D_CHAR*
-translate_status (CONNECTOR_STATUS cs)
+translate_status (const D_UINT32 cs)
 {
+  if (cs > CS_OS_ERR_BASE)
+    {
+      /* This is safe, coz this function is not supposed to be executed
+       * in a multi thread environment. a*/
+      static D_CHAR statusStr [64];
+      sprintf (statusStr, "OS internal error: %u.", cs - CS_OS_ERR_BASE);
+
+      return statusStr;
+    }
+
   switch (cs)
   {
   case CS_OK:
@@ -188,13 +199,12 @@ translate_status (CONNECTOR_STATUS cs)
     return "Connection has timeout.";
   case CS_SERVER_BUSY:
     return "Server is too busy.";
-  case CS_OS_INTERNAL:
-    return "OS internal error encountered.";
-  case CS_UNKNOWN_ERR:
-    return "An unknown error was encountered.";
+  case CS_GENERAL_ERR:
+    return "Unexpected error condition.";
   }
 
-  return "Unknown error.";
+  assert (FALSE);
+  return "Unknown error encountered!";
 }
 
 static const D_CHAR globalShowDesc[]    = "List context database's "
@@ -215,12 +225,12 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   unsigned int        glbsCount = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
 
-  CONNECTOR_STATUS cs  = Connect (GetRemoteHostName ().c_str (),
-                                  GetConnectionPort ().c_str (),
-                                  GetWorkingDB ().c_str (),
-                                  GetUserPassword ().c_str (),
-                                  GetUserId (),
-                                  &conHdl);
+  D_UINT32 cs  = Connect (GetRemoteHostName ().c_str (),
+                          GetConnectionPort ().c_str (),
+                          GetWorkingDB ().c_str (),
+                          GetUserPassword ().c_str (),
+                          GetUserId (),
+                          &conHdl);
 
   assert (token == "global");
 
@@ -336,13 +346,12 @@ cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   CONNECTOR_HND conHdl = NULL;
   WTICKS ticks  = wh_msec_ticks ();
-  CONNECTOR_STATUS cs  = Connect (GetRemoteHostName ().c_str (),
-                                  GetConnectionPort ().c_str (),
-                                  GetWorkingDB ().c_str (),
-                                  GetUserPassword ().c_str (),
-                                  GetUserId (),
-                                  &conHdl);
-
+  D_UINT32 cs  = Connect (GetRemoteHostName ().c_str (),
+                          GetConnectionPort ().c_str (),
+                          GetWorkingDB ().c_str (),
+                          GetUserPassword ().c_str (),
+                          GetUserId (),
+                          &conHdl);
   if (cs != CS_OK)
     goto cmd_ping_exit;
 
@@ -353,7 +362,7 @@ cmd_ping_exit:
   ticks = wh_msec_ticks () - ticks;
   if (cs != CS_OK)
     {
-      cout << "Server ping failed : " << translate_status (cs) << endl;
+      cout << translate_status (cs) << endl;
       return false;
     }
   else

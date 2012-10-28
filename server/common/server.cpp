@@ -240,18 +240,17 @@ listener_routine (void* args)
         ostringstream logEntry;
 
         logEntry << "Listening ";
-        logEntry << pListener->m_pInterface == "" ?
-                    "*" : pListener->m_pInterface;
+        logEntry << ((pListener->m_pInterface == NULL) ?
+                     "*" :
+                     pListener->m_pInterface);
         logEntry <<'@' << pListener->m_pPort << ".\n";
 
         spLogger->Log (LOG_INFO, logEntry.str ());
       }
 
-    pListener->m_Socket = WSocket (
-          pListener->m_pInterface == "" ?  NULL : pListener->m_pInterface,
-          pListener->m_pPort,
-          SOCKET_BACK_LOG
-                                  );
+    pListener->m_Socket = WSocket (pListener->m_pInterface,
+                                   pListener->m_pPort,
+                                   SOCKET_BACK_LOG);
 
     bool acceptUserConnections = sAcceptUsersConnections;
 
@@ -275,8 +274,6 @@ listener_routine (void* args)
               client.Write (sizeof busyResp, busyResp);
               client.Close ();
             }
-
-          acceptUserConnections = sAcceptUsersConnections;
         }
         catch (WSocketException& e)
         {
@@ -296,6 +293,7 @@ listener_routine (void* args)
                 spLogger->Log (LOG_ERROR, logEntry.str ());
               }
         }
+        acceptUserConnections = sAcceptUsersConnections;
       }
   }
   catch (WException& e)

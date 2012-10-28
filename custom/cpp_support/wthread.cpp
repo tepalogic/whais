@@ -61,6 +61,7 @@ WThread::WThread ()
     m_RoutineArgs (NULL),
     m_Exception (NULL),
     m_ThreadHnd (0),
+    m_Sync (),
     m_UnkExceptSignaled (false),
     m_IgnoreExceptions (false),
     m_Ended (true),
@@ -71,11 +72,12 @@ WThread::WThread ()
 void
 WThread::Run (WH_THREAD_ROUTINE routine, void* const args)
 {
-  assert (m_Ended);
-  //Wait for the the previous thread to be cleared
-  //But this should not happen.
+  //Wait for the the previous thread to be cleared.
   WaitToEnd ();
 
+  m_Sync.Enter ();
+
+  assert (m_Ended);
   assert (m_NeedsClean == false);
 
   m_Ended       = false;
@@ -88,6 +90,7 @@ WThread::Run (WH_THREAD_ROUTINE routine, void* const args)
   if (res != WOP_OK)
     {
       m_Ended = true;
+      m_Sync.Leave ();
       throw WThreadException (NULL, _EXTRA (errno));
     }
 
@@ -108,8 +111,9 @@ WThread::~WThread ()
 void
 WThread::WaitToEnd (const bool throwPending)
 {
-  while (! m_Ended)
-    wh_yield ();
+  WSynchronizerRAII holder (m_Sync);
+
+  assert (m_Ended );
 
   if (m_NeedsClean)
     wh_thread_free (m_ThreadHnd);
@@ -168,5 +172,8 @@ WThread::ThreadWrapperRoutine (void* const args)
       pThread->m_UnkExceptSignaled = true;
   }
 
+  assert (pThread->m_Ended == false);
+
   pThread->m_Ended = true;
+  pThread->m_Sync.Leave ();
 }
