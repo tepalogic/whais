@@ -14,6 +14,12 @@ template <class T>
 class auto_array
 {
 public:
+  auto_array ()
+    : m_pT (NULL),
+      m_Size (0)
+  {
+  }
+
   auto_array (const unsigned int size)
     : m_pT (new T [size]),
       m_Size (size)
@@ -48,16 +54,16 @@ public:
     return m_Size;
   }
 
-  void Size (const unsigned int newSize)
+  T* Size (const unsigned int newSize)
   {
     if (newSize == 0)
       {
-        delete m_pT;
+        delete [] m_pT;
 
         m_pT   = NULL;
         m_Size = 0;
 
-        return;
+        return m_pT;
       }
 
     const unsigned min = (newSize < m_Size) ? newSize : m_Size;
@@ -76,9 +82,11 @@ public:
 
     m_Size = newSize;
     m_pT   = pNewArray;
+
+    return m_pT;
   }
 
-  void Reset (const unsigned int newSize)
+  T* Reset (const unsigned int newSize)
   {
     T* const pNewArray = ((newSize == 0) ? NULL : new T[newSize]);
     try
@@ -93,6 +101,8 @@ public:
 
     m_Size = newSize;
     m_pT   = pNewArray;
+
+    return m_pT;
   }
 
 private:

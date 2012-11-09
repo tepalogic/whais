@@ -22,6 +22,7 @@ INCLUDES+=./ ./common
 ifeq ($(BUILD_TESTS),yes)
 DEFINES+=BUILD_TESTS=1
 MEMORY_TRACE?=yes
+EXTRA_LIBS=yes
 endif
 
 ifeq ($(MEMORY_TRACE),yes)

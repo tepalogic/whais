@@ -80,12 +80,12 @@ public:
                     std::vector<DBSDescriptors>& databases);
   ~ClientConnection ();
 
-  D_UINT16  MaxSize () const;
-  D_UINT16  Size () const;
-  void      Size (const D_UINT16 size);
-  D_UINT8*  Data ();
+  D_UINT16      MaxSize () const;
+  D_UINT16      DataSize () const;
+  void          DataSize (const D_UINT16 size);
+  D_UINT8*      Data ();
 
-  D_UINT32 ReadCommand (bool& oLastPart);
+  D_UINT32 ReadCommand (bool* const pLastPart);
   void     AckCommandPart (const bool waitingNext = true);
 
   void SendCmdResponse (const D_UINT16 respType,
@@ -93,6 +93,7 @@ public:
                         bool&          oSendNext);
 
   const DBSDescriptors&  Dbs () { return *m_UserHandler.m_pDesc; }
+  SessionStack&          Stack () { return m_Stack; }
 private:
   D_UINT8* RawCmdData ();
 
@@ -100,6 +101,7 @@ private:
   void SendRawClientFrame (const D_UINT8 type);
 
   UserHandler&        m_UserHandler;
+  SessionStack        m_Stack;
   D_UINT32            m_WaitingFrameId;
   D_UINT32            m_ClientCookie;
   D_UINT32            m_ServerCookie;

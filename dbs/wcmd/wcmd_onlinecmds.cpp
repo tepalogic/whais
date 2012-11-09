@@ -181,6 +181,8 @@ translate_status (const D_UINT32 cs)
     return "No error returned.";
   case CS_INVALID_ARGS:
     return "Invalid arguments.";
+  case CS_OP_NOTSUPP:
+    return "Operation not supported";
   case CS_OP_NOTPERMITED:
     return "Operation not permitted.";
   case CS_DROPPED:
@@ -281,7 +283,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     {
       unsigned int typeInfoSize = 0;
       token = CmdLineNextToken (globals, linePos);
-      cs = DescribeGlobal (conHdl, token.c_str (), &typeInfoSize);
+      cs = DescribeValue (conHdl, token.c_str (), &typeInfoSize);
 
       if (cs != CS_OK)
         {
@@ -301,10 +303,10 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           const unsigned char *pChunk    = NULL;
           unsigned int         chunkSize = 0;
 
-          cs = DescribeGlobalFetch (conHdl, &pChunk, &chunkSize);
+          cs = DescribeValueFetch (conHdl, &pChunk, &chunkSize);
           if (cs != CS_OK)
             {
-              DescribeGlobalFetchCancel (conHdl);
+              DescribeValueFetchCancel (conHdl);
               break;
             }
 

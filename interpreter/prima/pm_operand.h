@@ -187,6 +187,7 @@ public:
   //Special treatment for these
   virtual FIELD_INDEX   GetField ();
   virtual I_DBSTable&   GetTable ();
+  virtual StackValue    GetFieldAt (const FIELD_INDEX field);
   virtual StackValue    GetValueAt (const D_UINT64 index);
 
   virtual TableOperand  GetTableOp ();
@@ -1430,6 +1431,7 @@ public:
 
   virtual bool IsNull () const;
 
+  virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual I_DBSTable& GetTable ();
 
   TableReference& GetTableRef () const
@@ -2836,6 +2838,12 @@ public:
     return GetOperand ().GetTable ();
   }
 
+  StackValue GetFieldAt (const FIELD_INDEX field)
+  {
+    WSynchronizerRAII dummy(m_Sync);
+    return GetOperand ().GetFieldAt (field);
+  }
+
   StackValue GetValueAt (const D_UINT64 index)
   {
     WSynchronizerRAII dummy(m_Sync);
@@ -2951,6 +2959,7 @@ public:
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
+  virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual StackValue  GetValueAt (const D_UINT64 index);
 
   virtual StackValue CopyValue () const;
@@ -3036,6 +3045,7 @@ public:
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
+  virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual StackValue  GetValueAt (const D_UINT64 index);
 
   virtual StackValue CopyValue () const;

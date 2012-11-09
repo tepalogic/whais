@@ -29,8 +29,13 @@
 #include "dbs_types.h"
 #include "dbs_exception.h"
 
+#ifndef REAL_T
 typedef float       REAL_T;
+#endif
+
+#ifndef RICHREAL_T
 typedef long double RICHREAL_T;
+#endif
 
 struct DBSBool
 {

@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/include/le_converter.h"
 
 #include "commands.h"
+#include "stack_cmds.h"
 
 static void
 cmd_invalid (ClientConnection&, const bool)
@@ -40,11 +41,67 @@ cmd_unspp (ClientConnection&, const bool)
   throw ConnectionException ("Unsupported supported command.", _EXTRA (0));
 }
 
+static void
+cmd_read_stack (ClientConnection& conn, const bool receivedAll)
+{
+  cmd_unspp (conn, receivedAll);
+}
 
 static void
-cmd_ping_sever (ClientConnection& conn, const bool receivedAll)
+cmd_update_stack (ClientConnection& rConn, const bool receivedAll)
 {
-  if ((conn.Size () != 0) || (receivedAll == false))
+  const D_UINT8* const data    = rConn.Data ();
+  D_UINT32             status  = CS_OK;
+  D_UINT16             dataOff = 0;
+
+  if (rConn.DataSize () == 0)
+    {
+      status = CS_INVALID_ARGS;
+      goto cmd_update_exit;
+    }
+
+  while (dataOff < rConn.DataSize ())
+    {
+      const D_UINT8 subcmd = data[dataOff++];
+      switch (subcmd)
+      {
+      case CMD_UPDATE_FUNC_PUSH:
+          status = cmd_push_stack (rConn, &dataOff);
+          break;
+
+      case CMD_UPDATE_FUNC_POP:
+          status = cmd_pop_stack (rConn, &dataOff);
+          break;
+
+      case CMD_UPDATE_FUNC_CHTOP:
+          status = cmd_update_stack_top (rConn, &dataOff);
+          break;
+
+      default:
+        throw ConnectionException (
+                               "Encountered unexpected update sub function.",
+                               _EXTRA (subcmd)
+                                  );
+      }
+      if (status != CS_OK)
+        goto cmd_update_exit;
+    }
+
+  assert (status == CS_OK);
+  assert (dataOff == rConn.DataSize ());
+
+cmd_update_exit:
+  rConn.DataSize (sizeof (status));
+  store_le_int32 (status, rConn.Data());
+
+  bool dummy;
+  rConn.SendCmdResponse (CMD_UPDATE_STACK_RSP, true, dummy);
+}
+
+static void
+cmd_ping_sever (ClientConnection& rConn, const bool receivedAll)
+{
+  if ((rConn.DataSize () != 0) || (receivedAll == false))
     {
       throw ConnectionException (
                               "Command to ping the sever has invalid format.",
@@ -53,16 +110,16 @@ cmd_ping_sever (ClientConnection& conn, const bool receivedAll)
     }
 
   bool dummy;
-  conn.Size (0);
-  conn.SendCmdResponse (CMD_PING_SERVER_RSP, true, dummy);
+  rConn.DataSize (0);
+  rConn.SendCmdResponse (CMD_PING_SERVER_RSP, true, dummy);
 
   assert (dummy == false);
 }
 
 static void
-cmd_list_glbs (ClientConnection& conn, const bool receivedAll)
+cmd_list_glbs (ClientConnection& rConn, const bool receivedAll)
 {
-  if ((conn.Size () != 0) || (receivedAll == false))
+  if ((rConn.DataSize () != 0) || (receivedAll == false))
     {
       throw ConnectionException (
                               "Command used to retrieve context global "
@@ -70,25 +127,25 @@ cmd_list_glbs (ClientConnection& conn, const bool receivedAll)
                               _EXTRA (0)
                                 );
     }
-  const I_Session& session = *conn.Dbs ().m_Session;
+  const I_Session& session = *rConn.Dbs ().m_Session;
 
   const D_UINT32 glbsCount  = session.GlobalValuesCount ();
   D_UINT8        namesCount = 0;
   bool           firstResp  = true;
   bool           sendNext;
 
-  conn.Size (sizeof (D_UINT8) + sizeof (D_UINT32) + sizeof (D_UINT8));
+  rConn.DataSize (sizeof (D_UINT8) + sizeof (D_UINT32) + sizeof (D_UINT8));
   for (D_UINT32 glbIndex = 0; glbIndex < glbsCount; ++glbIndex)
     {
       const D_UINT8* pName    = session.GlobalValueName (glbIndex);
       const D_UINT   nameSize = strlen (_RC (const D_CHAR*, pName)) + 1;
 
-      if (((nameSize + conn.Size ()) < conn.MaxSize())
+      if (((nameSize + rConn.DataSize ()) < rConn.MaxSize())
           && (namesCount < 255))
         {
-          D_UINT8* pData = conn.Data () + conn.Size ();
-          memcpy (pData, pName, nameSize);
-          conn.Size (conn.Size () + nameSize);
+          D_UINT8* destination = rConn.Data () + rConn.DataSize ();
+          memcpy (destination, pName, nameSize);
+          rConn.DataSize (rConn.DataSize () + nameSize);
           ++namesCount;
           continue;
         }
@@ -96,16 +153,16 @@ cmd_list_glbs (ClientConnection& conn, const bool receivedAll)
       if (namesCount == 0)
         goto cmd_list_toobig_err;
 
-      conn.Data ()[0] = CMD_STATUS_OK;
+      rConn.Data ()[0] = CS_OK;
       if (firstResp)
         {
-          store_le_int32 (glbsCount, conn.Data () + sizeof (D_UINT8));
-          conn.Data ()[sizeof (D_UINT32) + sizeof (D_UINT8)] = namesCount;
+          store_le_int32 (glbsCount, rConn.Data () + sizeof (D_UINT8));
+          rConn.Data ()[sizeof (D_UINT32) + sizeof (D_UINT8)] = namesCount;
         }
       else
-        conn.Data ()[sizeof (D_UINT8)] = namesCount;
+        rConn.Data ()[sizeof (D_UINT8)] = namesCount;
 
-      conn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, false, sendNext);
+      rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, false, sendNext);
       if ( ! sendNext)
         goto cmd_list_cancel_op;
 
@@ -114,26 +171,26 @@ cmd_list_glbs (ClientConnection& conn, const bool receivedAll)
 
       namesCount = 0;
       firstResp  = false;
-      conn.Size (sizeof (D_UINT8) + sizeof (D_UINT8));
+      rConn.DataSize (sizeof (D_UINT8) + sizeof (D_UINT8));
     }
 
-  conn.Data ()[0] = CMD_STATUS_OK;
+  rConn.Data ()[0] = CS_OK;
   if (firstResp)
     {
-      store_le_int32 (glbsCount, conn.Data () + sizeof (D_UINT8));
-      conn.Data ()[sizeof (D_UINT32) + sizeof (D_UINT8)] = namesCount;
+      store_le_int32 (glbsCount, rConn.Data () + sizeof (D_UINT8));
+      rConn.Data ()[sizeof (D_UINT32) + sizeof (D_UINT8)] = namesCount;
     }
   else
-    conn.Data ()[sizeof (D_UINT8)] = namesCount;
+    rConn.Data ()[sizeof (D_UINT8)] = namesCount;
 
-  conn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, true, sendNext);
+  rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, true, sendNext);
   assert (sendNext == false);
   return;
 
 cmd_list_toobig_err:
-  conn.Size (1);
-  conn.Data ()[0] = CMD_STATUS_TOOBIG;
-  conn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, true, sendNext);
+  rConn.DataSize (1);
+  rConn.Data ()[0] = CS_LARGE_ARGS;
+  rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, true, sendNext);
 
 cmd_list_cancel_op:
   assert (sendNext == false);
@@ -142,10 +199,10 @@ cmd_list_cancel_op:
 }
 
 static void
-cmd_glb_desc (ClientConnection& conn, const bool receivedAll)
+cmd_glb_desc (ClientConnection& rConn, const bool receivedAll)
 {
   bool sendNext = false;
-  if (conn.Size () < (sizeof (D_UINT16) + 1))
+  if (rConn.DataSize () < (sizeof (D_UINT16) + 1))
     {
       throw ConnectionException (
                               "Command used to retrieve description of global "
@@ -155,7 +212,7 @@ cmd_glb_desc (ClientConnection& conn, const bool receivedAll)
     }
   else if (receivedAll == false)
     {
-      conn.AckCommandPart (false);
+      rConn.AckCommandPart (false);
       throw ConnectionException (
                               "Unable to find the description of a global "
                               "variable because its name is too large.",
@@ -163,20 +220,20 @@ cmd_glb_desc (ClientConnection& conn, const bool receivedAll)
                                 );
     }
 
-  D_UINT8* const pData    = conn.Data ();
-  const D_UINT16 nameSize = from_le_int16 (pData);
+  D_UINT8* const data_    = rConn.Data ();
+  const D_UINT16 nameSize = from_le_int16 (data_);
 
-  assert ((nameSize + sizeof (D_UINT16)) == conn.Size());
+  assert ((nameSize + sizeof (D_UINT16)) == rConn.DataSize());
 
-  const I_Session& session = *conn.Dbs ().m_Session;
-  const D_UINT8*   pGlbTI  = session.GlobalValueType (
-                                          pData + sizeof (D_UINT16)
-                                                     );
+  const I_Session& rSession = *rConn.Dbs ().m_Session;
+  const D_UINT8*   pGlbTI   = rSession.GlobalValueType (
+                                                    data_ + sizeof (D_UINT16)
+                                                       );
   if (pGlbTI == NULL)
     {
-      conn.Size (sizeof (D_UINT8));
-      pData[0] = CMD_STATUS_INVAL_ARGS;
-      conn.SendCmdResponse (CMD_GLOBAL_DESC_RSP, true, sendNext);
+      rConn.DataSize (sizeof (D_UINT8));
+      data_[0] = CS_INVALID_ARGS;
+      rConn.SendCmdResponse (CMD_GLOBAL_DESC_RSP, true, sendNext);
 
       assert (sendNext == false);
       return;
@@ -190,29 +247,28 @@ cmd_glb_desc (ClientConnection& conn, const bool receivedAll)
 
   while (progress < dataSize)
     {
-      D_UINT chunkSize = conn.MaxSize () -
+      D_UINT chunkSize = rConn.MaxSize () -
                          (sizeof (D_UINT16) + sizeof (D_UINT8));
       if (chunkSize > (dataSize - progress))
         chunkSize = (dataSize - progress);
 
-      conn.Size (sizeof (D_UINT8) + sizeof (D_UINT16) + chunkSize);
-      pData[0] = CMD_STATUS_OK;
-      store_le_int16 (chunkSize, &pData[sizeof(D_UINT8)]);
-      memcpy (&pData[sizeof (D_UINT8) + sizeof (D_UINT16)],
+      rConn.DataSize (sizeof (D_UINT8) + sizeof (D_UINT16) + chunkSize);
+      data_[0] = CS_OK;
+      store_le_int16 (chunkSize, &data_[sizeof(D_UINT8)]);
+      memcpy (&data_[sizeof (D_UINT8) + sizeof (D_UINT16)],
               pGlbTI + progress,
               chunkSize);
       progress += chunkSize;
 
       assert (progress <= dataSize);
 
-      conn.SendCmdResponse (CMD_GLOBAL_DESC_RSP,
+      rConn.SendCmdResponse (CMD_GLOBAL_DESC_RSP,
                             (progress >= dataSize),
                             sendNext);
       if (! sendNext)
         break;
     }
 }
-
 
 static COMMAND_HANDLER saAdminCmds[] =
     {
@@ -224,6 +280,8 @@ static COMMAND_HANDLER saAdminCmds[] =
 static COMMAND_HANDLER saUserCmds[] =
     {
         cmd_invalid,                     // CMD_CLOSE_CONN
+        cmd_read_stack,                        // CMD_READ_STACK
+        cmd_update_stack,                      // CMD_UPDATE_STACK
         cmd_ping_sever                   // CMD_PING_SERVER
     };
 

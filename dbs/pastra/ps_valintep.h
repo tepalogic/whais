@@ -28,7 +28,6 @@
 #include "dbs_values.h"
 
 namespace pastra
-
 {
 
 class PSValInterp
@@ -54,21 +53,21 @@ public:
   static void Store (D_UINT8* pLocation, const DBSUInt32 &value);
   static void Store (D_UINT8* pLocation, const DBSUInt64 &value);
 
-  static void Retrieve (const D_UINT8* pLocation, DBSBool* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSChar* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSDate* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSDateTime* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSHiresTime* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSInt8* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSInt16* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSInt32* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSInt64* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSReal* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSRichReal* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSUInt8* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSUInt16* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSUInt32* pOutValue);
-  static void Retrieve (const D_UINT8* pLocation, DBSUInt64* pOutValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSBool* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSChar* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSDate* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSDateTime* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSHiresTime* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSInt8* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSInt16* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSInt32* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSInt64* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSReal* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSRichReal* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSUInt8* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSUInt16* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSUInt32* pValue);
+  static void Retrieve (const D_UINT8* pLocation, DBSUInt64* pValue);
 
   static D_INT Size (DBS_FIELD_TYPE type, bool isArray);
   static D_INT Alignment (DBS_FIELD_TYPE, bool isArray);

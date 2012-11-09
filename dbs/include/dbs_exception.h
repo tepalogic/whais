@@ -75,6 +75,7 @@ public:
     INVALID_DATETIME,
     INVALID_HIRESTIME,
     ROW_NOT_ALLOCATED,
+    INVALID_UTF8_VALUE,
   };
 
   virtual WException* Clone () const

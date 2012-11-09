@@ -42,6 +42,12 @@ TableOperand::IsNull () const
   return (m_pRefTable->GetTable ().GetAllocatedRows () == 0);
 }
 
+StackValue
+TableOperand::GetFieldAt (const FIELD_INDEX field)
+{
+  return StackValue (FieldOperand (*this, field));
+}
+
 I_DBSTable&
 TableOperand::GetTable ()
 {

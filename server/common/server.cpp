@@ -119,7 +119,7 @@ client_handler_routine (void* args)
           const COMMAND_HANDLER* pCmds;
           bool                   lastPart;
 
-          D_UINT16 cmdType = connection.ReadCommand (lastPart);
+          D_UINT16 cmdType = connection.ReadCommand (&lastPart);
 
           if (cmdType == CMD_CLOSE_CONN)
             break;

@@ -356,6 +356,12 @@ I_PMOperand::GetTable ()
 }
 
 StackValue
+I_PMOperand::GetFieldAt (const FIELD_INDEX field)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+StackValue
 I_PMOperand::GetValueAt (const D_UINT64 index)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
@@ -2672,6 +2678,12 @@ GlobalOperand::GetTable ()
 }
 
 StackValue
+GlobalOperand::GetFieldAt (const FIELD_INDEX field)
+{
+  return m_Value.GetFieldAt (field);
+}
+
+StackValue
 GlobalOperand::GetValueAt (const D_UINT64 index)
 {
   return m_Value.GetValueAt (index);
@@ -3037,6 +3049,12 @@ I_DBSTable&
 LocalOperand::GetTable ()
 {
   return m_Stack[m_Index].GetOperand ().GetTable ();
+}
+
+StackValue
+LocalOperand::GetFieldAt (const FIELD_INDEX field)
+{
+  return m_Stack[m_Index].GetOperand ().GetFieldAt (field);
 }
 
 StackValue

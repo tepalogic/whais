@@ -1,7 +1,10 @@
 UNIT:=interpreter
 
 UNIT_EXES:= 
-UNIT_LIBS:=slprima
+UNIT_LIBS:=
+ifeq ($(EXTRA_LIBS),yes)
+UNIT_LIBS+=slprima
+endif
 UNIT_SHLS:=prima
 
 prima_INC:=utils/include

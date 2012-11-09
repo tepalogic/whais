@@ -36,7 +36,7 @@ static const D_UINT MAX_OP_QWORDS = 6;
 
 class StackValue;
 
-class I_Operand
+class INTERP_SHL I_Operand
 {
 public:
   I_Operand ()
@@ -113,6 +113,7 @@ public:
   //Special treatment for these
   virtual FIELD_INDEX   GetField () = 0;
   virtual I_DBSTable&   GetTable () = 0;
+  virtual StackValue    GetFieldAt (const FIELD_INDEX field) = 0;
   virtual StackValue    GetValueAt (const D_UINT64 index) = 0;
 
   virtual StackValue CopyValue () const = 0;
@@ -147,7 +148,7 @@ private:
   D_UINT64 m_Storage [MAX_OP_QWORDS];
 };
 
-class SessionStack
+class INTERP_SHL SessionStack
 {
 public:
   SessionStack ();

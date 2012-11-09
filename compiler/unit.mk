@@ -2,8 +2,12 @@
 UNIT:=compiler
 
 UNIT_EXES:=whc wod
+UNIT_LIBS:=
+ifeq ($(EXTRA_LIBS),yes)
+UNIT_LIBS+=slcompiler
+endif
 UNIT_SHLS:=compiler
-UNIT_LIBS:=slcompiler
+
 
 whc_SRC=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp
 whc_DEF=USE_COMPILER_SHL

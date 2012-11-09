@@ -1,7 +1,11 @@
 UNIT:=dbs
 
 UNIT_EXES:=wcmd
-UNIT_LIBS:=slpastra
+
+UNIT_LIBS:=
+ifeq ($(EXTRA_LIBS),yes)
+UNIT_LIBS+=slpastra
+endif
 UNIT_SHLS:=pastra
 
 pastra_INC:=utils/include

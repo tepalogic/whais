@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SERVER_PROTOCOL_H_
 #define SERVER_PROTOCOL_H_
 
+#include "client/include/whisper_connector.h"
+
 #define FRAME_SIZE_OFF                  0x00
 #define FRAME_TYPE_OFF                  0x02
 #define FRAME_ENCTYPE_OFF               0x03
@@ -71,10 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FRAME_AUTH_CLNT_DATA            0x08
 
 #define FRAME_MAX_SIZE                  0x1000
-
-#define CMD_STATUS_OK                   0x00
-#define CMD_STATUS_TOOBIG               0x01
-#define CMD_STATUS_INVAL_ARGS           0x02
 
 #define ADMIN_CMD_BASE                  0x0000
 #define USER_CMD_BASE                   0x1000
@@ -125,8 +123,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_CLOSE_CONN          USER_CMD_BASE
 #define CMD_CLOSE_CONN_RSP      (CMD_CLOSE_CONN + 1)
 
+#define CMD_READ_STACK          (CMD_CLOSE_CONN_RSP + 1)
+#define CMD_READ_STACK_RSP      (CMD_READ_STACK + 1)
+
+#define CMD_UPDATE_STACK        (CMD_READ_STACK_RSP + 1)
+#define CMD_UPDATE_STACK_RSP    (CMD_UPDATE_STACK + 1)
+
+#define CMD_UPDATE_FUNC_POP     1
+#define CMD_UPDATE_FUNC_PUSH    2
+#define CMD_UPDATE_FUNC_CHTOP   3
+
+/*
+ * CmdUpdate
+ * {
+ *      value_name : uint8[];
+ *      field_name : uint8[];
+ *      type       : uint16;
+ *      flags      : uint16;
+ *      row_index  : uint64;
+ *      from_pos   : uint64;
+ *      data       : uint8 [];
+ * }
+ *
+ * CmdSubCmdPop
+ * {
+ *      count      : uint32;
+ * }
+ *
+ * CmdSubCmdPush
+ * {
+ *      type      : uint16
+ *      fieldName : uint8[] (type == FT_TABLE)
+ *      fieldType : uint16 (type == FT_TABLE)
+ * }
+ *
+ * CmdSubcmdUpdateTop
+ * {
+ *      flags     : uint16
+ *      fieldName : uint8[]  (flags & FT_FIELD_MASK)
+ *      rowIndex  : uint8[]  (flags & FT_FIELD_MASK)
+ *      arrayIndex: uint8[]  (flags & FT_ARRAY_MASK)
+ *      count     : uint8[]  (flags & FT_ARRAY_MASK)
+ *      value1    : uint8[]  (count > 0)
+ *      value2    : uint8[]  (count > 1)
+ *      .
+ *      .
+ *      .
+ *      valuen   : uint8[]   (count > n-1)
+ * }
+ *
+ * CmdUpdatRsp
+ * {
+ *      status: uint16
+ * }
+ *
+ */
+
 /* Ping command */
-#define CMD_PING_SERVER         (CMD_CLOSE_CONN_RSP + 1)
+#define CMD_PING_SERVER         (CMD_UPDATE_STACK_RSP + 1)
 #define CMD_PING_SERVER_RSP     (CMD_PING_SERVER + 1)
 
 

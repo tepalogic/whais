@@ -24,7 +24,6 @@
 #include <assert.h>
 
 #include "dbs_exception.h"
-
 #include "ps_valintep.h"
 
 using namespace std;
@@ -39,10 +38,15 @@ static const D_INT PS_INT8_SIZE                = 1;
 static const D_INT PS_INT16_SIZE               = 2;
 static const D_INT PS_INT32_SIZE               = 4;
 static const D_INT PS_INT64_SIZE               = 8;
-static const D_INT PS_REAL_SIZE                = sizeof (REAL_T);
-static const D_INT PS_RICHREAL_SIZE            = sizeof (RICHREAL_T);
 static const D_INT PS_TEXT_SIZE                = 16;
 static const D_INT PS_ARRAY_SIZE               = 16;
+
+#ifndef PS_REAL_SIZE
+static const D_INT PS_REAL_SIZE                = sizeof (REAL_T);
+#endif
+#ifndef PS_RICHREAL_SIZE
+static const D_INT PS_RICHREAL_SIZE            = sizeof (RICHREAL_T);
+#endif
 
 static const D_INT PS_BOOL_ALIGN               = 1;
 static const D_INT PS_CHAR_ALIGN               = 4;
@@ -53,8 +57,6 @@ static const D_INT PS_INT8_ALIGN               = 1;
 static const D_INT PS_INT16_ALIGN              = 2;
 static const D_INT PS_INT32_ALIGN              = 4;
 static const D_INT PS_INT64_ALIGN              = 8;
-static const D_INT PS_REAL_ALIGN               = 0; //Based on system implementation
-static const D_INT PS_RICHREAL_ALIGN           = 0; //Based on system implementation
 static const D_INT PS_TEXT_ALIGN               = 8;
 static const D_INT PS_ARRAY_ALIGN              = 8;
 
@@ -108,16 +110,16 @@ new_hirestime (D_INT32       year,
 
 template <class T_OBJ, class T_VAL>
 static void
-new_integer (T_VAL value, T_OBJ* pOutValue)
+new_integer (T_VAL value, T_OBJ* pValue)
 {
-  _placement_new (pOutValue, T_OBJ (value));
+  _placement_new (pValue, T_OBJ (value));
 }
 
 template <class T_OBJ, class T_REAL>
 static void
-new_real (T_REAL value, T_OBJ* pOutValue)
+new_real (T_REAL value, T_OBJ* pValue)
 {
-  _placement_new (pOutValue, T_OBJ (value));
+  _placement_new (pValue, T_OBJ (value));
 }
 
 void
@@ -224,34 +226,32 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSUInt64 &value)
 }
 
 
-/////////////////////////////MARKER
-
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSBool* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSBool* pValue)
 {
-  new_bool (*pLocation != 0, pOutValue);
+  new_bool (*pLocation != 0, pValue);
   assert ((*pLocation == 0) || (*pLocation == 1));
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSChar* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSChar* pValue)
 {
-  new_char (_RC(const D_UINT32*, pLocation)[0], pOutValue);
+  new_char (_RC(const D_UINT32*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDate* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDate* pValue)
 {
 
   D_INT16 year  = _RC (const D_UINT16*, pLocation)[0];
   D_UINT8 month = pLocation[2];
   D_UINT8 day   = pLocation[3];
 
-  new_date (year, month, day, pOutValue);
+  new_date (year, month, day, pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDateTime* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDateTime* pValue)
 {
   D_INT16 year    = _RC (const D_UINT16*, pLocation)[0];
   D_UINT8 month   = pLocation[2];
@@ -260,11 +260,11 @@ PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDateTime* pOutValue)
   D_UINT8 mins    = pLocation[5];
   D_UINT8 secs    = pLocation[6];
 
-  new_datetime (year, month, day, hours, mins, secs, pOutValue);
+  new_datetime (year, month, day, hours, mins, secs, pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSHiresTime* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSHiresTime* pValue)
 {
   D_INT32 usecs    = _RC (const D_UINT32*, pLocation)[0];
   D_INT16 year     = _RC (const D_UINT16*, pLocation)[2];
@@ -274,67 +274,66 @@ PSValInterp::Retrieve (const D_UINT8* pLocation, DBSHiresTime* pOutValue)
   D_UINT8 mins     = pLocation[9];
   D_UINT8 secs     = pLocation[10];
 
-  new_hirestime (year, month, day, hours, mins, secs, usecs, pOutValue);
-
+  new_hirestime (year, month, day, hours, mins, secs, usecs, pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt8* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt8* pValue)
 {
-  new_integer (_RC(const D_INT8*, pLocation)[0], pOutValue);
+  new_integer (_RC(const D_INT8*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt16* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt16* pValue)
 {
-  new_integer (_RC(const D_INT16*, pLocation)[0], pOutValue);
+  new_integer (_RC(const D_INT16*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt32* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt32* pValue)
 {
-  new_integer (_RC(const D_INT32*, pLocation)[0], pOutValue);
+  new_integer (_RC(const D_INT32*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt64* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt64* pValue)
 {
-  new_integer (_RC(const D_INT64*, pLocation)[0], pOutValue);
+  new_integer (_RC(const D_INT64*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSReal* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSReal* pValue)
 {
-  new_real (_RC (const REAL_T*, pLocation)[0], pOutValue);
+  new_real (_RC (const REAL_T*, pLocation)[0], pValue);
 }
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSRichReal* pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSRichReal* pValue)
 {
-  new_real (_RC (const RICHREAL_T*, pLocation)[0], pOutValue);
-}
-
-void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt8 *pOutValue)
-{
-  new_integer (pLocation[0], pOutValue);
+  new_real (_RC (const RICHREAL_T*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt16 *pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt8 *pValue)
 {
-  new_integer (_RC(const D_UINT16*, pLocation)[0], pOutValue);
+  new_integer (pLocation[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt32 *pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt16 *pValue)
 {
-  new_integer (_RC(const D_UINT32*, pLocation)[0], pOutValue);
+  new_integer (_RC(const D_UINT16*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt64 *pOutValue)
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt32 *pValue)
 {
-  new_integer (_RC(const D_UINT64*, pLocation)[0], pOutValue);
+  new_integer (_RC(const D_UINT32*, pLocation)[0], pValue);
+}
+
+void
+PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt64 *pValue)
+{
+  new_integer (_RC(const D_UINT64*, pLocation)[0], pValue);
 }
 
 D_INT
@@ -399,6 +398,9 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
     return PS_HIRESDATE_ALIGN;
   case T_REAL:
     {
+#ifdef PS_REAL_ALIGN
+      return PS_REAL_ALIGN
+#else
       if (PS_REAL_SIZE == 4)
         return 4;
       else if (PS_REAL_SIZE == 8)
@@ -408,9 +410,13 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
           assert (false);
           throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
         }
+#endif
     }
   case T_RICHREAL:
     {
+#ifdef PS_RICHREAL_ALIGN
+      return PS_RICHREAL_ALIGN;
+#else
       if ((PS_RICHREAL_SIZE == 4) || (PS_RICHREAL_SIZE == 12))
         return 4;
       else if (PS_RICHREAL_SIZE == 8)
@@ -422,6 +428,7 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
           assert (false);
           throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
         }
+#endif
     }
   case T_UINT8:
   case T_INT8:
@@ -442,4 +449,3 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
   }
 }
-

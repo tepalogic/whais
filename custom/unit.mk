@@ -3,7 +3,10 @@ UNIT:=custom
 
 UNIT_EXES:=
 UNIT_SHLS:=common
-UNIT_LIBS:=custom slcommon
+UNIT_LIBS:=custom
+ifeq ($(EXTRA_LIBS),yes)
+UNIT_LIBS+=slcommon
+endif
 
 slcommon_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
 	         cpp_support/wfile.cpp cpp_support/wsocket.cpp

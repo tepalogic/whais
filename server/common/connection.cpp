@@ -68,6 +68,7 @@ ConnectionException::Description () const
 ClientConnection::ClientConnection (UserHandler&            client,
                                     vector<DBSDescriptors>& databases)
   : m_UserHandler (client),
+    m_Stack (),
     m_WaitingFrameId (0),
     m_ClientCookie (0),
     m_ServerCookie (0),
@@ -166,7 +167,7 @@ ClientConnection::MaxSize () const
 }
 
 D_UINT16
-ClientConnection::Size () const
+ClientConnection::DataSize () const
 {
   assert ((m_FrameSize == 0)
           || (m_FrameSize >= (FRAME_DATA_OFF + PLAIN_DATA_OFF)));
@@ -185,7 +186,7 @@ ClientConnection::Data ()
 }
 
 void
-ClientConnection::Size (const D_UINT16 size)
+ClientConnection::DataSize (const D_UINT16 size)
 {
   assert (size <= MaxSize ());
 
@@ -281,7 +282,7 @@ ClientConnection::SendRawClientFrame (const D_UINT8 type)
 }
 
 D_UINT32
-ClientConnection::ReadCommand (bool& oLastPart)
+ClientConnection::ReadCommand (bool* pLastPart)
 {
   ReciveRawClientFrame ();
 
@@ -299,10 +300,10 @@ ClientConnection::ReadCommand (bool& oLastPart)
   switch (m_Data[FRAME_TYPE_OFF])
   {
   case FRAME_TYPE_NORMAL:
-    oLastPart = true;
+    *pLastPart = true;
     break;
   case FRAME_TYPE_PARTIAL:
-    oLastPart = false;
+    *pLastPart = false;
     break;
   default:
     throw ConnectionException ("Connection with peer is out of sync.",
@@ -318,7 +319,8 @@ ClientConnection::ReadCommand (bool& oLastPart)
 void
 ClientConnection::AckCommandPart (const bool waitingNext)
 {
-  Size (0);
+  DataSize (0);
+
   m_ServerCookie = w_rnd ();
 
   assert (m_LastReceivedCmd != CMD_INVALID);
@@ -344,7 +346,7 @@ ClientConnection::SendCmdResponse (const D_UINT16 respType,
   assert ((respType & 1) != 0);
   assert ((m_LastReceivedCmd + 1) == respType);
 
-  const D_UINT16 respSize = Size ();
+  const D_UINT16 respSize = DataSize ();
   m_ServerCookie = w_rnd ();
 
   store_le_int32 (m_ClientCookie, RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
@@ -386,7 +388,7 @@ ClientConnection::SendCmdResponse (const D_UINT16 respType,
                                _EXTRA (0));
   }
 
-  if ((Size () != 0) || (RawCmdData ()[PLAIN_CRC_OFF] != 0))
+  if ((DataSize () != 0) || (RawCmdData ()[PLAIN_CRC_OFF] != 0))
     {
       throw ConnectionException ("Peer has send invalid data.",
                                  _EXTRA (0));

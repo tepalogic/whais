@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+#include "utils/include/utf8.h"
+
 #include "dbs_mgr.h"
 #include "dbs_exception.h"
 
@@ -32,141 +34,6 @@
 using namespace std;
 using namespace pastra;
 
-static const D_UINT8 UTF8_7BIT_MASK = 0x00;
-static const D_UINT8 UTF8_11BIT_MASK = 0xC0;
-static const D_UINT8 UTF8_16BIT_MASK = 0xE0;
-static const D_UINT8 UTF8_21BIT_MASK = 0xF0;
-static const D_UINT8 UTF8_26BIT_MASK = 0xF8;
-static const D_UINT8 UTF8_31BIT_MASK = 0xFC;
-static const D_UINT8 UTF8_37BIT_MASK = 0xFE;
-
-static const D_UINT8 UTF8_EXTRA_BYTE_SIG = 0x80;
-static const D_UINT8 UTF8_EXTRA_BYTE_MASK  = 0xC0;
-static const D_UINT8 UTF8_MAX_BYTES_COUNT = 0x8;
-
-static D_UINT
-get_utf8_char_size (D_UINT8 firstUtf8Byte)
-{
-  if ((firstUtf8Byte & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
-    return 1;
-  else if ((firstUtf8Byte & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
-    return 2;
-  else if ((firstUtf8Byte & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
-    return 3;
-  else if ((firstUtf8Byte & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
-    return 4;
-  else if ((firstUtf8Byte & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
-    return 5;
-  else if ((firstUtf8Byte & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
-    return 6;
-
-  return 0;
-}
-
-static D_UINT
-decode_utf8_char (const D_UINT8 *pSource, D_UINT32 &outChar)
-{
-  outChar = 0;
-  if ((pSource[0] & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
-    {
-      outChar |= pSource[0] & ~UTF8_7BIT_MASK;
-      return 1;
-    }
-  else if ((pSource[0] & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
-    {
-      outChar |= pSource[0] & ~UTF8_11BIT_MASK;
-      outChar <<= 6; outChar |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      return 2;
-    }
-  else if ((pSource[0] & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
-    {
-      outChar |= pSource[0] & ~UTF8_16BIT_MASK;
-      outChar <<= 6; outChar |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      outChar <<= 6; outChar |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-      return 3;
-    }
-  else if ((pSource[0] & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
-    {
-      outChar |= pSource[0] & ~UTF8_21BIT_MASK;
-      outChar <<= 6; outChar |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      outChar <<= 6; outChar |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-      outChar <<= 6; outChar |= pSource[3] & ~UTF8_EXTRA_BYTE_SIG;
-      return 4;
-    }
-  else if ((pSource[0] & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
-    {
-      outChar |= pSource[0] & ~UTF8_26BIT_MASK;
-      outChar <<= 6; outChar |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      outChar <<= 6; outChar |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-      outChar <<= 6; outChar |= pSource[3] & ~UTF8_EXTRA_BYTE_SIG;
-      outChar <<= 6; outChar |= pSource[4] & ~UTF8_EXTRA_BYTE_SIG;
-      return 5;
-    }
-  else if ((pSource[0] & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
-    {
-        outChar |= pSource[0] & ~UTF8_31BIT_MASK;
-        outChar <<= 6; outChar |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-        outChar <<= 6; outChar |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-        outChar <<= 6; outChar |= pSource[3] & ~UTF8_EXTRA_BYTE_SIG;
-        outChar <<= 6; outChar |= pSource[4] & ~UTF8_EXTRA_BYTE_SIG;
-        outChar <<= 6; outChar |= pSource[5] & ~UTF8_EXTRA_BYTE_SIG;
-        return 6;
-    }
-
-  return 0;
-}
-
-static D_UINT
-encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
-{
-  if (ch < 0x80)
-    {
-      pDest[0] = _SC(D_UINT8, ch & 0xFF);
-      return 1;
-    }
-  else if (ch < 0x800)
-    {
-      pDest[0] = _SC (D_UINT8, (ch >> 6) & 0xFF) | UTF8_11BIT_MASK;
-      pDest[1] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      return 2;
-    }
-  else if (ch < 0x10000)
-    {
-      pDest[0] = _SC (D_UINT8, (ch >> 12) & 0xFF) | UTF8_16BIT_MASK;
-      pDest[1] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      return 3;
-    }
-  else if (ch < 0x200000)
-    {
-      pDest[0] = _SC (D_UINT8, (ch >> 18) & 0xFF) | UTF8_21BIT_MASK;
-      pDest[1] = _SC (D_UINT8, (ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[3] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      return 4;
-    }
-  else if (ch < 0x4000000)
-    {
-      pDest[0] = _SC (D_UINT8, (ch >> 24) & 0xFF) | UTF8_26BIT_MASK;
-      pDest[1] = _SC (D_UINT8, (ch >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = _SC (D_UINT8, (ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[3] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[4] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      return 5;
-    }
-  else if (ch < 0x80000000)
-    {
-      pDest[0] = _SC (D_UINT8, (ch >> 30) & 0xFF) | UTF8_31BIT_MASK;
-      pDest[1] = _SC (D_UINT8, (ch >> 24) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = _SC (D_UINT8, (ch >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[3] = _SC (D_UINT8, (ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[4] = _SC (D_UINT8, (ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[5] = _SC (D_UINT8, ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      return 6;
-    }
-
-  return 0;
-}
 
 static D_UINT64
 get_utf8_string_size (const D_UINT8 *pUtf8Str, D_UINT64 maxLength)
@@ -327,7 +194,7 @@ GenericText::CharAt (D_UINT64 index)
                    MIN (m_BytesSize - offset, sizeof aUtf8Char),
                    aUtf8Char);
 
-  const D_UINT charSize = decode_utf8_char (aUtf8Char, charValue);
+  const D_UINT charSize = decode_utf8_char (aUtf8Char, &charValue);
   assert ((offset + charSize) <= m_BytesSize);
 
   return DBSChar (charValue);

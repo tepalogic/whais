@@ -22,48 +22,38 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef DBS_TYPES_H_
-#define DBS_TYPES_H_
+#ifndef UTF8_H_
+#define UTF8_H_
 
 #include "whisper.h"
 
-typedef D_UINT32         FIELD_INDEX;
-typedef D_UINT32         TABLE_INDEX;
-typedef D_UINT64         ROW_INDEX;
-
-enum DBS_FIELD_TYPE
-{
-  T_UNKNOWN = 0,
-  T_BOOL,
-  T_CHAR,
-  T_DATE,
-  T_DATETIME,
-  T_HIRESTIME,
-  T_INT8,
-  T_INT16,
-  T_INT32,
-  T_INT64,
-  T_UINT8,
-  T_UINT16,
-  T_UINT32,
-  T_UINT64,
-  T_REAL,
-  T_RICHREAL,
-  T_TEXT,
-  T_UNDETERMINED,
-
-  T_END_OF_TYPES
-};
-
 #ifdef __cplusplus
-
-struct DBSFieldDescriptor
-{
-  const D_CHAR*   m_pFieldName;
-  DBS_FIELD_TYPE  m_FieldType;
-  bool            isArray;
-};
-
+extern "C" {
 #endif
 
-#endif /* DBS_TYPES_H_ */
+static const D_UINT8 UTF8_7BIT_MASK = 0x00;
+static const D_UINT8 UTF8_11BIT_MASK = 0xC0;
+static const D_UINT8 UTF8_16BIT_MASK = 0xE0;
+static const D_UINT8 UTF8_21BIT_MASK = 0xF0;
+static const D_UINT8 UTF8_26BIT_MASK = 0xF8;
+static const D_UINT8 UTF8_31BIT_MASK = 0xFC;
+static const D_UINT8 UTF8_37BIT_MASK = 0xFE;
+
+static const D_UINT8 UTF8_EXTRA_BYTE_SIG = 0x80;
+static const D_UINT8 UTF8_EXTRA_BYTE_MASK  = 0xC0;
+static const D_UINT8 UTF8_MAX_BYTES_COUNT = 0x8;
+
+D_UINT
+get_utf8_char_size (D_UINT8 firstUtf8Byte);
+
+D_UINT
+decode_utf8_char (const D_UINT8 *pSource, D_UINT32* pCh);
+
+D_UINT
+encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* UTF8_H_ */
