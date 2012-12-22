@@ -86,29 +86,17 @@ decode_basic_type (const D_UINT16 type)
 }
 
 static string
-decode_glbvar_typeinfo (const D_UINT8* pTypeInfo)
+decode_glbvar_typeinfo (unsigned int type)
 {
   string result;
-  bool fieldDesc = false;
-  bool arrayDesc = false;
+  bool   arrayDesc = false;
 
-  D_UINT16       type = from_le_int16 (pTypeInfo);
-  const D_UINT16 size = from_le_int16 (pTypeInfo + sizeof (D_UINT16));
+  assert ((IS_FIELD (type) || IS_TABLE (type)) == false );
 
   if (IS_ARRAY(type))
     {
       result += "ARRAY";
       arrayDesc = true;
-    }
-  else if (IS_FIELD (type))
-    {
-      result += "FIELD";
-      fieldDesc = true;
-    }
-  else if (IS_TABLE (type))
-    {
-      result += "TABLE";
-      fieldDesc = true;
     }
 
   if (arrayDesc)
@@ -121,87 +109,51 @@ decode_glbvar_typeinfo (const D_UINT8* pTypeInfo)
       return result;
     }
 
-  if (fieldDesc)
-    {
-      assert (size >= 2);
-      if (size <= 2)
-        return result;
-
-      result += " (";
-      D_UINT16 progress = 0;
-
-      pTypeInfo += 2 * sizeof (D_UINT16);
-      while (progress < size -2 )
-        {
-          result += _RC (const D_CHAR*, pTypeInfo);
-
-          const D_UINT fieldLen = strlen (_RC (const D_CHAR*, pTypeInfo)) + 1;
-          pTypeInfo += fieldLen;
-          type = from_le_int16 (pTypeInfo);
-
-          result += " AS ";
-          if (IS_ARRAY (type))
-            result += " ARRAY OF ";
-          result += decode_basic_type (GET_BASIC_TYPE (type));
-
-          pTypeInfo += 2;
-
-          progress += 2 + fieldLen;
-          if (progress == (size - 2))
-            result += ')';
-          else
-            result += ", ";
-        }
-
-      assert (pTypeInfo[0] == ';');
-      assert (pTypeInfo[1] == 0);
-
-      return result;
-    }
-
   return decode_basic_type (GET_BASIC_TYPE (type));
 }
 
 const D_CHAR*
 translate_status (const D_UINT32 cs)
 {
-  if (cs > CS_OS_ERR_BASE)
+  if (cs > WCS_OS_ERR_BASE)
     {
       /* This is safe, coz this function is not supposed to be executed
        * in a multi thread environment. a*/
       static D_CHAR statusStr [64];
-      sprintf (statusStr, "OS internal error: %u.", cs - CS_OS_ERR_BASE);
+      sprintf (statusStr, "OS internal error: %u.", cs - WCS_OS_ERR_BASE);
 
       return statusStr;
     }
 
   switch (cs)
   {
-  case CS_OK:
+  case WCS_OK:
     return "No error returned.";
-  case CS_INVALID_ARGS:
+  case WCS_INVALID_ARGS:
     return "Invalid arguments.";
-  case CS_OP_NOTSUPP:
+  case WCS_OP_NOTSUPP:
     return "Operation not supported";
-  case CS_OP_NOTPERMITED:
+  case WCS_OP_NOTPERMITED:
     return "Operation not permitted.";
-  case CS_DROPPED:
+  case WCS_DROPPED:
     return "Connection dropped by peer.";
-  case CS_ENCTYPE_NOTSUPP:
+  case WCS_ENCTYPE_NOTSUPP:
     return "Could not agree on supported encryption type.";
-  case CS_UNEXPECTED_FRAME:
+  case WCS_UNEXPECTED_FRAME:
     return "Unexpected communication frame received.";
-  case CS_INVALID_FRAME:
+  case WCS_INVALID_FRAME:
     return "An frame with invalid content received.";
-  case CS_COMM_OUT_OF_SYNC:
+  case WCS_COMM_OUT_OF_SYNC:
     return "Communication is out of sync.";
-  case CS_LARGE_ARGS:
+  case WCS_LARGE_ARGS:
     return "Size of the operation arguments is not supported.";
-  case CS_CONNECTION_TIMEOUT:
+  case WCS_CONNECTION_TIMEOUT:
     return "Connection has timeout.";
-  case CS_SERVER_BUSY:
+  case WCS_SERVER_BUSY:
     return "Server is too busy.";
-  case CS_GENERAL_ERR:
+  case WCS_INCOMPLETE_CMD:
+    return "Previous command has not been completed";
+  case WCS_GENERAL_ERR:
     return "Unexpected error condition.";
   }
 
@@ -223,20 +175,20 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t              linePos   = 0;
   string              token     = CmdLineNextToken (cmdLine, linePos);
   string              globals;
-  CONNECTOR_HND       conHdl    = NULL;
+  W_CONNECTOR_HND       conHdl    = NULL;
   unsigned int        glbsCount = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
 
-  D_UINT32 cs  = Connect (GetRemoteHostName ().c_str (),
-                          GetConnectionPort ().c_str (),
-                          GetWorkingDB ().c_str (),
-                          GetUserPassword ().c_str (),
-                          GetUserId (),
-                          &conHdl);
+  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+                           GetConnectionPort ().c_str (),
+                           GetWorkingDB ().c_str (),
+                           GetUserPassword ().c_str (),
+                           GetUserId (),
+                           &conHdl);
 
   assert (token == "global");
 
-  if (cs != CS_OK)
+  if (cs != WCS_OK)
     {
       if (level >= VL_DEBUG)
         cout << "Failed to connect: " << translate_status (cs) << endl;
@@ -247,25 +199,25 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   if (linePos >= cmdLine.length ())
     {
-      cs = ListGlobals (conHdl, &glbsCount);
+      cs = WListGlobals (conHdl, &glbsCount);
       if (level >= VL_DEBUG)
         {
-          if (cs == CS_OK)
+          if (cs == WCS_OK)
             cout << "Got " << glbsCount << " globals.\n";
           else
             cout << "Listing globals variables has failed\n";
         }
 
-      while ((cs == CS_OK) && (glbsCount > 0))
+      while ((cs == WCS_OK) && (glbsCount > 0))
         {
           const char* pGlbName = NULL;
-          cs = ListGlobalsFetch (conHdl, &pGlbName);
+          cs = WListGlobalsFetch (conHdl, &pGlbName);
 
           assert (pGlbName != NULL);
           globals += ' ';
           globals += pGlbName;
 
-          if ((cs != CS_OK) && (level < VL_DEBUG))
+          if ((cs != WCS_OK) && (level < VL_DEBUG))
             {
               cout << "Fetching global value name has failed.\n";
             }
@@ -276,16 +228,16 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   else
     globals = cmdLine;
 
-  if (cs != CS_OK)
+  if (cs != WCS_OK)
     goto cmdGlobalList_exit;
 
   do
     {
-      unsigned int typeInfoSize = 0;
+      unsigned int rawType = 0;
       token = CmdLineNextToken (globals, linePos);
-      cs = DescribeValue (conHdl, token.c_str (), &typeInfoSize);
+      cs = WDescribeValue (conHdl, token.c_str (), &rawType);
 
-      if (cs != CS_OK)
+      if (cs != WCS_OK)
         {
           if (level <= VL_DEBUG)
             {
@@ -294,29 +246,6 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             }
           break;
         }
-      assert (typeInfoSize >= 4);
-      auto_array<D_UINT8> typeStore (typeInfoSize);
-      D_UINT  progress = 0;
-
-      while (progress < typeInfoSize)
-        {
-          const unsigned char *pChunk    = NULL;
-          unsigned int         chunkSize = 0;
-
-          cs = DescribeValueFetch (conHdl, &pChunk, &chunkSize);
-          if (cs != CS_OK)
-            {
-              DescribeValueFetchCancel (conHdl);
-              break;
-            }
-
-          memcpy (&typeStore[progress], pChunk, chunkSize);
-          progress += chunkSize;
-
-          assert (progress <= typeInfoSize);
-        }
-      if (cs != CS_OK)
-        break;
 
       const streamsize prevWidth = cout.width (20);
       const char       prevFill  = cout.fill (' ');
@@ -324,17 +253,52 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       cout << left << token;
       cout.width (prevWidth);
       cout.fill (prevFill);
-      cout << decode_glbvar_typeinfo (&typeStore[0]) << endl;
+
+      if (rawType & WFT_TABLE_MASK)
+        {
+          assert ((rawType & WFT_FIELD_MASK) == 0);
+
+          D_UINT fieldsCount;
+
+          cs = WDescribeValueGetFieldsCount (conHdl, &fieldsCount);
+          if (cs != WCS_OK)
+            break;
+
+          if (fieldsCount == 0)
+            cout << "TABLE";
+          else
+            cout << "TABLE OF ";
+
+          for (D_UINT field = 0; field < fieldsCount; field++)
+            {
+              const D_CHAR* fieldName;
+
+              cs = WDescribeValueFetchField (conHdl, &fieldName, &rawType);
+              if (cs != WCS_OK)
+                break;
+
+              cout << decode_glbvar_typeinfo (rawType) << endl;
+            }
+        }
+      else if (rawType & WFT_FIELD_MASK)
+        {
+          rawType &= ~WFT_FIELD_MASK;
+
+          cout << "FIELD OF";
+          cout << decode_glbvar_typeinfo (rawType) << endl;
+        }
+      else
+        cout << decode_glbvar_typeinfo (rawType) << endl;
     }
-  while (linePos < globals.length ());
+  while ((linePos < globals.length ()) && (cs == WCS_OK));
 
 cmdGlobalList_exit:
-  Close (conHdl);
+  WClose (conHdl);
 
-  if (cs != CS_OK)
+  if (cs != WCS_OK)
     cout << translate_status (cs) << endl;
 
-  return (cs == CS_OK) ? true : false;
+  return (cs == WCS_OK) ? true : false;
 }
 
 static const D_CHAR pingShowDesc[]    = "Ping the database sever. ";
@@ -346,23 +310,23 @@ static const D_CHAR pingShowDescExt[] =
 static bool
 cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  CONNECTOR_HND conHdl = NULL;
+  W_CONNECTOR_HND conHdl = NULL;
   WTICKS ticks  = wh_msec_ticks ();
-  D_UINT32 cs  = Connect (GetRemoteHostName ().c_str (),
-                          GetConnectionPort ().c_str (),
-                          GetWorkingDB ().c_str (),
-                          GetUserPassword ().c_str (),
-                          GetUserId (),
-                          &conHdl);
-  if (cs != CS_OK)
+  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+                           GetConnectionPort ().c_str (),
+                           GetWorkingDB ().c_str (),
+                           GetUserPassword ().c_str (),
+                           GetUserId (),
+                           &conHdl);
+  if (cs != WCS_OK)
     goto cmd_ping_exit;
 
-  cs = PingServer (conHdl);
+  cs = WPingServer (conHdl);
 
 cmd_ping_exit:
-  Close (conHdl);
+  WClose (conHdl);
   ticks = wh_msec_ticks () - ticks;
-  if (cs != CS_OK)
+  if (cs != WCS_OK)
     {
       cout << translate_status (cs) << endl;
       return false;

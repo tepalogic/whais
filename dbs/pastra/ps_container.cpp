@@ -326,9 +326,9 @@ TempContainer::Read (D_UINT64 from, D_UINT64 size, D_UINT8* pDest)
           const D_UINT toRead = MIN (size, m_CacheEndPos - from);
           memcpy (pDest, m_Cache.get () + (from - m_CacheStartPos), toRead);
 
-          from         += toRead;
+          from  += toRead;
           pDest += toRead;
-          size           -= toRead;
+          size  -= toRead;
 
         }
       else

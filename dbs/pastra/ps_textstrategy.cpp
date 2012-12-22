@@ -206,7 +206,7 @@ GenericText::Append (const D_UINT32 charValue)
   assert (m_ReferenceCount == 1);
 
   D_UINT8 aUtf8Encoding[UTF8_MAX_BYTES_COUNT];
-  D_UINT encodeSize = encode_utf8_char (charValue, aUtf8Encoding);
+  D_UINT  encodeSize = encode_utf8_char (charValue, aUtf8Encoding);
 
   WriteUtf8 (m_BytesSize, encodeSize, aUtf8Encoding);
   m_BytesSize += encodeSize;

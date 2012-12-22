@@ -27,8 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "connection.h"
 
-typedef void (*COMMAND_HANDLER)(ClientConnection& conn,
-                                const bool        receivedAll);
+typedef void (*COMMAND_HANDLER)(ClientConnection& conn);
 
 extern COMMAND_HANDLER* gpAdminCommands;
 extern COMMAND_HANDLER* gpUserCommands;

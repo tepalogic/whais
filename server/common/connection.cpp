@@ -248,9 +248,6 @@ ClientConnection::ReciveRawClientFrame ()
   switch (m_Data[FRAME_TYPE_OFF])
   {
   case FRAME_TYPE_NORMAL:
-  case FRAME_TYPE_PARTIAL:
-  case FRAME_TYPE_PARTIAL_ACK:
-  case FRAME_TYPE_PARTIAL_CANCEL:
   case FRAME_TYPE_AUTH_CLNT_RSP:
     //These are legitimate frame types that could be received by a server.
     break;
@@ -282,7 +279,7 @@ ClientConnection::SendRawClientFrame (const D_UINT8 type)
 }
 
 D_UINT32
-ClientConnection::ReadCommand (bool* pLastPart)
+ClientConnection::ReadCommand ()
 {
   ReciveRawClientFrame ();
 
@@ -297,18 +294,11 @@ ClientConnection::ReadCommand (bool* pLastPart)
 
   m_ClientCookie = from_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
 
-  switch (m_Data[FRAME_TYPE_OFF])
-  {
-  case FRAME_TYPE_NORMAL:
-    *pLastPart = true;
-    break;
-  case FRAME_TYPE_PARTIAL:
-    *pLastPart = false;
-    break;
-  default:
-    throw ConnectionException ("Connection with peer is out of sync.",
-                               _EXTRA (0));
-  }
+  if (m_Data[FRAME_TYPE_OFF] != FRAME_TYPE_NORMAL)
+    {
+      throw ConnectionException ("Connection with peer is out of sync.",
+                                 _EXTRA (0));
+    }
 
   m_LastReceivedCmd = from_le_int16 (RawCmdData () + PLAIN_TYPE_OFF);
   assert ((m_LastReceivedCmd & 1) == 0);
@@ -317,31 +307,7 @@ ClientConnection::ReadCommand (bool* pLastPart)
 }
 
 void
-ClientConnection::AckCommandPart (const bool waitingNext)
-{
-  DataSize (0);
-
-  m_ServerCookie = w_rnd ();
-
-  assert (m_LastReceivedCmd != CMD_INVALID);
-
-  store_le_int32 (m_ClientCookie, RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
-  store_le_int32 (m_ServerCookie, RawCmdData () + PLAIN_SERV_COOKIE_OFF);
-  store_le_int16 (m_LastReceivedCmd, RawCmdData () + PLAIN_TYPE_OFF);
-  store_le_int16 (0, RawCmdData () + PLAIN_CRC_OFF);
-
-  const D_UINT8 type = waitingNext ?
-                       FRAME_TYPE_PARTIAL_ACK :
-                       FRAME_TYPE_PARTIAL_CANCEL;
-
-  SendRawClientFrame (type);
-  m_LastReceivedCmd = CMD_INVALID;
-}
-
-void
-ClientConnection::SendCmdResponse (const D_UINT16 respType,
-                                   const bool     lastPart,
-                                   bool&          oSendNext)
+ClientConnection::SendCmdResponse (const D_UINT16 respType)
 {
   assert ((respType & 1) != 0);
   assert ((m_LastReceivedCmd + 1) == respType);
@@ -362,41 +328,5 @@ ClientConnection::SendCmdResponse (const D_UINT16 respType,
     }
   store_le_int16 (chkSum, RawCmdData () + PLAIN_CRC_OFF);
 
-  const D_UINT8 type = lastPart ? FRAME_TYPE_NORMAL : FRAME_TYPE_PARTIAL;
-
-  SendRawClientFrame (type);
-
-  if (lastPart)
-    {
-      oSendNext = false;
-      return ;
-    }
-
-  /* else lastPart == false*/
-
-  ReciveRawClientFrame ();
-  switch (m_Data[FRAME_TYPE_OFF])
-  {
-  case FRAME_TYPE_PARTIAL_ACK:
-    oSendNext = true;
-    break;
-  case FRAME_TYPE_PARTIAL_CANCEL:
-    oSendNext = false;
-    break;
-  default:
-    throw ConnectionException ("Connection with peer is out of sync.",
-                               _EXTRA (0));
-  }
-
-  if ((DataSize () != 0) || (RawCmdData ()[PLAIN_CRC_OFF] != 0))
-    {
-      throw ConnectionException ("Peer has send invalid data.",
-                                 _EXTRA (0));
-    }
-
-  if (from_le_int16 (RawCmdData () + PLAIN_TYPE_OFF) != respType)
-    {
-      throw ConnectionException ("Connection with peer is out of sync.",
-                                 _EXTRA (0));
-    }
+  SendRawClientFrame (FRAME_TYPE_NORMAL);
 }

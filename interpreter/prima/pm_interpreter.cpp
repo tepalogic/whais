@@ -309,29 +309,105 @@ Session::GlobalValuesCount () const
   return m_PrivateNames.Get ().GetGlobalsManager().Count();
 }
 
+D_UINT
+Session::ProceduresCount () const
+{
+  return m_PrivateNames.Get ().GetProcedureManager ().Count ();
+}
+
 const D_UINT8*
 Session::GlobalValueName (const D_UINT index) const
 {
   return m_PrivateNames.Get ().GetGlobalsManager ().Name (index);
 }
 
-const D_UINT8*
-Session::GlobalValueType (const D_UINT8* pName) const
+I_Operand&
+Session::GlobalValueOp (const D_UINT32 glbId)
 {
-  GlobalsManager& glbMgr   = m_PrivateNames.Get ().GetGlobalsManager ();
-  const D_UINT    glbCount = glbMgr.Count ();
+  GlobalsManager& glbMgr = m_PrivateNames.Get ().GetGlobalsManager ();
+  GlobalValue&    value  = glbMgr.GetGlobal (glbId);
 
-  for (D_UINT index = 0; index < glbCount; ++index)
-    {
-      if (strcmp (_RC (const D_CHAR*, glbMgr.Name (index)),
-                  _RC (const D_CHAR*, pName)) == 0)
-        {
-          return glbMgr.GetGlobalTI (index);
-        }
-    }
-
-  return NULL;
+  return value.GetOperand ();
 }
+
+I_Operand&
+Session::GlobalValueOp (const D_UINT8* const name)
+{
+  GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
+  D_UINT32        glbId   = pGlbMgr->FindGlobal (
+                                            name,
+                                            strlen (_RC (const D_CHAR*, name))
+                                                );
+
+  return GlobalValueOp (glbId);
+}
+
+const D_UINT8*
+Session::ProcedureName (const D_UINT id) const
+{
+  return m_PrivateNames.Get ().GetProcedureManager ().Name (id);
+}
+
+D_UINT
+Session::ProcedureParametersCount (const D_UINT id) const
+{
+  return m_PrivateNames.Get ().GetProcedureManager ().ArgsCount (id);
+}
+
+D_UINT
+Session::ProcedureParametersCount (const D_UINT8* name) const
+{
+  ProcedureManager& procMgr= m_PrivateNames.Get ().GetProcedureManager ();
+  const D_UINT      procId = procMgr.GetProcedure (
+                                           name,
+                                           strlen (_RC (const D_CHAR*, name))
+                                                  );
+  return ProcedureParametersCount (procId);
+}
+
+I_Operand&
+Session::ProcedureParameterOp (const D_UINT id, const D_UINT parameter) const
+{
+  ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
+  const StackValue& value   = procMgr.LocalValue (id, parameter + 1);
+
+  return _CC (StackValue&, value).GetOperand ();
+}
+
+I_Operand&
+Session::ProcedureParameterOp (const D_UINT8* name,
+                               const D_UINT   parameter) const
+{
+  ProcedureManager& procMgr= m_PrivateNames.Get ().GetProcedureManager ();
+  const D_UINT      procId = procMgr.GetProcedure (
+                                           name,
+                                           strlen (_RC (const D_CHAR*, name))
+                                                  );
+  return ProcedureParameterOp (procId, parameter);
+}
+
+I_Operand&
+Session::ProcedureReturnOp (const D_UINT id) const
+{
+  ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
+  const StackValue& value   = procMgr.LocalValue (id, 0);
+
+  return _CC (StackValue&, value).GetOperand ();
+}
+
+I_Operand&
+Session::ProcedureReturnOp (const D_UINT8* name) const
+{
+  ProcedureManager& procMgr= m_PrivateNames.Get ().GetProcedureManager ();
+  const D_UINT      procId = procMgr.GetProcedure (
+                                           name,
+                                           strlen (_RC (const D_CHAR*, name))
+                                                  );
+  return ProcedureReturnOp (procId);
+}
+
+
+
 
 D_UINT32
 Session::FindGlobal (const D_UINT8* pName, const D_UINT nameLength)

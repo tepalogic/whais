@@ -109,9 +109,21 @@ public:
   virtual void ExecuteProcedure (const D_UINT8* const pProcName,
                                  SessionStack&        stack);
   virtual D_UINT GlobalValuesCount () const;
+  virtual D_UINT ProceduresCount () const;
 
   virtual const D_UINT8* GlobalValueName (const D_UINT index) const;
-  virtual const D_UINT8* GlobalValueType (const D_UINT8* pName) const;
+  virtual I_Operand&     GlobalValueOp (const D_UINT32 index);
+  virtual I_Operand&     GlobalValueOp (const D_UINT8* const name);
+
+  virtual const D_UINT8* ProcedureName (const D_UINT id) const;
+  virtual D_UINT         ProcedureParametersCount (const D_UINT id) const;
+  virtual D_UINT         ProcedureParametersCount (const D_UINT8* name) const;
+  virtual I_Operand&     ProcedureParameterOp (const D_UINT id,
+                                               const D_UINT parameter) const;
+  virtual I_Operand&     ProcedureParameterOp (const D_UINT8* name,
+                                               const D_UINT   parameter) const;
+  virtual I_Operand&     ProcedureReturnOp (const D_UINT id) const;
+  virtual I_Operand&     ProcedureReturnOp (const D_UINT8* name) const;
 
   D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
   StackValue     GetGlobalValue (const D_UINT32 globalId);

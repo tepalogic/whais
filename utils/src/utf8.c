@@ -101,7 +101,7 @@ encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
 {
   if (ch < 0x80)
     {
-      pDest[0] = ch & 0xF;
+      pDest[0] = ch & 0xFF;
       return 1;
     }
   else if (ch < 0x800)

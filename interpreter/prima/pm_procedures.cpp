@@ -103,6 +103,17 @@ ProcedureManager::GetProcedure (const D_UINT8* pName,
   return INVALID_ENTRY;
 }
 
+const D_UINT8*
+ProcedureManager::Name (const D_UINT procEntry) const
+{
+  assert (procEntry < m_ProcsEntrys.size ());
+
+  if (procEntry >= m_ProcsEntrys.size ())
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+
+  return &m_Identifiers[m_ProcsEntrys[procEntry].m_IdIndex];
+}
+
 Unit&
 ProcedureManager::GetUnit (const D_UINT procEntry) const
 {

@@ -29,34 +29,247 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stack_cmds.h"
 
 static void
-cmd_invalid (ClientConnection&, const bool)
+cmd_invalid (ClientConnection&)
 {
   throw ConnectionException ("Invalid command received.",
                              _EXTRA (0));
 }
 
 static void
-cmd_unspp (ClientConnection&, const bool)
+cmd_value_desc (ClientConnection& rConn)
 {
-  throw ConnectionException ("Unsupported supported command.", _EXTRA (0));
+  D_UINT32 result = WCS_OK;
+
+  D_UINT8*       data_     = rConn.Data ();
+  const D_CHAR*  glbName   = _RC (const D_CHAR*, data_ + sizeof (D_UINT32));
+  D_UINT32       fieldHint = from_le_int16 (data_);
+  I_Operand*     op        = NULL;
+  D_UINT16       dataOffset = sizeof (D_UINT32) + strlen (glbName) + 1;
+
+  D_UINT         rawType;
+
+  if (rConn.DataSize () <  + sizeof (D_UINT16) + strlen (glbName) + 1)
+    {
+      throw ConnectionException (
+                              "Command used to retrieve description of global "
+                              "variables has invalid format.",
+                              _EXTRA (0)
+                                );
+    }
+
+  rConn.DataSize (rConn.MaxSize ());
+
+  if (strlen (glbName) > 0)
+    {
+      if (! rConn.IsAdmin ())
+        {
+          throw ConnectionException (
+                                  "Only and admin may request for a global "
+                                  "value description.",
+                                  _EXTRA (0)
+                                    );
+        }
+      try
+      {
+          op = &rConn.Dbs ().m_Session->GlobalValueOp (
+                                                _RC (const D_UINT8*, glbName)
+                                                      );
+      }
+      catch (InterException& e)
+      {
+          if (e.GetExtra () != InterException::INVALID_GLOBAL_REQ)
+            throw;
+
+          result = WCS_INVALID_ARGS;
+          goto cmd_glb_desc_err;
+      }
+    }
+  else
+    {
+      SessionStack& stack = rConn.Stack ();
+
+      if (stack.Size() == 0)
+        {
+          result = WCS_INVALID_ARGS;
+          goto cmd_glb_desc_err;
+        }
+
+      op = &stack[stack.Size () - 1].GetOperand ();
+    }
+
+  assert (op != NULL);
+
+  store_le_int32 (WCS_OK, data_);
+
+  rawType = op->GetType ();
+  store_le_int16 (rawType, data_ + dataOffset);
+  dataOffset += sizeof (D_UINT16);
+
+  if (IS_TABLE (rawType))
+    {
+      I_DBSTable& table = op->GetTable();
+      const FIELD_INDEX fieldCount = table.GetFieldsCount ();
+      if (fieldHint >= fieldCount)
+        {
+          result = WCS_INVALID_ARGS;
+          goto cmd_glb_desc_err;
+        }
+      else if (fieldCount > 0xFFFF)
+        {
+          result = WCS_LARGE_ARGS;
+          goto cmd_glb_desc_err;
+        }
+      store_le_int16 (fieldCount, data_ + dataOffset);
+      dataOffset += sizeof (D_UINT16);
+
+      store_le_int16 (fieldHint, data_ + dataOffset);
+      dataOffset += sizeof (D_UINT16);
+
+      bool oneAtLeast = false;
+      do
+        {
+          DBSFieldDescriptor fd        = table.GetFieldDescriptor (fieldHint);
+          const D_UINT       fieldLen  = strlen (fd.m_pFieldName) + 1;
+          D_UINT16           fieldType = fd.m_FieldType;
+
+          if (dataOffset + fieldLen + sizeof (D_UINT16) < rConn.DataSize ())
+            break;
+
+          strcpy (_RC (D_CHAR*, data_ + dataOffset), fd.m_pFieldName);
+          dataOffset += fieldLen;
+
+          if (fd.isArray)
+            MARK_ARRAY (fieldType);
+
+          store_le_int16 (fieldType, data_ + dataOffset);
+          dataOffset += sizeof (D_UINT16);
+
+          oneAtLeast = true;
+        }
+      while (fieldHint < fieldCount);
+
+      if (! oneAtLeast)
+        {
+          result = WCS_INVALID_ARGS;
+          goto cmd_glb_desc_err;
+        }
+    }
+  else if (fieldHint > 0)
+    {
+      result = WCS_INVALID_ARGS;
+      goto cmd_glb_desc_err;
+    }
+
+
+  assert (result == WCS_OK);
+  rConn.DataSize (dataOffset);
+  rConn.SendCmdResponse (CMD_GLOBAL_DESC_RSP);
+
+  return ;
+
+cmd_glb_desc_err:
+  assert (result != WCS_OK);
+
+  store_le_int32 (result, data_);
+  rConn.DataSize (sizeof (D_UINT32));
+  rConn.SendCmdResponse (CMD_GLOBAL_DESC_RSP);
 }
 
 static void
-cmd_read_stack (ClientConnection& conn, const bool receivedAll)
-{
-  cmd_unspp (conn, receivedAll);
-}
-
-static void
-cmd_update_stack (ClientConnection& rConn, const bool receivedAll)
+cmd_read_stack (ClientConnection& rConn)
 {
   const D_UINT8* const data    = rConn.Data ();
-  D_UINT32             status  = CS_OK;
+  D_UINT32             status  = WCS_OK;
+  D_UINT16             dataOff = 0;
+
+  const D_UINT64 rowHint = from_le_int64 (data + dataOff);
+  dataOff += sizeof (D_UINT64);
+
+  const D_UINT64 elHint  = from_le_int64 (data + dataOff);
+  dataOff += sizeof (D_UINT64);
+
+  const D_CHAR* const fieldNameHint = _RC (const D_CHAR*, data + dataOff);
+  dataOff += strlen (fieldNameHint) + 1;
+
+  if ((dataOff > rConn.DataSize ())
+      || (rConn.Stack ().Size () == 0))
+    {
+      status = WCS_INVALID_ARGS;
+      goto cmd_read_exit;
+    }
+
+  try
+    {
+      dataOff = sizeof (D_UINT32);
+
+      StackValue&    topValue = rConn.Stack ()[rConn.Stack ().Size () - 1];
+      const D_UINT16 valType = topValue.GetOperand ().GetType ();
+
+      if (IS_TABLE (valType))
+        {
+          I_DBSTable& table     = topValue.GetOperand ().GetTable ();
+          FIELD_INDEX fieldHint = (fieldNameHint[0] != 0) ?
+                                  table.GetFieldIndex (fieldNameHint) : 0;
+
+          status = cmd_read_table_stack_top (rConn,
+                                             topValue,
+                                             fieldHint,
+                                             rowHint,
+                                             elHint,
+                                             &dataOff);
+        }
+      else if (IS_FIELD (valType))
+        {
+          status = cmd_read_field_stack_top (rConn,
+                                             topValue,
+                                             rowHint,
+                                             elHint,
+                                             &dataOff);
+        }
+      else if (IS_ARRAY (valType))
+        status = cmd_read_array_stack_top (rConn, topValue, elHint, &dataOff);
+      else if (GET_BASIC_TYPE (valType) == T_TEXT)
+        status = cmd_read_text_stack_top (rConn, topValue, elHint, &dataOff);
+      else
+        status = cmd_read_basic_stack_top (rConn, topValue, &dataOff);
+    }
+  catch (DBSException& e)
+  {
+      if ((e.GetExtra () == DBSException::FIELD_NOT_FOUND)
+          || (e.GetExtra () == DBSException::FIELD_NOT_INDEXED)
+          || (e.GetExtra () == DBSException::ARRAY_INDEX_TOO_BIG)
+          || (e.GetExtra () == DBSException::ROW_NOT_ALLOCATED)
+          || (e.GetExtra () == DBSException::STRING_INDEX_TOO_BIG))
+        {
+          status = WCS_INVALID_ARGS;
+        }
+      else
+        throw ;
+  }
+
+  assert (dataOff >= sizeof (D_UINT32));
+  rConn.DataSize (dataOff);
+
+cmd_read_exit:
+
+  if (status != WCS_OK)
+    rConn.DataSize (sizeof (D_UINT32));
+
+  store_le_int32 (status, rConn.Data());
+
+  rConn.SendCmdResponse (CMD_READ_STACK_RSP);
+}
+
+static void
+cmd_update_stack (ClientConnection& rConn)
+{
+  const D_UINT8* const data    = rConn.Data ();
+  D_UINT32             status  = WCS_OK;
   D_UINT16             dataOff = 0;
 
   if (rConn.DataSize () == 0)
     {
-      status = CS_INVALID_ARGS;
+      status = WCS_INVALID_ARGS;
       goto cmd_update_exit;
     }
 
@@ -83,25 +296,29 @@ cmd_update_stack (ClientConnection& rConn, const bool receivedAll)
                                _EXTRA (subcmd)
                                   );
       }
-      if (status != CS_OK)
+      if (status != WCS_OK)
         goto cmd_update_exit;
     }
 
-  assert (status == CS_OK);
+  assert (status == WCS_OK);
   assert (dataOff == rConn.DataSize ());
 
 cmd_update_exit:
   rConn.DataSize (sizeof (status));
   store_le_int32 (status, rConn.Data());
 
-  bool dummy;
-  rConn.SendCmdResponse (CMD_UPDATE_STACK_RSP, true, dummy);
+  rConn.SendCmdResponse (CMD_UPDATE_STACK_RSP);
 }
 
 static void
-cmd_ping_sever (ClientConnection& rConn, const bool receivedAll)
+cmd_execute_procedure (ClientConnection& rConn)
 {
-  if ((rConn.DataSize () != 0) || (receivedAll == false))
+}
+
+static void
+cmd_ping_sever (ClientConnection& rConn)
+{
+  if (rConn.DataSize () != 0)
     {
       throw ConnectionException (
                               "Command to ping the sever has invalid format.",
@@ -109,179 +326,304 @@ cmd_ping_sever (ClientConnection& rConn, const bool receivedAll)
                                 );
     }
 
-  bool dummy;
-  rConn.DataSize (0);
-  rConn.SendCmdResponse (CMD_PING_SERVER_RSP, true, dummy);
-
-  assert (dummy == false);
+  rConn.DataSize (sizeof (D_UINT32));
+  store_le_int32 (WCS_OK, rConn.Data ());
+  rConn.SendCmdResponse (CMD_PING_SERVER_RSP);
 }
 
 static void
-cmd_list_glbs (ClientConnection& rConn, const bool receivedAll)
+cmd_list_globals (ClientConnection& rConn)
 {
-  if ((rConn.DataSize () != 0) || (receivedAll == false))
+  D_UINT32 result = WCS_OK;
+
+  if (rConn.DataSize () != sizeof (D_UINT32))
     {
       throw ConnectionException (
                               "Command used to retrieve context global "
-                              " variables has invalid format.",
+                              "variables has invalid format.",
                               _EXTRA (0)
                                 );
     }
   const I_Session& session = *rConn.Dbs ().m_Session;
 
   const D_UINT32 glbsCount  = session.GlobalValuesCount ();
-  D_UINT8        namesCount = 0;
-  bool           firstResp  = true;
-  bool           sendNext;
+  D_UINT32       firstHint  = from_le_int32 (rConn.Data ());
+  D_UINT16       dataOffset = 0;
+  bool           oneAtLeast = false;
 
-  rConn.DataSize (sizeof (D_UINT8) + sizeof (D_UINT32) + sizeof (D_UINT8));
-  for (D_UINT32 glbIndex = 0; glbIndex < glbsCount; ++glbIndex)
+  rConn.DataSize (rConn.MaxSize ());
+  store_le_int32 (WCS_OK, rConn.Data () + dataOffset);
+  dataOffset += sizeof (D_UINT32);
+
+  store_le_int32 (glbsCount, rConn.Data () + dataOffset);
+  dataOffset += sizeof (D_UINT32);
+
+  store_le_int32 (firstHint, rConn.Data () + dataOffset);
+  dataOffset += sizeof (D_UINT32);
+
+  assert (rConn.DataSize () > 3 * sizeof (D_UINT32));
+
+  if (firstHint >= glbsCount)
     {
-      const D_UINT8* pName    = session.GlobalValueName (glbIndex);
-      const D_UINT   nameSize = strlen (_RC (const D_CHAR*, pName)) + 1;
-
-      if (((nameSize + rConn.DataSize ()) < rConn.MaxSize())
-          && (namesCount < 255))
-        {
-          D_UINT8* destination = rConn.Data () + rConn.DataSize ();
-          memcpy (destination, pName, nameSize);
-          rConn.DataSize (rConn.DataSize () + nameSize);
-          ++namesCount;
-          continue;
-        }
-
-      if (namesCount == 0)
-        goto cmd_list_toobig_err;
-
-      rConn.Data ()[0] = CS_OK;
-      if (firstResp)
-        {
-          store_le_int32 (glbsCount, rConn.Data () + sizeof (D_UINT8));
-          rConn.Data ()[sizeof (D_UINT32) + sizeof (D_UINT8)] = namesCount;
-        }
-      else
-        rConn.Data ()[sizeof (D_UINT8)] = namesCount;
-
-      rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, false, sendNext);
-      if ( ! sendNext)
-        goto cmd_list_cancel_op;
-
-      assert (glbIndex > 0);
-      --glbIndex;
-
-      namesCount = 0;
-      firstResp  = false;
-      rConn.DataSize (sizeof (D_UINT8) + sizeof (D_UINT8));
+      result = WCS_INVALID_ARGS;
+      goto cmd_list_globals_err;
     }
 
-  rConn.Data ()[0] = CS_OK;
-  if (firstResp)
+  for (; firstHint < glbsCount; ++firstHint)
     {
-      store_le_int32 (glbsCount, rConn.Data () + sizeof (D_UINT8));
-      rConn.Data ()[sizeof (D_UINT32) + sizeof (D_UINT8)] = namesCount;
-    }
-  else
-    rConn.Data ()[sizeof (D_UINT8)] = namesCount;
+      const D_UINT8* pName   = session.GlobalValueName (firstHint);
+      const D_UINT   nameLen = strlen (_RC (const D_CHAR*, pName)) + 1;
 
-  rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, true, sendNext);
-  assert (sendNext == false);
+      if (dataOffset + nameLen >= rConn.DataSize())
+        {
+          if (! oneAtLeast)
+            {
+              //This global variable name is too large.
+              result = WCS_LARGE_ARGS;
+              goto cmd_list_globals_err;
+
+            }
+          else
+            break;
+        }
+
+      oneAtLeast = true;
+
+      memcpy (rConn.Data () + dataOffset, pName, nameLen);
+      dataOffset += nameLen;
+    }
+
+  assert (result == WCS_OK);
+  assert (dataOffset <= rConn.DataSize ());
+  assert (oneAtLeast);
+
+  rConn.DataSize (dataOffset);
+  rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP);
+
   return;
 
-cmd_list_toobig_err:
-  rConn.DataSize (1);
-  rConn.Data ()[0] = CS_LARGE_ARGS;
-  rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP, true, sendNext);
+cmd_list_globals_err:
+  assert (result != WCS_OK);
 
-cmd_list_cancel_op:
-  assert (sendNext == false);
+  rConn.DataSize (sizeof (result));
+  store_le_int32 (result, rConn.Data ());
+  rConn.SendCmdResponse (CMD_LIST_GLOBALS_RSP);
 
   return;
 }
 
 static void
-cmd_glb_desc (ClientConnection& rConn, const bool receivedAll)
+cmd_list_procedures (ClientConnection& rConn)
 {
-  bool sendNext = false;
-  if (rConn.DataSize () < (sizeof (D_UINT16) + 1))
+  D_UINT32 result = WCS_OK;
+
+  if (rConn.DataSize () != sizeof (D_UINT32))
     {
       throw ConnectionException (
-                              "Command used to retrieve description of global "
+                              "Command used to retrieve context global "
                               "variables has invalid format.",
                               _EXTRA (0)
                                 );
     }
-  else if (receivedAll == false)
+  const I_Session& session = *rConn.Dbs ().m_Session;
+
+  const D_UINT32 procsCount  = session.ProceduresCount ();
+  D_UINT32       firstHint   = from_le_int32 (rConn.Data ());
+  D_UINT16       dataOffset  = 0;
+  bool           oneAtLeast  = false;
+
+  rConn.DataSize (rConn.MaxSize ());
+  store_le_int32 (WCS_OK, rConn.Data () + dataOffset);
+  dataOffset += sizeof (D_UINT32);
+
+  store_le_int32 (procsCount, rConn.Data () + dataOffset);
+  dataOffset += sizeof (D_UINT32);
+
+  store_le_int32 (firstHint, rConn.Data () + dataOffset);
+  dataOffset += sizeof (D_UINT32);
+
+  assert (rConn.DataSize () > 3 * sizeof (D_UINT32));
+
+  if (firstHint >= procsCount)
     {
-      rConn.AckCommandPart (false);
+      result = WCS_INVALID_ARGS;
+      goto cmd_list_procedures_err;
+    }
+
+  for (; firstHint < procsCount; ++firstHint)
+    {
+      const D_UINT8* pName   = session.ProcedureName (firstHint);
+      const D_UINT   nameLen = strlen (_RC (const D_CHAR*, pName)) + 1;
+
+      if (dataOffset + nameLen >= rConn.DataSize())
+        {
+          if (! oneAtLeast)
+            {
+              //This global variable name is too large.
+              result = WCS_LARGE_ARGS;
+              goto cmd_list_procedures_err;
+            }
+          else
+            break;
+        }
+
+      oneAtLeast = true;
+
+      memcpy (rConn.Data () + dataOffset, pName, nameLen);
+      dataOffset += nameLen;
+    }
+
+  assert (result == WCS_OK);
+  assert (dataOffset <= rConn.DataSize ());
+  assert (oneAtLeast);
+
+  rConn.DataSize (dataOffset);
+  rConn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
+
+  return;
+
+cmd_list_procedures_err:
+  assert (result != WCS_OK);
+
+  rConn.DataSize (sizeof (result));
+  store_le_int32 (result, rConn.Data ());
+  rConn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
+
+  return;
+}
+
+static void
+cmd_procedure_param_desc (ClientConnection& rConn)
+{
+  D_UINT32 result = WCS_OK;
+
+  if (rConn.DataSize () < sizeof (D_UINT16) + 2 * sizeof (D_UINT8))
+    {
       throw ConnectionException (
-                              "Unable to find the description of a global "
-                              "variable because its name is too large.",
+                              "Command used to retrieve context global "
+                              "variables has invalid format.",
                               _EXTRA (0)
                                 );
     }
+  const I_Session&     session     = *rConn.Dbs ().m_Session;
+  D_UINT8*             data_       = rConn.Data ();
+  D_UINT16             hint        = from_le_int16 (data_);
+  const D_UINT8* const procName    = data_ + sizeof (D_UINT16);
+  D_UINT16             offset      = 0;
+  bool                 oneAtLeast  = false;
+  const D_UINT         paramsCount = session.ProcedureParametersCount (procName);
 
-  D_UINT8* const data_    = rConn.Data ();
-  const D_UINT16 nameSize = from_le_int16 (data_);
-
-  assert ((nameSize + sizeof (D_UINT16)) == rConn.DataSize());
-
-  const I_Session& rSession = *rConn.Dbs ().m_Session;
-  const D_UINT8*   pGlbTI   = rSession.GlobalValueType (
-                                                    data_ + sizeof (D_UINT16)
-                                                       );
-  if (pGlbTI == NULL)
+  if (paramsCount >= 0xFFFF)
     {
-      rConn.DataSize (sizeof (D_UINT8));
-      data_[0] = CS_INVALID_ARGS;
-      rConn.SendCmdResponse (CMD_GLOBAL_DESC_RSP, true, sendNext);
-
-      assert (sendNext == false);
-      return;
+      result = WCS_LARGE_ARGS;
+      goto cmd_procedure_param_desc_err;
+    }
+  else if (hint >= paramsCount)
+    {
+      result = WCS_INVALID_ARGS;
+      goto cmd_procedure_param_desc_err;
     }
 
-  const D_UINT dataSize =
-      from_le_int16 (pGlbTI + sizeof (D_UINT16)) + 2 * sizeof (D_UINT16);
-  assert (dataSize > sizeof (D_UINT16));
+  rConn.DataSize (rConn.MaxSize ());
+  store_le_int32 (WCS_OK, data_);
+  offset += sizeof (D_UINT32);
 
-  D_UINT progress = 0;
+  //Leave the name part unchanged!
+  offset += strlen (_RC (const D_CHAR*, procName)) + 1;
 
-  while (progress < dataSize)
+  store_le_int16 (paramsCount, data_ + offset);
+  offset += sizeof (D_UINT16);
+
+  store_le_int16 (hint, data_ + offset);
+  offset += sizeof (D_UINT16);
+
+  do
     {
-      D_UINT chunkSize = rConn.MaxSize () -
-                         (sizeof (D_UINT16) + sizeof (D_UINT8));
-      if (chunkSize > (dataSize - progress))
-        chunkSize = (dataSize - progress);
+      I_Operand& op = session.ProcedureParameterOp (procName, hint);
+      if (IS_TABLE (op.GetType ()))
+        {
+          I_DBSTable&  table       = op.GetTable ();
+          const D_UINT fieldsCount = table.GetFieldsCount();
 
-      rConn.DataSize (sizeof (D_UINT8) + sizeof (D_UINT16) + chunkSize);
-      data_[0] = CS_OK;
-      store_le_int16 (chunkSize, &data_[sizeof(D_UINT8)]);
-      memcpy (&data_[sizeof (D_UINT8) + sizeof (D_UINT16)],
-              pGlbTI + progress,
-              chunkSize);
-      progress += chunkSize;
+          if ((fieldsCount > 0xFFFF)
+              || (offset + sizeof (D_UINT16) >= rConn.DataSize ()))
+            {
+              break;
+            }
 
-      assert (progress <= dataSize);
+          store_le_int16 (fieldsCount, data_ + offset);
+          offset += sizeof (D_UINT16);
 
-      rConn.SendCmdResponse (CMD_GLOBAL_DESC_RSP,
-                            (progress >= dataSize),
-                            sendNext);
-      if (! sendNext)
-        break;
+          for (D_UINT field = 0; field < table.GetFieldsCount(); field++)
+            {
+              const DBSFieldDescriptor fd = table.GetFieldDescriptor (field);
+
+              const D_UINT fieldLen  = strlen (fd.m_pFieldName) + 1;
+              D_UINT16     fieldType = fd.m_FieldType;
+
+              if (offset + fieldLen + sizeof (D_UINT16) > rConn.DataSize ())
+                break;
+
+              strcpy (_RC (D_CHAR*, data_ + offset), fd.m_pFieldName);
+              offset += fieldLen;
+
+              if (fd.isArray)
+                MARK_ARRAY (fieldType);
+
+              store_le_int16 (fieldType, data_ + offset);
+              offset += sizeof (D_UINT16);
+            }
+        }
+      else
+        {
+          if (offset + sizeof (D_UINT32) > rConn.DataSize ())
+            break;
+
+          store_le_int16 (op.GetType (), data_ + offset);
+          offset += sizeof (D_UINT16);
+        }
+      ++hint;
+      oneAtLeast = true;
     }
+  while (hint < paramsCount);
+
+  if (! oneAtLeast)
+    {
+      result = WCS_LARGE_ARGS;
+      goto cmd_procedure_param_desc_err;
+    }
+
+  assert (result != WCS_OK);
+  rConn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
+
+  return;
+
+cmd_procedure_param_desc_err:
+  assert (result != WCS_OK);
+
+  rConn.DataSize (sizeof (result));
+  store_le_int32 (result, rConn.Data ());
+  rConn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
+
+  return;
 }
+
 
 static COMMAND_HANDLER saAdminCmds[] =
     {
         cmd_invalid,                     // CMD_INVALID
-        cmd_list_glbs,                   // CMD_LIST_GLOBALS
-        cmd_glb_desc                     // CMD_GLOBAL_DESC
+        cmd_list_globals,                // CMD_LIST_GLOBALS
+        cmd_list_procedures,             // CMD_LIST_PROC
+        cmd_procedure_param_desc         // CMD_DESC_PROC_PARAM
     };
 
 static COMMAND_HANDLER saUserCmds[] =
     {
         cmd_invalid,                     // CMD_CLOSE_CONN
-        cmd_read_stack,                        // CMD_READ_STACK
-        cmd_update_stack,                      // CMD_UPDATE_STACK
+        cmd_value_desc,                     // CMD_GLOBAL_DESC
+        cmd_read_stack,                  // CMD_READ_STACK
+        cmd_update_stack,                // CMD_UPDATE_STACK
+        cmd_execute_procedure,           // CMD_EXEC_PROC
         cmd_ping_sever                   // CMD_PING_SERVER
     };
 

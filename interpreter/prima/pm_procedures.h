@@ -68,6 +68,8 @@ public:
 
   ~ProcedureManager ();
 
+  D_UINT Count () const { return m_ProcsEntrys.size (); };
+
   D_UINT32 AddProcedure (const D_UINT8*           pName,
                          const D_UINT             nameLength,
                          const D_UINT32           localsCount,
@@ -81,9 +83,10 @@ public:
   D_UINT32 GetProcedure (const D_UINT8* pName,
                          const D_UINT   nameLength) const;
 
-  Unit&    GetUnit (const D_UINT procEntry) const;
-  D_UINT32 LocalsCount (const D_UINT procEntry) const;
-  D_UINT32 ArgsCount (const D_UINT procEntry) const;
+  const D_UINT8* Name (const D_UINT procEntry) const;
+  Unit&          GetUnit (const D_UINT procEntry) const;
+  D_UINT32       LocalsCount (const D_UINT procEntry) const;
+  D_UINT32       ArgsCount (const D_UINT procEntry) const;
 
   const StackValue& LocalValue (const D_UINT   procEntry,
                                 const D_UINT32 local) const;

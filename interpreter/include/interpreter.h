@@ -142,9 +142,22 @@ public:
                                  SessionStack&        stack) = 0;
 
   virtual D_UINT GlobalValuesCount () const = 0;
+  virtual D_UINT ProceduresCount () const = 0;
 
   virtual const D_UINT8* GlobalValueName (const D_UINT index) const = 0;
-  virtual const D_UINT8* GlobalValueType (const D_UINT8* pName) const = 0;
+  virtual I_Operand&     GlobalValueOp (const D_UINT32 index) = 0;
+  virtual I_Operand&     GlobalValueOp (const D_UINT8* const name) = 0;
+
+  virtual const D_UINT8* ProcedureName (const D_UINT index) const = 0;
+
+  virtual D_UINT     ProcedureParametersCount (const D_UINT8* name) const = 0;
+  virtual D_UINT     ProcedureParametersCount (const D_UINT id) const = 0;
+  virtual I_Operand& ProcedureParameterOp (const D_UINT id,
+                                           const D_UINT parameter) const = 0;
+  virtual I_Operand& ProcedureParameterOp (const D_UINT8* name,
+                                           const D_UINT   parameter) const = 0;
+  virtual I_Operand& ProcedureReturnOp (const D_UINT8* name) const = 0;
+  virtual I_Operand& ProcedureReturnOp (const D_UINT id) const = 0;
 
 protected:
   I_Logger& m_Log;

@@ -34,11 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FRAME_DATA_OFF                  0x08
 
 #define FRAME_TYPE_NORMAL               0x00
-#define FRAME_TYPE_PARTIAL              0x01
-#define FRAME_TYPE_PARTIAL_ACK          0x02
-#define FRAME_TYPE_PARTIAL_CANCEL       0x03
-#define FRAME_TYPE_AUTH_CLNT            0x04
-#define FRAME_TYPE_AUTH_CLNT_RSP        0x05
+#define FRAME_TYPE_AUTH_CLNT            0x01
+#define FRAME_TYPE_AUTH_CLNT_RSP        0x02
 #define FRAME_TYPE_COMM_NOSYNC          0xFD
 #define FRAME_TYPE_TIMEOUT              0xFE
 #define FRAME_TYPE_SERV_BUSY            0xFF
@@ -86,45 +83,106 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * CmdListResponseRsp
  * {
- *      status       : uint8
- *      globalsCount : uint32;
- *      frameVars    : uint8
- *      varNames     : char[]
- * }
- *
- * CmdListResponsePartialRsp
- * {
- *      status       : uint8
- *      frameVars    : uint8
+ *      status       : uint32
+ *      globalsCount : uint32
+ *      fromPos      : uint32
  *      varNames     : char[]
  * }
  */
 
+#define CMD_LIST_PROCEDURE             (CMD_LIST_GLOBALS_RSP + 1)
+#define CMD_LIST_PROCEDURE_RSP         (CMD_LIST_PROCEDURE + 1)
+/*
+ * CmdListResponseRsp
+ * {
+ *      status       : uint32
+ *      procsCount   : uint32
+ *      fromPos      : uint32
+ *      procNames    : char[]
+ * }
+ */
+
+#define CMD_DESC_PROC_PARAM            (CMD_LIST_PROCEDURE_RSP + 1)
+#define CMD_DESC_PROC_PARAM_RSP        (CMD_DESC_PROC_PARAM + 1)
+
+
+/* Connection close command */
+#define CMD_CLOSE_CONN                 USER_CMD_BASE
+#define CMD_CLOSE_CONN_RSP             (CMD_CLOSE_CONN + 1)
+
 /* Global describe type */
-#define CMD_GLOBAL_DESC                 (CMD_LIST_GLOBALS_RSP + 1)
-#define CMD_GLOBAL_DESC_RSP             (CMD_GLOBAL_DESC + 1)
+#define CMD_GLOBAL_DESC                (CMD_CLOSE_CONN_RSP + 1)
+#define CMD_GLOBAL_DESC_RSP            (CMD_GLOBAL_DESC + 1)
 
 /*
  * CmdGlobalDesc
  * {
- *     nameSize : uint16
- *     name     : char[]
+ *     fieldHint : uint16
+ *     reserved  : uint16
+ *     name      : char[]
  * }
  *
  * CmdGlobalDescRsp, CmdGlobalDescRspPartial
  * {
- *      status       : uint8
- *      typeDescSend : uint16
- *      typeDesc     : uint8[]
+ *      status       : uint32
+ *      globalName   : char[]
+ *      rawtype      : uint16
+ *      fieldCount   : uint16
+ *      fieldHint    : uint16
+ *      fieldName    : char[]
+ *      fieldRawType : uint16
+ *      .
+ *      .
+ *      .
  * }
  */
 
-/* Connection close command */
-#define CMD_CLOSE_CONN          USER_CMD_BASE
-#define CMD_CLOSE_CONN_RSP      (CMD_CLOSE_CONN + 1)
 
-#define CMD_READ_STACK          (CMD_CLOSE_CONN_RSP + 1)
-#define CMD_READ_STACK_RSP      (CMD_READ_STACK + 1)
+#define CMD_READ_STACK                  (CMD_CLOSE_CONN_RSP + 1)
+#define CMD_READ_STACK_RSP              (CMD_READ_STACK + 1)
+/*
+ *   CmdReadStack
+ *   {
+ *      fieldNameHint:  uint8[]
+ *      rowHint      :  uint64 (fieldName[0] != 0)
+ *      positionHint :  uint64 (array & texts)
+ *   }
+ *
+ *
+ *   CmdReadStackRsp
+ *   {
+ *      status  : uint32;
+ *      type    : uint16;
+ *      {       (type & ~(FT_FIELD_MASK | FT_ARRAY_MASK)
+ *              value : uint8[];
+ *      }
+ *      {
+ *              (type == FT_TEXT)
+ *
+ *              charsCount: uint64
+ *              position:   uint16
+ *              value:      uint8[] (not necessarily contains the all text!)
+ *      }
+ *      {
+ *              (type & FT_ARRAY_MASK)
+ *
+ *              arrayCount: uint64
+ *              entCount:   uint16
+ *              value1:     uint8[]
+ *              value2:     uint8[]
+ *              .
+ *              .
+ *              .
+ *              value[entCount]: uint8[]
+ *      }
+ *      {
+ *              (type == FT_TABLE)
+ *              rowsCount : uint64;
+ *              fieldname:  uint8[];
+ *              row:        uint64[];
+ *      }
+ *   }
+ */
 
 #define CMD_UPDATE_STACK        (CMD_READ_STACK_RSP + 1)
 #define CMD_UPDATE_STACK_RSP    (CMD_UPDATE_STACK + 1)
@@ -136,13 +194,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /*
  * CmdUpdate
  * {
- *      value_name : uint8[];
- *      field_name : uint8[];
- *      type       : uint16;
- *      flags      : uint16;
- *      row_index  : uint64;
- *      from_pos   : uint64;
- *      data       : uint8 [];
+ *      subcmd     : uint8;
+ *      SubCmdData : uint8[];
+ *      subcmd     : uint8;
+ *      SubCmdData : uint8[];
+ *      .
+ *      .
+ *      .
+ *      subcmd     : uint8;
+ *      SubCmdData : uint8[];
  * }
  *
  * CmdSubCmdPop
@@ -155,15 +215,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *      type      : uint16
  *      fieldName : uint8[] (type == FT_TABLE)
  *      fieldType : uint16 (type == FT_TABLE)
+ *      fieldName : uint8[] (type == FT_TABLE)
+ *      fieldType : uint16 (type == FT_TABLE)
+ *      .
+ *      .
+ *      .
+ *      fieldName : uint8[] (type == FT_TABLE)
+ *      fieldType : uint16 (type == FT_TABLE)
  * }
  *
- * CmdSubcmdUpdateTop
+ * CmdSubCmdUpdateTop
  * {
  *      flags     : uint16
  *      fieldName : uint8[]  (flags & FT_FIELD_MASK)
- *      rowIndex  : uint8[]  (flags & FT_FIELD_MASK)
- *      arrayIndex: uint8[]  (flags & FT_ARRAY_MASK)
- *      count     : uint8[]  (flags & FT_ARRAY_MASK)
+ *      rowIndex  : uint64  (flags & FT_FIELD_MASK)
+ *      count     : uint16  (flags & FT_ARRAY_MASK)
+ *      arrayIndex: uint64  (flags & FT_ARRAY_MASK)
  *      value1    : uint8[]  (count > 0)
  *      value2    : uint8[]  (count > 1)
  *      .
@@ -174,17 +241,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * CmdUpdatRsp
  * {
- *      status: uint16
+ *      status: uint32
  * }
  *
  */
 
+#define CMD_EXEC_PROC           (CMD_UPDATE_STACK_RSP + 1)
+#define CMD_EXEC_PROC_RSP       (CMD_EXEC_PROC + 1)
+
 /* Ping command */
-#define CMD_PING_SERVER         (CMD_UPDATE_STACK_RSP + 1)
+#define CMD_PING_SERVER         (CMD_EXEC_PROC_RSP + 1)
 #define CMD_PING_SERVER_RSP     (CMD_PING_SERVER + 1)
 
-
-#define ADMIN_CMDS_COUNT        ((CMD_GLOBAL_DESC / 2) + 1)
+#define ADMIN_CMDS_COUNT        ((CMD_DESC_PROC_PARAM / 2) + 1)
 #define USER_CMDS_COUNT         ((CMD_PING_SERVER - USER_CMD_BASE) / 2 + 1)
 
 #endif /* SERVER_PROTOCOL_H_ */

@@ -55,6 +55,15 @@ ArrayOperand::SetValue (const DBSArray& value)
   m_Value = value;
 }
 
+D_UINT
+ArrayOperand::GetType ()
+{
+  D_UINT type = 0;
+  MARK_ARRAY (type);
+
+  return type;
+}
+
 StackValue
 ArrayOperand::GetValueAt (const D_UINT64 index)
 {
@@ -162,6 +171,12 @@ BoolArrayElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
+D_UINT
+BoolArrayElOperand::GetType ()
+{
+  return T_BOOL;
+}
+
 StackValue
 BoolArrayElOperand::CopyValue () const
 {
@@ -200,6 +215,12 @@ void
 CharArrayElOperand::SetValue (const DBSChar& value)
 {
   Set (value);
+}
+
+D_UINT
+CharArrayElOperand::GetType ()
+{
+  return T_CHAR;
 }
 
 StackValue
@@ -260,6 +281,12 @@ DateArrayElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
+D_UINT
+DateArrayElOperand::GetType ()
+{
+  return T_DATE;
+}
+
 StackValue
 DateArrayElOperand::CopyValue () const
 {
@@ -313,6 +340,12 @@ DateTimeArrayElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
+D_UINT
+DateTimeArrayElOperand::GetType ()
+{
+  return T_DATETIME;
+}
+
 StackValue
 DateTimeArrayElOperand::CopyValue () const
 {
@@ -363,6 +396,12 @@ void
 HiresTimeArrayElOperand::SetValue (const DBSHiresTime& value)
 {
   Set (value);
+}
+
+D_UINT
+HiresTimeArrayElOperand::GetType ()
+{
+  return T_HIRESTIME;
 }
 
 StackValue
@@ -563,6 +602,12 @@ UInt8ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+UInt8ArrayElOperand::GetType ()
+{
+  return T_UINT8;
+}
+
 StackValue
 UInt8ArrayElOperand::CopyValue () const
 {
@@ -759,6 +804,12 @@ UInt16ArrayElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+UInt16ArrayElOperand::GetType ()
+{
+  return T_UINT16;
 }
 
 StackValue
@@ -959,6 +1010,12 @@ UInt32ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+UInt32ArrayElOperand::GetType ()
+{
+  return T_UINT32;
+}
+
 StackValue
 UInt32ArrayElOperand::CopyValue () const
 {
@@ -1155,6 +1212,12 @@ UInt64ArrayElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+UInt64ArrayElOperand::GetType ()
+{
+  return T_UINT64;
 }
 
 StackValue
@@ -1355,6 +1418,12 @@ Int8ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+Int8ArrayElOperand::GetType ()
+{
+  return T_INT8;
+}
+
 StackValue
 Int8ArrayElOperand::CopyValue () const
 {
@@ -1551,6 +1620,12 @@ Int16ArrayElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+Int16ArrayElOperand::GetType ()
+{
+  return T_INT16;
 }
 
 StackValue
@@ -1751,6 +1826,12 @@ Int32ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+Int32ArrayElOperand::GetType ()
+{
+  return T_INT32;
+}
+
 StackValue
 Int32ArrayElOperand::CopyValue () const
 {
@@ -1949,6 +2030,12 @@ Int64ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+Int64ArrayElOperand::GetType ()
+{
+  return T_INT64;
+}
+
 StackValue
 Int64ArrayElOperand::CopyValue () const
 {
@@ -2075,6 +2162,12 @@ RealArrayElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
+D_UINT
+RealArrayElOperand::GetType ()
+{
+  return T_REAL;
+}
+
 StackValue
 RealArrayElOperand::CopyValue () const
 {
@@ -2197,6 +2290,12 @@ RichRealArrayElOperand::SelfDiv (const DBSRichReal& value)
   currValue = internal_div (currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+RichRealArrayElOperand::GetType ()
+{
+  return T_RICHREAL;
 }
 
 StackValue

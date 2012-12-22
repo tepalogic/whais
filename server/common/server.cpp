@@ -117,9 +117,8 @@ client_handler_routine (void* args)
       while (true)
         {
           const COMMAND_HANDLER* pCmds;
-          bool                   lastPart;
 
-          D_UINT16 cmdType = connection.ReadCommand (&lastPart);
+          D_UINT16 cmdType = connection.ReadCommand ();
 
           if (cmdType == CMD_CLOSE_CONN)
             break;
@@ -127,7 +126,7 @@ client_handler_routine (void* args)
           if ((cmdType & 1) != 0)
             {
               throw ConnectionException ("Invalid command received.",
-                                         _EXTRA (0));
+                                         _EXTRA (cmdType));
             }
 
           if (cmdType >= USER_CMD_BASE)
@@ -136,8 +135,8 @@ client_handler_routine (void* args)
               cmdType /= 2;
               if (cmdType >= USER_CMDS_COUNT)
                 {
-                  throw ConnectionException ("Invalid user command received",
-                                             _EXTRA (0));
+                  throw ConnectionException ("Invalid user command received.",
+                                             _EXTRA (cmdType));
                 }
               pCmds = gpUserCommands;
             }
@@ -146,12 +145,18 @@ client_handler_routine (void* args)
               cmdType /= 2;
               if (cmdType >= ADMIN_CMDS_COUNT)
                 {
-                  throw ConnectionException ("Invalid admin command received",
-                                             _EXTRA (0));
+                  throw ConnectionException ("Invalid admin command received.",
+                                             _EXTRA (cmdType));
+                }
+              else if (! connection.IsAdmin ())
+                {
+                  throw ConnectionException ("Regular user requested to "
+                                             "execute admin command.",
+                                             _EXTRA (cmdType));
                 }
               pCmds = gpAdminCommands;
             }
-          pCmds[cmdType] (connection, lastPart);
+          pCmds[cmdType] (connection);
         }
   }
   catch (WSocketException& e)

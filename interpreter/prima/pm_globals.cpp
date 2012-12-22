@@ -108,7 +108,7 @@ GlobalsManager::Name (const D_UINT index) const
   if (index >= m_Storage.size ())
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
 
-  const GlobalEntry& entry      = m_GlobalsEntrys[index];
+  const GlobalEntry& entry = m_GlobalsEntrys[index];
 
   return  &m_Identifiers [entry.m_IdOffet];
 }

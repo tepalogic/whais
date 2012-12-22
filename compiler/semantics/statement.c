@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
+#include "utils/include/le_converter.h"
+
 #include "vardecl.h"
 #include "brlo_stmts.h"
 
@@ -270,22 +272,25 @@ is_type_spec_valid (const struct TypeSpec* pType)
 {
   D_BOOL result = TRUE;
 
-  if (((pType->type == T_UNKNOWN) || (pType->type > T_UNDETERMINED)) &&
-      (IS_FIELD (pType->type) == FALSE) &&
-      (IS_ARRAY (pType->type) == FALSE) &&
-      (IS_TABLE (pType->type) == FALSE))
+  const D_UINT16 htype = from_le_int16 ((D_UINT8*)&pType->type);
+  const D_UINT16 hsize = from_le_int16 ((D_UINT8*)&pType->dataSize);
+
+  if (((htype == T_UNKNOWN) || (htype > T_UNDETERMINED)) &&
+      (IS_FIELD (htype) == FALSE) &&
+      (IS_ARRAY (htype) == FALSE) &&
+      (IS_TABLE (htype) == FALSE))
     {
       result = FALSE;
     }
-  else if ((pType->data[pType->dataSize - 2] != TYPE_SPEC_END_MARK) ||
-           (pType->data[pType->dataSize - 1] != 0))
+  else if ((pType->data[hsize - 2] != TYPE_SPEC_END_MARK) ||
+           (pType->data[hsize - 1] != 0))
     {
       result = FALSE;
     }
-  else if (IS_FIELD (pType->type))
+  else if (IS_FIELD (htype))
     {
-      const D_UINT16 fieldType = GET_FIELD_TYPE (pType->type);
-      if (pType->dataSize != 2)
+      const D_UINT16 fieldType = GET_FIELD_TYPE (htype);
+      if (hsize != 2)
         result = FALSE;
       else if (IS_ARRAY (fieldType))
         {
@@ -304,20 +309,20 @@ is_type_spec_valid (const struct TypeSpec* pType)
             }
         }
     }
-  else if (IS_ARRAY (pType->type))
+  else if (IS_ARRAY (htype))
     {
-      if ( (pType->dataSize != 2) ||
-           (GET_BASIC_TYPE (pType->type) == T_UNKNOWN) ||
-           (GET_BASIC_TYPE (pType->type) > T_UNDETERMINED) )
+      if ( (hsize != 2) ||
+           (GET_BASIC_TYPE (htype) == T_UNKNOWN) ||
+           (GET_BASIC_TYPE (htype) > T_UNDETERMINED) )
         {
           result = FALSE;
         }
     }
-  else if (IS_TABLE (pType->type))
+  else if (IS_TABLE (htype))
     {
       D_UINT index = 0;
 
-      while ((index < (D_UINT) (pType->dataSize - 2)) && (result != FALSE))
+      while ((index < (D_UINT) (hsize - 2)) && (result != FALSE))
         {
           D_UINT16 type;
           D_UINT   identifierLength = strlen ((char *) &pType->data[index]);
@@ -383,7 +388,8 @@ static D_UINT
 type_spec_fill_table_field (struct OutputStream* const pStream,
                             const struct DeclaredVar*  pFieldList)
 {
-  D_UINT result = 0;
+  D_UINT   result = 0;
+  D_UINT16 le_type;
 
   while (pFieldList && IS_TABLE_FIELD (pFieldList->type))
     {
@@ -397,13 +403,14 @@ type_spec_fill_table_field (struct OutputStream* const pStream,
         }
 
       result += pFieldList->labelLength + 1;
-      if (output_uint16 (pStream, GET_BASIC_TYPE (pFieldList->type)) == NULL)
+      store_le_int16 (GET_BASIC_TYPE (pFieldList->type), (D_UINT8*)&le_type);
+      if (output_uint16 (pStream, le_type) == NULL)
         {
           result = TYPE_SPEC_ERROR;
           break;
         }
-      result     += 2;
-      pFieldList = pFieldList->extra;
+      result     += sizeof (D_UINT16);
+      pFieldList  = pFieldList->extra;
     }
 
   return result;
@@ -413,14 +420,17 @@ static D_UINT
 type_spec_fill_table (struct OutputStream* const     pStream,
                       const struct DeclaredVar*const pVar)
 {
-  D_UINT result  = 0;
-  D_UINT specOff = get_size_outstream (pStream);
+  D_UINT   result  = 0;
+  D_UINT   specOff = get_size_outstream (pStream);
+  D_UINT16 le_type;
 
   assert (IS_TABLE (pVar->type));
 
+  store_le_int16 (pVar->type, (D_UINT8*)&le_type);
+
   /* output the type and a dummy length to fill
    * after fields are output */
-  if ((output_uint16 (pStream, pVar->type) != NULL) &&
+  if ((output_uint16 (pStream, le_type) != NULL) &&
       (output_uint16 (pStream, 0) != NULL))
     {
       result = type_spec_fill_table_field (pStream, pVar->extra);
@@ -432,10 +442,10 @@ type_spec_fill_table (struct OutputStream* const     pStream,
       (output_uint8 (pStream, TYPE_SPEC_END_MARK) != NULL) &&
       (output_uint8 (pStream, 0) != NULL))
     {
-      struct TypeSpec *ts = (struct TypeSpec*)(get_buffer_outstream (pStream) + specOff);
-
-      result       += 2;
-      ts->dataSize  = result;
+      struct TypeSpec *ts = (struct TypeSpec*)
+                            (get_buffer_outstream (pStream) + specOff);
+      result += 2 * sizeof (D_UINT8);
+      store_le_int16 (result, (D_UINT8*)&ts->dataSize);
     }
   else
     result = TYPE_SPEC_ERROR;
@@ -452,17 +462,13 @@ type_spec_fill_array (struct OutputStream* const      pStream,
 
   assert (IS_ARRAY (pVar->type));
 
-  spec.type     = pVar->type;
-  spec.dataSize = 2;
-  spec.data[0]  = TYPE_SPEC_END_MARK;
-  spec.data[1]  = 0;
+  store_le_int16 (pVar->type, (D_UINT8*)&spec.type);
+  store_le_int16 (2, (D_UINT8*)&spec.dataSize);
+  spec.data[0] = TYPE_SPEC_END_MARK;
+  spec.data[1] = 0;
 
-  if ((output_uint16 (pStream, spec.type) != NULL) &&
-      (output_uint16 (pStream, spec.dataSize) != NULL) &&
-      (output_data (pStream, spec.data, sizeof spec.data) != NULL))
-    {
-      result = 2 * sizeof  (D_UINT16) + sizeof (spec.data);
-    }
+  if (output_data (pStream, (D_UINT8 *)&spec, sizeof spec) != NULL)
+    result = sizeof spec;
   else
     result = TYPE_SPEC_ERROR;
 
@@ -478,17 +484,13 @@ type_spec_fill_field (struct OutputStream* const      pStream,
 
   assert (IS_FIELD (pVar->type));
 
-  spec.type     = pVar->type;
-  spec.dataSize = 2;
-  spec.data[0]  = TYPE_SPEC_END_MARK;
-  spec.data[1]  = 0;
+  store_le_int16 (pVar->type, (D_UINT8*)&spec.type);
+  store_le_int16 (2, (D_UINT8*)&spec.dataSize);
+  spec.data[0] = TYPE_SPEC_END_MARK;
+  spec.data[1] = 0;
 
-  if ((output_uint16 (pStream, spec.type) != NULL) &&
-      (output_uint16 (pStream, spec.dataSize) != NULL) &&
-      (output_data (pStream, spec.data, sizeof spec.data) != NULL))
-    {
-      result = 2 * sizeof  (D_UINT16) + sizeof (spec.data);
-    }
+  if (output_data (pStream, (D_UINT8 *)&spec, sizeof spec) != NULL)
+    result = sizeof spec;
   else
     result = TYPE_SPEC_ERROR;
 
@@ -504,14 +506,15 @@ type_spec_fill_basic (struct OutputStream* const      pStream,
 
   assert ((IS_ARRAY (pVar->varId) || IS_TABLE (pVar->varId)) == FALSE);
   assert (pVar->type != T_UNKNOWN);
-  assert (pVar->type <= T_UINT64);
+  assert (pVar->type <= T_TEXT);
 
-  spec.type     = pVar->type;
-  spec.dataSize = 2;
-  spec.data[0]  = TYPE_SPEC_END_MARK;
-  spec.data[1]  = 0;
+  store_le_int16 (pVar->type, (D_UINT8*)&spec.type);
+  store_le_int16 (2, (D_UINT8*)&spec.dataSize);
+  spec.data[0] = TYPE_SPEC_END_MARK;
+  spec.data[1] = 0;
 
-  if (output_data (pStream, (D_UINT8 *) & spec, sizeof spec) != NULL)
+
+  if (output_data (pStream, (D_UINT8 *)&spec, sizeof spec) != NULL)
     result = sizeof spec;
   else
     result = TYPE_SPEC_ERROR;
@@ -524,7 +527,7 @@ type_spec_fill (struct OutputStream* const      pStream,
                 const struct DeclaredVar* const pVar)
 {
 
-  D_UINT           result = 0;
+  D_UINT              result = 0;
   struct OutputStream temporalStream;
 
   if (IS_TABLE_FIELD (pVar->type))
@@ -536,8 +539,12 @@ type_spec_fill (struct OutputStream* const      pStream,
 
   init_outstream (OUTSTREAM_INCREMENT_SIZE, &temporalStream);
 
-  if ( (IS_FIELD (pVar->type) || IS_ARRAY (pVar->type) || IS_TABLE (pVar->type)) == FALSE)
-    result = type_spec_fill_basic (&temporalStream, pVar);
+  if ( ! (IS_FIELD (pVar->type)
+          || IS_ARRAY (pVar->type)
+          || IS_TABLE (pVar->type)))
+    {
+      result = type_spec_fill_basic (&temporalStream, pVar);
+    }
   else if (IS_TABLE (pVar->type))
     result = type_spec_fill_table (&temporalStream, pVar);
   else if (IS_FIELD (pVar->type))

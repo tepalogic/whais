@@ -191,7 +191,7 @@ custom_mem_alloc (size_t size)
 {
   W_ALLOCATED_MEMORY *result = NULL;
 
-  test_set_mem_max (20*1024*1024);
+  test_set_mem_max (40*1024*1024);
 
   size += sizeof (W_ALLOCATED_MEMORY);
   size++;                       /* control byte */

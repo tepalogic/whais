@@ -229,6 +229,8 @@ public:
   virtual void GetValue (DBSText& outValue) const;
   virtual void GetValue (DBSArray& outValue) const;
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -252,6 +254,8 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -274,6 +278,8 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -299,6 +305,8 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -323,6 +331,8 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -346,6 +356,8 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -391,6 +403,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -438,6 +452,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -483,6 +499,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -530,6 +548,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -575,6 +595,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -622,6 +644,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -666,6 +690,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -712,6 +738,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -749,6 +777,8 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -785,6 +815,8 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -808,6 +840,8 @@ public:
 
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
@@ -846,6 +880,8 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 
 private:
@@ -867,6 +903,8 @@ public:
 
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
@@ -940,6 +978,8 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -957,6 +997,8 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -977,6 +1019,8 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -996,6 +1040,8 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1014,6 +1060,8 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1056,6 +1104,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1095,6 +1145,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1136,6 +1188,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1175,6 +1229,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1216,6 +1272,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1255,6 +1313,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1296,6 +1356,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1336,6 +1398,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1366,6 +1430,8 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1395,6 +1461,8 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1430,6 +1498,8 @@ public:
   }
 
   virtual bool IsNull () const;
+
+  virtual D_UINT GetType ();
 
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual I_DBSTable& GetTable ();
@@ -1469,6 +1539,8 @@ public:
   const FieldOperand& operator= (const FieldOperand& source);
 
   virtual bool IsNull () const;
+
+  virtual D_UINT GetType ();
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
@@ -1561,6 +1633,8 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1580,6 +1654,8 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1601,6 +1677,8 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSDate& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1624,6 +1702,8 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1644,6 +1724,8 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1687,6 +1769,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1728,6 +1812,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1771,6 +1857,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1812,6 +1900,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1855,6 +1945,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1896,6 +1988,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -1939,6 +2033,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -1981,6 +2077,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2012,6 +2110,8 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2045,6 +2145,8 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2066,6 +2168,8 @@ public:
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue GetValueAt (const D_UINT64 index);
 
   virtual StackValue CopyValue () const;
@@ -2085,6 +2189,8 @@ public:
 
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
@@ -2109,6 +2215,8 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 
@@ -2206,6 +2314,8 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2226,6 +2336,8 @@ public:
   virtual void GetValue (DBSText& outValue) const;
 
   virtual void SetValue (const DBSChar& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2249,6 +2361,8 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2271,6 +2385,8 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2292,6 +2408,8 @@ public:
   virtual void GetValue (DBSHiresTime& outValue) const;
 
   virtual void SetValue (const DBSHiresTime& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2336,6 +2454,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2378,6 +2498,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2422,6 +2544,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2464,6 +2588,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2508,6 +2634,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2550,6 +2678,8 @@ public:
   virtual void SelfAnd (const DBSInt64& value);
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2594,6 +2724,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2637,6 +2769,8 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2670,6 +2804,8 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
+  virtual D_UINT GetType ();
+
   virtual StackValue CopyValue () const;
 };
 
@@ -2702,6 +2838,8 @@ public:
 
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
+
+  virtual D_UINT GetType ();
 
   virtual StackValue CopyValue () const;
 };
@@ -2825,6 +2963,12 @@ public:
     WSynchronizerRAII dummy(m_Sync);
     GetOperand ().SelfOr (value);
   }
+
+  D_UINT GetType ()
+  {
+    return GetOperand ().GetType ();
+  }
+
 
   FIELD_INDEX GetField ()
   {
@@ -2957,6 +3101,8 @@ public:
   virtual void SelfOr (const DBSInt64& value);
   virtual void SelfOr (const DBSBool& value);
 
+  virtual D_UINT GetType ();
+
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
@@ -3042,6 +3188,8 @@ public:
 
   virtual void SelfOr (const DBSInt64& value);
   virtual void SelfOr (const DBSBool& value);
+
+  virtual D_UINT GetType ();
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();

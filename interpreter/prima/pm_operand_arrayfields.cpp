@@ -85,6 +85,12 @@ CharTextFieldElOperand::SetValue (const DBSChar& value)
   table.SetEntry (m_Row, m_Field, text);
 }
 
+D_UINT
+CharTextFieldElOperand::GetType ()
+{
+  return T_CHAR;
+}
+
 StackValue
 CharTextFieldElOperand::CopyValue () const
 {
@@ -154,6 +160,13 @@ BoolArrayFieldElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
+D_UINT
+BoolArrayFieldElOperand::GetType ()
+{
+  return T_BOOL;
+}
+
+
 StackValue
 BoolArrayFieldElOperand::CopyValue () const
 {
@@ -191,6 +204,12 @@ void
 CharArrayFieldElOperand::SetValue (const DBSChar& value)
 {
   Set (value);
+}
+
+D_UINT
+CharArrayFieldElOperand::GetType ()
+{
+  return T_CHAR;
 }
 
 StackValue
@@ -252,6 +271,12 @@ DateArrayFieldElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
+D_UINT
+DateArrayFieldElOperand::GetType ()
+{
+  return T_DATE;
+}
+
 StackValue
 DateArrayFieldElOperand::CopyValue () const
 {
@@ -306,6 +331,12 @@ DateTimeArrayFieldElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
+D_UINT
+DateTimeArrayFieldElOperand::GetType ()
+{
+  return T_DATETIME;
+}
+
 StackValue
 DateTimeArrayFieldElOperand::CopyValue () const
 {
@@ -356,6 +387,12 @@ void
 HiresTimeArrayFieldElOperand::SetValue (const DBSHiresTime& value)
 {
   Set (value);
+}
+
+D_UINT
+HiresTimeArrayFieldElOperand::GetType ()
+{
+  return T_HIRESTIME;
 }
 
 StackValue
@@ -554,6 +591,12 @@ UInt8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or (currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+UInt8ArrayFieldElOperand::GetType ()
+{
+  return T_UINT8;
 }
 
 StackValue
@@ -755,6 +798,12 @@ UInt16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+UInt16ArrayFieldElOperand::GetType ()
+{
+  return T_UINT16;
+}
+
 StackValue
 UInt16ArrayFieldElOperand::CopyValue () const
 {
@@ -952,6 +1001,12 @@ UInt32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+UInt32ArrayFieldElOperand::GetType ()
+{
+  return T_UINT32;
 }
 
 StackValue
@@ -1152,6 +1207,12 @@ UInt64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+UInt64ArrayFieldElOperand::GetType ()
+{
+  return T_UINT64;
+}
+
 StackValue
 UInt64ArrayFieldElOperand::CopyValue () const
 {
@@ -1348,6 +1409,12 @@ Int8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+Int8ArrayFieldElOperand::GetType ()
+{
+  return T_INT8;
 }
 
 StackValue
@@ -1549,6 +1616,12 @@ Int16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+Int16ArrayFieldElOperand::GetType ()
+{
+  return T_INT16;
+}
+
 StackValue
 Int16ArrayFieldElOperand::CopyValue () const
 {
@@ -1745,6 +1818,12 @@ Int32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   currValue = internal_or(currValue, value);
 
   Set (currValue);
+}
+
+D_UINT
+Int32ArrayFieldElOperand::GetType ()
+{
+  return T_INT32;
 }
 
 StackValue
@@ -1945,6 +2024,12 @@ Int64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
+D_UINT
+Int64ArrayFieldElOperand::GetType ()
+{
+  return T_INT64;
+}
+
 StackValue
 Int64ArrayFieldElOperand::CopyValue () const
 {
@@ -2071,6 +2156,12 @@ RealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
+D_UINT
+RealArrayFieldElOperand::GetType ()
+{
+  return T_REAL;
+}
+
 StackValue
 RealArrayFieldElOperand::CopyValue () const
 {
@@ -2195,6 +2286,13 @@ RichRealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
 
   Set (currValue);
 }
+
+D_UINT
+RichRealArrayFieldElOperand::GetType ()
+{
+  return T_RICHREAL;
+}
+
 
 StackValue
 RichRealArrayFieldElOperand::CopyValue () const

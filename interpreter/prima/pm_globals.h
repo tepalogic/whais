@@ -55,7 +55,7 @@ public:
 
   ~GlobalsManager ();
 
-  D_UINT    Count () const { return m_GlobalsEntrys.size (); };
+  D_UINT Count () const { return m_GlobalsEntrys.size (); };
 
   D_UINT32           AddGlobal (const D_UINT8*     pName,
                                 const D_UINT       nameLength,

@@ -49,7 +49,7 @@ BlockCache::~BlockCache ()
       assert (it->second.IsInUse() == false);
       assert (it->second.IsDirty () == false);
 
-      delete it->second.Data ();
+      delete [] it->second.Data ();
       ++it;
     }
 }
@@ -109,14 +109,9 @@ BlockCache::RetriveItem (const D_UINT64 item)
       it = m_CachedBlocks.begin ();
       while (it != m_CachedBlocks.end ())
         {
-          if (it->second.IsInUse () == false)
-            break;
-          else
-            ++ it;
-        }
+          if (it->second.IsInUse ())
+            continue ;
 
-      if (it != m_CachedBlocks.end ())
-        {
           D_UINT8* const pBlockData = it->second.Data ();
 
           if (it->second.IsDirty ())
@@ -124,22 +119,15 @@ BlockCache::RetriveItem (const D_UINT64 item)
                                     it->first,
                                     itemsPerBlock);
 
-          auto_ptr<D_UINT8> apBlockData (pBlockData);
+          delete [] pBlockData;
           m_CachedBlocks.erase (it);
-          m_CachedBlocks.insert (pair<D_UINT64, BlockEntry>
-                                 (baseBlockItem, BlockEntry (pBlockData)));
-          apBlockData.release();
-
-          m_pManager->RetrieveItems (pBlockData, baseBlockItem, itemsPerBlock);
-
-          return StoredItem (m_CachedBlocks.find (baseBlockItem)->second,
-                             (item % itemsPerBlock) * m_ItemSize);
+          ++it;
         }
     }
 
   //If we are here we have to allocate something anyway
-  std::auto_ptr <D_UINT8> apBlockData (new D_UINT8[m_BlockSize]);
-  D_UINT8* const          pBlockData = apBlockData.get ();
+  std::auto_ptr<D_UINT8> apBlockData (new D_UINT8[m_BlockSize]);
+  D_UINT8* const         pBlockData = apBlockData.get ();
 
   m_CachedBlocks.insert (pair<D_UINT64, BlockEntry>
                          (baseBlockItem, BlockEntry (pBlockData)));

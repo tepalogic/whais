@@ -38,11 +38,11 @@ struct INTERNAL_HANDLER
   D_UINT32  clientCookie;
   D_UINT32  encKeySize;
   D_UINT16  lastCmdRespReceived;
+  D_UINT16  buildingCmd;
   D_UINT8   userId;
   D_UINT8   encType;
   D_UINT8   data [FRAME_MAX_SIZE];
   D_UINT8   encriptionKey[1];
-  D_BOOL    lastCmdRespFrameReceived;
 };
 
 #endif /* CONNECTOR_H_ */

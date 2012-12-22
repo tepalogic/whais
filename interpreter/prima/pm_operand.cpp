@@ -511,6 +511,11 @@ NullOperand::GetValue (DBSArray& outValue) const
   assign_null (outValue);
 }
 
+D_UINT
+NullOperand::GetType ()
+{
+  return T_UNKNOWN;
+}
 
 StackValue
 NullOperand::CopyValue () const
@@ -560,6 +565,12 @@ BoolOperand::SelfOr (const DBSBool& value)
   m_Value = internal_xor (m_Value, value);
 }
 
+D_UINT
+BoolOperand::GetType ()
+{
+  return T_BOOL;
+}
+
 StackValue
 BoolOperand::CopyValue () const
 {
@@ -598,6 +609,12 @@ void
 CharOperand::SetValue (const DBSChar& value)
 {
   m_Value = value;
+}
+
+D_UINT
+CharOperand::GetType ()
+{
+  return T_CHAR;
 }
 
 StackValue
@@ -671,6 +688,12 @@ DateOperand::SetValue (const DBSDate& value)
   m_Value = value;
 }
 
+D_UINT
+DateOperand::GetType ()
+{
+  return T_DATE;
+}
+
 StackValue
 DateOperand::CopyValue () const
 {
@@ -739,6 +762,13 @@ DateTimeOperand::SetValue (const DBSDateTime& value)
   m_Value = value;
 }
 
+D_UINT
+DateTimeOperand::GetType ()
+{
+  return T_DATETIME;
+}
+
+
 StackValue
 DateTimeOperand::CopyValue () const
 {
@@ -805,6 +835,13 @@ HiresTimeOperand::SetValue (const DBSHiresTime& value)
 {
   m_Value = value;
 }
+
+D_UINT
+HiresTimeOperand::GetType ()
+{
+  return T_HIRESTIME;
+}
+
 
 StackValue
 HiresTimeOperand::CopyValue () const
@@ -962,6 +999,12 @@ void
 UInt8Operand::SelfOr (const DBSInt64& value)
 {
   m_Value = internal_xor (m_Value, value);
+}
+
+D_UINT
+UInt8Operand::GetType ()
+{
+  return T_UINT8;
 }
 
 StackValue
@@ -1123,6 +1166,13 @@ UInt16Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
+D_UINT
+UInt16Operand::GetType ()
+{
+  return T_UINT16;
+}
+
+
 StackValue
 UInt16Operand::CopyValue () const
 {
@@ -1280,6 +1330,12 @@ void
 UInt32Operand::SelfOr (const DBSInt64& value)
 {
   m_Value = internal_xor (m_Value, value);
+}
+
+D_UINT
+UInt32Operand::GetType ()
+{
+  return T_UINT32;
 }
 
 StackValue
@@ -1441,6 +1497,12 @@ UInt64Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
+D_UINT
+UInt64Operand::GetType ()
+{
+  return T_UINT64;
+}
+
 StackValue
 UInt64Operand::CopyValue () const
 {
@@ -1597,6 +1659,12 @@ void
 Int8Operand::SelfOr (const DBSInt64& value)
 {
   m_Value = internal_xor (m_Value, value);
+}
+
+D_UINT
+Int8Operand::GetType ()
+{
+  return T_INT8;
 }
 
 StackValue
@@ -1757,6 +1825,13 @@ Int16Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
+D_UINT
+Int16Operand::GetType ()
+{
+  return T_INT16;
+}
+
+
 StackValue
 Int16Operand::CopyValue () const
 {
@@ -1913,6 +1988,12 @@ void
 Int32Operand::SelfOr (const DBSInt64& value)
 {
   m_Value = internal_xor (m_Value, value);
+}
+
+D_UINT
+Int32Operand::GetType ()
+{
+  return T_INT32;
 }
 
 StackValue
@@ -2073,6 +2154,13 @@ Int64Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
+D_UINT
+Int64Operand::GetType ()
+{
+  return T_INT64;
+}
+
+
 StackValue
 Int64Operand::CopyValue () const
 {
@@ -2156,6 +2244,12 @@ void
 RealOperand::SelfDiv (const DBSRichReal& value)
 {
   m_Value = internal_div (m_Value, value);
+}
+
+D_UINT
+RealOperand::GetType ()
+{
+  return T_REAL;
 }
 
 StackValue
@@ -2243,6 +2337,12 @@ RichRealOperand::SelfDiv (const DBSRichReal& value)
   m_Value = internal_div (m_Value, value);
 }
 
+D_UINT
+RichRealOperand::GetType ()
+{
+  return T_RICHREAL;
+}
+
 StackValue
 RichRealOperand::CopyValue () const
 {
@@ -2291,6 +2391,12 @@ TextOperand::GetValueAt (const D_UINT64 index)
   return StackValue (CharTextElOperand (m_Value, index));
 }
 
+D_UINT
+TextOperand::GetType ()
+{
+  return T_TEXT;
+}
+
 StackValue
 TextOperand::CopyValue () const
 {
@@ -2330,6 +2436,12 @@ void
 CharTextElOperand::SetValue (const DBSChar& value)
 {
   m_Text.SetCharAtIndex (value, m_Index);
+}
+
+D_UINT
+CharTextElOperand::GetType ()
+{
+  return T_CHAR;
 }
 
 StackValue
@@ -2663,6 +2775,12 @@ void
 GlobalOperand::SelfOr (const DBSBool& value)
 {
   m_Value.SelfOr (value);
+}
+
+D_UINT
+GlobalOperand::GetType ()
+{
+  return m_Value.GetType ();
 }
 
 FIELD_INDEX
@@ -3037,6 +3155,12 @@ void
 LocalOperand::SelfOr (const DBSBool& value)
 {
   m_Stack[m_Index].GetOperand ().SelfOr (value);
+}
+
+D_UINT
+LocalOperand::GetType ()
+{
+  return m_Stack[m_Index].GetOperand ().GetType ();
 }
 
 FIELD_INDEX

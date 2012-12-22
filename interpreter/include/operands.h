@@ -110,6 +110,8 @@ public:
   virtual void SelfOr (const DBSInt64& value) = 0;
   virtual void SelfOr (const DBSBool& value) = 0;
 
+  virtual D_UINT GetType () = 0;
+
   //Special treatment for these
   virtual FIELD_INDEX   GetField () = 0;
   virtual I_DBSTable&   GetTable () = 0;

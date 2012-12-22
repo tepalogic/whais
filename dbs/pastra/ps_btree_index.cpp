@@ -280,7 +280,6 @@ I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
               SaveNode (it->second.m_pNode);
               delete it->second.m_pNode;
               m_NodesKeeper.erase (it);
-              break;
             }
           ++it;
         }

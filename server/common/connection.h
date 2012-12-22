@@ -85,15 +85,12 @@ public:
   void          DataSize (const D_UINT16 size);
   D_UINT8*      Data ();
 
-  D_UINT32 ReadCommand (bool* const pLastPart);
-  void     AckCommandPart (const bool waitingNext = true);
-
-  void SendCmdResponse (const D_UINT16 respType,
-                        const bool     lastPart,
-                        bool&          oSendNext);
+  D_UINT32 ReadCommand ();
+  void     SendCmdResponse (const D_UINT16 respType);
 
   const DBSDescriptors&  Dbs () { return *m_UserHandler.m_pDesc; }
   SessionStack&          Stack () { return m_Stack; }
+  bool                   IsAdmin () const { return m_UserHandler.m_Root; }
 private:
   D_UINT8* RawCmdData ();
 

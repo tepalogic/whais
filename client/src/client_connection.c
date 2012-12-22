@@ -42,16 +42,16 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                                               &pHnd->data[frameSize],
                                               &chunkSize);
       if (status != WOP_OK)
-        return CS_OS_ERR_BASE + status;
+        return WCS_OS_ERR_BASE + status;
       else if (chunkSize == 0)
-        return CS_DROPPED;
+        return WCS_DROPPED;
 
       frameSize += chunkSize;
     }
 
   frameId = from_le_int32 (&pHnd->data[FRAME_ID_OFF]);
   if (frameId != pHnd->expectedFrameId)
-    return CS_UNEXPECTED_FRAME;
+    return WCS_UNEXPECTED_FRAME;
 
   switch (pHnd->data[FRAME_TYPE_OFF])
   {
@@ -63,7 +63,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
       if ((expected < frameSize)
           || (expected >= FRAME_MAX_SIZE))
         {
-          return CS_UNEXPECTED_FRAME;
+          return WCS_UNEXPECTED_FRAME;
         }
 
       while (frameSize < expected)
@@ -74,24 +74,24 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                                                   &pHnd->data[frameSize],
                                                   &chunkSize);
           if (status != WOP_OK)
-            return CS_OS_ERR_BASE + status;
+            return WCS_OS_ERR_BASE + status;
           else if (chunkSize == 0)
-            return CS_DROPPED;
+            return WCS_DROPPED;
 
           frameSize += chunkSize;
         }
       *pOutSize = expected;
-      return CS_OK;
+      return WCS_OK;
     }
   case FRAME_TYPE_SERV_BUSY:
-    return CS_SERVER_BUSY;
+    return WCS_SERVER_BUSY;
   case FRAME_TYPE_TIMEOUT:
-    return CS_CONNECTION_TIMEOUT;
+    return WCS_CONNECTION_TIMEOUT;
   case FRAME_TYPE_COMM_NOSYNC:
-    return CS_COMM_OUT_OF_SYNC;
+    return WCS_COMM_OUT_OF_SYNC;
   default:
-    return CS_UNEXPECTED_FRAME;
+    return WCS_UNEXPECTED_FRAME;
   }
 
-  return CS_UNEXPECTED_FRAME;
+  return WCS_UNEXPECTED_FRAME;
 }
