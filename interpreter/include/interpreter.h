@@ -138,27 +138,56 @@ public:
   virtual ~I_Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
-  virtual void ExecuteProcedure (const D_UINT8* const pProcName,
-                                 SessionStack&        stack) = 0;
+  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
+                                 SessionStack&       stack) = 0;
 
   virtual D_UINT GlobalValuesCount () const = 0;
   virtual D_UINT ProceduresCount () const = 0;
 
-  virtual const D_UINT8* GlobalValueName (const D_UINT index) const = 0;
-  virtual I_Operand&     GlobalValueOp (const D_UINT32 index) = 0;
-  virtual I_Operand&     GlobalValueOp (const D_UINT8* const name) = 0;
+  virtual const D_CHAR* GlobalValueName (const D_UINT index) const = 0;
+  virtual const D_CHAR* ProcedureName (const D_UINT index) const = 0;
 
-  virtual const D_UINT8* ProcedureName (const D_UINT index) const = 0;
+  virtual D_UINT GlobalValueRawType (const D_UINT32 index) = 0;
+  virtual D_UINT GlobalValueRawType (const D_CHAR* const name) = 0;
+  virtual D_UINT GlobalValueFieldsCount (const D_UINT32 index) = 0;
+  virtual D_UINT GlobalValueFieldsCount (const D_CHAR* const name) = 0;
 
-  virtual D_UINT     ProcedureParametersCount (const D_UINT8* name) const = 0;
-  virtual D_UINT     ProcedureParametersCount (const D_UINT id) const = 0;
-  virtual I_Operand& ProcedureParameterOp (const D_UINT id,
-                                           const D_UINT parameter) const = 0;
-  virtual I_Operand& ProcedureParameterOp (const D_UINT8* name,
-                                           const D_UINT   parameter) const = 0;
-  virtual I_Operand& ProcedureReturnOp (const D_UINT8* name) const = 0;
-  virtual I_Operand& ProcedureReturnOp (const D_UINT id) const = 0;
+  virtual const D_CHAR* GlobalValueFieldName (const D_UINT32 index,
+                                              const D_UINT32 field) = 0;
+  virtual const D_CHAR* GlobalValueFieldName (const D_CHAR* const name,
+                                              const D_UINT32      field) = 0;
 
+  virtual D_UINT GlobalValueFieldType (const D_UINT32 index,
+                                       const D_UINT32 field) = 0;
+  virtual D_UINT GlobalValueFieldType (const D_CHAR* const name,
+                                       const D_UINT32      field) = 0;
+
+  virtual D_UINT ProcedureParametersCount (const D_UINT id) const = 0;
+  virtual D_UINT ProcedureParametersCount (const D_CHAR* const name) const = 0;
+  virtual D_UINT ProcedurePameterRawType (const D_UINT id,
+                                          const D_UINT param) = 0;
+  virtual D_UINT ProcedurePameterRawType (const D_CHAR* const name,
+                                          const D_UINT        param) = 0;
+  virtual D_UINT ProcedurePameterFieldsCount (const D_UINT id,
+                                              const D_UINT param) = 0;
+  virtual D_UINT ProcedurePameterFieldsCount (const D_CHAR* const name,
+                                              const D_UINT        param ) = 0;
+  virtual const D_CHAR* ProcedurePameterFieldName (
+                                                const D_UINT id,
+                                                const D_UINT param,
+                                                const D_UINT field
+                                                  ) = 0;
+  virtual const D_CHAR* ProcedurePameterFieldName (
+                                                const D_CHAR* const name,
+                                                const D_UINT        param,
+                                                const D_UINT        field
+                                                  ) = 0;
+  virtual D_UINT ProcedurePameterFieldType (const D_UINT id,
+                                            const D_UINT param,
+                                            const D_UINT field) = 0;
+  virtual D_UINT ProcedurePameterFieldType (const D_CHAR* const name,
+                                            const D_UINT        param,
+                                            const D_UINT        field) = 0;
 protected:
   I_Logger& m_Log;
 };

@@ -40,15 +40,14 @@ cmd_value_desc (ClientConnection& rConn)
 {
   D_UINT32 result = WCS_OK;
 
-  D_UINT8*       data_     = rConn.Data ();
-  const D_CHAR*  glbName   = _RC (const D_CHAR*, data_ + sizeof (D_UINT32));
-  D_UINT32       fieldHint = from_le_int16 (data_);
-  I_Operand*     op        = NULL;
-  D_UINT16       dataOffset = sizeof (D_UINT32) + strlen (glbName) + 1;
+  D_UINT8*      data_      = rConn.Data ();
+  const D_CHAR* glbName    = _RC (const D_CHAR*, data_ + sizeof (D_UINT32));
+  D_UINT32      fieldHint  = from_le_int16 (data_);
+  D_UINT16      dataOffset = sizeof (D_UINT32) + strlen (glbName) + 1;
+  I_Session&    session    = *rConn.Dbs ().m_Session;
+  D_UINT        rawType;
 
-  D_UINT         rawType;
-
-  if (rConn.DataSize () <  + sizeof (D_UINT16) + strlen (glbName) + 1)
+  if (rConn.DataSize () < dataOffset)
     {
       throw ConnectionException (
                               "Command used to retrieve description of global "
@@ -59,107 +58,174 @@ cmd_value_desc (ClientConnection& rConn)
 
   rConn.DataSize (rConn.MaxSize ());
 
-  if (strlen (glbName) > 0)
+  try
     {
-      if (! rConn.IsAdmin ())
+      if (strlen (_RC (const D_CHAR*, glbName)) > 0)
         {
-          throw ConnectionException (
-                                  "Only and admin may request for a global "
-                                  "value description.",
-                                  _EXTRA (0)
-                                    );
-        }
-      try
-      {
-          op = &rConn.Dbs ().m_Session->GlobalValueOp (
-                                                _RC (const D_UINT8*, glbName)
-                                                      );
-      }
-      catch (InterException& e)
-      {
-          if (e.GetExtra () != InterException::INVALID_GLOBAL_REQ)
-            throw;
+          if (! rConn.IsAdmin ())
+            {
+              throw ConnectionException (
+                                      "Only and admin may request for a "
+                                      "global value description.",
+                                      _EXTRA (0)
+                                        );
+            }
+          rawType = session.GlobalValueRawType (glbName);
+          store_le_int32 (WCS_OK, data_);
 
-          result = WCS_INVALID_ARGS;
-          goto cmd_glb_desc_err;
-      }
-    }
-  else
-    {
-      SessionStack& stack = rConn.Stack ();
-
-      if (stack.Size() == 0)
-        {
-          result = WCS_INVALID_ARGS;
-          goto cmd_glb_desc_err;
-        }
-
-      op = &stack[stack.Size () - 1].GetOperand ();
-    }
-
-  assert (op != NULL);
-
-  store_le_int32 (WCS_OK, data_);
-
-  rawType = op->GetType ();
-  store_le_int16 (rawType, data_ + dataOffset);
-  dataOffset += sizeof (D_UINT16);
-
-  if (IS_TABLE (rawType))
-    {
-      I_DBSTable& table = op->GetTable();
-      const FIELD_INDEX fieldCount = table.GetFieldsCount ();
-      if (fieldHint >= fieldCount)
-        {
-          result = WCS_INVALID_ARGS;
-          goto cmd_glb_desc_err;
-        }
-      else if (fieldCount > 0xFFFF)
-        {
-          result = WCS_LARGE_ARGS;
-          goto cmd_glb_desc_err;
-        }
-      store_le_int16 (fieldCount, data_ + dataOffset);
-      dataOffset += sizeof (D_UINT16);
-
-      store_le_int16 (fieldHint, data_ + dataOffset);
-      dataOffset += sizeof (D_UINT16);
-
-      bool oneAtLeast = false;
-      do
-        {
-          DBSFieldDescriptor fd        = table.GetFieldDescriptor (fieldHint);
-          const D_UINT       fieldLen  = strlen (fd.m_pFieldName) + 1;
-          D_UINT16           fieldType = fd.m_FieldType;
-
-          if (dataOffset + fieldLen + sizeof (D_UINT16) < rConn.DataSize ())
-            break;
-
-          strcpy (_RC (D_CHAR*, data_ + dataOffset), fd.m_pFieldName);
-          dataOffset += fieldLen;
-
-          if (fd.isArray)
-            MARK_ARRAY (fieldType);
-
-          store_le_int16 (fieldType, data_ + dataOffset);
+          store_le_int16 (rawType, data_ + dataOffset);
           dataOffset += sizeof (D_UINT16);
 
-          oneAtLeast = true;
-        }
-      while (fieldHint < fieldCount);
+          if (IS_TABLE (rawType))
+            {
+              const FIELD_INDEX fieldsCount = session.GlobalValueFieldsCount (
+                                                                       glbName
+                                                                             );
+              if (fieldHint >= fieldsCount)
+                {
+                  result = WCS_INVALID_ARGS;
+                  goto cmd_glb_desc_err;
+                }
+              else if (fieldsCount > 0xFFFF)
+                {
+                  result = WCS_LARGE_ARGS;
+                  goto cmd_glb_desc_err;
+                }
+              store_le_int16 (fieldsCount, data_ + dataOffset);
+              dataOffset += sizeof (D_UINT16);
 
-      if (! oneAtLeast)
+              store_le_int16 (fieldHint, data_ + dataOffset);
+              dataOffset += sizeof (D_UINT16);
+
+              bool oneAtLeast = false;
+              do
+                {
+                  const D_CHAR* fieldName = session.GlobalValueFieldName (
+                                                                      glbName,
+                                                                      fieldHint
+                                                                         );
+                  const D_UINT  fieldLen  = strlen (fieldName) + 1;
+                  const D_UINT  fieldType = session.GlobalValueFieldType (
+                                                                      glbName,
+                                                                      fieldHint
+                                                                         );
+                  if (dataOffset + fieldLen + sizeof (D_UINT16) <
+                      rConn.DataSize ())
+                    {
+                      break;
+                    }
+
+                  strcpy (_RC (D_CHAR*, data_ + dataOffset), fieldName);
+                  dataOffset += fieldLen;
+
+                  store_le_int16 (fieldType, data_ + dataOffset);
+                  dataOffset += sizeof (D_UINT16);
+
+                  ++fieldHint;
+                  oneAtLeast = true;
+                }
+              while (fieldHint < fieldsCount);
+
+              if (! oneAtLeast)
+                {
+                  result = WCS_INVALID_ARGS;
+                  goto cmd_glb_desc_err;
+                }
+            }
+          else if (fieldHint > 0)
+            {
+              result = WCS_INVALID_ARGS;
+              goto cmd_glb_desc_err;
+            }
+        }
+      else
         {
-          result = WCS_INVALID_ARGS;
-          goto cmd_glb_desc_err;
+          SessionStack& stack = rConn.Stack ();
+          I_Operand*    op;
+
+          if (stack.Size() == 0)
+            {
+              result = WCS_INVALID_ARGS;
+              goto cmd_glb_desc_err;
+            }
+
+          op = &stack[stack.Size () - 1].GetOperand ();
+          rawType = op->GetType ();
+          store_le_int32 (WCS_OK, data_);
+
+          store_le_int16 (rawType, data_ + dataOffset);
+          dataOffset += sizeof (D_UINT16);
+
+          if (IS_TABLE (rawType))
+            {
+              I_DBSTable&       table       = op->GetTable ();
+              const FIELD_INDEX fieldsCount = table.GetFieldsCount ();
+
+              if (fieldHint >= fieldsCount)
+                {
+                  result = WCS_INVALID_ARGS;
+                  goto cmd_glb_desc_err;
+                }
+              else if (fieldsCount > 0xFFFF)
+                {
+                  result = WCS_LARGE_ARGS;
+                  goto cmd_glb_desc_err;
+                }
+              store_le_int16 (fieldsCount, data_ + dataOffset);
+              dataOffset += sizeof (D_UINT16);
+
+              bool oneAtLeast = false;
+              do
+                {
+                  const DBSFieldDescriptor fd = table.GetFieldDescriptor (
+                                                                      fieldHint
+                                                                          );
+                  const D_UINT fieldLen  = strlen (fd.m_pFieldName) + 1;
+                  D_UINT       fieldType = fd.m_FieldType;
+
+                  if (fd.isArray)
+                    MARK_ARRAY (fieldType);
+
+                  if (dataOffset + fieldLen + sizeof (D_UINT16) <
+                      rConn.DataSize ())
+                    {
+                      break;
+                    }
+
+                  strcpy (_RC (D_CHAR*, data_ + dataOffset), fd.m_pFieldName);
+                  dataOffset += fieldLen;
+
+                  store_le_int16 (fieldType, data_ + dataOffset);
+                  dataOffset += sizeof (D_UINT16);
+
+                  ++fieldHint;
+                  oneAtLeast = true;
+                }
+              while (fieldHint < fieldsCount);
+
+              if (! oneAtLeast)
+                {
+                  result = WCS_INVALID_ARGS;
+                  goto cmd_glb_desc_err;
+                }
+            }
+          else if (fieldHint > 0)
+            {
+              result = WCS_INVALID_ARGS;
+              goto cmd_glb_desc_err;
+            }
         }
     }
-  else if (fieldHint > 0)
+  catch (InterException&)
     {
       result = WCS_INVALID_ARGS;
       goto cmd_glb_desc_err;
     }
-
+  catch (DBSException& )
+    {
+      result = WCS_INVALID_ARGS;
+      goto cmd_glb_desc_err;
+    }
 
   assert (result == WCS_OK);
   rConn.DataSize (dataOffset);
@@ -371,8 +437,8 @@ cmd_list_globals (ClientConnection& rConn)
 
   for (; firstHint < glbsCount; ++firstHint)
     {
-      const D_UINT8* pName   = session.GlobalValueName (firstHint);
-      const D_UINT   nameLen = strlen (_RC (const D_CHAR*, pName)) + 1;
+      const D_CHAR* pName   = session.GlobalValueName (firstHint);
+      const D_UINT  nameLen = strlen (_RC (const D_CHAR*, pName)) + 1;
 
       if (dataOffset + nameLen >= rConn.DataSize())
         {
@@ -452,8 +518,8 @@ cmd_list_procedures (ClientConnection& rConn)
 
   for (; firstHint < procsCount; ++firstHint)
     {
-      const D_UINT8* pName   = session.ProcedureName (firstHint);
-      const D_UINT   nameLen = strlen (_RC (const D_CHAR*, pName)) + 1;
+      const D_CHAR* name    = session.ProcedureName (firstHint);
+      const D_UINT  nameLen = strlen (_RC (const D_CHAR*, name)) + 1;
 
       if (dataOffset + nameLen >= rConn.DataSize())
         {
@@ -469,7 +535,7 @@ cmd_list_procedures (ClientConnection& rConn)
 
       oneAtLeast = true;
 
-      memcpy (rConn.Data () + dataOffset, pName, nameLen);
+      memcpy (rConn.Data () + dataOffset, name, nameLen);
       dataOffset += nameLen;
     }
 
@@ -505,14 +571,16 @@ cmd_procedure_param_desc (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  const I_Session&     session     = *rConn.Dbs ().m_Session;
-  D_UINT8*             data_       = rConn.Data ();
-  D_UINT16             hint        = from_le_int16 (data_);
-  const D_UINT8* const procName    = data_ + sizeof (D_UINT16);
-  D_UINT16             offset      = 0;
-  bool                 oneAtLeast  = false;
-  const D_UINT         paramsCount = session.ProcedureParametersCount (procName);
-
+  I_Session&          session     = *rConn.Dbs ().m_Session;
+  D_UINT8*            data_       = rConn.Data ();
+  D_UINT16            hint        = from_le_int16 (data_);
+  const D_CHAR* const procName    = _RC (const D_CHAR*,
+                                         data_ + sizeof (D_UINT16));
+  D_UINT16            offset      = 0;
+  bool                oneAtLeast  = false;
+  const D_UINT        paramsCount = session.ProcedureParametersCount (
+                                                                      procName
+                                                                     );
   if (paramsCount >= 0xFFFF)
     {
       result = WCS_LARGE_ARGS;
@@ -537,59 +605,80 @@ cmd_procedure_param_desc (ClientConnection& rConn)
   store_le_int16 (hint, data_ + offset);
   offset += sizeof (D_UINT16);
 
-  do
+  try
     {
-      I_Operand& op = session.ProcedureParameterOp (procName, hint);
-      if (IS_TABLE (op.GetType ()))
+      do
         {
-          I_DBSTable&  table       = op.GetTable ();
-          const D_UINT fieldsCount = table.GetFieldsCount();
-
-          if ((fieldsCount > 0xFFFF)
-              || (offset + sizeof (D_UINT16) >= rConn.DataSize ()))
+          const D_UINT paramType = session.ProcedurePameterRawType (procName,
+                                                                    hint);
+          if (IS_TABLE (paramType))
             {
-              break;
+              const D_UINT fieldsCount = session.ProcedurePameterFieldsCount (
+                                                                      procName,
+                                                                      hint
+                                                                             );
+              if ((fieldsCount > 0xFFFF)
+                  || (offset + sizeof (D_UINT16) >= rConn.DataSize ()))
+                {
+                  break;
+                }
+
+              store_le_int16 (fieldsCount, data_ + offset);
+              offset += sizeof (D_UINT16);
+
+              for (D_UINT field = 0; field < fieldsCount; field++)
+                {
+                  const D_CHAR* fieldName = _RC (
+                                          const D_CHAR*,
+                                          session.ProcedurePameterFieldName (
+                                                                    procName,
+                                                                    hint,
+                                                                    field
+                                                                           )
+                                                );
+                  const D_UINT16 fieldType =
+                      session.ProcedurePameterFieldType (procName,
+                                                         hint,
+                                                         field);
+                  const D_UINT fieldLen = strlen (fieldName) + 1;
+                  if (offset + fieldLen + sizeof (D_UINT16) > rConn.DataSize ())
+                    break;
+
+                  strcpy (_RC (D_CHAR*, data_ + offset), fieldName);
+                  offset += fieldLen;
+
+                  store_le_int16 (fieldType, data_ + offset);
+                  offset += sizeof (D_UINT16);
+                }
             }
-
-          store_le_int16 (fieldsCount, data_ + offset);
-          offset += sizeof (D_UINT16);
-
-          for (D_UINT field = 0; field < table.GetFieldsCount(); field++)
+          else
             {
-              const DBSFieldDescriptor fd = table.GetFieldDescriptor (field);
-
-              const D_UINT fieldLen  = strlen (fd.m_pFieldName) + 1;
-              D_UINT16     fieldType = fd.m_FieldType;
-
-              if (offset + fieldLen + sizeof (D_UINT16) > rConn.DataSize ())
+              if (offset + sizeof (D_UINT32) > rConn.DataSize ())
                 break;
 
-              strcpy (_RC (D_CHAR*, data_ + offset), fd.m_pFieldName);
-              offset += fieldLen;
-
-              if (fd.isArray)
-                MARK_ARRAY (fieldType);
-
-              store_le_int16 (fieldType, data_ + offset);
+              store_le_int16 (paramType, data_ + offset);
               offset += sizeof (D_UINT16);
             }
+
+          ++hint;
+          oneAtLeast = true;
         }
-      else
+      while (hint < paramsCount);
+
+      if (! oneAtLeast)
         {
-          if (offset + sizeof (D_UINT32) > rConn.DataSize ())
-            break;
-
-          store_le_int16 (op.GetType (), data_ + offset);
-          offset += sizeof (D_UINT16);
+          result = WCS_LARGE_ARGS;
+          goto cmd_procedure_param_desc_err;
         }
-      ++hint;
-      oneAtLeast = true;
     }
-  while (hint < paramsCount);
-
-  if (! oneAtLeast)
+  catch (InterException&)
     {
-      result = WCS_LARGE_ARGS;
+      result = WCS_INVALID_ARGS;
+      goto cmd_procedure_param_desc_err;
+    }
+  catch (DBSException& )
+    {
+      result = WCS_INVALID_ARGS;
       goto cmd_procedure_param_desc_err;
     }
 

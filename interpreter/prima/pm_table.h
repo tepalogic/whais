@@ -29,6 +29,7 @@
 
 #include "dbs/include/dbs_mgr.h"
 #include "dbs/include/dbs_table.h"
+#include "pm_general_table.h"
 
 namespace prima
 {
@@ -57,7 +58,8 @@ public:
 private:
   ~TableReference ()
   {
-    m_DbsHnd.ReleaseTable (m_Table);
+    if (&m_Table != &GeneralTable::Instance ())
+      m_DbsHnd.ReleaseTable (m_Table);
   }
 
   I_DBSHandler& m_DbsHnd;

@@ -15,14 +15,14 @@ using namespace prima;
 
 static const D_CHAR admin[] = "administrator";
 
-static const D_UINT8 bool_not[] = "bool_not";
-static const D_UINT8 bool_and[] = "bool_and";
-static const D_UINT8 bool_xor[] = "bool_xor";
-static const D_UINT8 bool_or[]  = "bool_or";
-static const D_UINT8 int_not[]  = "int_not";
-static const D_UINT8 int_and[]  = "int_and";
-static const D_UINT8 int_xor[]  = "int_xor";
-static const D_UINT8 int_or[]   = "int_or";
+static const D_CHAR bool_not[] = "bool_not";
+static const D_CHAR bool_and[] = "bool_and";
+static const D_CHAR bool_xor[] = "bool_xor";
+static const D_CHAR bool_or[]  = "bool_or";
+static const D_CHAR int_not[]  = "int_not";
+static const D_CHAR int_and[]  = "int_and";
+static const D_CHAR int_xor[]  = "int_xor";
+static const D_CHAR int_or[]   = "int_or";
 
 const D_UINT8 callTestProgram[] = ""
     "PROCEDURE bool_not (val AS BOOL) RETURN BOOL\n"
@@ -159,7 +159,7 @@ test_op_not (Session& session)
 template <typename DBS_T> bool
 test_op_andXX (Session&       session,
                const D_CHAR*  opDesc,
-               const D_UINT8* procName,
+               const D_CHAR*  procName,
                const DBS_T    val1,
                const DBS_T    val2)
 {
@@ -184,9 +184,9 @@ test_op_andXX (Session&       session,
 }
 
 template <typename DBS_T> bool
-test_op_orXX (Session&       session,
+test_op_orXX (Session&        session,
                const D_CHAR*  opDesc,
-               const D_UINT8* procName,
+               const D_CHAR*  procName,
                const DBS_T    val1,
                const DBS_T    val2)
 {
@@ -213,7 +213,7 @@ test_op_orXX (Session&       session,
 template <typename DBS_T> bool
 test_op_xorXX (Session&       session,
                const D_CHAR*  opDesc,
-               const D_UINT8* procName,
+               const D_CHAR*  procName,
                const DBS_T    val1,
                const DBS_T    val2)
 {

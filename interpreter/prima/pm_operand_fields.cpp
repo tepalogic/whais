@@ -152,7 +152,7 @@ FieldOperand::IsNull () const
 D_UINT
 FieldOperand::GetType ()
 {
-  D_UINT type = 0;
+  D_UINT type = m_FieldType;
   MARK_FIELD (type);
 
   return type;

@@ -894,7 +894,8 @@ class ArrayOperand : public I_PMOperand
 public:
   explicit ArrayOperand (const DBSArray& array)
     : I_PMOperand (),
-      m_Value (array)
+      m_Value (array),
+      m_FirstArrayType (array.ElementsType ())
     {
     }
   virtual ~ArrayOperand ();
@@ -912,6 +913,7 @@ public:
 
 private:
   DBSArray m_Value;
+  D_UINT16 m_FirstArrayType;
 };
 
 class BaseArrayElOperand : public I_PMOperand

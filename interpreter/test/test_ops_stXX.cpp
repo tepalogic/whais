@@ -14,7 +14,7 @@
 using namespace prima;
 
 static const D_CHAR admin[] = "administrator";
-static const D_UINT8 procName[] = "p1";
+static const D_CHAR procName[] = "p1";
 
 const D_UINT8 dummyProgram[] = ""
     "PROCEDURE p1 (a1 AS INT8, a2 AS INT8) RETURN BOOL\n"
@@ -91,7 +91,10 @@ test_op_stb (Session& session)
 {
   std::cout << "Testing bool assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -131,7 +134,10 @@ test_op_stc (Session& session)
 {
   std::cout << "Testing char assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -171,7 +177,10 @@ test_op_std (Session& session)
 {
   std::cout << "Testing date assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -212,7 +221,10 @@ test_op_stdt (Session& session)
 {
   std::cout << "Testing date time assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -252,7 +264,10 @@ test_op_stht (Session& session)
 {
   std::cout << "Testing hires date time assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -294,7 +309,10 @@ test_op_stXX (Session&       session,
 {
   std::cout << "Testing " << pText << " assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -334,7 +352,10 @@ test_op_stt (Session& session)
 {
   std::cout << "Testing text assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -374,7 +395,10 @@ test_op_stta (Session& session)
 {
   std::cout << "Testing table assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -428,7 +452,10 @@ test_op_stf (Session& session)
 {
   std::cout << "Testing field assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 
@@ -486,7 +513,10 @@ test_op_sta (Session& session)
 {
   std::cout << "Testing attay assignment...\n";
 
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (
+                                              _RC (const D_UINT8*, procName),
+                                              sizeof procName - 1
+                                                );
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
 

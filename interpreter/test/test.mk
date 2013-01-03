@@ -117,3 +117,14 @@ UNIT_EXES+=test_ops_selfs
 test_ops_selfs_SRC=test/test_ops_selfs.cpp
 test_ops_selfs_LIB=dbs/slpastra  custom/slcommon interpreter/slprima compiler/slcompiler utils/utils custom/custom
 test_ops_selfs_INC=utils/include custom/include dbs/include compiler/include
+
+UNIT_EXES+=test_globals_desc
+test_globals_desc_SRC=test/test_globals_desc.cpp
+test_globals_desc_LIB=dbs/slpastra  custom/slcommon interpreter/slprima compiler/slcompiler utils/utils custom/custom 
+test_globals_desc_INC=utils/include custom/include dbs/include compiler/include
+
+UNIT_EXES+=test_procs_decl
+test_procs_decl_SRC=test/test_procs_decl.cpp
+test_procs_decl_LIB=dbs/slpastra  custom/slcommon interpreter/slprima compiler/slcompiler utils/utils custom/custom 
+test_procs_decl_INC=utils/include custom/include dbs/include compiler/include
+

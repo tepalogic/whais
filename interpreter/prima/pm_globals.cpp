@@ -92,11 +92,9 @@ GlobalsManager::GetGlobal (const D_UINT32 glbId)
 {
   const D_UINT32 index = glbId & ~GLOBAL_ID;
 
-  assert (IsValid (glbId));
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
-  assert (index < m_GlobalsEntrys.size ());
 
-  if (index >= m_Storage.size ())
+  if ((IsValid (glbId) == false) || (index >= m_Storage.size ()))
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   return m_Storage[index];

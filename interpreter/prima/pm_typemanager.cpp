@@ -32,6 +32,7 @@
 
 #include "pm_typemanager.h"
 #include "pm_interpreter.h"
+#include "pm_general_table.h"
 
 using namespace std;
 using namespace prima;
@@ -175,6 +176,9 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
       vFields.push_back (field);
     }
 
+  if (vFields.size () == 0)
+    return GeneralTable::Instance ();
+
   I_DBSTable& table = dbsHndler.CreateTempTable (vFields.size (),
                                                  &vFields[0]);
   assert (table.GetFieldsCount () == vFields.size ());
@@ -286,7 +290,8 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
         return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt64*) NULL)));
       case T_UNDETERMINED:
         //Just a default
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt8*) NULL)));
+        assert (false);
+        return GlobalValue (ArrayOperand ( DBSArray ()));
       default:
         assert (false);
       }
@@ -294,6 +299,8 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
   else if (IS_FIELD (spec.Type ()))
     {
       assert (pPersistentTable == NULL);
+      assert (GET_FIELD_TYPE (spec.Type ()) > T_UNKNOWN);
+      assert (GET_FIELD_TYPE (spec.Type ()) < T_UNDETERMINED);
       return GlobalValue (FieldOperand (GET_FIELD_TYPE (spec.Type ())));
     }
   else if (IS_TABLE (spec.Type ()))
@@ -398,13 +405,14 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
         return StackValue (ArrayOperand ( DBSArray ((DBSUInt64*) NULL)));
       case T_UNDETERMINED:
         //Just a default
-        return StackValue (ArrayOperand ( DBSArray ((DBSUInt8*) NULL)));
+        return StackValue (ArrayOperand (DBSArray ()));
       default:
         assert (false);
       }
     }
   else if (IS_FIELD (spec.Type ()))
     {
+      assert (GET_FIELD_TYPE (spec.Type ()) > T_UNKNOWN);
       return StackValue (FieldOperand (GET_FIELD_TYPE (spec.Type ())));
     }
   else if (IS_TABLE (spec.Type ()))

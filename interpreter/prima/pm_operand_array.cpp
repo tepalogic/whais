@@ -58,7 +58,7 @@ ArrayOperand::SetValue (const DBSArray& value)
 D_UINT
 ArrayOperand::GetType ()
 {
-  D_UINT type = 0;
+  D_UINT type = m_FirstArrayType;
   MARK_ARRAY (type);
 
   return type;

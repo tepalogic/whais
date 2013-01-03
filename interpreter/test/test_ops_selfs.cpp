@@ -14,7 +14,7 @@
 using namespace prima;
 
 static const D_CHAR admin[] = "administrator";
-static const D_UINT8 procName[] = "p1";
+static const D_CHAR procName[] = "p1";
 
 const D_UINT8 dummyProgram[] = ""
     "PROCEDURE p1 (a1 AS INT8, a2 AS INT8) RETURN BOOL\n"
@@ -94,7 +94,8 @@ test_op_saddXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " self addition...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -140,7 +141,8 @@ test_op_ssubXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " self substraction...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -186,7 +188,8 @@ test_op_smulXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " self multiplication...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -232,7 +235,8 @@ test_op_sdivXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " self division...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -278,7 +282,8 @@ test_op_smodXX (Session& session,
                 const DBS_T second)
 {
   std::cout << "Testing " << desc << " self modulo...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -324,7 +329,8 @@ test_op_sandXX (Session& session,
                 const DBS_T second)
 {
   std::cout << "Testing " << desc << " self and...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -370,7 +376,8 @@ test_op_sxorXX (Session& session,
                 const DBS_T second)
 {
   std::cout << "Testing " << desc << " self xor...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;
@@ -416,7 +423,8 @@ test_op_sorXX (Session& session,
                const DBS_T second)
 {
   std::cout << "Testing " << desc << " self or...\n";
-  const D_UINT32 procId = session.FindProcedure (procName, sizeof procName - 1);
+  const D_UINT32 procId = session.FindProcedure (_RC (const D_UINT8*, procName),
+                                                 sizeof procName - 1);
 
   D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
   SessionStack stack;

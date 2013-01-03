@@ -237,13 +237,9 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
 
             typesOffset.push_back (typeOff);
 
-            //Keep a copy of stack values for locals ( except the ones of the
-            //parameters) to avoid construct them every time when the procedure
-            //is called.
-            if ((localIt == 0) || (localIt > argsCount))
-              values.push_back (value);
-            else
-              value.Clear ();
+            //Keep a copy of stack values for locals to avoid construct them
+            //every time when the procedure is called.
+            values.push_back (value);
           }
 
         try
@@ -284,15 +280,12 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
   }
 }
 
-
 void
-Session::ExecuteProcedure (const D_UINT8* const pProcName,
-                           SessionStack&        stack)
+Session::ExecuteProcedure (const D_CHAR* const pProcName,
+                           SessionStack&       stack)
 {
-  const D_UINT32 procId = FindProcedure (
-                                  pProcName,
-                                  strlen (_RC (const D_CHAR*, pProcName))
-                                        );
+  const D_UINT32 procId = FindProcedure (_RC (const D_UINT8*, pProcName),
+                                         strlen (pProcName));
 
   Processor proc (*this, stack, procId);
 
@@ -315,99 +308,232 @@ Session::ProceduresCount () const
   return m_PrivateNames.Get ().GetProcedureManager ().Count ();
 }
 
-const D_UINT8*
+const D_CHAR*
 Session::GlobalValueName (const D_UINT index) const
 {
-  return m_PrivateNames.Get ().GetGlobalsManager ().Name (index);
+  return _RC (const D_CHAR*,
+              m_PrivateNames.Get ().GetGlobalsManager ().Name (index));
 }
 
-I_Operand&
-Session::GlobalValueOp (const D_UINT32 glbId)
+const D_CHAR*
+Session::ProcedureName (const D_UINT index) const
+{
+  return _RC (const D_CHAR*,
+              m_PrivateNames.Get ().GetProcedureManager ().Name (index));
+}
+
+D_UINT
+Session::GlobalValueRawType (const D_UINT32 glbId)
 {
   GlobalsManager& glbMgr = m_PrivateNames.Get ().GetGlobalsManager ();
   GlobalValue&    value  = glbMgr.GetGlobal (glbId);
 
-  return value.GetOperand ();
+  I_Operand& glbOp = value.GetOperand ();
+  return glbOp.GetType ();
 }
 
-I_Operand&
-Session::GlobalValueOp (const D_UINT8* const name)
+D_UINT
+Session::GlobalValueRawType (const D_CHAR* const name)
 {
   GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
-  D_UINT32        glbId   = pGlbMgr->FindGlobal (
-                                            name,
-                                            strlen (_RC (const D_CHAR*, name))
-                                                );
+  D_UINT32        glbId   = pGlbMgr->FindGlobal (_RC (const D_UINT8*, name),
+                                                 strlen (name));
 
-  return GlobalValueOp (glbId);
+  return GlobalValueRawType (glbId);
 }
 
-const D_UINT8*
-Session::ProcedureName (const D_UINT id) const
+D_UINT
+Session::GlobalValueFieldsCount (const D_UINT32 glbId)
 {
-  return m_PrivateNames.Get ().GetProcedureManager ().Name (id);
+  GlobalsManager& glbMgr = m_PrivateNames.Get ().GetGlobalsManager ();
+  GlobalValue&    value  = glbMgr.GetGlobal (glbId);
+
+  I_Operand& glbOp = value.GetOperand ();
+
+  if (IS_TABLE (glbOp.GetType ()))
+    return glbOp.GetTable ().GetFieldsCount ();
+
+  return 0;
+}
+
+D_UINT
+Session::GlobalValueFieldsCount (const D_CHAR* const name)
+{
+  GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
+  D_UINT32        glbId   = pGlbMgr->FindGlobal (_RC (const D_UINT8*, name),
+                                                 strlen (name));
+
+  return GlobalValueFieldsCount (glbId);
+}
+
+const D_CHAR*
+Session::GlobalValueFieldName (const D_UINT32 glbId, const D_UINT32 field)
+{
+  GlobalsManager& glbMgr = m_PrivateNames.Get ().GetGlobalsManager ();
+  GlobalValue&    value  = glbMgr.GetGlobal (glbId);
+
+  I_Operand& glbOp = value.GetOperand ();
+
+  DBSFieldDescriptor fd = glbOp.GetTable ().GetFieldDescriptor (field);
+
+  return fd.m_pFieldName;
+}
+
+const D_CHAR*
+Session::GlobalValueFieldName (const D_CHAR* const name, const D_UINT32 field)
+{
+  GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
+  D_UINT32        glbId   = pGlbMgr->FindGlobal (_RC (const D_UINT8*, name),
+                                                 strlen (name));
+
+  return GlobalValueFieldName (glbId, field);
+}
+
+D_UINT
+Session::GlobalValueFieldType (const D_UINT32 glbId, const D_UINT32 field)
+{
+  GlobalsManager& glbMgr = m_PrivateNames.Get ().GetGlobalsManager ();
+  GlobalValue&    value  = glbMgr.GetGlobal (glbId);
+
+  I_Operand& glbOp = value.GetOperand ();
+
+  const DBSFieldDescriptor fd = glbOp.GetTable ().GetFieldDescriptor (field);
+
+  D_UINT16 type = fd.m_FieldType;
+  if (fd.isArray)
+    MARK_ARRAY (type);
+
+  return type;
+}
+
+D_UINT
+Session::GlobalValueFieldType (const D_CHAR* const name, const D_UINT32 field)
+{
+  GlobalsManager* pGlbMgr = &m_PrivateNames.Get ().GetGlobalsManager ();
+  D_UINT32        glbId   = pGlbMgr->FindGlobal (_RC (const D_UINT8*, name),
+                                                 strlen (name));
+
+  return GlobalValueFieldType (glbId, field);
 }
 
 D_UINT
 Session::ProcedureParametersCount (const D_UINT id) const
 {
-  return m_PrivateNames.Get ().GetProcedureManager ().ArgsCount (id);
+  return m_PrivateNames.Get ().GetProcedureManager ().ArgsCount (id) + 1;
 }
 
 D_UINT
-Session::ProcedureParametersCount (const D_UINT8* name) const
+Session::ProcedureParametersCount (const D_CHAR* const name) const
 {
-  ProcedureManager& procMgr= m_PrivateNames.Get ().GetProcedureManager ();
-  const D_UINT      procId = procMgr.GetProcedure (
-                                           name,
-                                           strlen (_RC (const D_CHAR*, name))
-                                                  );
+  ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
+  const D_UINT      procId  = procMgr.GetProcedure (_RC (const D_UINT8*, name),
+                                                    strlen (name));
   return ProcedureParametersCount (procId);
 }
 
-I_Operand&
-Session::ProcedureParameterOp (const D_UINT id, const D_UINT parameter) const
+D_UINT
+Session::ProcedurePameterRawType (const D_UINT id, const D_UINT param)
+{
+  if (param >= ProcedureParametersCount (id))
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+
+  ProcedureManager& mgr = m_PrivateNames.Get ().GetProcedureManager ();
+  StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
+
+  return val.GetOperand ().GetType ();
+}
+
+D_UINT
+Session::ProcedurePameterRawType (const D_CHAR* const name, const D_UINT param)
 {
   ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
-  const StackValue& value   = procMgr.LocalValue (id, parameter + 1);
-
-  return _CC (StackValue&, value).GetOperand ();
+  const D_UINT      procId  = procMgr.GetProcedure (_RC (const D_UINT8*, name),
+                                                    strlen (name));
+  return ProcedurePameterRawType (procId, param);
 }
 
-I_Operand&
-Session::ProcedureParameterOp (const D_UINT8* name,
-                               const D_UINT   parameter) const
+D_UINT
+Session::ProcedurePameterFieldsCount (const D_UINT id, const D_UINT param)
 {
-  ProcedureManager& procMgr= m_PrivateNames.Get ().GetProcedureManager ();
-  const D_UINT      procId = procMgr.GetProcedure (
-                                           name,
-                                           strlen (_RC (const D_CHAR*, name))
-                                                  );
-  return ProcedureParameterOp (procId, parameter);
+  if (param >= ProcedureParametersCount (id))
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+
+  ProcedureManager& mgr = m_PrivateNames.Get ().GetProcedureManager ();
+  StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
+
+  if (IS_TABLE (val.GetOperand ().GetType ()))
+    return val.GetOperand ().GetTable().GetFieldsCount ();
+
+  return 0;
 }
 
-I_Operand&
-Session::ProcedureReturnOp (const D_UINT id) const
+D_UINT
+Session::ProcedurePameterFieldsCount (const D_CHAR* const name,
+                                      const D_UINT        param)
 {
   ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
-  const StackValue& value   = procMgr.LocalValue (id, 0);
-
-  return _CC (StackValue&, value).GetOperand ();
+  const D_UINT      procId  = procMgr.GetProcedure (_RC (const D_UINT8*, name),
+                                                    strlen (name));
+  return ProcedurePameterFieldsCount (procId, param);
 }
 
-I_Operand&
-Session::ProcedureReturnOp (const D_UINT8* name) const
+const D_CHAR*
+Session::ProcedurePameterFieldName (const D_UINT id,
+                                    const D_UINT param,
+                                    const D_UINT field)
 {
-  ProcedureManager& procMgr= m_PrivateNames.Get ().GetProcedureManager ();
-  const D_UINT      procId = procMgr.GetProcedure (
-                                           name,
-                                           strlen (_RC (const D_CHAR*, name))
-                                                  );
-  return ProcedureReturnOp (procId);
+  if (param >= ProcedureParametersCount (id))
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+
+  ProcedureManager& mgr   = m_PrivateNames.Get ().GetProcedureManager ();
+  StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
+  I_DBSTable&       table = val.GetOperand ().GetTable();
+
+  return table.GetFieldDescriptor (field).m_pFieldName;
 }
 
+const D_CHAR*
+Session::ProcedurePameterFieldName (const D_CHAR* const name,
+                                    const D_UINT        param,
+                                    const D_UINT        field)
+{
+  ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
+  const D_UINT      procId  = procMgr.GetProcedure (_RC (const D_UINT8*, name),
+                                                    strlen (name));
+  return ProcedurePameterFieldName (procId, param, field);
+}
 
+D_UINT
+Session::ProcedurePameterFieldType (const D_UINT id,
+                                    const D_UINT param,
+                                    const D_UINT field)
+{
+  if (param >= ProcedureParametersCount (id))
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
 
+  ProcedureManager& mgr   = m_PrivateNames.Get ().GetProcedureManager ();
+  StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
+  I_DBSTable&       table = val.GetOperand ().GetTable();
+
+  DBSFieldDescriptor fd = table.GetFieldDescriptor (field);
+
+  D_UINT type = fd.m_FieldType;
+  if (fd.isArray)
+    MARK_ARRAY (type);
+
+  return type;
+}
+
+D_UINT
+Session::ProcedurePameterFieldType (const D_CHAR* const name,
+                                    const D_UINT        param,
+                                    const D_UINT        field)
+{
+  ProcedureManager& procMgr = m_PrivateNames.Get ().GetProcedureManager ();
+  const D_UINT      procId  = procMgr.GetProcedure (_RC (const D_UINT8*, name),
+                                                    strlen (name));
+  return ProcedurePameterFieldType (procId, param, field);
+}
 
 D_UINT32
 Session::FindGlobal (const D_UINT8* pName, const D_UINT nameLength)

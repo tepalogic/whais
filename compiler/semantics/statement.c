@@ -403,7 +403,7 @@ type_spec_fill_table_field (struct OutputStream* const pStream,
         }
 
       result += pFieldList->labelLength + 1;
-      store_le_int16 (GET_BASIC_TYPE (pFieldList->type), (D_UINT8*)&le_type);
+      store_le_int16 (GET_TYPE (pFieldList->type), (D_UINT8*)&le_type);
       if (output_uint16 (pStream, le_type) == NULL)
         {
           result = TYPE_SPEC_ERROR;
@@ -460,9 +460,9 @@ type_spec_fill_array (struct OutputStream* const      pStream,
   D_UINT          result = 0;
   struct TypeSpec spec;
 
-  assert (IS_ARRAY (pVar->type));
+  assert (IS_ARRAY (GET_TYPE (pVar->type)));
 
-  store_le_int16 (pVar->type, (D_UINT8*)&spec.type);
+  store_le_int16 (GET_TYPE (pVar->type), (D_UINT8*)&spec.type);
   store_le_int16 (2, (D_UINT8*)&spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
@@ -482,9 +482,9 @@ type_spec_fill_field (struct OutputStream* const      pStream,
   D_UINT          result = 0;
   struct TypeSpec spec;
 
-  assert (IS_FIELD (pVar->type));
+  assert (IS_FIELD (GET_TYPE (pVar->type)));
 
-  store_le_int16 (pVar->type, (D_UINT8*)&spec.type);
+  store_le_int16 (GET_TYPE (pVar->type), (D_UINT8*)&spec.type);
   store_le_int16 (2, (D_UINT8*)&spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
@@ -504,11 +504,13 @@ type_spec_fill_basic (struct OutputStream* const      pStream,
   D_UINT          result = 0;
   struct TypeSpec spec;
 
-  assert ((IS_ARRAY (pVar->varId) || IS_TABLE (pVar->varId)) == FALSE);
+  assert ((IS_ARRAY (pVar->varId) == FALSE)
+          && (IS_TABLE (pVar->varId) == FALSE)
+          && (IS_FIELD (pVar->varId) == FALSE));
   assert (pVar->type != T_UNKNOWN);
   assert (pVar->type <= T_TEXT);
 
-  store_le_int16 (pVar->type, (D_UINT8*)&spec.type);
+  store_le_int16 (GET_BASIC_TYPE (pVar->type), (D_UINT8*)&spec.type);
   store_le_int16 (2, (D_UINT8*)&spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;

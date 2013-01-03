@@ -55,6 +55,7 @@ ProcedureManager::AddProcedure (const D_UINT8*      pName,
                                 Unit&               unit)
 {
   assert (GetProcedure (pName, nameLength) == INVALID_ENTRY);
+  assert (localsCount > 0);
   assert (argsCount < localsCount);
 
   ProcedureEntry entry;
@@ -75,7 +76,7 @@ ProcedureManager::AddProcedure (const D_UINT8*      pName,
   m_SyncStmts.insert (m_SyncStmts.end(), syncCount, false);
   m_LocalsValues.insert (m_LocalsValues.end (),
                          &localValues[0],
-                         &localValues[0] + (localsCount - argsCount));
+                         &localValues[0] + localsCount);
   m_Identifiers.insert (m_Identifiers.end (), pName, pName + nameLength);
   m_Identifiers.push_back (0);
   m_Definitions.insert (m_Definitions.end (), pCode, pCode + codeSize);
@@ -106,8 +107,6 @@ ProcedureManager::GetProcedure (const D_UINT8* pName,
 const D_UINT8*
 ProcedureManager::Name (const D_UINT procEntry) const
 {
-  assert (procEntry < m_ProcsEntrys.size ());
-
   if (procEntry >= m_ProcsEntrys.size ())
     throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
 
@@ -142,7 +141,6 @@ D_UINT32
 ProcedureManager::ArgsCount (const D_UINT procEntry) const
 {
   const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
-  assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
     throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
@@ -155,27 +153,16 @@ ProcedureManager::LocalValue (const D_UINT   procEntry,
                               const D_UINT32 local) const
 {
   const D_UINT32 procedure = procEntry & ~GLOBAL_ID;
-  assert (procedure < m_ProcsEntrys.size ());
 
   if (procedure >= m_ProcsEntrys.size ())
     throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
 
   const ProcedureEntry& entry = m_ProcsEntrys[procedure];
 
-  assert (local < entry.m_LocalsCount);
-  assert ((local == 0) || (local >= entry.m_ArgsCount));
+  if (local >= entry.m_LocalsCount)
+    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
 
-  if ((local >= entry.m_LocalsCount)
-      || ((local != 0) && (local < entry.m_ArgsCount)) )
-    {
-      throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
-    }
-
-  if (local == 0)
-    return m_LocalsValues[entry.m_LocalsIndex];
-
-  return
-    m_LocalsValues [entry.m_LocalsIndex + (local - entry.m_ArgsCount)];
+  return m_LocalsValues[entry.m_LocalsIndex + local];
 }
 
 const D_UINT8*
