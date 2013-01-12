@@ -235,12 +235,6 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
         return GlobalValue (Int32Operand (DBSInt32 ()));
       case T_INT64:
         return GlobalValue (Int64Operand (DBSInt64 ()));
-      case T_REAL:
-        return GlobalValue (RealOperand (DBSReal ()));
-      case T_RICHREAL:
-        return GlobalValue (RichRealOperand (DBSRichReal ()));
-      case T_TEXT:
-        return GlobalValue (TextOperand (DBSText ()));
       case T_UINT8:
         return GlobalValue (UInt8Operand (DBSUInt8 ()));
       case T_UINT16:
@@ -249,6 +243,12 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
         return GlobalValue (UInt32Operand (DBSUInt32 ()));
       case T_UINT64:
         return GlobalValue (UInt64Operand (DBSUInt64 ()));
+      case T_REAL:
+        return GlobalValue (RealOperand (DBSReal ()));
+      case T_RICHREAL:
+        return GlobalValue (RichRealOperand (DBSRichReal ()));
+      case T_TEXT:
+        return GlobalValue (TextOperand (DBSText ()));
       default:
         assert (false);
       }
@@ -276,10 +276,6 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
         return GlobalValue (ArrayOperand ( DBSArray ((DBSInt32*) NULL)));
       case T_INT64:
         return GlobalValue (ArrayOperand ( DBSArray ((DBSInt64*) NULL)));
-      case T_REAL:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSReal*) NULL)));
-      case T_RICHREAL:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSRichReal*) NULL)));
       case T_UINT8:
         return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt8*) NULL)));
       case T_UINT16:
@@ -288,6 +284,13 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
         return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt32*) NULL)));
       case T_UINT64:
         return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt64*) NULL)));
+      case T_REAL:
+        return GlobalValue (ArrayOperand ( DBSArray ((DBSReal*) NULL)));
+      case T_RICHREAL:
+        return GlobalValue (ArrayOperand ( DBSArray ((DBSRichReal*) NULL)));
+      case T_TEXT:
+        throw InterException (NULL,
+                              _EXTRA (InterException::TEXT_ARRAY_NOT_SUPP));
       case T_UNDETERMINED:
         //Just a default
         assert (false);
@@ -299,8 +302,6 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
   else if (IS_FIELD (spec.Type ()))
     {
       assert (pPersistentTable == NULL);
-      assert (GET_FIELD_TYPE (spec.Type ()) > T_UNKNOWN);
-      assert (GET_FIELD_TYPE (spec.Type ()) < T_UNDETERMINED);
       return GlobalValue (FieldOperand (GET_FIELD_TYPE (spec.Type ())));
     }
   else if (IS_TABLE (spec.Type ()))
@@ -391,10 +392,6 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
         return StackValue (ArrayOperand ( DBSArray ((DBSInt32*) NULL)));
       case T_INT64:
         return StackValue (ArrayOperand ( DBSArray ((DBSInt64*) NULL)));
-      case T_REAL:
-        return StackValue (ArrayOperand ( DBSArray ((DBSReal*) NULL)));
-      case T_RICHREAL:
-        return StackValue (ArrayOperand ( DBSArray ((DBSRichReal*) NULL)));
       case T_UINT8:
         return StackValue (ArrayOperand ( DBSArray ((DBSUInt8*) NULL)));
       case T_UINT16:
@@ -403,6 +400,13 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
         return StackValue (ArrayOperand ( DBSArray ((DBSUInt32*) NULL)));
       case T_UINT64:
         return StackValue (ArrayOperand ( DBSArray ((DBSUInt64*) NULL)));
+      case T_REAL:
+        return StackValue (ArrayOperand ( DBSArray ((DBSReal*) NULL)));
+      case T_RICHREAL:
+        return StackValue (ArrayOperand ( DBSArray ((DBSRichReal*) NULL)));
+      case T_TEXT:
+        throw InterException (NULL,
+                              _EXTRA (InterException::TEXT_ARRAY_NOT_SUPP));
       case T_UNDETERMINED:
         //Just a default
         return StackValue (ArrayOperand (DBSArray ()));
@@ -412,7 +416,6 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
     }
   else if (IS_FIELD (spec.Type ()))
     {
-      assert (GET_FIELD_TYPE (spec.Type ()) > T_UNKNOWN);
       return StackValue (FieldOperand (GET_FIELD_TYPE (spec.Type ())));
     }
   else if (IS_TABLE (spec.Type ()))
@@ -454,8 +457,7 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
       else if (IS_ARRAY (fieldType))
         {
           if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (fieldType) >= T_UNDETERMINED)
-              || (GET_BASIC_TYPE (fieldType) == T_TEXT)) // Not supported yet!
+              || (GET_BASIC_TYPE (fieldType) > T_UNDETERMINED))
             {
               result = false;
             }
@@ -473,8 +475,7 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
     {
       if ( (spec.DataSize () != 2)
           || (GET_BASIC_TYPE (spec.Type ()) == T_UNKNOWN)
-          || (GET_BASIC_TYPE (spec.Type ()) > T_UNDETERMINED)
-          || (GET_BASIC_TYPE (spec.Type ()) == T_TEXT)) // Not supported yet!
+          || (GET_BASIC_TYPE (spec.Type ()) > T_UNDETERMINED))
         {
           result = false;
         }

@@ -171,6 +171,8 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
 
   while ( !  config.eof ())
     {
+      const streampos lastPos = config.tellg ();
+
       string line;
       getline (config, line);
 
@@ -186,7 +188,7 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
         {
           //Another configuration section starts from here.
           config.clear ();
-          config.seekg ( -1 * _SC(D_INT64, line.length ()), ios::cur);
+          config.seekg (lastPos);
           break;
         }
 
@@ -326,10 +328,17 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
                   cerr << ioConfigLine << ".\n";
                   return false;
                 }
-
             }
           else
             gMainSettings.m_TempDirectory = token;
+
+          string& dir = gMainSettings.m_WorkDirectory;
+
+          if ((dir.size () != 0)
+              && (dir[dir.size () - 1] != whc_get_directory_delimiter()[0]))
+            {
+              dir += whc_get_directory_delimiter ();
+            }
         }
       else if (token == gEntWorkDir)
         {
@@ -355,10 +364,17 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
                   cerr << ioConfigLine << ".\n";
                   return false;
                 }
-
             }
           else
             gMainSettings.m_WorkDirectory = token;
+
+          string& dir = gMainSettings.m_TempDirectory;
+
+          if ((dir.size () != 0)
+              && (dir[dir.size () - 1] != whc_get_directory_delimiter()[0]))
+            {
+              dir += whc_get_directory_delimiter ();
+            }
         }
       else if (token == gEntShowDbg)
         {
@@ -417,6 +433,8 @@ ParseContextSection (I_Logger&        log,
 
   while ( ! config.eof ())
     {
+      const streamoff lastPos = config.tellg ();
+
       string line;
       getline (config, line);
 
@@ -431,8 +449,9 @@ ParseContextSection (I_Logger&        log,
       if (token.at (0) == '[')
         {
           //Another configuration section starts from here.
+          //Another configuration section starts from here.
           config.clear ();
-          config.seekg ( -1 * _SC(D_INT64, line.length ()), ios::cur);
+          config.seekg (lastPos);
           break;
         }
 
@@ -495,6 +514,14 @@ ParseContextSection (I_Logger&        log,
             }
           else
             output.m_DbsDirectory = token;
+
+          string& dir = output.m_DbsDirectory;
+
+          if ((dir.size () != 0)
+              && (dir[dir.size () - 1] != whc_get_directory_delimiter()[0]))
+            {
+              dir += whc_get_directory_delimiter ();
+            }
         }
        else if (token == gEntLogFile)
         {
@@ -901,12 +928,6 @@ PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc)
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
-    }
-
-  if (ioDesc.m_DbsDirectory[ioDesc.m_DbsDirectory.length () - 1] !=
-      whc_get_directory_delimiter ()[0])
-    {
-      ioDesc.m_DbsDirectory += whc_get_directory_delimiter ();
     }
 
   if ( ! whc_is_path_absolute (ioDesc.m_DbsLogFile.c_str ()))

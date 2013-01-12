@@ -96,17 +96,17 @@ DBSGetSeettings ();
 
 DBS_SHL void
 DBSCreateDatabase (const D_CHAR* const pName,
-                   const D_CHAR*      pDbsDirectory = NULL);
+                   const D_CHAR*       pDbsDirectory = NULL);
 
 DBS_SHL I_DBSHandler&
 DBSRetrieveDatabase (const D_CHAR* const pName,
-                     const D_CHAR*        pDbsDirectory = NULL);
+                     const D_CHAR*       pDbsDirectory = NULL);
 
 DBS_SHL void
 DBSReleaseDatabase (I_DBSHandler& hndDatabase);
 
 DBS_SHL void
 DBSRemoveDatabase (const D_CHAR* const pName,
-                   const D_CHAR*        pDbsDirectory = NULL);
+                   const D_CHAR*       pDbsDirectory = NULL);
 
 #endif /* DBS_MGR_H_ */

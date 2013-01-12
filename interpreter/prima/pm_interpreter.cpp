@@ -44,14 +44,14 @@ static WSynchronizer                gSync;
 static map<string, NameSpaceHolder> gmNameSpaces;
 
 INTERP_SHL void
-InitInterpreter ()
+InitInterpreter (const D_CHAR* adminDbsDir)
 {
   WSynchronizerRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () != 0)
     throw InterException (NULL, _EXTRA (InterException::ALREADY_INITED));
 
-  static I_DBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName);
+  static I_DBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName, adminDbsDir);
 
   NameSpaceHolder handler (new NameSpace (glbDbsHnd));
   gmNameSpaces.insert (NameSpacePair (gDBSName, handler));
@@ -76,10 +76,10 @@ GetInstance (const D_CHAR* pName, I_Logger* pLog)
   map<string, NameSpaceHolder>::iterator it = gmNameSpaces.find (pName);
   if (it == gmNameSpaces.end ())
     {
-      I_DBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName);
+      I_DBSHandler& hnd = DBSRetrieveDatabase (pName);
       gmNameSpaces.insert (NameSpacePair (
-                              pName,
-                              NameSpaceHolder (new NameSpace (glbDbsHnd))
+                                        pName,
+                                        NameSpaceHolder (new NameSpace (hnd))
                                          ));
     }
 

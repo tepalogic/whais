@@ -47,7 +47,14 @@ get_line_from_buffer (const D_CHAR* pBuffer, D_UINT bufferOff)
         ++result;
       else if (pBuffer[count] == 0)
         {
-          assert (0);
+          assert (count == bufferOff - 1);
+          if (pBuffer[count - 1] == '\n')
+            {
+              assert (result > 1);
+              return result - 1;
+            }
+          else
+            return result;
         }
       ++count;
     }

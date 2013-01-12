@@ -126,6 +126,11 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
       frameRead += chunkSize;
     }
 
+  if (hnd->data[FRAME_TYPE_OFF] == FRAME_TYPE_TIMEOUT)
+    return WCS_CONNECTION_TIMEOUT;
+  else if (hnd->data[FRAME_TYPE_OFF] != FRAME_TYPE_NORMAL)
+    return WCS_UNEXPECTED_FRAME;
+
   frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
   if ((frameSize < FRAME_DATA_OFF)
       || (frameSize > FRAME_MAX_SIZE)
@@ -134,8 +139,6 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
       return WCS_COMM_OUT_OF_SYNC;
     }
 
-  if (hnd->data[FRAME_TYPE_TIMEOUT])
-    return WCS_CONNECTION_TIMEOUT;
 
   while (frameRead < frameSize)
     {
@@ -162,7 +165,7 @@ send_command (struct INTERNAL_HANDLER* const hnd,
               const D_UINT16                 commandId)
 {
   D_UINT8*               pData    = raw_data (hnd);
-  D_UINT32               chkSum   = 0;
+  D_UINT16               chkSum   = 0;
   D_UINT16               index    = 0;
   const D_UINT16         dataSize = data_size (hnd);
   D_UINT                 cs       = WCS_OK;
@@ -172,11 +175,7 @@ send_command (struct INTERNAL_HANDLER* const hnd,
   hnd->clientCookie = w_rnd ();
 
   for (index = 0; index < dataSize; index++)
-    {
-      chkSum = (chkSum >> 1) + ((chkSum & 1) << 15);
-      chkSum += pData [PLAIN_DATA_OFF + index];
-      chkSum &= 0xFFFFF;
-    }
+    chkSum += data (hnd)[index];
 
   store_le_int32 (hnd->clientCookie, &pData[PLAIN_CLNT_COOKIE_OFF]);
   store_le_int32 (hnd->serverCookie, &pData[PLAIN_SERV_COOKIE_OFF]);
@@ -192,16 +191,15 @@ recieve_answer (struct INTERNAL_HANDLER* const hnd,
                 D_UINT16* const                pRespType)
 {
   D_UINT                cs        = receive_raw_frame (hnd);
-  D_UINT32              chkSum    = 0;
+  D_UINT16              chkSum    = 0;
   const D_UINT16        dataSize  = data_size (hnd);
   D_UINT16              index     = 0;
 
+  if (cs != WCS_OK)
+    return cs;
+
   for (index = 0; index < dataSize; index++)
-    {
-      chkSum = (chkSum >> 1) + ((chkSum & 1) << 15);
-      chkSum += data (hnd) [index];
-      chkSum &= 0xFFFFF;
-    }
+    chkSum += data (hnd)[index];
 
   if (chkSum != from_le_int16 (&raw_data (hnd)[PLAIN_CRC_OFF]))
     {
@@ -220,12 +218,6 @@ recieve_answer (struct INTERNAL_HANDLER* const hnd,
   if ((*pRespType == CMD_INVALID_RSP) || ((*pRespType & 1) == 0))
     {
       cs = WCS_INVALID_FRAME;
-      goto recieve_failure;
-    }
-
-  if (hnd->data [FRAME_TYPE_OFF] != FRAME_TYPE_NORMAL)
-    {
-      cs = WCS_UNEXPECTED_FRAME;
       goto recieve_failure;
     }
 
@@ -291,7 +283,7 @@ WConnect (const char* const    host,
     goto fail_ret;
 
   {
-      D_UINT32 frameId   = from_le_int32 (&result->data[FRAME_ID_OFF]);
+      D_UINT32 frameId = from_le_int32 (&result->data[FRAME_ID_OFF]);
 
       if ((frameId != 0)
           || (frameSize != (FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA))
@@ -443,13 +435,14 @@ list_globals (struct INTERNAL_HANDLER* hnd,
       goto list_globals_err;
     }
 
-  dataOffset  = sizeof (D_UINT32);
+  dataOffset  =  sizeof (D_UINT32);
   *pGlbsCount =  from_le_int32 (data_ + dataOffset);
   dataOffset  += sizeof (D_UINT32);
 
-  hnd->cmdInternal = from_le_int32 (data_ + dataOffset);
-  dataOffset        += sizeof (D_UINT32);
-  hnd->cmdInternal |= ((D_UINT64)dataOffset << 32);
+  hnd->cmdInternal =  from_le_int32 (data_ + dataOffset) & 0xFFFF;
+  dataOffset       += sizeof (D_UINT32);
+  hnd->cmdInternal |= ((D_UINT64)dataOffset << 16);
+  hnd->cmdInternal |= ((D_UINT64)*pGlbsCount << 32);
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -484,9 +477,9 @@ WListGlobalsFetch (const W_CONNECTOR_HND hnd, const char** ppGlbName)
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   D_UINT    cs = WCS_OK;
-  D_UINT32  glbIndex;
+  D_UINT16  glbIndex;
   D_UINT16  dataOffset;
-
+  D_UINT32  glbsCount;
 
   if ((hnd_ == NULL)
       || (ppGlbName == NULL)
@@ -497,10 +490,16 @@ WListGlobalsFetch (const W_CONNECTOR_HND hnd, const char** ppGlbName)
   else if ((cs = from_le_int32 (data (hnd_))) != WCS_OK)
     goto list_global_fetch_err;
 
-  dataOffset = (hnd_->cmdInternal >> 32) & 0xFFFF;
-  glbIndex   = hnd_->cmdInternal  & 0xFFFFFFFF;
+  glbsCount  = (hnd_->cmdInternal >> 32) & 0xFFFFFFFF;
+  dataOffset = (hnd_->cmdInternal >> 16) & 0xFFFF;
+  glbIndex   = hnd_->cmdInternal  & 0xFFFF;
 
-  ++glbIndex;
+  if (glbIndex >= glbsCount)
+    {
+      *ppGlbName = NULL;
+      return WCS_OK;
+    }
+
   if (dataOffset >= data_size (hnd_))
     {
       D_UINT glbCount;
@@ -511,17 +510,20 @@ WListGlobalsFetch (const W_CONNECTOR_HND hnd, const char** ppGlbName)
       assert (glbIndex < glbCount);
 
       dataOffset = 3 * sizeof (D_UINT32);
-      assert (dataOffset == ((hnd_->cmdInternal >> 32) & 0xFFFF));
-      assert (glbIndex   == (hnd_->cmdInternal  & 0xFFFFFFFF));
+      assert (glbsCount  == ((hnd_->cmdInternal >> 32) & 0xFFFFFFFF));
+      assert (dataOffset == ((hnd_->cmdInternal >> 16) & 0xFFFF));
+      assert (glbIndex   == (hnd_->cmdInternal  & 0xFFFF));
     }
+
 
   *ppGlbName = (D_CHAR*)data (hnd_) + dataOffset;
   dataOffset += strlen (*ppGlbName) + 1;
 
   assert (dataOffset <= data_size (hnd_));
 
-  hnd_->cmdInternal =  glbIndex;
-  hnd_->cmdInternal |= ((D_UINT64)dataOffset << 32);
+  hnd_->cmdInternal =  ++glbIndex;
+  hnd_->cmdInternal |= ((D_UINT64)dataOffset << 16);
+  hnd_->cmdInternal |= ((D_UINT64)glbsCount << 32);
 
   assert (cs == WCS_OK);
 
@@ -534,7 +536,6 @@ list_global_fetch_err:
   hnd_->lastCmdRespReceived = CMD_INVALID_RSP;
   return cs;
 }
-
 
 static D_UINT
 list_procedures (struct INTERNAL_HANDLER* hnd,
@@ -570,13 +571,14 @@ list_procedures (struct INTERNAL_HANDLER* hnd,
       goto list_procedures_err;
     }
 
-  dataOffset   =  sizeof (D_UINT32);
+  dataOffset  =  sizeof (D_UINT32);
   *pProcsCount =  from_le_int32 (data_ + dataOffset);
-  dataOffset   += sizeof (D_UINT32);
+  dataOffset  += sizeof (D_UINT32);
 
-  hnd->cmdInternal = from_le_int32 (data_ + dataOffset);
-  dataOffset        += sizeof (D_UINT32);
-  hnd->cmdInternal |= ((D_UINT64)dataOffset << 32);
+  hnd->cmdInternal =  from_le_int32 (data_ + dataOffset) & 0xFFFF;
+  dataOffset       += sizeof (D_UINT32);
+  hnd->cmdInternal |= ((D_UINT64)dataOffset << 16);
+  hnd->cmdInternal |= ((D_UINT64)*pProcsCount << 32);
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -612,9 +614,9 @@ WListProceduresFetch (const W_CONNECTOR_HND hnd,
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   D_UINT    cs = WCS_OK;
-  D_UINT32  procIndex;
+  D_UINT16  procIndex;
   D_UINT16  dataOffset;
-
+  D_UINT32  procsCount;
 
   if ((hnd_ == NULL)
       || (ppProcName == NULL)
@@ -625,22 +627,31 @@ WListProceduresFetch (const W_CONNECTOR_HND hnd,
   else if ((cs = from_le_int32 (data (hnd_))) != WCS_OK)
     goto list_procedure_fetch_err;
 
-  dataOffset = (hnd_->cmdInternal >> 32) & 0xFFFF;
-  procIndex  = hnd_->cmdInternal  & 0xFFFFFFFF;
 
-  ++procIndex;
+  procsCount = (hnd_->cmdInternal >> 32) & 0xFFFFFFFF;
+  dataOffset = (hnd_->cmdInternal >> 16) & 0xFFFF;
+  procIndex  = hnd_->cmdInternal  & 0xFFFF;
+
+  if (procIndex >= procsCount)
+    {
+      *ppProcName = NULL;
+      return WCS_OK;
+    }
+
+
   if (dataOffset >= data_size (hnd_))
     {
       D_UINT procsCount;
 
-      if ((cs = list_globals (hnd_, procIndex, &procsCount)) != WCS_OK)
+      if ((cs = list_procedures (hnd_, procIndex, &procsCount)) != WCS_OK)
         goto list_procedure_fetch_err;
 
       assert (procIndex < procsCount);
 
       dataOffset = 3 * sizeof (D_UINT32);
-      assert (dataOffset == ((hnd_->cmdInternal >> 32) & 0xFFFF));
-      assert (procIndex   == (hnd_->cmdInternal  & 0xFFFFFFFF));
+      assert (procsCount == ((hnd_->cmdInternal >> 32) & 0xFFFFFFFF));
+      assert (dataOffset == ((hnd_->cmdInternal >> 16) & 0xFFFF));
+      assert (procIndex  == (hnd_->cmdInternal  & 0xFFFF));
     }
 
   *ppProcName =  (D_CHAR*)data (hnd_) + dataOffset;
@@ -648,8 +659,9 @@ WListProceduresFetch (const W_CONNECTOR_HND hnd,
 
   assert (dataOffset <= data_size (hnd_));
 
-  hnd_->cmdInternal =  procIndex;
-  hnd_->cmdInternal |= ((D_UINT64)dataOffset << 32);
+  hnd_->cmdInternal =  ++procIndex;
+  hnd_->cmdInternal |= ((D_UINT64)dataOffset << 16);
+  hnd_->cmdInternal |= ((D_UINT64)procsCount << 32);
 
   assert (cs == WCS_OK);
 

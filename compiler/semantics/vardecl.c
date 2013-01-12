@@ -80,36 +80,6 @@ process_table_decls (struct ParserState* pState,
   return result;
 }
 
-static D_BOOL
-process_field_decls (struct ParserState* pState,
-                     struct DeclaredVar* pVar)
-{
-  D_BOOL result = TRUE;
-
-  assert (IS_FIELD (pVar->type));
-
-  if (IS_ARRAY (GET_FIELD_TYPE (pVar->type)))
-    {
-      assert ((GET_BASIC_TYPE (pVar->type) > T_UNKNOWN) &&
-              (GET_BASIC_TYPE (pVar->type) <= T_UNDETERMINED));
-
-      if (GET_BASIC_TYPE (pVar->type) == T_UNDETERMINED)
-        {
-          D_CHAR tname[128];
-
-          copy_text_truncate (tname,
-                              pVar->label,
-                              sizeof tname,
-                              pVar->labelLength);
-          w_log_msg (pState, pState->bufferPos, MSG_FIELD_INV_ARRAY, tname);
-
-          result = FALSE;
-        }
-    }
-
-  return result;
-}
-
 struct DeclaredVar *
 install_declaration (struct ParserState* const pState,
                      YYSTYPE                   pVar,
@@ -152,15 +122,10 @@ install_declaration (struct ParserState* const pState,
       var.extra       = NULL;
       var.offset      = 0;
 
-      if (IS_TABLE (var.type) &&
-          ( ! process_table_decls (pState, &var, pType->val.u_tspec.extra)))
+      if (IS_TABLE (var.type)
+          && ! process_table_decls (pState, &var, pType->val.u_tspec.extra))
         {
           result = NULL;        /* something went wrong along the way */
-        }
-      else if (IS_FIELD (var.type) &&
-          (process_field_decls(pState, &var) == FALSE))
-        {
-          result = NULL; /* something went wrong along the way */
         }
       else if ((result = stmt_add_declaration (stmt, &var, parameter)) == NULL)
         {

@@ -101,8 +101,8 @@ class Session : public I_Session
 {
 public:
   Session (I_Logger&         log,
-          NameSpaceHolder& globalNames,
-          NameSpaceHolder& privateNames);
+          NameSpaceHolder&   globalNames,
+          NameSpaceHolder&   privateNames);
   virtual ~Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit);

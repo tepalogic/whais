@@ -73,17 +73,20 @@ public:
           return "Declaration of an external symbol is different from "
                  "its definition.";
         case INVALID_PROC_REQ:
-           return "Invalid procedure request.";
+          return "Invalid procedure request.";
         case INVALID_LOCAL_REQ:
-           return "Invalid local value request.";
+          return "Invalid local value request.";
         case ALREADY_INITED:
-           return "Already initialized.";
+          return "Already initialized.";
         case NOT_INITED:
-           return "Not initialized.";
+          return "Not initialized.";
          case INVALID_SESSION:
-           return "Invalid session.";
+          return "Invalid session.";
          case SESSION_IN_USE:
-             return "Session in use.";
+          return "Session in use.";
+         case TEXT_ARRAY_NOT_SUPP:
+          return "The current implementation does not have support for "
+                 "text arrays.";
          default:
              assert (false);
              return "Unknown exception.";
@@ -120,6 +123,7 @@ public:
     TEXT_INDEX_BIGGER,
     ARRAY_INDEX_NULL,
     ARRAY_INDEX_BIGGER,
+    TEXT_ARRAY_NOT_SUPP,
     ROW_INDEX_NULL,
     ROW_INDEX_BIGGER,
 
@@ -193,7 +197,7 @@ protected:
 };
 
 INTERP_SHL void
-InitInterpreter ();
+InitInterpreter (const D_CHAR* adminDbsDir = NULL);
 
 INTERP_SHL I_Session&
 GetInstance (const D_CHAR* pName, I_Logger* pLog = NULL);

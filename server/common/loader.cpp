@@ -45,7 +45,8 @@ LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc)
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str ("");
 
-  ioDbsDesc.m_Dbs = &DBSRetrieveDatabase (ioDbsDesc.m_DbsName.c_str ());
+  ioDbsDesc.m_Dbs = &DBSRetrieveDatabase (ioDbsDesc.m_DbsName.c_str (),
+                                          ioDbsDesc.m_DbsDirectory.c_str ());
 
   std::auto_ptr<I_Logger> apLogger (
                          new Logger (ioDbsDesc.m_DbsLogFile.c_str (), true)

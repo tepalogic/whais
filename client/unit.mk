@@ -11,6 +11,11 @@ connector_LIB=utils/utils custom/custom
 connector_SHL=
 
 
+ifeq ($(BUILD_TESTS),yes)
+connector_SRC+=test/test_client_common.cpp
+-include ./$(UNIT)/test/test.mk
+endif
+
 $(foreach exe, $(UNIT_EXES), $(eval $(call add_output_executable,$(exe),$(UNIT))))
 $(foreach shl, $(UNIT_SHLS), $(eval $(call add_output_shared_lib,$(shl),$(UNIT),$($(shl)_MAJ),$($(shl)_MIN))))
 $(foreach lib, $(UNIT_LIBS), $(eval $(call add_output_library,$(lib),$(UNIT))))

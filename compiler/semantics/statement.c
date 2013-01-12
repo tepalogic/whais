@@ -295,7 +295,7 @@ is_type_spec_valid (const struct TypeSpec* pType)
       else if (IS_ARRAY (fieldType))
         {
           if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN ||
-              GET_BASIC_TYPE (fieldType) >= T_UNDETERMINED)
+              GET_BASIC_TYPE (fieldType) > T_UNDETERMINED)
             {
               result = FALSE;
             }

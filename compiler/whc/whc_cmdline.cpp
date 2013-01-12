@@ -117,11 +117,10 @@ WhcCmdLineParser::CheckArguments ()
 
     m_OutputFile = tempBuffer;
     strcpy (tempBuffer, m_SourceFile);
-    if ((m_SourceFile[fileNameLen - 1] == 'c') &&
-        (m_SourceFile[fileNameLen - 2] == 'w') &&
-        (m_SourceFile[fileNameLen - 3]) == '.')
+    if ((m_SourceFile[fileNameLen - 1] == 'w') &&
+        (m_SourceFile[fileNameLen - 2] == '.'))
       {
-        tempBuffer[fileNameLen - 1] = 'o';
+        strcat (tempBuffer, "o");
       }
     else
       strcat (tempBuffer, fileExt);

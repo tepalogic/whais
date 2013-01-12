@@ -135,7 +135,7 @@ main (int argc, D_CHAR** argv)
 
   try
   {
-      D_UINT   sectionLine = 0;
+      D_UINT sectionLine = 0;
 
       if (SeekAtConfigurationSection (*config, sectionLine) == false)
         {
@@ -205,6 +205,15 @@ main (int argc, D_CHAR** argv)
         glbLog->Log (LOG_CRITICAL, "No session were configured.");
         return -1;
       }
+    else if (databases[0].m_DbsName != GlobalContextDatabase())
+      {
+        ostringstream noGlbMsg;
+        noGlbMsg << "No entry for global section '";
+        noGlbMsg << GlobalContextDatabase ();
+        noGlbMsg << "' was found.";
+
+        glbLog->Log (LOG_CRITICAL, noGlbMsg.str ());
+      }
 
     const ServerSettings& confSettings = GetAdminSettings ();
 
@@ -220,7 +229,7 @@ main (int argc, D_CHAR** argv)
     DBSInit (dbsSettings);
     sDbsInited = true;
 
-    InitInterpreter ();
+    InitInterpreter (databases[0].m_DbsDirectory.c_str ());
     sInterpreterInited = true;
 
     for (dbsIterator = databases.begin ();

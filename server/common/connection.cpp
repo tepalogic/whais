@@ -204,7 +204,7 @@ ClientConnection::RawCmdData ()
 void
 ClientConnection::ReciveRawClientFrame ()
 {
-  D_UINT16 frameRead   = 0;
+  D_UINT16 frameRead = 0;
 
   while (frameRead < FRAME_DATA_OFF)
     {
@@ -216,6 +216,21 @@ ClientConnection::ReciveRawClientFrame ()
 
       frameRead += chunkSize;
     }
+
+  switch (m_Data[FRAME_TYPE_OFF])
+  {
+  case FRAME_TYPE_NORMAL:
+  case FRAME_TYPE_AUTH_CLNT_RSP:
+    //These are legitimate frame types that could be received by a server.
+    break;
+  case FRAME_TYPE_TIMEOUT:
+    throw ConnectionException ("Client peer has signaled a timeout condition.",
+                               _EXTRA (0));
+    break;
+  default:
+    assert (false);
+    throw ConnectionException ("Unexpected frame type received.", _EXTRA (0));
+  }
 
   m_FrameSize = from_le_int16 (&m_Data[0]);
 
@@ -245,20 +260,7 @@ ClientConnection::ReciveRawClientFrame ()
                                  _EXTRA (0));
     }
 
-  switch (m_Data[FRAME_TYPE_OFF])
-  {
-  case FRAME_TYPE_NORMAL:
-  case FRAME_TYPE_AUTH_CLNT_RSP:
-    //These are legitimate frame types that could be received by a server.
-    break;
-  case FRAME_TYPE_TIMEOUT:
-    throw ConnectionException ("Client peer has signaled a timeout condition.",
-                               _EXTRA (0));
-    break;
-  default:
-    assert (false);
-    throw ConnectionException ("Unexpected frame type received.", _EXTRA (0));
-  }
+
 }
 
 void
@@ -267,15 +269,15 @@ ClientConnection::SendRawClientFrame (const D_UINT8 type)
   assert ((m_FrameSize >= FRAME_DATA_OFF) && (m_FrameSize <= FRAME_MAX_SIZE));
 
   store_le_int16 (m_FrameSize, &m_Data[FRAME_SIZE_OFF]);
-  store_le_int32 (++m_WaitingFrameId, &m_Data[FRAME_ENCTYPE_OFF]);
+  store_le_int32 (++m_WaitingFrameId, &m_Data[FRAME_ID_OFF]);
 
   m_Data[FRAME_ENCTYPE_OFF] = m_EncriptionType;
   m_Data[FRAME_TYPE_OFF]    = type;
 
   m_UserHandler.m_Socket.Write (m_FrameSize, m_Data);
 
-  m_FrameSize    = 0; //This frame content is not valid anymore.
-  m_ClientCookie = ~0; //Make the client cookie is reread.
+  m_FrameSize    = 0;  //This frame content is not valid anymore.
+  m_ClientCookie = ~0; //Make sure the client cookie is reread.
 }
 
 D_UINT32
@@ -292,13 +294,17 @@ ClientConnection::ReadCommand ()
                                  _EXTRA (0));
     }
 
-  m_ClientCookie = from_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
 
-  if (m_Data[FRAME_TYPE_OFF] != FRAME_TYPE_NORMAL)
-    {
-      throw ConnectionException ("Connection with peer is out of sync.",
-                                 _EXTRA (0));
-    }
+
+  const D_UINT16  respSize = DataSize ();
+  D_UINT16        chkSum   = 0;
+  for (D_UINT i = 0; i < respSize; i++)
+    chkSum += Data ()[i];
+
+  if (chkSum != from_le_int16 (RawCmdData () + PLAIN_CRC_OFF))
+    throw ConnectionException ("Frame with invalid CRC received.", _EXTRA (0));
+
+  m_ClientCookie = from_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
 
   m_LastReceivedCmd = from_le_int16 (RawCmdData () + PLAIN_TYPE_OFF);
   assert ((m_LastReceivedCmd & 1) == 0);
@@ -320,12 +326,9 @@ ClientConnection::SendCmdResponse (const D_UINT16 respType)
   store_le_int16 (respType, RawCmdData () + PLAIN_TYPE_OFF);
 
   D_UINT32 chkSum = 0;
-  for (int i = 0; i < respSize; i++)
-    {
-      chkSum = ((chkSum >> 1) & 0x7FFF) + ((chkSum & 1) << 15);
-      chkSum += Data ()[i];
-      chkSum &= 0xFFFF;
-    }
+  for (D_UINT i = 0; i < respSize; i++)
+    chkSum += Data ()[i];
+
   store_le_int16 (chkSum, RawCmdData () + PLAIN_CRC_OFF);
 
   SendRawClientFrame (FRAME_TYPE_NORMAL);
