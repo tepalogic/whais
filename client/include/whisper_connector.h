@@ -50,6 +50,7 @@ static const unsigned int WFT_UINT64     = 0x000D;
 static const unsigned int WFT_REAL       = 0x000E;
 static const unsigned int WFT_RICHREAL   = 0x000F;
 static const unsigned int WFT_TEXT       = 0x0010;
+static const unsigned int WFT_NOTSET     = 0x0011;
 static const unsigned int WFT_ARRAY_MASK = 0x0100;
 static const unsigned int WFT_FIELD_MASK = 0x0200;
 static const unsigned int WFT_TABLE_MASK = 0x0400;

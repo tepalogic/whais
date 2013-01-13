@@ -29,9 +29,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server/include/server_protocol.h"
 
+#define MAX_CMD_INTERNALS                 4
+
+static const D_UINT LIST_GLBSCOUNT      = 0;
+static const D_UINT LIST_GLBINDEX       = 1;
+static const D_UINT LIST_GLBOFF         = 2;
+
+static const D_UINT LIST_PROCSCOUNT     = 0;
+static const D_UINT LIST_PROCSINDEX     = 1;
+static const D_UINT LIST_PROCOFF        = 2;
+
+static const D_UINT DESC_RAWTYPE        = 0;
+static const D_UINT DESC_FIELD_COUNT    = 1;
+static const D_UINT DESC_FIELD_HINT     = 2;
+static const D_UINT DESC_FIELD_OFFSET   = 3;
+
+static const D_UINT UPDATE_SIZE         = 0;
+
 struct INTERNAL_HANDLER
 {
-  D_UINT64  cmdInternal;
+  D_UINT32  cmdInternal[MAX_CMD_INTERNALS];
   WH_SOCKET socket;
   D_UINT32  expectedFrameId;
   D_UINT32  serverCookie;

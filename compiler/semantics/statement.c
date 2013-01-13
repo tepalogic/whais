@@ -409,6 +409,7 @@ type_spec_fill_table_field (struct OutputStream* const pStream,
           result = TYPE_SPEC_ERROR;
           break;
         }
+
       result     += sizeof (D_UINT16);
       pFieldList  = pFieldList->extra;
     }

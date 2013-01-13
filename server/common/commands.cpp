@@ -575,12 +575,22 @@ cmd_procedure_param_desc (ClientConnection& rConn)
   D_UINT8*            data_       = rConn.Data ();
   D_UINT16            hint        = from_le_int16 (data_);
   const D_CHAR* const procName    = _RC (const D_CHAR*,
-                                         data_ + sizeof (D_UINT16));
+                                         data_ + 2 * sizeof (D_UINT16));
+  const D_UINT        procNameLen = strlen (procName) + 1;
   D_UINT16            offset      = 0;
   bool                oneAtLeast  = false;
-  const D_UINT        paramsCount = session.ProcedureParametersCount (
-                                                                      procName
-                                                                     );
+  D_UINT              paramsCount = 0;
+
+  try
+  {
+      paramsCount = session.ProcedureParametersCount (procName);
+  }
+  catch (InterException&)
+  {
+      result = WCS_INVALID_ARGS;
+      goto cmd_procedure_param_desc_err;
+  }
+
   if (paramsCount >= 0xFFFF)
     {
       result = WCS_LARGE_ARGS;
@@ -593,6 +603,12 @@ cmd_procedure_param_desc (ClientConnection& rConn)
     }
 
   rConn.DataSize (rConn.MaxSize ());
+  if (2 * sizeof (D_UINT32) + procNameLen > rConn.DataSize ())
+    {
+      result = WCS_LARGE_ARGS;
+      goto cmd_procedure_param_desc_err;
+    }
+
   store_le_int32 (WCS_OK, data_);
   offset += sizeof (D_UINT32);
 
@@ -613,6 +629,12 @@ cmd_procedure_param_desc (ClientConnection& rConn)
                                                                     hint);
           if (IS_TABLE (paramType))
             {
+              if (offset + sizeof (D_UINT16) > rConn.DataSize ())
+                break;
+
+              store_le_int16 (WFT_TABLE_MASK, data_ + offset);
+              offset += sizeof (D_UINT16);
+
               const D_UINT fieldsCount = session.ProcedurePameterFieldsCount (
                                                                       procName,
                                                                       hint
@@ -653,7 +675,7 @@ cmd_procedure_param_desc (ClientConnection& rConn)
             }
           else
             {
-              if (offset + sizeof (D_UINT32) > rConn.DataSize ())
+              if (offset + sizeof (D_UINT16) > rConn.DataSize ())
                 break;
 
               store_le_int16 (paramType, data_ + offset);
@@ -682,8 +704,9 @@ cmd_procedure_param_desc (ClientConnection& rConn)
       goto cmd_procedure_param_desc_err;
     }
 
-  assert (result != WCS_OK);
-  rConn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
+  assert (result == WCS_OK);
+  rConn.DataSize (offset); //Send only what it's needed!
+  rConn.SendCmdResponse (CMD_DESC_PROC_PARAM_RSP);
 
   return;
 
@@ -692,7 +715,7 @@ cmd_procedure_param_desc_err:
 
   rConn.DataSize (sizeof (result));
   store_le_int32 (result, rConn.Data ());
-  rConn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
+  rConn.SendCmdResponse (CMD_DESC_PROC_PARAM_RSP);
 
   return;
 }

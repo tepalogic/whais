@@ -331,6 +331,7 @@ install_field_declaration (struct ParserState*       pState,
               assert (pPrev->extra == pIt);
 
               result->extra = pPrev->extra;
+              pPrev->extra  = result;
               result        = pExtra;
 
               break;
