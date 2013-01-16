@@ -109,7 +109,7 @@ cmd_value_desc (ClientConnection& rConn)
                                                                       glbName,
                                                                       fieldHint
                                                                          );
-                  if (dataOffset + fieldLen + sizeof (D_UINT16) <
+                  if (dataOffset + fieldLen + sizeof (D_UINT16) >
                       rConn.DataSize ())
                     {
                       break;
@@ -128,7 +128,7 @@ cmd_value_desc (ClientConnection& rConn)
 
               if (! oneAtLeast)
                 {
-                  result = WCS_INVALID_ARGS;
+                  result = WCS_LARGE_ARGS;
                   goto cmd_glb_desc_err;
                 }
             }
@@ -186,7 +186,7 @@ cmd_value_desc (ClientConnection& rConn)
                   if (fd.isArray)
                     MARK_ARRAY (fieldType);
 
-                  if (dataOffset + fieldLen + sizeof (D_UINT16) <
+                  if (dataOffset + fieldLen + sizeof (D_UINT16) >
                       rConn.DataSize ())
                     {
                       break;
@@ -205,7 +205,7 @@ cmd_value_desc (ClientConnection& rConn)
 
               if (! oneAtLeast)
                 {
-                  result = WCS_INVALID_ARGS;
+                  result = WCS_LARGE_ARGS;
                   goto cmd_glb_desc_err;
                 }
             }

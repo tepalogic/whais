@@ -705,7 +705,7 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   data_ = data (hnd);
 
   store_le_int16 (0, data_);
-  offset += sizeof (D_UINT32);
+  offset += 2 * sizeof (D_UINT16);
 
   if (globalName == NULL)
     {
@@ -732,13 +732,13 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
 
   data_  = data (hnd);
 
-  if ((cs = from_le_int16 (data_)) != WCS_OK)
+  if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto describe_value_err;
 
-  offset += sizeof (D_UINT16);
+  assert (offset == strlen ((D_CHAR*)data_ + sizeof (D_UINT32)) + 1 +
+                    sizeof (D_UINT32));
+
   *pRawType = from_le_int16 (data_ + offset);
-
-
   hnd->cmdInternal[DESC_RAWTYPE] = *pRawType;
   offset += sizeof (D_UINT16);
 
@@ -778,7 +778,7 @@ WDescribeValueGetFieldsCount (const W_CONNECTOR_HND  hnd,
 {
   struct INTERNAL_HANDLER* hnd_   = (struct INTERNAL_HANDLER*)hnd;
   D_UINT                   cs     = WCS_OK;
-  D_UINT8* const           data_  = data (hnd_);
+  D_UINT8*                 data_  = NULL;
   D_UINT16                 type;
 
   if ((hnd_ == NULL) || (pFieldCount == NULL))
@@ -786,16 +786,20 @@ WDescribeValueGetFieldsCount (const W_CONNECTOR_HND  hnd,
   else if (hnd_->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP)
     return WCS_INCOMPLETE_CMD;
 
+  data_ = data (hnd);
   if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto describe_value_field_cnt_err;
 
   type = hnd_->cmdInternal[DESC_RAWTYPE];
   if ((type & WFT_TABLE_MASK) == 0)
-    return WCS_INVALID_ARGS;
+    {
+      *pFieldCount = 0;
+      return WCS_OK;
+    }
 
   *pFieldCount = hnd_->cmdInternal[DESC_FIELD_COUNT];
 
-  assert (cs = WCS_OK);
+  assert (cs == WCS_OK);
 
   return WCS_OK;
 
@@ -813,7 +817,7 @@ WDescribeValueFetchField (const W_CONNECTOR_HND  hnd,
 {
   struct INTERNAL_HANDLER* hnd_   = (struct INTERNAL_HANDLER*)hnd;
   D_UINT                   cs     = WCS_OK;
-  D_UINT8* const           data_  = data (hnd_);
+  D_UINT8*                 data_  = NULL;
   D_UINT16                 type;
   D_UINT16                 fieldHint;
   D_UINT16                 fieldCount;
@@ -824,41 +828,46 @@ WDescribeValueFetchField (const W_CONNECTOR_HND  hnd,
   else if (hnd_->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP)
     return WCS_INCOMPLETE_CMD;
 
+  data_ = data (hnd_);
   if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto describe_value_fetch_field_err;
+
+describe_value_fetch_field_again:
 
   type = hnd_->cmdInternal[DESC_RAWTYPE];
   if ((type & WFT_TABLE_MASK) == 0)
     return WCS_INVALID_ARGS;
-
-describe_value_fetch_field_again:
 
   fieldCount = hnd_->cmdInternal[DESC_FIELD_COUNT];
   fieldHint  = hnd_->cmdInternal[DESC_FIELD_HINT];
   offset     = hnd_->cmdInternal[DESC_FIELD_OFFSET];
 
   assert (fieldCount <= 0xFFFF);
-  assert (fieldHint <= fieldCount);
   assert (offset > 0);
 
-  if (fieldHint == fieldCount)
+  if (fieldHint > fieldCount)
+    return WCS_INVALID_ARGS;
+  else if (fieldHint == fieldCount)
     {
+      *pFieldType  = WFT_NOTSET;
       *ppFieldName = NULL;
-      return WCS_OK;
 
+      hnd_->cmdInternal[DESC_FIELD_HINT] = ++fieldHint;
+
+      return WCS_OK;
     }
   else if (offset < data_size (hnd_))
     {
-      *ppFieldName = (D_CHAR*)data (hnd_) + offset;
-      offset += strlen (*ppFieldName) + 1;
-      *pFieldType = from_le_int16 (data(hnd_) + offset);
-      offset += sizeof (D_UINT16);
+      *ppFieldName =  (D_CHAR*)data (hnd_) + offset;
+      offset       += strlen (*ppFieldName) + 1;
+
+      *pFieldType =  from_le_int16 (data(hnd_) + offset);
+      offset      += sizeof (D_UINT16);
 
       ++fieldHint;
       assert (offset <= 0xFFFF);
       assert (fieldHint <= 0xFFFF);
 
-      hnd_->cmdInternal[DESC_RAWTYPE]      = type;
       hnd_->cmdInternal[DESC_FIELD_COUNT]  = fieldCount;
       hnd_->cmdInternal[DESC_FIELD_HINT]   = fieldHint;
       hnd_->cmdInternal[DESC_FIELD_OFFSET] = offset;
@@ -877,8 +886,8 @@ describe_value_fetch_field_again:
       goto describe_value_fetch_field_again;
     }
 
-  /* We should'n be here */
-  assert (FALSE);
+  assert (cs == WCS_OK);
+  return cs;
 
 describe_value_fetch_field_err:
   assert (cs != WCS_OK);
@@ -1104,7 +1113,7 @@ D_UINT
 stack_top_field_basic_update (struct INTERNAL_HANDLER* hnd,
                               const D_UINT             type,
                               const D_CHAR* const      fieldNane,
-                              const W_TABLE_ROW_INDEX    row,
+                              const W_TABLE_ROW_INDEX  row,
                               const D_CHAR* const      value)
 {
   D_UINT32       cs        = WCS_OK;
@@ -1239,8 +1248,8 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
 static D_UINT
 stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
                              const D_CHAR* const      fieldName,
-                             const W_TABLE_ROW_INDEX    row,
-                             const W_ELEMENT_INDEX      fromPos,
+                             const W_TABLE_ROW_INDEX  row,
+                             const W_ELEMENT_INDEX    fromPos,
                              const D_CHAR* const      value)
 {
   D_UINT32       cs         = WCS_OK;
