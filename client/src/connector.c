@@ -690,13 +690,7 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   D_UINT16                 type;
   D_UINT8*                 data_;
 
-  if ((hnd == NULL) || (pRawType == NULL))
-    return WCS_INVALID_ARGS;
-  else if ((globalName != NULL) && (hnd->userId != 0))
-    return WCS_OP_NOTPERMITED;
-  else if ((globalName != NULL) && (strlen (globalName) == 0))
-    return WCS_INVALID_ARGS;
-  else if (hnd->buildingCmd != CMD_INVALID)
+  if (hnd->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
   else if (fieldHint > 0xFFFF)
     return WCS_LARGE_ARGS;
@@ -768,6 +762,17 @@ WDescribeValue (const W_CONNECTOR_HND    hnd,
                 unsigned int* const      pRawType)
 {
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+
+  if ((hnd == NULL)
+      || (globalName == NULL)
+      || (pRawType == NULL)
+      || (strlen (globalName) == 0))
+    {
+      return WCS_INVALID_ARGS;
+    }
+  else if (hnd_->userId != 0)
+    return WCS_OP_NOTPERMITED;
 
   return describe_value (hnd_, globalName, 0, pRawType);
 }
@@ -896,52 +901,61 @@ describe_value_fetch_field_err:
   return cs;
 }
 
+
+unsigned int
+WDescribeStackTop (const W_CONNECTOR_HND hnd,
+                   unsigned int* const   pRawType)
+{
+  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+
+  if ((hnd == NULL) || (pRawType == NULL))
+    return WCS_INVALID_ARGS;
+
+  return describe_value (hnd_, NULL, 0, pRawType);
+}
+
 static D_UINT
-compute_push_space_need (const D_UINT                        type,
-                         unsigned int                        fieldsCount,
+compute_push_space_need (const D_UINT                          type,
+                         unsigned int                          fieldsCount,
                          const struct W_FieldDescriptor* const fields)
 {
-  D_UINT result = 1;
-
   if (type != WFT_TABLE_MASK)
     {
-      const D_BOOL isArray = (type & WFT_ARRAY_MASK) != 0;
-      if ((((type & 0xFFFF) < WFT_BOOL) || ((type & 0XFFFF) > WFT_TEXT))
-          || (isArray && ((type & 0xFFFF) == WFT_TEXT)))
+      if (type & WFT_FIELD_MASK)
+        return 0;
+
+      const D_UINT baseType = type & ~(WFT_ARRAY_MASK);
+      if ((baseType < WFT_BOOL) || (baseType > WFT_TEXT)
+          || (fieldsCount > 0))
         {
           return 0;
         }
-      else
-        return sizeof (D_UINT16);
+
+      return sizeof (D_UINT16) + 1;
     }
-  else if (type == WFT_TABLE_MASK)
+
+  if ((fieldsCount == 0) || (fields == NULL))
+    return 0;
+
+  D_UINT result = 2 * sizeof (D_UINT16) + 1;
+  while (fieldsCount-- > 0)
     {
-      result += sizeof (D_UINT16);
+      const D_CHAR* const fieldName = fields[fieldsCount].m_FieldName;
+      const D_UINT        nameLen   = strlen (fieldName) + 1;
 
-      if ((fieldsCount == 0) || (fields == NULL))
-        return 0;
+      D_UINT16 fieldType = fields[fieldsCount].m_FieldType;
+      fieldType &= ~WFT_ARRAY_MASK;
 
-      result += sizeof (D_UINT16);
-      while (fieldsCount-- > 0)
+      if ((fieldName == NULL)
+          || (nameLen <= 1)
+          || ((fieldType < WFT_BOOL) || (fieldType > WFT_TEXT)))
         {
-          const D_CHAR* const fieldName = fields[fieldsCount].m_FieldName;
-
-          D_UINT16     fieldType = fields[fieldsCount].m_FieldType;
-          const D_BOOL isArray   = (fieldType & WFT_ARRAY_MASK) != 0;
-          fieldType &= ~WFT_ARRAY_MASK;
-
-          if ((fieldName == NULL)
-              || (fieldName[0] == 0)
-              || (isArray && (fieldType == WFT_TEXT))
-              || ((fieldType < WFT_BOOL) || (fieldType > WFT_TEXT)))
-            {
-              return 0;
-            }
-          result += strlen (fieldName) + 1;
-          result += sizeof (D_UINT16);
+          return 0;
         }
+      result += nameLen;
+      result += sizeof (D_UINT16);
     }
-  /* else: Type is not looking good! Signal it as an error result! */
 
   return result;
 }
@@ -954,11 +968,10 @@ write_push_cmd (const D_UINT                          type,
 {
   *dest++ = CMD_UPDATE_FUNC_PUSH;
 
-  if (type != WFT_TABLE_MASK)
-      store_le_int16 (type, dest);
-  else if (type == WFT_TABLE_MASK)
+  store_le_int16 (type, dest);
+
+  if (type == WFT_TABLE_MASK)
     {
-      store_le_int16 (type, dest);
       dest += sizeof (D_UINT16);
 
       assert  ((fieldsCount != 0) && (fields != NULL));
@@ -978,22 +991,17 @@ write_push_cmd (const D_UINT                          type,
           dest += sizeof (D_UINT16);
         }
     }
-  else
-    {
-      assert (FALSE);
-    }
 }
 
 D_UINT
 WPushStackValue (const W_CONNECTOR_HND                 hnd,
-                 const unsigned int                  type,
-                 const unsigned int                  fieldsCount,
+                 const unsigned int                    type,
+                 const unsigned int                    fieldsCount,
                  const struct W_FieldDescriptor* const fields)
 {
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   D_UINT       cs       = WCS_OK;
-  D_UINT       dataSize = 0;
   const D_UINT spaceReq = compute_push_space_need (type, fieldsCount, fields);
 
   if (hnd_ == NULL)
@@ -1001,25 +1009,39 @@ WPushStackValue (const W_CONNECTOR_HND                 hnd,
   else if (spaceReq == 0)
     return WCS_INVALID_ARGS;
   else if ((hnd_->buildingCmd != CMD_UPDATE_STACK)
-           && (hnd_->buildingCmd != CMD_UPDATE_STACK))
+           && (hnd_->buildingCmd != CMD_INVALID))
     {
       return WCS_INCOMPLETE_CMD;
     }
   else if (spaceReq > max_data_size (hnd_))
     return WCS_LARGE_ARGS;
 
-  dataSize = data_size (hnd_);
-  if (max_data_size (hnd_) - spaceReq < dataSize)
+  if (hnd_->buildingCmd == CMD_INVALID)
+    set_data_size (hnd_, 0);
+
+  if (max_data_size (hnd_) - spaceReq < data_size (hnd_))
     {
+      assert (hnd_->buildingCmd == CMD_UPDATE_STACK);
+      assert (data_size (hnd_) > 0);
+
       if ((cs == WUpdateStackFlush (hnd)) != WCS_OK)
         return cs;
+
+      assert (hnd_->buildingCmd == CMD_INVALID);
     }
 
-  assert (cs == WCS_OK);
+  {
+    D_UINT8* const data_    = data (hnd_);
+    const D_UINT   dataSize = data_size (hnd_);
 
-  write_push_cmd (type, fieldsCount, fields, data (hnd_) + dataSize);
-  dataSize += spaceReq;
-  set_data_size (hnd_, dataSize);
+    assert ((dataSize == 0) || (hnd_->buildingCmd == CMD_UPDATE_STACK));
+    assert ((dataSize > 0) || (hnd_->buildingCmd == CMD_INVALID));
+
+    write_push_cmd (type, fieldsCount, fields, data_ + dataSize);
+    set_data_size (hnd_, dataSize + spaceReq);
+  }
+
+  assert (cs == WCS_OK);
 
   memset (hnd_->cmdInternal, 0, sizeof (hnd_->cmdInternal));
   hnd_->buildingCmd = CMD_UPDATE_STACK;
@@ -1031,36 +1053,48 @@ D_UINT
 WPopStackValues (const W_CONNECTOR_HND hnd,
                  unsigned int        count)
 {
-  static const D_UINT neededSize = sizeof (D_UINT32) + 1;
+  static const D_UINT spaceReq = sizeof (D_UINT32) + 1;
 
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
-  D_UINT32 cs;
 
   if ((hnd_ == NULL) || (count == 0))
     return WCS_INVALID_ARGS;
   else if ((hnd_->buildingCmd != CMD_UPDATE_STACK)
-           && (hnd_->buildingCmd != CMD_UPDATE_STACK))
+           && (hnd_->buildingCmd != CMD_INVALID))
     {
       return WCS_INCOMPLETE_CMD;
     }
-  else if (neededSize + data_size (hnd_) > max_data_size (hnd_))
+
+  if (hnd_->buildingCmd == CMD_INVALID)
+    set_data_size (hnd_, 0);
+
+  if (max_data_size(hnd_) - spaceReq  <  data_size (hnd_))
     {
+      assert (hnd_->buildingCmd == CMD_UPDATE_STACK);
+      assert (data_size (hnd_) > 0);
+
+      D_UINT32 cs;
       if ((cs = WUpdateStackFlush (hnd_)) != WCS_OK)
         return cs;
+
+      assert (hnd_->buildingCmd == CMD_INVALID);
     }
 
   {
     D_UINT8* const data_    = data (hnd_);
     const D_UINT   dataSize = data_size (hnd_);
 
-    data_[0] = CMD_UPDATE_FUNC_POP;
-    store_le_int32 (count, data_ + 1);
+    assert ((dataSize == 0) || (hnd_->buildingCmd == CMD_UPDATE_STACK));
+    assert ((dataSize > 0) || (hnd_->buildingCmd == CMD_INVALID));
 
-    set_data_size (hnd_, dataSize + neededSize);
 
-    memset (hnd_->cmdInternal, 0, sizeof (hnd_->cmdInternal));
+    data_[dataSize] = CMD_UPDATE_FUNC_POP;
+    store_le_int32 (count, data_ + dataSize + 1);
+
+    set_data_size (hnd_, dataSize + spaceReq);
   }
 
+  memset (hnd_->cmdInternal, 0, sizeof (hnd_->cmdInternal));
   hnd_->buildingCmd = CMD_UPDATE_STACK;
 
   return WCS_OK;
@@ -1570,6 +1604,9 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
     {
       return WCS_INCOMPLETE_CMD;
     }
+
+  if (hnd_->buildingCmd == CMD_INVALID)
+    set_data_size (hnd_, 0);
 
   if ((valueType & (WFT_FIELD_MASK | WFT_ARRAY_MASK)) == 0)
     {

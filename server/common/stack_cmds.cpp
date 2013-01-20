@@ -50,10 +50,10 @@ assert_cmds_values ()
   assert (WFT_INT16      == T_INT16);
   assert (WFT_INT32      == T_INT32);
   assert (WFT_INT64      == T_INT64);
-  assert (WFT_UINT8      == T_INT8);
-  assert (WFT_UINT16     == T_INT16);
-  assert (WFT_UINT32     == T_INT32);
-  assert (WFT_UINT64     == T_INT64);
+  assert (WFT_UINT8      == T_UINT8);
+  assert (WFT_UINT16     == T_UINT16);
+  assert (WFT_UINT32     == T_UINT32);
+  assert (WFT_UINT64     == T_UINT64);
   assert (WFT_REAL       == T_REAL);
   assert (WFT_RICHREAL   == T_RICHREAL);
   assert (WFT_TEXT       == T_TEXT);
@@ -102,6 +102,9 @@ cmd_push_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
 
   if (type != WFT_TABLE_MASK)
     {
+      if (type & WFT_FIELD_MASK)
+        return WCS_INVALID_ARGS;
+
       const bool isArray = (type & WFT_ARRAY_MASK) != 0;
 
       type &= ~WFT_ARRAY_MASK;
@@ -111,7 +114,77 @@ cmd_push_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
         return WCS_OP_NOTSUPP;
       else if (isArray)
         {
-          rStack.Push (DBSArray ());
+          switch (type)
+          {
+            case WFT_BOOL:
+              rStack.Push (DBSArray (_SC (DBSBool*, NULL)));
+              break;
+
+            case WFT_CHAR:
+              rStack.Push (DBSArray (_SC (DBSChar*, NULL)));
+              break;
+
+            case WFT_DATE:
+              rStack.Push (DBSArray (_SC (DBSDate*, NULL)));
+              break;
+
+            case WFT_DATETIME:
+              rStack.Push (DBSArray (_SC (DBSDateTime*, NULL)));
+              break;
+
+            case WFT_HIRESTIME:
+              rStack.Push (DBSArray (_SC (DBSHiresTime*, NULL)));
+              break;
+
+            case WFT_INT8:
+              rStack.Push (DBSArray (_SC (DBSInt8*, NULL)));
+              break;
+
+            case WFT_INT16:
+              rStack.Push (DBSArray (_SC (DBSInt16*, NULL)));
+              break;
+
+            case WFT_INT32:
+              rStack.Push (DBSArray (_SC (DBSInt32*, NULL)));
+              break;
+
+            case WFT_INT64:
+              rStack.Push (DBSArray (_SC (DBSInt64*, NULL)));
+              break;
+
+            case WFT_UINT8:
+              rStack.Push (DBSArray (_SC (DBSUInt8*, NULL)));
+              break;
+
+            case WFT_UINT16:
+              rStack.Push (DBSArray (_SC (DBSUInt16*, NULL)));
+              break;
+
+            case WFT_UINT32:
+              rStack.Push (DBSArray (_SC (DBSUInt32*, NULL)));
+              break;
+
+            case WFT_UINT64:
+              rStack.Push (DBSArray (_SC (DBSUInt64*, NULL)));
+              break;
+
+            case WFT_REAL:
+              rStack.Push (DBSArray (_SC (DBSReal*, NULL)));
+              break;
+
+            case WFT_RICHREAL:
+              rStack.Push (DBSArray (_SC (DBSRichReal*, NULL)));
+              break;
+
+            case WFT_TEXT:
+              assert (false);
+            default:
+              throw ConnectionException (
+                        "Server internal error:\n"
+                        "Invalid type encountered, though it passed type checks!",
+                        _EXTRA (type)
+                                        );
+          }
           return WCS_OK;
         }
 
@@ -226,12 +299,17 @@ cmd_push_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
 
           fields_[field].isArray     = IS_ARRAY (fieldType);
           fields_[field].m_FieldType = _SC (DBS_FIELD_TYPE,
-                                            GET_FIELD_TYPE (fieldType));
+                                            GET_BASIC_TYPE (fieldType));
 
           if ((fields_[field].m_FieldType < WFT_BOOL)
               || (fields_[field].m_FieldType > WFT_TEXT))
             {
               goto push_frame_error;
+            }
+          else if ((fields_[field].m_FieldType == WFT_TEXT)
+                   && (fields_[field].isArray))
+            {
+              return WCS_OP_NOTSUPP;
             }
         }
       I_DBSHandler& dbs   = *rConn.Dbs().m_Dbs;

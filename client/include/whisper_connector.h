@@ -72,8 +72,8 @@ static const unsigned int WCS_GENERAL_ERR        = 0x0FFF;
 static const unsigned int WCS_OS_ERR_BASE        = 0x1000;
 
 #define WCONNECTOR_ENC_ALL   (CONNECTOR_ENC_PLAIN | CONNECTOR_ENC_ISX)
-#define WENC_OS_ERROR(x)  ((x) + WCS_OS_ERR_BASE)
-#define WDEC_OS_ERROR(x)  ((x) - WCS_OS_ERR_BASE)
+#define WENC_OS_ERROR(x)     ((x) + WCS_OS_ERR_BASE)
+#define WDEC_OS_ERROR(x)     ((x) - WCS_OS_ERR_BASE)
 
 #define WIGNORE_FIELD                            NULL
 #define WIGNORE_ROW                              (0)
@@ -83,17 +83,6 @@ struct W_FieldDescriptor
 {
   const    char*          m_FieldName;
   unsigned int            m_FieldType;
-};
-
-struct W_ValueDescriptor
-{
-  const char*             m_FieldName;
-  const char*             m_Value;
-  unsigned int            m_ValueType;
-
-  unsigned long long      m_Row;
-  unsigned long long      m_ElementOffset;
-  unsigned long long      m_ElementsCount;
 };
 
 unsigned int
@@ -153,6 +142,10 @@ WDescribeValue (const W_CONNECTOR_HND    hnd,
                 unsigned int* const      pRawType);
 
 unsigned int
+WDescribeStackTop (const W_CONNECTOR_HND hnd,
+                   unsigned int* const   pRawType);
+
+unsigned int
 WDescribeValueGetFieldsCount (const W_CONNECTOR_HND  hnd,
                               unsigned int* const    pFieldCount);
 
@@ -168,7 +161,8 @@ WPushStackValue (const W_CONNECTOR_HND                 hnd,
                  const struct W_FieldDescriptor* const fields);
 unsigned int
 WPopStackValues (const W_CONNECTOR_HND hnd,
-                 unsigned int        count);
+                 unsigned int          count);
+
 
 unsigned int
 WUpdateStackValue (const W_CONNECTOR_HND         hnd,

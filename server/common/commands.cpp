@@ -174,6 +174,9 @@ cmd_value_desc (ClientConnection& rConn)
               store_le_int16 (fieldsCount, data_ + dataOffset);
               dataOffset += sizeof (D_UINT16);
 
+              store_le_int16 (fieldHint, data_ + dataOffset);
+              dataOffset += sizeof (D_UINT16);
+
               bool oneAtLeast = false;
               do
                 {
@@ -732,7 +735,7 @@ static COMMAND_HANDLER saAdminCmds[] =
 static COMMAND_HANDLER saUserCmds[] =
     {
         cmd_invalid,                     // CMD_CLOSE_CONN
-        cmd_value_desc,                     // CMD_GLOBAL_DESC
+        cmd_value_desc,                  // CMD_GLOBAL_DESC
         cmd_read_stack,                  // CMD_READ_STACK
         cmd_update_stack,                // CMD_UPDATE_STACK
         cmd_execute_procedure,           // CMD_EXEC_PROC

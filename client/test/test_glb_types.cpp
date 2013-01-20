@@ -26,7 +26,7 @@ struct FieldEntry
   bool                visited;
 };
 
-GlobalValueEntry _globals[] =
+GlobalValueEntry no_fileds_types[] =
     {
         {"bool_", WFT_BOOL, 0},
         {"char_", WFT_CHAR, 0},
@@ -100,7 +100,7 @@ GlobalValueEntry _globals[] =
         {"complete_field_table_", WFT_TABLE_MASK, 31}
     };
 
-FieldEntry table_fields[] =
+FieldEntry tableFields[] =
     {
         {"bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_BOOL, false},
         {"char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_CHAR, false},
@@ -144,7 +144,7 @@ test_global_value_description (W_CONNECTOR_HND hnd)
 {
   const D_CHAR suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   D_CHAR buffer[1024];
-  const D_UINT glbsCount = sizeof (_globals)/sizeof (_globals[0]);
+  const D_UINT glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
   cout << "Testing global values types ... ";
 
@@ -153,16 +153,16 @@ test_global_value_description (W_CONNECTOR_HND hnd)
       D_UINT type;
       D_UINT fieldsCount;
 
-      strcpy (buffer, _globals[i].name);
+      strcpy (buffer, no_fileds_types[i].name);
       strcat (buffer, suffix);
 
       if ((WDescribeValue (hnd, buffer, &type) != WCS_OK)
-          || (type != _globals[i].type))
+          || (type != no_fileds_types[i].type))
         {
           goto test_global_value_description_err;
         }
       else if ((WDescribeValueGetFieldsCount (hnd, &fieldsCount) != WCS_OK)
-          || (fieldsCount != _globals[i].fieldsCount))
+          || (fieldsCount != no_fileds_types[i].fieldsCount))
         {
           goto test_global_value_description_err;
         }
@@ -181,18 +181,18 @@ static bool
 test_field_match (const D_CHAR*   field,
                   const D_UINT    type)
 {
-  for (D_UINT i = 0; i < sizeof (table_fields) / sizeof (table_fields[0]); ++i)
+  for (D_UINT i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
     {
-      if (strcmp (table_fields[i].name, field) == 0)
+      if (strcmp (tableFields[i].name, field) == 0)
         {
-          if (table_fields[i].visited
-              || (table_fields[i].type != type))
+          if (tableFields[i].visited
+              || (tableFields[i].type != type))
             {
               return false;
             }
           else
             {
-              table_fields[i].visited = true;
+              tableFields[i].visited = true;
               return true;
             }
         }
@@ -213,7 +213,7 @@ test_complete_field_global (W_CONNECTOR_HND hnd)
   if ((WDescribeValue (hnd, complete_field_table, &type) != WCS_OK)
       || (type != WFT_TABLE_MASK)
       || (WDescribeValueGetFieldsCount (hnd, &fieldsCount) != WCS_OK)
-      || (fieldsCount != sizeof (table_fields) / sizeof (table_fields[0])))
+      || (fieldsCount != sizeof (tableFields) / sizeof (tableFields[0])))
     {
       goto test_complete_field_global_err;
     }
@@ -235,9 +235,9 @@ test_complete_field_global (W_CONNECTOR_HND hnd)
       goto test_complete_field_global_err; //Should not allow an extra fetch!
     }
 
-  for (D_UINT i = 0; i < sizeof (table_fields) / sizeof (table_fields[0]); ++i)
+  for (D_UINT i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
     {
-      if (! table_fields[i].visited)
+      if (! tableFields[i].visited)
         goto test_complete_field_global_err;
     }
 
@@ -300,7 +300,9 @@ test_for_errors (W_CONNECTOR_HND hnd)
       goto test_for_errors_fail;
     }
   else if ((WDescribeValue (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WDescribeValue (hnd, one_field_table, NULL) != WCS_INVALID_ARGS))
+           || (WDescribeValue (hnd, one_field_table, NULL) != WCS_INVALID_ARGS)
+           || (WDescribeValue (hnd, NULL, &type) != WCS_INVALID_ARGS))
+
     {
       goto test_for_errors_fail;
     }

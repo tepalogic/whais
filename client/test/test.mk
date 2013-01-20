@@ -17,3 +17,8 @@ UNIT_EXES+=c_test_glb_types
 c_test_glb_types_SRC=test/test_glb_types.cpp
 c_test_glb_types_LIB=client/connector custom/custom utils/utils 
 c_test_glb_types_INC=
+
+UNIT_EXES+=c_test_stack_ops
+c_test_stack_ops_SRC=test/test_stack_ops.cpp
+c_test_stack_ops_LIB=client/connector custom/custom utils/utils 
+c_test_stack_ops_INC=

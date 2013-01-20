@@ -18,7 +18,7 @@ struct GlobalValueEntry
   bool                visited;
 };
 
-GlobalValueEntry _procedures[] =
+GlobalValueEntry no_fileds_types[] =
     {
         {"bool_", false},
         {"char_", false},
@@ -97,19 +97,19 @@ test_global_name_match (const D_CHAR* glb_name)
 {
   const D_CHAR suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   D_CHAR buffer[1024];
-  const D_UINT glbsCount = sizeof (_procedures)/sizeof (_procedures[0]);
+  const D_UINT glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
   for (D_UINT i = 0; i < glbsCount; ++i)
     {
-      strcpy (buffer, _procedures[i].name);
+      strcpy (buffer, no_fileds_types[i].name);
       strcat (buffer, suffix);
       if (strcmp (buffer, glb_name) == 0)
         {
-          if (_procedures[i].visited)
+          if (no_fileds_types[i].visited)
             return false;
           else
             {
-              _procedures[i].visited = true;
+              no_fileds_types[i].visited = true;
               return true;
             }
         }
@@ -122,7 +122,7 @@ static bool
 test_global_values_list (W_CONNECTOR_HND hnd)
 {
   const D_CHAR* recvGlbName = NULL;
-  const D_UINT  glbsCount = sizeof (_procedures)/sizeof (_procedures[0]);
+  const D_UINT  glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
   D_UINT globalsCount;
   D_UINT index = 0;
@@ -151,7 +151,7 @@ test_global_values_list (W_CONNECTOR_HND hnd)
 
   for (index = 0; index < glbsCount; ++index)
     {
-      if (! _procedures[index].visited)
+      if (! no_fileds_types[index].visited)
         goto test_global_values_list_error;
     }
 

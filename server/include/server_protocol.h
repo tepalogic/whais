@@ -138,7 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 
-#define CMD_READ_STACK                  (CMD_CLOSE_CONN_RSP + 1)
+#define CMD_READ_STACK                  (CMD_GLOBAL_DESC_RSP + 1)
 #define CMD_READ_STACK_RSP              (CMD_READ_STACK + 1)
 /*
  *   CmdReadStack
