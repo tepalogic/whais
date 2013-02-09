@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef INT128_H_
-#define INT128_H_
+#ifndef WE_INT128_H_
+#define WE_INT128_H_
 
 #include "whisper.h"
 
@@ -47,7 +47,7 @@ public:
       m_Lo (source)
     {
       if (source < 0)
-        m_Hi = ~(_SC (D_UINT, 0));
+        m_Hi = ~(_SC (D_UINT64, 0));
     }
 
   WE_I128 (const D_UINT source)
@@ -71,18 +71,19 @@ public:
     }
 
   WE_I128
-  operator- (const WE_I128& op) const
-    {
-      WE_I128 result (*this);
+  operator- () const
+  {
+    WE_I128 result (*this);
 
-      if (op.m_Lo > result.m_Lo)
-        result.m_Hi--;
+    result.m_Hi  = ~result.m_Hi;
+    result.m_Lo  = ~result.m_Lo;
+    result.m_Lo += 1;
 
-      result.m_Lo -= op.m_Lo;
-      result.m_Hi -= op.m_Hi;
+    if (m_Lo == 0)
+      result.m_Hi += 1;
 
-      return result;
-    }
+    return result;
+  }
 
   WE_I128
   operator+ (const WE_I128& op) const
@@ -99,19 +100,18 @@ public:
     }
 
   WE_I128
-  operator- () const
-  {
-    WE_I128 result (*this);
+  operator- (const WE_I128& op) const
+    {
+      WE_I128 result (*this);
 
-    result.m_Hi  = ~result.m_Hi;
-    result.m_Lo  = ~result.m_Lo;
-    result.m_Lo += 1;
+      if (op.m_Lo > result.m_Lo)
+        result.m_Hi--;
 
-    if (m_Lo == 0)
-      result.m_Hi += 1;
+      result.m_Lo -= op.m_Lo;
+      result.m_Hi -= op.m_Hi;
 
-    return result;
-  }
+      return result;
+    }
 
   WE_I128
   operator* (const WE_I128& op) const
@@ -324,6 +324,12 @@ public:
     return *this = *this & op;
   }
 
+  D_INT64
+  Int64 () const
+  {
+    return m_Lo;
+  }
+
 private:
 
   const WE_I128&
@@ -510,44 +516,46 @@ private:
 
   D_UINT64  m_Hi;
   D_UINT64  m_Lo;
+
+  friend D_INT64 toInt64 (const WE_I128&);
 };
 
 WE_I128
 operator+ (const D_INT64 op1, const WE_I128& op2)
 {
-  return WE_I128 (op2) + op1;
+  return op2 + op1;
 }
 
 WE_I128
 operator+ (const D_UINT64 op1, const WE_I128& op2)
 {
-  return WE_I128 (op2) + op1;
+  return op2 + op1;
 }
 
 WE_I128
 operator- (const D_INT64 op1, const WE_I128& op2)
 {
-  return WE_I128(op1) - op2;
+  return WE_I128 (op1) - op2;
 }
 
 
 WE_I128
 operator- (const D_UINT64 op1, const WE_I128& op2)
 {
-  return WE_I128(op1) - op2;
+  return WE_I128 (op1) - op2;
 }
 
 WE_I128
 operator* (const D_INT64 op1, const WE_I128& op2)
 {
-  return WE_I128 (op2) * op1;
+  return op2 * op1;
 }
 
 
 WE_I128
 operator* (const D_UINT64 op1, const WE_I128& op2)
 {
-  return WE_I128 (op2) * op1;
+  return op2 * op1;
 }
 
 WE_I128
@@ -574,8 +582,23 @@ operator% (const D_UINT64 op1, const WE_I128& op2)
   return WE_I128(op1) % op2;
 }
 
+D_INT64
+toInt64 (const WE_I128& value)
+{
+  return value.Int64 ();
+}
+
 #else
+
 typedef D_INT128 WE_I128;
+
+D_INT64
+toInt64 (const WE_I128& value)
+{
+  return value;
+}
+
+
 #endif /* D_UINT128 */
 
-#endif /* INT128_H_ */
+#endif /* WE_INT128_H_ */

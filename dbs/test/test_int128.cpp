@@ -5,8 +5,6 @@
  *      Author: ipopa
  */
 
-
-
 #include <assert.h>
 #include <iostream>
 #include <cstring>
@@ -17,13 +15,14 @@
 //#define D_INT128 int128_t
 #undef D_UINT128
 
-#include "utils/include/int128.h"
+#include "dbs_real.h"
+#include "utils/include/we_int128.h"
 #include "utils/include/random.h"
 #include "test/test_fmw.h"
 
 using namespace std;
 
-D_UINT64 _ieterationsCount = 5000000;
+D_UINT64 _iterationsCount = 5000000;
 
 
 static bool
@@ -34,9 +33,9 @@ test_for_addition_64bit_values ()
   D_INT64 i,j;
 
   cout << "Test for adds and muls of 64 bit values for ";
-  cout << _ieterationsCount << " random values.... ";
+  cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _ieterationsCount; ++it)
+  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd ();
       j = w_rnd ();
@@ -79,9 +78,9 @@ test_for_addition_32bit_values ()
   D_INT64 i,j;
 
   cout << "Test for adds and muls of 32 bit values for ";
-  cout << _ieterationsCount << " random values.... ";
+  cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _ieterationsCount; ++it)
+  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
       i = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
       j = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
@@ -127,9 +126,9 @@ test_for_addition_mix_values ()
   D_INT64 i,j;
 
   cout << "Test for adds and muls of mix 32 and 64 bit values for ";
-  cout << _ieterationsCount << " random values.... ";
+  cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _ieterationsCount; ++it)
+  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd ();
       j = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
@@ -173,9 +172,9 @@ test_for_reminder_64bit_values ()
   D_INT64 i,j, k;
 
   cout << "Test for reminders of 64 bit values for ";
-  cout << _ieterationsCount << " random values.... ";
+  cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _ieterationsCount; ++it)
+  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & 0x7FFFFFFFFFFFFFFF;
       j = w_rnd () & 0x7FFFFFFFFFFFFFFF;
@@ -231,9 +230,9 @@ test_for_reminder_32bit_values ()
   D_INT64 i,j, k;
 
   cout << "Test for reminders of 32 bit values for ";
-  cout << _ieterationsCount << " random values.... ";
+  cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _ieterationsCount; ++it)
+  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & 0x7FFFFFFF;
       j = w_rnd () & 0x7FFFFFFF;
@@ -294,9 +293,9 @@ test_for_reminder_mix_bit_values ()
   D_INT64 i,j, k;
 
   cout << "Test for reminders of mix 32 and 64 bit values for ";
-  cout << _ieterationsCount << " random values.... ";
+  cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _ieterationsCount; ++it)
+  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & 0x7FFFFFFFFFFFFFFF;
       j = w_rnd () & 0x7FFFFFFF;
@@ -414,11 +413,70 @@ test_special_add_fail:
   return false;
 }
 
+
+static bool
+test_for_special_mul_cases ()
+{
+  D_INT64 i;
+
+  cout << "Testing multiplication of special cases... ";
+
+  for (i = 0; i < 64; ++i)
+    {
+      WE_I128 val = 1 << i;
+
+      if ((val * 1ll != 1ll * val)
+          || (val * 1ll != val))
+        {
+          goto test_special_mul_fail;
+        }
+
+      if ((val * -1ll != 1ll * -val)
+          || (val * -1ll != -val))
+        {
+          goto test_special_mul_fail;
+        }
+
+      if ((val / 1ll != val / 1ll)
+          || (val / 1ll != val))
+        {
+          goto test_special_mul_fail;
+        }
+
+      if ((val / -1ll != -val / 1ll)
+          || (val / -1ll != -val))
+        {
+          goto test_special_mul_fail;
+        }
+
+      if (val / val != 1ll)
+        {
+          goto test_special_mul_fail;
+        }
+
+      if ((val / -val != -val / val)
+          || (val / -val != -1ll))
+        {
+          goto test_special_mul_fail;
+        }
+    }
+
+  cout << "OK\n";
+
+  return true;
+
+test_special_mul_fail:
+  cout << "FAIL\n";
+  cout << "i = " << i << ";\n";
+
+  return false;
+}
+
 int
 main (int argc, char** argv)
 {
   if (argc > 1)
-    _ieterationsCount = atol (argv[1]);
+    _iterationsCount = atol (argv[1]);
 
   bool success = true;
 
@@ -429,6 +487,7 @@ main (int argc, char** argv)
   success = test_for_reminder_32bit_values ();
   success = test_for_reminder_mix_bit_values ();
   success = test_for_special_add_cases ();
+  success = test_for_special_mul_cases ();
 
   if (!success)
     {
