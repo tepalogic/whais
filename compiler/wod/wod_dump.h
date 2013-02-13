@@ -75,6 +75,6 @@ typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8* pInArgs,
 extern FDECODE_OPCODE wod_decode_table[];
 extern const D_CHAR*  wod_str_table[];
 
-#define MAX_OP_STRING 32
+#define MAX_OP_STRING 128
 
 #endif /* WOD_DUMP_H_ */

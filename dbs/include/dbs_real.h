@@ -26,10 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DBS_REAL_H_
 
 #include <assert.h>
+#include <limits>
 
 #include "whisper.h"
 
 #include "utils/include/we_int128.h"
+
+static const D_INT64 DBS_REAL_PREC      = 1000000ull;
+static const D_INT64 DBS_RICHREAL_PREC  = 100000000000000ull;
 
 template <typename TI, typename TF, const D_INT64 PRECISION>
 class DBSDecimalReal
@@ -37,21 +41,44 @@ class DBSDecimalReal
 public:
   DBSDecimalReal ()
   {
-    //This does nothhing!
   }
 
-  DBSDecimalReal (const D_INT64 intPart, const D_INT64 fractPart)
-    : m_IntPart (intPart),
-      m_FracPart (fractPart)
+  DBSDecimalReal (const D_INT64 integer,
+                  const D_INT64 fractional,
+                  const D_INT64 precision)
   {
-    assert ((intPart >= 0) || (fractPart <= 0));
-    assert ((intPart <= 0) || (fractPart >= 0));
+    assert ((integer >= 0) || (fractional <= 0));
+    assert ((integer <= 0) || (fractional >= 0));
+
+    build (integer, fractional, precision);
   }
 
-  DBSDecimalReal (const D_INT64& value)
+  template <typename TI_S, typename TF_S, const D_INT64 PREC_S>
+  DBSDecimalReal (const DBSDecimalReal<TI_S, TF_S, PREC_S>& source)
+  {
+    build (source.Integer (), source.Fractional (), PREC_S);
+  }
+
+  template <typename T_INT>
+  DBSDecimalReal (const T_INT value)
     : m_IntPart (value),
       m_FracPart (0)
   {
+  }
+
+  DBSDecimalReal (const long double value)
+  {
+    build (value);
+  }
+
+  DBSDecimalReal (const double value)
+  {
+    build (value);
+  }
+
+  DBSDecimalReal (const float value)
+  {
+    build (value);
   }
 
   DBSDecimalReal (const WE_I128& value)
@@ -260,55 +287,112 @@ public:
     return *this = *this % op;
   }
 
-  D_INT64 Int64 () const
+  D_INT64 Integer () const
   {
     return m_IntPart;
   }
 
+  D_INT64
+  Fractional () const
+  {
+    return m_FracPart;
+  }
+
+  D_INT64
+  Precision () const
+  {
+    return PRECISION;
+  }
+
 private:
+  void build (const D_INT64 interger,
+              const D_INT64 fractional,
+              const D_INT64 precision)
+  {
+    m_IntPart  = interger;
+    m_FracPart = fractional;
+
+    const bool fracNegative = fractional < 0;
+
+    if (fracNegative)
+      m_FracPart = -m_FracPart;
+
+    if (PRECISION < precision)
+      m_FracPart /= (precision / PRECISION);
+    else
+      m_FracPart *= (PRECISION / precision);
+
+    if (fracNegative)
+      m_FracPart = -m_FracPart;
+  }
+
+  void build (const long double value)
+  {
+    D_INT64 integer    = value;
+    D_INT64 fractional = - ((integer - value) * PRECISION);
+
+    build (integer, fractional, PRECISION);
+  }
 
   TI    m_IntPart;
   TF    m_FracPart;
 };
 
-template <typename TI, typename TF, const D_INT64 PRECISION>
-DBSDecimalReal<TI, TF, PRECISION>
-operator+ (const D_INT64 op1, const DBSDecimalReal<TI, TF, PRECISION>& op2)
+typedef DBSDecimalReal<D_INT64, D_INT32, DBS_REAL_PREC>      DBS_REAL_T;
+typedef DBSDecimalReal<D_INT64, D_INT64, DBS_RICHREAL_PREC>  DBS_RICHREAL_T;
+
+template<typename T>
+DBS_REAL_T
+operator+ (const T op1, const DBS_REAL_T& op2)
 {
   return op2 + op1;
 }
 
-template <typename TI, typename TF, const D_INT64 PRECISION>
-DBSDecimalReal<TI, TF, PRECISION>
-operator- (const D_INT64 op1, const DBSDecimalReal<TI, TF, PRECISION>& op2)
+template<typename T>
+DBS_REAL_T
+operator- (const T op1, const DBS_REAL_T& op2)
 {
-  return DBSDecimalReal<TI, TF, PRECISION> (op1) - op2;
+  return DBS_REAL_T (op1) - op2;
 }
 
-template <typename TI, typename TF, const D_INT64 PRECISION>
-DBSDecimalReal<TI, TF, PRECISION>
-operator* (const D_INT64 op1, const DBSDecimalReal<TI, TF, PRECISION>& op2)
+template<typename T>
+DBS_REAL_T
+operator* (const T op1, const DBS_REAL_T& op2)
 {
   return op2 * op1;
 }
 
-
-static const D_INT64 DBS_REAL_PRECISSION      = 10000000;
-static const D_INT64 DBS_RICHREAL_PRECISSION  = 100000000000000;
-
-typedef DBSDecimalReal<D_INT64, D_INT32, DBS_REAL_PRECISSION>      REAL_T;
-typedef DBSDecimalReal<D_INT64, D_INT64, DBS_RICHREAL_PRECISSION>  RICHREAL_T;
-
-static inline D_INT64
-toInt64 (const REAL_T& value)
+template<typename T>
+DBS_RICHREAL_T
+operator+ (const T op1, const DBS_RICHREAL_T& op2)
 {
-  return value.Int64 ();
+  return op2 + op1;
+}
+
+template<typename T>
+DBS_RICHREAL_T
+operator- (const T op1, const DBS_RICHREAL_T& op2)
+{
+  return DBS_RICHREAL_T (op1) - op2;
+}
+
+template<typename T>
+DBS_RICHREAL_T
+operator* (const T op1, const DBS_RICHREAL_T& op2)
+{
+  return op2 * op1;
 }
 
 static inline D_INT64
-toInt64 (const RICHREAL_T& value)
+toInt64 (const DBS_REAL_T& value)
 {
-  return value.Int64 ();
+  return value.Integer ();
+}
+
+static inline D_INT64
+toInt64 (const DBS_RICHREAL_T& value)
+{
+  return value.Integer ();
 }
 
 #endif /* DBS_REAL_H_ */

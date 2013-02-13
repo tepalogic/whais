@@ -22,9 +22,11 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 #include <assert.h>
+#include <cstring>
 
 #include "dbs_exception.h"
 #include "ps_valintep.h"
+#include "dbs_values.h"
 
 using namespace std;
 using namespace pastra;
@@ -41,12 +43,8 @@ static const D_INT PS_INT64_SIZE               = 8;
 static const D_INT PS_TEXT_SIZE                = 16;
 static const D_INT PS_ARRAY_SIZE               = 16;
 
-#ifndef PS_REAL_SIZE
-static const D_INT PS_REAL_SIZE                = sizeof (REAL_T);
-#endif
-#ifndef PS_RICHREAL_SIZE
-static const D_INT PS_RICHREAL_SIZE            = sizeof (RICHREAL_T);
-#endif
+static const D_INT PS_REAL_SIZE                = 8;
+static const D_INT PS_RICHREAL_SIZE            = 14;
 
 static const D_INT PS_BOOL_ALIGN               = 1;
 static const D_INT PS_CHAR_ALIGN               = 4;
@@ -111,13 +109,6 @@ new_hirestime (D_INT32       year,
 template <class T_OBJ, class T_VAL>
 static void
 new_integer (T_VAL value, T_OBJ* pValue)
-{
-  _placement_new (pValue, T_OBJ (value));
-}
-
-template <class T_OBJ, class T_REAL>
-static void
-new_real (T_REAL value, T_OBJ* pValue)
 {
   _placement_new (pValue, T_OBJ (value));
 }
@@ -193,12 +184,30 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSInt64 &value)
 void
 PSValInterp::Store (D_UINT8* pLocation, const DBSReal& value)
 {
-  _RC(REAL_T*, pLocation)[0] = value.m_Value;
+  const D_UINT integerSize    = 5;
+  const D_UINT fractionalSize = 3;
+
+  D_INT64 temp;
+
+  temp = value.m_Value.Integer ();
+  memcpy (pLocation, &temp, integerSize);
+
+  temp = value.m_Value.Fractional ();
+  memcpy (pLocation + integerSize, &temp, fractionalSize);
 }
 void
 PSValInterp::Store (D_UINT8* pLocation, const DBSRichReal& value)
 {
-  _RC(RICHREAL_T*, pLocation)[0] = value.m_Value;
+  const D_UINT integerSize    = 8;
+  const D_UINT fractionalSize = 6;
+
+  D_INT64 temp;
+
+  temp = value.m_Value.Integer ();
+  memcpy (pLocation, &temp, integerSize);
+
+  temp = value.m_Value.Fractional ();
+  memcpy (pLocation + integerSize, &temp, fractionalSize);
 }
 
 void
@@ -304,12 +313,41 @@ PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt64* pValue)
 void
 PSValInterp::Retrieve (const D_UINT8* pLocation, DBSReal* pValue)
 {
-  new_real (_RC (const REAL_T*, pLocation)[0], pValue);
+  const D_UINT integerSize    = 5;
+  const D_UINT fractionalSize = 3;
+
+  D_INT64 integer = 0;
+  memcpy (&integer, pLocation, integerSize);
+
+  if (integer & 0x8000000000)
+    integer |= ~_SC (D_INT64, 0xFFFFFFFFFF);
+
+  D_INT64 fractional = 0;
+  memcpy (&fractional, pLocation + integerSize, fractionalSize);
+
+  if (fractional & 0x800000)
+    fractional |= ~_SC (D_INT64, 0xFFFFFF);
+
+  *pValue = DBSReal (DBS_REAL_T (integer, fractional, DBS_REAL_PREC));
 }
 void
 PSValInterp::Retrieve (const D_UINT8* pLocation, DBSRichReal* pValue)
 {
-  new_real (_RC (const RICHREAL_T*, pLocation)[0], pValue);
+  const D_UINT integerSize    = 8;
+  const D_UINT fractionalSize = 6;
+
+  D_INT64 integer = 0;
+  memcpy (&integer, pLocation, integerSize);
+
+  D_INT64 fractional = 0;
+  memcpy (&fractional, pLocation + integerSize, fractionalSize);
+
+  if (fractional & 0x800000000000)
+    fractional |= ~_SC (D_INT64, 0xFFFFFFFFFFFF);
+
+  *pValue = DBSRichReal (DBS_RICHREAL_T (integer,
+                                         fractional,
+                                         DBS_RICHREAL_PREC));
 }
 
 void
@@ -397,39 +435,9 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
   case T_HIRESTIME:
     return PS_HIRESDATE_ALIGN;
   case T_REAL:
-    {
-#ifdef PS_REAL_ALIGN
-      return PS_REAL_ALIGN
-#else
-      if (PS_REAL_SIZE == 4)
-        return 4;
-      else if (PS_REAL_SIZE == 8)
-        return 8;
-      else
-        {
-          assert (false);
-          throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
-        }
-#endif
-    }
+    return 1;
   case T_RICHREAL:
-    {
-#ifdef PS_RICHREAL_ALIGN
-      return PS_RICHREAL_ALIGN;
-#else
-      if ((PS_RICHREAL_SIZE == 4) || (PS_RICHREAL_SIZE == 12))
-        return 4;
-      else if (PS_RICHREAL_SIZE == 8)
-        return 8;
-      else if (PS_RICHREAL_SIZE == 16)
-        return 16;
-      else
-        {
-          assert (false);
-          throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
-        }
-#endif
-    }
+    return 1;
   case T_UINT8:
   case T_INT8:
     return PS_INT8_ALIGN;

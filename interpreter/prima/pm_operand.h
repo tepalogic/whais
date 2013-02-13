@@ -41,7 +41,7 @@ internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value + secondOp.m_Value);
+  return _SC (T_DEST, firstOp.m_Value + secondOp.m_Value);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -110,7 +110,7 @@ internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_SRC, typename T_DEST> void
 number_convert (const T_SRC& from, T_DEST& to)
 {
-  to = from.IsNull () ? T_DEST () : T_DEST (from.m_Value);
+  to = from.IsNull () ? T_DEST () : _SC (T_DEST, from.m_Value);
 }
 
 

@@ -62,6 +62,25 @@ int_to_ascii (D_UINT64 value,
   return pOutBuffer + index;
 }
 
+static const D_CHAR*
+fracint_to_ascii (D_UINT64 value,
+                  D_CHAR*  pOutBuffer,
+                  D_UINT64 precision)
+{
+  D_UINT index  = MAX_INT64_LENGTH - 1;
+
+  pOutBuffer[index--] = 0;
+  for (D_UINT64 p = 1; p < precision; p *= 10)
+    {
+      pOutBuffer[index] = (value % 10) + '0';
+      value /= 10;
+      --index;
+    }
+
+  return pOutBuffer + index + 1;
+}
+
+
 static inline void
 int8_str_conv (D_CHAR* pOutput, D_UINT8 value)
 {
@@ -257,18 +276,27 @@ wod_dec_w_ldht (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 }
 
 static D_UINT
-wod_dec_w_ldr (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+wod_dec_w_ldrr (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
 {
   D_CHAR t_str[MAX_RREAL_LENGTH];
 
-  D_UINT64 real_part = from_le_int64 (pInArgs);
-  D_INT8   frac_part = *(pInArgs + sizeof (D_UINT64));
+  D_INT64 int_part  = from_le_int64 (pInArgs);
+  D_INT64 frac_part = from_le_int64 (pInArgs + sizeof (D_UINT64));
 
-  strcpy (pOp1, int_to_ascii (real_part, t_str, FALSE));
-  strcat (pOp1, "E");
-  strcat (pOp1, int_to_ascii (frac_part, t_str, FALSE));
+  if ((int_part < 0) || (frac_part < 0))
+    {
+      int_part  = -int_part;
+      frac_part = -frac_part;
+      strcpy (pOp1, "-");
+    }
+  else
+    strcpy (pOp1, "");
 
-  return (sizeof (D_INT8) + sizeof (D_UINT64));
+  strcat (pOp1, int_to_ascii (int_part, t_str, FALSE));
+  strcat (pOp1, ".");
+  strcat (pOp1, fracint_to_ascii (frac_part, t_str, W_LDRR_PRECISSION));
+
+  return (sizeof (D_INT64) + sizeof (D_UINT64));
 }
 
 static FDECODE_OPCODE wod_dec_w_ldt  = wod_dec_w_ldi32;
@@ -503,7 +531,7 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_ldd,
   wod_dec_w_lddt,
   wod_dec_w_ldht,
-  wod_dec_w_ldr,
+  wod_dec_w_ldrr,
   wod_dec_w_ldt,
   wod_dec_w_ldbt,
   wod_dec_w_ldbf,
@@ -677,7 +705,7 @@ const D_CHAR *wod_str_table[] = {
   "ldd",
   "lddt",
   "ldht",
-  "ldr",
+  "ldrr",
   "ldt",
   "ldbt",
   "ldbf",

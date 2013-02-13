@@ -43,7 +43,7 @@ enum W_OPCODE
   W_LDD,
   W_LDDT,
   W_LDHT,
-  W_LDR,
+  W_LDRR,
   W_LDT,
   W_LDBT,
   W_LDBF,
@@ -206,6 +206,8 @@ enum W_OPCODE
 
   W_OP_END_MARK
 };
+
+static const D_INT64 W_LDRR_PRECISSION = 1000000000000000000ll;
 
 #ifdef __cplusplus
 extern "C"

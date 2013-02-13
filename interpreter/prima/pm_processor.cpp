@@ -192,33 +192,22 @@ op_func_ldht (Processor& processor, D_INT64& offset)
 }
 
 static void
-op_func_ldr (Processor& processor, D_INT64& offset)
+op_func_ldrr (Processor& processor, D_INT64& offset)
 {
   const D_UINT8* const pData = processor.Code () +
                                processor.CurrentOffset () +
                                offset;
-  const D_INT64 intPart     = _SC (D_INT64, load_le_uint64 (pData));
-  D_INT8        decExp      = *(pData + sizeof (D_UINT64));
-  const bool    negativeExp = (decExp > 0) ? false : true;
 
-  if (negativeExp)
-    decExp *= -1;
+  D_INT64 intPart  = load_le_uint64 (pData);
+  D_INT64 fracPart = load_le_uint64 (pData + sizeof (D_UINT64));
 
-  D_UINT64 fracPart = 1;
-  while (decExp-- > 0)
-    fracPart *= 10;
-
-  RICHREAL_T basicValue = intPart;
-
-  if (negativeExp)
-    basicValue /= fracPart;
-  else
-    basicValue *= fracPart;
-
+  const RICHREAL_T basicValue (intPart,
+                               fracPart,
+                               W_LDRR_PRECISSION);
   DBSRichReal value (basicValue);
   processor.GetStack ().Push (value);
 
-  offset += (sizeof (D_UINT8) + sizeof (D_UINT64));
+  offset += (sizeof (D_UINT64) + sizeof (D_UINT64));
 }
 
 static void
@@ -1293,7 +1282,7 @@ static OP_FUNC operations[] = {
                                 op_func_ldd,
                                 op_func_lddt,
                                 op_func_ldht,
-                                op_func_ldr,
+                                op_func_ldrr,
                                 op_func_ldt,
                                 op_func_ldbt,
                                 op_func_ldbf,

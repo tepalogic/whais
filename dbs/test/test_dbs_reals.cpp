@@ -47,7 +47,9 @@ to_real (WE_I128 value)
   if (value < 0)
     resneg = true, value = -value;
 
-  TR result (toInt64 (value / precision), toInt64 (value % precision));
+  TR result (toInt64 (value / precision),
+             toInt64 (value % precision),
+             precision);
 
   if (resneg)
     return -result;
@@ -225,7 +227,7 @@ test_multiplication_real_fail:
 }
 
 
-template <typename TR, const D_INT64 precision, const D_INT scale>
+template <typename TR, const D_INT64 precision, const D_INT scale, const D_INT64 MASK>
 bool test_division_real (const D_CHAR* type)
 {
   D_INT64 i, j;
@@ -235,8 +237,8 @@ bool test_division_real (const D_CHAR* type)
 
   for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd () & 0xFFFFFFFFFF;
-      j = w_rnd () & 0xFFFFFFFFFF;
+      i = w_rnd () & MASK;
+      j = w_rnd () & MASK;
 
       const WE_I128 op1 (i);
       const WE_I128 op2 (j);
@@ -246,16 +248,18 @@ bool test_division_real (const D_CHAR* type)
 
       const TR mult = first * second;
 
-      if ((mult / first != second)
-          || ((mult / -first ) != -second)
-          || ((-mult / first ) != -second))
+      if ((first != 0)
+          && ((mult / first != second)
+              || ((mult / -first ) != -second)
+              || ((-mult / first ) != -second)))
         {
           goto test_division_real_fail;
         }
 
-      if ((mult / second != first)
-          || ((mult / -second ) != -first)
-          || ((-mult / second ) != -first))
+      if ((second != 0)
+          && ((mult / second != first)
+              || ((mult / -second ) != -first)
+              || ((-mult / second ) != -first)))
         {
           goto test_division_real_fail;
         }
@@ -263,12 +267,12 @@ bool test_division_real (const D_CHAR* type)
 
       if (((first / 1) != - (first / -1))
           || ((first / 1) != first)
-          || ((first / first) != 1)
-          || ((first / -first) != -1)
+          || ((first != 0 ) && ((first / first) != 1))
+          || ((first != 0 ) && ((first / -first) != -1))
           || ((second / 1) != -(second / -1))
           || ((second / 1) != second)
-          || ((second / second) != 1)
-          || ((second / -second) != -1))
+          || ((second != 0 ) && ((second / second) != 1))
+          || ((second != 0 ) && ((second / -second) != -1)))
         {
           goto test_division_real_fail;
         }
@@ -295,17 +299,17 @@ main (int argc, char** argv)
 
   bool success = true;
 
-  success = test_addition_real <REAL_T, DBS_REAL_PRECISSION> ("reals");
-  success = test_addition_real <RICHREAL_T, DBS_RICHREAL_PRECISSION> ("richreals");
+  success = test_addition_real <DBS_REAL_T, DBS_REAL_PREC> ("reals");
+  success = test_addition_real <DBS_RICHREAL_T, DBS_RICHREAL_PREC> ("richreals");
 
-  success = test_subtraction_real <REAL_T, DBS_REAL_PRECISSION> ("reals");
-  success = test_subtraction_real <RICHREAL_T, DBS_RICHREAL_PRECISSION> ("richreals");
+  success = test_subtraction_real <DBS_REAL_T, DBS_REAL_PREC> ("reals");
+  success = test_subtraction_real <DBS_RICHREAL_T, DBS_RICHREAL_PREC> ("richreals");
 
-  success = test_multiplication_real <REAL_T, DBS_REAL_PRECISSION, 10000> ("reals");
-  success = test_multiplication_real <RICHREAL_T, DBS_RICHREAL_PRECISSION, 1> ("richreals");
+  success = test_multiplication_real <DBS_REAL_T, DBS_REAL_PREC, 10000> ("reals");
+  success = test_multiplication_real <DBS_RICHREAL_T, DBS_RICHREAL_PREC, 1> ("richreals");
 
-  success = test_division_real <REAL_T, DBS_REAL_PRECISSION, 10000> ("reals");
-  success = test_division_real <RICHREAL_T, DBS_RICHREAL_PRECISSION, 100000000> ("reals");
+  success = test_division_real <DBS_REAL_T, DBS_REAL_PREC, 10000, 0xFFFF> ("reals");
+  success = test_division_real <DBS_RICHREAL_T, DBS_RICHREAL_PREC, 100000000, 0xFFFFFFFF> ("richreals");
 
 
   if (!success)

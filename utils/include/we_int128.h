@@ -42,32 +42,16 @@ public:
   {
   }
 
-  WE_I128 (const D_INT source)
+  template <typename T_INT>
+  WE_I128 (const T_INT source)
     : m_Hi (0),
       m_Lo (source)
     {
       if (source < 0)
-        m_Hi = ~(_SC (D_UINT64, 0));
-    }
-
-  WE_I128 (const D_UINT source)
-    : m_Hi (0),
-      m_Lo (source)
-    {
-    }
-
-  WE_I128 (const D_INT64 source)
-    : m_Hi (0),
-      m_Lo (source)
-    {
-      if (source < 0)
-        m_Hi = ~(_SC (D_UINT64, 0));
-    }
-
-  WE_I128 (const D_UINT64 source)
-    : m_Hi (0),
-      m_Lo (source)
-    {
+        {
+          m_Lo = _SC (D_INT64, source);
+          m_Hi = ~(_SC (D_UINT64, 0));
+        }
     }
 
   WE_I128
@@ -516,73 +500,46 @@ private:
 
   D_UINT64  m_Hi;
   D_UINT64  m_Lo;
-
-  friend D_INT64 toInt64 (const WE_I128&);
 };
 
+template <typename T>
 WE_I128
-operator+ (const D_INT64 op1, const WE_I128& op2)
+operator+ (const T op1, const WE_I128& op2)
 {
   return op2 + op1;
 }
 
+template <typename T>
 WE_I128
-operator+ (const D_UINT64 op1, const WE_I128& op2)
-{
-  return op2 + op1;
-}
-
-WE_I128
-operator- (const D_INT64 op1, const WE_I128& op2)
+operator- (const T op1, const WE_I128& op2)
 {
   return WE_I128 (op1) - op2;
 }
 
 
+template <typename T>
 WE_I128
-operator- (const D_UINT64 op1, const WE_I128& op2)
-{
-  return WE_I128 (op1) - op2;
-}
-
-WE_I128
-operator* (const D_INT64 op1, const WE_I128& op2)
+operator* (const T op1, const WE_I128& op2)
 {
   return op2 * op1;
 }
 
-
+template <typename T>
 WE_I128
-operator* (const D_UINT64 op1, const WE_I128& op2)
-{
-  return op2 * op1;
-}
-
-WE_I128
-operator/ (const D_INT64 op1, const WE_I128& op2)
+operator/ (const T op1, const WE_I128& op2)
 {
   return WE_I128(op1) / op2;
 }
 
-WE_I128
-operator/ (const D_UINT64 op1, const WE_I128& op2)
-{
-  return WE_I128(op1) / op2;
-}
 
+template <typename T>
 WE_I128
-operator% (const D_INT64 op1, const WE_I128& op2)
+operator% (const T op1, const WE_I128& op2)
 {
   return WE_I128(op1) % op2;
 }
 
-WE_I128
-operator% (const D_UINT64 op1, const WE_I128& op2)
-{
-  return WE_I128(op1) % op2;
-}
-
-D_INT64
+static inline D_INT64
 toInt64 (const WE_I128& value)
 {
   return value.Int64 ();
@@ -592,7 +549,7 @@ toInt64 (const WE_I128& value)
 
 typedef D_INT128 WE_I128;
 
-D_INT64
+static inline D_INT64
 toInt64 (const WE_I128& value)
 {
   return value;

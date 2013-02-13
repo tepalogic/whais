@@ -76,7 +76,7 @@ struct SemCInt
 struct SemCReal
 {
   D_INT64 integerPart;
-  D_INT8  fractionalPart;
+  D_INT64 fractionalPart;
 };
 
 /* represents a string, a text delimited by \" */

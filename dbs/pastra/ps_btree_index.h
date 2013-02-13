@@ -258,33 +258,35 @@ private:
 };
 
 
-template <typename T> void
-make_array_room (T* const pArray,
-                 const D_UINT lastIndex,
-                 const D_UINT fromIndex,
-                 const D_UINT elemsCount)
+static inline void
+make_array_room (D_UINT8* const pArray,
+                 const D_UINT   lastIndex,
+                 const D_UINT   fromIndex,
+                 const D_UINT   elemSize)
 {
-  D_INT iterator = lastIndex; //Unsigned to check against underflow.
+  D_UINT lastPos = lastIndex * elemSize + elemSize - 1;
+  D_UINT fromPos = fromIndex * elemSize;
 
-  while (iterator >= _SC(D_INT, fromIndex))
+  while (lastPos >= fromPos)
     {
-      pArray [iterator + elemsCount] = pArray [iterator];
-      --iterator;
+      pArray[lastPos + elemSize] = pArray[lastPos];
+      --lastPos;
     }
 }
 
-template <typename T> void
-remove_array_elemes (T* const pArray,
-                     const D_UINT lastIndex,
-                     const D_UINT fromIndex,
-                     const D_UINT elemsCount)
+static inline void
+remove_array_elemes (D_UINT8* const pArray,
+                     const D_UINT   lastIndex,
+                     const D_UINT   fromIndex,
+                     const D_UINT   elemSize)
 {
-  D_UINT iterator = fromIndex;
+  D_UINT lastPos = lastIndex  * elemSize + elemSize - 1;
+  D_UINT fromPos = fromIndex  * elemSize;
 
-  while (iterator < lastIndex)
+  while (fromPos + elemSize <= lastPos)
     {
-      pArray [iterator] = pArray [iterator + elemsCount];
-      ++iterator;
+      pArray[fromPos] = pArray[fromPos + elemSize];
+      ++fromPos;
     }
 }
 
