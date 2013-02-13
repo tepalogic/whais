@@ -30,14 +30,32 @@ const D_CHAR tb_name[] = "t_test_tab";
 D_UINT _rowsCount   = 5000000;
 D_UINT _removedRows = _rowsCount / 10;
 
-static DBSRichReal _max_date (std::numeric_limits<RICHREAL_T>::infinity ());
+DBSRichReal
+MaxValue ()
+{
+  static const D_INT64 intPart  = ~0ull >> 1;
+  static const D_INT64 fracPart = DBS_RICHREAL_PREC - 1;
+
+  static DBSRichReal _sentinel (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
+
+  return _sentinel;
+}
 
 DBSRichReal
 get_random_real ()
 {
+  D_INT64 intPart  = w_rnd ();
+  D_INT64 fracPart = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
 
-  return DBSRichReal (_SC (RICHREAL_T, w_rnd () & 0xFFFFFF) / (w_rnd () % (0xFF + 1)) );
+  if (((intPart < 0) && (fracPart > 0))
+      || ((intPart > 0) && (fracPart < 0)))
+    {
+      fracPart = -fracPart;
+    }
+
+  return DBSRichReal (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
 }
+
 
 
 bool
@@ -74,7 +92,7 @@ fill_table_with_values (I_DBSTable& table,
 
   std::cout << std::endl << "Check table values ... " << std::endl;
   DBSArray values = table.GetMatchingRows (DBSRichReal (),
-                                           _max_date,
+                                           MaxValue (),
                                            0,
                                            ~0,
                                            0,
@@ -204,7 +222,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
     }
 
   values  = table.GetMatchingRows (nullValue,
-                                   _max_date,
+                                   MaxValue (),
                                    0,
                                    ~0,
                                    _removedRows,
@@ -267,7 +285,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
   table.CreateFieldIndex (0, callback_index_create, &data);
 
   DBSArray values  = table.GetMatchingRows (DBSRichReal (),
-                                            _max_date,
+                                            MaxValue (),
                                             0,
                                             ~0,
                                             0,

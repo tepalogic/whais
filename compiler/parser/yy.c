@@ -32,13 +32,14 @@
 #define YYSTYPE struct SemValue*
 #endif
 
+#include <string.h>
+#include <stdio.h>
+#include <assert.h>
+
 #include "whisper.tab.h"
 #include "whisper.h"
 
-#include "string.h"
-#include "stdio.h"
-#include "assert.h"
-
+#include "whisperc/wopcodes.h"
 #include "parser.h"
 #include "../semantics/wlog.h"
 
@@ -426,6 +427,7 @@ parse_real_value (const char*      pBuffer,
   const D_UINT oldLen            = bufferLen;
   D_BOOL       foundDecimalPoint = FALSE;
   D_BOOL       negative          = FALSE;
+  D_UINT64     precision         = 1;
 
   assert (pBuffer != NULL);
   assert (bufferLen != 0);
@@ -450,11 +452,17 @@ parse_real_value (const char*      pBuffer,
       if (*pBuffer >= '0' && *pBuffer <= '9')
         {
           digit += (*pBuffer - '0');
-          pOutReal->integerPart *= 10;
-          pOutReal->integerPart += digit;
-
-          if (foundDecimalPoint)
-            pOutReal->fractionalPart--;
+          if (! foundDecimalPoint)
+            {
+              pOutReal->integerPart *= 10;
+              pOutReal->integerPart += digit;
+            }
+          else
+            {
+              precision               *= 10;
+              pOutReal->fractionalPart *= 10;
+              pOutReal->fractionalPart += digit;
+            }
         }
       else if (*pBuffer == '.')
         {
@@ -472,8 +480,14 @@ parse_real_value (const char*      pBuffer,
       bufferLen--;
     }
 
+  for (; precision < W_LDRR_PRECISSION; precision *= 10)
+    pOutReal->fractionalPart *= 10;
+
   if (negative)
-    pOutReal->integerPart *= -1;
+    {
+      pOutReal->integerPart    = -pOutReal->integerPart;
+      pOutReal->fractionalPart = -pOutReal->fractionalPart;
+    }
 
   return (oldLen - bufferLen);
 }

@@ -27,14 +27,16 @@
 #include "whisper.h"
 
 #include "dbs_types.h"
+#include "dbs_real.h"
 #include "dbs_exception.h"
 
+
 #ifndef REAL_T
-typedef float       REAL_T;
+typedef DBS_REAL_T REAL_T;
 #endif
 
 #ifndef RICHREAL_T
-typedef long double RICHREAL_T;
+typedef DBS_RICHREAL_T RICHREAL_T;
 #endif
 
 struct DBSBool
@@ -1240,7 +1242,7 @@ struct DBSRichReal
   {
   }
 
-  explicit DBSRichReal (const RICHREAL_T value)
+  DBSRichReal (const RICHREAL_T value)
     : m_Value (value),
       m_IsNull (false)
   {

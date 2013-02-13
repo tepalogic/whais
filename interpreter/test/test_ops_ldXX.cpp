@@ -387,9 +387,9 @@ test_op_ldht (Session& session)
 }
 
 static bool
-test_op_ldr (Session& session)
+test_op_ldrr (Session& session)
 {
-  std::cout << "Testing ldr...\n";
+  std::cout << "Testing ldrr...\n";
 
   const D_UINT32 procId = session.FindProcedure (
                                               _RC (const D_UINT8*, procName),
@@ -399,18 +399,25 @@ test_op_ldr (Session& session)
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDR, testCode);
-  testCode [opSize + 0]  = 0x05;
-  testCode [opSize + 1]  = 0x00;
-  testCode [opSize + 2]  = 0x00;
-  testCode [opSize + 3]  = 0x00;
-  testCode [opSize + 4]  = 0x00;
-  testCode [opSize + 5]  = 0x00;
-  testCode [opSize + 6]  = 0x00;
-  testCode [opSize + 7]  = 0x00;
-  testCode [opSize + 8]  = 0xFE;
+  D_UINT opSize = w_encode_opcode (W_LDRR, testCode);
+  testCode [opSize + 0]   = 0xFB;
+  testCode [opSize + 1]   = 0xFF;
+  testCode [opSize + 2]   = 0xFF;
+  testCode [opSize + 3]   = 0xFF;
+  testCode [opSize + 4]   = 0xFF;
+  testCode [opSize + 5]   = 0xFF;
+  testCode [opSize + 6]   = 0xFF;
+  testCode [opSize + 7]   = 0xFF;
+  testCode [opSize + 8]   = 0xE0;
+  testCode [opSize + 9]   = 0xE6;
+  testCode [opSize + 10]  = 0xA7;
+  testCode [opSize + 11]  = 0x58;
+  testCode [opSize + 12]  = 0x4C;
+  testCode [opSize + 13]  = 0x49;
+  testCode [opSize + 14]  = 0x1F;
+  testCode [opSize + 15]  = 0xF2;
 
-  w_encode_opcode (W_RET, testCode + opSize + 9);
+  w_encode_opcode (W_RET, testCode + opSize + 16);
   session.ExecuteProcedure (procName, stack);
 
   if (stack.Size () != 1)
@@ -418,8 +425,12 @@ test_op_ldr (Session& session)
 
   DBSRichReal value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSRichReal ((RICHREAL_T)5 / 100))
-    return false;
+  if (value != DBSRichReal (RICHREAL_T (-5,
+                                        -99999999999922,
+                                        DBS_RICHREAL_PREC)))
+    {
+      return false;
+    }
 
   return true;
 }
@@ -548,7 +559,7 @@ main ()
     success = success && test_op_ldd (_SC (Session&, commonSession));
     success = success && test_op_lddt (_SC (Session&, commonSession));
     success = success && test_op_ldht (_SC (Session&, commonSession));
-    success = success && test_op_ldr (_SC (Session&, commonSession));
+    success = success && test_op_ldrr (_SC (Session&, commonSession));
     success = success && test_op_ldt (_SC (Session&, commonSession));
     success = success && test_op_ldbt (_SC (Session&, commonSession));
     success = success && test_op_ldbf (_SC (Session&, commonSession));

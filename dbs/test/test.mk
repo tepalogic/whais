@@ -98,3 +98,13 @@ UNIT_EXES+=l_test_temptableindex
 l_test_temptableindex_SRC=test/test_temptableindex.cpp
 l_test_temptableindex_LIB=dbs/slpastra utils/utils custom/custom custom/slcommon
 l_test_temptableindex_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_int128
+l_test_int128_SRC=test/test_int128.cpp
+l_test_int128_LIB=dbs/slpastra utils/utils custom/custom custom/slcommon
+l_test_int128_INC=utils/include custom/include
+
+UNIT_EXES+=l_test_dbs_reals
+l_test_dbs_reals_SRC=test/test_dbs_reals.cpp
+l_test_dbs_reals_LIB=dbs/slpastra utils/utils custom/custom custom/slcommon
+l_test_dbs_reals_INC=utils/include custom/include

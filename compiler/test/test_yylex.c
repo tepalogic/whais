@@ -79,6 +79,7 @@ test_buff_ids (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_ids;
+  state.bufferSize = strlen (state.buffer);
   init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing identifiers...");
   while ((result = yylex (&lvalp, &state)) != 0)
@@ -118,6 +119,7 @@ test_buff_integers (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_integers;
+  state.bufferSize = strlen (state.buffer);
   init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing integers...");
   while ((result = yylex (&lvalp, &state)) != 0)
@@ -142,15 +144,17 @@ test_buff_integers (void)
   return 0;
 }
 
-static char buff_reals[] = " 25.001 0023.41 0.0134 878.0 -2.1 -0.10 91.305";
+static char buff_reals[] = " 25.001 0023.41 0.0134 878.0 -2.1 -0.10 91.305"
+                           " -123.0023000010001";
 static struct SemCReal real_vals[] = {
-  {25001, -3},
-  {23.41, -2},
-  {134, -4},
-  {8780, -1 },
-  {-21, -1},
-  {-10, -2},
-  {91305, -3},
+  {25, 1000000000000000},
+  {23, 410000000000000000},
+  {0,  13400000000000000},
+  {878, 0 },
+  {-2, -100000000000000000},
+  {-0, -100000000000000000},
+  {91, 305000000000000000},
+  {-123, -2300001000100000},
 };
 
 static int
@@ -162,6 +166,7 @@ test_buff_reals (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_reals;
+  state.bufferSize = strlen (state.buffer);
   init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing reals...");
   while ((result = yylex (&lvalp, &state)) != 0)
@@ -204,6 +209,7 @@ test_buff_chars (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_chars;
+  state.bufferSize = strlen (state.buffer);
   init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing chars...");
   while ((result = yylex (&lvalp, &state)) != 0)
@@ -245,6 +251,7 @@ test_buff_dates (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_dates;
+  state.bufferSize = strlen (state.buffer);
   init_array (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing dates...");
   while ((result = yylex (&lvalp, &state)) != 0)
@@ -304,6 +311,7 @@ test_buff_strs (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_strs;
+  state.bufferSize = strlen (state.buffer);
   init_array (&state.parsedValues, sizeof (struct SemValue));
   state.strings = create_string_store ();
   printf ("Testing string...");

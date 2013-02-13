@@ -1772,7 +1772,7 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
   NODE_INDEX                   node;
   KEY_INDEX                    key;
   const T_BTreeKey<T>          firstKey (min, fromRow);
-  const T_BTreeKey<T>          lastKey (max, MIN (toRow, m_RowsCount));
+  const T_BTreeKey<T>          lastKey (max, toRow);
 
   assert (pNodeMgr != NULL);
 
@@ -2014,14 +2014,20 @@ TableRmNode::InsertKey (const I_BTreeKey& key)
 
       D_UINT64* const pRows = _RC (D_UINT64 *, DataToWrite ());
 
-      make_array_room (pRows, lastKey, keyIndex, 1);
+      make_array_room (_RC (D_UINT8*, pRows),
+                       lastKey,
+                       keyIndex,
+                       sizeof (D_UINT64));
       SetKeysCount (GetKeysCount() + 1);
       pRows[keyIndex] = *( _SC(const TableRmKey *, &key));
 
       if (IsLeaf () == false)
         {
           NODE_INDEX* const pNodes = _RC (NODE_INDEX*, pRows + KeysPerNode());
-          make_array_room (pNodes, lastKey, keyIndex, 1);
+          make_array_room (_RC (D_UINT8*, pNodes),
+                           lastKey,
+                           keyIndex,
+                           sizeof (NODE_INDEX));
         }
 
       return keyIndex;
@@ -2043,7 +2049,10 @@ TableRmNode::RemoveKey (const KEY_INDEX keyIndex)
   assert (lastKey < (KeysPerNode() - 1));
 
   D_UINT64* const pRows = _RC (D_UINT64 *, DataToWrite ());
-  remove_array_elemes (pRows, lastKey, keyIndex, 1);
+  remove_array_elemes (_RC (D_UINT8*, pRows),
+                       lastKey,
+                       keyIndex,
+                       sizeof (D_UINT64));
 
   if (IsLeaf () == false)
     {
@@ -2051,7 +2060,10 @@ TableRmNode::RemoveKey (const KEY_INDEX keyIndex)
                                       NODE_INDEX*,
                                       pRows + TableRmNode::KeysPerNode()
                                      );
-      remove_array_elemes (pNodes, lastKey, keyIndex, 1);
+      remove_array_elemes (_RC (D_UINT8*, pNodes),
+                           lastKey,
+                           keyIndex,
+                           sizeof (NODE_INDEX));
     }
 
   SetKeysCount (GetKeysCount () - 1);

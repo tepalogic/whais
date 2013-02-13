@@ -120,8 +120,7 @@ BlockCache::RetriveItem (const D_UINT64 item)
                                     itemsPerBlock);
 
           delete [] pBlockData;
-          m_CachedBlocks.erase (it);
-          ++it;
+          m_CachedBlocks.erase (it++);
         }
     }
 
