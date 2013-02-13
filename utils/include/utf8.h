@@ -52,6 +52,9 @@ decode_utf8_char (const D_UINT8 *pSource, D_UINT32* pCh);
 D_UINT
 encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest);
 
+D_INT
+utf8_strlen (const D_UINT8* pSource);
+
 #ifdef __cplusplus
 }
 #endif

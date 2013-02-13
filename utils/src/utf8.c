@@ -148,5 +148,19 @@ encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
   return 0;
 }
 
+D_INT
+utf8_strlen (const D_UINT8* pSource)
+{
+  D_INT result = 0;
+  while (*pSource != 0)
+    {
+      D_UINT chSize = get_utf8_char_size (pSource[0]);
+      if (chSize == 0)
+        return -1;
 
+      result  += chSize;
+      pSource += chSize;
+    }
 
+  return result;
+}

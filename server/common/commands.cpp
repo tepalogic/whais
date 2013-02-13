@@ -247,20 +247,23 @@ cmd_glb_desc_err:
 static void
 cmd_read_stack (ClientConnection& rConn)
 {
-  const D_UINT8* const data    = rConn.Data ();
+  D_UINT8* const       data    = rConn.Data ();
   D_UINT32             status  = WCS_OK;
-  D_UINT16             dataOff = 0;
-
-  const D_UINT64 rowHint = from_le_int64 (data + dataOff);
-  dataOff += sizeof (D_UINT64);
-
-  const D_UINT64 elHint  = from_le_int64 (data + dataOff);
-  dataOff += sizeof (D_UINT64);
+  D_UINT               dataOff = 0;
 
   const D_CHAR* const fieldNameHint = _RC (const D_CHAR*, data + dataOff);
   dataOff += strlen (fieldNameHint) + 1;
 
-  if ((dataOff > rConn.DataSize ())
+  const D_UINT64 rowHint = from_le_int64 (data + dataOff);
+  dataOff += sizeof (D_UINT64);
+
+  const D_UINT64 arrayHint  = from_le_int64 (data + dataOff);
+  dataOff += sizeof (D_UINT64);
+
+  const D_UINT64 textHint  = from_le_int64 (data + dataOff);
+  dataOff += sizeof (D_UINT64);
+
+  if ((dataOff != rConn.DataSize ())
       || (rConn.Stack ().Size () == 0))
     {
       status = WCS_INVALID_ARGS;
@@ -269,10 +272,14 @@ cmd_read_stack (ClientConnection& rConn)
 
   try
     {
+      rConn.DataSize (rConn.MaxSize ());
       dataOff = sizeof (D_UINT32);
 
       StackValue&    topValue = rConn.Stack ()[rConn.Stack ().Size () - 1];
-      const D_UINT16 valType = topValue.GetOperand ().GetType ();
+      const D_UINT16 valType  = topValue.GetOperand ().GetType ();
+
+      store_le_int16 (valType, data + dataOff);
+      dataOff += sizeof (D_UINT16);
 
       if (IS_TABLE (valType))
         {
@@ -284,7 +291,8 @@ cmd_read_stack (ClientConnection& rConn)
                                              topValue,
                                              fieldHint,
                                              rowHint,
-                                             elHint,
+                                             arrayHint,
+                                             textHint,
                                              &dataOff);
         }
       else if (IS_FIELD (valType))
@@ -292,13 +300,25 @@ cmd_read_stack (ClientConnection& rConn)
           status = cmd_read_field_stack_top (rConn,
                                              topValue,
                                              rowHint,
-                                             elHint,
+                                             arrayHint,
+                                             textHint,
                                              &dataOff);
         }
       else if (IS_ARRAY (valType))
-        status = cmd_read_array_stack_top (rConn, topValue, elHint, &dataOff);
+        {
+          assert ((valType & 0xFF) != WFT_TEXT);
+          status = cmd_read_array_stack_top (rConn,
+                                             topValue,
+                                             textHint,
+                                             &dataOff);
+        }
       else if (GET_BASIC_TYPE (valType) == T_TEXT)
-        status = cmd_read_text_stack_top (rConn, topValue, elHint, &dataOff);
+        {
+          status = cmd_read_text_stack_top (rConn,
+                                            topValue,
+                                            textHint,
+                                            &dataOff);
+        }
       else
         status = cmd_read_basic_stack_top (rConn, topValue, &dataOff);
     }
@@ -317,6 +337,7 @@ cmd_read_stack (ClientConnection& rConn)
   }
 
   assert (dataOff >= sizeof (D_UINT32));
+
   rConn.DataSize (dataOff);
 
 cmd_read_exit:
@@ -334,7 +355,7 @@ cmd_update_stack (ClientConnection& rConn)
 {
   const D_UINT8* const data    = rConn.Data ();
   D_UINT32             status  = WCS_OK;
-  D_UINT16             dataOff = 0;
+  D_UINT               dataOff = 0;
 
   if (rConn.DataSize () == 0)
     {

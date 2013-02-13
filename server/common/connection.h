@@ -80,10 +80,10 @@ public:
                     std::vector<DBSDescriptors>& databases);
   ~ClientConnection ();
 
-  D_UINT16      MaxSize () const;
-  D_UINT16      DataSize () const;
-  void          DataSize (const D_UINT16 size);
-  D_UINT8*      Data ();
+  D_UINT      MaxSize () const;
+  D_UINT      DataSize () const;
+  void        DataSize (const D_UINT16 size);
+  D_UINT8*    Data ();
 
   D_UINT32 ReadCommand ();
   void     SendCmdResponse (const D_UINT16 respType);

@@ -44,7 +44,7 @@ static const D_UINT DESC_FIELD_COUNT    = 1;
 static const D_UINT DESC_FIELD_HINT     = 2;
 static const D_UINT DESC_FIELD_OFFSET   = 3;
 
-static const D_UINT UPDATE_SIZE         = 0;
+static const D_UINT LAST_UPDATE_OFF     = 0;
 
 struct INTERNAL_HANDLER
 {

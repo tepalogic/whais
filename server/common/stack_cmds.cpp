@@ -35,9 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-
-static const D_UINT NULL_ELEMENT_LEN = sizeof ("");
-
 static inline void
 assert_cmds_values ()
 {
@@ -63,7 +60,7 @@ assert_cmds_values ()
 }
 
 D_UINT
-cmd_pop_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
+cmd_pop_stack (ClientConnection& rConn, D_UINT* const pDataOff)
 {
   assert_cmds_values();
 
@@ -86,15 +83,16 @@ cmd_pop_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
 }
 
 D_UINT
-cmd_push_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
+cmd_push_stack (ClientConnection& rConn, D_UINT* const pDataOff)
 {
   assert_cmds_values();
 
-  const D_UINT8* const data   = rConn.Data ();
-  SessionStack&        rStack = rConn.Stack ();
+  const D_UINT8* const data     = rConn.Data ();
+  const D_UINT         dataSize = rConn.DataSize ();
+  SessionStack&        rStack   = rConn.Stack ();
   D_UINT16             type;
 
-  if ((*pDataOff + sizeof (D_UINT16)) > rConn.DataSize ())
+  if ((*pDataOff + sizeof (D_UINT16)) > dataSize)
     goto push_frame_error;
 
   type       = from_le_int16 (data + *pDataOff);
@@ -268,7 +266,7 @@ cmd_push_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
       DBSFieldDescriptor             stackFields[STACK_FIELDS_SIZE];
       auto_array<DBSFieldDescriptor> heapFields;
 
-      if ((*pDataOff + sizeof (D_UINT16)) > rConn.DataSize ())
+      if ((*pDataOff + sizeof (D_UINT16)) > dataSize)
         goto push_frame_error;
 
       const D_UINT16 fieldsCount = from_le_int16 (data + *pDataOff);
@@ -288,7 +286,7 @@ cmd_push_stack (ClientConnection& rConn, D_UINT16* const pDataOff)
           const D_UINT fieldLen = strlen (fields_[field].m_pFieldName);
 
           *pDataOff +=  fieldLen+ 1;
-          if ((*pDataOff + sizeof (D_UINT16) > rConn.DataSize())
+          if ((*pDataOff + sizeof (D_UINT16) > dataSize)
               || (fieldLen == 0))
             {
               goto push_frame_error;
@@ -330,10 +328,10 @@ push_frame_error:
 
 static D_UINT
 read_value (StackValue&         dest,
-            const W_VALUE_TYPE    type,
+            const D_UINT32      type,
             const D_UINT8*      data,
             const D_UINT16      dataSize,
-            D_UINT16* const     pDataOff)
+            D_UINT* const       pDataOff)
 {
   D_UINT result = 0;
   switch (type)
@@ -498,48 +496,59 @@ read_value (StackValue&         dest,
 }
 
 D_UINT
-cmd_update_stack_top (ClientConnection& rConn, D_UINT16* const pDataOff)
+cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
 {
   assert_cmds_values ();
 
-  const D_UINT8* const data   = rConn.Data ();
-  SessionStack&        rStack = rConn.Stack ();
-  const D_UINT16       flags  = from_le_int16 (data + *pDataOff);
+  const D_UINT8* const data     = rConn.Data ();
+  const D_UINT8        dataSize = rConn.DataSize ();
+  SessionStack&        rStack   = rConn.Stack ();
+  D_UINT16             type     = from_le_int16 (data + *pDataOff);
 
   if (rStack.Size () == 0)
     return WCS_INVALID_ARGS;
 
-  StackValue topValue      = rStack[rStack.Size () - 1];
-  bool       clearTopValue = false;
+  StackValue& topValue      = rStack[rStack.Size () - 1];
+  bool        clearTopValue = false;
 
-  if ((*pDataOff + sizeof (D_UINT16)) > rConn.DataSize ())
+  if ((*pDataOff + sizeof (D_UINT16)) > dataSize)
     goto update_frame_error;
 
   try
   {
       *pDataOff += sizeof (D_UINT16);
-      if (flags & WFT_FIELD_MASK)
+      if (type & WFT_FIELD_MASK)
         {
+          type &= ~WFT_FIELD_MASK;
+
           const D_CHAR* const fieldName = _RC (const D_CHAR*,
                                                data + *pDataOff);
+          const D_UINT fieldLen = strlen (fieldName) + 1;
 
-          *pDataOff += strlen (fieldName) + 1;
-          if ((*pDataOff + sizeof (D_UINT64)) > rConn.DataSize ())
-            goto update_frame_error;
+          *pDataOff += fieldLen;
+          if ((fieldLen <= 1) ||
+              ((*pDataOff + sizeof (D_UINT64)) > dataSize))
+            {
+              goto update_frame_error;
+            }
 
           const D_UINT64 rowIndex = from_le_int64 (data + *pDataOff);
-          *pDataOff += sizeof (D_UINT8);
+          *pDataOff += sizeof (D_UINT64);
 
           I_DBSTable&    table      = topValue.GetOperand ().GetTable ();
           const D_UINT32 fieldIndex = table.GetFieldIndex (fieldName);
+
           /* topValue will be a field now! */
           StackValue temp = topValue;
           topValue  = temp.GetOperand ().GetFieldAt (fieldIndex);
           clearTopValue = true;
 
-          if (flags & WFT_ARRAY_MASK)
+          if (type & WFT_ARRAY_MASK)
             {
-              if ((flags & WFT_ARRAY_MASK) == WFT_TEXT)
+              type &= ~WFT_ARRAY_MASK;
+              assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+
+              if (type == WFT_TEXT)
                 {
                   assert (clearTopValue);
                   topValue.Clear ();
@@ -551,7 +560,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT16* const pDataOff)
               topValue = temp.GetOperand ().GetValueAt (rowIndex);
               temp.Clear ();
 
-              if (*pDataOff + sizeof (D_UINT16) > rConn.DataSize ())
+              if (*pDataOff + sizeof (D_UINT16) > dataSize)
                 goto update_frame_error;
 
               D_UINT16 elCount = from_le_int16 (data + *pDataOff);
@@ -563,88 +572,97 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT16* const pDataOff)
               D_UINT64 fromPos = from_le_int64 (data + *pDataOff);
               *pDataOff += sizeof (D_UINT64);
 
-              if (*pDataOff > rConn.DataSize ())
+              if (*pDataOff > dataSize)
                 goto update_frame_error;
 
               temp = topValue;
-              const D_UINT16 valTypes = flags & 0xFF;
-              while (elCount-- > 0)
+              while ((*pDataOff < dataSize)
+                      && (elCount-- > 0))
                 {
                   topValue  = temp.GetOperand ().GetValueAt (fromPos);
                   clearTopValue = true;
 
                   const D_UINT len = read_value (topValue,
-                                                 valTypes,
+                                                 type,
                                                  data,
-                                                 rConn.DataSize (),
+                                                 dataSize,
                                                  pDataOff);
-                  if (len <= NULL_ELEMENT_LEN)
-                    goto update_frame_error;
+                  if (len == 0)
+                    {
+                      temp.Clear ();
+                      goto update_frame_error;
+                    }
 
-                  assert (*pDataOff <= rConn.DataSize ());
+                  assert (*pDataOff <= dataSize);
 
                   ++fromPos;
                   topValue.Clear ();
                   clearTopValue = false;
                 }
               temp.Clear ();
+
+              if (elCount != 0)
+                goto update_frame_error;
             }
-          else if ((flags & 0xFF) == WFT_TEXT)
+          else if (type == WFT_TEXT)
             {
               DBSText fieldText;
               topValue.GetOperand ().GetValue (fieldText);
 
-              if ((*pDataOff + NULL_ELEMENT_LEN + sizeof (D_UINT64)) >
-                  rConn.DataSize ())
-                {
-                  goto update_frame_error;
-                }
+              if ((*pDataOff + sizeof (D_UINT64)) >= dataSize)
+                goto update_frame_error;
 
-              D_UINT64 fromPos = from_le_int64 (data + *pDataOff);
+              D_UINT64 textOff = from_le_int64 (data + *pDataOff);
               *pDataOff += sizeof (D_UINT64);
-              do
+
+              if (*pDataOff >= dataSize)
+                goto update_frame_error;
+
+              while (data[*pDataOff] != 0)
                 {
                   D_UINT32 ch    = 0;
                   D_UINT   chLen = decode_utf8_char (data + *pDataOff, &ch);
 
                   if ((chLen == 0)
                       || (ch == 0)
-                      || (*pDataOff + chLen > rConn.DataSize ()))
+                      || (*pDataOff + chLen > dataSize))
                     {
                       goto update_frame_error;
                     }
 
                   *pDataOff += chLen;
-                  fieldText.SetCharAtIndex (DBSChar (ch), fromPos++);
+                  fieldText.SetCharAtIndex (DBSChar (ch), textOff++);
                 }
-              while (data[*pDataOff] != 0);
 
               topValue.GetOperand ().SetValue (fieldText);
             }
           else
             {
               const D_UINT elLen = read_value (topValue,
-                                               flags & 0xFF,
+                                               type,
                                                data,
-                                               rConn.DataSize (),
+                                               dataSize,
                                                pDataOff);
-              if (elLen <= NULL_ELEMENT_LEN)
+              if (elLen == 0)
                 goto update_frame_error;
 
-              assert (*pDataOff <= rConn.DataSize ());
+              assert (*pDataOff <= dataSize);
             }
         }
-      else if (flags & WFT_ARRAY_MASK)
+      else if (type & WFT_ARRAY_MASK)
         {
-          if ((flags & 0xFF) == WFT_TEXT)
+          type &= ~WFT_ARRAY_MASK;
+          assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+
+          if (type == WFT_TEXT)
             {
               assert (clearTopValue);
+
               topValue.Clear ();
               return WCS_OP_NOTSUPP;
             }
 
-
-          if (*pDataOff + sizeof (D_UINT16) > rConn.DataSize ())
+          if (*pDataOff + sizeof (D_UINT16) > dataSize)
             goto update_frame_error;
 
           D_UINT16 elCount = from_le_int16 (data + *pDataOff);
@@ -653,76 +671,79 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT16* const pDataOff)
           if (elCount == 0)
             goto update_frame_error;
 
-          if (*pDataOff + sizeof (D_UINT64) > rConn.DataSize ())
+          if (*pDataOff + sizeof (D_UINT64) > dataSize)
             goto update_frame_error;
 
           D_UINT64 fromPos =  from_le_int64 (data + *pDataOff);
           *pDataOff        += sizeof (D_UINT64);
 
           StackValue temp = topValue;
-          while (elCount-- > 0)
+          while ((*pDataOff < dataSize)
+                 && (elCount-- > 0))
             {
               topValue  = temp.GetOperand ().GetValueAt (fromPos);
               clearTopValue = true;
 
               const D_UINT len = read_value (topValue,
-                                             flags & 0xFF,
+                                             type,
                                              data,
-                                             rConn.DataSize (),
+                                             dataSize,
                                              pDataOff);
-              if (len <= NULL_ELEMENT_LEN)
+              if (len <= 0)
                 goto update_frame_error;
 
-              assert (*pDataOff <= rConn.DataSize ());
+              assert (*pDataOff <= dataSize);
 
               ++fromPos;
               topValue.Clear ();
               clearTopValue = false;
             }
+
+          if (elCount != 0)
+            goto update_frame_error;
         }
-      else if ((flags & 0xFF) == WFT_TEXT)
+      else if (type == WFT_TEXT)
         {
           DBSText fieldText;
           topValue.GetOperand ().GetValue (fieldText);
 
-          if ((*pDataOff + sizeof (D_UINT8) + sizeof (D_UINT64)) >
-              rConn.DataSize ())
-            {
-              goto update_frame_error;
-            }
+          if ((*pDataOff + sizeof (D_UINT64)) > dataSize)
+            goto update_frame_error;
 
-          D_UINT64 fromPos = from_le_int64 (data + *pDataOff);
+          D_UINT64 offset = from_le_int64 (data + *pDataOff);
           *pDataOff += sizeof (D_UINT64);
 
-          do
+          while ((data[*pDataOff] != 0)
+                 && (*pDataOff < dataSize))
             {
               D_UINT32 ch    = 0;
               D_UINT   chLen = decode_utf8_char (data + *pDataOff, &ch);
 
-              if ((chLen == 0)
-                  || (ch == 0)
-                  || (*pDataOff + chLen > rConn.DataSize ()))
-                {
-                  goto update_frame_error;
-                }
+              if (chLen == 0)
+                goto update_frame_error;
 
               *pDataOff += chLen;
-              fieldText.SetCharAtIndex (DBSChar (ch), fromPos++);
+              fieldText.SetCharAtIndex (DBSChar (ch), offset++);
             }
-          while (data[*pDataOff] != 0);
+          if (*pDataOff >= dataSize)
+            goto update_frame_error;
+
+          fieldText.SetCharAtIndex (DBSChar (), offset);
+
           topValue.GetOperand ().SetValue (fieldText);
         }
       else
         {
+          assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
           const D_UINT elLen = read_value (topValue,
-                                           flags & 0xFF,
+                                           type,
                                            data,
-                                           rConn.DataSize (),
+                                           dataSize,
                                            pDataOff);
-          if (elLen <= NULL_ELEMENT_LEN)
+          if (elLen == 0)
             goto update_frame_error;
 
-          assert (*pDataOff <= rConn.DataSize ());
+          assert (*pDataOff <= dataSize);
         }
   }
   catch (InterException& e)
@@ -882,146 +903,104 @@ write_value (StackValue&      source,
 }
 
 
-static D_UINT
-cmd_read_basic_internal (ClientConnection& rConn,
-                         StackValue&       value,
-                         const bool        writeType,
-                         D_UINT16* const   pDataOffset)
+D_UINT
+cmd_read_basic_stack_top (ClientConnection& rConn,
+                          StackValue&       value,
+                          D_UINT* const     pDataOffset)
 {
-  D_UINT8* const data = rConn.Data ();
+  D_UINT8* const data        = rConn.Data ();
+  const D_UINT   maxDataSize = rConn.MaxSize ();
 
-  assert (*pDataOffset < rConn.MaxSize ());
+  assert (*pDataOffset <= maxDataSize);
   assert (rConn.Stack ().Size () > 0);
   assert ((value.GetOperand ().GetType() >= T_BOOL)
           && (value.GetOperand ().GetType () < T_TEXT));
 
-  if (writeType)
-    {
-      assert (*pDataOffset + sizeof (D_UINT16) < rConn.MaxSize ());
-
-      store_le_int16 (value.GetOperand ().GetType (), data + *pDataOffset);
-      *pDataOffset += sizeof (D_UINT16);
-    }
-
   const D_UINT16 length = write_value (value,
                                        data + *pDataOffset,
-                                       rConn.MaxSize () - *pDataOffset);
+                                       maxDataSize - *pDataOffset);
   if (length == 0)
-    return WCS_LARGE_ARGS;
+    return WCS_LARGE_RESPONSE;
   else
     *pDataOffset += length;
 
-  return WCS_OK;
-}
-
-D_UINT
-cmd_read_basic_stack_top (ClientConnection& rConn,
-                          StackValue&       topValue,
-                          D_UINT16* const   pDataOffset)
-{
-  return cmd_read_basic_internal (rConn, topValue, true, pDataOffset);
-}
-
-static D_UINT
-cmd_read_array_internal (ClientConnection& rConn,
-                         StackValue&       value,
-                         const D_UINT64    hintPosition,
-                         const bool        writeType,
-                         D_UINT16* const   pDataOffset)
-{
-  D_UINT8* const data     = rConn.Data ();
-  D_UINT64       maxCount = 0;
-
-  assert (*pDataOffset < rConn.MaxSize ());
-  assert (rConn.Stack ().Size () > 0);
-  assert (IS_ARRAY (value.GetOperand ().GetType()));
-
-  {
-    DBSArray temp;
-    value.GetOperand ().GetValue (temp);
-
-    assert ((temp.ElementsType () >= T_BOOL)
-            && (temp.ElementsType () < T_TEXT));
-
-    if (writeType)
-      {
-        assert (*pDataOffset + sizeof (D_UINT16) < rConn.MaxSize ());
-
-        store_le_int16 (temp.ElementsType () | WFT_ARRAY_MASK,
-                        data + *pDataOffset);
-        *pDataOffset += sizeof (D_UINT16);
-      }
-
-    if (*pDataOffset + sizeof (D_UINT64) >= rConn.MaxSize ())
-      return WCS_LARGE_ARGS;
-
-    maxCount = temp.ElementsCount ();
-    store_le_int64 (maxCount, data + *pDataOffset);
-    *pDataOffset +=sizeof (D_UINT64);
-
-    if ((hintPosition >= maxCount) && (maxCount > 0))
-      return WCS_INVALID_ARGS;
-    else if (maxCount == 0)
-      return WCS_OK;
-  }
-
-  if (*pDataOffset + sizeof (D_UINT64) >= rConn.MaxSize ())
-    return WCS_LARGE_ARGS;
-
-  store_le_int64 (hintPosition, data + *pDataOffset);
-  *pDataOffset += sizeof (D_UINT64);
-
-  for (D_UINT64 index = hintPosition; index < maxCount; ++index)
-    {
-      StackValue   el        = value.GetOperand ().GetValueAt (index);
-      const D_UINT writeSize = write_value (el,
-                                            data + *pDataOffset,
-                                            rConn.MaxSize () - *pDataOffset);
-
-      assert (! el.GetOperand ().IsNull());
-
-      if (writeSize == 0)
-        {
-          if (index == hintPosition)
-            return WCS_LARGE_ARGS;
-          else
-            break;
-        }
-
-      assert (writeSize > 1);
-
-      *pDataOffset += writeSize - 1; //Don't include the null terminator
-    }
-
-  *pDataOffset += 1; //Add the null terminator
+  assert (*pDataOffset <= maxDataSize);
 
   return WCS_OK;
 }
 
 D_UINT
 cmd_read_array_stack_top (ClientConnection& rConn,
-                          StackValue&       topValue,
-                          D_UINT64          hintPosition,
-                          D_UINT16* const   pDataOffset)
+                          StackValue&       value,
+                          const D_UINT64    hintOffset,
+                          D_UINT* const     pDataOffset)
 {
-  return cmd_read_array_internal (rConn,
-                                  topValue,
-                                  hintPosition,
-                                  true,
-                                  pDataOffset);
+  D_UINT8* const data        = rConn.Data ();
+  const D_UINT   maxDataSize = rConn.MaxSize ();
+  D_UINT64       maxCount    = 0;
+
+  assert (*pDataOffset < maxDataSize);
+
+  {
+    DBSArray temp;
+    value.GetOperand ().GetValue (temp);
+
+    if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
+      return WCS_LARGE_RESPONSE;
+
+    maxCount = temp.ElementsCount ();
+    store_le_int64 (maxCount, data + *pDataOffset);
+    *pDataOffset +=sizeof (D_UINT64);
+
+    if ((hintOffset >= maxCount) && (maxCount > 0))
+      return WCS_INVALID_ARGS;
+    else if (maxCount == 0)
+      return WCS_OK;
+  }
+
+  *pDataOffset += sizeof (D_UINT64);
+  if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
+    return WCS_LARGE_RESPONSE;
+
+  store_le_int64 (hintOffset, data + *pDataOffset);
+  *pDataOffset += sizeof (D_UINT64);
+
+  for (D_UINT64 index = hintOffset; index < maxCount; ++index)
+    {
+      StackValue   el        = value.GetOperand ().GetValueAt (index);
+      const D_UINT writeSize = write_value (el,
+                                            data + *pDataOffset,
+                                            maxDataSize - *pDataOffset);
+
+      assert (! el.GetOperand ().IsNull());
+
+      if (writeSize == 0)
+        {
+          if (index == hintOffset)
+            return WCS_LARGE_RESPONSE;
+          else
+            break;
+        }
+
+      assert (writeSize > 2);
+
+      *pDataOffset += writeSize;
+    }
+
+  return WCS_OK;
 }
 
-static D_UINT
-cmd_read_text_internal (ClientConnection& rConn,
-                        StackValue&       value,
-                        const D_UINT64    hintPosition,
-                        const bool        writeType,
-                        D_UINT16* const   pDataOffset)
+D_UINT
+cmd_read_text_stack_top (ClientConnection& rConn,
+                         StackValue&       value,
+                         const D_UINT64    hintOffset,
+                         D_UINT* const     pDataOffset)
 {
-  D_UINT8* const data     = rConn.Data ();
-  D_UINT64       maxCount = 0;
+  D_UINT8* const data        = rConn.Data ();
+  const D_UINT   maxDataSize = rConn.MaxSize ();
+  D_UINT64       maxCount    = 0;
 
-  assert (*pDataOffset < rConn.MaxSize ());
+  assert (*pDataOffset < maxDataSize);
   assert (rConn.Stack ().Size () > 0);
   assert (value.GetOperand ().GetType() == T_TEXT);
 
@@ -1029,45 +1008,37 @@ cmd_read_text_internal (ClientConnection& rConn,
     DBSText temp;
     value.GetOperand ().GetValue (temp);
 
-    if (writeType)
-      {
-        assert (*pDataOffset + sizeof (D_UINT16) < rConn.MaxSize ());
-
-        store_le_int16 (WFT_TEXT, data + *pDataOffset);
-        *pDataOffset = sizeof (D_UINT16);
-      }
-
-    if (*pDataOffset + sizeof (D_UINT64) >= rConn.MaxSize ())
+    if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
       return WCS_LARGE_ARGS;
 
     maxCount = temp.GetCharactersCount ();
     store_le_int64 (maxCount, data + *pDataOffset);
-    *pDataOffset +=sizeof (D_UINT64);
 
-    if ((hintPosition >= maxCount) && (maxCount > 0))
+    if ((hintOffset >= maxCount) && (maxCount > 0))
       return WCS_INVALID_ARGS;
     else if (maxCount == 0)
       return WCS_OK;
   }
 
-  if (*pDataOffset + sizeof (D_UINT64) >= rConn.MaxSize ())
+  *pDataOffset +=sizeof (D_UINT64);
+  if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
     return WCS_LARGE_ARGS;
 
-  store_le_int64 (hintPosition, data + *pDataOffset);
+  store_le_int64 (hintOffset, data + *pDataOffset);
   *pDataOffset += sizeof (D_UINT64);
 
-  for (D_UINT64 index = hintPosition; index < maxCount; ++index)
+  for (D_UINT64 index = hintOffset; index < maxCount; ++index)
     {
       StackValue   el        = value.GetOperand ().GetValueAt (index);
       const D_UINT writeSize = write_value (el,
                                             data + *pDataOffset,
-                                            rConn.MaxSize () - *pDataOffset);
+                                            maxDataSize - *pDataOffset);
       assert (! el.GetOperand ().IsNull());
 
       if (writeSize == 0)
         {
-          if (index == hintPosition)
-            return WCS_LARGE_ARGS;
+          if (index == hintOffset)
+            return WCS_LARGE_RESPONSE;
           else
             break;
         }
@@ -1075,33 +1046,86 @@ cmd_read_text_internal (ClientConnection& rConn,
       assert (writeSize > 1);
 
       *pDataOffset += writeSize - 1; //Don't include the null terminator
+      assert (data[*pDataOffset] == 0);
     }
 
+  assert (*pDataOffset < maxDataSize);
+  assert (data[*pDataOffset] == 0);
   *pDataOffset += 1; //Make sure we count the null terminator too!
 
   return WCS_OK;
 }
 
-D_UINT
-cmd_read_text_stack_top (ClientConnection& rConn,
-                         StackValue&       topValue,
-                         D_UINT64          hintPosition,
-                         D_UINT16* const   pDataOffset)
+static D_UINT
+cmd_read_table_field_internal (ClientConnection& rConn,
+                               StackValue&       topValue,
+                               D_UINT            hintField,
+                               D_UINT64          hintRow,
+                               D_UINT64          hintArrayOff,
+                               D_UINT64          hintTextOff,
+                               D_UINT* const     pDataOffset)
 {
-  return cmd_read_text_internal (rConn,
-                                 topValue,
-                                 hintPosition,
-                                 true,
-                                 pDataOffset);
+  D_UINT          cs          = WCS_OK;
+  D_UINT8* const  data        = rConn.Data ();
+  const D_UINT    maxDataSize = rConn.DataSize ();
+  I_DBSTable&     table       = topValue.GetOperand ().GetTable ();
+  const D_UINT64  rowsCount   = table.GetAllocatedRows ();
+
+  if (hintRow >= rowsCount)
+    return WCS_INVALID_ARGS;
+
+  DBSFieldDescriptor fd      = table.GetFieldDescriptor (hintField);
+  const D_UINT       nameLen = strlen (fd.m_pFieldName) + 1;
+
+  if (*pDataOffset + nameLen + sizeof (D_UINT16) >= maxDataSize)
+    return WCS_LARGE_RESPONSE;
+
+  memcpy (data + *pDataOffset, fd.m_pFieldName, nameLen);
+  store_le_int16 (WFT_ARRAY_MASK | fd.m_FieldType, data + *pDataOffset);
+
+  if (fd.isArray)
+    {
+      if (fd.m_FieldType == WFT_TEXT)
+        {
+          assert (false);
+          return WCS_GENERAL_ERR;
+        }
+      else if (hintTextOff != WIGNORE_OFF)
+        return WCS_OP_NOTSUPP;
+
+      cs = cmd_read_array_stack_top (rConn,
+                                     topValue,
+                                     hintArrayOff,
+                                     pDataOffset);
+    }
+  else if (fd.m_FieldType == WFT_TEXT)
+    {
+      if (hintArrayOff != WIGNORE_OFF)
+        return WCS_INVALID_ARGS;
+
+      cs = cmd_read_text_stack_top (rConn,
+                                    topValue,
+                                    hintTextOff,
+                                    pDataOffset);
+    }
+  else
+    {
+      if ((hintArrayOff != WIGNORE_OFF) && (hintTextOff != WIGNORE_OFF))
+        return WCS_INVALID_ARGS;
+
+      cs = cmd_read_basic_stack_top (rConn, topValue, pDataOffset);
+    }
+
+  return cs;
 }
 
-static D_UINT
-cmd_read_field_internal (ClientConnection& rConn,
-                         StackValue&       topValue,
-                         D_UINT64          hintRow,
-                         D_UINT64          hintPosition,
-                         const bool        tableEntry,
-                         D_UINT16* const   pDataOffset)
+D_UINT
+cmd_read_field_stack_top (ClientConnection& rConn,
+                          StackValue&       topValue,
+                          D_UINT64          hintRow,
+                          D_UINT64          hintArrayOff,
+                          D_UINT64          hintTextOff,
+                          D_UINT* const     pDataOffset)
 {
   assert (*pDataOffset < rConn.MaxSize ());
   assert (rConn.Stack ().Size () > 0);
@@ -1114,55 +1138,27 @@ cmd_read_field_internal (ClientConnection& rConn,
   D_UINT64 maxCount = table.GetAllocatedRows ();
   if (hintRow >= maxCount)
     return WCS_INVALID_ARGS;
-  else if (tableEntry)
-    {
-      //For a table entry print only one row. The hinted one.
-      maxCount = hintRow + 1;
-    }
 
   DBSFieldDescriptor fieldDesc = table.GetFieldDescriptor (field);
 
-  const D_UINT minSize = sizeof (D_UINT16) +
-                         strlen (fieldDesc.m_pFieldName) + 1 +
-                         tableEntry ?
-                               sizeof (D_UINT64) :
-                               2 * sizeof (D_UINT64);
+  const D_UINT minSize = sizeof (D_UINT64) * sizeof (D_UINT64);
   if (*pDataOffset + minSize > rConn.MaxSize ())
-    return WCS_LARGE_ARGS;
+    return WCS_LARGE_RESPONSE;
 
-  D_UINT16 type = fieldDesc.m_FieldType;
-  MARK_FIELD (type);
+  D_UINT16 type = fieldDesc.m_FieldType | WFT_FIELD_MASK;
   if (fieldDesc.isArray)
-    MARK_ARRAY (type);
+    type |= WFT_ARRAY_MASK;
 
-  store_le_int16 (type, data + *pDataOffset);
-  *pDataOffset += sizeof (D_UINT16);
 
-  strcpy (_RC (D_CHAR*, data + *pDataOffset), fieldDesc.m_pFieldName);
-  *pDataOffset += strlen (fieldDesc.m_pFieldName) + 1;
+  const D_UINT64 rowsCount = table.GetAllocatedRows ();
+  store_le_int64 (rowsCount, data + *pDataOffset);
+  *pDataOffset += sizeof (D_UINT64);
 
-  if (! tableEntry)
-    {
-      //For a non table entry total rows count
-      //and the starting row must have to be specified.
 
-      const D_UINT64 rowsCount = table.GetAllocatedRows ();
-
-      store_le_int64 (rowsCount, data + *pDataOffset);
-      *pDataOffset += sizeof (D_UINT64);
-
-      if (rowsCount > 0)
-        {
-          store_le_int64 (hintRow, data + *pDataOffset);
-          *pDataOffset += sizeof (D_UINT64);
-        }
-      else
-        return WCS_OK;
-    }
-  else
-    {
-      assert (table.GetAllocatedRows () > 0);
-    }
+  if ((hintRow > rowsCount) && (rowsCount > 0))
+    return WCS_INVALID_ARGS;
+  else if (rowsCount == 0)
+    return WCS_OK;
 
   D_UINT status = WCS_GENERAL_ERR;
   for (D_UINT64 row = hintRow; row < maxCount; ++row)
@@ -1173,23 +1169,31 @@ cmd_read_field_internal (ClientConnection& rConn,
 
       if (fieldDesc.isArray)
         {
-          assert (fieldDesc.m_FieldType != T_TEXT);
-          status = cmd_read_array_internal (rConn,
-                                            el,
-                                            hintPosition,
-                                            false,
-                                            pDataOffset);
+          if (hintTextOff != WIGNORE_OFF)
+            return WCS_INVALID_ARGS;
+
+          status = cmd_read_array_stack_top (rConn,
+                                             el,
+                                             hintArrayOff,
+                                             pDataOffset);
         }
       else if (fieldDesc.m_FieldType == T_TEXT)
         {
-          status = cmd_read_text_internal (rConn,
-                                           el,
-                                           hintPosition,
-                                           false,
-                                           pDataOffset);
+          if (hintArrayOff != WIGNORE_OFF)
+            return WCS_INVALID_ARGS;
+
+          status = cmd_read_text_stack_top (rConn,
+                                            el,
+                                            hintTextOff,
+                                            pDataOffset);
         }
       else
-        status = cmd_read_basic_internal (rConn, el, false, pDataOffset);
+        {
+          if ((hintArrayOff != WIGNORE_OFF) || (hintTextOff != WIGNORE_OFF))
+              return WCS_INVALID_ARGS;
+
+          status = cmd_read_basic_stack_top (rConn, el, pDataOffset);
+        }
 
       if (status != WCS_OK)
         {
@@ -1199,6 +1203,7 @@ cmd_read_field_internal (ClientConnection& rConn,
             {
               //At least one iteration was good! Return what was fitted.
               *pDataOffset = prevOffset;
+              status = WCS_OK;
               break;
             }
         }
@@ -1208,35 +1213,21 @@ cmd_read_field_internal (ClientConnection& rConn,
 }
 
 D_UINT
-cmd_read_field_stack_top (ClientConnection& rConn,
-                          StackValue&       topValue,
-                          D_UINT64          hintRow,
-                          D_UINT64          hintPosition,
-                          D_UINT16* const   pDataOffset)
-{
-  return cmd_read_field_internal (rConn,
-                                  topValue,
-                                  hintRow,
-                                  hintPosition,
-                                  false,
-                                  pDataOffset);
-
-}
-
-D_UINT
 cmd_read_table_stack_top (ClientConnection& rConn,
                           StackValue&       topValue,
-                          D_UINT64          hintField,
-                          D_UINT64          hintRow,
-                          D_UINT64          hintPosition,
-                          D_UINT16* const   pDataOffset)
+                          const D_UINT      hintField,
+                          const D_UINT64    hintRow,
+                          const D_UINT64    hintArrayOff,
+                          const D_UINT64    hintTextOff,
+                          D_UINT* const     pDataOffset)
 {
   assert (*pDataOffset < rConn.MaxSize ());
   assert (rConn.Stack ().Size () > 0);
   assert (IS_TABLE (topValue.GetOperand ().GetType()));
 
-  D_UINT8* const    data  = rConn.Data ();
-  I_DBSTable&       table = topValue.GetOperand ().GetTable ();
+  D_UINT8* const  data        = rConn.Data ();
+  const D_UINT    maxDataSize = rConn.MaxSize ();
+  I_DBSTable&     table       = topValue.GetOperand ().GetTable ();
 
   const FIELD_INDEX fieldsCount = table.GetFieldsCount();
   const ROW_INDEX   rowsCount  = table.GetAllocatedRows ();
@@ -1244,16 +1235,12 @@ cmd_read_table_stack_top (ClientConnection& rConn,
     return WCS_INVALID_ARGS;
   else
   {
-      const D_UINT minSize = sizeof (D_UINT16) +
+      const D_UINT minSize = sizeof (D_UINT64) +
                              sizeof (D_UINT64) +
-                             sizeof (D_UINT32);
-      if (*pDataOffset + minSize >= rConn. MaxSize())
-        return WCS_LARGE_ARGS;
+                             sizeof (D_UINT16);
+      if (*pDataOffset + minSize >= maxDataSize)
+        return WCS_LARGE_RESPONSE;
   }
-
-
-  store_le_int16 (WFT_TABLE_MASK, data + *pDataOffset);
-  *pDataOffset += sizeof (D_UINT16);
 
   store_le_int64 (rowsCount, data + *pDataOffset);
   *pDataOffset += sizeof (D_UINT64);
@@ -1262,39 +1249,47 @@ cmd_read_table_stack_top (ClientConnection& rConn,
     return WCS_INVALID_ARGS;
   else if (rowsCount > 0)
     {
-      store_le_int32 (fieldsCount, data + *pDataOffset);
+      store_le_int64 (hintRow, data + *pDataOffset);
+      *pDataOffset += sizeof (D_UINT64);
+
+      if (fieldsCount > 0xFFFF)
+        return WCS_OP_NOTSUPP;
+
+      store_le_int16 (fieldsCount, data + *pDataOffset);
       *pDataOffset += sizeof (D_UINT32);
 
-      for (D_UINT fieldId = 0; fieldId < fieldsCount; ++fieldId)
+      D_UINT64 currentRow = hintRow;
+      while (currentRow < rowsCount)
         {
-          const D_UINT16 prevOffset = *pDataOffset;
-
-          //Get as much fields values as we can as it fits,
-          //but the hinted one should be first.
-          const FIELD_INDEX field = (fieldId + hintPosition) % fieldsCount;
-          StackValue        el    = topValue.GetOperand ().GetFieldAt (field);
-
-          const D_UINT cs = cmd_read_field_internal (rConn,
-                                                     el,
-                                                     hintRow,
-                                                     hintPosition,
-                                                     true,
-                                                     pDataOffset);
-          if (cs != WCS_OK)
+          for (D_UINT fieldId = 0; fieldId < fieldsCount; ++fieldId)
             {
-              if (fieldId == 0)
-                return cs;
-              else
+              const D_UINT16 prevOffset = *pDataOffset;
+
+              //Get as much fields values as we can as it fits,
+              //but the hinted one should be first.
+              const FIELD_INDEX fi = (fieldId + hintField) % fieldsCount;
+              StackValue        el = topValue.GetOperand ().GetFieldAt (fi);
+
+              const D_UINT cs = cmd_read_table_field_internal (rConn,
+                                                               el,
+                                                               fi,
+                                                               currentRow,
+                                                               hintArrayOff,
+                                                               hintTextOff,
+                                                               pDataOffset);
+              if (cs != WCS_OK)
                 {
-                  //At least one iteration was good! Return what was fitted.
-                  *pDataOffset = prevOffset;
-                  break;
+                  if ((fieldId == 0) && (currentRow != hintRow))
+                    return cs;
+                  else
+                    {
+                      //At least one iteration was good! Return what was fitted.
+                      *pDataOffset = prevOffset;
+                      break;
+                    }
                 }
             }
-
-          hintPosition = 0;
         }
-
     }
 
   return WCS_OK;

@@ -31,8 +31,7 @@ extern "C" {
 
 typedef void*               W_CONNECTOR_HND;
 typedef unsigned long long  W_TABLE_ROW_INDEX;
-typedef unsigned long long  W_ELEMENT_INDEX;
-typedef unsigned int        W_VALUE_TYPE;
+typedef unsigned long long  W_ELEMENT_OFFSET;
 
 static const unsigned int WFT_BOOL       = 0x0001;
 static const unsigned int WFT_CHAR       = 0x0002;
@@ -65,9 +64,10 @@ static const unsigned int WCS_UNEXPECTED_FRAME   = 6;
 static const unsigned int WCS_INVALID_FRAME      = 7;
 static const unsigned int WCS_COMM_OUT_OF_SYNC   = 8;
 static const unsigned int WCS_LARGE_ARGS         = 9;
-static const unsigned int WCS_CONNECTION_TIMEOUT = 10;
-static const unsigned int WCS_SERVER_BUSY        = 11;
-static const unsigned int WCS_INCOMPLETE_CMD     = 12;
+static const unsigned int WCS_LARGE_RESPONSE     = 10;
+static const unsigned int WCS_CONNECTION_TIMEOUT = 11;
+static const unsigned int WCS_SERVER_BUSY        = 12;
+static const unsigned int WCS_INCOMPLETE_CMD     = 13;
 static const unsigned int WCS_GENERAL_ERR        = 0x0FFF;
 static const unsigned int WCS_OS_ERR_BASE        = 0x1000;
 
@@ -76,8 +76,8 @@ static const unsigned int WCS_OS_ERR_BASE        = 0x1000;
 #define WDEC_OS_ERROR(x)     ((x) - WCS_OS_ERR_BASE)
 
 #define WIGNORE_FIELD                            NULL
-#define WIGNORE_ROW                              (0)
-#define WIGNORE_OFFSET                           (0)
+#define WIGNORE_ROW                              (~0ull)
+#define WIGNORE_OFF                              (~0ull)
 
 struct W_FieldDescriptor
 {
@@ -166,18 +166,15 @@ WPopStackValues (const W_CONNECTOR_HND hnd,
 
 unsigned int
 WUpdateStackValue (const W_CONNECTOR_HND         hnd,
-                   const unsigned int            valueType,
+                   const unsigned int            type,
                    const char* const             fieldName,
                    const W_TABLE_ROW_INDEX       row,
-                   const W_ELEMENT_INDEX         position,
+                   const W_ELEMENT_OFFSET        arrayOff,
+                   const W_ELEMENT_OFFSET        textOff,
                    const char* const             value);
 
 unsigned int
 WUpdateStackFlush (const W_CONNECTOR_HND hnd);
-
-unsigned int
-WStackValueRawType (const W_CONNECTOR_HND hnd,
-                    unsigned int*         pType);
 
 unsigned int
 WGetStackValueRowsCount (const W_CONNECTOR_HND       hnd,
@@ -194,13 +191,15 @@ unsigned int
 WGetStackTextLengthCount (const W_CONNECTOR_HND   hnd,
                           const char*             field,
                           const W_TABLE_ROW_INDEX row,
+                          const W_ELEMENT_OFFSET  arrayOff,
                           unsigned long long*     pCount);
 
 unsigned int
 WGetStackValueEntry (const W_CONNECTOR_HND   hnd,
                      const char* const       field,
                      W_TABLE_ROW_INDEX       row,
-                     const W_ELEMENT_INDEX   index,
+                     const W_ELEMENT_OFFSET  arrayOff,
+                     const W_ELEMENT_OFFSET  textOff,
                      const char** const      pValue);
 
 unsigned int

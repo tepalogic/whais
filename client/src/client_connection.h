@@ -31,6 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 D_UINT
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                D_UINT16* const              pOutSize);
+                D_UINT* const                  pOutSize);
 
 #endif /* CLIENT_CONNECTION_H_ */

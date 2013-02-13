@@ -159,14 +159,14 @@ ClientConnection::~ClientConnection ()
 {
 }
 
-D_UINT16
+D_UINT
 ClientConnection::MaxSize () const
 {
   assert (m_EncriptionType == FRAME_ENCTYPE_PLAIN);
   return sizeof (m_Data) - (FRAME_DATA_OFF + PLAIN_DATA_OFF);
 }
 
-D_UINT16
+D_UINT
 ClientConnection::DataSize () const
 {
   assert ((m_FrameSize == 0)
