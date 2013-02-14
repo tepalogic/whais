@@ -1128,6 +1128,8 @@ stack_top_basic_update (struct INTERNAL_HANDLER* hnd,
     D_UINT8*     data_    = data (hnd);
     const D_UINT currSize = data_size (hnd);
 
+    data_ += currSize;
+
     *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
     store_le_int16 (type, data_);

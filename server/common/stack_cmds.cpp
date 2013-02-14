@@ -501,7 +501,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
   assert_cmds_values ();
 
   const D_UINT8* const data     = rConn.Data ();
-  const D_UINT8        dataSize = rConn.DataSize ();
+  const D_UINT         dataSize = rConn.DataSize ();
   SessionStack&        rStack   = rConn.Stack ();
   D_UINT16             type     = from_le_int16 (data + *pDataOff);
 

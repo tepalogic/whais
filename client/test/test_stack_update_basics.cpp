@@ -130,7 +130,13 @@ test_bulk_update (W_CONNECTOR_HND hnd)
   for (D_UINT i = 0; i < _valuesCount; ++i)
     {
       if ((WPushStackValue (hnd, _values[i].type, 0, NULL) != WCS_OK)
-          || (WUpdateStackValue (hnd, _values[i].type, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, WIGNORE_OFF, _values[i].value) != WCS_OK))
+          || (WUpdateStackValue (hnd,
+                                 _values[i].type,
+                                 WIGNORE_FIELD,
+                                 WIGNORE_ROW,
+                                 WIGNORE_OFF,
+                                 WIGNORE_OFF,
+                                 _values[i].value) != WCS_OK))
         {
           goto test_bulk_update_err;
         }
@@ -139,7 +145,7 @@ test_bulk_update (W_CONNECTOR_HND hnd)
   if (WUpdateStackFlush (hnd) != WCS_OK)
     goto test_bulk_update_err;
 
-  for (D_UINT i = 0; i < _valuesCount; ++i)
+  for (D_INT i = _valuesCount - 1; i >= 0; --i)
     {
       D_UINT        type;
       const D_CHAR* value;

@@ -24,21 +24,61 @@
 
 #include <assert.h>
 #include <cstdio>
+#include <cstring>
 
 #include "utils/include/utf8.h"
 
 #include "valtranslator.h"
 
-static long double
-to_frac_part (D_UINT fracPart, const D_INT fracLen)
+static const D_UINT MAX_INTEGER_STR_SIZE = 64;
+
+static D_INT64
+read_real (const D_UINT8* pLocation,
+           D_INT64*       pIntPart,
+           D_INT64*       pFraPart,
+           D_INT64*       pPrecision )
 {
-  assert (fracLen >= 0);
+  D_INT64 size     = 0;
+  bool    negative = false;
 
-  D_UINT64 pow10 = 1;
-  for (D_INT i = 0; i < fracLen; ++i)
-    pow10 *= 10;
+  if (*pLocation == '-')
+    {
+      pLocation++;
+      if ((*pLocation < '0') || (*pLocation > '9'))
+        return 0;
 
-  return _SC (long double, fracPart) / pow10;
+      size++;
+      negative = true;
+    }
+
+  *pIntPart   = 0;
+  *pFraPart   = 0;
+  *pPrecision = 1;
+
+  while (('0' <= *pLocation) && (*pLocation <= '9' ))
+    {
+      *pIntPart *= 10;
+      *pIntPart += *pLocation - '0';
+
+      pLocation++, size++;
+    }
+
+  if (*pLocation == '.')
+    pLocation++, size++;
+
+  while (('0' <= *pLocation) && (*pLocation <= '9' ))
+    {
+      *pFraPart   *= 10;
+      *pFraPart   += *pLocation - '0';
+      *pPrecision *= 10;
+
+      pLocation++, size++;
+    }
+
+  if (negative)
+    *pIntPart = -*pIntPart, *pFraPart = -*pFraPart;
+
+  return size;
 }
 
 static D_INT64
@@ -125,7 +165,7 @@ Utf8Translator::Read (const D_UINT8*       utf8Src,
       D_UINT32 ch;
       if ((decode_utf8_char (utf8Src, &ch) != result)
           || (ch == 0)
-          || (utf8Src[result + 1] != 0))
+          || (utf8Src[result] != 0))
         {
           return 0;
         }
@@ -523,32 +563,17 @@ Utf8Translator::Read (const D_UINT8*      utf8Src,
       return 1;
     }
 
-  D_UINT  result  = 0;
-  D_INT64 intPart = read_integer (utf8Src, &result);
-
+  D_INT64 intPart, fracPart, precision;
+  D_UINT  result  = read_real (utf8Src, &intPart, &fracPart, &precision);
   if ((result == 0)
-      || (utf8Src[result++] != '.')
-      || (result >= srcSize))
-    {
-      return 0;
-    }
-
-  D_UINT  fracLen = 0;
-  D_INT64 fracPart = read_integer (utf8Src + result, &fracLen);
-  result += fracLen;
-
-  if ((fracLen == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (fracPart < 0))
+      || (precision % 10 != 0))
     {
       return 0;
     }
 
-
-  long double value = intPart;
-  value += to_frac_part (fracPart, fracLen);
-  *pValue = DBSReal (value);
+  *pValue = DBSReal (DBS_REAL_T (intPart, fracPart, precision));
 
   return result;
 }
@@ -567,31 +592,17 @@ Utf8Translator::Read (const D_UINT8*      utf8Src,
       return 1;
     }
 
-  D_UINT  result  = 0;
-  D_INT64 intPart = read_integer (utf8Src, &result);
-
+  D_INT64 intPart, fracPart, precision;
+  D_UINT  result  = read_real (utf8Src, &intPart, &fracPart, &precision);
   if ((result == 0)
-      || (utf8Src[result++] != '.')
-      || (result >= srcSize))
-    {
-      return 0;
-    }
-
-  D_UINT  fracLen = 0;
-  D_INT64 fracPart = read_integer (utf8Src + result, &fracLen);
-  result += fracLen;
-
-  if ((fracLen == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (fracPart < 0))
+      || (precision % 10 != 0))
     {
       return 0;
     }
 
-
-  const long double value = intPart + to_frac_part (fracPart, fracLen);
-  *pValue = DBSRichReal (value);
+  *pValue = DBSRichReal (DBS_RICHREAL_T (intPart, fracPart, precision));
 
   return result;
 }
@@ -744,7 +755,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%lld",
-                           value.m_Value);
+                           _SC (long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -768,7 +779,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%lld",
-                           value.m_Value);
+                           _SC (long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -792,7 +803,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%lld",
-                           value.m_Value);
+                           _SC (long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -816,7 +827,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%lld",
-                           value.m_Value);
+                           _SC (long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -841,7 +852,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%llu",
-                           value.m_Value);
+                           _SC (unsigned long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -865,7 +876,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%llu",
-                           value.m_Value);
+                           _SC (unsigned long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -889,7 +900,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%llu",
-                           value.m_Value);
+                           _SC (unsigned long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -913,7 +924,7 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
   D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
                            maxSize,
                            "%llu",
-                           value.m_Value);
+                           _SC (unsigned long long, value.m_Value));
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
@@ -925,23 +936,46 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
                        const D_UINT        maxSize,
                        const DBSReal&      value)
 {
-  if (maxSize == 0)
-    return 0;
+  D_CHAR tempBuffer[MAX_INTEGER_STR_SIZE];
+   D_UINT result = 0;
+   D_UINT size   = maxSize;
 
-  if (value.IsNull ())
-    {
-      utf8Dest[0] = 0;
-      return 1;
-    }
+   if (maxSize <= 1)
+     return 0;
 
-  D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
-                           maxSize,
-                           "%Lf",
-                           value.m_Value);
-  if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
-    return 0;
+   *utf8Dest = 0;
+   if (value.IsNull ())
+     return 1;
 
-  return result + 1;
+   D_INT64 intPart  = value.m_Value.Integer ();
+   D_INT64 fracPart = value.m_Value.Fractional ();
+   if ((intPart < 0) || (fracPart < 0))
+     {
+       strcat (_RC (D_CHAR*, utf8Dest),  "-");
+
+       intPart = -intPart, fracPart = -fracPart;
+       size--, result++;
+     }
+
+   if (fracPart > 0)
+     {
+       while ((fracPart % 10) == 0)
+         fracPart /= 10;
+     }
+
+   result += snprintf (tempBuffer,
+                       size,
+                      "%lld.%lld",
+                      _SC (long long int, intPart),
+                      _SC (long long int, fracPart));
+
+   strcat (_RC (D_CHAR*, utf8Dest), tempBuffer);
+   assert (strlen (_RC (D_CHAR*, utf8Dest)) == result);
+
+   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
+     return 0;
+
+   return result + 1;
 }
 
 D_UINT
@@ -949,19 +983,42 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
                        const D_UINT        maxSize,
                        const DBSRichReal&  value)
 {
-  if (maxSize == 0)
+  D_CHAR tempBuffer[MAX_INTEGER_STR_SIZE];
+  D_UINT result = 0;
+  D_UINT size   = maxSize;
+
+  if (maxSize <= 1)
     return 0;
 
+  *utf8Dest = 0;
   if (value.IsNull ())
+    return 1;
+
+  D_INT64 intPart  = value.m_Value.Integer ();
+  D_INT64 fracPart = value.m_Value.Fractional ();
+  if ((intPart < 0) || (fracPart < 0))
     {
-      utf8Dest[0] = 0;
-      return 1;
+      strcat (_RC (D_CHAR*, utf8Dest),  "-");
+
+      intPart = -intPart, fracPart = -fracPart;
+      size--, result++;
     }
 
-  D_INT result = snprintf (_RC (D_CHAR*, utf8Dest),
-                           maxSize,
-                           "%Lf",
-                           value.m_Value);
+  if (fracPart > 0)
+    {
+      while ((fracPart % 10) == 0)
+        fracPart /= 10;
+    }
+
+  result += snprintf (tempBuffer,
+                      size,
+                     "%lld.%lld",
+                     _SC (long long int, intPart),
+                     _SC (long long int, fracPart));
+
+  strcat (_RC (D_CHAR*, utf8Dest), tempBuffer);
+  assert (strlen (_RC (D_CHAR*, utf8Dest)) == result);
+
   if ((result < 0) || (_SC (D_UINT, result) >= maxSize))
     return 0;
 
