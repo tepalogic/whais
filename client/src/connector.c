@@ -36,8 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "connector.h"
 #include "client_connection.h"
 
-
 static const D_CHAR WANONIM_FIELD[] = "";
+
+static const D_UINT INVALID_OFF    = ~0;
 
 /* TODO: Handle the cases where the text entry is bigger than 0xFFFF */
 /* TODO: Add support for accessing stacking results */
@@ -1029,7 +1030,7 @@ WPushStackValue (const W_CONNECTOR_HND                 hnd,
       assert (hnd_->buildingCmd == CMD_UPDATE_STACK);
       assert (data_size (hnd_) > 0);
 
-      if ((cs == WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
         return cs;
 
       assert (hnd_->buildingCmd == CMD_INVALID);
@@ -1056,7 +1057,7 @@ WPushStackValue (const W_CONNECTOR_HND                 hnd,
 
 D_UINT
 WPopStackValues (const W_CONNECTOR_HND hnd,
-                 unsigned int        count)
+                 unsigned int          count)
 {
   struct INTERNAL_HANDLER* hnd_     = (struct INTERNAL_HANDLER*)hnd;
   static const D_UINT      spaceReq = sizeof (D_UINT32) + 1;
@@ -1401,9 +1402,6 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
   const D_UINT fixedSize  = countOff + sizeof (D_UINT16) + sizeof (D_UINT64);
   const D_UINT cmdSize    = fixedSize + strlen (value) + 1;
 
-  D_UINT8* data_;
-  D_UINT   currSize;
-
   assert (hnd != NULL);
   assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
   assert (strlen (value) > 0);
@@ -1416,11 +1414,11 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
         return cs;
     }
 
-  data_    = data (hnd);
-  currSize = data_size (hnd);
-
+  D_UINT8* data_ = data (hnd);
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
   {
+      data_ += hnd->cmdInternal[LAST_UPDATE_OFF];
+
       const D_UINT16 prevType = from_le_int16 (++data_);
       if ((type | WFT_ARRAY_MASK) == prevType)
         {
@@ -1433,7 +1431,6 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
           const D_UINT64 prevOffset = from_le_int64 (data_);
           data_ += sizeof (D_UINT64);
 
-
           if ((prevCount < 0xFFFF) &&
               (prevOffset + prevCount) == arrayOff)
             {
@@ -1445,7 +1442,6 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
               const D_UINT newDataSize = data_size (hnd) + strlen (value) + 1;
 
               assert (newDataSize <= max_data_size (hnd));
-              assert (newDataSize > currSize);
 
               data_ = data (hnd) + data_size (hnd);
               strcpy ((D_CHAR*)data_, value);
@@ -1456,8 +1452,9 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
         }
   }
 
-  data_    = data (hnd) + currSize;
+  const D_UINT currSize = data_size (hnd);
 
+  data_    = data (hnd) + currSize;
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
   store_le_int16 (type | WFT_ARRAY_MASK, data_);
@@ -1832,18 +1829,18 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
   if ((row == WIGNORE_ROW) && (arrayOff == WIGNORE_OFF))
     {
       if (fieldName != WIGNORE_FIELD)
-        return WCS_INVALID_ARGS;
+        return WCS_INVALID_FIELD;
       else if (type != WFT_TEXT)
         {
           if (textOff != WIGNORE_OFF)
-            return WCS_INVALID_ARGS;
+            return WCS_INVALID_TEXT_OFF;
 
           cs = stack_top_basic_update (hnd_, type, value);
         }
       else
         {
           if (textOff == WIGNORE_OFF)
-            return WCS_INVALID_ARGS;
+            return WCS_INVALID_TEXT_OFF;
 
           cs = stack_top_text_update (hnd_, textOff, value);
         }
@@ -1851,18 +1848,18 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
   else if ((row == WIGNORE_ROW) || (arrayOff != WIGNORE_OFF))
     {
       if (fieldName != WIGNORE_FIELD)
-        return WCS_INVALID_ARGS;
+        return WCS_INVALID_FIELD;
       else if (type == WFT_TEXT)
         {
           if (textOff == WIGNORE_OFF)
-              return WCS_INVALID_ARGS;
+              return WCS_INVALID_TEXT_OFF;
 
           cs = stack_top_array_text_update (hnd_, arrayOff, textOff, value);
         }
       else
         {
           if (textOff != WIGNORE_OFF)
-            return WCS_INVALID_ARGS;
+            return WCS_INVALID_TEXT_OFF;
 
           cs = stack_top_array_basic_update (hnd_,
                                              type,
@@ -1873,14 +1870,14 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
   else if (row != WIGNORE_ROW)
     {
       if (fieldName == WIGNORE_FIELD)
-        return WCS_INVALID_ARGS;
+        return WCS_INVALID_FIELD;
 
       if (arrayOff == WIGNORE_OFF)
         {
           if (type == WFT_TEXT)
             {
               if (textOff == WIGNORE_OFF)
-                return WCS_INVALID_ARGS;
+                return WCS_INVALID_TEXT_OFF;
 
               cs = stack_top_field_text_update (hnd_,
                                                 fieldName,
@@ -1891,7 +1888,7 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
           else
             {
               if (textOff != WIGNORE_OFF)
-                return WCS_INVALID_ARGS;
+                return WCS_INVALID_TEXT_OFF;
 
               cs = stack_top_field_basic_update (hnd_,
                                                  type,
@@ -1905,7 +1902,7 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
           if (type == WFT_TEXT)
             {
               if (textOff == WIGNORE_OFF)
-                return WCS_INVALID_ARGS;
+                return WCS_INVALID_TEXT_OFF;
 
               cs = stack_top_field_array_text_update (hnd_,
                                                       fieldName,
@@ -1917,7 +1914,7 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
           else
             {
               if (textOff != WIGNORE_OFF)
-                return WCS_INVALID_ARGS;
+                return WCS_INVALID_TEXT_OFF;
 
               cs = stack_top_field_array_basic_update (hnd_,
                                                        type,
@@ -2309,7 +2306,7 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
 
   *pArraySize = elCount;
   if ((elCount == 0) || (*pArraySize <= arrayOff))
-    return 0;
+    return INVALID_OFF;
 
 
   assert (fromPos < dataSize);
@@ -2352,7 +2349,7 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
   return fromPos;
 }
 
-static D_UINT16
+static D_UINT
 text_el_off (struct INTERNAL_HANDLER* const hnd,
              const D_UINT64                 textOff,
              D_UINT16                       fromPos,
@@ -2365,7 +2362,7 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
 
   *pCharsCount = elCount;
   if ((elCount == 0) || (elCount <= textOff))
-    return 0;
+    return INVALID_OFF;
 
   fromPos += sizeof (D_UINT64);
   assert (fromPos < dataSize);
@@ -2503,7 +2500,7 @@ resend_req__get_stack_entry:
     {
       if ((field == WANONIM_FIELD) || (strlen (field) == 0))
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_FIELD;
           goto exit_get_stack_entry;
         }
 
@@ -2511,7 +2508,7 @@ resend_req__get_stack_entry:
       assert (dataOffset < dataSize);
       if (dataOffset == 0)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_ROW;
           goto exit_get_stack_entry;
         }
 
@@ -2519,7 +2516,7 @@ resend_req__get_stack_entry:
       assert (dataOffset < dataSize);
       if (dataOffset == 0)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_FIELD;
           goto exit_get_stack_entry;
         }
 
@@ -2535,7 +2532,7 @@ resend_req__get_stack_entry:
     {
       if (field != WANONIM_FIELD)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_FIELD;
           goto exit_get_stack_entry;
         }
 
@@ -2543,7 +2540,7 @@ resend_req__get_stack_entry:
       assert (dataOffset < dataSize);
       if (dataOffset == 0)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_ROW;
           goto exit_get_stack_entry;
         }
 
@@ -2551,28 +2548,32 @@ resend_req__get_stack_entry:
     }
   else
     {
-      if ((row != WIGNORE_OFF)
-          || (field != WIGNORE_FIELD))
+      if (row != WIGNORE_OFF)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_ROW;
+          goto exit_get_stack_entry;
+        }
+      else if (field != WIGNORE_FIELD)
+        {
+          cs = WCS_INVALID_FIELD;
           goto exit_get_stack_entry;
         }
     }
 
   if (*pType & WFT_ARRAY_MASK)
     {
-      if (arrayOff == WIGNORE_OFF)
-        {
-          cs = WCS_INVALID_ARGS;
-          goto exit_get_stack_entry;
-        }
       dataOffset = get_array_el_off (hnd,
                                      *pType & 0xFF,
                                      arrayOff,
                                      dataOffset,
                                      pCount);
-      assert (dataOffset < dataSize);
-      if (dataOffset == 0)
+      assert ((dataOffset < dataSize) || (dataOffset == INVALID_OFF));
+      if (dataOffset == INVALID_OFF)
+        {
+          cs = WCS_INVALID_ARRAY_OFF;
+          goto exit_get_stack_entry;
+        }
+      else if (dataOffset == 0)
         {
           cs = WCS_INVALID_ARGS;
           goto exit_get_stack_entry;
@@ -2583,7 +2584,7 @@ resend_req__get_stack_entry:
     {
       if (arrayOff != WIGNORE_OFF)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_ARRAY_OFF;
           goto exit_get_stack_entry;
         }
     }
@@ -2591,16 +2592,15 @@ resend_req__get_stack_entry:
   assert ((WFT_BOOL <= *pType) && (*pType <= WFT_TEXT));
   if (*pType == WFT_TEXT)
     {
-      if (textOff == WIGNORE_OFF)
-        {
-          cs = WCS_INVALID_ARGS;
-          goto exit_get_stack_entry;
-        }
-
       dataOffset = text_el_off (hnd, textOff, dataOffset, pCount);
 
-      assert (dataOffset < dataSize);
-      if (dataOffset == 0)
+      assert ((dataOffset < dataSize) || (dataOffset == INVALID_OFF));
+      if (dataOffset == INVALID_OFF)
+        {
+          cs = WCS_INVALID_TEXT_OFF;
+          goto exit_get_stack_entry;
+        }
+      else if (dataOffset == 0)
         {
           cs = WCS_INVALID_ARGS;
           goto exit_get_stack_entry;
@@ -2613,7 +2613,7 @@ resend_req__get_stack_entry:
     {
       if (textOff != WIGNORE_OFF)
         {
-          cs = WCS_INVALID_ARGS;
+          cs = WCS_INVALID_TEXT_OFF;
           goto exit_get_stack_entry;
         }
 
@@ -2645,22 +2645,23 @@ WGetStackArrayElementsCount (const W_CONNECTOR_HND   hnd,
   D_UINT16      type  = 0;
   const D_CHAR* value = NULL;
 
+  if (pCount == NULL)
+    return WCS_INVALID_ARGS;
+
   D_UINT cs = get_stack_value (hnd,
                                field,
                                row,
-                               WIGNORE_OFF,
+                               0,
                                WIGNORE_OFF,
                                &count,
                                &type,
                                &value);
 
-  if ((cs != WCS_OK)
-      && ((type & WFT_ARRAY_MASK) == 0))
-    {
-      return cs;
-    }
-  else if ((type & WFT_ARRAY_MASK) == 0)
+  if (cs == WCS_INVALID_ARRAY_OFF)
     return WCS_INVALID_ARGS;
+  else if (cs != WCS_OK)
+    return cs;
+
 
   *pCount = count;
   return WCS_OK;
@@ -2677,6 +2678,9 @@ WGetStackTextLengthCount (const W_CONNECTOR_HND   hnd,
   D_UINT16      type  = 0;
   const D_CHAR* value = NULL;
 
+  if (pCount == NULL)
+    return WCS_INVALID_ARGS;
+
   D_UINT cs = get_stack_value (hnd,
                                field,
                                row,
@@ -2686,10 +2690,10 @@ WGetStackTextLengthCount (const W_CONNECTOR_HND   hnd,
                                &type,
                                &value);
 
-  if (cs != WCS_OK)
+  if (cs == WCS_INVALID_TEXT_OFF)
+    return WCS_INVALID_ARGS;
+  else if (cs != WCS_OK)
     return cs;
-
-  assert (type == WFT_TEXT);
 
   *pCount = count;
   return WCS_OK;

@@ -27,3 +27,10 @@ UNIT_EXES+=c_test_stack_update_basics
 c_test_stack_update_basics_SRC=test/test_stack_update_basics.cpp
 c_test_stack_update_basics_LIB=client/connector custom/custom utils/utils 
 c_test_stack_update_basics_INC=
+
+UNIT_EXES+=c_test_stack_update_array
+c_test_stack_update_array_SRC=test/test_stack_update_array.cpp
+c_test_stack_update_array_LIB=client/connector custom/custom utils/utils 
+c_test_stack_update_array_INC=
+
+

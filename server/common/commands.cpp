@@ -324,14 +324,15 @@ cmd_read_stack (ClientConnection& rConn)
     }
   catch (DBSException& e)
   {
-      if ((e.GetExtra () == DBSException::FIELD_NOT_FOUND)
-          || (e.GetExtra () == DBSException::FIELD_NOT_INDEXED)
-          || (e.GetExtra () == DBSException::ARRAY_INDEX_TOO_BIG)
-          || (e.GetExtra () == DBSException::ROW_NOT_ALLOCATED)
-          || (e.GetExtra () == DBSException::STRING_INDEX_TOO_BIG))
-        {
-          status = WCS_INVALID_ARGS;
-        }
+      const D_UINT extra = e.GetExtra ();
+      if (extra == DBSException::FIELD_NOT_FOUND)
+        status = WCS_INVALID_FIELD;
+      else if (extra == DBSException::ARRAY_INDEX_TOO_BIG)
+        status = WCS_INVALID_ARRAY_OFF;
+      else if (extra == DBSException::STRING_INDEX_TOO_BIG)
+        status = WCS_INVALID_TEXT_OFF;
+      else if (extra == DBSException::ROW_NOT_ALLOCATED)
+        status = WCS_INVALID_ROW;
       else
         throw ;
   }

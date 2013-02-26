@@ -68,6 +68,10 @@ static const unsigned int WCS_LARGE_RESPONSE     = 10;
 static const unsigned int WCS_CONNECTION_TIMEOUT = 11;
 static const unsigned int WCS_SERVER_BUSY        = 12;
 static const unsigned int WCS_INCOMPLETE_CMD     = 13;
+static const unsigned int WCS_INVALID_ARRAY_OFF  = 14;
+static const unsigned int WCS_INVALID_TEXT_OFF   = 15;
+static const unsigned int WCS_INVALID_ROW        = 16;
+static const unsigned int WCS_INVALID_FIELD      = 17;
 static const unsigned int WCS_GENERAL_ERR        = 0x0FFF;
 static const unsigned int WCS_OS_ERR_BASE        = 0x1000;
 
@@ -78,6 +82,7 @@ static const unsigned int WCS_OS_ERR_BASE        = 0x1000;
 #define WIGNORE_FIELD                            NULL
 #define WIGNORE_ROW                              (~0ull)
 #define WIGNORE_OFF                              (~0ull)
+#define WPOP_ALL                                 (~0)
 
 struct W_FieldDescriptor
 {

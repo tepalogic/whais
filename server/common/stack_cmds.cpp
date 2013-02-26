@@ -329,11 +329,15 @@ push_frame_error:
 static D_UINT
 read_value (StackValue&         dest,
             const D_UINT32      type,
+            const bool          isArray,
             const D_UINT8*      data,
             const D_UINT16      dataSize,
             D_UINT* const       pDataOff)
 {
+  const D_UINT minSize = isArray ? 0 : 1;
+
   D_UINT result = 0;
+
   switch (type)
   {
   case WFT_BOOL:
@@ -342,7 +346,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -352,7 +357,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -362,7 +368,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -372,7 +379,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -382,7 +390,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -392,7 +401,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -402,7 +412,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -412,7 +423,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -422,7 +434,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -432,7 +445,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -442,7 +456,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -452,7 +467,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -462,7 +478,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -472,7 +489,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -482,7 +500,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *pDataOff,
                                      dataSize - *pDataOff,
                                      &value);
-      dest.GetOperand ().SetValue (value);
+      if (result > minSize)
+        dest.GetOperand ().SetValue (value);
     }
     break;
 
@@ -491,8 +510,13 @@ read_value (StackValue&         dest,
                                _EXTRA (type));
   }
 
-  *pDataOff += result;
-  return result;
+  if (result > minSize)
+    {
+      *pDataOff += result;
+      return result;
+    }
+
+  return 0;
 }
 
 D_UINT
@@ -508,8 +532,8 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
   if (rStack.Size () == 0)
     return WCS_INVALID_ARGS;
 
-  StackValue& topValue      = rStack[rStack.Size () - 1];
-  bool        clearTopValue = false;
+  StackValue stackTop      = rStack[0]; //Dummy initialization!
+  bool       clearTopValue = false;
 
   if ((*pDataOff + sizeof (D_UINT16)) > dataSize)
     goto update_frame_error;
@@ -519,6 +543,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
       *pDataOff += sizeof (D_UINT16);
       if (type & WFT_FIELD_MASK)
         {
+
           type &= ~WFT_FIELD_MASK;
 
           const D_CHAR* const fieldName = _RC (const D_CHAR*,
@@ -535,14 +560,14 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
           const D_UINT64 rowIndex = from_le_int64 (data + *pDataOff);
           *pDataOff += sizeof (D_UINT64);
 
-          I_DBSTable&    table      = topValue.GetOperand ().GetTable ();
+          I_DBSTable&    table      = stackTop.GetOperand ().GetTable ();
           const D_UINT32 fieldIndex = table.GetFieldIndex (fieldName);
 
           /* topValue will be a field now! */
-          StackValue temp = topValue;
-          topValue  = temp.GetOperand ().GetFieldAt (fieldIndex);
-          clearTopValue = true;
+          StackValue temp = rStack[rStack.Size () - 1];
 
+          stackTop      = temp.GetOperand ().GetFieldAt (fieldIndex);
+          clearTopValue = true;
           if (type & WFT_ARRAY_MASK)
             {
               type &= ~WFT_ARRAY_MASK;
@@ -551,13 +576,13 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
               if (type == WFT_TEXT)
                 {
                   assert (clearTopValue);
-                  topValue.Clear ();
+                  stackTop.Clear ();
                   return WCS_OP_NOTSUPP;
                 }
 
               /* topValue will be an array field now! */
-              temp     = topValue;
-              topValue = temp.GetOperand ().GetValueAt (rowIndex);
+              temp     = stackTop;
+              stackTop = temp.GetOperand ().GetValueAt (rowIndex);
               temp.Clear ();
 
               if (*pDataOff + sizeof (D_UINT16) > dataSize)
@@ -575,15 +600,15 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
               if (*pDataOff > dataSize)
                 goto update_frame_error;
 
-              temp = topValue;
-              while ((*pDataOff < dataSize)
-                      && (elCount-- > 0))
+              temp = stackTop;
+              while ((*pDataOff < dataSize) && (elCount > 0))
                 {
-                  topValue  = temp.GetOperand ().GetValueAt (fromPos);
+                  stackTop  = temp.GetOperand ().GetValueAt (fromPos);
                   clearTopValue = true;
 
-                  const D_UINT len = read_value (topValue,
+                  const D_UINT len = read_value (stackTop,
                                                  type,
+                                                 true,
                                                  data,
                                                  dataSize,
                                                  pDataOff);
@@ -596,7 +621,8 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
                   assert (*pDataOff <= dataSize);
 
                   ++fromPos;
-                  topValue.Clear ();
+                  --elCount;
+                  stackTop.Clear ();
                   clearTopValue = false;
                 }
               temp.Clear ();
@@ -607,7 +633,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
           else if (type == WFT_TEXT)
             {
               DBSText fieldText;
-              topValue.GetOperand ().GetValue (fieldText);
+              stackTop.GetOperand ().GetValue (fieldText);
 
               if ((*pDataOff + sizeof (D_UINT64)) >= dataSize)
                 goto update_frame_error;
@@ -634,12 +660,13 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
                   fieldText.SetCharAtIndex (DBSChar (ch), textOff++);
                 }
 
-              topValue.GetOperand ().SetValue (fieldText);
+              stackTop.GetOperand ().SetValue (fieldText);
             }
           else
             {
-              const D_UINT elLen = read_value (topValue,
+              const D_UINT elLen = read_value (stackTop,
                                                type,
+                                               false,
                                                data,
                                                dataSize,
                                                pDataOff);
@@ -658,7 +685,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
             {
               assert (clearTopValue);
 
-              topValue.Clear ();
+              stackTop.Clear ();
               return WCS_OP_NOTSUPP;
             }
 
@@ -677,15 +704,15 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
           D_UINT64 fromPos =  from_le_int64 (data + *pDataOff);
           *pDataOff        += sizeof (D_UINT64);
 
-          StackValue temp = topValue;
-          while ((*pDataOff < dataSize)
-                 && (elCount-- > 0))
+          StackValue& temp = rStack[rStack.Size () - 1];
+          while ((*pDataOff < dataSize) && (elCount > 0))
             {
-              topValue  = temp.GetOperand ().GetValueAt (fromPos);
+              stackTop      = temp.GetOperand ().GetValueAt (fromPos);
               clearTopValue = true;
 
-              const D_UINT len = read_value (topValue,
+              const D_UINT len = read_value (stackTop,
                                              type,
+                                             true,
                                              data,
                                              dataSize,
                                              pDataOff);
@@ -695,7 +722,8 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
               assert (*pDataOff <= dataSize);
 
               ++fromPos;
-              topValue.Clear ();
+              --elCount;
+              stackTop.Clear ();
               clearTopValue = false;
             }
 
@@ -705,7 +733,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
       else if (type == WFT_TEXT)
         {
           DBSText fieldText;
-          topValue.GetOperand ().GetValue (fieldText);
+          stackTop.GetOperand ().GetValue (fieldText);
 
           if ((*pDataOff + sizeof (D_UINT64)) > dataSize)
             goto update_frame_error;
@@ -730,13 +758,14 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
 
           fieldText.SetCharAtIndex (DBSChar (), offset);
 
-          topValue.GetOperand ().SetValue (fieldText);
+          stackTop.GetOperand ().SetValue (fieldText);
         }
       else
         {
           assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
-          const D_UINT elLen = read_value (topValue,
+          const D_UINT elLen = read_value (rStack[rStack.Size () - 1],
                                            type,
+                                           false,
                                            data,
                                            dataSize,
                                            pDataOff);
@@ -749,7 +778,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
   catch (InterException& e)
   {
       if (clearTopValue)
-        topValue.Clear ();
+        stackTop.Clear ();
 
       if (e.GetExtra() == InterException::INVALID_OP_REQ)
         return WCS_INVALID_ARGS;
@@ -759,34 +788,37 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
   catch (DBSException& e)
   {
       if (clearTopValue)
-        topValue.Clear ();
+        stackTop.Clear ();
 
-      if ((e.GetExtra() == DBSException::FIELD_NOT_FOUND)
-          || (e.GetExtra () == DBSException::ARRAY_INDEX_TOO_BIG)
-          || (e.GetExtra () == DBSException::STRING_INDEX_TOO_BIG))
-        {
-          return WCS_INVALID_ARGS;
-        }
+      const D_UINT extra = e.GetExtra ();
+      if (extra == DBSException::FIELD_NOT_FOUND)
+        return WCS_INVALID_FIELD;
+      else if (extra == DBSException::ARRAY_INDEX_TOO_BIG)
+        return WCS_INVALID_ARRAY_OFF;
+      else if (extra == DBSException::STRING_INDEX_TOO_BIG)
+        return WCS_INVALID_TEXT_OFF;
+      else if (extra == DBSException::ROW_NOT_ALLOCATED)
+        return WCS_INVALID_ROW;
 
       throw;
   }
   catch (...)
   {
       if (clearTopValue)
-        topValue.Clear ();
+        stackTop.Clear ();
 
       throw;
   }
 
   if (clearTopValue)
-    topValue.Clear ();
+    stackTop.Clear ();
 
   return WCS_OK;
 
 update_frame_error:
 
   if (clearTopValue)
-    topValue.Clear ();
+    stackTop.Clear ();
 
     throw ConnectionException (
                     "Frame with invalid content for stack update operation.",
@@ -932,7 +964,7 @@ cmd_read_basic_stack_top (ClientConnection& rConn,
 D_UINT
 cmd_read_array_stack_top (ClientConnection& rConn,
                           StackValue&       value,
-                          const D_UINT64    hintOffset,
+                          D_UINT64          hintOffset,
                           D_UINT* const     pDataOffset)
 {
   D_UINT8* const data        = rConn.Data ();
@@ -952,18 +984,18 @@ cmd_read_array_stack_top (ClientConnection& rConn,
     store_le_int64 (maxCount, data + *pDataOffset);
     *pDataOffset +=sizeof (D_UINT64);
 
-    if ((hintOffset >= maxCount) && (maxCount > 0))
-      return WCS_INVALID_ARGS;
-    else if (maxCount == 0)
+    if (maxCount == 0)
       return WCS_OK;
+
+    if (hintOffset >= maxCount)
+      hintOffset = 0;
+
+    if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
+      return WCS_LARGE_RESPONSE;
+
+    store_le_int64 (hintOffset, data + *pDataOffset);
+    *pDataOffset += sizeof (D_UINT64);
   }
-
-  *pDataOffset += sizeof (D_UINT64);
-  if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
-    return WCS_LARGE_RESPONSE;
-
-  store_le_int64 (hintOffset, data + *pDataOffset);
-  *pDataOffset += sizeof (D_UINT64);
 
   for (D_UINT64 index = hintOffset; index < maxCount; ++index)
     {
@@ -982,8 +1014,6 @@ cmd_read_array_stack_top (ClientConnection& rConn,
             break;
         }
 
-      assert (writeSize > 2);
-
       *pDataOffset += writeSize;
     }
 
@@ -993,7 +1023,7 @@ cmd_read_array_stack_top (ClientConnection& rConn,
 D_UINT
 cmd_read_text_stack_top (ClientConnection& rConn,
                          StackValue&       value,
-                         const D_UINT64    hintOffset,
+                         D_UINT64          hintOffset,
                          D_UINT* const     pDataOffset)
 {
   D_UINT8* const data        = rConn.Data ();
@@ -1014,10 +1044,11 @@ cmd_read_text_stack_top (ClientConnection& rConn,
     maxCount = temp.GetCharactersCount ();
     store_le_int64 (maxCount, data + *pDataOffset);
 
-    if ((hintOffset >= maxCount) && (maxCount > 0))
-      return WCS_INVALID_ARGS;
-    else if (maxCount == 0)
+    if (maxCount == 0)
       return WCS_OK;
+
+    if (hintOffset >= maxCount)
+      hintOffset = 0;
   }
 
   *pDataOffset +=sizeof (D_UINT64);
@@ -1091,7 +1122,7 @@ cmd_read_table_field_internal (ClientConnection& rConn,
           return WCS_GENERAL_ERR;
         }
       else if (hintTextOff != WIGNORE_OFF)
-        return WCS_OP_NOTSUPP;
+        return WCS_INVALID_ARGS;
 
       cs = cmd_read_array_stack_top (rConn,
                                      topValue,

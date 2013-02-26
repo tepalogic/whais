@@ -988,7 +988,12 @@ set_array_element (I_ArrayStrategy*& pArrayStrategy,
                    const T&          value,
                    const D_UINT64    index)
 {
-  if (index >= pArrayStrategy->Count())
+  if (index == pArrayStrategy->Count())
+    {
+      add_array_element (value, pArrayStrategy);
+      return ;
+    }
+  else if (index > pArrayStrategy->Count())
     throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (pArrayStrategy);
