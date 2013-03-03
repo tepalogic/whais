@@ -66,14 +66,14 @@ test_print_unfree_mem (void)
 {
   W_ALLOCATED_MEMORY *pIt = spListHead;
 
-  printf ("%10s %10s %4s %s\n",
-         "Count(low)", "Size", "Line", "File");
+  printf ("%10s %10s %5s %s\n",
+         "Count", "Size", "Line", "File");
 
   assert (pIt->size >= (sizeof (W_ALLOCATED_MEMORY) + 1));
   while (pIt != NULL)
     {
-      printf ("%10d %10d %4d %s\n",
-              (unsigned int) pIt->count,
+      printf ("%10llu %10d %5d %s\n",
+              (unsigned long long)pIt->count,
               (unsigned int)pIt->size - (sizeof (W_ALLOCATED_MEMORY) + 1),
               (unsigned int)pIt->line,
               ((pIt->file == NULL) ? "NULL" : pIt->file));

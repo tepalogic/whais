@@ -1647,7 +1647,11 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
 
   //Check if we are trying to write a different value
   T currentValue;
-  RetrieveEntry (row, field, currentValue);
+
+  if (row == m_RowsCount)
+    AddRow ();
+  else
+    RetrieveEntry (row, field, currentValue);
 
   if (currentValue == value)
     return; //Nothing to change

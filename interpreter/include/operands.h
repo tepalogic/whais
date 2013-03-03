@@ -27,6 +27,7 @@
 
 #include <assert.h>
 #include <vector>
+#include <cstring>
 
 #include "dbs/include/dbs_mgr.h"
 #include "dbs/include/dbs_values.h"
@@ -112,13 +113,16 @@ public:
 
   virtual D_UINT GetType () = 0;
 
-  //Special treatment for these
   virtual FIELD_INDEX   GetField () = 0;
   virtual I_DBSTable&   GetTable () = 0;
   virtual StackValue    GetFieldAt (const FIELD_INDEX field) = 0;
   virtual StackValue    GetValueAt (const D_UINT64 index) = 0;
 
-  virtual StackValue CopyValue () const = 0;
+  virtual StackValue Duplicate () const = 0;
+
+protected:
+  friend class StackValue;
+  virtual void NotifyCopy () = 0;
 };
 
 class StackValue
@@ -135,18 +139,41 @@ public:
     _placement_new (m_Storage, op);
   }
 
-  ~StackValue ()
+  StackValue (const StackValue& source)
   {
+    I_Operand& op = _CC (I_Operand&,
+                         _RC (const I_Operand&, source.m_Storage));
+    op.NotifyCopy ();
+
+    memcpy (&m_Storage, &source.m_Storage, sizeof m_Storage);
   }
 
-  void Clear ()
+  StackValue&
+  operator= (const StackValue& source)
   {
-    GetOperand ().~I_Operand ();
+    I_Operand& op = _CC (I_Operand&,
+                         _RC (const I_Operand&, source.m_Storage));
+    op.NotifyCopy ();
+
+    Clear ();
+    memcpy (&m_Storage, &source.m_Storage, sizeof m_Storage);
+
+    return *this;
+  }
+
+  ~StackValue ()
+  {
+    Clear ();
   }
 
   I_Operand& GetOperand () { return *_RC (I_Operand*, m_Storage);  }
 
 private:
+  void Clear ()
+  {
+    GetOperand ().~I_Operand ();
+  }
+
   D_UINT64 m_Storage [MAX_OP_QWORDS];
 };
 

@@ -447,7 +447,9 @@ DBSText::SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index)
 void
 DBSText::SetMirror (DBSText& mirror) const
 {
-  if (m_pText->ReferenceCount () > 1)
+  if (m_pText->ReferenceCount() == 1)
+    m_pText->IncreaseShareCount ();
+  else
     {
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
@@ -458,17 +460,23 @@ DBSText::SetMirror (DBSText& mirror) const
 
       assert (m_pText->ShareCount () == 0);
       assert (m_pText->ReferenceCount () == 1);
+
+      m_pText->IncreaseShareCount ();
     }
 
-  if (mirror.m_pText->ShareCount () > 0)
-    mirror.m_pText->DecreaseShareCount ();
-  else
-    mirror.m_pText->DecreaseReferenceCount ();
+  assert (m_pText->ReferenceCount () == 1);
 
-  m_pText->IncreaseShareCount ();
-  mirror.m_pText = m_pText;
+  if (this != &mirror)
+    {
+      if (mirror.m_pText->ShareCount () > 0)
+        mirror.m_pText->DecreaseShareCount ();
+      else
+        mirror.m_pText->DecreaseReferenceCount ();
+
+      mirror.m_pText = m_pText;
+    }
+
 }
-
 
 template <class T> void
 init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
@@ -1431,11 +1439,14 @@ DBSArray::SetMirror (DBSArray& mirror) const
 
   assert (m_pArray->ReferenceCount () == 1);
 
-  if (mirror.m_pArray->ShareCount () == 0)
-    mirror.m_pArray->DecrementReferenceCount ();
-  else
-    mirror.m_pArray->DecrementShareCount ();
+  if (this != &mirror)
+    {
+      if (mirror.m_pArray->ShareCount () == 0)
+        mirror.m_pArray->DecrementReferenceCount ();
+      else
+        mirror.m_pArray->DecrementShareCount ();
 
-  mirror.m_pArray = m_pArray;
+      mirror.m_pArray = m_pArray;
+    }
 }
 

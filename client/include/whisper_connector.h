@@ -72,6 +72,7 @@ static const unsigned int WCS_INVALID_ARRAY_OFF  = 14;
 static const unsigned int WCS_INVALID_TEXT_OFF   = 15;
 static const unsigned int WCS_INVALID_ROW        = 16;
 static const unsigned int WCS_INVALID_FIELD      = 17;
+static const unsigned int WCS_TYPE_MISMATCH      = 18;
 static const unsigned int WCS_GENERAL_ERR        = 0x0FFF;
 static const unsigned int WCS_OS_ERR_BASE        = 0x1000;
 

@@ -196,7 +196,7 @@ public:
   virtual FieldOperand  GetFieldOp ();
   virtual void          CopyFieldOp (const FieldOperand& source);
 
-
+  virtual void          NotifyCopy ();
 };
 
 class NullOperand : public I_PMOperand
@@ -231,7 +231,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class BoolOperand : public I_PMOperand
@@ -256,7 +256,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSBool m_Value;
@@ -281,7 +281,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSChar m_Value;
@@ -307,7 +307,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSDate m_Value;
@@ -333,7 +333,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSDateTime m_Value;
@@ -359,7 +359,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSHiresTime m_Value;
@@ -406,7 +406,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSUInt8 m_Value;
@@ -454,7 +454,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSUInt16 m_Value;
@@ -502,7 +502,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSUInt32 m_Value;
@@ -550,7 +550,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSUInt64 m_Value;
@@ -598,7 +598,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSInt8 m_Value;
@@ -646,7 +646,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSInt16 m_Value;
@@ -693,7 +693,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSInt32 m_Value;
@@ -740,7 +740,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSInt64 m_Value;
@@ -779,7 +779,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSReal m_Value;
@@ -817,7 +817,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBSRichReal m_Value;
@@ -845,7 +845,8 @@ public:
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
+  virtual void       NotifyCopy ();
 
 private:
   DBSText m_Value;
@@ -882,7 +883,8 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
+  virtual void       NotifyCopy ();
 
 private:
   const D_UINT64 m_Index;
@@ -909,7 +911,8 @@ public:
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
+  virtual void       NotifyCopy ();
 
 private:
   DBSArray m_Value;
@@ -939,9 +942,6 @@ protected:
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
-    if (m_Array.ElementsCount () < m_ElementIndex)
-      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
-
     m_Array.GetElement (out, m_ElementIndex);
 
     assert (out.IsNull () == false);
@@ -949,11 +949,10 @@ protected:
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    if (m_Array.ElementsCount () < m_ElementIndex)
-      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
-
     m_Array.SetElement (value, m_ElementIndex);
   }
+
+  virtual void NotifyCopy ();
 
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
@@ -982,7 +981,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class CharArrayElOperand : public BaseArrayElOperand
@@ -1002,7 +1001,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateArrayElOperand : public BaseArrayElOperand
@@ -1023,7 +1022,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateTimeArrayElOperand : public BaseArrayElOperand
@@ -1044,7 +1043,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class HiresTimeArrayElOperand : public BaseArrayElOperand
@@ -1065,7 +1064,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt8ArrayElOperand : public BaseArrayElOperand
@@ -1108,7 +1107,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt16ArrayElOperand : public BaseArrayElOperand
@@ -1150,7 +1149,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt32ArrayElOperand : public BaseArrayElOperand
@@ -1192,7 +1191,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt64ArrayElOperand : public BaseArrayElOperand
@@ -1234,7 +1233,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int8ArrayElOperand : public BaseArrayElOperand
@@ -1276,7 +1275,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int16ArrayElOperand : public BaseArrayElOperand
@@ -1318,7 +1317,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int32ArrayElOperand : public BaseArrayElOperand
@@ -1360,7 +1359,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int64ArrayElOperand : public BaseArrayElOperand
@@ -1402,7 +1401,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class RealArrayElOperand : public BaseArrayElOperand
@@ -1434,7 +1433,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class RichRealArrayElOperand : public BaseArrayElOperand
@@ -1466,7 +1465,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class TableOperand : public I_PMOperand
@@ -1513,7 +1512,8 @@ public:
     return *m_pRefTable;
   }
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
+  virtual void       NotifyCopy ();
 
   virtual TableOperand  GetTableOp ();
   virtual void          CopyTableOp (const TableOperand& source);
@@ -1548,7 +1548,8 @@ public:
   virtual I_DBSTable& GetTable ();
   virtual StackValue  GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
+  virtual void       NotifyCopy ();
 
   virtual FieldOperand  GetFieldOp ();
   virtual void          CopyFieldOp (const FieldOperand& source);
@@ -1587,9 +1588,6 @@ protected:
   {
     I_DBSTable& table = m_pRefTable->GetTable ();
 
-    if (table.GetAllocatedRows () <= m_Row)
-      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
-
     table.GetEntry (m_Row, m_Field, out);
   }
 
@@ -1597,11 +1595,10 @@ protected:
   {
     I_DBSTable& table = m_pRefTable->GetTable ();
 
-    if (table.GetAllocatedRows () <= m_Row)
-      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
-
     table.SetEntry (m_Row, m_Field, value);
   }
+
+  virtual void NotifyCopy ();
 
 private:
   friend class CharTextFieldElOperand;
@@ -1637,7 +1634,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class CharFieldElOperand : public BaseFieldElOperand
@@ -1659,7 +1656,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateFieldElOperand : public BaseFieldElOperand
@@ -1682,7 +1679,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateTimeFieldElOperand : public BaseFieldElOperand
@@ -1706,7 +1703,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class HiresTimeFieldElOperand : public BaseFieldElOperand
@@ -1729,7 +1726,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt8FieldElOperand : public BaseFieldElOperand
@@ -1773,7 +1770,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt16FieldElOperand : public BaseFieldElOperand
@@ -1817,7 +1814,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt32FieldElOperand : public BaseFieldElOperand
@@ -1861,7 +1858,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt64FieldElOperand : public BaseFieldElOperand
@@ -1905,7 +1902,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int8FieldElOperand : public BaseFieldElOperand
@@ -1949,7 +1946,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int16FieldElOperand : public BaseFieldElOperand
@@ -1993,7 +1990,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int32FieldElOperand : public BaseFieldElOperand
@@ -2037,7 +2034,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int64FieldElOperand : public BaseFieldElOperand
@@ -2081,7 +2078,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class RealFieldElOperand : public BaseFieldElOperand
@@ -2115,7 +2112,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class RichRealFieldElOperand : public BaseFieldElOperand
@@ -2149,7 +2146,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class TextFieldElOperand : public BaseFieldElOperand
@@ -2174,7 +2171,7 @@ public:
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class ArrayFieldElOperand : public BaseFieldElOperand
@@ -2196,7 +2193,7 @@ public:
 
   virtual StackValue GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class CharTextFieldElOperand : public BaseFieldElOperand
@@ -2220,7 +2217,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
 private:
   const D_UINT64    m_Index;
@@ -2256,14 +2253,8 @@ protected:
   {
     I_DBSTable& table = m_pRefTable->GetTable ();
 
-    if (table.GetAllocatedRows () <= m_Row)
-      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
-
     DBSArray array;
     table.GetEntry (m_Row, m_Field, array);
-
-    if (array.ElementsCount () <= m_Index)
-      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
 
     array.GetElement (outValue, m_Index);
     assert (outValue.IsNull () == false);
@@ -2273,18 +2264,14 @@ protected:
   {
     I_DBSTable& table = m_pRefTable->GetTable ();
 
-    if (table.GetAllocatedRows () <= m_Row)
-      throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
-
     DBSArray array;
     table.GetEntry (m_Row, m_Field, array);
-
-    if (array.ElementsCount () <= m_Index)
-      throw InterException (NULL, _EXTRA (InterException::ARRAY_INDEX_BIGGER));
 
     array.SetElement (value, m_Index);
     table.SetEntry (m_Row, m_Field, array);
   }
+
+  virtual void NotifyCopy ();
 
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
@@ -2318,7 +2305,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class CharArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2341,7 +2328,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2365,7 +2352,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2389,7 +2376,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2413,7 +2400,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2458,7 +2445,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt16ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2503,7 +2490,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt32ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2548,7 +2535,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt64ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2593,7 +2580,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2638,7 +2625,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int16ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2683,7 +2670,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int32ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2728,7 +2715,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int64ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2773,7 +2760,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class RealArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2808,7 +2795,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class RichRealArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2843,7 +2830,7 @@ public:
 
   virtual D_UINT GetType ();
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 };
 
 class GlobalValue
@@ -2996,10 +2983,16 @@ public:
     return GetOperand ().GetValueAt (index);
   }
 
-  StackValue CopyValue ()
+  StackValue Duplicate ()
   {
     WSynchronizerRAII dummy(m_Sync);
-    return GetOperand ().CopyValue ();
+    return GetOperand ().Duplicate ();
+  }
+
+  void NotifyCopy ()
+  {
+    WSynchronizerRAII dummy(m_Sync);
+    GetOperand ().NotifyCopy ();
   }
 
   TableOperand GetTableOp ()
@@ -3110,7 +3103,8 @@ public:
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual StackValue  GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
+  virtual void       NotifyCopy ();
 
   virtual TableOperand  GetTableOp ();
   virtual void          CopyTableOp (const TableOperand& source);
@@ -3119,8 +3113,8 @@ public:
   virtual void          CopyFieldOp (const FieldOperand& source);
 
 private:
-  GlobalValue& m_Value;
 
+  GlobalValue& m_Value;
 };
 
 class LocalOperand : public I_PMOperand
@@ -3198,7 +3192,7 @@ public:
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual StackValue  GetValueAt (const D_UINT64 index);
 
-  virtual StackValue CopyValue () const;
+  virtual StackValue Duplicate () const;
 
   virtual TableOperand  GetTableOp ();
   virtual void          CopyTableOp (const TableOperand& source);

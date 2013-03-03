@@ -253,9 +253,8 @@ op_func_ldlo8 (Processor& processor, D_INT64& offset)
 
   LocalOperand localOp (processor.GetStack(),
                         processor.StackBegin () + localIndex);
-  StackValue value (localOp);
 
-  processor.GetStack ().Push (value);
+  processor.GetStack ().Push (StackValue (localOp));
 
   offset += sizeof (D_UINT8);
 }
@@ -272,9 +271,8 @@ op_func_ldlo16 (Processor& processor, D_INT64& offset)
 
   LocalOperand localOp (processor.GetStack(),
                         processor.StackBegin () + localIndex);
-  StackValue value (localOp);
 
-  processor.GetStack ().Push (value);
+  processor.GetStack ().Push (StackValue (localOp));
 
   offset += sizeof (D_UINT16);
 }
@@ -291,9 +289,8 @@ op_func_ldlo32 (Processor& processor, D_INT64& offset)
 
   LocalOperand localOp (processor.GetStack(),
                         processor.StackBegin () + localIndex);
-  StackValue value (localOp);
 
-  processor.GetStack ().Push (value);
+  processor.GetStack ().Push (StackValue (localOp));
 
   offset += sizeof (D_UINT32);
 }
@@ -465,7 +462,7 @@ op_func_ret (Processor& processor, D_INT64& offset)
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <= stackSize);
 
-  StackValue result = stack[stackSize - 1].GetOperand().CopyValue ();
+  StackValue result = stack[stackSize - 1].GetOperand().Duplicate ();
 
   stack.Pop (stackSize - processor.StackBegin());
   stack.Push (result);

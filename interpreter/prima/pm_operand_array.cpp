@@ -107,15 +107,27 @@ ArrayOperand::GetValueAt (const D_UINT64 index)
 }
 
 StackValue
-ArrayOperand::CopyValue () const
+ArrayOperand::Duplicate () const
 {
   return StackValue (*this);
+}
+
+void
+ArrayOperand::NotifyCopy ()
+{
+  m_Value.SetMirror (m_Value);
 }
 
 ///////////////////////////BaseArrayElOperand//////////////////////////////////
 
 BaseArrayElOperand::~BaseArrayElOperand ()
 {
+}
+
+void
+BaseArrayElOperand::NotifyCopy ()
+{
+  m_Array.SetMirror (m_Array);
 }
 
 //////////////////////////BoolArrayElOperand///////////////////////////////////
@@ -178,7 +190,7 @@ BoolArrayElOperand::GetType ()
 }
 
 StackValue
-BoolArrayElOperand::CopyValue () const
+BoolArrayElOperand::Duplicate () const
 {
   DBSBool value;
   Get (value);
@@ -224,7 +236,7 @@ CharArrayElOperand::GetType ()
 }
 
 StackValue
-CharArrayElOperand::CopyValue () const
+CharArrayElOperand::Duplicate () const
 {
   DBSChar ch;
   Get (ch);
@@ -288,7 +300,7 @@ DateArrayElOperand::GetType ()
 }
 
 StackValue
-DateArrayElOperand::CopyValue () const
+DateArrayElOperand::Duplicate () const
 {
   DBSDate value;
   Get (value);
@@ -347,7 +359,7 @@ DateTimeArrayElOperand::GetType ()
 }
 
 StackValue
-DateTimeArrayElOperand::CopyValue () const
+DateTimeArrayElOperand::Duplicate () const
 {
   DBSDateTime value;
   Get (value);
@@ -405,7 +417,7 @@ HiresTimeArrayElOperand::GetType ()
 }
 
 StackValue
-HiresTimeArrayElOperand::CopyValue () const
+HiresTimeArrayElOperand::Duplicate () const
 {
   DBSHiresTime value;
   Get (value);
@@ -609,7 +621,7 @@ UInt8ArrayElOperand::GetType ()
 }
 
 StackValue
-UInt8ArrayElOperand::CopyValue () const
+UInt8ArrayElOperand::Duplicate () const
 {
   DBSUInt8 value;
   Get (value);
@@ -813,7 +825,7 @@ UInt16ArrayElOperand::GetType ()
 }
 
 StackValue
-UInt16ArrayElOperand::CopyValue () const
+UInt16ArrayElOperand::Duplicate () const
 {
   DBSUInt16 value;
   Get (value);
@@ -1017,7 +1029,7 @@ UInt32ArrayElOperand::GetType ()
 }
 
 StackValue
-UInt32ArrayElOperand::CopyValue () const
+UInt32ArrayElOperand::Duplicate () const
 {
   DBSUInt32 value;
   Get (value);
@@ -1221,7 +1233,7 @@ UInt64ArrayElOperand::GetType ()
 }
 
 StackValue
-UInt64ArrayElOperand::CopyValue () const
+UInt64ArrayElOperand::Duplicate () const
 {
   DBSUInt64 value;
   Get (value);
@@ -1425,7 +1437,7 @@ Int8ArrayElOperand::GetType ()
 }
 
 StackValue
-Int8ArrayElOperand::CopyValue () const
+Int8ArrayElOperand::Duplicate () const
 {
   DBSInt8 value;
   Get (value);
@@ -1629,7 +1641,7 @@ Int16ArrayElOperand::GetType ()
 }
 
 StackValue
-Int16ArrayElOperand::CopyValue () const
+Int16ArrayElOperand::Duplicate () const
 {
   DBSInt16 value;
   Get (value);
@@ -1833,7 +1845,7 @@ Int32ArrayElOperand::GetType ()
 }
 
 StackValue
-Int32ArrayElOperand::CopyValue () const
+Int32ArrayElOperand::Duplicate () const
 {
   DBSInt32 value;
   Get (value);
@@ -2037,7 +2049,7 @@ Int64ArrayElOperand::GetType ()
 }
 
 StackValue
-Int64ArrayElOperand::CopyValue () const
+Int64ArrayElOperand::Duplicate () const
 {
   DBSInt64 value;
   Get (value);
@@ -2169,7 +2181,7 @@ RealArrayElOperand::GetType ()
 }
 
 StackValue
-RealArrayElOperand::CopyValue () const
+RealArrayElOperand::Duplicate () const
 {
   DBSReal value;
   Get (value);
@@ -2299,7 +2311,7 @@ RichRealArrayElOperand::GetType ()
 }
 
 StackValue
-RichRealArrayElOperand::CopyValue () const
+RichRealArrayElOperand::Duplicate () const
 {
   DBSRichReal value;
   Get (value);

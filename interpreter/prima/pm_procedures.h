@@ -66,8 +66,6 @@ public:
   {
   }
 
-  ~ProcedureManager ();
-
   D_UINT Count () const { return m_ProcsEntrys.size (); };
 
   D_UINT32 AddProcedure (const D_UINT8*           pName,

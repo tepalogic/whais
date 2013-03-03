@@ -32,16 +32,6 @@
 using namespace std;
 using namespace prima;
 
-ProcedureManager::~ProcedureManager ()
-{
-  for (vector<StackValue>::iterator it = m_LocalsValues.begin ();
-      it != m_LocalsValues.end ();
-      ++it)
-    {
-      it->Clear ();
-    }
-}
-
 D_UINT32
 ProcedureManager::AddProcedure (const D_UINT8*      pName,
                                 const D_UINT        nameLength,

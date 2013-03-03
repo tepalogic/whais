@@ -46,7 +46,7 @@ cmd_read_basic_stack_top (ClientConnection& rConn,
 D_UINT
 cmd_read_array_stack_top (ClientConnection& rConn,
                           StackValue&       value,
-                          const D_UINT64    hintOffset,
+                          D_UINT64          hintOffset,
                           D_UINT* const     pDataOffset);
 
 D_UINT
@@ -67,9 +67,9 @@ D_UINT
 cmd_read_table_stack_top (ClientConnection& rConn,
                           StackValue&       topValue,
                           const D_UINT      hintField,
-                          const D_UINT64    hintRow,
-                          const D_UINT64    hintArrayOff,
-                          const D_UINT64    hintTextOff,
+                          D_UINT64          hintRow,
+                          D_UINT64          hintArrayOff,
+                          D_UINT64          hintTextOff,
                           D_UINT* const     pDataOffset);
 
 #endif /* STACK_CMDS_H */

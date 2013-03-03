@@ -388,8 +388,6 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
 
       if ( (first != second) && ( ! test_op_invalid_conv (*pOp) ))
         result = false;
-
-      sv.Clear ();
     }
 
   sv = arrayOp.GetValueAt (array.ElementsCount () - 1);
@@ -404,8 +402,6 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
 
   if ( val != testVal)
     result = false;
-
-  sv.Clear ();
 
   return result;
 }
@@ -502,10 +498,6 @@ test_array_tableread_value (I_DBSHandler& dbsHnd,
   result &= test_null_write (svSimple.GetOperand (), DBS_T ());
 
   result &= test_table_value (testTable, array, DBS_T ());
-
-  svArray.Clear ();
-  svArrayEl.Clear ();
-  svSimple.Clear ();
 
   return result;
 }

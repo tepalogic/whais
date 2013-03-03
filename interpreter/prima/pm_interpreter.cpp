@@ -242,35 +242,21 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
             values.push_back (value);
           }
 
-        try
-        {
-            const D_UINT32 procIndex = DefineProcedure (
-                                    pName,
-                                    nameLength,
-                                    localsCount,
-                                    argsCount,
-                                    unit.GetProcSyncStatementsCount (procIt),
-                                    values,
-                                    &typesOffset[0],
-                                    unit.RetriveProcCodeArea (procIt),
-                                    unit.GetProcCodeAreaSize (procIt),
-                                    external,
-                                    unitMgr.GetUnit (unitIndex)
-                                                         );
+          const D_UINT32 procIndex = DefineProcedure (
+                                  pName,
+                                  nameLength,
+                                  localsCount,
+                                  argsCount,
+                                  unit.GetProcSyncStatementsCount (procIt),
+                                  values,
+                                  &typesOffset[0],
+                                  unit.RetriveProcCodeArea (procIt),
+                                  unit.GetProcCodeAreaSize (procIt),
+                                  external,
+                                  unitMgr.GetUnit (unitIndex)
+                                                       );
 
-            unitMgr.SetProcIndex (unitIndex, procIt, procIndex);
-        }
-        catch (...)
-        {
-            for (vector<StackValue>::iterator it = values.begin ();
-                 it != values.end ();
-                 ++it)
-              {
-                it->Clear ();
-              }
-
-            throw;
-        }
+          unitMgr.SetProcIndex (unitIndex, procIt, procIndex);
       }
   }
   catch (...)

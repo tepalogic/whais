@@ -273,13 +273,10 @@ cmd_read_stack (ClientConnection& rConn)
   try
     {
       rConn.DataSize (rConn.MaxSize ());
-      dataOff = sizeof (D_UINT32);
+      dataOff = sizeof (D_UINT32) + sizeof (D_UINT16);
 
       StackValue&    topValue = rConn.Stack ()[rConn.Stack ().Size () - 1];
       const D_UINT16 valType  = topValue.GetOperand ().GetType ();
-
-      store_le_int16 (valType, data + dataOff);
-      dataOff += sizeof (D_UINT16);
 
       if (IS_TABLE (valType))
         {
@@ -321,6 +318,8 @@ cmd_read_stack (ClientConnection& rConn)
         }
       else
         status = cmd_read_basic_stack_top (rConn, topValue, &dataOff);
+
+      store_le_int16 (valType, data + sizeof (D_UINT32));
     }
   catch (DBSException& e)
   {

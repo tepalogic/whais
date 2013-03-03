@@ -43,14 +43,8 @@ CharTextFieldElOperand::GetValue (DBSChar& outValue) const
 {
   I_DBSTable& table = m_pRefTable->GetTable ();
 
-  if (table.GetAllocatedRows () <= m_Row)
-    throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
-
   DBSText text;
   table.GetEntry (m_Row, m_Field, text);
-
-  if (text.GetCharactersCount () <= m_Index)
-    throw InterException (NULL, _EXTRA (InterException::TEXT_INDEX_BIGGER));
 
   outValue = text.GetCharAtIndex (m_Index);
 
@@ -72,14 +66,8 @@ CharTextFieldElOperand::SetValue (const DBSChar& value)
 {
   I_DBSTable& table = m_pRefTable->GetTable ();
 
-  if (table.GetAllocatedRows () <= m_Row)
-    throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_BIGGER));
-
   DBSText text;
   table.GetEntry (m_Row, m_Field, text);
-
-  if (text.GetCharactersCount () <= m_Index)
-    throw InterException (NULL, _EXTRA (InterException::TEXT_INDEX_BIGGER));
 
   text.SetCharAtIndex(value, m_Index);
   table.SetEntry (m_Row, m_Field, text);
@@ -92,7 +80,7 @@ CharTextFieldElOperand::GetType ()
 }
 
 StackValue
-CharTextFieldElOperand::CopyValue () const
+CharTextFieldElOperand::Duplicate () const
 {
   DBSChar ch;
   Get (ch);
@@ -105,6 +93,12 @@ CharTextFieldElOperand::CopyValue () const
 BaseArrayFieldElOperand::~BaseArrayFieldElOperand ()
 {
   m_pRefTable->DecrementRefCount ();
+}
+
+void
+BaseArrayFieldElOperand::NotifyCopy ()
+{
+  m_pRefTable->IncrementRefCount ();
 }
 
 //////////////////////////BoolArrayFieldElOperand///////////////////////////////////
@@ -168,7 +162,7 @@ BoolArrayFieldElOperand::GetType ()
 
 
 StackValue
-BoolArrayFieldElOperand::CopyValue () const
+BoolArrayFieldElOperand::Duplicate () const
 {
   DBSBool value;
   Get (value);
@@ -213,7 +207,7 @@ CharArrayFieldElOperand::GetType ()
 }
 
 StackValue
-CharArrayFieldElOperand::CopyValue () const
+CharArrayFieldElOperand::Duplicate () const
 {
   DBSChar ch;
   Get (ch);
@@ -278,7 +272,7 @@ DateArrayFieldElOperand::GetType ()
 }
 
 StackValue
-DateArrayFieldElOperand::CopyValue () const
+DateArrayFieldElOperand::Duplicate () const
 {
   DBSDate value;
   Get (value);
@@ -338,7 +332,7 @@ DateTimeArrayFieldElOperand::GetType ()
 }
 
 StackValue
-DateTimeArrayFieldElOperand::CopyValue () const
+DateTimeArrayFieldElOperand::Duplicate () const
 {
   DBSDateTime value;
   Get (value);
@@ -396,7 +390,7 @@ HiresTimeArrayFieldElOperand::GetType ()
 }
 
 StackValue
-HiresTimeArrayFieldElOperand::CopyValue () const
+HiresTimeArrayFieldElOperand::Duplicate () const
 {
   DBSHiresTime value;
   Get (value);
@@ -600,7 +594,7 @@ UInt8ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-UInt8ArrayFieldElOperand::CopyValue () const
+UInt8ArrayFieldElOperand::Duplicate () const
 {
   DBSUInt8 value;
   Get (value);
@@ -805,7 +799,7 @@ UInt16ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-UInt16ArrayFieldElOperand::CopyValue () const
+UInt16ArrayFieldElOperand::Duplicate () const
 {
   DBSUInt16 value;
   Get (value);
@@ -1010,7 +1004,7 @@ UInt32ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-UInt32ArrayFieldElOperand::CopyValue () const
+UInt32ArrayFieldElOperand::Duplicate () const
 {
   DBSUInt32 value;
   Get (value);
@@ -1214,7 +1208,7 @@ UInt64ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-UInt64ArrayFieldElOperand::CopyValue () const
+UInt64ArrayFieldElOperand::Duplicate () const
 {
   DBSUInt64 value;
   Get (value);
@@ -1418,7 +1412,7 @@ Int8ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-Int8ArrayFieldElOperand::CopyValue () const
+Int8ArrayFieldElOperand::Duplicate () const
 {
   DBSInt8 value;
   Get (value);
@@ -1623,7 +1617,7 @@ Int16ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-Int16ArrayFieldElOperand::CopyValue () const
+Int16ArrayFieldElOperand::Duplicate () const
 {
   DBSInt16 value;
   Get (value);
@@ -1827,7 +1821,7 @@ Int32ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-Int32ArrayFieldElOperand::CopyValue () const
+Int32ArrayFieldElOperand::Duplicate () const
 {
   DBSInt32 value;
   Get (value);
@@ -2031,7 +2025,7 @@ Int64ArrayFieldElOperand::GetType ()
 }
 
 StackValue
-Int64ArrayFieldElOperand::CopyValue () const
+Int64ArrayFieldElOperand::Duplicate () const
 {
   DBSInt64 value;
   Get (value);
@@ -2163,7 +2157,7 @@ RealArrayFieldElOperand::GetType ()
 }
 
 StackValue
-RealArrayFieldElOperand::CopyValue () const
+RealArrayFieldElOperand::Duplicate () const
 {
   DBSReal value;
   Get (value);
@@ -2295,7 +2289,7 @@ RichRealArrayFieldElOperand::GetType ()
 
 
 StackValue
-RichRealArrayFieldElOperand::CopyValue () const
+RichRealArrayFieldElOperand::Duplicate () const
 {
   DBSRichReal value;
   Get (value);

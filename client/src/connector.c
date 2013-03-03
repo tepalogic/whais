@@ -1129,9 +1129,8 @@ stack_top_basic_update (struct INTERNAL_HANDLER* hnd,
     D_UINT8*     data_    = data (hnd);
     const D_UINT currSize = data_size (hnd);
 
-    data_ += currSize;
-
-    *data_++ = CMD_UPDATE_FUNC_CHTOP;
+    data_    += currSize;
+    *data_++  = CMD_UPDATE_FUNC_CHTOP;
 
     store_le_int16 (type, data_);
     data_ += sizeof (D_UINT16);
@@ -1178,7 +1177,8 @@ stack_top_field_basic_update (struct INTERNAL_HANDLER* hnd,
     D_UINT8*     data_    = data (hnd);
     const D_UINT currSize = data_size (hnd);
 
-    *data_++ = CMD_UPDATE_FUNC_CHTOP;
+    data_    += currSize;
+    *data_++  = CMD_UPDATE_FUNC_CHTOP;
 
     store_le_int16 (type | WFT_FIELD_MASK, data_);
     data_ += sizeof (D_UINT16);
@@ -1547,7 +1547,6 @@ stack_top_array_text_update (struct INTERNAL_HANDLER* hnd,
   }
 
   data_    = data (hnd) + currSize;
-
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
   store_le_int16 (WFT_TEXT | WFT_ARRAY_MASK, data_);
@@ -1650,8 +1649,7 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
         }
   }
 
-  data_ = data (hnd) + currSize;
-
+  data_    = data (hnd) + currSize;
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
   store_le_int16 (type | WFT_ARRAY_MASK | WFT_FIELD_MASK, data_);
@@ -1763,8 +1761,7 @@ stack_top_field_array_text_update (struct INTERNAL_HANDLER* hnd,
         }
   }
 
-  data_ = data (hnd) + currSize;
-
+  data_    = data (hnd) + currSize;
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
   store_le_int16 (WFT_TEXT | WFT_ARRAY_MASK | WFT_FIELD_MASK, data_);
@@ -2135,7 +2132,7 @@ get_table_field_off (struct INTERNAL_HANDLER* const hnd,
 
       fromPos = next_table_field_off (hnd, fromPos);
     }
-  while (fromPos < dataSize);
+  while ((0 < fromPos) && (fromPos < dataSize));
 
   return 0; /* We did not find anything */
 }
@@ -2148,18 +2145,19 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
   const D_UINT         dataSize = data_size (hnd);
 
   D_UINT16 type       = from_le_int16 (data_ + sizeof (D_UINT32));
-  D_UINT   rowOff     = sizeof (D_UINT32) + 2 * sizeof (D_UINT16);
+  D_UINT   rowOff     = sizeof (D_UINT32) + sizeof (D_UINT16);
   D_UINT64 currentRow = 0;
 
   assert (hnd->lastCmdRespReceived == CMD_READ_STACK_RSP);
   assert (dataSize > (D_UINT32) + sizeof (D_UINT16));
   assert (from_le_int32 (data_) == WCS_OK);
 
-  if (row > from_le_int64 (data_ + rowOff))
+  if (row >= from_le_int64 (data_ + rowOff))
     return 0;
 
   rowOff     += sizeof (D_UINT64);
   currentRow  = from_le_int64 (data_ + rowOff);
+  rowOff     += sizeof (D_UINT64);
 
   if (currentRow > row)
     return 0;
@@ -2174,8 +2172,9 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
           D_UINT i;
           for (i = 0; (i < fieldsCount) && (rowOff < dataSize); ++i)
             {
-              D_UINT fieldOff = next_table_field_off (hnd, rowOff);
-              assert (fieldOff > rowOff);
+              const D_UINT fieldOff = next_table_field_off (hnd, rowOff);
+              if (fieldOff == 0)
+                return 0;
 
               rowOff = fieldOff;
             }
@@ -2448,7 +2447,7 @@ WGetStackValueRowsCount (const W_CONNECTOR_HND       hnd,
       *pCount = from_le_int64 (data_ + offset);
     }
   else
-    cs = WCS_INVALID_ARGS;
+    cs = WCS_TYPE_MISMATCH;
 
   return cs;
 }
@@ -2498,7 +2497,7 @@ resend_req__get_stack_entry:
 
   if (*pType == WFT_TABLE_MASK)
     {
-      if ((field == WANONIM_FIELD) || (strlen (field) == 0))
+      if ((field == WIGNORE_FIELD) || (strlen (field) == 0))
         {
           cs = WCS_INVALID_FIELD;
           goto exit_get_stack_entry;
@@ -2530,7 +2529,7 @@ resend_req__get_stack_entry:
     }
   else if (*pType & WFT_FIELD_MASK)
     {
-      if (field != WANONIM_FIELD)
+      if (field != WIGNORE_FIELD)
         {
           cs = WCS_INVALID_FIELD;
           goto exit_get_stack_entry;
@@ -2548,14 +2547,9 @@ resend_req__get_stack_entry:
     }
   else
     {
-      if (row != WIGNORE_OFF)
+      if ((row != WIGNORE_OFF) || (field != WIGNORE_FIELD))
         {
-          cs = WCS_INVALID_ROW;
-          goto exit_get_stack_entry;
-        }
-      else if (field != WIGNORE_FIELD)
-        {
-          cs = WCS_INVALID_FIELD;
+          cs = WCS_TYPE_MISMATCH;
           goto exit_get_stack_entry;
         }
     }
@@ -2584,7 +2578,7 @@ resend_req__get_stack_entry:
     {
       if (arrayOff != WIGNORE_OFF)
         {
-          cs = WCS_INVALID_ARRAY_OFF;
+          cs = WCS_TYPE_MISMATCH;
           goto exit_get_stack_entry;
         }
     }
@@ -2613,7 +2607,7 @@ resend_req__get_stack_entry:
     {
       if (textOff != WIGNORE_OFF)
         {
-          cs = WCS_INVALID_TEXT_OFF;
+          cs = WCS_TYPE_MISMATCH;
           goto exit_get_stack_entry;
         }
 
@@ -2657,9 +2651,7 @@ WGetStackArrayElementsCount (const W_CONNECTOR_HND   hnd,
                                &type,
                                &value);
 
-  if (cs == WCS_INVALID_ARRAY_OFF)
-    return WCS_INVALID_ARGS;
-  else if (cs != WCS_OK)
+  if ((cs != WCS_OK) && (cs != WCS_INVALID_ARRAY_OFF))
     return cs;
 
 
@@ -2690,9 +2682,7 @@ WGetStackTextLengthCount (const W_CONNECTOR_HND   hnd,
                                &type,
                                &value);
 
-  if (cs == WCS_INVALID_TEXT_OFF)
-    return WCS_INVALID_ARGS;
-  else if (cs != WCS_OK)
+  if ((cs != WCS_OK) && (cs != WCS_INVALID_TEXT_OFF))
     return cs;
 
   *pCount = count;

@@ -391,6 +391,12 @@ I_PMOperand::CopyFieldOp (const FieldOperand& fieldOp)
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
+void
+I_PMOperand::NotifyCopy ()
+{
+  //Do nothing by default!
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
@@ -518,7 +524,7 @@ NullOperand::GetType ()
 }
 
 StackValue
-NullOperand::CopyValue () const
+NullOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -572,7 +578,7 @@ BoolOperand::GetType ()
 }
 
 StackValue
-BoolOperand::CopyValue () const
+BoolOperand::Duplicate () const
 {
   return  StackValue (*this);
 }
@@ -618,7 +624,7 @@ CharOperand::GetType ()
 }
 
 StackValue
-CharOperand::CopyValue () const
+CharOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -695,7 +701,7 @@ DateOperand::GetType ()
 }
 
 StackValue
-DateOperand::CopyValue () const
+DateOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -770,7 +776,7 @@ DateTimeOperand::GetType ()
 
 
 StackValue
-DateTimeOperand::CopyValue () const
+DateTimeOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -844,7 +850,7 @@ HiresTimeOperand::GetType ()
 
 
 StackValue
-HiresTimeOperand::CopyValue () const
+HiresTimeOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1008,7 +1014,7 @@ UInt8Operand::GetType ()
 }
 
 StackValue
-UInt8Operand::CopyValue () const
+UInt8Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1174,7 +1180,7 @@ UInt16Operand::GetType ()
 
 
 StackValue
-UInt16Operand::CopyValue () const
+UInt16Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1339,7 +1345,7 @@ UInt32Operand::GetType ()
 }
 
 StackValue
-UInt32Operand::CopyValue () const
+UInt32Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1504,7 +1510,7 @@ UInt64Operand::GetType ()
 }
 
 StackValue
-UInt64Operand::CopyValue () const
+UInt64Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1668,7 +1674,7 @@ Int8Operand::GetType ()
 }
 
 StackValue
-Int8Operand::CopyValue () const
+Int8Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1833,7 +1839,7 @@ Int16Operand::GetType ()
 
 
 StackValue
-Int16Operand::CopyValue () const
+Int16Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1997,7 +2003,7 @@ Int32Operand::GetType ()
 }
 
 StackValue
-Int32Operand::CopyValue () const
+Int32Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2162,7 +2168,7 @@ Int64Operand::GetType ()
 
 
 StackValue
-Int64Operand::CopyValue () const
+Int64Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2253,7 +2259,7 @@ RealOperand::GetType ()
 }
 
 StackValue
-RealOperand::CopyValue () const
+RealOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2344,7 +2350,7 @@ RichRealOperand::GetType ()
 }
 
 StackValue
-RichRealOperand::CopyValue () const
+RichRealOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2398,9 +2404,15 @@ TextOperand::GetType ()
 }
 
 StackValue
-TextOperand::CopyValue () const
+TextOperand::Duplicate () const
 {
   return StackValue (*this);
+}
+
+void
+TextOperand::NotifyCopy ()
+{
+  m_Value.SetMirror (m_Value);
 }
 
 ///////////////////////////////CharTextOperand/////////////////////////////////
@@ -2445,12 +2457,18 @@ CharTextElOperand::GetType ()
 }
 
 StackValue
-CharTextElOperand::CopyValue () const
+CharTextElOperand::Duplicate () const
 {
   DBSChar ch;
   GetValue (ch);
 
   return StackValue (CharOperand (ch));
+}
+
+void
+CharTextElOperand::NotifyCopy ()
+{
+  m_Text.SetMirror (m_Text);
 }
 
 ///////////////////////GlobalOperand///////////////////////////////////////////
@@ -2808,10 +2826,17 @@ GlobalOperand::GetValueAt (const D_UINT64 index)
 }
 
 StackValue
-GlobalOperand::CopyValue () const
+GlobalOperand::Duplicate () const
 {
-  return m_Value.CopyValue ();
+  return m_Value.Duplicate ();
 }
+
+void
+GlobalOperand::NotifyCopy ()
+{
+  m_Value.NotifyCopy ();
+}
+
 
 TableOperand
 GlobalOperand::GetTableOp ()
@@ -3188,9 +3213,9 @@ LocalOperand::GetValueAt (const D_UINT64 index)
 }
 
 StackValue
-LocalOperand::CopyValue () const
+LocalOperand::Duplicate () const
 {
-  return m_Stack[m_Index].GetOperand ().CopyValue ();
+  return m_Stack[m_Index].GetOperand ().Duplicate ();
 }
 
 TableOperand
@@ -3419,10 +3444,7 @@ SessionStack::Pop (const D_UINT count)
 
   D_UINT topIndex = m_Stack.size () - 1;
   for (D_UINT index = 0; index < count; ++index, --topIndex)
-    {
-      m_Stack[topIndex].Clear ();
-      m_Stack.pop_back ();
-    }
+    m_Stack.pop_back ();
 }
 
 size_t

@@ -385,8 +385,6 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
 
       if ( (first != second) && ( ! test_op_invalid_conv (*pOp) ))
         result = false;
-
-      sv.Clear ();
     }
 
   sv = arrayOp.GetValueAt (array.ElementsCount () - 1);
@@ -401,8 +399,6 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
 
   if ( val != testVal)
     result = false;
-
-  sv.Clear ();
 
   return result;
 }
@@ -500,10 +496,6 @@ test_array_tableread_value (I_DBSHandler& dbsHnd,
 
   result &= test_table_value (testTable, array, DBS_T ());
 
-  svArray.Clear ();
-  svArrayEl.Clear ();
-  svSimple.Clear ();
-
   return result;
 }
 
@@ -541,8 +533,6 @@ test_text_char ()
         charOp.SetValue (DBSChar ('r'));
       else if (index == 3)
         charOp.SetValue (DBSChar ('e'));
-
-      sv.Clear ();
     }
 
 
@@ -614,16 +604,12 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
         charOp.SetValue (DBSChar ('r'));
       else if (index == 3)
         charOp.SetValue (DBSChar ('e'));
-
-      sv.Clear ();
     }
 
   testTable.GetEntry (0, 0, resultText);
 
   if (resultText != DBSText (_RC (const D_UINT8*, textC_2)))
     result = false;
-
-  stackTextField.Clear ();
 
   return result;
 }

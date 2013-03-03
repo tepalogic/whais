@@ -388,12 +388,18 @@ check_array_entry (W_CONNECTOR_HND hnd, const D_INT index)
         }
     }
 
-  if (WGetStackValueEntry (hnd,
-                           WIGNORE_FIELD,
-                           WIGNORE_ROW,
-                           pEntry->elementsCount,
-                           WIGNORE_OFF,
-                           &value) != WCS_INVALID_ARRAY_OFF)
+  if ((WGetStackValueEntry (hnd,
+                            WIGNORE_FIELD,
+                            WIGNORE_ROW,
+                            pEntry->elementsCount,
+                            WIGNORE_OFF,
+                            &value) != WCS_INVALID_ARRAY_OFF)
+      || (WGetStackValueEntry (hnd,
+                               WIGNORE_FIELD,
+                               WIGNORE_ROW,
+                               pEntry->elementsCount,
+                               WIGNORE_OFF,
+                               NULL) != WCS_INVALID_ARGS))
     {
       return false;
     }
@@ -466,28 +472,26 @@ test_for_errors (W_CONNECTOR_HND hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WGetStackValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
+  if ((WPushStackValue (hnd, WFT_BOOL | WFT_ARRAY_MASK, 0, NULL) != WCS_OK)
+      || (WUpdateStackFlush (hnd) != WCS_OK)
+      || (WUpdateStackFlush (hnd) != WCS_OK) //Just for fun!
+      || (WGetStackValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
       || (WGetStackValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS))
-    {
-      goto test_for_errors_fail;
-    }
-
-  if ((WPushStackValue (hnd, WFT_BOOL, 0, NULL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_ARGS)
-      || (WPushStackValue (hnd, WFT_ARRAY_MASK | WFT_BOOL, 0, NULL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
-      || (WGetStackArrayElementsCount (hnd, "somef", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, NULL) != WCS_INVALID_ARGS)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_ARGS)
+      || (WGetStackValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WGetStackValueRowsCount (hnd, &count) != WCS_TYPE_MISMATCH)
+      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_OK)
+      || (count != 0)
+      || (WGetStackArrayElementsCount (hnd, "some_f", WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
+      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, 0, &count) != WCS_TYPE_MISMATCH)
+      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_ARRAY_OFF)
+      || (WGetStackTextLengthCount (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_TYPE_MISMATCH)
+      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_TYPE_MISMATCH)
+      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, WIGNORE_OFF, 0, &count) != WCS_INVALID_ARRAY_OFF)
       || (WPopStackValues (hnd, WPOP_ALL) != WCS_OK)
       || (WUpdateStackFlush (hnd) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
-
   cout << "OK\n";
   return true;
 
