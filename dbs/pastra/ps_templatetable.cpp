@@ -781,7 +781,9 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if (row >= m_RowsCount)
+  if (row == m_RowsCount)
+    AddRow ();
+  else if (row > m_RowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
@@ -832,8 +834,6 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
                             D_UINT64*,
                             pRawData + desc.m_StoreIndex + sizeof (D_UINT64)
                                          );
-
-
   assert (desc.m_NullBitIndex > 0);
 
   const D_UINT  byte_off = desc.m_NullBitIndex / 8;
@@ -891,7 +891,10 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if (row >= m_RowsCount)
+
+  if (row == m_RowsCount)
+    AddRow ();
+  else if (row > m_RowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ( ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
@@ -950,7 +953,6 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
                             D_UINT64*,
                             pRawData + desc.m_StoreIndex + sizeof (D_UINT64)
                                         );
-
   assert (desc.m_NullBitIndex > 0);
 
   const D_UINT  byte_off = desc.m_NullBitIndex / 8;

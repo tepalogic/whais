@@ -2265,7 +2265,9 @@ protected:
     I_DBSTable& table = m_pRefTable->GetTable ();
 
     DBSArray array;
-    table.GetEntry (m_Row, m_Field, array);
+
+    if (m_Row < table.GetAllocatedRows () )
+      table.GetEntry (m_Row, m_Field, array);
 
     array.SetElement (value, m_Index);
     table.SetEntry (m_Row, m_Field, array);

@@ -966,7 +966,6 @@ cmd_read_array_stack_top (ClientConnection& rConn,
           else
             break;
         }
-
       *pDataOffset += writeSize;
     }
 
@@ -1030,6 +1029,7 @@ cmd_read_text_stack_top (ClientConnection& rConn,
       assert (writeSize > 1);
 
       *pDataOffset += writeSize - 1; //Don't include the null terminator
+
       assert (data[*pDataOffset] == 0);
     }
 
@@ -1268,7 +1268,7 @@ cmd_read_table_stack_top (ClientConnection& rConn,
                                                            pDataOffset);
           if (cs != WCS_OK)
             {
-              if ((fieldId == 0) && (currentRow != hintRow))
+              if ((fieldId == 0) && (currentRow == hintRow))
                 return cs;
               else
                 {
