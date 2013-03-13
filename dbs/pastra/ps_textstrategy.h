@@ -58,6 +58,9 @@ public:
   virtual void    Append (const D_UINT32 charValue) = 0;
   virtual void    Append (I_TextStrategy& text) = 0;
   virtual void    Truncate (D_UINT64 newCharCount) = 0;
+  virtual void    UpdateCharAt (const D_UINT32   charValue,
+                                const D_UINT64   index,
+                                I_TextStrategy** pIOStrategy) = 0;
 
   virtual void ReadUtf8 (const D_UINT64 offset,
                          const D_UINT64 count,
@@ -99,6 +102,9 @@ public:
   virtual void    Append (const D_UINT32 charValue);
   virtual void    Append (I_TextStrategy& text);
   virtual void    Truncate (D_UINT64 newCharCount);
+  virtual void    UpdateCharAt (const D_UINT32   charValue,
+                                const D_UINT64   index,
+                                I_TextStrategy** pIOStrategy);
 
   virtual bool          IsRowValue() const;
   virtual TemporalText& GetTemporal ();
@@ -109,8 +115,14 @@ protected:
   virtual void ClearMyself () = 0;
 
   D_UINT64 m_BytesSize;
+  D_UINT64 m_CachedCharCount;
+  D_UINT64 m_CachedCharIndex;
+  D_UINT64 m_CachedCharIndexOffset;
   D_UINT   m_ReferenceCount;
   D_UINT   m_ShareCount;
+
+
+  static const D_UINT64 INVALID_CACHE_VALUE = ~0ull;
 };
 
 class NullText : public GenericText
@@ -178,7 +190,7 @@ protected:
   virtual void ClearMyself ();
 
   const D_UINT64       m_FirstEntry;
-  VLVarsStore& m_Storage;
+  VLVarsStore&         m_Storage;
 
 private:
   RowFieldText (const RowFieldText&);
@@ -201,6 +213,9 @@ protected:
                           const D_UINT64 count,
                           const D_UINT8 *const pBuffSrc);
   virtual void TruncateUtf8 (const D_UINT64 newSize);
+  virtual void UpdateCharAt (const D_UINT32   charValue,
+                             const D_UINT64   index,
+                             I_TextStrategy** pIOStrategy);
 
   virtual TemporalText& GetTemporal();
 

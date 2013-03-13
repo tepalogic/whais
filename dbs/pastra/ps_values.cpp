@@ -413,35 +413,18 @@ DBSText::SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index)
 {
   const D_UINT64 charsCount = m_pText->CharsCount();
 
-  if (charsCount <= index)
+  if (charsCount == index)
+    {
+      Append (rCharacter);
+      return ;
+    }
+  else if (charsCount < index)
     throw DBSException (NULL, _EXTRA (DBSException::STRING_INDEX_TOO_BIG));
 
-  auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
-  newText->IncreaseReferenceCount();
-
-  for (D_UINT64 it = 0; it < charsCount; ++it)
-    {
-      if (index == it)
-        {
-          if ((rCharacter.m_IsNull) || (rCharacter.m_Value == 0))
-            break ;
-
-          newText->Append (rCharacter.m_Value);
-        }
-      else
-        newText->Append (m_pText->CharAt (it).m_Value);
-    }
-
-  if (m_pText->ShareCount () > 0)
-    {
-      assert (m_pText->ReferenceCount() == 1);
-      m_pText->Duplicate (*newText.get ());
-    }
+  if (rCharacter.IsNull ())
+    m_pText->Truncate (index);
   else
-    {
-      m_pText->DecreaseReferenceCount ();
-      m_pText = newText.release ();
-    }
+    m_pText->UpdateCharAt (rCharacter.m_Value, index, &m_pText);
 }
 
 void

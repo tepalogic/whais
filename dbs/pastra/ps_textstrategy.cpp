@@ -63,6 +63,9 @@ get_utf8_string_size (const D_UINT8 *pUtf8Str, D_UINT64 maxLength)
 
 GenericText::GenericText (D_UINT64 bytesSize)
   : m_BytesSize (bytesSize),
+    m_CachedCharCount (INVALID_CACHE_VALUE),
+    m_CachedCharIndex (0),
+    m_CachedCharIndexOffset (0),
     m_ReferenceCount (0),
     m_ShareCount (0)
 
@@ -122,9 +125,11 @@ GenericText::DecreaseShareCount ()
 D_UINT64
 GenericText::CharsCount()
 {
+  if (m_CachedCharCount != INVALID_CACHE_VALUE)
+    return m_CachedCharCount;
 
-  D_UINT64 offset = 0;
-  D_UINT64 result = 0;
+  D_UINT64 offset = m_CachedCharIndexOffset;
+  D_UINT64 result = m_CachedCharIndex;
 
   while (offset < m_BytesSize)
     {
@@ -138,6 +143,8 @@ GenericText::CharsCount()
       ++result, offset += charSize;
     }
 
+  m_CachedCharCount = result;
+
   return result;
 }
 
@@ -150,60 +157,79 @@ GenericText::BytesCount() const
 void
 GenericText::Duplicate (I_TextStrategy& source)
 {
-
-  D_UINT64 offset = 0;
-  D_UINT64 count = source.BytesCount();
+  D_UINT64 index = 0;
 
   Truncate (0);
   assert (m_BytesSize == 0);
 
-  while (count > 0)
+  DBSChar temp;
+  while ((temp = source.CharAt (index)).IsNull () == false)
     {
-        D_UINT8 dataChunk[512];
-        const D_UINT64 chunkToTansfer = MIN (sizeof dataChunk, count);
-        source.ReadUtf8 (offset, chunkToTansfer, dataChunk);
-        WriteUtf8 (offset, chunkToTansfer, dataChunk);
-
-        m_BytesSize += chunkToTansfer,
-        offset += chunkToTansfer,
-        count -= chunkToTansfer;
+      Append (temp.m_Value);
+      ++index;
     }
+
+  m_CachedCharCount       = index;
+  m_CachedCharIndex       = 0;
+  m_CachedCharIndexOffset = 0;
 }
 
 DBSChar
 GenericText::CharAt (D_UINT64 index)
 {
-  if (index >= CharsCount() )
-    return DBSChar (); //Null char!
+  D_UINT64 chIndex  = 0;
+  D_UINT64 chOffset = 0;
+  D_UINT32 chValue  = 0;
 
-  D_UINT64 offset = 0;
-  D_UINT32 charValue = 0;
-
-  while (index > 0)
+  if (m_CachedCharIndex <= index)
     {
-      D_UINT8 utf8Char;
-      ReadUtf8 (offset, 1, &utf8Char);
-      offset += get_utf8_char_size (utf8Char);
-      -- index;
-
-      assert (offset < m_BytesSize);
+      chIndex   = m_CachedCharIndex;
+      chOffset  = m_CachedCharIndexOffset;
     }
 
+  while ((chIndex < index)
+          && (chOffset < m_BytesSize))
+    {
+      D_UINT8 utf8CharCodeUnit;
+      ReadUtf8 (chOffset, 1, &utf8CharCodeUnit);
+      chOffset += get_utf8_char_size (utf8CharCodeUnit);
+
+      ++chIndex;
+    }
+
+  assert (chOffset <= m_BytesSize);
+  if (chOffset == m_BytesSize)
+    {
+      assert ((m_CachedCharCount == INVALID_CACHE_VALUE)
+              || (m_CachedCharCount == chIndex));
+
+      if (m_CachedCharCount == INVALID_CACHE_VALUE)
+        m_CachedCharCount = chIndex;
+
+      return DBSChar ();
+    }
+
+  assert (chIndex == index);
+
+  m_CachedCharIndex       = chIndex;
+  m_CachedCharIndexOffset = chOffset;
+
   D_UINT8 aUtf8Char[UTF8_MAX_BYTES_COUNT];
-  ReadUtf8 (offset,
-                   MIN (m_BytesSize - offset, sizeof aUtf8Char),
-                   aUtf8Char);
+  ReadUtf8 (chOffset,
+            MIN (m_BytesSize - chOffset, sizeof aUtf8Char),
+            aUtf8Char);
 
-  const D_UINT charSize = decode_utf8_char (aUtf8Char, &charValue);
-  assert ((offset + charSize) <= m_BytesSize);
+  const D_UINT charSize = decode_utf8_char (aUtf8Char, &chValue);
+  assert ((chOffset + charSize) <= m_BytesSize);
 
-  return DBSChar (charValue);
+  return DBSChar (chValue);
 }
 
 void
 GenericText::Append (const D_UINT32 charValue)
 {
   assert (m_ReferenceCount == 1);
+  assert (charValue != 0);
 
   D_UINT8 aUtf8Encoding[UTF8_MAX_BYTES_COUNT];
   D_UINT  encodeSize = encode_utf8_char (charValue, aUtf8Encoding);
@@ -211,47 +237,91 @@ GenericText::Append (const D_UINT32 charValue)
   WriteUtf8 (m_BytesSize, encodeSize, aUtf8Encoding);
   m_BytesSize += encodeSize;
 
+  if (m_CachedCharCount != INVALID_CACHE_VALUE)
+    ++m_CachedCharCount;
 }
 
 void
 GenericText::Append (I_TextStrategy& text)
 {
-  D_UINT64 toAppend = text.BytesCount ();
-  D_UINT64 appendOffset = 0;
+  D_UINT64 index = 0;
+  DBSChar  temp;
 
-  while (toAppend > 0)
+  while ((temp = text.CharAt (index)).IsNull () == false)
     {
-      D_UINT8 chunkData [512];
-      D_UINT64 chunkSize = MIN (sizeof chunkData, toAppend);
-
-      text.ReadUtf8 (appendOffset, chunkSize, chunkData);
-      WriteUtf8 (m_BytesSize, chunkSize, chunkData);
-
-      m_BytesSize  += chunkSize;
-      appendOffset += chunkSize;
-      toAppend     -= chunkSize;
+      Append (temp.m_Value);
+      ++index;
     }
 }
 
 void
 GenericText::Truncate (D_UINT64 newCharCount)
 {
-  if (newCharCount >= CharsCount ())
-    return;
+  m_CachedCharCount = newCharCount;
 
-  D_UINT offset = 0;
-  while (newCharCount > 0)
+  D_UINT64 offset = 0;
+  if (m_CachedCharIndex <= newCharCount)
+    {
+      offset        = m_CachedCharIndexOffset;
+      newCharCount -= m_CachedCharIndex;
+    }
+
+  while ((newCharCount > 0)
+          && (offset < m_BytesSize))
     {
       D_UINT8 utf8Char;
       ReadUtf8 (offset, 1, &utf8Char);
       offset += get_utf8_char_size (utf8Char);
       --newCharCount;
 
-      assert (offset < m_BytesSize);
+      assert (offset <= m_BytesSize);
     }
 
-  TruncateUtf8 (offset);
-  m_BytesSize = offset;
+  if (offset == m_BytesSize)
+    m_CachedCharCount -= newCharCount;
+  else
+    {
+      assert (offset < m_BytesSize);
+
+      TruncateUtf8 (offset);
+      m_BytesSize = offset;
+    }
+
+}
+
+void
+GenericText::UpdateCharAt (const D_UINT32   charValue,
+                           const D_UINT64   index,
+                           I_TextStrategy** pIOStrategy)
+{
+  assert (this == *pIOStrategy);
+  assert (charValue != 0);
+
+  auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+  newText->IncreaseReferenceCount();
+
+  D_UINT64 it  = 0;
+  DBSChar  temp;
+  while ((temp = CharAt (it)).IsNull () == false)
+    {
+      if (index == it)
+        newText->Append (charValue);
+      else
+        newText->Append (temp.m_Value);
+
+      ++it;
+    }
+
+  if (ShareCount () > 0)
+    {
+      assert (ReferenceCount() == 1);
+      Duplicate (*newText.get ());
+    }
+  else
+    {
+      DecreaseReferenceCount ();
+      *pIOStrategy = newText.release ();
+    }
 }
 
 bool
@@ -498,6 +568,36 @@ TemporalText::TruncateUtf8 (const D_UINT64 newSize)
 {
   assert (m_BytesSize == m_Storage.Size ());
   m_Storage.Colapse (newSize, m_BytesSize);
+}
+
+void
+TemporalText::UpdateCharAt (const D_UINT32   charValue,
+                            const D_UINT64   index,
+                            I_TextStrategy** pIOStrategy)
+{
+  assert (this == *pIOStrategy);
+  assert (charValue != 0);
+
+  const D_UINT32 utf8CodeUnitsCount = utf8_encode_size (charValue);
+  assert ((utf8CodeUnitsCount > 0)
+          && (utf8CodeUnitsCount < UTF8_MAX_BYTES_COUNT));
+
+  const D_UINT32 oldChar = CharAt (index).m_Value;
+  assert (oldChar != 0);
+
+  if ((ReferenceCount () > 1)
+      || (utf8CodeUnitsCount != utf8_encode_size (oldChar)))
+    {
+      this->GenericText::UpdateCharAt (charValue, index, pIOStrategy);
+      return;
+    }
+
+  D_UINT8 utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
+  encode_utf8_char (charValue, utf8CodeUnits);
+  assert (m_CachedCharIndex == index);
+  WriteUtf8 (m_CachedCharIndexOffset,
+             utf8CodeUnitsCount,
+             utf8CodeUnits);
 }
 
 TemporalText&

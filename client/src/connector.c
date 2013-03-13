@@ -2155,17 +2155,13 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
       assert (chSize > 0);
       assert (fromPos < dataSize);
 
-      if (ch == 0)
-        return 0;
-      else
-        fromPos += chSize;
-
-      currOff++;
+      ++currOff, fromPos += chSize;
     }
 
-  if (fromPos >= dataSize)
+  if ((fromPos >= dataSize)
+      || (data_[fromPos] == 0))
     {
-      assert (fromPos == dataSize);
+      assert (fromPos <= dataSize);
       return 0;
     }
 
@@ -2320,9 +2316,14 @@ resend_req_get_stack_entry:
     }
   else
     {
-      if ((row != WIGNORE_OFF) || (field != WIGNORE_FIELD))
+      if (field != WIGNORE_FIELD)
         {
-          cs = WCS_TYPE_MISMATCH;
+          cs = WCS_INVALID_FIELD;
+          goto exit_get_stack_entry;
+        }
+      else if (row != WIGNORE_OFF)
+        {
+          cs = WCS_INVALID_ROW;
           goto exit_get_stack_entry;
         }
     }

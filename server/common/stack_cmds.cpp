@@ -613,33 +613,36 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
           else if (type == WFT_TEXT)
             {
               DBSText fieldText;
-              rowValue.GetOperand ().GetValue (fieldText);
+
+              if (rowIndex < table.GetAllocatedRows ())
+                rowValue.GetOperand().GetValue (fieldText);
 
               if ((*pDataOff + sizeof (D_UINT64)) >= dataSize)
                 goto update_frame_error;
 
-              D_UINT64 textOff = from_le_int64 (data + *pDataOff);
+              D_UINT64 offset = from_le_int64 (data + *pDataOff);
               *pDataOff += sizeof (D_UINT64);
 
-              if (*pDataOff >= dataSize)
-                goto update_frame_error;
-
-              while (data[*pDataOff] != 0)
+              do
                 {
                   D_UINT32 ch    = 0;
                   D_UINT   chLen = decode_utf8_char (data + *pDataOff, &ch);
 
-                  if ((chLen == 0)
-                      || (ch == 0)
-                      || (*pDataOff + chLen > dataSize))
-                    {
-                      goto update_frame_error;
-                    }
+                  if (chLen == 0)
+                    goto update_frame_error;
+                  else if (ch == 0)
+                    return WCS_INVALID_ARGS;
+
+                  fieldText.SetCharAtIndex (DBSChar (ch), offset++);
 
                   *pDataOff += chLen;
-                  fieldText.SetCharAtIndex (DBSChar (ch), textOff++);
+                  if (*pDataOff >= dataSize)
+                    goto update_frame_error;
                 }
+              while (data[*pDataOff] != 0);
+              *pDataOff += sizeof (D_UINT8);
 
+              assert (*pDataOff <= dataSize);
               rowValue.GetOperand ().SetValue (fieldText);
             }
           else
@@ -676,7 +679,7 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
           if (*pDataOff + sizeof (D_UINT64) > dataSize)
             goto update_frame_error;
 
-          D_UINT64 fromPos =  from_le_int64 (data + *pDataOff);
+          D_UINT64 fromPos  = from_le_int64 (data + *pDataOff);
           *pDataOff        += sizeof (D_UINT64);
 
           while ((*pDataOff < dataSize) && (elCount > 0))
@@ -712,22 +715,24 @@ cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff)
           D_UINT64 offset = from_le_int64 (data + *pDataOff);
           *pDataOff += sizeof (D_UINT64);
 
-          while ((data[*pDataOff] != 0)
-                 && (*pDataOff < dataSize))
+          do
             {
               D_UINT32 ch    = 0;
               D_UINT   chLen = decode_utf8_char (data + *pDataOff, &ch);
 
               if (chLen == 0)
                 goto update_frame_error;
+              else if (ch == 0)
+                return WCS_INVALID_ARGS;
+
+              fieldText.SetCharAtIndex (DBSChar (ch), offset++);
 
               *pDataOff += chLen;
-              fieldText.SetCharAtIndex (DBSChar (ch), offset++);
+              if (*pDataOff >= dataSize)
+                goto update_frame_error;
             }
-          if (*pDataOff >= dataSize)
-            goto update_frame_error;
-
-          fieldText.SetCharAtIndex (DBSChar (), offset);
+          while (data[*pDataOff] != 0);
+          *pDataOff += sizeof (D_UINT8);
 
           stackTop.GetOperand ().SetValue (fieldText);
         }
@@ -995,6 +1000,7 @@ cmd_read_text_stack_top (ClientConnection& rConn,
 
     maxCount = temp.GetCharactersCount ();
     store_le_int64 (maxCount, data + *pDataOffset);
+    *pDataOffset += sizeof (D_UINT64);
 
     if (maxCount == 0)
       return WCS_OK;
@@ -1003,7 +1009,6 @@ cmd_read_text_stack_top (ClientConnection& rConn,
       hintOffset = 0;
   }
 
-  *pDataOffset +=sizeof (D_UINT64);
   if (*pDataOffset + sizeof (D_UINT64) >= maxDataSize)
     return WCS_LARGE_ARGS;
 
@@ -1028,7 +1033,7 @@ cmd_read_text_stack_top (ClientConnection& rConn,
 
       assert (writeSize > 1);
 
-      *pDataOffset += writeSize - 1; //Don't include the null terminator
+      *pDataOffset += writeSize - 1; //Don't include the null terminator yet
 
       assert (data[*pDataOffset] == 0);
     }

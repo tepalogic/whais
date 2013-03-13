@@ -148,6 +148,25 @@ encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
   return 0;
 }
 
+D_UINT
+utf8_encode_size (D_UINT32 ch)
+{
+  if (ch < 0x80)
+    return 1;
+  else if (ch < 0x800)
+    return 2;
+  else if (ch < 0x10000)
+    return 3;
+  else if (ch < 0x200000)
+    return 4;
+  else if (ch < 0x4000000)
+    return 5;
+  else if (ch < 0x80000000)
+    return 6;
+
+  return 0;
+}
+
 D_INT
 utf8_strlen (const D_UINT8* pSource)
 {
@@ -158,8 +177,7 @@ utf8_strlen (const D_UINT8* pSource)
       if (chSize == 0)
         return -1;
 
-      result  += chSize;
-      pSource += chSize;
+      ++result,  pSource += chSize;
     }
 
   return result;

@@ -43,3 +43,8 @@ c_test_stack_update_table_array_SRC=test/test_stack_update_table_array.cpp
 c_test_stack_update_table_array_LIB=client/connector custom/custom utils/utils 
 c_test_stack_update_table_array_INC=
 
+UNIT_EXES+=c_test_stack_update_text
+c_test_stack_update_text_SRC=test/test_stack_update_text.cpp
+c_test_stack_update_text_LIB=client/connector custom/custom utils/utils 
+c_test_stack_update_text_INC=
+

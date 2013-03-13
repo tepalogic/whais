@@ -889,41 +889,40 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
   pEntHdr->MarkAsFirstEntry (false);
 
   //Maybe we are lucky! Check to see if we can link to one of our neighbors!
-  if (m_EntrysCount > (entry + 1))
+  if ((entry + 1) < m_EntrysCount)
     {
       neighborCachedItem = m_EntrysCache.RetriveItem (entry + 1);
       pNeighborEntHdr     = _RC (StoreEntry*,
                                  neighborCachedItem.GetDataForUpdate());
-    }
 
-  if ((pNeighborEntHdr != NULL) && pNeighborEntHdr->IsDeleted())
-    {
-      assert (pNeighborEntHdr->IsFirstEntry() == false);
-
-      const D_UINT64 prevEntry = pNeighborEntHdr->GetPrevEntry();
-      pNeighborEntHdr->SetPrevEntry (entry);
-      pEntHdr->SetPrevEntry (prevEntry);
-      pEntHdr->SetNextEntry (entry + 1);
-
-      neighborCachedItem = m_EntrysCache.RetriveItem (prevEntry);
-      pNeighborEntHdr    = _RC (StoreEntry*,
-                                neighborCachedItem.GetDataForUpdate());
-
-      assert (pNeighborEntHdr->IsDeleted());
-      assert (pNeighborEntHdr->IsFirstEntry() == false);
-
-      pNeighborEntHdr->SetNextEntry (entry);
-
-      if (m_FirstFreeEntry == (entry + 1))
+      if (pNeighborEntHdr->IsDeleted())
         {
-          assert (prevEntry == 0);
-          m_FirstFreeEntry = entry;
+          assert (pNeighborEntHdr->IsFirstEntry() == false);
+
+          const D_UINT64 prevEntry = pNeighborEntHdr->GetPrevEntry();
+          pNeighborEntHdr->SetPrevEntry (entry);
+          pEntHdr->SetPrevEntry (prevEntry);
+          pEntHdr->SetNextEntry (entry + 1);
+
+          neighborCachedItem = m_EntrysCache.RetriveItem (prevEntry);
+          pNeighborEntHdr    = _RC (StoreEntry*,
+                                    neighborCachedItem.GetDataForUpdate());
+
+          assert (pNeighborEntHdr->IsDeleted());
+          assert (pNeighborEntHdr->IsFirstEntry() == false);
+
+          pNeighborEntHdr->SetNextEntry (entry);
+
+          if (m_FirstFreeEntry == (entry + 1))
+            {
+              assert (prevEntry == 0);
+              m_FirstFreeEntry = entry;
+            }
+
+          return ;
         }
-
-      return ;
     }
-
-  if (entry > 1)
+  else if (entry > 1)
     {
       neighborCachedItem = m_EntrysCache.RetriveItem (entry - 1);
       pNeighborEntHdr    = _RC (StoreEntry*,
@@ -955,6 +954,18 @@ VLVarsStore::AddToFreeList (const D_UINT64 entry)
     }
 
   //Nothing found close by! Let's add it at the begin.
+  if (m_FirstFreeEntry != StoreEntry::LAST_CHAINED_ENTRY)
+    {
+      neighborCachedItem = m_EntrysCache.RetriveItem (m_FirstFreeEntry);
+      pNeighborEntHdr    = _RC (StoreEntry*,
+                                neighborCachedItem.GetDataForUpdate());
+
+      assert (pNeighborEntHdr->IsDeleted ());
+      assert (pNeighborEntHdr->IsFirstEntry() == false);
+
+     pNeighborEntHdr->SetPrevEntry (entry);
+    }
+
   pEntHdr->SetPrevEntry (0);
   pEntHdr->SetNextEntry( m_FirstFreeEntry);
 
