@@ -699,13 +699,17 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   if (hnd->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
   else if (fieldHint > 0xFFFF)
-    return WCS_LARGE_ARGS;
+    return WCS_OP_NOTSUPP;
 
   set_data_size (hnd, max_data_size (hnd));
   data_ = data (hnd);
 
+  store_le_int16 (fieldHint, data_);
+  offset += sizeof (D_UINT16);
+
+  /* These 16 bits are reserved */
   store_le_int16 (0, data_);
-  offset += 2 * sizeof (D_UINT16);
+  offset += sizeof (D_UINT16);
 
   if (globalName == NULL)
     {
@@ -2874,5 +2878,42 @@ proc_parameter_field_err:
         goto proc_parameter_field_try_again;
     }
 
+  return cs;
+}
+
+unsigned int
+WExecuteProcedure (const W_CONNECTOR_HND     hnd,
+                   const char* const         procedure)
+{
+  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+  D_UINT   cs    = WCS_OK;
+  D_UINT8* data_ = NULL;
+  D_UINT16 type  = 0;
+
+  if ((hnd_ == NULL)
+      || (procedure == NULL)
+      || (procedure[0] == 0)
+      || (hnd_->buildingCmd != CMD_INVALID))
+    {
+      return WCS_INCOMPLETE_CMD;
+    }
+
+  set_data_size (hnd, strlen (procedure) + 1);
+  data_ = data (hnd);
+  strcpy ((D_CHAR*)data_, procedure);
+
+  if ((cs = send_command (hnd, CMD_EXEC_PROC)) != WCS_OK)
+    goto execute_proc_err;
+
+  if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
+    goto execute_proc_err;
+  else if (type != CMD_LIST_PROCEDURE_RSP)
+    {
+      cs = WCS_INVALID_FRAME;
+      goto execute_proc_err;
+    }
+
+execute_proc_err:
   return cs;
 }

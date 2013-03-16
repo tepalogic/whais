@@ -42,7 +42,7 @@ cmd_value_desc (ClientConnection& rConn)
 
   D_UINT8*      data_      = rConn.Data ();
   const D_CHAR* glbName    = _RC (const D_CHAR*, data_ + sizeof (D_UINT32));
-  D_UINT32      fieldHint  = from_le_int16 (data_);
+  D_UINT16      fieldHint  = from_le_int16 (data_);
   D_UINT16      dataOffset = sizeof (D_UINT32) + strlen (glbName) + 1;
   I_Session&    session    = *rConn.Dbs ().m_Session;
   D_UINT        rawType;
@@ -403,6 +403,15 @@ cmd_update_exit:
 static void
 cmd_execute_procedure (ClientConnection& rConn)
 {
+  const D_CHAR* procName   = _RC (const D_CHAR*, rConn.Data ());
+  I_Session&    session    = *rConn.Dbs ().m_Session;
+  SessionStack& stack      = rConn.Stack ();
+
+  session.ExecuteProcedure (procName, stack);
+
+  rConn.DataSize (sizeof (D_UINT32));
+  store_le_int32 (WCS_OK, rConn.Data ());
+  rConn.SendCmdResponse (CMD_EXEC_PROC_RSP);
 }
 
 static void
