@@ -229,7 +229,8 @@ DBSText::DBSText (const DBSText& sourceText)
 
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*sourceText.m_pText);
+      newText.get()->Duplicate (*sourceText.m_pText,
+                                 sourceText.m_pText->BytesCount());
 
       m_pText = newText.release ();
       assert (m_pText->ShareCount () == 0);
@@ -258,7 +259,8 @@ DBSText::operator= (const DBSText& sourceText)
 
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*sourceText.m_pText);
+      newText.get()->Duplicate (*sourceText.m_pText,
+                                 sourceText.m_pText->BytesCount ());
 
       m_pText = newText.release ();
       assert (m_pText->ShareCount () == 0);
@@ -366,7 +368,7 @@ DBSText::Append (const DBSChar& character)
     {
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*m_pText);
+      newText.get()->Duplicate (*m_pText, m_pText->BytesCount ());
 
       m_pText->DecreaseReferenceCount();
       m_pText = newText.release ();
@@ -390,7 +392,7 @@ DBSText::Append (const DBSText& text)
     {
       auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*m_pText);
+      newText.get()->Duplicate (*m_pText, m_pText->BytesCount ());
 
       m_pText->DecreaseReferenceCount();
       m_pText = newText.release ();
@@ -434,9 +436,9 @@ DBSText::SetMirror (DBSText& mirror) const
     m_pText->IncreaseShareCount ();
   else
     {
-      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      auto_ptr<I_TextStrategy> newText (new TemporalText (NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*m_pText);
+      newText.get()->Duplicate (*m_pText, m_pText->BytesCount ());
       m_pText->DecreaseReferenceCount ();
 
       _CC (DBSText*, this)->m_pText = newText.release ();
@@ -458,7 +460,6 @@ DBSText::SetMirror (DBSText& mirror) const
 
       mirror.m_pText = m_pText;
     }
-
 }
 
 template <class T> void
@@ -498,7 +499,6 @@ init_array (const T* array, D_UINT64 count, I_ArrayStrategy*& prOutStrategy)
 
       PSValInterp::Store (rawStorage, array[index]);
       prOutStrategy->WriteRaw(currentOffset, valueIncrement, rawStorage);
-      prOutStrategy->IncrementCount();
       currentOffset += valueIncrement;
     }
 
@@ -753,8 +753,8 @@ add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
     throw DBSException (NULL, _EXTRA (DBSException::NULL_ARRAY_ELEMENT));
 
   static const D_UINT storageSize = get_aligned_elem_size (
-                                                    element.GetDBSType ());
-
+                                                    element.GetDBSType ()
+                                                          );
   prepare_array_strategy (pArrayStrategy);
 
   D_UINT8 rawElement[MAX_VALUE_RAW_STORAGE];
@@ -766,8 +766,6 @@ add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
                             rawElement);
 
   assert ((pArrayStrategy->RawSize() % storageSize) == 0);
-
-  pArrayStrategy->IncrementCount();
 
   return (pArrayStrategy->Count() - 1);
 }
@@ -992,10 +990,7 @@ set_array_element (I_ArrayStrategy*& pArrayStrategy,
                                                     pArrayStrategy->Type());
 
   if (value.IsNull())
-    {
       pArrayStrategy->CollapseRaw (index* storageSize, storageSize);
-      pArrayStrategy->DecrementCount ();
-    }
   else
     {
       D_UINT8 rawElement[MAX_VALUE_RAW_STORAGE];
@@ -1095,7 +1090,6 @@ DBSArray::SetElement (const DBSInt64& newValue, const D_UINT64 index)
   set_array_element (m_pArray, newValue, index);
 }
 
-
 void
 DBSArray::RemoveElement (const D_UINT64 index)
 {
@@ -1107,7 +1101,6 @@ DBSArray::RemoveElement (const D_UINT64 index)
   const D_UINT storageSize = get_aligned_elem_size (m_pArray->Type());
 
   m_pArray->CollapseRaw (index*storageSize, storageSize);
-  m_pArray->DecrementCount();
 }
 
 

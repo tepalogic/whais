@@ -46,8 +46,10 @@ public:
   virtual ~I_ArrayStrategy ();
 
   D_UINT64  Count () const { return m_ElementsCount; };
+#if 0
   void      IncrementCount () { ++m_ElementsCount; };
   void      DecrementCount () { --m_ElementsCount; };
+#endif
 
   DBS_FIELD_TYPE Type () const { return m_ElementsType; };
 
@@ -74,13 +76,14 @@ public:
   virtual bool IsRowValue () const;
 
   virtual pastra::TemporalArray& GetTemporal();
-  virtual pastra::RowFieldArray& GetRowValue();
+  virtual pastra::RowFieldArray& GetRow();
 
 protected:
   D_UINT64              m_ElementsCount;
   D_UINT                m_ShareCount;
   D_UINT                m_ReferenceCount;
   const DBS_FIELD_TYPE  m_ElementsType;
+  D_INT                 m_ElementRawSize;
 
 private:
   I_ArrayStrategy (const I_ArrayStrategy&);
@@ -99,7 +102,6 @@ public:
 
   static NullArray& GetSingletoneInstace (const DBS_FIELD_TYPE type);
 
-protected:
   //Overwrites of I_ArrayStrategy
   virtual D_UINT ReferenceCount () const;
   virtual void   IncrementReferenceCount ();
@@ -127,7 +129,6 @@ public:
   TemporalArray (const DBS_FIELD_TYPE elemsType);
   virtual ~TemporalArray ();
 
-protected:
   //Implements of I_ArrayStrategy
   virtual void     ReadRaw (const D_UINT64 offset,
                             const D_UINT64 length,
@@ -152,12 +153,6 @@ public:
                  DBS_FIELD_TYPE type);
   ~RowFieldArray ();
 
-protected:
-  //Overwrites of I_ArrayStrategy
-  virtual D_UINT ReferenceCount () const;
-  virtual bool   IsRowValue () const;
-  virtual pastra::RowFieldArray& GetRowValue();
-
   //Implements of I_ArrayStrategy
   virtual void     ReadRaw (const D_UINT64 offset,
                             const D_UINT64 length,
@@ -168,11 +163,21 @@ protected:
   virtual void     CollapseRaw (const D_UINT64 offset, const D_UINT64 count);
   virtual D_UINT64 RawSize () const;
 
+  virtual bool           IsRowValue () const;
+  virtual RowFieldArray& GetRow();
+  virtual TemporalArray& GetTemporal();
+
   const D_UINT64       m_FirstRecordEntry;
   VLVarsStore&         m_Storage;
+  TemporalArray*       m_TempArray;
+
 private:
   RowFieldArray (const RowFieldArray&);
   RowFieldArray& operator= (const RowFieldArray&);
+
+  void EnableTemporalStorage ();
+
+  static const D_UINT METADATA_SIZE = sizeof (D_UINT64);
 };
 
 }

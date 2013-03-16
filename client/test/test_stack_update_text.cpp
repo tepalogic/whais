@@ -227,7 +227,7 @@ test_table_text (W_CONNECTOR_HND hnd)
 
       aSimpleOffset = w_rnd () % 7;
       aValue[0]     = 0;
-      while (strlen (aValue) < strlen (ref[row * _fieldsCount] + aSimpleOffset))
+      while (strlen (aValue) < strlen (ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
           if (WGetStackValueEntry (hnd,
                                    "WFT_TEXT_2",
@@ -240,7 +240,7 @@ test_table_text (W_CONNECTOR_HND hnd)
             }
           strcat (aValue, value);
         }
-      if (strcmp (aValue, ref[row * _fieldsCount] + aSimpleOffset) != 0)
+      if (strcmp (aValue, ref[row * _fieldsCount + 1] + aSimpleOffset) != 0)
         goto test_table_text_fail;
     }
 

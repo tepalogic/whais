@@ -22,6 +22,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+
+#include "utils/include/le_converter.h"
+
 #include "ps_templatetable.h"
 
 #include "ps_valintep.h"
@@ -792,41 +795,78 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  D_UINT64                 newFirstEntry     = ~0;
-  D_UINT64                 newFieldValueSize = 0;
-  const D_UINT8            bitsSet           = ~0;
-  bool                     fieldValueWasNull = false;
-
+  D_UINT64 newFirstEntry     = ~0ull;
+  D_UINT64 newFieldValueSize = 0;
   if (value.IsNull() == false)
     {
       I_TextStrategy& text = value;
       if (text.IsRowValue ())
         {
-          RowFieldText& value = text.GetRowValue();
-          newFieldValueSize   = value.m_BytesSize;
-          newFirstEntry       = VariableFieldsStore ().AddRecord (
-                                                      value.m_Storage,
-                                                      value.m_FirstEntry,
-                                                      0,
-                                                      value.m_BytesSize
-                                                                  );
+          RowFieldText& value = text.GetRow ();
+
+          if (&value.m_Storage != &VariableFieldsStore ())
+            {
+              newFirstEntry = VariableFieldsStore ().AddRecord (
+                                  value.m_Storage,
+                                  value.m_FirstEntry,
+                                  0,
+                                  value.m_BytesSize +
+                                    RowFieldText::CACHE_META_DATA_SIZE);
+
+              newFieldValueSize = value.m_BytesSize +
+                                  RowFieldText::CACHE_META_DATA_SIZE;
+            }
+          else
+            {
+              value.m_Storage.IncrementRecordRef (value.m_FirstEntry);
+
+              newFirstEntry     = value.m_FirstEntry;
+              newFieldValueSize = value.m_BytesSize +
+                                  RowFieldText::CACHE_META_DATA_SIZE;
+            }
         }
       else
         {
           TemporalText& value = text.GetTemporal();
-          newFieldValueSize   = value.m_BytesSize;
-          newFirstEntry       = VariableFieldsStore ().AddRecord (
-                                                        value.m_Storage,
-                                                        0,
-                                                        newFieldValueSize
-                                                                  );
+
+          assert (value.m_BytesSize > 0);
+          if (value.m_BytesSize >= RowFieldText::MAX_BYTES_COUNT)
+            {
+              throw DBSException (NULL,
+                                  _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+            }
+
+          newFieldValueSize = value.m_BytesSize +
+                              RowFieldText::CACHE_META_DATA_SIZE;
+
+          assert (value.CharsCount () <= RowFieldText::MAX_CHARS_COUNT);
+
+          D_UINT8 aCachedData[RowFieldText::CACHE_META_DATA_SIZE];
+
+          store_le_int32 (value.CharsCount (), aCachedData);
+          store_le_int32 (value.m_CachedCharIndex,
+                          aCachedData + sizeof (D_UINT32));
+          store_le_int32 (value.m_CachedCharIndexOffset,
+                          aCachedData + 2 * sizeof (D_UINT32));
+
+          newFirstEntry = VariableFieldsStore ().AddRecord (
+                                                  aCachedData,
+                                                  sizeof (aCachedData)
+                                                            );
+          VariableFieldsStore ().UpdateRecord (newFirstEntry,
+                                               sizeof (aCachedData),
+                                               value.m_Storage,
+                                               0,
+                                               value.m_BytesSize);
         }
     }
 
   WSynchronizerRAII syncHolder (m_Sync);
 
-  StoredItem     cachedItem = m_RowCache.RetriveItem (row);
-  D_UINT8* const pRawData   = cachedItem.GetDataForUpdate();
+  StoredItem     cachedItem        = m_RowCache.RetriveItem (row);
+  D_UINT8* const pRawData          = cachedItem.GetDataForUpdate();
+  const D_UINT8  bitsSet           = ~0;
+  bool           fieldValueWasNull = false;
 
   D_UINT64* const fieldFirstEntry = _RC (D_UINT64*,
                                          pRawData + desc.m_StoreIndex + 0);
@@ -870,12 +910,12 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
       RowFieldText   oldEntryRAII (VariableFieldsStore (),
                                    *fieldFirstEntry,
                                    *fieldValueSize);
+      syncHolder.Leave ();
 
       VariableFieldsStore ().DecrementRecordRef (*fieldFirstEntry);
       *fieldFirstEntry = newFirstEntry;
       *fieldValueSize  = newFieldValueSize;
 
-      syncHolder.Leave ();
     }
   else
     {
@@ -914,25 +954,37 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
       I_ArrayStrategy& array = value;
       if (array.IsRowValue())
         {
-          RowFieldArray& value = array.GetRowValue();
-          newFieldValueSize    = value.RawSize();
-          newFirstEntry        = VariableFieldsStore ().AddRecord (
-                                                  value.m_Storage,
-                                                  value.m_FirstRecordEntry,
-                                                  0,
-                                                  newFieldValueSize
-                                                                  );
+          RowFieldArray& value = array.GetRow();
+          if (&value.m_Storage == &VariableFieldsStore ())
+            {
+              value.m_Storage.IncrementRecordRef (value.m_FirstRecordEntry);
+
+              newFieldValueSize = value.RawSize ();
+              newFirstEntry     = value.m_FirstRecordEntry;
+            }
+          else
+            {
+              newFieldValueSize = value.RawSize();
+              newFirstEntry     = VariableFieldsStore ().AddRecord (
+                                                      value.m_Storage,
+                                                      value.m_FirstRecordEntry,
+                                                      0,
+                                                      newFieldValueSize
+                                                                   );
+            }
         }
       else
         {
           TemporalArray& value = array.GetTemporal ();
           newFieldValueSize    = value.RawSize();
 
-          const D_UINT64 elemsCount = value.Count();
-          newFirstEntry             = VariableFieldsStore ().AddRecord (
-                                              _RC (const D_UINT8*, &elemsCount),
-                                              sizeof elemsCount
-                                                                       );
+          D_UINT8 elemsCount[RowFieldArray::METADATA_SIZE];
+          store_le_int64 (value.Count(), elemsCount);
+
+          newFirstEntry = VariableFieldsStore ().AddRecord (
+                                                        elemsCount,
+                                                        sizeof (elemsCount)
+                                                            );
           VariableFieldsStore ().UpdateRecord (newFirstEntry,
                                                sizeof elemsCount,
                                                value.m_Storage,

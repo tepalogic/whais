@@ -9,6 +9,8 @@
 #include <iostream>
 #include <string.h>
 
+#include "utils/include/le_converter.h"
+
 #include "../include/dbs_mgr.h"
 #include "../include/dbs_exception.h"
 #include "../include/dbs_values.h"
@@ -228,12 +230,18 @@ test_text_append ()
       const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
 
       {
+        D_UINT8 tempBuff[1024] = {0, };
+        strcpy (_RC (D_CHAR*, tempBuff) + 12, pOriginalText);
+        store_le_int32 ((sizeof charValues / sizeof (D_UINT32)), tempBuff);
+
         VLVarsStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
         storage.RegisterReference ();
 
-        allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText),
-                                             (sizeof charValues / sizeof (D_UINT32)));
+        allocated_entry = storage.AddRecord (
+                                  tempBuff,
+                                  (sizeof charValues / sizeof (D_UINT32)) + 12
+                                            );
 
         storage.Flush ();
       }
@@ -243,12 +251,17 @@ test_text_append ()
       else
         {
           VLVarsStore storage;
-          storage.Init(temp_file_base.c_str(), (originalText.GetRawUtf8Count() + 713 - 1) / 713, 713);
+
+          storage.Init(temp_file_base.c_str(), 1, 713);
           storage.RegisterReference ();
           storage.MarkForRemoval();
 
           {
-            DBSText destinationText (*(new RowFieldText(storage, allocated_entry, originalText.GetRawUtf8Count())));
+            DBSText destinationText (
+                      *(new RowFieldText(storage,
+                                        allocated_entry,
+                                        originalText.GetRawUtf8Count () + 12))
+                                    );
 
             if (destinationText.GetCharactersCount() != originalText.GetCharactersCount())
               result = false;
@@ -314,10 +327,24 @@ test_character_insertion ()
               VLVarsStore storage;
               storage.Init(temp_file_base.c_str(), 0, 713);
               storage.RegisterReference ();
-
               storage.MarkForRemoval();
-              allocated_entry = storage.AddRecord (_RC(const D_UINT8*, pOriginalText), sizeof (charValues) / sizeof (D_UINT32));
-              DBSText originalText (*(new RowFieldText(storage, allocated_entry, sizeof (charValues) / sizeof (D_UINT32))));
+
+               D_UINT8 tempBuff[1024] = {0, };
+              strcpy (_RC (D_CHAR*, tempBuff) + 12, pOriginalText);
+              store_le_int32 ((sizeof charValues / sizeof (D_UINT32)), tempBuff);
+
+              allocated_entry = storage.AddRecord (
+                                  tempBuff,
+                                  (sizeof charValues / sizeof (D_UINT32)) + 12
+                                                  );
+
+              DBSText originalText (
+                    *(new RowFieldText(
+                              storage,
+                              allocated_entry,
+                              sizeof (charValues) / sizeof (D_UINT32) + 12
+                                      ))
+                                   );
 
               DBSChar test_char = DBSChar(0x211356);
               originalText.SetCharAtIndex (test_char, charsCount / 2);
