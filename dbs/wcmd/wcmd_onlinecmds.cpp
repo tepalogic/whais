@@ -101,7 +101,7 @@ decode_glbvar_typeinfo (unsigned int type)
 
   if (arrayDesc)
     {
-      if (GET_BASIC_TYPE (type) == T_UNDETERMINED)
+      if (GET_BASIC_TYPE (type) == WFT_NOTSET)
         return result;
 
       result += " OF ";
@@ -146,13 +146,25 @@ translate_status (const D_UINT32 cs)
   case WCS_COMM_OUT_OF_SYNC:
     return "Communication is out of sync.";
   case WCS_LARGE_ARGS:
-    return "Size of the operation arguments is not supported.";
+    return "Size of the request arguments is big.";
+  case WCS_LARGE_RESPONSE:
+    return "Size of the request response is too big.";
   case WCS_CONNECTION_TIMEOUT:
     return "Connection has timeout.";
   case WCS_SERVER_BUSY:
-    return "Server is too busy.";
+    return "Server is busy.";
   case WCS_INCOMPLETE_CMD:
-    return "Previous command has not been completed";
+    return "Previous command has not been completed.";
+  case WCS_INVALID_ARRAY_OFF:
+    return "An invalid array index was used.";
+  case WCS_INVALID_TEXT_OFF:
+    return "An invalid text index was used.";
+  case WCS_INVALID_ROW:
+    return "An invalid row index was used.";
+  case WCS_INVALID_FIELD:
+    return "An invalid table field was used.";
+  case WCS_TYPE_MISMATCH:
+    return "The request cannot be completed due to unexpected value types.";
   case WCS_GENERAL_ERR:
     return "Unexpected error condition.";
   }
@@ -164,10 +176,10 @@ translate_status (const D_UINT32 cs)
 static const D_CHAR globalShowDesc[]    = "List context database's "
                                          "global variables.";
 static const D_CHAR globalShowDescExt[] =
-"Show the global variables installed in the database context.\n"
-"If a name is provided it limits the listing to only those variables.\n"
-"Usage:\n"
-"  global [variable_name] ... ";
+  "Show the global variables installed in the database context.\n"
+  "If a name is provided it limits the listing to only those variables.\n"
+  "Usage:\n"
+  "  global [variable_name] ... ";
 
 static bool
 cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
@@ -175,7 +187,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t              linePos   = 0;
   string              token     = CmdLineNextToken (cmdLine, linePos);
   string              globals;
-  W_CONNECTOR_HND       conHdl    = NULL;
+  W_CONNECTOR_HND     conHdl    = NULL;
   unsigned int        glbsCount = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
 
@@ -208,7 +220,8 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             cout << "Listing globals variables has failed\n";
         }
 
-      while ((cs == WCS_OK) && (glbsCount > 0))
+      while ((cs == WCS_OK)
+              && (glbsCount-- > 0))
         {
           const char* pGlbName = NULL;
           cs = WListGlobalsFetch (conHdl, &pGlbName);
@@ -218,10 +231,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           globals += pGlbName;
 
           if ((cs != WCS_OK) && (level < VL_DEBUG))
-            {
-              cout << "Fetching global value name has failed.\n";
-            }
-          --glbsCount;
+            cout << "Fetching global value name has failed.\n";
         }
       linePos = 0;
     }
@@ -247,13 +257,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           break;
         }
 
-      const streamsize prevWidth = cout.width (20);
-      const char       prevFill  = cout.fill (' ');
-
-      cout << left << token;
-      cout.width (prevWidth);
-      cout.fill (prevFill);
-
+      cout << token << ' ';
       if (rawType & WFT_TABLE_MASK)
         {
           assert ((rawType & WFT_FIELD_MASK) == 0);
@@ -277,20 +281,25 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               if (cs != WCS_OK)
                 break;
 
-              cout << decode_glbvar_typeinfo (rawType) << endl;
+              if (field > 0)
+                cout << ", ";
+
+              cout << decode_glbvar_typeinfo (rawType);
             }
+          cout << endl;
         }
       else if (rawType & WFT_FIELD_MASK)
         {
           rawType &= ~WFT_FIELD_MASK;
 
-          cout << "FIELD OF";
+          cout << "FIELD OF ";
           cout << decode_glbvar_typeinfo (rawType) << endl;
         }
       else
         cout << decode_glbvar_typeinfo (rawType) << endl;
     }
-  while ((linePos < globals.length ()) && (cs == WCS_OK));
+  while ((linePos < globals.length ())
+         && (cs == WCS_OK));
 
 cmdGlobalList_exit:
   WClose (conHdl);
@@ -301,11 +310,197 @@ cmdGlobalList_exit:
   return (cs == WCS_OK) ? true : false;
 }
 
+
+static const D_CHAR procShowDesc[]    = "List context database's procedures.";
+static const D_CHAR procShowDescExt[] =
+  "Show the procedures installed in the database context.\n"
+  "If a name is provided it limits the listing to only those procedures\n"
+  "Usage:\n"
+  "  procedure [procedure_name] ... ";
+
+static bool
+cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+{
+  size_t              linePos     = 0;
+  string              token       = CmdLineNextToken (cmdLine, linePos);
+  string              procedures;
+  W_CONNECTOR_HND     conHdl      = NULL;
+  unsigned int        procsCount  = 0;
+  const VERBOSE_LEVEL level       = GetVerbosityLevel ();
+
+  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+                           GetConnectionPort ().c_str (),
+                           GetWorkingDB ().c_str (),
+                           GetUserPassword ().c_str (),
+                           GetUserId (),
+                           &conHdl);
+
+  assert (token == "procedure");
+
+  if (cs != WCS_OK)
+    {
+      if (level >= VL_DEBUG)
+        cout << "Failed to connect: " << translate_status (cs) << endl;
+
+      cout << translate_status (cs) << endl;
+      return false;
+    }
+
+  if (linePos >= cmdLine.length ())
+    {
+      cs = WListProcedures (conHdl, &procsCount);
+      if (level >= VL_DEBUG)
+        {
+          if (cs == WCS_OK)
+            cout << "Got " << procsCount << " globals.\n";
+          else
+            cout << "Listing procedures has failed\n";
+        }
+
+      while ((cs == WCS_OK)
+              && (procsCount-- > 0))
+        {
+          const char* pProcName = NULL;
+          cs = WListProceduresFetch (conHdl, &pProcName);
+
+          assert (pProcName != NULL);
+          procedures += ' ';
+          procedures += pProcName;
+
+          if ((cs != WCS_OK) && (level < VL_DEBUG))
+            cout << "Fetching procedure name has failed.\n";
+        }
+      linePos = 0;
+    }
+  else
+    procedures = cmdLine;
+
+  if (cs != WCS_OK)
+    goto cmdProcList_exit;
+
+  do
+    {
+      D_UINT procsParameter;
+      token = CmdLineNextToken (procedures, linePos);
+      cs = WProcedureParametersCount (conHdl, token.c_str (), &procsParameter);
+
+      if (cs != WCS_OK)
+        {
+          if (level <= VL_DEBUG)
+            {
+              cout << "Failed to get the number of arguments for procedure '"
+                   << token << "'.\n";
+            }
+          break;
+        }
+
+      cout << token << " (";
+
+      D_UINT param = 1; //Start with the first procdure parameter
+      do
+        {
+          param %= procsParameter;
+
+          if (param == 0)
+            cout << ") ";
+
+          unsigned int paramType;
+          cs = WProcedureParameter (conHdl,
+                                    token.c_str (),
+                                    param,
+                                    &paramType);
+          if (cs != WCS_OK)
+            {
+              if (level <= VL_DEBUG)
+                {
+                  cout << "Failed to fetch type information for '"
+                       << token << "' procedure.\n";
+                }
+              break;
+            }
+
+          if (param > 1)
+            cout << ", ";
+
+          if (paramType & WFT_TABLE_MASK)
+            {
+              assert ((paramType & WFT_FIELD_MASK) == 0);
+
+              D_UINT fieldsCount;
+
+              cs = WProcedureParameterFieldCount (conHdl,
+                                                  token.c_str (),
+                                                  param,
+                                                  &fieldsCount);
+              if (cs != WCS_OK)
+                break;
+
+              if (fieldsCount == 0)
+                {
+                  cout << "TABLE";
+                  continue;
+                }
+
+              cout << "TABLE OF [";
+
+              for (D_UINT field = 0; field < fieldsCount; field++)
+                {
+                  const D_CHAR* fieldName;
+
+                  cs = WProcedureParameterField (conHdl,
+                                                 token.c_str (),
+                                                 0,
+                                                 field,
+                                                 &fieldName,
+                                                 &paramType);
+                  if (cs != WCS_OK)
+                    break;
+
+                  if (field > 0)
+                    cout << ", ";
+
+                  cout << fieldName << " AS ";
+                  cout << decode_glbvar_typeinfo (paramType);
+                }
+              cout << ']';
+            }
+          else if (paramType & WFT_FIELD_MASK)
+            {
+              paramType &= ~WFT_FIELD_MASK;
+
+              if (paramType == WFT_NOTSET)
+                cout << "FIELD";
+              else
+                {
+                  cout << "FIELD OF ";
+                  cout << decode_glbvar_typeinfo (paramType);
+                }
+            }
+          else
+            cout << decode_glbvar_typeinfo (paramType);
+        }
+      while (param++ > 0);
+
+      cout << endl;
+    }
+  while ((linePos < procedures.length ())
+         && (cs == WCS_OK));
+
+cmdProcList_exit:
+  WClose (conHdl);
+
+  if (cs != WCS_OK)
+    cout << translate_status (cs) << endl;
+
+  return (cs == WCS_OK) ? true : false;
+}
+
+
 static const D_CHAR pingShowDesc[]    = "Ping the database sever. ";
 static const D_CHAR pingShowDescExt[] =
-"Ping the database server to check if it is up.\n"
-"Usage:\n"
-"  ping";
+  "Ping the database server to check if it is up.\n"
+  "Usage:\n"
+  "  ping";
 
 static bool
 cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
@@ -354,6 +549,14 @@ AddOnlineTableCommands ()
   entry.m_pCmdDesc     = globalShowDesc;
   entry.m_pExtHelpDesc = globalShowDescExt;
   entry.m_cmd          = cmdGlobalList;
+
+  RegisterCommand (entry);
+
+  entry.m_showStatus   = false;
+  entry.m_pCmdText     = "procedure";
+  entry.m_pCmdDesc     = procShowDesc;
+  entry.m_pExtHelpDesc = procShowDescExt;
+  entry.m_cmd          = cmdProcList;
 
   RegisterCommand (entry);
 

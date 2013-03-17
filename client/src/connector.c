@@ -398,7 +398,9 @@ WPingServer (const W_CONNECTOR_HND hnd)
     goto exit_ping_server;
 
   if ((type != CMD_PING_SERVER_RSP)
-      || (data_size (hnd_) != 0))
+      || (data_size (hnd_) != sizeof (D_UINT32))
+      || (from_le_int32 (data (hnd_)) != WCS_OK))
+
     {
       cs = WCS_INVALID_FRAME;
     }
@@ -2766,7 +2768,6 @@ proc_parameter_field_count_try_again:
 
   offset += sizeof (D_UINT16);
   *pCount = from_le_int16 (data_ + offset);
-  assert (*pCount != 0);
 
   assert (cs == WCS_OK);
   return WCS_OK;
