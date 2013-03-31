@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-static const D_UINT8 UTF8_7BIT_MASK = 0x00;
+static const D_UINT8 UTF8_7BIT_MASK  = 0x00;
 static const D_UINT8 UTF8_11BIT_MASK = 0xC0;
 static const D_UINT8 UTF8_16BIT_MASK = 0xE0;
 static const D_UINT8 UTF8_21BIT_MASK = 0xF0;
@@ -39,9 +39,9 @@ static const D_UINT8 UTF8_26BIT_MASK = 0xF8;
 static const D_UINT8 UTF8_31BIT_MASK = 0xFC;
 static const D_UINT8 UTF8_37BIT_MASK = 0xFE;
 
-static const D_UINT8 UTF8_EXTRA_BYTE_SIG = 0x80;
+static const D_UINT8 UTF8_EXTRA_BYTE_SIG   = 0x80;
 static const D_UINT8 UTF8_EXTRA_BYTE_MASK  = 0xC0;
-static const D_UINT8 UTF8_MAX_BYTES_COUNT = 0x8;
+static const D_UINT8 UTF8_MAX_BYTES_COUNT  = 0x08;
 
 D_UINT
 get_utf8_char_size (D_UINT8 firstUtf8Byte);

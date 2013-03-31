@@ -795,8 +795,8 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
     return 0;
 
   D_UINT64 usecPrec = USECS_PRECISION / 10;
-  D_UINT32 msec_t   = value.m_Microsec;
-  while (usecPrec > msec_t)
+  D_UINT32 usec_t   = value.m_Microsec;
+  while ((usec_t > 0 ) && (usecPrec > usec_t))
     {
       utf8Dest[result++] = '0';
       usecPrec /= 10;
@@ -805,15 +805,15 @@ Utf8Translator::Write (D_UINT8* const      utf8Dest,
         return 0;
     }
 
-  while ((msec_t % 10) == 0)
-    msec_t /= 10;
+  while ((usec_t > 0) && ((usec_t % 10) == 0))
+    usec_t /= 10;
 
   const D_INT64 res_t = result;
 
   result = snprintf (_RC (D_CHAR*, utf8Dest + result),
                      maxSize - result,
                      "%u",
-                     msec_t);
+                     usec_t);
 
   if ((result < 0) || (result + res_t >= maxSize))
     return 0;

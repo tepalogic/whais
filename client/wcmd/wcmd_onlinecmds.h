@@ -25,8 +25,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WCMD_ONLINECMDS_H_
 #define WCMD_ONLINECMDS_H_
 
+#include "whisper.h"
+
 void
 AddOnlineTableCommands ();
 
+
+const D_CHAR*
+wcmd_translate_status (const D_UINT32 cs);
 
 #endif /* WCMD_ONLINECMDS_H_ */

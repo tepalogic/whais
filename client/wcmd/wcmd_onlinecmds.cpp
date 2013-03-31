@@ -30,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "compiler/include/whisperc/whisperc.h"
 #include "utils/include/auto_array.h"
 #include "utils/include/le_converter.h"
 #include "client/include/whisper_connector.h"
@@ -38,82 +37,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_onlinecmds.h"
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_optglbs.h"
+#include "wcmd_execcmd.h"
 
 using namespace std;
 
-const D_CHAR*
-decode_basic_type (const D_UINT16 type)
-{
-  switch (GET_BASIC_TYPE (type))
-  {
-  case T_BOOL:
-    return "BOOL";
-  case T_CHAR:
-    return "CHARACTER";
-  case T_DATE:
-    return "DATE";
-  case T_DATETIME:
-    return "DATETIME";
-  case T_HIRESTIME:
-    return "HIRESTIME";
-  case T_UINT8:
-    return "UNSIGNED INT8";
-  case T_UINT16:
-    return "UNSIGNED INT16";
-  case T_UINT32:
-    return "UNSIGNED INT32";
-  case T_UINT64:
-    return "UNSIGNED INT64";
-  case T_INT8:
-    return "INT8";
-  case T_INT16:
-    return "INT16";
-  case T_INT32:
-    return "INT32";
-  case T_INT64:
-    return "INT64";
-  case T_REAL:
-    return "REAL";
-  case T_RICHREAL:
-    return "RICHREAL";
-  case T_TEXT:
-    return "TEXT";
-  default:
-    assert (false);
-  }
-
-  return NULL;
-}
-
-static string
-decode_glbvar_typeinfo (unsigned int type)
-{
-  string result;
-  bool   arrayDesc = false;
-
-  assert ((IS_FIELD (type) || IS_TABLE (type)) == false );
-
-  if (IS_ARRAY(type))
-    {
-      result += "ARRAY";
-      arrayDesc = true;
-    }
-
-  if (arrayDesc)
-    {
-      if (GET_BASIC_TYPE (type) == WFT_NOTSET)
-        return result;
-
-      result += " OF ";
-      result += decode_basic_type (GET_BASIC_TYPE (type));
-      return result;
-    }
-
-  return decode_basic_type (GET_BASIC_TYPE (type));
-}
 
 const D_CHAR*
-translate_status (const D_UINT32 cs)
+wcmd_translate_status (const D_UINT32 cs)
 {
   if (cs > WCS_OS_ERR_BASE)
     {
@@ -191,6 +121,8 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   unsigned int        glbsCount = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
 
+  assert (token == "global");
+
   D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
                            GetConnectionPort ().c_str (),
                            GetWorkingDB ().c_str (),
@@ -198,14 +130,13 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                            GetUserId (),
                            &conHdl);
 
-  assert (token == "global");
 
   if (cs != WCS_OK)
     {
       if (level >= VL_DEBUG)
-        cout << "Failed to connect: " << translate_status (cs) << endl;
+        cout << "Failed to connect: " << wcmd_translate_status (cs) << endl;
 
-      cout << translate_status (cs) << endl;
+      cout << wcmd_translate_status (cs) << endl;
       return false;
     }
 
@@ -284,7 +215,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               if (field > 0)
                 cout << ", ";
 
-              cout << decode_glbvar_typeinfo (rawType);
+              cout << wcmd_decode_typeinfo (rawType);
             }
           cout << endl;
         }
@@ -293,10 +224,10 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           rawType &= ~WFT_FIELD_MASK;
 
           cout << "FIELD OF ";
-          cout << decode_glbvar_typeinfo (rawType) << endl;
+          cout << wcmd_decode_typeinfo (rawType) << endl;
         }
       else
-        cout << decode_glbvar_typeinfo (rawType) << endl;
+        cout << wcmd_decode_typeinfo (rawType) << endl;
     }
   while ((linePos < globals.length ())
          && (cs == WCS_OK));
@@ -305,7 +236,7 @@ cmdGlobalList_exit:
   WClose (conHdl);
 
   if (cs != WCS_OK)
-    cout << translate_status (cs) << endl;
+    cout << wcmd_translate_status (cs) << endl;
 
   return (cs == WCS_OK) ? true : false;
 }
@@ -340,9 +271,9 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   if (cs != WCS_OK)
     {
       if (level >= VL_DEBUG)
-        cout << "Failed to connect: " << translate_status (cs) << endl;
+        cout << "Failed to connect: ";
 
-      cout << translate_status (cs) << endl;
+      cout << wcmd_translate_status (cs) << endl;
       return false;
     }
 
@@ -460,7 +391,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                     cout << ", ";
 
                   cout << fieldName << " AS ";
-                  cout << decode_glbvar_typeinfo (paramType);
+                  cout << wcmd_decode_typeinfo (paramType);
                 }
               cout << ']';
             }
@@ -473,11 +404,11 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               else
                 {
                   cout << "FIELD OF ";
-                  cout << decode_glbvar_typeinfo (paramType);
+                  cout << wcmd_decode_typeinfo (paramType);
                 }
             }
           else
-            cout << decode_glbvar_typeinfo (paramType);
+            cout << wcmd_decode_typeinfo (paramType);
         }
       while (param++ > 0);
 
@@ -490,7 +421,7 @@ cmdProcList_exit:
   WClose (conHdl);
 
   if (cs != WCS_OK)
-    cout << translate_status (cs) << endl;
+    cout << wcmd_translate_status (cs) << endl;
 
   return (cs == WCS_OK) ? true : false;
 }
@@ -523,7 +454,7 @@ cmd_ping_exit:
   ticks = wh_msec_ticks () - ticks;
   if (cs != WCS_OK)
     {
-      cout << translate_status (cs) << endl;
+      cout << wcmd_translate_status (cs) << endl;
       return false;
     }
   else
@@ -537,6 +468,28 @@ cmd_ping_exit:
 }
 
 
+static const D_CHAR execShowDesc[]    = "Execute a procedure. ";
+static const D_CHAR execShowDescExt[] =
+  "Execute a procedure on the remote server using the "
+  "specified parameters.\n"
+  "Parameters specifiers:\n"
+  "  B -- denotes a value of boolean type.\n"
+  "  C -- denotes a value of character type.\n"
+  "  D -- denotes a value of date type.\n"
+  "  H -- denotes a value of time type.\n"
+  "  M -- denotes a value of high resolution time type.\n"
+  "  I -- denotes a value of integer type.\n"
+  "  U -- denotes a value of unsigned integer type.\n"
+  "  R -- denotes a value of real type.\n"
+  "  T -- denotes a value of text type.\n"
+  "Usage:\n"
+  "  exec proc_name\n"
+  "  exec proc_name I('231') T('Text \\'example\\'')\n"
+  "  exec proc_name [ { field1:C('A') field2:R('123.45') } "
+                      "{ field1:C('A') field2:R('123.45') } ]\n"
+  "  exec proc_name C{'A' 'B' 'C'} R{'123' '123.12' '-9999.99'}\n"
+  "  exec proc_name [ { field1.C{'A' 'B' 'C'} "
+                      "field2.R{'123' '123.12' '-9999.99'} } ]\n";
 
 void
 AddOnlineTableCommands ()
@@ -565,6 +518,14 @@ AddOnlineTableCommands ()
   entry.m_pCmdDesc     = pingShowDesc;
   entry.m_pExtHelpDesc = pingShowDescExt;
   entry.m_cmd          = cmdPing;
+
+  RegisterCommand (entry);
+
+  entry.m_showStatus   = false;
+  entry.m_pCmdText     = "exec";
+  entry.m_pCmdDesc     = execShowDesc;
+  entry.m_pExtHelpDesc = execShowDescExt;
+  entry.m_cmd          = cmdExec;
 
   RegisterCommand (entry);
 }

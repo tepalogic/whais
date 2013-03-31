@@ -22,43 +22,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WCMD_CMDSMGR_H_
-#define WCMD_CMDSMGR_H_
+#ifndef WCMD_EXECCMD_H_
+#define WCMD_EXECCMD_H_
 
 #include <string>
-#include <iostream>
 
-#include "whisper.h"
-#include "wexception.h"
+#include "wcmd_cmdsmgr.h"
 
-typedef void* ENTRY_CMD_CONTEXT;
-typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
+bool
+cmdExec (const std::string& cmdLine, ENTRY_CMD_CONTEXT context);
 
-struct CmdEntry
-{
-  const D_CHAR*     m_pCmdText;
-  const D_CHAR*     m_pCmdDesc;
-  const D_CHAR*     m_pExtHelpDesc;
-  ENTRY_CMD         m_cmd;
-  ENTRY_CMD_CONTEXT m_context;
-
-  bool              m_showStatus;
-};
-
-void
-InitCmdManager ();
-
-void
-RegisterCommand (const CmdEntry& entry);
-
-const CmdEntry*
-FindCmdEntry (const D_CHAR* pCommand);
-
-const std::string
-CmdLineNextToken (const std::string& cmdLine, size_t& ioPosition);
-
-void
-printException (std::ostream& outputStream, const WException& e);
-
-#endif // WCMD_CMDSMGR_H_
-
+#endif /* WCMD_EXECCMD_H_ */

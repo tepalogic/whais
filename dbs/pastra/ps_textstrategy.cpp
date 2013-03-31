@@ -486,12 +486,23 @@ RowFieldText::~RowFieldText ()
 
   if (m_TempText == NULL)
     {
-      assert (m_BytesSize > CACHE_META_DATA_SIZE);
-
       D_UINT8 cachedMetaData[CACHE_META_DATA_SIZE];
+      m_Storage.GetRecord (m_FirstEntry,
+                           0,
+                           CACHE_META_DATA_SIZE,
+                           cachedMetaData);
 
-      store_le_int32 (m_CachedCharCount, cachedMetaData);
-      store_le_int32 (m_CachedCharIndex, cachedMetaData + sizeof (D_UINT32));
+      //Do not update the elements count if we have not modified ours
+      //Someone else might did it in the mean time, so we will do our
+      //best to avoid conflicts.
+      if (from_le_int32 (cachedMetaData) < m_CachedCharCount)
+        store_le_int32 (m_CachedCharCount, cachedMetaData);
+
+      //Char index and offset would in the worst case trigger only
+      //cache miss hits, but their values should stay valid, as they are
+      //protected if the string is truncated or modified.
+      store_le_int32 (m_CachedCharIndex,
+                      cachedMetaData + sizeof (D_UINT32));
       store_le_int32 (m_CachedCharIndexOffset,
                       cachedMetaData + 2 * sizeof (D_UINT32));
 

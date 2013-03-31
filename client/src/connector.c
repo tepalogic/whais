@@ -2909,7 +2909,7 @@ WExecuteProcedure (const W_CONNECTOR_HND     hnd,
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     goto execute_proc_err;
-  else if (type != CMD_LIST_PROCEDURE_RSP)
+  else if (type != CMD_EXEC_PROC_RSP)
     {
       cs = WCS_INVALID_FRAME;
       goto execute_proc_err;

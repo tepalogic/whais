@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <map>
 
+#include "compiler/include/whisperc/whisperc.h"
+#include "client/include/whisper_connector.h"
 #include "utils/include/tokenizer.h"
 
 #include "wcmd_cmdsmgr.h"
@@ -34,6 +36,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 static const D_UINT MAX_DECODED_STRING = 256;
+
+static const D_CHAR*
+decode_basic_type (const D_UINT16 type)
+{
+  switch (GET_BASIC_TYPE (type))
+  {
+  case T_BOOL:
+    return "BOOL";
+  case T_CHAR:
+    return "CHARACTER";
+  case T_DATE:
+    return "DATE";
+  case T_DATETIME:
+    return "DATETIME";
+  case T_HIRESTIME:
+    return "HIRESTIME";
+  case T_UINT8:
+    return "UNSIGNED INT8";
+  case T_UINT16:
+    return "UNSIGNED INT16";
+  case T_UINT32:
+    return "UNSIGNED INT32";
+  case T_UINT64:
+    return "UNSIGNED INT64";
+  case T_INT8:
+    return "INT8";
+  case T_INT16:
+    return "INT16";
+  case T_INT32:
+    return "INT32";
+  case T_INT64:
+    return "INT64";
+  case T_REAL:
+    return "REAL";
+  case T_RICHREAL:
+    return "RICHREAL";
+  case T_TEXT:
+    return "TEXT";
+  default:
+    assert (false);
+  }
+
+  return NULL;
+}
+
+string
+wcmd_decode_typeinfo (unsigned int type)
+{
+  string result;
+  bool   arrayDesc = false;
+
+  assert ((IS_FIELD (type) || IS_TABLE (type)) == false );
+
+  if (IS_ARRAY(type))
+    {
+      result += "ARRAY";
+      arrayDesc = true;
+    }
+
+  if (arrayDesc)
+    {
+      if (GET_BASIC_TYPE (type) == WFT_NOTSET)
+        return result;
+
+      result += " OF ";
+      result += decode_basic_type (GET_BASIC_TYPE (type));
+      return result;
+    }
+
+  return decode_basic_type (GET_BASIC_TYPE (type));
+}
 
 map<string, CmdEntry> sCommands;
 static const D_CHAR descHelp[]    = "Display help on available commands.";
