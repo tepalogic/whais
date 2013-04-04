@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server/include/server_protocol.h"
 
+#define CLIENT_VERSION                    1
+
 #define MAX_CMD_INTERNALS                 4
 
 static const D_UINT LIST_GLBSCOUNT      = 0;
@@ -48,6 +50,9 @@ static const D_UINT LAST_UPDATE_OFF     = 0;
 
 struct INTERNAL_HANDLER
 {
+  D_UINT8*  data;
+  D_UINT32  dataSize;
+  D_UINT32  version;
   D_UINT32  cmdInternal[MAX_CMD_INTERNALS];
   WH_SOCKET socket;
   D_UINT32  expectedFrameId;
@@ -58,7 +63,6 @@ struct INTERNAL_HANDLER
   D_UINT16  buildingCmd;
   D_UINT8   userId;
   D_UINT8   encType;
-  D_UINT8   data [FRAME_MAX_SIZE];
   D_UINT8   encriptionKey[1];
 };
 

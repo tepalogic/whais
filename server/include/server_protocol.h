@@ -27,11 +27,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "client/include/whisper_connector.h"
 
+#define MIN_FRAME_SIZE                  512
+#define MAX_FRAME_SIZE                  65535
+#define DEFAULT_FRAME_SIZE              4096
+
+
 #define FRAME_SIZE_OFF                  0x00
 #define FRAME_TYPE_OFF                  0x02
 #define FRAME_ENCTYPE_OFF               0x03
 #define FRAME_ID_OFF                    0x04
-#define FRAME_DATA_OFF                  0x08
+#define FRAME_HDR_SIZE                  0x08
 
 #define FRAME_TYPE_NORMAL               0x00
 #define FRAME_TYPE_AUTH_CLNT            0x01
@@ -41,38 +46,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FRAME_TYPE_SERV_BUSY            0xFF
 
 #define FRAME_ENCTYPE_PLAIN             0x01
-#define FRAME_ENCTYPE_IXS               0x02
+#define FRAME_ENCTYPE_3K                0x02
+
+#define ENC_3K_FIRST_KING_OFF           0x00
+#define ENC_3K_SECOND_KING_OFF          0x04
+#define ENC_3K_PLAIN_SIZE_OFF           0x08
+#define ENC_3K_1ST_SPARE_OFF            0x0A
+#define ENC_3K_HDR_SIZE                 0x0C
 
 #define PLAIN_CLNT_COOKIE_OFF           0x00
 #define PLAIN_SERV_COOKIE_OFF           0x04
 #define PLAIN_TYPE_OFF                  0x08
 #define PLAIN_CRC_OFF                   0x0A
-#define PLAIN_DATA_OFF                  0x0C
+#define PLAIN_HDR_SIZE                  0x0C
 
 /* Authenticate offsets */
 /*
  * Auth
  * {
- *      version : 32bit map
+ *      version        : 32 bit map //Supported protocol versions
+ *      maxframeSize   : uint16
+ *      spare          : 16 bit
+ *      encryp         : uint8      //The encryption type to be used.
+ *      spare          : 24 bit
+ *
  * }
  *
  * AuthRsp
  * {
- *      version  : 32bit map     // Chosen interface.
+ *      version  : 32bit map     // Chosen protocol interface.
  *      userId   : uint8
+ *      spare    : 24 bit
  *      database : char[]
- *      password : char[]
+ *      password : char[]        //Present only for unencrypted connections.
+ *      encData  : uint8[        //Optional, depending on the encryption type.
  * }
  */
-#define FRAME_AUTH_CLNT_VER             0x00
-#define FRAME_AUTH_CLNT_USR             0x04
-#define FRAME_AUTH_CLNT_RESERVED        0x05
-#define FRAME_AUTH_CLNT_DATA            0x08
 
-#define FRAME_MAX_SIZE                  0x1000
+#define FRAME_AUTH_VER_OFF                  0x00
+#define FRAME_AUTH_SIZE_OFF                 0x04
+#define FRAME_AUTH_SPARE_1_OFF              0x06
+#define FRAME_AUTH_ENC_OFF                  0x08
+#define FRAME_AUTH_SPARE_2_OFF              0x09
+#define FRAME_AUTH_SIZE                     0x0C
 
-#define ADMIN_CMD_BASE                  0x0000
-#define USER_CMD_BASE                   0x1000
+#define FRAME_AUTH_RSP_VER_OFF              0x00
+#define FRAME_AUTH_RSP_USR_OFF              0x04
+#define FRAME_AUTH_RSP_SPARE_1_OFF          0x05
+#define FRAME_AUTH_RSP_FIXED_SIZE           0x08
+
+#define ADMIN_CMD_BASE                      0x0000
+#define USER_CMD_BASE                       0x1000
 
 /* List database context globals */
 #define CMD_INVALID                     ADMIN_CMD_BASE

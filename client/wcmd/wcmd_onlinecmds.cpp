@@ -67,6 +67,8 @@ wcmd_translate_status (const D_UINT32 cs)
     return "Operation not permitted.";
   case WCS_DROPPED:
     return "Connection dropped by peer.";
+  case WCS_PROTOCOL_NOTSUPP:
+    return "No suitable protocol to communicate with the server.";
   case WCS_ENCTYPE_NOTSUPP:
     return "Could not agree on supported encryption type.";
   case WCS_UNEXPECTED_FRAME:

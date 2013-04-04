@@ -27,15 +27,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include <fstream>
 
+#include "utils/include/tokenizer.h"
+
+#include "server_protocol.h"
 #include "configuration.h"
 
-#include "utils/include/tokenizer.h"
+
 
 using namespace std;
 
-static const D_CHAR COMMENT_CHAR = '#';
-
+static const D_CHAR COMMENT_CHAR          = '#';
 static const D_CHAR DEFAULT_LISTEN_PORT[] = "1761";
+static const D_CHAR CLEAR_LOG_STREAM[]    = "";
 
 static const D_UINT MIN_TABLE_CACHE_BLOCK_SIZE  = 1024;
 static const D_UINT MIN_TABLE_CACHE_BLOCK_COUNT = 128;
@@ -52,6 +55,7 @@ static const D_UINT DEFAULT_TEMP_CACHE              = 512;
 
 static const string gEntPort ("listen");
 static const string gEntMaxConnections ("max_connections");
+static const string gEntMaxFrameSize("max_frame_size");
 static const string gEntTableBlkSize ("table_block_cache_size");
 static const string gEntTableBlkCount ("table_block_cache_count");
 static const string gEntVlBlkSize ("vl_values_block_size");
@@ -66,6 +70,7 @@ static const string gEntObjectLib ("load_object");
 static const string gEntNativeLib ("load_native");
 static const string gEntRootPasswrd("root_password");
 static const string gEntUserPasswrd("user_password");
+
 
 static ServerSettings gMainSettings;
 
@@ -213,13 +218,12 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
         {
           token = NextToken (line, pos, delimiters);
           gMainSettings.m_MaxConnections = atoi (token.c_str ());
-
-          if (gMainSettings.m_MaxConnections == 0)
-            {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
-              return false;
-            }
         }
+      else if (token == gEntMaxFrameSize)
+       {
+          token = NextToken (line, pos, delimiters);
+          gMainSettings.m_MaxFrameSize = atoi (token.c_str ());
+       }
       else if (token == gEntTableBlkCount)
         {
           token = NextToken (line, pos, delimiters);
@@ -737,12 +741,46 @@ PrepareConfigurationSection (I_Logger& log)
     }
 
   if (gMainSettings.m_MaxConnections == 0)
-    gMainSettings.m_MaxConnections = DEFAULT_MAX_CONNS;
+    {
+      if (gMainSettings.m_ShowDebugLog)
+        {
+          log.Log (LOG_DEBUG,
+                     "The number of maximum simultaneous connections per "
+                     "interface set to default.");
+        }
+      gMainSettings.m_MaxConnections = DEFAULT_MAX_CONNS;
+    }
 
   logStream << "Maximum simultaneous connections per interface set at ";
   logStream << gMainSettings.m_MaxConnections << ".";
   log.Log (LOG_INFO, logStream.str ());
-  logStream.str ("");
+  logStream.str (CLEAR_LOG_STREAM);
+
+  if (gMainSettings.m_MaxFrameSize == 0)
+    {
+      if (gMainSettings.m_ShowDebugLog)
+        {
+          log.Log (LOG_DEBUG,
+                   "The maximum communication frame size set to default.");
+        }
+      gMainSettings.m_MaxFrameSize = DEFAULT_FRAME_SIZE;
+    }
+  else if ((gMainSettings.m_MaxFrameSize < MIN_FRAME_SIZE)
+            || (MAX_FRAME_SIZE < gMainSettings.m_MaxFrameSize))
+    {
+      logStream << "The maximum frame size set to a invalid value. ";
+      logStream << "The value should be set between " << MIN_FRAME_SIZE;
+      logStream << " and " << MAX_FRAME_SIZE << " bytes.";
+
+      log.Log (LOG_ERROR, logStream.str ());
+
+      return false;
+    }
+
+  logStream << "Maximum communication frame size set to ";
+  logStream << gMainSettings.m_MaxFrameSize <<" bytes.";
+  log.Log (LOG_INFO, logStream.str ());
+  logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.m_TableCacheBlockSize == 0)
     {
@@ -763,7 +801,7 @@ PrepareConfigurationSection (I_Logger& log)
   logStream << "Table cache block size set at ";
   logStream << gMainSettings.m_TableCacheBlockSize << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
-  logStream.str ("");
+  logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.m_TableCacheBlockCount == 0)
     {
@@ -783,7 +821,7 @@ PrepareConfigurationSection (I_Logger& log)
   logStream << "Table cache block count set at ";
   logStream << gMainSettings.m_TableCacheBlockCount << '.';
   log.Log (LOG_INFO, logStream.str ());
-  logStream.str ("");
+  logStream.str (CLEAR_LOG_STREAM);
 
   //VLS
   if (gMainSettings.m_VLBlockSize == 0)
@@ -810,7 +848,7 @@ PrepareConfigurationSection (I_Logger& log)
   logStream << "Table VL store cache block size set at ";
   logStream << gMainSettings.m_VLBlockSize << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
-  logStream.str ("");
+  logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.m_VLBlockCount == 0)
     {
@@ -824,6 +862,7 @@ PrepareConfigurationSection (I_Logger& log)
                    );
         }
     }
+
   if (gMainSettings.m_VLBlockCount < MIN_VL_BLOCK_COUNT)
     {
       gMainSettings.m_VLBlockCount = MIN_VL_BLOCK_COUNT;
@@ -836,7 +875,7 @@ PrepareConfigurationSection (I_Logger& log)
   logStream << "Table VL store cache block count set at ";
   logStream << gMainSettings.m_VLBlockCount << '.';
   log.Log (LOG_INFO, logStream.str ());
-  logStream.str ("");
+  logStream.str (CLEAR_LOG_STREAM);
 
   //Temporal values
   if (gMainSettings.m_TempValuesCache == 0)
@@ -863,7 +902,7 @@ PrepareConfigurationSection (I_Logger& log)
   logStream << "The temporal values cache set at ";
   logStream << gMainSettings.m_TempValuesCache << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
-  logStream.str ("");
+  logStream.str (CLEAR_LOG_STREAM);
 
   return true;
 }

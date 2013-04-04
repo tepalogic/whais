@@ -48,7 +48,10 @@ max_data_size (const struct INTERNAL_HANDLER* const hnd)
 {
   assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
 
-  return sizeof (hnd->data) - (FRAME_DATA_OFF + PLAIN_DATA_OFF);
+  assert (MIN_FRAME_SIZE <= hnd->dataSize);
+  assert (hnd->dataSize <= MAX_FRAME_SIZE);
+
+  return hnd->dataSize - (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
 }
 
 static D_UINT
@@ -57,16 +60,16 @@ data_size (const struct INTERNAL_HANDLER* const hnd)
   const D_UINT16 frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
 
   assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
-  assert (frameSize >= (FRAME_DATA_OFF + PLAIN_DATA_OFF));
-  assert (frameSize <= sizeof (hnd->data));
+  assert (frameSize >= (FRAME_HDR_SIZE + PLAIN_HDR_SIZE));
+  assert (frameSize <= hnd->dataSize);
 
-  return frameSize - (FRAME_DATA_OFF + PLAIN_DATA_OFF);
+  return frameSize - (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
 }
 
 static void
 set_data_size (struct INTERNAL_HANDLER* const hnd, const D_UINT size)
 {
-  const D_UINT frameSize = size + (FRAME_DATA_OFF + PLAIN_DATA_OFF);
+  const D_UINT frameSize = size + (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
 
   assert (size <= max_data_size (hnd));
 
@@ -78,7 +81,7 @@ raw_data (struct INTERNAL_HANDLER* const hnd)
 {
   assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
 
-  return &hnd->data[FRAME_DATA_OFF];
+  return &hnd->data[FRAME_HDR_SIZE];
 }
 
 static D_UINT8*
@@ -86,7 +89,7 @@ data (struct INTERNAL_HANDLER* const hnd)
 {
   assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
 
-  return &hnd->data[FRAME_DATA_OFF + PLAIN_DATA_OFF];
+  return &hnd->data[FRAME_HDR_SIZE + PLAIN_HDR_SIZE];
 }
 
 static D_UINT
@@ -98,7 +101,7 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
   const D_UINT frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
 
   assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
-  assert ((frameSize > 0) && (frameSize <= sizeof (hnd->data)));
+  assert ((frameSize > 0) && (frameSize <= hnd->dataSize));
 
   hnd->data[FRAME_ENCTYPE_OFF] = hnd->encType;
   hnd->data[FRAME_TYPE_OFF]    = type;
@@ -117,9 +120,9 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
   D_UINT frameSize;
   D_UINT frameRead = 0;
 
-  while (frameRead < FRAME_DATA_OFF)
+  while (frameRead < FRAME_HDR_SIZE)
     {
-      D_UINT chunkSize = FRAME_DATA_OFF - frameRead;
+      D_UINT chunkSize = FRAME_HDR_SIZE - frameRead;
 
       const D_UINT32 status  = wh_socket_read (hnd->socket,
                                                &hnd->data [frameRead],
@@ -138,8 +141,8 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
     return WCS_UNEXPECTED_FRAME;
 
   frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
-  if ((frameSize < FRAME_DATA_OFF)
-      || (frameSize > FRAME_MAX_SIZE)
+  if ((frameSize < FRAME_HDR_SIZE)
+      || (frameSize > hnd->dataSize)
       || (hnd->data[FRAME_ENCTYPE_OFF] != hnd->encType))
     {
       return WCS_COMM_OUT_OF_SYNC;
@@ -254,6 +257,8 @@ WConnect (const char* const    host,
   D_UINT                   frameSize   = 0;
   D_UINT32                 status      = WCS_OK;
 
+  D_UINT8                  tempBuffer[MIN_FRAME_SIZE];
+
   if ((host == NULL)
       || (port == NULL)
       || (databaseName == NULL)
@@ -276,67 +281,89 @@ WConnect (const char* const    host,
   result->socket     = INVALID_SOCKET;
   result->encType    = FRAME_ENCTYPE_PLAIN;
   memcpy (result->encriptionKey, password, passwordLen);
+  result->data       = tempBuffer;
+  result->dataSize   = sizeof (tempBuffer);
 
-  status = wh_socket_client (host, port, &result->socket);
-  if (status != WOP_OK)
+  if ((status = wh_socket_client (host, port, &result->socket)) != WCS_OK)
     {
-      status += WCS_OS_ERR_BASE;
+      status = WENC_OS_ERROR (status);
       goto fail_ret;
     }
 
-  status = read_raw_frame (result, &frameSize);
-  if (status != WCS_OK)
+  if ((status = read_raw_frame (result, &frameSize)) != WCS_OK)
     goto fail_ret;
 
+  assert (frameSize <= result->dataSize);
   {
+      D_UINT serverFrameSize = 0;
       const D_UINT32 frameId = from_le_int32 (&result->data[FRAME_ID_OFF]);
 
       if ((frameId != 0)
-          || (frameSize != (FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA))
           || (result->data[FRAME_TYPE_OFF] != FRAME_TYPE_AUTH_CLNT))
         {
           status = WCS_UNEXPECTED_FRAME;
           goto fail_ret;
         }
 
-      if ((result->data[FRAME_ENCTYPE_OFF] & result->encType) == 0)
+      assert (frameSize == FRAME_HDR_SIZE + FRAME_AUTH_SIZE);
+      assert (result->data[FRAME_ENCTYPE_OFF] == FRAME_ENCTYPE_PLAIN);
+
+
+      result->encType = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];
+      if (result->encType != FRAME_ENCTYPE_PLAIN)
         {
           status = WCS_ENCTYPE_NOTSUPP;
           goto fail_ret;
         }
+      result->version = from_le_int32 (result->data +
+                                      FRAME_HDR_SIZE +
+                                      FRAME_AUTH_ENC_OFF);
+      if ((result->version & CLIENT_VERSION) == 0)
+        {
+          status = WCS_PROTOCOL_NOTSUPP;
+          goto fail_ret;
+        }
+      else
+        result->version = CLIENT_VERSION;
 
-      assert (result->data[FRAME_ENCTYPE_OFF] == result->encType);
+      /* Make sure we are able to handle server's published max frames size */
+      serverFrameSize = from_le_int16 (result->data +
+                                       FRAME_HDR_SIZE +
+                                       FRAME_AUTH_SIZE_OFF);
+      assert (MIN_FRAME_SIZE <= serverFrameSize);
+      assert (serverFrameSize <= MAX_FRAME_SIZE);
+
+      result->data     = mem_alloc (serverFrameSize);
+      result->dataSize = serverFrameSize;
   }
 
-  assert (result->encType == FRAME_ENCTYPE_PLAIN);
   {
-    D_UINT32 wss;
-
-    const D_UINT frameSize = FRAME_DATA_OFF +
-                             FRAME_AUTH_CLNT_DATA +
-                             strlen (databaseName) + 1 +
-                             passwordLen + 1;
+    const D_UINT frameSize = FRAME_HDR_SIZE +
+                              FRAME_AUTH_RSP_FIXED_SIZE +
+                              strlen (databaseName) + 1 +
+                              passwordLen + 1;
     D_CHAR* const pAuthData =
-        (D_CHAR*)&result->data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA];
+        (D_CHAR*)&result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE];
 
-    if (frameSize >= FRAME_MAX_SIZE)
+    if (frameSize > result->dataSize)
       {
         status = WCS_LARGE_ARGS;
         goto fail_ret;
       }
 
+    store_le_int16 (frameSize, &result->data[FRAME_SIZE_OFF]);
     result->data[FRAME_ENCTYPE_OFF] = FRAME_ENCTYPE_PLAIN;
     result->data[FRAME_TYPE_OFF]    = FRAME_TYPE_AUTH_CLNT_RSP;
-    store_le_int16 (frameSize, &result->data[FRAME_SIZE_OFF]);
     store_le_int32 (0, &result->data[FRAME_ID_OFF]);
 
-    store_le_int32 (1, &result->data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_VER]);
-    result->data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_USR] = userId;
+    store_le_int32 (result->version,
+                    &result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_VER_OFF]);
+    result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] = userId;
+
     strcpy (pAuthData, databaseName);
     strcpy (pAuthData + strlen (databaseName) + 1, password);
 
-    wss = wh_socket_write (result->socket, result->data, frameSize);
-    if (wss != WOP_OK)
+    if ((status = write_raw_frame (result, frameSize)) != WCS_OK)
       goto fail_ret;
   }
 
@@ -350,6 +377,9 @@ fail_ret:
 
   if (result != NULL)
     {
+      if ((result->data != NULL) && (result->data != tempBuffer))
+        mem_free (result->data);
+
       if (result->socket != INVALID_SOCKET)
         wh_socket_close (result->socket);
 
@@ -373,6 +403,10 @@ WClose (W_CONNECTOR_HND hnd)
       send_command (hnd_, CMD_CLOSE_CONN);
       wh_socket_close (hnd_->socket);
     }
+
+  if (hnd_->data != NULL)
+    mem_free (hnd_->data);
+
   mem_free (hnd_);
 }
 

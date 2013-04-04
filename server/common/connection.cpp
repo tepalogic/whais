@@ -75,24 +75,33 @@ ClientConnection::ClientConnection (UserHandler&            client,
     m_LastReceivedCmd (CMD_INVALID),
     m_FrameSize (0),
     m_EncriptionType (FRAME_ENCTYPE_PLAIN),
-    m_Version (1)
+    m_Version (1),
+    m_DataSize (GetAdminSettings ().m_MaxFrameSize),
+    m_Data (new D_UINT8[m_DataSize])
 {
+  assert ((m_DataSize >= MIN_FRAME_SIZE) && (m_DataSize <= MAX_FRAME_SIZE));
+
   m_UserHandler.m_pDesc = NULL;
-  const D_UINT16 authFrameLen = FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA;
+  const D_UINT16 authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
 
   memset (&m_Data[0], 0, authFrameLen);
 
-  m_Data[FRAME_ENCTYPE_OFF] = m_EncriptionType;
-  m_Data[FRAME_TYPE_OFF]    = FRAME_TYPE_AUTH_CLNT;
-  store_le_int32 (0, &m_Data[FRAME_ID_OFF]);
-  store_le_int32 (m_Version, &m_Data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_VER]);
+  assert (authFrameLen <= MIN_FRAME_SIZE);
   store_le_int16 (authFrameLen, &m_Data[FRAME_SIZE_OFF]);
+  m_Data[FRAME_TYPE_OFF]    = FRAME_TYPE_AUTH_CLNT;
+  m_Data[FRAME_ENCTYPE_OFF] = FRAME_ENCTYPE_PLAIN;
+  store_le_int32 (0, &m_Data[FRAME_ID_OFF]);
 
-  m_UserHandler.m_Socket.Write (authFrameLen, &m_Data[0]);
+  store_le_int32 (m_Version, &m_Data[FRAME_HDR_SIZE + FRAME_AUTH_VER_OFF]);
+  store_le_int16 (m_DataSize, &m_Data[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]);
+  m_Data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = m_EncriptionType;
+
+
+  m_UserHandler.m_Socket.Write (authFrameLen, m_Data);
   ReciveRawClientFrame ();
 
   const D_UINT32 protocolVer = from_le_int32 (
-                              &m_Data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_VER]
+                              &m_Data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_VER_OFF]
                                              );
   if ((m_FrameSize < authFrameLen)
       || (protocolVer != m_Version)
@@ -104,7 +113,8 @@ ClientConnection::ClientConnection (UserHandler&            client,
     }
 
   const string dbsName = _RC (const D_CHAR*,
-                              &m_Data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA]);
+                              &m_Data[FRAME_HDR_SIZE +
+                                      FRAME_AUTH_RSP_FIXED_SIZE]);
 
   for (vector<DBSDescriptors>::iterator it = databases.begin ();
       it != databases.end ();
@@ -123,13 +133,14 @@ ClientConnection::ClientConnection (UserHandler&            client,
                                  _EXTRA (0));
     }
 
-  m_UserHandler.m_Root = (m_Data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_USR] == 0) ?
-                         true :
-                         false;
+  m_UserHandler.m_Root =
+        (m_Data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0) ?
+          true :
+          false;
 
   const string passwd = _RC (
       const D_CHAR*,
-      &m_Data[FRAME_DATA_OFF + FRAME_AUTH_CLNT_DATA + dbsName.size () + 1]
+      &m_Data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE + dbsName.size () + 1]
                             );
 
   if (m_UserHandler.m_Root)
@@ -147,42 +158,41 @@ ClientConnection::ClientConnection (UserHandler&            client,
     {
       if (m_UserHandler.m_pDesc->m_UserPasswd != passwd)
         {
-          throw ConnectionException (
-                                "Failed to authenticate database user.",
-                                _EXTRA (0)
-                                    );
+          throw ConnectionException ("Failed to authenticate database user.",
+                                     _EXTRA (0));
         }
     }
 }
 
 ClientConnection::~ClientConnection ()
 {
+  delete [] m_Data;
 }
 
 D_UINT
 ClientConnection::MaxSize () const
 {
   assert (m_EncriptionType == FRAME_ENCTYPE_PLAIN);
-  return sizeof (m_Data) - (FRAME_DATA_OFF + PLAIN_DATA_OFF);
+  return m_DataSize - (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
 }
 
 D_UINT
 ClientConnection::DataSize () const
 {
   assert ((m_FrameSize == 0)
-          || (m_FrameSize >= (FRAME_DATA_OFF + PLAIN_DATA_OFF)));
+          || (m_FrameSize >= (FRAME_HDR_SIZE + PLAIN_HDR_SIZE)));
 
-  assert (m_FrameSize <= sizeof (m_Data));
+  assert (m_FrameSize <= m_DataSize);
 
   return (m_FrameSize == 0) ?
          0 :
-         (m_FrameSize - (FRAME_DATA_OFF + PLAIN_DATA_OFF));
+         (m_FrameSize - (FRAME_HDR_SIZE + PLAIN_HDR_SIZE));
 }
 
 D_UINT8*
 ClientConnection::Data ()
 {
-  return &m_Data[FRAME_DATA_OFF + PLAIN_DATA_OFF];
+  return &m_Data[FRAME_HDR_SIZE + PLAIN_HDR_SIZE];
 }
 
 void
@@ -190,15 +200,15 @@ ClientConnection::DataSize (const D_UINT16 size)
 {
   assert (size <= MaxSize ());
 
-  m_FrameSize = size + FRAME_DATA_OFF + PLAIN_DATA_OFF;
+  m_FrameSize = size + FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
 
-  assert (m_FrameSize <= sizeof (m_Data));
+  assert (m_FrameSize <= m_DataSize);
 }
 
 D_UINT8*
 ClientConnection::RawCmdData ()
 {
-  return &m_Data[FRAME_DATA_OFF];
+  return &m_Data[FRAME_HDR_SIZE];
 }
 
 void
@@ -206,10 +216,10 @@ ClientConnection::ReciveRawClientFrame ()
 {
   D_UINT16 frameRead = 0;
 
-  while (frameRead < FRAME_DATA_OFF)
+  while (frameRead < FRAME_HDR_SIZE)
     {
       D_UINT16 chunkSize;
-      chunkSize = m_UserHandler.m_Socket.Read (FRAME_DATA_OFF - frameRead,
+      chunkSize = m_UserHandler.m_Socket.Read (FRAME_HDR_SIZE - frameRead,
                                                &m_Data[frameRead]);
       if (chunkSize == 0)
         throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
@@ -235,7 +245,7 @@ ClientConnection::ReciveRawClientFrame ()
   m_FrameSize = from_le_int16 (&m_Data[0]);
 
   if ((m_FrameSize < frameRead)
-      || (m_FrameSize > FRAME_MAX_SIZE))
+      || (m_FrameSize > m_DataSize))
     {
       throw ConnectionException ("Invalid frame received.", _EXTRA (0));
     }
@@ -266,7 +276,7 @@ ClientConnection::ReciveRawClientFrame ()
 void
 ClientConnection::SendRawClientFrame (const D_UINT8 type)
 {
-  assert ((m_FrameSize >= FRAME_DATA_OFF) && (m_FrameSize <= FRAME_MAX_SIZE));
+  assert ((m_FrameSize >= FRAME_HDR_SIZE) && (m_FrameSize <= m_DataSize));
 
   store_le_int16 (m_FrameSize, &m_Data[FRAME_SIZE_OFF]);
   store_le_int32 (++m_WaitingFrameId, &m_Data[FRAME_ID_OFF]);

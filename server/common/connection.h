@@ -106,7 +106,9 @@ private:
   D_UINT16            m_FrameSize;
   D_UINT8             m_EncriptionType;
   D_UINT8             m_Version;
-  D_UINT8             m_Data[FRAME_MAX_SIZE];
+  D_UINT              m_DataSize;
+  D_UINT8*            m_Data;
+
 
   ClientConnection (const ClientConnection&);
   const ClientConnection& operator= (const ClientConnection&);

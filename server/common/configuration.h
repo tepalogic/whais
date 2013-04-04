@@ -32,8 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "dbs/include/dbs_mgr.h"
 #include "interpreter/include/interpreter.h"
-
 #include "utils/include/logger.h"
+
+#include "server_protocol.h"
 
 struct ListenEntry
 {
@@ -45,6 +46,7 @@ struct ServerSettings
 {
   ServerSettings ()
     : m_MaxConnections (0),
+      m_MaxFrameSize (0),
       m_TableCacheBlockSize (0),
       m_TableCacheBlockCount (0),
       m_VLBlockSize (0),
@@ -59,6 +61,7 @@ struct ServerSettings
   }
 
   D_UINT      m_MaxConnections;
+  D_UINT      m_MaxFrameSize;
   D_UINT      m_TableCacheBlockSize;
   D_UINT      m_TableCacheBlockCount;
   D_UINT      m_VLBlockSize;
