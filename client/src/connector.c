@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/include/le_converter.h"
 #include "utils/include/random.h"
 #include "utils/include/utf8.h"
+#include "utils/include/enc_3k.h"
 
 #include "connector.h"
 #include "client_connection.h"
@@ -41,55 +42,127 @@ static const D_CHAR WANONIM_FIELD[] = "";
 static const D_UINT INVALID_OFF    = ~0;
 
 /* TODO: Handle the cases where the text entry is bigger than 0xFFFF */
-/* TODO: Add support for accessing stacking results */
 
 static D_UINT
 max_data_size (const struct INTERNAL_HANDLER* const hnd)
 {
-  assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
+  D_UINT metaDataSize;
+
+  assert ((hnd->cipher == FRAME_ENCTYPE_PLAIN)
+          || (hnd->cipher == FRAME_ENCTYPE_3K));
 
   assert (MIN_FRAME_SIZE <= hnd->dataSize);
   assert (hnd->dataSize <= MAX_FRAME_SIZE);
 
-  return hnd->dataSize - (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
+  switch (hnd->cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  case FRAME_ENCTYPE_3K:
+    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  default:
+    assert (FALSE);
+  }
+
+  return hnd->dataSize - metaDataSize;
 }
 
 static D_UINT
 data_size (const struct INTERNAL_HANDLER* const hnd)
 {
+  D_UINT metaDataSize;
+
   const D_UINT16 frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
 
-  assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
-  assert (frameSize >= (FRAME_HDR_SIZE + PLAIN_HDR_SIZE));
-  assert (frameSize <= hnd->dataSize);
+  switch (hnd->cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
 
-  return frameSize - (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
+  case FRAME_ENCTYPE_3K:
+    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  default:
+    assert (FALSE);
+  }
+
+  assert ((frameSize >= metaDataSize) && (frameSize <= hnd->dataSize));
+
+  return frameSize - metaDataSize;
 }
 
 static void
 set_data_size (struct INTERNAL_HANDLER* const hnd, const D_UINT size)
 {
-  const D_UINT frameSize = size + (FRAME_HDR_SIZE + PLAIN_HDR_SIZE);
+  D_UINT metaDataSize;
+
+  switch (hnd->cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  case FRAME_ENCTYPE_3K:
+    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  default:
+    assert (FALSE);
+  }
 
   assert (size <= max_data_size (hnd));
 
-  store_le_int16 (frameSize, &hnd->data[FRAME_SIZE_OFF]);
+  store_le_int16 (size + metaDataSize, &hnd->data[FRAME_SIZE_OFF]);
 }
 
 static D_UINT8*
 raw_data (struct INTERNAL_HANDLER* const hnd)
 {
-  assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
+  D_UINT metaDataSize;
 
-  return &hnd->data[FRAME_HDR_SIZE];
+  switch (hnd->cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    metaDataSize = FRAME_HDR_SIZE;
+    break;
+
+  case FRAME_ENCTYPE_3K:
+    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
+    break;
+
+  default:
+    assert (FALSE);
+  }
+
+  return hnd->data + metaDataSize;
 }
 
 static D_UINT8*
 data (struct INTERNAL_HANDLER* const hnd)
 {
-  assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
+  D_UINT metaDataSize;
 
-  return &hnd->data[FRAME_HDR_SIZE + PLAIN_HDR_SIZE];
+  switch (hnd->cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  case FRAME_ENCTYPE_3K:
+    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
+    break;
+
+  default:
+    assert (FALSE);
+  }
+
+  return hnd->data + metaDataSize;
 }
 
 static D_UINT
@@ -98,18 +171,59 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
 {
   D_UINT32 status = 0;
 
-  const D_UINT frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
+  D_UINT frameSize = from_le_int16 (hnd->data + FRAME_SIZE_OFF);
 
-  assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
+  if (hnd->cipher == FRAME_ENCTYPE_3K)
+    {
+      D_UINT32 firstKing, secondKing;
+      D_UINT8  prev, i;
+
+      const D_UINT16 plainSize = frameSize;
+
+      while (frameSize % sizeof (D_UINT32) != 0)
+        hnd->data[frameSize++] = w_rnd () & 0xFF;
+
+      firstKing  = w_rnd () & 0xFFFFFFFF;
+      store_le_int32 (firstKing,
+                      hnd->data + FRAME_HDR_SIZE + ENC_3K_FIRST_KING_OFF);
+
+      secondKing = w_rnd () & 0xFFFFFFFF;
+      store_le_int32 (secondKing,
+                      hnd->data + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
+
+      for (i = 0, prev = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+        {
+          const D_UINT8 temp = hnd->data[FRAME_HDR_SIZE + i];
+          hnd->data[FRAME_HDR_SIZE + i] ^=
+                              hnd->encriptionKey[prev % hnd->encKeySize];
+          prev = temp;
+        }
+
+      store_le_int16 (plainSize,
+                      hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
+
+      store_le_int16 (w_rnd () & 0xFFFF,
+                      hnd->data + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
+
+      encrypt_3k_buffer (firstKing,
+                         secondKing,
+                         hnd->encriptionKey,
+                         hnd->encKeySize,
+                         hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
+                         frameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF));
+
+      store_le_int16 (frameSize, hnd->data + FRAME_SIZE_OFF);
+    }
+
   assert ((frameSize > 0) && (frameSize <= hnd->dataSize));
 
-  hnd->data[FRAME_ENCTYPE_OFF] = hnd->encType;
   hnd->data[FRAME_TYPE_OFF]    = type;
+  hnd->data[FRAME_ENCTYPE_OFF] = hnd->cipher;
   store_le_int32 (hnd->expectedFrameId++, &hnd->data[FRAME_ID_OFF]);
 
   status = wh_socket_write (hnd->socket, hnd->data, frameSize);
   if (status != WOP_OK)
-    return WCS_OS_ERR_BASE + status;
+    return WENC_OS_ERROR (status);
 
   return WCS_OK;
 }
@@ -128,7 +242,8 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
                                                &hnd->data [frameRead],
                                                &chunkSize);
       if (status != WOP_OK)
-        return WCS_OS_ERR_BASE + status;
+        return WENC_OS_ERROR (status);
+
       else if (chunkSize == 0)
         return WCS_DROPPED;
 
@@ -137,17 +252,17 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
 
   if (hnd->data[FRAME_TYPE_OFF] == FRAME_TYPE_TIMEOUT)
     return WCS_CONNECTION_TIMEOUT;
+
   else if (hnd->data[FRAME_TYPE_OFF] != FRAME_TYPE_NORMAL)
     return WCS_UNEXPECTED_FRAME;
 
   frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
   if ((frameSize < FRAME_HDR_SIZE)
       || (frameSize > hnd->dataSize)
-      || (hnd->data[FRAME_ENCTYPE_OFF] != hnd->encType))
+      || (hnd->data[FRAME_ENCTYPE_OFF] != hnd->cipher))
     {
-      return WCS_COMM_OUT_OF_SYNC;
+      return WCS_UNEXPECTED_FRAME;
     }
-
 
   while (frameRead < frameSize)
     {
@@ -156,15 +271,50 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
                                               &hnd->data [frameRead],
                                               &chunkSize);
       if (status != WOP_OK)
-        return WCS_OS_ERR_BASE + status;
+        return WENC_OS_ERROR (status);
+
       else if (chunkSize == 0)
         return WCS_DROPPED;
 
       frameRead += chunkSize;
     }
 
-  if (from_le_int32 (&hnd->data[FRAME_ID_OFF]) != hnd->expectedFrameId)
+  if (from_le_int32 (hnd->data + FRAME_ID_OFF) != hnd->expectedFrameId)
     return WCS_UNEXPECTED_FRAME;
+
+  if (hnd->cipher == FRAME_ENCTYPE_3K)
+    {
+      D_UINT    i, prev;
+      D_UINT32  firstKing, secondKing;
+      D_UINT16  plainSize;
+
+      for (i = 0, prev = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+        {
+          hnd->data[FRAME_HDR_SIZE + i] ^=
+                              hnd->encriptionKey[prev % hnd->encKeySize];
+          prev = hnd->data[FRAME_HDR_SIZE + i];
+        }
+
+      firstKing = from_le_int32 (hnd->data +
+                                FRAME_HDR_SIZE +
+                                ENC_3K_FIRST_KING_OFF);
+      secondKing = from_le_int32 (hnd->data +
+                                  FRAME_HDR_SIZE +
+                                  ENC_3K_SECOND_KING_OFF);
+      decrypt_3k_buffer (firstKing,
+                         secondKing,
+                         hnd->encriptionKey,
+                         hnd->encKeySize,
+                         hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
+                         frameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF));
+
+      plainSize = from_le_int16 (hnd->data+
+                                 FRAME_HDR_SIZE +
+                                 ENC_3K_PLAIN_SIZE_OFF);
+      assert (plainSize <= frameSize);
+      frameSize = plainSize;
+      store_le_int16 (plainSize, hnd->data + FRAME_SIZE_OFF);
+    }
 
   return WCS_OK;
 }
@@ -178,8 +328,6 @@ send_command (struct INTERNAL_HANDLER* const hnd,
   const D_UINT dataSize = data_size (hnd);
   D_UINT       cs       = WCS_OK;
   D_UINT16     chkSum   = 0;
-
-  assert (hnd->encType == FRAME_ENCTYPE_PLAIN);
 
   hnd->clientCookie = w_rnd ();
 
@@ -279,7 +427,7 @@ WConnect (const char* const    host,
   result->userId     = userId;
   result->encKeySize = passwordLen;
   result->socket     = INVALID_SOCKET;
-  result->encType    = FRAME_ENCTYPE_PLAIN;
+  result->cipher     = FRAME_ENCTYPE_PLAIN;
   memcpy (result->encriptionKey, password, passwordLen);
   result->data       = tempBuffer;
   result->dataSize   = sizeof (tempBuffer);
@@ -309,15 +457,16 @@ WConnect (const char* const    host,
       assert (result->data[FRAME_ENCTYPE_OFF] == FRAME_ENCTYPE_PLAIN);
 
 
-      result->encType = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];
-      if (result->encType != FRAME_ENCTYPE_PLAIN)
+      result->cipher = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];
+      if ((result->cipher != FRAME_ENCTYPE_PLAIN)
+          && (result->cipher != FRAME_ENCTYPE_3K))
         {
           status = WCS_ENCTYPE_NOTSUPP;
           goto fail_ret;
         }
       result->version = from_le_int32 (result->data +
                                       FRAME_HDR_SIZE +
-                                      FRAME_AUTH_ENC_OFF);
+                                      FRAME_AUTH_VER_OFF);
       if ((result->version & CLIENT_VERSION) == 0)
         {
           status = WCS_PROTOCOL_NOTSUPP;
@@ -359,9 +508,12 @@ WConnect (const char* const    host,
     store_le_int32 (result->version,
                     &result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_VER_OFF]);
     result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] = userId;
+    result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_ENC_OFF] = result->cipher;
 
     strcpy (pAuthData, databaseName);
-    strcpy (pAuthData + strlen (databaseName) + 1, password);
+
+    if (result->cipher == FRAME_ENCTYPE_PLAIN)
+      strcpy (pAuthData + strlen (databaseName) + 1, password);
 
     if ((status = write_raw_frame (result, frameSize)) != WCS_OK)
       goto fail_ret;

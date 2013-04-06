@@ -62,7 +62,7 @@ struct INTERNAL_HANDLER
   D_UINT16  lastCmdRespReceived;
   D_UINT16  buildingCmd;
   D_UINT8   userId;
-  D_UINT8   encType;
+  D_UINT8   cipher;
   D_UINT8   encriptionKey[1];
 };
 

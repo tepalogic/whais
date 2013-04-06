@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENC_3K_FIRST_KING_OFF           0x00
 #define ENC_3K_SECOND_KING_OFF          0x04
 #define ENC_3K_PLAIN_SIZE_OFF           0x08
-#define ENC_3K_1ST_SPARE_OFF            0x0A
+#define ENC_3K_SPARE_OFF                0x0A
 #define ENC_3K_HDR_SIZE                 0x0C
 
 #define PLAIN_CLNT_COOKIE_OFF           0x00
@@ -92,7 +92,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define FRAME_AUTH_RSP_VER_OFF              0x00
 #define FRAME_AUTH_RSP_USR_OFF              0x04
-#define FRAME_AUTH_RSP_SPARE_1_OFF          0x05
+#define FRAME_AUTH_RSP_ENC_OFF              0x05
+#define FRAME_AUTH_RSP_SPARE_OFF            0x06
 #define FRAME_AUTH_RSP_FIXED_SIZE           0x08
 
 #define ADMIN_CMD_BASE                      0x0000

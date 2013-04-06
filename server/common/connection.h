@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONNECTION_H_
 #define CONNECTION_H_
 
-#include <vector>
+#include <string>
 
 #include "whisper.h"
 
@@ -104,10 +104,11 @@ private:
   D_UINT32            m_ServerCookie;
   D_UINT16            m_LastReceivedCmd;
   D_UINT16            m_FrameSize;
-  D_UINT8             m_EncriptionType;
   D_UINT8             m_Version;
+  D_UINT8             m_Cipher;
   D_UINT              m_DataSize;
   D_UINT8*            m_Data;
+  std::string         m_Key;
 
 
   ClientConnection (const ClientConnection&);

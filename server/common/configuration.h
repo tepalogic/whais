@@ -56,6 +56,7 @@ struct ServerSettings
       m_TempDirectory (),
       m_LogFile (),
       m_Listens (),
+      m_Cipher (0),
       m_ShowDebugLog (false)
   {
   }
@@ -73,6 +74,7 @@ struct ServerSettings
 
   std::vector<ListenEntry> m_Listens;
 
+  D_UINT8     m_Cipher;
   bool        m_ShowDebugLog;
 
 };

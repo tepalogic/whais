@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 
 #include "utils/include/tokenizer.h"
 
@@ -39,6 +40,9 @@ using namespace std;
 static const D_CHAR COMMENT_CHAR          = '#';
 static const D_CHAR DEFAULT_LISTEN_PORT[] = "1761";
 static const D_CHAR CLEAR_LOG_STREAM[]    = "";
+
+static const D_CHAR CIPHER_PLAIN[]        = "plain";
+static const D_CHAR CIPHER_3K[]           = "3k";
 
 static const D_UINT MIN_TABLE_CACHE_BLOCK_SIZE  = 1024;
 static const D_UINT MIN_TABLE_CACHE_BLOCK_COUNT = 128;
@@ -56,6 +60,7 @@ static const D_UINT DEFAULT_TEMP_CACHE              = 512;
 static const string gEntPort ("listen");
 static const string gEntMaxConnections ("max_connections");
 static const string gEntMaxFrameSize("max_frame_size");
+static const string gEntEncryption("cipher");
 static const string gEntTableBlkSize ("table_block_cache_size");
 static const string gEntTableBlkCount ("table_block_cache_count");
 static const string gEntVlBlkSize ("vl_values_block_size");
@@ -224,6 +229,24 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
           token = NextToken (line, pos, delimiters);
           gMainSettings.m_MaxFrameSize = atoi (token.c_str ());
        }
+      else if (token == gEntEncryption)
+        {
+          token = NextToken (line, pos, delimiters);
+          std::transform(token.begin(), token.end(), token.begin(), ::tolower);
+
+          if (token == CIPHER_PLAIN)
+            gMainSettings.m_Cipher = FRAME_ENCTYPE_PLAIN;
+          else if (token == CIPHER_3K)
+            gMainSettings.m_Cipher = FRAME_ENCTYPE_3K;
+          else
+            {
+              cerr << "The cipher '" << token << "' is not supported. ";
+              cerr << "Allowed ciphers are '" << CIPHER_PLAIN << "' and '";
+              cerr << CIPHER_3K <<"'.\n";
+
+              return false;
+            }
+        }
       else if (token == gEntTableBlkCount)
         {
           token = NextToken (line, pos, delimiters);
@@ -753,6 +776,30 @@ PrepareConfigurationSection (I_Logger& log)
 
   logStream << "Maximum simultaneous connections per interface set at ";
   logStream << gMainSettings.m_MaxConnections << ".";
+  log.Log (LOG_INFO, logStream.str ());
+  logStream.str (CLEAR_LOG_STREAM);
+
+  if (gMainSettings.m_Cipher == 0)
+    {
+      if (gMainSettings.m_ShowDebugLog)
+        {
+          log.Log (LOG_DEBUG, "The communication cipher is set to default.");
+        }
+      gMainSettings.m_Cipher = FRAME_ENCTYPE_PLAIN;
+    }
+  logStream << "Communication cipher is set to '";
+  switch (gMainSettings.m_Cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    logStream << CIPHER_PLAIN;
+    break;
+  case FRAME_ENCTYPE_3K:
+    logStream << CIPHER_3K;
+    break;
+  default:
+    assert (false);
+  }
+  logStream << "'.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 

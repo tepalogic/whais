@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "enc_3k.h"
 #include "le_converter.h"
 
 static D_UINT32
@@ -104,17 +105,18 @@ exchange_16bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
 }
 
 void
-encrypt_3k_buffer (const D_UINT32      firstKing,
-                   const D_UINT32      secondKing,
-                   const D_UINT* const key,
-                   const D_UINT        keyLen,
-                   D_UINT8*            buffer,
-                   const D_UINT        bufferSize)
+encrypt_3k_buffer (const D_UINT32       firstKing,
+                   const D_UINT32       secondKing,
+                   const D_UINT8* const key,
+                   const D_UINT         keyLen,
+                   D_UINT8*             buffer,
+                   const D_UINT         bufferSize)
 {
   D_UINT pos, b;
 
   assert (bufferSize % sizeof (D_UINT32) == 0);
 
+  D_UINT keyIndex = firstKing % keyLen;
   for (pos = 0; pos < bufferSize; pos += sizeof (D_UINT32))
     {
       D_UINT64 message   = from_le_int32 (buffer + pos);
@@ -123,10 +125,21 @@ encrypt_3k_buffer (const D_UINT32      firstKing,
       message -= firstKing;
       message ^= secondKing;
 
-      thirdKing  = buffer[(pos + 0) % keyLen]; thirdKing <<= 8;
-      thirdKing |= buffer[(pos + 1) % keyLen]; thirdKing <<= 8;
-      thirdKing |= buffer[(pos + 2) % keyLen]; thirdKing <<= 8;
-      thirdKing |= buffer[(pos + 3) % keyLen];
+      thirdKing = key[keyIndex++]; thirdKing <<= 8;
+      if (keyIndex == keyLen)
+        keyIndex = 0;
+
+      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
+      if (keyIndex == keyLen)
+        keyIndex = 0;
+
+      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
+      if (keyIndex == keyLen)
+        keyIndex = 0;
+
+      thirdKing |= key[keyIndex++];
+      if (keyIndex == keyLen)
+        keyIndex = 0;
 
       for (b = 0; b < 16; ++b)
         {
@@ -155,73 +168,81 @@ encrypt_3k_buffer (const D_UINT32      firstKing,
       if (thirdKing & (1 << 30))
         message = exchange_16bit_pair (message, 0, 16);
 
-      if (thirdKing & (1 << 30))
+      if (thirdKing & (1 << 31))
         message = exchange_8bit_pair (message, 8, 16);
 
       store_le_int32 (message, buffer + pos);
     }
-
 }
 
 
 void
-decrypt_3k_buffer (const D_UINT32      firstKing,
-                   const D_UINT32      secondKing,
-                   const D_UINT* const key,
-                   const D_UINT        keyLen,
-                   D_UINT8*            buffer,
-                   const D_UINT        bufferSize)
+decrypt_3k_buffer (const D_UINT32       firstKing,
+                   const D_UINT32       secondKing,
+                   const D_UINT8* const key,
+                   const D_UINT         keyLen,
+                   D_UINT8*             buffer,
+                   const D_UINT         bufferSize)
 {
-  D_UINT pos, b;
+  D_INT pos, b;
   assert (bufferSize % sizeof (D_UINT32) == 0);
 
+  D_UINT keyIndex = firstKing % keyLen;
   for (pos = 0; pos < bufferSize; pos += sizeof (D_UINT32))
     {
       D_UINT64 message   = from_le_int32 (buffer + pos);
       D_UINT32 thirdKing = 0;
 
-      thirdKing  = buffer[(pos + 0) % keyLen]; thirdKing <<= 8;
-      thirdKing |= buffer[(pos + 1) % keyLen]; thirdKing <<= 8;
-      thirdKing |= buffer[(pos + 2) % keyLen]; thirdKing <<= 8;
-      thirdKing |= buffer[(pos + 3) % keyLen];
+      thirdKing = key[keyIndex++]; thirdKing <<= 8;
+      if (keyIndex == keyLen)
+        keyIndex = 0;
 
-      if (thirdKing & (1 << 30))
+      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
+      if (keyIndex == keyLen)
+        keyIndex = 0;
+
+      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
+      if (keyIndex == keyLen)
+        keyIndex = 0;
+
+      thirdKing |= key[keyIndex++];
+      if (keyIndex == keyLen)
+        keyIndex = 0;
+
+      if (thirdKing & (1 << 31))
         message = exchange_8bit_pair (message, 8, 16);
 
       if (thirdKing & (1 << 30))
         message = exchange_16bit_pair (message, 0, 16);
 
-      for (b = 0; b < 2; ++b)
+      for (b = 1; b >= 0; --b)
         {
           if (thirdKing & (1 << (28 + b)))
             message = exchange_8bit_pair (message, 16 * b, 16 * b + 8);
         }
 
-      for (b = 0; b < 4; ++b)
+      for (b = 3; b >= 0; --b)
         {
           if (thirdKing & (1 << (24 + b)))
             message = exchange_4bit_pair (message, 8 * b, 8 * b + 4);
         }
 
-      for (b = 0; b < 8; ++b)
+      for (b = 7; b >= 0; --b)
         {
           if (thirdKing & (1 << (16 + b)))
             message = exchange_2bit_pair (message, 4 * b, 4 * b + 2);
         }
 
-      for (b = 0; b < 16; ++b)
+      for (b = 15; b >= 0; --b)
         {
           if (thirdKing & (1 << b))
             message = exchange_1bit_pair (message, 2 * b, 2 * b + 1);
         }
 
-      message -= firstKing;
       message ^= secondKing;
+      message += firstKing;
 
       store_le_int32 (message, buffer + pos);
     }
-
-
-
 }
 
