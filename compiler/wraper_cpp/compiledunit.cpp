@@ -24,10 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
-#include "../include/whisperc/compiledunit.h"
+#include "compiler/compiledunit.h"
+#include "utils/le_converter.h"
 
-#include "../../compiler/whc/wo_format.h"
-#include "../include/le_converter.h"
+#include "../whc/wo_format.h"
 
 /////////////******WBufferCompiledUnit********//////////////////////////////
 

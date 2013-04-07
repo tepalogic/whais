@@ -3,27 +3,27 @@ UNIT:=interpreter
 UNIT_EXES:= 
 UNIT_LIBS:=
 ifeq ($(EXTRA_LIBS),yes)
-UNIT_LIBS+=slprima
+UNIT_LIBS+=wslprima
 endif
-UNIT_SHLS:=prima
+UNIT_SHLS:=wprima
 
-prima_INC:=utils/include
-prima_SRC= prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
+wprima_INC:=
+wprima_SRC:=prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
            prima/pm_typemanager.cpp prima/pm_procedures.cpp prima/pm_units.cpp\
            prima/pm_processor.cpp prima/pm_operand_arrayfields.cpp\
            prima/pm_operand_fields.cpp prima/pm_operand_array.cpp\
            prima/pm_general_table.cpp
            
-prima_DEF:=USE_INTERP_SHL USE_DBS_SHL INTERP_EXPORTING
-prima_LIB:=utils/utils custom/custom
-prima_SHL:=dbs/pastra compiler/compiler custom/common
+wprima_DEF:=USE_INTERP_SHL USE_DBS_SHL INTERP_EXPORTING
+wprima_LIB:=utils/wslutils custom/wslcustom
+wprima_SHL:=dbs/wpastra compiler/wcompiler custom/wcommon
 
-slprima_SRC=$(prima_SRC)
-slprima_INC=$(prima_INC)
-slprima_DEF:=
+wslprima_SRC=$(wprima_SRC)
+wslprima_INC=$(wprima_INC)
+wslprima_DEF:=
 
-prima_MAJ=.1
-prima_MIN=.0
+wprima_MAJ=.1
+wprima_MIN=.0
 
 ifeq ($(BUILD_TESTS),yes)
 -include ./$(UNIT)/test/test.mk

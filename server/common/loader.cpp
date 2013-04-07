@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "dbs/include/dbs_mgr.h"
 #include "interpreter/include/interpreter.h"
-#include "compiler/include/whisperc/compiledunit.h"
+#include "compiler//compiledunit.h"
 #include "utils/include/logger.h"
 
 using namespace std;

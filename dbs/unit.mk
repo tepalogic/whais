@@ -3,25 +3,25 @@ UNIT:=dbs
 UNIT_EXES:=
 UNIT_LIBS:=
 ifeq ($(EXTRA_LIBS),yes)
-UNIT_LIBS+=slpastra
+UNIT_LIBS+=wslpastra
 endif
-UNIT_SHLS:=pastra
+UNIT_SHLS:=wpastra
 
-pastra_INC:=utils/include
-pastra_SRC:=pastra/ps_values.cpp pastra/ps_container.cpp pastra/ps_table.cpp\
+wpastra_INC:=
+wpastra_SRC:=pastra/ps_values.cpp pastra/ps_container.cpp pastra/ps_table.cpp\
 		   	pastra/ps_dbsmgr.cpp pastra/ps_valintep.cpp pastra/ps_varstorage.cpp\
 		   	pastra/ps_blockcache.cpp pastra/ps_textstrategy.cpp pastra/ps_arraystrategy.cpp\
 		   	pastra/ps_btree_index.cpp pastra/ps_btree_fields.cpp pastra/ps_templatetable.cpp
-pastra_LIB:=utils/utils custom/custom
-pastra_SHL:=custom/common
-pastra_DEF:=USE_DBS_SHL DBS_EXPORTING
+wpastra_LIB:=utils/wslutils custom/wslcustom
+wpastra_SHL:=custom/wcommon
+wpastra_DEF:=USE_DBS_SHL DBS_EXPORTING
 	   
-pastra_MAJ=.1
-pastra_MIN=.0
+wpastra_MAJ=.1
+wpastra_MIN=.0
 
-slpastra_DEF:=
-slpastra_SRC:=$(pastra_SRC)
-slpastra_INC:=$(pastra_INC)
+wslpastra_DEF:=
+wslpastra_SRC:=$(wpastra_SRC)
+wslpastra_INC:=$(wpastra_INC)
 
 ifeq ($(BUILD_TESTS),yes)
 -include ./$(UNIT)/test/test.mk

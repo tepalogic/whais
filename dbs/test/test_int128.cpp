@@ -18,7 +18,7 @@
 #include "dbs_real.h"
 #include "utils/include/we_int128.h"
 #include "utils/include/random.h"
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 using namespace std;
 

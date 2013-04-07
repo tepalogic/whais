@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <map>
 
-#include "compiler/include/whisperc/whisperc.h"
+#include "compiler//whisperc.h"
 #include "client/include/whisper_connector.h"
 #include "utils/include/tokenizer.h"
 

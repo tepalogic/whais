@@ -7,7 +7,7 @@
 #include "../semantics/opcodes.h"
 #include "../semantics/procdecl.h"
 
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 extern int yyparse (struct ParserState *);
 

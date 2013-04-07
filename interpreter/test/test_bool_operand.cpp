@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 #include "interpreter.h"
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 #include "interpreter/prima/pm_interpreter.h"
 #include "interpreter/prima/pm_operand.h"
-#include "compiler/include/whisperc/wopcodes.h"
+#include "compiler/wopcodes.h"
 
 using namespace prima;
 

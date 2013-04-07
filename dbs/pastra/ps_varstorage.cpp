@@ -25,7 +25,7 @@
 #include <memory.h>
 #include <assert.h>
 
-#include "dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 
 #include "dbs_exception.h"
 #include "ps_varstorage.h"

@@ -10,9 +10,9 @@
 #include <iostream>
 #include <string.h>
 
-#include "random.h"
-#include "wthread.h"
-#include "test/test_fmw.h"
+#include "utils/random.h"
+#include "utils/wthread.h"
+#include "custom/include/test/test_fmw.h"
 
 #include "../include/dbs_mgr.h"
 #include "../include/dbs_exception.h"

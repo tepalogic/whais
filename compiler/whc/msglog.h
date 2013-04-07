@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdarg.h>
 
 #include "whisper.h"
-#include "../../common/whisper.h"
-#include "../../compiler/include/whisperc/whisperc.h"
+
+#include "compiler/whisperc.h"
 
 #ifndef MSGLOG_H_
 #define MSGLOG_H_

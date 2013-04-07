@@ -26,7 +26,7 @@
 
 #include "utils/include/le_converter.h"
 
-#include "dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 #include "dbs_types.h"
 #include "dbs_exception.h"
 
@@ -481,7 +481,10 @@ void
 RowFieldArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 {
   if (m_TempArray)
-    return m_TempArray->CollapseRaw (offset, count);
+    {
+      m_TempArray->CollapseRaw (offset, count);
+      return;
+    }
   else
     EnableTemporalStorage ();
 

@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WHISPER_TYPES_H
 
 #ifndef ARCH_LINUX_GCC
-#error "Do not compile this file with a compilator other than linux's gcc/g++!"
+#error "Do not compile this file with a compilator other than Linux's gcc/g++!"
 #endif
 
 #include "sys/types.h"

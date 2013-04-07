@@ -857,7 +857,7 @@ fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
     }
   else
     {
-      D_UINT64 length  = 0;
+      unsigned long long length  = 0;
       D_UINT64 offset  = 0;
       wcs = WGetStackTextLengthCount (hnd, field, row, WIGNORE_OFF, &length);
       if (wcs != WCS_OK)
@@ -913,7 +913,7 @@ fetch_execution_array_result (W_CONNECTOR_HND        hnd,
   assert ((type >= WFT_BOOL) && (type < WFT_TEXT));
 
   const D_CHAR*         retValue;
-  D_UINT64              count;
+  unsigned long long              count;
   D_UINT                wcs;
 
   if ((wcs = WGetStackArrayElementsCount (hnd, field, row, &count)) != WCS_OK)
@@ -949,7 +949,7 @@ fetch_result_fail:
 static bool
 fetch_execution_field_result (W_CONNECTOR_HND hnd, const D_UINT type)
 {
-  D_UINT64 rowsCount = 0;
+  unsigned long long rowsCount = 0;
   D_UINT   wcs       = WCS_OK;
 
   if ((wcs = WGetStackValueRowsCount (hnd, &rowsCount)) != WCS_OK)
@@ -1002,7 +1002,7 @@ static bool
 fetch_execution_table_result (W_CONNECTOR_HND hnd,
                               vector<W_FieldDescriptor>& fields)
 {
-  D_UINT64 rowsCount = 0;
+  unsigned long long rowsCount = 0;
   D_UINT   wcs       = WCS_OK;
 
   if ((wcs = WGetStackValueRowsCount (hnd, &rowsCount)) != WCS_OK)

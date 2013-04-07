@@ -25,9 +25,9 @@
 #include <assert.h>
 #include <vector>
 
-#include "dbs_values.h"
-#include "dbs_mgr.h"
-#include "random.h"
+#include "dbs/dbs_values.h"
+#include "dbs/dbs_mgr.h"
+#include "utils/random.h"
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"

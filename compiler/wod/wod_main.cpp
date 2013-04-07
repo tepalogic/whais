@@ -27,8 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wod_dump.h"
 #include "wod_cmdline.h"
 
-
-#include "../include/whisperc/compiledunit.h"
+#include "compiler/compiledunit.h"
 
 #include "../../utils/include/wfile.h"
 #include "../whc/wo_format.h"

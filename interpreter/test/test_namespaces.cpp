@@ -10,10 +10,10 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "whisperc/compiledunit.h"
-#include "dbs_mgr.h"
+#include "compiler/compiledunit.h"
+#include "dbs/dbs_mgr.h"
 #include "interpreter.h"
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 static const D_CHAR admin[]    = "administrator";
 static const D_CHAR test_db1[] = "t_testdb_1";

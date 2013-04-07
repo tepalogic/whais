@@ -2,29 +2,29 @@
 UNIT:=custom
 
 UNIT_EXES:=
-UNIT_SHLS:=common
-UNIT_LIBS:=custom
+UNIT_SHLS:=wcommon
+UNIT_LIBS:=wslcustom
 ifeq ($(EXTRA_LIBS),yes)
-UNIT_LIBS+=slcommon
+UNIT_LIBS+=wslcommon
 endif
 
-slcommon_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
+wslcommon_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
 	         cpp_support/wfile.cpp cpp_support/wsocket.cpp
 
-common_SRC=$(slcommon_SRC) cpp_support/wmemtracker.cpp 
+wcommon_SRC=$(wslcommon_SRC) cpp_support/wmemtracker.cpp 
 
-common_DEF=USE_SHL EXPORT_EXCEP_SHL
-common_MAJ=.1
-common_MIN=.0
-common_LIB=custom/custom
+wcommon_DEF=USE_SHL EXPORT_EXCEP_SHL
+wcommon_MAJ=.1
+wcommon_MIN=.0
+wcommon_LIB=custom/wslcustom
 
-custom_SRC=
+wslcustom_SRC=
 
-ifeq ($(ARCH),linux_gcc64)
+ifeq ($(ARCH),linux_gcc_x86_64)
 SRC_FOLDER:=posix
 endif
 
-ifeq ($(ARCH),linux_gcc32)
+ifeq ($(ARCH),linux_gcc_x86)
 SRC_FOLDER:=posix
 endif
 ifeq ($(ARCH),wine_vc)
@@ -35,15 +35,16 @@ ifeq ($(ARCH),windows_vc)
 SRC_FOLDER:=windows
 endif
 
-custom_SRC+=$(SRC_FOLDER)/fileio.c
-custom_SRC+=$(SRC_FOLDER)/thread.c  
-custom_SRC+=$(SRC_FOLDER)/time.c  
-custom_SRC+=$(SRC_FOLDER)/network.c  
-custom_SRC+=$(SRC_FOLDER)/memory.cpp
+wslcustom_SRC+=$(SRC_FOLDER)/fileio.c
+wslcustom_SRC+=$(SRC_FOLDER)/thread.c  
+wslcustom_SRC+=$(SRC_FOLDER)/time.c  
+wslcustom_SRC+=$(SRC_FOLDER)/network.c  
+wslcustom_SRC+=$(SRC_FOLDER)/memory.cpp
 
 ifeq ($(MEMORY_TRACE),yes)
-custom_SRC+=test/mem_test.c
+wslcustom_SRC+=test/mem_test.c
 endif
 
 $(foreach shl, $(UNIT_SHLS), $(eval $(call add_output_shared_lib,$(shl),$(UNIT),$($(shl)_MAJ),$($(shl)_MIN))))
 $(foreach lib, $(UNIT_LIBS), $(eval $(call add_output_library,$(lib),$(UNIT))))
+

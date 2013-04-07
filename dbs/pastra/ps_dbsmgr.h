@@ -28,8 +28,8 @@
 #include <map>
 #include <string.h>
 
-#include "wthread.h"
-#include "dbs_mgr.h"
+#include "utils/wthread.h"
+#include "dbs/dbs_mgr.h"
 
 namespace pastra
 {

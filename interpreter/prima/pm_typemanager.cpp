@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "dbs/include/dbs_types.h"
-#include "compiler/include/whisperc/whisperc.h"
+#include "compiler/whisperc.h"
 #include "utils/include/le_converter.h"
 
 #include "pm_typemanager.h"

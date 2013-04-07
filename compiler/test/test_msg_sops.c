@@ -9,9 +9,9 @@
 #include "../semantics/opcodes.h"
 #include "../semantics/procdecl.h"
 #include "../semantics/wlog.h"
-#include "../include/whisperc/whisperc.h"
+#include "compiler/whisperc.h"
 
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 extern int yyparse (struct ParserState *);
 

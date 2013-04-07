@@ -25,7 +25,7 @@
 #include <assert.h>
 
 #include "whisper.h"
-#include "whisperc/wopcodes.h"
+#include "compiler/wopcodes.h"
 
 #include "expression.h"
 #include "wlog.h"

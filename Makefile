@@ -17,7 +17,7 @@ else
 ECHO:=@
 endif
 
-INCLUDES+=./ ./common
+INCLUDES+=./ ./headers
 
 ifeq ($(BUILD_TESTS),yes)
 DEFINES+=BUILD_TESTS=1

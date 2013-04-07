@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "../include/whisperc/compiledunit.h"
+#include "compiler/compiledunit.h"
 
 #include "../../utils/include/wfile.h"
 #include "../../utils/include/le_converter.h"

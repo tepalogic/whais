@@ -25,9 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef OPCODES_H_
 #define OPCODES_H_
 
-#include "compiler/include/whisperc/wopcodes.h"
+#include "compiler/wopcodes.h"
+#include "utils/outstream.h"
 
-#include "outstream.h"
 #include "vardecl.h"
 
 extern const enum W_OPCODE inc_op[T_END_OF_TYPES];

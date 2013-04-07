@@ -29,8 +29,10 @@
 #define PARSER_H
 
 #include "whisper.h"
-#include "whisperc/whisperc.h"
+
+#include "compiler/whisperc.h"
 #include "utils/include/array.h"
+
 #include "strstore.h"
 #include "../semantics/statement.h"
 

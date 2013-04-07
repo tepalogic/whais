@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "utils/include/random.h"
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 #include "../include/dbs_mgr.h"
 #include "../include/dbs_exception.h"

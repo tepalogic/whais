@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WHISPER_TYPES_H
 
 #ifndef ARCH_WINDOWS_VC
-#error Do not compile this file with other compilator than MS Visual C
+#error "Do not compile this file with other compilator than MS Visual C/C++"
 #endif
 
 #include "sys/types.h"

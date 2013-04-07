@@ -26,9 +26,8 @@
 #include <iostream>
 #include <map>
 
-#include "wthread.h"
-
-#include "dbs/include/dbs_mgr.h"
+#include "utils/wthread.h"
+#include "dbs/dbs_mgr.h"
 
 #include "pm_interpreter.h"
 #include "pm_processor.h"

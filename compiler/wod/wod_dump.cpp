@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "../whc/wo_format.h"
-#include "../include/whisperc/whisperc.h"
+#include "compiler/whisperc.h"
 #include "../../utils/include/le_converter.h"
 
 #include "wod_dump.h"

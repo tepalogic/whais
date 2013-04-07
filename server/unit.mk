@@ -10,8 +10,8 @@ whisper_SRC=common/configuration.cpp common/loader.cpp common/server.cpp\
 			common/valtranslator.cpp common/server_main.cpp
 			
 whisper_DEF=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL
-whisper_LIB=utils/utils custom/custom
-whisper_SHL=dbs/pastra interpreter/prima compiler/compiler custom/common
+whisper_LIB=utils/wslutils custom/wslcustom
+whisper_SHL=dbs/wpastra interpreter/wprima compiler/wcompiler custom/wcommon
 
 whisper_LINUX_SRC=linux/main.cpp
 whisper_WINDOWS_SRC=

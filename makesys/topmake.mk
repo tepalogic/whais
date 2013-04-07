@@ -1,5 +1,4 @@
 
-
 .PHONY: all prepare_env libs exes clean 
 
 all: prepare_env exes $(EXES) $(SHLS) $(LIBS)

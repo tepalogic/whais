@@ -9,9 +9,9 @@
 #include <memory.h>
 #include <iostream>
 
-#include "dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 #include "../pastra/ps_container.h"
 
 using namespace pastra;

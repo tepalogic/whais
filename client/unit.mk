@@ -3,24 +3,24 @@ UNIT:=client
 
 UNIT_EXES:=wcmd
 UNIT_SHLS:=
-UNIT_LIBS:=connector
+UNIT_LIBS:=wslconnector
 
-connector_SRC=src/connector.c src/client_connection.c
-connector_DEF=
-connector_LIB=utils/utils custom/custom
-connector_SHL=
+wslconnector_SRC:=src/connector.c src/client_connection.c
+wslconnector_DEF:=
+wslconnector_LIB:=utils/wutils custom/wcustom
+wslconnector_SHL:=
 
-wcmd_SRC=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
+wcmd_SRC:=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
 		 wcmd/wcmd_tabcomds.cpp wcmd/wcmd_onlinecmds.cpp wcmd/wcmd_execcmd.cpp
 		 
-wcmd_DEF=USE_DBS_SHL
-wcmd_LIB=client/connector utils/utils custom/custom 
-wcmd_SHL=dbs/pastra custom/common
-wcmd_INC=
+wcmd_DEF:=USE_DBS_SHL
+wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcustom 
+wcmd_SHL:=dbs/wpastra custom/wcommon
+wcmd_INC:=
 
 
 ifeq ($(BUILD_TESTS),yes)
-connector_SRC+=test/test_client_common.cpp
+wslconnector_SRC+=test/test_client_common.cpp
 -include ./$(UNIT)/test/test.mk
 endif
 

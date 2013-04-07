@@ -36,10 +36,10 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "whisper.tab.h"
 #include "whisper.h"
+#include "whisper.tab.h"
+#include "compiler/wopcodes.h"
 
-#include "whisperc/wopcodes.h"
 #include "parser.h"
 #include "../semantics/wlog.h"
 

@@ -27,7 +27,7 @@
 #include "utils/include/le_converter.h"
 #include "utils/include/utf8.h"
 
-#include "dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 #include "dbs_exception.h"
 
 #include "ps_textstrategy.h"

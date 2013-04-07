@@ -30,7 +30,7 @@
 #include "whisper.h"
 
 #include "dbs/include/dbs_mgr.h"
-#include "compiler/include/whisperc/compiledunit.h"
+#include "compiler/compiledunit.h"
 #include "utils/include/logger.h"
 
 #include "operands.h"

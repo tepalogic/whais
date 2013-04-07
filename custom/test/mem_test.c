@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "test/test_fmw.h"
+#include "custom/include/test/test_fmw.h"
 
 /* GLOBAL variables for testing */
 static size_t test_mem_used;

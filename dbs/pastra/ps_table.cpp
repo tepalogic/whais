@@ -29,7 +29,7 @@
 
 #include "utils/include/wfile.h"
 
-#include "dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 #include "dbs_exception.h"
 
 #include "ps_table.h"

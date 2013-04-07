@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <assert.h>
 
-#include "./compiler/include/whisperc/whisperc.h"
+#include "compiler/whisperc.h"
 
 #include "whc_cmdline.h"
 

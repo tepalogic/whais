@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "compiler/include/whisperc/wopcodes.h"
+#include "compiler/wopcodes.h"
 
 #include "pm_processor.h"
 
