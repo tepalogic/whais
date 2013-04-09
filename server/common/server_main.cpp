@@ -127,7 +127,7 @@ main (int argc, char** argv)
         }
     }
 
-  if (! wh_init_socks ())
+  if (! whs_init ())
     {
       cerr << "Couldn't not init the network socket framework\n";
       return ENOTSOCK;
@@ -241,7 +241,7 @@ main (int argc, char** argv)
 
     StartServer (*glbLog, databases);
   }
-  catch (WException& e)
+  catch (Exception& e)
   {
     ostringstream logEntry;
     //TODO: Handle this exception with more specific err messages
@@ -253,8 +253,8 @@ main (int argc, char** argv)
     if (e.Message ())
       logEntry << "Message:\n\t" << e.Message () << endl;
 
-    logEntry <<"Extra: " << e.GetExtra () << " (";
-    logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+    logEntry <<"Extra: " << e.Extra () << " (";
+    logEntry << e.File () << ':' << e.Line() << ").\n";
 
     glbLog->Log (LOG_CRITICAL, logEntry.str ());
 
@@ -291,7 +291,7 @@ main (int argc, char** argv)
   }
 
   clean_frameworks (*glbLog);
-  wh_clean_socks ();
+  whs_clean ();
 
   return 0;
 }

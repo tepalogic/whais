@@ -40,14 +40,14 @@ namespace pastra
 void
 append_int_to_str (std::string& dest, uint64_t number);
 
-class DataContainerException : public WException
+class DataContainerException : public Exception
 {
 public:
   DataContainerException (const char* message,
                           const char* file,
                           uint32_t      line,
                           uint32_t      extra)
-    : WException (message, file, line, extra)
+    : Exception (message, file, line, extra)
   {
   }
   virtual ~DataContainerException ()
@@ -127,8 +127,8 @@ private:
   const uint_t                     m_CacheSize;
   bool                             m_DirtyCache;
 
-  static uint64_t      sm_TemporalsCount;
-  static WSynchronizer sm_Sync;
+  static uint64_t      smTemporalsCount;
+  static WSynchronizer smSync;
 };
 
 class WFileContainerException : public DataContainerException
@@ -147,14 +147,14 @@ public:
   {
   }
 
-  virtual WException*     Clone () const
+  virtual Exception*     Clone () const
   {
     return new WFileContainerException (*this);
   }
   virtual EXPCEPTION_TYPE Type () const { return FILE_CONTAINER_EXCEPTION; }
   virtual const char*   Description () const
   {
-    switch (GetExtra ())
+    switch (Extra ())
       {
       case INVALID_PARAMETERS:
         return "Invalid parameters.";

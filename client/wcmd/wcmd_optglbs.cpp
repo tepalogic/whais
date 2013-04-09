@@ -32,7 +32,7 @@ using namespace std;
 
 const uint64_t       MINIMUM_FILE_SIZE = 0x100000; //1 MB
 
-static string        sWorkingDirectory (whc_get_current_directory ());
+static string        sWorkingDirectory (whf_current_dir ());
 static string        sDBName;
 static VERBOSE_LEVEL sVerbLevel   = VL_ERROR;
 static uint64_t      sMaxFileSize = 0x80000000; //default: 2GB

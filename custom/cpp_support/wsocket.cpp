@@ -32,7 +32,7 @@ WSocket::WSocket (const char* const pServerName,
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  const uint32_t e = wh_socket_client (pServerName, pService, &m_Socket);
+  const uint32_t e = whs_create_client (pServerName, pService, &m_Socket);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -49,7 +49,7 @@ WSocket::WSocket (const char* const pServerName,
   char   service[16];
 
   sprintf (service, "%u", port);
-  e = wh_socket_client (pServerName, service, &m_Socket);
+  e = whs_create_client (pServerName, service, &m_Socket);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -63,7 +63,7 @@ WSocket::WSocket (const char* const pLocalAddress,
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  const uint32_t e = wh_socket_server (pLocalAddress,
+  const uint32_t e = whs_create_server (pLocalAddress,
                                        pService,
                                        backLog,
                                        &m_Socket);
@@ -84,7 +84,7 @@ WSocket::WSocket (const char* const pLocalAddress,
   char   service[16];
 
   sprintf (service, "%u", port);
-  e = wh_socket_server (pLocalAddress, service, backLog, &m_Socket);
+  e = whs_create_server (pLocalAddress, service, backLog, &m_Socket);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -110,7 +110,7 @@ WSocket::~WSocket ()
   if (m_Owned)
     {
       assert (m_Socket != INVALID_SOCKET);
-      wh_socket_close (m_Socket);
+      whs_close (m_Socket);
     }
 }
 
@@ -120,7 +120,7 @@ WSocket::operator= (const WSocket& source)
   if (this != &source)
     {
       if (m_Owned)
-        wh_socket_close (m_Socket);
+        whs_close (m_Socket);
 
       m_Socket = source.m_Socket;
       m_Owned  = source.m_Owned;
@@ -134,7 +134,7 @@ WSocket
 WSocket::Accept ()
 {
   WH_SOCKET      client = INVALID_SOCKET;
-  const uint32_t e      = wh_socket_accept (m_Socket, &client);
+  const uint32_t e      = whs_accept (m_Socket, &client);
 
   if (e != WOP_OK )
     throw WSocketException (NULL, _EXTRA (e));
@@ -148,7 +148,7 @@ uint_t
 WSocket::Read (const uint_t count, uint8_t* const pBuffer)
 {
   uint_t         result = count;
-  const uint32_t e      = wh_socket_read (m_Socket, pBuffer, &result);
+  const uint32_t e      = whs_read (m_Socket, pBuffer, &result);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -159,7 +159,7 @@ WSocket::Read (const uint_t count, uint8_t* const pBuffer)
 void
 WSocket::Write (const uint_t count, const uint8_t* const pBuffer)
 {
-  const uint32_t e = wh_socket_write (m_Socket, pBuffer, count);
+  const uint32_t e = whs_write (m_Socket, pBuffer, count);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -173,7 +173,7 @@ WSocket::Close ()
 
   assert (m_Socket != INVALID_SOCKET);
 
-  wh_socket_close (m_Socket);
+  whs_close (m_Socket);
 
   m_Socket = INVALID_SOCKET;
   m_Owned  = false;

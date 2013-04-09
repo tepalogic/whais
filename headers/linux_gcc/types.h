@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHISPER_TYPES_H
 #define WHISPER_TYPES_H
 
-
 #ifndef ARCH_LINUX_GCC
 #error "Do not compile this file with a compilator other than Linux's gcc/g++!"
 #endif
@@ -34,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
-typedef int             WH_FILE_HND;
+typedef int             WH_FILE;
 typedef pthread_mutex_t WH_SYNC;
 typedef pthread_t       WH_THREAD;
 typedef int             WH_SOCKET;

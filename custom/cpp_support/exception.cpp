@@ -27,51 +27,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/include/wthread.h"
 #include "utils/include/wsocket.h"
 
-WException::WException (const char* pMessage,
+Exception::Exception (const char* pMessage,
                         const char* pFile,
                         uint32_t      line,
                         uint32_t      extra)
-  : m_ErrorMessage ((pMessage == NULL) ? "" : pMessage),
-    m_File (pFile),
-    m_Line (line),
-    m_Extra (extra)
+  : mErrorMessage ((pMessage == NULL) ? "" : pMessage),
+    mFile (pFile),
+    mLine (line),
+    mExtra (extra)
 {
 }
 
-WException::WException (const WException& source)
-  : m_ErrorMessage (source.m_ErrorMessage),
-    m_File (source.m_File),
-    m_Line (source.m_Line),
-    m_Extra (source.m_Extra)
+Exception::Exception (const Exception& source)
+  : mErrorMessage (source.mErrorMessage),
+    mFile (source.mFile),
+    mLine (source.mLine),
+    mExtra (source.mExtra)
 {
 }
 
-WException::~WException ()
+Exception::~Exception ()
 {
-}
-
-uint32_t
-WException::GetExtra () const
-{
-  return m_Extra;
-}
-
-const char*
-WException::Message () const
-{
-  return m_ErrorMessage.c_str ();
-}
-
-const char*
-WException::GetFile () const
-{
-  return m_File;
 }
 
 uint32_t
-WException::GetLine () const
+Exception::Extra () const
 {
-  return m_Line;
+  return mExtra;
+}
+
+const char*
+Exception::Message () const
+{
+  return mErrorMessage.c_str ();
+}
+
+const char*
+Exception::File () const
+{
+  return mFile;
+}
+
+uint32_t
+Exception::Line () const
+{
+  return mLine;
 }
 
 
@@ -80,11 +80,11 @@ WFileException::WFileException (const char* pMessage,
                                 const char* pFile,
                                 uint32_t      line,
                                 uint32_t      extra)
-  : WException (pMessage, pFile, line, extra)
+  : Exception (pMessage, pFile, line, extra)
 {
 }
 
-WException*
+Exception*
 WFileException::Clone () const
 {
   return new WFileException (*this);
@@ -108,11 +108,11 @@ WSynchException::WSynchException (const char* message,
                                   const char* file,
                                   uint32_t      line,
                                   uint32_t      extra)
-  : WException (message, file, line, extra)
+  : Exception (message, file, line, extra)
 {
 }
 
-WException*
+Exception*
 WSynchException::Clone () const
 {
   return new WSynchException (*this);
@@ -136,11 +136,11 @@ WThreadException::WThreadException (const char* message,
                                     const char* file,
                                     uint32_t      line,
                                     uint32_t      extra)
-  : WException (message, file, line, extra)
+  : Exception (message, file, line, extra)
 {
 }
 
-WException*
+Exception*
 WThreadException::Clone () const
 {
   return new WThreadException (*this);
@@ -164,11 +164,11 @@ WSocketException::WSocketException (const char* message,
                                     const char* file,
                                     uint32_t      line,
                                     uint32_t      extra)
-  : WException (message, file, line, extra)
+  : Exception (message, file, line, extra)
 {
 }
 
-WException*
+Exception*
 WSocketException::Clone () const
 {
   return new WSocketException (*this);

@@ -65,6 +65,8 @@ map <S-F7> :make clean<CR>
 map <F6> :cn<CR>
 map <S-F6> :cp<CR>
 
+hi ColorColumn guibg=#2d2d2d ctermbg=232
+
 " spell settings
 :setlocal spell spelllang=en
 " set the spellfile - folders must exist
@@ -83,19 +85,23 @@ map <C-k> <C-k>j
 
 nmap <F2> :NERDTreeToggle<CR>
 
-" My patetic function stuff!
 function! GnuIndent()
   setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
   setlocal shiftwidth=2
   setlocal tabstop=8
   setlocal expandtab " expand tabs to spaces
+endfunction
+
+function! CodingSetTextWidth()
     " wrap lines at 80 chars. 
   setlocal textwidth=80
   setlocal nowrap
-  setlocal colorcolumn=+1
+  setlocal colorcolumn=80
+  let &colorcolumn=join(range(81,999),",")
 endfunction
 
 autocmd FileType c,cpp call GnuIndent() 
+autocmd FileType c,cpp,java call CodingSetTextWidth() 
 autocmd FileType c,cpp,java autocmd BufWritePre <buffer> :%s/\s\+$//e
 
 

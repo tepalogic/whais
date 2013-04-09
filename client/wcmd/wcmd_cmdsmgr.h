@@ -58,7 +58,7 @@ const std::string
 CmdLineNextToken (const std::string& cmdLine, size_t& ioPosition);
 
 void
-printException (std::ostream& outputStream, const WException& e);
+printException (std::ostream& outputStream, const whisper::Exception& e);
 
 std::string
 wcmd_decode_typeinfo (unsigned int type);

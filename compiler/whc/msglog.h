@@ -36,7 +36,8 @@ my_postman (WHC_MESSENGER_ARG data,
             uint_t            buffOff,
             uint_t            msgId,
             uint_t            msgType,
-            const char*     msgFormat,
+            const char*       msgFormat,
             va_list           args);
 
 #endif /* MSGLOG_H_ */
+

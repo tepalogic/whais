@@ -31,42 +31,42 @@ extern "C"
 #endif
 
 bool_t
-wh_init_socks ();
+whs_init ();
 
 uint32_t
-wh_socket_client (const char* const       pServer,
-                  const char* const       pPort,
-                  WH_SOCKET* const          pOutSocket);
+whs_create_client (const char* const       server,
+                   const char* const       port,
+                   WH_SOCKET* const        outSocket);
 
 uint32_t
-wh_socket_server (const char* const       pLocalAdress,
-                  const char* const       pPort,
-                  const uint_t              listenBackLog,
-                  WH_SOCKET* const          pOutSocket);
+whs_create_server (const char* const       localAddress,
+                   const char* const       localPort,
+                   const uint_t            listenBackLog,
+                   WH_SOCKET* const        outSocket);
 
 uint32_t
-wh_socket_accept (const WH_SOCKET           sd,
-                  WH_SOCKET* const          pConnectSocket);
+whs_accept (const WH_SOCKET           sd,
+            WH_SOCKET* const          outSocket);
 
 uint32_t
-wh_socket_write (const WH_SOCKET           sd,
-                 const uint8_t*            pBuffer,
-                 const uint_t              count);
+whs_write (const WH_SOCKET           sd,
+           const uint8_t*            srcBuffer,
+           const uint_t              count);
 
 uint32_t
-wh_socket_read (const WH_SOCKET           sd,
-                uint8_t*                  pOutBuffer,
-                uint_t* const             pIOCount);
+whs_read (const WH_SOCKET           sd,
+          uint8_t*                  dstBuffer,
+          uint_t* const             inoutCount);
 
 void
-wh_socket_close (const WH_SOCKET socket);
+whs_close (const WH_SOCKET socket);
 
 void
-wh_clean_socks ();
+whs_clean ();
 
 #ifdef __cplusplus
 }
 #endif
 
-
 #endif /* WHISPER_NET_H_ */
+

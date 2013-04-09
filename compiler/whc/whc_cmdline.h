@@ -27,6 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+namespace whisper
+{
+
 class WhcCmdLineParser
 {
 public:
@@ -56,14 +59,14 @@ private:
   bool        m_OutputFileOwn;
 };
 
-class WhcCmdLineException : public WException
+class WhcCmdLineException : public Exception
 {
 public:
   WhcCmdLineException (const char* pMessage,
                        const char* pFile,
                        uint32_t      line,
                        uint32_t      extra)
-    : WException (pMessage, pFile, line, extra)
+    : Exception (pMessage, pFile, line, extra)
   {
   }
 
@@ -71,7 +74,7 @@ public:
   {
   };
 
-  virtual WException*     Clone () const
+  virtual Exception*     Clone () const
   {
     return new WhcCmdLineException (*this);
   }
@@ -81,6 +84,8 @@ public:
     return "Invalid command line.";
   }
 };
+
+} //namespace whisper
 
 // Declaration of error codes
 #define ECMD_LINE_NO_ARGS        1

@@ -38,8 +38,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wo_format.h"
 
 using namespace std;
+using namespace whisper;
 
-uint8_t whc_header[WHC_TABLE_SIZE] = { 0, };
+uint8_t wh_header[WHC_TABLE_SIZE] = { 0, };
 
 static void
 fill_globals_table (WICompiledUnit&      rUnit,
@@ -138,7 +139,7 @@ main (int argc, char **argv)
   OutputStream      glbsTableStream;
   OutputStream      procsTableStream;
 
-  whc_get_lang_ver (&langVerMaj, &langVerMin);
+  wh_get_lang_ver (&langVerMaj, &langVerMin);
   init_outstream (OUTSTREAM_INCREMENT_SIZE, &symbolsStream);
   init_outstream (OUTSTREAM_INCREMENT_SIZE, &glbsTableStream);
   init_outstream (OUTSTREAM_INCREMENT_SIZE, &procsTableStream);
@@ -169,33 +170,33 @@ main (int argc, char **argv)
     outputFile.Seek (0, WHC_SEEK_BEGIN);
 
     //reserve space for header file
-    outputFile.Write (whc_header, sizeof whc_header);
+    outputFile.Write (wh_header, sizeof wh_header);
 
     process_procedures_table (unit, outputFile, &symbolsStream, &procsTableStream);
     fill_globals_table (unit, &symbolsStream, &glbsTableStream);
 
-    *_RC(uint32_t*, whc_header + WHC_GLOBS_COUNT_OFF) = get_size_outstream (&glbsTableStream) /
+    *_RC(uint32_t*, wh_header + WHC_GLOBS_COUNT_OFF) = get_size_outstream (&glbsTableStream) /
                                                         WHC_GLOBAL_ENTRY_SIZE;
     assert ((get_size_outstream (&glbsTableStream) % WHC_GLOBAL_ENTRY_SIZE) == 0);
 
-    *_RC (uint32_t*, whc_header + WHC_PROCS_COUNT_OFF) = get_size_outstream (&procsTableStream) /
+    *_RC (uint32_t*, wh_header + WHC_PROCS_COUNT_OFF) = get_size_outstream (&procsTableStream) /
                                                          WHC_PROC_ENTRY_SIZE;
 
     assert ((get_size_outstream (&procsTableStream) % WHC_PROC_ENTRY_SIZE) == 0);
 
-    *_RC (uint32_t *, whc_header + WHC_TYPEINFO_START_OFF) = outputFile.Tell ();
-    *_RC (uint32_t *, whc_header + WHC_TYPEINFO_SIZE_OFF)  = unit.GetTypeInformationSize ();
+    *_RC (uint32_t *, wh_header + WHC_TYPEINFO_START_OFF) = outputFile.Tell ();
+    *_RC (uint32_t *, wh_header + WHC_TYPEINFO_SIZE_OFF)  = unit.GetTypeInformationSize ();
 
     outputFile.Write (unit.RetriveTypeInformation (), unit.GetTypeInformationSize ());
 
-    *_RC (uint32_t *, whc_header + WHC_SYMTABLE_START_OFF) = outputFile.Tell ();
-    *_RC (uint32_t *, whc_header + WHC_SYMTABLE_SIZE_OFF)  = get_size_outstream (&symbolsStream);
+    *_RC (uint32_t *, wh_header + WHC_SYMTABLE_START_OFF) = outputFile.Tell ();
+    *_RC (uint32_t *, wh_header + WHC_SYMTABLE_SIZE_OFF)  = get_size_outstream (&symbolsStream);
 
     outputFile.Write (get_buffer_outstream (&symbolsStream), get_size_outstream (&symbolsStream));
 
 
-    *_RC (uint32_t *, whc_header + WHC_CONSTAREA_START_OFF) = outputFile.Tell ();
-    *_RC (uint32_t *, whc_header + WHC_CONSTAREA_SIZE_OFF) = unit.GetConstAreaSize ();
+    *_RC (uint32_t *, wh_header + WHC_CONSTAREA_START_OFF) = outputFile.Tell ();
+    *_RC (uint32_t *, wh_header + WHC_CONSTAREA_SIZE_OFF) = unit.GetConstAreaSize ();
 
     outputFile.Write (unit.RetrieveConstArea (), unit.GetConstAreaSize ());
 
@@ -204,28 +205,28 @@ main (int argc, char **argv)
     outputFile.Write (get_buffer_outstream (&procsTableStream),
                       get_size_outstream (&procsTableStream));
 
-    whc_header[WHC_SIGNATURE_OFF]     = WH_SIGNATURE[0];
-    whc_header[WHC_SIGNATURE_OFF + 1] = WH_SIGNATURE[1];
-    whc_header[WHC_FORMATMMAJ_OFF]    = WH_FFVER_MAJ;
-    whc_header[WHC_FORMATMIN_OFF]     = WH_FFVER_MIN;
-    whc_header[WHC_LANGVER_MAJ_OFF]   = langVerMaj;
-    whc_header[WHC_LANGVER_MIN_OFF]   = langVerMin;
+    wh_header[WHC_SIGNATURE_OFF]     = WH_SIGNATURE[0];
+    wh_header[WHC_SIGNATURE_OFF + 1] = WH_SIGNATURE[1];
+    wh_header[WHC_FORMATMMAJ_OFF]    = WH_FFVER_MAJ;
+    wh_header[WHC_FORMATMIN_OFF]     = WH_FFVER_MIN;
+    wh_header[WHC_LANGVER_MAJ_OFF]   = langVerMaj;
+    wh_header[WHC_LANGVER_MIN_OFF]   = langVerMin;
 
-    to_le_int32 (whc_header + WHC_GLOBS_COUNT_OFF);
-    to_le_int32 (whc_header + WHC_PROCS_COUNT_OFF);
-    to_le_int32 (whc_header + WHC_TYPEINFO_START_OFF);
-    to_le_int32 (whc_header + WHC_TYPEINFO_SIZE_OFF);
-    to_le_int32 (whc_header + WHC_SYMTABLE_START_OFF);
-    to_le_int32 (whc_header + WHC_SYMTABLE_SIZE_OFF);
+    to_le_int32 (wh_header + WHC_GLOBS_COUNT_OFF);
+    to_le_int32 (wh_header + WHC_PROCS_COUNT_OFF);
+    to_le_int32 (wh_header + WHC_TYPEINFO_START_OFF);
+    to_le_int32 (wh_header + WHC_TYPEINFO_SIZE_OFF);
+    to_le_int32 (wh_header + WHC_SYMTABLE_START_OFF);
+    to_le_int32 (wh_header + WHC_SYMTABLE_SIZE_OFF);
 
     outputFile.Seek (0, WHC_SEEK_BEGIN);
-    outputFile.Write (whc_header, sizeof whc_header);
+    outputFile.Write (wh_header, sizeof wh_header);
     outputFile.Sync ();
 
   }
   catch (WFileException & e)
   {
-    std::cerr << "File IO error: " << e.GetExtra ();
+    std::cerr << "File IO error: " << e.Extra ();
     if (e.Message () != NULL)
       std::cerr << ": " << e.Message () << std::endl;
     else
@@ -240,11 +241,11 @@ main (int argc, char **argv)
   {
     std::cerr << e.Message () << std::endl;
   }
-  catch (WException & e)
+  catch (Exception & e)
   {
     std::cerr << "error : " << e.Message () << std::endl;
-    std::cerr << "file: " << e.GetFile() << " : " << e.GetLine() << std::endl;
-    std::cerr << "Extra: " << e.GetExtra() << std::endl;
+    std::cerr << "file: " << e.File() << " : " << e.Line() << std::endl;
+    std::cerr << "Extra: " << e.Extra() << std::endl;
     retCode = -1;
   }
   catch (std::bad_alloc&)
@@ -266,6 +267,6 @@ main (int argc, char **argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "WHC";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "WHC";
 #endif

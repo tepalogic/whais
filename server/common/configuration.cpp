@@ -362,9 +362,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
           string& dir = gMainSettings.m_WorkDirectory;
 
           if ((dir.size () != 0)
-              && (dir[dir.size () - 1] != whc_get_directory_delimiter()[0]))
+              && (dir[dir.size () - 1] != whf_dir_delim()[0]))
             {
-              dir += whc_get_directory_delimiter ();
+              dir += whf_dir_delim ();
             }
         }
       else if (token == gEntWorkDir)
@@ -398,9 +398,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
           string& dir = gMainSettings.m_TempDirectory;
 
           if ((dir.size () != 0)
-              && (dir[dir.size () - 1] != whc_get_directory_delimiter()[0]))
+              && (dir[dir.size () - 1] != whf_dir_delim()[0]))
             {
-              dir += whc_get_directory_delimiter ();
+              dir += whf_dir_delim ();
             }
         }
       else if (token == gEntShowDbg)
@@ -545,9 +545,9 @@ ParseContextSection (I_Logger&        log,
           string& dir = output.m_DbsDirectory;
 
           if ((dir.size () != 0)
-              && (dir[dir.size () - 1] != whc_get_directory_delimiter()[0]))
+              && (dir[dir.size () - 1] != whf_dir_delim()[0]))
             {
-              dir += whc_get_directory_delimiter ();
+              dir += whf_dir_delim ();
             }
         }
        else if (token == gEntLogFile)
@@ -612,7 +612,7 @@ ParseContextSection (I_Logger&        log,
            else
              libEntry = token;
 
-           if ( ! whc_is_path_absolute (libEntry.c_str ()))
+           if ( ! whf_is_absolute (libEntry.c_str ()))
              {
                libEntry = gMainSettings.m_WorkDirectory + libEntry;
              }
@@ -651,7 +651,7 @@ ParseContextSection (I_Logger&        log,
            else
              libEntry = token;
 
-           if ( ! whc_is_path_absolute (libEntry.c_str ()))
+           if ( ! whf_is_absolute (libEntry.c_str ()))
              {
                libEntry = gMainSettings.m_WorkDirectory + libEntry;
              }
@@ -1016,7 +1016,7 @@ PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc)
       return false;
     }
 
-  if ( ! whc_is_path_absolute (ioDesc.m_DbsLogFile.c_str ()))
+  if ( ! whf_is_absolute (ioDesc.m_DbsLogFile.c_str ()))
     ioDesc.m_DbsLogFile = ioDesc.m_DbsDirectory + ioDesc.m_DbsLogFile;
 
   return true;

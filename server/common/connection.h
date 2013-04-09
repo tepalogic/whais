@@ -60,7 +60,7 @@ struct UserHandler
   bool                  m_EndConnetion;
 };
 
-class ConnectionException : public WException
+class ConnectionException : public Exception
 {
 public:
   ConnectionException (const char* pMessage,
@@ -68,7 +68,7 @@ public:
                        uint32_t      line,
                        uint32_t      extra);
 
-  virtual WException*     Clone () const;
+  virtual Exception*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
   virtual const char*   Description () const;
 };

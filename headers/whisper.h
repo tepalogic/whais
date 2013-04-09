@@ -65,3 +65,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WOP_UNKNOW      -1
 
 #endif /* WHISPER_H */
+

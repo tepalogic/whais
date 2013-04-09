@@ -38,7 +38,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
     {
       uint_t chunkSize = FRAME_HDR_SIZE - frameSize;
 
-      const uint32_t status = wh_socket_read (pHnd->socket,
+      const uint32_t status = whs_read (pHnd->socket,
                                               &pHnd->data[frameSize],
                                               &chunkSize);
       if (status != WOP_OK)
@@ -70,7 +70,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
         {
           uint_t chunkSize = expected - frameSize;
 
-          const uint32_t status = wh_socket_read (pHnd->socket,
+          const uint32_t status = whs_read (pHnd->socket,
                                                   &pHnd->data[frameSize],
                                                   &chunkSize);
           if (status != WOP_OK)
@@ -101,7 +101,7 @@ uint_t
 write_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                  const  uint_t                  frameSize)
 {
-  uint_t result = wh_socket_write (pHnd->socket, pHnd->data, frameSize);
+  uint_t result = whs_write (pHnd->socket, pHnd->data, frameSize);
   if (result != WOP_OK)
     result = WENC_OS_ERROR (result);
 

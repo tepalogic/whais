@@ -27,14 +27,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-class EXCEP_SHL WSocketException : public WException
+using namespace whisper;
+
+class EXCEP_SHL WSocketException : public Exception
 {
 public:
   WSocketException (const char* message,
                     const char* file,
                     uint32_t      line,
                     uint32_t      extra);
-  virtual WException*     Clone () const;
+  virtual Exception*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
   virtual const char*   Description () const;
 };
@@ -72,7 +74,7 @@ private:
   {
     SocketInitialiser ()
     {
-      if ( ! wh_init_socks ())
+      if ( ! whs_init ())
         {
           throw WSocketException ("Network system could not be initialized.",
                                   _EXTRA (0));
@@ -81,7 +83,7 @@ private:
 
     ~SocketInitialiser ()
     {
-      wh_clean_socks ();
+      whs_clean ();
     }
   };
 

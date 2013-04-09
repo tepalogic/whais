@@ -35,14 +35,14 @@
 
 #include "operands.h"
 
-class InterException : public WException
+class InterException : public Exception
 {
 public:
   explicit InterException (const char*  message,
                            const char*  file,
                            const uint32_t line,
                            const uint32_t extra)
-    : WException (message, file, line, extra)
+    : Exception (message, file, line, extra)
   {
   }
 
@@ -50,11 +50,11 @@ public:
   {
   }
 
-  virtual WException*     Clone () const { return new InterException (*this); }
+  virtual Exception*     Clone () const { return new InterException (*this); }
   virtual EXPCEPTION_TYPE Type () const { return INTERPRETER_EXCEPTION; }
   virtual const char*   Description () const
   {
-    switch (GetExtra ())
+    switch (Extra ())
       {
         case INVALID_OP_CONVERSION:
           return "Invalid operand conversion.";

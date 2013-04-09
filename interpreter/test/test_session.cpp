@@ -249,7 +249,7 @@ check_global_def_err (I_Session& testSession)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::EXTERNAL_FIRST)
+      if (e.Extra () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found global with out defintion OK" << std::endl;
           result = true;
@@ -281,7 +281,7 @@ check_global_doubledef_err (I_Session& testSession)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::DUPLICATE_DEFINITION)
+      if (e.Extra () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -313,7 +313,7 @@ check_global_diffdef_err (I_Session& testSession)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::EXTERNAL_MISMATCH)
+      if (e.Extra () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -346,7 +346,7 @@ check_proc_def_err (I_Session& testSession)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::EXTERNAL_FIRST)
+      if (e.Extra () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found procedure with out defintion OK" << std::endl;
           result = true;
@@ -378,7 +378,7 @@ check_proc_doubledef_err (I_Session& testSession)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::DUPLICATE_DEFINITION)
+      if (e.Extra () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -410,7 +410,7 @@ check_proc_diffdef_err (I_Session& testSession)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::EXTERNAL_MISMATCH)
+      if (e.Extra () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -469,6 +469,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "T";
 #endif

@@ -94,61 +94,61 @@ extern "C"
 #endif
 
 WHC_HANDLER
-whc_hnd_create (const char*       pBuffer,
+wh_hnd_create (const char*       pBuffer,
                 unsigned          bufferSize,
                 WHC_MESSENGER     messenger,
                 WHC_MESSENGER_ARG messengerContext);
 
 void
-whc_hnd_destroy (WHC_HANDLER hnd);
+wh_hnd_destroy (WHC_HANDLER hnd);
 
 unsigned int
-whc_get_globals_count (WHC_HANDLER hnd);
+wh_get_globals_count (WHC_HANDLER hnd);
 
 unsigned int
-whc_get_global (WHC_HANDLER      hnd,
+wh_get_global (WHC_HANDLER      hnd,
                 unsigned int     globalId,
                 WHC_GLBVAR_DESC* pOutDescript);
 
 unsigned int
-whc_get_procs_count (WHC_HANDLER hnd);
+wh_get_procs_count (WHC_HANDLER hnd);
 
 unsigned int
-whc_get_proc (WHC_HANDLER  hnd,
+wh_get_proc (WHC_HANDLER  hnd,
             unsigned int   procId,
             WHC_PROC_DESC* pOutDesc);
 
 WHC_PROC_HANDLER
-whc_get_proc_hnd (WHC_HANDLER  hnd,
+wh_get_proc_hnd (WHC_HANDLER  hnd,
                   unsigned int procId);
 
 void
-whc_release_proc_hnd (WHC_HANDLER      hnd,
+wh_release_proc_hnd (WHC_HANDLER      hnd,
                       WHC_PROC_HANDLER hProc);
 
 const unsigned char*
-whc_get_proc_rettype (WHC_HANDLER      hnd,
+wh_get_proc_rettype (WHC_HANDLER      hnd,
                       WHC_PROC_HANDLER hProc);
 
 const unsigned char*
-whc_get_local_type (WHC_HANDLER      hnd,
+wh_get_local_type (WHC_HANDLER      hnd,
                     WHC_PROC_HANDLER hProc,
                     unsigned int     localId);
 
 unsigned int
-whc_get_typedec_pool (WHC_HANDLER           hnd,
+wh_get_typedec_pool (WHC_HANDLER           hnd,
                       const unsigned char** pOutPTypes);
 
 unsigned int
-whc_get_const_area (WHC_HANDLER           hnd,
+wh_get_const_area (WHC_HANDLER           hnd,
                     const unsigned char** pOutPConsts);
 
 COMPILER_SHL void
-whc_get_libver (unsigned int* pOutMajor,
+wh_get_libver (unsigned int* pOutMajor,
                 unsigned int* pOutMinor);
 
 COMPILER_SHL void
-whc_get_lang_ver (unsigned int* pOutMajor,
+wh_get_lang_ver (unsigned int* pOutMajor,
                   unsigned int* pOutMinor);
 
 #ifdef __cplusplus

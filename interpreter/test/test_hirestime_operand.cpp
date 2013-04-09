@@ -40,7 +40,7 @@ test_self_add (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -63,7 +63,7 @@ test_self_sub (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -86,7 +86,7 @@ test_self_mul (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -109,7 +109,7 @@ test_self_div (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -132,7 +132,7 @@ test_self_mod (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -155,7 +155,7 @@ test_self_and (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -178,7 +178,7 @@ test_self_xor (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -201,7 +201,7 @@ test_self_or (I_Operand& op)
   }
   catch (InterException& e)
   {
-      assert (e.GetExtra () == InterException::INVALID_OP_REQ);
+      assert (e.Extra () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -225,7 +225,7 @@ test_operand_for_exceptions (I_Operand& op)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra () == InterException::INVALID_OP_REQ)
+      if (e.Extra () == InterException::INVALID_OP_REQ)
         result = true;
   }
   catch (...)
@@ -308,7 +308,7 @@ test_op_invalid_conv (I_Operand& op)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra() != InterException::INVALID_OP_REQ)
+      if (e.Extra() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch (...)
@@ -323,7 +323,7 @@ test_op_invalid_conv (I_Operand& op)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra() != InterException::INVALID_OP_REQ)
+      if (e.Extra() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch (...)
@@ -338,7 +338,7 @@ test_op_invalid_conv (I_Operand& op)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra() != InterException::INVALID_OP_REQ)
+      if (e.Extra() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch (...)
@@ -546,6 +546,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "T";
 #endif

@@ -28,7 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WEXCEPTION_H_
 #define WEXCEPTION_H_
 
-#include "string"
+#include <string>
+
+namespace whisper
+{
 
 //Base class to handle all exceptions
 enum EXPCEPTION_TYPE
@@ -47,38 +50,41 @@ enum EXPCEPTION_TYPE
   CONNECTION_EXCEPTION
 };
 
-class EXCEP_SHL WException
+class EXCEP_SHL Exception
 {
 public:
-  WException (const char* pMessage,
-              const char* pFile,
+  Exception (const char*   message,
+              const char*   file,
               uint32_t      line,
               uint32_t      extra);
-  WException (const WException& source);
+  Exception (const Exception& source);
 
-  virtual ~WException ();
+  virtual ~Exception ();
 
-  uint32_t      GetExtra () const;
-  const char* Message () const;
-  const char* GetFile () const;
-  uint32_t      GetLine () const;
+  uint32_t      Extra () const;
+  const char*   Message () const;
+  const char*   File () const;
+  uint32_t      Line () const;
 
-  virtual WException*     Clone () const = 0;
+  virtual Exception*     Clone () const = 0;
   virtual EXPCEPTION_TYPE Type () const = 0;
-  virtual const char*   Description () const = 0;
+  virtual const char*     Description () const = 0;
 
 private:
 
 #pragma warning( disable : 4251 )
-  const std::string m_ErrorMessage;
+  const std::string mErrorMessage;
 #pragma warning( default : 4251)
 
-  const char*     m_File;
-  uint32_t          m_Line;
-  uint32_t          m_Extra;
+  const char*       mFile;
+  uint32_t          mLine;
+  uint32_t          mExtra;
 };
+
+} //namespace whisper
 
 // Macro used to expand the CMD line
 #define _EXTRA(x)  __FILE__, __LINE__, (x)
 
 #endif /* WEXCEPTION_H_ */
+

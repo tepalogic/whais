@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wod_cmdline.h"
 
 using namespace std;
+using namespace whisper;
 
 #define VER_MAJOR       0
 #define VER_MINOR       4

@@ -93,15 +93,15 @@ struct DbsManager
       }
 
     if (m_DBSSettings.m_WorkDir [m_DBSSettings.m_WorkDir.length () - 1] !=
-        whc_get_directory_delimiter ()[0])
+        whf_dir_delim ()[0])
       {
-        m_DBSSettings.m_WorkDir += whc_get_directory_delimiter ();
+        m_DBSSettings.m_WorkDir += whf_dir_delim ();
       }
 
     if (m_DBSSettings.m_TempDir [m_DBSSettings.m_TempDir.length () - 1] !=
-        whc_get_directory_delimiter ()[0])
+        whf_dir_delim ()[0])
       {
-        m_DBSSettings.m_TempDir += whc_get_directory_delimiter ();
+        m_DBSSettings.m_TempDir += whf_dir_delim ();
       }
   }
 
@@ -549,10 +549,10 @@ DbsHandler::RemoveFromStorage ()
 
   //Remove the database file
   const string fileName (WorkingDir () + m_Name + DBS_FILE_EXT);
-  whc_fremove (fileName.c_str ());
+  whf_remove (fileName.c_str ());
 }
 
 #if  defined (ENABLE_MEMORY_TRACE) && defined (USE_DBS_SHL)
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "PASTRA";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "PASTRA";
 #endif

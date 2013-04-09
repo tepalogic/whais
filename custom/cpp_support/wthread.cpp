@@ -140,7 +140,7 @@ WThread::ThrowPendingException ()
 
   if (m_Exception != NULL)
     {
-      WException* pTemp = m_Exception->Clone ();
+      Exception* pTemp = m_Exception->Clone ();
       DiscardException ();
 
       throw pTemp;
@@ -156,12 +156,12 @@ WThread::ThreadWrapperRoutine (void* const args)
   {
     pThread->m_Routine (pThread->m_RoutineArgs);
   }
-  catch (WException &e)
+  catch (Exception &e)
   {
     if (pThread->m_IgnoreExceptions == false)
       pThread->m_Exception = e.Clone ();
   }
-  catch (WException* pE)
+  catch (Exception* pE)
   {
     if (pThread->m_IgnoreExceptions == false)
       pThread->m_Exception = pE;

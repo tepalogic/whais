@@ -171,8 +171,8 @@ client_handler_routine (void* args)
       if (e.Message ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
-      logEntry <<"Extra: " << e.GetExtra () << " (";
-      logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry << e.File () << ':' << e.Line() << ").\n";
 
       spLogger->Log (LOG_CRITICAL, logEntry.str ());
 
@@ -185,7 +185,7 @@ client_handler_routine (void* args)
       else
         spLogger->Log (LOG_ERROR, e.Message ());
   }
-  catch (WException& e)
+  catch (Exception& e)
   {
       ostringstream logEntry;
 
@@ -196,8 +196,8 @@ client_handler_routine (void* args)
       if (e.Message ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
-      logEntry <<"Extra: " << e.GetExtra () << " (";
-      logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry << e.File () << ':' << e.Line() << ").\n";
 
       spLogger->Log (LOG_CRITICAL, logEntry.str ());
 
@@ -292,8 +292,8 @@ listener_routine (void* args)
                 if (e.Message ())
                   logEntry << "Message:\n\t" << e.Message () << endl;
 
-                logEntry <<"Extra: " << e.GetExtra () << " (";
-                logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+                logEntry <<"Extra: " << e.Extra () << " (";
+                logEntry << e.File () << ':' << e.Line() << ").\n";
 
                 spLogger->Log (LOG_ERROR, logEntry.str ());
               }
@@ -301,7 +301,7 @@ listener_routine (void* args)
         acceptUserConnections = sAcceptUsersConnections;
       }
   }
-  catch (WException& e)
+  catch (Exception& e)
   {
       assert (e.Description () != NULL);
 
@@ -313,8 +313,8 @@ listener_routine (void* args)
       if (e.Message ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
-      logEntry <<"Extra: " << e.GetExtra () << " (";
-      logEntry << e.GetFile () << ':' << e.GetLine() << ").\n";
+      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry << e.File () << ':' << e.Line() << ").\n";
 
       spLogger->Log (LOG_CRITICAL, logEntry.str ());
 
@@ -398,6 +398,6 @@ StopServer ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "WHISPER";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "WHISPER";
 #endif

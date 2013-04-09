@@ -27,57 +27,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/include/wfile.h"
 #include "whisper.h"
 
-
+using namespace whisper;
 
 WFile::WFile (const char* pFileName, uint_t mode)
   : m_Handle (0)
 {
-  m_Handle = whc_fopen (pFileName, mode);
+  m_Handle = whf_open (pFileName, mode);
   if (m_Handle == 0)
-    throw WFileException (pFileName, _EXTRA (whc_fgetlasterror ()));
+    throw WFileException (pFileName, _EXTRA (whf_last_error ()));
 }
 
 WFile::WFile (const WFile &rSource) :
-  m_Handle (whc_fdup (rSource.m_Handle))
+  m_Handle (whf_dup (rSource.m_Handle))
 {
   if (m_Handle == 0)
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 WFile::~WFile ()
 {
   /* Close it only if is not already closed */
   if (m_Handle != 0)
-    whc_fclose (m_Handle);
+    whf_close (m_Handle);
 }
 
 void
 WFile::Read (uint8_t* pBuffer, uint_t size)
 {
-  if (!whc_fread (m_Handle, pBuffer, size))
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+  if (!whf_read (m_Handle, pBuffer, size))
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 void
 WFile::Write (const uint8_t* pBuffer, uint_t size)
 {
-  if (!whc_fwrite (m_Handle, pBuffer, size))
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+  if (!whf_write (m_Handle, pBuffer, size))
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 void
 WFile::Seek (const int64_t where, const int whence)
 {
-  if (!whc_fseek (m_Handle, where, whence))
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+  if (!whf_seek (m_Handle, where, whence))
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 uint64_t WFile::Tell ()
 {
   uint64_t position;
 
-  if (!whc_ftell (m_Handle, &position))
-    throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
+  if (!whf_tell (m_Handle, &position))
+    throw WFileException (NULL, _EXTRA(whf_last_error ()));
 
   return position;
 }
@@ -85,16 +85,16 @@ uint64_t WFile::Tell ()
 void
 WFile::Sync ()
 {
-  if (!whc_fsync (m_Handle))
-    throw WFileException (NULL,_EXTRA(whc_fgetlasterror ()));
+  if (!whf_sync (m_Handle))
+    throw WFileException (NULL,_EXTRA(whf_last_error ()));
 }
 
 uint64_t WFile::GetSize () const
 {
   uint64_t size;
 
-  if (!whc_ftellsize (m_Handle, &size))
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+  if (!whf_tell_size (m_Handle, &size))
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 
   return size;
 }
@@ -102,8 +102,8 @@ uint64_t WFile::GetSize () const
 void
 WFile::SetSize (const uint64_t size)
 {
-  if (!whc_fsetsize (m_Handle, size))
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+  if (!whf_set_size (m_Handle, size))
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 void
@@ -111,12 +111,12 @@ WFile::Close ()
 {
   assert (m_Handle != 0);
 
-  if (whc_fclose (m_Handle))
+  if (whf_close (m_Handle))
     m_Handle = 0;
   else
     {
       m_Handle = 0;
-      throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+      throw WFileException (NULL, _EXTRA (whf_last_error ()));
     }
 }
 
@@ -128,9 +128,9 @@ WFile::operator= (const WFile &rSource)
 
   Close(); // Close the old handler
 
-  m_Handle = whc_fdup (rSource.m_Handle);
+  m_Handle = whf_dup (rSource.m_Handle);
   if (m_Handle == 0)
-    throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
+    throw WFileException (NULL, _EXTRA (whf_last_error ()));
 
   return *this;
 }

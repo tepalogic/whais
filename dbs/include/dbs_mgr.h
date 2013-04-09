@@ -64,8 +64,8 @@ public:
 struct DBSSettings
 {
   DBSSettings ()
-    : m_WorkDir (whc_get_current_directory ()),
-      m_TempDir (whc_get_current_directory ()),
+    : m_WorkDir (whf_current_dir ()),
+      m_TempDir (whf_current_dir ()),
       m_MaxFileSize (DEFAULT_MAX_FILE_SIZE),
       m_TableCacheBlkSize (DEFAULT_TABLE_CACHE_BLK_SIZE),
       m_TableCacheBlkCount (DEFAULT_TABLE_CACHE_BLK_COUNT),

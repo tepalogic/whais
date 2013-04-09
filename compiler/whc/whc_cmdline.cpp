@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whc_cmdline.h"
 
+using namespace whisper;
+
 static inline bool
 isStrEqual (const char* str1, const char* str2)
 {
@@ -133,7 +135,7 @@ WhcCmdLineParser::DisplayUsage () const
   using namespace std;
 
   unsigned int ver_maj, ver_min;
-  whc_get_libver (&ver_maj, &ver_min);
+  wh_get_libver (&ver_maj, &ver_min);
 
   cout << "Whisper Compiler ver. " << ver_maj << '.' << ver_min;
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl

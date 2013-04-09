@@ -212,7 +212,7 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
       if (unit != 0)
         append_int_to_str (fileName, unit);
 
-      if (!whc_fremove (fileName.c_str ()))
+      if (!whf_remove (fileName.c_str ()))
         throw WFileContainerException (NULL, _EXTRA (WFileContainerException::FILE_OS_IO_ERROR));
 
       m_FilesHandles.pop_back ();
@@ -417,9 +417,9 @@ TempContainer::FillCache (uint64_t position)
     {
       uint64_t curentId;
 
-      sm_Sync.Enter ();
-      curentId = sm_TemporalsCount++;
-      sm_Sync.Leave ();
+      smSync.Enter ();
+      curentId = smTemporalsCount++;
+      smSync.Leave ();
 
       assert (m_CacheStartPos == 0);
       assert (m_CacheEndPos == m_CacheSize);
@@ -446,11 +446,14 @@ TempContainer::FillCache (uint64_t position)
     {
       if (m_DirtyCache)
         {
-          m_FileContainer->Write (m_CacheStartPos, m_CacheEndPos - m_CacheStartPos, m_Cache.get ());
+          m_FileContainer->Write (m_CacheStartPos,
+                                  m_CacheEndPos - m_CacheStartPos,
+                                  m_Cache.get ());
           m_DirtyCache = false;
         }
 
-      const uint_t toRead = MIN (m_CacheSize, m_FileContainer->Size() - position);
+      const uint_t toRead = MIN (m_CacheSize,
+                                 m_FileContainer->Size() - position);
 
       m_FileContainer->Read (position, toRead, m_Cache.get ());
       m_CacheStartPos = position;
@@ -458,5 +461,5 @@ TempContainer::FillCache (uint64_t position)
     }
 }
 
-uint64_t      TempContainer::sm_TemporalsCount = 0;
-WSynchronizer TempContainer::sm_Sync;
+uint64_t      TempContainer::smTemporalsCount = 0;
+WSynchronizer TempContainer::smSync;

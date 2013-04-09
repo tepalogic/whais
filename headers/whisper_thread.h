@@ -30,6 +30,8 @@ extern "C"
 {
 #endif
 
+typedef void (*WH_THREAD_ROUTINE) (void*);
+
 uint_t
 wh_sync_init (WH_SYNC* pSync);
 
@@ -41,8 +43,6 @@ wh_sync_enter (WH_SYNC* pSync);
 
 uint_t
 wh_sync_leave (WH_SYNC* pSync);
-
-typedef void (*WH_THREAD_ROUTINE) (void*);
 
 uint_t
 wh_thread_create (WH_THREAD*        pThread,

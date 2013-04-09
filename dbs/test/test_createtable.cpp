@@ -62,7 +62,7 @@ test_for_no_args (I_DBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.GetExtra() == DBSException::INVALID_PARAMETERS)
+    if (e.Extra() == DBSException::INVALID_PARAMETERS)
       result = true;
   }
 
@@ -79,7 +79,7 @@ test_for_no_args (I_DBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.GetExtra() == DBSException::INVALID_PARAMETERS)
+    if (e.Extra() == DBSException::INVALID_PARAMETERS)
       result = true;
     else
       result = false;
@@ -107,7 +107,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.GetExtra () == DBSException::FIELD_TYPE_INVALID)
+    if (e.Extra () == DBSException::FIELD_TYPE_INVALID)
       result = true;
   }
 
@@ -122,7 +122,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.GetExtra () == DBSException::FIELD_NAME_INVALID)
+    if (e.Extra () == DBSException::FIELD_NAME_INVALID)
       result = true;
     else
       result = false;
@@ -145,7 +145,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.GetExtra () == DBSException::FIELD_NAME_DUPLICATED)
+    if (e.Extra () == DBSException::FIELD_NAME_DUPLICATED)
       result = true;
     else
       result = false;
@@ -363,6 +363,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "T";
 #endif

@@ -901,6 +901,6 @@ Session::DefineProcedure (const uint8_t*      pName,
 }
 
 #if  defined (ENABLE_MEMORY_TRACE) && defined (USE_INTERP_SHL)
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "PRIMA";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "PRIMA";
 #endif

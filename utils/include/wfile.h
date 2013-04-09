@@ -27,7 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-class EXCEP_SHL WFileException : public WException
+namespace whisper
+{
+
+class EXCEP_SHL WFileException : public Exception
 {
 public:
   WFileException (const char* pMessage,
@@ -35,7 +38,7 @@ public:
                   uint32_t      line,
                   uint32_t      extra);
 
-  virtual WException*     Clone () const;
+  virtual Exception*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
   virtual const char*   Description () const;
 };
@@ -59,7 +62,9 @@ public:
   WFile&   operator= (const WFile&);
 
 private:
-  WH_FILE_HND m_Handle;
+  WH_FILE m_Handle;
 };
+
+} //namespace whisper
 
 #endif /* WFILE_H_ */

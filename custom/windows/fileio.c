@@ -31,13 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "whisper_fileio.h"
 
-WH_FILE_HND
-whc_fopen (const char* pFileName, uint_t mode)
+WH_FILE
+whf_open (const char* pFileName, uint_t mode)
 {
   DWORD       dwDesiredAccess = 0;
   DWORD       dwCreation      = 0;
   DWORD       dwFlagsAndAttr  = 0;
-  WH_FILE_HND result;
+  WH_FILE result;
 
   if (mode & WHC_FILECREATE_NEW)
     dwCreation |= CREATE_NEW;
@@ -63,10 +63,10 @@ whc_fopen (const char* pFileName, uint_t mode)
   return result;
 }
 
-WH_FILE_HND
-whc_fdup (WH_FILE_HND f_hnd)
+WH_FILE
+whf_dup (WH_FILE f_hnd)
 {
-  WH_FILE_HND result = INVALID_HANDLE_VALUE;
+  WH_FILE result = INVALID_HANDLE_VALUE;
 
   DuplicateHandle(GetCurrentProcess(),
                   f_hnd,
@@ -80,7 +80,7 @@ whc_fdup (WH_FILE_HND f_hnd)
 }
 
 bool_t
-whc_fseek (WH_FILE_HND f_hnd, int64_t where, int whence)
+whf_seek (WH_FILE f_hnd, int64_t where, int whence)
 {
   LARGE_INTEGER sliWhere;
 
@@ -108,7 +108,7 @@ whc_fseek (WH_FILE_HND f_hnd, int64_t where, int whence)
 }
 
 bool_t
-whc_fread (WH_FILE_HND f_hnd, uint8_t* pBuffer, uint_t size)
+whf_read (WH_FILE f_hnd, uint8_t* pBuffer, uint_t size)
 {
   bool_t result = TRUE;
   uint_t actual_count = 0;
@@ -133,7 +133,7 @@ whc_fread (WH_FILE_HND f_hnd, uint8_t* pBuffer, uint_t size)
 }
 
 bool_t
-whc_fwrite (WH_FILE_HND f_hnd, const uint8_t* pBuffer, uint_t size)
+whf_write (WH_FILE f_hnd, const uint8_t* pBuffer, uint_t size)
 {
 
   bool_t result     = TRUE;
@@ -162,7 +162,7 @@ whc_fwrite (WH_FILE_HND f_hnd, const uint8_t* pBuffer, uint_t size)
 }
 
 bool_t
-whc_ftell (WH_FILE_HND f_hnd, uint64_t* pOutSize)
+whf_tell (WH_FILE f_hnd, uint64_t* pOutSize)
 {
 
   const LARGE_INTEGER sTemp = { 0, };
@@ -177,41 +177,41 @@ whc_ftell (WH_FILE_HND f_hnd, uint64_t* pOutSize)
 }
 
 bool_t
-whc_fsync (WH_FILE_HND f_hnd)
+whf_sync (WH_FILE f_hnd)
 {
   const HANDLE handler = (HANDLE) f_hnd;
   return FlushFileBuffers (handler);
 }
 
 bool_t
-whc_ftellsize (WH_FILE_HND f_hnd, uint64_t* pOutSize)
+whf_tell_size (WH_FILE f_hnd, uint64_t* pOutSize)
 {
   return GetFileSizeEx (f_hnd, (LARGE_INTEGER*) pOutSize);
 }
 
 bool_t
-whc_fsetsize (WH_FILE_HND f_hnd, uint64_t newSize)
+whf_set_size (WH_FILE f_hnd, uint64_t newSize)
 {
-  if (whc_fseek (f_hnd, newSize, WHC_SEEK_BEGIN)
+  if (whf_seek (f_hnd, newSize, WHC_SEEK_BEGIN)
       && (SetEndOfFile (f_hnd) != 0))
     return TRUE;
   return FALSE;
 }
 
 bool_t
-whc_fclose (WH_FILE_HND f_hnd)
+whf_close (WH_FILE f_hnd)
 {
   return CloseHandle (f_hnd);
 }
 
 uint32_t
-whc_fgetlasterror ()
+whf_last_error ()
 {
   return GetLastError ();
 }
 
 bool_t
-whc_ferrtostrs (uint64_t error_code, char* str, uint_t strSize)
+whf_err_to_str (uint64_t error_code, char* str, uint_t strSize)
 {
   return FormatMessage (
               FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -222,25 +222,25 @@ whc_ferrtostrs (uint64_t error_code, char* str, uint_t strSize)
 }
 
 bool_t
-whc_fremove (const char *pFileName)
+whf_remove (const char *pFileName)
 {
   return DeleteFile (pFileName);
 }
 
 const char*
-whc_get_directory_delimiter ()
+whf_dir_delim ()
 {
   return "\\";
 }
 
 const char*
-whc_get_current_directory ()
+whf_current_dir ()
 {
   return ".\\";
 }
 
 bool_t
-whc_is_path_absolute (const char* pPath)
+whf_is_absolute (const char* pPath)
 {
   assert (pPath != NULL);
   return (pPath[1] == ':');

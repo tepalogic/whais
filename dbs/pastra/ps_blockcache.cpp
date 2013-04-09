@@ -26,8 +26,9 @@
 
 #include "ps_blockcache.h"
 
-using namespace pastra;
 using namespace std;
+using namespace pastra;
+using namespace whisper;
 
 BlockCache::BlockCache () :
     m_pManager (NULL),

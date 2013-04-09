@@ -61,7 +61,7 @@ main (int argc, char **argv)
   }
   catch (WFileException& e)
   {
-    std::cerr << "File IO error " << e.GetExtra ();
+    std::cerr << "File IO error " << e.Extra ();
     if (e.Message () != NULL)
       std::cerr << ": " << e.Message () << std::endl;
     else
@@ -71,11 +71,11 @@ main (int argc, char **argv)
   catch (WodCmdLineException& e)
   {
     std::cerr << e.Message () << std::endl;
-  } catch (WException & e)
+  } catch (Exception & e)
   {
     std::cerr << "error : " << e.Message () << std::endl;
-    std::cerr << "file: " << e.GetFile() << " : " << e.GetLine() << std::endl;
-    std::cerr << "Extra: " << e.GetExtra() << std::endl;
+    std::cerr << "file: " << e.File() << " : " << e.Line() << std::endl;
+    std::cerr << "Extra: " << e.Extra() << std::endl;
 
     retCode = -1;
   }
@@ -94,7 +94,7 @@ main (int argc, char **argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "WOD";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "WOD";
 #endif
 

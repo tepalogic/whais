@@ -221,7 +221,7 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
   hnd->data[FRAME_ENCTYPE_OFF] = hnd->cipher;
   store_le_int32 (hnd->expectedFrameId++, &hnd->data[FRAME_ID_OFF]);
 
-  status = wh_socket_write (hnd->socket, hnd->data, frameSize);
+  status = whs_write (hnd->socket, hnd->data, frameSize);
   if (status != WOP_OK)
     return WENC_OS_ERROR (status);
 
@@ -238,7 +238,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
     {
       uint_t chunkSize = FRAME_HDR_SIZE - frameRead;
 
-      const uint32_t status  = wh_socket_read (hnd->socket,
+      const uint32_t status  = whs_read (hnd->socket,
                                                &hnd->data [frameRead],
                                                &chunkSize);
       if (status != WOP_OK)
@@ -267,7 +267,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
   while (frameRead < frameSize)
     {
       uint_t chunkSize = frameSize - frameRead;
-      const uint32_t status = wh_socket_read (hnd->socket,
+      const uint32_t status = whs_read (hnd->socket,
                                               &hnd->data [frameRead],
                                               &chunkSize);
       if (status != WOP_OK)
@@ -386,7 +386,7 @@ recieve_failure:
 
   hnd->lastCmdRespReceived      = CMD_INVALID_RSP;
 
-  wh_socket_close (hnd->socket);
+  whs_close (hnd->socket);
   hnd->socket = INVALID_SOCKET;
 
   return cs;
@@ -432,7 +432,7 @@ WConnect (const char* const    host,
   result->data       = tempBuffer;
   result->dataSize   = sizeof (tempBuffer);
 
-  if ((status = wh_socket_client (host, port, &result->socket)) != WCS_OK)
+  if ((status = whs_create_client (host, port, &result->socket)) != WCS_OK)
     {
       status = WENC_OS_ERROR (status);
       goto fail_ret;
@@ -533,7 +533,7 @@ fail_ret:
         mem_free (result->data);
 
       if (result->socket != INVALID_SOCKET)
-        wh_socket_close (result->socket);
+        whs_close (result->socket);
 
       mem_free (result);
     }
@@ -553,7 +553,7 @@ WClose (W_CONNECTOR_HND hnd)
     {
       set_data_size (hnd_, 0);
       send_command (hnd_, CMD_CLOSE_CONN);
-      wh_socket_close (hnd_->socket);
+      whs_close (hnd_->socket);
     }
 
   if (hnd_->data != NULL)

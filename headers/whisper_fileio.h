@@ -44,56 +44,57 @@ extern "C"
 {
 #endif
 
-WH_FILE_HND
-whc_fopen (const char* pFileName, uint_t mode);
+WH_FILE
+whf_open (const char* file, uint_t mode);
 
-WH_FILE_HND
-whc_fdup (WH_FILE_HND f_hnd);
-
-bool_t
-whc_fread (WH_FILE_HND f_hnd, uint8_t* pBuffer, uint_t size);
+WH_FILE
+whf_dup (WH_FILE hnd);
 
 bool_t
-whc_fwrite (WH_FILE_HND f_hnd, const uint8_t* pBuffer, uint_t size);
+whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size);
 
 bool_t
-whc_fseek (WH_FILE_HND f_hnd, int64_t where, int whence);
+whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size);
 
 bool_t
-whc_ftell (WH_FILE_HND f_hnd, uint64_t* pOutPosition);
+whf_seek (WH_FILE hnd, int64_t where, int whence);
 
 bool_t
-whc_fsync (WH_FILE_HND f_hnd);
+whf_tell (WH_FILE hnd, uint64_t* outPosition);
 
 bool_t
-whc_ftellsize (WH_FILE_HND f_hnd, uint64_t* pOutSize);
+whf_sync (WH_FILE hnd);
 
 bool_t
-whc_fsetsize (WH_FILE_HND, uint64_t newSize);
+whf_tell_size (WH_FILE hnd, uint64_t* outSize);
 
 bool_t
-whc_fclose (WH_FILE_HND f_hnd);
+whf_set_size (WH_FILE, uint64_t newSize);
+
+bool_t
+whf_close (WH_FILE hnd);
 
 uint32_t
-whc_fgetlasterror ();
+whf_last_error ();
 
 bool_t
-whc_ferrtostrs (uint64_t errorCode, char* str, uint_t strSize);
+whf_err_to_str (uint64_t errorCode, char* str, uint_t strSize);
 
 bool_t
-whc_fremove (const char* pFileName);
+whf_remove (const char* file);
 
 const char*
-whc_get_directory_delimiter ();
+whf_dir_delim ();
 
 const char*
-whc_get_current_directory ();
+whf_current_dir ();
 
 bool_t
-whc_is_path_absolute (const char* pPath);
+whf_is_absolute (const char* path);
 
 #ifdef __cplusplus
-} /* extern C++ */
+} /* extern 'C' */
 #endif
 
-#endif                                /* WHISPER_FILEIO_H_ */
+#endif /* WHISPER_FILEIO_H_ */
+

@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern int yyparse (struct ParserState*);
 
 WHC_HANDLER
-whc_hnd_create (const char*       pBuffer,
+wh_hnd_create (const char*       pBuffer,
                 unsigned          bufferSize,
                 WHC_MESSENGER     messenger,
                 WHC_MESSENGER_ARG messengerContext)
@@ -58,7 +58,7 @@ whc_hnd_create (const char*       pBuffer,
       /* begin the compilation of the buffer */
       if (yyparse (pState) != 0)
         {
-          whc_hnd_destroy ((WHC_HANDLER) pState);
+          wh_hnd_destroy ((WHC_HANDLER) pState);
           pState = NULL;
         }
     }
@@ -67,7 +67,7 @@ whc_hnd_create (const char*       pBuffer,
 }
 
 void
-whc_hnd_destroy (WHC_HANDLER hnd)
+wh_hnd_destroy (WHC_HANDLER hnd)
 {
   struct ParserState* pState = (struct ParserState*)hnd;
 
@@ -78,7 +78,7 @@ whc_hnd_destroy (WHC_HANDLER hnd)
 }
 
 unsigned int
-whc_get_globals_count (WHC_HANDLER hnd)
+wh_get_globals_count (WHC_HANDLER hnd)
 {
   struct ParserState* pState = (struct ParserState*)hnd;
 
@@ -104,7 +104,7 @@ get_var_from_stmt (const struct Statement* pStmt, unsigned int item)
 }
 
 unsigned int
-whc_get_global (WHC_HANDLER      hnd,
+wh_get_global (WHC_HANDLER      hnd,
                 unsigned int     globalId,
                 WHC_GLBVAR_DESC* pOutDescript)
 {
@@ -127,7 +127,7 @@ whc_get_global (WHC_HANDLER      hnd,
 }
 
 unsigned int
-whc_get_procs_count (WHC_HANDLER hnd)
+wh_get_procs_count (WHC_HANDLER hnd)
 {
   struct ParserState* pState = (struct ParserState*)hnd;
 
@@ -135,11 +135,11 @@ whc_get_procs_count (WHC_HANDLER hnd)
 }
 
 unsigned int
-whc_get_proc (WHC_HANDLER    hnd,
+wh_get_proc (WHC_HANDLER    hnd,
               unsigned int   procId,
               WHC_PROC_DESC* pOutDesc)
 {
-  const struct Statement* pProc  = (const struct Statement*)whc_get_proc_hnd (hnd, procId);
+  const struct Statement* pProc  = (const struct Statement*)wh_get_proc_hnd (hnd, procId);
 
   if (pProc == NULL)
     return 0; /* Not found */
@@ -158,7 +158,7 @@ whc_get_proc (WHC_HANDLER    hnd,
 }
 
 WHC_PROC_HANDLER
-whc_get_proc_hnd (WHC_HANDLER hnd, unsigned int procId)
+wh_get_proc_hnd (WHC_HANDLER hnd, unsigned int procId)
 {
   struct ParserState*     pState     = (struct ParserState*)hnd;
   const struct Statement* pProc      = NULL;
@@ -182,14 +182,14 @@ whc_get_proc_hnd (WHC_HANDLER hnd, unsigned int procId)
 }
 
 void
-whc_release_proc_hnd (WHC_HANDLER hnd, WHC_PROC_HANDLER h_proc)
+wh_release_proc_hnd (WHC_HANDLER hnd, WHC_PROC_HANDLER h_proc)
 {
   /* Do nothing for now! */
   return;
 }
 
 const unsigned char *
-whc_get_proc_rettype (WHC_HANDLER hnd, WHC_PROC_HANDLER hProc)
+wh_get_proc_rettype (WHC_HANDLER hnd, WHC_PROC_HANDLER hProc)
 {
   struct ParserState* const pState     = (struct ParserState*) hnd;
   struct Statement* const   pProc      = (struct Statement*) hProc;
@@ -203,7 +203,7 @@ whc_get_proc_rettype (WHC_HANDLER hnd, WHC_PROC_HANDLER hProc)
 }
 
 const unsigned char *
-whc_get_local_type (WHC_HANDLER      hnd,
+wh_get_local_type (WHC_HANDLER      hnd,
                     WHC_PROC_HANDLER hProc,
                     unsigned int     localId)
 {
@@ -228,7 +228,7 @@ whc_get_local_type (WHC_HANDLER      hnd,
 }
 
 unsigned int
-whc_get_typedec_pool (WHC_HANDLER hnd, const unsigned char** pOutPTypes)
+wh_get_typedec_pool (WHC_HANDLER hnd, const unsigned char** pOutPTypes)
 {
 
   struct ParserState* const        pState       = (struct ParserState*) hnd;
@@ -244,7 +244,7 @@ whc_get_typedec_pool (WHC_HANDLER hnd, const unsigned char** pOutPTypes)
 }
 
 unsigned int
-whc_get_const_area (WHC_HANDLER hnd, const unsigned char** pOutPConsts)
+wh_get_const_area (WHC_HANDLER hnd, const unsigned char** pOutPConsts)
 {
   struct ParserState* const        pState     = (struct ParserState*) hnd;
   const struct Statement* const    pGlbStm    = &pState->globalStmt;
@@ -258,14 +258,14 @@ whc_get_const_area (WHC_HANDLER hnd, const unsigned char** pOutPConsts)
 }
 
 void
-whc_get_libver (unsigned int* pOutMajor, unsigned int* pOutMinor)
+wh_get_libver (unsigned int* pOutMajor, unsigned int* pOutMinor)
 {
   *pOutMajor = 0;
   *pOutMinor = 1;
 }
 
 void
-whc_get_lang_ver (unsigned int* pOutMajor, unsigned int* pOutMinor)
+wh_get_lang_ver (unsigned int* pOutMajor, unsigned int* pOutMinor)
 {
   *pOutMajor = 1;
   *pOutMinor = 0;

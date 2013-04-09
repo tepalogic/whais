@@ -30,6 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMPILEDUNIT_H_
 #define COMPILEDUNIT_H_
 
+namespace whisper
+{
+
 class COMPILER_SHL WICompiledUnit
 {
 public:
@@ -66,14 +69,14 @@ public:
   virtual bool_t         IsProcExternal (uint_t item_proc) = 0;
 };
 
-class COMPILER_SHL WCompiledUnitException : public WException
+class COMPILER_SHL WCompiledUnitException : public Exception
 {
 public:
   WCompiledUnitException (const char* pMessage,
                           const char* pFile,
                           uint32_t      line,
                           uint32_t      extra)
-    : WException (pMessage, pFile, line, extra)
+    : Exception (pMessage, pFile, line, extra)
   {
   }
 
@@ -81,7 +84,7 @@ public:
   {
   };
 
-  virtual WException*     Clone () const
+  virtual Exception*     Clone () const
   {
     return new WCompiledUnitException (*this);
   }
@@ -192,5 +195,7 @@ private:
   std::auto_ptr<uint8_t*> m_ProcData;
 #pragma warning (default: 4251)
 };
+
+} //namespace whisper
 
 #endif /* COMPILEDUNIT_H_ */

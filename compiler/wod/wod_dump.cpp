@@ -338,7 +338,7 @@ wod_dump_code (const uint8_t* pCode,
       char        operand1[MAX_OP_STRING];
       char        operand2[MAX_OP_STRING];
       enum W_OPCODE opcode     = W_NA;
-      uint_t        instr_size = whc_decode_opcode (pCode, &opcode);
+      uint_t        instr_size = wh_decode_opcode (pCode, &opcode);
 
       instr_size += wod_decode_table[opcode] (pCode + instr_size,
                                               operand1,

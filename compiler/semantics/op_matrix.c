@@ -389,7 +389,7 @@ w_opcode_decode (const uint8_t* pCode)
 }
 
 unsigned int
-whc_decode_opcode (const unsigned char* pCode, enum W_OPCODE* const pOutOpcode)
+wh_decode_opcode (const unsigned char* pCode, enum W_OPCODE* const pOutOpcode)
 {
   if (*pCode & SECOND_BYTE_MARK)
     {

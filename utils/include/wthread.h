@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+using namespace whisper;
+
 class EXCEP_SHL WSynchronizer
 {
 public:
@@ -71,14 +73,14 @@ private:
   bool           m_IsEntered;
 };
 
-class EXCEP_SHL WSynchException : public WException
+class EXCEP_SHL WSynchException : public Exception
 {
 public:
   WSynchException (const char* message,
                    const char* file,
                    uint32_t      line,
                    uint32_t      extra);
-  virtual WException*     Clone () const;
+  virtual Exception*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
   virtual const char*   Description () const;
 };
@@ -115,7 +117,7 @@ private:
 
   WH_THREAD_ROUTINE       m_Routine;
   void*                   m_RoutineArgs;
-  WException*             m_Exception;
+  Exception*             m_Exception;
   WH_THREAD               m_ThreadHnd;
   WSynchronizer           m_Sync;
   bool                    m_UnkExceptSignaled;
@@ -128,14 +130,14 @@ private:
 };
 
 
-class EXCEP_SHL WThreadException : public WException
+class EXCEP_SHL WThreadException : public Exception
 {
 public:
   WThreadException (const char* message,
                     const char* file,
                     uint32_t      line,
                     uint32_t      extra);
-  virtual WException*     Clone () const;
+  virtual Exception*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
   virtual const char*   Description () const;
 };

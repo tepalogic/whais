@@ -32,7 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "compiler/wopcodes.h"
 #include "compiler/compiledunit.h"
 
-#include "../../utils/include/wfile.h"
+#include "utils/wfile.h"
+
+using namespace whisper;
 
 void
 wod_dump_header (WFile& rInObj, std::ostream& rOutStream);
@@ -46,21 +48,21 @@ wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutStream);
 void
 wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutStream, bool_t showCode);
 
-class WDumpException : public WException
+class WDumpException : public Exception
 {
 public:
   WDumpException (const char* pMessage,
                   const char* pFile,
                   uint32_t      line,
                   uint32_t      extra)
-    : WException (pMessage, pFile, line, extra)
+    : Exception (pMessage, pFile, line, extra)
   {
   }
   virtual ~ WDumpException ()
   {
   };
 
-  virtual WException*     Clone () const { return new WDumpException (*this); }
+  virtual Exception*     Clone () const { return new WDumpException (*this); }
   virtual EXPCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
   virtual const char*   Description () const
   {

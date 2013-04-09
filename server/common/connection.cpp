@@ -42,11 +42,11 @@ ConnectionException::ConnectionException (const char* pMessage,
                                           const char* pFile,
                                           uint32_t      line,
                                           uint32_t      extra)
-  : WException (pMessage, pFile, line, extra)
+  : Exception (pMessage, pFile, line, extra)
 {
 }
 
-WException*
+Exception*
 ConnectionException::Clone () const
 {
   ConnectionException* pResult = new ConnectionException (*this);

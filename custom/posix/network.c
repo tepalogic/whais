@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 
 bool_t
-wh_init_socks ()
+whs_init ()
 {
   static bool_t _inited = FALSE;
 
@@ -51,7 +51,7 @@ wh_init_socks ()
 }
 
 uint32_t
-wh_socket_client (const char* const        pServer,
+whs_create_client (const char* const        pServer,
                   const char* const        pPort,
                   WH_SOCKET* const           pOutSocket)
 {
@@ -111,7 +111,7 @@ wh_socket_client (const char* const        pServer,
 }
 
 uint32_t
-wh_socket_server (const char* const       pLocalAdress,
+whs_create_server (const char* const       pLocalAdress,
                   const char* const       pPort,
                   const uint_t              listenBackLog,
                   WH_SOCKET* const          pOutSocket)
@@ -179,7 +179,7 @@ wh_socket_server (const char* const       pLocalAdress,
 }
 
 uint32_t
-wh_socket_accept (const WH_SOCKET      sd,
+whs_accept (const WH_SOCKET      sd,
                   WH_SOCKET* const     pConnectSocket)
 {
   int csd = accept (sd, NULL, NULL);
@@ -191,7 +191,7 @@ wh_socket_accept (const WH_SOCKET      sd,
 }
 
 uint32_t
-wh_socket_write (const WH_SOCKET      sd,
+whs_write (const WH_SOCKET      sd,
                  const uint8_t*       pBuffer,
                  const uint_t         count)
 {
@@ -220,7 +220,7 @@ wh_socket_write (const WH_SOCKET      sd,
 }
 
 uint32_t
-wh_socket_read (const WH_SOCKET           sd,
+whs_read (const WH_SOCKET           sd,
                 uint8_t*                  pOutBuffer,
                 uint_t* const             pIOCount)
 {
@@ -248,14 +248,14 @@ wh_socket_read (const WH_SOCKET           sd,
 }
 
 void
-wh_socket_close (const WH_SOCKET sd)
+whs_close (const WH_SOCKET sd)
 {
   shutdown (sd, SHUT_RDWR);
   close (sd);
 }
 
 void
-wh_clean_socks ()
+whs_clean ()
 {
 }
 

@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_optglbs.h"
 
 using namespace std;
+using namespace whisper;
 
 static const uint_t MAX_DECODED_STRING = 256;
 
@@ -211,7 +212,7 @@ CmdLineNextToken (const string& cmdLine, size_t& ioPosition)
 }
 
 void
-printException (ostream& outputStream, const WException& e)
+printException (ostream& outputStream, const Exception& e)
 {
   const VERBOSE_LEVEL level = GetVerbosityLevel ();
 
@@ -232,7 +233,7 @@ printException (ostream& outputStream, const WException& e)
         {
           char errorDesc[MAX_DECODED_STRING];
 
-          whc_ferrtostrs (e.GetExtra (), errorDesc, sizeof errorDesc);
+          whf_err_to_str (e.Extra (), errorDesc, sizeof errorDesc);
           outputStream << errorDesc << endl;
         }
     }
@@ -247,8 +248,8 @@ printException (ostream& outputStream, const WException& e)
 
   if (level >= VL_DEBUG)
     {
-      outputStream << "file: " << e.GetFile () << endl;
-      outputStream << "line: " << e.GetLine () << endl;
+      outputStream << "file: " << e.File () << endl;
+      outputStream << "line: " << e.Line () << endl;
     }
 }
 

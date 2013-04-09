@@ -754,14 +754,15 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
   }
   catch (InterException& e)
   {
-      if (e.GetExtra() == InterException::INVALID_OP_REQ)
+      if (e.Extra() == InterException::INVALID_OP_REQ)
         return WCS_TYPE_MISMATCH;
 
       throw;
   }
   catch (DBSException& e)
   {
-      const uint_t extra = e.GetExtra ();
+      const uint_t extra = e.Extra ();
+
       if (extra == DBSException::FIELD_NOT_FOUND)
         return WCS_INVALID_FIELD;
       else if (extra == DBSException::ARRAY_INDEX_TOO_BIG)

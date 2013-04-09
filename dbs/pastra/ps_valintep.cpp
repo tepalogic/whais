@@ -30,6 +30,7 @@
 
 using namespace std;
 using namespace pastra;
+using namespace whisper;
 
 static const int PS_BOOL_SIZE                = 1;
 static const int PS_CHAR_SIZE                = 4;

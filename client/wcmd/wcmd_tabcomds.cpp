@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_optglbs.h"
 
 using namespace std;
+using namespace whisper;
 
 static const char tableShowDesc[]    = "Describe database's tables.";
 static const char tableShowDescEXt[] =
@@ -255,7 +256,7 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   {
     dbsHnd.AddTable (tableName.c_str (), fields.size (), &(fields.front ()));
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     if (level >= VL_ERROR)
       cout << "Failed to add table: " << tableName << endl;
@@ -300,7 +301,7 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         if (level >= VL_INFO)
           cout << "  ... " << token << endl;
       }
-      catch (const WException& e)
+      catch (const Exception& e)
       {
         if (level >= VL_ERROR)
           cout << "Failed to remove table: " << token << endl;
@@ -370,7 +371,7 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         while (linePos < cmdLine.length ());
       }
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     printException (cout, e);
 
@@ -416,7 +417,7 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     token  = CmdLineNextToken (cmdLine, linePos);
     pTable = &dbsHnd.RetrievePersistentTable (token.c_str ());
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     if (level >= VL_INFO)
       cout << "Failed to open table: " << token << endl;
@@ -452,7 +453,7 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               pTable->CreateFieldIndex (field, NULL, NULL);
           }
       }
-      catch (const WException& e)
+      catch (const Exception& e)
       {
         if (level >= VL_INFO)
           cout << "Failed to create index for field: " << token << endl;
@@ -500,7 +501,7 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     token  = CmdLineNextToken (cmdLine, linePos);
     pTable = &dbsHnd.RetrievePersistentTable (token.c_str ());
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     if (level >= VL_INFO)
       cout << "Failed to open table: " << token << endl;
@@ -532,7 +533,7 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           if (level > VL_INFO)
             cout << "Ignoring field " << token << ".\n";
       }
-      catch (const WException& e)
+      catch (const Exception& e)
       {
         if (level >= VL_INFO)
           cout << "Failed to renove index for field: " << token << endl;

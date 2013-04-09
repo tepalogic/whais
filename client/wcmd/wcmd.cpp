@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_onlinecmds.h"
 
 using namespace std;
+using namespace whisper;
 
 static const char usageDescription[] =
 "\n"
@@ -323,7 +324,7 @@ main (const int argc, char *argv[])
   string        dbDirectory;
 
 
-  if (! wh_init_socks ())
+  if (! whs_init ())
     {
       cerr << "Couldn't not init the network socket framework\n";
       return ENOTSOCK;
@@ -491,10 +492,10 @@ main (const int argc, char *argv[])
   {
     InitDBS ();
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     printException (cout, e);
-    return e.GetExtra ();
+    return e.Extra ();
   }
   catch (...)
   {
@@ -538,11 +539,11 @@ main (const int argc, char *argv[])
     else
       RemoveDB ();
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     printException (cout, e);
 
-    result = e.GetExtra ();
+    result = e.Extra ();
   }
   catch (...)
   {
@@ -554,10 +555,10 @@ main (const int argc, char *argv[])
   {
     StopDBS ();
   }
-  catch (const WException& e)
+  catch (const Exception& e)
   {
     printException (cout, e);
-    result = (result != 0) ? result : e.GetExtra ();
+    result = (result != 0) ? result : e.Extra ();
   }
   catch (...)
   {
@@ -565,12 +566,12 @@ main (const int argc, char *argv[])
     result = (result != 0)  ? result : 0xFF;
   }
 
-  wh_clean_socks ();
+  whs_clean ();
 
   return result;
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-uint32_t WMemoryTracker::sm_InitCount = 0;
-const char* WMemoryTracker::sm_Module = "WCMD";
+uint32_t WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule = "WCMD";
 #endif

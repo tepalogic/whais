@@ -148,21 +148,21 @@ public:
 
   WMemoryTracker ()
   {
-    sm_InitCount++;
+    smInitCount++;
   }
 
   ~WMemoryTracker ()
   {
-    if (sm_InitCount == 0)
+    if (smInitCount == 0)
       {
         int a = 1;
         int b = 0;
 
-        a /= b; //Make sure we scream loud enough.
+        a /= b; //If you are to crash make it loud.
       }
 
 
-    if ((--sm_InitCount & 0x7FFFFFFF) == 0)
+    if ((--smInitCount & 0x7FFFFFFF) == 0)
       PrintMemoryStatistics ();
   }
 
@@ -187,14 +187,15 @@ public:
   static void PrintMemResume (const bool print)
   {
     if (print)
-      sm_InitCount |= 0x80000000;
+      smInitCount |= 0x80000000;
+
     else
-      sm_InitCount &= 0x7FFFFFFF;
+      smInitCount &= 0x7FFFFFFF;
   }
 
   static bool PrintMemResume ()
   {
-    return (sm_InitCount & 0x80000000) != 0;
+    return (smInitCount & 0x80000000) != 0;
   }
 
 private:
@@ -203,7 +204,7 @@ private:
     if ((GetCurrentMemoryUsage () == 0) && (! PrintMemResume ()))
       return ;
 
-    std::cout << '(' << sm_Module << ") ";
+    std::cout << '(' << smModule << ") ";
     if (GetCurrentMemoryUsage () != 0)
       {
         std::cout << "MEMORY: FAILED\n";
@@ -215,8 +216,8 @@ private:
     std::cout << "Memory in use: " << GetCurrentMemoryUsage () << " bytes.\n";
   }
 
-  static       uint32_t sm_InitCount;
-  static const char*  sm_Module;
+  static uint32_t       smInitCount;
+  static const char*    smModule;
 };
 
 static WMemoryTracker __One_Hidden_Static_For_Compiling_Unit__;

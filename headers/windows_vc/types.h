@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if ! (defined(YYTOKENTYPE) || defined (YYBISON))
 /* Avoid some type name redefinition */
 #include "windows.h"
-typedef HANDLE              WH_FILE_HND;
+typedef HANDLE              WH_FILE;
 typedef CRITICAL_SECTION    WH_SYNC;
 typedef HANDLE              WH_THREAD;
 typedef SOCKET              WH_SOCKET;

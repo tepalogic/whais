@@ -29,14 +29,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-class DBS_SHL DBSException : public WException
+namespace whisper
+{
+
+class DBS_SHL DBSException : public Exception
 {
 public:
   DBSException (const char* pMessage,
                 const char* pFile,
                 uint32_t uLine,
                 uint32_t extra)
-    : WException (pMessage, pFile, uLine, extra)
+    : Exception (pMessage, pFile, uLine, extra)
   {
   }
 
@@ -78,7 +81,7 @@ public:
     INVALID_UTF8_VALUE,
   };
 
-  virtual WException* Clone () const
+  virtual Exception* Clone () const
     {
       return new DBSException (*this);
     }
@@ -89,7 +92,7 @@ public:
 
   virtual const char* Description () const
     {
-      switch (GetExtra ())
+      switch (Extra ())
         {
         case OPER_NOT_SUPPORTED:
           return "Operation not supported.";
@@ -151,7 +154,10 @@ public:
           assert (false);
           return "Unknown exception code.";
         }
+      return NULL;
     }
 };
+
+} //namespace whisper
 
 #endif /* DBS_EXCEPTION_H_ */

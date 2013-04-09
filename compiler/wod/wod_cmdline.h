@@ -29,7 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-
+namespace whisper
+{
 
 class WodCmdLineParser
 {
@@ -60,14 +61,14 @@ private:
 
 };
 
-class WodCmdLineException : public WException
+class WodCmdLineException : public Exception
 {
 public:
   WodCmdLineException (const char* pMessage,
                        const char* pFile,
                        uint32_t      line,
                        uint32_t      extra)
-    : WException (pMessage, pFile, line, extra)
+    : Exception (pMessage, pFile, line, extra)
   {
   }
 
@@ -75,7 +76,7 @@ public:
   {
   };
 
-  virtual WException*     Clone () const
+  virtual Exception* Clone () const
   {
     return new WodCmdLineException (*this);
   }
@@ -86,5 +87,7 @@ public:
     return "Invalid command line.";
   }
 };
+
+} //namespace whisper
 
 #endif /* WOD_CMDLINE_H_ */
