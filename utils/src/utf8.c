@@ -24,8 +24,8 @@
 
 #include "utf8.h"
 
-D_UINT
-get_utf8_char_size (D_UINT8 firstUtf8Byte)
+uint_t
+get_utf8_char_size (uint8_t firstUtf8Byte)
 {
   if ((firstUtf8Byte & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
     return 1;
@@ -43,8 +43,8 @@ get_utf8_char_size (D_UINT8 firstUtf8Byte)
   return 0;
 }
 
-D_UINT
-decode_utf8_char (const D_UINT8 *pSource, D_UINT32* pCh)
+uint_t
+decode_utf8_char (const uint8_t *pSource, uint32_t* pCh)
 {
   *pCh = 0;
   if ((pSource[0] & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
@@ -96,8 +96,8 @@ decode_utf8_char (const D_UINT8 *pSource, D_UINT32* pCh)
   return 0;
 }
 
-D_UINT
-encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
+uint_t
+encode_utf8_char (uint32_t ch, uint8_t *pDest)
 {
   if (ch < 0x80)
     {
@@ -148,8 +148,8 @@ encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest)
   return 0;
 }
 
-D_UINT
-utf8_encode_size (D_UINT32 ch)
+uint_t
+utf8_encode_size (uint32_t ch)
 {
   if (ch < 0x80)
     return 1;
@@ -167,13 +167,13 @@ utf8_encode_size (D_UINT32 ch)
   return 0;
 }
 
-D_INT
-utf8_strlen (const D_UINT8* pSource)
+int
+utf8_strlen (const uint8_t* pSource)
 {
-  D_INT result = 0;
+  int result = 0;
   while (*pSource != 0)
     {
-      D_UINT chSize = get_utf8_char_size (pSource[0]);
+      uint_t chSize = get_utf8_char_size (pSource[0]);
       if (chSize == 0)
         return -1;
 

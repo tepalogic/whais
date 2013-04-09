@@ -61,27 +61,27 @@ struct ServerSettings
   {
   }
 
-  D_UINT      m_MaxConnections;
-  D_UINT      m_MaxFrameSize;
-  D_UINT      m_TableCacheBlockSize;
-  D_UINT      m_TableCacheBlockCount;
-  D_UINT      m_VLBlockSize;
-  D_UINT      m_VLBlockCount;
-  D_UINT      m_TempValuesCache;
+  uint_t      m_MaxConnections;
+  uint_t      m_MaxFrameSize;
+  uint_t      m_TableCacheBlockSize;
+  uint_t      m_TableCacheBlockCount;
+  uint_t      m_VLBlockSize;
+  uint_t      m_VLBlockCount;
+  uint_t      m_TempValuesCache;
   std::string m_WorkDirectory;
   std::string m_TempDirectory;
   std::string m_LogFile;
 
   std::vector<ListenEntry> m_Listens;
 
-  D_UINT8     m_Cipher;
+  uint8_t     m_Cipher;
   bool        m_ShowDebugLog;
 
 };
 
 struct DBSDescriptors
 {
-  DBSDescriptors (const D_UINT configLine)
+  DBSDescriptors (const uint_t configLine)
     : m_ConfigLine (configLine),
       m_DbsName (),
       m_DbsDirectory (),
@@ -93,7 +93,7 @@ struct DBSDescriptors
   {
   }
 
-  D_UINT                   m_ConfigLine;
+  uint_t                   m_ConfigLine;
   std::string              m_DbsName;
   std::string              m_DbsDirectory;
   std::string              m_DbsLogFile;
@@ -115,18 +115,18 @@ const ServerSettings&
 GetAdminSettings ();
 
 bool
-SeekAtConfigurationSection (std::ifstream& config, D_UINT& oConfigLine);
+SeekAtConfigurationSection (std::ifstream& config, uint_t& oConfigLine);
 
 bool
-FindNextContextSection (std::ifstream& config, D_UINT& ioConfigLine);
+FindNextContextSection (std::ifstream& config, uint_t& ioConfigLine);
 
 bool
-ParseConfigurationSection (std::ifstream& config, D_UINT& ioConfigLine);
+ParseConfigurationSection (std::ifstream& config, uint_t& ioConfigLine);
 
 bool
 ParseContextSection (I_Logger&        log,
                      std::ifstream&   config,
-                     D_UINT&          ioConfigLine,
+                     uint_t&          ioConfigLine,
                      DBSDescriptors&  output);
 
 bool

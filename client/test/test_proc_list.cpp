@@ -14,7 +14,7 @@ using namespace std;
 
 struct ProcedureEntry
 {
-  const D_CHAR* const name;
+  const char* const name;
   bool                visited;
 };
 
@@ -98,13 +98,13 @@ ProcedureEntry _procedures[] =
     };
 
 static bool
-test_proc_name_match (const D_CHAR* proc_name)
+test_proc_name_match (const char* proc_name)
 {
-  const D_CHAR suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-  D_CHAR buffer[1024];
-  const D_UINT glbsCount = sizeof (_procedures)/sizeof (_procedures[0]);
+  const char suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  char buffer[1024];
+  const uint_t glbsCount = sizeof (_procedures)/sizeof (_procedures[0]);
 
-  for (D_UINT i = 0; i < glbsCount; ++i)
+  for (uint_t i = 0; i < glbsCount; ++i)
     {
       strcpy (buffer, _procedures[i].name);
       strcat (buffer, suffix);
@@ -126,11 +126,11 @@ test_proc_name_match (const D_CHAR* proc_name)
 static bool
 test_procedures_list (W_CONNECTOR_HND hnd)
 {
-  const D_CHAR* recvGlbName = NULL;
-  const D_UINT  procsCount = sizeof (_procedures)/sizeof (_procedures[0]);
+  const char* recvGlbName = NULL;
+  const uint_t  procsCount = sizeof (_procedures)/sizeof (_procedures[0]);
 
-  D_UINT globalsCount;
-  D_UINT index = 0;
+  uint_t globalsCount;
+  uint_t index = 0;
 
   cout << "Testing the procedures listing ... ";
 
@@ -172,8 +172,8 @@ test_procedures_list_error:
 static bool
 test_for_errors (W_CONNECTOR_HND hnd)
 {
-  D_UINT          procsCount;
-  const D_CHAR*   nameFetched;
+  uint_t          procsCount;
+  const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
   if ((WListProcedures(NULL, &procsCount) != WCS_INVALID_ARGS)
@@ -205,19 +205,19 @@ test_for_errors_fail :
 
 
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 0;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "root_test_password";

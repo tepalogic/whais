@@ -27,12 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/include/wsocket.h"
 
-WSocket::WSocket (const D_CHAR* const pServerName,
-                  const D_CHAR* const pService)
+WSocket::WSocket (const char* const pServerName,
+                  const char* const pService)
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  const D_UINT32 e = wh_socket_client (pServerName, pService, &m_Socket);
+  const uint32_t e = wh_socket_client (pServerName, pService, &m_Socket);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -40,13 +40,13 @@ WSocket::WSocket (const D_CHAR* const pServerName,
   m_Owned = true;
 }
 
-WSocket::WSocket (const D_CHAR* const pServerName,
-                  const D_UINT16      port)
+WSocket::WSocket (const char* const pServerName,
+                  const uint16_t      port)
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  D_UINT32 e;
-  D_CHAR   service[16];
+  uint32_t e;
+  char   service[16];
 
   sprintf (service, "%u", port);
   e = wh_socket_client (pServerName, service, &m_Socket);
@@ -57,13 +57,13 @@ WSocket::WSocket (const D_CHAR* const pServerName,
   m_Owned = true;
 }
 
-WSocket::WSocket (const D_CHAR* const pLocalAddress,
-                  const D_CHAR* const pService,
-                  const D_UINT        backLog)
+WSocket::WSocket (const char* const pLocalAddress,
+                  const char* const pService,
+                  const uint_t        backLog)
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  const D_UINT32 e = wh_socket_server (pLocalAddress,
+  const uint32_t e = wh_socket_server (pLocalAddress,
                                        pService,
                                        backLog,
                                        &m_Socket);
@@ -74,14 +74,14 @@ WSocket::WSocket (const D_CHAR* const pLocalAddress,
   m_Owned = true;
 }
 
-WSocket::WSocket (const D_CHAR* const pLocalAddress,
-                  const D_UINT16      port,
-                  const D_UINT        backLog)
+WSocket::WSocket (const char* const pLocalAddress,
+                  const uint16_t      port,
+                  const uint_t        backLog)
   : m_Socket (INVALID_SOCKET),
     m_Owned (false)
 {
-  D_UINT32 e;
-  D_CHAR   service[16];
+  uint32_t e;
+  char   service[16];
 
   sprintf (service, "%u", port);
   e = wh_socket_server (pLocalAddress, service, backLog, &m_Socket);
@@ -134,7 +134,7 @@ WSocket
 WSocket::Accept ()
 {
   WH_SOCKET      client = INVALID_SOCKET;
-  const D_UINT32 e      = wh_socket_accept (m_Socket, &client);
+  const uint32_t e      = wh_socket_accept (m_Socket, &client);
 
   if (e != WOP_OK )
     throw WSocketException (NULL, _EXTRA (e));
@@ -144,11 +144,11 @@ WSocket::Accept ()
   return WSocket (client);
 }
 
-D_UINT
-WSocket::Read (const D_UINT count, D_UINT8* const pBuffer)
+uint_t
+WSocket::Read (const uint_t count, uint8_t* const pBuffer)
 {
-  D_UINT         result = count;
-  const D_UINT32 e      = wh_socket_read (m_Socket, pBuffer, &result);
+  uint_t         result = count;
+  const uint32_t e      = wh_socket_read (m_Socket, pBuffer, &result);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));
@@ -157,9 +157,9 @@ WSocket::Read (const D_UINT count, D_UINT8* const pBuffer)
 }
 
 void
-WSocket::Write (const D_UINT count, const D_UINT8* const pBuffer)
+WSocket::Write (const uint_t count, const uint8_t* const pBuffer)
 {
-  const D_UINT32 e = wh_socket_write (m_Socket, pBuffer, count);
+  const uint32_t e = wh_socket_write (m_Socket, pBuffer, count);
 
   if (e != WOP_OK)
     throw WSocketException (NULL, _EXTRA (e));

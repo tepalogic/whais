@@ -40,23 +40,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 
-static const D_CHAR     NULL_VALUE[]   = "";
-static const D_CHAR     NULL_LABEL[]  = "(NULL)";
+static const char     NULL_VALUE[]   = "";
+static const char     NULL_LABEL[]  = "(NULL)";
 
-typedef map<D_UINT, vector<string> > FIELD_ENTRY;
+typedef map<uint_t, vector<string> > FIELD_ENTRY;
 typedef FIELD_ENTRY::iterator        FIELD_ENTRY_IT;
 
 struct FieldEntry
 {
-  FieldEntry (const D_UINT fieldType = WFT_NOTSET)
+  FieldEntry (const uint_t fieldType = WFT_NOTSET)
     : m_Values (),
       m_FieldType (fieldType)
   {
   }
 
   bool
-  SetValue (const D_UINT           row,
-            const D_UINT16         type,
+  SetValue (const uint_t           row,
+            const uint16_t         type,
             const string&          value)
   {
     if ((m_FieldType != WFT_NOTSET) && (type != m_FieldType))
@@ -69,7 +69,7 @@ struct FieldEntry
   }
 
   FIELD_ENTRY m_Values;
-  D_UINT16    m_FieldType;
+  uint16_t    m_FieldType;
 };
 
 typedef map<string, FieldEntry> FIELD_VALUE;
@@ -85,8 +85,8 @@ struct TableParameter
 
   bool
   SetValue (const string&          field,
-            const D_UINT           row,
-            const D_UINT           type,
+            const uint_t           row,
+            const uint_t           type,
             const string&          value)
   {
     if (m_RowsCount < (row + 1))
@@ -104,16 +104,16 @@ struct TableParameter
   }
 
   FIELD_VALUE  m_Fields;
-  D_UINT       m_RowsCount;
+  uint_t       m_RowsCount;
 };
 
-D_UINT
+uint_t
 update_stack_value (const W_CONNECTOR_HND         hnd,
                     const unsigned int            type,
-                    const D_CHAR* const           fieldName,
+                    const char* const           fieldName,
                     const W_TABLE_ROW_INDEX       row,
                     const W_ELEMENT_OFFSET        arrayOff,
-                    const D_CHAR* const           value)
+                    const char* const           value)
 {
   /* When the values was created on the stack,
    * it already has value set to NULL. We need a was to specify NULL values
@@ -121,7 +121,7 @@ update_stack_value (const W_CONNECTOR_HND         hnd,
   if (strcmp (value, NULL_VALUE) == 0)
     return WCS_OK;
 
-  D_UINT wcs = WCS_OK;
+  uint_t wcs = WCS_OK;
 
   if (type != WFT_TEXT)
     {
@@ -137,17 +137,17 @@ update_stack_value (const W_CONNECTOR_HND         hnd,
   assert (arrayOff == WIGNORE_OFF);
 
   //Send one character at a time to avoid large parameter errors.
-  D_UINT       utf8TextOff  = 0;
-  const D_UINT utf8ValueLen = utf8_strlen (_RC (const D_UINT8*, value));
-  D_UINT       valueOff     = 0;
+  uint_t       utf8TextOff  = 0;
+  const uint_t utf8ValueLen = utf8_strlen (_RC (const uint8_t*, value));
+  uint_t       valueOff     = 0;
   while ((utf8TextOff < utf8ValueLen)
          && (wcs == WCS_OK))
     {
       assert (valueOff < strlen (value));
 
-      const D_UINT charSize = get_utf8_char_size (value[valueOff]);
+      const uint_t charSize = get_utf8_char_size (value[valueOff]);
 
-      D_CHAR tempBuffer[UTF8_MAX_BYTES_COUNT];
+      char tempBuffer[UTF8_MAX_BYTES_COUNT];
       memcpy (tempBuffer, value + valueOff, charSize);
 
       tempBuffer[charSize]  = 0;
@@ -172,7 +172,7 @@ parse_value (const string& cmdLine,
              size_t&       ioLineOff,
              string&       oValue)
 {
-  const D_CHAR* const line = cmdLine.c_str ();
+  const char* const line = cmdLine.c_str ();
 
   assert (line[ioLineOff - 1] == '\'');
 
@@ -215,7 +215,7 @@ parse_value (const string& cmdLine,
             break;
           case 'u':
             {
-              D_UINT64 charCode = 0;
+              uint64_t charCode = 0;
               while (line[ioLineOff] != '&')
                 {
                   charCode *= 16;
@@ -264,11 +264,11 @@ parse_value (const string& cmdLine,
                   return false;
                 }
 
-              D_UINT8 utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-              D_UINT  utf8UnitsCount = encode_utf8_char (charCode,
+              uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
+              uint_t  utf8UnitsCount = encode_utf8_char (charCode,
                                                          utf8CodeUnits);
               assert (utf8UnitsCount > 0);
-              oValue.append (_RC (const D_CHAR*, utf8CodeUnits),
+              oValue.append (_RC (const char*, utf8CodeUnits),
                              utf8UnitsCount);
             }
             break;
@@ -292,9 +292,9 @@ parse_value (const string& cmdLine,
 static bool
 parse_type (const string&       cmdLine,
             size_t&             ioLineOff,
-            D_UINT&             oType)
+            uint_t&             oType)
 {
-  const D_CHAR* const line = cmdLine.c_str ();
+  const char* const line = cmdLine.c_str ();
 
   switch (line[ioLineOff++])
   {
@@ -356,13 +356,13 @@ parse_type (const string&       cmdLine,
 static bool
 handle_param_value (W_CONNECTOR_HND           hnd,
                     const string&             cmdLine,
-                    const D_UINT              type,
-                    const D_CHAR* const       field,
+                    const uint_t              type,
+                    const char* const       field,
                     const W_TABLE_ROW_INDEX   row,
                     const W_ELEMENT_OFFSET    arrayOff,
                     size_t&                   ioLineOff)
 {
-  D_UINT   wcs = WCS_OK;
+  uint_t   wcs = WCS_OK;
 
   string value;
   if (! parse_value (cmdLine, ioLineOff, value))
@@ -398,15 +398,15 @@ proc_param_connector_error:
 static bool
 handle_procedure_array_param (W_CONNECTOR_HND           hnd,
                               const string&             cmdLine,
-                              const D_UINT              type,
-                              const D_CHAR* const       field,
+                              const uint_t              type,
+                              const char* const       field,
                               const W_TABLE_ROW_INDEX   row,
                               size_t&                   ioLineOff)
 {
-  const D_CHAR* const line = cmdLine.c_str ();
+  const char* const line = cmdLine.c_str ();
 
-  D_UINT64 arrayIndex = 0;
-  D_UINT   wcs        = WCS_OK;
+  uint64_t arrayIndex = 0;
+  uint_t   wcs        = WCS_OK;
 
   assert (type != WFT_TEXT);
   assert (line[ioLineOff - 1] == '(');
@@ -455,10 +455,10 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
                               const string&             cmdLine,
                               size_t&                   ioLineOff)
 {
-  const D_CHAR* const line       = cmdLine.c_str ();
-  D_UINT              wcs        = WCS_OK;
-  D_UINT              row        = 0;
-  D_UINT              type       = 0;
+  const char* const line       = cmdLine.c_str ();
+  uint_t              wcs        = WCS_OK;
+  uint_t              row        = 0;
+  uint_t              type       = 0;
   string              field;
   string              value;
   TableParameter      table;
@@ -670,7 +670,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
     goto proc_param_connector_error;
 
   assert (table.m_RowsCount > 0);
-  for (D_UINT row = 0; row < table.m_RowsCount; ++row)
+  for (uint_t row = 0; row < table.m_RowsCount; ++row)
     {
       for (FIELD_VALUE_IT it = table.m_Fields.begin ();
            it != table.m_Fields.end ();
@@ -684,7 +684,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
             {
               assert (entry->second.size () >= 1);
 
-              for (D_UINT arrayId = 0;
+              for (uint_t arrayId = 0;
                    arrayId < entry->second.size ();
                    ++arrayId)
                 {
@@ -732,9 +732,9 @@ handle_procedure_parameters (W_CONNECTOR_HND hnd,
                              const string&   cmdLine,
                              size_t&         ioLineOff)
 {
-  const D_CHAR* const line = cmdLine.c_str ();
-  D_UINT              type = WFT_NOTSET;
-  D_UINT              wcs  = WCS_OK;
+  const char* const line = cmdLine.c_str ();
+  uint_t              type = WFT_NOTSET;
+  uint_t              wcs  = WCS_OK;
 
   while ((ioLineOff < cmdLine.length ())
          && (wcs == WCS_OK))
@@ -831,13 +831,13 @@ proc_param_connector_error:
 
 static bool
 fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
-                               const D_UINT            type,
+                               const uint_t            type,
                                const char* const       field,
-                               const D_UINT64          row)
+                               const uint64_t          row)
 
 {
-  D_UINT         wcs = WCS_OK;
-  const D_CHAR*  retValue;
+  uint_t         wcs = WCS_OK;
+  const char*  retValue;
 
   if (type != WFT_TEXT)
     {
@@ -858,7 +858,7 @@ fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
   else
     {
       unsigned long long length  = 0;
-      D_UINT64 offset  = 0;
+      uint64_t offset  = 0;
       wcs = WGetStackTextLengthCount (hnd, field, row, WIGNORE_OFF, &length);
       if (wcs != WCS_OK)
         goto fetch_result_fail;
@@ -877,7 +877,7 @@ fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
               if (wcs != WCS_OK)
                 goto fetch_result_fail;
 
-              offset += utf8_strlen (_RC (const D_UINT8*, retValue));
+              offset += utf8_strlen (_RC (const uint8_t*, retValue));
 
               cout << retValue;
             }
@@ -905,23 +905,23 @@ fetch_result_fail:
 
 static bool
 fetch_execution_array_result (W_CONNECTOR_HND        hnd,
-                              const D_UINT           type,
+                              const uint_t           type,
                               const char* const      field,
-                              const D_UINT64         row)
+                              const uint64_t         row)
 
 {
   assert ((type >= WFT_BOOL) && (type < WFT_TEXT));
 
-  const D_CHAR*         retValue;
+  const char*         retValue;
   unsigned long long              count;
-  D_UINT                wcs;
+  uint_t                wcs;
 
   if ((wcs = WGetStackArrayElementsCount (hnd, field, row, &count)) != WCS_OK)
     goto fetch_result_fail;
 
   if (count > 0)
     {
-      for (D_UINT64 i = 0; i < count; ++i)
+      for (uint64_t i = 0; i < count; ++i)
         {
           wcs = WGetStackValueEntry (hnd, field, row, i, WIGNORE_OFF, &retValue);
           if (wcs != WCS_OK)
@@ -947,17 +947,17 @@ fetch_result_fail:
 }
 
 static bool
-fetch_execution_field_result (W_CONNECTOR_HND hnd, const D_UINT type)
+fetch_execution_field_result (W_CONNECTOR_HND hnd, const uint_t type)
 {
   unsigned long long rowsCount = 0;
-  D_UINT   wcs       = WCS_OK;
+  uint_t   wcs       = WCS_OK;
 
   if ((wcs = WGetStackValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
 
   if (rowsCount > 0)
     {
-      for (D_UINT64 row = 0; row < rowsCount; ++row)
+      for (uint64_t row = 0; row < rowsCount; ++row)
         {
           cout << row << " | ";
           if (type & WFT_ARRAY_MASK)
@@ -1003,16 +1003,16 @@ fetch_execution_table_result (W_CONNECTOR_HND hnd,
                               vector<W_FieldDescriptor>& fields)
 {
   unsigned long long rowsCount = 0;
-  D_UINT   wcs       = WCS_OK;
+  uint_t   wcs       = WCS_OK;
 
   if ((wcs = WGetStackValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
 
   if (rowsCount > 0)
     {
-      for (D_UINT64 row = 0; row < rowsCount; ++row)
+      for (uint64_t row = 0; row < rowsCount; ++row)
         {
-          for (D_UINT i = 0; i < fields.size (); ++i )
+          for (uint_t i = 0; i < fields.size (); ++i )
             {
               cout << row << " | " << fields[i].m_FieldName << " | ";
               if (fields[i].m_FieldType & WFT_ARRAY_MASK)
@@ -1060,8 +1060,8 @@ fetch_result_fail:
 static bool
 fetch_execution_result (W_CONNECTOR_HND hnd)
 {
-  D_UINT stackResut = WFT_NOTSET;
-  D_UINT wcs        = WCS_OK;
+  uint_t stackResut = WFT_NOTSET;
+  uint_t wcs        = WCS_OK;
 
   if ((wcs = WDescribeStackTop (hnd, &stackResut)) != WCS_OK)
     goto fetch_result_fail;
@@ -1070,7 +1070,7 @@ fetch_execution_result (W_CONNECTOR_HND hnd)
     {
       vector<string>            fields;
       vector<W_FieldDescriptor> fieldsDescriptors;
-      D_UINT                    fieldsCount;
+      uint_t                    fieldsCount;
 
       assert (stackResut == WFT_TABLE_MASK);
 
@@ -1080,11 +1080,11 @@ fetch_execution_result (W_CONNECTOR_HND hnd)
       assert (fieldsCount > 0);
 
       cout << "TABLE OF (";
-      for (D_UINT i = 0; i < fieldsCount; ++i)
+      for (uint_t i = 0; i < fieldsCount; ++i)
         {
           W_FieldDescriptor     fd;
-          const D_CHAR*         fieldName;
-          D_UINT                fieldType;
+          const char*         fieldName;
+          uint_t                fieldType;
 
           wcs = WDescribeValueFetchField (hnd, &fieldName, &fieldType);
           if (wcs != WCS_OK)
@@ -1182,7 +1182,7 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+  uint32_t cs  = WConnect (GetRemoteHostName ().c_str (),
                            GetConnectionPort ().c_str (),
                            GetWorkingDB ().c_str (),
                            GetUserPassword ().c_str (),

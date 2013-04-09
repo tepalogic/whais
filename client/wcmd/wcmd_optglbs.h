@@ -48,48 +48,48 @@ const std::string&
 GetRemoteHostName ();
 
 void
-SetRemoteHostName (const D_CHAR* pHostName);
+SetRemoteHostName (const char* pHostName);
 
 const std::string&
 GetConnectionPort ();
 
 void
-SetConnectionPort (const D_CHAR* pPort);
+SetConnectionPort (const char* pPort);
 
-D_UINT
+uint_t
 GetUserId ();
 
 void
-SetUserId (const D_UINT userId);
+SetUserId (const uint_t userId);
 
 const std::string&
 GetUserPassword ();
 
 void
-SetUserPassword (const D_CHAR* pPassword);
+SetUserPassword (const char* pPassword);
 
 const std::string&
 GetWorkingDirectory ();
 
 void
-SetWorkingDirectory (const D_CHAR* pDirectory);
+SetWorkingDirectory (const char* pDirectory);
 
 const std::string&
 GetWorkingDB ();
 
 void
-SetWorkingDB (const D_CHAR* pDBName);
+SetWorkingDB (const char* pDBName);
 
 VERBOSE_LEVEL
 GetVerbosityLevel ();
 
 void
-SetVerbosityLevel (const D_UINT level);
+SetVerbosityLevel (const uint_t level);
 
 bool
 SetMaximumFileSize (std::string size);
 
-D_UINT64
+uint64_t
 GetMaximumFileSize ();
 
 void

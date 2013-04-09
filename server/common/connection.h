@@ -63,14 +63,14 @@ struct UserHandler
 class ConnectionException : public WException
 {
 public:
-  ConnectionException (const D_CHAR* pMessage,
-                       const D_CHAR* pFile,
-                       D_UINT32      line,
-                       D_UINT32      extra);
+  ConnectionException (const char* pMessage,
+                       const char* pFile,
+                       uint32_t      line,
+                       uint32_t      extra);
 
   virtual WException*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
+  virtual const char*   Description () const;
 };
 
 class ClientConnection
@@ -80,34 +80,34 @@ public:
                     std::vector<DBSDescriptors>& databases);
   ~ClientConnection ();
 
-  D_UINT      MaxSize () const;
-  D_UINT      DataSize () const;
-  void        DataSize (const D_UINT16 size);
-  D_UINT8*    Data ();
+  uint_t      MaxSize () const;
+  uint_t      DataSize () const;
+  void        DataSize (const uint16_t size);
+  uint8_t*    Data ();
 
-  D_UINT32 ReadCommand ();
-  void     SendCmdResponse (const D_UINT16 respType);
+  uint32_t ReadCommand ();
+  void     SendCmdResponse (const uint16_t respType);
 
   const DBSDescriptors&  Dbs () { return *m_UserHandler.m_pDesc; }
   SessionStack&          Stack () { return m_Stack; }
   bool                   IsAdmin () const { return m_UserHandler.m_Root; }
 private:
-  D_UINT8* RawCmdData ();
+  uint8_t* RawCmdData ();
 
   void ReciveRawClientFrame ();
-  void SendRawClientFrame (const D_UINT8 type);
+  void SendRawClientFrame (const uint8_t type);
 
   UserHandler&        m_UserHandler;
   SessionStack        m_Stack;
-  D_UINT32            m_WaitingFrameId;
-  D_UINT32            m_ClientCookie;
-  D_UINT32            m_ServerCookie;
-  D_UINT16            m_LastReceivedCmd;
-  D_UINT16            m_FrameSize;
-  D_UINT8             m_Version;
-  D_UINT8             m_Cipher;
-  D_UINT              m_DataSize;
-  D_UINT8*            m_Data;
+  uint32_t            m_WaitingFrameId;
+  uint32_t            m_ClientCookie;
+  uint32_t            m_ServerCookie;
+  uint16_t            m_LastReceivedCmd;
+  uint16_t            m_FrameSize;
+  uint8_t             m_Version;
+  uint8_t             m_Cipher;
+  uint_t              m_DataSize;
+  uint8_t*            m_Data;
   std::string         m_Key;
 
 

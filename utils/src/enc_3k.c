@@ -29,14 +29,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "enc_3k.h"
 #include "le_converter.h"
 
-static D_UINT32
-exchange_1bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
+static uint32_t
+exchange_1bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
   assert (p1 < 32);
   assert (p2 < 32);
 
-  const D_UINT32 val1 = (value >> p1) & 1;
-  const D_UINT32 val2 = (value >> p2) & 1;
+  const uint32_t val1 = (value >> p1) & 1;
+  const uint32_t val2 = (value >> p2) & 1;
 
   value &= ~((1 << p1) | (1 << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -44,14 +44,14 @@ exchange_1bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
   return value;
 }
 
-static D_UINT32
-exchange_2bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
+static uint32_t
+exchange_2bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
   assert ((p1 < 32) && ((p1 % 2) == 0));
   assert ((p2 < 32) && ((p2 % 2) == 0));
 
-  const D_UINT32 val1 = (value >> p1) & 0x03;
-  const D_UINT32 val2 = (value >> p2) & 0x03;
+  const uint32_t val1 = (value >> p1) & 0x03;
+  const uint32_t val2 = (value >> p2) & 0x03;
 
   value &= ~((0x03 << p1) | (0x03 << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -59,14 +59,14 @@ exchange_2bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
   return value;
 }
 
-static D_UINT32
-exchange_4bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
+static uint32_t
+exchange_4bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
   assert ((p1 < 32) && ((p1 % 4) == 0));
   assert ((p2 < 32) && ((p2 % 4) == 0));
 
-  const D_UINT32 val1 = (value >> p1) & 0x0F;
-  const D_UINT32 val2 = (value >> p2) & 0x0F;
+  const uint32_t val1 = (value >> p1) & 0x0F;
+  const uint32_t val2 = (value >> p2) & 0x0F;
 
   value &= ~((0x0F << p1) | (0x0F << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -74,14 +74,14 @@ exchange_4bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
   return value;
 }
 
-static D_UINT32
-exchange_8bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
+static uint32_t
+exchange_8bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
   assert ((p1 < 32) && ((p1 % 8) == 0));
   assert ((p2 < 32) && ((p2 % 8) == 0));
 
-  const D_UINT32 val1 = (value >> p1) & 0xFF;
-  const D_UINT32 val2 = (value >> p2) & 0xFF;
+  const uint32_t val1 = (value >> p1) & 0xFF;
+  const uint32_t val2 = (value >> p2) & 0xFF;
 
   value &= ~((0xFF << p1) | (0xFF << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -89,14 +89,14 @@ exchange_8bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
   return value;
 }
 
-static D_UINT32
-exchange_16bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
+static uint32_t
+exchange_16bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
   assert ((p1 < 32) && ((p1 % 16) == 0));
   assert ((p2 < 32) && ((p2 % 16) == 0));
 
-  const D_UINT32 val1 = (value >> p1) & 0xFFFF;
-  const D_UINT32 val2 = (value >> p2) & 0xFFFF;
+  const uint32_t val1 = (value >> p1) & 0xFFFF;
+  const uint32_t val2 = (value >> p2) & 0xFFFF;
 
   value &= ~((0xFFFF << p1) | (0xFFFF << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -105,22 +105,22 @@ exchange_16bit_pair (D_UINT32 value, const D_UINT p1, const D_UINT p2)
 }
 
 void
-encrypt_3k_buffer (const D_UINT32       firstKing,
-                   const D_UINT32       secondKing,
-                   const D_UINT8* const key,
-                   const D_UINT         keyLen,
-                   D_UINT8*             buffer,
-                   const D_UINT         bufferSize)
+encrypt_3k_buffer (const uint32_t       firstKing,
+                   const uint32_t       secondKing,
+                   const uint8_t* const key,
+                   const uint_t         keyLen,
+                   uint8_t*             buffer,
+                   const uint_t         bufferSize)
 {
-  D_UINT pos, b;
+  uint_t pos, b;
 
-  assert (bufferSize % sizeof (D_UINT32) == 0);
+  assert (bufferSize % sizeof (uint32_t) == 0);
 
-  D_UINT keyIndex = firstKing % keyLen;
-  for (pos = 0; pos < bufferSize; pos += sizeof (D_UINT32))
+  uint_t keyIndex = firstKing % keyLen;
+  for (pos = 0; pos < bufferSize; pos += sizeof (uint32_t))
     {
-      D_UINT64 message   = from_le_int32 (buffer + pos);
-      D_UINT32 thirdKing = 0;
+      uint64_t message   = from_le_int32 (buffer + pos);
+      uint32_t thirdKing = 0;
 
       message -= firstKing;
       message ^= secondKing;
@@ -177,21 +177,21 @@ encrypt_3k_buffer (const D_UINT32       firstKing,
 
 
 void
-decrypt_3k_buffer (const D_UINT32       firstKing,
-                   const D_UINT32       secondKing,
-                   const D_UINT8* const key,
-                   const D_UINT         keyLen,
-                   D_UINT8*             buffer,
-                   const D_UINT         bufferSize)
+decrypt_3k_buffer (const uint32_t       firstKing,
+                   const uint32_t       secondKing,
+                   const uint8_t* const key,
+                   const uint_t         keyLen,
+                   uint8_t*             buffer,
+                   const uint_t         bufferSize)
 {
-  D_INT pos, b;
-  assert (bufferSize % sizeof (D_UINT32) == 0);
+  int pos, b;
+  assert (bufferSize % sizeof (uint32_t) == 0);
 
-  D_UINT keyIndex = firstKing % keyLen;
-  for (pos = 0; pos < bufferSize; pos += sizeof (D_UINT32))
+  uint_t keyIndex = firstKing % keyLen;
+  for (pos = 0; pos < bufferSize; pos += sizeof (uint32_t))
     {
-      D_UINT64 message   = from_le_int32 (buffer + pos);
-      D_UINT32 thirdKing = 0;
+      uint64_t message   = from_le_int32 (buffer + pos);
+      uint32_t thirdKing = 0;
 
       thirdKing = key[keyIndex++]; thirdKing <<= 8;
       if (keyIndex == keyLen)

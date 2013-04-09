@@ -70,7 +70,7 @@ public:
       m_RefsCount (source.m_RefsCount)
   {
     _CC (NameSpace*&, source.m_pSpace) = NULL;
-    _CC (D_UINT64&, source.m_RefsCount)  = 0;
+    _CC (uint64_t&, source.m_RefsCount)  = 0;
   }
 
   ~NameSpaceHolder ()
@@ -85,7 +85,7 @@ public:
   }
 
   NameSpace& Get () { assert (m_RefsCount > 0); return *m_pSpace; }
-  D_UINT64   RefsCount () { return m_RefsCount; }
+  uint64_t   RefsCount () { return m_RefsCount; }
   void       IncRefsCount () { ++m_RefsCount; }
   void       DecRefsCount () { assert (m_RefsCount > 0); --m_RefsCount; }
   void       ForceRelease () { m_RefsCount = 0; }
@@ -94,7 +94,7 @@ private:
   const NameSpaceHolder& operator= (const NameSpaceHolder& source);
 
   NameSpace* m_pSpace;
-  D_UINT64   m_RefsCount;
+  uint64_t   m_RefsCount;
 };
 
 class Session : public I_Session
@@ -106,87 +106,87 @@ public:
   virtual ~Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit);
-  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
+  virtual void ExecuteProcedure (const char* const pProcName,
                                  SessionStack&       stack);
 
-  virtual D_UINT GlobalValuesCount () const;
-  virtual D_UINT ProceduresCount () const;
+  virtual uint_t GlobalValuesCount () const;
+  virtual uint_t ProceduresCount () const;
 
-  virtual const D_CHAR* GlobalValueName (const D_UINT index) const;
-  virtual const D_CHAR* ProcedureName (const D_UINT index) const;
+  virtual const char* GlobalValueName (const uint_t index) const;
+  virtual const char* ProcedureName (const uint_t index) const;
 
-  virtual D_UINT GlobalValueRawType (const D_UINT32 index);
-  virtual D_UINT GlobalValueRawType (const D_CHAR* const name);
-  virtual D_UINT GlobalValueFieldsCount (const D_UINT32 index);
-  virtual D_UINT GlobalValueFieldsCount (const D_CHAR* const name);
+  virtual uint_t GlobalValueRawType (const uint32_t index);
+  virtual uint_t GlobalValueRawType (const char* const name);
+  virtual uint_t GlobalValueFieldsCount (const uint32_t index);
+  virtual uint_t GlobalValueFieldsCount (const char* const name);
 
-  virtual const D_CHAR* GlobalValueFieldName (const D_UINT32 index,
-                                              const D_UINT32 field);
-  virtual const D_CHAR* GlobalValueFieldName (const D_CHAR* const name,
-                                              const D_UINT32      field);
+  virtual const char* GlobalValueFieldName (const uint32_t index,
+                                              const uint32_t field);
+  virtual const char* GlobalValueFieldName (const char* const name,
+                                              const uint32_t      field);
 
-  virtual D_UINT GlobalValueFieldType (const D_UINT32 index,
-                                       const D_UINT32 field);
-  virtual D_UINT GlobalValueFieldType (const D_CHAR* const name,
-                                       const D_UINT32      field);
+  virtual uint_t GlobalValueFieldType (const uint32_t index,
+                                       const uint32_t field);
+  virtual uint_t GlobalValueFieldType (const char* const name,
+                                       const uint32_t      field);
 
-  virtual D_UINT ProcedureParametersCount (const D_UINT id) const;
-  virtual D_UINT ProcedureParametersCount (const D_CHAR* const name) const;
-  virtual D_UINT ProcedurePameterRawType (const D_UINT id,
-                                          const D_UINT param);
-  virtual D_UINT ProcedurePameterRawType (const D_CHAR* const name,
-                                          const D_UINT        param);
-  virtual D_UINT ProcedurePameterFieldsCount (const D_UINT id,
-                                              const D_UINT param);
-  virtual D_UINT ProcedurePameterFieldsCount (const D_CHAR* const name,
-                                              const D_UINT        param);
-  virtual const D_CHAR* ProcedurePameterFieldName (const D_UINT id,
-                                                   const D_UINT param,
-                                                   const D_UINT field);
-  virtual const D_CHAR* ProcedurePameterFieldName (const D_CHAR* const name,
-                                                   const D_UINT        param,
-                                                   const D_UINT        field);
-  virtual D_UINT ProcedurePameterFieldType (const D_UINT id,
-                                            const D_UINT param,
-                                            const D_UINT field);
-  virtual D_UINT ProcedurePameterFieldType (const D_CHAR* const name,
-                                            const D_UINT        param,
-                                            const D_UINT        field);
+  virtual uint_t ProcedureParametersCount (const uint_t id) const;
+  virtual uint_t ProcedureParametersCount (const char* const name) const;
+  virtual uint_t ProcedurePameterRawType (const uint_t id,
+                                          const uint_t param);
+  virtual uint_t ProcedurePameterRawType (const char* const name,
+                                          const uint_t        param);
+  virtual uint_t ProcedurePameterFieldsCount (const uint_t id,
+                                              const uint_t param);
+  virtual uint_t ProcedurePameterFieldsCount (const char* const name,
+                                              const uint_t        param);
+  virtual const char* ProcedurePameterFieldName (const uint_t id,
+                                                   const uint_t param,
+                                                   const uint_t field);
+  virtual const char* ProcedurePameterFieldName (const char* const name,
+                                                   const uint_t        param,
+                                                   const uint_t        field);
+  virtual uint_t ProcedurePameterFieldType (const uint_t id,
+                                            const uint_t param,
+                                            const uint_t field);
+  virtual uint_t ProcedurePameterFieldType (const char* const name,
+                                            const uint_t        param,
+                                            const uint_t        field);
 
-  D_UINT32       FindGlobal (const D_UINT8* pName, const D_UINT nameLength);
-  StackValue     GetGlobalValue (const D_UINT32 globalId);
-  const D_UINT8* FindGlobalTI (const D_UINT32 globalId);
+  uint32_t       FindGlobal (const uint8_t* pName, const uint_t nameLength);
+  StackValue     GetGlobalValue (const uint32_t globalId);
+  const uint8_t* FindGlobalTI (const uint32_t globalId);
 
-  D_UINT32       FindProcedure (const D_UINT8* pName, const D_UINT nameLength);
-  D_UINT32       ArgsCount (const D_UINT32 procId);
-  D_UINT32       LocalsCount (const D_UINT32 procId);
-  const D_UINT8* FindLocalTI (const D_UINT32 procId, const D_UINT32 local);
-  Unit&          ProcUnit (const D_UINT32 procId);
-  const D_UINT8* ProcCode (const D_UINT32 procId);
-  D_UINT64       ProcCodeSize (const D_UINT32 procId);
-  StackValue     ProcLocalValue (const D_UINT32 procId, const D_UINT32 local);
+  uint32_t       FindProcedure (const uint8_t* pName, const uint_t nameLength);
+  uint32_t       ArgsCount (const uint32_t procId);
+  uint32_t       LocalsCount (const uint32_t procId);
+  const uint8_t* FindLocalTI (const uint32_t procId, const uint32_t local);
+  Unit&          ProcUnit (const uint32_t procId);
+  const uint8_t* ProcCode (const uint32_t procId);
+  uint64_t       ProcCodeSize (const uint32_t procId);
+  StackValue     ProcLocalValue (const uint32_t procId, const uint32_t local);
 
-  void AquireProcSync (const D_UINT32 procId, const D_UINT32 sync);
-  void ReleaseProcSync (const D_UINT32 procId, const D_UINT32 sync);
+  void AquireProcSync (const uint32_t procId, const uint32_t sync);
+  void ReleaseProcSync (const uint32_t procId, const uint32_t sync);
 
   I_DBSHandler& DBSHandler ();
 
 private:
   void     DefineTablesGlobalValues ();
-  D_UINT32 DefineGlobalValue (const D_UINT8*    pName,
-                              const D_UINT      nameLength,
-                              const D_UINT8*    pTI,
+  uint32_t DefineGlobalValue (const uint8_t*    pName,
+                              const uint_t      nameLength,
+                              const uint8_t*    pTI,
                               const bool        external,
                               I_DBSTable* const pPersistentTable);
-  D_UINT32 DefineProcedure (const D_UINT8*           pName,
-                            const D_UINT             nameLength,
-                            const D_UINT32           localsCount,
-                            const D_UINT32           argsCount,
-                            const D_UINT32           syncCount,
+  uint32_t DefineProcedure (const uint8_t*           pName,
+                            const uint_t             nameLength,
+                            const uint32_t           localsCount,
+                            const uint32_t           argsCount,
+                            const uint32_t           syncCount,
                             std::vector<StackValue>& localValues,
-                            const D_UINT32*          pTypesOffset,
-                            const D_UINT8*           pCode,
-                            const D_UINT32           codeSize,
+                            const uint32_t*          pTypesOffset,
+                            const uint8_t*           pCode,
+                            const uint32_t           codeSize,
                             const bool               external,
                             Unit&                    unit);
 

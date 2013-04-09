@@ -14,15 +14,15 @@ using namespace std;
 
 struct GlobalValueEntry
 {
-  const D_CHAR* const name;
-  const D_UINT        type;
-  const D_UINT        fieldsCount;
+  const char* const name;
+  const uint_t        type;
+  const uint_t        fieldsCount;
 };
 
 struct FieldEntry
 {
-  const D_CHAR* const name;
-  D_UINT16            type;
+  const char* const name;
+  uint16_t            type;
   bool                visited;
 };
 
@@ -136,22 +136,22 @@ FieldEntry tableFields[] =
         {"array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_RICHREAL, false}
     };
 
-static const D_CHAR one_field_table[] = "one_field_table_global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-static const D_CHAR complete_field_table[] = "complete_field_table_global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+static const char one_field_table[] = "one_field_table_global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+static const char complete_field_table[] = "complete_field_table_global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
 static bool
 test_global_value_description (W_CONNECTOR_HND hnd)
 {
-  const D_CHAR suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-  D_CHAR buffer[1024];
-  const D_UINT glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
+  const char suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  char buffer[1024];
+  const uint_t glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
   cout << "Testing global values types ... ";
 
-  for (D_UINT i = 0; i < glbsCount; ++i)
+  for (uint_t i = 0; i < glbsCount; ++i)
     {
-      D_UINT type;
-      D_UINT fieldsCount;
+      uint_t type;
+      uint_t fieldsCount;
 
       strcpy (buffer, no_fileds_types[i].name);
       strcat (buffer, suffix);
@@ -178,10 +178,10 @@ test_global_value_description_err:
 }
 
 static bool
-test_field_match (const D_CHAR*   field,
-                  const D_UINT    type)
+test_field_match (const char*   field,
+                  const uint_t    type)
 {
-  for (D_UINT i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
+  for (uint_t i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
     {
       if (strcmp (tableFields[i].name, field) == 0)
         {
@@ -204,9 +204,9 @@ test_field_match (const D_CHAR*   field,
 static bool
 test_complete_field_global (W_CONNECTOR_HND hnd)
 {
-  D_UINT        type;
-  const D_CHAR* fieldName;
-  D_UINT        fieldsCount;
+  uint_t        type;
+  const char* fieldName;
+  uint_t        fieldsCount;
 
   cout << "Testing the complete field ... ";
 
@@ -235,7 +235,7 @@ test_complete_field_global (W_CONNECTOR_HND hnd)
       goto test_complete_field_global_err; //Should not allow an extra fetch!
     }
 
-  for (D_UINT i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
+  for (uint_t i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
     {
       if (! tableFields[i].visited)
         goto test_complete_field_global_err;
@@ -252,8 +252,8 @@ test_complete_field_global_err:
 static bool
 test_one_field_global (W_CONNECTOR_HND hnd)
 {
-  D_UINT        type;
-  const D_CHAR* fieldName;
+  uint_t        type;
+  const char* fieldName;
 
   cout << "Testing the one field ... ";
 
@@ -288,9 +288,9 @@ test_one_field_global_err:
 static bool
 test_for_errors (W_CONNECTOR_HND hnd)
 {
-  D_UINT          fieldsCount;
-  D_UINT          type;
-  const D_CHAR*   nameFetched;
+  uint_t          fieldsCount;
+  uint_t          type;
+  const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
 
@@ -329,19 +329,19 @@ test_for_errors_fail :
   return false;
 }
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 0;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "root_test_password";

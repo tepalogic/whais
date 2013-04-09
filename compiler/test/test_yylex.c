@@ -341,7 +341,7 @@ test_buff_strs (void)
 int
 main (void)
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   if ((test_tokens () < 0))
     {
       test_result = FALSE;

@@ -28,15 +28,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "msglog.h"
 
 
-static const D_CHAR *MSG_PREFIX[] = {
+static const char *MSG_PREFIX[] = {
   "", "error ", "warning ", "error "
 };
 
-static D_UINT
-get_line_from_buffer (const D_CHAR* pBuffer, D_UINT bufferOff)
+static uint_t
+get_line_from_buffer (const char* pBuffer, uint_t bufferOff)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (bufferOff == WHC_IGNORE_BUFFER_POS)
     return -1;
@@ -63,14 +63,14 @@ get_line_from_buffer (const D_CHAR* pBuffer, D_UINT bufferOff)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buffOff,
-            D_UINT            msgId,
-            D_UINT            msgType,
-            const D_CHAR*     msgFormat,
+            uint_t            buffOff,
+            uint_t            msgId,
+            uint_t            msgType,
+            const char*     msgFormat,
             va_list           args)
 {
-  const D_CHAR* pBuffer  = (const D_CHAR*)data;
-  D_INT         buffLine = get_line_from_buffer (pBuffer, buffOff);
+  const char* pBuffer  = (const char*)data;
+  int         buffLine = get_line_from_buffer (pBuffer, buffOff);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
   fprintf (stderr, "%d : line %d: ", msgId, buffLine);

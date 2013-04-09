@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#ifndef D_INT128
+#ifndef int128
 class WE_I128
 {
 public:
@@ -49,8 +49,8 @@ public:
     {
       if (source < 0)
         {
-          m_Lo = _SC (D_INT64, source);
-          m_Hi = ~(_SC (D_UINT64, 0));
+          m_Lo = _SC (int64_t, source);
+          m_Hi = ~(_SC (uint64_t, 0));
         }
     }
 
@@ -239,9 +239,9 @@ public:
   bool
   operator<  (const WE_I128& op) const
   {
-    if ((_SC (D_INT64, m_Hi) < 0) && (_SC (D_INT64, op.m_Hi) >= 0))
+    if ((_SC (int64_t, m_Hi) < 0) && (_SC (int64_t, op.m_Hi) >= 0))
       return true;
-    if ((_SC (D_INT64, m_Hi) > 0) && (_SC (D_INT64, op.m_Hi) <= 0))
+    if ((_SC (int64_t, m_Hi) > 0) && (_SC (int64_t, op.m_Hi) <= 0))
       return false;
 
     return ((m_Hi < op.m_Hi)
@@ -308,7 +308,7 @@ public:
     return *this = *this & op;
   }
 
-  D_INT64
+  int64_t
   Int64 () const
   {
     return m_Lo;
@@ -358,12 +358,12 @@ private:
   const WE_I128&
   rshift ()
   {
-    const D_UINT64 one = 1;
+    const uint64_t one = 1;
 
     m_Lo = (m_Lo >> 1) & 0x7FFFFFFFFFFFFFFFull;
     m_Lo |= ((m_Hi & 1) << 63);
 
-    const bool negative = _SC(D_INT64, m_Hi) < 0;
+    const bool negative = _SC(int64_t, m_Hi) < 0;
     m_Hi = (m_Hi >> 1) & 0x7FFFFFFFFFFFFFFFull;
     if (negative)
       m_Hi |= (one << 63);
@@ -372,7 +372,7 @@ private:
   }
 
   WE_I128
-  multiply32 (const D_UINT32 op) const
+  multiply32 (const uint32_t op) const
   {
     WE_I128 temp   = op * (m_Lo & 0xFFFFFFFF);
     WE_I128 result = temp;
@@ -392,15 +392,15 @@ private:
   WE_I128
   multiply (const WE_I128& op) const
   {
-    const D_UINT32 tw0 = m_Lo & 0xFFFFFFFF;
-    const D_UINT32 tw1 = (m_Lo >> 32) & 0xFFFFFFFF;
-    const D_UINT32 tw2 = (m_Hi) & 0xFFFFFFFF;
-    const D_UINT32 tw3 = (m_Hi >> 32) & 0xFFFFFFFF;
+    const uint32_t tw0 = m_Lo & 0xFFFFFFFF;
+    const uint32_t tw1 = (m_Lo >> 32) & 0xFFFFFFFF;
+    const uint32_t tw2 = (m_Hi) & 0xFFFFFFFF;
+    const uint32_t tw3 = (m_Hi >> 32) & 0xFFFFFFFF;
 
-    const D_UINT64 opw0 = op.m_Lo & 0xFFFFFFFF;
-    const D_UINT64 opw1 = (op.m_Lo >> 32) & 0xFFFFFFFF;
-    const D_UINT64 opw2 = (op.m_Hi) & 0xFFFFFFFF;
-    const D_UINT64 opw3 = (op.m_Hi >> 32) & 0xFFFFFFFF;
+    const uint64_t opw0 = op.m_Lo & 0xFFFFFFFF;
+    const uint64_t opw1 = (op.m_Lo >> 32) & 0xFFFFFFFF;
+    const uint64_t opw2 = (op.m_Hi) & 0xFFFFFFFF;
+    const uint64_t opw3 = (op.m_Hi >> 32) & 0xFFFFFFFF;
 
 
     WE_I128 temp   = opw0 * tw0;
@@ -443,7 +443,7 @@ private:
   }
 
   void
-  devide64 (const D_UINT64 op, WE_I128& quotient, WE_I128& reminder) const
+  devide64 (const uint64_t op, WE_I128& quotient, WE_I128& reminder) const
   {
     quotient.m_Hi = m_Hi / op;
     quotient.m_Lo = m_Lo / op;
@@ -451,8 +451,8 @@ private:
     reminder.m_Hi = m_Hi % op;
     reminder.m_Lo = m_Lo % op;
 
-    D_UINT64 sq = 0xFFFFFFFFFFFFFFFFul / op;
-    D_UINT64 sr = (0xFFFFFFFFFFFFFFFFul % op) + 1;
+    uint64_t sq = 0xFFFFFFFFFFFFFFFFul / op;
+    uint64_t sr = (0xFFFFFFFFFFFFFFFFul % op) + 1;
 
     if (sr == op)
       ++sq, sr = 0;
@@ -484,7 +484,7 @@ private:
     quotient = *this;
     reminder = 0;
 
-    for (D_UINT i = 0; i < 128; ++i)
+    for (uint_t i = 0; i < 128; ++i)
       {
         reminder.lshift ();
         reminder.m_Lo |= (quotient.m_Hi >> 63) & 1;
@@ -498,8 +498,8 @@ private:
       }
   }
 
-  D_UINT64  m_Hi;
-  D_UINT64  m_Lo;
+  uint64_t  m_Hi;
+  uint64_t  m_Lo;
 };
 
 template <typename T>
@@ -539,7 +539,7 @@ operator% (const T op1, const WE_I128& op2)
   return WE_I128(op1) % op2;
 }
 
-static inline D_INT64
+static inline int64_t
 toInt64 (const WE_I128& value)
 {
   return value.Int64 ();
@@ -547,15 +547,15 @@ toInt64 (const WE_I128& value)
 
 #else
 
-typedef D_INT128 WE_I128;
+typedef int128 WE_I128;
 
-static inline D_INT64
+static inline int64_t
 toInt64 (const WE_I128& value)
 {
   return value;
 }
 
 
-#endif /* D_UINT128 */
+#endif /* uint_t128 */
 
 #endif /* WE_INT128_H_ */

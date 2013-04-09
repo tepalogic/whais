@@ -31,7 +31,7 @@ void
 AddOnlineTableCommands ();
 
 
-const D_CHAR*
-wcmd_translate_status (const D_UINT32 cs);
+const char*
+wcmd_translate_status (const uint32_t cs);
 
 #endif /* WCMD_ONLINECMDS_H_ */

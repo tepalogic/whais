@@ -53,6 +53,6 @@ struct OutputStream*
 w_opcode_encode (struct OutputStream *pStream, const enum W_OPCODE opcode);
 
 enum W_OPCODE
-w_opcode_decode (const D_UINT8* pCode);
+w_opcode_decode (const uint8_t* pCode);
 
 #endif /* OPCODES_H_ */

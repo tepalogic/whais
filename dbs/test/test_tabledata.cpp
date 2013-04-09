@@ -16,15 +16,15 @@
 #include "../pastra/ps_table.h"
 #include "../pastra/ps_valintep.h"
 
-const D_CHAR db_name[] = "t_baza_date_1";
-const D_CHAR tb_name[] = "t_test_tab";
+const char db_name[] = "t_baza_date_1";
+const char tb_name[] = "t_test_tab";
 
-static const D_UINT array_values = 5;
+static const uint_t array_values = 5;
 
-static D_CHAR text1[] = "This is a text!";
-static D_CHAR text2[] = "This is should be bigger. It mus have more chars then the first one";
-static D_CHAR text3[] = "FirstName LastName";
-static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
+static char text1[] = "This is a text!";
+static char text2[] = "This is should be bigger. It mus have more chars then the first one";
+static char text3[] = "FirstName LastName";
+static char text4[] = "Total domination of the world is the goal, but why?\n"
                         "Some one will say because one can, but this is not the case.\b"
                         "I have no idea what I wrote here!\n";
 
@@ -136,11 +136,11 @@ static D_CHAR text4[] = "Total domination of the world is the goal, but why?\n"
   vectRichReal.push_back (DBSRichReal (-1.6180339887498948482));\
   vectRichReal.push_back (DBSRichReal ());\
 \
-  vectText.push_back (DBSText (_RC(D_UINT8*, text1)));\
+  vectText.push_back (DBSText (_RC(uint8_t*, text1)));\
   vectText.push_back (DBSText ());\
-  vectText.push_back (DBSText (_RC(D_UINT8*, text2)));\
-  vectText.push_back (DBSText (_RC(D_UINT8*, text3)));\
-  vectText.push_back (DBSText (_RC(D_UINT8*, text4)));
+  vectText.push_back (DBSText (_RC(uint8_t*, text2)));\
+  vectText.push_back (DBSText (_RC(uint8_t*, text3)));\
+  vectText.push_back (DBSText (_RC(uint8_t*, text4)));
 
 
 #define CLEAR_VECTORS vectBool.clear();\
@@ -199,12 +199,12 @@ struct DBSFieldDescriptor field_descs[] = {
 
 };
 
-static const D_UINT FIXED_DESC_FIELDS_COUNT = 15;
-static const D_UINT VAR_DESC_FIELDS_COUNT = 16;
-static const D_UINT TOTAL_DESC_FIELDS_COUNT = 31;
+static const uint_t FIXED_DESC_FIELDS_COUNT = 15;
+static const uint_t VAR_DESC_FIELDS_COUNT = 16;
+static const uint_t TOTAL_DESC_FIELDS_COUNT = 31;
 
-static const D_CHAR *
-type_to_text (D_UINT type)
+static const char *
+type_to_text (uint_t type)
 {
   if (type == T_BOOL)
     {
@@ -276,9 +276,9 @@ type_to_text (D_UINT type)
 
 
 static void
-print_table_fields (I_DBSHandler& rDbs, const D_CHAR* tb_name)
+print_table_fields (I_DBSHandler& rDbs, const char* tb_name)
 {
-  D_UINT      fieldIndex = 0;
+  uint_t      fieldIndex = 0;
   I_DBSTable& table      = rDbs.RetrievePersistentTable (tb_name);
 
   std::cout << "Field list:" << std::endl;
@@ -296,10 +296,10 @@ print_table_fields (I_DBSHandler& rDbs, const D_CHAR* tb_name)
   rDbs.ReleaseTable (table);
 }
 
-template <class T> D_UINT
+template <class T> uint_t
 add_fixed_values_vector_to_table (I_DBSTable& table, std::vector<T> &vectValues)
 {
-  D_UINT fieldIndex = 0;
+  uint_t fieldIndex = 0;
 
   while (fieldIndex < table.GetFieldsCount())
     {
@@ -317,7 +317,7 @@ add_fixed_values_vector_to_table (I_DBSTable& table, std::vector<T> &vectValues)
     return ~0;
 
 
-  for (D_UINT index = 0; index < vectValues.size(); ++index)
+  for (uint_t index = 0; index < vectValues.size(); ++index)
     {
       if (table.GetAllocatedRows() <= index)
         table.AddRow();
@@ -329,11 +329,11 @@ add_fixed_values_vector_to_table (I_DBSTable& table, std::vector<T> &vectValues)
 }
 
 template <class T> bool
-test_fixed_values_vector (I_DBSTable& table, const D_UINT fieldIndex, std::vector<T> &vectValues)
+test_fixed_values_vector (I_DBSTable& table, const uint_t fieldIndex, std::vector<T> &vectValues)
 {
   T fieldValue;
 
-  for (D_UINT rowIndex = 0; rowIndex < table.GetAllocatedRows(); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < table.GetAllocatedRows(); ++rowIndex)
     {
       table.GetEntry(rowIndex, fieldIndex, fieldValue);
       if (! (fieldValue == vectValues[rowIndex]))
@@ -345,11 +345,11 @@ test_fixed_values_vector (I_DBSTable& table, const D_UINT fieldIndex, std::vecto
 
 template <class T> bool
 test_fixed_values_vector_reverse (I_DBSTable& table,
-                                  const D_UINT fieldIndex,
+                                  const uint_t fieldIndex,
                                   std::vector<T> &vectValues)
 {
   T fieldValue;
-  D_UINT rowIndex = table.GetAllocatedRows();
+  uint_t rowIndex = table.GetAllocatedRows();
 
   do
     {
@@ -367,7 +367,7 @@ template <class T> bool
 test_fixed_value_field (I_DBSHandler& rDbs, std::vector<T> &valuesVect)
 {
 
-  D_UINT fieldIndex = ~0;
+  uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
@@ -375,7 +375,7 @@ test_fixed_value_field (I_DBSHandler& rDbs, std::vector<T> &valuesVect)
 
     fieldIndex = add_fixed_values_vector_to_table (table, valuesVect);
 
-    if (fieldIndex == _SC(D_UINT, ~0))
+    if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
@@ -402,13 +402,13 @@ template <class T> bool
 test_fixed_value_field (I_DBSTable& table, std::vector<T> &valuesVect)
 {
 
-  D_UINT fieldIndex = ~0;
+  uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
     fieldIndex = add_fixed_values_vector_to_table (table, valuesVect);
 
-    if (fieldIndex == _SC(D_UINT, ~0))
+    if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
@@ -461,18 +461,18 @@ test_fixed_values_table (I_DBSHandler& rDbs)
 }
 
 template <class T> bool
-check_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
+check_value_array (std::vector<T> &source, DBSArray& array, const uint_t seed)
 {
   if (array.ElementsType() != source[0].GetDBSType ())
     return false;
 
-  D_UINT arrayIndex = 0;
+  uint_t arrayIndex = 0;
 
-  for (D_UINT elIndex = 0; elIndex < source.size (); ++elIndex)
+  for (uint_t elIndex = 0; elIndex < source.size (); ++elIndex)
     {
       T testElement;
 
-      D_UINT64 testIndex = (elIndex + seed) % source.size ();
+      uint64_t testIndex = (elIndex + seed) % source.size ();
       if (source[testIndex] == T ())
         continue;
 
@@ -488,14 +488,14 @@ check_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
 }
 
 template <class T> bool
-fill_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
+fill_value_array (std::vector<T> &source, DBSArray& array, const uint_t seed)
 {
   if (array.ElementsType() != source[0].GetDBSType ())
     return false;
 
-  for (D_UINT elIndex = 0; elIndex < source.size (); ++elIndex)
+  for (uint_t elIndex = 0; elIndex < source.size (); ++elIndex)
     {
-      D_UINT64 testIndex = (elIndex + seed) % source.size ();
+      uint64_t testIndex = (elIndex + seed) % source.size ();
       if (source[testIndex] == T ())
         continue;
 
@@ -504,10 +504,10 @@ fill_value_array (std::vector<T> &source, DBSArray& array, const D_UINT seed)
   return check_value_array (source, array, seed);
 }
 
-template <class T> D_UINT
+template <class T> uint_t
 add_vectors_values_to_table (I_DBSTable& table, std::vector<T> &testVect)
 {
-  D_UINT fieldIndex = 0;
+  uint_t fieldIndex = 0;
 
   for (; fieldIndex < table.GetFieldsCount(); ++fieldIndex)
     {
@@ -523,7 +523,7 @@ add_vectors_values_to_table (I_DBSTable& table, std::vector<T> &testVect)
     return ~0;
 
 
-  for (D_UINT rowIndex = 0; rowIndex < testVect.size (); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < testVect.size (); ++rowIndex)
     {
       DBSArray valueArray (_SC(T*, NULL));
 
@@ -540,9 +540,9 @@ add_vectors_values_to_table (I_DBSTable& table, std::vector<T> &testVect)
 }
 
 template <class T> bool
-test_vector_values_table (I_DBSTable& table, D_UINT fieldIndex, std::vector<T> &testVect)
+test_vector_values_table (I_DBSTable& table, uint_t fieldIndex, std::vector<T> &testVect)
 {
-  for (D_UINT rowIndex = 0; rowIndex < table.GetAllocatedRows(); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < table.GetAllocatedRows(); ++rowIndex)
     {
 
       DBSArray testArray (_SC(T*, NULL));
@@ -564,7 +564,7 @@ template <class T> bool
 test_variable_field_array (I_DBSHandler& rDbs, std::vector<T> &testVect)
 {
 
-  D_UINT fieldIndex = ~0;
+  uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
@@ -572,7 +572,7 @@ test_variable_field_array (I_DBSHandler& rDbs, std::vector<T> &testVect)
 
     fieldIndex = add_vectors_values_to_table (table, testVect);
 
-    if (fieldIndex == _SC(D_UINT, ~0))
+    if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
@@ -599,13 +599,13 @@ template <class T> bool
 test_variable_field_array (I_DBSTable& table, std::vector<T> &testVect)
 {
 
-  D_UINT fieldIndex = ~0;
+  uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
     fieldIndex = add_vectors_values_to_table (table, testVect);
 
-    if (fieldIndex == _SC(D_UINT, ~0))
+    if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
@@ -625,7 +625,7 @@ test_variable_field_array (I_DBSTable& table, std::vector<T> &testVect)
 bool
 test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
 {
-  D_UINT fieldIndex = 0;
+  uint_t fieldIndex = 0;
   bool result = true;
 
   {
@@ -649,14 +649,14 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
   if (result)
     {      I_DBSTable& table = rDbs.RetrievePersistentTable(tb_name);
 
-      for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           if (rowIndex >= table.GetAllocatedRows())
             table.AddRow();
           table.SetEntry (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
-      for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           DBSText testValue;
           table.GetEntry (rowIndex, fieldIndex, testValue);
@@ -674,7 +674,7 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
     {
       I_DBSTable& table = rDbs.RetrievePersistentTable(tb_name);
 
-      for (D_UINT rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
+      for (uint_t rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
         {
           --rowIndex;
           DBSText testValue;
@@ -694,7 +694,7 @@ test_text_value_table (I_DBSHandler& rDbs, std::vector<DBSText> &vectText)
 bool
 test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
 {
-  D_UINT fieldIndex = 0;
+  uint_t fieldIndex = 0;
   bool result = true;
 
   {
@@ -714,14 +714,14 @@ test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
 
   if (result)
     {
-      for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           if (rowIndex >= table.GetAllocatedRows())
             table.AddRow();
           table.SetEntry (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
-      for (D_UINT rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           DBSText testValue;
           table.GetEntry (rowIndex, fieldIndex, testValue);
@@ -735,7 +735,7 @@ test_text_value_table (I_DBSTable& table, std::vector<DBSText> &vectText)
 
   if (result)
     {
-      for (D_UINT rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
+      for (uint_t rowIndex = table.GetAllocatedRows(); rowIndex > 0; )
         {
           --rowIndex;
           DBSText testValue;
@@ -935,6 +935,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

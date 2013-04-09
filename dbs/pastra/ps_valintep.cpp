@@ -31,32 +31,32 @@
 using namespace std;
 using namespace pastra;
 
-static const D_INT PS_BOOL_SIZE                = 1;
-static const D_INT PS_CHAR_SIZE                = 4;
-static const D_INT PS_DATE_SIZE                = 4;
-static const D_INT PS_DATETIME_SIZE            = 7;
-static const D_INT PS_HIRESDATE_SIZE           = 11;
-static const D_INT PS_INT8_SIZE                = 1;
-static const D_INT PS_INT16_SIZE               = 2;
-static const D_INT PS_INT32_SIZE               = 4;
-static const D_INT PS_INT64_SIZE               = 8;
-static const D_INT PS_TEXT_SIZE                = 16;
-static const D_INT PS_ARRAY_SIZE               = 16;
+static const int PS_BOOL_SIZE                = 1;
+static const int PS_CHAR_SIZE                = 4;
+static const int PS_DATE_SIZE                = 4;
+static const int PS_DATETIME_SIZE            = 7;
+static const int PS_HIRESDATE_SIZE           = 11;
+static const int PS_INT8_SIZE                = 1;
+static const int PS_INT16_SIZE               = 2;
+static const int PS_INT32_SIZE               = 4;
+static const int PS_INT64_SIZE               = 8;
+static const int PS_TEXT_SIZE                = 16;
+static const int PS_ARRAY_SIZE               = 16;
 
-static const D_INT PS_REAL_SIZE                = 8;
-static const D_INT PS_RICHREAL_SIZE            = 14;
+static const int PS_REAL_SIZE                = 8;
+static const int PS_RICHREAL_SIZE            = 14;
 
-static const D_INT PS_BOOL_ALIGN               = 1;
-static const D_INT PS_CHAR_ALIGN               = 4;
-static const D_INT PS_DATE_ALIGN               = 2;
-static const D_INT PS_DATETIME_ALIGN           = 2;
-static const D_INT PS_HIRESDATE_ALIGN          = 4;
-static const D_INT PS_INT8_ALIGN               = 1;
-static const D_INT PS_INT16_ALIGN              = 2;
-static const D_INT PS_INT32_ALIGN              = 4;
-static const D_INT PS_INT64_ALIGN              = 8;
-static const D_INT PS_TEXT_ALIGN               = 8;
-static const D_INT PS_ARRAY_ALIGN              = 8;
+static const int PS_BOOL_ALIGN               = 1;
+static const int PS_CHAR_ALIGN               = 4;
+static const int PS_DATE_ALIGN               = 2;
+static const int PS_DATETIME_ALIGN           = 2;
+static const int PS_HIRESDATE_ALIGN          = 4;
+static const int PS_INT8_ALIGN               = 1;
+static const int PS_INT16_ALIGN              = 2;
+static const int PS_INT32_ALIGN              = 4;
+static const int PS_INT64_ALIGN              = 8;
+static const int PS_TEXT_ALIGN               = 8;
+static const int PS_ARRAY_ALIGN              = 8;
 
 inline static void
 new_bool (bool value, DBSBool* pOutBool)
@@ -65,27 +65,27 @@ new_bool (bool value, DBSBool* pOutBool)
 }
 
 inline static void
-new_char (D_UINT32 value, DBSChar* pOutChar)
+new_char (uint32_t value, DBSChar* pOutChar)
 {
   _placement_new (pOutChar, DBSChar (value));
 }
 
 inline static void
-new_date (D_INT32  year,
-          D_UINT8  month,
-          D_UINT8  day,
+new_date (int32_t  year,
+          uint8_t  month,
+          uint8_t  day,
           DBSDate* pOutDate)
 {
   _placement_new (pOutDate, DBSDate (year, month, day));
 }
 
 inline static void
-new_datetime (D_INT32      year,
-              D_UINT8      month,
-              D_UINT8      day,
-              D_UINT8      hours,
-              D_UINT8      mins,
-              D_UINT8      secs,
+new_datetime (int32_t      year,
+              uint8_t      month,
+              uint8_t      day,
+              uint8_t      hours,
+              uint8_t      mins,
+              uint8_t      secs,
               DBSDateTime* pOutDateTime)
 {
   _placement_new (pOutDateTime,
@@ -93,13 +93,13 @@ new_datetime (D_INT32      year,
 }
 
 inline static void
-new_hirestime (D_INT32       year,
-               D_UINT8       month,
-               D_UINT8       day,
-               D_UINT8       hours,
-               D_UINT8       mins,
-               D_UINT8       secs,
-               D_UINT32      usescs,
+new_hirestime (int32_t       year,
+               uint8_t       month,
+               uint8_t       day,
+               uint8_t       hours,
+               uint8_t       mins,
+               uint8_t       secs,
+               uint32_t      usescs,
                DBSHiresTime* pOutHiresTime)
 {
   _placement_new (pOutHiresTime,
@@ -114,30 +114,30 @@ new_integer (T_VAL value, T_OBJ* pValue)
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSBool& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSBool& value)
 {
   pLocation[0] = (value.m_Value == false) ? 0 : 1;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSChar& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSChar& value)
 {
-  _RC(D_UINT32*, pLocation)[0] = value.m_Value;
+  _RC(uint32_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSDate& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSDate& value)
 {
 
-  _RC(D_UINT16*, pLocation)[0] = value.m_Year;
+  _RC(uint16_t*, pLocation)[0] = value.m_Year;
   pLocation[2] = value.m_Month;
   pLocation[3] = value.m_Day;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSDateTime& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSDateTime& value)
 {
-  _RC(D_UINT16*, pLocation)[0] = value.m_Year;
+  _RC(uint16_t*, pLocation)[0] = value.m_Year;
   pLocation[2] = value.m_Month;
   pLocation[3] = value.m_Day;
   pLocation[4] = value.m_Hour;
@@ -146,10 +146,10 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSDateTime& value)
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSHiresTime& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSHiresTime& value)
 {
-  _RC(D_UINT32 *, pLocation)[0] = value.m_Microsec;
-  _RC(D_UINT16 *, pLocation)[2] = value.m_Year;
+  _RC(uint32_t *, pLocation)[0] = value.m_Microsec;
+  _RC(uint16_t *, pLocation)[2] = value.m_Year;
   pLocation[6]  = value.m_Month;
   pLocation[7]  = value.m_Day;
   pLocation[8]  = value.m_Hour;
@@ -158,36 +158,36 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSHiresTime& value)
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSInt8 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSInt8 &value)
 {
-  _RC(D_INT8*, pLocation)[0] = value.m_Value;
+  _RC(int8_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSInt16 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSInt16 &value)
 {
-  _RC(D_INT16*, pLocation)[0] = value.m_Value;
+  _RC(int16_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSInt32 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSInt32 &value)
 {
-  _RC(D_INT32*, pLocation)[0] = value.m_Value;
+  _RC(int32_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSInt64 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSInt64 &value)
 {
-  _RC(D_INT64*, pLocation)[0] = value.m_Value;
+  _RC(int64_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSReal& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSReal& value)
 {
-  const D_UINT integerSize    = 5;
-  const D_UINT fractionalSize = 3;
+  const uint_t integerSize    = 5;
+  const uint_t fractionalSize = 3;
 
-  D_INT64 temp;
+  int64_t temp;
 
   temp = value.m_Value.Integer ();
   memcpy (pLocation, &temp, integerSize);
@@ -196,12 +196,12 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSReal& value)
   memcpy (pLocation + integerSize, &temp, fractionalSize);
 }
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSRichReal& value)
+PSValInterp::Store (uint8_t* pLocation, const DBSRichReal& value)
 {
-  const D_UINT integerSize    = 8;
-  const D_UINT fractionalSize = 6;
+  const uint_t integerSize    = 8;
+  const uint_t fractionalSize = 6;
 
-  D_INT64 temp;
+  int64_t temp;
 
   temp = value.m_Value.Integer ();
   memcpy (pLocation, &temp, integerSize);
@@ -211,139 +211,139 @@ PSValInterp::Store (D_UINT8* pLocation, const DBSRichReal& value)
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSUInt8 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSUInt8 &value)
 {
-  _RC(D_UINT8*, pLocation)[0] = value.m_Value;
+  _RC(uint8_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSUInt16 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSUInt16 &value)
 {
-  _RC(D_UINT16*, pLocation)[0] = value.m_Value;
+  _RC(uint16_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSUInt32 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSUInt32 &value)
 {
-  _RC(D_UINT32*, pLocation)[0] = value.m_Value;
+  _RC(uint32_t*, pLocation)[0] = value.m_Value;
 }
 
 void
-PSValInterp::Store (D_UINT8* pLocation, const DBSUInt64 &value)
+PSValInterp::Store (uint8_t* pLocation, const DBSUInt64 &value)
 {
-  _RC(D_UINT64*, pLocation)[0] = value.m_Value;
+  _RC(uint64_t*, pLocation)[0] = value.m_Value;
 }
 
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSBool* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSBool* pValue)
 {
   new_bool (*pLocation != 0, pValue);
   assert ((*pLocation == 0) || (*pLocation == 1));
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSChar* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSChar* pValue)
 {
-  new_char (_RC(const D_UINT32*, pLocation)[0], pValue);
+  new_char (_RC(const uint32_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDate* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSDate* pValue)
 {
 
-  D_INT16 year  = _RC (const D_UINT16*, pLocation)[0];
-  D_UINT8 month = pLocation[2];
-  D_UINT8 day   = pLocation[3];
+  int16_t year  = _RC (const uint16_t*, pLocation)[0];
+  uint8_t month = pLocation[2];
+  uint8_t day   = pLocation[3];
 
   new_date (year, month, day, pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSDateTime* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSDateTime* pValue)
 {
-  D_INT16 year    = _RC (const D_UINT16*, pLocation)[0];
-  D_UINT8 month   = pLocation[2];
-  D_UINT8 day     = pLocation[3];
-  D_UINT8 hours   = pLocation[4];
-  D_UINT8 mins    = pLocation[5];
-  D_UINT8 secs    = pLocation[6];
+  int16_t year    = _RC (const uint16_t*, pLocation)[0];
+  uint8_t month   = pLocation[2];
+  uint8_t day     = pLocation[3];
+  uint8_t hours   = pLocation[4];
+  uint8_t mins    = pLocation[5];
+  uint8_t secs    = pLocation[6];
 
   new_datetime (year, month, day, hours, mins, secs, pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSHiresTime* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSHiresTime* pValue)
 {
-  D_INT32 usecs    = _RC (const D_UINT32*, pLocation)[0];
-  D_INT16 year     = _RC (const D_UINT16*, pLocation)[2];
-  D_UINT8 month    = pLocation[6];
-  D_UINT8 day      = pLocation[7];
-  D_UINT8 hours    = pLocation[8];
-  D_UINT8 mins     = pLocation[9];
-  D_UINT8 secs     = pLocation[10];
+  int32_t usecs    = _RC (const uint32_t*, pLocation)[0];
+  int16_t year     = _RC (const uint16_t*, pLocation)[2];
+  uint8_t month    = pLocation[6];
+  uint8_t day      = pLocation[7];
+  uint8_t hours    = pLocation[8];
+  uint8_t mins     = pLocation[9];
+  uint8_t secs     = pLocation[10];
 
   new_hirestime (year, month, day, hours, mins, secs, usecs, pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt8* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSInt8* pValue)
 {
-  new_integer (_RC(const D_INT8*, pLocation)[0], pValue);
+  new_integer (_RC(const int8_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt16* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSInt16* pValue)
 {
-  new_integer (_RC(const D_INT16*, pLocation)[0], pValue);
+  new_integer (_RC(const int16_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt32* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSInt32* pValue)
 {
-  new_integer (_RC(const D_INT32*, pLocation)[0], pValue);
+  new_integer (_RC(const int32_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSInt64* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSInt64* pValue)
 {
-  new_integer (_RC(const D_INT64*, pLocation)[0], pValue);
+  new_integer (_RC(const int64_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSReal* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSReal* pValue)
 {
-  const D_UINT integerSize    = 5;
-  const D_UINT fractionalSize = 3;
+  const uint_t integerSize    = 5;
+  const uint_t fractionalSize = 3;
 
-  D_INT64 integer = 0;
+  int64_t integer = 0;
   memcpy (&integer, pLocation, integerSize);
 
   if (integer & 0x8000000000)
-    integer |= ~_SC (D_INT64, 0xFFFFFFFFFF);
+    integer |= ~_SC (int64_t, 0xFFFFFFFFFF);
 
-  D_INT64 fractional = 0;
+  int64_t fractional = 0;
   memcpy (&fractional, pLocation + integerSize, fractionalSize);
 
   if (fractional & 0x800000)
-    fractional |= ~_SC (D_INT64, 0xFFFFFF);
+    fractional |= ~_SC (int64_t, 0xFFFFFF);
 
   *pValue = DBSReal (DBS_REAL_T (integer, fractional, DBS_REAL_PREC));
 }
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSRichReal* pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSRichReal* pValue)
 {
-  const D_UINT integerSize    = 8;
-  const D_UINT fractionalSize = 6;
+  const uint_t integerSize    = 8;
+  const uint_t fractionalSize = 6;
 
-  D_INT64 integer = 0;
+  int64_t integer = 0;
   memcpy (&integer, pLocation, integerSize);
 
-  D_INT64 fractional = 0;
+  int64_t fractional = 0;
   memcpy (&fractional, pLocation + integerSize, fractionalSize);
 
   if (fractional & 0x800000000000)
-    fractional |= ~_SC (D_INT64, 0xFFFFFFFFFFFF);
+    fractional |= ~_SC (int64_t, 0xFFFFFFFFFFFF);
 
   *pValue = DBSRichReal (DBS_RICHREAL_T (integer,
                                          fractional,
@@ -351,30 +351,30 @@ PSValInterp::Retrieve (const D_UINT8* pLocation, DBSRichReal* pValue)
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt8 *pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSUInt8 *pValue)
 {
   new_integer (pLocation[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt16 *pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSUInt16 *pValue)
 {
-  new_integer (_RC(const D_UINT16*, pLocation)[0], pValue);
+  new_integer (_RC(const uint16_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt32 *pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSUInt32 *pValue)
 {
-  new_integer (_RC(const D_UINT32*, pLocation)[0], pValue);
+  new_integer (_RC(const uint32_t*, pLocation)[0], pValue);
 }
 
 void
-PSValInterp::Retrieve (const D_UINT8* pLocation, DBSUInt64 *pValue)
+PSValInterp::Retrieve (const uint8_t* pLocation, DBSUInt64 *pValue)
 {
-  new_integer (_RC(const D_UINT64*, pLocation)[0], pValue);
+  new_integer (_RC(const uint64_t*, pLocation)[0], pValue);
 }
 
-D_INT
+int
 PSValInterp::Size (DBS_FIELD_TYPE type, bool isArray)
 {
   if (isArray)
@@ -416,7 +416,7 @@ PSValInterp::Size (DBS_FIELD_TYPE type, bool isArray)
   }
 }
 
-D_INT
+int
 PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
 {
   if (isArray)

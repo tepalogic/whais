@@ -31,32 +31,32 @@
 extern "C" {
 #endif
 
-static const D_UINT8 UTF8_7BIT_MASK  = 0x00;
-static const D_UINT8 UTF8_11BIT_MASK = 0xC0;
-static const D_UINT8 UTF8_16BIT_MASK = 0xE0;
-static const D_UINT8 UTF8_21BIT_MASK = 0xF0;
-static const D_UINT8 UTF8_26BIT_MASK = 0xF8;
-static const D_UINT8 UTF8_31BIT_MASK = 0xFC;
-static const D_UINT8 UTF8_37BIT_MASK = 0xFE;
+static const uint8_t UTF8_7BIT_MASK  = 0x00;
+static const uint8_t UTF8_11BIT_MASK = 0xC0;
+static const uint8_t UTF8_16BIT_MASK = 0xE0;
+static const uint8_t UTF8_21BIT_MASK = 0xF0;
+static const uint8_t UTF8_26BIT_MASK = 0xF8;
+static const uint8_t UTF8_31BIT_MASK = 0xFC;
+static const uint8_t UTF8_37BIT_MASK = 0xFE;
 
-static const D_UINT8 UTF8_EXTRA_BYTE_SIG   = 0x80;
-static const D_UINT8 UTF8_EXTRA_BYTE_MASK  = 0xC0;
-static const D_UINT8 UTF8_MAX_BYTES_COUNT  = 0x08;
+static const uint8_t UTF8_EXTRA_BYTE_SIG   = 0x80;
+static const uint8_t UTF8_EXTRA_BYTE_MASK  = 0xC0;
+static const uint8_t UTF8_MAX_BYTES_COUNT  = 0x08;
 
-D_UINT
-get_utf8_char_size (D_UINT8 firstUtf8Byte);
+uint_t
+get_utf8_char_size (uint8_t firstUtf8Byte);
 
-D_UINT
-decode_utf8_char (const D_UINT8 *pSource, D_UINT32* pCh);
+uint_t
+decode_utf8_char (const uint8_t *pSource, uint32_t* pCh);
 
-D_UINT
-encode_utf8_char (D_UINT32 ch, D_UINT8 *pDest);
+uint_t
+encode_utf8_char (uint32_t ch, uint8_t *pDest);
 
-D_UINT
-utf8_encode_size (D_UINT32 codePoint);
+uint_t
+utf8_encode_size (uint32_t codePoint);
 
-D_INT
-utf8_strlen (const D_UINT8* pSource);
+int
+utf8_strlen (const uint8_t* pSource);
 
 #ifdef __cplusplus
 }

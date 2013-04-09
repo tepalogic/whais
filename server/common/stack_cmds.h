@@ -29,48 +29,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "connection.h"
 
-D_UINT
-cmd_pop_stack (ClientConnection& rConn, D_UINT* const pDataOff);
+uint_t
+cmd_pop_stack (ClientConnection& rConn, uint_t* const pDataOff);
 
-D_UINT
-cmd_push_stack (ClientConnection& rConn, D_UINT* const pDataOff);
+uint_t
+cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff);
 
-D_UINT
-cmd_update_stack_top (ClientConnection& rConn, D_UINT* const pDataOff);
+uint_t
+cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff);
 
-D_UINT
+uint_t
 cmd_read_basic_stack_top (ClientConnection& rConn,
                           StackValue&       value,
-                          D_UINT* const     pDataOffset);
+                          uint_t* const     pDataOffset);
 
-D_UINT
+uint_t
 cmd_read_array_stack_top (ClientConnection& rConn,
                           StackValue&       value,
-                          D_UINT64          hintOffset,
-                          D_UINT* const     pDataOffset);
+                          uint64_t          hintOffset,
+                          uint_t* const     pDataOffset);
 
-D_UINT
+uint_t
 cmd_read_text_stack_top (ClientConnection& rConn,
                          StackValue&       value,
-                         const D_UINT64    hintOffset,
-                         D_UINT* const     pDataOffset);
+                         const uint64_t    hintOffset,
+                         uint_t* const     pDataOffset);
 
-D_UINT
+uint_t
 cmd_read_field_stack_top (ClientConnection& rConn,
                           StackValue&       topValue,
-                          D_UINT64          hintRow,
-                          D_UINT64          hintArrayOff,
-                          D_UINT64          hintTextOff,
-                          D_UINT* const     pDataOffset);
+                          uint64_t          hintRow,
+                          uint64_t          hintArrayOff,
+                          uint64_t          hintTextOff,
+                          uint_t* const     pDataOffset);
 
-D_UINT
+uint_t
 cmd_read_table_stack_top (ClientConnection& rConn,
                           StackValue&       topValue,
-                          const D_UINT      hintField,
-                          D_UINT64          hintRow,
-                          D_UINT64          hintArrayOff,
-                          D_UINT64          hintTextOff,
-                          D_UINT* const     pDataOffset);
+                          const uint_t      hintField,
+                          uint64_t          hintRow,
+                          uint64_t          hintArrayOff,
+                          uint64_t          hintTextOff,
+                          uint_t* const     pDataOffset);
 
 #endif /* STACK_CMDS_H */
 

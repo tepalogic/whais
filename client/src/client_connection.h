@@ -29,12 +29,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "connector.h"
 
-D_UINT
+uint_t
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                D_UINT* const                  pOutFrameSize);
+                uint_t* const                  pOutFrameSize);
 
-D_UINT
+uint_t
 write_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                 const  D_UINT                  frameSize);
+                 const  uint_t                  frameSize);
 
 #endif /* CLIENT_CONNECTION_H_ */

@@ -60,7 +60,7 @@ I_ArrayStrategy::~I_ArrayStrategy()
   assert (m_ShareCount == 0);
 }
 
-D_UINT
+uint_t
 I_ArrayStrategy::ReferenceCount() const
 {
   return m_ReferenceCount;
@@ -84,7 +84,7 @@ I_ArrayStrategy::DecrementReferenceCount ()
     delete this;
 }
 
-D_UINT
+uint_t
 I_ArrayStrategy::ShareCount () const
 {
   return m_ShareCount;
@@ -112,16 +112,16 @@ I_ArrayStrategy::Clone (I_ArrayStrategy& strategy)
   assert (strategy.Type() == m_ElementsType);
   assert (this != &strategy);
 
-  D_UINT64 currentPosition = 0;
-  D_UINT64 cloneSize = strategy.RawSize();
+  uint64_t currentPosition = 0;
+  uint64_t cloneSize = strategy.RawSize();
   while (cloneSize > 0)
     {
       assert (m_ElementRawSize > 0);
 
-      D_UINT8      cloneBuff [128];
-      const D_UINT cloneBuffSize = ((sizeof cloneBuff) / m_ElementRawSize) *
+      uint8_t      cloneBuff [128];
+      const uint_t cloneBuffSize = ((sizeof cloneBuff) / m_ElementRawSize) *
                                     m_ElementRawSize;
-      D_UINT64     toClone = MIN (cloneBuffSize, cloneSize);
+      uint64_t     toClone = MIN (cloneBuffSize, cloneSize);
 
       strategy.ReadRaw (currentPosition, toClone, cloneBuff);
       WriteRaw (currentPosition, toClone, cloneBuff);
@@ -164,7 +164,7 @@ NullArray::~NullArray ()
 {
 }
 
-D_UINT
+uint_t
 NullArray::ReferenceCount () const
 {
   return ~0; //To force new allocation when it will be modified.
@@ -182,7 +182,7 @@ NullArray::DecrementReferenceCount ()
   return ; //Do nothing as we are a singletone that lifes for ever.
 }
 
-D_UINT
+uint_t
 NullArray::ShareCount () const
 {
   return 0;
@@ -203,30 +203,30 @@ NullArray::DecrementShareCount ()
 }
 
 void
-NullArray::ReadRaw (const D_UINT64 offset,
-                    const D_UINT64 length,
-                    D_UINT8*const  pData)
+NullArray::ReadRaw (const uint64_t offset,
+                    const uint64_t length,
+                    uint8_t*const  pData)
 {
   //Someone does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 void
-NullArray::WriteRaw (const D_UINT64       offset,
-                     const D_UINT64       length,
-                     const D_UINT8* const pData)
+NullArray::WriteRaw (const uint64_t       offset,
+                     const uint64_t       length,
+                     const uint8_t* const pData)
 {
   //Someone does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 void
-NullArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
+NullArray::CollapseRaw (const uint64_t offset, const uint64_t count)
 {
   //Someone does not know what is doing!
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
-D_UINT64
+uint64_t
 NullArray::RawSize () const
 {
   return 0;
@@ -309,16 +309,16 @@ TemporalArray::~TemporalArray ()
 }
 
 void
-TemporalArray::ReadRaw (const D_UINT64 offset,
-                        const D_UINT64 length,
-                        D_UINT8 *const pData)
+TemporalArray::ReadRaw (const uint64_t offset,
+                        const uint64_t length,
+                        uint8_t *const pData)
 {
   m_Storage.Read (offset, length, pData);
 }
 void
-TemporalArray::WriteRaw (const D_UINT64       offset,
-                         const D_UINT64       length,
-                         const D_UINT8 *const pData)
+TemporalArray::WriteRaw (const uint64_t       offset,
+                         const uint64_t       length,
+                         const uint8_t *const pData)
 {
   assert ((m_ElementsType >= T_BOOL) && (m_ElementsType < T_TEXT));
   assert (m_ElementRawSize > 0);
@@ -329,7 +329,7 @@ TemporalArray::WriteRaw (const D_UINT64       offset,
   m_ElementsCount = m_Storage.Size () / m_ElementRawSize;
 }
 
-D_UINT64
+uint64_t
 TemporalArray::RawSize () const
 {
   return m_Storage.Size() ;
@@ -342,7 +342,7 @@ TemporalArray::GetTemporal ()
 }
 
 void
-TemporalArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
+TemporalArray::CollapseRaw (const uint64_t offset, const uint64_t count)
 {
   assert ((m_ElementsType >= T_BOOL) && (m_ElementsType < T_TEXT));
   assert (m_ElementRawSize > 0);
@@ -355,7 +355,7 @@ TemporalArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
 
 
 RowFieldArray::RowFieldArray (VLVarsStore&   storage,
-                              D_UINT64       firstRecordEntry,
+                              uint64_t       firstRecordEntry,
                               DBS_FIELD_TYPE type)
   : I_ArrayStrategy (type),
     m_FirstRecordEntry (firstRecordEntry),
@@ -370,7 +370,7 @@ RowFieldArray::RowFieldArray (VLVarsStore&   storage,
   m_Storage.RegisterReference ();
   m_Storage.IncrementRecordRef (m_FirstRecordEntry);
 
-  D_UINT8   elemetsCount[METADATA_SIZE];
+  uint8_t   elemetsCount[METADATA_SIZE];
 
   m_Storage.GetRecord (firstRecordEntry,
                        0,
@@ -414,9 +414,9 @@ RowFieldArray::GetTemporal ()
 }
 
 void
-RowFieldArray::ReadRaw (const D_UINT64 offset,
-                        const D_UINT64 length,
-                        D_UINT8* const pData)
+RowFieldArray::ReadRaw (const uint64_t offset,
+                        const uint64_t length,
+                        uint8_t* const pData)
 {
 
   if (m_TempArray)
@@ -430,9 +430,9 @@ RowFieldArray::ReadRaw (const D_UINT64 offset,
     }
 }
 void
-RowFieldArray::WriteRaw (const D_UINT64       offset,
-                         const D_UINT64       length,
-                         const D_UINT8 *const pData)
+RowFieldArray::WriteRaw (const uint64_t       offset,
+                         const uint64_t       length,
+                         const uint8_t *const pData)
 {
   if (m_TempArray)
     {
@@ -453,7 +453,7 @@ RowFieldArray::WriteRaw (const D_UINT64       offset,
           m_ElementsCount += (offset + length - RawSize ()) /
                              m_ElementRawSize;
 
-          D_UINT8 temp[METADATA_SIZE];
+          uint8_t temp[METADATA_SIZE];
           store_le_int64 (m_ElementsCount, temp);
           m_Storage.UpdateRecord (m_FirstRecordEntry,
                                   0,
@@ -466,7 +466,7 @@ RowFieldArray::WriteRaw (const D_UINT64       offset,
 
 }
 
-D_UINT64
+uint64_t
 RowFieldArray::RawSize () const
 {
   if (m_TempArray)
@@ -478,7 +478,7 @@ RowFieldArray::RawSize () const
 }
 
 void
-RowFieldArray::CollapseRaw (const D_UINT64 offset, const D_UINT64 count)
+RowFieldArray::CollapseRaw (const uint64_t offset, const uint64_t count)
 {
   if (m_TempArray)
     {

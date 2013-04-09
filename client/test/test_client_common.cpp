@@ -12,14 +12,14 @@
 
 using namespace std;
 
-extern const D_CHAR* DefaultDatabaseName ();
-extern const D_UINT  DefaultUserId ();
-extern const D_CHAR* DefaultUserPassword ();
+extern const char* DefaultDatabaseName ();
+extern const uint_t  DefaultUserId ();
+extern const char* DefaultUserPassword ();
 
 static const char DEFAULT_HOST_SEREVR[]   = "localhost";
 static const char DEFAULT_PORT_SERVER[]   = "1761";
 
-static const D_INT ROOT_ID                = 0;
+static const int ROOT_ID                = 0;
 
 static const char ARG_ROOT[]              = "--root";
 static const char ARG_HOST_NAME[]         = "-h";
@@ -46,12 +46,12 @@ tc_settup_connection (int              argc,
   const char*   hostname      = DEFAULT_HOST_SEREVR;
   const char*   port          = DEFAULT_PORT_SERVER;
   const char*   database      = DefaultDatabaseName ();
-  D_UINT        userid        = DefaultUserId ();
+  uint_t        userid        = DefaultUserId ();
   const char*   password      = DefaultUserPassword ();
 
-  D_UINT status = WCS_OK;
+  uint_t status = WCS_OK;
 
-  for (D_INT argi = 1; argi < argc; ++argi)
+  for (int argi = 1; argi < argc; ++argi)
     {
       if (strcmp (argv[argi], ARG_ROOT) == 0)
         userid = ROOT_ID;
@@ -101,6 +101,6 @@ tc_settup_connection (int              argc,
 
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

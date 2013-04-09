@@ -40,18 +40,18 @@
 namespace pastra
 {
 
-static const D_UINT PS_TABLE_FIELD_TYPE_MASK = 0x00FF;
-static const D_UINT PS_TABLE_ARRAY_MASK      = 0x0100;
+static const uint_t PS_TABLE_FIELD_TYPE_MASK = 0x00FF;
+static const uint_t PS_TABLE_ARRAY_MASK      = 0x0100;
 
 struct FieldDescriptor
 {
-  D_UINT32 m_NullBitIndex;
-  D_UINT32 m_StoreIndex;
-  D_UINT32 m_NameOffset;
-  D_UINT32 m_TypeDesc        : 12;
-  D_UINT32 m_Aquired         : 1;
-  D_UINT32 m_IndexNodeSizeKB : 9;
-  D_UINT32 m_IndexUnitsCount : 10;
+  uint32_t m_NullBitIndex;
+  uint32_t m_StoreIndex;
+  uint32_t m_NameOffset;
+  uint32_t m_TypeDesc        : 12;
+  uint32_t m_Aquired         : 1;
+  uint32_t m_IndexNodeSizeKB : 9;
+  uint32_t m_IndexUnitsCount : 10;
 };
 
 
@@ -67,7 +67,7 @@ public:
   virtual ~PrototypeTable ();
 
   //Implementations for I_BTreeNodeManager
-  virtual D_UINT64    RawNodeSize () const;
+  virtual uint64_t    RawNodeSize () const;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent,
                                     const KEY_INDEX  parentKey);
   virtual void        FreeNode (const NODE_INDEX node);
@@ -75,12 +75,12 @@ public:
   virtual void        SetRootNodeId (const NODE_INDEX node);
 
   //Implementations for I_PSBlocksManager
-  virtual void StoreItems (const D_UINT8* pSrcBuffer, D_UINT64 firstItem, D_UINT itemsCount);
-  virtual void RetrieveItems (D_UINT8* pDestBuffer, D_UINT64 firstItem, D_UINT itemsCount);
+  virtual void StoreItems (const uint8_t* pSrcBuffer, uint64_t firstItem, uint_t itemsCount);
+  virtual void RetrieveItems (uint8_t* pDestBuffer, uint64_t firstItem, uint_t itemsCount);
 
   //Implementations for I_DBSTable
   virtual FIELD_INDEX        GetFieldsCount ();
-  virtual FIELD_INDEX        GetFieldIndex (const D_CHAR* pFieldName);
+  virtual FIELD_INDEX        GetFieldIndex (const char* pFieldName);
   virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field);
   virtual ROW_INDEX          GetAllocatedRows ();
   virtual ROW_INDEX          AddRow ();
@@ -249,7 +249,7 @@ public:
                                     const ROW_INDEX    maxCount,
                                     const FIELD_INDEX  field);
 
-  D_UINT           GetRowSize () const;
+  uint_t           GetRowSize () const;
   FieldDescriptor& GetFieldDescriptorInternal (const FIELD_INDEX fieldIndex) const;
 
 private:
@@ -281,7 +281,7 @@ private:
   void      ReleaseIndexField (FieldDescriptor* const pFieldDesc);
 
   //Implementations for I_BTreeNodeManager
-  virtual D_UINT       MaxCachedNodes ();
+  virtual uint_t       MaxCachedNodes ();
   virtual I_BTreeNode* LoadNode (const NODE_INDEX node);
   virtual void         SaveNode (I_BTreeNode* const pNode);
 
@@ -298,10 +298,10 @@ protected:
   ROW_INDEX                             m_RowsCount;
   NODE_INDEX                            m_RootNode;
   NODE_INDEX                            m_FirstUnallocatedRoot;
-  D_UINT32                              m_RowSize;
-  D_UINT32                              m_DescriptorsSize;
+  uint32_t                              m_RowSize;
+  uint32_t                              m_DescriptorsSize;
   FIELD_INDEX                           m_FieldsCount;
-  std::auto_ptr<D_UINT8>                m_FieldsDescriptors;
+  std::auto_ptr<uint8_t>                m_FieldsDescriptors;
   std::vector<FieldIndexNodeManager*>   m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
   WSynchronizer                         m_Sync;
@@ -311,22 +311,22 @@ protected:
 class TableRmKey : public I_BTreeKey
 {
 public:
-  TableRmKey (const D_UINT64 row) : m_Row (row) {};
+  TableRmKey (const uint64_t row) : m_Row (row) {};
 
-  operator D_UINT64 () const { return m_Row; }
-  const D_UINT64 m_Row;
+  operator uint64_t () const { return m_Row; }
+  const uint64_t m_Row;
 };
 
 class TableRmNode : public I_BTreeNode
 {
 public:
-  static const D_UINT RAW_NODE_SIZE = 16384;
+  static const uint_t RAW_NODE_SIZE = 16384;
 
   TableRmNode (PrototypeTable& table, const NODE_INDEX nodeId);
   virtual ~TableRmNode ();
 
   //Implementation of I_BTreeNode
-  virtual D_UINT     KeysPerNode () const;
+  virtual uint_t     KeysPerNode () const;
   virtual KEY_INDEX  GetParentKeyIndex (const I_BTreeNode& parent) const;
   virtual NODE_INDEX GetNodeOfKey (const KEY_INDEX keyIndex) const;
   virtual void       AdjustKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex);

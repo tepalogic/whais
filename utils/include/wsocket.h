@@ -30,28 +30,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class EXCEP_SHL WSocketException : public WException
 {
 public:
-  WSocketException (const D_CHAR* message,
-                    const D_CHAR* file,
-                    D_UINT32      line,
-                    D_UINT32      extra);
+  WSocketException (const char* message,
+                    const char* file,
+                    uint32_t      line,
+                    uint32_t      extra);
   virtual WException*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
+  virtual const char*   Description () const;
 };
 
 class EXCEP_SHL WSocket
 {
 public:
-  WSocket (const D_CHAR* const pServerName,
-           const D_CHAR* const pService);
-  WSocket (const D_CHAR* const pServerName,
-           const D_UINT16      port);
-  WSocket (const D_CHAR* const pLocalAddress,
-           const D_CHAR* const pService,
-           const D_UINT        backLog);
-  WSocket (const D_CHAR* const pLocalAddress,
-           const D_UINT16      port,
-           const D_UINT        backLog);
+  WSocket (const char* const pServerName,
+           const char* const pService);
+  WSocket (const char* const pServerName,
+           const uint16_t      port);
+  WSocket (const char* const pLocalAddress,
+           const char* const pService,
+           const uint_t        backLog);
+  WSocket (const char* const pLocalAddress,
+           const uint16_t      port,
+           const uint_t        backLog);
   WSocket (const WH_SOCKET sd);
   WSocket (const WSocket& source);
   ~WSocket ();
@@ -59,8 +59,8 @@ public:
   WSocket& operator= (const WSocket& source);
 
   WSocket Accept ();
-  D_UINT  Read (const D_UINT count, D_UINT8* const pBuffer);
-  void    Write (const D_UINT count, const D_UINT8* const pBuffer);
+  uint_t  Read (const uint_t count, uint8_t* const pBuffer);
+  void    Write (const uint_t count, const uint8_t* const pBuffer);
   void    Close ();
 
 private:

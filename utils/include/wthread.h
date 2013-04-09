@@ -74,13 +74,13 @@ private:
 class EXCEP_SHL WSynchException : public WException
 {
 public:
-  WSynchException (const D_CHAR* message,
-                   const D_CHAR* file,
-                   D_UINT32      line,
-                   D_UINT32      extra);
+  WSynchException (const char* message,
+                   const char* file,
+                   uint32_t      line,
+                   uint32_t      extra);
   virtual WException*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
+  virtual const char*   Description () const;
 };
 
 
@@ -131,13 +131,13 @@ private:
 class EXCEP_SHL WThreadException : public WException
 {
 public:
-  WThreadException (const D_CHAR* message,
-                    const D_CHAR* file,
-                    D_UINT32      line,
-                    D_UINT32      extra);
+  WThreadException (const char* message,
+                    const char* file,
+                    uint32_t      line,
+                    uint32_t      extra);
   virtual WException*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
+  virtual const char*   Description () const;
 };
 
 

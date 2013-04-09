@@ -40,7 +40,7 @@ create_string_store ();
 void
 release_string_store (StringStoreHnd* pStore);
 
-D_CHAR*
-alloc_str (StringStoreHnd store, D_UINT length);
+char*
+alloc_str (StringStoreHnd store, uint_t length);
 
 #endif /* STRSTORE_H */

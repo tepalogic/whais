@@ -35,10 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-D_BOOL
+bool_t
 wh_init_socks ()
 {
-  static D_BOOL _inited = FALSE;
+  static bool_t _inited = FALSE;
 
   WORD wVersionRequested;
   WSADATA wsaData;
@@ -62,17 +62,17 @@ wh_init_socks ()
   return TRUE;
 }
 
-D_UINT32
-wh_socket_client (const D_CHAR* const        pServer,
-                  const D_CHAR* const        pPort,
+uint32_t
+wh_socket_client (const char* const        pServer,
+                  const char* const        pPort,
                   WH_SOCKET* const           pOutSocket)
 {
   struct addrinfo  hints    = {0, };
   struct addrinfo* pResults = NULL;
   struct addrinfo* pIt      = NULL;
-  D_UINT32         status   = ~0;
-  D_INT            sd       = -1;
-  const D_INT      on       = 1;
+  uint32_t         status   = ~0;
+  int            sd       = -1;
+  const int      on       = 1;
 
 
   assert (pServer != NULL);
@@ -124,18 +124,18 @@ wh_socket_client (const D_CHAR* const        pServer,
   return status;
 }
 
-D_UINT32
-wh_socket_server (const D_CHAR* const       pLocalAdress,
-                  const D_CHAR* const       pPort,
-                  const D_UINT              listenBackLog,
+uint32_t
+wh_socket_server (const char* const       pLocalAdress,
+                  const char* const       pPort,
+                  const uint_t              listenBackLog,
                   WH_SOCKET* const          pOutSocket)
 {
   struct addrinfo  hints    = {0, };
   struct addrinfo* pResults = NULL;
   struct addrinfo* pIt      = NULL;
-  D_UINT32         status   = ~0;
-  D_INT            sd       = -1;
-  const D_INT      on       = 1;
+  uint32_t         status   = ~0;
+  int            sd       = -1;
+  const int      on       = 1;
 
   assert (pPort != NULL);
 
@@ -193,7 +193,7 @@ wh_socket_server (const D_CHAR* const       pLocalAdress,
   return status;
 }
 
-D_UINT32
+uint32_t
 wh_socket_accept (const WH_SOCKET      sd,
                   WH_SOCKET* const     pConnectSocket)
 {
@@ -205,21 +205,21 @@ wh_socket_accept (const WH_SOCKET      sd,
   return WOP_OK;
 }
 
-D_UINT32
+uint32_t
 wh_socket_write (const WH_SOCKET      sd,
-                 const D_UINT8*       pBuffer,
-                 const D_UINT         count)
+                 const uint8_t*       pBuffer,
+                 const uint_t         count)
 {
-  D_UINT   wrote = 0;
+  uint_t   wrote = 0;
 
   assert (count > 0);
 
   while (wrote < count)
     {
-      const D_INT chunk = send (sd, pBuffer + wrote, count - wrote, 0);
+      const int chunk = send (sd, pBuffer + wrote, count - wrote, 0);
       if (chunk < 0)
         {
-          const D_UINT32 status = WSAGetLastError ();
+          const uint32_t status = WSAGetLastError ();
           if (status != WSATRY_AGAIN)
             return status;
         }
@@ -235,26 +235,26 @@ wh_socket_write (const WH_SOCKET      sd,
   return WOP_OK;
 }
 
-D_UINT32
+uint32_t
 wh_socket_read (const WH_SOCKET           sd,
-                D_UINT8*                  pOutBuffer,
-                D_UINT* const             pIOCount)
+                uint8_t*                  pOutBuffer,
+                uint_t* const             pIOCount)
 {
   if (*pIOCount == 0)
     return WSAEINVAL;
 
   while (TRUE)
     {
-      const D_INT chunk = recv (sd, pOutBuffer, *pIOCount, 0);
+      const int chunk = recv (sd, pOutBuffer, *pIOCount, 0);
       if (chunk < 0)
         {
-          const D_UINT32 status = WSAGetLastError ();
+          const uint32_t status = WSAGetLastError ();
           if (status != WSATRY_AGAIN)
             return status;
         }
       else
         {
-          assert ((D_UINT)chunk <= *pIOCount);
+          assert ((uint_t)chunk <= *pIOCount);
 
           *pIOCount = chunk;
           break;

@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-static const D_CHAR usageDescription[] =
+static const char usageDescription[] =
 "\n"
 "Usage: wcmd --create db_name [OPTIONS]\n"
 "   or: wcmd --remove db_name [OPTIONS]\n"
@@ -98,8 +98,8 @@ static const D_CHAR usageDescription[] =
 "\n";
 
 
-static const D_CHAR descExit[]    = "Terminate execution.";
-static const D_CHAR descExtExit[] = "Terminate execution.\n"
+static const char descExit[]    = "Terminate execution.";
+static const char descExtExit[] = "Terminate execution.\n"
                                     "Usage:\n"
                                     "  quit";
 
@@ -234,7 +234,7 @@ InitDBS ()
   else
     {
       const string&  workDir     = GetWorkingDirectory ();
-      const D_UINT64 maxFileSize = GetMaximumFileSize ();
+      const uint64_t maxFileSize = GetMaximumFileSize ();
 
       if (GetVerbosityLevel () >= VL_DEBUG)
         {
@@ -312,11 +312,11 @@ RemoveDB ()
     cout << "done." << endl;
 }
 
-D_INT
-main (const D_INT argc, D_CHAR *argv[])
+int
+main (const int argc, char *argv[])
 {
-  D_INT         result     = 0;
-  D_INT         currentArg = 1;
+  int         result     = 0;
+  int         currentArg = 1;
   bool          createDB   = false;
   bool          removeDB   = false;
   string        script;
@@ -571,6 +571,6 @@ main (const D_INT argc, D_CHAR *argv[])
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "WCMD";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "WCMD";
 #endif

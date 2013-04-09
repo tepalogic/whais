@@ -37,7 +37,7 @@ public:
   PersistentTable (DbsHandler&               dbsHandler,
                    const std::string&        tableName,
                    const DBSFieldDescriptor* pFields,
-                   const D_UINT              fieldsCount,
+                   const uint_t              fieldsCount,
                    const bool                temporal = false);
 
   PersistentTable (const PrototypeTable& prototype);
@@ -64,8 +64,8 @@ protected:
 
   //Data members
   const DBSSettings&           m_DbsSettings;
-  D_UINT64                     m_MaxFileSize;
-  D_UINT64                     m_VariableStorageSize;
+  uint64_t                     m_MaxFileSize;
+  uint64_t                     m_VariableStorageSize;
   std::string                  m_BaseFileName;
   std::auto_ptr<FileContainer> m_apMainTable;
   std::auto_ptr<FileContainer> m_apFixedFields;

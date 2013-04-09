@@ -42,35 +42,35 @@ public:
   I_TextStrategy () {};
   virtual ~I_TextStrategy() {};
 
-  virtual D_UINT ReferenceCount () const = 0;
+  virtual uint_t ReferenceCount () const = 0;
   virtual void   IncreaseReferenceCount () = 0;
   virtual void   DecreaseReferenceCount () = 0;
 
-  virtual D_UINT ShareCount () const = 0;
+  virtual uint_t ShareCount () const = 0;
   virtual void   IncreaseShareCount () = 0;
   virtual void   DecreaseShareCount () = 0;
 
-  virtual D_UINT64 CharsCount () = 0;
-  virtual D_UINT64 BytesCount () const = 0;
+  virtual uint64_t CharsCount () = 0;
+  virtual uint64_t BytesCount () const = 0;
 
   virtual void Duplicate (I_TextStrategy& source,
-                          const D_UINT64  newMaxUtf8Size) = 0;
+                          const uint64_t  newMaxUtf8Size) = 0;
 
-  virtual DBSChar CharAt (D_UINT64 index) = 0;
-  virtual void    Append (const D_UINT32 charValue) = 0;
+  virtual DBSChar CharAt (uint64_t index) = 0;
+  virtual void    Append (const uint32_t charValue) = 0;
   virtual void    Append (I_TextStrategy& text) = 0;
-  virtual void    Truncate (D_UINT64 newCharCount) = 0;
-  virtual void    UpdateCharAt (const D_UINT32   charValue,
-                                const D_UINT64   index,
+  virtual void    Truncate (uint64_t newCharCount) = 0;
+  virtual void    UpdateCharAt (const uint32_t   charValue,
+                                const uint64_t   index,
                                 I_TextStrategy** pIOStrategy) = 0;
 
-  virtual void ReadUtf8 (const D_UINT64 offset,
-                         const D_UINT64 count,
-                         D_UINT8 *const pBuffDest) = 0;
-  virtual void WriteUtf8 (const D_UINT64 offset,
-                          const D_UINT64 count,
-                          const D_UINT8 *const pBuffSrc) = 0;
-  virtual void TruncateUtf8 (const D_UINT64 newSize) = 0;
+  virtual void ReadUtf8 (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t *const pBuffDest) = 0;
+  virtual void WriteUtf8 (const uint64_t offset,
+                          const uint64_t count,
+                          const uint8_t *const pBuffSrc) = 0;
+  virtual void TruncateUtf8 (const uint64_t newSize) = 0;
 
   virtual bool                  IsRowValue() const = 0;
   virtual pastra::TemporalText& GetTemporal () = 0;
@@ -85,29 +85,29 @@ namespace pastra
 class GenericText : public I_TextStrategy
 {
 public:
-  GenericText (D_UINT64 bytesSize);
+  GenericText (uint64_t bytesSize);
 
   //Implementations of public I_TextStrategy
-  virtual D_UINT ReferenceCount () const;
+  virtual uint_t ReferenceCount () const;
   virtual void   IncreaseReferenceCount ();
   virtual void   DecreaseReferenceCount ();
 
-  virtual D_UINT ShareCount () const;
+  virtual uint_t ShareCount () const;
   virtual void   IncreaseShareCount ();
   virtual void   DecreaseShareCount ();
 
-  virtual D_UINT64 CharsCount ();
-  virtual D_UINT64 BytesCount () const;
+  virtual uint64_t CharsCount ();
+  virtual uint64_t BytesCount () const;
 
   virtual void Duplicate (I_TextStrategy& source,
-                          const D_UINT64  newMaxUtf8Size);
+                          const uint64_t  newMaxUtf8Size);
 
-  virtual DBSChar CharAt (D_UINT64 index);
-  virtual void    Append (const D_UINT32 charValue);
+  virtual DBSChar CharAt (uint64_t index);
+  virtual void    Append (const uint32_t charValue);
   virtual void    Append (I_TextStrategy& text);
-  virtual void    Truncate (D_UINT64 newCharCount);
-  virtual void    UpdateCharAt (const D_UINT32   charValue,
-                                const D_UINT64   index,
+  virtual void    Truncate (uint64_t newCharCount);
+  virtual void    UpdateCharAt (const uint32_t   charValue,
+                                const uint64_t   index,
                                 I_TextStrategy** pIOStrategy);
 
   virtual bool          IsRowValue() const;
@@ -119,36 +119,36 @@ protected:
 
   virtual void ClearMyself () = 0;
 
-  D_UINT64 m_BytesSize;
-  D_UINT64 m_CachedCharCount;
-  D_UINT64 m_CachedCharIndex;
-  D_UINT64 m_CachedCharIndexOffset;
-  D_UINT   m_ReferenceCount;
-  D_UINT   m_ShareCount;
+  uint64_t m_BytesSize;
+  uint64_t m_CachedCharCount;
+  uint64_t m_CachedCharIndex;
+  uint64_t m_CachedCharIndexOffset;
+  uint_t   m_ReferenceCount;
+  uint_t   m_ShareCount;
 
 
-  static const D_UINT64 INVALID_CACHE_VALUE = ~0ull;
+  static const uint64_t INVALID_CACHE_VALUE = ~0ull;
 };
 
 class NullText : public GenericText
 {
 public:
   //Implementations of I_TextStrategy
-  virtual D_UINT ReferenceCount () const;
+  virtual uint_t ReferenceCount () const;
   virtual void   IncreaseReferenceCount ();
   virtual void   DecreaseReferenceCount ();
 
-  virtual D_UINT ShareCount () const;
+  virtual uint_t ShareCount () const;
   virtual void   IncreaseShareCount ();
   virtual void   DecreaseShareCount ();
 
-  virtual void ReadUtf8 (const D_UINT64 offset,
-                         const D_UINT64 count,
-                         D_UINT8 *const pBuffDest);
-  virtual void WriteUtf8 (const D_UINT64 offset,
-                          const D_UINT64 count,
-                          const D_UINT8 *const pBuffSrc);
-  virtual void TruncateUtf8 (const D_UINT64 newSize);
+  virtual void ReadUtf8 (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t *const pBuffDest);
+  virtual void WriteUtf8 (const uint64_t offset,
+                          const uint64_t count,
+                          const uint8_t *const pBuffSrc);
+  virtual void TruncateUtf8 (const uint64_t newSize);
 
   static NullText& GetSingletoneInstace ();
 
@@ -165,19 +165,19 @@ class TemporalText : public GenericText
 {
   friend class PrototypeTable;
 public:
-  TemporalText (const D_UINT8 *pUtf8String, D_UINT64 bytesCount = ~0);
+  TemporalText (const uint8_t *pUtf8String, uint64_t bytesCount = ~0);
   virtual ~TemporalText ();
 
   //Implementations of I_TextStrategy
-  virtual void ReadUtf8 (const D_UINT64 offset,
-                         const D_UINT64 count,
-                         D_UINT8 *const pBuffDest);
-  virtual void WriteUtf8 (const D_UINT64 offset,
-                          const D_UINT64 count,
-                          const D_UINT8 *const pBuffSrc);
-  virtual void TruncateUtf8 (const D_UINT64 newSize);
-  virtual void UpdateCharAt (const D_UINT32   charValue,
-                             const D_UINT64   index,
+  virtual void ReadUtf8 (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t *const pBuffDest);
+  virtual void WriteUtf8 (const uint64_t offset,
+                          const uint64_t count,
+                          const uint8_t *const pBuffSrc);
+  virtual void TruncateUtf8 (const uint64_t newSize);
+  virtual void UpdateCharAt (const uint32_t   charValue,
+                             const uint64_t   index,
                              I_TextStrategy** pIOStrategy);
 
   virtual TemporalText& GetTemporal();
@@ -194,20 +194,20 @@ class RowFieldText : public GenericText
 {
   friend class PrototypeTable;
 public:
-  RowFieldText (VLVarsStore& storage, D_UINT64 firstEntry, D_UINT64 bytesSize);
+  RowFieldText (VLVarsStore& storage, uint64_t firstEntry, uint64_t bytesSize);
 
   //Implementations of I_TextStrategy
-  virtual void ReadUtf8 (const D_UINT64 offset,
-                         const D_UINT64 count,
-                         D_UINT8 *const pBuffDest);
-  virtual void WriteUtf8 (const D_UINT64 offset,
-                          const D_UINT64 count,
-                          const D_UINT8 *const pBuffSrc);
+  virtual void ReadUtf8 (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t *const pBuffDest);
+  virtual void WriteUtf8 (const uint64_t offset,
+                          const uint64_t count,
+                          const uint8_t *const pBuffSrc);
 
-  virtual void TruncateUtf8 (const D_UINT64 newSize);
+  virtual void TruncateUtf8 (const uint64_t newSize);
 
-  virtual void UpdateCharAt (const D_UINT32   charValue,
-                             const D_UINT64   index,
+  virtual void UpdateCharAt (const uint32_t   charValue,
+                             const uint64_t   index,
                              I_TextStrategy** pIOStrategy);
 
   virtual bool          IsRowValue() const;
@@ -219,11 +219,11 @@ protected:
 
   virtual void ClearMyself ();
 
-  static const D_UINT64 CACHE_META_DATA_SIZE = 3 * sizeof (D_UINT32);
-  static const D_UINT32 MAX_CHARS_COUNT      = 0xFFFFFFFF;
-  static const D_UINT32 MAX_BYTES_COUNT      = 0xFFFFFFFF;
+  static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof (uint32_t);
+  static const uint32_t MAX_CHARS_COUNT      = 0xFFFFFFFF;
+  static const uint32_t MAX_BYTES_COUNT      = 0xFFFFFFFF;
 
-  const D_UINT64  m_FirstEntry;
+  const uint64_t  m_FirstEntry;
   VLVarsStore&    m_Storage;
   TemporalText*   m_TempText;
 

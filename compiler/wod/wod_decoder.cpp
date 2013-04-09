@@ -32,16 +32,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../../utils/include/le_converter.h"
 
-static const D_UINT MAX_INT64_LENGTH = 25;        //log (MAX_UINT64) = 19.34
-static const D_UINT MAX_RREAL_LENGTH = 64;        //log (MAX_UINT64) = 19.34
+static const uint_t MAX_INT64_LENGTH = 25;        //log (MAX_UINT64) = 19.34
+static const uint_t MAX_RREAL_LENGTH = 64;        //log (MAX_UINT64) = 19.34
 
-static const D_CHAR*
-int_to_ascii (D_UINT64 value,
-              D_CHAR*  pOutBuffer,
-              D_BOOL   isUnsigned = TRUE)
+static const char*
+into_ascii (uint64_t value,
+              char*  pOutBuffer,
+              bool_t   isUnsigned = TRUE)
 {
-  D_UINT       index    = MAX_INT64_LENGTH - 1;
-  const D_BOOL negative = isUnsigned ? FALSE : ((value >> 63) & 1) != 0;
+  uint_t       index    = MAX_INT64_LENGTH - 1;
+  const bool_t negative = isUnsigned ? FALSE : ((value >> 63) & 1) != 0;
 
   pOutBuffer[index--] = 0;
 
@@ -62,15 +62,15 @@ int_to_ascii (D_UINT64 value,
   return pOutBuffer + index;
 }
 
-static const D_CHAR*
-fracint_to_ascii (D_UINT64 value,
-                  D_CHAR*  pOutBuffer,
-                  D_UINT64 precision)
+static const char*
+fracint_to_ascii (uint64_t value,
+                  char*  pOutBuffer,
+                  uint64_t precision)
 {
-  D_UINT index  = MAX_INT64_LENGTH - 1;
+  uint_t index  = MAX_INT64_LENGTH - 1;
 
   pOutBuffer[index--] = 0;
-  for (D_UINT64 p = 1; p < precision; p *= 10)
+  for (uint64_t p = 1; p < precision; p *= 10)
     {
       pOutBuffer[index] = (value % 10) + '0';
       value /= 10;
@@ -82,33 +82,33 @@ fracint_to_ascii (D_UINT64 value,
 
 
 static inline void
-int8_str_conv (D_CHAR* pOutput, D_UINT8 value)
+int8_str_conv (char* pOutput, uint8_t value)
 {
-  const D_UINT8 hiDigit = (value >> 4) & 0x0F;
-  const D_UINT8 loDigit = value & 0x0F;
+  const uint8_t hiDigit = (value >> 4) & 0x0F;
+  const uint8_t loDigit = value & 0x0F;
 
   pOutput[0] = (hiDigit > 9) ? 'A' + (hiDigit - 10) : '0' + hiDigit;
   pOutput[1] = (loDigit > 9) ? 'A' + (loDigit - 10) : '0' + loDigit;
   pOutput[2] = 0;
 }
 
-static D_UINT
-wod_dec_w_na (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_na (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   throw WDumpException ("Not a valid opcode encountered!", _EXTRA(0));
   return 0;
 }
 
-static D_UINT
-wod_dec_w_ldnull (const D_UINT8* pInArgs, D_CHAR* pOp1,  D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldnull (const uint8_t* pInArgs, char* pOp1,  char* pOp2)
 {
   pOp1[0] = pOp2[0] = 0;
 
   return 0;
 }
 
-static D_UINT
-wod_dec_w_ldc (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldc (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
 
   pOp1[0] = '\'';
@@ -124,8 +124,8 @@ wod_dec_w_ldc (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   return 4;
 }
 
-static D_UINT
-wod_dec_w_ldi8 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldi8 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   //Does not support any extended character set yet!
   int8_str_conv (pOp1, pInArgs[0]);
@@ -137,8 +137,8 @@ wod_dec_w_ldi8 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   return 1;
 }
 
-static D_UINT
-wod_dec_w_ldi16 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldi16 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   int8_str_conv (pOp1, pInArgs[1]);
   int8_str_conv (pOp1 + 2, pInArgs[0]);
@@ -148,8 +148,8 @@ wod_dec_w_ldi16 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   return 2;
 }
 
-static D_UINT
-wod_dec_w_ldi32 (const D_UINT8* pInArgs, D_CHAR* pOp1,  D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldi32 (const uint8_t* pInArgs, char* pOp1,  char* pOp2)
 {
   int8_str_conv (pOp1, pInArgs[3]);
   int8_str_conv (pOp1 + 2, pInArgs[2]);
@@ -161,8 +161,8 @@ wod_dec_w_ldi32 (const D_UINT8* pInArgs, D_CHAR* pOp1,  D_CHAR* pOp2)
   return 4;
 }
 
-static D_UINT
-wod_dec_w_ldi64 (const D_UINT8* pinArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldi64 (const uint8_t* pinArgs, char* pOp1, char* pOp2)
 {
   int8_str_conv (pOp1, pinArgs[7]);
   int8_str_conv (pOp1 + 2, pinArgs[6]);
@@ -178,40 +178,40 @@ wod_dec_w_ldi64 (const D_UINT8* pinArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   return 8;
 }
 
-static D_UINT
-wod_dec_w_ldd (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldd (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT8 day   = pInArgs[0];
-  const D_UINT8 month = pInArgs[1];
-  const D_INT16 year  = _SC (D_INT16, from_le_int16 (pInArgs + 2));
+  const uint8_t day   = pInArgs[0];
+  const uint8_t month = pInArgs[1];
+  const int16_t year  = _SC (int16_t, from_le_int16 (pInArgs + 2));
 
   assert (day >= 1 && day <= 31);
   assert (month >= 1 && month <= 12);
 
-  strcpy (pOp1, int_to_ascii (_SC (D_INT64, year), t_str, FALSE));
+  strcpy (pOp1, into_ascii (_SC (int64_t, year), t_str, FALSE));
   strcat (pOp1, "/");
-  strcat (pOp1, int_to_ascii (month, t_str));
+  strcat (pOp1, into_ascii (month, t_str));
   strcat (pOp1, "/");
-  strcat (pOp1, int_to_ascii (day, t_str));
+  strcat (pOp1, into_ascii (day, t_str));
 
   pOp2[0] = 0;
 
   return 4;
 }
 
-static D_UINT
-wod_dec_w_lddt (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_lddt (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT8 sec   = pInArgs[0];
-  const D_UINT8 min   = pInArgs[1];
-  const D_UINT8 hour  = pInArgs[2];
-  const D_UINT8 day   = pInArgs[3];
-  const D_UINT8 month = pInArgs[4];
-  const D_INT16 year  = _SC (D_INT16, from_le_int16 (pInArgs + 5));
+  const uint8_t sec   = pInArgs[0];
+  const uint8_t min   = pInArgs[1];
+  const uint8_t hour  = pInArgs[2];
+  const uint8_t day   = pInArgs[3];
+  const uint8_t month = pInArgs[4];
+  const int16_t year  = _SC (int16_t, from_le_int16 (pInArgs + 5));
 
   assert (sec < 60);
   assert (min < 60);
@@ -219,35 +219,35 @@ wod_dec_w_lddt (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   assert (day >= 1 && day <= 31);
   assert (month >= 1 && month <= 12);
 
-  strcpy (pOp1, int_to_ascii (_SC (D_INT16, year), t_str, FALSE));
+  strcpy (pOp1, into_ascii (_SC (int16_t, year), t_str, FALSE));
   strcat (pOp1, "/");
-  strcat (pOp1, int_to_ascii (month, t_str));
+  strcat (pOp1, into_ascii (month, t_str));
   strcat (pOp1, "/");
-  strcat (pOp1, int_to_ascii (day, t_str));
+  strcat (pOp1, into_ascii (day, t_str));
   strcat (pOp1, " ");
-  strcat (pOp1, int_to_ascii (hour, t_str));
+  strcat (pOp1, into_ascii (hour, t_str));
   strcat (pOp1, ":");
-  strcat (pOp1, int_to_ascii (min, t_str));
+  strcat (pOp1, into_ascii (min, t_str));
   strcat (pOp1, ":");
-  strcat (pOp1, int_to_ascii (sec, t_str));
+  strcat (pOp1, into_ascii (sec, t_str));
 
   pOp2[0] = 0;
 
   return 7;
 }
 
-static D_UINT
-wod_dec_w_ldht (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldht (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT32 u_sec = from_le_int32 (pInArgs);
-  const D_UINT8 sec    = pInArgs[4];
-  const D_UINT8 min    = pInArgs[5];
-  const D_UINT8 hour   = pInArgs[6];
-  const D_UINT8 day    = pInArgs[7];
-  const D_UINT8 month  = pInArgs[8];
-  const D_INT16 year   = _SC (D_INT16, from_le_int16 (pInArgs + 9));
+  const uint32_t u_sec = from_le_int32 (pInArgs);
+  const uint8_t sec    = pInArgs[4];
+  const uint8_t min    = pInArgs[5];
+  const uint8_t hour   = pInArgs[6];
+  const uint8_t day    = pInArgs[7];
+  const uint8_t month  = pInArgs[8];
+  const int16_t year   = _SC (int16_t, from_le_int16 (pInArgs + 9));
 
   assert (sec < 60);
   assert (min < 60);
@@ -255,33 +255,33 @@ wod_dec_w_ldht (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   assert (day >= 1 && day <= 31);
   assert (month >= 1 && month <= 12);
 
-  strcpy (pOp1, int_to_ascii (_SC (D_INT64, year), t_str, FALSE));
+  strcpy (pOp1, into_ascii (_SC (int64_t, year), t_str, FALSE));
   strcat (pOp1, "/");
-  strcat (pOp1, int_to_ascii (month, t_str));
+  strcat (pOp1, into_ascii (month, t_str));
   strcat (pOp1, "/");
-  strcat (pOp1, int_to_ascii (day, t_str));
+  strcat (pOp1, into_ascii (day, t_str));
   strcat (pOp1, " ");
-  strcat (pOp1, int_to_ascii (hour, t_str));
+  strcat (pOp1, into_ascii (hour, t_str));
   strcat (pOp1, ":");
-  strcat (pOp1, int_to_ascii (min, t_str));
+  strcat (pOp1, into_ascii (min, t_str));
   strcat (pOp1, ":");
-  strcat (pOp1, int_to_ascii (sec, t_str));
+  strcat (pOp1, into_ascii (sec, t_str));
 
   strcat (pOp1, ".");
-  strcat (pOp1, int_to_ascii (u_sec, t_str));
+  strcat (pOp1, into_ascii (u_sec, t_str));
 
   pOp2[0] = 0;
 
   return 11;
 }
 
-static D_UINT
-wod_dec_w_ldrr (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldrr (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_RREAL_LENGTH];
+  char t_str[MAX_RREAL_LENGTH];
 
-  D_INT64 int_part  = from_le_int64 (pInArgs);
-  D_INT64 frac_part = from_le_int64 (pInArgs + sizeof (D_UINT64));
+  int64_t int_part  = from_le_int64 (pInArgs);
+  int64_t frac_part = from_le_int64 (pInArgs + sizeof (uint64_t));
 
   if ((int_part < 0) || (frac_part < 0))
     {
@@ -292,54 +292,54 @@ wod_dec_w_ldrr (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
   else
     strcpy (pOp1, "");
 
-  strcat (pOp1, int_to_ascii (int_part, t_str, FALSE));
+  strcat (pOp1, into_ascii (int_part, t_str, FALSE));
   strcat (pOp1, ".");
   strcat (pOp1, fracint_to_ascii (frac_part, t_str, W_LDRR_PRECISSION));
 
-  return (sizeof (D_INT64) + sizeof (D_UINT64));
+  return (sizeof (int64_t) + sizeof (uint64_t));
 }
 
 static FDECODE_OPCODE wod_dec_w_ldt  = wod_dec_w_ldi32;
 const FDECODE_OPCODE  wod_dec_w_ldbt = wod_dec_w_ldnull;
 const FDECODE_OPCODE  wod_dec_w_ldbf = wod_dec_w_ldnull;
 
-static D_UINT
-wod_dec_w_ldlo8 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldlo8 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT8 value = pInArgs[0];
+  const uint8_t value = pInArgs[0];
 
-  strcpy (pOp1, int_to_ascii (value, t_str));
+  strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
 
-  return sizeof (D_UINT8);
+  return sizeof (uint8_t);
 }
 
-static D_UINT
-wod_dec_w_ldlo16 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldlo16 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT16 value = from_le_int16 (pInArgs);
+  const uint16_t value = from_le_int16 (pInArgs);
 
-  strcpy (pOp1, int_to_ascii (value, t_str));
+  strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
 
-  return sizeof (D_UINT16);
+  return sizeof (uint16_t);
 }
 
-static D_UINT
-wod_dec_w_ldlo32 (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_ldlo32 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT32 value = from_le_int32 (pInArgs);
+  const uint32_t value = from_le_int32 (pInArgs);
 
-  strcpy (pOp1, int_to_ascii (value, t_str));
+  strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
 
-  return sizeof (D_UINT32);
+  return sizeof (uint32_t);
 }
 
 const FDECODE_OPCODE wod_dec_w_ldgb8  = wod_dec_w_ldlo8;
@@ -370,17 +370,17 @@ const FDECODE_OPCODE wod_dec_w_sta    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_inull  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_nnull  = wod_dec_w_ldnull;
 
-static D_UINT
-wod_dec_w_call (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_call (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_UINT32 value = from_le_int32 (pInArgs);
+  const uint32_t value = from_le_int32 (pInArgs);
 
-  strcpy (pOp1, int_to_ascii (value, t_str));
+  strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
 
-  return sizeof (D_UINT32);
+  return sizeof (uint32_t);
 }
 
 const FDECODE_OPCODE wod_dec_w_ret    = wod_dec_w_ldnull;
@@ -453,18 +453,18 @@ const FDECODE_OPCODE wod_dec_w_subrr  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_xor    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_xorb   = wod_dec_w_ldnull;
 
-static D_UINT
-wod_dec_w_jf (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_jf (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_INT64_LENGTH];
+  char t_str[MAX_INT64_LENGTH];
 
-  const D_INT32 temp  = _SC (D_INT32, from_le_int32 (pInArgs));
-  const D_INT64 value = temp;
+  const int32_t temp  = _SC (int32_t, from_le_int32 (pInArgs));
+  const int64_t value = temp;
 
-  strcpy (pOp1, int_to_ascii (value, t_str, FALSE));
+  strcpy (pOp1, into_ascii (value, t_str, FALSE));
   pOp2[0] = 0;
 
-  return sizeof (D_UINT32);
+  return sizeof (uint32_t);
 }
 
 const FDECODE_OPCODE wod_dec_w_jfc = wod_dec_w_jf;
@@ -478,17 +478,17 @@ const FDECODE_OPCODE wod_dec_w_indf  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_indta = wod_dec_w_ldlo32;
 const FDECODE_OPCODE wod_dec_w_self  = wod_dec_w_ldlo32;
 
-static D_UINT
-wod_dec_w_bsync (const D_UINT8* pInArgs, D_CHAR* pOp1, D_CHAR* pOp2)
+static uint_t
+wod_dec_w_bsync (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
-  D_CHAR t_str[MAX_OP_STRING];
+  char t_str[MAX_OP_STRING];
 
-  const D_UINT8 value = pInArgs[0];
+  const uint8_t value = pInArgs[0];
 
-  strcpy (pOp1, int_to_ascii (value, t_str));
+  strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
 
-  return sizeof (D_UINT8);
+  return sizeof (uint8_t);
 
 }
 
@@ -693,7 +693,7 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_sorb
 };
 
-const D_CHAR *wod_str_table[] = {
+const char *wod_str_table[] = {
   "na",
 
   "ldnull",

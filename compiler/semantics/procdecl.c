@@ -31,12 +31,12 @@
 
 struct Statement*
 find_proc_decl(struct ParserState* pState,
-               const D_CHAR*       pName,
-               const D_UINT        nameLength,
-               const D_BOOL        referenced)
+               const char*       pName,
+               const uint_t        nameLength,
+               const bool_t        referenced)
 {
   const struct UArray* pProcsList = &(pState->globalStmt.spec.glb.procsDecls);
-  D_UINT               procIt     = get_array_count (pProcsList);
+  uint_t               procIt     = get_array_count (pProcsList);
 
   while (procIt-- > 0)
     {
@@ -129,7 +129,7 @@ install_proc_decl(struct ParserState* const pState,
                       stmt.spec.proc.nameLength,
                       FALSE) != NULL)
     {
-      D_CHAR tname[128];
+      char tname[128];
       copy_text_truncate (tname,
                           stmt.spec.proc.name,
                           sizeof tname,

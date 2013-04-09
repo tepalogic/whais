@@ -32,3 +32,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX(a,b) ((a)<(b)?(b):(a))
 
 #endif /*WHISPER_MACROS_H */
+

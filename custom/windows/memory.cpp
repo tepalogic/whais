@@ -81,7 +81,7 @@ operator new (std::size_t size, const std::nothrow_t&) throw()
 }
 
 void*
-operator new (std::size_t size, const D_CHAR* pFile, D_UINT line)
+operator new (std::size_t size, const char* pFile, uint_t line)
 {
 #ifndef ENABLE_MEMORY_TRACE
   (void)pFile;
@@ -124,7 +124,7 @@ operator new[] (std::size_t size, const std::nothrow_t&) throw()
 }
 
 void*
-operator new [] (size_t size, const D_CHAR* pFile, D_UINT line)
+operator new [] (size_t size, const char* pFile, uint_t line)
 {
 #ifndef ENABLE_MEMORY_TRACE
   (void)pFile;
@@ -152,7 +152,7 @@ operator delete (void* ptr)
 }
 
 void
-operator delete (void* ptr, const D_CHAR*, D_UINT)
+operator delete (void* ptr, const char*, uint_t)
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
@@ -174,7 +174,7 @@ operator delete [] (void* ptr)
 }
 
 void
-operator delete[] (void* ptr, const D_CHAR*, D_UINT )
+operator delete[] (void* ptr, const char*, uint_t )
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE

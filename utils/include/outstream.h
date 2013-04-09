@@ -31,10 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct OutputStream
 {
-  D_UINT8* data;
-  D_UINT   dataSize;
-  D_UINT   increment;
-  D_UINT   reserved;
+  uint8_t* data;
+  uint_t   dataSize;
+  uint_t   increment;
+  uint_t   reserved;
 };
 
 #ifdef __cplusplus
@@ -43,36 +43,36 @@ extern "C"
 #endif
 
 struct OutputStream*
-init_outstream (const D_UINT increment, struct OutputStream* pOutStream);
+init_outstream (const uint_t increment, struct OutputStream* pOutStream);
 
 void
 destroy_outstream (struct OutputStream* pStream);
 
 struct OutputStream*
-output_data (struct OutputStream* pStream, const D_UINT8* pData, D_UINT dataSize);
+output_data (struct OutputStream* pStream, const uint8_t* pData, uint_t dataSize);
 
 INLINE static struct OutputStream*
-output_uint8 (struct OutputStream* pStream, D_UINT8 value)
+output_uint8 (struct OutputStream* pStream, uint8_t value)
 {
   return output_data (pStream, &value, sizeof value);
 }
 
 INLINE static struct OutputStream*
-output_uint16 (struct OutputStream* pStream, D_UINT16 value)
+output_uint16 (struct OutputStream* pStream, uint16_t value)
 {
-  return output_data (pStream, (D_UINT8*)&value, sizeof value);
+  return output_data (pStream, (uint8_t*)&value, sizeof value);
 }
 
 INLINE static struct OutputStream*
-output_uint32 (struct OutputStream* pStream, D_UINT32 value)
+output_uint32 (struct OutputStream* pStream, uint32_t value)
 {
-  return output_data (pStream, (D_UINT8*)&value, sizeof value);
+  return output_data (pStream, (uint8_t*)&value, sizeof value);
 }
 
 INLINE static struct OutputStream*
-output_uint64 (struct OutputStream* pStream, D_UINT64 value)
+output_uint64 (struct OutputStream* pStream, uint64_t value)
 {
-  return output_data (pStream, (D_UINT8*)&value, sizeof value);
+  return output_data (pStream, (uint8_t*)&value, sizeof value);
 }
 
 #define get_buffer_outstream(pStream) ((pStream)->data)

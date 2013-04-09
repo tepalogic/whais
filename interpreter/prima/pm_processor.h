@@ -33,19 +33,19 @@ namespace prima
 class Processor
 {
 public:
-  Processor (Session& session, SessionStack& stack, const D_UINT32 procId);
+  Processor (Session& session, SessionStack& stack, const uint32_t procId);
 
   void Run ();
-  void AquireSync (const D_UINT8 sync);
-  void ReleaseSync (const D_UINT8 sync);
+  void AquireSync (const uint8_t sync);
+  void ReleaseSync (const uint8_t sync);
 
   Session&       GetSession () const { return m_Session; }
   SessionStack&  GetStack () const { return m_Stack; }
   const Unit&    GetUnit () const { return m_ProcUnit; }
 
-  const D_UINT8* Code () const { return m_pCode; }
-  D_UINT64       CurrentOffset () const { return m_CodePos; }
-  D_UINT64       CodeSize () const { return m_CodeSize; }
+  const uint8_t* Code () const { return m_pCode; }
+  uint64_t       CurrentOffset () const { return m_CodePos; }
+  uint64_t       CodeSize () const { return m_CodeSize; }
 
   size_t         LocalsCount () const { return m_LocalsCount; }
   size_t         StackBegin () const { return m_StackBegin; }
@@ -54,15 +54,15 @@ private:
   Session&       m_Session;
   SessionStack&  m_Stack;
   const Unit&    m_ProcUnit;
-  const D_UINT8* m_pCode;
-  const D_UINT64 m_CodeSize;
-  D_UINT64       m_CodePos;
-  const D_UINT   m_LocalsCount;
+  const uint8_t* m_pCode;
+  const uint64_t m_CodeSize;
+  uint64_t       m_CodePos;
+  const uint_t   m_LocalsCount;
   const size_t   m_StackBegin;
-  const D_UINT32 m_ProcId;
-  D_UINT16       m_AquiredSync;
+  const uint32_t m_ProcId;
+  uint16_t       m_AquiredSync;
 
-  static const D_UINT16 NO_INDEX = 0xFFFF;
+  static const uint16_t NO_INDEX = 0xFFFF;
 };
 
 }

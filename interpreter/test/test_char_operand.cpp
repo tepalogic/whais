@@ -13,7 +13,7 @@
 
 using namespace prima;
 
-static const D_CHAR admin[] = "administrator";
+static const char admin[] = "administrator";
 
 DBSArray
 get_test_array ()
@@ -371,7 +371,7 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
   StackValue sv (nullOp);
   I_Operand* pOp = NULL;
 
-  for (D_UINT index = 0;
+  for (uint_t index = 0;
        (index < array.ElementsCount ()) && result;
        ++index)
     {
@@ -423,7 +423,7 @@ test_table_value (I_DBSTable& table, DBSArray& array, const DBS_T testVal)
   if (array.ElementsCount () != fieldArray.ElementsCount())
     return false;
 
-  for (D_UINT64 el = 0; el < array.ElementsCount (); ++el)
+  for (uint64_t el = 0; el < array.ElementsCount (); ++el)
     {
       DBS_T firstVal, secondVal;
 
@@ -503,16 +503,16 @@ bool
 test_text_char ()
 {
   bool result = true;
-  const D_CHAR textC[] = "This is a test text!";
-  const D_CHAR textC_2[] = "Here is a test text!";
+  const char textC[] = "This is a test text!";
+  const char textC_2[] = "Here is a test text!";
 
-  DBSText testText (_RC (const D_UINT8*, textC));
+  DBSText testText (_RC (const uint8_t*, textC));
   TextOperand textOp (testText);
 
   if (testText.GetCharactersCount () != (sizeof textC - 1))
     result = false;
 
-  for (D_UINT index = 0; result && (index < sizeof textC - 1); ++index)
+  for (uint_t index = 0; result && (index < sizeof textC - 1); ++index)
     {
       StackValue sv = textOp.GetValueAt (index);
       I_Operand& charOp = sv.GetOperand ();
@@ -520,7 +520,7 @@ test_text_char ()
       DBSChar c;
       charOp.GetValue (c);
 
-      if ( c.IsNull () || (c.m_Value != _SC (D_UINT, textC[index])))
+      if ( c.IsNull () || (c.m_Value != _SC (uint_t, textC[index])))
         result = false;
 
       result &= test_op_invalid_conv (charOp);
@@ -539,7 +539,7 @@ test_text_char ()
   DBSText resultText;
   textOp.GetValue (resultText);
 
-  if (resultText != DBSText (_RC (const D_UINT8*, textC_2)))
+  if (resultText != DBSText (_RC (const uint8_t*, textC_2)))
     result = false;
 
   return result;
@@ -568,10 +568,10 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
     stackTextField = fieldArrayOp.GetValueAt (0);
    }
 
-  const D_CHAR textC[] = "This is a test text!";
-  const D_CHAR textC_2[] = "Here is a test text!";
+  const char textC[] = "This is a test text!";
+  const char textC_2[] = "Here is a test text!";
 
-  DBSText testText (_RC (const D_UINT8*, textC));
+  DBSText testText (_RC (const uint8_t*, textC));
   stackTextField.GetOperand ().SetValue (testText);
 
   DBSText resultText;
@@ -583,7 +583,7 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
   if (testText.GetCharactersCount () != (sizeof textC - 1))
     result = false;
 
-  for (D_UINT index = 0; result && (index < sizeof textC - 1); ++index)
+  for (uint_t index = 0; result && (index < sizeof textC - 1); ++index)
     {
       StackValue sv = stackTextField.GetOperand ().GetValueAt (index);
       I_Operand& charOp = sv.GetOperand ();
@@ -591,7 +591,7 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
       DBSChar c;
       charOp.GetValue (c);
 
-      if ( c.IsNull () || (c.m_Value != _SC (D_UINT, textC[index])))
+      if ( c.IsNull () || (c.m_Value != _SC (uint_t, textC[index])))
         result = false;
 
       result &= test_op_invalid_conv (charOp);
@@ -608,7 +608,7 @@ test_tabletext_char (I_DBSHandler& dbsHnd)
 
   testTable.GetEntry (0, 0, resultText);
 
-  if (resultText != DBSText (_RC (const D_UINT8*, textC_2)))
+  if (resultText != DBSText (_RC (const uint8_t*, textC_2)))
     result = false;
 
   return result;
@@ -657,6 +657,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

@@ -37,25 +37,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-static const D_CHAR COMMENT_CHAR          = '#';
-static const D_CHAR DEFAULT_LISTEN_PORT[] = "1761";
-static const D_CHAR CLEAR_LOG_STREAM[]    = "";
+static const char COMMENT_CHAR          = '#';
+static const char DEFAULT_LISTEN_PORT[] = "1761";
+static const char CLEAR_LOG_STREAM[]    = "";
 
-static const D_CHAR CIPHER_PLAIN[]        = "plain";
-static const D_CHAR CIPHER_3K[]           = "3k";
+static const char CIPHER_PLAIN[]        = "plain";
+static const char CIPHER_3K[]           = "3k";
 
-static const D_UINT MIN_TABLE_CACHE_BLOCK_SIZE  = 1024;
-static const D_UINT MIN_TABLE_CACHE_BLOCK_COUNT = 128;
-static const D_UINT MIN_VL_BLOCK_SIZE           = 1024;
-static const D_UINT MIN_VL_BLOCK_COUNT          = 128;
-static const D_UINT MIN_TEMP_CACHE              = 128;
+static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE  = 1024;
+static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT = 128;
+static const uint_t MIN_VL_BLOCK_SIZE           = 1024;
+static const uint_t MIN_VL_BLOCK_COUNT          = 128;
+static const uint_t MIN_TEMP_CACHE              = 128;
 
-static const D_UINT DEFAULT_MAX_CONNS               = 64;
-static const D_UINT DEFAULT_TABLE_CACHE_BLOCK_SIZE  = 4098;
-static const D_UINT DEFAULT_TABLE_CACHE_BLOCK_COUNT = 1024;
-static const D_UINT DEFAULT_VL_BLOCK_SIZE           = 1024;
-static const D_UINT DEFAULT_VL_BLOCK_COUNT          = 4098;
-static const D_UINT DEFAULT_TEMP_CACHE              = 512;
+static const uint_t DEFAULT_MAX_CONNS               = 64;
+static const uint_t DEFAULT_TABLE_CACHE_BLOCK_SIZE  = 4098;
+static const uint_t DEFAULT_TABLE_CACHE_BLOCK_COUNT = 1024;
+static const uint_t DEFAULT_VL_BLOCK_SIZE           = 1024;
+static const uint_t DEFAULT_VL_BLOCK_COUNT          = 4098;
+static const uint_t DEFAULT_TEMP_CACHE              = 512;
 
 static const string gEntPort ("listen");
 static const string gEntMaxConnections ("max_connections");
@@ -82,16 +82,16 @@ static ServerSettings gMainSettings;
 static bool
 get_enclose_entry (ostream&      os,
                    const string& line,
-                   const D_CHAR  encChar,
+                   const char  encChar,
                    string&       output)
 {
   assert (line.at (0) == encChar);
 
   bool encEnded = false;
 
-  for (D_UINT i = 1; i < line.length (); ++i)
+  for (uint_t i = 1; i < line.length (); ++i)
     {
-      D_CHAR ch = line.at (i);
+      char ch = line.at (i);
       if (ch == encChar)
         {
           encEnded = true;
@@ -118,7 +118,7 @@ GetAdminSettings ()
 }
 
 bool
-SeekAtConfigurationSection (ifstream& config, D_UINT& oConfigLine)
+SeekAtConfigurationSection (ifstream& config, uint_t& oConfigLine)
 {
   static const string identifier = "[CONFIG]";
   static const string delimiters = " \t";
@@ -147,7 +147,7 @@ SeekAtConfigurationSection (ifstream& config, D_UINT& oConfigLine)
 }
 
 bool
-FindNextContextSection (std::ifstream& config, D_UINT& ioConfigLine)
+FindNextContextSection (std::ifstream& config, uint_t& ioConfigLine)
 {
   static const string identifier = "[SESSION]";
   static const string delimiters = " \t";
@@ -175,7 +175,7 @@ FindNextContextSection (std::ifstream& config, D_UINT& ioConfigLine)
 }
 
 bool
-ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
+ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 {
   static const string delimiters = " \t=";
 
@@ -452,7 +452,7 @@ ParseConfigurationSection (ifstream& config, D_UINT& ioConfigLine)
 bool
 ParseContextSection (I_Logger&        log,
                      ifstream&        config,
-                     D_UINT&          ioConfigLine,
+                     uint_t&          ioConfigLine,
                      DBSDescriptors&  output)
 {
   ostringstream logEntry;

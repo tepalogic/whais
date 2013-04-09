@@ -37,15 +37,15 @@ namespace prima
 struct Unit;
 struct ProcedureEntry
 {
-  D_UINT32 m_LocalsCount;
-  D_UINT32 m_ArgsCount;
-  D_UINT32 m_SyncCount;
-  D_UINT32 m_SyncIndex;
-  D_UINT32 m_LocalsIndex;
-  D_UINT32 m_IdIndex;
-  D_UINT32 m_TypeOff;
-  D_UINT32 m_CodeIndex;
-  D_UINT32 m_CodeSize;
+  uint32_t m_LocalsCount;
+  uint32_t m_ArgsCount;
+  uint32_t m_SyncCount;
+  uint32_t m_SyncIndex;
+  uint32_t m_LocalsIndex;
+  uint32_t m_IdIndex;
+  uint32_t m_TypeOff;
+  uint32_t m_CodeIndex;
+  uint32_t m_CodeSize;
   Unit*    m_pUnit;
 };
 
@@ -66,46 +66,46 @@ public:
   {
   }
 
-  D_UINT Count () const { return m_ProcsEntrys.size (); };
+  uint_t Count () const { return m_ProcsEntrys.size (); };
 
-  D_UINT32 AddProcedure (const D_UINT8*           pName,
-                         const D_UINT             nameLength,
-                         const D_UINT32           localsCount,
-                         const D_UINT32           argsCount,
-                         const D_UINT32           syncCount,
+  uint32_t AddProcedure (const uint8_t*           pName,
+                         const uint_t             nameLength,
+                         const uint32_t           localsCount,
+                         const uint32_t           argsCount,
+                         const uint32_t           syncCount,
                          std::vector<StackValue>& localValues,
-                         const D_UINT32*          pTypesOffset,
-                         const D_UINT8*           pCode,
-                         const D_UINT32           codeSize,
+                         const uint32_t*          pTypesOffset,
+                         const uint8_t*           pCode,
+                         const uint32_t           codeSize,
                          Unit&                    unit);
-  D_UINT32 GetProcedure (const D_UINT8* pName,
-                         const D_UINT   nameLength) const;
+  uint32_t GetProcedure (const uint8_t* pName,
+                         const uint_t   nameLength) const;
 
-  const D_UINT8* Name (const D_UINT procEntry) const;
-  Unit&          GetUnit (const D_UINT procEntry) const;
-  D_UINT32       LocalsCount (const D_UINT procEntry) const;
-  D_UINT32       ArgsCount (const D_UINT procEntry) const;
+  const uint8_t* Name (const uint_t procEntry) const;
+  Unit&          GetUnit (const uint_t procEntry) const;
+  uint32_t       LocalsCount (const uint_t procEntry) const;
+  uint32_t       ArgsCount (const uint_t procEntry) const;
 
-  const StackValue& LocalValue (const D_UINT   procEntry,
-                                const D_UINT32 local) const;
-  const D_UINT8*    LocalTI (const D_UINT   procEntry,
-                             const D_UINT32 local) const;
-  const D_UINT8*    Code (const D_UINT procEntry, D_UINT64* pOutCodeSize) const;
+  const StackValue& LocalValue (const uint_t   procEntry,
+                                const uint32_t local) const;
+  const uint8_t*    LocalTI (const uint_t   procEntry,
+                             const uint32_t local) const;
+  const uint8_t*    Code (const uint_t procEntry, uint64_t* pOutCodeSize) const;
 
-  void AquireSync (const D_UINT procEntry, const D_UINT32 sync);
-  void ReleaseSync (const D_UINT procEntry, const D_UINT32 sync);
+  void AquireSync (const uint_t procEntry, const uint32_t sync);
+  void ReleaseSync (const uint_t procEntry, const uint32_t sync);
 
-  static bool IsValid (const D_UINT32 entry)
+  static bool IsValid (const uint32_t entry)
   {
     return entry != INVALID_ENTRY;
   }
 
-  static bool IsGlobalEntry (const D_UINT32 entry)
+  static bool IsGlobalEntry (const uint32_t entry)
   {
     return IsValid (entry) && ((entry & GLOBAL_ID) != 0);
   }
 
-  static void MarkAsGlobalEntry (D_UINT32& entry)
+  static void MarkAsGlobalEntry (uint32_t& entry)
   {
     entry |= GLOBAL_ID;
   }
@@ -114,15 +114,15 @@ private:
   ProcedureManager (const ProcedureManager&);
   ProcedureManager& operator= (const ProcedureManager&);
 
-  static const D_UINT32 GLOBAL_ID     = 0x80000000;
-  static const D_UINT32 INVALID_ENTRY = 0xFFFFFFFF;
+  static const uint32_t GLOBAL_ID     = 0x80000000;
+  static const uint32_t INVALID_ENTRY = 0xFFFFFFFF;
 
   NameSpace&                  m_NameSpace;
   std::vector<ProcedureEntry> m_ProcsEntrys;
-  std::vector<D_UINT8>        m_Identifiers;
+  std::vector<uint8_t>        m_Identifiers;
   std::vector<StackValue>     m_LocalsValues;
-  std::vector<D_UINT32>       m_LocalsTypes;
-  std::vector<D_UINT8>        m_Definitions;
+  std::vector<uint32_t>       m_LocalsTypes;
+  std::vector<uint8_t>        m_Definitions;
   std::vector<bool>           m_SyncStmts;
   WSynchronizer               m_Sync;
 };

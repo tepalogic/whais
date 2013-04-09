@@ -56,13 +56,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct DeclaredVar
 {
-  const D_CHAR*       label;        /* not necessarily  null terminated */
+  const char*       label;        /* not necessarily  null terminated */
   struct DeclaredVar* extra;        /* only for tables, list to/next field entries */
-  D_UINT32            typeSpecOff;
-  D_UINT32            varId;
-  D_UINT32            offset;       /* offset position */
-  D_UINT16            labelLength;  /* label's length */
-  D_UINT16            type;         /* type of this variable */
+  uint32_t            typeSpecOff;
+  uint32_t            varId;
+  uint32_t            offset;       /* offset position */
+  uint16_t            labelLength;  /* label's length */
+  uint16_t            type;         /* type of this variable */
 };
 
 YYSTYPE
@@ -70,14 +70,14 @@ add_id_to_list (YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
 create_type_spec (struct ParserState* pState,
-                  D_UINT16            type);
+                  uint16_t            type);
 
 struct DeclaredVar *
 install_declaration (struct ParserState* const pState,
                      YYSTYPE                   pVar,
                      YYSTYPE                   pType,
-                     const D_BOOL              paramter,
-                     const D_BOOL              unique);
+                     const bool_t              paramter,
+                     const bool_t              unique);
 
 YYSTYPE
 install_list_declrs (struct ParserState* pState,

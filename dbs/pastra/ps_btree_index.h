@@ -39,8 +39,8 @@ class I_BTreeKey
 
 class I_BTreeNodeManager;
 
-typedef D_UINT32 NODE_INDEX;
-typedef D_UINT   KEY_INDEX;
+typedef uint32_t NODE_INDEX;
+typedef uint_t   KEY_INDEX;
 
 static const NODE_INDEX NIL_NODE = ~0;
 
@@ -56,20 +56,20 @@ public:
   NODE_INDEX NodeId () const { return m_Header->m_NodeId; }
   NODE_INDEX GetNext () const { return m_Header->m_Right; }
   NODE_INDEX GetPrev () const { return m_Header->m_Left; }
-  D_UINT16   GetNullKeysCount () const { return m_Header->m_NullKeysCount; };
+  uint16_t   GetNullKeysCount () const { return m_Header->m_NullKeysCount; };
 
-  const D_UINT8*  DataToRead () const
+  const uint8_t*  DataToRead () const
   {
-    return _RC (const D_UINT8*, (m_Header.get () + 1));
+    return _RC (const uint8_t*, (m_Header.get () + 1));
   }
-  D_UINT8*        DataToWrite ()
+  uint8_t*        DataToWrite ()
   {
     MarkDirty ();
-    return _RC (D_UINT8*, (m_Header.get () + 1));
+    return _RC (uint8_t*, (m_Header.get () + 1));
   }
-  D_UINT8*  RawData () const
+  uint8_t*  RawData () const
   {
-    return _RC (D_UINT8*, m_Header.get ());
+    return _RC (uint8_t*, m_Header.get ());
   }
 
   void MarkDirty () {  m_Header->m_Dirty = 1; }
@@ -79,20 +79,20 @@ public:
   void MarkAsUsed() { m_Header->m_Removed = 0; MarkDirty (); };
   void SetNext (const NODE_INDEX next) { m_Header->m_Right = next; MarkDirty (); }
   void SetPrev (const NODE_INDEX prev) { m_Header->m_Left = prev; MarkDirty ();; }
-  void SetNullKeysCount (const D_UINT16 count)
+  void SetNullKeysCount (const uint16_t count)
   {
     m_Header->m_NullKeysCount = count;
     MarkDirty ();
   };
 
-  D_UINT GetKeysCount () const { return m_Header->m_KeysCount; }
-  void   SetKeysCount (D_UINT count)
+  uint_t GetKeysCount () const { return m_Header->m_KeysCount; }
+  void   SetKeysCount (uint_t count)
   {
     m_Header->m_KeysCount = count;
     MarkDirty ();
   }
 
-  virtual D_UINT KeysPerNode () const = 0;
+  virtual uint_t KeysPerNode () const = 0;
 
   virtual bool NeedsSpliting () const;
   virtual bool NeedsJoining () const;
@@ -104,7 +104,7 @@ public:
   virtual void       AdjustKeyNode (const I_BTreeNode& childNode,
                                     const KEY_INDEX    keyIndex) = 0;
   virtual void       SetNodeOfKey (const KEY_INDEX keyIndex, const NODE_INDEX childNode) = 0;
-  virtual void       SetData (const KEY_INDEX keyIndex, const D_UINT8 *data);
+  virtual void       SetData (const KEY_INDEX keyIndex, const uint8_t *data);
 
   virtual KEY_INDEX InsertKey (const I_BTreeKey& key) = 0;
   void              RemoveKey (const I_BTreeKey& key);
@@ -125,16 +125,16 @@ public:
 protected:
   struct NodeHeader
   {
-    D_UINT64  m_Left          : 32;
-    D_UINT64  m_Right         : 32;
-    D_UINT64  m_NodeId        : 32;
-    D_UINT64  m_KeysCount     : 16;
-    D_UINT64  m_NullKeysCount : 16;
-    D_UINT64  m_Leaf          : 1;
-    D_UINT64  m_Dirty         : 1;
-    D_UINT64  m_Removed       : 1;
-    D_UINT64  _reserved       : 61; //To make sure this is aligned well
-    D_UINT64  _unused;
+    uint64_t  m_Left          : 32;
+    uint64_t  m_Right         : 32;
+    uint64_t  m_NodeId        : 32;
+    uint64_t  m_KeysCount     : 16;
+    uint64_t  m_NullKeysCount : 16;
+    uint64_t  m_Leaf          : 1;
+    uint64_t  m_Dirty         : 1;
+    uint64_t  m_Removed       : 1;
+    uint64_t  _reserved       : 61; //To make sure this is aligned well
+    uint64_t  _unused;
   };
 
   I_BTreeNodeManager&       m_NodesMgr;
@@ -202,7 +202,7 @@ public:
   void         ReleaseNode (I_BTreeNode* pNode) { ReleaseNode (pNode->NodeId()); }
   void         FlushNodes ();
 
-  virtual D_UINT64   RawNodeSize () const = 0;
+  virtual uint64_t   RawNodeSize () const = 0;
   virtual NODE_INDEX AllocateNode (const NODE_INDEX parent,
                                    const KEY_INDEX  parentKey) = 0;
   virtual void       FreeNode (const NODE_INDEX node) = 0;
@@ -220,10 +220,10 @@ protected:
     }
 
     I_BTreeNode* m_pNode;
-    D_UINT       m_RefsCount;
+    uint_t       m_RefsCount;
   };
 
-  virtual D_UINT       MaxCachedNodes () = 0;
+  virtual uint_t       MaxCachedNodes () = 0;
   virtual I_BTreeNode* LoadNode (const NODE_INDEX node) = 0;
   virtual void         SaveNode (I_BTreeNode* const pNode) = 0;
 
@@ -259,13 +259,13 @@ private:
 
 
 static inline void
-make_array_room (D_UINT8* const pArray,
-                 const D_UINT   lastIndex,
-                 const D_UINT   fromIndex,
-                 const D_UINT   elemSize)
+make_array_room (uint8_t* const pArray,
+                 const uint_t   lastIndex,
+                 const uint_t   fromIndex,
+                 const uint_t   elemSize)
 {
-  D_UINT lastPos = lastIndex * elemSize + elemSize - 1;
-  D_UINT fromPos = fromIndex * elemSize;
+  uint_t lastPos = lastIndex * elemSize + elemSize - 1;
+  uint_t fromPos = fromIndex * elemSize;
 
   while (lastPos >= fromPos)
     {
@@ -275,13 +275,13 @@ make_array_room (D_UINT8* const pArray,
 }
 
 static inline void
-remove_array_elemes (D_UINT8* const pArray,
-                     const D_UINT   lastIndex,
-                     const D_UINT   fromIndex,
-                     const D_UINT   elemSize)
+remove_array_elemes (uint8_t* const pArray,
+                     const uint_t   lastIndex,
+                     const uint_t   fromIndex,
+                     const uint_t   elemSize)
 {
-  D_UINT lastPos = lastIndex  * elemSize + elemSize - 1;
-  D_UINT fromPos = fromIndex  * elemSize;
+  uint_t lastPos = lastIndex  * elemSize + elemSize - 1;
+  uint_t fromPos = fromIndex  * elemSize;
 
   while (fromPos + elemSize <= lastPos)
     {

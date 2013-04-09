@@ -46,8 +46,8 @@ enum BRANCH_TYPE
 struct Branch
 {
   enum BRANCH_TYPE type;
-  D_INT32          startPos;
-  D_INT32          elsePos;
+  int32_t          startPos;
+  int32_t          elsePos;
 };
 
 void
@@ -79,8 +79,8 @@ enum LOOP_ELEMENT_TYPE
 struct Loop
 {
   enum LOOP_ELEMENT_TYPE type;
-  D_UINT32               startPos;
-  D_INT32                endPos;
+  uint32_t               startPos;
+  int32_t                endPos;
 };
 
 void

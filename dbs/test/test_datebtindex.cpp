@@ -23,20 +23,20 @@ struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_DATE, false}
 };
 
-const D_CHAR db_name[] = "t_baza_date_1";
-const D_CHAR tb_name[] = "t_test_tab";
+const char db_name[] = "t_baza_date_1";
+const char tb_name[] = "t_test_tab";
 
-static D_UINT _rowsCount   = 5000000;
-D_UINT _removedRows = _rowsCount / 10;
+static uint_t _rowsCount   = 5000000;
+uint_t _removedRows = _rowsCount / 10;
 
 static DBSDate _max_date (0x7FFF, 12, 31);
 
 DBSDate
 get_random_date ()
 {
-  D_INT16 year  = w_rnd () & 0xFFFF;
-  D_UINT8 month = w_rnd () % 12 + 1;
-  D_UINT8 day   = w_rnd () % 27 + 1;
+  int16_t year  = w_rnd () & 0xFFFF;
+  uint8_t month = w_rnd () % 12 + 1;
+  uint8_t day   = w_rnd () % 27 + 1;
 
   return DBSDate (year, month, day);
 }
@@ -44,8 +44,8 @@ get_random_date ()
 
 bool
 fill_table_with_values (I_DBSTable& table,
-                        const D_UINT32 rowCount,
-                        D_UINT64 seed,
+                        const uint32_t rowCount,
+                        uint64_t seed,
                         DBSArray& tableValues)
 {
   bool     result = true;
@@ -55,7 +55,7 @@ fill_table_with_values (I_DBSTable& table,
   std::cout << "Filling table with values ... " << std::endl;
 
   w_rnd_set_seed (seed);
-  for (D_UINT index = 0; index < rowCount; ++index)
+  for (uint_t index = 0; index < rowCount; ++index)
     {
       DBSDate value = get_random_date ();
       if (table.AddRow () != index)
@@ -89,7 +89,7 @@ fill_table_with_values (I_DBSTable& table,
       result = false;
     }
 
-  for (D_UINT checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
+  for (uint_t checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
     {
       DBSDate  rowValue;
       DBSUInt64 rowIndex;
@@ -125,14 +125,14 @@ fill_table_with_values (I_DBSTable& table,
 }
 
 bool
-fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
+fill_table_with_first_nulls (I_DBSTable& table, const uint32_t rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
 
   DBSDate nullValue;
 
-  for (D_UINT64 index = 0; index < rowCount; ++index)
+  for (uint64_t index = 0; index < rowCount; ++index)
     {
       table.SetEntry (index, 0, nullValue);
 
@@ -151,7 +151,7 @@ fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
                                            ~0,
                                            0);
 
-  for (D_UINT64 index = 0; (index < rowCount) && result; ++index)
+  for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
       DBSUInt64 element;
       values.GetElement (element, index);
@@ -190,7 +190,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                             0,
                                             ~0,
                                             0);
-  for (D_UINT64 index = 0; (index < _removedRows) && result; ++index)
+  for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
       DBSUInt64 element;
       values.GetElement (element, index);
@@ -213,7 +213,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                    ~0,
                                     0);
 
-  for (D_UINT64 index = _removedRows; (index < _rowsCount) && result; ++index)
+  for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
       DBSUInt64 element;
       values.GetElement (element, index - _removedRows);
@@ -257,7 +257,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   table.RemoveFieldIndex (0);
 
-  for (D_UINT64 index = 0; index < _removedRows; ++index)
+  for (uint64_t index = 0; index < _removedRows; ++index)
     {
       DBSDate rowValue;
       tableValues.GetElement (rowValue, index);
@@ -283,7 +283,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   std::cout << "Check index values ... " << std::endl;
 
-  for (D_UINT64 index = 0; (index < _rowsCount) && result; ++index)
+  for (uint64_t index = 0; (index < _rowsCount) && result; ++index)
     {
       DBSDate rowValue;
       table.GetEntry (index, 0, rowValue);
@@ -355,7 +355,7 @@ main (int argc, char **argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif
 

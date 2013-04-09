@@ -15,37 +15,37 @@
 #include "interpreter.h"
 #include "custom/include/test/test_fmw.h"
 
-static const D_UINT MAX_PROC_PARAM = 10;
-static const D_UINT MAX_FIELDS     = 10;
+static const uint_t MAX_PROC_PARAM = 10;
+static const uint_t MAX_FIELDS     = 10;
 
 struct FieldDesc
 {
-  const D_CHAR*  field_name;
-  const D_UINT16 field_type;
+  const char*  field_name;
+  const uint16_t field_type;
   bool           field_visited;
 };
 
 struct ParameterDesc
 {
-  const D_UINT16      type;
+  const uint16_t      type;
   bool                desc_visited;
-  D_UINT16            field_count;
+  uint16_t            field_count;
   FieldDesc           fields[MAX_FIELDS];
 };
 
 struct ProcDesc
 {
-  const D_CHAR*  name;
-  const D_UINT   param_count;
+  const char*  name;
+  const uint_t   param_count;
   bool           desc_visited;
   ParameterDesc  params[MAX_PROC_PARAM];
 };
 
-static const D_CHAR admin[]    = "administrator";
-static const D_CHAR test_db1[] = "t_testdb_1";
+static const char admin[]    = "administrator";
+static const char test_db1[] = "t_testdb_1";
 
-static const D_UINT ADMIN_PROCS_COUNT = 3;
-static const D_UINT USERS_PROCS_COUNT = 4;
+static const uint_t ADMIN_PROCS_COUNT = 3;
+static const uint_t USERS_PROCS_COUNT = 4;
 
 static ProcDesc admin_procs[ADMIN_PROCS_COUNT] =
     {
@@ -67,7 +67,7 @@ static ProcDesc admin_procs[ADMIN_PROCS_COUNT] =
         }
     };
 
-static const D_UINT8 commonCode[] =
+static const uint8_t commonCode[] =
     "PROCEDURE c1 () RETURN DATE\n"
     "DO\n"
     "RETURN NULL;\n"
@@ -110,7 +110,7 @@ static ProcDesc user_procs[USERS_PROCS_COUNT] =
         }
     };
 
-static const D_UINT8 userCode[] =
+static const uint8_t userCode[] =
     "PROCEDURE u1 () RETURN INT8\n"
     "DO\n"
     "RETURN NULL;\n"
@@ -128,15 +128,15 @@ static const D_UINT8 userCode[] =
     "RETURN NULL;\n"
     "ENDPROC\n";
 
-static const D_CHAR *MSG_PREFIX[] = {
+static const char *MSG_PREFIX[] = {
                                       "", "error ", "warning ", "error "
                                     };
 
-static D_UINT
-get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+static uint_t
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
@@ -156,14 +156,14 @@ get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buff_pos,
-            D_UINT            msg_id,
-            D_UINT            msgType,
-            const D_CHAR*     pMsgFormat,
+            uint_t            buff_pos,
+            uint_t            msg_id,
+            uint_t            msgType,
+            const char*     pMsgFormat,
             va_list           args)
 {
-  const D_CHAR *buffer = (const D_CHAR *) data;
-  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+  const char *buffer = (const char *) data;
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
   fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
@@ -173,8 +173,8 @@ my_postman (WHC_MESSENGER_ARG data,
 
 bool
 load_unit (I_Session&           session,
-           const D_UINT8* const unitCode,
-           const D_UINT         unitCodeSize)
+           const uint8_t* const unitCode,
+           const uint_t         unitCodeSize)
 {
   bool result = true;
 
@@ -197,11 +197,11 @@ load_unit (I_Session&           session,
 }
 
 FieldDesc*
-find_field_desc (const D_CHAR* name,
+find_field_desc (const char* name,
                  FieldDesc*    fields,
-                 const D_UINT  fields_count)
+                 const uint_t  fields_count)
 {
-  for (D_UINT index = 0; index < fields_count; ++index)
+  for (uint_t index = 0; index < fields_count; ++index)
     {
       if (strcmp (fields[index].field_name, name) == 0)
         {
@@ -215,11 +215,11 @@ find_field_desc (const D_CHAR* name,
 }
 
 ProcDesc*
-find_proc_desc (const D_CHAR* name,
+find_proc_desc (const char* name,
                 ProcDesc*     procs,
-                const D_UINT  procs_count)
+                const uint_t  procs_count)
 {
-  for (D_UINT index = 0; index < procs_count; ++index)
+  for (uint_t index = 0; index < procs_count; ++index)
     {
       if (strcmp (procs[index].name, name) == 0)
         {
@@ -234,12 +234,12 @@ find_proc_desc (const D_CHAR* name,
 
 bool
 test_fields_are_ok (I_Session&          session,
-                    const D_CHAR*       procName,
-                    const D_UINT        paramId,
+                    const char*       procName,
+                    const uint_t        paramId,
                     FieldDesc*          fields,
-                    const D_UINT        fields_count)
+                    const uint_t        fields_count)
 {
-  for (D_UINT index = 0;
+  for (uint_t index = 0;
        index < session.ProcedurePameterFieldsCount (procName, paramId);
        ++index)
     {
@@ -250,7 +250,7 @@ test_fields_are_ok (I_Session&          session,
                         fields,
                         fields_count
                                           );
-      const D_UINT type = session.ProcedurePameterFieldType (procName,
+      const uint_t type = session.ProcedurePameterFieldType (procName,
                                                              paramId,
                                                              index);
       if (field == NULL)
@@ -261,7 +261,7 @@ test_fields_are_ok (I_Session&          session,
       field->field_visited = true;
     }
 
-  for (D_UINT index = 0; index < fields_count; ++index)
+  for (uint_t index = 0; index < fields_count; ++index)
     {
       if (! fields[index].field_visited)
         return false;
@@ -296,12 +296,12 @@ test_fields_are_ok (I_Session&          session,
 
 bool
 test_func_paramter (I_Session&     session,
-                    const D_CHAR*  procName,
-                    const D_UINT   paramId,
+                    const char*  procName,
+                    const uint_t   paramId,
                     ParameterDesc* param)
 {
-  const D_UINT type     = session.ProcedurePameterRawType (procName, paramId);
-  const D_UINT fields_c = session.ProcedurePameterFieldsCount (procName,
+  const uint_t type     = session.ProcedurePameterRawType (procName, paramId);
+  const uint_t fields_c = session.ProcedurePameterFieldsCount (procName,
                                                                paramId);
 
   if (param->desc_visited)
@@ -330,12 +330,12 @@ test_func_paramter (I_Session&     session,
 bool
 test_procedures (I_Session&     session,
                  ProcDesc       procedures[],
-                 const D_UINT   procsCount)
+                 const uint_t   procsCount)
 {
   if (procsCount != session.ProceduresCount ())
     return false;
 
-  for (D_UINT index = 0;
+  for (uint_t index = 0;
        index < session.ProceduresCount ();
        ++index)
     {
@@ -352,7 +352,7 @@ test_procedures (I_Session&     session,
         }
       desc->desc_visited = true;
 
-      for (D_UINT param = 0;
+      for (uint_t param = 0;
            param < session.ProcedureParametersCount (desc->name);
            ++param)
         {
@@ -365,14 +365,14 @@ test_procedures (I_Session&     session,
             }
         }
 
-      for (D_UINT param = 0; param < desc->param_count; ++param)
+      for (uint_t param = 0; param < desc->param_count; ++param)
         {
           if (! desc->params[param].desc_visited)
             return false;
         }
     }
 
-  for (D_UINT index = 0; index < procsCount; ++index)
+  for (uint_t index = 0; index < procsCount; ++index)
     {
       if (! procedures[index].desc_visited)
         return false;
@@ -465,6 +465,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

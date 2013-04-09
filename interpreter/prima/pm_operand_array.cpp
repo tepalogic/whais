@@ -55,17 +55,17 @@ ArrayOperand::SetValue (const DBSArray& value)
   m_Value = value;
 }
 
-D_UINT
+uint_t
 ArrayOperand::GetType ()
 {
-  D_UINT type = m_FirstArrayType;
+  uint_t type = m_FirstArrayType;
   MARK_ARRAY (type);
 
   return type;
 }
 
 StackValue
-ArrayOperand::GetValueAt (const D_UINT64 index)
+ArrayOperand::GetValueAt (const uint64_t index)
 {
   switch (m_Value.ElementsType ())
   {
@@ -183,7 +183,7 @@ BoolArrayElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 BoolArrayElOperand::GetType ()
 {
   return T_BOOL;
@@ -229,7 +229,7 @@ CharArrayElOperand::SetValue (const DBSChar& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 CharArrayElOperand::GetType ()
 {
   return T_CHAR;
@@ -293,7 +293,7 @@ DateArrayElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 DateArrayElOperand::GetType ()
 {
   return T_DATE;
@@ -352,7 +352,7 @@ DateTimeArrayElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 DateTimeArrayElOperand::GetType ()
 {
   return T_DATETIME;
@@ -410,7 +410,7 @@ HiresTimeArrayElOperand::SetValue (const DBSHiresTime& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 HiresTimeArrayElOperand::GetType ()
 {
   return T_HIRESTIME;
@@ -614,7 +614,7 @@ UInt8ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt8ArrayElOperand::GetType ()
 {
   return T_UINT8;
@@ -818,7 +818,7 @@ UInt16ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt16ArrayElOperand::GetType ()
 {
   return T_UINT16;
@@ -1022,7 +1022,7 @@ UInt32ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt32ArrayElOperand::GetType ()
 {
   return T_UINT32;
@@ -1226,7 +1226,7 @@ UInt64ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt64ArrayElOperand::GetType ()
 {
   return T_UINT64;
@@ -1430,7 +1430,7 @@ Int8ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int8ArrayElOperand::GetType ()
 {
   return T_INT8;
@@ -1634,7 +1634,7 @@ Int16ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int16ArrayElOperand::GetType ()
 {
   return T_INT16;
@@ -1838,7 +1838,7 @@ Int32ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int32ArrayElOperand::GetType ()
 {
   return T_INT32;
@@ -2042,7 +2042,7 @@ Int64ArrayElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int64ArrayElOperand::GetType ()
 {
   return T_INT64;
@@ -2174,7 +2174,7 @@ RealArrayElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 RealArrayElOperand::GetType ()
 {
   return T_REAL;
@@ -2304,7 +2304,7 @@ RichRealArrayElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 RichRealArrayElOperand::GetType ()
 {
   return T_RICHREAL;

@@ -37,9 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct MsgCodeEntry
 {
-  D_UINT  id;
-  D_UINT  type;
-  D_CHAR* msg;
+  uint_t  id;
+  uint_t  type;
+  char* msg;
 };
 
 /* general eventes related errors, base 100 */
@@ -121,6 +121,6 @@ struct MsgCodeEntry
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
 
 void
-w_log_msg (struct ParserState *pState, D_UINT buffPos, D_UINT msgCode, ...);
+w_log_msg (struct ParserState *pState, uint_t buffPos, uint_t msgCode, ...);
 
 #endif /*WLOG_H_ */

@@ -35,39 +35,39 @@ struct UArray
 {
   size_t realItemSize;
   size_t userItemSize;
-  D_UINT itemsCount;
-  D_UINT itemsReserved;
+  uint_t itemsCount;
+  uint_t itemsReserved;
 
   /* Array of pointers to the array's elements */
-  D_INT8** arraysList;
-  D_UINT   incrementCount;
-  D_UINT   arraysCount;
-  D_UINT   arraysUsed;
+  int8_t** arraysList;
+  uint_t   incrementCount;
+  uint_t   arraysCount;
+  uint_t   arraysUsed;
 };
 
 #define ARRAY_INCRMENT_SIZE     512        /* in bytes here */
 #define init_array(a, x) init_array_ex((a),\
                                        (x),\
                                        (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\
-                                       sizeof(D_UINTMAX))
+                                       sizeof(uint64_t))
 
 struct  UArray*
 init_array_ex (struct UArray* pArray,
                size_t         item_size,
-               D_UINT         increment,
-               D_UINT         alignmentr);
+               uint_t         increment,
+               uint_t         alignmentr);
 
 void*
 add_item (struct UArray* pArray, const void* data);
 
 void*
-get_item (const struct UArray* pArray, D_UINT item);
+get_item (const struct UArray* pArray, uint_t item);
 
-D_UINT
+uint_t
 get_array_count (const struct UArray* pArray);
 
 void
-set_array_count (struct UArray* pArray, D_UINT new_count);
+set_array_count (struct UArray* pArray, uint_t new_count);
 
 void
 destroy_array (struct UArray* pArray);

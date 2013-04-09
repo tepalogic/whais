@@ -44,32 +44,32 @@
 #include "../semantics/wlog.h"
 
 
-INLINE static D_BOOL
+INLINE static bool_t
 is_space (char c)
 {
   return (c == ' ' || c == '\t' || c == 0x0A || c == 0x0D);
 }
 
-INLINE static D_BOOL
-is_numeric (char c, D_BOOL is_hexa)
+INLINE static bool_t
+is_numeric (char c, bool_t is_hexa)
 {
   return (c >= '0' && c <= '9') ||
          (is_hexa && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
 }
 
-INLINE static D_BOOL
+INLINE static bool_t
 is_alpha (char c)
 {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-INLINE static D_BOOL
+INLINE static bool_t
 is_idlegal (char c)
 {
   return is_numeric (c, FALSE) || is_alpha (c) || (c == '_');
 }
 
-INLINE static D_BOOL
+INLINE static bool_t
 is_eol (char c)
 {
   return (c == 0x0A || c == 0x0D);
@@ -98,7 +98,7 @@ typedef enum
 static TOKEN_TYPE
 get_next_token (const char*  pBuffer,
                 char const** pOutPToken,
-                D_UINT*      pOutTokenLen)
+                uint_t*      pOutTokenLen)
 {
   TOKEN_TYPE result = TK_UNDETERMINED;
 
@@ -124,7 +124,7 @@ get_next_token (const char*  pBuffer,
 
   if (is_numeric (*pBuffer, FALSE))
     {
-      D_BOOL isHexa = FALSE;
+      bool_t isHexa = FALSE;
 
       if ((pBuffer[0] == '0') && (pBuffer[1] == 'x' || pBuffer[1] == 'X'))
         {
@@ -217,7 +217,7 @@ get_next_token (const char*  pBuffer,
   else
     pBuffer++;
 
-  *pOutTokenLen = (D_UINT) (pBuffer - *pOutPToken);
+  *pOutTokenLen = (uint_t) (pBuffer - *pOutPToken);
 
   return result;
 }
@@ -225,7 +225,7 @@ get_next_token (const char*  pBuffer,
 typedef struct
 {
   const char* text;
-  D_UINT      token;
+  uint_t      token;
 } TOKEN_SEMANTIC;
 
 /*
@@ -287,9 +287,9 @@ static TOKEN_SEMANTIC keywords[] = {
                                     };
 
 static int
-parse_keyword (const char* keyWord, D_UINT keyLen)
+parse_keyword (const char* keyWord, uint_t keyLen)
 {
-  D_UINT count;
+  uint_t count;
   char   key_upcase[MAX_KEYWORD_LEN];
 
   if (keyLen >= MAX_KEYWORD_LEN)
@@ -337,7 +337,7 @@ static TOKEN_SEMANTIC composed_operators[] = {
 static int
 parse_composed_operator (const char* pOpText)
 {
-  D_UINT count = 0;
+  uint_t count = 0;
 
   while (composed_operators[count].text != NULL)
     {
@@ -350,15 +350,15 @@ parse_composed_operator (const char* pOpText)
   return composed_operators[count].token;
 }
 
-static D_UINT
+static uint_t
 parse_integer (const char* pBuffer,
-               D_UINT      bufferLen,
-               D_UINTMAX*  pOutVal,
-               D_BOOL*     pOutSigned)
+               uint_t      bufferLen,
+               uint64_t*   pOutVal,
+               bool_t*     pOutSigned)
 {
-  const D_UINT oldLen   = bufferLen;
-  D_UINT       base     = 10;
-  D_BOOL       negative = FALSE;
+  const uint_t oldLen   = bufferLen;
+  uint_t       base     = 10;
+  bool_t       negative = FALSE;
 
   assert (pBuffer != NULL);
   assert (bufferLen != 0);
@@ -390,7 +390,7 @@ parse_integer (const char* pBuffer,
 
   while (bufferLen > 0)
     {
-      D_UINT8 digit;
+      uint8_t digit;
 
       if (*pBuffer >= '0' && *pBuffer <= '9')
         digit = (*pBuffer - '0');
@@ -419,15 +419,15 @@ parse_integer (const char* pBuffer,
   return (oldLen - bufferLen);
 }
 
-static D_UINT
+static uint_t
 parse_real_value (const char*      pBuffer,
-                  D_UINT           bufferLen,
+                  uint_t           bufferLen,
                   struct SemCReal* pOutReal)
 {
-  const D_UINT oldLen            = bufferLen;
-  D_BOOL       foundDecimalPoint = FALSE;
-  D_BOOL       negative          = FALSE;
-  D_UINT64     precision         = 1;
+  const uint_t oldLen            = bufferLen;
+  bool_t       foundDecimalPoint = FALSE;
+  bool_t       negative          = FALSE;
+  uint64_t     precision         = 1;
 
   assert (pBuffer != NULL);
   assert (bufferLen != 0);
@@ -492,12 +492,12 @@ parse_real_value (const char*      pBuffer,
   return (oldLen - bufferLen);
 }
 
-static D_UINT
+static uint_t
 parse_character (const char* pBuffer,
-                D_UINT       bufferLen,
-                D_CHAR*      pOutChar)
+                uint_t       bufferLen,
+                char*      pOutChar)
 {
-  D_UINT result = 0;
+  uint_t result = 0;
 
   assert (pBuffer != NULL);
   assert (bufferLen != 0);
@@ -568,11 +568,11 @@ parse_character (const char* pBuffer,
         }
       else if (is_numeric (*pBuffer, FALSE))
         {
-          D_UINTMAX intValue = 0;
-          D_BOOL    dummy;
+          uint64_t  intValue = 0;
+          bool_t    dummy;
 
           result    += parse_integer (pBuffer, bufferLen, &intValue, &dummy);
-          *pOutChar  = (D_CHAR) intValue;
+          *pOutChar  = (char) intValue;
         }
     }
   else
@@ -584,13 +584,13 @@ parse_character (const char* pBuffer,
   return result;
 }
 
-static D_UINT
+static uint_t
 parse_string (const char* pBuffer,
-              D_UINT      bufferLen,
-              D_CHAR*     pOutString,
-              D_UINT*     oOutStringLen)
+              uint_t      bufferLen,
+              char*     pOutString,
+              uint_t*     oOutStringLen)
 {
-  const D_UINT oldLen = bufferLen;
+  const uint_t oldLen = bufferLen;
 
   assert (pBuffer != NULL);
   assert (bufferLen != 0);
@@ -600,7 +600,7 @@ parse_string (const char* pBuffer,
 
   while ((bufferLen > 0) && (*pBuffer != '\"'))
     {
-      D_UINT result = parse_character (pBuffer, bufferLen, pOutString);
+      uint_t result = parse_character (pBuffer, bufferLen, pOutString);
 
       if (result != 0)
         {
@@ -620,29 +620,29 @@ parse_string (const char* pBuffer,
   return (oldLen - bufferLen);
 }
 
-static D_UINT
+static uint_t
 parse_time_value (const char*      pBuffer,
-                  D_UINT           bufferLen,
+                  uint_t           bufferLen,
                   struct SemCTime* pOutTime)
 {
-  D_INTMAX intVal    = 0;
-  D_UINT   intValLen = 0;
-  D_UINT   result    = 0;
-  D_BOOL   dummy;
+  int64_t  intVal;
+  uint_t   intValLen = 0;
+  uint_t   result    = 0;
+  bool_t   dummy;
 
   /* initialise the structure with default valid values */
   memset (pOutTime, 0, sizeof (pOutTime[0]));
   pOutTime->month = pOutTime->day = 1;
 
   /* found the year part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX*) &intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t*)&intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->year = (D_INT16) intVal;
+      pOutTime->year = (int16_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -662,14 +662,14 @@ parse_time_value (const char*      pBuffer,
     }
 
   /* found the month part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t*)&intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->month = (D_UINT8) intVal;
+      pOutTime->month = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -689,14 +689,14 @@ parse_time_value (const char*      pBuffer,
     }
 
   /* found the day part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->day = (D_UINT8) intVal;
+      pOutTime->day = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -716,14 +716,14 @@ parse_time_value (const char*      pBuffer,
     }
 
   /* found the hour part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->hour = (D_UINT8) intVal;
+      pOutTime->hour = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -741,14 +741,14 @@ parse_time_value (const char*      pBuffer,
     }
 
   /* found the minute part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->min = (D_UINT8) intVal;
+      pOutTime->min = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -768,14 +768,14 @@ parse_time_value (const char*      pBuffer,
     }
 
   /* found the second part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->sec = (D_UINT8) intVal;
+      pOutTime->sec = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -795,14 +795,14 @@ parse_time_value (const char*      pBuffer,
     }
 
   /* found the microsecond part */
-  intValLen = parse_integer (pBuffer, bufferLen, (D_UINTMAX *) & intVal, &dummy);
+  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
       pBuffer   += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->usec = (D_UINT32) intVal;
+      pOutTime->usec = (uint32_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -814,11 +814,11 @@ int
 yylex (YYSTYPE * lvalp, struct ParserState* pState)
 {
   int result = 0;
-  const D_CHAR* pBuffer   = pState->buffer;
-  const D_CHAR* pToken    = NULL;
-  D_UINT        tokenLen  = 0;
+  const char* pBuffer   = pState->buffer;
+  const char* pToken    = NULL;
+  uint_t        tokenLen  = 0;
   TOKEN_TYPE    tokenType = TK_ERROR;
-  D_UINT        bufferOff = pState->bufferPos;
+  uint_t        bufferOff = pState->bufferPos;
 
   if (pState->bufferPos > pState->bufferSize)
     return 0;
@@ -828,7 +828,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
   tokenType  = get_next_token (pBuffer, &pToken, &tokenLen);
 
   /* remember to start from here  next time */
-  pState->bufferPos += (D_UINT) ((pToken + tokenLen) - pBuffer);
+  pState->bufferPos += (uint_t) ((pToken + tokenLen) - pBuffer);
 
   /* allocate storage for value */
   *lvalp = NULL;                /* if we are to crash... make it loud */
@@ -964,7 +964,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
 /* this is internally used by yyparse()
  * it's declaration is found on wisper.y */
 int
-yyerror (struct ParserState* pState, const D_CHAR* msg)
+yyerror (struct ParserState* pState, const char* msg)
 {
   w_log_msg (pState, pState->bufferPos, MSG_COMPILER_ERR);
 

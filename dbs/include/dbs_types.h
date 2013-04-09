@@ -27,9 +27,9 @@
 
 #include "whisper.h"
 
-typedef D_UINT32         FIELD_INDEX;
-typedef D_UINT32         TABLE_INDEX;
-typedef D_UINT64         ROW_INDEX;
+typedef uint32_t         FIELD_INDEX;
+typedef uint32_t         TABLE_INDEX;
+typedef uint64_t         ROW_INDEX;
 
 enum DBS_FIELD_TYPE
 {
@@ -59,7 +59,7 @@ enum DBS_FIELD_TYPE
 
 struct DBSFieldDescriptor
 {
-  const D_CHAR*   m_pFieldName;
+  const char*   m_pFieldName;
   DBS_FIELD_TYPE  m_FieldType;
   bool            isArray;
 };

@@ -43,23 +43,23 @@ class I_Logger
 public:
   virtual ~I_Logger ();
 
-  virtual void Log (const LOG_TYPE type, const D_CHAR* pStr) = 0;
+  virtual void Log (const LOG_TYPE type, const char* pStr) = 0;
   virtual void Log (const LOG_TYPE type, const std::string& str) = 0;
 };
 
 class Logger : public I_Logger
 {
 public:
-  Logger (const D_CHAR* const pFile, const bool printStart = true);
+  Logger (const char* const pFile, const bool printStart = true);
 
-  void Log (const LOG_TYPE type, const D_CHAR* pStr);
+  void Log (const LOG_TYPE type, const char* pStr);
   void Log (const LOG_TYPE type, const std::string& str);
 
 private:
   Logger (const I_Logger&);
   Logger& operator= (const I_Logger&);
 
-  D_UINT PrintTimeMark (LOG_TYPE type, WTICKS ticks);
+  uint_t PrintTimeMark (LOG_TYPE type, WTICKS ticks);
 
   WTICKS        m_StartTick;
   WSynchronizer m_Sync;
@@ -69,7 +69,7 @@ private:
 class NullLogger : public I_Logger
 {
 public:
-  void Log (const LOG_TYPE type, const D_CHAR* pStr);
+  void Log (const LOG_TYPE type, const char* pStr);
   void Log (const LOG_TYPE type, const std::string& str);
 };
 

@@ -12,7 +12,7 @@
 extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -32,10 +32,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  int vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
@@ -49,7 +49,7 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-D_CHAR proc_null_check[] =
+char proc_null_check[] =
     "PROCEDURE ProcId1 (arg AS BOOL) RETURN BOOL "
     "DO "
     "RETURN arg == NULL; "
@@ -91,15 +91,15 @@ D_CHAR proc_null_check[] =
     "ENDPROC\n\n"
     "";
 
-static D_BOOL
+static bool_t
 check_procedure (struct ParserState* state,
-                 D_CHAR*             proc_name,
+                 char*             proc_name,
                  const enum W_OPCODE opcode)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
-  D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  int code_size = get_size_outstream (stmt_query_instrs (stmt));
 
   if (code_size != 4)
     {
@@ -115,11 +115,11 @@ check_procedure (struct ParserState* state,
   return TRUE;
 }
 
-static D_BOOL
+static bool_t
 check_all_procs (struct ParserState *state)
 {
-  D_UINT count;
-  D_CHAR proc_name[25];
+  uint_t count;
+  char proc_name[25];
 
   for (count = 1; count < 5; ++count)
     {
@@ -145,7 +145,7 @@ check_all_procs (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, proc_null_check);

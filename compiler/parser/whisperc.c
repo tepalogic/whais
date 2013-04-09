@@ -162,8 +162,8 @@ whc_get_proc_hnd (WHC_HANDLER hnd, unsigned int procId)
 {
   struct ParserState*     pState     = (struct ParserState*)hnd;
   const struct Statement* pProc      = NULL;
-  const D_UINT            totalProcs = get_array_count (&pState->globalStmt.spec.glb.procsDecls);
-  D_UINT                  procIndex;
+  const uint_t            totalProcs = get_array_count (&pState->globalStmt.spec.glb.procsDecls);
+  uint_t                  procIndex;
 
   for (procIndex = 0; procIndex < totalProcs; ++procIndex)
     {
@@ -211,7 +211,7 @@ whc_get_local_type (WHC_HANDLER      hnd,
   struct ParserState* pState          = (struct ParserState*) hnd;
   struct Statement*   pProc           = (struct Statement*) hProc;
   struct DeclaredVar* pLocalVal       = NULL;
-  const D_UINT        procParamsCount = get_array_count (&(pProc->spec.proc.paramsList));
+  const uint_t        procParamsCount = get_array_count (&(pProc->spec.proc.paramsList));
 
   assert (pProc->type == STMT_PROC);
 

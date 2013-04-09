@@ -14,10 +14,10 @@ static size_t test_max_mem;
 #define CONTROL_BYTE    0xAC    /* all correct */
 
 static W_ALLOCATED_MEMORY* spListHead      = NULL;
-static D_UINT64            sMemAllocations = 0;
+static uint64_t            sMemAllocations = 0;
 
 static WH_SYNC             sMemSync;
-static D_BOOL              sMemSyncInit;
+static bool_t              sMemSyncInit;
 
 /* set the maximum memory usage, 0 for unlimited */
 
@@ -83,7 +83,7 @@ test_print_unfree_mem (void)
 }
 
 void*
-custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
+custom_trace_mem_alloc (size_t size, const char *file, uint_t line)
 {
   W_ALLOCATED_MEMORY* result = NULL;
 
@@ -131,11 +131,11 @@ custom_trace_mem_alloc (size_t size, const char *file, D_UINT line)
 
 void*
 custom_trace_mem_realloc (void *old_ptr,
-                          size_t new_size, const char *file, D_UINT line)
+                          size_t new_size, const char *file, uint_t line)
 {
   W_ALLOCATED_MEMORY* result  = NULL;
   W_ALLOCATED_MEMORY* pOldMem = NULL;
-  D_UINT64            size;
+  uint64_t            size;
 
   result  = custom_trace_mem_alloc (new_size, file, line);
   pOldMem = (W_ALLOCATED_MEMORY*)old_ptr;
@@ -159,7 +159,7 @@ custom_trace_mem_realloc (void *old_ptr,
 }
 
 void
-custom_trace_mem_free (void *ptr, const char *file, D_UINT line)
+custom_trace_mem_free (void *ptr, const char *file, uint_t line)
 {
   W_ALLOCATED_MEMORY *pMem = (W_ALLOCATED_MEMORY *)ptr;
 
@@ -210,7 +210,7 @@ custom_mem_alloc (size_t size)
 
       assert (size >= (sizeof (W_ALLOCATED_MEMORY) +1));
       test_add_used_mem (size - (sizeof (W_ALLOCATED_MEMORY) +1 ));
-      ((D_UINT8* )result)[size - 1] = CONTROL_BYTE;
+      ((uint8_t* )result)[size - 1] = CONTROL_BYTE;
       result++;
     }
 
@@ -255,7 +255,7 @@ custom_mem_free (void *ptr)
   real_ptr--;
   size = real_ptr->size;
 
-  if (((D_UINT8* )real_ptr)[size - 1] != CONTROL_BYTE)
+  if (((uint8_t* )real_ptr)[size - 1] != CONTROL_BYTE)
     abort ();                   /* blow it up */
 
   free (real_ptr);

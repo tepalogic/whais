@@ -18,23 +18,23 @@
 
 using namespace pastra;
 
-static D_UINT8 pattern1[48];
-static D_UINT8 pattern2[503];
-static D_UINT8 pattern3[0x1001F7];
+static uint8_t pattern1[48];
+static uint8_t pattern2[503];
+static uint8_t pattern3[0x1001F7];
 
-static D_UINT64 firstEntries[3];
+static uint64_t firstEntries[3];
 
 #define TEST_UNIT_MAX_SIZE              105000
 
-void init_pattern (D_UINT8 *pattern, D_UINT size, D_UINT8 seed)
+void init_pattern (uint8_t *pattern, uint_t size, uint8_t seed)
 {
-  for (D_UINT index = 0; index < size; ++index, ++seed)
+  for (uint_t index = 0; index < size; ++index, ++seed)
     pattern[index] = seed;
 }
 
-bool test_pattern (D_UINT8 *pattern, D_UINT size, D_UINT8 seed)
+bool test_pattern (uint8_t *pattern, uint_t size, uint8_t seed)
 {
-  for (D_UINT index = 0; index < size; ++index, ++seed)
+  for (uint_t index = 0; index < size; ++index, ++seed)
     if (pattern[index] != seed)
       return false;
 
@@ -42,10 +42,10 @@ bool test_pattern (D_UINT8 *pattern, D_UINT size, D_UINT8 seed)
 }
 
 bool test_record (VLVarsStore* storage,
-                  D_UINT8*const pattern,
-                  D_UINT seed,
-                  D_UINT firstEntry,
-                  D_UINT size)
+                  uint8_t*const pattern,
+                  uint_t seed,
+                  uint_t firstEntry,
+                  uint_t size)
 {
   init_pattern (pattern, size, seed + 11);
   storage->GetRecord (firstEntry, 0, size, pattern);
@@ -106,7 +106,7 @@ bool test_record_create ()
       std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_ps_varstore";
 
-      D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
+      uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
@@ -139,7 +139,7 @@ test_record_removal ()
     std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
-    D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
+    uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
@@ -172,7 +172,7 @@ test_record_removal ()
       std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_ps_varstore";
 
-      D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
+      uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
@@ -199,7 +199,7 @@ bool test_record_update ()
     std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
     temp_file_base += "t_ps_varstore";
 
-    D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
+    uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
@@ -238,7 +238,7 @@ bool test_record_update ()
       std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
       temp_file_base += "t_ps_varstore";
 
-      D_UINT storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
+      uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
@@ -263,7 +263,7 @@ bool test_record_update ()
 
 
 
-static D_UINT8 testBuffer[128] = "This is a test! Let us hope it will be big enough to keep a large"
+static uint8_t testBuffer[128] = "This is a test! Let us hope it will be big enough to keep a large"
                                  " text (e.g. at least the size of a 48 byte :)))";
 
 bool
@@ -285,7 +285,7 @@ test_record_container_update ()
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
-    const D_UINT64 entry = storage.AddRecord (container,  0, 0);
+    const uint64_t entry = storage.AddRecord (container,  0, 0);
 
     if (entry == 0)
       {
@@ -293,7 +293,7 @@ test_record_container_update ()
         break;
       }
     storage.UpdateRecord (entry, 0, container, 0, container.Size());
-    D_UINT8 temp[128];
+    uint8_t temp[128];
     assert (sizeof temp == sizeof testBuffer);
 
     memset (temp, 0xFF, sizeof temp);
@@ -349,14 +349,14 @@ test_record_record_update ()
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
-    const D_UINT64 entry = storage.AddRecord (container,  0, container.Size());
+    const uint64_t entry = storage.AddRecord (container,  0, container.Size());
 
     if (entry == 0)
       {
         result = false;
         break;
       }
-    D_UINT8 temp[128];
+    uint8_t temp[128];
     assert (sizeof temp == sizeof testBuffer);
 
     memset (temp, 0xFF, sizeof temp);
@@ -423,6 +423,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

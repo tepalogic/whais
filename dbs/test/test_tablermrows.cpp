@@ -20,7 +20,7 @@ struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_UINT32, false}
 };
 
-static D_UINT gElemsCount = 5000000; /* Scale this down for debug purposes! */
+static uint_t gElemsCount = 5000000; /* Scale this down for debug purposes! */
 
 bool
 fill_table (I_DBSTable& table)
@@ -28,10 +28,10 @@ fill_table (I_DBSTable& table)
   std::cout << "Fill table with " << gElemsCount << " elements ... " << std::endl;
 
   bool result = true;
-  for (D_UINT32 index = 0; index < gElemsCount; ++index)
+  for (uint32_t index = 0; index < gElemsCount; ++index)
     {
       DBSUInt32 fieldValue (index);
-      D_UINT rowIndex = table.AddRow ();
+      uint_t rowIndex = table.AddRow ();
 
       if (rowIndex != index)
         {
@@ -54,9 +54,9 @@ remove_first_rows (I_DBSTable& table)
   std::cout << "Deleting " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
 
-  const D_UINT32 count = gElemsCount / 2;
+  const uint32_t count = gElemsCount / 2;
 
-  for (D_UINT32 rowIndex = count; rowIndex > 0; --rowIndex)
+  for (uint32_t rowIndex = count; rowIndex > 0; --rowIndex)
     {
       if ((rowIndex % 21) == 0)
         {
@@ -87,9 +87,9 @@ restore_first_rows (I_DBSTable& table)
   std::cout << "Restore the first " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
 
-  const D_UINT32 count = gElemsCount / 2;
+  const uint32_t count = gElemsCount / 2;
 
-  for (D_UINT32 rowIndex = 1; rowIndex <= count; ++rowIndex)
+  for (uint32_t rowIndex = 1; rowIndex <= count; ++rowIndex)
     {
       DBSUInt32 fieldValue (rowIndex);
       table.SetEntry (rowIndex, 0, fieldValue);
@@ -119,9 +119,9 @@ test_for_radius_rows (I_DBSTable& table)
   std::cout << "Delete rows symmetrically ... " << std::endl;
   bool result = true;
 
-  const D_UINT32 count = gElemsCount / 10;
+  const uint32_t count = gElemsCount / 10;
 
-  for (D_UINT rowIndex = 0; rowIndex < count; ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < count; ++rowIndex)
     {
       DBSUInt32 fieldValue;
       table.SetEntry ((gElemsCount / 2) - rowIndex, 0, fieldValue);
@@ -140,7 +140,7 @@ test_for_radius_rows (I_DBSTable& table)
     {
       std::cout << std::endl << "Restore symmetric rows ... " << std::endl;
 
-      for (D_UINT rowIndex = (gElemsCount / 2) - count + 1;
+      for (uint_t rowIndex = (gElemsCount / 2) - count + 1;
           rowIndex <= (gElemsCount / 2) + count;
           ++rowIndex)
         {
@@ -161,7 +161,7 @@ test_for_radius_rows (I_DBSTable& table)
   return result;
 }
 
-const D_CHAR db_name[] = "t_baza_date_1";
+const char db_name[] = "t_baza_date_1";
 
 int
 main (int argc, char **argv)
@@ -212,6 +212,6 @@ main (int argc, char **argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

@@ -35,8 +35,8 @@ struct SemValue*
 alloc_sem_value (struct ParserState* const pState)
 {
   struct SemValue* result      = NULL;
-  D_UINT           iter        = 0;
-  D_UINT           stored_vals = get_array_count (&pState->parsedValues);
+  uint_t           iter        = 0;
+  uint_t           stored_vals = get_array_count (&pState->parsedValues);
 
   while (iter < stored_vals)
     {
@@ -57,7 +57,7 @@ alloc_sem_value (struct ParserState* const pState)
 }
 
 struct SemValue*
-alloc_boolean_sem_value (struct ParserState* const pState, const D_BOOL initialValue)
+alloc_boolean_sem_value (struct ParserState* const pState, const bool_t initialValue)
 {
   struct SemValue *val = alloc_sem_value (pState);
 

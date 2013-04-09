@@ -36,9 +36,9 @@ typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
 
 struct CmdEntry
 {
-  const D_CHAR*     m_pCmdText;
-  const D_CHAR*     m_pCmdDesc;
-  const D_CHAR*     m_pExtHelpDesc;
+  const char*     m_pCmdText;
+  const char*     m_pCmdDesc;
+  const char*     m_pExtHelpDesc;
   ENTRY_CMD         m_cmd;
   ENTRY_CMD_CONTEXT m_context;
 
@@ -52,7 +52,7 @@ void
 RegisterCommand (const CmdEntry& entry);
 
 const CmdEntry*
-FindCmdEntry (const D_CHAR* pCommand);
+FindCmdEntry (const char* pCommand);
 
 const std::string
 CmdLineNextToken (const std::string& cmdLine, size_t& ioPosition);

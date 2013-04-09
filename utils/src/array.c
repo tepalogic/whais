@@ -31,11 +31,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct UArray*
 init_array_ex (struct UArray* pOutArray,
                size_t         itemSize,
-               D_UINT         increment,
-               D_UINT         alignment)
+               uint_t         increment,
+               uint_t         alignment)
 {
 
-  if ((alignment > sizeof (D_UINTMAX)) || (alignment == 0))
+  if ((alignment > sizeof (uint64_t)) || (alignment == 0))
     {
       /* We are not made for such things.
        * We need to make sure the memory is proper allocated */
@@ -58,10 +58,10 @@ init_array_ex (struct UArray* pOutArray,
   return pOutArray;
 }
 
-static D_BOOL
+static bool_t
 increment_array (struct UArray* pArray)
 {
-  D_INT8 **temp = mem_realloc (pArray->arraysList,
+  int8_t **temp = mem_realloc (pArray->arraysList,
                                (pArray->arraysCount + 1) * sizeof (temp[0]));
   if (temp == NULL)
     return FALSE;
@@ -98,9 +98,9 @@ add_item (struct UArray* pArray, const void *pData)
 }
 
 void*
-get_item (const struct UArray* pArray, D_UINT index)
+get_item (const struct UArray* pArray, uint_t index)
 {
-  D_UINT seg, offset;
+  uint_t seg, offset;
 
   if (index >= pArray->itemsCount)
     {
@@ -115,18 +115,18 @@ get_item (const struct UArray* pArray, D_UINT index)
   return &(pArray->arraysList[seg][offset]);
 }
 
-D_UINT
+uint_t
 get_array_count (const struct UArray* pArray)
 {
   return pArray->itemsCount;
 }
 
 void
-set_array_count (struct UArray* pArray, D_UINT newCount)
+set_array_count (struct UArray* pArray, uint_t newCount)
 {
   if (newCount < pArray->itemsCount)
     {
-      D_UINT startSeg, iterator;
+      uint_t startSeg, iterator;
 
       pArray->itemsCount = newCount;
       startSeg           = newCount / pArray->incrementCount;
@@ -147,7 +147,7 @@ set_array_count (struct UArray* pArray, D_UINT newCount)
 void
 destroy_array (struct UArray* pArray)
 {
-  D_UINT count = 0;
+  uint_t count = 0;
 
   for (count = 0; count < pArray->arraysCount; count++)
     mem_free (pArray->arraysList[count]);

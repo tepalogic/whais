@@ -13,10 +13,10 @@
 
 using namespace prima;
 
-static const D_CHAR admin[] = "administrator";
-static const D_CHAR procName[] = "p1";
+static const char admin[] = "administrator";
+static const char procName[] = "p1";
 
-const D_UINT8 dummyProgram[] = ""
+const uint8_t dummyProgram[] = ""
     "PROCEDURE p1 () RETURN BOOL\n"
     "DO\n"
       "LET t1 AS TEXT;\n"
@@ -30,15 +30,15 @@ const D_UINT8 dummyProgram[] = ""
     "\n";
 
 
-static const D_CHAR *MSG_PREFIX[] = {
+static const char *MSG_PREFIX[] = {
                                       "", "error ", "warning ", "error "
                                     };
 
-static D_UINT
-get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+static uint_t
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
@@ -58,14 +58,14 @@ get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buff_pos,
-            D_UINT            msg_id,
-            D_UINT            msgType,
-            const D_CHAR*     pMsgFormat,
+            uint_t            buff_pos,
+            uint_t            msg_id,
+            uint_t            msgType,
+            const char*     pMsgFormat,
             va_list           args)
 {
-  const D_CHAR *buffer = (const D_CHAR *) data;
-  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+  const char *buffer = (const char *) data;
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
   fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
@@ -73,12 +73,12 @@ my_postman (WHC_MESSENGER_ARG data,
   fprintf (stderr, "\n");
 };
 
-static D_UINT
-w_encode_opcode (W_OPCODE opcode, D_UINT8* pOutCode)
+static uint_t
+w_encode_opcode (W_OPCODE opcode, uint8_t* pOutCode)
 {
   if (opcode >= 0x80)
     {
-      D_UINT16 temp = opcode;
+      uint16_t temp = opcode;
       temp |= 0x8000;
       pOutCode [0] = (temp & 0xFF);
       pOutCode [1] = ((temp >> 8) & 0xFF);
@@ -94,15 +94,15 @@ test_op_ldnull (Session& session)
 {
   std::cout << "Testing ldnull...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDNULL, testCode);
+  uint_t opSize = w_encode_opcode (W_LDNULL, testCode);
   w_encode_opcode (W_RET, testCode + opSize);
   session.ExecuteProcedure (procName, stack);
 
@@ -120,15 +120,15 @@ test_op_ldc (Session& session)
 {
   std::cout << "Testing ldc...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDC, testCode);
+  uint_t opSize = w_encode_opcode (W_LDC, testCode);
   testCode [opSize + 3] = 0x53;
   testCode [opSize + 2] = 0x52;
   testCode [opSize + 1] = 0x51;
@@ -153,15 +153,15 @@ test_op_ldi8 (Session& session)
 {
   std::cout << "Testing ldi8...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDI8, testCode);
+  uint_t opSize = w_encode_opcode (W_LDI8, testCode);
   testCode [opSize + 0] = 0xD8;
   w_encode_opcode (W_RET, testCode + opSize + 1);
 
@@ -183,15 +183,15 @@ test_op_ldi16 (Session& session)
 {
   std::cout << "Testing ldi16...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDI16, testCode);
+  uint_t opSize = w_encode_opcode (W_LDI16, testCode);
   testCode [opSize + 0] = 0xA1;
   testCode [opSize + 1] = 0xB4;
   w_encode_opcode (W_RET, testCode + opSize + 2);
@@ -213,15 +213,15 @@ static bool
 test_op_ldi32 (Session& session)
 {
   std::cout << "Testing ldi32...\n";
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDI32, testCode);
+  uint_t opSize = w_encode_opcode (W_LDI32, testCode);
   testCode [opSize + 0] = 0xF1;
   testCode [opSize + 1] = 0xD4;
   testCode [opSize + 2] = 0x21;
@@ -245,15 +245,15 @@ static bool
 test_op_ldi64 (Session& session)
 {
   std::cout << "Testing ldi64...\n";
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDI64, testCode);
+  uint_t opSize = w_encode_opcode (W_LDI64, testCode);
   testCode [opSize + 0] = 0xF1;
   testCode [opSize + 1] = 0xD4;
   testCode [opSize + 2] = 0x21;
@@ -281,15 +281,15 @@ static bool
 test_op_ldd (Session& session)
 {
   std::cout << "Testing ldd...\n";
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDD, testCode);
+  uint_t opSize = w_encode_opcode (W_LDD, testCode);
   testCode [opSize + 0] = 0x05;
   testCode [opSize + 1] = 0x06;
   testCode [opSize + 2] = 0xF1;
@@ -314,15 +314,15 @@ test_op_lddt (Session& session)
 {
   std::cout << "Testing lddt...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDDT, testCode);
+  uint_t opSize = w_encode_opcode (W_LDDT, testCode);
   testCode [opSize + 0] = 0x23;
   testCode [opSize + 1] = 0x10;
   testCode [opSize + 2] = 0x0B;
@@ -350,15 +350,15 @@ test_op_ldht (Session& session)
 {
   std::cout << "Testing ldht...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDHT, testCode);
+  uint_t opSize = w_encode_opcode (W_LDHT, testCode);
   testCode [opSize + 0]  = 0x04;
   testCode [opSize + 1]  = 0x03;
   testCode [opSize + 2]  = 0x02;
@@ -391,15 +391,15 @@ test_op_ldrr (Session& session)
 {
   std::cout << "Testing ldrr...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDRR, testCode);
+  uint_t opSize = w_encode_opcode (W_LDRR, testCode);
   testCode [opSize + 0]   = 0xFB;
   testCode [opSize + 1]   = 0xFF;
   testCode [opSize + 2]   = 0xFF;
@@ -440,17 +440,17 @@ test_op_ldt (Session& session)
 {
   std::cout << "Testing ldt...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_CHAR someText[] = "A test to check!Good Luck!";
+  char someText[] = "A test to check!Good Luck!";
 
-  D_UINT opSize = w_encode_opcode (W_LDT, testCode);
+  uint_t opSize = w_encode_opcode (W_LDT, testCode);
   testCode [opSize + 0]  = 0x02;
   testCode [opSize + 1]  = 0x00;
   testCode [opSize + 2]  = 0x00;
@@ -464,7 +464,7 @@ test_op_ldt (Session& session)
 
   DBSText      value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSText ((D_UINT8*)someText + 2))
+  if (value != DBSText ((uint8_t*)someText + 2))
     return false;
 
   return true;
@@ -475,15 +475,15 @@ test_op_ldbt (Session& session)
 {
   std::cout << "Testing ldbt...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDBT, testCode);
+  uint_t opSize = w_encode_opcode (W_LDBT, testCode);
   w_encode_opcode (W_RET, testCode + opSize);
 
   session.ExecuteProcedure (procName, stack);
@@ -504,15 +504,15 @@ test_op_ldbf (Session& session)
 {
   std::cout << "Testing ldbf...\n";
 
-  const D_UINT32 procId = session.FindProcedure (
-                                              _RC (const D_UINT8*, procName),
+  const uint32_t procId = session.FindProcedure (
+                                              _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  D_UINT8* testCode = _CC (D_UINT8*, session.ProcCode (procId));
+  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
 
   SessionStack stack;
 
-  D_UINT opSize = w_encode_opcode (W_LDBF, testCode);
+  uint_t opSize = w_encode_opcode (W_LDBF, testCode);
   w_encode_opcode (W_RET, testCode + opSize);
 
   session.ExecuteProcedure (procName, stack);
@@ -583,7 +583,7 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif
 

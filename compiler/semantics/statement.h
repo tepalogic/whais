@@ -41,8 +41,8 @@ enum STATEMENT_TYPE
 
 struct StatementGlobalSymbol
 {
-  D_CHAR* symbol;
-  D_UINT  index;
+  char* symbol;
+  uint_t  index;
 };
 
 struct _GlobalStatmentSpec
@@ -51,13 +51,13 @@ struct _GlobalStatmentSpec
   struct OutputStream constsArea;
   struct UArray       procsDecls;  /* for GLOBAL statement contains the list
                                    of procedures */
-  D_UINT32            procsCount;
+  uint32_t            procsCount;
 };
 
 struct _ProcStatementSpec
 {
-  const D_CHAR*      name;         /* name of the procedure */
-  D_UINT             nameLength;   /* length of the name */
+  const char*      name;         /* name of the procedure */
+  uint_t             nameLength;   /* length of the name */
   struct UArray      paramsList;   /* Used only for procedures
                                     0 - special case for return type
                                     1 - first parameter, 2 second parameter */
@@ -65,14 +65,14 @@ struct _ProcStatementSpec
                                     statements */
   struct UArray       branchStack;  /* keep track of conditional branches */
   struct UArray       loopStack;    /* keep the track of looping statements */
-  D_UINT32            procId;       /* ID of the procedure in the import table */
-  D_UINT16            syncTracker;
+  uint32_t            procId;       /* ID of the procedure in the import table */
+  uint16_t            syncTracker;
 };
 
 struct Statement
 {
   struct Statement*   pParentStmt;  /* NULL for global statement */
-  D_UINT              localsUsed;   /* used to assign IDs to declared variables */
+  uint_t              localsUsed;   /* used to assign IDs to declared variables */
   enum STATEMENT_TYPE type;         /* type of the statement */
   struct UArray       decls;        /* variables declared in this statement */
   union
@@ -82,13 +82,13 @@ struct Statement
   } spec;
 };
 
-D_BOOL
+bool_t
 init_glbl_stmt (struct Statement* pStmt);
 
 void
 clear_glbl_stmt (struct Statement* pGlbStmt);
 
-D_BOOL
+bool_t
 init_proc_stmt (struct Statement* pParentStmt, struct Statement* pOutStmt);
 
 void
@@ -97,22 +97,22 @@ clear_proc_stmt (struct Statement* pStmt);
 struct DeclaredVar*
 stmt_find_declaration (struct Statement* pStmt,
                        const char*       pName,
-                       const D_UINT      nameLength,
-                       const D_BOOL      recursive,
-                       const D_BOOL      refferenced);
+                       const uint_t      nameLength,
+                       const bool_t      recursive,
+                       const bool_t      refferenced);
 
 struct DeclaredVar*
 stmt_add_declaration (struct Statement* const   pStmt,
                       struct DeclaredVar*       pVar,
-                      const D_BOOL              parameter);
+                      const bool_t              parameter);
 
 const struct DeclaredVar*
-stmt_get_param (const struct Statement* const pStmt, D_UINT param);
+stmt_get_param (const struct Statement* const pStmt, uint_t param);
 
-D_UINT
+uint_t
 stmt_get_param_count (const struct Statement* const pStmt);
 
-D_UINT32
+uint32_t
 stmt_get_import_id (const struct Statement* const pProc);
 
 /* some inline functions to access statement members */
@@ -144,25 +144,25 @@ stmt_query_loop_stack (struct Statement* const pStmt)
 
 struct TypeSpec
 {
-  D_UINT16 type;
-  D_UINT16 dataSize;
-  D_UINT8  data[2];     /* keep this last */
+  uint16_t type;
+  uint16_t dataSize;
+  uint8_t  data[2];     /* keep this last */
 };
 
-D_BOOL
+bool_t
 is_type_spec_valid (const struct TypeSpec* pSpec);
 
-D_BOOL
+bool_t
 type_spec_cmp (const struct TypeSpec* const pSpec_1,
                const struct TypeSpec* const pSpec_2);
 
-D_UINT
+uint_t
 type_spec_fill (struct OutputStream* const      pOutStream,
                 const struct DeclaredVar* const pVar);
 
-D_INT
+int
 add_text_const (struct Statement* const pStmt,
-                const D_UINT8* const    pText,
-                const D_UINT            textSize);
+                const uint8_t* const    pText,
+                const uint_t            textSize);
 
 #endif /*STATEMENT_H_ */

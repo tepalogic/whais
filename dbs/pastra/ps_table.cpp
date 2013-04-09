@@ -38,60 +38,60 @@
 using namespace pastra;
 using namespace std;
 
-static const D_CHAR PS_TEMP_TABLE_SUFFIX[]   = "pttable_";
-static const D_CHAR PS_TABLE_FIXFIELDS_EXT[] = "_f";
-static const D_CHAR PS_TABLE_VARFIELDS_EXT[] = "_v";
+static const char PS_TEMP_TABLE_SUFFIX[]   = "pttable_";
+static const char PS_TABLE_FIXFIELDS_EXT[] = "_f";
+static const char PS_TABLE_VARFIELDS_EXT[] = "_v";
 
-static const D_UINT8 PS_TABLE_SIGNATURE[] =
+static const uint8_t PS_TABLE_SIGNATURE[] =
   { 0x50, 0x41, 0x53, 0x54, 0x52, 0x41, 0x54, 0x42 };
 
-static const D_UINT PS_HEADER_SIZE = 128;
+static const uint_t PS_HEADER_SIZE = 128;
 
-static const D_UINT PS_TABLE_SIG_OFF               = 0; //Signature
-static const D_UINT PS_TABLES_SIG_LEN              = 8;
-static const D_UINT PS_TABLE_FIELDS_COUNT_OFF      = 8; //Number of fields.
-static const D_UINT PS_TABLE_FIELDS_COUNT_LEN      = 4;
-static const D_UINT PS_TABLE_ELEMS_SIZE_OFF        = 12; //Size of the fields description area
-static const D_UINT PS_TABLE_ELEMS_SIZE_LEN        = 4;
-static const D_UINT PS_TABLE_RECORDS_COUNT_OFF     = 16; //Number of allocated records.
-static const D_UINT PS_TABLE_RECORDS_COUNT_LEN     = 8;
-static const D_UINT PS_TABLE_MAX_FILE_SIZE_OFF     = 24; //The maximum file size allowe for this table
-static const D_UINT PS_TABLE_MAX_FILE_SIZE_LEN     = 8;
-static const D_UINT PS_TABLE_MAINTABLE_SIZE_OFF    = 32; //Size of variable storage
-static const D_UINT PS_TABLE_MAINTABLE_SIZE_LEN    = 8;
-static const D_UINT PS_TABLE_VARSTORAGE_SIZE_OFF   = 40; //Size of variable storage
-static const D_UINT PS_TABLE_VARSTORAGE_SIZE_LEN   = 8;
-static const D_UINT PS_TABLE_BT_ROOT_OFF           = 48; //The root node of BTree holding the removed rows.
-static const D_UINT PS_TABLE_BT_ROOT_LEN           = 4;
-static const D_UINT PS_TABLE_BT_HEAD_OFF           = 52; //First node pointing to the removed BT nodes.
-static const D_UINT PS_TABLE_BT_HEAD_LEN           = 4;
-static const D_UINT PS_TABLE_ROW_SIZE_OFF          = 56; //Size of a row.
-static const D_UINT PS_TABLE_ROW_SIZE_LEN          = 4;
+static const uint_t PS_TABLE_SIG_OFF               = 0; //Signature
+static const uint_t PS_TABLES_SIG_LEN              = 8;
+static const uint_t PS_TABLE_FIELDS_COUNT_OFF      = 8; //Number of fields.
+static const uint_t PS_TABLE_FIELDS_COUNT_LEN      = 4;
+static const uint_t PS_TABLE_ELEMS_SIZE_OFF        = 12; //Size of the fields description area
+static const uint_t PS_TABLE_ELEMS_SIZE_LEN        = 4;
+static const uint_t PS_TABLE_RECORDS_COUNT_OFF     = 16; //Number of allocated records.
+static const uint_t PS_TABLE_RECORDS_COUNT_LEN     = 8;
+static const uint_t PS_TABLE_MAX_FILE_SIZE_OFF     = 24; //The maximum file size allowe for this table
+static const uint_t PS_TABLE_MAX_FILE_SIZE_LEN     = 8;
+static const uint_t PS_TABLE_MAINTABLE_SIZE_OFF    = 32; //Size of variable storage
+static const uint_t PS_TABLE_MAINTABLE_SIZE_LEN    = 8;
+static const uint_t PS_TABLE_VARSTORAGE_SIZE_OFF   = 40; //Size of variable storage
+static const uint_t PS_TABLE_VARSTORAGE_SIZE_LEN   = 8;
+static const uint_t PS_TABLE_BT_ROOT_OFF           = 48; //The root node of BTree holding the removed rows.
+static const uint_t PS_TABLE_BT_ROOT_LEN           = 4;
+static const uint_t PS_TABLE_BT_HEAD_OFF           = 52; //First node pointing to the removed BT nodes.
+static const uint_t PS_TABLE_BT_HEAD_LEN           = 4;
+static const uint_t PS_TABLE_ROW_SIZE_OFF          = 56; //Size of a row.
+static const uint_t PS_TABLE_ROW_SIZE_LEN          = 4;
 
-static const D_UINT PS_RESEVED_FOR_FUTURE_OFF = 60;
-static const D_UINT PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_FUTURE_OFF;
+static const uint_t PS_RESEVED_FOR_FUTURE_OFF = 60;
+static const uint_t PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE - PS_RESEVED_FOR_FUTURE_OFF;
 
-static const D_UINT MAX_FIELD_VALUE_ALIGN = 16; /* Bytes. */
+static const uint_t MAX_FIELD_VALUE_ALIGN = 16; /* Bytes. */
 
 
 struct PaddInterval
 {
-  PaddInterval(D_UINT32 begin_byte, D_UINT32 bytes_count) :
+  PaddInterval(uint32_t begin_byte, uint32_t bytes_count) :
     mBegin(begin_byte * 8),
     mEnd(((begin_byte + bytes_count) * 8) - 1)
   {
     assert (mBegin <= mEnd);
   }
 
-  D_UINT32 mBegin;
-  D_UINT32 mEnd;
+  uint32_t mBegin;
+  uint32_t mEnd;
 
 };
 
-static D_UINT32
-get_strlens_till_index (const DBSFieldDescriptor* pFields, D_UINT index)
+static uint32_t
+get_strlens_till_index (const DBSFieldDescriptor* pFields, uint_t index)
 {
-  D_UINT32 result = 0;
+  uint32_t result = 0;
 
   while (index-- > 0)
     {
@@ -103,7 +103,7 @@ get_strlens_till_index (const DBSFieldDescriptor* pFields, D_UINT index)
 }
 
 static void
-validate_field_name (const D_CHAR* pFieldName)
+validate_field_name (const char* pFieldName)
 {
 
   while (pFieldName[0])
@@ -121,14 +121,14 @@ validate_field_name (const D_CHAR* pFieldName)
 
 static void
 validate_field_descriptors (const DBSFieldDescriptor* const pFields,
-                            const D_UINT                    fieldsCount)
+                            const uint_t                    fieldsCount)
 {
   assert ((fieldsCount > 0) && (pFields != NULL));
-  for (D_UINT firstIt = 0; firstIt < fieldsCount; ++firstIt)
+  for (uint_t firstIt = 0; firstIt < fieldsCount; ++firstIt)
     {
       validate_field_name(pFields[firstIt].m_pFieldName);
 
-      for (D_UINT secondIt = firstIt; secondIt < fieldsCount; ++secondIt)
+      for (uint_t secondIt = firstIt; secondIt < fieldsCount; ++secondIt)
         if (firstIt == secondIt)
           continue;
         else if (strcmp(pFields[firstIt].m_pFieldName,
@@ -154,10 +154,10 @@ validate_field_descriptors (const DBSFieldDescriptor* const pFields,
     }
 }
 
-static D_INT
-get_next_alignment (D_INT size)
+static int
+get_next_alignment (int size)
 {
-  D_INT result = 1;
+  int result = 1;
 
   size &= 0x0F, size |= 0x10;
 
@@ -169,42 +169,42 @@ get_next_alignment (D_INT size)
 
 static void
 arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
-                       D_UINT8* const              pOutFieldsDescription,
-                       D_UINT32&                   uOutRowSize)
+                       uint8_t* const              pOutFieldsDescription,
+                       uint32_t&                   uOutRowSize)
 {
 
   vector<PaddInterval> padds;
 
   FieldDescriptor* const pFieldDesc = _RC (FieldDescriptor*,
                                            pOutFieldsDescription);
-  const D_INT nullBitsRequested = rvFields.size ();      //One for each field.
-  D_INT       paddingBytesCount = 0;
-  D_INT       currentAlignment  = MAX_FIELD_VALUE_ALIGN; //Force the best choice
+  const int nullBitsRequested = rvFields.size ();      //One for each field.
+  int       paddingBytesCount = 0;
+  int       currentAlignment  = MAX_FIELD_VALUE_ALIGN; //Force the best choice
 
   //Find the best fields position in order to minimize the numbers of padding
   //bytes that are need it for values alignments
-  for (D_UINT fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
+  for (uint_t fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
     {
-      D_INT foundIndex         = -1;    //-1 Nothing found!
-      D_INT foundReqAlign      = 1;     //Worst requested align
-      D_INT foundResultedAlign = 1;     //Worst resulted align
-      D_INT foundReqPaddsCount = MAX_FIELD_VALUE_ALIGN - 1;
-      D_INT foundSize          = 0;
+      int foundIndex         = -1;    //-1 Nothing found!
+      int foundReqAlign      = 1;     //Worst requested align
+      int foundResultedAlign = 1;     //Worst resulted align
+      int foundReqPaddsCount = MAX_FIELD_VALUE_ALIGN - 1;
+      int foundSize          = 0;
 
-      for (D_UINT schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
+      for (uint_t schIndex = fieldIndex; schIndex < rvFields.size(); ++schIndex)
         {
-          D_INT currIndexSize = PSValInterp::Size (
+          int currIndexSize = PSValInterp::Size (
                                                rvFields[schIndex].m_FieldType,
                                                rvFields[schIndex].isArray
                                                   );
 
-          D_INT currReqAlign = PSValInterp::Alignment (
+          int currReqAlign = PSValInterp::Alignment (
                                       rvFields[schIndex].m_FieldType,
                                       rvFields[schIndex].isArray
                                                       );
-          D_INT currReqPaddsCount = (currReqAlign > currentAlignment) ?
+          int currReqPaddsCount = (currReqAlign > currentAlignment) ?
                                       (currReqAlign - currentAlignment) : 0;
-          D_INT currResultedAlign = get_next_alignment (
+          int currResultedAlign = get_next_alignment (
                           currReqPaddsCount + currIndexSize + uOutRowSize
                                                        );
 
@@ -264,9 +264,9 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
       pFieldDesc[fieldIndex].m_NameOffset += sizeof(FieldDescriptor) *
                                              rvFields.size();
 
-      strcpy(_RC (D_CHAR*,
+      strcpy(_RC (char*,
                   pOutFieldsDescription + pFieldDesc[fieldIndex].m_NameOffset),
-             _RC (const D_CHAR *, temp.m_pFieldName));
+             _RC (const char *, temp.m_pFieldName));
 
       pFieldDesc[fieldIndex].m_Aquired         = 0;
       pFieldDesc[fieldIndex].m_IndexNodeSizeKB = 0;
@@ -287,7 +287,7 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 
   //Increase the row size if we need more bytes to keep the null bits.
-  const D_INT32 extraPaddBytesNeeded = ((nullBitsRequested + 7) / 8) -
+  const int32_t extraPaddBytesNeeded = ((nullBitsRequested + 7) / 8) -
                                        paddingBytesCount;
   if (extraPaddBytesNeeded > 0)
     {
@@ -296,14 +296,14 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
     }
 
   //Round the row size so the first element of the next row is alligned
-  D_INT32 needExtraAlign = PSValInterp::Alignment (rvFields[0].m_FieldType,
+  int32_t needExtraAlign = PSValInterp::Alignment (rvFields[0].m_FieldType,
                                                    rvFields[0].isArray);
   needExtraAlign -= get_next_alignment(uOutRowSize);
   if (needExtraAlign > 0)
     uOutRowSize += needExtraAlign;
 
   //Reuse the padding bytes to hold the fileds value null bits indicators.
-  for (D_UINT fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
+  for (uint_t fieldIndex = 0; fieldIndex < rvFields.size(); ++fieldIndex)
     {
       pFieldDesc[fieldIndex].m_NullBitIndex = padds[0].mBegin++;
 
@@ -313,45 +313,45 @@ arrange_field_entries (vector<DBSFieldDescriptor>& rvFields,
 }
 
 static void
-create_table_file (const D_UINT64            maxFileSize,
-                   const D_CHAR*             pBaseFileName,
+create_table_file (const uint64_t            maxFileSize,
+                   const char*             pBaseFileName,
                    const DBSFieldDescriptor* pFields,
-                   D_UINT                    fieldsCount)
+                   uint_t                    fieldsCount)
 {
   //Check the arguments
   if ((pFields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
     throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
 
   //Compute the table header descriptor size
-  const D_UINT32 descriptorsSize = sizeof (FieldDescriptor) * fieldsCount +
+  const uint32_t descriptorsSize = sizeof (FieldDescriptor) * fieldsCount +
                                    get_strlens_till_index(pFields, fieldsCount);
 
   //Validate the optimally rearrange the fields for minimum row size
-  D_UINT rowSize = 0;
+  uint_t rowSize = 0;
   validate_field_descriptors (pFields, fieldsCount);
 
   vector<DBSFieldDescriptor> vect (pFields + 0, pFields + fieldsCount);
-  auto_ptr<D_UINT8> apFieldDescription (new D_UINT8[descriptorsSize]);
+  auto_ptr<uint8_t> apFieldDescription (new uint8_t[descriptorsSize]);
 
   arrange_field_entries(vect, apFieldDescription.get(), rowSize);
   pFields = &vect.front();
 
   WFile tableFile (pBaseFileName, WHC_FILECREATE_NEW | WHC_FILERDWR);
 
-  auto_ptr<D_UINT8> apBuffer(new D_UINT8[PS_HEADER_SIZE]);
-  D_UINT8* const    pBuffer = apBuffer.get();
+  auto_ptr<uint8_t> apBuffer(new uint8_t[PS_HEADER_SIZE]);
+  uint8_t* const    pBuffer = apBuffer.get();
 
   memcpy (pBuffer, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
-  *_RC (D_UINT32*, pBuffer + PS_TABLE_FIELDS_COUNT_OFF)    = fieldsCount;
-  *_RC (D_UINT32*, pBuffer + PS_TABLE_ELEMS_SIZE_OFF)      = descriptorsSize;
-  *_RC (D_UINT64*, pBuffer + PS_TABLE_RECORDS_COUNT_OFF)   = 0;
-  *_RC (D_UINT64*, pBuffer + PS_TABLE_VARSTORAGE_SIZE_OFF) = 0;
-  *_RC (D_UINT32*, pBuffer + PS_TABLE_ROW_SIZE_OFF)        = rowSize;
+  *_RC (uint32_t*, pBuffer + PS_TABLE_FIELDS_COUNT_OFF)    = fieldsCount;
+  *_RC (uint32_t*, pBuffer + PS_TABLE_ELEMS_SIZE_OFF)      = descriptorsSize;
+  *_RC (uint64_t*, pBuffer + PS_TABLE_RECORDS_COUNT_OFF)   = 0;
+  *_RC (uint64_t*, pBuffer + PS_TABLE_VARSTORAGE_SIZE_OFF) = 0;
+  *_RC (uint32_t*, pBuffer + PS_TABLE_ROW_SIZE_OFF)        = rowSize;
   *_RC (NODE_INDEX*, pBuffer + PS_TABLE_BT_ROOT_OFF)       = NIL_NODE;
   *_RC (NODE_INDEX*, pBuffer + PS_TABLE_BT_HEAD_OFF)       = NIL_NODE;
-  *_RC (D_UINT64*, pBuffer + PS_TABLE_MAX_FILE_SIZE_OFF)   = maxFileSize;
-  *_RC (D_UINT64*, pBuffer + PS_TABLE_MAINTABLE_SIZE_OFF)  = ~0;
+  *_RC (uint64_t*, pBuffer + PS_TABLE_MAX_FILE_SIZE_OFF)   = maxFileSize;
+  *_RC (uint64_t*, pBuffer + PS_TABLE_MAINTABLE_SIZE_OFF)  = ~0;
 
 
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_HEAD_LEN);
@@ -365,11 +365,11 @@ create_table_file (const D_UINT64            maxFileSize,
   //Write the field descriptors;
   tableFile.Write(apFieldDescription.get(), descriptorsSize);
 
-  const D_UINT toFill = tableFile.Tell () % TableRmNode::RAW_NODE_SIZE;
+  const uint_t toFill = tableFile.Tell () % TableRmNode::RAW_NODE_SIZE;
 
   if (toFill != 0)
     {
-      static const D_UINT8 dump [TableRmNode::RAW_NODE_SIZE] = {0,};
+      static const uint8_t dump [TableRmNode::RAW_NODE_SIZE] = {0,};
       assert ((tableFile.Tell() == tableFile.GetSize()));
       assert ((tableFile.Tell() < sizeof dump));
 
@@ -377,7 +377,7 @@ create_table_file (const D_UINT64            maxFileSize,
     }
   assert ((tableFile.Tell() == tableFile.GetSize()));
 
-  *_RC (D_UINT64*, pBuffer + PS_TABLE_MAINTABLE_SIZE_OFF) = tableFile.GetSize ();
+  *_RC (uint64_t*, pBuffer + PS_TABLE_MAINTABLE_SIZE_OFF) = tableFile.GetSize ();
 
   tableFile.Seek (0, WHC_SEEK_BEGIN);
   tableFile.Write (pBuffer, PS_HEADER_SIZE);
@@ -403,8 +403,8 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
 
   assert (m_apMainTable.get () != NULL);
 
-  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
-  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  uint_t       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const uint_t blkCount = DBSSettings ().m_TableCacheBlkCount;
   assert ((blkSize != 0) && (blkCount != 0));
 
   while (blkSize < m_RowSize)
@@ -420,7 +420,7 @@ PersistentTable::PersistentTable (DbsHandler&   dbsHandler,
 PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
                                   const string&             tableName,
                                   const DBSFieldDescriptor* pFields,
-                                  const D_UINT              fieldsCount,
+                                  const uint_t              fieldsCount,
                                   const bool                temporal)
   : PrototypeTable (dbsHandler),
     m_DbsSettings (DBSGetSeettings ()),
@@ -440,8 +440,8 @@ PersistentTable::PersistentTable (DbsHandler&               dbsHandler,
 
   assert (m_apMainTable.get () != NULL);
 
-  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
-  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  uint_t       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const uint_t blkCount = DBSSettings ().m_TableCacheBlkCount;
   assert ((blkSize != 0) && (blkCount != 0));
 
   while (blkSize < m_RowSize)
@@ -463,7 +463,7 @@ PersistentTable::~PersistentTable ()
       {
         FieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
-        D_UINT64 unitsCount = m_MaxFileSize - 1;
+        uint64_t unitsCount = m_MaxFileSize - 1;
 
         unitsCount += m_vIndexNodeMgrs[fieldIndex]->GetIndexRawSize();
         unitsCount /= m_MaxFileSize;
@@ -492,8 +492,8 @@ PersistentTable::Spawn () const
 void
 PersistentTable::InitFromFile ()
 {
-  D_UINT64   mainTableSize = 0;
-  D_UINT8    aTableHdr[PS_HEADER_SIZE];
+  uint64_t   mainTableSize = 0;
+  uint8_t    aTableHdr[PS_HEADER_SIZE];
 
   WFile mainTableFile (m_BaseFileName.c_str(),
                        WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
@@ -505,15 +505,15 @@ PersistentTable::InitFromFile ()
     throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
 
   //Retrieve the header information.
-  m_FieldsCount          = *_RC (D_UINT32*, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF);
-  m_DescriptorsSize      = *_RC (D_UINT32*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF);
-  m_RowsCount            = *_RC (D_UINT64*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF);
-  m_VariableStorageSize  = *_RC (D_UINT64*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF);
-  m_RowSize              = *_RC (D_UINT32*, aTableHdr + PS_TABLE_ROW_SIZE_OFF);
+  m_FieldsCount          = *_RC (uint32_t*, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF);
+  m_DescriptorsSize      = *_RC (uint32_t*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF);
+  m_RowsCount            = *_RC (uint64_t*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF);
+  m_VariableStorageSize  = *_RC (uint64_t*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF);
+  m_RowSize              = *_RC (uint32_t*, aTableHdr + PS_TABLE_ROW_SIZE_OFF);
   m_RootNode             = *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF);
   m_FirstUnallocatedRoot = *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF);
-  m_MaxFileSize          = *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
-  mainTableSize          = *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
+  m_MaxFileSize          = *_RC (uint64_t*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
+  mainTableSize          = *_RC (uint64_t*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
 
   if ((m_FieldsCount == 0) ||
       (m_DescriptorsSize < (sizeof(FieldDescriptor) * m_FieldsCount)) ||
@@ -523,8 +523,8 @@ PersistentTable::InitFromFile ()
     }
 
   //Cache the field descriptors in memory
-  m_FieldsDescriptors.reset(new D_UINT8[m_DescriptorsSize]);
-  mainTableFile.Read(_CC (D_UINT8*, m_FieldsDescriptors.get ()),
+  m_FieldsDescriptors.reset(new uint8_t[m_DescriptorsSize]);
+  mainTableFile.Read(_CC (uint8_t*, m_FieldsDescriptors.get ()),
                      m_DescriptorsSize);
   mainTableFile.Close ();
 
@@ -585,7 +585,7 @@ PersistentTable::InitIndexedFields ()
       string containerNameBase = m_BaseFileName;
 
       containerNameBase += '_';
-      containerNameBase += _RC (D_CHAR*, m_FieldsDescriptors.get ()) +
+      containerNameBase += _RC (char*, m_FieldsDescriptors.get ()) +
                             field.m_NameOffset;
       containerNameBase += "_bt";
 
@@ -610,20 +610,20 @@ PersistentTable::MakeHeaderPersistent ()
   if (m_Removed)
     return ; //We were removed. We were removed.
 
-  D_UINT8 aTableHdr[PS_HEADER_SIZE];
+  uint8_t aTableHdr[PS_HEADER_SIZE];
 
   memcpy (aTableHdr, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
-  *_RC (D_UINT32*, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF)    = m_FieldsCount;
-  *_RC (D_UINT32*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)      = m_DescriptorsSize;
-  *_RC (D_UINT64*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)   = m_RowsCount;
-  *_RC (D_UINT64*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF) =
+  *_RC (uint32_t*, aTableHdr + PS_TABLE_FIELDS_COUNT_OFF)    = m_FieldsCount;
+  *_RC (uint32_t*, aTableHdr + PS_TABLE_ELEMS_SIZE_OFF)      = m_DescriptorsSize;
+  *_RC (uint64_t*, aTableHdr + PS_TABLE_RECORDS_COUNT_OFF)   = m_RowsCount;
+  *_RC (uint64_t*, aTableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF) =
       (m_pVariableFields != NULL) ? m_pVariableFields->Size () : 0;
-  *_RC (D_UINT32*, aTableHdr + PS_TABLE_ROW_SIZE_OFF)        = m_RowSize;
+  *_RC (uint32_t*, aTableHdr + PS_TABLE_ROW_SIZE_OFF)        = m_RowSize;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_ROOT_OFF)       = m_RootNode;
   *_RC (NODE_INDEX*, aTableHdr + PS_TABLE_BT_HEAD_OFF)       = m_FirstUnallocatedRoot;
-  *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF)   = m_MaxFileSize;
-  *_RC (D_UINT64*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF)  = m_apMainTable->Size ();
+  *_RC (uint64_t*, aTableHdr + PS_TABLE_MAX_FILE_SIZE_OFF)   = m_MaxFileSize;
+  *_RC (uint64_t*, aTableHdr + PS_TABLE_MAINTABLE_SIZE_OFF)  = m_apMainTable->Size ();
 
   memset(aTableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
@@ -716,16 +716,16 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
     throw(DBSException(NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED)));
 
   //Compute the table header descriptor size
-  const D_UINT32 descriptorsSize = sizeof(FieldDescriptor) * fieldsCount +
+  const uint32_t descriptorsSize = sizeof(FieldDescriptor) * fieldsCount +
                                    get_strlens_till_index(pFields,
                                                           fieldsCount);
 
   //Optimally rearrange the fields for minimum row size
-  D_UINT rowSize = 0;
+  uint_t rowSize = 0;
   validate_field_descriptors(pFields, fieldsCount);
 
   vector<DBSFieldDescriptor> vect(pFields + 0, pFields + fieldsCount);
-  auto_ptr<D_UINT8> apFieldDescription(new D_UINT8[descriptorsSize]);
+  auto_ptr<uint8_t> apFieldDescription(new uint8_t[descriptorsSize]);
 
   arrange_field_entries(vect, apFieldDescription.get(), rowSize);
   pFields = &vect.front();
@@ -739,8 +739,8 @@ TemporalTable::TemporalTable (DbsHandler&               dbsHandler,
                            m_FieldsCount,
                            NULL);
 
-  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
-  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  uint_t       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const uint_t blkCount = DBSSettings ().m_TableCacheBlkCount;
   assert ((blkSize != 0) && (blkCount != 0));
 
   while (blkSize < m_RowSize)
@@ -760,8 +760,8 @@ TemporalTable::TemporalTable (const PrototypeTable& prototype)
                            m_FieldsCount,
                            NULL);
 
-  D_UINT       blkSize  = DBSSettings ().m_TableCacheBlkSize;
-  const D_UINT blkCount = DBSSettings ().m_TableCacheBlkCount;
+  uint_t       blkSize  = DBSSettings ().m_TableCacheBlkSize;
+  const uint_t blkCount = DBSSettings ().m_TableCacheBlkCount;
   assert ((blkSize != 0) && (blkCount != 0));
 
   while (blkSize < m_RowSize)

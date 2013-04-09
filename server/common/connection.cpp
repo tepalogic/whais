@@ -34,14 +34,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "connection.h"
 
-static const D_UINT32 FRAME_SERVER_VERS  = 0x00000001;
+static const uint32_t FRAME_SERVER_VERS  = 0x00000001;
 
 using namespace std;
 
-ConnectionException::ConnectionException (const D_CHAR* pMessage,
-                                          const D_CHAR* pFile,
-                                          D_UINT32      line,
-                                          D_UINT32      extra)
+ConnectionException::ConnectionException (const char* pMessage,
+                                          const char* pFile,
+                                          uint32_t      line,
+                                          uint32_t      extra)
   : WException (pMessage, pFile, line, extra)
 {
 }
@@ -60,7 +60,7 @@ ConnectionException::Type () const
   return CONNECTION_EXCEPTION;
 }
 
-const D_CHAR*
+const char*
 ConnectionException::Description () const
 {
   return NULL;
@@ -78,15 +78,15 @@ ClientConnection::ClientConnection (UserHandler&            client,
     m_Version (1),
     m_Cipher (FRAME_ENCTYPE_PLAIN),
     m_DataSize (GetAdminSettings ().m_MaxFrameSize),
-    m_Data (new D_UINT8[m_DataSize])
+    m_Data (new uint8_t[m_DataSize])
 {
   assert ((m_DataSize >= MIN_FRAME_SIZE) && (m_DataSize <= MAX_FRAME_SIZE));
 
   if (m_Cipher == FRAME_ENCTYPE_3K)
-    m_DataSize -= m_DataSize % sizeof (D_UINT32);
+    m_DataSize -= m_DataSize % sizeof (uint32_t);
 
   m_UserHandler.m_pDesc = NULL;
-  const D_UINT16 authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
+  const uint16_t authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
 
   memset (&m_Data[0], 0, authFrameLen);
 
@@ -105,7 +105,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
   ReciveRawClientFrame ();
 
   m_Cipher = GetAdminSettings().m_Cipher;
-  const D_UINT32 protocolVer = from_le_int32 (
+  const uint32_t protocolVer = from_le_int32 (
                               &m_Data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_VER_OFF]
                                              );
   if ((m_FrameSize < authFrameLen)
@@ -123,7 +123,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
                                  _EXTRA (0));
     }
 
-  const string dbsName = _RC (const D_CHAR*,
+  const string dbsName = _RC (const char*,
                               &m_Data[FRAME_HDR_SIZE +
                                       FRAME_AUTH_RSP_FIXED_SIZE]);
 
@@ -151,7 +151,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
 
   if (m_Cipher == FRAME_ENCTYPE_PLAIN)
     {
-      const string passwd = _RC (const D_CHAR*,
+      const string passwd = _RC (const char*,
                                    m_Data +
                                    FRAME_HDR_SIZE +
                                    FRAME_AUTH_RSP_FIXED_SIZE +
@@ -202,13 +202,13 @@ ClientConnection::~ClientConnection ()
   delete [] m_Data;
 }
 
-D_UINT
+uint_t
 ClientConnection::MaxSize () const
 {
   assert ((m_Cipher == FRAME_ENCTYPE_PLAIN) || (m_Cipher == FRAME_ENCTYPE_3K));
   assert ((MIN_FRAME_SIZE<= m_DataSize) && (m_DataSize <= MAX_FRAME_SIZE));
 
-  D_UINT metaDataSize;
+  uint_t metaDataSize;
 
   switch (m_Cipher)
   {
@@ -227,10 +227,10 @@ ClientConnection::MaxSize () const
   return m_DataSize - metaDataSize;
 }
 
-D_UINT
+uint_t
 ClientConnection::DataSize () const
 {
-  D_UINT metaDataSize;
+  uint_t metaDataSize;
 
   switch (m_Cipher)
   {
@@ -253,10 +253,10 @@ ClientConnection::DataSize () const
 
 }
 
-D_UINT8*
+uint8_t*
 ClientConnection::Data ()
 {
-  D_UINT metaDataSize;
+  uint_t metaDataSize;
 
   switch (m_Cipher)
   {
@@ -276,11 +276,11 @@ ClientConnection::Data ()
 }
 
 void
-ClientConnection::DataSize (const D_UINT16 size)
+ClientConnection::DataSize (const uint16_t size)
 {
   assert (size <= MaxSize ());
 
-  D_UINT metaDataSize;
+  uint_t metaDataSize;
 
   switch (m_Cipher)
   {
@@ -301,7 +301,7 @@ ClientConnection::DataSize (const D_UINT16 size)
   assert (m_FrameSize <= m_DataSize);
 }
 
-D_UINT8*
+uint8_t*
 ClientConnection::RawCmdData ()
 {
   if (m_Cipher == FRAME_ENCTYPE_PLAIN)
@@ -316,11 +316,11 @@ ClientConnection::RawCmdData ()
 void
 ClientConnection::ReciveRawClientFrame ()
 {
-  D_UINT16 frameRead = 0;
+  uint16_t frameRead = 0;
 
   while (frameRead < FRAME_HDR_SIZE)
     {
-      D_UINT16 chunkSize;
+      uint16_t chunkSize;
       chunkSize = m_UserHandler.m_Socket.Read (FRAME_HDR_SIZE - frameRead,
                                                &m_Data[frameRead]);
       if (chunkSize == 0)
@@ -354,7 +354,7 @@ ClientConnection::ReciveRawClientFrame ()
 
   while (frameRead < m_FrameSize)
     {
-      D_UINT16 chunkSize;
+      uint16_t chunkSize;
       chunkSize = m_UserHandler.m_Socket.Read (m_FrameSize - frameRead,
                                                &m_Data[frameRead]);
       if (chunkSize == 0)
@@ -365,42 +365,42 @@ ClientConnection::ReciveRawClientFrame ()
 
   assert (frameRead == m_FrameSize);
 
-  const D_UINT32 frameId = from_le_int32 (m_Data + FRAME_ID_OFF);
+  const uint32_t frameId = from_le_int32 (m_Data + FRAME_ID_OFF);
   if (frameId != m_WaitingFrameId)
     {
       throw ConnectionException ("Connection with peer is out of sync",
                                  _EXTRA (0));
     }
 
-  const D_UINT32 encType = m_Data[FRAME_ENCTYPE_OFF];
+  const uint32_t encType = m_Data[FRAME_ENCTYPE_OFF];
   if (encType != m_Cipher)
     throw ConnectionException ("Peer has used a wrong cipher.", _EXTRA (0));
 
   if (encType == FRAME_ENCTYPE_3K)
     {
-      D_UINT8 prev = 0;
-      for (D_UINT i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+      uint8_t prev = 0;
+      for (uint_t i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
         {
           m_Data[FRAME_HDR_SIZE + i] ^= m_Key.at (prev % m_Key.length ());
           prev = m_Data[FRAME_HDR_SIZE + i];
         }
 
-      const D_UINT32 firstKing = from_le_int32 (m_Data +
+      const uint32_t firstKing = from_le_int32 (m_Data +
                                                 FRAME_HDR_SIZE +
                                                 ENC_3K_FIRST_KING_OFF);
-      const D_UINT32 secondKing = from_le_int32 (m_Data +
+      const uint32_t secondKing = from_le_int32 (m_Data +
                                                  FRAME_HDR_SIZE +
                                                  ENC_3K_SECOND_KING_OFF);
       decrypt_3k_buffer (
                       firstKing,
                       secondKing,
-                      _RC (const D_UINT8*, m_Key.c_str ()),
+                      _RC (const uint8_t*, m_Key.c_str ()),
                       m_Key.length (),
                       m_Data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
                       m_FrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
                          );
 
-      const D_UINT16 plainSize = from_le_int16 (m_Data +
+      const uint16_t plainSize = from_le_int16 (m_Data +
                                                 FRAME_HDR_SIZE +
                                                 ENC_3K_PLAIN_SIZE_OFF);
       m_FrameSize = plainSize;
@@ -409,30 +409,30 @@ ClientConnection::ReciveRawClientFrame ()
 }
 
 void
-ClientConnection::SendRawClientFrame (const D_UINT8 type)
+ClientConnection::SendRawClientFrame (const uint8_t type)
 {
   assert ((m_FrameSize >= FRAME_HDR_SIZE) && (m_FrameSize <= m_DataSize));
 
 
   if (m_Cipher == FRAME_ENCTYPE_3K)
     {
-      const D_UINT16 plainSize = m_FrameSize;
+      const uint16_t plainSize = m_FrameSize;
 
-      while (m_FrameSize % sizeof (D_UINT32) != 0)
+      while (m_FrameSize % sizeof (uint32_t) != 0)
         m_Data[m_FrameSize++] = w_rnd () & 0xFF;
 
-      const D_UINT32 firstKing  = w_rnd () & 0xFFFFFFFF;
+      const uint32_t firstKing  = w_rnd () & 0xFFFFFFFF;
       store_le_int32 (firstKing,
                       m_Data + FRAME_HDR_SIZE + ENC_3K_FIRST_KING_OFF);
 
-      const D_UINT32 secondKing = w_rnd () & 0xFFFFFFFF;
+      const uint32_t secondKing = w_rnd () & 0xFFFFFFFF;
       store_le_int32 (secondKing,
                       m_Data + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
 
-      D_UINT8 prev = 0;
-      for (D_UINT i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+      uint8_t prev = 0;
+      for (uint_t i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
         {
-          const D_UINT8 temp = m_Data[FRAME_HDR_SIZE + i];
+          const uint8_t temp = m_Data[FRAME_HDR_SIZE + i];
 
           m_Data[FRAME_HDR_SIZE + i] ^= m_Key.at (prev % m_Key.length ());
           prev = temp;
@@ -446,7 +446,7 @@ ClientConnection::SendRawClientFrame (const D_UINT8 type)
       encrypt_3k_buffer (
                       firstKing,
                       secondKing,
-                      _RC (const D_UINT8*, m_Key.c_str ()),
+                      _RC (const uint8_t*, m_Key.c_str ()),
                       m_Key.length (),
                       m_Data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
                       m_FrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
@@ -465,12 +465,12 @@ ClientConnection::SendRawClientFrame (const D_UINT8 type)
   m_ClientCookie = ~0; //Make sure the client cookie is reread.
 }
 
-D_UINT32
+uint32_t
 ClientConnection::ReadCommand ()
 {
   ReciveRawClientFrame ();
 
-  const D_UINT32 servCookie = from_le_int32 (
+  const uint32_t servCookie = from_le_int32 (
                                 RawCmdData () + PLAIN_SERV_COOKIE_OFF
                                             );
   if (servCookie != m_ServerCookie)
@@ -481,9 +481,9 @@ ClientConnection::ReadCommand ()
 
 
 
-  const D_UINT16  respSize = DataSize ();
-  D_UINT16        chkSum   = 0;
-  for (D_UINT i = 0; i < respSize; i++)
+  const uint16_t  respSize = DataSize ();
+  uint16_t        chkSum   = 0;
+  for (uint_t i = 0; i < respSize; i++)
     chkSum += Data ()[i];
 
   if (chkSum != from_le_int16 (RawCmdData () + PLAIN_CRC_OFF))
@@ -498,20 +498,20 @@ ClientConnection::ReadCommand ()
 }
 
 void
-ClientConnection::SendCmdResponse (const D_UINT16 respType)
+ClientConnection::SendCmdResponse (const uint16_t respType)
 {
   assert ((respType & 1) != 0);
   assert ((m_LastReceivedCmd + 1) == respType);
 
-  const D_UINT16 respSize = DataSize ();
+  const uint16_t respSize = DataSize ();
   m_ServerCookie = w_rnd ();
 
   store_le_int32 (m_ClientCookie, RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
   store_le_int32 (m_ServerCookie, RawCmdData () + PLAIN_SERV_COOKIE_OFF);
   store_le_int16 (respType, RawCmdData () + PLAIN_TYPE_OFF);
 
-  D_UINT32 chkSum = 0;
-  for (D_UINT i = 0; i < respSize; i++)
+  uint32_t chkSum = 0;
+  for (uint_t i = 0; i < respSize; i++)
     chkSum += Data ()[i];
 
   store_le_int16 (chkSum, RawCmdData () + PLAIN_CRC_OFF);

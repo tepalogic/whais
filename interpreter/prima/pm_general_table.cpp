@@ -52,7 +52,7 @@ GeneralTable::GetFieldsCount ()
 }
 
 FIELD_INDEX
-GeneralTable::GetFieldIndex (const D_CHAR* pFieldName)
+GeneralTable::GetFieldIndex (const char* pFieldName)
 {
   throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
 }

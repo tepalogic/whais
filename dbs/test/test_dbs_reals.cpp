@@ -13,8 +13,8 @@
 
 
 //#include <inttypes.h>
-//#define D_INT128 int128_t
-#undef D_UINT128
+//#define int128 int128_t
+#undef uint_t128
 
 #include "dbs_real.h"
 #include "utils/include/we_int128.h"
@@ -23,9 +23,9 @@
 
 using namespace std;
 
-D_UINT64 _iterationsCount = 5000000;
+uint64_t _iterationsCount = 5000000;
 
-template <typename TR, const D_INT64 precision>
+template <typename TR, const int64_t precision>
 static WE_I128
 from_real (TR value)
 {
@@ -38,7 +38,7 @@ from_real (TR value)
   return result;
 }
 
-template <typename TR, const D_INT64 precision>
+template <typename TR, const int64_t precision>
 static TR
 to_real (WE_I128 value)
 {
@@ -57,15 +57,15 @@ to_real (WE_I128 value)
   return result;
 }
 
-template <typename TR, const D_INT64 precision>
-bool test_addition_real (const D_CHAR* type)
+template <typename TR, const int64_t precision>
+bool test_addition_real (const char* type)
 {
-  D_INT64 i, j;
+  int64_t i, j;
 
   cout << "Testing addition of " << type <<" values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd ();
       j = w_rnd ();
@@ -112,15 +112,15 @@ test_addition_real_fail:
   return false;
 }
 
-template <typename TR, const D_INT64 precision>
-bool test_subtraction_real (const D_CHAR* type)
+template <typename TR, const int64_t precision>
+bool test_subtraction_real (const char* type)
 {
-  D_INT64 i, j;
+  int64_t i, j;
 
   cout << "Testing subtraction of " << type <<" values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd ();
       j = w_rnd ();
@@ -170,15 +170,15 @@ test_subtraction_real_fail:
   return false;
 }
 
-template <typename TR, const D_INT64 precision, const D_INT scale>
-bool test_multiplication_real (const D_CHAR* type)
+template <typename TR, const int64_t precision, const int scale>
+bool test_multiplication_real (const char* type)
 {
-  D_INT64 i, j;
+  int64_t i, j;
 
   cout << "Testing multiplication of " << type <<" values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () / scale;
       j = w_rnd () / scale;
@@ -227,15 +227,15 @@ test_multiplication_real_fail:
 }
 
 
-template <typename TR, const D_INT64 precision, const D_INT scale, const D_INT64 MASK>
-bool test_division_real (const D_CHAR* type)
+template <typename TR, const int64_t precision, const int scale, const int64_t MASK>
+bool test_division_real (const char* type)
 {
-  D_INT64 i, j;
+  int64_t i, j;
 
   cout << "Testing division of " << type <<" values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & MASK;
       j = w_rnd () & MASK;
@@ -324,8 +324,8 @@ main (int argc, char** argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif
 
 

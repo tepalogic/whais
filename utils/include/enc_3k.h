@@ -32,20 +32,20 @@ extern "C" {
 #endif
 
 void
-encrypt_3k_buffer (const D_UINT32       firstKing,
-                   const D_UINT32       secondKing,
-                   const D_UINT8* const key,
-                   const D_UINT         keyLen,
-                   D_UINT8*             buffer,
-                   const D_UINT         bufferSize);
+encrypt_3k_buffer (const uint32_t       firstKing,
+                   const uint32_t       secondKing,
+                   const uint8_t* const key,
+                   const uint_t         keyLen,
+                   uint8_t*             buffer,
+                   const uint_t         bufferSize);
 
 void
-decrypt_3k_buffer (const D_UINT32       firstKing,
-                   const D_UINT32       secondKing,
-                   const D_UINT8* const key,
-                   const D_UINT         keyLen,
-                   D_UINT8*             buffer,
-                   const D_UINT         bufferSize);
+decrypt_3k_buffer (const uint32_t       firstKing,
+                   const uint32_t       secondKing,
+                   const uint8_t* const key,
+                   const uint_t         keyLen,
+                   uint8_t*             buffer,
+                   const uint_t         bufferSize);
 
 #ifdef __cplusplus
 }

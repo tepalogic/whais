@@ -18,13 +18,13 @@
 
 using namespace pastra;
 
-static D_INT
-get_next_alignment (D_INT size)
+static int
+get_next_alignment (int size)
 {
   if (size == 12)
     return 4; //Special case of sizeof (RICHREAL_T) == 12.
 
-  D_INT result = 1;
+  int result = 1;
 
   assert (size > 0);
 
@@ -171,11 +171,11 @@ test_for_one_field (I_DBSHandler& rDbs)
   rDbs.AddTable ("t_test_tab", 1, &temp);
   I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
-  D_UINT rowSize = (_RC (pastra::PrototypeTable &, table)).GetRowSize ();
+  uint_t rowSize = (_RC (pastra::PrototypeTable &, table)).GetRowSize ();
 
 
   //Check if we added the byte to keep the null bit.
-  if (_SC (D_INT, rowSize + 1) <= pastra::PSValInterp::Size(T_INT16, false))
+  if (_SC (int, rowSize + 1) <= pastra::PSValInterp::Size(T_INT16, false))
     result = false;
   else if (get_next_alignment (rowSize) <
       pastra::PSValInterp::Alignment (T_INT16, false))
@@ -190,20 +190,20 @@ test_for_one_field (I_DBSHandler& rDbs)
 
 struct StorageInterval
   {
-    StorageInterval (D_UINT32 begin_byte, D_UINT32 end_byte) :
+    StorageInterval (uint32_t begin_byte, uint32_t end_byte) :
         mBegin (begin_byte),
         mEnd (end_byte)
     {}
 
-    D_UINT32 mBegin;
-    D_UINT32 mEnd;
+    uint32_t mBegin;
+    uint32_t mEnd;
 
   };
 
 bool
 test_for_fields (I_DBSHandler& rDbs,
                  DBSFieldDescriptor* pDesc,
-                 const D_UINT32 fieldsCount)
+                 const uint32_t fieldsCount)
 {
   bool result = true;
 
@@ -212,13 +212,13 @@ test_for_fields (I_DBSHandler& rDbs,
   rDbs.AddTable ("t_test_tab", fieldsCount, pDesc);
   I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
-  std::vector <D_UINT32 > nullPositions;
+  std::vector <uint32_t > nullPositions;
   std::vector <StorageInterval> storage;
 
   if (table.GetFieldsCount () != fieldsCount)
     result = false;
 
-  for (D_UINT32 fieldIndex = 0;
+  for (uint32_t fieldIndex = 0;
       result && (fieldIndex < fieldsCount);
       ++fieldIndex)
     {
@@ -230,7 +230,7 @@ test_for_fields (I_DBSHandler& rDbs,
           break;
         }
 
-      for (D_UINT index = 0; index < nullPositions.size (); ++index)
+      for (uint_t index = 0; index < nullPositions.size (); ++index)
         {
           if (descr.m_NullBitIndex == nullPositions[index])
             {
@@ -245,12 +245,12 @@ test_for_fields (I_DBSHandler& rDbs,
       if (! result)
         break;
 
-      D_UINT elem_start = descr.m_StoreIndex;
-      D_UINT elem_end = elem_start +
+      uint_t elem_start = descr.m_StoreIndex;
+      uint_t elem_end = elem_start +
           PSValInterp::Size (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
                                 (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0);
 
-      for (D_UINT index = 0; index < storage.size (); ++index)
+      for (uint_t index = 0; index < storage.size (); ++index)
         {
           if ( ((storage[index].mBegin >= elem_start) &&
               (elem_start <= storage[index].mEnd))
@@ -268,7 +268,7 @@ test_for_fields (I_DBSHandler& rDbs,
       if (result)
         {
           DBSFieldDescriptor desc = table.GetFieldDescriptor(fieldIndex);
-          D_UINT array_index = desc.m_pFieldName[0] - 'a';
+          uint_t array_index = desc.m_pFieldName[0] - 'a';
           if (desc != pDesc[array_index])
             {
               result = false;
@@ -326,7 +326,7 @@ struct DBSFieldDescriptor alt_descs[] = {
     {"p", T_TEXT, false}
 };
 
-const D_CHAR db_name[] = "t_baza_date_1";
+const char db_name[] = "t_baza_date_1";
 int
 main ()
 {
@@ -363,6 +363,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

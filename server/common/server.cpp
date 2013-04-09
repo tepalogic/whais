@@ -54,7 +54,7 @@ public:
   {
     assert (m_UsersPool.Size () > 0);
 
-    for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
+    for (uint_t index = 0; index < m_UsersPool.Size (); ++index)
       {
         if (m_UsersPool[index].m_Thread.IsEnded ())
           return &m_UsersPool[index];
@@ -73,7 +73,7 @@ public:
     //Cancel any pending IO operations.
     m_Socket.Close ();
 
-    for (D_UINT index = 0; index < m_UsersPool.Size (); ++index)
+    for (uint_t index = 0; index < m_UsersPool.Size (); ++index)
       {
         m_UsersPool[index].m_Thread.IgnoreExceptions (true);
         m_UsersPool[index].m_Thread.DiscardException ();
@@ -83,8 +83,8 @@ public:
       }
   }
 
-  const D_CHAR*           m_pInterface;
-  const D_CHAR*           m_pPort;
+  const char*           m_pInterface;
+  const char*           m_pPort;
   WThread                 m_ListenThread;
   WSocket                 m_Socket;
   auto_array<UserHandler> m_UsersPool;
@@ -94,7 +94,7 @@ private:
   Listener& operator= (const Listener&);
 };
 
-static const D_UINT SOCKET_BACK_LOG = 10;
+static const uint_t SOCKET_BACK_LOG = 10;
 
 static vector<DBSDescriptors>* spDatabases;
 static Logger*                 spLogger;
@@ -118,7 +118,7 @@ client_handler_routine (void* args)
         {
           const COMMAND_HANDLER* pCmds;
 
-          D_UINT16 cmdType = connection.ReadCommand ();
+          uint16_t cmdType = connection.ReadCommand ();
 
           if (cmdType == CMD_CLOSE_CONN)
             break;
@@ -274,7 +274,7 @@ listener_routine (void* args)
             }
           else
             {
-              static const D_UINT8 busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
+              static const uint8_t busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
 
               client.Write (sizeof busyResp, busyResp);
               client.Close ();
@@ -361,7 +361,7 @@ StartServer (Logger& log, vector<DBSDescriptors>& databases)
   sAcceptUsersConnections = true;
   sServerStopped          = false;
 
-  for (D_UINT index = 0; index < listeners.Size (); ++index)
+  for (uint_t index = 0; index < listeners.Size (); ++index)
     {
       Listener* const pEnt = &listeners[index];
 
@@ -374,7 +374,7 @@ StartServer (Logger& log, vector<DBSDescriptors>& databases)
       pEnt->m_ListenThread.Run (listener_routine, pEnt);
     }
 
-  for (D_UINT index = 0; index < listeners.Size (); ++index)
+  for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].m_ListenThread.WaitToEnd (false);
 
   spaListeners = NULL;
@@ -393,11 +393,11 @@ StopServer ()
   sAcceptUsersConnections = false;
   sServerStopped          = true;
 
-  for (D_UINT index = 0; index < spaListeners->Size (); ++index)
+  for (uint_t index = 0; index < spaListeners->Size (); ++index)
     (*spaListeners)[index].Close ();
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "WHISPER";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "WHISPER";
 #endif

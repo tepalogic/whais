@@ -48,16 +48,16 @@ public:
 
   virtual TABLE_INDEX  PersistentTablesCount ();
   virtual I_DBSTable&  RetrievePersistentTable (const TABLE_INDEX index);
-  virtual I_DBSTable&  RetrievePersistentTable (const D_CHAR* pTableName);
+  virtual I_DBSTable&  RetrievePersistentTable (const char* pTableName);
   virtual void         ReleaseTable (I_DBSTable&);
-  virtual void         AddTable (const D_CHAR* const pTableName,
+  virtual void         AddTable (const char* const pTableName,
                                  const FIELD_INDEX   fieldsCount,
                                  DBSFieldDescriptor* pInOutFields);
-  virtual void         DeleteTable (const D_CHAR* const pTableName);
+  virtual void         DeleteTable (const char* const pTableName);
 
   virtual I_DBSTable&  CreateTempTable (const FIELD_INDEX   fieldsCount,
                                         DBSFieldDescriptor* pInOutFields);
-  virtual const D_CHAR* TableName (const TABLE_INDEX index);
+  virtual const char* TableName (const TABLE_INDEX index);
 
   void Discard ();
   void RemoveFromStorage ();
@@ -71,7 +71,7 @@ public:
     return m_GlbSettings.m_TempDir;
   }
 
-  D_UINT64 MaxFileSize () const
+  uint64_t MaxFileSize () const
   {
     return m_GlbSettings.m_MaxFileSize;
   }

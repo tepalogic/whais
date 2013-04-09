@@ -24,17 +24,17 @@ struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_RICHREAL, false}
 };
 
-const D_CHAR db_name[] = "t_baza_date_1";
-const D_CHAR tb_name[] = "t_test_tab";
+const char db_name[] = "t_baza_date_1";
+const char tb_name[] = "t_test_tab";
 
-D_UINT _rowsCount   = 5000000;
-D_UINT _removedRows = _rowsCount / 10;
+uint_t _rowsCount   = 5000000;
+uint_t _removedRows = _rowsCount / 10;
 
 DBSRichReal
 MaxValue ()
 {
-  static const D_INT64 intPart  = ~0ull >> 1;
-  static const D_INT64 fracPart = DBS_RICHREAL_PREC - 1;
+  static const int64_t intPart  = ~0ull >> 1;
+  static const int64_t fracPart = DBS_RICHREAL_PREC - 1;
 
   static DBSRichReal _sentinel (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
 
@@ -44,8 +44,8 @@ MaxValue ()
 DBSRichReal
 get_random_real ()
 {
-  D_INT64 intPart  = w_rnd ();
-  D_INT64 fracPart = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
+  int64_t intPart  = w_rnd ();
+  int64_t fracPart = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
 
   if (((intPart < 0) && (fracPart > 0))
       || ((intPart > 0) && (fracPart < 0)))
@@ -60,8 +60,8 @@ get_random_real ()
 
 bool
 fill_table_with_values (I_DBSTable& table,
-                        const D_UINT32 rowCount,
-                        D_UINT64 seed,
+                        const uint32_t rowCount,
+                        uint64_t seed,
                         DBSArray& tableValues)
 {
   bool result = true;
@@ -71,7 +71,7 @@ fill_table_with_values (I_DBSTable& table,
   std::cout << "Filling table with " << rowCount << " values ... " << std::endl;
 
   w_rnd_set_seed (seed);
-  for (D_UINT index = 0; index < rowCount; ++index)
+  for (uint_t index = 0; index < rowCount; ++index)
     {
       DBSRichReal value = get_random_real ();
       if (table.AddRow () != index)
@@ -105,7 +105,7 @@ fill_table_with_values (I_DBSTable& table,
     }
 
 
-  for (D_UINT checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
+  for (uint_t checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
     {
       DBSRichReal   rowValue;
       DBSUInt64 rowIndex;
@@ -141,14 +141,14 @@ fill_table_with_values (I_DBSTable& table,
 }
 
 bool
-fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
+fill_table_with_first_nulls (I_DBSTable& table, const uint32_t rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
 
   DBSRichReal nullValue;
 
-  for (D_UINT64 index = 0; index < rowCount; ++index)
+  for (uint64_t index = 0; index < rowCount; ++index)
     {
       table.SetEntry (index, 0, nullValue);
 
@@ -167,7 +167,7 @@ fill_table_with_first_nulls (I_DBSTable& table, const D_UINT32 rowCount)
                                            ~0,
                                            0);
 
-  for (D_UINT64 index = 0; (index < rowCount) && result; ++index)
+  for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
       DBSUInt64 element;
       values.GetElement (element, index);
@@ -206,7 +206,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                             0,
                                             ~0,
                                             0);
-  for (D_UINT64 index = 0; (index < _removedRows) && result; ++index)
+  for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
       DBSUInt64 element;
       values.GetElement (element, index);
@@ -229,7 +229,7 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                    ~0,
                                     0);
 
-  for (D_UINT64 index = _removedRows; (index < _rowsCount) && result; ++index)
+  for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
       DBSUInt64 element;
       values.GetElement (element, index - _removedRows);
@@ -273,7 +273,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   table.RemoveFieldIndex (0);
 
-  for (D_UINT64 index = 0; index < _removedRows; ++index)
+  for (uint64_t index = 0; index < _removedRows; ++index)
     {
       DBSRichReal rowValue;
       tableValues.GetElement (rowValue, index);
@@ -299,7 +299,7 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   std::cout << "Check index values ... " << std::endl;
 
-  for (D_UINT64 index = 0; (index < _rowsCount) && result; ++index)
+  for (uint64_t index = 0; (index < _rowsCount) && result; ++index)
     {
       DBSRichReal rowValue;
       table.GetEntry (index, 0, rowValue);
@@ -372,6 +372,6 @@ main (int argc, char **argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

@@ -33,14 +33,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sched.h>
 #include <unistd.h>
 
-D_UINT
+uint_t
 wh_sync_init (WH_SYNC* pSync)
 {
-  D_UINT result;
+  uint_t result;
 
   do
     result = pthread_mutex_init (pSync, NULL);
-  while (result == (D_UINT)EAGAIN);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -48,14 +48,14 @@ wh_sync_init (WH_SYNC* pSync)
   return result;
 }
 
-D_UINT
+uint_t
 wh_sync_destroy (WH_SYNC* pSync)
 {
-  D_UINT result;
+  uint_t result;
 
   do
     result = pthread_mutex_destroy (pSync);
-  while (result == (D_UINT)EAGAIN);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -63,14 +63,14 @@ wh_sync_destroy (WH_SYNC* pSync)
   return result;
 }
 
-D_UINT
+uint_t
 wh_sync_enter (WH_SYNC* pSync)
 {
-  D_UINT result;
+  uint_t result;
 
   do
     result = pthread_mutex_lock (pSync);
-  while (result == (D_UINT)EAGAIN);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -78,14 +78,14 @@ wh_sync_enter (WH_SYNC* pSync)
   return result;
 }
 
-D_UINT
+uint_t
 wh_sync_leave (WH_SYNC* pSync)
 {
-  D_UINT result;
+  uint_t result;
 
   do
     result = pthread_mutex_unlock (pSync);
-  while (result == (D_UINT)EAGAIN);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -93,16 +93,16 @@ wh_sync_leave (WH_SYNC* pSync)
   return result;
 }
 
-D_UINT
+uint_t
 wh_thread_create (WH_THREAD*       pThread,
                  WH_THREAD_ROUTINE routine,
                  void*             args)
 {
-  D_UINT result;
+  uint_t result;
 
   do
     result = pthread_create (pThread, NULL, (void* (*)(void*))routine, args);
-  while (result == (D_UINT)EAGAIN);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
     result = pthread_detach (*pThread);
@@ -110,7 +110,7 @@ wh_thread_create (WH_THREAD*       pThread,
   return result;
 }
 
-D_UINT
+uint_t
 wh_thread_free (WH_THREAD thread)
 {
   return WOP_OK;
@@ -123,7 +123,7 @@ wh_yield ()
 }
 
 void
-wh_sleep (D_UINT millisecs)
+wh_sleep (uint_t millisecs)
 {
   usleep (millisecs * 1000);
 }

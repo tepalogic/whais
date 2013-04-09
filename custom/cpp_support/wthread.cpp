@@ -29,21 +29,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 WSynchronizer::WSynchronizer ()
 {
-  const D_UINT result = wh_sync_init (&m_Sync);
+  const uint_t result = wh_sync_init (&m_Sync);
   if (result != WOP_OK)
     throw WSynchException (NULL, _EXTRA (result));
 }
 
 WSynchronizer::~WSynchronizer ()
 {
-  const D_UINT result = wh_sync_destroy (&m_Sync);
+  const uint_t result = wh_sync_destroy (&m_Sync);
   assert (result == WOP_OK);
 }
 
 void
 WSynchronizer::Enter ()
 {
-  const D_UINT result = wh_sync_enter (&m_Sync);
+  const uint_t result = wh_sync_enter (&m_Sync);
   if (result != WOP_OK)
     throw WSynchException (NULL, _EXTRA (result));
 }
@@ -51,7 +51,7 @@ WSynchronizer::Enter ()
 void
 WSynchronizer::Leave ()
 {
-  const D_UINT result = wh_sync_leave (&m_Sync);
+  const uint_t result = wh_sync_leave (&m_Sync);
 
   assert (result == WOP_OK);
 }
@@ -84,7 +84,7 @@ WThread::Run (WH_THREAD_ROUTINE routine, void* const args)
   m_Routine     = routine;
   m_RoutineArgs = args;
 
-  const D_UINT res = wh_thread_create (&m_ThreadHnd,
+  const uint_t res = wh_thread_create (&m_ThreadHnd,
                                        WThread::ThreadWrapperRoutine,
                                        this);
   if (res != WOP_OK)

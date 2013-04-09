@@ -13,8 +13,8 @@ using namespace std;
 
 struct BasicValueEntry
 {
-  const D_UINT  type;
-  const D_CHAR* value;
+  const uint_t  type;
+  const char* value;
 };
 
 BasicValueEntry _values[] =
@@ -434,13 +434,13 @@ static const W_FieldDescriptor _fields[] =
   {"WFT_RICHREAL", WFT_RICHREAL}
 };
 
-static const D_UINT _valuesCount = sizeof (_values) / sizeof (_values[0]);
-static const D_UINT _fieldsCount = sizeof (_fields) / sizeof (_fields[0]);
+static const uint_t _valuesCount = sizeof (_values) / sizeof (_values[0]);
+static const uint_t _fieldsCount = sizeof (_fields) / sizeof (_fields[0]);
 
-static const D_CHAR*
-get_table_field_name (const D_UINT fieldType)
+static const char*
+get_table_field_name (const uint_t fieldType)
 {
-  for (D_UINT i = 0; i < _fieldsCount; ++i)
+  for (uint_t i = 0; i < _fieldsCount; ++i)
     {
       if (fieldType == _fields[i].m_FieldType)
         return _fields[i].m_FieldName;
@@ -453,10 +453,10 @@ get_table_field_name (const D_UINT fieldType)
 static bool
 check_table_description (W_CONNECTOR_HND hnd)
 {
-  D_UINT type, fcount;
+  uint_t type, fcount;
 
-  const D_CHAR* fieldName = NULL;
-  D_UINT        fieldType = 0;
+  const char* fieldName = NULL;
+  uint_t        fieldType = 0;
 
   if ((WDescribeStackTop (hnd, &type) != WCS_OK)
       || (type != WFT_TABLE_MASK)
@@ -466,7 +466,7 @@ check_table_description (W_CONNECTOR_HND hnd)
       return false;
     }
 
-  for (D_UINT i = 0; i < _fieldsCount; ++i)
+  for (uint_t i = 0; i < _fieldsCount; ++i)
     {
 
       if (WDescribeValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
@@ -489,12 +489,12 @@ check_table_description (W_CONNECTOR_HND hnd)
 
 static bool
 check_table_value (W_CONNECTOR_HND      hnd,
-                   const D_UINT         index,
+                   const uint_t         index,
                    const bool           extraCheck)
 {
-  const D_CHAR* const fieldName = get_table_field_name (_values[index].type);
-  const D_CHAR*       tabVal    = NULL;
-  const D_UINT64      row       = index / _fieldsCount;
+  const char* const fieldName = get_table_field_name (_values[index].type);
+  const char*       tabVal    = NULL;
+  const uint64_t      row       = index / _fieldsCount;
 
   if (extraCheck)
     {
@@ -566,7 +566,7 @@ fill_table_with_values (W_CONNECTOR_HND hnd,
   if ( ! bulk && (WUpdateStackFlush (hnd) != WCS_OK))
     return false;
 
-  for (D_UINT i = 0; i < _valuesCount; ++i)
+  for (uint_t i = 0; i < _valuesCount; ++i)
     {
       if (WUpdateStackValue (hnd,
                              _values[i].type,
@@ -601,7 +601,7 @@ test_step_table_fill (W_CONNECTOR_HND hnd)
     goto test_step_table_fill_error;
 
 
-  for (D_UINT i = 0; i < _valuesCount; ++i)
+  for (uint_t i = 0; i < _valuesCount; ++i)
     {
       if (! check_table_value (hnd, i, true))
         goto test_step_table_fill_error;
@@ -631,7 +631,7 @@ test_bulk_table_fill (W_CONNECTOR_HND hnd)
   if (! fill_table_with_values (hnd, true))
     goto test_bulk_table_fill_error;
 
-  for (D_UINT i = 0; i < _valuesCount; ++i)
+  for (uint_t i = 0; i < _valuesCount; ++i)
     {
       if (! check_table_value (hnd, i, false))
         goto test_bulk_table_fill_error;
@@ -689,19 +689,19 @@ test_for_errors_fail :
   return false;
 }
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 1;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "test_password";

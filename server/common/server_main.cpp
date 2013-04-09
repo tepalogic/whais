@@ -106,7 +106,7 @@ set_signals ()
 
 
 int
-main (int argc, D_CHAR** argv)
+main (int argc, char** argv)
 {
   auto_ptr<ifstream> config (NULL);
   auto_ptr<Logger>   glbLog (NULL);
@@ -135,7 +135,7 @@ main (int argc, D_CHAR** argv)
 
   try
   {
-      D_UINT sectionLine = 0;
+      uint_t sectionLine = 0;
 
       if (SeekAtConfigurationSection (*config, sectionLine) == false)
         {
@@ -166,7 +166,7 @@ main (int argc, D_CHAR** argv)
     if ( ! PrepareConfigurationSection (*glbLog))
       return -1;
 
-    D_UINT configLine = 0;
+    uint_t configLine = 0;
     config->clear ();
     config->seekg (0);
     while (FindNextContextSection (*config, configLine))

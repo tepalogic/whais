@@ -30,30 +30,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class EXCEP_SHL WFileException : public WException
 {
 public:
-  WFileException (const D_CHAR* pMessage,
-                  const D_CHAR* pFile,
-                  D_UINT32      line,
-                  D_UINT32      extra);
+  WFileException (const char* pMessage,
+                  const char* pFile,
+                  uint32_t      line,
+                  uint32_t      extra);
 
   virtual WException*     Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const D_CHAR*   Description () const;
+  virtual const char*   Description () const;
 };
 
 class EXCEP_SHL WFile
 {
 public:
-  explicit WFile (const D_CHAR* pFileName, D_UINT mode = 0);
+  explicit WFile (const char* pFileName, uint_t mode = 0);
   WFile (const WFile& rSource);
   ~WFile ();
 
-  void     Read (D_UINT8* pBuffer, D_UINT size);
-  void     Write (const D_UINT8* pBuffer, D_UINT size);
-  void     Seek (const D_INT64 where, const D_INT whence);
-  D_UINT64 Tell ();
+  void     Read (uint8_t* pBuffer, uint_t size);
+  void     Write (const uint8_t* pBuffer, uint_t size);
+  void     Seek (const int64_t where, const int whence);
+  uint64_t Tell ();
   void     Sync ();
-  D_UINT64 GetSize () const;
-  void     SetSize (const D_UINT64 size);
+  uint64_t GetSize () const;
+  void     SetSize (const uint64_t size);
   void     Close ();
 
   WFile&   operator= (const WFile&);

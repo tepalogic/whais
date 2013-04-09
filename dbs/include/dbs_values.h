@@ -122,7 +122,7 @@ struct DBSChar
   {
   }
 
-  explicit DBSChar (const D_UINT32 ch)
+  explicit DBSChar (const uint32_t ch)
     : m_Value (ch),
       m_IsNull (false)
   {
@@ -135,7 +135,7 @@ struct DBSChar
 
   DBSChar& operator= (const DBSChar& source)
   {
-    _CC (D_UINT32&, m_Value) = source.m_Value;
+    _CC (uint32_t&, m_Value) = source.m_Value;
     _CC (bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
@@ -185,7 +185,7 @@ struct DBSChar
   DBS_FIELD_TYPE  GetDBSType() const { return T_CHAR; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT32 m_Value;                //4 bytes to hold an UTF-8 character
+  const uint32_t m_Value;                //4 bytes to hold an UTF-8 character
   const bool     m_IsNull;
 };
 
@@ -199,9 +199,9 @@ struct DBS_SHL DBSDate
   {
   }
 
-  DBSDate (const D_INT32 year,
-           const D_UINT8 month,
-           const D_UINT8 day);
+  DBSDate (const int32_t year,
+           const uint8_t month,
+           const uint8_t day);
 
   DBSDate (const DBSDate& source)
     : m_Year (source.m_Year),
@@ -213,9 +213,9 @@ struct DBS_SHL DBSDate
 
   DBSDate& operator= (const DBSDate& source)
   {
-    _CC( D_INT16&, m_Year)   = source.m_Year;
-    _CC( D_UINT8&, m_Month)  = source.m_Month;
-    _CC( D_UINT8&, m_Day)    = source.m_Day;
+    _CC( int16_t&, m_Year)   = source.m_Year;
+    _CC( uint8_t&, m_Month)  = source.m_Month;
+    _CC( uint8_t&, m_Day)    = source.m_Day;
     _CC( bool&,    m_IsNull) = source.m_IsNull;
     return *this;
   }
@@ -278,9 +278,9 @@ struct DBS_SHL DBSDate
   DBS_FIELD_TYPE  GetDBSType() const { return T_DATE; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT16 m_Year;
-  const D_UINT8 m_Month;
-  const D_UINT8 m_Day;
+  const int16_t m_Year;
+  const uint8_t m_Month;
+  const uint8_t m_Day;
   const bool    m_IsNull;
 };
 
@@ -297,12 +297,12 @@ struct DBS_SHL DBSDateTime
   {
   }
 
-  explicit DBSDateTime (const D_INT32 year,
-                        const D_UINT8 mounth,
-                        const D_UINT8 day,
-                        const D_UINT8 hour,
-                        const D_UINT8 minutes,
-                        const D_UINT8 seconds);
+  explicit DBSDateTime (const int32_t year,
+                        const uint8_t mounth,
+                        const uint8_t day,
+                        const uint8_t hour,
+                        const uint8_t minutes,
+                        const uint8_t seconds);
 
   DBSDateTime (const DBSDateTime& source)
     : m_Year (source.m_Year),
@@ -317,12 +317,12 @@ struct DBS_SHL DBSDateTime
 
   DBSDateTime& operator= (const DBSDateTime& source)
   {
-    _CC( D_INT16&, m_Year)    = source.m_Year;
-    _CC( D_UINT8&, m_Month)   = source.m_Month;
-    _CC( D_UINT8&, m_Day)     = source.m_Day;
-    _CC( D_UINT8&, m_Hour)    = source.m_Hour;
-    _CC( D_UINT8&, m_Minutes) = source.m_Minutes;
-    _CC( D_UINT8&, m_Seconds) = source.m_Seconds;
+    _CC( int16_t&, m_Year)    = source.m_Year;
+    _CC( uint8_t&, m_Month)   = source.m_Month;
+    _CC( uint8_t&, m_Day)     = source.m_Day;
+    _CC( uint8_t&, m_Hour)    = source.m_Hour;
+    _CC( uint8_t&, m_Minutes) = source.m_Minutes;
+    _CC( uint8_t&, m_Seconds) = source.m_Seconds;
     _CC( bool&,    m_IsNull)  = source.m_IsNull;
     return *this;
   }
@@ -403,12 +403,12 @@ struct DBS_SHL DBSDateTime
   DBS_FIELD_TYPE  GetDBSType() const { return T_DATETIME; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT16 m_Year;
-  const D_UINT8 m_Month;
-  const D_UINT8 m_Day;
-  const D_UINT8 m_Hour;
-  const D_UINT8 m_Minutes;
-  const D_UINT8 m_Seconds;
+  const int16_t m_Year;
+  const uint8_t m_Month;
+  const uint8_t m_Day;
+  const uint8_t m_Hour;
+  const uint8_t m_Minutes;
+  const uint8_t m_Seconds;
   const bool    m_IsNull;
 };
 
@@ -427,13 +427,13 @@ struct DBS_SHL DBSHiresTime
   {
   }
 
-  explicit DBSHiresTime (const D_INT32 year,
-                         const D_UINT8 month,
-                         const D_UINT8 day,
-                         const D_UINT8 hour,
-                         const D_UINT8 minutes,
-                         const D_UINT8 seconds,
-                         const D_UINT32 microsec);
+  explicit DBSHiresTime (const int32_t year,
+                         const uint8_t month,
+                         const uint8_t day,
+                         const uint8_t hour,
+                         const uint8_t minutes,
+                         const uint8_t seconds,
+                         const uint32_t microsec);
 
   DBSHiresTime (const DBSHiresTime& source)
     : m_Microsec (source.m_Microsec),
@@ -449,13 +449,13 @@ struct DBS_SHL DBSHiresTime
 
   DBSHiresTime& operator= (const DBSHiresTime& source)
   {
-    _CC( D_UINT32&, m_Microsec) = source.m_Microsec;
-    _CC( D_INT16&,  m_Year)     = source.m_Year;
-    _CC( D_UINT8&,  m_Month)    = source.m_Month;
-    _CC( D_UINT8&,  m_Day)      = source.m_Day;
-    _CC( D_UINT8&,  m_Hour)     = source.m_Hour;
-    _CC( D_UINT8&,  m_Minutes)  = source.m_Minutes;
-    _CC( D_UINT8&,  m_Seconds)  = source.m_Seconds;
+    _CC( uint32_t&, m_Microsec) = source.m_Microsec;
+    _CC( int16_t&,  m_Year)     = source.m_Year;
+    _CC( uint8_t&,  m_Month)    = source.m_Month;
+    _CC( uint8_t&,  m_Day)      = source.m_Day;
+    _CC( uint8_t&,  m_Hour)     = source.m_Hour;
+    _CC( uint8_t&,  m_Minutes)  = source.m_Minutes;
+    _CC( uint8_t&,  m_Seconds)  = source.m_Seconds;
     _CC( bool&,     m_IsNull)   = source.m_IsNull;
     return *this;
   }
@@ -541,13 +541,13 @@ struct DBS_SHL DBSHiresTime
   DBS_FIELD_TYPE  GetDBSType() const { return T_HIRESTIME; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT32 m_Microsec;
-  const D_INT16  m_Year;
-  const D_UINT8  m_Month;
-  const D_UINT8  m_Day;
-  const D_UINT8  m_Hour;
-  const D_UINT8  m_Minutes;
-  const D_UINT8  m_Seconds;
+  const uint32_t m_Microsec;
+  const int16_t  m_Year;
+  const uint8_t  m_Month;
+  const uint8_t  m_Day;
+  const uint8_t  m_Hour;
+  const uint8_t  m_Minutes;
+  const uint8_t  m_Seconds;
   const bool     m_IsNull;
 
 };
@@ -560,7 +560,7 @@ struct DBSUInt8
   {
   }
 
-  explicit DBSUInt8 (const D_UINT8 value)
+  explicit DBSUInt8 (const uint8_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -574,7 +574,7 @@ struct DBSUInt8
 
   DBSUInt8& operator= (const DBSUInt8& source)
   {
-    _CC( D_UINT8&, m_Value) = source.m_Value;
+    _CC( uint8_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
@@ -624,7 +624,7 @@ struct DBSUInt8
   DBS_FIELD_TYPE  GetDBSType() const { return T_UINT8; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT8 m_Value;
+  const uint8_t m_Value;
   const bool    m_IsNull;
 };
 
@@ -636,7 +636,7 @@ struct DBSUInt16
   {
   }
 
-  explicit DBSUInt16 (const D_UINT16 value)
+  explicit DBSUInt16 (const uint16_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -650,7 +650,7 @@ struct DBSUInt16
 
   DBSUInt16& operator= (const DBSUInt16& source)
   {
-    _CC( D_UINT16&, m_Value) = source.m_Value;
+    _CC( uint16_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
@@ -700,7 +700,7 @@ struct DBSUInt16
   DBS_FIELD_TYPE  GetDBSType() const { return T_UINT16; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT16 m_Value;
+  const uint16_t m_Value;
   const bool     m_IsNull;
 };
 
@@ -712,7 +712,7 @@ struct DBSUInt32
   {
   }
 
-  explicit DBSUInt32 (const D_UINT32 value)
+  explicit DBSUInt32 (const uint32_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -725,7 +725,7 @@ struct DBSUInt32
 
   DBSUInt32& operator= (const DBSUInt32& source)
   {
-    _CC( D_UINT32&, m_Value) = source.m_Value;
+    _CC( uint32_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
@@ -775,7 +775,7 @@ struct DBSUInt32
   DBS_FIELD_TYPE  GetDBSType() const { return T_UINT32; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT32 m_Value;
+  const uint32_t m_Value;
   const bool     m_IsNull;
 };
 
@@ -787,7 +787,7 @@ struct DBSUInt64
   {
   }
 
-  explicit DBSUInt64 (const D_UINT64 value)
+  explicit DBSUInt64 (const uint64_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -801,7 +801,7 @@ struct DBSUInt64
 
   DBSUInt64& operator= (const DBSUInt64& source)
   {
-    _CC( D_UINT64&, m_Value) = source.m_Value;
+    _CC( uint64_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)    = source.m_IsNull;
     return *this;
   }
@@ -851,7 +851,7 @@ struct DBSUInt64
   DBS_FIELD_TYPE  GetDBSType() const { return T_UINT64; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_UINT64 m_Value;
+  const uint64_t m_Value;
   const bool     m_IsNull;
 };
 
@@ -863,7 +863,7 @@ struct DBSInt8
   {
   }
 
-  explicit DBSInt8 (const D_INT8 value)
+  explicit DBSInt8 (const int8_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -877,7 +877,7 @@ struct DBSInt8
 
   DBSInt8& operator= (const DBSInt8& source)
   {
-    _CC( D_INT8&, m_Value) = source.m_Value;
+    _CC( int8_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)  = source.m_IsNull;
     return *this;
   }
@@ -927,7 +927,7 @@ struct DBSInt8
   DBS_FIELD_TYPE  GetDBSType() const { return T_INT8; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT8 m_Value;
+  const int8_t m_Value;
   const bool   m_IsNull;
 };
 
@@ -939,7 +939,7 @@ struct DBSInt16
   {
   }
 
-  explicit DBSInt16 (const D_INT16 value)
+  explicit DBSInt16 (const int16_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -953,7 +953,7 @@ struct DBSInt16
 
   DBSInt16& operator= (const DBSInt16& source)
   {
-    _CC( D_INT16&, m_Value) = source.m_Value;
+    _CC( int16_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
@@ -1003,7 +1003,7 @@ struct DBSInt16
   DBS_FIELD_TYPE  GetDBSType() const { return T_INT16; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT16 m_Value;
+  const int16_t m_Value;
   bool          m_IsNull;
 };
 
@@ -1015,7 +1015,7 @@ struct DBSInt32
   {
   }
 
-  explicit DBSInt32 (const D_INT32 value)
+  explicit DBSInt32 (const int32_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -1029,7 +1029,7 @@ struct DBSInt32
 
   DBSInt32& operator= (const DBSInt32& source)
   {
-    _CC( D_INT32&, m_Value) = source.m_Value;
+    _CC( int32_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
@@ -1079,7 +1079,7 @@ struct DBSInt32
   DBS_FIELD_TYPE  GetDBSType() const { return T_INT32; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT32 m_Value;
+  const int32_t m_Value;
   const bool    m_IsNull;
 };
 
@@ -1091,7 +1091,7 @@ struct DBSInt64
   {
   }
 
-  explicit DBSInt64 (const D_INT64 value)
+  explicit DBSInt64 (const int64_t value)
     : m_Value (value),
       m_IsNull (false)
   {
@@ -1105,7 +1105,7 @@ struct DBSInt64
 
   DBSInt64& operator= (const DBSInt64& source)
   {
-    _CC( D_INT64&, m_Value) = source.m_Value;
+    _CC( int64_t&, m_Value) = source.m_Value;
     _CC( bool&, m_IsNull)   = source.m_IsNull;
     return *this;
   }
@@ -1155,7 +1155,7 @@ struct DBSInt64
   DBS_FIELD_TYPE  GetDBSType() const { return T_INT64; }
   bool IsNull () const { return m_IsNull; }
 
-  const D_INT64 m_Value;
+  const int64_t m_Value;
   const bool    m_IsNull;
 };
 
@@ -1314,8 +1314,8 @@ class I_TextStrategy;
 class DBS_SHL DBSText
 {
 public:
-  explicit DBSText (const D_CHAR* pText = NULL);
-  explicit DBSText (const D_UINT8* pUtf8String);
+  explicit DBSText (const char* pText = NULL);
+  explicit DBSText (const uint8_t* pUtf8String);
   explicit DBSText (I_TextStrategy& text);
 
   DBSText (const DBSText& sourceText);
@@ -1330,17 +1330,17 @@ public:
 
   bool IsNull () const;
 
-  D_UINT64 GetCharactersCount() const;
-  D_UINT64 GetRawUtf8Count() const;
-  void     GetRawUtf8 (D_UINT64       offset,
-                       D_UINT64       count,
-                       D_UINT8* const pBuffer) const;
+  uint64_t GetCharactersCount() const;
+  uint64_t GetRawUtf8Count() const;
+  void     GetRawUtf8 (uint64_t       offset,
+                       uint64_t       count,
+                       uint8_t* const pBuffer) const;
 
   void Append (const DBSChar& character);
   void Append (const DBSText& text);
 
-  DBSChar GetCharAtIndex(const D_UINT64 index) const;
-  void    SetCharAtIndex (const DBSChar& rCharacter, const D_UINT64 index);
+  DBSChar GetCharAtIndex(const uint64_t index) const;
+  void    SetCharAtIndex (const DBSChar& rCharacter, const uint64_t index);
 
   void SetMirror (DBSText& mirror) const;
 
@@ -1357,21 +1357,21 @@ class DBS_SHL DBSArray
 public:
 
   DBSArray ();
-  explicit DBSArray (const DBSBool* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSChar* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSDate* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSDateTime* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSHiresTime* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt8* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt16* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt32* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSUInt64* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSReal* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSRichReal* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt8* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt16* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt32* array, D_UINT64 count = 0);
-  explicit DBSArray (const DBSInt64* array, D_UINT64 count = 0);
+  explicit DBSArray (const DBSBool* array, uint64_t count = 0);
+  explicit DBSArray (const DBSChar* array, uint64_t count = 0);
+  explicit DBSArray (const DBSDate* array, uint64_t count = 0);
+  explicit DBSArray (const DBSDateTime* array, uint64_t count = 0);
+  explicit DBSArray (const DBSHiresTime* array, uint64_t count = 0);
+  explicit DBSArray (const DBSUInt8* array, uint64_t count = 0);
+  explicit DBSArray (const DBSUInt16* array, uint64_t count = 0);
+  explicit DBSArray (const DBSUInt32* array, uint64_t count = 0);
+  explicit DBSArray (const DBSUInt64* array, uint64_t count = 0);
+  explicit DBSArray (const DBSReal* array, uint64_t count = 0);
+  explicit DBSArray (const DBSRichReal* array, uint64_t count = 0);
+  explicit DBSArray (const DBSInt8* array, uint64_t count = 0);
+  explicit DBSArray (const DBSInt16* array, uint64_t count = 0);
+  explicit DBSArray (const DBSInt32* array, uint64_t count = 0);
+  explicit DBSArray (const DBSInt64* array, uint64_t count = 0);
 
   explicit DBSArray (I_ArrayStrategy& array);
 
@@ -1381,58 +1381,58 @@ public:
   DBSArray& operator= (const DBSArray& rSource);
 
   bool           IsNull () const { return ElementsCount() == 0; }
-  D_UINT64       ElementsCount () const;
+  uint64_t       ElementsCount () const;
   DBS_FIELD_TYPE ElementsType () const;
 
-  D_UINT64 AddElement (const DBSBool& value);
-  D_UINT64 AddElement (const DBSChar& value);
-  D_UINT64 AddElement (const DBSDate& value);
-  D_UINT64 AddElement (const DBSDateTime& value);
-  D_UINT64 AddElement (const DBSHiresTime& value);
-  D_UINT64 AddElement (const DBSUInt8& value);
-  D_UINT64 AddElement (const DBSUInt16& value);
-  D_UINT64 AddElement (const DBSUInt32& value);
-  D_UINT64 AddElement (const DBSUInt64& value);
-  D_UINT64 AddElement (const DBSReal& value);
-  D_UINT64 AddElement (const DBSRichReal& value);
-  D_UINT64 AddElement (const DBSInt8& value);
-  D_UINT64 AddElement (const DBSInt16& value);
-  D_UINT64 AddElement (const DBSInt32& value);
-  D_UINT64 AddElement (const DBSInt64& value);
+  uint64_t AddElement (const DBSBool& value);
+  uint64_t AddElement (const DBSChar& value);
+  uint64_t AddElement (const DBSDate& value);
+  uint64_t AddElement (const DBSDateTime& value);
+  uint64_t AddElement (const DBSHiresTime& value);
+  uint64_t AddElement (const DBSUInt8& value);
+  uint64_t AddElement (const DBSUInt16& value);
+  uint64_t AddElement (const DBSUInt32& value);
+  uint64_t AddElement (const DBSUInt64& value);
+  uint64_t AddElement (const DBSReal& value);
+  uint64_t AddElement (const DBSRichReal& value);
+  uint64_t AddElement (const DBSInt8& value);
+  uint64_t AddElement (const DBSInt16& value);
+  uint64_t AddElement (const DBSInt32& value);
+  uint64_t AddElement (const DBSInt64& value);
 
-  void GetElement (DBSBool& outValue, const D_UINT64 index) const;
-  void GetElement (DBSChar& outValue, const D_UINT64 index) const;
-  void GetElement (DBSDate& outValue, const D_UINT64 index) const;
-  void GetElement (DBSDateTime& outValue, const D_UINT64 index) const;
-  void GetElement (DBSHiresTime& outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt8& outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt16& outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt32& outValue, const D_UINT64 index) const;
-  void GetElement (DBSUInt64& outValue, const D_UINT64 index) const;
-  void GetElement (DBSReal& outValue, const D_UINT64 index) const;
-  void GetElement (DBSRichReal& outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt8& outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt16& outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt32& outValue, const D_UINT64 index) const;
-  void GetElement (DBSInt64& outValue, const D_UINT64 index) const;
+  void GetElement (DBSBool& outValue, const uint64_t index) const;
+  void GetElement (DBSChar& outValue, const uint64_t index) const;
+  void GetElement (DBSDate& outValue, const uint64_t index) const;
+  void GetElement (DBSDateTime& outValue, const uint64_t index) const;
+  void GetElement (DBSHiresTime& outValue, const uint64_t index) const;
+  void GetElement (DBSUInt8& outValue, const uint64_t index) const;
+  void GetElement (DBSUInt16& outValue, const uint64_t index) const;
+  void GetElement (DBSUInt32& outValue, const uint64_t index) const;
+  void GetElement (DBSUInt64& outValue, const uint64_t index) const;
+  void GetElement (DBSReal& outValue, const uint64_t index) const;
+  void GetElement (DBSRichReal& outValue, const uint64_t index) const;
+  void GetElement (DBSInt8& outValue, const uint64_t index) const;
+  void GetElement (DBSInt16& outValue, const uint64_t index) const;
+  void GetElement (DBSInt32& outValue, const uint64_t index) const;
+  void GetElement (DBSInt64& outValue, const uint64_t index) const;
 
-  void SetElement (const DBSBool& newValue, const D_UINT64 index);
-  void SetElement (const DBSChar& newValue, const D_UINT64 index);
-  void SetElement (const DBSDate& newValue, const D_UINT64 index);
-  void SetElement (const DBSDateTime& newValue, const D_UINT64 index);
-  void SetElement (const DBSHiresTime& newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt8& newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt16& newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt32& newValue, const D_UINT64 index);
-  void SetElement (const DBSUInt64& newValue, const D_UINT64 index);
-  void SetElement (const DBSReal& newValue, const D_UINT64 index);
-  void SetElement (const DBSRichReal& newValue, const D_UINT64 index);
-  void SetElement (const DBSInt8& newValue, const D_UINT64 index);
-  void SetElement (const DBSInt16& newValue, const D_UINT64 index);
-  void SetElement (const DBSInt32& newValue, const D_UINT64 index);
-  void SetElement (const DBSInt64& newValue, const D_UINT64 index);
+  void SetElement (const DBSBool& newValue, const uint64_t index);
+  void SetElement (const DBSChar& newValue, const uint64_t index);
+  void SetElement (const DBSDate& newValue, const uint64_t index);
+  void SetElement (const DBSDateTime& newValue, const uint64_t index);
+  void SetElement (const DBSHiresTime& newValue, const uint64_t index);
+  void SetElement (const DBSUInt8& newValue, const uint64_t index);
+  void SetElement (const DBSUInt16& newValue, const uint64_t index);
+  void SetElement (const DBSUInt32& newValue, const uint64_t index);
+  void SetElement (const DBSUInt64& newValue, const uint64_t index);
+  void SetElement (const DBSReal& newValue, const uint64_t index);
+  void SetElement (const DBSRichReal& newValue, const uint64_t index);
+  void SetElement (const DBSInt8& newValue, const uint64_t index);
+  void SetElement (const DBSInt16& newValue, const uint64_t index);
+  void SetElement (const DBSInt32& newValue, const uint64_t index);
+  void SetElement (const DBSInt64& newValue, const uint64_t index);
 
-  void RemoveElement (const D_UINT64 index);
+  void RemoveElement (const uint64_t index);
   void Sort (bool reverse = false);
   void SetMirror (DBSArray& mirror) const;
 

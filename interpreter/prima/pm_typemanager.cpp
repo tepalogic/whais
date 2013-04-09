@@ -37,24 +37,24 @@
 using namespace std;
 using namespace prima;
 
-static const D_UINT8  TYPE_SPEC_END_MARK = ';';
+static const uint8_t  TYPE_SPEC_END_MARK = ';';
 
 class TypeSpec
 {
 public:
-  TypeSpec (const D_UINT8* const pTI)
+  TypeSpec (const uint8_t* const pTI)
     : m_Type (from_le_int16 (pTI)),
-      m_Size (from_le_int16 (pTI + sizeof (D_UINT16))),
-      m_Data (pTI + 2 * sizeof (D_UINT16))
+      m_Size (from_le_int16 (pTI + sizeof (uint16_t))),
+      m_Data (pTI + 2 * sizeof (uint16_t))
   {
   }
 
-  D_UINT16 RawSize () const
+  uint16_t RawSize () const
   {
-    return m_Size + 2 * sizeof (D_UINT16);
+    return m_Size + 2 * sizeof (uint16_t);
   }
 
-  D_UINT16 DataSize () const
+  uint16_t DataSize () const
   {
     return m_Size;
   }
@@ -67,13 +67,13 @@ public:
       return false;
     }
 
-  D_UINT16       Type () const { return m_Type; }
-  const D_UINT8* Data () const { return m_Data; }
+  uint16_t       Type () const { return m_Type; }
+  const uint8_t* Data () const { return m_Data; }
 
 private:
-  const D_UINT16       m_Type;
-  const D_UINT16       m_Size;
-  const D_UINT8* const m_Data;
+  const uint16_t       m_Type;
+  const uint16_t       m_Size;
+  const uint8_t* const m_Data;
 };
 
 TypeManager::TypeManager (NameSpace& space)
@@ -86,14 +86,14 @@ TypeManager::~TypeManager ()
 {
 }
 
-D_UINT32
-TypeManager::FindType (const D_UINT8* const pTI)
+uint32_t
+TypeManager::FindType (const uint8_t* const pTI)
 {
   assert (IsTypeValid (pTI));
 
   const TypeSpec spec (pTI);
 
-  D_UINT32 result = 0;
+  uint32_t result = 0;
 
   while (result < m_TypesDescriptions.size ())
     {
@@ -112,12 +112,12 @@ TypeManager::FindType (const D_UINT8* const pTI)
   return INVALID_OFFSET;
 }
 
-D_UINT32
-TypeManager::AddType (const D_UINT8* const pTI)
+uint32_t
+TypeManager::AddType (const uint8_t* const pTI)
 {
   assert (IsTypeValid (pTI));
 
-  D_UINT32 result = FindType (pTI);
+  uint32_t result = FindType (pTI);
 
   if (result != INVALID_OFFSET)
     return result;
@@ -132,12 +132,12 @@ TypeManager::AddType (const D_UINT8* const pTI)
   return result;
 }
 
-const D_UINT8*
-TypeManager::GetType (const D_UINT32 offset) const
+const uint8_t*
+TypeManager::GetType (const uint32_t offset) const
 {
   assert ((offset == 0) || (offset < m_TypesDescriptions.size ()));
 
-  const D_UINT8 *const pTypeDescription = &m_TypesDescriptions[offset];
+  const uint8_t *const pTypeDescription = &m_TypesDescriptions[offset];
 
   assert (IsTypeValid (pTypeDescription));
 
@@ -146,7 +146,7 @@ TypeManager::GetType (const D_UINT32 offset) const
 
 static I_DBSTable&
 create_non_persistent_table (I_DBSHandler&  dbsHndler,
-                             D_UINT8* const pInOutTI)
+                             uint8_t* const pInOutTI)
 {
   assert (TypeManager::IsTypeValid (pInOutTI));
 
@@ -155,14 +155,14 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
   assert (IS_TABLE (spec.Type ()));
 
   vector<DBSFieldDescriptor> vFields;
-  D_INT                      typeOff = 0;
+  int                      typeOff = 0;
 
   while (typeOff < spec.DataSize () - 2)
     {
       DBSFieldDescriptor field;
-      D_UINT16           type;
+      uint16_t           type;
 
-      field.m_pFieldName = _RC (const D_CHAR*, spec.Data () + typeOff);
+      field.m_pFieldName = _RC (const char*, spec.Data () + typeOff);
 
       typeOff += strlen (field.m_pFieldName) + 1;
       assert (typeOff < spec.DataSize () - 2);
@@ -184,28 +184,28 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
   assert (table.GetFieldsCount () == vFields.size ());
 
   typeOff = 0;
-  for (D_UINT fieldIndex = 0; fieldIndex < vFields.size (); ++fieldIndex)
+  for (uint_t fieldIndex = 0; fieldIndex < vFields.size (); ++fieldIndex)
     {
       DBSFieldDescriptor field   = table.GetFieldDescriptor (fieldIndex);
-      D_UINT16           type    = field.m_FieldType;
-      const D_UINT       nameLen = strlen (field.m_pFieldName) + 1;
+      uint16_t           type    = field.m_FieldType;
+      const uint_t       nameLen = strlen (field.m_pFieldName) + 1;
 
       if (field.isArray)
         MARK_ARRAY (type);
 
-      memcpy (_CC (D_UINT8*, spec.Data()) + typeOff,
+      memcpy (_CC (uint8_t*, spec.Data()) + typeOff,
               field.m_pFieldName,
               nameLen);
       typeOff += nameLen;
-      store_le_int16 (type, _CC (D_UINT8*, spec.Data()) + typeOff);
-      typeOff += sizeof (D_UINT16);
+      store_le_int16 (type, _CC (uint8_t*, spec.Data()) + typeOff);
+      typeOff += sizeof (uint16_t);
     }
 
   return table;
 }
 
 GlobalValue
-TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
+TypeManager::CreateGlobalValue (uint8_t*    pInOutTI,
                                 I_DBSTable* pPersistentTable)
 {
   assert (TypeManager::IsTypeValid (pInOutTI));
@@ -324,7 +324,7 @@ TypeManager::CreateGlobalValue (D_UINT8*    pInOutTI,
 }
 
 StackValue
-TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
+TypeManager::CreateLocalValue (uint8_t* pInOutTI)
 {
   assert (TypeManager::IsTypeValid (pInOutTI));
 
@@ -432,7 +432,7 @@ TypeManager::CreateLocalValue (D_UINT8* pInOutTI)
 }
 
 bool
-TypeManager::IsTypeValid (const D_UINT8* pTI)
+TypeManager::IsTypeValid (const uint8_t* pTI)
 {
   bool result = true;
   const TypeSpec spec (pTI);
@@ -451,7 +451,7 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
     }
   else if (IS_FIELD (spec.Type ()))
     {
-      const D_UINT16 fieldType = GET_FIELD_TYPE (spec.Type ());
+      const uint16_t fieldType = GET_FIELD_TYPE (spec.Type ());
       if (spec.DataSize () != 2)
         result = false;
       else if (IS_ARRAY (fieldType))
@@ -482,16 +482,16 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
     }
   else if (IS_TABLE (spec.Type ()))
     {
-      D_UINT index = 0;
+      uint_t index = 0;
 
-      while ((index < (D_UINT) (spec.DataSize () - 2)) && (result != FALSE))
+      while ((index < (uint_t) (spec.DataSize () - 2)) && (result != FALSE))
         {
-          D_UINT id_len = strlen (_RC (const D_CHAR*, spec.Data ()) + index);
+          uint_t id_len = strlen (_RC (const char*, spec.Data ()) + index);
 
           /* don't check for zero here, because of strlen */
           index += id_len + 1;
 
-          D_UINT16 type = from_le_int16 (spec.Data () + index);
+          uint16_t type = from_le_int16 (spec.Data () + index);
           /* clear an eventual array mask */
           type = GET_BASIC_TYPE (type);
           if ((type == T_UNKNOWN) || (type >= T_UNDETERMINED))
@@ -499,15 +499,15 @@ TypeManager::IsTypeValid (const D_UINT8* pTI)
               result = false;
               break;
             }
-          index += sizeof (D_UINT16);
+          index += sizeof (uint16_t);
         }
     }
 
   return result;
 }
 
-D_UINT
-TypeManager::GetTypeLength (const D_UINT8* pTI)
+uint_t
+TypeManager::GetTypeLength (const uint8_t* pTI)
 {
   assert (IsTypeValid (pTI));
 
@@ -516,46 +516,46 @@ TypeManager::GetTypeLength (const D_UINT8* pTI)
   return ts.RawSize ();
 }
 
-vector<D_UINT8>
+vector<uint8_t>
 prima::compute_table_typeinfo (I_DBSTable& table)
 {
-  vector<D_UINT8> data;
+  vector<uint8_t> data;
 
   const FIELD_INDEX fieldsCount = table.GetFieldsCount ();
   for (FIELD_INDEX fieldId = 0; fieldId < fieldsCount; ++fieldId)
     {
       DBSFieldDescriptor field = table.GetFieldDescriptor (fieldId);
 
-      const D_UINT nameLen = strlen (field.m_pFieldName) + 1;
+      const uint_t nameLen = strlen (field.m_pFieldName) + 1;
 
       data.insert (data.end (),
                    field.m_pFieldName,
                    field.m_pFieldName + nameLen);
 
-      D_UINT16 type = field.m_FieldType;
+      uint16_t type = field.m_FieldType;
       if (field.isArray)
         MARK_ARRAY (type);
 
       data.insert (data.end (),
-                   _RC (D_UINT8*, &type),
-                   _RC (D_UINT8*, &type) + 2);
+                   _RC (uint8_t*, &type),
+                   _RC (uint8_t*, &type) + 2);
     }
 
   data.push_back (TYPE_SPEC_END_MARK);
   data.push_back (0);
 
-  vector<D_UINT8> result;
+  vector<uint8_t> result;
 
-  D_UINT16 temp = 0;
+  uint16_t temp = 0;
   MARK_TABLE (temp);
   result.insert (result.end (),
-                 _RC (D_UINT8*, &temp),
-                 _RC (D_UINT8*, &temp) + sizeof (temp));
+                 _RC (uint8_t*, &temp),
+                 _RC (uint8_t*, &temp) + sizeof (temp));
 
   temp = data.size ();
   result.insert (result.end (),
-                 _RC (D_UINT8*, &temp),
-                 _RC (D_UINT8*, &temp) + sizeof (temp));
+                 _RC (uint8_t*, &temp),
+                 _RC (uint8_t*, &temp) + sizeof (temp));
 
   result.insert (result.end (), data.begin (), data.end ());
 

@@ -16,21 +16,21 @@
 
 using namespace pastra;
 
-D_UINT8 buffer[1468];
-const D_CHAR fileName[] = "./test_file.tm";
+uint8_t buffer[1468];
+const char fileName[] = "./test_file.tm";
 
 
 static bool
-create_container (D_UINT max_file_size, const D_UINT container_size)
+create_container (uint_t max_file_size, const uint_t container_size)
 {
   FileContainer container (fileName, max_file_size, 0);
-  D_UINT8 marker = 0;
-  D_UINT64 current_pos = 0;
-  D_UINT left_to_write = container_size;
+  uint8_t marker = 0;
+  uint64_t current_pos = 0;
+  uint_t left_to_write = container_size;
 
   while (left_to_write > 0)
     {
-      D_UINT write_size = MIN (sizeof (buffer), left_to_write);
+      uint_t write_size = MIN (sizeof (buffer), left_to_write);
 
       memset (buffer, marker, sizeof buffer);
       container.Write (current_pos, write_size, buffer);
@@ -42,25 +42,25 @@ create_container (D_UINT max_file_size, const D_UINT container_size)
 }
 
 static bool
-check_container (D_UINT max_file_size,
-                 const D_UINT container_size,
-                 const D_UINT8 marker_start, const D_UINT8 marker_increment)
+check_container (uint_t max_file_size,
+                 const uint_t container_size,
+                 const uint8_t marker_start, const uint8_t marker_increment)
 {
   FileContainer container (fileName, max_file_size,
                            (container_size / max_file_size) + 1);
-  D_UINT64 current_pos = 0;
-  D_UINT8 marker = marker_start;
-  D_UINT left_to_read = container_size;
+  uint64_t current_pos = 0;
+  uint8_t marker = marker_start;
+  uint_t left_to_read = container_size;
 
   if (container.Size () != container_size)
     return false;
 
   while (left_to_read > 0)
     {
-      D_UINT read_size = MIN (sizeof (buffer), left_to_read);
+      uint_t read_size = MIN (sizeof (buffer), left_to_read);
       container.Read (current_pos, read_size, buffer);
 
-      for (D_UINT index = 0; index < read_size; ++index)
+      for (uint_t index = 0; index < read_size; ++index)
         if (buffer[index] != marker)
           return false;
       marker = (marker + marker_increment) & 0xFF;
@@ -70,20 +70,20 @@ check_container (D_UINT max_file_size,
   return true;
 }
 
-static D_UINT
-colapse_container (D_UINT max_file_size, const D_UINT container_size)
+static uint_t
+colapse_container (uint_t max_file_size, const uint_t container_size)
 {
-  D_UINT64 current_pos = 0;
+  uint64_t current_pos = 0;
   FileContainer container (fileName, max_file_size,
                            (container_size / max_file_size) + 1);
-  D_UINT64 new_container_size = container.Size ();
+  uint64_t new_container_size = container.Size ();
 
   if (new_container_size != container_size)
     return false;
 
   while (current_pos < container.Size ())
     {
-      D_UINT64 to_delete = MIN (sizeof buffer,
+      uint64_t to_delete = MIN (sizeof buffer,
                                 container.Size () - current_pos);
       container.Colapse (current_pos, current_pos + to_delete);
       current_pos += to_delete;
@@ -93,19 +93,19 @@ colapse_container (D_UINT max_file_size, const D_UINT container_size)
 }
 
 static bool
-check_temp_container (D_UINT uTestContainerSize)
+check_temp_container (uint_t uTestContainerSize)
 {
-  const D_UINT uContainerSize = 761;
-  const D_UINT uStepSize = 100;
+  const uint_t uContainerSize = 761;
+  const uint_t uStepSize = 100;
   TempContainer container ("./", uContainerSize);
 
-  D_UINT8 marker = 0;
-  D_UINT64 current_pos = 0;
-  D_UINT left_to_write = uTestContainerSize;
+  uint8_t marker = 0;
+  uint64_t current_pos = 0;
+  uint_t left_to_write = uTestContainerSize;
 
   while (left_to_write > 0)
     {
-      D_UINT write_size = MIN (uStepSize, left_to_write);
+      uint_t write_size = MIN (uStepSize, left_to_write);
 
       memset (buffer, marker, sizeof buffer);
       container.Write (current_pos, write_size, buffer);
@@ -128,16 +128,16 @@ check_temp_container (D_UINT uTestContainerSize)
   if (container.Size () != (uTestContainerSize - 2 * uStepSize))
     return false;
 
-  D_UINT left_to_read = container.Size ();
+  uint_t left_to_read = container.Size ();
   marker = 1;
   current_pos = 0;
 
   while (left_to_read > 0)
     {
-      D_UINT read_size = MIN (uStepSize, left_to_read);
+      uint_t read_size = MIN (uStepSize, left_to_read);
       container.Read (current_pos, read_size, buffer);
 
-      for (D_UINT index = 0; index < read_size; ++index)
+      for (uint_t index = 0; index < read_size; ++index)
         if (buffer[index] != marker)
           return false;
       marker = (marker + 1) & 0xFF;
@@ -159,8 +159,8 @@ main ()
     DBSInit (DBSSettings ());
   }
 
-  const D_UINT max_file_size = 512 * 1024;
-  const D_UINT container_size = max_file_size * 4 + 345;
+  const uint_t max_file_size = 512 * 1024;
+  const uint_t container_size = max_file_size * 4 + 345;
 
   if (!create_container (max_file_size, container_size))
     success = false;
@@ -168,7 +168,7 @@ main ()
   if (!check_container (max_file_size, container_size, 0, 1))
     success = false;
 
-  D_UINT64 new_container_size = colapse_container (max_file_size,
+  uint64_t new_container_size = colapse_container (max_file_size,
                                 container_size);
   if ((new_container_size <= 0) || (new_container_size % sizeof buffer) != 0)
     success = false;
@@ -201,6 +201,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

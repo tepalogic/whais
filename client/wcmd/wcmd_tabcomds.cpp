@@ -37,22 +37,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-static const D_CHAR tableShowDesc[]    = "Describe database's tables.";
-static const D_CHAR tableShowDescEXt[] =
+static const char tableShowDesc[]    = "Describe database's tables.";
+static const char tableShowDescEXt[] =
 "Show table information. If no table name is provided it prints the list of\n"
 "tables from the current database.\n"
 "If a table name is provided, it prints the table's fields information.\n"
 "Usage:\n"
 "  table [table_name] ... ";
 
-static const D_CHAR tableRmDesc[]      = "Remove tables from the database.";
-static const D_CHAR tableRmDescExt[ ]  =
+static const char tableRmDesc[]      = "Remove tables from the database.";
+static const char tableRmDescExt[ ]  =
 "Remove the specified tables from the database.\n"
 "Usage:\n"
 "  table_remove table_name ... ";
 
-static const D_CHAR tableAddDesc[]     = "Add table to the database.";
-static const D_CHAR tableAddDescExt[]  =
+static const char tableAddDesc[]     = "Add table to the database.";
+static const char tableAddDescExt[]  =
 "Add a table to database with by specifying table name,\n"
 "fields names and fields types.\n"
 "Type specifiers:\n"
@@ -83,14 +83,14 @@ static const D_CHAR tableAddDescExt[]  =
 "Example:\n"
 "  table_add SomeTableName fieldName DATE otherFieldname ARRAY INT8";
 
-static const D_CHAR tableAddIndDesc[]    = "Create table field index.";
-static const D_CHAR tableAddIndDescExt[] =
+static const char tableAddIndDesc[]    = "Create table field index.";
+static const char tableAddIndDescExt[] =
 "For the specified fields creates indexes.\n"
 "Usage:\n"
 "  table_index table_name field_name ...";
 
-static const D_CHAR tableRmIndDesc[]    = "Remove table field index.";
-static const D_CHAR tableRmIndDescExt[] =
+static const char tableRmIndDesc[]    = "Remove table field index.";
+static const char tableRmIndDescExt[] =
 "For the specified fields remove their indexes.\n"
 "Usage:\n"
 "  table_rmindex table_name field_name ...";

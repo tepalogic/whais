@@ -33,7 +33,7 @@ using namespace std;
 I_BTreeNode::I_BTreeNode (I_BTreeNodeManager& nodesManager,
                           const NODE_INDEX    node)
   : m_NodesMgr (nodesManager),
-    m_Header (_RC (NodeHeader*, new D_UINT8 [m_NodesMgr.RawNodeSize ()]))
+    m_Header (_RC (NodeHeader*, new uint8_t [m_NodesMgr.RawNodeSize ()]))
 {
   assert (node != NIL_NODE);
 
@@ -114,7 +114,7 @@ I_BTreeNode::GetChildNode (const I_BTreeKey& key) const
 }
 
 void
-I_BTreeNode::SetData (const KEY_INDEX, const D_UINT8 *)
+I_BTreeNode::SetData (const KEY_INDEX, const uint8_t *)
 {
   throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }

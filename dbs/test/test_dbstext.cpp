@@ -25,7 +25,7 @@ test_nulliness()
 {
   std::cout << "Testing for nulliness ... ";
   bool result = true;
-  D_UINT8 nullUtf8[] = {0x00};
+  uint8_t nullUtf8[] = {0x00};
 
   {
     DBSText textSingleton;
@@ -143,7 +143,7 @@ test_nulliness()
       storage.RegisterReference ();
       storage.MarkForRemoval();
 
-      D_UINT64 allocated_entry = storage.AddRecord (NULL, 0);
+      uint64_t allocated_entry = storage.AddRecord (NULL, 0);
 
       DBSText textVarRaw  (*(new RowFieldText(storage, allocated_entry, 0)));
 
@@ -173,7 +173,7 @@ test_nulliness()
 }
 
 
-static const D_UINT32 charValues[] = { 0x54, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20, 0x61, 0x20, 0x74,
+static const uint32_t charValues[] = { 0x54, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20, 0x61, 0x20, 0x74,
                                        0x65, 0x78, 0x74, 0x20, 0x74, 0x6f, 0x20, 0x74, 0x65, 0x73, 0x74,
                                        0x21, 0x20, 0x4c, 0x65, 0x74, 0x27, 0x73, 0x20, 0x68, 0x6f, 0x70,
                                        0x65, 0x20, 0x69, 0x74, 0x20, 0x77, 0x69, 0x6c, 0x6c, 0x20, 0x77,
@@ -183,7 +183,7 @@ static const D_UINT32 charValues[] = { 0x54, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73,
                                        0x6e, 0x79, 0x20, 0x70, 0x72, 0x6f, 0x62, 0x6c, 0x65, 0x6d, 0x73,
                                        0x20, 0x77, 0x69, 0x74, 0x68, 0x20, 0x69, 0x74, 0x2e };
 
-static const D_CHAR* pOriginalText = "This is a text to test! Let's hope it will work just fine and we "
+static const char* pOriginalText = "This is a text to test! Let's hope it will work just fine and we "
                                      "won't have any problems with it.";
 
 static bool
@@ -195,8 +195,8 @@ test_text_append ()
   if (result)
     {
       DBSText destinationText;
-      const DBSText originalText (_RC(const D_UINT8*, pOriginalText));
-      const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
+      const DBSText originalText (_RC(const uint8_t*, pOriginalText));
+      const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
       if (originalText.GetCharactersCount() != charsCount)
         result = false;
@@ -209,7 +209,7 @@ test_text_append ()
             result = false;
           else
             {
-              for (D_UINT index = 0; index < charsCount; ++index)
+              for (uint_t index = 0; index < charsCount; ++index)
                 if ( destinationText.GetCharAtIndex(index).m_IsNull ||
                     (destinationText.GetCharAtIndex(index).m_Value != originalText.GetCharAtIndex(index).m_Value) ||
                     (destinationText.GetCharAtIndex(index).m_Value != charValues[index]))
@@ -224,15 +224,15 @@ test_text_append ()
       std::string temp_file_base = DBSGetSeettings ().m_WorkDir;;
       temp_file_base += "ps_t_text";
 
-      D_UINT64 allocated_entry = 0;
+      uint64_t allocated_entry = 0;
 
-      const DBSText originalText (_RC(const D_UINT8*, pOriginalText));
-      const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
+      const DBSText originalText (_RC(const uint8_t*, pOriginalText));
+      const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
       {
-        D_UINT8 tempBuff[1024] = {0, };
-        strcpy (_RC (D_CHAR*, tempBuff) + 12, pOriginalText);
-        store_le_int32 ((sizeof charValues / sizeof (D_UINT32)), tempBuff);
+        uint8_t tempBuff[1024] = {0, };
+        strcpy (_RC (char*, tempBuff) + 12, pOriginalText);
+        store_le_int32 ((sizeof charValues / sizeof (uint32_t)), tempBuff);
 
         VLVarsStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
@@ -240,7 +240,7 @@ test_text_append ()
 
         allocated_entry = storage.AddRecord (
                                   tempBuff,
-                                  (sizeof charValues / sizeof (D_UINT32)) + 12
+                                  (sizeof charValues / sizeof (uint32_t)) + 12
                                             );
 
         storage.Flush ();
@@ -269,7 +269,7 @@ test_text_append ()
               result = false;
             else
               {
-                for (D_UINT index = 0; index < charsCount; ++index)
+                for (uint_t index = 0; index < charsCount; ++index)
                   if ( destinationText.GetCharAtIndex(index).m_IsNull ||
                       (destinationText.GetCharAtIndex(index).m_Value != originalText.GetCharAtIndex(index).m_Value) ||
                       (destinationText.GetCharAtIndex(index).m_Value != charValues[index]))
@@ -292,8 +292,8 @@ test_character_insertion ()
 
   if (result)
     {
-      DBSText originalText (_RC(const D_UINT8*, pOriginalText));
-      const D_UINT charsCount = sizeof (charValues) / sizeof (D_UINT32);
+      DBSText originalText (_RC(const uint8_t*, pOriginalText));
+      const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
       if (originalText.GetCharactersCount() != charsCount)
         result = false;
@@ -322,27 +322,27 @@ test_character_insertion ()
             {
               std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
               temp_file_base += "ps_t_text";
-              D_UINT64 allocated_entry = 0;
+              uint64_t allocated_entry = 0;
 
               VLVarsStore storage;
               storage.Init(temp_file_base.c_str(), 0, 713);
               storage.RegisterReference ();
               storage.MarkForRemoval();
 
-               D_UINT8 tempBuff[1024] = {0, };
-              strcpy (_RC (D_CHAR*, tempBuff) + 12, pOriginalText);
-              store_le_int32 ((sizeof charValues / sizeof (D_UINT32)), tempBuff);
+               uint8_t tempBuff[1024] = {0, };
+              strcpy (_RC (char*, tempBuff) + 12, pOriginalText);
+              store_le_int32 ((sizeof charValues / sizeof (uint32_t)), tempBuff);
 
               allocated_entry = storage.AddRecord (
                                   tempBuff,
-                                  (sizeof charValues / sizeof (D_UINT32)) + 12
+                                  (sizeof charValues / sizeof (uint32_t)) + 12
                                                   );
 
               DBSText originalText (
                     *(new RowFieldText(
                               storage,
                               allocated_entry,
-                              sizeof (charValues) / sizeof (D_UINT32) + 12
+                              sizeof (charValues) / sizeof (uint32_t) + 12
                                       ))
                                    );
 
@@ -369,10 +369,10 @@ test_text_mirroring ()
   std::cout << "Testing for text mirroring ... ";
   bool result = true;
 
-  const DBSText arbiter (_RC(const D_UINT8*, "Love is all you need!"));
-  const DBSText arbiter2 (_RC(const D_UINT8*, "B"));
+  const DBSText arbiter (_RC(const uint8_t*, "Love is all you need!"));
+  const DBSText arbiter2 (_RC(const uint8_t*, "B"));
 
-  DBSText firstText (_RC(const D_UINT8*, "A"));
+  DBSText firstText (_RC(const uint8_t*, "A"));
   DBSText secondText (firstText);
 
   if (firstText != secondText)
@@ -422,6 +422,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

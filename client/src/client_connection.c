@@ -27,18 +27,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "client_connection.h"
 
-D_UINT
+uint_t
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                D_UINT* const                  pOutFrameSize)
+                uint_t* const                  pOutFrameSize)
 {
-  D_UINT32 frameId;
-  D_UINT16 frameSize = 0;
+  uint32_t frameId;
+  uint16_t frameSize = 0;
 
   while (frameSize < FRAME_HDR_SIZE)
     {
-      D_UINT chunkSize = FRAME_HDR_SIZE - frameSize;
+      uint_t chunkSize = FRAME_HDR_SIZE - frameSize;
 
-      const D_UINT32 status = wh_socket_read (pHnd->socket,
+      const uint32_t status = wh_socket_read (pHnd->socket,
                                               &pHnd->data[frameSize],
                                               &chunkSize);
       if (status != WOP_OK)
@@ -58,7 +58,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
   case FRAME_TYPE_NORMAL:
   case FRAME_TYPE_AUTH_CLNT:
     {
-      const D_UINT16 expected = from_le_int16 (&pHnd->data[FRAME_SIZE_OFF]);
+      const uint16_t expected = from_le_int16 (&pHnd->data[FRAME_SIZE_OFF]);
 
       if ((expected < frameSize)
           || (expected > pHnd->dataSize))
@@ -68,9 +68,9 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
 
       while (frameSize < expected)
         {
-          D_UINT chunkSize = expected - frameSize;
+          uint_t chunkSize = expected - frameSize;
 
-          const D_UINT32 status = wh_socket_read (pHnd->socket,
+          const uint32_t status = wh_socket_read (pHnd->socket,
                                                   &pHnd->data[frameSize],
                                                   &chunkSize);
           if (status != WOP_OK)
@@ -97,11 +97,11 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
 }
 
 
-D_UINT
+uint_t
 write_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                 const  D_UINT                  frameSize)
+                 const  uint_t                  frameSize)
 {
-  D_UINT result = wh_socket_write (pHnd->socket, pHnd->data, frameSize);
+  uint_t result = wh_socket_write (pHnd->socket, pHnd->data, frameSize);
   if (result != WOP_OK)
     result = WENC_OS_ERROR (result);
 

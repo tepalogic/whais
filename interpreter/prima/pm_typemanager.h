@@ -42,29 +42,29 @@ public:
   TypeManager (NameSpace& space);
   ~TypeManager ();
 
-  D_UINT32 FindType (const D_UINT8* const pTI);
-  D_UINT32 AddType (const D_UINT8* const pTI);
+  uint32_t FindType (const uint8_t* const pTI);
+  uint32_t AddType (const uint8_t* const pTI);
 
-  const D_UINT8* GetType (const D_UINT32 offset) const;
+  const uint8_t* GetType (const uint32_t offset) const;
 
-  GlobalValue CreateGlobalValue (D_UINT8* const pInOutTI,
+  GlobalValue CreateGlobalValue (uint8_t* const pInOutTI,
                                  I_DBSTable*    pPersistentTable);
-  StackValue  CreateLocalValue (D_UINT8* const pInOutTI);
+  StackValue  CreateLocalValue (uint8_t* const pInOutTI);
 
-  static bool   IsTypeValid (const D_UINT8* pTI);
-  static D_UINT GetTypeLength (const D_UINT8* pTI);
+  static bool   IsTypeValid (const uint8_t* pTI);
+  static uint_t GetTypeLength (const uint8_t* pTI);
 
-  static const D_UINT32 INVALID_OFFSET = 0xFFFFFFFF;
+  static const uint32_t INVALID_OFFSET = 0xFFFFFFFF;
 
 private:
   TypeManager (const TypeManager&);
   TypeManager& operator= (const TypeManager&);
 
   NameSpace&           m_NameSpace;
-  std::vector<D_UINT8> m_TypesDescriptions;
+  std::vector<uint8_t> m_TypesDescriptions;
 };
 
-std::vector<D_UINT8>
+std::vector<uint8_t>
 compute_table_typeinfo (I_DBSTable& table);
 
 }

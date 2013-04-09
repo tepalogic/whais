@@ -14,19 +14,19 @@ using namespace std;
 
 struct ProcedureEntry
 {
-  const D_CHAR* const name;
-  D_UINT16            retRawType;
+  const char* const name;
+  uint16_t            retRawType;
   bool                visited;
 };
 
 struct FieldEntry
 {
-  const D_CHAR* const name;
-  D_UINT16            type;
+  const char* const name;
+  uint16_t            type;
   bool                visited;
 };
 
-static const D_UINT COMPLETE_PROC_ARGS  = 68;
+static const uint_t COMPLETE_PROC_ARGS  = 68;
 
 ProcedureEntry _procedures[] =
     {
@@ -109,13 +109,13 @@ ProcedureEntry _procedures[] =
 
 static bool
 check_field_entry (FieldEntry*   fields,
-                   const D_UINT  fieldsCount,
-                   const D_CHAR* fieldName,
-                   D_UINT        fieldType)
+                   const uint_t  fieldsCount,
+                   const char* fieldName,
+                   uint_t        fieldType)
 {
   FieldEntry*  entry = NULL;
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
       entry = fields + i;
       if (strcmp (entry->name, fieldName) == 0)
@@ -135,11 +135,11 @@ check_field_entry (FieldEntry*   fields,
 static bool
 test_proc_one_field_tab_ret (W_CONNECTOR_HND hnd)
 {
-  const D_CHAR  procName[]  = "one_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-  const D_CHAR* fieldName;
+  const char  procName[]  = "one_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  const char* fieldName;
 
-  D_UINT fieldType;
-  D_UINT fieldsCount;
+  uint_t fieldType;
+  uint_t fieldsCount;
 
   cout << "Testing one field ret tab ... ";
 
@@ -167,7 +167,7 @@ test_proc_one_field_tab_ret_err:
 static bool
 test_proc_two_field_tab_ret (W_CONNECTOR_HND hnd)
 {
-  const D_CHAR  procName[]  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  const char  procName[]  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
   FieldEntry fields[] =
       {
@@ -175,14 +175,14 @@ test_proc_two_field_tab_ret (W_CONNECTOR_HND hnd)
           {"field2", WFT_ARRAY_MASK | WFT_UINT64, false}
       };
 
-  D_UINT fieldsCount = sizeof (fields) / sizeof (fields[0]);
-  D_UINT fieldType;
+  uint_t fieldsCount = sizeof (fields) / sizeof (fields[0]);
+  uint_t fieldType;
 
   cout << "Testing two field ret tab ... ";
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
-      const D_CHAR* fieldName;
+      const char* fieldName;
       if ((WProcedureParameterField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
         || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
         {
@@ -190,7 +190,7 @@ test_proc_two_field_tab_ret (W_CONNECTOR_HND hnd)
         }
     }
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
       if (! fields[i].visited)
         return false;
@@ -215,8 +215,8 @@ test_proc_two_field_tab_ret_err:
 static bool
 test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
 {
-  const D_CHAR  procName[]  = "table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-  const D_UINT  procParamas[] =
+  const char  procName[]  = "table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  const uint_t  procParamas[] =
       {
           WFT_TABLE_MASK,
 
@@ -329,14 +329,14 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
           {"array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_RICHREAL, false}
       };
 
-  D_UINT fieldsCount = sizeof (fields) / sizeof (fields[0]);
-  D_UINT fieldType;
+  uint_t fieldsCount = sizeof (fields) / sizeof (fields[0]);
+  uint_t fieldType;
 
   cout << "Testing complete proc   ... ";
 
-  for (D_UINT i = 0; i < COMPLETE_PROC_ARGS; ++i)
+  for (uint_t i = 0; i < COMPLETE_PROC_ARGS; ++i)
     {
-      D_UINT procType;
+      uint_t procType;
       if ((WProcedureParameter (hnd, procName, i, &procType) != WCS_OK)
           || (procType != procParamas[i]))
         {
@@ -344,9 +344,9 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
         }
     }
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
-      const D_CHAR* fieldName;
+      const char* fieldName;
       if ((WProcedureParameterField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
         || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
         {
@@ -354,7 +354,7 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
         }
     }
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
       if (! fields[i].visited)
         return false;
@@ -362,9 +362,9 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
       fields[i].visited = false;
     }
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
-      const D_CHAR* fieldName;
+      const char* fieldName;
       if ((WProcedureParameterField (hnd, procName, COMPLETE_PROC_ARGS - 1, i, &fieldName, &fieldType) != WCS_OK)
         || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
         {
@@ -372,7 +372,7 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
         }
     }
 
-  for (D_UINT i = 0; i < fieldsCount; ++i)
+  for (uint_t i = 0; i < fieldsCount; ++i)
     {
       if (! fields[i].visited)
         return false;
@@ -392,10 +392,10 @@ test_proc_complete_field_tab_ret_err:
 static bool
 test_proc_entry_ret_match (W_CONNECTOR_HND hnd, ProcedureEntry* entry)
 {
-  const D_CHAR suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-  D_CHAR buffer[1024];
-  D_UINT type;
-  D_UINT paramsCount;
+  const char suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  char buffer[1024];
+  uint_t type;
+  uint_t paramsCount;
 
   strcpy (buffer, entry->name);
   strcat (buffer, suffix);
@@ -427,10 +427,10 @@ test_proc_name_match_error:
 static bool
 test_procedures_list (W_CONNECTOR_HND hnd)
 {
-  D_UINT procsCount = sizeof (_procedures) / sizeof (_procedures[0]);
+  uint_t procsCount = sizeof (_procedures) / sizeof (_procedures[0]);
   cout << "Testing the procedures return values ... ";
 
-  for (D_UINT i = 0; i < procsCount; ++i)
+  for (uint_t i = 0; i < procsCount; ++i)
     {
       if (! test_proc_entry_ret_match (hnd, &_procedures[i]))
         goto test_procedures_list_error;
@@ -448,11 +448,11 @@ test_procedures_list_error:
 static bool
 test_for_errors (W_CONNECTOR_HND hnd)
 {
-  D_UINT        paramsCount;
-  D_UINT        type;
-  D_UINT        fieldCount;
-  const D_CHAR* fieldName;
-  const D_CHAR* procName  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  uint_t        paramsCount;
+  uint_t        type;
+  uint_t        fieldCount;
+  const char* fieldName;
+  const char* procName  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
   cout << "Testing against error conditions ... ";
   if ((WProcedureParametersCount (NULL, NULL, NULL) != WCS_INVALID_ARGS)
@@ -493,19 +493,19 @@ test_for_errors_fail :
   return false;
 }
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 0;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "root_test_password";

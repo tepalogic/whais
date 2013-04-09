@@ -14,7 +14,7 @@ using namespace std;
 
 struct GlobalValueEntry
 {
-  const D_CHAR* const name;
+  const char* const name;
   bool                visited;
 };
 
@@ -93,13 +93,13 @@ GlobalValueEntry no_fileds_types[] =
     };
 
 static bool
-test_global_name_match (const D_CHAR* glb_name)
+test_global_name_match (const char* glb_name)
 {
-  const D_CHAR suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
-  D_CHAR buffer[1024];
-  const D_UINT glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
+  const char suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
+  char buffer[1024];
+  const uint_t glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
-  for (D_UINT i = 0; i < glbsCount; ++i)
+  for (uint_t i = 0; i < glbsCount; ++i)
     {
       strcpy (buffer, no_fileds_types[i].name);
       strcat (buffer, suffix);
@@ -121,11 +121,11 @@ test_global_name_match (const D_CHAR* glb_name)
 static bool
 test_global_values_list (W_CONNECTOR_HND hnd)
 {
-  const D_CHAR* recvGlbName = NULL;
-  const D_UINT  glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
+  const char* recvGlbName = NULL;
+  const uint_t  glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
-  D_UINT globalsCount;
-  D_UINT index = 0;
+  uint_t globalsCount;
+  uint_t index = 0;
 
   cout << "Testing the global values listing ... ";
 
@@ -167,8 +167,8 @@ test_global_values_list_error:
 static bool
 test_for_errors (W_CONNECTOR_HND hnd)
 {
-  D_UINT          glbsCount;
-  const D_CHAR*   nameFetched;
+  uint_t          glbsCount;
+  const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
   if ((WListGlobals(NULL, &glbsCount) != WCS_INVALID_ARGS)
@@ -200,19 +200,19 @@ test_for_errors_fail :
 
 
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 0;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "root_test_password";

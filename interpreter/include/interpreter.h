@@ -38,10 +38,10 @@
 class InterException : public WException
 {
 public:
-  explicit InterException (const D_CHAR*  message,
-                           const D_CHAR*  file,
-                           const D_UINT32 line,
-                           const D_UINT32 extra)
+  explicit InterException (const char*  message,
+                           const char*  file,
+                           const uint32_t line,
+                           const uint32_t extra)
     : WException (message, file, line, extra)
   {
   }
@@ -52,7 +52,7 @@ public:
 
   virtual WException*     Clone () const { return new InterException (*this); }
   virtual EXPCEPTION_TYPE Type () const { return INTERPRETER_EXCEPTION; }
-  virtual const D_CHAR*   Description () const
+  virtual const char*   Description () const
   {
     switch (GetExtra ())
       {
@@ -139,65 +139,65 @@ public:
   virtual ~I_Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
-  virtual void ExecuteProcedure (const D_CHAR* const pProcName,
+  virtual void ExecuteProcedure (const char* const pProcName,
                                  SessionStack&       stack) = 0;
 
-  virtual D_UINT GlobalValuesCount () const = 0;
-  virtual D_UINT ProceduresCount () const = 0;
+  virtual uint_t GlobalValuesCount () const = 0;
+  virtual uint_t ProceduresCount () const = 0;
 
-  virtual const D_CHAR* GlobalValueName (const D_UINT index) const = 0;
-  virtual const D_CHAR* ProcedureName (const D_UINT index) const = 0;
+  virtual const char* GlobalValueName (const uint_t index) const = 0;
+  virtual const char* ProcedureName (const uint_t index) const = 0;
 
-  virtual D_UINT GlobalValueRawType (const D_UINT32 index) = 0;
-  virtual D_UINT GlobalValueRawType (const D_CHAR* const name) = 0;
-  virtual D_UINT GlobalValueFieldsCount (const D_UINT32 index) = 0;
-  virtual D_UINT GlobalValueFieldsCount (const D_CHAR* const name) = 0;
+  virtual uint_t GlobalValueRawType (const uint32_t index) = 0;
+  virtual uint_t GlobalValueRawType (const char* const name) = 0;
+  virtual uint_t GlobalValueFieldsCount (const uint32_t index) = 0;
+  virtual uint_t GlobalValueFieldsCount (const char* const name) = 0;
 
-  virtual const D_CHAR* GlobalValueFieldName (const D_UINT32 index,
-                                              const D_UINT32 field) = 0;
-  virtual const D_CHAR* GlobalValueFieldName (const D_CHAR* const name,
-                                              const D_UINT32      field) = 0;
+  virtual const char* GlobalValueFieldName (const uint32_t index,
+                                              const uint32_t field) = 0;
+  virtual const char* GlobalValueFieldName (const char* const name,
+                                              const uint32_t      field) = 0;
 
-  virtual D_UINT GlobalValueFieldType (const D_UINT32 index,
-                                       const D_UINT32 field) = 0;
-  virtual D_UINT GlobalValueFieldType (const D_CHAR* const name,
-                                       const D_UINT32      field) = 0;
+  virtual uint_t GlobalValueFieldType (const uint32_t index,
+                                       const uint32_t field) = 0;
+  virtual uint_t GlobalValueFieldType (const char* const name,
+                                       const uint32_t      field) = 0;
 
-  virtual D_UINT ProcedureParametersCount (const D_UINT id) const = 0;
-  virtual D_UINT ProcedureParametersCount (const D_CHAR* const name) const = 0;
-  virtual D_UINT ProcedurePameterRawType (const D_UINT id,
-                                          const D_UINT param) = 0;
-  virtual D_UINT ProcedurePameterRawType (const D_CHAR* const name,
-                                          const D_UINT        param) = 0;
-  virtual D_UINT ProcedurePameterFieldsCount (const D_UINT id,
-                                              const D_UINT param) = 0;
-  virtual D_UINT ProcedurePameterFieldsCount (const D_CHAR* const name,
-                                              const D_UINT        param ) = 0;
-  virtual const D_CHAR* ProcedurePameterFieldName (
-                                                const D_UINT id,
-                                                const D_UINT param,
-                                                const D_UINT field
+  virtual uint_t ProcedureParametersCount (const uint_t id) const = 0;
+  virtual uint_t ProcedureParametersCount (const char* const name) const = 0;
+  virtual uint_t ProcedurePameterRawType (const uint_t id,
+                                          const uint_t param) = 0;
+  virtual uint_t ProcedurePameterRawType (const char* const name,
+                                          const uint_t        param) = 0;
+  virtual uint_t ProcedurePameterFieldsCount (const uint_t id,
+                                              const uint_t param) = 0;
+  virtual uint_t ProcedurePameterFieldsCount (const char* const name,
+                                              const uint_t        param ) = 0;
+  virtual const char* ProcedurePameterFieldName (
+                                                const uint_t id,
+                                                const uint_t param,
+                                                const uint_t field
                                                   ) = 0;
-  virtual const D_CHAR* ProcedurePameterFieldName (
-                                                const D_CHAR* const name,
-                                                const D_UINT        param,
-                                                const D_UINT        field
+  virtual const char* ProcedurePameterFieldName (
+                                                const char* const name,
+                                                const uint_t        param,
+                                                const uint_t        field
                                                   ) = 0;
-  virtual D_UINT ProcedurePameterFieldType (const D_UINT id,
-                                            const D_UINT param,
-                                            const D_UINT field) = 0;
-  virtual D_UINT ProcedurePameterFieldType (const D_CHAR* const name,
-                                            const D_UINT        param,
-                                            const D_UINT        field) = 0;
+  virtual uint_t ProcedurePameterFieldType (const uint_t id,
+                                            const uint_t param,
+                                            const uint_t field) = 0;
+  virtual uint_t ProcedurePameterFieldType (const char* const name,
+                                            const uint_t        param,
+                                            const uint_t        field) = 0;
 protected:
   I_Logger& m_Log;
 };
 
 INTERP_SHL void
-InitInterpreter (const D_CHAR* adminDbsDir = NULL);
+InitInterpreter (const char* adminDbsDir = NULL);
 
 INTERP_SHL I_Session&
-GetInstance (const D_CHAR* pName, I_Logger* pLog = NULL);
+GetInstance (const char* pName, I_Logger* pLog = NULL);
 
 INTERP_SHL void
 ReleaseInstance (I_Session& hInstance);

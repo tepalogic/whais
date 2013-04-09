@@ -34,15 +34,15 @@
 struct StoreLink
 {
   struct StoreLink* next;
-  D_UINT            allocated;
-  D_UINT            unused;
-  D_CHAR            data[1];
+  uint_t            allocated;
+  uint_t            unused;
+  char            data[1];
 };
 
 static struct StoreLink*
-alloc_link (const D_UINT size)
+alloc_link (const uint_t size)
 {
-  struct StoreLink* const pLink = mem_alloc (sizeof (struct StoreLink) + size * sizeof (D_CHAR));
+  struct StoreLink* const pLink = mem_alloc (sizeof (struct StoreLink) + size * sizeof (char));
   if (pLink != NULL)
     {
       pLink->next      = NULL;
@@ -73,10 +73,10 @@ release_string_store (StringStoreHnd* handle)
 
 }
 
-D_CHAR *
-alloc_str (StringStoreHnd handle, D_UINT length)
+char *
+alloc_str (StringStoreHnd handle, uint_t length)
 {
-  D_CHAR*           result = NULL;
+  char*           result = NULL;
   struct StoreLink* pLink  = (struct StoreLink*) handle;
 
   while ((pLink->unused < length) && (pLink->next != NULL))

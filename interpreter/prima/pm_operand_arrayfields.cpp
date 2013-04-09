@@ -73,7 +73,7 @@ CharTextFieldElOperand::SetValue (const DBSChar& value)
   table.SetEntry (m_Row, m_Field, text);
 }
 
-D_UINT
+uint_t
 CharTextFieldElOperand::GetType ()
 {
   return T_CHAR;
@@ -154,7 +154,7 @@ BoolArrayFieldElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 BoolArrayFieldElOperand::GetType ()
 {
   return T_BOOL;
@@ -200,7 +200,7 @@ CharArrayFieldElOperand::SetValue (const DBSChar& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 CharArrayFieldElOperand::GetType ()
 {
   return T_CHAR;
@@ -265,7 +265,7 @@ DateArrayFieldElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 DateArrayFieldElOperand::GetType ()
 {
   return T_DATE;
@@ -325,7 +325,7 @@ DateTimeArrayFieldElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 DateTimeArrayFieldElOperand::GetType ()
 {
   return T_DATETIME;
@@ -383,7 +383,7 @@ HiresTimeArrayFieldElOperand::SetValue (const DBSHiresTime& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 HiresTimeArrayFieldElOperand::GetType ()
 {
   return T_HIRESTIME;
@@ -587,7 +587,7 @@ UInt8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt8ArrayFieldElOperand::GetType ()
 {
   return T_UINT8;
@@ -792,7 +792,7 @@ UInt16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt16ArrayFieldElOperand::GetType ()
 {
   return T_UINT16;
@@ -997,7 +997,7 @@ UInt32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt32ArrayFieldElOperand::GetType ()
 {
   return T_UINT32;
@@ -1201,7 +1201,7 @@ UInt64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt64ArrayFieldElOperand::GetType ()
 {
   return T_UINT64;
@@ -1405,7 +1405,7 @@ Int8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int8ArrayFieldElOperand::GetType ()
 {
   return T_INT8;
@@ -1610,7 +1610,7 @@ Int16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int16ArrayFieldElOperand::GetType ()
 {
   return T_INT16;
@@ -1814,7 +1814,7 @@ Int32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int32ArrayFieldElOperand::GetType ()
 {
   return T_INT32;
@@ -2018,7 +2018,7 @@ Int64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int64ArrayFieldElOperand::GetType ()
 {
   return T_INT64;
@@ -2150,7 +2150,7 @@ RealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 RealArrayFieldElOperand::GetType ()
 {
   return T_REAL;
@@ -2281,7 +2281,7 @@ RichRealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 RichRealArrayFieldElOperand::GetType ()
 {
   return T_RICHREAL;

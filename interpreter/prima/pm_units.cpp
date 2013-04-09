@@ -34,55 +34,55 @@ using namespace prima;
 ////////////////////////////////Unit///////////////////////////////////////////
 
 void
-Unit::SetGlobalId (const D_UINT32 globalIndex, const D_UINT32 globalId)
+Unit::SetGlobalId (const uint32_t globalIndex, const uint32_t globalId)
 {
   if (globalIndex >= m_GlbsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
 
-  _RC (D_UINT32*, m_UnitData)[globalIndex] = globalId;
+  _RC (uint32_t*, m_UnitData)[globalIndex] = globalId;
 }
 
 void
-Unit::SetProcId (const D_UINT32 procIndex, const D_UINT32 procId)
+Unit::SetProcId (const uint32_t procIndex, const uint32_t procId)
 {
   if (procIndex >= m_ProcsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
 
-  _RC (D_UINT32*, m_UnitData)[m_GlbsCount + procIndex] = procId;
+  _RC (uint32_t*, m_UnitData)[m_GlbsCount + procIndex] = procId;
 }
 
-D_UINT32
-Unit::GetGlobalId (const D_UINT32 globalIndex) const
+uint32_t
+Unit::GetGlobalId (const uint32_t globalIndex) const
 {
   if (globalIndex >= m_GlbsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
 
-  return _RC (const D_UINT32*, m_UnitData)[globalIndex];
+  return _RC (const uint32_t*, m_UnitData)[globalIndex];
 }
 
-D_UINT32
-Unit::GetProcId (const D_UINT32 procIndex) const
+uint32_t
+Unit::GetProcId (const uint32_t procIndex) const
 {
   if (procIndex >= m_ProcsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
 
-  return _RC (const D_UINT32*, m_UnitData)[m_GlbsCount + procIndex];
+  return _RC (const uint32_t*, m_UnitData)[m_GlbsCount + procIndex];
 }
 
-const D_UINT8*
-Unit::GetConstData (const D_UINT32 offset) const
+const uint8_t*
+Unit::GetConstData (const uint32_t offset) const
 {
   if (offset >= m_ConstSize)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_DATA_OFF));
 
-  const D_UINT8* pData = m_UnitData;
+  const uint8_t* pData = m_UnitData;
 
-  pData += (m_GlbsCount + m_ProcsCount) * sizeof (D_UINT32) + offset;
+  pData += (m_GlbsCount + m_ProcsCount) * sizeof (uint32_t) + offset;
 
   return pData;
 }
@@ -91,31 +91,31 @@ Unit::GetConstData (const D_UINT32 offset) const
 
 UnitsManager::~UnitsManager ()
 {
-  for (D_UINT32 index = 0; index < m_Units.size (); ++index)
-    delete [] _RC (D_UINT8*, m_Units[index]);
+  for (uint32_t index = 0; index < m_Units.size (); ++index)
+    delete [] _RC (uint8_t*, m_Units[index]);
 }
 
-D_UINT32
-UnitsManager::AddUnit (const D_UINT32 glbsCount,
-                       const D_UINT32 procsCount,
-                       const D_UINT8* pConstData,
-                       const D_UINT32 constAreaSize)
+uint32_t
+UnitsManager::AddUnit (const uint32_t glbsCount,
+                       const uint32_t procsCount,
+                       const uint8_t* pConstData,
+                       const uint32_t constAreaSize)
 {
-  const D_UINT entrySize = sizeof (Unit) +
-                           (glbsCount + procsCount) * sizeof (D_UINT32) +
+  const uint_t entrySize = sizeof (Unit) +
+                           (glbsCount + procsCount) * sizeof (uint32_t) +
                            constAreaSize;
-  auto_ptr<D_UINT8> apUnitData (new D_UINT8[entrySize]);
+  auto_ptr<uint8_t> apUnitData (new uint8_t[entrySize]);
   Unit* const  pEntry = _RC (Unit*, apUnitData.get ());
 
   pEntry->m_GlbsCount  = glbsCount;
   pEntry->m_ProcsCount = procsCount;
   pEntry->m_ConstSize  = constAreaSize;
 
-  memcpy (pEntry->m_UnitData + ((glbsCount + procsCount) * sizeof (D_UINT32)),
+  memcpy (pEntry->m_UnitData + ((glbsCount + procsCount) * sizeof (uint32_t)),
           pConstData,
           constAreaSize);
 
-  const D_UINT32 result = m_Units.size();
+  const uint32_t result = m_Units.size();
   m_Units.push_back (pEntry);
   apUnitData.release ();
 
@@ -127,12 +127,12 @@ UnitsManager::RemoveLastUnit ()
 {
   assert (m_Units.size () > 0);
 
-  delete [] _RC (D_UINT8*, m_Units[m_Units.size () - 1]);
+  delete [] _RC (uint8_t*, m_Units[m_Units.size () - 1]);
   m_Units.pop_back ();
 }
 
 Unit&
-UnitsManager::GetUnit (const D_UINT32 unitIndex)
+UnitsManager::GetUnit (const uint32_t unitIndex)
 {
   assert (unitIndex < m_Units.size ());
 
@@ -140,9 +140,9 @@ UnitsManager::GetUnit (const D_UINT32 unitIndex)
 }
 
 void
-UnitsManager::SetGlobalIndex (const D_UINT32 unitIndex,
-                              const D_UINT32 unitGlbIndex,
-                              const D_UINT32 glbMgrIndex)
+UnitsManager::SetGlobalIndex (const uint32_t unitIndex,
+                              const uint32_t unitGlbIndex,
+                              const uint32_t glbMgrIndex)
 {
   assert (unitIndex < m_Units.size ());
 
@@ -150,27 +150,27 @@ UnitsManager::SetGlobalIndex (const D_UINT32 unitIndex,
 }
 
 void
-UnitsManager::SetProcIndex (const D_UINT32 unitIndex,
-                            const D_UINT32 unitProcIndex,
-                            const D_UINT32 procMgrIndex)
+UnitsManager::SetProcIndex (const uint32_t unitIndex,
+                            const uint32_t unitProcIndex,
+                            const uint32_t procMgrIndex)
 {
   assert (unitIndex < m_Units.size ());
 
   m_Units[unitIndex]->SetProcId (unitProcIndex, procMgrIndex);
 }
 
-D_UINT32
-UnitsManager::GetGlobalIndex (const D_UINT32 unitIndex,
-                              const D_UINT32 unitGlbIndex) const
+uint32_t
+UnitsManager::GetGlobalIndex (const uint32_t unitIndex,
+                              const uint32_t unitGlbIndex) const
 {
   assert (unitIndex < m_Units.size ());
 
  return m_Units[unitIndex]->GetGlobalId (unitGlbIndex);
 }
 
-D_UINT32
-UnitsManager::GetProcIndex (const D_UINT32 unitIndex,
-                            const D_UINT32 unitProcIndex) const
+uint32_t
+UnitsManager::GetProcIndex (const uint32_t unitIndex,
+                            const uint32_t unitProcIndex) const
 {
   assert (unitIndex < m_Units.size ());
 

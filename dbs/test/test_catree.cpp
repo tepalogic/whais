@@ -11,30 +11,30 @@
 
 #include "utils/include/catree.h"
 
-typedef std::vector<D_UINT64> VectInt64;
+typedef std::vector<uint64_t> VectInt64;
 
 class Int64NodeArray
 {
 public:
   Int64NodeArray (VectInt64 &vect) : mVect (vect) {};
 
-  D_UINT64 GetSize ()
+  uint64_t GetSize ()
   {
     return mVect.size ();
   }
 
-  void Exchange (D_UINT64 firstNode, D_UINT64 secondNode)
+  void Exchange (uint64_t firstNode, uint64_t secondNode)
   {
     if (firstNode != secondNode)
       {
-        D_UINT64 temp = mVect[firstNode];
+        uint64_t temp = mVect[firstNode];
         mVect[firstNode] = mVect[secondNode];
         mVect[secondNode] = temp;
       }
     ++changes;
   }
 
-  void PushBack (D_UINT64 value)
+  void PushBack (uint64_t value)
   {
     mVect.push_back (value);
     changes = 0;
@@ -45,7 +45,7 @@ public:
     mVect.pop_back();
   }
 
-  D_UINT64& operator[] (D_UINT64 index)
+  uint64_t& operator[] (uint64_t index)
   {
     return mVect[index];
   }
@@ -57,16 +57,16 @@ private:
 };
 
 
-void print_tabs (const D_UINT count)
+void print_tabs (const uint_t count)
 {
-  for (D_UINT index = 0; index < count; ++index)
+  for (uint_t index = 0; index < count; ++index)
     std::cout << "\t";
 }
 
-void print_tree (VectInt64 &rInVect, D_UINT64 rootNode)
+void print_tree (VectInt64 &rInVect, uint64_t rootNode)
 {
   Int64NodeArray array (rInVect);
-  CATree <D_UINT64, D_UINT64, Int64NodeArray> tree (array);
+  CATree <uint64_t, uint64_t, Int64NodeArray> tree (array);
 
 
   if (tree.GetRightChild (rootNode) != tree.Nil)
@@ -83,7 +83,7 @@ bool create_tree (VectInt64 &rInVect, VectInt64 &rOutVect)
 {
 
   Int64NodeArray array (rOutVect);
-  CATree <D_UINT64, D_UINT64, Int64NodeArray> tree (array);
+  CATree <uint64_t, uint64_t, Int64NodeArray> tree (array);
 
   for (unsigned int index = 0; index < rInVect.size(); ++index)
     tree.AddNode (rInVect[index]);
@@ -94,12 +94,12 @@ bool create_tree (VectInt64 &rInVect, VectInt64 &rOutVect)
   return true;
 }
 
-D_UINT64 check_tree_consistency (VectInt64 &rInVect, D_UINT64 rootNode)
+uint64_t check_tree_consistency (VectInt64 &rInVect, uint64_t rootNode)
 {
   Int64NodeArray array (rInVect);
-  CATree <D_UINT64, D_UINT64, Int64NodeArray> tree (array);
+  CATree <uint64_t, uint64_t, Int64NodeArray> tree (array);
 
-  D_UINT64 result = 0;
+  uint64_t result = 0;
 
   if (tree.GetLeftChild (rootNode) != tree.Nil)
     {
@@ -131,7 +131,7 @@ int main ()
 {
   VectInt64 temp;
   Int64NodeArray array (temp);
-  CATree <D_UINT64, D_UINT64, Int64NodeArray> caTree (array);
+  CATree <uint64_t, uint64_t, Int64NodeArray> caTree (array);
 
   for (int i = 1; i < 1000; ++i)
     {

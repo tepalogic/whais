@@ -31,37 +31,37 @@
 class Utf8Translator
 {
 public:
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSBool* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSChar* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSDate* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSDateTime* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSHiresTime* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSInt8* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSInt16* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSInt32* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSInt64* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSReal* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSRichReal* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSUInt8* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSUInt16* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSUInt32* pValue);
-  static D_UINT Read (const D_UINT8* utf8Src, const D_UINT srcSize, DBSUInt64* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSBool* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSChar* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSDate* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSDateTime* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSHiresTime* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt8* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt16* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt32* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt64* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSReal* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSRichReal* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt8* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt16* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt32* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt64* pValue);
 
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSBool& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSChar& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSDate& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSDateTime& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSHiresTime& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSInt8 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSInt16 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSInt32 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSInt64 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSReal& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSRichReal& value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSUInt8 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSUInt16 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSUInt32 &value);
-  static D_UINT Write (D_UINT8* const utf8Dest, const D_UINT maxSize, const DBSUInt64 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSBool& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSChar& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSDate& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSDateTime& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSHiresTime& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt8 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt16 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt32 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt64 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSReal& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSRichReal& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt8 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt16 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt32 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt64 &value);
 };
 
 #endif /* VALTRANSLATOR_H_ */

@@ -26,7 +26,7 @@ static DBSFieldDescriptor field_descs[] =
   {"f_int8", T_UINT8, false}
 };
 
-static const D_UINT descCount = sizeof (field_descs) / sizeof field_descs[0];
+static const uint_t descCount = sizeof (field_descs) / sizeof field_descs[0];
 
 bool
 operator!= (const DBSFieldDescriptor& field_1,
@@ -44,7 +44,7 @@ test_fields (I_DBSTable& table)
   DBSFieldDescriptor field_d;
 
   std::cout << "Real fields' order: " << std::endl;
-  for (D_UINT index = 0; index < descCount; ++index)
+  for (uint_t index = 0; index < descCount; ++index)
     {
       field_d = table.GetFieldDescriptor (index);
       std::cout << "\t" << field_d.m_pFieldName << std::endl;
@@ -150,6 +150,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

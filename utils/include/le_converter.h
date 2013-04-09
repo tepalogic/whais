@@ -33,12 +33,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 static INLINE void
-to_le_int16 (D_UINT8* pInOutValue)
+to_le_int16 (uint8_t* pInOutValue)
 {
-  D_UINT8        temp;
-  const D_UINT16 le_machine = 0x1;
+  uint8_t        temp;
+  const uint16_t le_machine = 0x1;
 
-  if (*((D_UINT8 *) & le_machine))
+  if (*((uint8_t *) & le_machine))
     return;     /* no need for conversion */
 
   temp           = pInOutValue[0];
@@ -47,12 +47,12 @@ to_le_int16 (D_UINT8* pInOutValue)
 }
 
 static INLINE void
-to_le_int32 (D_UINT8* pInOutValue)
+to_le_int32 (uint8_t* pInOutValue)
 {
-  D_UINT8        temp;
-  const D_UINT16 le_machine = 0x1;
+  uint8_t        temp;
+  const uint16_t le_machine = 0x1;
 
-  if (*((D_UINT8 *) & le_machine))
+  if (*((uint8_t *) & le_machine))
     return;     /* no need for conversion */
 
   temp           = pInOutValue[0];
@@ -64,13 +64,13 @@ to_le_int32 (D_UINT8* pInOutValue)
 }
 
 static INLINE void
-to_le_int64 (D_UINT8* pInOutValue)
+to_le_int64 (uint8_t* pInOutValue)
 {
-  D_UINT8        temp;
-  const D_UINT16 le_machine = 0x1;
+  uint8_t        temp;
+  const uint16_t le_machine = 0x1;
 
 
-  if (*((D_UINT8 *) & le_machine))
+  if (*((uint8_t *) & le_machine))
     return;     /* no need for conversion */
 
   temp           = pInOutValue[0];
@@ -87,10 +87,10 @@ to_le_int64 (D_UINT8* pInOutValue)
   pInOutValue[4] = temp;
 }
 
-static INLINE D_UINT16
-from_le_int16 (const D_UINT8* pValue)
+static INLINE uint16_t
+from_le_int16 (const uint8_t* pValue)
 {
-  D_UINT16 result;
+  uint16_t result;
 
   result = pValue[1];
   result <<= 8;
@@ -98,10 +98,10 @@ from_le_int16 (const D_UINT8* pValue)
   return result;
 }
 
-static INLINE D_UINT32
-from_le_int32 (const D_UINT8* pValue)
+static INLINE uint32_t
+from_le_int32 (const uint8_t* pValue)
 {
-  D_UINT32 result;
+  uint32_t result;
 
   result = pValue[3];
   result <<= 8;
@@ -114,10 +114,10 @@ from_le_int32 (const D_UINT8* pValue)
   return result;
 }
 
-static INLINE D_UINT64
-from_le_int64 (const D_UINT8* pValue)
+static INLINE uint64_t
+from_le_int64 (const uint8_t* pValue)
 {
-  D_UINT64 result;
+  uint64_t result;
 
   result = pValue[7];
   result <<= 8;
@@ -139,60 +139,60 @@ from_le_int64 (const D_UINT8* pValue)
 }
 
 static INLINE void
-store_le_int16 (const D_UINT16 value, D_UINT8* const pDest)
+store_le_int16 (const uint16_t value, uint8_t* const pDest)
 {
-  const D_UINT8* pSrc = (const D_UINT8*)&value;
-  const D_UINT16 le_machine = 0x1;
+  const uint8_t* pSrc = (const uint8_t*)&value;
+  const uint16_t le_machine = 0x1;
 
-    if (*((D_UINT8*)&le_machine))
+    if (*((uint8_t*)&le_machine))
       {
-        D_UINT i;
+        uint_t i;
         for (i = 0; i < sizeof (value); ++i)
           pDest[i] = pSrc[i];
       }
     else
       {
-        D_UINT i;
+        uint_t i;
         for (i = 0; i < sizeof (value); ++i)
           pDest[i] = pSrc[sizeof (value) - (i + 1)];
       }
 }
 
 static INLINE void
-store_le_int32 (const D_UINT32 value, D_UINT8* const pDest)
+store_le_int32 (const uint32_t value, uint8_t* const pDest)
 {
-  const D_UINT8* pSrc = (const D_UINT8*)&value;
-  const D_UINT16 le_machine = 0x1;
+  const uint8_t* pSrc = (const uint8_t*)&value;
+  const uint16_t le_machine = 0x1;
 
-    if (*((D_UINT8*)&le_machine))
+    if (*((uint8_t*)&le_machine))
       {
-        D_UINT i;
+        uint_t i;
         for (i = 0; i < sizeof (value); ++i)
           pDest[i] = pSrc[i];
       }
     else
       {
-        D_UINT i;
+        uint_t i;
         for (i = 0; i < sizeof (value); ++i)
           pDest[i] = pSrc[sizeof (value) - (i + 1)];
       }
 }
 
 static INLINE void
-store_le_int64 (const D_UINT64 value, D_UINT8* const pDest)
+store_le_int64 (const uint64_t value, uint8_t* const pDest)
 {
-  const D_UINT8* pSrc = (const D_UINT8*)&value;
-  const D_UINT16 le_machine = 0x1;
+  const uint8_t* pSrc = (const uint8_t*)&value;
+  const uint16_t le_machine = 0x1;
 
-    if (*((D_UINT8*)&le_machine))
+    if (*((uint8_t*)&le_machine))
       {
-        D_UINT i;
+        uint_t i;
         for (i = 0; i < sizeof (value); ++i)
           pDest[i] = pSrc[i];
       }
     else
       {
-        D_UINT i;
+        uint_t i;
         for (i = 0; i < sizeof (value); ++i)
           pDest[i] = pSrc[sizeof (value) - (i + 1)];
       }

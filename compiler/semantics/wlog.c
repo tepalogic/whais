@@ -172,9 +172,9 @@ static const struct MsgCodeEntry messages[] = {
 };
 
 static const struct MsgCodeEntry*
-find_string (D_UINT msgCode)
+find_string (uint_t msgCode)
 {
-  D_UINT count = 0;
+  uint_t count = 0;
   while ((msgCode != messages[count].id) && (messages[count].id != 0))
     {
       count++;
@@ -188,7 +188,7 @@ find_string (D_UINT msgCode)
 }
 
 void
-w_log_msg (struct ParserState* pState, D_UINT buffPos, D_UINT msgCode, ...)
+w_log_msg (struct ParserState* pState, uint_t buffPos, uint_t msgCode, ...)
 {
   va_list args;
   const struct MsgCodeEntry *pMsgEntry = find_string (msgCode);

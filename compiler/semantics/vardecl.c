@@ -50,7 +50,7 @@ add_id_to_list (YYSTYPE list, YYSTYPE id)
 }
 
 YYSTYPE
-create_type_spec (struct ParserState* pState, D_UINT16 type)
+create_type_spec (struct ParserState* pState, uint16_t type)
 {
   struct SemValue *result = alloc_sem_value (pState);
 
@@ -66,12 +66,12 @@ create_type_spec (struct ParserState* pState, D_UINT16 type)
   return result;
 }
 
-static D_BOOL
+static bool_t
 process_table_decls (struct ParserState* pState,
                      struct DeclaredVar* pVar,
                      void*               pExtra)
 {
-  D_BOOL result = TRUE;
+  bool_t result = TRUE;
 
   assert (IS_TABLE (pVar->type));
 
@@ -84,8 +84,8 @@ struct DeclaredVar *
 install_declaration (struct ParserState* const pState,
                      YYSTYPE                   pVar,
                      YYSTYPE                   pType,
-                     const D_BOOL              parameter,
-                     const D_BOOL              unique)
+                     const bool_t              parameter,
+                     const bool_t              unique)
 {
   struct DeclaredVar*     result = NULL;
   struct DeclaredVar*     pDecl  = NULL;
@@ -108,7 +108,7 @@ install_declaration (struct ParserState* const pState,
   if (pDecl != NULL)
     {
       /* Already declared! */
-      D_CHAR text[128];
+      char text[128];
       copy_text_truncate (text, pDecl->label, sizeof text, pDecl->labelLength);
       w_log_msg (pState, pState->bufferPos, MSG_VAR_DEFINED, text);
     }
@@ -143,7 +143,7 @@ install_declaration (struct ParserState* const pState,
               if ( ! parameter)
                 {
                   /* Already declared! */
-                  D_CHAR text[128];
+                  char text[128];
                   copy_text_truncate (text,
                                       var.label,
                                       sizeof text,
@@ -170,7 +170,7 @@ install_declaration (struct ParserState* const pState,
               || (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
             {
               /* Already declared! */
-              D_CHAR text[128];
+              char text[128];
               copy_text_truncate (text,
                                   var.label,
                                   sizeof text,
@@ -187,7 +187,7 @@ install_declaration (struct ParserState* const pState,
           if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN)
               || (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
             {
-              D_CHAR text[128];
+              char text[128];
 
               assert (IS_ARRAY (var.type) == FALSE);
               /* Already declared! */
@@ -290,7 +290,7 @@ install_field_declaration (struct ParserState*       pState,
       if ((pIt->labelLength == pSemId->length) &&
           (strncmp (pIt->label, pSemId->text, pIt->labelLength) == 0))
         {
-          D_CHAR tname[128];
+          char tname[128];
 
           copy_text_truncate (tname,
                               pSemId->text,
@@ -312,7 +312,7 @@ install_field_declaration (struct ParserState*       pState,
     {
       /* Insert this alphabetically to make sure
        * we avoid equivalent fields declarations. */
-      const D_INT compare = strncmp (pIt->label,
+      const int compare = strncmp (pIt->label,
                                      result->label,
                                      MIN (pIt->labelLength,
                                           result->labelLength));

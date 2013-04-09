@@ -188,7 +188,7 @@ public:
   virtual FIELD_INDEX   GetField ();
   virtual I_DBSTable&   GetTable ();
   virtual StackValue    GetFieldAt (const FIELD_INDEX field);
-  virtual StackValue    GetValueAt (const D_UINT64 index);
+  virtual StackValue    GetValueAt (const uint64_t index);
 
   virtual TableOperand  GetTableOp ();
   virtual void          CopyTableOp (const TableOperand& source);
@@ -229,7 +229,7 @@ public:
   virtual void GetValue (DBSText& outValue) const;
   virtual void GetValue (DBSArray& outValue) const;
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -254,7 +254,7 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -279,7 +279,7 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -305,7 +305,7 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -331,7 +331,7 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -357,7 +357,7 @@ public:
 
   virtual void SetValue (const DBSHiresTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -404,7 +404,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -452,7 +452,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -500,7 +500,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -548,7 +548,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -596,7 +596,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -644,7 +644,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -691,7 +691,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -738,7 +738,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -777,7 +777,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -815,7 +815,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
@@ -841,9 +841,9 @@ public:
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
-  virtual StackValue GetValueAt (const D_UINT64 index);
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
   virtual void       NotifyCopy ();
@@ -855,7 +855,7 @@ private:
 class CharTextElOperand : public I_PMOperand
 {
 public:
-  CharTextElOperand (DBSText &text, const D_UINT64 index)
+  CharTextElOperand (DBSText &text, const uint64_t index)
     : I_PMOperand (),
       m_Index (index),
       m_Text ()
@@ -881,13 +881,13 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
   virtual void       NotifyCopy ();
 
 private:
-  const D_UINT64 m_Index;
+  const uint64_t m_Index;
   DBSText        m_Text;
 };
 
@@ -907,22 +907,22 @@ public:
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
-  virtual StackValue GetValueAt (const D_UINT64 index);
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
   virtual void       NotifyCopy ();
 
 private:
   DBSArray m_Value;
-  D_UINT16 m_FirstArrayType;
+  uint16_t m_FirstArrayType;
 };
 
 class BaseArrayElOperand : public I_PMOperand
 {
 protected:
-  BaseArrayElOperand (DBSArray& array, const D_UINT64 index)
+  BaseArrayElOperand (DBSArray& array, const uint64_t index)
     : I_PMOperand (),
       m_ElementIndex (index),
       m_Array  ()
@@ -957,14 +957,14 @@ protected:
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
 
-  const D_UINT64 m_ElementIndex;
+  const uint64_t m_ElementIndex;
   DBSArray       m_Array;
 };
 
 class BoolArrayElOperand : public BaseArrayElOperand
 {
 public:
-  BoolArrayElOperand (DBSArray& array, const D_UINT64 index)
+  BoolArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -979,7 +979,7 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -987,7 +987,7 @@ public:
 class CharArrayElOperand : public BaseArrayElOperand
 {
 public:
-  CharArrayElOperand (DBSArray& array, const D_UINT64 index)
+  CharArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -999,7 +999,7 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1007,7 +1007,7 @@ public:
 class DateArrayElOperand : public BaseArrayElOperand
 {
 public:
-  DateArrayElOperand (DBSArray& array, const D_UINT64 index)
+  DateArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1020,7 +1020,7 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1028,7 +1028,7 @@ public:
 class DateTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
-  DateTimeArrayElOperand (DBSArray& array, const D_UINT64 index)
+  DateTimeArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1041,7 +1041,7 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1049,7 +1049,7 @@ public:
 class HiresTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
-  HiresTimeArrayElOperand (DBSArray& array, const D_UINT64 index)
+  HiresTimeArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1062,7 +1062,7 @@ public:
 
   virtual void SetValue (const DBSHiresTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1070,7 +1070,7 @@ public:
 class UInt8ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt8ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  UInt8ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1105,7 +1105,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1113,7 +1113,7 @@ public:
 class UInt16ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt16ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  UInt16ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1147,7 +1147,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1155,7 +1155,7 @@ public:
 class UInt32ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt32ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  UInt32ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1189,7 +1189,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1197,7 +1197,7 @@ public:
 class UInt64ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt64ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  UInt64ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1231,7 +1231,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1239,7 +1239,7 @@ public:
 class Int8ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int8ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  Int8ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1273,7 +1273,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1281,7 +1281,7 @@ public:
 class Int16ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int16ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  Int16ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1315,7 +1315,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1323,7 +1323,7 @@ public:
 class Int32ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int32ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  Int32ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1357,7 +1357,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1365,7 +1365,7 @@ public:
 class Int64ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int64ArrayElOperand (DBSArray& array, const D_UINT64 index)
+  Int64ArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1399,7 +1399,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1407,7 +1407,7 @@ public:
 class RealArrayElOperand : public BaseArrayElOperand
 {
 public:
-  RealArrayElOperand (DBSArray& array, const D_UINT64 index)
+  RealArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1431,7 +1431,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1439,7 +1439,7 @@ public:
 class RichRealArrayElOperand : public BaseArrayElOperand
 {
 public:
-  RichRealArrayElOperand (DBSArray& array, const D_UINT64 index)
+  RichRealArrayElOperand (DBSArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
@@ -1463,7 +1463,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1500,7 +1500,7 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual I_DBSTable& GetTable ();
@@ -1525,7 +1525,7 @@ private:
 class FieldOperand : public I_PMOperand
 {
 public:
-  FieldOperand (const D_UINT32 fieldType = T_UNDETERMINED)
+  FieldOperand (const uint32_t fieldType = T_UNDETERMINED)
     : m_pRefTable (NULL),
       m_Field (~0),
       m_FieldType (fieldType)
@@ -1542,11 +1542,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
-  virtual StackValue  GetValueAt (const D_UINT64 index);
+  virtual StackValue  GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
   virtual void       NotifyCopy ();
@@ -1557,7 +1557,7 @@ public:
 private:
   TableReference* m_pRefTable;
   FIELD_INDEX     m_Field;
-  D_UINT32        m_FieldType;
+  uint32_t        m_FieldType;
 };
 
 class BaseFieldElOperand : public I_PMOperand
@@ -1632,7 +1632,7 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1654,7 +1654,7 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1677,7 +1677,7 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1701,7 +1701,7 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1724,7 +1724,7 @@ public:
 
   virtual void SetValue (const DBSHiresTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1768,7 +1768,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1812,7 +1812,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1856,7 +1856,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1900,7 +1900,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1944,7 +1944,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -1988,7 +1988,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2032,7 +2032,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2076,7 +2076,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2110,7 +2110,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2144,7 +2144,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2167,9 +2167,9 @@ public:
   virtual void SelfAdd (const DBSChar& value);
   virtual void SelfAdd (const DBSText& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
-  virtual StackValue GetValueAt (const D_UINT64 index);
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
 };
@@ -2189,9 +2189,9 @@ public:
   virtual void GetValue (DBSArray& outValue) const;
   virtual void SetValue (const DBSArray& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
-  virtual StackValue GetValueAt (const D_UINT64 index);
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
 };
@@ -2202,7 +2202,7 @@ public:
   CharTextFieldElOperand (TableReference*   pTableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field,
-                          const D_UINT64    index)
+                          const uint64_t    index)
     : BaseFieldElOperand (pTableRef, row, field),
       m_Index (index)
   {
@@ -2215,12 +2215,12 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  const D_UINT64    m_Index;
+  const uint64_t    m_Index;
 };
 
 class BaseArrayFieldElOperand : public I_PMOperand
@@ -2229,7 +2229,7 @@ protected:
   BaseArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
-                           const D_UINT64    index)
+                           const uint64_t    index)
      : m_Index (index),
        m_Row (row),
        m_pRefTable (pTableRef),
@@ -2278,7 +2278,7 @@ protected:
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
 
-  const D_UINT64    m_Index;
+  const uint64_t    m_Index;
   const ROW_INDEX   m_Row;
   TableReference*   m_pRefTable;
   const FIELD_INDEX m_Field;
@@ -2290,7 +2290,7 @@ public:
   BoolArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
-                           const D_UINT64    index)
+                           const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2305,7 +2305,7 @@ public:
   virtual void SelfXor (const DBSBool& value);
   virtual void SelfOr (const DBSBool& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2316,7 +2316,7 @@ public:
   CharArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
-                           const D_UINT64    index)
+                           const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2328,7 +2328,7 @@ public:
 
   virtual void SetValue (const DBSChar& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2339,7 +2339,7 @@ public:
   DateArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
-                           const D_UINT64    index)
+                           const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2352,7 +2352,7 @@ public:
 
   virtual void SetValue (const DBSDate& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2363,7 +2363,7 @@ public:
   DateTimeArrayFieldElOperand (TableReference*   pTableRef,
                                const ROW_INDEX   row,
                                const FIELD_INDEX field,
-                               const D_UINT64    index)
+                               const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2376,7 +2376,7 @@ public:
 
   virtual void SetValue (const DBSDateTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2387,7 +2387,7 @@ public:
   HiresTimeArrayFieldElOperand (TableReference*   pTableRef,
                                 const ROW_INDEX   row,
                                 const FIELD_INDEX field,
-                                const D_UINT64    index)
+                                const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2400,7 +2400,7 @@ public:
 
   virtual void SetValue (const DBSHiresTime& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2411,7 +2411,7 @@ public:
   UInt8ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
-                            const D_UINT64    index)
+                            const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2445,7 +2445,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2456,7 +2456,7 @@ public:
   UInt16ArrayFieldElOperand (TableReference*   pTableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
-                             const D_UINT64    index)
+                             const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2490,7 +2490,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2501,7 +2501,7 @@ public:
   UInt32ArrayFieldElOperand (TableReference*   pTableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
-                             const D_UINT64    index)
+                             const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2535,7 +2535,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2546,7 +2546,7 @@ public:
   UInt64ArrayFieldElOperand (TableReference*   pTableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
-                             const D_UINT64    index)
+                             const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2580,7 +2580,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2591,7 +2591,7 @@ public:
   Int8ArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
-                           const D_UINT64    index)
+                           const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2625,7 +2625,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2636,7 +2636,7 @@ public:
   Int16ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
-                            const D_UINT64    index)
+                            const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2670,7 +2670,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2681,7 +2681,7 @@ public:
   Int32ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
-                            const D_UINT64    index)
+                            const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2715,7 +2715,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2726,7 +2726,7 @@ public:
   Int64ArrayFieldElOperand (TableReference*   pTableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
-                            const D_UINT64    index)
+                            const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2760,7 +2760,7 @@ public:
   virtual void SelfXor (const DBSInt64& value);
   virtual void SelfOr (const DBSInt64& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2771,7 +2771,7 @@ public:
   RealArrayFieldElOperand (TableReference*   pTableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
-                           const D_UINT64    index)
+                           const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2795,7 +2795,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2806,7 +2806,7 @@ public:
   RichRealArrayFieldElOperand (TableReference*   pTableRef,
                                const ROW_INDEX   row,
                                const FIELD_INDEX field,
-                               const D_UINT64    index)
+                               const uint64_t    index)
     : BaseArrayFieldElOperand (pTableRef, row, field, index)
   {
   }
@@ -2830,7 +2830,7 @@ public:
   virtual void SelfDiv (const DBSInt64& value);
   virtual void SelfDiv (const DBSRichReal& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
@@ -2854,7 +2854,7 @@ public:
     : m_Sync (),
       m_OperandOwner (source.m_OperandOwner)
   {
-    for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
+    for (uint_t i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];
 
     _CC (bool&, source.m_OperandOwner) = false;
@@ -2866,7 +2866,7 @@ public:
       return *this;
 
     m_OperandOwner = source.m_OperandOwner;
-    for (D_UINT i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
+    for (uint_t i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
       m_Storage[i] = source.m_Storage[i];
 
     _CC (bool&, source.m_OperandOwner) = false;
@@ -2955,7 +2955,7 @@ public:
     GetOperand ().SelfOr (value);
   }
 
-  D_UINT GetType ()
+  uint_t GetType ()
   {
     return GetOperand ().GetType ();
   }
@@ -2979,7 +2979,7 @@ public:
     return GetOperand ().GetFieldAt (field);
   }
 
-  StackValue GetValueAt (const D_UINT64 index)
+  StackValue GetValueAt (const uint64_t index)
   {
     WSynchronizerRAII dummy(m_Sync);
     return GetOperand ().GetValueAt (index);
@@ -3026,7 +3026,7 @@ public:
 private:
   WSynchronizer m_Sync;
   bool          m_OperandOwner;
-  D_UINT64      m_Storage[MAX_OP_QWORDS];
+  uint64_t      m_Storage[MAX_OP_QWORDS];
 };
 
 class GlobalOperand : public I_PMOperand
@@ -3098,12 +3098,12 @@ public:
   virtual void SelfOr (const DBSInt64& value);
   virtual void SelfOr (const DBSBool& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
-  virtual StackValue  GetValueAt (const D_UINT64 index);
+  virtual StackValue  GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
   virtual void       NotifyCopy ();
@@ -3122,7 +3122,7 @@ private:
 class LocalOperand : public I_PMOperand
 {
 public:
-  LocalOperand (SessionStack& stack, const D_UINT64 index);
+  LocalOperand (SessionStack& stack, const uint64_t index);
 
   virtual bool IsNull () const;
 
@@ -3187,12 +3187,12 @@ public:
   virtual void SelfOr (const DBSInt64& value);
   virtual void SelfOr (const DBSBool& value);
 
-  virtual D_UINT GetType ();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
   virtual I_DBSTable& GetTable ();
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
-  virtual StackValue  GetValueAt (const D_UINT64 index);
+  virtual StackValue  GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
 
@@ -3203,7 +3203,7 @@ public:
   virtual void          CopyFieldOp (const FieldOperand& source);
 
 private:
-  const D_UINT64 m_Index;
+  const uint64_t m_Index;
   SessionStack&  m_Stack;
 };
 

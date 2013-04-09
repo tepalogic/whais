@@ -67,18 +67,18 @@ extern "C"
 void*
 custom_trace_mem_alloc (size_t      size,
                         const char* pFile,
-                        D_UINT      line);
+                        uint_t      line);
 
 void*
 custom_trace_mem_realloc (void*       oldPtr,
                           size_t      newSize,
                           const char* pFile,
-                          D_UINT      line);
+                          uint_t      line);
 
 void
 custom_trace_mem_free (void*       ptr,
                        const char* pFile,
-                       D_UINT      line);
+                       uint_t      line);
 #endif /* ENABLE_MEMORY_TRACE */
 
 void* custom_mem_alloc (size_t size);
@@ -99,7 +99,7 @@ void*
 operator new (std::size_t size, const std::nothrow_t&) throw();
 
 void*
-operator new (std::size_t size, const D_CHAR* pFile, D_UINT line);
+operator new (std::size_t size, const char* pFile, uint_t line);
 
 void*
 operator new[] (std::size_t size) throw (std::bad_alloc);
@@ -108,19 +108,19 @@ void*
 operator new[] (std::size_t size, const std::nothrow_t&) throw();
 
 void*
-operator new[] (std::size_t size, const D_CHAR* pFile, D_UINT line);
+operator new[] (std::size_t size, const char* pFile, uint_t line);
 
 void
 operator delete (void* ptr) throw ();
 
 void
-operator delete (void* ptr, const D_CHAR*, D_UINT);
+operator delete (void* ptr, const char*, uint_t);
 
 void
 operator delete[] (void* ptr) throw ();
 
 void
-operator delete[] (void* ptr, const D_CHAR*, D_UINT );
+operator delete[] (void* ptr, const char*, uint_t );
 
 
 template <class T> static inline void
@@ -215,8 +215,8 @@ private:
     std::cout << "Memory in use: " << GetCurrentMemoryUsage () << " bytes.\n";
   }
 
-  static       D_UINT32 sm_InitCount;
-  static const D_CHAR*  sm_Module;
+  static       uint32_t sm_InitCount;
+  static const char*  sm_Module;
 };
 
 static WMemoryTracker __One_Hidden_Static_For_Compiling_Unit__;

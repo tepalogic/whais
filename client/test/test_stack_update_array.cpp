@@ -11,13 +11,13 @@
 
 using namespace std;
 
-static const D_UINT16 MAX_VALUES_ENTRIES = 10;
+static const uint16_t MAX_VALUES_ENTRIES = 10;
 
 struct ArrayValuesEntry
 {
-  D_UINT16      type;
-  D_UINT16      elementsCount;
-  const D_CHAR* values[MAX_VALUES_ENTRIES];
+  uint16_t      type;
+  uint16_t      elementsCount;
+  const char* values[MAX_VALUES_ENTRIES];
 };
 
 struct ArrayValuesEntry _values[] =
@@ -289,12 +289,12 @@ struct ArrayValuesEntry _values[] =
         {WFT_RICHREAL, 5, {"-9223372036854775807.00000000000001", "-0.00000000000001", "0.00000000000001", "1.1", "0" }}
     };
 
-static const D_UINT _valuesCount  = sizeof (_values) / sizeof (_values[0]);
+static const uint_t _valuesCount  = sizeof (_values) / sizeof (_values[0]);
 
 static bool
 fill_array_entries_step (W_CONNECTOR_HND hnd)
 {
-  for (D_UINT i = 0; i < _valuesCount; i++)
+  for (uint_t i = 0; i < _valuesCount; i++)
     {
       if ((WPushStackValue (hnd,
                             _values[i].type | WFT_ARRAY_MASK,
@@ -305,7 +305,7 @@ fill_array_entries_step (W_CONNECTOR_HND hnd)
           return false;
         }
 
-      for (D_UINT j = 0; j < _values[i].elementsCount; ++j)
+      for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
           if ((WUpdateStackValue (hnd,
                                   _values[i].type,
@@ -327,7 +327,7 @@ fill_array_entries_step (W_CONNECTOR_HND hnd)
 static bool
 fill_array_entries_bulk (W_CONNECTOR_HND hnd)
 {
-  for (D_UINT i = 0; i < _valuesCount; i++)
+  for (uint_t i = 0; i < _valuesCount; i++)
     {
       if (WPushStackValue (hnd,
                            _values[i].type | WFT_ARRAY_MASK,
@@ -337,7 +337,7 @@ fill_array_entries_bulk (W_CONNECTOR_HND hnd)
           return false;
         }
 
-      for (D_UINT j = 0; j < _values[i].elementsCount; ++j)
+      for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
           if (WUpdateStackValue (hnd,
                                  _values[i].type,
@@ -359,10 +359,10 @@ fill_array_entries_bulk (W_CONNECTOR_HND hnd)
 }
 
 static bool
-check_array_entry (W_CONNECTOR_HND hnd, const D_INT index)
+check_array_entry (W_CONNECTOR_HND hnd, const int index)
 {
   const ArrayValuesEntry* pEntry = &_values[index];
-  const D_CHAR*           value;
+  const char*           value;
   unsigned long long int  count;
 
   if ((WGetStackArrayElementsCount (hnd,
@@ -374,7 +374,7 @@ check_array_entry (W_CONNECTOR_HND hnd, const D_INT index)
       return false;
     }
 
-  for (D_UINT i = 0; i < pEntry->elementsCount; ++i)
+  for (uint_t i = 0; i < pEntry->elementsCount; ++i)
     {
       if ((WGetStackValueEntry (hnd,
                                WIGNORE_FIELD,
@@ -415,7 +415,7 @@ test_array_step_update (W_CONNECTOR_HND hnd)
   if (! fill_array_entries_step (hnd))
     goto test_array_step_update_fail;
 
-  for (D_INT i = _valuesCount - 1; i >= 0; i--)
+  for (int i = _valuesCount - 1; i >= 0; i--)
     {
       if (! check_array_entry (hnd, i))
         goto test_array_step_update_fail;
@@ -444,7 +444,7 @@ test_array_bulk_update (W_CONNECTOR_HND hnd)
   if (! fill_array_entries_bulk (hnd))
     goto test_array_bulk_update_fail;
 
-  for (D_INT i = _valuesCount - 1; i >= 0; i--)
+  for (int i = _valuesCount - 1; i >= 0; i--)
     {
       if (! check_array_entry (hnd, i))
         goto test_array_bulk_update_fail;
@@ -501,19 +501,19 @@ test_for_errors_fail :
 }
 
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 1;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "test_password";

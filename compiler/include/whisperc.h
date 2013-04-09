@@ -66,7 +66,7 @@ typedef void        (*WHC_MESSENGER) (WHC_MESSENGER_ARG data,
                                       const char*       pMessage,
                                       va_list           args);
 
-#define WHC_IGNORE_BUFFER_POS      (D_UINT)(-1)
+#define WHC_IGNORE_BUFFER_POS      (uint_t)(-1)
 
 typedef struct
 {

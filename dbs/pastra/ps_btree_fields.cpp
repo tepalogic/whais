@@ -29,8 +29,8 @@ using namespace pastra;
 
 
 FieldIndexNodeManager::FieldIndexNodeManager (std::auto_ptr <I_DataContainer> &container,
-                                              const D_UINT nodeSize,
-                                              const D_UINT maxCacheMem,
+                                              const uint_t nodeSize,
+                                              const uint_t maxCacheMem,
                                               const DBS_FIELD_TYPE fieldType,
                                               const bool create)
   : m_NodeSize (nodeSize),
@@ -52,7 +52,7 @@ FieldIndexNodeManager::~FieldIndexNodeManager()
   FlushNodes ();
 }
 
-D_UINT64
+uint64_t
 FieldIndexNodeManager::RawNodeSize () const
 {
   return m_NodeSize;
@@ -65,7 +65,7 @@ FieldIndexNodeManager::MarkForRemoval ()
   m_Container->MarkForRemoval ();
 }
 
-D_UINT64
+uint64_t
 FieldIndexNodeManager::GetIndexRawSize () const
 {
   return m_Container->Size ();
@@ -132,7 +132,7 @@ FieldIndexNodeManager::SetRootNodeId (const NODE_INDEX node)
   UpdateContainer ();
 }
 
-D_UINT
+uint_t
 FieldIndexNodeManager::MaxCachedNodes ()
 {
   return m_MaxCachedMem / m_NodeSize;

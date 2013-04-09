@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-WFile::WFile (const D_CHAR* pFileName, D_UINT mode)
+WFile::WFile (const char* pFileName, uint_t mode)
   : m_Handle (0)
 {
   m_Handle = whc_fopen (pFileName, mode);
@@ -52,29 +52,29 @@ WFile::~WFile ()
 }
 
 void
-WFile::Read (D_UINT8* pBuffer, D_UINT size)
+WFile::Read (uint8_t* pBuffer, uint_t size)
 {
   if (!whc_fread (m_Handle, pBuffer, size))
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 void
-WFile::Write (const D_UINT8* pBuffer, D_UINT size)
+WFile::Write (const uint8_t* pBuffer, uint_t size)
 {
   if (!whc_fwrite (m_Handle, pBuffer, size))
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
 void
-WFile::Seek (const D_INT64 where, const D_INT whence)
+WFile::Seek (const int64_t where, const int whence)
 {
   if (!whc_fseek (m_Handle, where, whence))
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
 }
 
-D_UINT64 WFile::Tell ()
+uint64_t WFile::Tell ()
 {
-  D_UINT64 position;
+  uint64_t position;
 
   if (!whc_ftell (m_Handle, &position))
     throw WFileException (NULL, _EXTRA(whc_fgetlasterror ()));
@@ -89,9 +89,9 @@ WFile::Sync ()
     throw WFileException (NULL,_EXTRA(whc_fgetlasterror ()));
 }
 
-D_UINT64 WFile::GetSize () const
+uint64_t WFile::GetSize () const
 {
-  D_UINT64 size;
+  uint64_t size;
 
   if (!whc_ftellsize (m_Handle, &size))
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));
@@ -100,7 +100,7 @@ D_UINT64 WFile::GetSize () const
 }
 
 void
-WFile::SetSize (const D_UINT64 size)
+WFile::SetSize (const uint64_t size)
 {
   if (!whc_fsetsize (m_Handle, size))
     throw WFileException (NULL, _EXTRA (whc_fgetlasterror ()));

@@ -64,7 +64,7 @@ private:
 
   I_DBSHandler& m_DbsHnd;
   I_DBSTable&   m_Table;
-  D_UINT64      m_RefCount;
+  uint64_t      m_RefCount;
 };
 
 };

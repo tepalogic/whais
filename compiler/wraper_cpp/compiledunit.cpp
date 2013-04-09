@@ -31,13 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /////////////******WBufferCompiledUnit********//////////////////////////////
 
-WBufferCompiledUnit::WBufferCompiledUnit (const D_UINT8*    pBuuffer,
-                                          D_UINT            bufferSize,
+WBufferCompiledUnit::WBufferCompiledUnit (const uint8_t*    pBuuffer,
+                                          uint_t            bufferSize,
                                           WHC_MESSENGER     messenger,
                                           WHC_MESSENGER_ARG messengerContext) :
   m_Handler (NULL)
 {
-  m_Handler = whc_hnd_create (_RC (const D_CHAR*, pBuuffer),
+  m_Handler = whc_hnd_create (_RC (const char*, pBuuffer),
                               bufferSize,
                               messenger,
                               messengerContext);
@@ -51,58 +51,58 @@ WBufferCompiledUnit::~WBufferCompiledUnit ()
     whc_hnd_destroy (m_Handler);
 }
 
-D_UINT
+uint_t
 WBufferCompiledUnit::GetTypeInformationSize ()
 {
-  const D_UINT8* pDummy;
-  const D_UINT   result = whc_get_typedec_pool (m_Handler, &pDummy);
+  const uint8_t* pDummy;
+  const uint_t   result = whc_get_typedec_pool (m_Handler, &pDummy);
 
   return result;
 }
 
-const D_UINT8*
+const uint8_t*
 WBufferCompiledUnit::RetriveTypeInformation ()
 {
-  const D_UINT8* pTypeInfo = NULL;
+  const uint8_t* pTypeInfo = NULL;
 
   whc_get_typedec_pool (m_Handler, &pTypeInfo);
 
   return pTypeInfo;
 }
 
-D_UINT
+uint_t
 WBufferCompiledUnit::GetConstAreaSize ()
 {
-  const D_UINT8* pDummy;
-  const D_UINT   result = whc_get_const_area (m_Handler, &pDummy);
+  const uint8_t* pDummy;
+  const uint_t   result = whc_get_const_area (m_Handler, &pDummy);
 
   return result;
 }
 
-const D_UINT8*
+const uint8_t*
 WBufferCompiledUnit::RetrieveConstArea ()
 {
-  const D_UINT8* pConstArea = NULL;
+  const uint8_t* pConstArea = NULL;
 
   whc_get_const_area (m_Handler, &pConstArea);
 
   return pConstArea;
 }
 
-D_UINT
+uint_t
 WBufferCompiledUnit::GetGlobalsCount ()
 {
   return whc_get_globals_count (m_Handler);
 }
 
-D_UINT
+uint_t
 WBufferCompiledUnit::GetProceduresCount ()
 {
   return whc_get_procs_count (m_Handler);
 }
 
-D_UINT
-WBufferCompiledUnit::GetGlobalNameLength (D_UINT item)
+uint_t
+WBufferCompiledUnit::GetGlobalNameLength (uint_t item)
 {
   WHC_GLBVAR_DESC globalDesc = {NULL, };
 
@@ -112,8 +112,8 @@ WBufferCompiledUnit::GetGlobalNameLength (D_UINT item)
   return globalDesc.m_NameLength;
 }
 
-const D_CHAR*
-WBufferCompiledUnit::RetriveGlobalName (D_UINT item)
+const char*
+WBufferCompiledUnit::RetriveGlobalName (uint_t item)
 {
   WHC_GLBVAR_DESC globalDesc;
 
@@ -123,15 +123,15 @@ WBufferCompiledUnit::RetriveGlobalName (D_UINT item)
   return globalDesc.m_Name;
 }
 
-D_UINT
-WBufferCompiledUnit::GetGlobalTypeIndex (D_UINT item)
+uint_t
+WBufferCompiledUnit::GetGlobalTypeIndex (uint_t item)
 {
   WHC_GLBVAR_DESC globalDesc;
 
   if (!whc_get_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  const D_UINT8* pTemp;
+  const uint8_t* pTemp;
   whc_get_typedec_pool (m_Handler, &pTemp);
 
   assert (pTemp && (pTemp <= globalDesc.m_Type));
@@ -140,8 +140,8 @@ WBufferCompiledUnit::GetGlobalTypeIndex (D_UINT item)
 
 }
 
-D_BOOL
-WBufferCompiledUnit::IsGlobalExternal (D_UINT item)
+bool_t
+WBufferCompiledUnit::IsGlobalExternal (uint_t item)
 {
   WHC_GLBVAR_DESC globalDesc;
 
@@ -151,8 +151,8 @@ WBufferCompiledUnit::IsGlobalExternal (D_UINT item)
   return (globalDesc.m_Defined == FALSE);
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcSyncStatementsCount (D_UINT item)
+uint_t
+WBufferCompiledUnit::GetProcSyncStatementsCount (uint_t item)
 {
   WHC_PROC_DESC desc;
 
@@ -162,8 +162,8 @@ WBufferCompiledUnit::GetProcSyncStatementsCount (D_UINT item)
   return desc.m_SyncsCount;
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcCodeAreaSize (D_UINT item)
+uint_t
+WBufferCompiledUnit::GetProcCodeAreaSize (uint_t item)
 {
   WHC_PROC_DESC desc;
 
@@ -173,8 +173,8 @@ WBufferCompiledUnit::GetProcCodeAreaSize (D_UINT item)
   return desc.m_CodeSize;
 }
 
-const D_UINT8*
-WBufferCompiledUnit::RetriveProcCodeArea (D_UINT item)
+const uint8_t*
+WBufferCompiledUnit::RetriveProcCodeArea (uint_t item)
 {
   WHC_PROC_DESC desc;
 
@@ -184,8 +184,8 @@ WBufferCompiledUnit::RetriveProcCodeArea (D_UINT item)
   return desc.m_Code;
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcLocalsCount (D_UINT item)
+uint_t
+WBufferCompiledUnit::GetProcLocalsCount (uint_t item)
 {
   WHC_PROC_DESC desc;
 
@@ -195,8 +195,8 @@ WBufferCompiledUnit::GetProcLocalsCount (D_UINT item)
   return desc.m_LocalsCount;
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcParametersCount (D_UINT item)
+uint_t
+WBufferCompiledUnit::GetProcParametersCount (uint_t item)
 {
   WHC_PROC_DESC desc;
 
@@ -206,27 +206,27 @@ WBufferCompiledUnit::GetProcParametersCount (D_UINT item)
   return desc.m_ParamsCount;
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcReturnTypeIndex (D_UINT proc_item)
+uint_t
+WBufferCompiledUnit::GetProcReturnTypeIndex (uint_t proc_item)
 {
   WHC_PROC_HANDLER hProc = whc_get_proc_hnd (m_Handler, proc_item);
 
   if (hProc == NULL)
     throw WCompiledUnitException ("Could not create the  procedure handle.", _EXTRA(0));
 
-  const D_UINT8* pTemp;
+  const uint8_t* pTemp;
   whc_get_typedec_pool (m_Handler, &pTemp);
 
   assert (pTemp && (pTemp <= whc_get_proc_rettype (m_Handler, hProc)));
-  D_UINT result = whc_get_proc_rettype (m_Handler, hProc) - pTemp;
+  uint_t result = whc_get_proc_rettype (m_Handler, hProc) - pTemp;
 
   whc_release_proc_hnd (m_Handler, hProc);
 
   return result;
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcNameSize (D_UINT proc_item)
+uint_t
+WBufferCompiledUnit::GetProcNameSize (uint_t proc_item)
 {
   WHC_PROC_DESC desc;
 
@@ -236,8 +236,8 @@ WBufferCompiledUnit::GetProcNameSize (D_UINT proc_item)
   return desc.m_NameLength;
 }
 
-const D_CHAR*
-WBufferCompiledUnit::RetriveProcName (D_UINT proc_item)
+const char*
+WBufferCompiledUnit::RetriveProcName (uint_t proc_item)
 {
   WHC_PROC_DESC desc;
 
@@ -247,13 +247,13 @@ WBufferCompiledUnit::RetriveProcName (D_UINT proc_item)
   return desc.m_Name;
 }
 
-D_UINT
-WBufferCompiledUnit::GetProcLocalTypeIndex (D_UINT item_proc, D_UINT item_local)
+uint_t
+WBufferCompiledUnit::GetProcLocalTypeIndex (uint_t item_proc, uint_t item_local)
 {
   if (item_local == 0)
     return GetProcReturnTypeIndex (item_proc);
 
-  const D_UINT8* pLocalType;
+  const uint8_t* pLocalType;
   WHC_PROC_DESC  proc_desc;
 
   if (!whc_get_proc (m_Handler, item_proc, &proc_desc))
@@ -270,22 +270,22 @@ WBufferCompiledUnit::GetProcLocalTypeIndex (D_UINT item_proc, D_UINT item_local)
   if (pLocalType == NULL)
     throw WCompiledUnitException ("Could not get local variable type.", _EXTRA(0));
 
-  const D_UINT8* pLocalDesc;
+  const uint8_t* pLocalDesc;
   whc_get_typedec_pool (m_Handler, &pLocalDesc);
 
   assert (pLocalDesc && (pLocalDesc <= pLocalType));
   return pLocalType - pLocalDesc;
 }
 
-D_BOOL
-WBufferCompiledUnit::IsProcExternal (D_UINT item_proc)
+bool_t
+WBufferCompiledUnit::IsProcExternal (uint_t item_proc)
 {
   return (GetProcCodeAreaSize (item_proc) == 0);
 }
 
 /////////////******WFileCompiledUnit********//////////////////////////////
 
-WFileCompiledUnit::WFileCompiledUnit (const D_CHAR * file_name) :
+WFileCompiledUnit::WFileCompiledUnit (const char * file_name) :
     m_File (file_name, WHC_FILEREAD),
     m_GlobalsCount (0),
     m_ProcsCount (0),
@@ -298,24 +298,24 @@ WFileCompiledUnit::WFileCompiledUnit (const D_CHAR * file_name) :
     m_ProcData (NULL)
 {
   ProcessHeader ();
-  m_ProcData.reset (new D_UINT8*[m_ProcsCount]);
+  m_ProcData.reset (new uint8_t*[m_ProcsCount]);
 
-  for (D_UINT count = 0; count < m_ProcsCount; ++count)
+  for (uint_t count = 0; count < m_ProcsCount; ++count)
     m_ProcData.get ()[count] = NULL;
 
 }
 
 WFileCompiledUnit::~WFileCompiledUnit ()
 {
-  for (D_UINT count = 0; count < m_ProcsCount; ++count)
+  for (uint_t count = 0; count < m_ProcsCount; ++count)
     delete [] m_ProcData.get ()[count];
 }
 
 void
 WFileCompiledUnit::ProcessHeader ()
 {
-  D_UINT8  t_buffer[WHC_TABLE_SIZE];
-  D_UINT32 temp32;
+  uint8_t  t_buffer[WHC_TABLE_SIZE];
+  uint32_t temp32;
 
   m_File.Seek (0, WHC_SEEK_BEGIN);
   m_File.Read (t_buffer, sizeof t_buffer);
@@ -329,156 +329,156 @@ WFileCompiledUnit::ProcessHeader ()
   temp32    = from_le_int32 (t_buffer + WHC_TYPEINFO_START_OFF);
   m_TtySize = from_le_int32 (t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
-  m_TypeInfo.reset (new D_UINT8[m_TtySize]);
+  m_TypeInfo.reset (new uint8_t[m_TtySize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
   m_File.Read (m_TypeInfo.get (), m_TtySize);
 
   temp32        = from_le_int32 (t_buffer + WHC_SYMTABLE_START_OFF);
   m_SymbolsSize = from_le_int32 (t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
-  m_Symbols.reset (new D_UINT8[m_SymbolsSize]);
+  m_Symbols.reset (new uint8_t[m_SymbolsSize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
   m_File.Read (m_Symbols.get (), m_SymbolsSize);
 
   temp32         = from_le_int32 (t_buffer + WHC_CONSTAREA_START_OFF);
   m_ConstAreaSize = from_le_int32 (t_buffer + WHC_CONSTAREA_SIZE_OFF);
 
-  m_ConstArea.reset (new D_UINT8[m_ConstAreaSize]);
+  m_ConstArea.reset (new uint8_t[m_ConstAreaSize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
   m_File.Read (m_ConstArea.get (), m_ConstAreaSize);
 
   temp32 = (m_GlobalsCount * WHC_GLOBAL_ENTRY_SIZE) + (m_ProcsCount * WHC_PROC_ENTRY_SIZE);
 
-  m_Globals.reset (new D_UINT8[m_GlobalsCount * WHC_GLOBAL_ENTRY_SIZE]);
-  m_Procs.reset (new D_UINT8[m_ProcsCount * WHC_PROC_ENTRY_SIZE]);
-  m_File.Seek ((-1 * _SC (D_INT64, temp32)), WHC_SEEK_END);
+  m_Globals.reset (new uint8_t[m_GlobalsCount * WHC_GLOBAL_ENTRY_SIZE]);
+  m_Procs.reset (new uint8_t[m_ProcsCount * WHC_PROC_ENTRY_SIZE]);
+  m_File.Seek ((-1 * _SC (int64_t, temp32)), WHC_SEEK_END);
   m_File.Read (m_Globals.get (), m_GlobalsCount * WHC_GLOBS_COUNT_OFF);
   m_File.Read (m_Procs.get (), m_ProcsCount * WHC_PROC_ENTRY_SIZE);
 
 }
 
 void
-WFileCompiledUnit::LoadProcInMemory (D_UINT proc_item)
+WFileCompiledUnit::LoadProcInMemory (uint_t proc_item)
 {
   assert (proc_item < m_ProcsCount);
 
   if (m_ProcData.get ()[proc_item] != NULL)
     return;
 
-  const D_UINT8* pProcEntry     = m_Procs.get () + (proc_item * WHC_PROC_ENTRY_SIZE);
-  const D_UINT32 nlocals        = from_le_int16 (pProcEntry + WHC_PROC_ENTRY_NLOCAL_OFF);
-  const D_UINT32 code_size      = from_le_int32 (pProcEntry + WHC_PROC_ENTRY_CODE_SIZE);
-  const D_UINT32 body_pos       = from_le_int32 (pProcEntry + WHC_PROC_ENTRY_BODY_OFF);
-  const D_UINT   proc_body_size = (WHC_PROC_BODY_LOCAL_ENTRY_SIZE * nlocals) +
+  const uint8_t* pProcEntry     = m_Procs.get () + (proc_item * WHC_PROC_ENTRY_SIZE);
+  const uint32_t nlocals        = from_le_int16 (pProcEntry + WHC_PROC_ENTRY_NLOCAL_OFF);
+  const uint32_t code_size      = from_le_int32 (pProcEntry + WHC_PROC_ENTRY_CODE_SIZE);
+  const uint32_t body_pos       = from_le_int32 (pProcEntry + WHC_PROC_ENTRY_BODY_OFF);
+  const uint_t   proc_body_size = (WHC_PROC_BODY_LOCAL_ENTRY_SIZE * nlocals) +
                                   WHC_PROC_BODY_SYNCS_ENTRY_SYZE + code_size;
 
-  m_ProcData.get ()[proc_item] = new D_UINT8[proc_body_size];
+  m_ProcData.get ()[proc_item] = new uint8_t[proc_body_size];
   m_File.Seek (body_pos, WHC_SEEK_BEGIN);
   m_File.Read (m_ProcData.get ()[proc_item], proc_body_size);
 }
 
-D_UINT WFileCompiledUnit::GetTypeInformationSize ()
+uint_t WFileCompiledUnit::GetTypeInformationSize ()
 {
   return m_TtySize;
 }
 
-const D_UINT8*
+const uint8_t*
 WFileCompiledUnit::RetriveTypeInformation ()
 {
   return m_TypeInfo.get ();
 }
 
-D_UINT WFileCompiledUnit::GetConstAreaSize ()
+uint_t WFileCompiledUnit::GetConstAreaSize ()
 {
   return m_ConstAreaSize;
 }
 
-const D_UINT8*
+const uint8_t*
 WFileCompiledUnit::RetrieveConstArea ()
 {
   return m_ConstArea.get ();
 }
 
-D_UINT
+uint_t
 WFileCompiledUnit::GetGlobalsCount ()
 {
   return m_GlobalsCount;
 }
 
-D_UINT
-WFileCompiledUnit::GetGlobalNameLength (D_UINT item)
+uint_t
+WFileCompiledUnit::GetGlobalNameLength (uint_t item)
 {
   if (item >= m_GlobalsCount)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  const D_UINT8* const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  D_UINT32             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
+  const uint8_t* const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
+  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
 
   assert (temp32 < m_SymbolsSize);
-  return strlen (_RC (const D_CHAR *, m_Symbols.get ()) +temp32);
+  return strlen (_RC (const char *, m_Symbols.get ()) +temp32);
 }
 
-const D_CHAR*
-WFileCompiledUnit::RetriveGlobalName (D_UINT item)
+const char*
+WFileCompiledUnit::RetriveGlobalName (uint_t item)
 {
   if (item >= m_GlobalsCount)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  const D_UINT8* const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  D_UINT32             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
+  const uint8_t* const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
+  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
 
   assert (temp32 < m_SymbolsSize);
-  return _RC (const D_CHAR *, m_Symbols.get ()) +temp32;
+  return _RC (const char *, m_Symbols.get ()) +temp32;
 }
 
-D_UINT
-WFileCompiledUnit::GetGlobalTypeIndex (D_UINT item)
+uint_t
+WFileCompiledUnit::GetGlobalTypeIndex (uint_t item)
 {
   if (item >= m_GlobalsCount)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  const D_UINT8 *const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  D_UINT32             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
+  const uint8_t *const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
+  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
 
   temp32 &= ~EXTERN_MASK;
   assert (temp32 < m_TtySize);
   return temp32;
 }
 
-D_BOOL
-WFileCompiledUnit::IsGlobalExternal (D_UINT item)
+bool_t
+WFileCompiledUnit::IsGlobalExternal (uint_t item)
 {
   if (item >= m_GlobalsCount)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  const D_UINT8 *const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  D_UINT32             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
+  const uint8_t *const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
+  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
 
   return (temp32 & EXTERN_MASK) != 0;
 }
 
-D_UINT
+uint_t
 WFileCompiledUnit::GetProceduresCount ()
 {
   return m_ProcsCount;
 }
 
-D_UINT
-WFileCompiledUnit::GetProcSyncStatementsCount (D_UINT item)
+uint_t
+WFileCompiledUnit::GetProcSyncStatementsCount (uint_t item)
 {
   if (item >= m_ProcsCount)
     throw  WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
   LoadProcInMemory (item);
 
-  const D_UINT8 *const proc_data = m_ProcData.get ()[item];
+  const uint8_t *const proc_data = m_ProcData.get ()[item];
 
   return proc_data[GetProcLocalsCount (item) * WHC_PROC_BODY_LOCAL_ENTRY_SIZE +
                    WHC_PROC_BODY_SYNCS_ENTRY_SYZE];
 }
 
-D_UINT
-WFileCompiledUnit::GetProcCodeAreaSize (D_UINT item)
+uint_t
+WFileCompiledUnit::GetProcCodeAreaSize (uint_t item)
 {
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
@@ -486,13 +486,13 @@ WFileCompiledUnit::GetProcCodeAreaSize (D_UINT item)
   return from_le_int32 (m_Procs.get () + (item * WHC_PROC_ENTRY_SIZE) + WHC_PROC_ENTRY_CODE_SIZE);
 }
 
-const D_UINT8*
-WFileCompiledUnit::RetriveProcCodeArea (D_UINT item)
+const uint8_t*
+WFileCompiledUnit::RetriveProcCodeArea (uint_t item)
 {
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  D_UINT8 nlocals = GetProcLocalsCount (item);
+  uint8_t nlocals = GetProcLocalsCount (item);
 
   LoadProcInMemory (item);
 
@@ -501,8 +501,8 @@ WFileCompiledUnit::RetriveProcCodeArea (D_UINT item)
           WHC_PROC_BODY_SYNCS_ENTRY_SYZE);
 }
 
-D_UINT
-WFileCompiledUnit::GetProcLocalsCount (D_UINT item)
+uint_t
+WFileCompiledUnit::GetProcLocalsCount (uint_t item)
 {
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
@@ -512,8 +512,8 @@ WFileCompiledUnit::GetProcLocalsCount (D_UINT item)
                         WHC_PROC_ENTRY_NLOCAL_OFF);
 }
 
-D_UINT
-WFileCompiledUnit::GetProcParametersCount (D_UINT item)
+uint_t
+WFileCompiledUnit::GetProcParametersCount (uint_t item)
 {
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
@@ -521,13 +521,13 @@ WFileCompiledUnit::GetProcParametersCount (D_UINT item)
   return from_le_int16 (m_Procs.get () + (item * WHC_PROC_ENTRY_SIZE) + WHC_PROC_ENTRY_NPARMS_OFF);
 }
 
-D_UINT
-WFileCompiledUnit::GetProcReturnTypeIndex (D_UINT proc_item)
+uint_t
+WFileCompiledUnit::GetProcReturnTypeIndex (uint_t proc_item)
 {
   if (proc_item >= m_ProcsCount)
     throw  WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  const D_UINT32 temp32 = (from_le_int32 (m_Procs.get () +
+  const uint32_t temp32 = (from_le_int32 (m_Procs.get () +
                                           (proc_item * WHC_PROC_ENTRY_SIZE) +
                                           WHC_PROC_ENTRY_TYPE_OFF) &
                            ~EXTERN_MASK);
@@ -535,35 +535,35 @@ WFileCompiledUnit::GetProcReturnTypeIndex (D_UINT proc_item)
   return temp32;
 }
 
-D_UINT
-WFileCompiledUnit::GetProcNameSize (D_UINT proc_item)
+uint_t
+WFileCompiledUnit::GetProcNameSize (uint_t proc_item)
 {
   if (proc_item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  D_UINT temp32 = from_le_int32 (m_Procs.get () +
+  uint_t temp32 = from_le_int32 (m_Procs.get () +
                                  (proc_item * WHC_PROC_ENTRY_SIZE) +
                                  WHC_PROC_ENTRY_NAME_OFF);
   assert (temp32 < m_SymbolsSize);
-  return::strlen (_RC (const D_CHAR *, m_Symbols.get () + temp32));
+  return::strlen (_RC (const char *, m_Symbols.get () + temp32));
 }
 
-const D_CHAR*
-WFileCompiledUnit::RetriveProcName (D_UINT proc_item)
+const char*
+WFileCompiledUnit::RetriveProcName (uint_t proc_item)
 {
   if (proc_item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.",
         _EXTRA(0));
 
-  D_UINT temp32 = from_le_int32 (m_Procs.get () +
+  uint_t temp32 = from_le_int32 (m_Procs.get () +
                                  (proc_item * WHC_PROC_ENTRY_SIZE) +
                                  WHC_PROC_ENTRY_NAME_OFF);
   assert (temp32 < m_SymbolsSize);
-  return _RC (const D_CHAR *, m_Symbols.get () + temp32);
+  return _RC (const char *, m_Symbols.get () + temp32);
 }
 
-D_UINT
-WFileCompiledUnit::GetProcLocalTypeIndex (D_UINT item_proc, D_UINT item_local)
+uint_t
+WFileCompiledUnit::GetProcLocalTypeIndex (uint_t item_proc, uint_t item_local)
 {
   if (item_local == 0)
     return GetProcReturnTypeIndex (item_proc);
@@ -573,16 +573,16 @@ WFileCompiledUnit::GetProcLocalTypeIndex (D_UINT item_proc, D_UINT item_local)
 
   LoadProcInMemory (item_proc);
 
-  const D_UINT8* pProcEntry = m_ProcData.get ()[item_proc];
+  const uint8_t* pProcEntry = m_ProcData.get ()[item_proc];
   pProcEntry += (item_local * WHC_PROC_BODY_LOCAL_ENTRY_SIZE);
 
-  D_UINT temp32 = from_le_int32 (pProcEntry);
+  uint_t temp32 = from_le_int32 (pProcEntry);
   assert (temp32 < m_TtySize);
   return temp32;
 }
 
-D_BOOL
-WFileCompiledUnit::IsProcExternal (D_UINT item_proc)
+bool_t
+WFileCompiledUnit::IsProcExternal (uint_t item_proc)
 {
   if (item_proc >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
@@ -595,7 +595,7 @@ WFileCompiledUnit::IsProcExternal (D_UINT item_proc)
 
 
 #if defined (ENABLE_MEMORY_TRACE) && defined (USE_COMPILER_SHL)
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "COMPILER";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "COMPILER";
 #endif
 

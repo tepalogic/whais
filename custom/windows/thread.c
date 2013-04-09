@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "whisper_thread.h"
 
-D_UINT
+uint_t
 wh_sync_init (WH_SYNC* pSync)
 {
   InitializeCriticalSection (pSync);
@@ -35,7 +35,7 @@ wh_sync_init (WH_SYNC* pSync)
   return WOP_OK;
 }
 
-D_UINT
+uint_t
 wh_sync_destroy (WH_SYNC* pSync)
 {
   DeleteCriticalSection (pSync);
@@ -43,7 +43,7 @@ wh_sync_destroy (WH_SYNC* pSync)
   return WOP_OK;
 }
 
-D_UINT
+uint_t
 wh_sync_enter (WH_SYNC* pSync)
 {
   EnterCriticalSection (pSync);
@@ -51,7 +51,7 @@ wh_sync_enter (WH_SYNC* pSync)
   return WOP_OK;
 }
 
-D_UINT
+uint_t
 wh_sync_leave (WH_SYNC* pSync)
 {
   LeaveCriticalSection (pSync);
@@ -59,7 +59,7 @@ wh_sync_leave (WH_SYNC* pSync)
   return WOP_OK;
 }
 
-D_UINT
+uint_t
 wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
 {
   *pThread = CreateThread (NULL,
@@ -70,7 +70,7 @@ wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
                            NULL);
   if (*pThread == NULL)
     {
-      const D_UINT result = GetLastError ();
+      const uint_t result = GetLastError ();
 
       return (result == WOP_OK) ? WOP_UNKNOW : result;
     }
@@ -78,7 +78,7 @@ wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
   return WOP_OK;
 }
 
-D_UINT
+uint_t
 wh_thread_free (WH_THREAD thread)
 {
   //Give a chance of the thread to finish!
@@ -95,7 +95,7 @@ wh_yield ()
 }
 
 void
-wh_sleep (D_UINT millisecs)
+wh_sleep (uint_t millisecs)
 {
   if (millisecs == 0)
     return;

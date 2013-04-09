@@ -27,41 +27,41 @@
 
 #include "whisper.h"
 
-const D_UINT8 WH_SIGNATURE[] = { 'W', 'O' };
+const uint8_t WH_SIGNATURE[] = { 'W', 'O' };
 
-const D_INT8 WH_FFVER_MAJ = 1;
-const D_INT8 WH_FFVER_MIN = 0;
+const int8_t WH_FFVER_MAJ = 1;
+const int8_t WH_FFVER_MIN = 0;
 
-const D_UINT WHC_SIGNATURE_OFF         = 0;
-const D_UINT WHC_FORMATMMAJ_OFF        = 2;
-const D_UINT WHC_FORMATMIN_OFF         = 3;
-const D_UINT WHC_LANGVER_MAJ_OFF       = 4;
-const D_UINT WHC_LANGVER_MIN_OFF       = 5;
-const D_UINT WHC_GLOBS_COUNT_OFF       = 8;
-const D_UINT WHC_PROCS_COUNT_OFF       = 12;
-const D_UINT WHC_TYPEINFO_START_OFF    = 16;
-const D_UINT WHC_TYPEINFO_SIZE_OFF     = 20;
-const D_UINT WHC_SYMTABLE_START_OFF    = 24;
-const D_UINT WHC_SYMTABLE_SIZE_OFF     = 28;
-const D_UINT WHC_CONSTAREA_START_OFF   = 32;
-const D_UINT WHC_CONSTAREA_SIZE_OFF    = 36;
+const uint_t WHC_SIGNATURE_OFF         = 0;
+const uint_t WHC_FORMATMMAJ_OFF        = 2;
+const uint_t WHC_FORMATMIN_OFF         = 3;
+const uint_t WHC_LANGVER_MAJ_OFF       = 4;
+const uint_t WHC_LANGVER_MIN_OFF       = 5;
+const uint_t WHC_GLOBS_COUNT_OFF       = 8;
+const uint_t WHC_PROCS_COUNT_OFF       = 12;
+const uint_t WHC_TYPEINFO_START_OFF    = 16;
+const uint_t WHC_TYPEINFO_SIZE_OFF     = 20;
+const uint_t WHC_SYMTABLE_START_OFF    = 24;
+const uint_t WHC_SYMTABLE_SIZE_OFF     = 28;
+const uint_t WHC_CONSTAREA_START_OFF   = 32;
+const uint_t WHC_CONSTAREA_SIZE_OFF    = 36;
 
-const D_UINT   WHC_TABLE_SIZE          = 40;
-const D_UINT32 EXTERN_MASK             = 0x80000000;
+const uint_t   WHC_TABLE_SIZE          = 40;
+const uint32_t EXTERN_MASK             = 0x80000000;
 
-const D_UINT WHC_GLB_ENTRY_TYPE_OFF    = 0;
-const D_UINT WHC_GLB_ENTRY_NAME_OFF    = 4;
-const D_UINT WHC_GLOBAL_ENTRY_SIZE     = 8;
+const uint_t WHC_GLB_ENTRY_TYPE_OFF    = 0;
+const uint_t WHC_GLB_ENTRY_NAME_OFF    = 4;
+const uint_t WHC_GLOBAL_ENTRY_SIZE     = 8;
 
-const D_UINT WHC_PROC_ENTRY_NAME_OFF   = 0;
-const D_UINT WHC_PROC_ENTRY_BODY_OFF   = 4;
-const D_UINT WHC_PROC_ENTRY_TYPE_OFF   = 8;
-const D_UINT WHC_PROC_ENTRY_NLOCAL_OFF = 12;
-const D_UINT WHC_PROC_ENTRY_NPARMS_OFF = 14;
-const D_UINT WHC_PROC_ENTRY_CODE_SIZE  = 16;
-const D_UINT WHC_PROC_ENTRY_SIZE       = 20;
+const uint_t WHC_PROC_ENTRY_NAME_OFF   = 0;
+const uint_t WHC_PROC_ENTRY_BODY_OFF   = 4;
+const uint_t WHC_PROC_ENTRY_TYPE_OFF   = 8;
+const uint_t WHC_PROC_ENTRY_NLOCAL_OFF = 12;
+const uint_t WHC_PROC_ENTRY_NPARMS_OFF = 14;
+const uint_t WHC_PROC_ENTRY_CODE_SIZE  = 16;
+const uint_t WHC_PROC_ENTRY_SIZE       = 20;
 
-const D_UINT WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof (D_UINT32);
-const D_UINT WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof (D_UINT8);
+const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof (uint32_t);
+const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof (uint8_t);
 
 #endif /* WO_FORMAT_H_ */

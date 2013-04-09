@@ -34,17 +34,17 @@ namespace prima
 
 struct Unit
 {
-  D_UINT32 m_GlbsCount;
-  D_UINT32 m_ProcsCount;
-  D_UINT32 m_ConstSize;
-  D_UINT8  m_UnitData[1];
+  uint32_t m_GlbsCount;
+  uint32_t m_ProcsCount;
+  uint32_t m_ConstSize;
+  uint8_t  m_UnitData[1];
 
-  void SetGlobalId (const D_UINT32 globalIndex, const D_UINT32 globalId);
-  void SetProcId (const D_UINT32 procIndex, const D_UINT32 procId);
+  void SetGlobalId (const uint32_t globalIndex, const uint32_t globalId);
+  void SetProcId (const uint32_t procIndex, const uint32_t procId);
 
-  D_UINT32       GetGlobalId (const D_UINT32 globalIndex) const;
-  D_UINT32       GetProcId (const D_UINT32 procIndex) const;
-  const D_UINT8* GetConstData (const D_UINT32 offset) const;
+  uint32_t       GetGlobalId (const uint32_t globalIndex) const;
+  uint32_t       GetProcId (const uint32_t procIndex) const;
+  const uint8_t* GetConstData (const uint32_t offset) const;
 };
 
 class UnitsManager
@@ -57,22 +57,22 @@ public:
 
   ~UnitsManager ();
 
-  D_UINT32 AddUnit (const D_UINT32 glbsCount,
-                    const D_UINT32 procsCount,
-                    const D_UINT8* pConstData,
-                    const D_UINT32 constAreaSize);
+  uint32_t AddUnit (const uint32_t glbsCount,
+                    const uint32_t procsCount,
+                    const uint8_t* pConstData,
+                    const uint32_t constAreaSize);
   void     RemoveLastUnit ();
-  Unit&    GetUnit (const D_UINT32 unitIndex);
-  void     SetGlobalIndex (const D_UINT32 unitIndex,
-                           const D_UINT32 unitGlbIndex,
-                           const D_UINT32 glbMgrIndex);
-  void     SetProcIndex (const D_UINT32 unitIndex,
-                         const D_UINT32 unitProcIndex,
-                         const D_UINT32 procMgrIndex);
-  D_UINT32 GetGlobalIndex (const D_UINT32 unitIndx,
-                           const D_UINT32 unitGlbIndex) const;
-  D_UINT32 GetProcIndex (const D_UINT32 unitIndex,
-                         const D_UINT32 unitProcIndex) const;
+  Unit&    GetUnit (const uint32_t unitIndex);
+  void     SetGlobalIndex (const uint32_t unitIndex,
+                           const uint32_t unitGlbIndex,
+                           const uint32_t glbMgrIndex);
+  void     SetProcIndex (const uint32_t unitIndex,
+                         const uint32_t unitProcIndex,
+                         const uint32_t procMgrIndex);
+  uint32_t GetGlobalIndex (const uint32_t unitIndx,
+                           const uint32_t unitGlbIndex) const;
+  uint32_t GetProcIndex (const uint32_t unitIndex,
+                         const uint32_t unitProcIndex) const;
 
 private:
   std::vector<Unit*> m_Units;

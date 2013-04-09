@@ -27,10 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/include/wthread.h"
 #include "utils/include/wsocket.h"
 
-WException::WException (const D_CHAR* pMessage,
-                        const D_CHAR* pFile,
-                        D_UINT32      line,
-                        D_UINT32      extra)
+WException::WException (const char* pMessage,
+                        const char* pFile,
+                        uint32_t      line,
+                        uint32_t      extra)
   : m_ErrorMessage ((pMessage == NULL) ? "" : pMessage),
     m_File (pFile),
     m_Line (line),
@@ -50,25 +50,25 @@ WException::~WException ()
 {
 }
 
-D_UINT32
+uint32_t
 WException::GetExtra () const
 {
   return m_Extra;
 }
 
-const D_CHAR*
+const char*
 WException::Message () const
 {
   return m_ErrorMessage.c_str ();
 }
 
-const D_CHAR*
+const char*
 WException::GetFile () const
 {
   return m_File;
 }
 
-D_UINT32
+uint32_t
 WException::GetLine () const
 {
   return m_Line;
@@ -76,10 +76,10 @@ WException::GetLine () const
 
 
 ///////////////////////////////////////////////////////////////////////////////
-WFileException::WFileException (const D_CHAR* pMessage,
-                                const D_CHAR* pFile,
-                                D_UINT32      line,
-                                D_UINT32      extra)
+WFileException::WFileException (const char* pMessage,
+                                const char* pFile,
+                                uint32_t      line,
+                                uint32_t      extra)
   : WException (pMessage, pFile, line, extra)
 {
 }
@@ -96,7 +96,7 @@ WFileException::Type () const
   return FILE_EXCEPTION;
 }
 
-const D_CHAR*
+const char*
 WFileException::Description () const
 {
   return "File IO error.";
@@ -104,10 +104,10 @@ WFileException::Description () const
 
 //////////////////////////WSynchException/////////////////////////////////////
 
-WSynchException::WSynchException (const D_CHAR* message,
-                                  const D_CHAR* file,
-                                  D_UINT32      line,
-                                  D_UINT32      extra)
+WSynchException::WSynchException (const char* message,
+                                  const char* file,
+                                  uint32_t      line,
+                                  uint32_t      extra)
   : WException (message, file, line, extra)
 {
 }
@@ -124,7 +124,7 @@ WSynchException::Type () const
   return SYNC_EXCEPTION;
 }
 
-const D_CHAR*
+const char*
 WSynchException::Description () const
 {
   return "A mutex related exception.";
@@ -132,10 +132,10 @@ WSynchException::Description () const
 
 //////////////////////////WThreadException/////////////////////////////////////
 
-WThreadException::WThreadException (const D_CHAR* message,
-                                    const D_CHAR* file,
-                                    D_UINT32      line,
-                                    D_UINT32      extra)
+WThreadException::WThreadException (const char* message,
+                                    const char* file,
+                                    uint32_t      line,
+                                    uint32_t      extra)
   : WException (message, file, line, extra)
 {
 }
@@ -152,7 +152,7 @@ WThreadException::Type () const
   return THREAD_EXCEPTION;
 }
 
-const D_CHAR*
+const char*
 WThreadException::Description () const
 {
   return "Thread related exception.";
@@ -160,10 +160,10 @@ WThreadException::Description () const
 
 //////////////////////////WSocketException////////////////////////////////////
 
-WSocketException::WSocketException (const D_CHAR* message,
-                                    const D_CHAR* file,
-                                    D_UINT32      line,
-                                    D_UINT32      extra)
+WSocketException::WSocketException (const char* message,
+                                    const char* file,
+                                    uint32_t      line,
+                                    uint32_t      extra)
   : WException (message, file, line, extra)
 {
 }
@@ -180,7 +180,7 @@ WSocketException::Type () const
   return SOCKED_EXCEPTION;
 }
 
-const D_CHAR*
+const char*
 WSocketException::Description () const
 {
 

@@ -30,33 +30,33 @@ extern "C"
 {
 #endif
 
-D_UINT
+uint_t
 wh_sync_init (WH_SYNC* pSync);
 
-D_UINT
+uint_t
 wh_sync_destroy (WH_SYNC* pSync);
 
-D_UINT
+uint_t
 wh_sync_enter (WH_SYNC* pSync);
 
-D_UINT
+uint_t
 wh_sync_leave (WH_SYNC* pSync);
 
 typedef void (*WH_THREAD_ROUTINE) (void*);
 
-D_UINT
+uint_t
 wh_thread_create (WH_THREAD*        pThread,
                   WH_THREAD_ROUTINE routine,
                   void*             args);
 
-D_UINT
+uint_t
 wh_thread_free (WH_THREAD thread);
 
 void
 wh_yield ();
 
 void
-wh_sleep (D_UINT millisecs);
+wh_sleep (uint_t millisecs);
 
 #ifdef __cplusplus
 }

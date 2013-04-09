@@ -50,22 +50,22 @@ enum EXPCEPTION_TYPE
 class EXCEP_SHL WException
 {
 public:
-  WException (const D_CHAR* pMessage,
-              const D_CHAR* pFile,
-              D_UINT32      line,
-              D_UINT32      extra);
+  WException (const char* pMessage,
+              const char* pFile,
+              uint32_t      line,
+              uint32_t      extra);
   WException (const WException& source);
 
   virtual ~WException ();
 
-  D_UINT32      GetExtra () const;
-  const D_CHAR* Message () const;
-  const D_CHAR* GetFile () const;
-  D_UINT32      GetLine () const;
+  uint32_t      GetExtra () const;
+  const char* Message () const;
+  const char* GetFile () const;
+  uint32_t      GetLine () const;
 
   virtual WException*     Clone () const = 0;
   virtual EXPCEPTION_TYPE Type () const = 0;
-  virtual const D_CHAR*   Description () const = 0;
+  virtual const char*   Description () const = 0;
 
 private:
 
@@ -73,9 +73,9 @@ private:
   const std::string m_ErrorMessage;
 #pragma warning( default : 4251)
 
-  const D_CHAR*     m_File;
-  D_UINT32          m_Line;
-  D_UINT32          m_Extra;
+  const char*     m_File;
+  uint32_t          m_Line;
+  uint32_t          m_Extra;
 };
 
 // Macro used to expand the CMD line

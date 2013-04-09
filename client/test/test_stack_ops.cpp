@@ -13,7 +13,7 @@
 using namespace std;
 
 
-D_UINT simpleTypes[] =
+uint_t simpleTypes[] =
     {
         WFT_BOOL,
         WFT_CHAR,
@@ -50,7 +50,7 @@ D_UINT simpleTypes[] =
 //         WFT_ARRAY_MASK | WFT_TEXT,
     };
 
-const D_UINT simpleTypesSize = sizeof (simpleTypes) / sizeof (simpleTypes[0]);
+const uint_t simpleTypesSize = sizeof (simpleTypes) / sizeof (simpleTypes[0]);
 
 W_FieldDescriptor tableFields[] =
     {
@@ -88,14 +88,14 @@ W_FieldDescriptor tableFields[] =
         {"array_richreal_field", WFT_ARRAY_MASK | WFT_RICHREAL}
     };
 
-const D_UINT tableFieldsSize = sizeof (tableFields) / sizeof (tableFields[0]);
+const uint_t tableFieldsSize = sizeof (tableFields) / sizeof (tableFields[0]);
 
-static D_UINT
-get_field_entry_index (const D_CHAR*                  field,
+static uint_t
+get_field_entry_index (const char*                  field,
                        const W_FieldDescriptor*       fields,
-                       const D_UINT                   fieldsSize)
+                       const uint_t                   fieldsSize)
 {
-  for (D_UINT i = 0; i < fieldsSize; ++i)
+  for (uint_t i = 0; i < fieldsSize; ++i)
     {
       if (strcmp (fields[i].m_FieldName, field) == 0)
         return i;
@@ -107,11 +107,11 @@ get_field_entry_index (const D_CHAR*                  field,
 static bool
 match_table_fields_match (W_CONNECTOR_HND               hnd,
                          const W_FieldDescriptor*       fields,
-                         const D_UINT                   fieldsSize)
+                         const uint_t                   fieldsSize)
 {
-  D_UINT visitedFields = 0;
-  D_UINT fieldsCount;
-  D_UINT topType;
+  uint_t visitedFields = 0;
+  uint_t fieldsCount;
+  uint_t topType;
 
   if ((WDescribeStackTop (hnd, &topType) != WCS_OK)
       || (topType != WFT_TABLE_MASK)
@@ -121,15 +121,15 @@ match_table_fields_match (W_CONNECTOR_HND               hnd,
       return false;
     }
 
-  for (D_UINT i = 0; i < fieldsSize; ++i)
+  for (uint_t i = 0; i < fieldsSize; ++i)
     {
-      const D_CHAR* fieldName;
-      D_UINT        fieldType;
+      const char* fieldName;
+      uint_t        fieldType;
 
       if (WDescribeValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
-      const D_UINT index = get_field_entry_index (fieldName,
+      const uint_t index = get_field_entry_index (fieldName,
                                                   fields,
                                                   fieldsSize);
       if (index > fieldsSize)
@@ -144,7 +144,7 @@ match_table_fields_match (W_CONNECTOR_HND               hnd,
       SET_BIT (visitedFields, index);
     }
 
-  for (D_UINT i = 0; i < fieldsSize; ++i)
+  for (uint_t i = 0; i < fieldsSize; ++i)
     {
       if (GET_BIT (visitedFields, i) == 0)
         return false;
@@ -162,7 +162,7 @@ test_stack_bulk_update (W_CONNECTOR_HND hnd)
   if (WPushStackValue (hnd, WFT_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
       goto test_stack_bulk_update_err;
 
-  for (D_UINT i = 0; i < simpleTypesSize; ++i)
+  for (uint_t i = 0; i < simpleTypesSize; ++i)
     {
       if (WPushStackValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
         goto test_stack_bulk_update_err;
@@ -181,10 +181,10 @@ test_stack_bulk_update (W_CONNECTOR_HND hnd)
       goto test_stack_bulk_update_err;
     }
 
-  for (D_INT i = simpleTypesSize - 1; i >= 0; --i)
+  for (int i = simpleTypesSize - 1; i >= 0; --i)
     {
-      D_UINT    type;
-      D_UINT    fieldsCount;
+      uint_t    type;
+      uint_t    fieldsCount;
 
       if ((WDescribeStackTop (hnd, &type) != WCS_OK)
            || (type != simpleTypes[i])
@@ -225,10 +225,10 @@ test_stack_step_update (W_CONNECTOR_HND hnd)
       goto test_stack_step_update_err;
     }
 
-  for (D_UINT i = 0; i < simpleTypesSize; ++i)
+  for (uint_t i = 0; i < simpleTypesSize; ++i)
     {
-      D_UINT    type;
-      D_UINT    fieldsCount;
+      uint_t    type;
+      uint_t    fieldsCount;
 
       if ((WPushStackValue (hnd, simpleTypes[i], 0, NULL) != WCS_OK)
           || (WUpdateStackFlush (hnd) != WCS_OK))
@@ -268,7 +268,7 @@ test_stack_step_update_err:
 static bool
 test_for_errors (W_CONNECTOR_HND hnd)
 {
-  D_UINT type;
+  uint_t type;
   W_FieldDescriptor invalid1 = { "", WFT_ARRAY_MASK | WFT_BOOL };
   W_FieldDescriptor invalid2 = { "name", WFT_FIELD_MASK | WFT_INT8} ;
 
@@ -298,19 +298,19 @@ test_for_errors_fail :
   return false;
 }
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 1;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "test_password";

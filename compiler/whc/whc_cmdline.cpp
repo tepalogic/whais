@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whc_cmdline.h"
 
 static inline bool
-isStrEqual (const D_CHAR* str1, const D_CHAR* str2)
+isStrEqual (const char* str1, const char* str2)
 {
   return::strcmp (str1, str2) == 0;
 }
@@ -111,9 +111,9 @@ WhcCmdLineParser::CheckArguments ()
     throw WhcCmdLineException ("No given input file!", _EXTRA(0));
   else if (m_OutputFile == NULL)
   {
-    const D_CHAR  fileExt[]   = ".wo";
-    const D_UINT  fileNameLen = strlen (m_SourceFile);
-    D_CHAR* const tempBuffer  = new D_CHAR[fileNameLen + sizeof fileExt];
+    const char  fileExt[]   = ".wo";
+    const uint_t  fileNameLen = strlen (m_SourceFile);
+    char* const tempBuffer  = new char[fileNameLen + sizeof fileExt];
 
     m_OutputFile = tempBuffer;
     strcpy (tempBuffer, m_SourceFile);

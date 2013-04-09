@@ -38,8 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void
 wod_dump_header (WFile& rInObj, std::ostream& rOutputStream)
 {
-  D_UINT32 temp32;
-  D_UINT8  woheader[WHC_TABLE_SIZE];
+  uint32_t temp32;
+  uint8_t  woheader[WHC_TABLE_SIZE];
 
   rInObj.Seek (0, WHC_SEEK_BEGIN);
   rInObj.Read (woheader, sizeof woheader);
@@ -52,10 +52,10 @@ wod_dump_header (WFile& rInObj, std::ostream& rOutputStream)
   rOutputStream << "File Signature:\t\t\t\t0x" << woheader[0] << " 0x" << woheader[1] <<
        " ('" << woheader[0] << "', '" << woheader[1] << "')" << std::endl;
   rOutputStream.flags (std::ios::dec);
-  rOutputStream << "Format major:\t\t\t\t" << _SC (D_UINT, woheader[WHC_FORMATMMAJ_OFF]) << std::endl;
-  rOutputStream << "Format minor:\t\t\t\t" << _SC (D_UINT, woheader[WHC_FORMATMIN_OFF]) << std::endl;
-  rOutputStream << "Language major:\t\t\t\t" << _SC (D_UINT, woheader[WHC_LANGVER_MAJ_OFF]) << std::endl;
-  rOutputStream << "Language minor:\t\t\t\t" << _SC (D_UINT, woheader[WHC_LANGVER_MIN_OFF]) << std::endl;
+  rOutputStream << "Format major:\t\t\t\t" << _SC (uint_t, woheader[WHC_FORMATMMAJ_OFF]) << std::endl;
+  rOutputStream << "Format minor:\t\t\t\t" << _SC (uint_t, woheader[WHC_FORMATMIN_OFF]) << std::endl;
+  rOutputStream << "Language major:\t\t\t\t" << _SC (uint_t, woheader[WHC_LANGVER_MAJ_OFF]) << std::endl;
+  rOutputStream << "Language minor:\t\t\t\t" << _SC (uint_t, woheader[WHC_LANGVER_MIN_OFF]) << std::endl;
 
   temp32 = from_le_int32 (woheader + WHC_GLOBS_COUNT_OFF);
   rOutputStream << "Globals count:\t\t\t\t" << temp32 << std::endl;
@@ -91,42 +91,42 @@ wod_dump_const_area (WICompiledUnit& rUnit, std::ostream& rOutputStream)
     "************************************************************************"
     << std::endl;
 
-  D_UINT constantOff = 0;
+  uint_t constantOff = 0;
   do
     {
-      const D_UINT rowSize = 16;
+      const uint_t rowSize = 16;
 
       rOutputStream.flags (std::ios::hex | std::ios::uppercase);
-      rOutputStream << std::endl << std::setw (sizeof (D_UINT32) * 2) <<
+      rOutputStream << std::endl << std::setw (sizeof (uint32_t) * 2) <<
            std::setfill ('0') << constantOff << ":\t";
 
-      for (D_UINT row_pos = 0; row_pos < rowSize; row_pos++)
+      for (uint_t row_pos = 0; row_pos < rowSize; row_pos++)
         {
-          if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
+          if (row_pos && (row_pos % sizeof (uint32_t) == 0))
             rOutputStream << " ";
 
           if (row_pos + constantOff >= rUnit.GetConstAreaSize ())
             rOutputStream << "  ";
           else
             {
-              rOutputStream << std::setw (sizeof (D_UINT8) * 2) << std::setfill ('0') <<
-                   _SC(D_UINT, rUnit.RetrieveConstArea ()[constantOff + row_pos]);
+              rOutputStream << std::setw (sizeof (uint8_t) * 2) << std::setfill ('0') <<
+                   _SC(uint_t, rUnit.RetrieveConstArea ()[constantOff + row_pos]);
             }
         }
 
       rOutputStream << '\t';
-      for (D_UINT row_pos = 0; row_pos < rowSize; row_pos++)
+      for (uint_t row_pos = 0; row_pos < rowSize; row_pos++)
         {
           if (row_pos + constantOff >= rUnit.GetConstAreaSize ())
             break;
           else
             {
-              if (row_pos && (row_pos % sizeof (D_UINT32) == 0))
+              if (row_pos && (row_pos % sizeof (uint32_t) == 0))
                 rOutputStream << " ";
 
-              D_UINT char_code = rUnit.RetrieveConstArea ()[constantOff + row_pos];
+              uint_t char_code = rUnit.RetrieveConstArea ()[constantOff + row_pos];
               if (isalnum (char_code) || ispunct (char_code))
-                rOutputStream << _SC (D_CHAR, char_code);
+                rOutputStream << _SC (char, char_code);
               else
                 rOutputStream << ".";
             }
@@ -140,7 +140,7 @@ wod_dump_const_area (WICompiledUnit& rUnit, std::ostream& rOutputStream)
 }
 
 static void
-wod_dump_nontable_type_info (std::ostream& rOutStream, D_UINT16 type)
+wod_dump_nontable_type_info (std::ostream& rOutStream, uint16_t type)
 {
   assert ((IS_TABLE (type) == FALSE) && (IS_TABLE_FIELD (type) == FALSE));
 
@@ -225,20 +225,20 @@ wod_dump_nontable_type_info (std::ostream& rOutStream, D_UINT16 type)
 }
 
 static void
-wod_dump_table_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
+wod_dump_table_type_inf (const uint8_t* pTypeDesc, std::ostream& rOutputStream)
 {
-  const D_UINT16 type = from_le_int16 (pTypeDesc);
-  pTypeDesc += sizeof (D_UINT16);
+  const uint16_t type = from_le_int16 (pTypeDesc);
+  pTypeDesc += sizeof (uint16_t);
 
-  const D_UINT16 type_size = from_le_int16 (pTypeDesc);
-  pTypeDesc += sizeof (D_UINT16);
+  const uint16_t type_size = from_le_int16 (pTypeDesc);
+  pTypeDesc += sizeof (uint16_t);
 
   if (IS_TABLE (type))
     rOutputStream << "TABLE";
 
   if (type_size > 2)
     {
-      D_BOOL printComma = FALSE;
+      bool_t printComma = FALSE;
 
       rOutputStream << " WITH ( ";
       while (pTypeDesc[0] != ';' && pTypeDesc[1] != 0)
@@ -251,9 +251,9 @@ wod_dump_table_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
           rOutputStream << pTypeDesc << " AS ";
           pTypeDesc += strlen (_RC (const char *, pTypeDesc)) + 1;
 
-          D_UINT16 type = from_le_int16 (pTypeDesc);
+          uint16_t type = from_le_int16 (pTypeDesc);
 
-          pTypeDesc += sizeof (D_UINT16);
+          pTypeDesc += sizeof (uint16_t);
           wod_dump_nontable_type_info (rOutputStream, type);
         }
       rOutputStream << " )";
@@ -262,14 +262,14 @@ wod_dump_table_type_inf (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
 }
 
 static void
-wod_dump_type_info (const D_UINT8* pTypeDesc, std::ostream& rOutputStream)
+wod_dump_type_info (const uint8_t* pTypeDesc, std::ostream& rOutputStream)
 {
-  const D_UINT16 type     = from_le_int16 (pTypeDesc);
-  const D_UINT16 typeSize = from_le_int16 (pTypeDesc + sizeof (D_UINT16));
+  const uint16_t type     = from_le_int16 (pTypeDesc);
+  const uint16_t typeSize = from_le_int16 (pTypeDesc + sizeof (uint16_t));
 
   if ((typeSize < 2) ||
-      (pTypeDesc[typeSize + sizeof (D_UINT16)] != ';') ||
-      (pTypeDesc[typeSize + sizeof (D_UINT16) + 1] != 0x0))
+      (pTypeDesc[typeSize + sizeof (uint16_t)] != ';') ||
+      (pTypeDesc[typeSize + sizeof (uint16_t) + 1] != 0x0))
     {
       throw WDumpException ("Object file is corrupt!", _EXTRA(0));
     }
@@ -291,7 +291,7 @@ wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutputStream)
     "************************************************************************"
     << std::endl << std::endl;
 
-  const D_INT globalsCount = rUnit.GetGlobalsCount ();
+  const int globalsCount = rUnit.GetGlobalsCount ();
   if (globalsCount == 0)
     {
       rOutputStream << "No globals entries." << std::endl;
@@ -300,7 +300,7 @@ wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutputStream)
   rOutputStream << "Id.\tName\t\t\tVisible\tType" << std::endl <<
     "************************************************************************" << std::endl;
 
-  for (D_INT globalIt = 0; globalIt < globalsCount; ++globalIt)
+  for (int globalIt = 0; globalIt < globalsCount; ++globalIt)
     {
       rOutputStream << globalIt << "\t";
       rOutputStream << rUnit.RetriveGlobalName (globalIt);
@@ -319,12 +319,12 @@ wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutputStream)
 }
 
 static void
-wod_dump_code (const D_UINT8* pCode,
-               const D_UINT   codeSize,
+wod_dump_code (const uint8_t* pCode,
+               const uint_t   codeSize,
                std::ostream&  rOutputStream,
-               const D_CHAR*  pPrefix)
+               const char*  pPrefix)
 {
-  D_UINT currPos = 0;
+  uint_t currPos = 0;
 
   while (currPos < codeSize)
     {
@@ -335,10 +335,10 @@ wod_dump_code (const D_UINT8* pCode,
           rOutputStream << "\t";
         }
 
-      D_CHAR        operand1[MAX_OP_STRING];
-      D_CHAR        operand2[MAX_OP_STRING];
+      char        operand1[MAX_OP_STRING];
+      char        operand2[MAX_OP_STRING];
       enum W_OPCODE opcode     = W_NA;
-      D_UINT        instr_size = whc_decode_opcode (pCode, &opcode);
+      uint_t        instr_size = whc_decode_opcode (pCode, &opcode);
 
       instr_size += wod_decode_table[opcode] (pCode + instr_size,
                                               operand1,
@@ -357,18 +357,18 @@ wod_dump_code (const D_UINT8* pCode,
 }
 
 void
-wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutputStream, D_BOOL showCode)
+wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutputStream, bool_t showCode)
 {
-  const D_UINT procsCount = rUnit.GetProceduresCount ();
+  const uint_t procsCount = rUnit.GetProceduresCount ();
 
-  for (D_UINT proc_it = 0; proc_it < procsCount; ++proc_it)
+  for (uint_t proc_it = 0; proc_it < procsCount; ++proc_it)
     {
       rOutputStream << "PROCEDURE " << rUnit.RetriveProcName (proc_it) << std::endl
         <<
         "********************************************************************"
         << std::endl;
-      D_UINT localsCount = rUnit.GetProcLocalsCount (proc_it);
-      for (D_UINT localIt = 0; localIt < localsCount; ++localIt)
+      uint_t localsCount = rUnit.GetProcLocalsCount (proc_it);
+      for (uint_t localIt = 0; localIt < localsCount; ++localIt)
         {
           if (localIt == 0)
             rOutputStream << "return (id. 0)\t\t";

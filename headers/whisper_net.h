@@ -30,33 +30,33 @@ extern "C"
 {
 #endif
 
-D_BOOL
+bool_t
 wh_init_socks ();
 
-D_UINT32
-wh_socket_client (const D_CHAR* const       pServer,
-                  const D_CHAR* const       pPort,
+uint32_t
+wh_socket_client (const char* const       pServer,
+                  const char* const       pPort,
                   WH_SOCKET* const          pOutSocket);
 
-D_UINT32
-wh_socket_server (const D_CHAR* const       pLocalAdress,
-                  const D_CHAR* const       pPort,
-                  const D_UINT              listenBackLog,
+uint32_t
+wh_socket_server (const char* const       pLocalAdress,
+                  const char* const       pPort,
+                  const uint_t              listenBackLog,
                   WH_SOCKET* const          pOutSocket);
 
-D_UINT32
+uint32_t
 wh_socket_accept (const WH_SOCKET           sd,
                   WH_SOCKET* const          pConnectSocket);
 
-D_UINT32
+uint32_t
 wh_socket_write (const WH_SOCKET           sd,
-                 const D_UINT8*            pBuffer,
-                 const D_UINT              count);
+                 const uint8_t*            pBuffer,
+                 const uint_t              count);
 
-D_UINT32
+uint32_t
 wh_socket_read (const WH_SOCKET           sd,
-                D_UINT8*                  pOutBuffer,
-                D_UINT* const             pIOCount);
+                uint8_t*                  pOutBuffer,
+                uint_t* const             pIOCount);
 
 void
 wh_socket_close (const WH_SOCKET socket);

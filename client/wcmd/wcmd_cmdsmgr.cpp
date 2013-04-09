@@ -35,10 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-static const D_UINT MAX_DECODED_STRING = 256;
+static const uint_t MAX_DECODED_STRING = 256;
 
-static const D_CHAR*
-decode_basic_type (const D_UINT16 type)
+static const char*
+decode_basic_type (const uint16_t type)
 {
   switch (GET_BASIC_TYPE (type))
   {
@@ -109,8 +109,8 @@ wcmd_decode_typeinfo (unsigned int type)
 }
 
 map<string, CmdEntry> sCommands;
-static const D_CHAR descHelp[]    = "Display help on available commands.";
-static const D_CHAR descExtHelp[] = "Display the list of available commands "
+static const char descHelp[]    = "Display help on available commands.";
+static const char descExtHelp[] = "Display the list of available commands "
                                      "or extended help.\n"
                                      "Usage:\n"
                                      "  help [command]\n"
@@ -190,7 +190,7 @@ RegisterCommand (const CmdEntry& entry)
 }
 
 const CmdEntry*
-FindCmdEntry (const D_CHAR* pCommand)
+FindCmdEntry (const char* pCommand)
 {
   const string command = pCommand;
   CmdEntry*    pEnt    = NULL;
@@ -230,7 +230,7 @@ printException (ostream& outputStream, const WException& e)
 
       if (level >= VL_ERROR)
         {
-          D_CHAR errorDesc[MAX_DECODED_STRING];
+          char errorDesc[MAX_DECODED_STRING];
 
           whc_ferrtostrs (e.GetExtra (), errorDesc, sizeof errorDesc);
           outputStream << errorDesc << endl;

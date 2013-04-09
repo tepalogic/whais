@@ -30,23 +30,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-const D_UINT64       MINIMUM_FILE_SIZE = 0x100000; //1 MB
+const uint64_t       MINIMUM_FILE_SIZE = 0x100000; //1 MB
 
 static string        sWorkingDirectory (whc_get_current_directory ());
 static string        sDBName;
 static VERBOSE_LEVEL sVerbLevel   = VL_ERROR;
-static D_UINT64      sMaxFileSize = 0x80000000; //default: 2GB
+static uint64_t      sMaxFileSize = 0x80000000; //default: 2GB
 static I_DBSHandler* s_pDBSHnd    = NULL;
 
 static string        sRemoteHost;
 static string        sConnectPort;
 static string        sPassword;
 
-static D_INT         sUserId  = -1;
+static int         sUserId  = -1;
 
-static const D_CHAR  DEFAULT_PORT[] = "1761";
+static const char  DEFAULT_PORT[] = "1761";
 
-static const D_UINT  DEFUALT_USER   = 1;
+static const uint_t  DEFUALT_USER   = 1;
 
 const string&
 GetRemoteHostName ()
@@ -55,7 +55,7 @@ GetRemoteHostName ()
 }
 
 void
-SetRemoteHostName (const D_CHAR* pHostName)
+SetRemoteHostName (const char* pHostName)
 {
   sRemoteHost = pHostName;
 }
@@ -70,12 +70,12 @@ GetConnectionPort ()
 }
 
 void
-SetConnectionPort (const D_CHAR* pPort)
+SetConnectionPort (const char* pPort)
 {
   sConnectPort = pPort;
 }
 
-D_UINT
+uint_t
 GetUserId ()
 {
   if ((sUserId < 0 ) && IsDatabaseRemote ())
@@ -85,7 +85,7 @@ GetUserId ()
 }
 
 void
-SetUserId (const D_UINT userId)
+SetUserId (const uint_t userId)
 {
   sUserId = (userId > 0) ? 1 : 0;
 }
@@ -97,7 +97,7 @@ GetUserPassword ()
 }
 
 void
-SetUserPassword (const D_CHAR* pPassword)
+SetUserPassword (const char* pPassword)
 {
   sPassword = pPassword;
 }
@@ -109,7 +109,7 @@ GetWorkingDirectory ()
 }
 
 void
-SetWorkingDirectory (const D_CHAR* pDirectory)
+SetWorkingDirectory (const char* pDirectory)
 {
   sWorkingDirectory = pDirectory;
 }
@@ -121,7 +121,7 @@ GetWorkingDB ()
 }
 
 void
-SetWorkingDB (const D_CHAR* pDBName)
+SetWorkingDB (const char* pDBName)
 {
   sDBName = pDBName;
 }
@@ -133,7 +133,7 @@ GetVerbosityLevel ()
 }
 
 void
-SetVerbosityLevel (const D_UINT level)
+SetVerbosityLevel (const uint_t level)
 {
   sVerbLevel = _SC (VERBOSE_LEVEL, MIN (level, VL_MAX));
 }
@@ -146,7 +146,7 @@ SetMaximumFileSize (std::string size)
   if (size.length () == 0)
     return false;
 
-  D_UINT64 multiplier = 1;
+  uint64_t multiplier = 1;
   size_t   lastPos    = size.find_first_not_of (digits);
 
   if (lastPos != size.npos)
@@ -183,7 +183,7 @@ SetMaximumFileSize (std::string size)
   return true;
 }
 
-D_UINT64
+uint64_t
 GetMaximumFileSize ()
 {
   return sMaxFileSize;

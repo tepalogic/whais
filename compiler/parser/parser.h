@@ -63,52 +63,52 @@ enum SEMVALUE_TYPE
 /* represents an identifier */
 struct SemId
 {
-  const D_CHAR* text;         /* points at the name of identifier */
-  D_UINT        length;       /* the name's length of the identifier */
+  const char* text;         /* points at the name of identifier */
+  uint_t        length;       /* the name's length of the identifier */
 };
 
 /* represents a number */
 struct SemCInt
 {
-  D_UINTMAX value;
-  D_BOOL    is_signed;
+  uint64_t  value;
+  bool_t    is_signed;
 };
 
 /*represents a real number */
 struct SemCReal
 {
-  D_INT64 integerPart;
-  D_INT64 fractionalPart;
+  int64_t integerPart;
+  int64_t fractionalPart;
 };
 
 /* represents a string, a text delimited by \" */
 struct SemCText
 {
-  D_CHAR* text;
-  D_UINT  length;  /* the length of the text including the null terminator */
+  char* text;
+  uint_t  length;  /* the length of the text including the null terminator */
 };
 
 /* represent a character, delimited by \' */
 struct SemCChar
 {
-  D_CHAR value;
+  char value;
 };
 
 /* represents a date and time value */
 struct SemCTime
 {
-  D_UINT32 usec;        /* microseconds */
-  D_INT16  year;
-  D_UINT8  month;
-  D_UINT8  day;
-  D_UINT8  hour;
-  D_UINT8  min;
-  D_UINT8  sec;
+  uint32_t usec;        /* microseconds */
+  int16_t  year;
+  uint8_t  month;
+  uint8_t  day;
+  uint8_t  hour;
+  uint8_t  min;
+  uint8_t  sec;
 };
 
 struct SemCBool
 {
-  D_BOOL value;
+  bool_t value;
 };
 
 struct SemIdList
@@ -120,7 +120,7 @@ struct SemIdList
 struct SemTypeSpec
 {
   void*    extra;       /* extra info for container types */
-  D_UINT16 type;        /* contains the type specification */
+  uint16_t type;        /* contains the type specification */
 };
 
 struct SemProcParamList
@@ -135,7 +135,7 @@ struct SemExpression
   struct SemValue* pFirstOp;
   struct SemValue* pSecondOp;
   struct SemValue* pThirdOp;
-  D_UINT16         opcode;
+  uint16_t         opcode;
 };
 
 struct SemProcArgumentsList
@@ -146,7 +146,7 @@ struct SemProcArgumentsList
 
 struct SemValue
 {
-  /*    D_UINT   buffer_pos; */
+  /*    uint_t   buffer_pos; */
   enum SEMVALUE_TYPE val_type;        /* the type of the value */
   union
   {
@@ -170,15 +170,15 @@ struct ParserState
   WHC_MESSENGER_ARG messengerContext;
   WHC_MESSENGER     messenger;
 
-  const D_CHAR*     buffer;
-  D_UINT            bufferSize;
-  D_UINT            bufferPos;           /* Use this offset to get the next token */
+  const char*     buffer;
+  uint_t            bufferSize;
+  uint_t            bufferPos;           /* Use this offset to get the next token */
   StringStoreHnd    strings;             /* String container to hold constant strings */
   struct UArray     parsedValues;        /* Array to store the semantics values parsed */
   struct Statement  globalStmt;          /* the global statement */
   struct Statement* pCurrentStmt;
-  D_BOOL            abortError;          /* set to true to abort parsing. */
-  D_BOOL            externDeclaration;   /* set to true if the declaration is external */
+  bool_t            abortError;          /* set to true to abort parsing. */
+  bool_t            externDeclaration;   /* set to true if the declaration is external */
 
 };
 
@@ -186,7 +186,7 @@ struct SemValue*
 alloc_sem_value (struct ParserState* const pState);
 
 struct SemValue*
-alloc_boolean_sem_value (struct ParserState* const pState, const D_BOOL intialValue);
+alloc_boolean_sem_value (struct ParserState* const pState, const bool_t intialValue);
 
 INLINE static void
 free_sem_value (struct SemValue* const pValue)

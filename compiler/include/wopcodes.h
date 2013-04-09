@@ -207,7 +207,7 @@ enum W_OPCODE
   W_OP_END_MARK
 };
 
-static const D_INT64 W_LDRR_PRECISSION = 1000000000000000000ll;
+static const int64_t W_LDRR_PRECISSION = 1000000000000000000ll;
 
 #ifdef __cplusplus
 extern "C"

@@ -21,9 +21,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-
 #ifndef WHISPER_TYPES_H
 #define WHISPER_TYPES_H
+
 
 #ifndef ARCH_LINUX_GCC
 #error "Do not compile this file with a compilator other than Linux's gcc/g++!"
@@ -32,35 +32,54 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "sys/types.h"
 #include "pthread.h"
 
+#include <stdint.h>
+
 typedef int             WH_FILE_HND;
 typedef pthread_mutex_t WH_SYNC;
 typedef pthread_t       WH_THREAD;
 typedef int             WH_SOCKET;
 
-typedef char          D_BOOL;
+/* Simple type shortcuts */
+typedef unsigned int       uint_t;
+typedef unsigned long      ulong_t;
+typedef long long          llong_t;
+typedef unsigned long long ullong_t;
 
-typedef char          D_CHAR;
-typedef unsigned char D_UCHAR;
+#ifndef int8_t
+typedef int8_t        int8_t;
+#endif
 
-typedef int           D_INT;
-typedef unsigned int  D_UINT;
+#ifndef uint8_t
+typedef u_int8_t      uint8_t;
+#endif
 
-typedef int8_t        D_INT8;
-typedef u_int8_t      D_UINT8;
+#ifndef int16_t
+typedef int16_t       int16_t;
+#endif
 
-typedef int16_t       D_INT16;
-typedef u_int16_t     D_UINT16;
+#ifndef uint16_t
+typedef u_int16_t     uint16_t;
+#endif
 
-typedef int32_t       D_INT32;
-typedef u_int32_t     D_UINT32;
+#ifndef int32_t
+typedef int32_t       int32_t;
+#endif
 
-typedef int64_t       D_INT64;
-typedef u_int64_t     D_UINT64;
+#ifndef uint32_t
+typedef u_int32_t     uint32_t;
+#endif
 
-/* D_INTMAX is the type that could hold the biggest integer
- * for a specific architecture */
-typedef D_INT64       D_INTMAX;
-typedef D_UINT64      D_UINTMAX;
+#ifndef int64_t
+typedef int64_t       int64_t;
+#endif
+
+#ifndef uint64_t
+typedef u_int64_t     uint64_t;
+#endif
+
+#ifndef bool_t
+typedef uint8_t       bool_t;
+#endif
 
 #define SHL_EXPORT_SYMBOL __attribute__((visibility("default")))
 #define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))

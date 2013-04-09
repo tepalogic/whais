@@ -15,11 +15,11 @@
 #include "interpreter.h"
 #include "custom/include/test/test_fmw.h"
 
-static const D_CHAR admin[]    = "administrator";
-static const D_CHAR test_db1[] = "t_testdb_1";
-static const D_CHAR test_db2[] = "t_testdb_2";
+static const char admin[]    = "administrator";
+static const char test_db1[] = "t_testdb_1";
+static const char test_db2[] = "t_testdb_2";
 
-static const D_UINT8 commonCode[] =
+static const uint8_t commonCode[] =
     "LET gb0 AS DATE;\n"
     "LET gb1 AS UNSIGNED INT32;\n"
     "LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
@@ -60,7 +60,7 @@ static const D_UINT8 commonCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1Code_Fail_1 [] =
+static const uint8_t db1Code_Fail_1 [] =
     "LET gb1 AS UNSIGNED INT32;\n"
     "\n"
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
@@ -83,7 +83,7 @@ static const D_UINT8 db1Code_Fail_1 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1Code_Fail_2 [] =
+static const uint8_t db1Code_Fail_2 [] =
     "EXTERN LET gb1 AS  INT32;\n"
     "\n"
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
@@ -106,7 +106,7 @@ static const D_UINT8 db1Code_Fail_2 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1Code_Fail_3 [] =
+static const uint8_t db1Code_Fail_3 [] =
     "\n"
     "\n"
     "EXTERN PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
@@ -131,7 +131,7 @@ static const D_UINT8 db1Code_Fail_3 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1Code_Fail_4 [] =
+static const uint8_t db1Code_Fail_4 [] =
     "\n"
     "EXTERN LET tab1 AS TABLE OF (t_field AS int8, vasile as DATE);\n"
     "\n"
@@ -145,7 +145,7 @@ static const D_UINT8 db1Code_Fail_4 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1Code_Fail_5 [] =
+static const uint8_t db1Code_Fail_5 [] =
     "EXTERN LET gb1 AS UNSIGNED INT32;\n"
     "EXTERN LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
     "PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
@@ -168,7 +168,7 @@ static const D_UINT8 db1Code_Fail_5 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1Code_Fail_6 [] =
+static const uint8_t db1Code_Fail_6 [] =
     "PROCEDURE c_proc_1 ()\n"
     "RETURN BOOL\n"
     "DO\n"
@@ -177,7 +177,7 @@ static const D_UINT8 db1Code_Fail_6 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1_Code_1 [] =
+static const uint8_t db1_Code_1 [] =
     "LET private_gb1 AS UNSIGNED INT32;\n"
     "\n"
     "EXTERN PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
@@ -200,7 +200,7 @@ static const D_UINT8 db1_Code_1 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db1_Code_2 [] =
+static const uint8_t db1_Code_2 [] =
     "EXTERN LET private_gb1 AS UNSIGNED INT32;\n"
     "\n"
     "EXTERN PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
@@ -222,7 +222,7 @@ static const D_UINT8 db1_Code_2 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db2_Code_1 [] =
+static const uint8_t db2_Code_1 [] =
     "LET private_gb1 AS HIRESTIME;\n"
     "\n"
     "PROCEDURE private_proc () RETURN HIRESTIME\n"
@@ -232,7 +232,7 @@ static const D_UINT8 db2_Code_1 [] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 db2_Code_2 [] =
+static const uint8_t db2_Code_2 [] =
     "EXTERN LET private_gb1 AS HIRESTIME;\n"
     "\n"
     "EXTERN PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
@@ -253,15 +253,15 @@ static const D_UINT8 db2_Code_2 [] =
 
 
 
-static const D_CHAR *MSG_PREFIX[] = {
+static const char *MSG_PREFIX[] = {
                                       "", "error ", "warning ", "error "
                                     };
 
-static D_UINT
-get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+static uint_t
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
@@ -281,14 +281,14 @@ get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buff_pos,
-            D_UINT            msg_id,
-            D_UINT            msgType,
-            const D_CHAR*     pMsgFormat,
+            uint_t            buff_pos,
+            uint_t            msg_id,
+            uint_t            msgType,
+            const char*     pMsgFormat,
             va_list           args)
 {
-  const D_CHAR *buffer = (const D_CHAR *) data;
-  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+  const char *buffer = (const char *) data;
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
   fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
@@ -299,9 +299,9 @@ my_postman (WHC_MESSENGER_ARG data,
 
 bool
 test_fault (I_Session& session,
-            const D_UINT8* const unitCode,
-            const D_UINT         unitCodeSize,
-            const D_UINT         expectedCode)
+            const uint8_t* const unitCode,
+            const uint_t         unitCodeSize,
+            const uint_t         expectedCode)
 {
   bool result = false;
 
@@ -357,8 +357,8 @@ load_common_session (I_Session& testSession)
 
 bool
 load_unit (I_Session&           session,
-           const D_UINT8* const unitCode,
-           const D_UINT         unitCodeSize)
+           const uint8_t* const unitCode,
+           const uint_t         unitCodeSize)
 {
   bool result = true;
 
@@ -459,6 +459,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

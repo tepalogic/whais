@@ -50,20 +50,20 @@ get_postman_bag (void)
 }
 
 void
-LOGMSG (D_UINT  buffPos,
-        D_UINT  msgCode,
-        D_UINT  msgType,
-        D_CHAR* pMessage,
+LOGMSG (uint_t  buffPos,
+        uint_t  msgCode,
+        uint_t  msgType,
+        char* pMessage,
         va_list args)
 {
   __postman (__postman_bag, buffPos, msgCode, msgType, pMessage, args);
 }
 
-D_CHAR*
-copy_text_truncate (D_CHAR*       dest,
-                    const D_CHAR* src,
-                    D_UINT        destMax,
-                    D_UINT        srcLength)
+char*
+copy_text_truncate (char*       dest,
+                    const char* src,
+                    uint_t        destMax,
+                    uint_t        srcLength)
 {
   assert (destMax > 4);  /* make sure we can hold the '...' string */
 

@@ -33,7 +33,7 @@
 #include "dbs/include/dbs_values.h"
 
 //TODO: Make sure you compute this limit properly  for all architectures
-static const D_UINT MAX_OP_QWORDS = 6;
+static const uint_t MAX_OP_QWORDS = 6;
 
 class StackValue;
 
@@ -111,12 +111,12 @@ public:
   virtual void SelfOr (const DBSInt64& value) = 0;
   virtual void SelfOr (const DBSBool& value) = 0;
 
-  virtual D_UINT GetType () = 0;
+  virtual uint_t GetType () = 0;
 
   virtual FIELD_INDEX   GetField () = 0;
   virtual I_DBSTable&   GetTable () = 0;
   virtual StackValue    GetFieldAt (const FIELD_INDEX field) = 0;
-  virtual StackValue    GetValueAt (const D_UINT64 index) = 0;
+  virtual StackValue    GetValueAt (const uint64_t index) = 0;
 
   virtual StackValue Duplicate () const = 0;
 
@@ -174,7 +174,7 @@ private:
     GetOperand ().~I_Operand ();
   }
 
-  D_UINT64 m_Storage [MAX_OP_QWORDS];
+  uint64_t m_Storage [MAX_OP_QWORDS];
 };
 
 class INTERP_SHL SessionStack
@@ -205,11 +205,11 @@ public:
 
   void  Push (const StackValue& value);
 
-  void  Pop (const D_UINT count);
+  void  Pop (const uint_t count);
 
   size_t Size () const;
 
-  StackValue& operator[] (const D_UINT index);
+  StackValue& operator[] (const uint_t index);
 
 private:
   std::vector<StackValue> m_Stack;

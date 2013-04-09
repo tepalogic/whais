@@ -13,18 +13,18 @@
 
 using namespace prima;
 
-static const D_CHAR admin[] = "administrator";
+static const char admin[] = "administrator";
 
-static const D_CHAR bool_not[] = "bool_not";
-static const D_CHAR bool_and[] = "bool_and";
-static const D_CHAR bool_xor[] = "bool_xor";
-static const D_CHAR bool_or[]  = "bool_or";
-static const D_CHAR int_not[]  = "int_not";
-static const D_CHAR int_and[]  = "int_and";
-static const D_CHAR int_xor[]  = "int_xor";
-static const D_CHAR int_or[]   = "int_or";
+static const char bool_not[] = "bool_not";
+static const char bool_and[] = "bool_and";
+static const char bool_xor[] = "bool_xor";
+static const char bool_or[]  = "bool_or";
+static const char int_not[]  = "int_not";
+static const char int_and[]  = "int_and";
+static const char int_xor[]  = "int_xor";
+static const char int_or[]   = "int_or";
 
-const D_UINT8 callTestProgram[] = ""
+const uint8_t callTestProgram[] = ""
     "PROCEDURE bool_not (val AS BOOL) RETURN BOOL\n"
     "DO\n"
       "RETURN NOT val;\n"
@@ -65,15 +65,15 @@ const D_UINT8 callTestProgram[] = ""
     "\n";
 
 
-static const D_CHAR *MSG_PREFIX[] = {
+static const char *MSG_PREFIX[] = {
                                       "", "error ", "warning ", "error "
                                     };
 
-static D_UINT
-get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+static uint_t
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
@@ -93,14 +93,14 @@ get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buff_pos,
-            D_UINT            msg_id,
-            D_UINT            msgType,
-            const D_CHAR*     pMsgFormat,
+            uint_t            buff_pos,
+            uint_t            msg_id,
+            uint_t            msgType,
+            const char*     pMsgFormat,
             va_list           args)
 {
-  const D_CHAR *buffer = (const D_CHAR *) data;
-  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+  const char *buffer = (const char *) data;
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
   fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
@@ -158,8 +158,8 @@ test_op_not (Session& session)
 
 template <typename DBS_T> bool
 test_op_andXX (Session&       session,
-               const D_CHAR*  opDesc,
-               const D_CHAR*  procName,
+               const char*  opDesc,
+               const char*  procName,
                const DBS_T    val1,
                const DBS_T    val2)
 {
@@ -185,8 +185,8 @@ test_op_andXX (Session&       session,
 
 template <typename DBS_T> bool
 test_op_orXX (Session&        session,
-               const D_CHAR*  opDesc,
-               const D_CHAR*  procName,
+               const char*  opDesc,
+               const char*  procName,
                const DBS_T    val1,
                const DBS_T    val2)
 {
@@ -212,8 +212,8 @@ test_op_orXX (Session&        session,
 
 template <typename DBS_T> bool
 test_op_xorXX (Session&       session,
-               const D_CHAR*  opDesc,
-               const D_CHAR*  procName,
+               const char*  opDesc,
+               const char*  procName,
                const DBS_T    val1,
                const DBS_T    val2)
 {
@@ -315,6 +315,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

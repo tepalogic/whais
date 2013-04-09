@@ -82,11 +82,11 @@ test_integers_array (const char* type)
   std::cout << "Testing " << type << " array... ";
   bool result = true;
 
-  D_UINT64 elementsCount = 0;
+  uint64_t elementsCount = 0;
   T nullValue;
   DBSArray testArray((T *)NULL);
 
-  for (D_UINT64 index = 1; index < 10000; index += 13)
+  for (uint64_t index = 1; index < 10000; index += 13)
     {
       if (testArray.ElementsCount () != elementsCount)
         {
@@ -112,8 +112,8 @@ test_integers_array (const char* type)
   if (result)
     {
       T testValue;
-      D_INT64 content = 14;
-      for (D_UINT index = 0; index < elementsCount; index++)
+      int64_t content = 14;
+      for (uint_t index = 0; index < elementsCount; index++)
         {
           testArray.GetElement(testValue, index);
           if (testValue.IsNull() || ((content & 0xFF) != testValue.m_Value))
@@ -140,14 +140,14 @@ test_dates_array ()
   std::cout << "Testing T_DATE array... ";
   bool result = true;
 
-  D_UINT elementsCount = 0;
-  D_INT year = 1;
-  D_UINT day = 1;
-  D_UINT month = 1;
+  uint_t elementsCount = 0;
+  int year = 1;
+  uint_t day = 1;
+  uint_t month = 1;
 
   DBSArray testArray((DBSDate *)NULL);
 
-  for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
+  for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
       if (testArray.ElementsCount () != elementsCount)
         {
@@ -164,7 +164,7 @@ test_dates_array ()
 
   //Read back;
   year = day = month = 1;
-  for (D_UINT64 index = 0; index < elementsCount; ++index)
+  for (uint64_t index = 0; index < elementsCount; ++index)
   {
     DBSDate testValue;
     testArray.GetElement (testValue, index);
@@ -185,7 +185,7 @@ test_dates_array ()
 
   if (result)
     {
-      for (D_UINT index = 0; index < elementsCount; ++ index)
+      for (uint_t index = 0; index < elementsCount; ++ index)
         testArray.RemoveElement (0);
 
       if (testArray.IsNull () != false)
@@ -202,17 +202,17 @@ test_datetimes_array ()
   std::cout << "Testing T_DATETIME array... ";
   bool result = true;
 
-  D_UINT elementsCount = 0;
-  D_INT year = 1;
-  D_UINT day = 1;
-  D_UINT month = 1;
-  D_UINT hour = 3;
-  D_UINT mins = 3;
-  D_UINT sec = 3;
+  uint_t elementsCount = 0;
+  int year = 1;
+  uint_t day = 1;
+  uint_t month = 1;
+  uint_t hour = 3;
+  uint_t mins = 3;
+  uint_t sec = 3;
 
   DBSArray testArray((DBSDateTime *)NULL);
 
-  for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
+  for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
       if (testArray.ElementsCount () != elementsCount)
         {
@@ -233,7 +233,7 @@ test_datetimes_array ()
   //Read back;
   year = day = month = 1;
   hour = mins = sec = 3;
-  for (D_UINT64 index = 0; index < elementsCount; ++index)
+  for (uint64_t index = 0; index < elementsCount; ++index)
   {
     DBSDateTime testValue;
     testArray.GetElement (testValue, index);
@@ -260,7 +260,7 @@ test_datetimes_array ()
 
   if (result)
     {
-      for (D_UINT index = 0; index < elementsCount; ++ index)
+      for (uint_t index = 0; index < elementsCount; ++ index)
         testArray.RemoveElement (0);
 
       if (testArray.IsNull () != false)
@@ -277,18 +277,18 @@ test_hiresdate_array ()
   std::cout << "Testing T_HIRESTIME array... ";
   bool result = true;
 
-  D_UINT elementsCount = 0;
-  D_INT year = 1;
-  D_UINT day = 1;
-  D_UINT month = 1;
-  D_UINT hour = 3;
-  D_UINT mins = 3;
-  D_UINT sec = 3;
-  D_UINT32 msec = 4;
+  uint_t elementsCount = 0;
+  int year = 1;
+  uint_t day = 1;
+  uint_t month = 1;
+  uint_t hour = 3;
+  uint_t mins = 3;
+  uint_t sec = 3;
+  uint32_t msec = 4;
 
   DBSArray testArray((DBSHiresTime *)NULL);
 
-  for (D_UINT64 elementsCount = 0; elementsCount < 500;  elementsCount++)
+  for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
       if (testArray.ElementsCount () != elementsCount)
         {
@@ -311,7 +311,7 @@ test_hiresdate_array ()
   year = day = month = 1;
   hour = mins = sec = 3;
   msec = 4;
-  for (D_UINT64 index = 0; index < elementsCount; ++index)
+  for (uint64_t index = 0; index < elementsCount; ++index)
   {
     DBSHiresTime testValue;
     testArray.GetElement (testValue, index);
@@ -340,7 +340,7 @@ test_hiresdate_array ()
 
   if (result)
     {
-      for (D_UINT index = 0; index < elementsCount; ++ index)
+      for (uint_t index = 0; index < elementsCount; ++ index)
         testArray.RemoveElement (0);
 
       if (testArray.IsNull () != false)
@@ -354,8 +354,8 @@ test_hiresdate_array ()
 bool
 test_array_mirroring ()
 {
-  static D_UINT32 firstVals[] = {10, 1, 233, 0x4545};
-  static D_UINT32 secondVals[] = {0, 12, 45};
+  static uint32_t firstVals[] = {10, 1, 233, 0x4545};
+  static uint32_t secondVals[] = {0, 12, 45};
   std::cout << "Testing array mirroring ...";
   bool result = true;
 
@@ -373,7 +373,7 @@ test_array_mirroring ()
   if (array2.ElementsCount () != array1.ElementsCount ())
     result = false;
 
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -396,7 +396,7 @@ test_array_mirroring ()
 
   if (array2.ElementsCount () != array1.ElementsCount ())
     result = false;
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -418,7 +418,7 @@ test_array_mirroring ()
   array1.SetElement(DBSUInt32 (0xFFFF), 0);
   if (array2.ElementsCount () != array1.ElementsCount ())
     result = false;
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -448,7 +448,7 @@ test_array_mirroring ()
   array2.SetMirror (array1);
   if (array2.ElementsCount () != array1.ElementsCount ())
     result = false;
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -470,7 +470,7 @@ test_array_mirroring ()
   array1.AddElement (DBSUInt32 (firstVals [3]));
   if (array2.ElementsCount () != array1.ElementsCount ())
     result = false;
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -492,7 +492,7 @@ test_array_mirroring ()
   DBSArray array3((DBSUInt32*) NULL);
   array3 = array1;
 
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -519,7 +519,7 @@ test_array_mirroring ()
     }
 
   array3.SetElement (DBSUInt32 (0), 0);
-  for (D_UINT index = 0; result && (index < array1.ElementsCount ()); ++index)
+  for (uint_t index = 0; result && (index < array1.ElementsCount ()); ++index)
     {
       DBSUInt32 temp;
       array1.GetElement (temp, index);
@@ -566,10 +566,10 @@ main ()
   DBSInit (DBSSettings ());
 
   success = success && test_bool_array ();
-  success = success && test_integers_array<DBSUInt8, D_UINT8> ("T_UINT8");
-  success = success && test_integers_array<DBSUInt16, D_UINT16> ("T_UINT16");
-  success = success && test_integers_array<DBSUInt32, D_UINT32> ("T_UINT32");
-  success = success && test_integers_array<DBSInt64, D_INT64> ("T_INT64");
+  success = success && test_integers_array<DBSUInt8, uint8_t> ("T_UINT8");
+  success = success && test_integers_array<DBSUInt16, uint16_t> ("T_UINT16");
+  success = success && test_integers_array<DBSUInt32, uint32_t> ("T_UINT32");
+  success = success && test_integers_array<DBSInt64, int64_t> ("T_INT64");
   success = success && test_dates_array ();
   success = success && test_datetimes_array ();
   success = success && test_hiresdate_array ();
@@ -589,6 +589,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

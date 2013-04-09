@@ -34,7 +34,7 @@ I_Logger::~I_Logger ()
 
 }
 
-Logger::Logger (const D_CHAR* const pFile, const bool printStart)
+Logger::Logger (const char* const pFile, const bool printStart)
   : I_Logger (),
     m_StartTick (wh_msec_ticks ()),
     m_Sync (),
@@ -60,20 +60,20 @@ Logger::Logger (const D_CHAR* const pFile, const bool printStart)
 }
 
 void
-Logger::Log (const LOG_TYPE type, const D_CHAR* pStr)
+Logger::Log (const LOG_TYPE type, const char* pStr)
 {
 
   WSynchronizerRAII holder (m_Sync);
 
   const WTICKS ticks = wh_msec_ticks ();
-  const D_INT markSize = PrintTimeMark (type, ticks);
+  const int markSize = PrintTimeMark (type, ticks);
 
   while (*pStr != 0)
     {
       if ((*pStr == '\n') && (*(pStr + 1) != '\n'))
         {
           m_OutStream << endl;
-          for (D_INT i = 0; i < markSize; ++i)
+          for (int i = 0; i < markSize; ++i)
             m_OutStream << ' ';
         }
       else
@@ -90,26 +90,26 @@ Logger::Log (const LOG_TYPE type, const string& str)
   Log (type, str.c_str ());
 }
 
-D_UINT
+uint_t
 Logger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
 {
-  static D_CHAR logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
+  static char logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
 
   if (type > LOG_DEBUG)
     type = LOG_UNKNOW;
 
   ticks -= m_StartTick;
 
-  const D_UINT days = ticks / (1000 * 3600 * 24);
+  const uint_t days = ticks / (1000 * 3600 * 24);
   ticks %= (1000 * 3600 * 24);
 
-  const D_UINT hours = ticks / (1000 * 3600);
+  const uint_t hours = ticks / (1000 * 3600);
   ticks %= (1000 * 3600);
 
-  const D_UINT mins = ticks / (1000 * 60);
+  const uint_t mins = ticks / (1000 * 60);
   ticks %= (1000 * 60);
 
-  const D_UINT secs = ticks / 1000;
+  const uint_t secs = ticks / 1000;
   ticks %= 1000;
 
   const char       fill  = m_OutStream.fill ();
@@ -137,7 +137,7 @@ Logger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
 }
 
 void
-NullLogger::Log (const LOG_TYPE, const D_CHAR*)
+NullLogger::Log (const LOG_TYPE, const char*)
 {
 }
 

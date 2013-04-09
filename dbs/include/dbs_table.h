@@ -33,8 +33,8 @@ struct CallBackIndexData
   CallBackIndexData () {}
   virtual ~CallBackIndexData () {};
 
-  D_UINT64      m_RowIndex;
-  D_UINT64      m_RowsCount;
+  uint64_t      m_RowIndex;
+  uint64_t      m_RowsCount;
 };
 
 typedef void CREATE_INDEX_CALLBACK_FUNC (CallBackIndexData* cb_data);
@@ -48,7 +48,7 @@ public:
   virtual bool               IsTemporal () const = 0;
   virtual I_DBSTable&        Spawn () const = 0;
   virtual FIELD_INDEX        GetFieldsCount () = 0;
-  virtual FIELD_INDEX        GetFieldIndex (const D_CHAR* pFieldName) = 0;
+  virtual FIELD_INDEX        GetFieldIndex (const char* pFieldName) = 0;
   virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field) = 0;
   virtual ROW_INDEX          GetAllocatedRows () = 0;
 

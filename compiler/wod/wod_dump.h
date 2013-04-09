@@ -44,15 +44,15 @@ void
 wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutStream);
 
 void
-wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutStream, D_BOOL showCode);
+wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutStream, bool_t showCode);
 
 class WDumpException : public WException
 {
 public:
-  WDumpException (const D_CHAR* pMessage,
-                  const D_CHAR* pFile,
-                  D_UINT32      line,
-                  D_UINT32      extra)
+  WDumpException (const char* pMessage,
+                  const char* pFile,
+                  uint32_t      line,
+                  uint32_t      extra)
     : WException (pMessage, pFile, line, extra)
   {
   }
@@ -62,18 +62,18 @@ public:
 
   virtual WException*     Clone () const { return new WDumpException (*this); }
   virtual EXPCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
-  virtual const D_CHAR*   Description () const
+  virtual const char*   Description () const
   {
     return "General exception by object dumper.";
   }
 };
 
-typedef D_UINT (*FDECODE_OPCODE) (const D_UINT8* pInArgs,
-                                  D_CHAR*        pOp1,
-                                  D_CHAR*        pOp2);
+typedef uint_t (*FDECODE_OPCODE) (const uint8_t* pInArgs,
+                                  char*        pOp1,
+                                  char*        pOp2);
 
 extern FDECODE_OPCODE wod_decode_table[];
-extern const D_CHAR*  wod_str_table[];
+extern const char*  wod_str_table[];
 
 #define MAX_OP_STRING 128
 

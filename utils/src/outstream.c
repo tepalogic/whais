@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "outstream.h"
 
 struct OutputStream*
-init_outstream (const D_UINT increment, struct OutputStream* pOutStream)
+init_outstream (const uint_t increment, struct OutputStream* pOutStream)
 {
   pOutStream->dataSize  = 0;
   pOutStream->increment = (increment != 0) ? increment : OUTSTREAM_INCREMENT_SIZE;
@@ -47,7 +47,7 @@ destroy_outstream (struct OutputStream* pStream)
 }
 
 struct OutputStream*
-output_data (struct OutputStream *pStream, const D_UINT8* pData, D_UINT dataSize)
+output_data (struct OutputStream *pStream, const uint8_t* pData, uint_t dataSize)
 {
   assert (pStream->reserved >= pStream->dataSize);
 
@@ -55,8 +55,8 @@ output_data (struct OutputStream *pStream, const D_UINT8* pData, D_UINT dataSize
     {
       /* output buffer needs to be enlarged */
 
-      D_UINT8* temp;
-      D_UINT   increment = dataSize + pStream->dataSize - pStream->reserved;
+      uint8_t* temp;
+      uint_t   increment = dataSize + pStream->dataSize - pStream->reserved;
       if (increment > pStream->increment)
         {
           /* The increment defined previously is not enough to hold the new

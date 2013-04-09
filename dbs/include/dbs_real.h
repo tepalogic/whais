@@ -32,10 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/include/we_int128.h"
 
-static const D_INT64 DBS_REAL_PREC      = 1000000ull;
-static const D_INT64 DBS_RICHREAL_PREC  = 100000000000000ull;
+static const int64_t DBS_REAL_PREC      = 1000000ull;
+static const int64_t DBS_RICHREAL_PREC  = 100000000000000ull;
 
-template <typename TI, typename TF, const D_INT64 PRECISION>
+template <typename TI, typename TF, const int64_t PRECISION>
 class DBSDecimalReal
 {
 public:
@@ -43,9 +43,9 @@ public:
   {
   }
 
-  DBSDecimalReal (const D_INT64 integer,
-                  const D_INT64 fractional,
-                  const D_INT64 precision)
+  DBSDecimalReal (const int64_t integer,
+                  const int64_t fractional,
+                  const int64_t precision)
   {
     assert ((integer >= 0) || (fractional <= 0));
     assert ((integer <= 0) || (fractional >= 0));
@@ -53,7 +53,7 @@ public:
     build (integer, fractional, precision);
   }
 
-  template <typename TI_S, typename TF_S, const D_INT64 PREC_S>
+  template <typename TI_S, typename TF_S, const int64_t PREC_S>
   DBSDecimalReal (const DBSDecimalReal<TI_S, TF_S, PREC_S>& source)
   {
     build (source.Integer (), source.Fractional (), PREC_S);
@@ -207,7 +207,7 @@ public:
     DBSDecimalReal result (toInt64 (op1 / op2));
 
     op1 %= op2;
-    for (D_INT64 i = 1; i < PRECISION; i *= 10)
+    for (int64_t i = 1; i < PRECISION; i *= 10)
       {
         result.m_FracPart *= 10;
         op1 *= 10;
@@ -287,27 +287,27 @@ public:
     return *this = *this % op;
   }
 
-  D_INT64 Integer () const
+  int64_t Integer () const
   {
     return m_IntPart;
   }
 
-  D_INT64
+  int64_t
   Fractional () const
   {
     return m_FracPart;
   }
 
-  D_INT64
+  int64_t
   Precision () const
   {
     return PRECISION;
   }
 
 private:
-  void build (const D_INT64 interger,
-              const D_INT64 fractional,
-              const D_INT64 precision)
+  void build (const int64_t interger,
+              const int64_t fractional,
+              const int64_t precision)
   {
     m_IntPart  = interger;
     m_FracPart = fractional;
@@ -328,8 +328,8 @@ private:
 
   void build (const long double value)
   {
-    D_INT64 integer    = value;
-    D_INT64 fractional = - ((integer - value) * PRECISION);
+    int64_t integer    = value;
+    int64_t fractional = - ((integer - value) * PRECISION);
 
     build (integer, fractional, PRECISION);
   }
@@ -338,8 +338,8 @@ private:
   TF    m_FracPart;
 };
 
-typedef DBSDecimalReal<D_INT64, D_INT32, DBS_REAL_PREC>      DBS_REAL_T;
-typedef DBSDecimalReal<D_INT64, D_INT64, DBS_RICHREAL_PREC>  DBS_RICHREAL_T;
+typedef DBSDecimalReal<int64_t, int32_t, DBS_REAL_PREC>      DBS_REAL_T;
+typedef DBSDecimalReal<int64_t, int64_t, DBS_RICHREAL_PREC>  DBS_RICHREAL_T;
 
 template<typename T>
 DBS_REAL_T
@@ -383,13 +383,13 @@ operator* (const T op1, const DBS_RICHREAL_T& op2)
   return op2 * op1;
 }
 
-static inline D_INT64
+static inline int64_t
 toInt64 (const DBS_REAL_T& value)
 {
   return value.Integer ();
 }
 
-static inline D_INT64
+static inline int64_t
 toInt64 (const DBS_RICHREAL_T& value)
 {
   return value.Integer ();

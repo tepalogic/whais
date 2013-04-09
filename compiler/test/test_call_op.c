@@ -12,7 +12,7 @@
 extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -32,10 +32,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  int vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
@@ -49,7 +49,7 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-D_CHAR proc_decl_buffer[] =
+char proc_decl_buffer[] =
   "PROCEDURE ProcId0 () "
   "RETURN BOOL "
   "DO "
@@ -134,19 +134,19 @@ D_CHAR proc_decl_buffer[] =
   "LET v2 AS TABLE OF (v1 AS HIRESTIME, v2 AS TEXT, v3 AS ARRAY OF BOOL); "
   "RETURN ProcId3(v1, v2); " "ENDPROC " "\n" "";
 
-static D_BOOL
+static bool_t
 check_procedure (struct ParserState *state,
-                 D_CHAR * proc_name, D_CHAR * called_proc, D_UINT nargs)
+                 char * proc_name, char * called_proc, uint_t nargs)
 {
   struct Statement *stmt = find_proc_decl (state, proc_name,
                                            strlen (proc_name), FALSE);
   struct Statement *called_stmt = find_proc_decl (state, called_proc,
                                                   strlen (called_proc), FALSE);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
-  D_UINT code_size = get_size_outstream (stmt_query_instrs (stmt));
-  D_UINT count = 0;
-  D_UINT32 linkid = stmt_get_import_id (called_stmt);
-  D_UINT temp = 0;
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  uint_t code_size = get_size_outstream (stmt_query_instrs (stmt));
+  uint_t count = 0;
+  uint32_t linkid = stmt_get_import_id (called_stmt);
+  uint_t temp = 0;
 
   if (code_size < ((nargs * 2) + 5))
     {
@@ -154,7 +154,7 @@ check_procedure (struct ParserState *state,
     }
   for (count = 0; count < nargs; ++count)
     {
-      const D_UINT offset = count * 2;
+      const uint_t offset = count * 2;
       if ((w_opcode_decode (code + offset) != W_LDLO8)
           || (code[offset + 1] != count))
         {
@@ -183,10 +183,10 @@ check_procedure (struct ParserState *state,
   return TRUE;
 }
 
-static D_BOOL
+static bool_t
 check_procedure_calls (struct ParserState *state)
 {
-  D_BOOL result = TRUE;
+  bool_t result = TRUE;
   result &= check_procedure (state, "ProcIdTst0", "ProcId0", 0);
 
   result &= check_procedure (state, "ProcIdTst1", "ProcId1", 16);
@@ -201,7 +201,7 @@ check_procedure_calls (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, proc_decl_buffer);

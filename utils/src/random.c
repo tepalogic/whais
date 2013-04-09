@@ -28,10 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define XORSHIFT_DEFAULT_SEED 858495253484946541
 
-static D_UINT64 _seed    = XORSHIFT_DEFAULT_SEED;
-static D_UINT64 _current = XORSHIFT_DEFAULT_SEED;
+static uint64_t _seed    = XORSHIFT_DEFAULT_SEED;
+static uint64_t _current = XORSHIFT_DEFAULT_SEED;
 
-D_UINT64
+uint64_t
 w_rnd_get_seed ()
 {
   assert (_seed != 0);
@@ -39,7 +39,7 @@ w_rnd_get_seed ()
 }
 
 void
-w_rnd_set_seed (D_UINT64 seed)
+w_rnd_set_seed (uint64_t seed)
 {
   if (seed == 0)
     _seed = XORSHIFT_DEFAULT_SEED;
@@ -47,10 +47,10 @@ w_rnd_set_seed (D_UINT64 seed)
   _seed = seed;
 }
 
-D_UINT64
+uint64_t
 w_rnd ()
 {
-  D_UINT64 current = _current;
+  uint64_t current = _current;
 
   current ^= current << 1;
   current ^= current >> 7;

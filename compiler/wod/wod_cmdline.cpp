@@ -35,12 +35,12 @@ using namespace std;
 #define VER_MINOR       4
 
 static inline bool
-isStrEqual (const D_CHAR* str1, const D_CHAR* str2)
+isStrEqual (const char* str1, const char* str2)
 {
   return::strcmp (str1, str2) == 0;
 }
 
-WodCmdLineParser::WodCmdLineParser (D_INT argc, D_CHAR ** argv) :
+WodCmdLineParser::WodCmdLineParser (int argc, char ** argv) :
     m_ArgCount (argc),
     m_Args (argv),
     m_SourceFile (NULL),

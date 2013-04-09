@@ -29,13 +29,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef const void *POSTMAN_BAG;
 
-#define IGNORE_BUFFER_POS      (D_UINT)(~0)
+#define IGNORE_BUFFER_POS      (uint_t)(~0)
 
 typedef void (*POSTMAN) (POSTMAN_BAG bag,
-                         D_UINT      bufferPosition,
-                         D_UINT      msgCode,
-                         D_UINT      msgType,
-                         D_CHAR*     msgFormat,
+                         uint_t      bufferPosition,
+                         uint_t      msgCode,
+                         uint_t      msgType,
+                         char*     msgFormat,
                          va_list     args);
 
 void
@@ -48,17 +48,17 @@ POSTMAN_BAG
 get_postman_bag (void);
 
 void
-LOGMSG (D_UINT  buff_pos,
-        D_UINT  msgCode,
-        D_UINT  msgType,
-        D_CHAR* msgFormat,
+LOGMSG (uint_t  buff_pos,
+        uint_t  msgCode,
+        uint_t  msgType,
+        char* msgFormat,
         va_list args);
 
 /* utils for LOGMSG arguments */
-D_CHAR*
-copy_text_truncate (D_CHAR*       dest,
-                   const D_CHAR*  src,
-                   D_UINT         destMax,
-                   D_UINT         srcLength);
+char*
+copy_text_truncate (char*       dest,
+                   const char*  src,
+                   uint_t         destMax,
+                   uint_t         srcLength);
 
 #endif /*MSGLOG_H_ */

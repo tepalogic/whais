@@ -12,7 +12,7 @@
 extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -32,10 +32,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  int vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
@@ -49,7 +49,7 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-D_CHAR proc_decl_buffer[] =
+char proc_decl_buffer[] =
   "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 "
   "DO "
   "RETURN v1 XOR v2; "
@@ -102,10 +102,10 @@ D_CHAR proc_decl_buffer[] =
   "PROCEDURE ProcId11 (v1 AS BOOL, v2 AS BOOL) RETURN BOOL "
   "DO " "RETURN v1 XOR v2; " "ENDPROC\n\n" "";
 
-static D_BOOL
+static bool_t
 check_op_symmetry ()
 {
-  D_INT i, j;
+  int i, j;
   for (i = T_END_OF_TYPES - 1, j = 0; (i >= 0) && (j < T_END_OF_TYPES);
        i--, j++)
     {
@@ -123,15 +123,15 @@ check_op_symmetry ()
   return TRUE;
 }
 
-static D_BOOL
-check_procedure (struct ParserState *state, D_CHAR * proc_name)
+static bool_t
+check_procedure (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   struct DeclaredVar *var =
     (struct DeclaredVar *) get_item (&stmt->spec.proc.paramsList, 0);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
-  D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  int code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_NA;
 
   /* check the opcode based on the return type */
@@ -163,11 +163,11 @@ check_procedure (struct ParserState *state, D_CHAR * proc_name)
   return TRUE;
 }
 
-static D_BOOL
+static bool_t
 check_all_procs (struct ParserState *state)
 {
-  D_UINT count;
-  D_CHAR proc_name[25];
+  uint_t count;
+  char proc_name[25];
 
   for (count = 1; count <= 11; ++count)
     {
@@ -184,7 +184,7 @@ check_all_procs (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, proc_decl_buffer);

@@ -362,7 +362,7 @@ I_PMOperand::GetFieldAt (const FIELD_INDEX field)
 }
 
 StackValue
-I_PMOperand::GetValueAt (const D_UINT64 index)
+I_PMOperand::GetValueAt (const uint64_t index)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -517,7 +517,7 @@ NullOperand::GetValue (DBSArray& outValue) const
   assign_null (outValue);
 }
 
-D_UINT
+uint_t
 NullOperand::GetType ()
 {
   return T_UNKNOWN;
@@ -571,7 +571,7 @@ BoolOperand::SelfOr (const DBSBool& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 BoolOperand::GetType ()
 {
   return T_BOOL;
@@ -617,7 +617,7 @@ CharOperand::SetValue (const DBSChar& value)
   m_Value = value;
 }
 
-D_UINT
+uint_t
 CharOperand::GetType ()
 {
   return T_CHAR;
@@ -694,7 +694,7 @@ DateOperand::SetValue (const DBSDate& value)
   m_Value = value;
 }
 
-D_UINT
+uint_t
 DateOperand::GetType ()
 {
   return T_DATE;
@@ -768,7 +768,7 @@ DateTimeOperand::SetValue (const DBSDateTime& value)
   m_Value = value;
 }
 
-D_UINT
+uint_t
 DateTimeOperand::GetType ()
 {
   return T_DATETIME;
@@ -842,7 +842,7 @@ HiresTimeOperand::SetValue (const DBSHiresTime& value)
   m_Value = value;
 }
 
-D_UINT
+uint_t
 HiresTimeOperand::GetType ()
 {
   return T_HIRESTIME;
@@ -871,28 +871,28 @@ void
 UInt8Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 UInt8Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 UInt8Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 UInt8Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -929,28 +929,28 @@ void
 UInt8Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 UInt8Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 UInt8Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 UInt8Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1007,7 +1007,7 @@ UInt8Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 UInt8Operand::GetType ()
 {
   return T_UINT8;
@@ -1036,28 +1036,28 @@ void
 UInt16Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 UInt16Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 UInt16Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 UInt16Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -1094,28 +1094,28 @@ void
 UInt16Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 UInt16Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 UInt16Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 UInt16Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1172,7 +1172,7 @@ UInt16Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 UInt16Operand::GetType ()
 {
   return T_UINT16;
@@ -1202,28 +1202,28 @@ void
 UInt32Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 UInt32Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 UInt32Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 UInt32Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -1260,28 +1260,28 @@ void
 UInt32Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 UInt32Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 UInt32Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 UInt32Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1338,7 +1338,7 @@ UInt32Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 UInt32Operand::GetType ()
 {
   return T_UINT32;
@@ -1367,28 +1367,28 @@ void
 UInt64Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 UInt64Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 UInt64Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 UInt64Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -1425,28 +1425,28 @@ void
 UInt64Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 UInt64Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 UInt64Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 UInt64Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1503,7 +1503,7 @@ UInt64Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 UInt64Operand::GetType ()
 {
   return T_UINT64;
@@ -1531,28 +1531,28 @@ void
 Int8Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)  = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value) = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value) = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 Int8Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 Int8Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 Int8Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -1589,28 +1589,28 @@ void
 Int8Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 Int8Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 Int8Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 Int8Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1667,7 +1667,7 @@ Int8Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 Int8Operand::GetType ()
 {
   return T_INT8;
@@ -1695,28 +1695,28 @@ void
 Int16Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 Int16Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 Int16Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 Int16Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -1753,28 +1753,28 @@ void
 Int16Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 Int16Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 Int16Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 Int16Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1831,7 +1831,7 @@ Int16Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 Int16Operand::GetType ()
 {
   return T_INT16;
@@ -1860,28 +1860,28 @@ void
 Int32Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 Int32Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 Int32Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 Int32Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -1918,28 +1918,28 @@ void
 Int32Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 Int32Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 Int32Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 Int32Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -1996,7 +1996,7 @@ Int32Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 Int32Operand::GetType ()
 {
   return T_INT32;
@@ -2024,28 +2024,28 @@ void
 Int64Operand::GetValue (DBSInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT8&, outValue.m_Value)  = _SC (D_INT8, m_Value.m_Value);
+  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
 }
 
 void
 Int64Operand::GetValue (DBSInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT16&, outValue.m_Value) = _SC (D_INT16, m_Value.m_Value);
+  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
 }
 
 void
 Int64Operand::GetValue (DBSInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT32&, outValue.m_Value) = _SC (D_INT32, m_Value.m_Value);
+  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
 }
 
 void
 Int64Operand::GetValue (DBSInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (D_INT64&, outValue.m_Value) = _SC (D_INT64, m_Value.m_Value);
+  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
 }
 
 void
@@ -2082,28 +2082,28 @@ void
 Int64Operand::GetValue (DBSUInt8& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT8&, outValue.m_Value)  = _SC (D_UINT8, m_Value.m_Value);
+  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
 }
 
 void
 Int64Operand::GetValue (DBSUInt16& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT16&, outValue.m_Value) = _SC (D_UINT16, m_Value.m_Value);
+  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
 }
 
 void
 Int64Operand::GetValue (DBSUInt32& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT32&, outValue.m_Value) = _SC (D_UINT32, m_Value.m_Value);
+  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
 }
 
 void
 Int64Operand::GetValue (DBSUInt64& outValue) const
 {
   _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (D_UINT64&, outValue.m_Value) = _SC (D_UINT64, m_Value.m_Value);
+  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
 }
 
 void
@@ -2160,7 +2160,7 @@ Int64Operand::SelfOr (const DBSInt64& value)
   m_Value = internal_xor (m_Value, value);
 }
 
-D_UINT
+uint_t
 Int64Operand::GetType ()
 {
   return T_INT64;
@@ -2252,7 +2252,7 @@ RealOperand::SelfDiv (const DBSRichReal& value)
   m_Value = internal_div (m_Value, value);
 }
 
-D_UINT
+uint_t
 RealOperand::GetType ()
 {
   return T_REAL;
@@ -2343,7 +2343,7 @@ RichRealOperand::SelfDiv (const DBSRichReal& value)
   m_Value = internal_div (m_Value, value);
 }
 
-D_UINT
+uint_t
 RichRealOperand::GetType ()
 {
   return T_RICHREAL;
@@ -2392,12 +2392,12 @@ TextOperand::SelfAdd (const DBSText& value)
 }
 
 StackValue
-TextOperand::GetValueAt (const D_UINT64 index)
+TextOperand::GetValueAt (const uint64_t index)
 {
   return StackValue (CharTextElOperand (m_Value, index));
 }
 
-D_UINT
+uint_t
 TextOperand::GetType ()
 {
   return T_TEXT;
@@ -2450,7 +2450,7 @@ CharTextElOperand::SetValue (const DBSChar& value)
   m_Text.SetCharAtIndex (value, m_Index);
 }
 
-D_UINT
+uint_t
 CharTextElOperand::GetType ()
 {
   return T_CHAR;
@@ -2795,7 +2795,7 @@ GlobalOperand::SelfOr (const DBSBool& value)
   m_Value.SelfOr (value);
 }
 
-D_UINT
+uint_t
 GlobalOperand::GetType ()
 {
   return m_Value.GetType ();
@@ -2820,7 +2820,7 @@ GlobalOperand::GetFieldAt (const FIELD_INDEX field)
 }
 
 StackValue
-GlobalOperand::GetValueAt (const D_UINT64 index)
+GlobalOperand::GetValueAt (const uint64_t index)
 {
   return m_Value.GetValueAt (index);
 }
@@ -2864,7 +2864,7 @@ GlobalOperand::CopyFieldOp (const FieldOperand& fieldOp)
 
 ////////////////////////////////////LocalOperand///////////////////////////////
 
-LocalOperand::LocalOperand (SessionStack& stack, const D_UINT64 index)
+LocalOperand::LocalOperand (SessionStack& stack, const uint64_t index)
   : I_PMOperand (),
     m_Index (index),
     m_Stack (stack)
@@ -3182,7 +3182,7 @@ LocalOperand::SelfOr (const DBSBool& value)
   m_Stack[m_Index].GetOperand ().SelfOr (value);
 }
 
-D_UINT
+uint_t
 LocalOperand::GetType ()
 {
   return m_Stack[m_Index].GetOperand ().GetType ();
@@ -3207,7 +3207,7 @@ LocalOperand::GetFieldAt (const FIELD_INDEX field)
 }
 
 StackValue
-LocalOperand::GetValueAt (const D_UINT64 index)
+LocalOperand::GetValueAt (const uint64_t index)
 {
   return m_Stack[m_Index].GetOperand ().GetValueAt (index);
 }
@@ -3437,13 +3437,13 @@ SessionStack::Push (const StackValue& value)
 }
 
 void
-SessionStack::Pop (const D_UINT count)
+SessionStack::Pop (const uint_t count)
 {
   if (count > m_Stack.size ())
     throw DBSException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
 
-  D_UINT topIndex = m_Stack.size () - 1;
-  for (D_UINT index = 0; index < count; ++index, --topIndex)
+  uint_t topIndex = m_Stack.size () - 1;
+  for (uint_t index = 0; index < count; ++index, --topIndex)
     m_Stack.pop_back ();
 }
 
@@ -3454,7 +3454,7 @@ SessionStack::Size () const
 }
 
 StackValue&
-SessionStack::operator[] (const D_UINT index)
+SessionStack::operator[] (const uint_t index)
 {
   if (index > m_Stack.size ())
     throw DBSException (NULL, _EXTRA (InterException::STACK_CORRUPTED));

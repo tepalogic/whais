@@ -10,16 +10,16 @@
 extern int yyparse (struct ParserState *);
 
 
-D_CHAR buffer[] =
+char buffer[] =
   "LET field2 AS FIELD OF ARRAY OF DATE;\n"
   "LET field3 AS FIELD OF INT8;\n"
   "LET vTable2, vTable3 AS TABLE OF (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n";
 
 
-extern D_BOOL is_type_spec_valid (const struct TypeSpec *spec);
+extern bool_t is_type_spec_valid (const struct TypeSpec *spec);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -39,10 +39,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState* pState)
 {
-  D_INT vals_count = get_array_count (&pState->parsedValues);
+  int vals_count = get_array_count (&pState->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&pState->parsedValues, vals_count);
@@ -56,13 +56,13 @@ check_used_vals (struct ParserState* pState)
   return FALSE;                        /* no value in use */
 }
 
-static D_BOOL
+static bool_t
 check_type_spec_fill (const struct TypeSpec* ts,
-                      const D_CHAR*          fname,
-                      const D_UINT           type)
+                      const char*          fname,
+                      const uint_t           type)
 {
-  const D_UINT8 *it = ts->data;
-  D_UINT count = 0;
+  const uint8_t *it = ts->data;
+  uint_t count = 0;
   if (!is_type_spec_valid (ts))
     {
       return FALSE;
@@ -78,17 +78,17 @@ check_type_spec_fill (const struct TypeSpec* ts,
 
   while (count < (ts->dataSize - 2))
     {
-      D_UINT16 temp = strlen ((D_CHAR *) it) + 1;
-      if (strcmp ((D_CHAR *) it, fname) != 0)
+      uint16_t temp = strlen ((char *) it) + 1;
+      if (strcmp ((char *) it, fname) != 0)
         {
           it += temp;
           count += temp;
-          it += sizeof (D_UINT16);
-          count += sizeof (D_UINT16);
+          it += sizeof (uint16_t);
+          count += sizeof (uint16_t);
         }
       else
         {
-          D_UINT16 *ts_type = (D_UINT16 *) (it + temp);
+          uint16_t *ts_type = (uint16_t *) (it + temp);
           if (*ts_type == type)
             {
               return TRUE;
@@ -102,12 +102,12 @@ check_type_spec_fill (const struct TypeSpec* ts,
   return FALSE;
 }
 
-static D_BOOL
+static bool_t
 check_container_field (struct Statement *stmt,
-                       struct DeclaredVar *var, D_CHAR * field, D_UINT32 type)
+                       struct DeclaredVar *var, char * field, uint32_t type)
 {
   struct DeclaredVar *extra = var->extra;
-  D_CHAR result = TRUE;
+  char result = TRUE;
   unsigned int f_len = (field != NULL) ? strlen (field) : 0;
 
   while (extra != NULL)
@@ -135,7 +135,7 @@ check_container_field (struct Statement *stmt,
 
   if (result != FALSE)
     {
-      D_UINT8 *const buffer =
+      uint8_t *const buffer =
         get_buffer_outstream (&stmt->spec.glb.typesDescs);
       struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->typeSpecOff);
       result = check_type_spec_fill (ts, field, type);
@@ -144,7 +144,7 @@ check_container_field (struct Statement *stmt,
   return result;
 }
 
-static D_BOOL
+static bool_t
 check_vars_decl (struct ParserState *state)
 {
   struct DeclaredVar *decl_var = NULL;
@@ -220,7 +220,7 @@ check_vars_decl (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, buffer);

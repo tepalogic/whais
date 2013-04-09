@@ -41,17 +41,17 @@ GlobalsManager::~GlobalsManager ()
     }
 }
 
-D_UINT32
-GlobalsManager::AddGlobal (const D_UINT8*     pName,
-                           const D_UINT       nameLength,
+uint32_t
+GlobalsManager::AddGlobal (const uint8_t*     pName,
+                           const uint_t       nameLength,
                            GlobalValue&       value,
-                           const D_UINT32     typeOffset)
+                           const uint32_t     typeOffset)
 {
   assert (FindGlobal (pName, nameLength) == INVALID_ENTRY);
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
 
-  const D_UINT32 result   = m_GlobalsEntrys.size ();
-  const D_UINT32 IdOffset = m_Identifiers.size ();
+  const uint32_t result   = m_GlobalsEntrys.size ();
+  const uint32_t IdOffset = m_Identifiers.size ();
 
   m_Identifiers.insert (m_Identifiers.end (), pName, pName + nameLength);
   m_Identifiers.push_back (0);
@@ -64,21 +64,21 @@ GlobalsManager::AddGlobal (const D_UINT8*     pName,
   return result;
 }
 
-D_UINT32
-GlobalsManager::FindGlobal (const D_UINT8* pName,
-                            const D_UINT   nameLength)
+uint32_t
+GlobalsManager::FindGlobal (const uint8_t* pName,
+                            const uint_t   nameLength)
 {
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
 
-  D_UINT32 iterator = 0;
+  uint32_t iterator = 0;
 
   while (iterator < m_GlobalsEntrys.size ())
     {
       const GlobalEntry& entry      = m_GlobalsEntrys[iterator];
-      const D_CHAR*      pEntryName = _RC (const D_CHAR*,
+      const char*      pEntryName = _RC (const char*,
                                            &m_Identifiers [entry.m_IdOffet]);
 
-      if (strncmp (pEntryName, _RC (const D_CHAR*, pName), nameLength) == 0)
+      if (strncmp (pEntryName, _RC (const char*, pName), nameLength) == 0)
         return iterator;
 
       ++iterator;
@@ -88,9 +88,9 @@ GlobalsManager::FindGlobal (const D_UINT8* pName,
 }
 
 GlobalValue&
-GlobalsManager::GetGlobal (const D_UINT32 glbId)
+GlobalsManager::GetGlobal (const uint32_t glbId)
 {
-  const D_UINT32 index = glbId & ~GLOBAL_ID;
+  const uint32_t index = glbId & ~GLOBAL_ID;
 
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
 
@@ -100,8 +100,8 @@ GlobalsManager::GetGlobal (const D_UINT32 glbId)
   return m_Storage[index];
 }
 
-const D_UINT8*
-GlobalsManager::Name (const D_UINT index) const
+const uint8_t*
+GlobalsManager::Name (const uint_t index) const
 {
   if (index >= m_Storage.size ())
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
@@ -111,10 +111,10 @@ GlobalsManager::Name (const D_UINT index) const
   return  &m_Identifiers [entry.m_IdOffet];
 }
 
-const D_UINT8*
-GlobalsManager::GetGlobalTI (const D_UINT32 glbId)
+const uint8_t*
+GlobalsManager::GetGlobalTI (const uint32_t glbId)
 {
-  const D_UINT32 index = glbId & ~GLOBAL_ID;
+  const uint32_t index = glbId & ~GLOBAL_ID;
 
   assert (IsValid (glbId));
   assert (m_GlobalsEntrys.size () == m_Storage.size ());
@@ -124,7 +124,7 @@ GlobalsManager::GetGlobalTI (const D_UINT32 glbId)
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   TypeManager&   typeMgr = m_Names.GetTypeManager ();
-  const D_UINT8* pType   = typeMgr.GetType (m_GlobalsEntrys[index].m_TypeOffset);
+  const uint8_t* pType   = typeMgr.GetType (m_GlobalsEntrys[index].m_TypeOffset);
 
   assert (typeMgr.IsTypeValid (pType));
 

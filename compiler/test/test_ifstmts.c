@@ -13,7 +13,7 @@
 extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -33,10 +33,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  int vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
@@ -50,7 +50,7 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-D_CHAR proc_decl_buffer[] =
+char proc_decl_buffer[] =
   "PROCEDURE proc1() RETURN BOOL "
   "DO "
   "LET a,b AS BOOL; "
@@ -98,10 +98,10 @@ D_CHAR proc_decl_buffer[] =
   "b = FALSE; "
   "ELSE " "b = a = TRUE; " "END " " " "RETURN b; " "ENDPROC\n " " " " ";
 
-static D_INT32
-get_int32 (D_UINT8 * buffer)
+static int32_t
+get_int32 (uint8_t * buffer)
 {
-  D_INT32 value = 0;
+  int32_t value = 0;
   value = buffer[3];
   value <<= 8;
   value += buffer[2];
@@ -113,13 +113,13 @@ get_int32 (D_UINT8 * buffer)
   return value;
 }
 
-static D_BOOL
-check_procedure_1 (struct ParserState *state, D_CHAR * proc_name)
+static bool_t
+check_procedure_1 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
-  D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  int code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
 
@@ -146,13 +146,13 @@ check_procedure_1 (struct ParserState *state, D_CHAR * proc_name)
   return TRUE;
 }
 
-static D_BOOL
-check_procedure_2 (struct ParserState *state, D_CHAR * proc_name)
+static bool_t
+check_procedure_2 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
-  D_INT code_size = get_size_outstream (stmt_query_instrs (stmt));
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  int code_size = get_size_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
   int shift_exit = 0;
@@ -186,12 +186,12 @@ check_procedure_2 (struct ParserState *state, D_CHAR * proc_name)
   return TRUE;
 }
 
-static D_BOOL
-check_procedure_3 (struct ParserState *state, D_CHAR * proc_name)
+static bool_t
+check_procedure_3 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
   int if_exit = 0;
@@ -235,12 +235,12 @@ check_procedure_3 (struct ParserState *state, D_CHAR * proc_name)
   return TRUE;
 }
 
-static D_BOOL
-check_procedure_4 (struct ParserState *state, D_CHAR * proc_name)
+static bool_t
+check_procedure_4 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
-  D_UINT8 *code = get_buffer_outstream (stmt_query_instrs (stmt));
+  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
   int if_exit = 0;
@@ -288,7 +288,7 @@ check_procedure_4 (struct ParserState *state, D_CHAR * proc_name)
   return TRUE;
 }
 
-static D_BOOL
+static bool_t
 check_all_procs (struct ParserState *state)
 {
 
@@ -300,7 +300,7 @@ check_all_procs (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, proc_decl_buffer);

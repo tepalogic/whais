@@ -34,10 +34,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class WodCmdLineParser
 {
 public:
-  WodCmdLineParser (D_INT argc, D_CHAR** argv);
+  WodCmdLineParser (int argc, char** argv);
   ~WodCmdLineParser ();
 
-  const D_CHAR* GetSourceFile () const
+  const char* GetSourceFile () const
   {
     return m_SourceFile;
   }
@@ -52,9 +52,9 @@ private:
   void CheckArguments ();
 
 private:
-  D_INT         m_ArgCount;
-  D_CHAR**      m_Args;
-  const D_CHAR* m_SourceFile;
+  int         m_ArgCount;
+  char**      m_Args;
+  const char* m_SourceFile;
   std::ostream* m_OutStream;
   bool          m_ShowHelp;
 
@@ -63,10 +63,10 @@ private:
 class WodCmdLineException : public WException
 {
 public:
-  WodCmdLineException (const D_CHAR* pMessage,
-                       const D_CHAR* pFile,
-                       D_UINT32      line,
-                       D_UINT32      extra)
+  WodCmdLineException (const char* pMessage,
+                       const char* pFile,
+                       uint32_t      line,
+                       uint32_t      extra)
     : WException (pMessage, pFile, line, extra)
   {
   }
@@ -81,7 +81,7 @@ public:
   }
 
   virtual EXPCEPTION_TYPE Type () const { return DUMP_CMD_LINE_EXCEPTION; }
-  virtual const D_CHAR*   Description () const
+  virtual const char*   Description () const
   {
     return "Invalid command line.";
   }

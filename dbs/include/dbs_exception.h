@@ -32,10 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class DBS_SHL DBSException : public WException
 {
 public:
-  DBSException (const D_CHAR* pMessage,
-                const D_CHAR* pFile,
-                D_UINT32 uLine,
-                D_UINT32 extra)
+  DBSException (const char* pMessage,
+                const char* pFile,
+                uint32_t uLine,
+                uint32_t extra)
     : WException (pMessage, pFile, uLine, extra)
   {
   }
@@ -87,7 +87,7 @@ public:
       return DBS_EXCEPTION;
     }
 
-  virtual const D_CHAR* Description () const
+  virtual const char* Description () const
     {
       switch (GetExtra ())
         {

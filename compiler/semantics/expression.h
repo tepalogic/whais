@@ -91,7 +91,7 @@ translate_exp (struct ParserState* pState, YYSTYPE exp);
 YYSTYPE
 translate_return_exp (struct ParserState* pState, YYSTYPE exp);
 
-D_BOOL
+bool_t
 translate_bool_exp (struct ParserState* pState, YYSTYPE exp);
 
 YYSTYPE

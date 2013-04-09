@@ -14,13 +14,13 @@
 
 extern int yyparse (struct ParserState *);
 
-D_UINT last_msg_code = 0xFF, last_msg_type = 0XFF;
+uint_t last_msg_code = 0xFF, last_msg_type = 0XFF;
 
-static D_INT
-get_buffer_line_from_pos (const char *buffer, D_UINT buff_pos)
+static int
+get_buffer_line_from_pos (const char *buffer, uint_t buff_pos)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (buff_pos == IGNORE_BUFFER_POS)
     {
@@ -48,12 +48,12 @@ static char *MSG_PREFIX[] = {
 
 void
 my_postman (POSTMAN_BAG bag,
-            D_UINT buff_pos,
-            D_UINT msg_id,
-            D_UINT msgType, const D_CHAR * msgFormat, va_list args)
+            uint_t buff_pos,
+            uint_t msg_id,
+            uint_t msgType, const char * msgFormat, va_list args)
 {
   const char *buffer = (const char *) bag;
-  D_INT buff_line = get_buffer_line_from_pos (buffer, buff_pos);
+  int buff_line = get_buffer_line_from_pos (buffer, buff_pos);
 
   printf (MSG_PREFIX[msgType]);
   printf ("%d : line %d: ", msg_id, buff_line);
@@ -64,31 +64,31 @@ my_postman (POSTMAN_BAG bag,
   last_msg_type = msgType;
 }
 
-D_CHAR test_prog_1[] = ""
+char test_prog_1[] = ""
   "PROCEDURE Proc_1 () RETURN FIELD\n "
   "DO\n "
   "LET test_table AS TABLE OF (field1 AS INT8, field2 AS UNSIGNED INT8);\n "
   "RETURN test_table.field3;\n " "ENDPROC\n ";
 
-D_CHAR test_prog_2[] = ""
+char test_prog_2[] = ""
   "PROCEDURE Proc_1 () RETURN BOOL\n "
   "DO\n "
   "LET test AS BOOL; \n "
   "RETURN test[10, some_field];\n "
   "ENDPROC\n ";
 
-D_CHAR test_prog_3[] = ""
+char test_prog_3[] = ""
   "PROCEDURE Proc_1 () RETURN BOOL\n "
   "DO\n "
   "LET test AS BOOL; \n "
   "RETURN test.some_field;\n "
   "ENDPROC\n ";
 
-D_BOOL
-test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
+bool_t
+test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
   WHC_HANDLER handler;
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
 
   last_msg_code = 0xFF, last_msg_type = 0XFF;
   handler = whc_hnd_create (test_buffer,
@@ -120,7 +120,7 @@ test_for_error (const char *test_buffer, D_UINT err_expected, D_UINT err_type)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
 
   printf ("Testing for received error messages...\n");
   test_result = test_for_error (test_prog_1, MSG_MEMSEL_ERD, MSG_ERROR_EVENT);

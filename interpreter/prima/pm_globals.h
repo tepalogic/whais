@@ -38,8 +38,8 @@ class NameSpace;
 
 struct GlobalEntry
 {
-  D_UINT32  m_IdOffet;
-  D_UINT32  m_TypeOffset;
+  uint32_t  m_IdOffet;
+  uint32_t  m_TypeOffset;
 };
 
 class GlobalsManager
@@ -55,30 +55,30 @@ public:
 
   ~GlobalsManager ();
 
-  D_UINT Count () const { return m_GlobalsEntrys.size (); };
+  uint_t Count () const { return m_GlobalsEntrys.size (); };
 
-  D_UINT32           AddGlobal (const D_UINT8*     pName,
-                                const D_UINT       nameLength,
+  uint32_t           AddGlobal (const uint8_t*     pName,
+                                const uint_t       nameLength,
                                 GlobalValue&       value,
-                                const D_UINT32     tiOffset);
-  D_UINT32           FindGlobal (const D_UINT8 *const pName,
-                                 const D_UINT         nameLength);
+                                const uint32_t     tiOffset);
+  uint32_t           FindGlobal (const uint8_t *const pName,
+                                 const uint_t         nameLength);
 
-  GlobalValue&       GetGlobal (const D_UINT32 glbId);
-  const D_UINT8*     Name (const D_UINT index) const;
-  const D_UINT8*     GetGlobalTI (const D_UINT32 glbId);
+  GlobalValue&       GetGlobal (const uint32_t glbId);
+  const uint8_t*     Name (const uint_t index) const;
+  const uint8_t*     GetGlobalTI (const uint32_t glbId);
 
-  static bool IsValid (const D_UINT32 glbId)
+  static bool IsValid (const uint32_t glbId)
   {
     return glbId != INVALID_ENTRY;
   }
 
-  static bool IsGlobalEntry (const D_UINT32 glbId)
+  static bool IsGlobalEntry (const uint32_t glbId)
   {
     return IsValid (glbId) && ((glbId & GLOBAL_ID) != 0);
   }
 
-  static void MarkAsGlobalEntry (D_UINT32& glbId)
+  static void MarkAsGlobalEntry (uint32_t& glbId)
   {
     glbId |= GLOBAL_ID;
   }
@@ -87,11 +87,11 @@ private:
   GlobalsManager (const GlobalsManager&);
   GlobalsManager& operator= (const GlobalsManager);
 
-  static const D_UINT32 GLOBAL_ID     = 0x80000000;
-  static const D_UINT32 INVALID_ENTRY = 0xFFFFFFFF;
+  static const uint32_t GLOBAL_ID     = 0x80000000;
+  static const uint32_t INVALID_ENTRY = 0xFFFFFFFF;
 
   NameSpace&               m_Names;
-  std::vector<D_UINT8>     m_Identifiers;
+  std::vector<uint8_t>     m_Identifiers;
   std::vector<GlobalValue> m_Storage;
   std::vector<GlobalEntry> m_GlobalsEntrys;
 };

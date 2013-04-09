@@ -15,12 +15,12 @@ struct ParserState;
 
 typedef struct _W_ALLOCATED_MEMORY
 {
-  D_UINT64    count;
+  uint64_t    count;
   struct _W_ALLOCATED_MEMORY *prev;
   struct _W_ALLOCATED_MEMORY *next;
   const char *file;
   size_t      size;
-  D_UINT32    line;
+  uint32_t    line;
 } W_ALLOCATED_MEMORY;
 
 

@@ -59,10 +59,10 @@ private:
 class WhcCmdLineException : public WException
 {
 public:
-  WhcCmdLineException (const D_CHAR* pMessage,
-                       const D_CHAR* pFile,
-                       D_UINT32      line,
-                       D_UINT32      extra)
+  WhcCmdLineException (const char* pMessage,
+                       const char* pFile,
+                       uint32_t      line,
+                       uint32_t      extra)
     : WException (pMessage, pFile, line, extra)
   {
   }
@@ -76,7 +76,7 @@ public:
     return new WhcCmdLineException (*this);
   }
   virtual EXPCEPTION_TYPE Type () const { return COMPILER_CMD_LINE_EXCEPTION; }
-  virtual const D_CHAR*   Description () const
+  virtual const char*   Description () const
   {
     return "Invalid command line.";
   }

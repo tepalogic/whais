@@ -27,16 +27,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct
 {
-  D_INT16  year;
-  D_UINT8  month;
-  D_UINT8  day;
-  D_UINT8  hour;
-  D_UINT8  min;
-  D_UINT8  sec;
+  int16_t  year;
+  uint8_t  month;
+  uint8_t  day;
+  uint8_t  hour;
+  uint8_t  min;
+  uint8_t  sec;
 }WTime;
 
 
-typedef D_UINT64 WTICKS;
+typedef uint64_t WTICKS;
 
 #ifdef __cplusplus
 extern "C"

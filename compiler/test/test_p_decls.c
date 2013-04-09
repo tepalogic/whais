@@ -10,7 +10,7 @@
 extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -30,10 +30,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  int vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
@@ -47,11 +47,11 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-static D_BOOL
-check_container_field (struct DeclaredVar *extra, D_CHAR * field,
+static bool_t
+check_container_field (struct DeclaredVar *extra, char * field,
                        unsigned type)
 {
-  D_CHAR result = FALSE;
+  char result = FALSE;
   unsigned int f_len = strlen (field);
   while (extra != NULL)
     {
@@ -78,7 +78,7 @@ check_container_field (struct DeclaredVar *extra, D_CHAR * field,
   return result;
 }
 
-D_CHAR proc_decl_buffer[] =
+char proc_decl_buffer[] =
   "PROCEDURE ProcId1 () RETURN TEXT "
   "DO "
   "LET dummy_var1 as REAL; "
@@ -107,13 +107,13 @@ D_CHAR proc_decl_buffer[] =
   "RETURN NULL; "
   "ENDPROC";
 
-static D_BOOL
+static bool_t
 general_proc_check (struct Statement *glb_stmt,
                     struct Statement *proc_stmt,
-                    D_CHAR * proc_name, D_INT parameters, D_INT local_vars)
+                    char * proc_name, int parameters, int local_vars)
 {
-  D_UINT count = 0;
-  D_UINT nlocals = 0;
+  uint_t count = 0;
+  uint_t nlocals = 0;
   if ((proc_stmt->type != STMT_PROC) ||
       (proc_stmt->pParentStmt != glb_stmt) ||
       (proc_stmt->spec.proc.nameLength != strlen (proc_name)) ||
@@ -145,7 +145,7 @@ general_proc_check (struct Statement *glb_stmt,
   return TRUE;
 }
 
-static D_BOOL
+static bool_t
 check_procs_decl (struct ParserState *state)
 {
   struct Statement *const glb_stmt = &(state->globalStmt);
@@ -153,7 +153,7 @@ check_procs_decl (struct ParserState *state)
   struct Statement *proc = NULL;
   struct DeclaredVar *tmp_var = NULL;
   struct DeclaredVar *tmp_table = NULL;
-  D_UINT type = T_INT16;
+  uint_t type = T_INT16;
 
   if ((glb_stmt->pParentStmt != NULL) || (glb_stmt->type != STMT_GLOBAL))
     {
@@ -365,7 +365,7 @@ check_procs_decl (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, proc_decl_buffer);

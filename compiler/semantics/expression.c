@@ -103,20 +103,20 @@ create_exp_link (struct ParserState* pState,
   return result;
 }
 
-static D_BOOL
-is_unsigned (D_UINT type)
+static bool_t
+is_unsigned (uint_t type)
 {
   return ((type >= T_UINT8) && (type <= T_UINT64));
 }
 
-static D_BOOL
-is_signed (D_UINT type)
+static bool_t
+is_signed (uint_t type)
 {
   return ((type >= T_INT8) && (type <= T_INT64));
 }
 
-static D_BOOL
-is_integer (D_UINT type)
+static bool_t
+is_integer (uint_t type)
 {
   return is_unsigned (type) || is_signed (type);
 }
@@ -124,7 +124,7 @@ is_integer (D_UINT type)
 struct ExpResultType
 {
   const struct DeclaredVar* extra; /* only for table types */
-  D_UINT                    type;
+  uint_t                    type;
 };
 
 static const struct ExpResultType gResultUnk = { NULL, T_UNKNOWN };
@@ -135,15 +135,15 @@ translate_exp_tree (struct ParserState* const   pState,
                     struct Statement* const     pStmt,
                     struct SemExpression* const pTreeHead);
 
-static D_BOOL
+static bool_t
 is_leaf_exp (struct SemExpression *exp)
 {
   return (exp->opcode == OP_NULL) && (exp->pSecondOp == NULL);
 }
 
 static const struct DeclaredVar*
-find_field (const D_CHAR* const       pLabel,
-            const D_UINT              labelLen,
+find_field (const char* const       pLabel,
+            const uint_t              labelLen,
             const struct DeclaredVar* pFieldList)
 {
   assert (pFieldList != NULL);
@@ -169,12 +169,12 @@ find_field (const D_CHAR* const       pLabel,
   return pFieldList;
 }
 
-static D_BOOL
+static bool_t
 are_compatible_fields (const struct DeclaredVar* const pFirstField,
                        const struct DeclaredVar* const pSecondField)
 {
-  const D_UINT firstBaseType  = GET_BASIC_TYPE (pFirstField->type);
-  const D_UINT secondBaseType = GET_BASIC_TYPE (pSecondField->type);
+  const uint_t firstBaseType  = GET_BASIC_TYPE (pFirstField->type);
+  const uint_t secondBaseType = GET_BASIC_TYPE (pSecondField->type);
 
   assert (IS_TABLE_FIELD (pFirstField->type));
   assert (IS_TABLE_FIELD (pSecondField->type));
@@ -193,8 +193,8 @@ are_compatible_fields (const struct DeclaredVar* const pFirstField,
   return TRUE;
 }
 
-static const D_CHAR*
-array_to_text (D_UINT type)
+static const char*
+array_to_text (uint_t type)
 {
   assert (IS_ARRAY (type));
   type = GET_BASIC_TYPE (type);
@@ -237,8 +237,8 @@ array_to_text (D_UINT type)
   return "ARRAY";
 }
 
-static const D_CHAR*
-field_to_text (D_UINT type)
+static const char*
+field_to_text (uint_t type)
 {
   assert (IS_FIELD (type));
 
@@ -320,8 +320,8 @@ field_to_text (D_UINT type)
   return "FIELD";
 }
 
-static const D_CHAR*
-type_to_text (D_UINT type)
+static const char*
+type_to_text (uint_t type)
 {
   type = GET_TYPE (type);
 
@@ -375,7 +375,7 @@ translate_exp_not (struct ParserState* const         pState,
   struct Statement* const    pStmt        = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
   enum W_OPCODE              opcode       = W_NA;
-  const D_UINT               ftype        = GET_TYPE (firstType->type);
+  const uint_t               ftype        = GET_TYPE (firstType->type);
 
   assert (pStmt->type == STMT_PROC);
 
@@ -404,7 +404,7 @@ translate_exp_not (struct ParserState* const         pState,
 
 static struct ExpResultType
 translate_exp_chknull (struct ParserState* const pState,
-                       const D_BOOL              trueIfNull)
+                       const bool_t              trueIfNull)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
@@ -497,8 +497,8 @@ translate_exp_sub (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -560,8 +560,8 @@ translate_exp_mul (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -622,8 +622,8 @@ translate_exp_div (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -685,8 +685,8 @@ translate_exp_mod (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -724,8 +724,8 @@ translate_exp_less (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -765,8 +765,8 @@ translate_exp_less_equal (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -806,8 +806,8 @@ translate_exp_grater (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -847,8 +847,8 @@ translate_exp_grater_equal (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -888,8 +888,8 @@ translate_exp_equals (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -930,8 +930,8 @@ translate_exp_not_equals (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -972,8 +972,8 @@ translate_exp_or (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1021,8 +1021,8 @@ translate_exp_and (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1068,8 +1068,8 @@ translate_exp_xor (struct ParserState* const        pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1108,7 +1108,7 @@ translate_exp_xor (struct ParserState* const        pState,
   return result;
 }
 
-static D_BOOL
+static bool_t
 are_compatible_tables (struct ParserState* const         pState,
                        const struct ExpResultType* const pFirstType,
                        const struct ExpResultType* const pSecondType)
@@ -1133,7 +1133,7 @@ are_compatible_tables (struct ParserState* const         pState,
 
   while (IS_TABLE_FIELD (pFirstField->type))
     {
-      D_CHAR temp[128];
+      char temp[128];
 
       const struct DeclaredVar* pFoundField = find_field (pFirstField->label,
                                                           pFirstField->labelLength,
@@ -1179,8 +1179,8 @@ translate_exp_store (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1210,8 +1210,8 @@ translate_exp_store (struct ParserState* const         pState,
         }
       else if (IS_ARRAY (ftype) && IS_ARRAY (stype))
         {
-          const D_UINT temp_ftype = GET_BASIC_TYPE (ftype);
-          const D_UINT temp_stype = GET_BASIC_TYPE (stype);
+          const uint_t temp_ftype = GET_BASIC_TYPE (ftype);
+          const uint_t temp_stype = GET_BASIC_TYPE (stype);
 
           assert (temp_ftype <= T_UNDETERMINED);
           assert (temp_stype <= T_UNDETERMINED);
@@ -1263,8 +1263,8 @@ translate_exp_sadd (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1326,8 +1326,8 @@ translate_exp_ssub (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1382,8 +1382,8 @@ translate_exp_smul (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1438,8 +1438,8 @@ translate_exp_sdiv (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1494,8 +1494,8 @@ translate_exp_smod (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1540,8 +1540,8 @@ translate_exp_sand (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1588,8 +1588,8 @@ translate_exp_sxor (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1636,8 +1636,8 @@ translate_exp_sor (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1684,8 +1684,8 @@ translate_exp_index (struct ParserState* const         pState,
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
   struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  const D_UINT               ftype       = GET_TYPE (firstType->type);
-  const D_UINT               stype       = GET_TYPE (secondType->type);
+  const uint_t               ftype       = GET_TYPE (firstType->type);
+  const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -1761,7 +1761,7 @@ translate_exp_index (struct ParserState* const         pState,
 static struct ExpResultType
 translate_exp_opcode (struct ParserState* const   pState,
                       struct Statement* const     pStmt,
-                      const D_UINT16              opcode,
+                      const uint16_t              opcode,
                       const struct ExpResultType* firstType,
                       const struct ExpResultType* secondType)
 {
@@ -1915,15 +1915,15 @@ translate_exp_leaf (struct ParserState* const pState,
                                                        expression->val.u_id.length,
                                                        TRUE,
                                                        TRUE);
-      D_UINT32 value;
-      D_UINT32 value_32 = ~0;
-      D_UINT16 value_16 = ~0;
-      D_UINT8  value_8  = ~0;
+      uint32_t value;
+      uint32_t value_32 = ~0;
+      uint16_t value_16 = ~0;
+      uint8_t  value_8  = ~0;
       enum W_OPCODE op_code = W_NA;
 
       if (pVar == NULL)
         {
-          D_CHAR temp[128];
+          char temp[128];
           copy_text_truncate (temp,
                               expression->val.u_id.text,
                               sizeof temp,
@@ -1987,16 +1987,16 @@ translate_exp_leaf (struct ParserState* const pState,
     }
   else if (expression->val_type == VAL_C_INT)
     {
-      const D_UINT32 value_32 = ~0;
-      const D_UINT16 value_16 = ~0;
-      const D_UINT8  value_8  = ~0;
+      const uint32_t value_32 = ~0;
+      const uint16_t value_16 = ~0;
+      const uint8_t  value_8  = ~0;
 
       if (expression->val.u_int.value <= value_8)
         {
           result.type = expression->val.u_int.is_signed ? T_INT8 : T_UINT8;
           if ((w_opcode_encode (pCodeStream, W_LDI8) == NULL) ||
               (output_uint8 (pCodeStream,
-                             (D_UINT8)expression->val.u_int.value & value_8) == NULL))
+                             (uint8_t)expression->val.u_int.value & value_8) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2007,7 +2007,7 @@ translate_exp_leaf (struct ParserState* const pState,
           result.type = expression->val.u_int.is_signed ? T_INT16 : T_UINT16;
           if ((w_opcode_encode (pCodeStream, W_LDI16) == NULL) ||
               (output_uint16 (pCodeStream,
-                              (D_UINT16)expression->val.u_int.value & value_16) == NULL))
+                              (uint16_t)expression->val.u_int.value & value_16) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2018,7 +2018,7 @@ translate_exp_leaf (struct ParserState* const pState,
           result.type = expression->val.u_int.is_signed ? T_INT32 : T_UINT32;
           if ((w_opcode_encode (pCodeStream, W_LDI32) == NULL) ||
               (output_uint32 (pCodeStream,
-                              (D_UINT32)expression->val.u_int.value & value_32) == NULL))
+                              (uint32_t)expression->val.u_int.value & value_32) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2028,7 +2028,7 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = expression->val.u_int.is_signed ? T_INT64 : T_UINT64;
           if ((w_opcode_encode (pCodeStream, W_LDI64) == NULL) ||
-              (output_uint64 (pCodeStream, (D_UINT64) expression->val.u_int.value) == NULL))
+              (output_uint64 (pCodeStream, (uint64_t) expression->val.u_int.value) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2037,7 +2037,7 @@ translate_exp_leaf (struct ParserState* const pState,
     }
   else if (expression->val_type == VAL_C_CHAR)
     {
-      const D_UINT32 unicodeCh = expression->val.u_char.value;
+      const uint32_t unicodeCh = expression->val.u_char.value;
 
       result.type = T_CHAR;
       if ((w_opcode_encode (pCodeStream, W_LDC) == NULL)
@@ -2111,8 +2111,8 @@ translate_exp_leaf (struct ParserState* const pState,
   else if (expression->val_type == VAL_C_TEXT)
     {
       struct SemCText* const value    = &expression->val.u_text;
-      D_INT32                constPos = add_text_const (pStmt,
-                                                        (const D_UINT8*)value->text,
+      int32_t                constPos = add_text_const (pStmt,
+                                                        (const uint8_t*)value->text,
                                                         value->length);
 
       result.type = T_TEXT;
@@ -2154,9 +2154,9 @@ translate_exp_call (struct ParserState* const   pState,
   const struct Statement*    pProc       = NULL;
   const struct DeclaredVar*  pProcVar    = NULL;
   struct SemValue*           pExpArg     = NULL;
-  D_UINT                     argCount    = 0;
+  uint_t                     argCount    = 0;
   struct ExpResultType       result;
-  D_CHAR                     temp[128];
+  char                     temp[128];
 
   assert (callExp->pFirstOp->val_type == VAL_ID);
   assert ((callExp->pSecondOp == NULL) ||
@@ -2232,8 +2232,8 @@ translate_exp_call (struct ParserState* const   pState,
         {
           if (IS_FIELD (result.type))
             {
-              const D_BOOL isArgArray = IS_ARRAY (GET_FIELD_TYPE (argType.type));
-              const D_BOOL isArgUndet = isArgArray ?
+              const bool_t isArgArray = IS_ARRAY (GET_FIELD_TYPE (argType.type));
+              const bool_t isArgUndet = isArgArray ?
                                           FALSE :
                                           (GET_BASIC_TYPE (argType.type) == T_UNDETERMINED);
 
@@ -2262,8 +2262,8 @@ translate_exp_call (struct ParserState* const   pState,
             {
               if (IS_ARRAY (result.type) == IS_ARRAY (argType.type))
                 {
-                  const D_UINT        arg_t  = GET_BASIC_TYPE (argType.type);
-                  const D_UINT        res_t  = GET_BASIC_TYPE (result.type);
+                  const uint_t        arg_t  = GET_BASIC_TYPE (argType.type);
+                  const uint_t        res_t  = GET_BASIC_TYPE (result.type);
                   const enum W_OPCODE tempOp = store_op[arg_t][res_t];
 
                   assert (arg_t <= T_UNDETERMINED);
@@ -2418,7 +2418,7 @@ translate_exp_tabval (struct ParserState* const   pState,
 
   if (pVarField == NULL)
     {
-      D_CHAR temp[128];
+      char temp[128];
 
       copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
       w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_ERD, temp);
@@ -2428,8 +2428,8 @@ translate_exp_tabval (struct ParserState* const   pState,
     }
 
   {
-    const D_INT32 constPos = add_text_const (pStmt,
-                                             (const D_UINT8*)pId->text,
+    const int32_t constPos = add_text_const (pStmt,
+                                             (const uint8_t*)pId->text,
                                              pId->length);
 
     if ((constPos < 0) ||
@@ -2492,7 +2492,7 @@ translate_exp_field (struct ParserState* const   pState,
 
   if (pVarField == NULL)
     {
-      D_CHAR temp[128];
+      char temp[128];
 
       copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
       w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_ERD, temp);
@@ -2502,8 +2502,8 @@ translate_exp_field (struct ParserState* const   pState,
     }
 
   {
-    const D_INT32 constPos = add_text_const (pStmt,
-                                             (const D_UINT8*)pId->text,
+    const int32_t constPos = add_text_const (pStmt,
+                                             (const uint8_t*)pId->text,
                                              pId->length);
 
     if ((constPos < 0) ||
@@ -2532,9 +2532,9 @@ translate_exp_tree (struct ParserState* const   pState,
                     struct SemExpression* const pTreeHead)
 {
   struct OutputStream* const pCodeStream    = stmt_query_instrs (pState->pCurrentStmt);
-  D_BOOL                     needsJmpAdjust = FALSE;
-  D_INT                      jmpPosition;
-  D_INT                      jmpDataPos;
+  bool_t                     needsJmpAdjust = FALSE;
+  int                      jmpPosition;
+  int                      jmpDataPos;
   struct ExpResultType       firstType;
   struct ExpResultType       secondType;
 
@@ -2591,7 +2591,7 @@ translate_exp_tree (struct ParserState* const   pState,
             }
           needsJmpAdjust = TRUE;
         }
-      jmpDataPos = get_size_outstream (pCodeStream) - sizeof (D_UINT32);
+      jmpDataPos = get_size_outstream (pCodeStream) - sizeof (uint32_t);
     }
 
   if (pTreeHead->pSecondOp != NULL)
@@ -2619,9 +2619,9 @@ translate_exp_tree (struct ParserState* const   pState,
   if (needsJmpAdjust && (GET_TYPE (secondType.type) == T_BOOL))
     {
       /* lets correct some jumps offsets */
-      D_INT                currentPos = get_size_outstream (pCodeStream) - jmpPosition;
-      const D_UINT8* const pCurrPos   = (D_UINT8*)&currentPos;
-      D_UINT8* const       pCode      = get_buffer_outstream (pCodeStream);
+      int                currentPos = get_size_outstream (pCodeStream) - jmpPosition;
+      const uint8_t* const pCurrPos   = (uint8_t*)&currentPos;
+      uint8_t* const       pCode      = get_buffer_outstream (pCodeStream);
 
       /* Fix the jump offset! */
       pCode[jmpDataPos + 0] = pCurrPos[0];
@@ -2711,8 +2711,8 @@ translate_return_exp (struct ParserState* pState, YYSTYPE exp)
         {
           if (IS_ARRAY (retType.type) == FALSE)
             {
-              const D_UINT        baseExpType   = GET_BASIC_TYPE (expType.type);
-              const D_UINT        baseRetType   = GET_BASIC_TYPE (retType.type);
+              const uint_t        baseExpType   = GET_BASIC_TYPE (expType.type);
+              const uint_t        baseRetType   = GET_BASIC_TYPE (retType.type);
               const enum W_OPCODE temp_op       = store_op[baseRetType][baseExpType];
 
               assert (IS_ARRAY (expType.type) == FALSE);
@@ -2760,7 +2760,7 @@ translate_return_exp (struct ParserState* pState, YYSTYPE exp)
   return NULL;
 }
 
-D_BOOL
+bool_t
 translate_bool_exp (struct ParserState* pState, YYSTYPE exp)
 {
   struct ExpResultType expType;

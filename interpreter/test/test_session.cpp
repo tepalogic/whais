@@ -15,9 +15,9 @@
 #include "interpreter.h"
 #include "custom/include/test/test_fmw.h"
 
-static const D_CHAR admin[] = "administrator";
+static const char admin[] = "administrator";
 
-static const D_UINT8 firstCode[] =
+static const uint8_t firstCode[] =
     "LET gb0 AS DATE;\n"
     "LET gb1 AS UNSIGNED INT32;\n"
     "LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
@@ -58,7 +58,7 @@ static const D_UINT8 firstCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 secondCode[] =
+static const uint8_t secondCode[] =
     "EXTERN LET gb1 AS UNSIGNED INT32;\n"
     "\n"
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
@@ -81,7 +81,7 @@ static const D_UINT8 secondCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 notDefGlbCode[] =
+static const uint8_t notDefGlbCode[] =
     "EXTERN LET someGlobal AS UNSIGNED INT32;"
     "PROCEDURE random_proc_name () RETURN INT32\n"
     "DO\n"
@@ -89,7 +89,7 @@ static const D_UINT8 notDefGlbCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 notDefProcCode[] =
+static const uint8_t notDefProcCode[] =
     "EXTERN PROCEDURE some_proc_name (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
     "                   p1v3 AS ARRAY,\n"
@@ -105,7 +105,7 @@ static const D_UINT8 notDefProcCode[] =
 
 
 
-static const D_UINT8 doubleDefGlbCode[] =
+static const uint8_t doubleDefGlbCode[] =
     "EXTERN LET gb1 AS UNSIGNED INT32;\n"
     "LET gb0 AS UNSIGNED INT32;"
     "PROCEDURE random_proc_name_2 () RETURN INT32\n"
@@ -114,7 +114,7 @@ static const D_UINT8 doubleDefGlbCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 doubleDefProcCode[] =
+static const uint8_t doubleDefProcCode[] =
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
     "                   p1v3 AS ARRAY,\n"
@@ -129,7 +129,7 @@ static const D_UINT8 doubleDefProcCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 diffDefGlbCode[] =
+static const uint8_t diffDefGlbCode[] =
     "EXTERN LET gb1 AS UNSIGNED INT64;\n"
     "PROCEDURE random_proc_name_4 () RETURN INT64\n"
     "DO\n"
@@ -137,7 +137,7 @@ static const D_UINT8 diffDefGlbCode[] =
     "\n"
     "ENDPROC\n";
 
-static const D_UINT8 diffDefProcCode[] =
+static const uint8_t diffDefProcCode[] =
     "EXTERN PROCEDURE proced_1 (p1v1 AS DATE,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
     "                   p1v3 AS ARRAY,\n"
@@ -154,15 +154,15 @@ static const D_UINT8 diffDefProcCode[] =
 
 
 
-static const D_CHAR *MSG_PREFIX[] = {
+static const char *MSG_PREFIX[] = {
                                       "", "error ", "warning ", "error "
                                     };
 
-static D_UINT
-get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
+static uint_t
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
-  D_UINT count = 0;
-  D_INT result = 1;
+  uint_t count = 0;
+  int result = 1;
 
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
@@ -182,14 +182,14 @@ get_line_from_buffer (const D_CHAR * buffer, D_UINT buff_pos)
 
 void
 my_postman (WHC_MESSENGER_ARG data,
-            D_UINT            buff_pos,
-            D_UINT            msg_id,
-            D_UINT            msgType,
-            const D_CHAR*     pMsgFormat,
+            uint_t            buff_pos,
+            uint_t            msg_id,
+            uint_t            msgType,
+            const char*     pMsgFormat,
             va_list           args)
 {
-  const D_CHAR *buffer = (const D_CHAR *) data;
-  D_INT buff_line = get_line_from_buffer (buffer, buff_pos);
+  const char *buffer = (const char *) data;
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
   fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
@@ -469,6 +469,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

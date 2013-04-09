@@ -10,7 +10,7 @@
 extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const D_CHAR * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store ();
@@ -30,10 +30,10 @@ free_state (struct ParserState *state)
 
 }
 
-static D_BOOL
+static bool_t
 check_used_vals (struct ParserState *state)
 {
-  D_INT vals_count = get_array_count (&state->parsedValues);
+  int vals_count = get_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
       struct SemValue *val = get_item (&state->parsedValues, vals_count);
@@ -47,15 +47,15 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-D_CHAR buffer[] =
+char buffer[] =
   "LET aVar01_ AS ARRAY OF INT32;\n"
   "LET aVar02_ AS ARRAY OF REAL;\n"
   "LET aVar031 AS ARRAY OF REAL;\n"
   "LET aVar04, __array_2_ AS ARRAY OF TEXT;\n";
 
-static D_BOOL
+static bool_t
 check_declared_var (struct Statement *stm,
-                    struct DeclaredVar *var, D_UINT type)
+                    struct DeclaredVar *var, uint_t type)
 {
   struct OutputStream *os = &stm->spec.glb.typesDescs;
   if ((var == NULL) ||                /* var not found */
@@ -83,13 +83,13 @@ check_declared_var (struct Statement *stm,
   return TRUE;
 }
 
-static D_BOOL
+static bool_t
 check_vars_decl (struct ParserState *state)
 {
   struct DeclaredVar *decl_var = NULL;
-  D_UINT count;
-  D_UINT temp_pos;
-  D_UINT type;
+  uint_t count;
+  uint_t temp_pos;
+  uint_t type;
 
   if (state->globalStmt.type != STMT_GLOBAL ||
       state->globalStmt.pParentStmt != NULL)
@@ -147,7 +147,7 @@ check_vars_decl (struct ParserState *state)
 int
 main ()
 {
-  D_BOOL test_result = TRUE;
+  bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
   init_state_for_test (&state, buffer);

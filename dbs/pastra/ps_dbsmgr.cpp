@@ -37,31 +37,31 @@
 using namespace pastra;
 using namespace std;
 
-static const D_CHAR DBS_FILE_EXT[]       = ".pd";
-static const D_CHAR DBS_FILE_SIGNATURE[] = {
+static const char DBS_FILE_EXT[]       = ".pd";
+static const char DBS_FILE_SIGNATURE[] = {
                                               0x50, 0x41, 0x53, 0x54,
                                               0x52, 0x41, 0x20, 0x44
                                             };
 
-static const D_UINT16 PS_DBS_VER_MAJ      = 0;
-static const D_UINT16 PS_DBS_VER_MIN      = 10;
+static const uint16_t PS_DBS_VER_MAJ      = 0;
+static const uint16_t PS_DBS_VER_MIN      = 10;
 
-static const D_UINT PS_DBS_SIGNATURE_OFF  = 0;
-static const D_UINT PS_DBS_SIGNATURE_LEN  = 8;
-static const D_UINT PS_DBS_VER_MAJ_OFF    = 8;
-static const D_UINT PS_DBS_VER_MAJ_LEN    = 2;
-static const D_UINT PS_DBS_VER_MIN_OFF    = 10;
-static const D_UINT PS_DBS_VER_MIN_LEN    = 2;
-static const D_UINT PS_DBS_NUM_TABLES_OFF = 14;
-static const D_UINT PS_DBS_NUM_TABLES_LEN = 2;
-static const D_UINT PS_DBS_MAX_FILE_OFF   = 16;
-static const D_UINT PS_DBS_MAX_FILE_LEN   = 8;
+static const uint_t PS_DBS_SIGNATURE_OFF  = 0;
+static const uint_t PS_DBS_SIGNATURE_LEN  = 8;
+static const uint_t PS_DBS_VER_MAJ_OFF    = 8;
+static const uint_t PS_DBS_VER_MAJ_LEN    = 2;
+static const uint_t PS_DBS_VER_MIN_OFF    = 10;
+static const uint_t PS_DBS_VER_MIN_LEN    = 2;
+static const uint_t PS_DBS_NUM_TABLES_OFF = 14;
+static const uint_t PS_DBS_NUM_TABLES_LEN = 2;
+static const uint_t PS_DBS_MAX_FILE_OFF   = 16;
+static const uint_t PS_DBS_MAX_FILE_LEN   = 8;
 
-static const D_UINT PS_DBS_HEADER_SIZE = 24;
+static const uint_t PS_DBS_HEADER_SIZE = 24;
 
 struct DbsElement
 {
-  D_UINT64   m_RefCount;
+  uint64_t   m_RefCount;
   DbsHandler m_Dbs;
 
   DbsElement (const DbsHandler& rDbs) :
@@ -141,8 +141,8 @@ DBSGetSeettings ()
 }
 
 DBS_SHL void
-DBSCreateDatabase (const D_CHAR* const pName,
-                   const D_CHAR*       pDbsDirectory)
+DBSCreateDatabase (const char* const pName,
+                   const char*       pDbsDirectory)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -156,24 +156,24 @@ DBSCreateDatabase (const D_CHAR* const pName,
 
   WFile dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
 
-  auto_ptr<D_UINT8> apBufferHeader (new D_UINT8[PS_DBS_HEADER_SIZE]);
-  D_UINT8* const    cpHeader = apBufferHeader.get ();
+  auto_ptr<uint8_t> apBufferHeader (new uint8_t[PS_DBS_HEADER_SIZE]);
+  uint8_t* const    cpHeader = apBufferHeader.get ();
 
   memcpy (cpHeader + PS_DBS_SIGNATURE_OFF,
           DBS_FILE_SIGNATURE,
           PS_DBS_SIGNATURE_LEN);
 
-  *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
-  *_RC (D_UINT16*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
-  *_RC (D_UINT16*, cpHeader + PS_DBS_NUM_TABLES_OFF) = 0;
-  *_RC (D_UINT64*, cpHeader + PS_DBS_MAX_FILE_OFF)   =
+  *_RC (uint16_t*, cpHeader + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
+  *_RC (uint16_t*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
+  *_RC (uint16_t*, cpHeader + PS_DBS_NUM_TABLES_OFF) = 0;
+  *_RC (uint64_t*, cpHeader + PS_DBS_MAX_FILE_OFF)   =
                                   apDbsManager_->m_DBSSettings.m_MaxFileSize;
 
   dbsFile.Write (cpHeader, PS_DBS_HEADER_SIZE);
 }
 
 DBS_SHL  I_DBSHandler&
-DBSRetrieveDatabase (const D_CHAR* const pName, const D_CHAR* pDatabaseDir)
+DBSRetrieveDatabase (const char* const pName, const char* pDatabaseDir)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -235,7 +235,7 @@ DBSReleaseDatabase (I_DBSHandler& hndDatabase)
 }
 
 DBS_SHL  void
-DBSRemoveDatabase (const D_CHAR* const pName, const D_CHAR* pDatabaseDir)
+DBSRemoveDatabase (const char* const pName, const char* pDatabaseDir)
 {
   if (apDbsManager_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -284,8 +284,8 @@ DbsHandler::DbsHandler (const DBSSettings& globalSettings,
   string fileName = m_DbsWorkDir + m_Name + DBS_FILE_EXT;
   WFile  inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
 
-  auto_ptr<D_UINT8> apBuffer (new D_UINT8[inputFile.GetSize ()]);
-  D_UINT8*          pBuffer = apBuffer.get ();
+  auto_ptr<uint8_t> apBuffer (new uint8_t[inputFile.GetSize ()]);
+  uint8_t*          pBuffer = apBuffer.get ();
 
   inputFile.Seek (0, WHC_SEEK_BEGIN);
   inputFile.Read (pBuffer, inputFile.GetSize ());
@@ -293,8 +293,8 @@ DbsHandler::DbsHandler (const DBSSettings& globalSettings,
   if (memcmp (pBuffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
     throw DBSException (NULL, _EXTRA (DBSException::INAVLID_DATABASE));
 
-  const D_UINT16 versionMaj = *_RC (D_UINT16*, pBuffer + PS_DBS_VER_MAJ_OFF);
-  const D_UINT16 versionMin = *_RC (D_UINT16*, pBuffer + PS_DBS_VER_MIN_OFF);
+  const uint16_t versionMaj = *_RC (uint16_t*, pBuffer + PS_DBS_VER_MAJ_OFF);
+  const uint16_t versionMin = *_RC (uint16_t*, pBuffer + PS_DBS_VER_MIN_OFF);
 
   if ((versionMaj > PS_DBS_VER_MAJ) ||
       ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
@@ -302,22 +302,22 @@ DbsHandler::DbsHandler (const DBSSettings& globalSettings,
       throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
     }
 
-  D_UINT64 maxFileSize  = *_RC (D_UINT64*, pBuffer + PS_DBS_MAX_FILE_OFF);
+  uint64_t maxFileSize  = *_RC (uint64_t*, pBuffer + PS_DBS_MAX_FILE_OFF);
 
   if (maxFileSize != m_GlbSettings.m_MaxFileSize)
     throw DBSException (NULL, _EXTRA (DBSException::INAVLID_DATABASE));
 
-  D_UINT16 tablesCount = *_RC (D_UINT16*, pBuffer + PS_DBS_NUM_TABLES_OFF);
+  uint16_t tablesCount = *_RC (uint16_t*, pBuffer + PS_DBS_NUM_TABLES_OFF);
 
   pBuffer += PS_DBS_HEADER_SIZE;
 
   while (tablesCount-- > 0)
     {
       m_Tables.insert (
-          pair<string, PersistentTable*> (_RC (D_CHAR*, pBuffer),
+          pair<string, PersistentTable*> (_RC (char*, pBuffer),
                                           _RC (PersistentTable*, NULL))
                       );
-      pBuffer += strlen (_RC (D_CHAR*, pBuffer)) + 1;
+      pBuffer += strlen (_RC (char*, pBuffer)) + 1;
     }
 
 }
@@ -368,7 +368,7 @@ DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
 }
 
 I_DBSTable&
-DbsHandler::RetrievePersistentTable (const D_CHAR* pTableName)
+DbsHandler::RetrievePersistentTable (const char* pTableName)
 {
   WSynchronizerRAII syncHolder (m_Sync);
 
@@ -384,7 +384,7 @@ DbsHandler::RetrievePersistentTable (const D_CHAR* pTableName)
 }
 
 void
-DbsHandler::AddTable (const D_CHAR* const pTableName,
+DbsHandler::AddTable (const char* const pTableName,
                       const FIELD_INDEX   fieldsCount,
                       DBSFieldDescriptor* pInOutFields)
 {
@@ -442,7 +442,7 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
       }
 }
 
-const D_CHAR*
+const char*
 DbsHandler::TableName (const TABLE_INDEX index)
 {
   TABLE_INDEX       iterator = index;
@@ -466,7 +466,7 @@ DbsHandler::TableName (const TABLE_INDEX index)
 }
 
 void
-DbsHandler::DeleteTable (const D_CHAR* const pTableName)
+DbsHandler::DeleteTable (const char* const pTableName)
 {
   WSynchronizerRAII syncHolder (m_Sync);
 
@@ -510,14 +510,14 @@ DbsHandler::Discard ()
 void
 DbsHandler::SyncToFile ()
 {
-  D_UINT8 aBuffer[PS_DBS_HEADER_SIZE];
+  uint8_t aBuffer[PS_DBS_HEADER_SIZE];
 
   memcpy (aBuffer, DBS_FILE_SIGNATURE, PS_DBS_SIGNATURE_LEN);
 
-  *_RC (D_UINT16*, aBuffer + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
-  *_RC (D_UINT16*, aBuffer + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
-  *_RC (D_UINT16*, aBuffer + PS_DBS_NUM_TABLES_OFF) = m_Tables.size ();
-  *_RC (D_UINT64*, aBuffer + PS_DBS_MAX_FILE_OFF)   = MaxFileSize ();
+  *_RC (uint16_t*, aBuffer + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
+  *_RC (uint16_t*, aBuffer + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
+  *_RC (uint16_t*, aBuffer + PS_DBS_NUM_TABLES_OFF) = m_Tables.size ();
+  *_RC (uint64_t*, aBuffer + PS_DBS_MAX_FILE_OFF)   = MaxFileSize ();
 
   string fileName (WorkingDir () + m_Name + DBS_FILE_EXT);
   WFile outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
@@ -526,7 +526,7 @@ DbsHandler::SyncToFile ()
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
     {
-      outFile.Write (_RC (const D_UINT8*, it->first.c_str ()),
+      outFile.Write (_RC (const uint8_t*, it->first.c_str ()),
                      it->first.length () + 1);
     }
 }
@@ -553,6 +553,6 @@ DbsHandler::RemoveFromStorage ()
 }
 
 #if  defined (ENABLE_MEMORY_TRACE) && defined (USE_DBS_SHL)
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "PASTRA";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "PASTRA";
 #endif

@@ -38,7 +38,7 @@ public:
   virtual bool               IsTemporal () const;
   virtual I_DBSTable&        Spawn () const;
   virtual FIELD_INDEX        GetFieldsCount ();
-  virtual FIELD_INDEX        GetFieldIndex (const D_CHAR* pFieldName);
+  virtual FIELD_INDEX        GetFieldIndex (const char* pFieldName);
   virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field);
   virtual ROW_INDEX          GetAllocatedRows ();
 

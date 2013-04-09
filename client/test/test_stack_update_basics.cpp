@@ -7,8 +7,8 @@ using namespace std;
 
 struct BasicValueEntry
 {
-  const D_UINT  type;
-  const D_CHAR* value;
+  const uint_t  type;
+  const char* value;
 };
 
 BasicValueEntry _values[] =
@@ -1152,7 +1152,7 @@ BasicValueEntry _values[] =
         {WFT_RICHREAL, "-1"}
     };
 
-static const D_UINT _valuesCount = sizeof (_values) / sizeof (_values[0]);
+static const uint_t _valuesCount = sizeof (_values) / sizeof (_values[0]);
 
 static bool
 test_step_update (W_CONNECTOR_HND hnd)
@@ -1160,10 +1160,10 @@ test_step_update (W_CONNECTOR_HND hnd)
 
   cout << "Testing basic values step update ... ";
 
-  for (D_UINT i = 0; i < _valuesCount; ++i)
+  for (uint_t i = 0; i < _valuesCount; ++i)
     {
-      D_UINT        type;
-      const D_CHAR* value;
+      uint_t        type;
+      const char* value;
 
       unsigned long long rowsCount, elemesCount;
 
@@ -1242,7 +1242,7 @@ test_bulk_update (W_CONNECTOR_HND hnd)
 
   cout << "Testing basic values bulk update ... ";
 
-  for (D_UINT i = 0; i < _valuesCount; ++i)
+  for (uint_t i = 0; i < _valuesCount; ++i)
     {
       if ((WPushStackValue (hnd, _values[i].type, 0, NULL) != WCS_OK)
           || (WUpdateStackValue (hnd,
@@ -1260,10 +1260,10 @@ test_bulk_update (W_CONNECTOR_HND hnd)
   if (WUpdateStackFlush (hnd) != WCS_OK)
     goto test_bulk_update_err;
 
-  for (D_INT i = _valuesCount - 1; i >= 0; --i)
+  for (int i = _valuesCount - 1; i >= 0; --i)
     {
-      D_UINT        type;
-      const D_CHAR* value;
+      uint_t        type;
+      const char* value;
 
       if ((WDescribeStackTop (hnd, &type) != WCS_OK)
           || (type != _values[i].type))
@@ -1329,19 +1329,19 @@ test_for_errors_fail :
   return false;
 }
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 1;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "test_password";

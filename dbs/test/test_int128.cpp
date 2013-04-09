@@ -12,8 +12,8 @@
 
 
 //#include <inttypes.h>
-//#define D_INT128 int128_t
-#undef D_UINT128
+//#define int128 int128_t
+#undef uint_t128
 
 #include "dbs_real.h"
 #include "utils/include/we_int128.h"
@@ -22,7 +22,7 @@
 
 using namespace std;
 
-D_UINT64 _iterationsCount = 5000000;
+uint64_t _iterationsCount = 5000000;
 
 
 static bool
@@ -30,12 +30,12 @@ test_for_addition_64bit_values ()
 {
 
   WE_I128 addRes, mulRes;
-  D_INT64 i,j;
+  int64_t i,j;
 
   cout << "Test for adds and muls of 64 bit values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd ();
       j = w_rnd ();
@@ -75,15 +75,15 @@ static bool
 test_for_addition_32bit_values ()
 {
   WE_I128 addRes, mulRes;
-  D_INT64 i,j;
+  int64_t i,j;
 
   cout << "Test for adds and muls of 32 bit values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
-      j = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
+      i = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
+      j = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
 
       addRes = WE_I128(i) + j;
       if (addRes != WE_I128(j) + i)
@@ -123,15 +123,15 @@ test_for_addition_mix_values ()
 {
 
   WE_I128 addRes, mulRes;
-  D_INT64 i,j;
+  int64_t i,j;
 
   cout << "Test for adds and muls of mix 32 and 64 bit values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd ();
-      j = _SC (D_INT32, w_rnd () & 0xFFFFFFFF);
+      j = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
 
       addRes = WE_I128(i) + j;
       if (addRes != WE_I128(j) + i)
@@ -169,12 +169,12 @@ static bool
 test_for_reminder_64bit_values ()
 {
   WE_I128 addRes, mulRes;
-  D_INT64 i,j, k;
+  int64_t i,j, k;
 
   cout << "Test for reminders of 64 bit values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & 0x7FFFFFFFFFFFFFFF;
       j = w_rnd () & 0x7FFFFFFFFFFFFFFF;
@@ -227,12 +227,12 @@ static bool
 test_for_reminder_32bit_values ()
 {
   WE_I128 addRes, mulRes;
-  D_INT64 i,j, k;
+  int64_t i,j, k;
 
   cout << "Test for reminders of 32 bit values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & 0x7FFFFFFF;
       j = w_rnd () & 0x7FFFFFFF;
@@ -290,12 +290,12 @@ static bool
 test_for_reminder_mix_bit_values ()
 {
   WE_I128 addRes, mulRes;
-  D_INT64 i,j, k;
+  int64_t i,j, k;
 
   cout << "Test for reminders of mix 32 and 64 bit values for ";
   cout << _iterationsCount << " random values.... ";
 
-  for (D_UINT64 it = 0; it <= _iterationsCount; ++it)
+  for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
       i = w_rnd () & 0x7FFFFFFFFFFFFFFF;
       j = w_rnd () & 0x7FFFFFFF;
@@ -348,7 +348,7 @@ static bool
 test_for_special_add_cases ()
 {
   WE_I128 sum;
-  D_INT64 i,j;
+  int64_t i,j;
 
   cout << "Testing addition of special cases... ";
 
@@ -388,7 +388,7 @@ test_for_special_add_cases ()
           if ((1ll - val1 != -val1 + 1) || (1ll - val2 != -val2 + 1))
             goto test_special_add_fail;
 
-          D_INT64 temp = w_rnd();
+          int64_t temp = w_rnd();
 
           if ((temp - val1 != -val1 + temp) || (temp - val2 != -val2 + temp))
             goto test_special_add_fail;
@@ -417,7 +417,7 @@ test_special_add_fail:
 static bool
 test_for_special_mul_cases ()
 {
-  D_INT64 i;
+  int64_t i;
 
   cout << "Testing multiplication of special cases... ";
 
@@ -501,7 +501,7 @@ main (int argc, char** argv)
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif
 

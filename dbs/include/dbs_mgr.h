@@ -33,12 +33,12 @@
 struct DBSFieldDescriptor;
 class I_DBSTable;
 
-static const D_UINT64 DEFAULT_MAX_FILE_SIZE           = 2147483648ul; //2GB
-static const D_UINT32 DEFAULT_TABLE_CACHE_BLK_SIZE    = 16384u;       //16KB
-static const D_UINT32 DEFAULT_TABLE_CACHE_BLK_COUNT   = 1024u;
-static const D_UINT32 DEFAULT_VLSTORE_CACHE_BLK_SIZE  = 16384u;       //16KB
-static const D_UINT32 DEFAULT_VLSTORE_CACHE_BLK_COUNT = 1024u;
-static const D_UINT32 DEFAULT_VLVALUE_CACHE_SIZE      = 512u;
+static const uint64_t DEFAULT_MAX_FILE_SIZE           = 2147483648ul; //2GB
+static const uint32_t DEFAULT_TABLE_CACHE_BLK_SIZE    = 16384u;       //16KB
+static const uint32_t DEFAULT_TABLE_CACHE_BLK_COUNT   = 1024u;
+static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_SIZE  = 16384u;       //16KB
+static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_COUNT = 1024u;
+static const uint32_t DEFAULT_VLVALUE_CACHE_SIZE      = 512u;
 
 class DBS_SHL I_DBSHandler
 {
@@ -48,17 +48,17 @@ public:
 
   virtual TABLE_INDEX   PersistentTablesCount () = 0;
   virtual I_DBSTable&   RetrievePersistentTable (const TABLE_INDEX index) = 0;
-  virtual I_DBSTable&   RetrievePersistentTable (const D_CHAR* pTableName) = 0;
-  virtual void          AddTable (const D_CHAR* const pTableName,
+  virtual I_DBSTable&   RetrievePersistentTable (const char* pTableName) = 0;
+  virtual void          AddTable (const char* const pTableName,
                                   const FIELD_INDEX   fieldsCount,
                                   DBSFieldDescriptor* pInOutFields) = 0;
-  virtual void          DeleteTable (const D_CHAR* const pTableName) = 0;
+  virtual void          DeleteTable (const char* const pTableName) = 0;
 
   virtual I_DBSTable&   CreateTempTable (const FIELD_INDEX   fieldsCount,
                                          DBSFieldDescriptor* pInOutFields) = 0;
   virtual void          ReleaseTable (I_DBSTable&) = 0;
 
-  virtual const D_CHAR* TableName (const TABLE_INDEX index) = 0;
+  virtual const char* TableName (const TABLE_INDEX index) = 0;
 };
 
 struct DBSSettings
@@ -77,12 +77,12 @@ struct DBSSettings
 
   std::string   m_WorkDir;
   std::string   m_TempDir;
-  D_UINT64      m_MaxFileSize;
-  D_UINT32      m_TableCacheBlkSize;
-  D_UINT32      m_TableCacheBlkCount;
-  D_UINT32      m_VLStoreCacheBlkSize;
-  D_UINT32      m_VLStoreCacheBlkCount;
-  D_UINT32      m_VLValueCacheSize;
+  uint64_t      m_MaxFileSize;
+  uint32_t      m_TableCacheBlkSize;
+  uint32_t      m_TableCacheBlkCount;
+  uint32_t      m_VLStoreCacheBlkSize;
+  uint32_t      m_VLStoreCacheBlkCount;
+  uint32_t      m_VLValueCacheSize;
 };
 
 DBS_SHL void
@@ -95,18 +95,18 @@ DBS_SHL const DBSSettings&
 DBSGetSeettings ();
 
 DBS_SHL void
-DBSCreateDatabase (const D_CHAR* const pName,
-                   const D_CHAR*       pDbsDirectory = NULL);
+DBSCreateDatabase (const char* const pName,
+                   const char*       pDbsDirectory = NULL);
 
 DBS_SHL I_DBSHandler&
-DBSRetrieveDatabase (const D_CHAR* const pName,
-                     const D_CHAR*       pDbsDirectory = NULL);
+DBSRetrieveDatabase (const char* const pName,
+                     const char*       pDbsDirectory = NULL);
 
 DBS_SHL void
 DBSReleaseDatabase (I_DBSHandler& hndDatabase);
 
 DBS_SHL void
-DBSRemoveDatabase (const D_CHAR* const pName,
-                   const D_CHAR*       pDbsDirectory = NULL);
+DBSRemoveDatabase (const char* const pName,
+                   const char*       pDbsDirectory = NULL);
 
 #endif /* DBS_MGR_H_ */

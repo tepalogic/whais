@@ -40,30 +40,27 @@ typedef HANDLE              WH_THREAD;
 typedef SOCKET              WH_SOCKET;
 #endif
 
-typedef char             D_BOOL;
+/* Simple type shortcuts */
+typedef unsigned int       uint_t;
+typedef unsigned long      ulong_t;
+typedef long long          llong_t;
+typedef unsigned long long ullong_t;
 
-typedef char             D_CHAR;
-typedef unsigned char    D_UCHAR;
+typedef __int8           int8_t;
+typedef unsigned __int8  uint8_t;
 
-typedef int              D_INT;
-typedef unsigned int     D_UINT;
+typedef __int16          int16_t;
+typedef unsigned __int16 uint16_t;
 
-typedef __int8           D_INT8;
-typedef unsigned __int8  D_UINT8;
+typedef __int32          int32_t;
+typedef unsigned __int32 uint32_t;
 
-typedef __int16          D_INT16;
-typedef unsigned __int16 D_UINT16;
+typedef __int64          int64_t;
+typedef unsigned __int64 uint64_t;
 
-typedef __int32          D_INT32;
-typedef unsigned __int32 D_UINT32;
-
-typedef __int64          D_INT64;
-typedef unsigned __int64 D_UINT64;
-
-/* D_INTMAX is the type that could hold the biggest integer
- * for a specific architecture */
-typedef D_INT64          D_INTMAX;
-typedef D_UINT64         D_UINTMAX;
+#ifndef bool_t
+typedef uint8_t       bool_t;
+#endif
 
 #define SHL_EXPORT_SYMBOL __declspec(dllexport)
 #define SHL_IMPORT_SYMBOL __declspec(dllimport)

@@ -14,10 +14,10 @@
 
 using namespace std;
 
-const D_UINT64 MAX_STRING_SIZE  = 32768;
-const D_UINT64 MAX_REFS_STRINGS = 5;
+const uint64_t MAX_STRING_SIZE  = 32768;
+const uint64_t MAX_REFS_STRINGS = 5;
 
-const D_CHAR* _refStrings[MAX_REFS_STRINGS] =
+const char* _refStrings[MAX_REFS_STRINGS] =
     {
         "This is the first string!",
         "This is a second string!",
@@ -32,23 +32,23 @@ const W_FieldDescriptor  _fields[] =
         {"WFT_TEXT_2", WFT_TEXT},
     };
 
-static const D_UINT _fieldsCount = sizeof _fields / sizeof (_fields[0]);
+static const uint_t _fieldsCount = sizeof _fields / sizeof (_fields[0]);
 
-const D_CHAR*
+const char*
 insert_a_string (W_CONNECTOR_HND        hnd,
-                 const D_CHAR*          fieldName,
-                 const D_UINT64         row,
+                 const char*          fieldName,
+                 const uint64_t         row,
                  const bool             bulk)
 {
-  const D_UINT thisStringSize = w_rnd () % MAX_STRING_SIZE;
+  const uint_t thisStringSize = w_rnd () % MAX_STRING_SIZE;
 
-  D_CHAR* result = new D_CHAR[MAX_STRING_SIZE];
+  char* result = new char[MAX_STRING_SIZE];
 
   memset (result, 0, MAX_STRING_SIZE);
 
   while (true)
     {
-      const D_CHAR* temp = _refStrings[w_rnd () % MAX_REFS_STRINGS];
+      const char* temp = _refStrings[w_rnd () % MAX_REFS_STRINGS];
 
       if (strlen (result) + strlen (temp) >= thisStringSize)
         break;
@@ -58,7 +58,7 @@ insert_a_string (W_CONNECTOR_HND        hnd,
                               fieldName,
                               row,
                               WIGNORE_OFF,
-                              utf8_strlen (_RC (D_UINT8*, result)),
+                              utf8_strlen (_RC (uint8_t*, result)),
                               temp) != WCS_OK)
           || (bulk && (WUpdateStackFlush (hnd) != WCS_OK)))
         {
@@ -78,13 +78,13 @@ insert_a_string (W_CONNECTOR_HND        hnd,
 static bool
 test_simple_text (W_CONNECTOR_HND hnd)
 {
-  D_UINT              aSimpleOffset = w_rnd () % 7;
+  uint_t              aSimpleOffset = w_rnd () % 7;
 
-  const D_CHAR*       ref;
-  D_CHAR              aValue[MAX_STRING_SIZE];
-  const D_CHAR*       value;
+  const char*       ref;
+  char              aValue[MAX_STRING_SIZE];
+  const char*       value;
   unsigned long long  count;
-  D_UINT              rawType;
+  uint_t              rawType;
 
   cout << "Testing text simple updates ... ";
 
@@ -100,7 +100,7 @@ test_simple_text (W_CONNECTOR_HND hnd)
                                  WIGNORE_ROW,
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
-      || (_SC (D_INT, count) != utf8_strlen (_RC (const D_UINT8*, ref)))
+      || (_SC (int, count) != utf8_strlen (_RC (const uint8_t*, ref)))
       || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
       || (rawType != WFT_TEXT))
     {
@@ -114,7 +114,7 @@ test_simple_text (W_CONNECTOR_HND hnd)
                                WIGNORE_FIELD,
                                WIGNORE_ROW,
                                WIGNORE_OFF,
-                               utf8_strlen (_RC (D_UINT8*, aValue)) + aSimpleOffset,
+                               utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                &value) != WCS_OK)
         {
           goto test_simple_text_fail;
@@ -136,7 +136,7 @@ test_simple_text (W_CONNECTOR_HND hnd)
                                  WIGNORE_ROW,
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
-      || (_SC (D_INT, count) != utf8_strlen (_RC (const D_UINT8*, ref)))
+      || (_SC (int, count) != utf8_strlen (_RC (const uint8_t*, ref)))
       || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
       || (rawType != WFT_TEXT))
     {
@@ -151,7 +151,7 @@ test_simple_text (W_CONNECTOR_HND hnd)
                                WIGNORE_FIELD,
                                WIGNORE_ROW,
                                WIGNORE_OFF,
-                               utf8_strlen (_RC (D_UINT8*, aValue)) + aSimpleOffset,
+                               utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                &value) != WCS_OK)
         {
           goto test_simple_text_fail;
@@ -177,12 +177,12 @@ static bool
 test_table_text (W_CONNECTOR_HND hnd)
 {
 
-  const D_UINT        rowsCount = 2;
+  const uint_t        rowsCount = 2;
 
-  const D_CHAR*       ref[rowsCount * _fieldsCount];
-  const D_CHAR*       value;
-  D_UINT              aSimpleOffset;
-  D_CHAR              aValue[MAX_STRING_SIZE];
+  const char*       ref[rowsCount * _fieldsCount];
+  const char*       value;
+  uint_t              aSimpleOffset;
+  char              aValue[MAX_STRING_SIZE];
 
   if ((WPushStackValue (hnd, WFT_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
       || (WUpdateStackFlush (hnd) != WCS_OK))
@@ -191,7 +191,7 @@ test_table_text (W_CONNECTOR_HND hnd)
     }
 
 
-  for (D_UINT row = 0; row < rowsCount; row++)
+  for (uint_t row = 0; row < rowsCount; row++)
     {
 
       ref[row * _fieldsCount] = insert_a_string (hnd,
@@ -205,7 +205,7 @@ test_table_text (W_CONNECTOR_HND hnd)
                                                      false);
     }
 
-  for (D_UINT row = 0; row < rowsCount; row++)
+  for (uint_t row = 0; row < rowsCount; row++)
     {
       aSimpleOffset = w_rnd () % 7;
       aValue[0]     = 0;
@@ -215,7 +215,7 @@ test_table_text (W_CONNECTOR_HND hnd)
                                    "WFT_TEXT",
                                    row,
                                    WIGNORE_OFF,
-                                   utf8_strlen (_RC (D_UINT8*, aValue)) + aSimpleOffset,
+                                   utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                    &value) != WCS_OK)
             {
               goto test_table_text_fail;
@@ -233,7 +233,7 @@ test_table_text (W_CONNECTOR_HND hnd)
                                    "WFT_TEXT_2",
                                    row,
                                    WIGNORE_OFF,
-                                   utf8_strlen (_RC (D_UINT8*, aValue)) + aSimpleOffset,
+                                   utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                    &value) != WCS_OK)
             {
               goto test_table_text_fail;
@@ -244,7 +244,7 @@ test_table_text (W_CONNECTOR_HND hnd)
         goto test_table_text_fail;
     }
 
-  for (D_UINT i = 0; i < rowsCount; ++i)
+  for (uint_t i = 0; i < rowsCount; ++i)
     {
       delete [] ref[i * _fieldsCount];
       delete [] ref[i * _fieldsCount + 1];
@@ -255,7 +255,7 @@ test_table_text (W_CONNECTOR_HND hnd)
 
 test_table_text_fail:
 
-  for (D_UINT i = 0; i < rowsCount; ++i)
+  for (uint_t i = 0; i < rowsCount; ++i)
   {
     delete [] ref[i * _fieldsCount];
     delete [] ref[i * _fieldsCount + 1];
@@ -317,19 +317,19 @@ test_for_errors_fail:
   return false;
 }
 
-const D_CHAR*
+const char*
 DefaultDatabaseName ()
 {
   return "test_list_db";
 }
 
-const D_UINT
+const uint_t
 DefaultUserId ()
 {
   return 1;
 }
 
-const D_CHAR*
+const char*
 DefaultUserPassword ()
 {
   return "test_password";

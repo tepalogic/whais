@@ -13,7 +13,7 @@
 
 using namespace prima;
 
-static const D_CHAR admin[] = "administrator";
+static const char admin[] = "administrator";
 
 DBSArray
 get_test_array ()
@@ -371,7 +371,7 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
   StackValue sv (nullOp);
   I_Operand* pOp = NULL;
 
-  for (D_UINT index = 0;
+  for (uint_t index = 0;
        (index < array.ElementsCount ()) && result;
        ++index)
     {
@@ -422,7 +422,7 @@ test_table_value (I_DBSTable& table, DBSArray& array, const DBS_T testVal)
   if (array.ElementsCount () != fieldArray.ElementsCount())
     return false;
 
-  for (D_UINT64 el = 0; el < array.ElementsCount (); ++el)
+  for (uint64_t el = 0; el < array.ElementsCount (); ++el)
     {
       DBS_T firstVal, secondVal;
 
@@ -539,6 +539,6 @@ main ()
 }
 
 #ifdef ENABLE_MEMORY_TRACE
-D_UINT32 WMemoryTracker::sm_InitCount = 0;
-const D_CHAR* WMemoryTracker::sm_Module = "T";
+uint32_t WMemoryTracker::sm_InitCount = 0;
+const char* WMemoryTracker::sm_Module = "T";
 #endif

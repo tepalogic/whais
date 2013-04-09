@@ -42,14 +42,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 
-const D_CHAR*
-wcmd_translate_status (const D_UINT32 cs)
+const char*
+wcmd_translate_status (const uint32_t cs)
 {
   if (cs > WCS_OS_ERR_BASE)
     {
       /* This is safe, coz this function is not supposed to be executed
        * in a multi thread environment. a*/
-      static D_CHAR statusStr [64];
+      static char statusStr [64];
       sprintf (statusStr, "OS internal error: %u.", cs - WCS_OS_ERR_BASE);
 
       return statusStr;
@@ -105,9 +105,9 @@ wcmd_translate_status (const D_UINT32 cs)
   return "Unknown error encountered!";
 }
 
-static const D_CHAR globalShowDesc[]    = "List context database's "
+static const char globalShowDesc[]    = "List context database's "
                                          "global variables.";
-static const D_CHAR globalShowDescExt[] =
+static const char globalShowDescExt[] =
   "Show the global variables installed in the database context.\n"
   "If a name is provided it limits the listing to only those variables.\n"
   "Usage:\n"
@@ -125,7 +125,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   assert (token == "global");
 
-  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+  uint32_t cs  = WConnect (GetRemoteHostName ().c_str (),
                            GetConnectionPort ().c_str (),
                            GetWorkingDB ().c_str (),
                            GetUserPassword ().c_str (),
@@ -195,7 +195,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         {
           assert ((rawType & WFT_FIELD_MASK) == 0);
 
-          D_UINT fieldsCount;
+          uint_t fieldsCount;
 
           cs = WDescribeValueGetFieldsCount (conHdl, &fieldsCount);
           if (cs != WCS_OK)
@@ -206,9 +206,9 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           else
             cout << "TABLE OF ";
 
-          for (D_UINT field = 0; field < fieldsCount; field++)
+          for (uint_t field = 0; field < fieldsCount; field++)
             {
-              const D_CHAR* fieldName;
+              const char* fieldName;
 
               cs = WDescribeValueFetchField (conHdl, &fieldName, &rawType);
               if (cs != WCS_OK)
@@ -244,8 +244,8 @@ cmdGlobalList_exit:
 }
 
 
-static const D_CHAR procShowDesc[]    = "List context database's procedures.";
-static const D_CHAR procShowDescExt[] =
+static const char procShowDesc[]    = "List context database's procedures.";
+static const char procShowDescExt[] =
   "Show the procedures installed in the database context.\n"
   "If a name is provided it limits the listing to only those procedures\n"
   "Usage:\n"
@@ -261,7 +261,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   unsigned int        procsCount  = 0;
   const VERBOSE_LEVEL level       = GetVerbosityLevel ();
 
-  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+  uint32_t cs  = WConnect (GetRemoteHostName ().c_str (),
                            GetConnectionPort ().c_str (),
                            GetWorkingDB ().c_str (),
                            GetUserPassword ().c_str (),
@@ -313,7 +313,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   do
     {
-      D_UINT procsParameter;
+      uint_t procsParameter;
       token = CmdLineNextToken (procedures, linePos);
       cs = WProcedureParametersCount (conHdl, token.c_str (), &procsParameter);
 
@@ -329,7 +329,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       cout << token << " (";
 
-      D_UINT param = 1; //Start with the first procdure parameter
+      uint_t param = 1; //Start with the first procdure parameter
       do
         {
           param %= procsParameter;
@@ -359,7 +359,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             {
               assert ((paramType & WFT_FIELD_MASK) == 0);
 
-              D_UINT fieldsCount;
+              uint_t fieldsCount;
 
               cs = WProcedureParameterFieldCount (conHdl,
                                                   token.c_str (),
@@ -376,9 +376,9 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
               cout << "TABLE OF [";
 
-              for (D_UINT field = 0; field < fieldsCount; field++)
+              for (uint_t field = 0; field < fieldsCount; field++)
                 {
-                  const D_CHAR* fieldName;
+                  const char* fieldName;
 
                   cs = WProcedureParameterField (conHdl,
                                                  token.c_str (),
@@ -429,8 +429,8 @@ cmdProcList_exit:
 }
 
 
-static const D_CHAR pingShowDesc[]    = "Ping the database sever. ";
-static const D_CHAR pingShowDescExt[] =
+static const char pingShowDesc[]    = "Ping the database sever. ";
+static const char pingShowDescExt[] =
   "Ping the database server to check if it is up.\n"
   "Usage:\n"
   "  ping";
@@ -440,7 +440,7 @@ cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   W_CONNECTOR_HND conHdl = NULL;
   WTICKS ticks  = wh_msec_ticks ();
-  D_UINT32 cs  = WConnect (GetRemoteHostName ().c_str (),
+  uint32_t cs  = WConnect (GetRemoteHostName ().c_str (),
                            GetConnectionPort ().c_str (),
                            GetWorkingDB ().c_str (),
                            GetUserPassword ().c_str (),
@@ -470,8 +470,8 @@ cmd_ping_exit:
 }
 
 
-static const D_CHAR execShowDesc[]    = "Execute a procedure. ";
-static const D_CHAR execShowDescExt[] =
+static const char execShowDesc[]    = "Execute a procedure. ";
+static const char execShowDescExt[] =
   "Execute a procedure on the remote server using the "
   "specified parameters.\n"
   "Parameters specifiers:\n"

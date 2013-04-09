@@ -31,39 +31,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define CLIENT_VERSION                    1
 
-#define MAX_CMD_INTERNALS                 4
+#define MAX_CMint_tERNALS                 4
 
-static const D_UINT LIST_GLBSCOUNT      = 0;
-static const D_UINT LIST_GLBINDEX       = 1;
-static const D_UINT LIST_GLBOFF         = 2;
+static const uint_t LIST_GLBSCOUNT      = 0;
+static const uint_t LIST_GLBINDEX       = 1;
+static const uint_t LIST_GLBOFF         = 2;
 
-static const D_UINT LIST_PROCSCOUNT     = 0;
-static const D_UINT LIST_PROCSINDEX     = 1;
-static const D_UINT LIST_PROCOFF        = 2;
+static const uint_t LIST_PROCSCOUNT     = 0;
+static const uint_t LIST_PROCSINDEX     = 1;
+static const uint_t LIST_PROCOFF        = 2;
 
-static const D_UINT DESC_RAWTYPE        = 0;
-static const D_UINT DESC_FIELD_COUNT    = 1;
-static const D_UINT DESC_FIELD_HINT     = 2;
-static const D_UINT DESC_FIELD_OFFSET   = 3;
+static const uint_t DESC_RAWTYPE        = 0;
+static const uint_t DESC_FIELD_COUNT    = 1;
+static const uint_t DESC_FIELD_HINT     = 2;
+static const uint_t DESC_FIELD_OFFSET   = 3;
 
-static const D_UINT LAST_UPDATE_OFF     = 0;
+static const uint_t LAST_UPDATE_OFF     = 0;
 
 struct INTERNAL_HANDLER
 {
-  D_UINT8*  data;
-  D_UINT32  dataSize;
-  D_UINT32  version;
-  D_UINT32  cmdInternal[MAX_CMD_INTERNALS];
+  uint8_t*  data;
+  uint32_t  dataSize;
+  uint32_t  version;
+  uint32_t  cmdInternal[MAX_CMint_tERNALS];
   WH_SOCKET socket;
-  D_UINT32  expectedFrameId;
-  D_UINT32  serverCookie;
-  D_UINT32  clientCookie;
-  D_UINT32  encKeySize;
-  D_UINT16  lastCmdRespReceived;
-  D_UINT16  buildingCmd;
-  D_UINT8   userId;
-  D_UINT8   cipher;
-  D_UINT8   encriptionKey[1];
+  uint32_t  expectedFrameId;
+  uint32_t  serverCookie;
+  uint32_t  clientCookie;
+  uint32_t  encKeySize;
+  uint16_t  lastCmdRespReceived;
+  uint16_t  buildingCmd;
+  uint8_t   userId;
+  uint8_t   cipher;
+  uint8_t   encriptionKey[1];
 };
 
 #endif /* CONNECTOR_H_ */

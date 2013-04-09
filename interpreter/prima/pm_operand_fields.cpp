@@ -42,10 +42,10 @@ TableOperand::IsNull () const
   return (m_pRefTable->GetTable ().GetAllocatedRows () == 0);
 }
 
-D_UINT
+uint_t
 TableOperand::GetType ()
 {
-  D_UINT type = 0;
+  uint_t type = 0;
   MARK_TABLE (type);
 
   return type;
@@ -156,10 +156,10 @@ FieldOperand::IsNull () const
   return (m_pRefTable == NULL);
 }
 
-D_UINT
+uint_t
 FieldOperand::GetType ()
 {
-  D_UINT type = m_FieldType;
+  uint_t type = m_FieldType;
   MARK_FIELD (type);
 
   return type;
@@ -178,7 +178,7 @@ FieldOperand::GetTable ()
 }
 
 StackValue
-FieldOperand::GetValueAt (const D_UINT64 index)
+FieldOperand::GetValueAt (const uint64_t index)
 {
 
   if ((m_FieldType == T_UNKNOWN) || (m_pRefTable == NULL))
@@ -324,7 +324,7 @@ BoolFieldElOperand::SelfOr (const DBSBool& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 BoolFieldElOperand::GetType ()
 {
   return T_BOOL;
@@ -372,7 +372,7 @@ CharFieldElOperand::SetValue (const DBSChar& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 CharFieldElOperand::GetType ()
 {
   return T_CHAR;
@@ -445,7 +445,7 @@ DateFieldElOperand::SetValue (const DBSDate& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 DateFieldElOperand::GetType ()
 {
   return T_DATE;
@@ -513,7 +513,7 @@ DateTimeFieldElOperand::SetValue (const DBSDateTime& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 DateTimeFieldElOperand::GetType ()
 {
   return T_DATETIME;
@@ -580,7 +580,7 @@ HiresTimeFieldElOperand::SetValue (const DBSHiresTime& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 HiresTimeFieldElOperand::GetType ()
 {
   return T_HIRESTIME;
@@ -787,7 +787,7 @@ UInt8FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt8FieldElOperand::GetType ()
 {
   return T_UINT8;
@@ -994,7 +994,7 @@ UInt16FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt16FieldElOperand::GetType ()
 {
   return T_UINT16;
@@ -1201,7 +1201,7 @@ UInt32FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt32FieldElOperand::GetType ()
 {
   return T_UINT32;
@@ -1408,7 +1408,7 @@ UInt64FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 UInt64FieldElOperand::GetType ()
 {
   return T_UINT64;
@@ -1615,7 +1615,7 @@ Int8FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int8FieldElOperand::GetType ()
 {
   return T_INT8;
@@ -1822,7 +1822,7 @@ Int16FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int16FieldElOperand::GetType ()
 {
   return T_INT16;
@@ -2029,7 +2029,7 @@ Int32FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int32FieldElOperand::GetType ()
 {
   return T_INT32;
@@ -2236,7 +2236,7 @@ Int64FieldElOperand::SelfOr (const DBSInt64& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 Int64FieldElOperand::GetType ()
 {
   return T_INT64;
@@ -2371,7 +2371,7 @@ RealFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 RealFieldElOperand::GetType ()
 {
   return T_REAL;
@@ -2504,7 +2504,7 @@ RichRealFieldElOperand::SelfDiv (const DBSRichReal& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 RichRealFieldElOperand::GetType ()
 {
   return T_RICHREAL;
@@ -2564,14 +2564,14 @@ TextFieldElOperand::SelfAdd (const DBSText& value)
   Set (currValue);
 }
 
-D_UINT
+uint_t
 TextFieldElOperand::GetType ()
 {
   return T_TEXT;
 }
 
 StackValue
-TextFieldElOperand::GetValueAt (const D_UINT64 index)
+TextFieldElOperand::GetValueAt (const uint64_t index)
 {
   return StackValue (CharTextFieldElOperand (m_pRefTable,
                                              m_Row,
@@ -2612,10 +2612,10 @@ ArrayFieldElOperand::SetValue (const DBSArray& value)
   Set (value);
 }
 
-D_UINT
+uint_t
 ArrayFieldElOperand::GetType ()
 {
-  D_UINT type = 0;
+  uint_t type = 0;
   MARK_ARRAY (type);
 
   return type;
@@ -2623,7 +2623,7 @@ ArrayFieldElOperand::GetType ()
 
 
 StackValue
-ArrayFieldElOperand::GetValueAt (const D_UINT64 index)
+ArrayFieldElOperand::GetValueAt (const uint64_t index)
 {
   I_DBSTable&        table = m_pRefTable->GetTable ();
   DBSFieldDescriptor fd    = table.GetFieldDescriptor (m_Field);
