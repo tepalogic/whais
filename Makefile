@@ -8,7 +8,7 @@ EXES:=
 LIBS:=
 
 ifeq ($(ARCH),)
-$(error "You must specify tour ARCH as linux_gcc32, linux_gcc64 or windows_vc") 
+$(error "You must specify tour ARCH as linux_gcc_x86, linux_gcc_x86_64 or windows_vc_x86") 
 endif
 
 ifeq ($(VERBOSE),yes)

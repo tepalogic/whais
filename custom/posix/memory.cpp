@@ -55,7 +55,7 @@ custom_mem_free (void* ptr)
 #undef new
 
 void*
-operator new (std::size_t size)
+operator new (std::size_t size) throw (std::bad_alloc)
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc (size);
@@ -98,7 +98,7 @@ operator new (std::size_t size, const D_CHAR* pFile, D_UINT line)
 
 
 void*
-operator new [] (std::size_t size)
+operator new [] (std::size_t size) throw (std::bad_alloc)
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc (size);
@@ -141,7 +141,7 @@ operator new [] (size_t size, const D_CHAR* pFile, D_UINT line)
 
 
 void
-operator delete (void* ptr)
+operator delete (void* ptr) throw ()
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
@@ -163,7 +163,7 @@ operator delete (void* ptr, const D_CHAR*, D_UINT)
 }
 
 void
-operator delete [] (void* ptr)
+operator delete[] (void* ptr) throw ()
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
@@ -183,3 +183,4 @@ operator delete[] (void* ptr, const D_CHAR*, D_UINT )
     custom_trace_mem_free(ptr, NULL, 0);
 #endif
 }
+

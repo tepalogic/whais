@@ -1,116 +1,137 @@
-" An example for a vimrc file.
-"
-" Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2006 Nov 16
-"
-" To use it, copy it to
-"     for Unix and OS/2:  ~/.vimrc
-"	      for Amiga:  s:.vimrc
-"  for MS-DOS and Win32:  $VIM\_vimrc
-"	    for OpenVMS:  sys$login:.vimrc
 
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
-
-" Use Vim settings, rather then Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
+" disable vi compatibility (emulation of old bugs)
 set nocompatible
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set backup		" keep a backup file
-endif
-set backupdir=~/.vimback/
-set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set incsearch		" do incremental searching
-set showmatch
-set showmode
-
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-" let &guioptions = substitute(&guioptions, "t", "", "g")
-
-" Don't use Ex mode, use Q for formatting
-map Q gq
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on
-endif
-
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
-
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
-
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
-
-  " For all text files set 'textwidth' to 78 characters.
-  autocmd FileType text setlocal textwidth=100
-
-  " When editing a file, always jump to the last known cursor position.
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
-
-  augroup END
-
-else
-
-  set smartindent		" always set autoindenting on
-
-endif " has("autocmd")
-
-"text editing
-colorscheme zellner
-
-"commenting a higlight selection
-map ,/ :s/^/\/\//<CR>
-map ,* :s/^\(.*\)$/\/\* \1 \*\//<CR><Esc>:nohlsearch<CR>
-
-set tags=~/tags
-map <C-F12> :!~/make_tags<CR>
-
+" Select as you type, and make it incrementally
 set hlsearch
-set nowrap
-set number
-filetype plugin on
+set incsearch
 
-set spelllang=en
-set spellfile=~/.vim/vimspellfile.en.add
+" use indentation of previous line
+set autoindent
 
-set spell
-set guifont=Courier\ 10\ Pitch\ 10
+" use intelligent indentation for C
+set smartindent
+set cindent
 
-set guioptions-=m " turn off menu bar
-set guioptions-=T " turn off toolbar
-set completeopt=longest,menu
+" configure tabwidth and insert spaces instead of tabs
+set tabstop=4        " tab width is 4 spaces
+set shiftwidth=4     " indent also with 4 spaces
 
+
+" turn syntax highlighting on
+set t_Co=256
+syntax on
+
+if has('gui_running')
+	colorscheme wombat
+else
+	colorscheme koehler
+endif
+
+" highlight matching braces
+set showmatch
+set ignorecase
+set smartcase
+
+
+" Make sure the history remembers all
+set history=1000
+set undolevels=1000
+
+" Some nice interactions
+set title
+set visualbell
+set noerrorbells
+set nobackup
+
+filetype plugin indent on
+
+
+" Enhanced keyboard mappings
+
+" switch between header/source with F4
+map <S-Tab> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+
+set tags+=./tags,tags,~/tags
+" recreate tags file with F5
+map <F5> :!~/abin/ctags_for_vim tags<CR>
+
+" The 'make_for_vim' is a helper script to allow the proper call of the
+" build/clean program.
+set makeprg=~/abin/make_for_vim
+" build using makeprg with <F7>
+map <F7> :make all<CR>
+map <S-F7> :make clean<CR>
+map <F6> :cn<CR>
+map <S-F6> :cp<CR>
+
+" spell settings
+:setlocal spell spelllang=en
+" set the spellfile - folders must exist
+set spellfile=~/.vim/spellfile.add
+map <M-Down> ]s
+map <M-Up> [s
+
+"Tab navigation shortcuts 
+
+map <C-h> <C-w>h
+map <C-l> <C-w>l
+map <C-j> <C-w>j
+map <C-k> <C-k>j
+
+" NERDTree stuff
+
+nmap <F2> :NERDTreeToggle<CR>
+
+" My patetic function stuff!
 function! GnuIndent()
-   setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
-   setlocal shiftwidth=2
-   setlocal tabstop=8
-   setlocal expandtab
+  setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
+  setlocal shiftwidth=2
+  setlocal tabstop=8
+  setlocal expandtab " expand tabs to spaces
+    " wrap lines at 80 chars. 
+  setlocal textwidth=80
+  setlocal nowrap
+  setlocal colorcolumn=+1
 endfunction
 
-au FileType c,cpp call GnuIndent()
-au FileType c,cpp,java,php autocmd BufWritePre <buffer> :%s/\s\+$//e
+autocmd FileType c,cpp call GnuIndent() 
+autocmd FileType c,cpp,java autocmd BufWritePre <buffer> :%s/\s\+$//e
 
 
+" Clang Complete Settings
+" g:clang_user_options set at vimprj section
+let g:clang_use_library=0
+let g:clang_user_path='/usr/bin/clang'
+let g:clang_complete_copen=1
+let g:clang_complete_macros=1
+let g:clang_complete_patterns=1
+let g:clang_auto_select=1
+" Avoids lame path cache generation and other unknown sources for includes 
+let g:clang_auto_user_options=".clang_complete"
+let g:clang_memory_percent=70
+
+set conceallevel=2
+set concealcursor=vin
+let g:clang_snippets=0
+let g:clang_conceal_snippets=1
+" The single one that works with clang_complete
+let g:clang_snippets_engine='clang_complete'
+"
+" Complete options (disable preview scratch window, longest removed to aways
+" show menu)
+set completeopt=menu,menuone
+
+" Limit popup menu height
+set pumheight=20
+
+
+"Complete-T settings
+
+let g:CommandTMatchWindowReverse=1
+let g:CommandTMaxHeight=20
+
+set wildignore+=*.o,*.obj,*.d,.git
+
+" From here downwards will be the per system custom part
+set wildignore+=*.o,*.obj,*.d,.git,bin,tmp

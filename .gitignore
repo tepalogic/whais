@@ -17,4 +17,6 @@ _CL_*
 .*.swp
 .project
 .cproject
+tags
+.clang_complete
 

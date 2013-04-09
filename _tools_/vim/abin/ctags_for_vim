@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#This is the default script to be used by VIM to
+#create a tag file. It should be more than enough.
+
+: ${1?"FAIL: You have not provided the tag file."}
+
+#Make sure the tag file is deleted is there is one
+rm "$@" 2>/dev/null
+
+
+#Do the actual tags 
+ctags -R --c++-kinds=+p --fields=+iaS --extra=+q -f "$1" . 
+
