@@ -48,9 +48,9 @@ typedef FIELD_ENTRY::iterator        FIELD_ENTRY_IT;
 
 struct FieldEntry
 {
-  FieldEntry (const uint_t fieldType = WFT_NOTSET)
-    : m_Values (),
-      m_FieldType (fieldType)
+  FieldEntry (const uint_t fieldType = WHC_TYPE_NOTSET)
+    : mValues (),
+      mType (fieldType)
   {
   }
 
@@ -59,17 +59,17 @@ struct FieldEntry
             const uint16_t         type,
             const string&          value)
   {
-    if ((m_FieldType != WFT_NOTSET) && (type != m_FieldType))
+    if ((mType != WHC_TYPE_NOTSET) && (type != mType))
       return false;
 
-    m_FieldType = type;
-    m_Values[row].push_back (value);
+    mType = type;
+    mValues[row].push_back (value);
 
     return true;
   }
 
-  FIELD_ENTRY m_Values;
-  uint16_t    m_FieldType;
+  FIELD_ENTRY mValues;
+  uint16_t    mType;
 };
 
 typedef map<string, FieldEntry> FIELD_VALUE;
@@ -108,11 +108,11 @@ struct TableParameter
 };
 
 uint_t
-update_stack_value (const W_CONNECTOR_HND         hnd,
+update_stack_value (const WH_CONNECTION         hnd,
                     const unsigned int            type,
                     const char* const           fieldName,
-                    const W_TABLE_ROW_INDEX       row,
-                    const W_ELEMENT_OFFSET        arrayOff,
+                    const WHT_ROW_INDEX       row,
+                    const WHT_INDEX        arrayOff,
                     const char* const           value)
 {
   /* When the values was created on the stack,
@@ -123,9 +123,9 @@ update_stack_value (const W_CONNECTOR_HND         hnd,
 
   uint_t wcs = WCS_OK;
 
-  if (type != WFT_TEXT)
+  if (type != WHC_TYPE_TEXT)
     {
-      return WUpdateStackValue (hnd,
+      return WUpdateValue (hnd,
                                 type,
                                 fieldName,
                                 row,
@@ -155,8 +155,8 @@ update_stack_value (const W_CONNECTOR_HND         hnd,
 
       assert (valueOff <= strlen (value));
 
-      wcs = WUpdateStackValue (hnd,
-                               WFT_TEXT,
+      wcs = WUpdateValue (hnd,
+                               WHC_TYPE_TEXT,
                                fieldName,
                                row,
                                WIGNORE_OFF,
@@ -300,47 +300,47 @@ parse_type (const string&       cmdLine,
   {
   case      'B':
   case      'b':
-    oType = WFT_BOOL;
+    oType = WHC_TYPE_BOOL;
     break;
 
   case      'C':
   case      'c':
-    oType = WFT_CHAR;
+    oType = WHC_TYPE_CHAR;
     break;
 
   case      'D':
   case      'd':
-    oType = WFT_DATE;
+    oType = WHC_TYPE_DATE;
     break;
 
   case      'H':
   case      'h':
-    oType = WFT_DATETIME;
+    oType = WHC_TYPE_DATETIME;
     break;
 
   case      'M':
   case      'm':
-    oType = WFT_HIRESTIME;
+    oType = WHC_TYPE_HIRESTIME;
     break;
 
   case      'I':
   case      'i':
-    oType = WFT_INT64;
+    oType = WHC_TYPE_INT64;
     break;
 
   case      'U':
   case      'u':
-    oType = WFT_UINT64;
+    oType = WHC_TYPE_UINT64;
     break;
 
   case      'R':
   case      'r':
-    oType = WFT_RICHREAL;
+    oType = WHC_TYPE_RICHREAL;
     break;
 
   case      't':
   case      'T':
-    oType = WFT_TEXT;
+    oType = WHC_TYPE_TEXT;
     break;
 
   default:
@@ -354,12 +354,12 @@ parse_type (const string&       cmdLine,
 }
 
 static bool
-handle_param_value (W_CONNECTOR_HND           hnd,
+handle_param_value (WH_CONNECTION           hnd,
                     const string&             cmdLine,
                     const uint_t              type,
                     const char* const       field,
-                    const W_TABLE_ROW_INDEX   row,
-                    const W_ELEMENT_OFFSET    arrayOff,
+                    const WHT_ROW_INDEX   row,
+                    const WHT_INDEX    arrayOff,
                     size_t&                   ioLineOff)
 {
   uint_t   wcs = WCS_OK;
@@ -396,11 +396,11 @@ proc_param_connector_error:
 }
 
 static bool
-handle_procedure_array_param (W_CONNECTOR_HND           hnd,
+handle_procedure_array_param (WH_CONNECTION           hnd,
                               const string&             cmdLine,
                               const uint_t              type,
                               const char* const       field,
-                              const W_TABLE_ROW_INDEX   row,
+                              const WHT_ROW_INDEX   row,
                               size_t&                   ioLineOff)
 {
   const char* const line = cmdLine.c_str ();
@@ -408,7 +408,7 @@ handle_procedure_array_param (W_CONNECTOR_HND           hnd,
   uint64_t arrayIndex = 0;
   uint_t   wcs        = WCS_OK;
 
-  assert (type != WFT_TEXT);
+  assert (type != WHC_TYPE_TEXT);
   assert (line[ioLineOff - 1] == '(');
 
   while (ioLineOff < cmdLine.length ())
@@ -451,7 +451,7 @@ handle_procedure_array_param (W_CONNECTOR_HND           hnd,
 }
 
 static bool
-handle_procedure_table_param (W_CONNECTOR_HND           hnd,
+handle_procedure_table_param (WH_CONNECTION           hnd,
                               const string&             cmdLine,
                               size_t&                   ioLineOff)
 {
@@ -576,7 +576,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
               if (line[ioLineOff] == '(')
                 {
                   ++ioLineOff;
-                  type       |= WFT_ARRAY_MASK;
+                  type       |= WHC_TYPE_ARRAY_MASK;
                   arrayValue  = true;
 
                   continue;
@@ -584,7 +584,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
               else
                 {
                   assert (arrayValue);
-                  assert (type & WFT_ARRAY_MASK);
+                  assert (type & WHC_TYPE_ARRAY_MASK);
                 }
 
               if (line[ioLineOff] == ')')
@@ -649,15 +649,15 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
       return false;
     }
 
-  vector<W_FieldDescriptor> fields;
+  vector<WField> fields;
   for (FIELD_VALUE_IT it = table.m_Fields.begin ();
        it != table.m_Fields.end ();
        ++it)
     {
-      W_FieldDescriptor fd;
+      WField fd;
 
-      fd.m_FieldName = it->first.c_str ();
-      fd.m_FieldType = it->second.m_FieldType;
+      fd.name = it->first.c_str ();
+      fd.type = it->second.mType;
 
       fields.push_back (fd);
     }
@@ -665,7 +665,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
   assert (fields.size () == table.m_Fields.size ());
   assert (fields.size () > 0);
 
-  wcs = WPushStackValue (hnd, WFT_TABLE_MASK, fields.size (), &fields[0]);
+  wcs = WPushValue (hnd, WHC_TYPE_TABLE_MASK, fields.size (), &fields[0]);
   if (wcs != WCS_OK)
     goto proc_param_connector_error;
 
@@ -676,11 +676,11 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
            it != table.m_Fields.end ();
            ++it)
         {
-          FIELD_ENTRY_IT entry = it->second.m_Values.find (row);
-          if (entry == it->second.m_Values.end ())
+          FIELD_ENTRY_IT entry = it->second.mValues.find (row);
+          if (entry == it->second.mValues.end ())
             continue;
 
-          if (it->second.m_FieldType & WFT_ARRAY_MASK)
+          if (it->second.mType & WHC_TYPE_ARRAY_MASK)
             {
               assert (entry->second.size () >= 1);
 
@@ -690,7 +690,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
                 {
                   wcs = update_stack_value (
                               hnd,
-                              it->second.m_FieldType & ~WFT_ARRAY_MASK,
+                              it->second.mType & ~WHC_TYPE_ARRAY_MASK,
                               it->first.c_str (),
                               row,
                               arrayId,
@@ -704,7 +704,7 @@ handle_procedure_table_param (W_CONNECTOR_HND           hnd,
             {
               assert (entry->second.size () == 1);
               wcs = update_stack_value (hnd,
-                                        it->second.m_FieldType,
+                                        it->second.mType,
                                         it->first.c_str (),
                                         row,
                                         WIGNORE_OFF,
@@ -728,12 +728,12 @@ proc_param_connector_error:
 }
 
 static bool
-handle_procedure_parameters (W_CONNECTOR_HND hnd,
+handle_procedure_parameters (WH_CONNECTION hnd,
                              const string&   cmdLine,
                              size_t&         ioLineOff)
 {
   const char* const line = cmdLine.c_str ();
-  uint_t              type = WFT_NOTSET;
+  uint_t              type = WHC_TYPE_NOTSET;
   uint_t              wcs  = WCS_OK;
 
   while ((ioLineOff < cmdLine.length ())
@@ -773,7 +773,7 @@ handle_procedure_parameters (W_CONNECTOR_HND hnd,
             }
           else if (line[ioLineOff] == '(')
             {
-              wcs = WPushStackValue (hnd, type | WFT_ARRAY_MASK, 0, NULL);
+              wcs = WPushValue (hnd, type | WHC_TYPE_ARRAY_MASK, 0, NULL);
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
 
@@ -790,7 +790,7 @@ handle_procedure_parameters (W_CONNECTOR_HND hnd,
             }
           else if (line[ioLineOff] == '\'')
             {
-              wcs = WPushStackValue (hnd, type, 0, NULL);
+              wcs = WPushValue (hnd, type, 0, NULL);
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
 
@@ -816,7 +816,7 @@ handle_procedure_parameters (W_CONNECTOR_HND hnd,
         }
     }
 
-  wcs = WUpdateStackFlush (hnd);
+  wcs = WFlush (hnd);
   if (wcs == WCS_OK)
     return true;
 
@@ -830,7 +830,7 @@ proc_param_connector_error:
 }
 
 static bool
-fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
+fetch_execution_simple_result (WH_CONNECTION         hnd,
                                const uint_t            type,
                                const char* const       field,
                                const uint64_t          row)
@@ -839,9 +839,9 @@ fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
   uint_t         wcs = WCS_OK;
   const char*  retValue;
 
-  if (type != WFT_TEXT)
+  if (type != WHC_TYPE_TEXT)
     {
-      wcs = WGetStackValueEntry (hnd,
+      wcs = WValueEntry (hnd,
                                  field,
                                  row,
                                  WIGNORE_OFF,
@@ -859,7 +859,7 @@ fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
     {
       unsigned long long length  = 0;
       uint64_t offset  = 0;
-      wcs = WGetStackTextLengthCount (hnd, field, row, WIGNORE_OFF, &length);
+      wcs = WValueTextLength (hnd, field, row, WIGNORE_OFF, &length);
       if (wcs != WCS_OK)
         goto fetch_result_fail;
 
@@ -868,7 +868,7 @@ fetch_execution_simple_result (W_CONNECTOR_HND         hnd,
           cout << '\'';
           while (offset < length)
             {
-              wcs = WGetStackValueEntry (hnd,
+              wcs = WValueEntry (hnd,
                                         field,
                                         row,
                                         WIGNORE_OFF,
@@ -904,26 +904,26 @@ fetch_result_fail:
 
 
 static bool
-fetch_execution_array_result (W_CONNECTOR_HND        hnd,
+fetch_execution_array_result (WH_CONNECTION        hnd,
                               const uint_t           type,
                               const char* const      field,
                               const uint64_t         row)
 
 {
-  assert ((type >= WFT_BOOL) && (type < WFT_TEXT));
+  assert ((type >= WHC_TYPE_BOOL) && (type < WHC_TYPE_TEXT));
 
   const char*         retValue;
   unsigned long long              count;
   uint_t                wcs;
 
-  if ((wcs = WGetStackArrayElementsCount (hnd, field, row, &count)) != WCS_OK)
+  if ((wcs = WValueArraySize (hnd, field, row, &count)) != WCS_OK)
     goto fetch_result_fail;
 
   if (count > 0)
     {
       for (uint64_t i = 0; i < count; ++i)
         {
-          wcs = WGetStackValueEntry (hnd, field, row, i, WIGNORE_OFF, &retValue);
+          wcs = WValueEntry (hnd, field, row, i, WIGNORE_OFF, &retValue);
           if (wcs != WCS_OK)
             goto fetch_result_fail;
 
@@ -947,12 +947,12 @@ fetch_result_fail:
 }
 
 static bool
-fetch_execution_field_result (W_CONNECTOR_HND hnd, const uint_t type)
+fetch_execution_field_result (WH_CONNECTION hnd, const uint_t type)
 {
   unsigned long long rowsCount = 0;
   uint_t   wcs       = WCS_OK;
 
-  if ((wcs = WGetStackValueRowsCount (hnd, &rowsCount)) != WCS_OK)
+  if ((wcs = WValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
 
   if (rowsCount > 0)
@@ -960,10 +960,10 @@ fetch_execution_field_result (W_CONNECTOR_HND hnd, const uint_t type)
       for (uint64_t row = 0; row < rowsCount; ++row)
         {
           cout << row << " | ";
-          if (type & WFT_ARRAY_MASK)
+          if (type & WHC_TYPE_ARRAY_MASK)
             {
               if ( ! fetch_execution_array_result (hnd,
-                                                   type & ~WFT_ARRAY_MASK,
+                                                   type & ~WHC_TYPE_ARRAY_MASK,
                                                    WIGNORE_FIELD,
                                                    row))
                 {
@@ -999,13 +999,13 @@ fetch_result_fail:
 }
 
 static bool
-fetch_execution_table_result (W_CONNECTOR_HND hnd,
-                              vector<W_FieldDescriptor>& fields)
+fetch_execution_table_result (WH_CONNECTION hnd,
+                              vector<WField>& fields)
 {
   unsigned long long rowsCount = 0;
   uint_t   wcs       = WCS_OK;
 
-  if ((wcs = WGetStackValueRowsCount (hnd, &rowsCount)) != WCS_OK)
+  if ((wcs = WValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
 
   if (rowsCount > 0)
@@ -1014,13 +1014,13 @@ fetch_execution_table_result (W_CONNECTOR_HND hnd,
         {
           for (uint_t i = 0; i < fields.size (); ++i )
             {
-              cout << row << " | " << fields[i].m_FieldName << " | ";
-              if (fields[i].m_FieldType & WFT_ARRAY_MASK)
+              cout << row << " | " << fields[i].name << " | ";
+              if (fields[i].type & WHC_TYPE_ARRAY_MASK)
                 {
                   if ( ! fetch_execution_array_result (
                                       hnd,
-                                      fields[i].m_FieldType & ~WFT_ARRAY_MASK,
-                                      fields[i].m_FieldName,
+                                      fields[i].type & ~WHC_TYPE_ARRAY_MASK,
+                                      fields[i].name,
                                       row
                                                        ))
                     {
@@ -1030,8 +1030,8 @@ fetch_execution_table_result (W_CONNECTOR_HND hnd,
               else
                 {
                   if ( ! fetch_execution_simple_result (hnd,
-                                                        fields[i].m_FieldType,
-                                                        fields[i].m_FieldName,
+                                                        fields[i].type,
+                                                        fields[i].name,
                                                         row))
                     {
                       return false;
@@ -1058,23 +1058,23 @@ fetch_result_fail:
 }
 
 static bool
-fetch_execution_result (W_CONNECTOR_HND hnd)
+fetch_execution_result (WH_CONNECTION hnd)
 {
-  uint_t stackResut = WFT_NOTSET;
+  uint_t stackResut = WHC_TYPE_NOTSET;
   uint_t wcs        = WCS_OK;
 
-  if ((wcs = WDescribeStackTop (hnd, &stackResut)) != WCS_OK)
+  if ((wcs = WStackValueType (hnd, &stackResut)) != WCS_OK)
     goto fetch_result_fail;
 
-  if (stackResut & WFT_TABLE_MASK)
+  if (stackResut & WHC_TYPE_TABLE_MASK)
     {
       vector<string>            fields;
-      vector<W_FieldDescriptor> fieldsDescriptors;
+      vector<WField> fieldsDescriptors;
       uint_t                    fieldsCount;
 
-      assert (stackResut == WFT_TABLE_MASK);
+      assert (stackResut == WHC_TYPE_TABLE_MASK);
 
-      if ((wcs = WDescribeValueGetFieldsCount (hnd, &fieldsCount)) != WCS_OK)
+      if ((wcs = WFieldsCount (hnd, &fieldsCount)) != WCS_OK)
         goto fetch_result_fail;
 
       assert (fieldsCount > 0);
@@ -1082,25 +1082,25 @@ fetch_execution_result (W_CONNECTOR_HND hnd)
       cout << "TABLE OF (";
       for (uint_t i = 0; i < fieldsCount; ++i)
         {
-          W_FieldDescriptor     fd;
+          WField     fd;
           const char*         fieldName;
           uint_t                fieldType;
 
-          wcs = WDescribeValueFetchField (hnd, &fieldName, &fieldType);
+          wcs = WFetchField (hnd, &fieldName, &fieldType);
           if (wcs != WCS_OK)
             goto fetch_result_fail;
 
           fields.push_back (fieldName);
 
-          fd.m_FieldName = fields.back ().c_str ();
-          fd.m_FieldType = fieldType;
+          fd.name = fields.back ().c_str ();
+          fd.type = fieldType;
 
           fieldsDescriptors.push_back (fd);
 
           if (i > 0)
             cout << ", ";
-          cout << fd.m_FieldName << " AS ";
-          cout << wcmd_decode_typeinfo (fd.m_FieldType);
+          cout << fd.name << " AS ";
+          cout << wcmd_decode_typeinfo (fd.type);
         }
       cout << ")\n";
 
@@ -1111,23 +1111,23 @@ fetch_execution_result (W_CONNECTOR_HND hnd)
         return false;
 
     }
-  else if (stackResut & WFT_FIELD_MASK)
+  else if (stackResut & WHC_TYPE_FIELD_MASK)
     {
       cout << "FIELD OF ";
-      cout << wcmd_decode_typeinfo (stackResut & ~WFT_FIELD_MASK) << endl;
+      cout << wcmd_decode_typeinfo (stackResut & ~WHC_TYPE_FIELD_MASK) << endl;
 
       if ( ! fetch_execution_field_result (hnd,
-                                           stackResut & ~WFT_FIELD_MASK))
+                                           stackResut & ~WHC_TYPE_FIELD_MASK))
         {
           return false;
         }
     }
-  else if (stackResut & WFT_ARRAY_MASK)
+  else if (stackResut & WHC_TYPE_ARRAY_MASK)
     {
       cout << wcmd_decode_typeinfo (stackResut) << endl;
 
       if (! fetch_execution_array_result (hnd,
-                                          stackResut & ~WFT_ARRAY_MASK,
+                                          stackResut & ~WHC_TYPE_ARRAY_MASK,
                                           WIGNORE_FIELD,
                                           WIGNORE_ROW))
         {
@@ -1137,7 +1137,7 @@ fetch_execution_result (W_CONNECTOR_HND hnd)
     }
   else
     {
-      cout << wcmd_decode_typeinfo (stackResut & ~WFT_ARRAY_MASK) << endl;
+      cout << wcmd_decode_typeinfo (stackResut & ~WHC_TYPE_ARRAY_MASK) << endl;
       if ( ! fetch_execution_simple_result (hnd,
                                             stackResut,
                                             WIGNORE_FIELD,
@@ -1168,7 +1168,7 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   const VERBOSE_LEVEL level       = GetVerbosityLevel ();
   size_t              linePos     = 0;
   string              token       = CmdLineNextToken (cmdLine, linePos);
-  W_CONNECTOR_HND     conHdl      = NULL;
+  WH_CONNECTION     conHdl      = NULL;
   bool                result      = false;
 
   WTICKS paramTicks, execTicks, fetchTicks;

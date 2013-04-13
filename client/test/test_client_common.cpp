@@ -41,7 +41,7 @@ print_usage (const char* cmd)
 bool
 tc_settup_connection (int              argc,
                       const char**     argv,
-                      W_CONNECTOR_HND* pHnd)
+                      WH_CONNECTION* pHnd)
 {
   const char*   hostname      = DEFAULT_HOST_SEREVR;
   const char*   port          = DEFAULT_PORT_SERVER;

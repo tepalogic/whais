@@ -41,8 +41,8 @@ static const char WANONIM_FIELD[] = "";
 
 static const uint_t INVALID_OFF    = ~0;
 
-/* TODO: Handle the cases where the text entry is bigger than 0xFFFF */
-
+/* Calculate how much data can fit in one communication frame. It depends on
+ * advertised size, type of encryption, etc. */
 static uint_t
 max_data_size (const struct INTERNAL_HANDLER* const hnd)
 {
@@ -71,6 +71,7 @@ max_data_size (const struct INTERNAL_HANDLER* const hnd)
   return hnd->dataSize - metaDataSize;
 }
 
+/* Get the size of the command's associated data. */
 static uint_t
 data_size (const struct INTERNAL_HANDLER* const hnd)
 {
@@ -97,6 +98,7 @@ data_size (const struct INTERNAL_HANDLER* const hnd)
   return frameSize - metaDataSize;
 }
 
+/* Set the size of the command's associated data. */
 static void
 set_data_size (struct INTERNAL_HANDLER* const hnd, const uint_t size)
 {
@@ -121,28 +123,7 @@ set_data_size (struct INTERNAL_HANDLER* const hnd, const uint_t size)
   store_le_int16 (size + metaDataSize, &hnd->data[FRAME_SIZE_OFF]);
 }
 
-static uint8_t*
-raw_data (struct INTERNAL_HANDLER* const hnd)
-{
-  uint_t metaDataSize;
-
-  switch (hnd->cipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
-    break;
-
-  default:
-    assert (FALSE);
-  }
-
-  return hnd->data + metaDataSize;
-}
-
+/* Returns a pointer to the command associated data. */
 static uint8_t*
 data (struct INTERNAL_HANDLER* const hnd)
 {
@@ -165,20 +146,46 @@ data (struct INTERNAL_HANDLER* const hnd)
   return hnd->data + metaDataSize;
 }
 
+/* Returns a pointer where the plain command header resides for further
+ * processing before/after encryption step. */
+static uint8_t*
+raw_data (struct INTERNAL_HANDLER* const hnd)
+{
+  uint_t metaDataSize;
+
+  switch (hnd->cipher)
+  {
+  case FRAME_ENCTYPE_PLAIN:
+    metaDataSize = FRAME_HDR_SIZE;
+    break;
+
+  case FRAME_ENCTYPE_3K:
+    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
+    break;
+
+  default:
+    assert (FALSE);
+  }
+
+  return hnd->data + metaDataSize;
+}
+
+/* Process the command frame before sending it to the server, according
+ * to the connections specifics (e.g. used cipher, frame validations, etc).
+ */
 static uint_t
 send_raw_frame (struct INTERNAL_HANDLER* const hnd,
                 const uint8_t                  type)
 {
-  uint32_t status = 0;
-
-  uint_t frameSize = from_le_int16 (hnd->data + FRAME_SIZE_OFF);
+  uint32_t status    = 0;
+  uint_t   frameSize = from_le_int16 (hnd->data + FRAME_SIZE_OFF);
 
   if (hnd->cipher == FRAME_ENCTYPE_3K)
     {
+      const uint16_t plainSize = frameSize;
+
       uint32_t firstKing, secondKing;
       uint8_t  prev, i;
-
-      const uint16_t plainSize = frameSize;
 
       while (frameSize % sizeof (uint32_t) != 0)
         hnd->data[frameSize++] = w_rnd () & 0xFF;
@@ -228,19 +235,24 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
   return WCS_OK;
 }
 
+/* Waith for a communication frame from server and do connection specfic
+ * processing before gets forwarded to upper layers.
+ */
 static uint_t
 receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
 {
   uint_t frameSize;
   uint_t frameRead = 0;
 
+  /* Any frame will have at least FRAME_HDR_SIZE bytes.
+   * Extract from this header the real size of the frame. */
   while (frameRead < FRAME_HDR_SIZE)
     {
       uint_t chunkSize = FRAME_HDR_SIZE - frameRead;
 
-      const uint32_t status  = whs_read (hnd->socket,
-                                               &hnd->data [frameRead],
-                                               &chunkSize);
+      const uint32_t status = whs_read (hnd->socket,
+                                        hnd->data + frameRead,
+                                        &chunkSize);
       if (status != WOP_OK)
         return WENC_OS_ERROR (status);
 
@@ -256,6 +268,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
   else if (hnd->data[FRAME_TYPE_OFF] != FRAME_TYPE_NORMAL)
     return WCS_UNEXPECTED_FRAME;
 
+  /* The real frame size. */
   frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
   if ((frameSize < FRAME_HDR_SIZE)
       || (frameSize > hnd->dataSize)
@@ -267,9 +280,10 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
   while (frameRead < frameSize)
     {
       uint_t chunkSize = frameSize - frameRead;
+
       const uint32_t status = whs_read (hnd->socket,
-                                              &hnd->data [frameRead],
-                                              &chunkSize);
+                                        hnd->data + frameRead,
+                                        &chunkSize);
       if (status != WOP_OK)
         return WENC_OS_ERROR (status);
 
@@ -284,9 +298,9 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
 
   if (hnd->cipher == FRAME_ENCTYPE_3K)
     {
-      uint_t    i, prev;
       uint32_t  firstKing, secondKing;
       uint16_t  plainSize;
+      uint8_t   i, prev;
 
       for (i = 0, prev = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
         {
@@ -301,6 +315,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
       secondKing = from_le_int32 (hnd->data +
                                   FRAME_HDR_SIZE +
                                   ENC_3K_SECOND_KING_OFF);
+
       decrypt_3k_buffer (firstKing,
                          secondKing,
                          hnd->encriptionKey,
@@ -311,7 +326,9 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
       plainSize = from_le_int16 (hnd->data+
                                  FRAME_HDR_SIZE +
                                  ENC_3K_PLAIN_SIZE_OFF);
+
       assert (plainSize <= frameSize);
+
       frameSize = plainSize;
       store_le_int16 (plainSize, hnd->data + FRAME_SIZE_OFF);
     }
@@ -321,23 +338,23 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
 
 static uint_t
 send_command (struct INTERNAL_HANDLER* const hnd,
-              const uint16_t                 commandId)
+              const uint16_t                 cmd)
 {
-  uint8_t*     pData    = raw_data (hnd);
-  uint_t       index    = 0;
-  const uint_t dataSize = data_size (hnd);
-  uint_t       cs       = WCS_OK;
-  uint16_t     chkSum   = 0;
+  uint8_t* const rawData  = raw_data (hnd);
+  uint_t         index    = 0;
+  const uint_t   dataSize = data_size (hnd);
+  uint_t         cs       = WCS_OK;
+  uint16_t       chkSum   = 0;
 
   hnd->clientCookie = w_rnd ();
 
   for (index = 0; index < dataSize; index++)
     chkSum += data (hnd)[index];
 
-  store_le_int32 (hnd->clientCookie, &pData[PLAIN_CLNT_COOKIE_OFF]);
-  store_le_int32 (hnd->serverCookie, &pData[PLAIN_SERV_COOKIE_OFF]);
-  store_le_int16 (commandId, &pData[PLAIN_TYPE_OFF]);
-  store_le_int16 (chkSum, &pData[PLAIN_CRC_OFF]);
+  store_le_int32 (hnd->clientCookie, rawData + PLAIN_CLNT_COOKIE_OFF);
+  store_le_int32 (hnd->serverCookie, rawData + PLAIN_SERV_COOKIE_OFF);
+  store_le_int16 (cmd, rawData + PLAIN_TYPE_OFF);
+  store_le_int16 (chkSum, rawData + PLAIN_CRC_OFF);
 
   cs = send_raw_frame (hnd, FRAME_TYPE_NORMAL);
   return cs;
@@ -345,12 +362,13 @@ send_command (struct INTERNAL_HANDLER* const hnd,
 
 static uint_t
 recieve_answer (struct INTERNAL_HANDLER* const hnd,
-                uint16_t* const                pRespType)
+                uint16_t* const                outRsp)
 {
-  uint_t        cs       = receive_raw_frame (hnd);
-  uint_t        index    = 0;
-  const uint_t  dataSize = data_size (hnd);
-  uint16_t      chkSum   = 0;
+  uint8_t* const rawData  = raw_data (hnd);
+  uint_t         cs       = receive_raw_frame (hnd);
+  uint_t         index    = 0;
+  const uint_t   dataSize = data_size (hnd);
+  uint16_t       chkSum   = 0;
 
   if (cs != WCS_OK)
     return cs;
@@ -358,33 +376,33 @@ recieve_answer (struct INTERNAL_HANDLER* const hnd,
   for (index = 0; index < dataSize; index++)
     chkSum += data (hnd)[index];
 
-  if (chkSum != from_le_int16 (&raw_data (hnd)[PLAIN_CRC_OFF]))
+  if (chkSum != from_le_int16 (rawData + PLAIN_CRC_OFF))
     {
       cs = WCS_INVALID_FRAME;
       goto recieve_failure;
     }
-  else if (from_le_int32 (&raw_data (hnd)[PLAIN_CLNT_COOKIE_OFF]) !=
+  else if (from_le_int32 (rawData + PLAIN_CLNT_COOKIE_OFF) !=
            hnd->clientCookie)
     {
       cs = WCS_UNEXPECTED_FRAME;
       goto recieve_failure;
     }
 
-  hnd->serverCookie = from_le_int32 (&raw_data (hnd)[PLAIN_SERV_COOKIE_OFF]);
-  *pRespType = from_le_int16 (&raw_data (hnd)[PLAIN_TYPE_OFF]);
-  if ((*pRespType == CMD_INVALID_RSP) || ((*pRespType & 1) == 0))
+  hnd->serverCookie = from_le_int32 (rawData + PLAIN_SERV_COOKIE_OFF);
+
+  *outRsp = from_le_int16 (rawData + PLAIN_TYPE_OFF);
+  if ((*outRsp == CMD_INVALID_RSP) || ((*outRsp & 1) == 0))
     {
       cs = WCS_INVALID_FRAME;
       goto recieve_failure;
     }
-
-  hnd->lastCmdRespReceived        = *pRespType;
+  hnd->lastCmdRespReceived = *outRsp;
 
   return WCS_OK;
 
 recieve_failure:
 
-  hnd->lastCmdRespReceived      = CMD_INVALID_RSP;
+  hnd->lastCmdRespReceived = CMD_INVALID_RSP;
 
   whs_close (hnd->socket);
   hnd->socket = INVALID_SOCKET;
@@ -395,10 +413,10 @@ recieve_failure:
 uint_t
 WConnect (const char* const    host,
           const char* const    port,
-          const char* const    databaseName,
+          const char* const    database,
           const char* const    password,
-          const unsigned int   userId,
-          W_CONNECTOR_HND* const pHnd)
+          const uint_t         userId,
+          WH_CONNECTION* const pHnd)
 {
   struct INTERNAL_HANDLER* result      = NULL;
   const uint_t             passwordLen = strlen (password);
@@ -409,28 +427,27 @@ WConnect (const char* const    host,
 
   if ((host == NULL)
       || (port == NULL)
-      || (databaseName == NULL)
+      || (database == NULL)
       || (password == NULL)
       || (pHnd == NULL)
       || (strlen (host) == 0)
       || (strlen (port) == 0)
-      || (strlen (databaseName) == 0))
+      || (strlen (database) == 0))
     {
       status = WCS_INVALID_ARGS;
       goto fail_ret;
     }
 
-  *pHnd = NULL;
   result = mem_alloc (sizeof (*result) + passwordLen);
   memset (result, 0, sizeof (*result));
-
-  result->userId     = userId;
-  result->encKeySize = passwordLen;
-  result->socket     = INVALID_SOCKET;
-  result->cipher     = FRAME_ENCTYPE_PLAIN;
   memcpy (result->encriptionKey, password, passwordLen);
+
   result->data       = tempBuffer;
   result->dataSize   = sizeof (tempBuffer);
+  result->userId     = userId;
+  result->socket     = INVALID_SOCKET;
+  result->encKeySize = passwordLen;
+  result->cipher     = FRAME_ENCTYPE_PLAIN;
 
   if ((status = whs_create_client (host, port, &result->socket)) != WCS_OK)
     {
@@ -438,12 +455,19 @@ WConnect (const char* const    host,
       goto fail_ret;
     }
 
+  /* The server is the one who starts the communication. The first frame
+   * is an authenticate request and its size is fixed at minimum. */
   if ((status = read_raw_frame (result, &frameSize)) != WCS_OK)
     goto fail_ret;
 
-  assert (frameSize <= result->dataSize);
+  assert (frameSize == result->dataSize);
+
   {
+      /* The authentication frame will always be send in plain, and it publish
+       * some communication settings set at the server size (e.g. frame size,
+       * cipher to be used, version, etc.). */
       uint_t serverFrameSize = 0;
+
       const uint32_t frameId = from_le_int32 (&result->data[FRAME_ID_OFF]);
 
       if ((frameId != 0)
@@ -456,7 +480,6 @@ WConnect (const char* const    host,
       assert (frameSize == FRAME_HDR_SIZE + FRAME_AUTH_SIZE);
       assert (result->data[FRAME_ENCTYPE_OFF] == FRAME_ENCTYPE_PLAIN);
 
-
       result->cipher = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];
       if ((result->cipher != FRAME_ENCTYPE_PLAIN)
           && (result->cipher != FRAME_ENCTYPE_3K))
@@ -465,8 +488,8 @@ WConnect (const char* const    host,
           goto fail_ret;
         }
       result->version = from_le_int32 (result->data +
-                                      FRAME_HDR_SIZE +
-                                      FRAME_AUTH_VER_OFF);
+                                         FRAME_HDR_SIZE +
+                                         FRAME_AUTH_VER_OFF);
       if ((result->version & CLIENT_VERSION) == 0)
         {
           status = WCS_PROTOCOL_NOTSUPP;
@@ -477,8 +500,8 @@ WConnect (const char* const    host,
 
       /* Make sure we are able to handle server's published max frames size */
       serverFrameSize = from_le_int16 (result->data +
-                                       FRAME_HDR_SIZE +
-                                       FRAME_AUTH_SIZE_OFF);
+                                         FRAME_HDR_SIZE +
+                                         FRAME_AUTH_SIZE_OFF);
       assert (MIN_FRAME_SIZE <= serverFrameSize);
       assert (serverFrameSize <= MAX_FRAME_SIZE);
 
@@ -487,10 +510,12 @@ WConnect (const char* const    host,
   }
 
   {
+    /* Prepare the authentication response, according to the server's
+     * published settings. */
     const uint_t frameSize = FRAME_HDR_SIZE +
-                              FRAME_AUTH_RSP_FIXED_SIZE +
-                              strlen (databaseName) + 1 +
-                              passwordLen + 1;
+                               FRAME_AUTH_RSP_FIXED_SIZE +
+                               strlen (database) + 1 +
+                               passwordLen + 1;
     char* const pAuthData =
         (char*)&result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE];
 
@@ -510,10 +535,10 @@ WConnect (const char* const    host,
     result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] = userId;
     result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_ENC_OFF] = result->cipher;
 
-    strcpy (pAuthData, databaseName);
+    strcpy (pAuthData, database);
 
     if (result->cipher == FRAME_ENCTYPE_PLAIN)
-      strcpy (pAuthData + strlen (databaseName) + 1, password);
+      strcpy (pAuthData + strlen (database) + 1, password);
 
     if ((status = write_raw_frame (result, frameSize)) != WCS_OK)
       goto fail_ret;
@@ -542,9 +567,9 @@ fail_ret:
 }
 
 void
-WClose (W_CONNECTOR_HND hnd)
+WClose (WH_CONNECTION hnd)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   if (hnd_ == NULL)
     return ;
@@ -563,13 +588,12 @@ WClose (W_CONNECTOR_HND hnd)
 }
 
 uint_t
-WPingServer (const W_CONNECTOR_HND hnd)
+WPingServer (const WH_CONNECTION hnd)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  uint16_t type;
-
-  uint_t cs = WCS_OK;
+  uint_t   cs   = WCS_OK;
+  uint16_t type = CMD_INVALID_RSP;
 
   if (hnd == NULL)
     return WCS_INVALID_ARGS;
@@ -596,15 +620,14 @@ exit_ping_server:
 };
 
 static uint_t
-list_globals (struct INTERNAL_HANDLER* hnd,
-              const unsigned int       hint,
-              unsigned int* const      pGlbsCount)
+list_globals (struct INTERNAL_HANDLER* const hnd,
+              const uint_t                   hint,
+              uint_t* const                  outCount)
 {
-  uint_t cs = WCS_OK;
-
-  uint8_t* data_;
-  uint_t   dataOffset;
-  uint16_t type;
+  uint_t   cs         = WCS_OK;
+  uint8_t* data_      = NULL;
+  uint_t   dataOffset = 0;
+  uint16_t type       = CMD_INVALID_RSP;
 
   set_data_size (hnd, sizeof (uint32_t));
   store_le_int32 (hint, data (hnd));
@@ -614,6 +637,7 @@ list_globals (struct INTERNAL_HANDLER* hnd,
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     goto list_globals_err;
+
   else if (type != CMD_LIST_GLOBALS_RSP)
     {
       cs = WCS_INVALID_FRAME;
@@ -623,21 +647,16 @@ list_globals (struct INTERNAL_HANDLER* hnd,
   data_ = data (hnd);
   if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto list_globals_err;
-  else if (data_size (hnd) < 3 * sizeof (uint32_t))
-    {
-      cs = WCS_INVALID_FRAME;
-      goto list_globals_err;
-    }
 
-  dataOffset  =  sizeof (uint32_t);
-  *pGlbsCount =  from_le_int32 (data_ + dataOffset);
-  dataOffset  += sizeof (uint32_t);
+  dataOffset  = sizeof (uint32_t);
+  *outCount   = from_le_int32 (data_ + dataOffset);
+  dataOffset += sizeof (uint32_t);
 
   hnd->cmdInternal[LIST_GLBINDEX] = from_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
   hnd->cmdInternal[LIST_GLBOFF]    = dataOffset;
-  hnd->cmdInternal[LIST_GLBSCOUNT] = *pGlbsCount;
+  hnd->cmdInternal[LIST_GLBSCOUNT] = *outCount;
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -652,32 +671,36 @@ list_globals_err:
 }
 
 uint_t
-WListGlobals (const W_CONNECTOR_HND hnd, unsigned int* pGlbsCount)
+WListGlobals (const WH_CONNECTION hnd,
+              uint_t* const       outCount)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  if ((hnd == NULL) || (pGlbsCount == NULL))
+  if ((hnd == NULL) || (outCount == NULL))
     return WCS_INVALID_ARGS;
+
   else if (hnd_->userId != 0)
     return WCS_OP_NOTPERMITED;
+
   else if (hnd_->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
-  return list_globals (hnd_, 0, pGlbsCount);
+  return list_globals (hnd_, 0, outCount);
 }
 
 uint_t
-WListGlobalsFetch (const W_CONNECTOR_HND hnd, const char** ppGlbName)
+WListGlobalsFetch (const WH_CONNECTION hnd,
+                   const char** const  outpName)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   uint_t  cs = WCS_OK;
+
   uint_t  dataOffset;
-  uint_t  glbIndex;
-  uint_t  glbsCount;
+  uint_t  glbIndex, glbsCount;
 
   if ((hnd_ == NULL)
-      || (ppGlbName == NULL)
+      || (outpName == NULL)
       || (hnd_->lastCmdRespReceived != CMD_LIST_GLOBALS_RSP))
     {
       return WCS_INVALID_ARGS;
@@ -691,18 +714,19 @@ WListGlobalsFetch (const W_CONNECTOR_HND hnd, const char** ppGlbName)
 
   if (glbIndex >= glbsCount)
     {
-      *ppGlbName = NULL;
+      *outpName = NULL;
       return WCS_OK;
     }
 
   if (dataOffset >= data_size (hnd_))
     {
-      uint_t glbCount;
+      /* Couldn't find the next name in this frame, send a new request
+       * to the server with a new hint. */
 
-      if ((cs = list_globals (hnd_, glbIndex, &glbCount)) != WCS_OK)
+      if ((cs = list_globals (hnd_, glbIndex, &glbsCount)) != WCS_OK)
         goto list_global_fetch_err;
 
-      assert (glbIndex < glbCount);
+      assert (glbIndex < glbsCount);
 
       dataOffset = 3 * sizeof (uint32_t);
 
@@ -712,8 +736,8 @@ WListGlobalsFetch (const W_CONNECTOR_HND hnd, const char** ppGlbName)
     }
 
 
-  *ppGlbName = (char*)data (hnd_) + dataOffset;
-  dataOffset += strlen (*ppGlbName) + 1;
+  *outpName   = (char*)data (hnd_) + dataOffset;
+  dataOffset += strlen (*outpName) + 1;
 
   assert (dataOffset <= data_size (hnd_));
 
@@ -734,9 +758,9 @@ list_global_fetch_err:
 }
 
 static uint_t
-list_procedures (struct INTERNAL_HANDLER* hnd,
-                 const unsigned int       hint,
-                 unsigned int* const      pProcsCount)
+list_procedures (struct INTERNAL_HANDLER* const hnd,
+                 const uint_t             hint,
+                 uint_t* const            outCount)
 {
   uint_t cs = WCS_OK;
 
@@ -752,6 +776,7 @@ list_procedures (struct INTERNAL_HANDLER* hnd,
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     goto list_procedures_err;
+
   else if (type != CMD_LIST_PROCEDURE_RSP)
     {
       cs = WCS_INVALID_FRAME;
@@ -761,21 +786,22 @@ list_procedures (struct INTERNAL_HANDLER* hnd,
   data_ = data (hnd);
   if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto list_procedures_err;
+
   else if (data_size (hnd) < 3 * sizeof (uint32_t))
     {
       cs = WCS_INVALID_FRAME;
       goto list_procedures_err;
     }
 
-  dataOffset   =  sizeof (uint32_t);
-  *pProcsCount =  from_le_int32 (data_ + dataOffset);
-  dataOffset   += sizeof (uint32_t);
+  dataOffset  = sizeof (uint32_t);
+  *outCount   = from_le_int32 (data_ + dataOffset);
+  dataOffset += sizeof (uint32_t);
 
   hnd->cmdInternal[LIST_PROCSINDEX] = from_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
   hnd->cmdInternal[LIST_PROCOFF]    = dataOffset;
-  hnd->cmdInternal[LIST_PROCSCOUNT] = *pProcsCount;
+  hnd->cmdInternal[LIST_PROCSCOUNT] = *outCount;
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -790,37 +816,41 @@ list_procedures_err:
 }
 
 uint_t
-WListProcedures (const W_CONNECTOR_HND hnd, unsigned int* pProcsCount)
+WListProcedures (const WH_CONNECTION hnd, uint_t* const outpCount)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  if ((hnd == NULL) || (pProcsCount == NULL))
+  if ((hnd == NULL) || (outpCount == NULL))
     return WCS_INVALID_ARGS;
+
   else if (hnd_->userId != 0)
     return WCS_OP_NOTPERMITED;
+
   else if (hnd_->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
-  return list_procedures (hnd_, 0, pProcsCount);
+  return list_procedures (hnd_, 0, outpCount);
 }
 
+
 uint_t
-WListProceduresFetch (const W_CONNECTOR_HND hnd,
-                      const char**          ppProcName)
+WListProceduresFetch (const WH_CONNECTION  hnd,
+                      const char** const   outpName)
 {
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   uint_t  cs = WCS_OK;
-  uint_t  procIndex;
+
   uint_t  dataOffset;
-  uint_t  procsCount;
+  uint_t  procIndex, procsCount;
 
   if ((hnd_ == NULL)
-      || (ppProcName == NULL)
+      || (outpName == NULL)
       || (hnd_->lastCmdRespReceived != CMD_LIST_PROCEDURE_RSP))
     {
       return WCS_INVALID_ARGS;
     }
+
   else if ((cs = from_le_int32 (data (hnd_))) != WCS_OK)
     goto list_procedure_fetch_err;
 
@@ -831,14 +861,14 @@ WListProceduresFetch (const W_CONNECTOR_HND hnd,
 
   if (procIndex >= procsCount)
     {
-      *ppProcName = NULL;
+      *outpName = NULL;
       return WCS_OK;
     }
 
-
   if (dataOffset >= data_size (hnd_))
     {
-      uint_t procsCount;
+      /* Couldn't find the next name in this frame, send a new request
+       * to the server with a new hint. */
 
       if ((cs = list_procedures (hnd_, procIndex, &procsCount)) != WCS_OK)
         goto list_procedure_fetch_err;
@@ -846,13 +876,14 @@ WListProceduresFetch (const W_CONNECTOR_HND hnd,
       assert (procIndex < procsCount);
 
       dataOffset = 3 * sizeof (uint32_t);
+
       assert (procsCount == hnd_->cmdInternal[LIST_PROCSCOUNT]);
       assert (dataOffset == hnd_->cmdInternal[LIST_PROCOFF]);
       assert (procIndex  == hnd_->cmdInternal[LIST_PROCSINDEX]);
     }
 
-  *ppProcName =  (char*)data (hnd_) + dataOffset;
-  dataOffset  += strlen (*ppProcName) + 1;
+  *outpName   = (char*)data (hnd_) + dataOffset;
+  dataOffset += strlen (*outpName) + 1;
 
   assert (dataOffset <= data_size (hnd_));
 
@@ -873,11 +904,15 @@ list_procedure_fetch_err:
 }
 
 
-static unsigned int
+/* Internal function used to retrieve type information about a value.
+ * If the global name is NULL then it refers to the value from the connection
+ * stack top. For a table value, the hint field specifies what fields should
+ * cached from in this frame for next type processing. */
+static uint_t
 describe_value (struct INTERNAL_HANDLER* const  hnd,
                 const char* const               globalName,
-                const unsigned int              fieldHint,
-                unsigned int* const             pRawType)
+                const uint_t                    fieldHint,
+                uint_t* const                   outRawType)
 {
   uint_t    cs     = WCS_OK;
   uint_t    offset = 0;
@@ -886,6 +921,7 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
 
   if (hnd->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
+
   else if (fieldHint > 0xFFFF)
     return WCS_OP_NOTSUPP;
 
@@ -916,13 +952,14 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     goto describe_value_err;
+
   else if (type != CMD_GLOBAL_DESC_RSP)
     {
       cs = WCS_INVALID_FRAME;
       goto describe_value_err;
     }
 
-  data_  = data (hnd);
+  data_ = data (hnd);
 
   if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto describe_value_err;
@@ -930,8 +967,8 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   assert (offset == strlen ((char*)data_ + sizeof (uint32_t)) + 1 +
                     sizeof (uint32_t));
 
-  *pRawType = from_le_int16 (data_ + offset);
-  hnd->cmdInternal[DESC_RAWTYPE] = *pRawType;
+  *outRawType = from_le_int16 (data_ + offset);
+  hnd->cmdInternal[DESC_RAWTYPE] = *outRawType;
   offset += sizeof (uint16_t);
 
   hnd->cmdInternal[DESC_FIELD_COUNT] = from_le_int16 (data_ + offset);
@@ -945,47 +982,50 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   hnd->lastCmdRespReceived = CMD_GLOBAL_DESC_RSP;
 
   assert (cs == WCS_OK);
+
   return WCS_OK;
 
 describe_value_err:
   assert (cs != WCS_OK);
+
   hnd->lastCmdRespReceived = CMD_INVALID_RSP;
 
   return cs;
 }
 
-unsigned int
-WDescribeValue (const W_CONNECTOR_HND    hnd,
-                const char* const        globalName,
-                unsigned int* const      pRawType)
+uint_t
+WGlobalType (const WH_CONNECTION    hnd,
+             const char* const      name,
+             uint_t* const          outRawType)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
-
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   if ((hnd == NULL)
-      || (globalName == NULL)
-      || (pRawType == NULL)
-      || (strlen (globalName) == 0))
+      || (name == NULL)
+      || (strlen (name) == 0)
+      || (outRawType == NULL))
     {
       return WCS_INVALID_ARGS;
     }
+
   else if (hnd_->userId != 0)
     return WCS_OP_NOTPERMITED;
 
-  return describe_value (hnd_, globalName, 0, pRawType);
+  return describe_value (hnd_, name, 0, outRawType);
 }
 
-unsigned int
-WDescribeValueGetFieldsCount (const W_CONNECTOR_HND  hnd,
-                              unsigned int* const    pFieldCount)
+uint_t
+WFieldsCount (const WH_CONNECTION  hnd,
+              uint_t* const        outCount)
 {
-  struct INTERNAL_HANDLER* hnd_   = (struct INTERNAL_HANDLER*)hnd;
-  uint_t                   cs     = WCS_OK;
-  uint8_t*                 data_  = NULL;
-  uint16_t                 type;
+  struct INTERNAL_HANDLER* const hnd_   = (struct INTERNAL_HANDLER*)hnd;
+  uint_t                         cs     = WCS_OK;
+  uint8_t*                       data_  = NULL;
+  uint16_t                       type;
 
-  if ((hnd_ == NULL) || (pFieldCount == NULL))
+  if ((hnd_ == NULL) || (outCount == NULL))
     return WCS_INVALID_ARGS;
+
   else if (hnd_->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP)
     return WCS_INCOMPLETE_CMD;
 
@@ -994,13 +1034,13 @@ WDescribeValueGetFieldsCount (const W_CONNECTOR_HND  hnd,
     goto describe_value_field_cnt_err;
 
   type = hnd_->cmdInternal[DESC_RAWTYPE];
-  if ((type & WFT_TABLE_MASK) == 0)
+  if ((type & WHC_TYPE_TABLE_MASK) == 0)
     {
-      *pFieldCount = 0;
+      *outCount = 0;
       return WCS_OK;
     }
 
-  *pFieldCount = hnd_->cmdInternal[DESC_FIELD_COUNT];
+  *outCount = hnd_->cmdInternal[DESC_FIELD_COUNT];
 
   assert (cs == WCS_OK);
 
@@ -1008,26 +1048,28 @@ WDescribeValueGetFieldsCount (const W_CONNECTOR_HND  hnd,
 
 describe_value_field_cnt_err:
   assert (cs != WCS_OK);
+
   hnd_->lastCmdRespReceived = CMD_INVALID_RSP;
 
   return cs;
 }
 
-unsigned int
-WDescribeValueFetchField (const W_CONNECTOR_HND  hnd,
-                          const char**           ppFieldName,
-                          unsigned int* const    pFieldType)
+uint_t
+WFetchField (const WH_CONNECTION    hnd,
+             const char**           outpFieldName,
+             uint_t* const          outFieldType)
 {
-  struct INTERNAL_HANDLER* hnd_   = (struct INTERNAL_HANDLER*)hnd;
-  uint_t                   cs     = WCS_OK;
-  uint8_t*                 data_  = NULL;
-  uint16_t                 type;
-  uint_t                   fieldHint;
-  uint_t                   fieldCount;
-  uint_t                   offset;
+  struct INTERNAL_HANDLER* const hnd_   = (struct INTERNAL_HANDLER*)hnd;
 
-  if ((hnd_ == NULL) || (ppFieldName == NULL) || (pFieldType == NULL))
+  uint_t    cs     = WCS_OK;
+  uint8_t*  data_  = NULL;
+  uint_t    offset;
+  uint_t    fieldHint, fieldCount;
+  uint16_t  type;
+
+  if ((hnd_ == NULL) || (outpFieldName == NULL) || (outFieldType == NULL))
     return WCS_INVALID_ARGS;
+
   else if (hnd_->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP)
     return WCS_INCOMPLETE_CMD;
 
@@ -1038,7 +1080,7 @@ WDescribeValueFetchField (const W_CONNECTOR_HND  hnd,
 describe_value_fetch_field_again:
 
   type = hnd_->cmdInternal[DESC_RAWTYPE];
-  if ((type & WFT_TABLE_MASK) == 0)
+  if ((type & WHC_TYPE_TABLE_MASK) == 0)
     return WCS_INVALID_ARGS;
 
   fieldCount = hnd_->cmdInternal[DESC_FIELD_COUNT];
@@ -1050,10 +1092,11 @@ describe_value_fetch_field_again:
 
   if (fieldHint > fieldCount)
     return WCS_INVALID_ARGS;
+
   else if (fieldHint == fieldCount)
     {
-      *pFieldType  = WFT_NOTSET;
-      *ppFieldName = NULL;
+      *outFieldType  = WHC_TYPE_NOTSET;
+      *outpFieldName = NULL;
 
       hnd_->cmdInternal[DESC_FIELD_HINT] = ++fieldHint;
 
@@ -1061,13 +1104,14 @@ describe_value_fetch_field_again:
     }
   else if (offset < data_size (hnd_))
     {
-      *ppFieldName =  (char*)data (hnd_) + offset;
-      offset       += strlen (*ppFieldName) + 1;
+      *outpFieldName  = (char*)data (hnd_) + offset;
+      offset         += strlen (*outpFieldName) + 1;
 
-      *pFieldType =  from_le_int16 (data(hnd_) + offset);
-      offset      += sizeof (uint16_t);
+      *outFieldType  = from_le_int16 (data(hnd_) + offset);
+      offset        += sizeof (uint16_t);
 
       ++fieldHint;
+
       assert (offset <= 0xFFFF);
       assert (fieldHint <= 0xFFFF);
 
@@ -1077,6 +1121,9 @@ describe_value_fetch_field_again:
     }
   else
     {
+      /* The next field isn't contained in this frame, send a new request
+       * with a new field hint. */
+
       uint_t dummyType;
       cs = describe_value (hnd_,
                            (char*)data (hnd_) + sizeof (uint32_t),
@@ -1086,45 +1133,48 @@ describe_value_fetch_field_again:
         goto describe_value_fetch_field_err;
 
       assert (type == dummyType);
+
       goto describe_value_fetch_field_again;
     }
 
   assert (cs == WCS_OK);
+
   return cs;
 
 describe_value_fetch_field_err:
   assert (cs != WCS_OK);
+
   hnd_->lastCmdRespReceived = CMD_INVALID_RSP;
 
   return cs;
 }
 
 
-unsigned int
-WDescribeStackTop (const W_CONNECTOR_HND hnd,
-                   unsigned int* const   pRawType)
+uint_t
+WStackValueType (const WH_CONNECTION hnd,
+                 uint_t* const       outRawType)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
 
-  if ((hnd == NULL) || (pRawType == NULL))
+  if ((hnd == NULL) || (outRawType == NULL))
     return WCS_INVALID_ARGS;
 
-  return describe_value (hnd_, NULL, 0, pRawType);
+  return describe_value (hnd_, NULL, 0, outRawType);
 }
 
 static uint_t
-compute_push_space_need (const uint_t                          type,
-                         unsigned int                          fieldsCount,
-                         const struct W_FieldDescriptor* const fields)
+compute_push_space_need (const uint_t               type,
+                         uint_t                     fieldsCount,
+                         const struct WField* const fields)
 {
-  if (type != WFT_TABLE_MASK)
+  if (type != WHC_TYPE_TABLE_MASK)
     {
-      if (type & WFT_FIELD_MASK)
+      if (type & WHC_TYPE_FIELD_MASK)
         return 0;
 
-      const uint_t baseType = type & ~(WFT_ARRAY_MASK);
-      if ((baseType < WFT_BOOL) || (baseType > WFT_TEXT)
+      const uint_t baseType = type & ~(WHC_TYPE_ARRAY_MASK);
+      if ((baseType < WHC_TYPE_BOOL) || (baseType > WHC_TYPE_TEXT)
           || (fieldsCount > 0))
         {
           return 0;
@@ -1139,15 +1189,15 @@ compute_push_space_need (const uint_t                          type,
   uint_t result = 2 * sizeof (uint16_t) + 1;
   while (fieldsCount-- > 0)
     {
-      const char* const fieldName = fields[fieldsCount].m_FieldName;
-      const uint_t        nameLen   = strlen (fieldName) + 1;
+      const char* const fieldName = fields[fieldsCount].name;
+      const uint_t      nameLen   = strlen (fieldName) + 1;
 
-      uint16_t fieldType = fields[fieldsCount].m_FieldType;
-      fieldType &= ~WFT_ARRAY_MASK;
+      uint16_t fieldType = fields[fieldsCount].type;
+      fieldType &= ~WHC_TYPE_ARRAY_MASK;
 
       if ((fieldName == NULL)
           || (nameLen <= 1)
-          || ((fieldType < WFT_BOOL) || (fieldType > WFT_TEXT)))
+          || ((fieldType < WHC_TYPE_BOOL) || (fieldType > WHC_TYPE_TEXT)))
         {
           return 0;
         }
@@ -1159,29 +1209,29 @@ compute_push_space_need (const uint_t                          type,
 }
 
 static void
-write_push_cmd (const uint_t                          type,
-                unsigned int                          fieldsCount,
-                const struct W_FieldDescriptor* const fields,
-                uint8_t*                              dest)
+write_push_cmd (const uint_t               type,
+                uint_t                     fieldsCount,
+                const struct WField* const fields,
+                uint8_t*                   dest)
 {
   *dest++ = CMD_UPDATE_FUNC_PUSH;
 
   store_le_int16 (type, dest);
 
-  if (type == WFT_TABLE_MASK)
+  if (type == WHC_TYPE_TABLE_MASK)
     {
       dest += sizeof (uint16_t);
 
-      assert  ((fieldsCount != 0) && (fields != NULL));
+      assert ((fieldsCount != 0) && (fields != NULL));
 
       store_le_int16 (fieldsCount, dest);
       dest += sizeof (uint16_t);
 
       while (fieldsCount-- > 0)
         {
-          const uint16_t      fieldType = fields[fieldsCount].m_FieldType;
-          const char* const fieldName = fields[fieldsCount].m_FieldName;
-          const uint_t        nameLen   = strlen (fieldName) + 1;
+          const uint16_t    fieldType = fields[fieldsCount].type;
+          const char* const fieldName = fields[fieldsCount].name;
+          const uint_t      nameLen   = strlen (fieldName) + 1;
 
           memcpy (dest, fieldName, nameLen);
           dest += nameLen;
@@ -1192,20 +1242,23 @@ write_push_cmd (const uint_t                          type,
 }
 
 uint_t
-WPushStackValue (const W_CONNECTOR_HND                 hnd,
-                 const unsigned int                    type,
-                 const unsigned int                    fieldsCount,
-                 const struct W_FieldDescriptor* const fields)
+WPushValue (const WH_CONNECTION        hnd,
+            const uint_t               type,
+            const uint_t               fieldsCount,
+            const struct WField* const fields)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  uint_t       cs       = WCS_OK;
   const uint_t spaceReq = compute_push_space_need (type, fieldsCount, fields);
+
+  uint_t cs = WCS_OK;
 
   if (hnd_ == NULL)
     return WCS_INVALID_ARGS;
+
   else if (spaceReq == 0)
     return WCS_INVALID_ARGS;
+
   else if ((hnd_->buildingCmd != CMD_UPDATE_STACK)
            && (hnd_->buildingCmd != CMD_INVALID))
     {
@@ -1217,12 +1270,14 @@ WPushStackValue (const W_CONNECTOR_HND                 hnd,
   if (hnd_->buildingCmd == CMD_INVALID)
     set_data_size (hnd_, 0);
 
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   if (max_data_size (hnd_) - spaceReq < data_size (hnd_))
     {
       assert (hnd_->buildingCmd == CMD_UPDATE_STACK);
       assert (data_size (hnd_) > 0);
 
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
 
       assert (hnd_->buildingCmd == CMD_INVALID);
@@ -1248,14 +1303,16 @@ WPushStackValue (const W_CONNECTOR_HND                 hnd,
 }
 
 uint_t
-WPopStackValues (const W_CONNECTOR_HND hnd,
-                 unsigned int          count)
+WPopValues (const WH_CONNECTION hnd,
+            const uint_t        count)
 {
-  struct INTERNAL_HANDLER* hnd_     = (struct INTERNAL_HANDLER*)hnd;
-  static const uint_t      spaceReq = sizeof (uint32_t) + 1;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+  static const uint_t  spaceReq  = sizeof (uint32_t) + 1;
 
   if ((hnd_ == NULL) || (count == 0))
     return WCS_INVALID_ARGS;
+
   else if ((hnd_->buildingCmd != CMD_UPDATE_STACK)
            && (hnd_->buildingCmd != CMD_INVALID))
     {
@@ -1265,6 +1322,8 @@ WPopStackValues (const W_CONNECTOR_HND hnd,
   if (hnd_->buildingCmd == CMD_INVALID)
     set_data_size (hnd_, 0);
 
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   if (max_data_size(hnd_) - spaceReq  <  data_size (hnd_))
     {
       uint_t cs;
@@ -1272,7 +1331,7 @@ WPopStackValues (const W_CONNECTOR_HND hnd,
       assert (hnd_->buildingCmd == CMD_UPDATE_STACK);
       assert (data_size (hnd_) > 0);
 
-      if ((cs = WUpdateStackFlush (hnd_)) != WCS_OK)
+      if ((cs = WFlush (hnd_)) != WCS_OK)
         return cs;
 
       assert (hnd_->buildingCmd == CMD_INVALID);
@@ -1298,22 +1357,25 @@ WPopStackValues (const W_CONNECTOR_HND hnd,
 }
 
 static uint_t
-stack_top_basic_update (struct INTERNAL_HANDLER* hnd,
-                        const uint_t             type,
-                        const char* const        value)
+stack_top_basic_update (struct INTERNAL_HANDLER* const hnd,
+                        const uint_t                   type,
+                        const char* const              value)
 {
-  uint_t       cs        = WCS_OK;
   const uint_t spaceNeed = sizeof (uint8_t) +
-                           sizeof (uint16_t) +
-                           strlen (value) + 1;
+                             sizeof (uint16_t) +
+                             strlen (value) + 1;
+  uint_t cs = WCS_OK;
 
-  assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
+  assert ((WHC_TYPE_BOOL <= type) && (type < WHC_TYPE_TEXT));
 
   if (spaceNeed > max_data_size (hnd))
     return WCS_LARGE_ARGS;
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   else if (max_data_size (hnd) - spaceNeed < data_size (hnd))
     {
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
     }
 
@@ -1340,28 +1402,31 @@ stack_top_basic_update (struct INTERNAL_HANDLER* hnd,
 }
 
 uint_t
-stack_top_field_basic_update (struct INTERNAL_HANDLER* hnd,
-                              const uint_t             type,
-                              const char* const      fieldNane,
-                              const W_TABLE_ROW_INDEX  row,
-                              const char* const      value)
+stack_top_field_basic_update (struct INTERNAL_HANDLER* const hnd,
+                              const uint_t                   type,
+                              const char* const              fieldNane,
+                              const WHT_ROW_INDEX            row,
+                              const char* const              value)
 {
-  uint_t       cs        = WCS_OK;
   const uint_t spaceNeed = sizeof (uint8_t) +
-                           sizeof (uint16_t) +
-                           strlen (fieldNane) + 1 +
-                           sizeof (uint64_t) +
-                           strlen (value) + 1;
+                             sizeof (uint16_t) +
+                             strlen (fieldNane) + 1 +
+                             sizeof (uint64_t) +
+                             strlen (value) + 1;
+  uint_t cs = WCS_OK;
 
   assert (hnd != NULL);
   assert (strlen (fieldNane) > 0);
-  assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
+  assert ((WHC_TYPE_BOOL <= type) && (type < WHC_TYPE_TEXT));
 
   if (spaceNeed > max_data_size (hnd))
     return WCS_LARGE_ARGS;
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   else if (max_data_size (hnd) - spaceNeed < data_size (hnd))
     {
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
     }
 
@@ -1372,7 +1437,7 @@ stack_top_field_basic_update (struct INTERNAL_HANDLER* hnd,
     data_    += currSize;
     *data_++  = CMD_UPDATE_FUNC_CHTOP;
 
-    store_le_int16 (type | WFT_FIELD_MASK, data_);
+    store_le_int16 (type | WHC_TYPE_FIELD_MASK, data_);
     data_ += sizeof (uint16_t);
 
     strcpy ((char*)data_, fieldNane);
@@ -1384,39 +1449,45 @@ stack_top_field_basic_update (struct INTERNAL_HANDLER* hnd,
     strcpy ((char*)data_, value);
 
     assert ((currSize + spaceNeed) <= max_data_size (hnd));
+
     set_data_size (hnd, currSize + spaceNeed);
 
     hnd->cmdInternal[LAST_UPDATE_OFF] = currSize;
   }
 
   assert (cs == WCS_OK);
+
   return cs;
 }
 
 static uint_t
 stack_top_text_update (struct INTERNAL_HANDLER* hnd,
-                       const W_ELEMENT_OFFSET   textOff,
-                       const char* const      value)
+                       const WHT_INDEX          textOff,
+                       const char* const        value)
 {
-  uint_t       cs        = WCS_OK;
-  const uint_t fixedSize =  sizeof (uint8_t) +
-                            sizeof (uint16_t) +
-                            sizeof (uint64_t);
+  const uint_t fixedSize = sizeof (uint8_t) +
+                             sizeof (uint16_t) +
+                             sizeof (uint64_t);
   const uint_t cmdSize   = fixedSize + strlen (value) + 1;
 
   uint8_t* data_;
   uint_t   currSize;
+  uint_t   cs = WCS_OK;
 
   assert (hnd != NULL);
   assert (strlen (value) > 0);
 
   if (utf8_strlen ((const uint8_t*)value) < 0)
     return WCS_INVALID_ARGS;
+
   else if (cmdSize > max_data_size (hnd))
     return WCS_LARGE_ARGS;
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   else if (max_data_size (hnd) - cmdSize < data_size (hnd))
     {
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
     }
 
@@ -1426,7 +1497,7 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
   {
       const uint16_t prevType = from_le_int16 (++data_);
-      if (prevType == WFT_TEXT)
+      if (prevType == WHC_TYPE_TEXT)
         {
           data_ += sizeof (uint16_t);
 
@@ -1434,6 +1505,7 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
           data_ += sizeof (uint64_t);
 
           const int prevLen = utf8_strlen (data_);
+
           assert (prevLen >= 0);
 
           const uint_t prevRawlen = strlen ((const char*)data_);
@@ -1441,9 +1513,9 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
           if ((prevOffset + prevLen) == textOff)
             {
               const uint_t newDataSize = hnd->cmdInternal[LAST_UPDATE_OFF] +
-                                         fixedSize +
-                                         prevRawlen +
-                                         strlen (value) + 1;
+                                           fixedSize +
+                                           prevRawlen +
+                                           strlen (value) + 1;
 
               assert (newDataSize <= max_data_size (hnd));
               assert (newDataSize > currSize);
@@ -1461,7 +1533,7 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
 
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
-  store_le_int16 (WFT_TEXT, data_);
+  store_le_int16 (WHC_TYPE_TEXT, data_);
   data_ += sizeof (uint16_t);
 
   store_le_int64 (textOff, data_);
@@ -1470,22 +1542,23 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
   strcpy ((char*)data_, value);
 
   assert ((currSize + cmdSize) <= max_data_size (hnd));
+
   set_data_size (hnd, currSize + cmdSize);
 
   hnd->cmdInternal[LAST_UPDATE_OFF] = currSize;
 
   assert (cs == WCS_OK);
+
   return cs;
 }
 
 static uint_t
-stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
-                             const char* const      fieldName,
-                             const W_TABLE_ROW_INDEX  row,
-                             const W_ELEMENT_OFFSET   textOff,
-                             const char* const      value)
+stack_top_field_text_update (struct INTERNAL_HANDLER* const hnd,
+                             const char* const              fieldName,
+                             const WHT_ROW_INDEX            row,
+                             const WHT_INDEX                textOff,
+                             const char* const              value)
 {
-  uint_t       cs         = WCS_OK;
   const uint_t fixedSize  = sizeof (uint8_t) +
                               sizeof (uint16_t) +
                               strlen (fieldName) + 1 +
@@ -1495,6 +1568,7 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
 
   uint8_t* data_;
   uint_t   currSize;
+  uint_t   cs         = WCS_OK;
 
   assert (hnd != NULL);
   assert (strlen (value) > 0);
@@ -1502,11 +1576,15 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
 
   if (utf8_strlen ((const uint8_t*)value) < 0)
     return WCS_INVALID_ARGS;
+
   else if (cmdSize > max_data_size (hnd))
     return WCS_LARGE_ARGS;
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   else if (max_data_size (hnd) - cmdSize < data_size (hnd))
     {
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
     }
 
@@ -1514,9 +1592,9 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
   currSize = data_size (hnd);
 
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
-  {
+    {
       const uint16_t prevType = from_le_int16 (++data_);
-      if (prevType == (WFT_TEXT | WFT_FIELD_MASK))
+      if (prevType == (WHC_TYPE_TEXT | WHC_TYPE_FIELD_MASK))
         {
           data_ += sizeof (uint16_t);
 
@@ -1530,6 +1608,7 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
           data_ += sizeof (uint64_t);
 
           const int prevLen = utf8_strlen (data_);
+
           assert (prevLen >= 0);
 
           const uint_t prevRawlen = strlen ((const char*)data_);
@@ -1540,9 +1619,9 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
               && ((prevOffset + prevLen) == textOff))
             {
               const uint_t newDataSize = hnd->cmdInternal[LAST_UPDATE_OFF] +
-                                         fixedSize +
-                                         prevRawlen +
-                                         strlen (value) + 1;
+                                           fixedSize +
+                                           prevRawlen +
+                                           strlen (value) + 1;
 
               assert (newDataSize <= max_data_size (hnd));
               assert (newDataSize > currSize);
@@ -1553,14 +1632,14 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
               return WCS_OK;
             }
         }
-  }
+    }
 
   currSize = data_size (hnd);
   data_    = data (hnd) + currSize;
 
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
-  store_le_int16 (WFT_TEXT | WFT_FIELD_MASK, data_),
+  store_le_int16 (WHC_TYPE_TEXT | WHC_TYPE_FIELD_MASK, data_),
   data_ += sizeof (uint16_t);
 
   strcpy ((char*)data_, fieldName);
@@ -1575,34 +1654,40 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* hnd,
   strcpy ((char*)data_, value);
 
   assert ((currSize + cmdSize) <= max_data_size (hnd));
+
   set_data_size (hnd, currSize + cmdSize);
 
   hnd->cmdInternal[LAST_UPDATE_OFF] = currSize;
 
   assert (cs == WCS_OK);
+
   return cs;
 }
 
 static uint_t
-stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
-                              const uint_t             type,
-                              const W_ELEMENT_OFFSET   arrayOff,
-                              const char* const      value)
+stack_top_array_basic_update (struct INTERNAL_HANDLER* const hnd,
+                              const uint_t                   type,
+                              const WHT_INDEX                arrayOff,
+                              const char* const              value)
 {
-  uint_t       cs         = WCS_OK;
-  uint_t       countOff   = sizeof (uint8_t) + sizeof (uint16_t);
+  uint_t cs       = WCS_OK;
+  uint_t countOff = sizeof (uint8_t) + sizeof (uint16_t);
+
   const uint_t fixedSize  = countOff + sizeof (uint16_t) + sizeof (uint64_t);
   const uint_t cmdSize    = fixedSize + strlen (value) + 1;
 
   assert (hnd != NULL);
-  assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
+  assert ((WHC_TYPE_BOOL <= type) && (type < WHC_TYPE_TEXT));
   assert (strlen (value) > 0);
 
   if (cmdSize > max_data_size (hnd))
     return WCS_LARGE_ARGS;
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   else if (max_data_size (hnd) - cmdSize < data_size (hnd))
     {
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
     }
 
@@ -1612,12 +1697,14 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
       data_ += hnd->cmdInternal[LAST_UPDATE_OFF];
 
       const uint16_t prevType = from_le_int16 (++data_);
-      if ((type | WFT_ARRAY_MASK) == prevType)
+      if ((type | WHC_TYPE_ARRAY_MASK) == prevType)
         {
           data_ += sizeof (uint16_t);
 
           const uint16_t prevCount = from_le_int16 (data_);
+
           assert (prevCount > 0);
+
           data_ += sizeof (uint16_t);
 
           const uint64_t prevOffset = from_le_int64 (data_);
@@ -1627,8 +1714,8 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
               (prevOffset + prevCount) == arrayOff)
             {
               data_ = data (hnd) +
-                      hnd->cmdInternal[LAST_UPDATE_OFF] +
-                      countOff;
+                        hnd->cmdInternal[LAST_UPDATE_OFF] +
+                        countOff;
               store_le_int16 (prevCount + 1, data_);
 
               const uint_t newDataSize = data_size (hnd) + strlen (value) + 1;
@@ -1649,7 +1736,7 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
   data_    = data (hnd) + currSize;
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
-  store_le_int16 (type | WFT_ARRAY_MASK, data_);
+  store_le_int16 (type | WHC_TYPE_ARRAY_MASK, data_);
   data_ += sizeof (uint16_t);
 
   store_le_int16 (1, data_);
@@ -1661,27 +1748,29 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* hnd,
   strcpy ((char*)data_, value);
 
   assert ((currSize + cmdSize) <= max_data_size (hnd));
+
   set_data_size (hnd, currSize + cmdSize);
 
   hnd->cmdInternal[LAST_UPDATE_OFF] = currSize;
 
   assert (cs == WCS_OK);
+
   return cs;
 }
 
 static uint_t
-stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
-                                    const uint_t             type,
-                                    const char*            fieldName,
-                                    const W_TABLE_ROW_INDEX  row,
-                                    const W_ELEMENT_OFFSET   arrayOff,
-                                    const char* const      value)
+stack_top_field_array_basic_update (struct INTERNAL_HANDLER* const hnd,
+                                    const uint_t                   type,
+                                    const char*                    fieldName,
+                                    const WHT_ROW_INDEX            row,
+                                    const WHT_INDEX                arrayOff,
+                                    const char* const              value)
 {
   uint_t       cs         = WCS_OK;
   uint_t       countOff   = sizeof (uint8_t) +
-                            sizeof (uint16_t) +
-                            strlen (fieldName) + 1 +
-                            sizeof (uint64_t);
+                              sizeof (uint16_t) +
+                              strlen (fieldName) + 1 +
+                              sizeof (uint64_t);
   const uint_t fixedSize  = countOff + sizeof (uint16_t) + sizeof (uint64_t);
   const uint_t cmdSize    = fixedSize + strlen (value) + 1;
 
@@ -1689,15 +1778,18 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
   uint_t   currSize;
 
   assert (hnd != NULL);
-  assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
+  assert ((WHC_TYPE_BOOL <= type) && (type < WHC_TYPE_TEXT));
   assert (strlen (fieldName) > 0);
   assert (strlen (value) > 0);
 
   if (cmdSize > max_data_size (hnd))
     return WCS_LARGE_ARGS;
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
   else if (max_data_size (hnd) - cmdSize < data_size (hnd))
     {
-      if ((cs = WUpdateStackFlush (hnd)) != WCS_OK)
+      if ((cs = WFlush (hnd)) != WCS_OK)
         return cs;
     }
 
@@ -1707,7 +1799,7 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
   {
       const uint16_t prevType = from_le_int16 (++data_);
-      if ((type | WFT_ARRAY_MASK | WFT_FIELD_MASK) == prevType)
+      if ((type | WHC_TYPE_ARRAY_MASK | WHC_TYPE_FIELD_MASK) == prevType)
         {
           data_ += sizeof (uint16_t);
 
@@ -1718,7 +1810,9 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
           data_ += sizeof (uint64_t);
 
           const uint16_t prevCount = from_le_int16 (data_);
+
           assert (prevCount > 0);
+
           data_ += sizeof (uint16_t);
 
           const uint64_t prevOffset = from_le_int64 (data_);
@@ -1728,7 +1822,9 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
               && (prevRow == row)
               && (strcmp (prevFielName, fieldName) == 0))
             {
-              data_ = data (hnd) + hnd->cmdInternal[LAST_UPDATE_OFF] + countOff;
+              data_ = data (hnd) +
+                        hnd->cmdInternal[LAST_UPDATE_OFF] +
+                        countOff;
               store_le_int16 (prevCount + 1, data_);
 
               const uint_t newDataSize = data_size (hnd) + strlen (value) + 1;
@@ -1748,7 +1844,7 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
   data_    = data (hnd) + currSize;
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
 
-  store_le_int16 (type | WFT_ARRAY_MASK | WFT_FIELD_MASK, data_);
+  store_le_int16 (type | WHC_TYPE_ARRAY_MASK | WHC_TYPE_FIELD_MASK, data_);
   data_ += sizeof (uint16_t);
 
   strcpy ((char*)data_, fieldName);
@@ -1766,34 +1862,39 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* hnd,
   strcpy ((char*)data_, value);
 
   assert ((currSize + cmdSize) <= max_data_size (hnd));
+
   set_data_size (hnd, currSize + cmdSize);
 
   hnd->cmdInternal[LAST_UPDATE_OFF] = currSize;
 
   assert (cs == WCS_OK);
+
   return cs;
 }
 
 uint_t
-WUpdateStackValue (const W_CONNECTOR_HND         hnd,
-                   const unsigned int            type,
-                   const char* const             fieldName,
-                   const W_TABLE_ROW_INDEX       row,
-                   const W_ELEMENT_OFFSET        arrayOff,
-                   const W_ELEMENT_OFFSET        textOff,
-                   const char* const             value)
+WUpdateValue (const WH_CONNECTION    hnd,
+              const uint_t           type,
+              const char* const      fieldName,
+              const WHT_ROW_INDEX    row,
+              const WHT_INDEX        arrayOff,
+              const WHT_INDEX        textOff,
+              const char* const      value)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   uint32_t cs = WCS_OK;
 
   if ((hnd_ == NULL)
       || (value == NULL)
       || (value[0] == 0)
-      || (type < WFT_BOOL) || (type > WFT_TEXT))
+      || (type < WHC_TYPE_BOOL) || (type > WHC_TYPE_TEXT))
     {
       return WCS_INVALID_ARGS;
     }
+
+  /* Check if the current frame keep is caching data for other type of command.
+   * That one has to be flushed prior this to proceed. */
   else if ((hnd_->buildingCmd != CMD_INVALID)
            && (hnd_->buildingCmd != CMD_UPDATE_STACK))
     {
@@ -1803,11 +1904,15 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
   if (hnd_->buildingCmd == CMD_INVALID)
     set_data_size (hnd_, 0);
 
+  /* Based on the values of the supplied parameter, try to determine the if
+   * the stack value's type is a table, field, array, etc. and based on these
+   * findings call the proper help function. */
   if ((row == WIGNORE_ROW) && (arrayOff == WIGNORE_OFF))
     {
       if (fieldName != WIGNORE_FIELD)
         return WCS_TYPE_MISMATCH;
-      else if (type != WFT_TEXT)
+
+      else if (type != WHC_TYPE_TEXT)
         {
           if (textOff != WIGNORE_OFF)
             return WCS_INVALID_TEXT_OFF;
@@ -1826,17 +1931,16 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
     {
       if (fieldName != WIGNORE_FIELD)
         return WCS_TYPE_MISMATCH;
-      else if (type == WFT_TEXT)
+
+      else if (type == WHC_TYPE_TEXT)
         return WCS_OP_NOTSUPP;
+
       else
         {
           if (textOff != WIGNORE_OFF)
             return WCS_INVALID_TEXT_OFF;
 
-          cs = stack_top_array_basic_update (hnd_,
-                                             type,
-                                             arrayOff,
-                                             value);
+          cs = stack_top_array_basic_update (hnd_,type, arrayOff, value);
         }
     }
   else if (row != WIGNORE_ROW)
@@ -1846,7 +1950,7 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
 
       if (arrayOff == WIGNORE_OFF)
         {
-          if (type == WFT_TEXT)
+          if (type == WHC_TYPE_TEXT)
             {
               if (textOff == WIGNORE_OFF)
                 return WCS_INVALID_TEXT_OFF;
@@ -1871,8 +1975,9 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
         }
       else
         {
-          if (type == WFT_TEXT)
+          if (type == WHC_TYPE_TEXT)
             return WCS_OP_NOTSUPP;
+
           else
             {
               if (textOff != WIGNORE_OFF)
@@ -1890,6 +1995,7 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
   else
     {
       assert (FALSE);
+
       cs = WCS_GENERAL_ERR;
     }
 
@@ -1899,9 +2005,9 @@ WUpdateStackValue (const W_CONNECTOR_HND         hnd,
 }
 
 uint_t
-WUpdateStackFlush (const W_CONNECTOR_HND hnd)
+WFlush (const WH_CONNECTION hnd)
 {
-  struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   uint32_t  cs  = WCS_OK;
 
@@ -1909,12 +2015,18 @@ WUpdateStackFlush (const W_CONNECTOR_HND hnd)
 
   if (hnd_ == NULL)
     return WCS_INVALID_ARGS;
+
+  /* Currently WFlush() knows that only stack update commands are cached.
+   * If the current frame holds a different command type, return the proper
+   * error status. */
   else if (hnd_->buildingCmd != CMD_UPDATE_STACK)
     {
       if (hnd_->buildingCmd == CMD_INVALID)
         {
+          /* It's nothing here, just ignore this call. */
           if (data_size (hnd_) == 0)
             return WCS_OK;
+
           else
             return WCS_INCOMPLETE_CMD;
         }
@@ -1929,6 +2041,7 @@ WUpdateStackFlush (const W_CONNECTOR_HND hnd)
 
   if ((cs = recieve_answer (hnd_, &type)) != WCS_OK)
     return cs;
+
   else if (type != CMD_UPDATE_STACK_RSP)
     return WCS_UNEXPECTED_FRAME;
 
@@ -1942,21 +2055,24 @@ WUpdateStackFlush (const W_CONNECTOR_HND hnd)
 
 static uint_t
 send_stack_read_req (struct INTERNAL_HANDLER* const hnd,
-                     const char*                  field,
+                     const char*                    field,
                      const uint64_t                 row,
                      const uint64_t                 arrayOff,
                      const uint64_t                 textOff)
 {
-  uint_t   cs       = WCS_OK;
-  uint16_t type     = 0;
+
+
+  uint_t   cs         = WCS_OK;
+  uint_t   neededSize = 0;
+  uint16_t type       = 0;
 
   if (field == WIGNORE_FIELD)
     field = WANONIM_FIELD;
 
-  const uint_t neededSize = strlen (field) + 1 +
-                            sizeof (uint64_t) +
-                            sizeof (uint64_t) +
-                            sizeof (uint64_t);
+  neededSize = strlen (field) + 1 +
+                 sizeof (uint64_t) +
+                 sizeof (uint64_t) +
+                 sizeof (uint64_t);
 
   if (neededSize > max_data_size (hnd))
     return WCS_LARGE_ARGS;
@@ -1987,6 +2103,7 @@ send_stack_read_req (struct INTERNAL_HANDLER* const hnd,
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     return cs;
+
   else if (type != CMD_READ_STACK_RSP)
     return WCS_UNEXPECTED_FRAME;
 
@@ -1995,6 +2112,8 @@ send_stack_read_req (struct INTERNAL_HANDLER* const hnd,
   return cs;
 }
 
+/* Helper function to get frame offest of the next cached field value.
+ * It calculates the bytes to be skipped based on the current field type. */
 static uint_t
 next_table_field_off (struct INTERNAL_HANDLER* const hnd,
                       uint_t                         position)
@@ -2002,13 +2121,17 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
   const uint8_t* const data_    = data (hnd);
   const uint_t         dataSize = data_size (hnd);
 
+  /* Position points at the beginning of the current field,
+   * so retrieve the its type. */
   const uint_t nameLen = strlen ((const char*)data_ + position) + 1;
   uint16_t     type    = from_le_int16 (data_ + position + nameLen);
 
   position += nameLen + sizeof (uint16_t);
+
   assert (position < dataSize);
 
-  if (type & WFT_ARRAY_MASK)
+  /* Do the offset calculations based on the type of the current field. */
+  if (type & WHC_TYPE_ARRAY_MASK)
     {
       const uint_t arraySize = from_le_int64 (data_ + position);
       position += sizeof (uint64_t);
@@ -2016,29 +2139,35 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
       if (arraySize != 0)
         {
           uint64_t arrayOff = from_le_int64 (data_ + position);
+
           assert (arrayOff < arraySize);
+
           position += sizeof (uint64_t);
 
           while (arrayOff < arraySize)
             {
-              if ((type & 0xFF) != WFT_TEXT)
+              if ((type & 0xFF) != WHC_TYPE_TEXT)
                 {
                   assert (strlen ((const char*)data_ + position) > 0);
+
                   position += strlen ((const char*)data_ + position) + 1;
                 }
               else
                 {
                   assert (from_le_int32 (data_ + position) > 0);
+
                   position += 2 * sizeof (uint64_t);
 
                   assert (position < dataSize);
                   assert (strlen ((const char*)data_ + position) > 0);
+
                   position += strlen ((const char*)data_ + position) + 1;
                 }
 
               if (position >= dataSize)
                 {
                   assert (position == dataSize);
+
                   return 0;
                 }
 
@@ -2048,7 +2177,7 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
     }
   else
     {
-      if (type == WFT_TEXT)
+      if (type == WHC_TYPE_TEXT)
         {
           const uint64_t charsCount = from_le_int64 (data_ + position);
           position += sizeof (uint64_t);
@@ -2056,30 +2185,35 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
           if (charsCount > 0)
             {
               assert (from_le_int64 (data_ + position) < charsCount);
+
               position += sizeof (uint64_t);
               position += strlen ((const char*)data_ + position) + 1;
             }
         }
       else
         {
-          assert ((type >= WFT_BOOL) && (type < WFT_TEXT));
+          assert ((type >= WHC_TYPE_BOOL) && (type < WHC_TYPE_TEXT));
 
           position += strlen ((const char*)data_ + position) + 1;
         }
     }
 
+  /* If we got at the end of the frame, then we just miss hit the cache,
+   * return 0 for the caller to reissue a server request. */
   if (position >= dataSize)
     {
       assert (position == dataSize);
+
       return 0;
     }
 
   return position;
 }
 
+/* Help function to search a specific field. */
 static uint_t
 get_table_field_off (struct INTERNAL_HANDLER* const hnd,
-                     const char* const            field,
+                     const char* const              field,
                      uint_t                         fromPos)
 {
   const uint8_t* const data_    = data (hnd);
@@ -2087,8 +2221,8 @@ get_table_field_off (struct INTERNAL_HANDLER* const hnd,
 
   assert (hnd->lastCmdRespReceived == CMD_READ_STACK_RSP);
   assert (fromPos < data_size(hnd));
-
   assert (strlen (field) > 0);
+
   do
     {
       const char* cachedField = (const char*)data_ + fromPos;
@@ -2099,9 +2233,12 @@ get_table_field_off (struct INTERNAL_HANDLER* const hnd,
     }
   while ((0 < fromPos) && (fromPos < dataSize));
 
-  return 0; /* We did not find anything */
+  return 0; /* The requested field is not cached in this frame. */
 }
 
+/* For cached table or field values, this should return the frame offset,
+ * where the specified row values begins. It does that  based on the type
+ * of the currently cached values. */
 static uint_t
 get_row_offset (struct INTERNAL_HANDLER* const hnd,
                 const uint64_t                 row)
@@ -2125,9 +2262,9 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
   rowOff     += sizeof (uint64_t);
 
   if (currentRow > row)
-    return 0;
+    return 0; /* The requested row is not cached in this frame. */
 
-  if (type == WFT_TABLE_MASK)
+  if (type == WHC_TYPE_TABLE_MASK)
     {
       const uint_t fieldsCount = from_le_int16 (data_ + rowOff);
       rowOff += sizeof (uint16_t);
@@ -2147,6 +2284,7 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
           if (rowOff >= dataSize)
             {
               assert (rowOff == dataSize);
+
               return 0;
             }
 
@@ -2155,19 +2293,23 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
       return rowOff;
     }
 
-  assert (type & WFT_FIELD_MASK);
+  /* The cached values is of field type. So determine the type values it
+   * holds, and try to find the row offset. */
+  assert (type & WHC_TYPE_FIELD_MASK);
 
-  type &= ~WFT_FIELD_MASK;
-  if (type & WFT_ARRAY_MASK)
+  type &= ~WHC_TYPE_FIELD_MASK;
+  if (type & WHC_TYPE_ARRAY_MASK)
     {
-      type &= ~WFT_ARRAY_MASK;
-      assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+      type &= ~WHC_TYPE_ARRAY_MASK;
+
+      assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
 
       while ((currentRow < row)
              && (rowOff < dataSize))
         {
           const uint_t arrayCount = from_le_int64 (data_ + rowOff);
           rowOff += sizeof (uint64_t);
+
           assert (rowOff <= dataSize);
 
           if (arrayCount > 0)
@@ -2178,22 +2320,26 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
               while ((arrayOff < arrayCount)
                      && (rowOff < dataSize))
                 {
-                  if (type == WFT_TEXT)
+                  if (type == WHC_TYPE_TEXT)
                     {
                       assert (from_le_int64 (data_ + rowOff) > 0);
+
                       rowOff += sizeof (uint64_t);
 
                       assert (from_le_int64 (data_ + rowOff) > 0);
+
                       rowOff += sizeof (uint64_t);
 
                       assert (rowOff < dataSize);
                       assert (strlen ((const char*)data_ + rowOff) > 0);
+
                       rowOff += strlen ((const char*)data_ + rowOff) + 1;
                     }
                   else
                     {
                       assert (rowOff < dataSize);
                       assert (strlen ((const char*)data_ + rowOff) > 0);
+
                       rowOff += strlen ((const char*)data_ + rowOff) + 1;
                     }
                   arrayOff++;
@@ -2206,36 +2352,41 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
       if (rowOff >= dataSize)
         {
           assert (rowOff == dataSize);
-          return 0;
+
+          return 0; /*  No row values are cached in here. */
         }
 
       return rowOff;
     }
 
-  assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+  assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
+
   while ((currentRow < row)
          && (rowOff < dataSize))
     {
-      if (type == WFT_TEXT)
+      if (type == WHC_TYPE_TEXT)
         {
           const uint_t charsCount = from_le_int64 (data_ + sizeof (uint64_t));
           rowOff += sizeof (uint64_t);
+
           assert (rowOff <= dataSize);
 
           if (charsCount > 0)
             {
               const uint_t textOff = from_le_int64 (data_ + sizeof (uint64_t));
               rowOff += sizeof (uint64_t);
-              assert (rowOff <= dataSize);
 
+              assert (rowOff <= dataSize);
               assert (textOff < charsCount);
               assert (strlen ((const char*)data_ + rowOff) > 0);
+
               rowOff += strlen ((const char*)data_ + rowOff) + 1;
             }
         }
       else
         {
             assert (strlen ((const char*)data_ + rowOff) > 0);
+
             rowOff += strlen ((const char*)data_ + rowOff) + 1;
         }
 
@@ -2245,12 +2396,15 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
   if (rowOff >= dataSize)
     {
       assert (rowOff == dataSize);
+
       return 0;
     }
 
   return rowOff;
 }
 
+/* Find the offset of where the specified array element resides, given the
+ * start of the array. */
 static uint_t
 get_array_el_off (struct INTERNAL_HANDLER* const hnd,
                   const uint_t                   type,
@@ -2264,16 +2418,18 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
   uint64_t       currOff;
 
   assert (sizeof (uint32_t) <= fromPos);
+
   fromPos += sizeof (uint64_t);
+
   assert (fromPos <= dataSize);
-  assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+  assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
 
   *pArraySize = elCount;
   if ((elCount == 0) || (*pArraySize <= arrayOff))
     return INVALID_OFF;
 
-
   assert (fromPos < dataSize);
+
   currOff = from_le_int64 (data_ + fromPos);
   if (arrayOff < currOff)
     return 0;
@@ -2283,30 +2439,34 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
          && (fromPos < dataSize))
     {
       assert (fromPos < dataSize);
-      if (type == WFT_TEXT)
+
+      if (type == WHC_TYPE_TEXT)
         {
           assert (from_le_int64 (data_ + fromPos) > 0);
-          fromPos += sizeof (uint64_t);
 
           fromPos += sizeof (uint64_t);
+          fromPos += sizeof (uint64_t);
+
           assert (fromPos < dataSize);
-
           assert (strlen ((const char*)data_ + fromPos) > 0);
+
           fromPos += strlen ((const char*)data_ + fromPos) + 1;
         }
       else
         {
           assert (strlen ((const char*)data_ + fromPos) > 0);
+
           fromPos += strlen ((const char*)data_ + fromPos) + 1;
         }
-
       ++currOff;
     }
 
   assert (currOff == arrayOff);
+
   if (fromPos >= dataSize)
     {
       assert (fromPos == dataSize);
+
       return 0;
     }
 
@@ -2329,6 +2489,7 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
     return INVALID_OFF;
 
   fromPos += sizeof (uint64_t);
+
   assert (fromPos < dataSize);
 
   currOff = from_le_int64 (data_ + fromPos);
@@ -2336,6 +2497,7 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
     return 0;
 
   fromPos += sizeof (uint64_t);
+
   assert (fromPos < dataSize);
 
   while ((currOff < textOff)
@@ -2354,24 +2516,27 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
       || (data_[fromPos] == 0))
     {
       assert (fromPos <= dataSize);
+
       return 0;
     }
 
   assert (currOff == textOff);
+
   return fromPos;
 }
 
-unsigned int
-WGetStackValueRowsCount (const W_CONNECTOR_HND       hnd,
-                         unsigned long long* const   pCount)
+uint_t
+WValueRowsCount (const WH_CONNECTION        hnd,
+                 ullong_t* const            outCount)
 {
-  struct INTERNAL_HANDLER* hnd_  = (struct INTERNAL_HANDLER*)hnd;
-  uint_t                   cs    = WCS_OK;
-  uint_t                   type  = 0;
-  const  uint8_t*          data_;
+  struct INTERNAL_HANDLER* const hnd_  = (struct INTERNAL_HANDLER*)hnd;
+  uint_t                         cs    = WCS_OK;
+  uint_t                         type  = 0;
+  const  uint8_t*                data_;
 
-  if ((hnd == NULL) || (pCount == NULL))
+  if ((hnd == NULL) || (outCount == NULL))
     return WCS_INVALID_ARGS;
+
   else if (hnd_->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
@@ -2396,16 +2561,20 @@ WGetStackValueRowsCount (const W_CONNECTOR_HND       hnd,
 
   assert (from_le_int32 (data_) == WCS_OK);
 
-  if (type & WFT_TABLE_MASK)
-    *pCount = from_le_int64 (data_ + sizeof (uint32_t) + sizeof (uint16_t));
-  else if (type & WFT_FIELD_MASK)
+  if (type & WHC_TYPE_TABLE_MASK)
+    {
+      *outCount = from_le_int64 (data_ +
+                                   sizeof (uint32_t) +
+                                   sizeof (uint16_t));
+    }
+  else if (type & WHC_TYPE_FIELD_MASK)
     {
       uint_t offset = sizeof (uint32_t) + sizeof (uint16_t);
       offset += strlen ((const char*)data_ + offset) + 1;
 
       assert (offset < data_size (hnd_));
 
-      *pCount = from_le_int64 (data_ + offset);
+      *outCount = from_le_int64 (data_ + offset);
     }
   else
     cs = WCS_TYPE_MISMATCH;
@@ -2416,24 +2585,24 @@ WGetStackValueRowsCount (const W_CONNECTOR_HND       hnd,
 static int
 get_stack_value (struct INTERNAL_HANDLER* const hnd,
                  const char* const              field,
-                 const W_TABLE_ROW_INDEX        row,
-                 const W_ELEMENT_OFFSET         arrayOff,
-                 const W_ELEMENT_OFFSET         textOff,
-                 uint64_t* const                pCount,
-                 uint16_t* const                pType,
-                 const char** const           pValue)
+                 const WHT_ROW_INDEX            row,
+                 const WHT_INDEX                arrayOff,
+                 const WHT_INDEX                textOff,
+                 uint64_t* const                outCount,
+                 uint16_t* const                outType,
+                 const char** const             outpValue)
 {
-  uint_t                   cs       = WCS_OK;
-  bool_t                   tryAgain = TRUE;
-  const  uint8_t*          data_;
-  uint_t                   dataSize;
-  uint_t                   dataOffset;
+  uint_t          cs       = WCS_OK;
+  bool_t          tryAgain = TRUE;
+  const  uint8_t* data_;
+  uint_t          dataSize, dataOffset;
 
-  assert (pType != NULL);
-  assert (pCount != NULL);
+  assert (outType  != NULL);
+  assert (outCount != NULL);
 
-  if ((hnd == NULL) || (pValue == NULL))
+  if ((hnd == NULL) || (outpValue == NULL))
     return WCS_INVALID_ARGS;
+
   else if (hnd->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
@@ -2453,10 +2622,10 @@ resend_req_get_stack_entry:
   dataSize   = data_size (hnd);
   dataOffset = sizeof (uint32_t);
 
-  *pType      = from_le_int16 (data_ + dataOffset);
+  *outType    = from_le_int16 (data_ + dataOffset);
   dataOffset += sizeof (uint16_t);
 
-  if (*pType == WFT_TABLE_MASK)
+  if (*outType == WHC_TYPE_TABLE_MASK)
     {
       if ((field == WIGNORE_FIELD) || (strlen (field) == 0))
         {
@@ -2465,7 +2634,9 @@ resend_req_get_stack_entry:
         }
 
       dataOffset = get_row_offset (hnd, row);
+
       assert (dataOffset <= dataSize);
+
       if ((dataOffset == 0) || (dataOffset == dataSize))
         {
           cs = WCS_INVALID_ROW;
@@ -2473,7 +2644,9 @@ resend_req_get_stack_entry:
         }
 
       dataOffset = get_table_field_off (hnd, field, dataOffset);
+
       assert (dataOffset <= dataSize);
+
       if ((dataOffset == 0) || (dataOffset == dataSize))
         {
           cs = WCS_INVALID_FIELD;
@@ -2481,14 +2654,17 @@ resend_req_get_stack_entry:
         }
 
       assert (strcmp ((const char*)data_ + dataOffset, field) == 0);
+
       dataOffset += strlen (field) + 1;
+
       assert (dataOffset < dataSize);
 
-      *pType = from_le_int16 (data_ + dataOffset);
+      *outType    = from_le_int16 (data_ + dataOffset);
       dataOffset += sizeof (uint16_t);
+
       assert (dataOffset < dataSize);
     }
-  else if (*pType & WFT_FIELD_MASK)
+  else if (*outType & WHC_TYPE_FIELD_MASK)
     {
       if (field != WIGNORE_FIELD)
         {
@@ -2497,14 +2673,16 @@ resend_req_get_stack_entry:
         }
 
       dataOffset = get_row_offset (hnd, row);
+
       assert (dataOffset < dataSize);
+
       if ((dataOffset == 0) || (dataOffset == dataSize))
         {
           cs = WCS_INVALID_ROW;
           goto exit_get_stack_entry;
         }
 
-      *pType &= ~WFT_FIELD_MASK;
+      *outType &= ~WHC_TYPE_FIELD_MASK;
     }
   else
     {
@@ -2520,14 +2698,16 @@ resend_req_get_stack_entry:
         }
     }
 
-  if (*pType & WFT_ARRAY_MASK)
+  if (*outType & WHC_TYPE_ARRAY_MASK)
     {
       dataOffset = get_array_el_off (hnd,
-                                     *pType & 0xFF,
+                                     *outType & 0xFF,
                                      arrayOff,
                                      dataOffset,
-                                     pCount);
+                                     outCount);
+
       assert ((dataOffset < dataSize) || (dataOffset == INVALID_OFF));
+
       if (dataOffset == INVALID_OFF)
         {
           cs = WCS_INVALID_ARRAY_OFF;
@@ -2538,7 +2718,7 @@ resend_req_get_stack_entry:
           cs = WCS_INVALID_ARGS;
           goto exit_get_stack_entry;
         }
-      *pType &= ~WFT_ARRAY_MASK;
+      *outType &= ~WHC_TYPE_ARRAY_MASK;
     }
   else
     {
@@ -2549,12 +2729,14 @@ resend_req_get_stack_entry:
         }
     }
 
-  assert ((WFT_BOOL <= *pType) && (*pType <= WFT_TEXT));
-  if (*pType == WFT_TEXT)
+  assert ((WHC_TYPE_BOOL <= *outType) && (*outType <= WHC_TYPE_TEXT));
+
+  if (*outType == WHC_TYPE_TEXT)
     {
-      dataOffset = text_el_off (hnd, textOff, dataOffset, pCount);
+      dataOffset = text_el_off (hnd, textOff, dataOffset, outCount);
 
       assert ((dataOffset < dataSize) || (dataOffset == INVALID_OFF));
+
       if (dataOffset == INVALID_OFF)
         {
           cs = WCS_INVALID_TEXT_OFF;
@@ -2566,8 +2748,8 @@ resend_req_get_stack_entry:
           goto exit_get_stack_entry;
         }
 
-      *pType &= ~WFT_ARRAY_MASK;
-      *pValue = (const char*)data_ + dataOffset;
+      *outType  &= ~WHC_TYPE_ARRAY_MASK;
+      *outpValue = (const char*)data_ + dataOffset;
     }
   else
     {
@@ -2578,7 +2760,8 @@ resend_req_get_stack_entry:
         }
 
       assert (dataOffset < dataSize);
-      *pValue = (const char*)data_ + dataOffset;
+
+      *outpValue = (const char*)data_ + dataOffset;
     }
 
 exit_get_stack_entry:
@@ -2595,17 +2778,17 @@ exit_get_stack_entry:
   return cs;
 }
 
-unsigned int
-WGetStackArrayElementsCount (const W_CONNECTOR_HND   hnd,
-                             const char*             field,
-                             const W_TABLE_ROW_INDEX row,
-                             unsigned long long*     pCount)
+uint_t
+WValueArraySize (const WH_CONNECTION  hnd,
+                 const char*          field,
+                 const WHT_ROW_INDEX  row,
+                 ullong_t* const      outCount)
 {
   uint64_t      count = 0;
   uint16_t      type  = 0;
-  const char* value = NULL;
+  const char*   value = NULL;
 
-  if (pCount == NULL)
+  if (outCount == NULL)
     return WCS_INVALID_ARGS;
 
   uint_t cs = get_stack_value (hnd,
@@ -2621,22 +2804,22 @@ WGetStackArrayElementsCount (const W_CONNECTOR_HND   hnd,
     return cs;
 
 
-  *pCount = count;
+  *outCount = count;
   return WCS_OK;
 }
 
-unsigned int
-WGetStackTextLengthCount (const W_CONNECTOR_HND   hnd,
-                          const char*             field,
-                          const W_TABLE_ROW_INDEX row,
-                          const W_TABLE_ROW_INDEX arrayOff,
-                          unsigned long long*     pCount)
+uint_t
+WValueTextLength (const WH_CONNECTION           hnd,
+                          const char*           field,
+                          const WHT_ROW_INDEX   row,
+                          const WHT_ROW_INDEX   arrayOff,
+                          ullong_t* const       outCount)
 {
   uint64_t      count = 0;
   uint16_t      type  = 0;
-  const char* value = NULL;
+  const char*   value = NULL;
 
-  if (pCount == NULL)
+  if (outCount == NULL)
     return WCS_INVALID_ARGS;
 
   uint_t cs = get_stack_value (hnd,
@@ -2651,17 +2834,17 @@ WGetStackTextLengthCount (const W_CONNECTOR_HND   hnd,
   if ((cs != WCS_OK) && (cs != WCS_INVALID_TEXT_OFF))
     return cs;
 
-  *pCount = count;
+  *outCount = count;
   return WCS_OK;
 }
 
-unsigned int
-WGetStackValueEntry (const W_CONNECTOR_HND   hnd,
-                     const char* const       field,
-                     W_TABLE_ROW_INDEX       row,
-                     const W_ELEMENT_OFFSET  arrayOff,
-                     const W_ELEMENT_OFFSET  textOff,
-                     const char** const      pValue)
+uint_t
+WValueEntry (const WH_CONNECTION        hnd,
+             const char* const          field,
+             WHT_ROW_INDEX              row,
+             const WHT_INDEX            arrayOff,
+             const WHT_INDEX            textOff,
+             const char** const         outpValue)
 {
   uint64_t  count = 0;
   uint16_t  type  = 0;
@@ -2673,29 +2856,28 @@ WGetStackValueEntry (const W_CONNECTOR_HND   hnd,
                                textOff,
                                &count,
                                &type,
-                               pValue);
-
+                               outpValue);
   if (cs != WCS_OK)
     return cs;
 
-  assert (*pValue != NULL);
+  assert (*outpValue != NULL);
 
   return WCS_OK;
 }
 
 static uint_t
-describe_proc_parameter (struct INTERNAL_HANDLER* hnd,
-                         const char* const      procName,
-                         const uint_t             parameter)
+describe_proc_parameter (struct INTERNAL_HANDLER* const hnd,
+                         const char* const              procedure,
+                         const uint_t                   param)
 {
-  const uint_t nameLen = strlen (procName) + 1;
+  const uint_t nameLen = strlen (procedure) + 1;
 
-  uint_t   cs = WCS_OK;
-  uint8_t* data_;
-  uint16_t type;
+  uint8_t* data_ = NULL;
+  uint_t   cs    = WCS_OK;
+  uint16_t type  = 0;
 
   if ((nameLen + sizeof (uint16_t) > max_data_size (hnd))
-      || (parameter > 0xFFFF))
+      || (param > 0xFFFF))
     {
       cs = WCS_LARGE_ARGS;
       goto describe_proc_parameter_err;
@@ -2703,14 +2885,15 @@ describe_proc_parameter (struct INTERNAL_HANDLER* hnd,
 
   set_data_size (hnd, nameLen + sizeof (uint32_t));
   data_ = data (hnd);
-  store_le_int16 (parameter, data_);
-  strcpy ((char*)data_ + 2 * sizeof (uint16_t), procName);
+  store_le_int16 (param, data_);
+  strcpy ((char*)data_ + 2 * sizeof (uint16_t), procedure);
 
   if ((cs = send_command (hnd, CMD_DESC_PROC_PARAM)) != WCS_OK)
     goto describe_proc_parameter_err;
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     goto describe_proc_parameter_err;
+
   else if (type != CMD_DESC_PROC_PARAM_RSP)
     {
       cs = WCS_INVALID_FRAME;
@@ -2720,68 +2903,77 @@ describe_proc_parameter (struct INTERNAL_HANDLER* hnd,
   data_ = data (hnd);
   if ((cs = from_le_int32 (data_)) != WCS_OK)
     goto describe_proc_parameter_err;
-  else if ((strcmp ((char*)data_ + sizeof (uint32_t), procName) != 0)
+
+  else if ((strcmp ((char*)data_ + sizeof (uint32_t), procedure) != 0)
           || (sizeof (uint32_t) + nameLen + 3 * sizeof (uint16_t) >
-              data_size (hnd)))
+                data_size (hnd)))
     {
       cs = WCS_INVALID_FRAME;
       goto describe_proc_parameter_err;
     }
 
   assert (cs == WCS_OK);
+
   return cs;
 
 describe_proc_parameter_err:
 
   assert (cs != WCS_OK);
+
   hnd->lastCmdRespReceived = CMD_INVALID_RSP;
 
   return cs;
 }
 
-unsigned int
-WProcedureParametersCount (const W_CONNECTOR_HND hnd,
-                           const char* const     procName,
-                           unsigned int* const   pCount)
+uint_t
+WProcParamsCount (const WH_CONNECTION   hnd,
+                  const char* const     procedure,
+                  uint_t* const         outCount)
 {
   struct INTERNAL_HANDLER* hnd_    = (struct INTERNAL_HANDLER*)hnd;
   const uint8_t*           data_   = NULL;
   uint_t                   cs      = WCS_OK;
 
   if ((hnd == NULL)
-      || (procName == NULL)
-      || (pCount == NULL)
-      || (strlen (procName) == 0))
+      || (procedure == NULL)
+      || (strlen (procedure) == 0)
+      || (outCount == NULL))
     {
       return WCS_INVALID_ARGS;
     }
   else if (hnd_->lastCmdRespReceived == CMD_DESC_PROC_PARAM_RSP)
     {
       data_ = data (hnd_);
+
       assert (from_le_int32 (data_) == WCS_OK);
 
-      if (strcmp (procName, (const char*)data_ + sizeof (uint32_t)) != 0)
+      if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
-          if ((cs = describe_proc_parameter (hnd, procName, 0)) != WCS_OK)
+          if ((cs = describe_proc_parameter (hnd, procedure, 0)) != WCS_OK)
             return cs;
         }
     }
-  else if ((cs = describe_proc_parameter (hnd, procName, 0)) != WCS_OK)
+  else if ((cs = describe_proc_parameter (hnd, procedure, 0)) != WCS_OK)
     return cs;
 
   data_ = data (hnd_);
+
   assert (cs == WCS_OK);
   assert (from_le_int32 (data_) == WCS_OK);
 
-  *pCount = from_le_int16 (data_ + sizeof (uint32_t) + strlen (procName) + 1);
+  *outCount = from_le_int16 (data_ +
+                               sizeof (uint32_t) +
+                               strlen (procedure) + 1);
 
   return WCS_OK;
 }
 
+/* Calculate the offset where a procedure parameter's description begins.
+ * Returns an error if is not cached in this frame. */
 static uint_t
 get_paratmeter_offset (struct INTERNAL_HANDLER* const       hnd,
                        const uint_t                         param,
-                       uint16_t* const                      pOff)
+                       uint16_t* const                      outOff)
 {
   const uint8_t* data_   = data (hnd);
   const uint_t   nameLen = strlen ((char*)data_ + sizeof (uint32_t)) + 1;
@@ -2794,79 +2986,80 @@ get_paratmeter_offset (struct INTERNAL_HANDLER* const       hnd,
   assert (hnd->lastCmdRespReceived == CMD_DESC_PROC_PARAM_RSP);
   assert (from_le_int32 (data (hnd)) == WCS_OK);
 
-  *pOff =  sizeof (uint32_t);
-  *pOff += nameLen;
+  *outOff  = sizeof (uint32_t);
+  *outOff += nameLen;
 
-  count = from_le_int16 (data_ + *pOff); *pOff += sizeof (uint16_t);
-  hint  = from_le_int16 (data_ + *pOff); *pOff += sizeof (uint16_t);
+  count = from_le_int16 (data_ + *outOff); *outOff += sizeof (uint16_t);
+  hint  = from_le_int16 (data_ + *outOff); *outOff += sizeof (uint16_t);
 
   if ((param < hint) || (count < param))
     return WCS_INVALID_ARGS;
 
-  for (it = hint; (it < param) && (*pOff < data_size (hnd)); ++it)
+  for (it = hint; (it < param) && (*outOff < data_size (hnd)); ++it)
     {
-      const uint16_t type = from_le_int16 (data_ + *pOff);
-      *pOff += sizeof (uint16_t);
-      if (type & WFT_TABLE_MASK)
+      const uint16_t type = from_le_int16 (data_ + *outOff);
+      *outOff += sizeof (uint16_t);
+      if (type & WHC_TYPE_TABLE_MASK)
         {
           uint_t field;
 
-          const uint16_t fieldsCount = from_le_int16 (data_ + *pOff);
+          const uint16_t fieldsCount = from_le_int16 (data_ + *outOff);
 
-          *pOff += sizeof (uint16_t);
+          *outOff += sizeof (uint16_t);
 
           for (field = 0;
-               (field < fieldsCount) && (*pOff < data_size (hnd));
+               (field < fieldsCount) && (*outOff < data_size (hnd));
                ++field)
             {
-              *pOff += strlen ((char*)data_ + *pOff) + 1;
-              *pOff += sizeof (uint16_t);
+              *outOff += strlen ((char*)data_ + *outOff) + 1;
+              *outOff += sizeof (uint16_t);
             }
         }
       else
-        *pOff += sizeof (uint16_t);
+        *outOff += sizeof (uint16_t);
     }
 
-  if ((*pOff >= data_size (hnd)) || (hint != param))
+  if ((*outOff >= data_size (hnd)) || (hint != param))
     return WCS_INVALID_ARGS;
 
   return WCS_OK;
 }
 
-unsigned int
-WProcedureParameter (const W_CONNECTOR_HND hnd,
-                     const char* const     procName,
-                     const unsigned int    parameter,
-                     unsigned int* const   pRawType)
+uint_t
+WProcParamType (const WH_CONNECTION     hnd,
+                const char* const       procedure,
+                const uint_t            param,
+                uint_t* const           outRawType)
 {
-  struct INTERNAL_HANDLER* hnd_     = (struct INTERNAL_HANDLER*)hnd;
-  const uint8_t*           data_    = NULL;
-  uint_t                   cs       = WCS_OK;
-  bool_t                   tryAgain = TRUE;
+  struct INTERNAL_HANDLER* const hnd_    = (struct INTERNAL_HANDLER*)hnd;
 
-  uint16_t offset;
+  const uint8_t*  data_    = NULL;
+  uint_t          cs       = WCS_OK;
+  bool_t          tryAgain = TRUE;
+  uint16_t        offset   = 0;
 
   if ((hnd == NULL)
-      || (procName == NULL)
-      || (pRawType == NULL)
-      || (strlen (procName) == 0))
+      || (procedure == NULL)
+      || (strlen (procedure) == 0)
+      || (outRawType == NULL))
     {
       return WCS_INVALID_ARGS;
     }
   else if (hnd_->lastCmdRespReceived == CMD_DESC_PROC_PARAM_RSP)
     {
       data_ = data (hnd_);
+
       assert (from_le_int32 (data_) == WCS_OK);
 
-      if (strcmp (procName, (const char*)data_ + sizeof (uint32_t)) != 0)
+      if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
           tryAgain = FALSE;
-          cs = describe_proc_parameter (hnd, procName, parameter);
+          cs = describe_proc_parameter (hnd, procedure, param);
           if (cs != WCS_OK)
             return cs;
         }
     }
-  else if ((cs = describe_proc_parameter (hnd, procName, parameter)) != WCS_OK)
+  else if ((cs = describe_proc_parameter (hnd, procedure, param)) != WCS_OK)
     {
       tryAgain = FALSE;
       return cs;
@@ -2875,14 +3068,16 @@ WProcedureParameter (const W_CONNECTOR_HND hnd,
 proc_parameter_try_again:
 
   data_ = data (hnd_);
+
   assert (cs == WCS_OK);
   assert (from_le_int32 (data_) == WCS_OK);
 
-  if ((cs = get_paratmeter_offset (hnd_, parameter, &offset)) != WCS_OK)
+  if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
     goto proc_parameter_err;
 
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
-  *pRawType = from_le_int16 (data_ + offset);
+
+  *outRawType = from_le_int16 (data_ + offset);
 
   assert (cs == WCS_OK);
   return WCS_OK;
@@ -2893,9 +3088,11 @@ proc_parameter_err:
 
   if (tryAgain)
     {
+      /* Maybe the parameter asked for is not cached. As the server,
+       * this with the right hints. */
       tryAgain = FALSE;
 
-      cs = describe_proc_parameter (hnd, procName, parameter);
+      cs = describe_proc_parameter (hnd, procedure, param);
       if (cs == WCS_OK)
         goto proc_parameter_try_again;
     }
@@ -2903,23 +3100,23 @@ proc_parameter_err:
   return cs;
 }
 
-unsigned int
-WProcedureParameterFieldCount (const W_CONNECTOR_HND hnd,
-                               const char* const     procName,
-                               const unsigned int    parameter,
-                               unsigned int* const   pCount)
+uint_t
+WProcParamFieldCount (const WH_CONNECTION       hnd,
+                      const char* const         procedure,
+                      const uint_t              param,
+                      uint_t* const             outCount)
 {
-  struct INTERNAL_HANDLER* hnd_     = (struct INTERNAL_HANDLER*)hnd;
-  const uint8_t*           data_    = NULL;
-  uint_t                   cs       = WCS_OK;
-  bool_t                   tryAgain = TRUE;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  uint16_t offset;
+  const uint8_t* data_    = NULL;
+  uint_t         cs       = WCS_OK;
+  uint16_t       offset   = 0;
+  bool_t         tryAgain = TRUE;
 
   if ((hnd == NULL)
-      || (procName == NULL)
-      || (pCount == NULL)
-      || (strlen (procName) == 0))
+      || (procedure == NULL)
+      || (strlen (procedure) == 0)
+      || (outCount == NULL))
     {
       return WCS_INVALID_ARGS;
     }
@@ -2927,25 +3124,30 @@ WProcedureParameterFieldCount (const W_CONNECTOR_HND hnd,
   if (hnd_->lastCmdRespReceived == CMD_DESC_PROC_PARAM_RSP)
     {
       data_ = data (hnd_);
+
       assert (from_le_int32 (data_) == WCS_OK);
 
-      if (strcmp (procName, (const char*)data_ + sizeof (uint32_t)) != 0)
+      if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
-          cs = describe_proc_parameter (hnd, procName, parameter);
+          cs = describe_proc_parameter (hnd, procedure, param);
           if (cs != WCS_OK)
             return cs;
         }
     }
-  else if ((cs = describe_proc_parameter (hnd, procName, parameter)) != WCS_OK)
-    return cs;
+  else if ((cs = describe_proc_parameter (hnd, procedure, param))
+             != WCS_OK)
+    {
+      return cs;
+    }
 
 proc_parameter_field_count_try_again:
 
   data_ = data (hnd_);
+
   assert (cs == WCS_OK);
   assert (from_le_int32 (data_) == WCS_OK);
 
-  if ((cs = get_paratmeter_offset (hnd_, parameter, &offset)) != WCS_OK)
+  if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
     goto proc_parameter_field_count_err;
 
   tryAgain = FALSE;
@@ -2953,9 +3155,10 @@ proc_parameter_field_count_try_again:
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
 
   offset += sizeof (uint16_t);
-  *pCount = from_le_int16 (data_ + offset);
+  *outCount = from_le_int16 (data_ + offset);
 
   assert (cs == WCS_OK);
+
   return WCS_OK;
 
 proc_parameter_field_count_err:
@@ -2964,9 +3167,11 @@ proc_parameter_field_count_err:
 
   if (tryAgain)
     {
+      /* Maybe the parameter info wasn't store in this cache frame.
+       * So let's ask the server for it. */
       tryAgain = FALSE;
 
-      cs = describe_proc_parameter (hnd, procName, parameter);
+      cs = describe_proc_parameter (hnd, procedure, param);
       if (cs == WCS_OK)
         goto proc_parameter_field_count_try_again;
     }
@@ -2974,29 +3179,30 @@ proc_parameter_field_count_err:
   return cs;
 }
 
-unsigned int
-WProcedureParameterField (const W_CONNECTOR_HND hnd,
-                          const char* const     procName,
-                          const unsigned int    parameter,
-                          const unsigned int    field,
-                          const char**          pFieldName,
-                          unsigned int* const   pFieldType)
+uint_t
+WProcParamField (const WH_CONNECTION   hnd,
+                 const char* const     procedure,
+                 const uint_t          param,
+                 const uint_t          field,
+                 const char**          outpFieldName,
+                 uint_t* const         outFieldType)
 {
 
-  struct INTERNAL_HANDLER* hnd_     = (struct INTERNAL_HANDLER*)hnd;
-  const uint8_t*           data_    = NULL;
-  uint_t                   cs       = WCS_OK;
-  bool_t                   tryAgain = TRUE;
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+  const uint8_t* data_    = NULL;
+  uint_t         cs       = WCS_OK;
+  bool_t         tryAgain = TRUE;
 
   uint16_t  iterator;
   uint16_t  fieldsCount;
   uint16_t  offset;
 
   if ((hnd == NULL)
-      || (procName == NULL)
-      || (pFieldName == NULL)
-      || (pFieldType == NULL)
-      || (strlen (procName) == 0))
+      || (procedure == NULL)
+      || (outpFieldName == NULL)
+      || (outFieldType == NULL)
+      || (strlen (procedure) == 0))
     {
       return WCS_INVALID_ARGS;
     }
@@ -3005,31 +3211,32 @@ WProcedureParameterField (const W_CONNECTOR_HND hnd,
       data_ = data (hnd_);
       assert (from_le_int32 (data_) == WCS_OK);
 
-      if (strcmp (procName, (const char*)data_ + sizeof (uint32_t)) != 0)
+      if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
-          cs = describe_proc_parameter (hnd, procName, parameter);
+          cs = describe_proc_parameter (hnd, procedure, param);
           if (cs != WCS_OK)
             return cs;
         }
     }
-  else if ((cs = describe_proc_parameter (hnd, procName, parameter)) != WCS_OK)
+  else if ((cs = describe_proc_parameter (hnd, procedure, param)) != WCS_OK)
     return cs;
 
 proc_parameter_field_try_again:
 
   data_ = data (hnd_);
+
   assert (cs == WCS_OK);
   assert (from_le_int32 (data_) == WCS_OK);
 
-  if ((cs = get_paratmeter_offset (hnd_, parameter, &offset)) != WCS_OK)
+  if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
     goto proc_parameter_field_err;
 
   tryAgain = FALSE;
 
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
 
-  offset += sizeof (uint16_t);
-  fieldsCount = from_le_int16 (data_ + offset);
+  offset      += sizeof (uint16_t);
+  fieldsCount  = from_le_int16 (data_ + offset);
 
   if (fieldsCount <= field)
     {
@@ -3044,12 +3251,13 @@ proc_parameter_field_try_again:
       offset += sizeof (uint16_t);
     }
 
-  *pFieldName = (char*)data_ + offset;
-  offset += strlen (*pFieldName) + 1;
-  *pFieldType = from_le_int16 (data_ + offset);
+  *outpFieldName  = (char*)data_ + offset;
+  offset         += strlen (*outpFieldName) + 1;
+  *outFieldType   = from_le_int16 (data_ + offset);
 
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
   assert (cs == WCS_OK);
+
   return WCS_OK;
 
 proc_parameter_field_err:
@@ -3058,9 +3266,11 @@ proc_parameter_field_err:
 
   if (tryAgain)
     {
+      /* Might be the procedure parameter isn't cached in this frame.
+       * Make a new request, */
       tryAgain = FALSE;
 
-      cs = describe_proc_parameter (hnd, procName, parameter);
+      cs = describe_proc_parameter (hnd, procedure, param);
       if (cs == WCS_OK)
         goto proc_parameter_field_try_again;
     }
@@ -3068,9 +3278,9 @@ proc_parameter_field_err:
   return cs;
 }
 
-unsigned int
-WExecuteProcedure (const W_CONNECTOR_HND     hnd,
-                   const char* const         procedure)
+uint_t
+WExecuteProcedure (const WH_CONNECTION     hnd,
+                   const char* const       procedure)
 {
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
@@ -3080,7 +3290,7 @@ WExecuteProcedure (const W_CONNECTOR_HND     hnd,
 
   if ((hnd_ == NULL)
       || (procedure == NULL)
-      || (procedure[0] == 0)
+      || (strlen (procedure) == 0)
       || (hnd_->buildingCmd != CMD_INVALID))
     {
       return WCS_INCOMPLETE_CMD;
@@ -3104,3 +3314,4 @@ WExecuteProcedure (const W_CONNECTOR_HND     hnd,
 execute_proc_err:
   return cs;
 }
+

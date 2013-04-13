@@ -119,7 +119,7 @@ test_global_name_match (const char* glb_name)
 }
 
 static bool
-test_global_values_list (W_CONNECTOR_HND hnd)
+test_global_values_list (WH_CONNECTION hnd)
 {
   const char* recvGlbName = NULL;
   const uint_t  glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
@@ -165,7 +165,7 @@ test_global_values_list_error:
 }
 
 static bool
-test_for_errors (W_CONNECTOR_HND hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   uint_t          glbsCount;
   const char*   nameFetched;
@@ -221,7 +221,7 @@ DefaultUserPassword ()
 int
 main (int argc, const char** argv)
 {
-  W_CONNECTOR_HND       hnd = NULL;
+  WH_CONNECTION       hnd = NULL;
 
   bool success = tc_settup_connection (argc, argv, &hnd);
 

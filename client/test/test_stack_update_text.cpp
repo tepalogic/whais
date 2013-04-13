@@ -26,16 +26,16 @@ const char* _refStrings[MAX_REFS_STRINGS] =
         "This is the end."
     };
 
-const W_FieldDescriptor  _fields[] =
+const WField  _fields[] =
     {
-        {"WFT_TEXT", WFT_TEXT},
-        {"WFT_TEXT_2", WFT_TEXT},
+        {"WHC_TYPE_TEXT", WHC_TYPE_TEXT},
+        {"WHC_TYPE_TEXT_2", WHC_TYPE_TEXT},
     };
 
 static const uint_t _fieldsCount = sizeof _fields / sizeof (_fields[0]);
 
 const char*
-insert_a_string (W_CONNECTOR_HND        hnd,
+insert_a_string (WH_CONNECTION        hnd,
                  const char*          fieldName,
                  const uint64_t         row,
                  const bool             bulk)
@@ -53,14 +53,14 @@ insert_a_string (W_CONNECTOR_HND        hnd,
       if (strlen (result) + strlen (temp) >= thisStringSize)
         break;
 
-      if ((WUpdateStackValue (hnd,
-                              WFT_TEXT,
+      if ((WUpdateValue (hnd,
+                              WHC_TYPE_TEXT,
                               fieldName,
                               row,
                               WIGNORE_OFF,
                               utf8_strlen (_RC (uint8_t*, result)),
                               temp) != WCS_OK)
-          || (bulk && (WUpdateStackFlush (hnd) != WCS_OK)))
+          || (bulk && (WFlush (hnd) != WCS_OK)))
         {
           return NULL;
         }
@@ -68,7 +68,7 @@ insert_a_string (W_CONNECTOR_HND        hnd,
       strcat (result, temp);
     }
 
-  if (WUpdateStackFlush (hnd) != WCS_OK)
+  if (WFlush (hnd) != WCS_OK)
     return NULL;
 
   return result;
@@ -76,7 +76,7 @@ insert_a_string (W_CONNECTOR_HND        hnd,
 
 
 static bool
-test_simple_text (W_CONNECTOR_HND hnd)
+test_simple_text (WH_CONNECTION hnd)
 {
   uint_t              aSimpleOffset = w_rnd () % 7;
 
@@ -88,21 +88,21 @@ test_simple_text (W_CONNECTOR_HND hnd)
 
   cout << "Testing text simple updates ... ";
 
-  if ((WPushStackValue (hnd, WFT_TEXT, 0, NULL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+  if ((WPushValue (hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_simple_text_fail;
     }
 
   ref = insert_a_string (hnd, WIGNORE_FIELD, WIGNORE_OFF, false);
-  if ((WGetStackTextLengthCount (hnd,
+  if ((WValueTextLength (hnd,
                                  WIGNORE_FIELD,
                                  WIGNORE_ROW,
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
       || (_SC (int, count) != utf8_strlen (_RC (const uint8_t*, ref)))
-      || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
-      || (rawType != WFT_TEXT))
+      || (WStackValueType (hnd, &rawType) != WCS_OK)
+      || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;
     }
@@ -110,7 +110,7 @@ test_simple_text (W_CONNECTOR_HND hnd)
   aValue[0] = 0;
   while (strlen (aValue) < strlen (ref + aSimpleOffset))
     {
-      if (WGetStackValueEntry (hnd,
+      if (WValueEntry (hnd,
                                WIGNORE_FIELD,
                                WIGNORE_ROW,
                                WIGNORE_OFF,
@@ -127,18 +127,18 @@ test_simple_text (W_CONNECTOR_HND hnd)
 
   delete [] ref;
 
-  if (WPushStackValue (hnd, WFT_TEXT, 0, NULL) != WCS_OK)
+  if (WPushValue (hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
     goto test_simple_text_fail;
 
   ref = insert_a_string (hnd, WIGNORE_FIELD, WIGNORE_OFF, true);
-  if ((WGetStackTextLengthCount (hnd,
+  if ((WValueTextLength (hnd,
                                  WIGNORE_FIELD,
                                  WIGNORE_ROW,
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
       || (_SC (int, count) != utf8_strlen (_RC (const uint8_t*, ref)))
-      || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
-      || (rawType != WFT_TEXT))
+      || (WStackValueType (hnd, &rawType) != WCS_OK)
+      || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;
     }
@@ -147,7 +147,7 @@ test_simple_text (W_CONNECTOR_HND hnd)
   aValue[0]     = 0;
   while (strlen (aValue) < strlen (ref + aSimpleOffset))
     {
-      if (WGetStackValueEntry (hnd,
+      if (WValueEntry (hnd,
                                WIGNORE_FIELD,
                                WIGNORE_ROW,
                                WIGNORE_OFF,
@@ -174,7 +174,7 @@ test_simple_text_fail:
 }
 
 static bool
-test_table_text (W_CONNECTOR_HND hnd)
+test_table_text (WH_CONNECTION hnd)
 {
 
   const uint_t        rowsCount = 2;
@@ -184,8 +184,8 @@ test_table_text (W_CONNECTOR_HND hnd)
   uint_t              aSimpleOffset;
   char              aValue[MAX_STRING_SIZE];
 
-  if ((WPushStackValue (hnd, WFT_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_table_text_fail;
     }
@@ -195,12 +195,12 @@ test_table_text (W_CONNECTOR_HND hnd)
     {
 
       ref[row * _fieldsCount] = insert_a_string (hnd,
-                                                 "WFT_TEXT",
+                                                 "WHC_TYPE_TEXT",
                                                  row,
                                                  true);
 
       ref[row * _fieldsCount + 1] = insert_a_string (hnd,
-                                                     "WFT_TEXT_2",
+                                                     "WHC_TYPE_TEXT_2",
                                                      row,
                                                      false);
     }
@@ -211,8 +211,8 @@ test_table_text (W_CONNECTOR_HND hnd)
       aValue[0]     = 0;
       while (strlen (aValue) < strlen (ref[row * _fieldsCount] + aSimpleOffset))
         {
-          if (WGetStackValueEntry (hnd,
-                                   "WFT_TEXT",
+          if (WValueEntry (hnd,
+                                   "WHC_TYPE_TEXT",
                                    row,
                                    WIGNORE_OFF,
                                    utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
@@ -229,8 +229,8 @@ test_table_text (W_CONNECTOR_HND hnd)
       aValue[0]     = 0;
       while (strlen (aValue) < strlen (ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
-          if (WGetStackValueEntry (hnd,
-                                   "WFT_TEXT_2",
+          if (WValueEntry (hnd,
+                                   "WHC_TYPE_TEXT_2",
                                    row,
                                    WIGNORE_OFF,
                                    utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
@@ -268,42 +268,42 @@ test_table_text_fail:
 
 
 static bool
-test_for_errors (W_CONNECTOR_HND hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   unsigned long long count;
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushStackValue (hnd, WFT_TEXT | WFT_ARRAY_MASK, 0, NULL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OP_NOTSUPP)
-      || (WPushStackValue (hnd, WFT_TEXT, 0, NULL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
-      || (WGetStackValueRowsCount (hnd, &count) != WCS_TYPE_MISMATCH)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
-      || (WGetStackArrayElementsCount (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
-      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, 0, &count) != WCS_TYPE_MISMATCH)
-      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_OK)
+  if ((WPushValue (hnd, WHC_TYPE_TEXT | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OP_NOTSUPP)
+      || (WPushValue (hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK)
+      || (WValueRowsCount (hnd, &count) != WCS_TYPE_MISMATCH)
+      || (WValueArraySize (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
+      || (WValueArraySize (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueArraySize (hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, 0, &count) != WCS_TYPE_MISMATCH)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_OK)
       || (count != 0)
-      || (WGetStackTextLengthCount (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW))
+      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW))
     {
       goto test_for_errors_fail;
     }
 
-  if ((WPushStackValue (hnd, WFT_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK) //Just for fun!
-      || (WGetStackValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (hnd, &count) != WCS_OK)
+  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK) //Just for fun!
+      || (WValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (hnd, &count) != WCS_OK)
       || (count != 0)
-      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WGetStackTextLengthCount (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WGetStackTextLengthCount (hnd, "WFT_TEXT", 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
-      || (WPopStackValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength (hnd, "WHC_TYPE_TEXT", 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
+      || (WPopValues (hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
@@ -338,7 +338,7 @@ DefaultUserPassword ()
 int
 main (int argc, const char** argv)
 {
-  W_CONNECTOR_HND hnd        = NULL;
+  WH_CONNECTION hnd        = NULL;
 
   bool success = tc_settup_connection (argc, argv, &hnd);
 

@@ -303,7 +303,7 @@ cmd_read_stack (ClientConnection& rConn)
         }
       else if (IS_ARRAY (valType))
         {
-          assert ((valType & 0xFF) != WFT_TEXT);
+          assert ((valType & 0xFF) != WHC_TYPE_TEXT);
           status = cmd_read_array_stack_top (rConn,
                                              topValue,
                                              textHint,
@@ -666,7 +666,7 @@ cmd_procedure_param_desc (ClientConnection& rConn)
               if (offset + sizeof (uint16_t) > rConn.DataSize ())
                 break;
 
-              store_le_int16 (WFT_TABLE_MASK, data_ + offset);
+              store_le_int16 (WHC_TYPE_TABLE_MASK, data_ + offset);
               offset += sizeof (uint16_t);
 
               const uint_t fieldsCount = session.ProcedurePameterFieldsCount (

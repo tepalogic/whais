@@ -98,7 +98,7 @@ wcmd_decode_typeinfo (unsigned int type)
 
   if (arrayDesc)
     {
-      if (GET_BASIC_TYPE (type) == WFT_NOTSET)
+      if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
         return result;
 
       result += " OF ";

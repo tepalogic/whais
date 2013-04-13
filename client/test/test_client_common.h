@@ -20,6 +20,6 @@
 bool
 tc_settup_connection (int              argc,
                       char const **    argv,
-                      W_CONNECTOR_HND* pHnd);
+                      WH_CONNECTION* pHnd);
 
 #endif /* TEST_CLIENT_COMMON_H_ */

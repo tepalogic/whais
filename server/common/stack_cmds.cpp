@@ -38,25 +38,25 @@ using namespace std;
 static inline void
 assert_cmds_values ()
 {
-  assert (WFT_BOOL       == T_BOOL);
-  assert (WFT_CHAR       == T_CHAR);
-  assert (WFT_DATE       == T_DATE);
-  assert (WFT_DATETIME   == T_DATETIME);
-  assert (WFT_HIRESTIME  == T_HIRESTIME);
-  assert (WFT_INT8       == T_INT8);
-  assert (WFT_INT16      == T_INT16);
-  assert (WFT_INT32      == T_INT32);
-  assert (WFT_INT64      == T_INT64);
-  assert (WFT_UINT8      == T_UINT8);
-  assert (WFT_UINT16     == T_UINT16);
-  assert (WFT_UINT32     == T_UINT32);
-  assert (WFT_UINT64     == T_UINT64);
-  assert (WFT_REAL       == T_REAL);
-  assert (WFT_RICHREAL   == T_RICHREAL);
-  assert (WFT_TEXT       == T_TEXT);
-  assert (WFT_ARRAY_MASK == T_ARRAY_MASK);
-  assert (WFT_FIELD_MASK == T_FIELD_MASK);
-  assert (WFT_TABLE_MASK == T_TABLE_MASK);
+  assert (WHC_TYPE_BOOL       == T_BOOL);
+  assert (WHC_TYPE_CHAR       == T_CHAR);
+  assert (WHC_TYPE_DATE       == T_DATE);
+  assert (WHC_TYPE_DATETIME   == T_DATETIME);
+  assert (WHC_TYPE_HIRESTIME  == T_HIRESTIME);
+  assert (WHC_TYPE_INT8       == T_INT8);
+  assert (WHC_TYPE_INT16      == T_INT16);
+  assert (WHC_TYPE_INT32      == T_INT32);
+  assert (WHC_TYPE_INT64      == T_INT64);
+  assert (WHC_TYPE_UINT8      == T_UINT8);
+  assert (WHC_TYPE_UINT16     == T_UINT16);
+  assert (WHC_TYPE_UINT32     == T_UINT32);
+  assert (WHC_TYPE_UINT64     == T_UINT64);
+  assert (WHC_TYPE_REAL       == T_REAL);
+  assert (WHC_TYPE_RICHREAL   == T_RICHREAL);
+  assert (WHC_TYPE_TEXT       == T_TEXT);
+  assert (WHC_TYPE_ARRAY_MASK == T_ARRAY_MASK);
+  assert (WHC_TYPE_FIELD_MASK == T_FIELD_MASK);
+  assert (WHC_TYPE_TABLE_MASK == T_TABLE_MASK);
 }
 
 uint_t
@@ -98,83 +98,83 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
   type       = from_le_int16 (data + *pDataOff);
   *pDataOff += sizeof (uint16_t);
 
-  if (type != WFT_TABLE_MASK)
+  if (type != WHC_TYPE_TABLE_MASK)
     {
-      if (type & WFT_FIELD_MASK)
+      if (type & WHC_TYPE_FIELD_MASK)
         return WCS_INVALID_ARGS;
 
-      const bool isArray = (type & WFT_ARRAY_MASK) != 0;
+      const bool isArray = (type & WHC_TYPE_ARRAY_MASK) != 0;
 
-      type &= ~WFT_ARRAY_MASK;
-      if ((type < WFT_BOOL) || (type > WFT_TEXT))
+      type &= ~WHC_TYPE_ARRAY_MASK;
+      if ((type < WHC_TYPE_BOOL) || (type > WHC_TYPE_TEXT))
         goto push_frame_error;
-      else if (isArray && (type == WFT_TEXT))
+      else if (isArray && (type == WHC_TYPE_TEXT))
         return WCS_OP_NOTSUPP;
       else if (isArray)
         {
           switch (type)
           {
-            case WFT_BOOL:
+            case WHC_TYPE_BOOL:
               rStack.Push (DBSArray (_SC (DBSBool*, NULL)));
               break;
 
-            case WFT_CHAR:
+            case WHC_TYPE_CHAR:
               rStack.Push (DBSArray (_SC (DBSChar*, NULL)));
               break;
 
-            case WFT_DATE:
+            case WHC_TYPE_DATE:
               rStack.Push (DBSArray (_SC (DBSDate*, NULL)));
               break;
 
-            case WFT_DATETIME:
+            case WHC_TYPE_DATETIME:
               rStack.Push (DBSArray (_SC (DBSDateTime*, NULL)));
               break;
 
-            case WFT_HIRESTIME:
+            case WHC_TYPE_HIRESTIME:
               rStack.Push (DBSArray (_SC (DBSHiresTime*, NULL)));
               break;
 
-            case WFT_INT8:
+            case WHC_TYPE_INT8:
               rStack.Push (DBSArray (_SC (DBSInt8*, NULL)));
               break;
 
-            case WFT_INT16:
+            case WHC_TYPE_INT16:
               rStack.Push (DBSArray (_SC (DBSInt16*, NULL)));
               break;
 
-            case WFT_INT32:
+            case WHC_TYPE_INT32:
               rStack.Push (DBSArray (_SC (DBSInt32*, NULL)));
               break;
 
-            case WFT_INT64:
+            case WHC_TYPE_INT64:
               rStack.Push (DBSArray (_SC (DBSInt64*, NULL)));
               break;
 
-            case WFT_UINT8:
+            case WHC_TYPE_UINT8:
               rStack.Push (DBSArray (_SC (DBSUInt8*, NULL)));
               break;
 
-            case WFT_UINT16:
+            case WHC_TYPE_UINT16:
               rStack.Push (DBSArray (_SC (DBSUInt16*, NULL)));
               break;
 
-            case WFT_UINT32:
+            case WHC_TYPE_UINT32:
               rStack.Push (DBSArray (_SC (DBSUInt32*, NULL)));
               break;
 
-            case WFT_UINT64:
+            case WHC_TYPE_UINT64:
               rStack.Push (DBSArray (_SC (DBSUInt64*, NULL)));
               break;
 
-            case WFT_REAL:
+            case WHC_TYPE_REAL:
               rStack.Push (DBSArray (_SC (DBSReal*, NULL)));
               break;
 
-            case WFT_RICHREAL:
+            case WHC_TYPE_RICHREAL:
               rStack.Push (DBSArray (_SC (DBSRichReal*, NULL)));
               break;
 
-            case WFT_TEXT:
+            case WHC_TYPE_TEXT:
               assert (false);
             default:
               throw ConnectionException (
@@ -188,67 +188,67 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
 
       switch (type)
       {
-        case WFT_BOOL:
+        case WHC_TYPE_BOOL:
           rStack.Push (DBSBool ());
           break;
 
-        case WFT_CHAR:
+        case WHC_TYPE_CHAR:
           rStack.Push (DBSChar ());
           break;
 
-        case WFT_DATE:
+        case WHC_TYPE_DATE:
           rStack.Push (DBSDate ());
           break;
 
-        case WFT_DATETIME:
+        case WHC_TYPE_DATETIME:
           rStack.Push (DBSDateTime ());
           break;
 
-        case WFT_HIRESTIME:
+        case WHC_TYPE_HIRESTIME:
           rStack.Push (DBSHiresTime ());
           break;
 
-        case WFT_INT8:
+        case WHC_TYPE_INT8:
           rStack.Push (DBSInt8 ());
           break;
 
-        case WFT_INT16:
+        case WHC_TYPE_INT16:
           rStack.Push (DBSInt16 ());
           break;
 
-        case WFT_INT32:
+        case WHC_TYPE_INT32:
           rStack.Push (DBSInt32 ());
           break;
 
-        case WFT_INT64:
+        case WHC_TYPE_INT64:
           rStack.Push (DBSInt64 ());
           break;
 
-        case WFT_UINT8:
+        case WHC_TYPE_UINT8:
           rStack.Push (DBSUInt8 ());
           break;
 
-        case WFT_UINT16:
+        case WHC_TYPE_UINT16:
           rStack.Push (DBSUInt16 ());
           break;
 
-        case WFT_UINT32:
+        case WHC_TYPE_UINT32:
           rStack.Push (DBSUInt32 ());
           break;
 
-        case WFT_UINT64:
+        case WHC_TYPE_UINT64:
           rStack.Push (DBSUInt64 ());
           break;
 
-        case WFT_REAL:
+        case WHC_TYPE_REAL:
           rStack.Push (DBSReal ());
           break;
 
-        case WFT_RICHREAL:
+        case WHC_TYPE_RICHREAL:
           rStack.Push (DBSRichReal ());
           break;
 
-        case WFT_TEXT:
+        case WHC_TYPE_TEXT:
           rStack.Push (DBSText ());
           break;
 
@@ -299,12 +299,12 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
           fields_[field].m_FieldType = _SC (DBS_FIELD_TYPE,
                                             GET_BASIC_TYPE (fieldType));
 
-          if ((fields_[field].m_FieldType < WFT_BOOL)
-              || (fields_[field].m_FieldType > WFT_TEXT))
+          if ((fields_[field].m_FieldType < WHC_TYPE_BOOL)
+              || (fields_[field].m_FieldType > WHC_TYPE_TEXT))
             {
               goto push_frame_error;
             }
-          else if ((fields_[field].m_FieldType == WFT_TEXT)
+          else if ((fields_[field].m_FieldType == WHC_TYPE_TEXT)
                    && (fields_[field].isArray))
             {
               return WCS_OP_NOTSUPP;
@@ -340,7 +340,7 @@ read_value (StackValue&         dest,
 
   switch (type)
   {
-  case WFT_BOOL:
+  case WHC_TYPE_BOOL:
     {
       DBSBool value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -351,7 +351,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_CHAR:
+  case WHC_TYPE_CHAR:
     {
       DBSChar value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -362,7 +362,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_DATE:
+  case WHC_TYPE_DATE:
     {
       DBSDate value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -373,7 +373,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_DATETIME:
+  case WHC_TYPE_DATETIME:
     {
       DBSDateTime value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -384,7 +384,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_HIRESTIME:
+  case WHC_TYPE_HIRESTIME:
     {
       DBSHiresTime value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -395,7 +395,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_INT8:
+  case WHC_TYPE_INT8:
     {
       DBSInt8 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -406,7 +406,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_INT16:
+  case WHC_TYPE_INT16:
     {
       DBSInt16 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -417,7 +417,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_INT32:
+  case WHC_TYPE_INT32:
     {
       DBSInt32 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -428,7 +428,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_INT64:
+  case WHC_TYPE_INT64:
     {
       DBSInt64 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -439,7 +439,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_UINT8:
+  case WHC_TYPE_UINT8:
     {
       DBSUInt8 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -450,7 +450,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_UINT16:
+  case WHC_TYPE_UINT16:
     {
       DBSUInt16 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -461,7 +461,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_UINT32:
+  case WHC_TYPE_UINT32:
     {
       DBSUInt32 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -472,7 +472,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_UINT64:
+  case WHC_TYPE_UINT64:
     {
       DBSUInt64 value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -483,7 +483,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_REAL:
+  case WHC_TYPE_REAL:
     {
       DBSReal value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -494,7 +494,7 @@ read_value (StackValue&         dest,
     }
     break;
 
-  case WFT_RICHREAL:
+  case WHC_TYPE_RICHREAL:
     {
       DBSRichReal value;
       result = Utf8Translator::Read (data + *pDataOff,
@@ -540,9 +540,9 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
   try
   {
       *pDataOff += sizeof (uint16_t);
-      if (type & WFT_FIELD_MASK)
+      if (type & WHC_TYPE_FIELD_MASK)
         {
-          type &= ~WFT_FIELD_MASK;
+          type &= ~WHC_TYPE_FIELD_MASK;
 
           const char* const fieldName = _RC (const char*,
                                                data + *pDataOff);
@@ -564,12 +564,12 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           StackValue field    = stackTop.GetOperand ().GetFieldAt (fieldIndex);
           StackValue rowValue = field.GetOperand ().GetValueAt (rowIndex);
 
-          if (type & WFT_ARRAY_MASK)
+          if (type & WHC_TYPE_ARRAY_MASK)
             {
-              type &= ~WFT_ARRAY_MASK;
-              assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+              type &= ~WHC_TYPE_ARRAY_MASK;
+              assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
 
-              if (type == WFT_TEXT)
+              if (type == WHC_TYPE_TEXT)
                 return WCS_OP_NOTSUPP;
 
               if (*pDataOff + sizeof (uint16_t) > dataSize)
@@ -610,7 +610,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               if (elCount != 0)
                 goto update_frame_error;
             }
-          else if (type == WFT_TEXT)
+          else if (type == WHC_TYPE_TEXT)
             {
               DBSText fieldText;
 
@@ -659,12 +659,12 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               assert (*pDataOff <= dataSize);
             }
         }
-      else if (type & WFT_ARRAY_MASK)
+      else if (type & WHC_TYPE_ARRAY_MASK)
         {
-          type &= ~WFT_ARRAY_MASK;
-          assert ((WFT_BOOL <= type) && (type <= WFT_TEXT));
+          type &= ~WHC_TYPE_ARRAY_MASK;
+          assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
 
-          if (type == WFT_TEXT)
+          if (type == WHC_TYPE_TEXT)
             return WCS_OP_NOTSUPP;
 
           if (*pDataOff + sizeof (uint16_t) > dataSize)
@@ -704,7 +704,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           if (elCount != 0)
             goto update_frame_error;
         }
-      else if (type == WFT_TEXT)
+      else if (type == WHC_TYPE_TEXT)
         {
           DBSText fieldText;
           stackTop.GetOperand ().GetValue (fieldText);
@@ -738,7 +738,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
         }
       else
         {
-          assert ((WFT_BOOL <= type) && (type < WFT_TEXT));
+          assert ((WHC_TYPE_BOOL <= type) && (type < WHC_TYPE_TEXT));
 
           const uint_t elLen = read_value (stackTop,
                                            type,
@@ -797,7 +797,7 @@ write_value (StackValue&      source,
 
   switch (valueOp.GetType ())
   {
-  case WFT_BOOL:
+  case WHC_TYPE_BOOL:
     {
 
       DBSBool value;
@@ -807,7 +807,7 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_CHAR:
+  case WHC_TYPE_CHAR:
     {
       DBSChar value;
       source.GetOperand ().GetValue (value);
@@ -816,7 +816,7 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_DATE:
+  case WHC_TYPE_DATE:
     {
       DBSDate value;
       source.GetOperand ().GetValue (value);
@@ -825,7 +825,7 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_DATETIME:
+  case WHC_TYPE_DATETIME:
     {
       DBSDateTime value;
       source.GetOperand ().GetValue (value);
@@ -834,7 +834,7 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_HIRESTIME:
+  case WHC_TYPE_HIRESTIME:
     {
       DBSHiresTime value;
       source.GetOperand ().GetValue (value);
@@ -843,10 +843,10 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_INT8:
-  case WFT_INT16:
-  case WFT_INT32:
-  case WFT_INT64:
+  case WHC_TYPE_INT8:
+  case WHC_TYPE_INT16:
+  case WHC_TYPE_INT32:
+  case WHC_TYPE_INT64:
     {
       DBSInt64 value;
       source.GetOperand ().GetValue (value);
@@ -855,10 +855,10 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_UINT8:
-  case WFT_UINT16:
-  case WFT_UINT32:
-  case WFT_UINT64:
+  case WHC_TYPE_UINT8:
+  case WHC_TYPE_UINT16:
+  case WHC_TYPE_UINT32:
+  case WHC_TYPE_UINT64:
     {
       DBSUInt64 value;
       source.GetOperand ().GetValue (value);
@@ -867,7 +867,7 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_REAL:
+  case WHC_TYPE_REAL:
     {
       DBSReal value;
       source.GetOperand ().GetValue (value);
@@ -876,7 +876,7 @@ write_value (StackValue&      source,
     }
     break;
 
-  case WFT_RICHREAL:
+  case WHC_TYPE_RICHREAL:
     {
       DBSRichReal value;
       source.GetOperand ().GetValue (value);
@@ -1074,10 +1074,10 @@ cmd_read_table_field_internal (ClientConnection& rConn,
 
   if (fd.isArray)
     {
-      store_le_int16 (fd.m_FieldType | WFT_ARRAY_MASK, data + *pDataOffset);
+      store_le_int16 (fd.m_FieldType | WHC_TYPE_ARRAY_MASK, data + *pDataOffset);
       *pDataOffset += sizeof (uint16_t);
 
-      if (fd.m_FieldType == WFT_TEXT)
+      if (fd.m_FieldType == WHC_TYPE_TEXT)
         {
           assert (false);
           return WCS_GENERAL_ERR;
@@ -1090,7 +1090,7 @@ cmd_read_table_field_internal (ClientConnection& rConn,
                                      hintArrayOff,
                                      pDataOffset);
     }
-  else if (fd.m_FieldType == WFT_TEXT)
+  else if (fd.m_FieldType == WHC_TYPE_TEXT)
     {
       store_le_int16 (fd.m_FieldType, data + *pDataOffset);
       *pDataOffset += sizeof (uint16_t);
@@ -1139,9 +1139,9 @@ cmd_read_field_stack_top (ClientConnection& rConn,
   if (*pDataOffset + minSize > rConn.MaxSize ())
     return WCS_LARGE_RESPONSE;
 
-  uint16_t type = fieldDesc.m_FieldType | WFT_FIELD_MASK;
+  uint16_t type = fieldDesc.m_FieldType | WHC_TYPE_FIELD_MASK;
   if (fieldDesc.isArray)
-    type |= WFT_ARRAY_MASK;
+    type |= WHC_TYPE_ARRAY_MASK;
 
 
   const uint64_t rowsCount = table.GetAllocatedRows ();

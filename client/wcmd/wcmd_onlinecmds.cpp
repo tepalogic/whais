@@ -119,7 +119,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t              linePos   = 0;
   string              token     = CmdLineNextToken (cmdLine, linePos);
   string              globals;
-  W_CONNECTOR_HND     conHdl    = NULL;
+  WH_CONNECTION     conHdl    = NULL;
   unsigned int        glbsCount = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
 
@@ -178,7 +178,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     {
       unsigned int rawType = 0;
       token = CmdLineNextToken (globals, linePos);
-      cs = WDescribeValue (conHdl, token.c_str (), &rawType);
+      cs = WGlobalType (conHdl, token.c_str (), &rawType);
 
       if (cs != WCS_OK)
         {
@@ -191,13 +191,13 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         }
 
       cout << token << ' ';
-      if (rawType & WFT_TABLE_MASK)
+      if (rawType & WHC_TYPE_TABLE_MASK)
         {
-          assert ((rawType & WFT_FIELD_MASK) == 0);
+          assert ((rawType & WHC_TYPE_FIELD_MASK) == 0);
 
           uint_t fieldsCount;
 
-          cs = WDescribeValueGetFieldsCount (conHdl, &fieldsCount);
+          cs = WFieldsCount (conHdl, &fieldsCount);
           if (cs != WCS_OK)
             break;
 
@@ -210,7 +210,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             {
               const char* fieldName;
 
-              cs = WDescribeValueFetchField (conHdl, &fieldName, &rawType);
+              cs = WFetchField (conHdl, &fieldName, &rawType);
               if (cs != WCS_OK)
                 break;
 
@@ -221,9 +221,9 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             }
           cout << endl;
         }
-      else if (rawType & WFT_FIELD_MASK)
+      else if (rawType & WHC_TYPE_FIELD_MASK)
         {
-          rawType &= ~WFT_FIELD_MASK;
+          rawType &= ~WHC_TYPE_FIELD_MASK;
 
           cout << "FIELD OF ";
           cout << wcmd_decode_typeinfo (rawType) << endl;
@@ -257,7 +257,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t              linePos     = 0;
   string              token       = CmdLineNextToken (cmdLine, linePos);
   string              procedures;
-  W_CONNECTOR_HND     conHdl      = NULL;
+  WH_CONNECTION     conHdl      = NULL;
   unsigned int        procsCount  = 0;
   const VERBOSE_LEVEL level       = GetVerbosityLevel ();
 
@@ -315,7 +315,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     {
       uint_t procsParameter;
       token = CmdLineNextToken (procedures, linePos);
-      cs = WProcedureParametersCount (conHdl, token.c_str (), &procsParameter);
+      cs = WProcParamsCount (conHdl, token.c_str (), &procsParameter);
 
       if (cs != WCS_OK)
         {
@@ -338,7 +338,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             cout << ") ";
 
           unsigned int paramType;
-          cs = WProcedureParameter (conHdl,
+          cs = WProcParamType (conHdl,
                                     token.c_str (),
                                     param,
                                     &paramType);
@@ -355,13 +355,13 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           if (param > 1)
             cout << ", ";
 
-          if (paramType & WFT_TABLE_MASK)
+          if (paramType & WHC_TYPE_TABLE_MASK)
             {
-              assert ((paramType & WFT_FIELD_MASK) == 0);
+              assert ((paramType & WHC_TYPE_FIELD_MASK) == 0);
 
               uint_t fieldsCount;
 
-              cs = WProcedureParameterFieldCount (conHdl,
+              cs = WProcParamFieldCount (conHdl,
                                                   token.c_str (),
                                                   param,
                                                   &fieldsCount);
@@ -380,7 +380,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 {
                   const char* fieldName;
 
-                  cs = WProcedureParameterField (conHdl,
+                  cs = WProcParamField (conHdl,
                                                  token.c_str (),
                                                  0,
                                                  field,
@@ -397,11 +397,11 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 }
               cout << ']';
             }
-          else if (paramType & WFT_FIELD_MASK)
+          else if (paramType & WHC_TYPE_FIELD_MASK)
             {
-              paramType &= ~WFT_FIELD_MASK;
+              paramType &= ~WHC_TYPE_FIELD_MASK;
 
-              if (paramType == WFT_NOTSET)
+              if (paramType == WHC_TYPE_NOTSET)
                 cout << "FIELD";
               else
                 {
@@ -438,7 +438,7 @@ static const char pingShowDescExt[] =
 static bool
 cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  W_CONNECTOR_HND conHdl = NULL;
+  WH_CONNECTION conHdl = NULL;
   WTICKS ticks  = wh_msec_ticks ();
   uint32_t cs  = WConnect (GetRemoteHostName ().c_str (),
                            GetConnectionPort ().c_str (),

@@ -25,13 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CONNECTOR_H_
 #define CONNECTOR_H_
 
-#include "whisper.h"
-
-#include "server/include/server_protocol.h"
+#include "server/server_protocol.h"
 
 #define CLIENT_VERSION                    1
-
-#define MAX_CMint_tERNALS                 4
+#define INT32_INTERNALS_COUNT             4
 
 static const uint_t LIST_GLBSCOUNT      = 0;
 static const uint_t LIST_GLBINDEX       = 1;
@@ -53,7 +50,7 @@ struct INTERNAL_HANDLER
   uint8_t*  data;
   uint32_t  dataSize;
   uint32_t  version;
-  uint32_t  cmdInternal[MAX_CMint_tERNALS];
+  uint32_t  cmdInternal[INT32_INTERNALS_COUNT];
   WH_SOCKET socket;
   uint32_t  expectedFrameId;
   uint32_t  serverCookie;
@@ -67,3 +64,4 @@ struct INTERNAL_HANDLER
 };
 
 #endif /* CONNECTOR_H_ */
+

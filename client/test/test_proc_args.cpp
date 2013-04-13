@@ -30,81 +30,81 @@ static const uint_t COMPLETE_PROC_ARGS  = 68;
 
 ProcedureEntry _procedures[] =
     {
-        {"bool_return_proc_no_args", WFT_BOOL, false},
-        {"char_return_proc_no_args", WFT_CHAR, false},
-        {"date_return_proc_no_args", WFT_DATE, false},
-        {"datetime_return_proc_no_args", WFT_DATETIME, false},
-        {"hirestime_return_proc_no_args", WFT_HIRESTIME, false},
-        {"int8_return_proc_no_args", WFT_INT8, false},
-        {"int16_return_proc_no_args", WFT_INT16, false},
-        {"int32_return_proc_no_args", WFT_INT32, false},
-        {"int64_return_proc_no_args", WFT_INT64, false},
-        {"uint8_return_proc_no_args", WFT_UINT8, false},
-        {"uint16_return_proc_no_args", WFT_UINT16, false},
-        {"uint32_return_proc_no_args", WFT_UINT32,  false},
-        {"uint64_return_proc_no_args", WFT_UINT64,  false},
-        {"real_return_proc_no_args", WFT_REAL, false},
-        {"richreal_return_proc_no_args", WFT_RICHREAL, false},
-        {"text_return_proc_no_args", WFT_TEXT, false},
+        {"bool_return_proc_no_args", WHC_TYPE_BOOL, false},
+        {"char_return_proc_no_args", WHC_TYPE_CHAR, false},
+        {"date_return_proc_no_args", WHC_TYPE_DATE, false},
+        {"datetime_return_proc_no_args", WHC_TYPE_DATETIME, false},
+        {"hirestime_return_proc_no_args", WHC_TYPE_HIRESTIME, false},
+        {"int8_return_proc_no_args", WHC_TYPE_INT8, false},
+        {"int16_return_proc_no_args", WHC_TYPE_INT16, false},
+        {"int32_return_proc_no_args", WHC_TYPE_INT32, false},
+        {"int64_return_proc_no_args", WHC_TYPE_INT64, false},
+        {"uint8_return_proc_no_args", WHC_TYPE_UINT8, false},
+        {"uint16_return_proc_no_args", WHC_TYPE_UINT16, false},
+        {"uint32_return_proc_no_args", WHC_TYPE_UINT32,  false},
+        {"uint64_return_proc_no_args", WHC_TYPE_UINT64,  false},
+        {"real_return_proc_no_args", WHC_TYPE_REAL, false},
+        {"richreal_return_proc_no_args", WHC_TYPE_RICHREAL, false},
+        {"text_return_proc_no_args", WHC_TYPE_TEXT, false},
 
-        {"array_bool_return_proc_no_args", WFT_ARRAY_MASK | WFT_BOOL, false},
-        {"array_char_return_proc_no_args", WFT_ARRAY_MASK | WFT_CHAR, false},
-        {"array_date_return_proc_no_args", WFT_ARRAY_MASK | WFT_DATE, false},
-        {"array_datetime_return_proc_no_args", WFT_ARRAY_MASK | WFT_DATETIME, false},
-        {"array_hirestime_return_proc_no_args", WFT_ARRAY_MASK | WFT_HIRESTIME, false},
-        {"array_int8_return_proc_no_args", WFT_ARRAY_MASK | WFT_INT8, false},
-        {"array_int16_return_proc_no_args", WFT_ARRAY_MASK | WFT_INT16, false},
-        {"array_int32_return_proc_no_args", WFT_ARRAY_MASK | WFT_INT32, false},
-        {"array_int64_return_proc_no_args", WFT_ARRAY_MASK | WFT_INT64, false},
-        {"array_uint8_return_proc_no_args", WFT_ARRAY_MASK | WFT_UINT8, false},
-        {"array_uint16_return_proc_no_args", WFT_ARRAY_MASK | WFT_UINT16, false},
-        {"array_uint32_return_proc_no_args", WFT_ARRAY_MASK | WFT_UINT32, false},
-        {"array_uint64_return_proc_no_args", WFT_ARRAY_MASK | WFT_UINT64, false},
-        {"array_real_return_proc_no_args", WFT_ARRAY_MASK | WFT_REAL, false},
-        {"array_richreal_return_proc_no_args", WFT_ARRAY_MASK | WFT_RICHREAL, false},
-//        {"array_text_return_proc_no_args", WFT_ARRAY_MASK | WFT_TEXT, false},
-        {"array_return_proc_no_args", WFT_ARRAY_MASK | WFT_NOTSET, false},
+        {"array_bool_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL, false},
+        {"array_char_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR, false},
+        {"array_date_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE, false},
+        {"array_datetime_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME, false},
+        {"array_hirestime_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME, false},
+        {"array_int8_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8, false},
+        {"array_int16_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16, false},
+        {"array_int32_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32, false},
+        {"array_int64_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64, false},
+        {"array_uint8_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8, false},
+        {"array_uint16_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16, false},
+        {"array_uint32_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32, false},
+        {"array_uint64_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64, false},
+        {"array_real_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL, false},
+        {"array_richreal_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL, false},
+//        {"array_text_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_TEXT, false},
+        {"array_return_proc_no_args", WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, false},
 
-        {"field_bool_return_proc_no_args", WFT_FIELD_MASK | WFT_BOOL, false},
-        {"field_char_return_proc_no_args", WFT_FIELD_MASK | WFT_CHAR, false},
-        {"field_date_return_proc_no_args", WFT_FIELD_MASK | WFT_DATE, false},
-        {"field_datetime_return_proc_no_args", WFT_FIELD_MASK | WFT_DATETIME, false},
-        {"field_hirestime_return_proc_no_args", WFT_FIELD_MASK | WFT_HIRESTIME, false},
-        {"field_int8_return_proc_no_args", WFT_FIELD_MASK | WFT_INT8, false},
-        {"field_int16_return_proc_no_args", WFT_FIELD_MASK | WFT_INT16, false},
-        {"field_int32_return_proc_no_args", WFT_FIELD_MASK | WFT_INT32, false},
-        {"field_int64_return_proc_no_args", WFT_FIELD_MASK | WFT_INT64, false},
-        {"field_uint8_return_proc_no_args", WFT_FIELD_MASK | WFT_UINT8, false},
-        {"field_uint16_return_proc_no_args", WFT_FIELD_MASK | WFT_UINT16, false},
-        {"field_uint32_return_proc_no_args", WFT_FIELD_MASK | WFT_UINT32, false},
-        {"field_uint64_return_proc_no_args", WFT_FIELD_MASK | WFT_UINT64, false},
-        {"field_real_return_proc_no_args", WFT_FIELD_MASK | WFT_REAL, false},
-        {"field_richreal_return_proc_no_args", WFT_FIELD_MASK | WFT_RICHREAL, false},
-        {"field_text_return_proc_no_args", WFT_FIELD_MASK | WFT_TEXT, false},
+        {"field_bool_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_BOOL, false},
+        {"field_char_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_CHAR, false},
+        {"field_date_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_DATE, false},
+        {"field_datetime_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_DATETIME, false},
+        {"field_hirestime_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_HIRESTIME, false},
+        {"field_int8_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_INT8, false},
+        {"field_int16_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_INT16, false},
+        {"field_int32_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_INT32, false},
+        {"field_int64_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_INT64, false},
+        {"field_uint8_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT8, false},
+        {"field_uint16_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT16, false},
+        {"field_uint32_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT32, false},
+        {"field_uint64_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT64, false},
+        {"field_real_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_REAL, false},
+        {"field_richreal_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_RICHREAL, false},
+        {"field_text_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_TEXT, false},
 
-        {"field_array_bool_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_BOOL, false},
-        {"field_array_char_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_CHAR, false},
-        {"field_array_date_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_DATE, false},
-        {"field_array_datetime_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_DATETIME, false},
-        {"field_array_hirestime_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_HIRESTIME, false},
-        {"field_array_int8_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT8, false},
-        {"field_array_int16_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT16, false},
-        {"field_array_int32_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT32, false},
-        {"field_array_int64_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT64, false},
-        {"field_array_uint8_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT8, false},
-        {"field_array_uint16_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT16, false},
-        {"field_array_uint32_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT32, false},
-        {"field_array_uint64_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT64, false},
-        {"field_array_real_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_REAL, false},
-        {"field_array_richreal_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_RICHREAL, false},
-//        {"field_array_text_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_TEXT, false},
-        {"field_array_return_proc_no_args", WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_NOTSET, false},
-        {"field_return_proc_no_args", WFT_FIELD_MASK | WFT_NOTSET, false},
+        {"field_array_bool_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL, false},
+        {"field_array_char_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR, false},
+        {"field_array_date_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE, false},
+        {"field_array_datetime_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME, false},
+        {"field_array_hirestime_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME, false},
+        {"field_array_int8_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8, false},
+        {"field_array_int16_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16, false},
+        {"field_array_int32_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32, false},
+        {"field_array_int64_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64, false},
+        {"field_array_uint8_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8, false},
+        {"field_array_uint16_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16, false},
+        {"field_array_uint32_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32, false},
+        {"field_array_uint64_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64, false},
+        {"field_array_real_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL, false},
+        {"field_array_richreal_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL, false},
+//        {"field_array_text_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_TEXT, false},
+        {"field_array_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, false},
+        {"field_return_proc_no_args", WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET, false},
 
-        {"one_field_table_return_proc_no_args", WFT_TABLE_MASK, false},
-        {"two_field_table_return_proc_no_args", WFT_TABLE_MASK, false},
-        {"table_return_proc_no_args", WFT_TABLE_MASK, false},
-        {"table_return_proc_all_type_args", WFT_TABLE_MASK, false}
+        {"one_field_table_return_proc_no_args", WHC_TYPE_TABLE_MASK, false},
+        {"two_field_table_return_proc_no_args", WHC_TYPE_TABLE_MASK, false},
+        {"table_return_proc_no_args", WHC_TYPE_TABLE_MASK, false},
+        {"table_return_proc_all_type_args", WHC_TYPE_TABLE_MASK, false}
     };
 
 static bool
@@ -133,7 +133,7 @@ check_field_entry (FieldEntry*   fields,
 }
 
 static bool
-test_proc_one_field_tab_ret (W_CONNECTOR_HND hnd)
+test_proc_one_field_tab_ret (WH_CONNECTION hnd)
 {
   const char  procName[]  = "one_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   const char* fieldName;
@@ -143,13 +143,13 @@ test_proc_one_field_tab_ret (W_CONNECTOR_HND hnd)
 
   cout << "Testing one field ret tab ... ";
 
-  if ((WProcedureParameterField (hnd, procName, 0, 0, &fieldName, &fieldType) != WCS_OK)
+  if ((WProcParamField (hnd, procName, 0, 0, &fieldName, &fieldType) != WCS_OK)
       || (strcmp (fieldName, "field1") != 0)
-      || (fieldType != WFT_TEXT))
+      || (fieldType != WHC_TYPE_TEXT))
     {
       goto test_proc_one_field_tab_ret_err;
     }
-  else if ((WProcedureParameterFieldCount (hnd, procName, 0, &fieldsCount) != WCS_OK)
+  else if ((WProcParamFieldCount (hnd, procName, 0, &fieldsCount) != WCS_OK)
            || (fieldsCount != 1))
     {
       goto test_proc_one_field_tab_ret_err;
@@ -165,14 +165,14 @@ test_proc_one_field_tab_ret_err:
 }
 
 static bool
-test_proc_two_field_tab_ret (W_CONNECTOR_HND hnd)
+test_proc_two_field_tab_ret (WH_CONNECTION hnd)
 {
   const char  procName[]  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
   FieldEntry fields[] =
       {
-          {"field1", WFT_CHAR, false},
-          {"field2", WFT_ARRAY_MASK | WFT_UINT64, false}
+          {"field1", WHC_TYPE_CHAR, false},
+          {"field2", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64, false}
       };
 
   uint_t fieldsCount = sizeof (fields) / sizeof (fields[0]);
@@ -183,7 +183,7 @@ test_proc_two_field_tab_ret (W_CONNECTOR_HND hnd)
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       const char* fieldName;
-      if ((WProcedureParameterField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
+      if ((WProcParamField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
         || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
         {
           goto test_proc_two_field_tab_ret_err;
@@ -197,7 +197,7 @@ test_proc_two_field_tab_ret (W_CONNECTOR_HND hnd)
     }
 
   fieldsCount = 0;
-  if ((WProcedureParameterFieldCount (hnd, procName, 0, &fieldsCount) != WCS_OK)
+  if ((WProcParamFieldCount (hnd, procName, 0, &fieldsCount) != WCS_OK)
       || (fieldsCount != sizeof (fields) / sizeof (fields[0])))
     {
       goto test_proc_two_field_tab_ret_err;
@@ -213,120 +213,120 @@ test_proc_two_field_tab_ret_err:
 }
 
 static bool
-test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
+test_proc_complete_field_tab_ret (WH_CONNECTION hnd)
 {
   const char  procName[]  = "table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   const uint_t  procParamas[] =
       {
-          WFT_TABLE_MASK,
+          WHC_TYPE_TABLE_MASK,
 
-          WFT_BOOL,
-          WFT_CHAR,
-          WFT_DATE,
-          WFT_DATETIME,
-          WFT_HIRESTIME,
-          WFT_INT8,
-          WFT_INT16,
-          WFT_INT32,
-          WFT_INT64,
-          WFT_UINT8,
-          WFT_UINT16,
-          WFT_UINT32,
-          WFT_UINT64,
-          WFT_REAL,
-          WFT_RICHREAL,
-          WFT_TEXT,
+          WHC_TYPE_BOOL,
+          WHC_TYPE_CHAR,
+          WHC_TYPE_DATE,
+          WHC_TYPE_DATETIME,
+          WHC_TYPE_HIRESTIME,
+          WHC_TYPE_INT8,
+          WHC_TYPE_INT16,
+          WHC_TYPE_INT32,
+          WHC_TYPE_INT64,
+          WHC_TYPE_UINT8,
+          WHC_TYPE_UINT16,
+          WHC_TYPE_UINT32,
+          WHC_TYPE_UINT64,
+          WHC_TYPE_REAL,
+          WHC_TYPE_RICHREAL,
+          WHC_TYPE_TEXT,
 
-          WFT_ARRAY_MASK | WFT_BOOL,
-          WFT_ARRAY_MASK | WFT_CHAR,
-          WFT_ARRAY_MASK | WFT_DATE,
-          WFT_ARRAY_MASK | WFT_DATETIME,
-          WFT_ARRAY_MASK | WFT_HIRESTIME,
-          WFT_ARRAY_MASK | WFT_INT8,
-          WFT_ARRAY_MASK | WFT_INT16,
-          WFT_ARRAY_MASK | WFT_INT32,
-          WFT_ARRAY_MASK | WFT_INT64,
-          WFT_ARRAY_MASK | WFT_UINT8,
-          WFT_ARRAY_MASK | WFT_UINT16,
-          WFT_ARRAY_MASK | WFT_UINT32,
-          WFT_ARRAY_MASK | WFT_UINT64,
-          WFT_ARRAY_MASK | WFT_REAL,
-          WFT_ARRAY_MASK | WFT_RICHREAL,
-          WFT_ARRAY_MASK | WFT_NOTSET,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL,
+          WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET,
 
-          WFT_FIELD_MASK | WFT_BOOL,
-          WFT_FIELD_MASK | WFT_CHAR,
-          WFT_FIELD_MASK | WFT_DATE,
-          WFT_FIELD_MASK | WFT_DATETIME,
-          WFT_FIELD_MASK | WFT_HIRESTIME,
-          WFT_FIELD_MASK | WFT_INT8,
-          WFT_FIELD_MASK | WFT_INT16,
-          WFT_FIELD_MASK | WFT_INT32,
-          WFT_FIELD_MASK | WFT_INT64,
-          WFT_FIELD_MASK | WFT_UINT8,
-          WFT_FIELD_MASK | WFT_UINT16,
-          WFT_FIELD_MASK | WFT_UINT32,
-          WFT_FIELD_MASK | WFT_UINT64,
-          WFT_FIELD_MASK | WFT_REAL,
-          WFT_FIELD_MASK | WFT_RICHREAL,
-          WFT_FIELD_MASK | WFT_TEXT,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_BOOL,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_CHAR,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_DATE,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_DATETIME,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_HIRESTIME,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_INT8,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_INT16,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_INT32,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_INT64,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT8,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT16,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT32,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_UINT64,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_REAL,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_RICHREAL,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_TEXT,
 
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_BOOL,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_CHAR,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_DATE,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_DATETIME,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_HIRESTIME,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT8,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT16,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT32,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_INT64,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT8,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT16,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT32,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_UINT64,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_REAL,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_RICHREAL,
-          WFT_FIELD_MASK | WFT_ARRAY_MASK | WFT_NOTSET,
-          WFT_FIELD_MASK | WFT_NOTSET,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET,
+          WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET,
 
-          WFT_TABLE_MASK,
-          WFT_TABLE_MASK
+          WHC_TYPE_TABLE_MASK,
+          WHC_TYPE_TABLE_MASK
       };
 
   FieldEntry fields[] =
       {
-          {"bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_BOOL, false},
-          {"char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_CHAR, false},
-          {"date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_DATE, false},
-          {"datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_DATETIME, false},
-          {"hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_HIRESTIME, false},
-          {"int8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_INT8, false},
-          {"int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_INT16, false},
-          {"int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_INT32, false},
-          {"int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_INT64, false},
-          {"uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_UINT8, false},
-          {"uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_UINT16, false},
-          {"uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_UINT32, false},
-          {"uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_UINT64, false},
-          {"real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_REAL, false},
-          {"richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_RICHREAL, false},
-          {"text_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_TEXT, false},
+          {"bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_BOOL, false},
+          {"char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_CHAR, false},
+          {"date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_DATE, false},
+          {"datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_DATETIME, false},
+          {"hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_HIRESTIME, false},
+          {"int8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_INT8, false},
+          {"int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_INT16, false},
+          {"int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_INT32, false},
+          {"int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_INT64, false},
+          {"uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_UINT8, false},
+          {"uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_UINT16, false},
+          {"uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_UINT32, false},
+          {"uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_UINT64, false},
+          {"real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_REAL, false},
+          {"richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_RICHREAL, false},
+          {"text_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_TEXT, false},
 
-          {"array_bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_ARRAY_MASK | WFT_ARRAY_MASK | WFT_BOOL, false},
-          {"array_char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_ARRAY_MASK | WFT_ARRAY_MASK | WFT_CHAR, false},
-          {"array_date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_ARRAY_MASK | WFT_ARRAY_MASK | WFT_DATE, false},
-          {"array_datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_DATETIME, false},
-          {"array_hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_HIRESTIME, false},
-          {"array_int8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_INT8, false},
-          {"array_int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_INT16, false},
-          {"array_int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_INT32, false},
-          {"array_int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_INT64, false},
-          {"array_uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_UINT8, false},
-          {"array_uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_UINT16, false},
-          {"array_uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_UINT32, false},
-          {"array_uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_UINT64, false},
-          {"array_real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_REAL, false},
-          {"array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WFT_ARRAY_MASK | WFT_RICHREAL, false}
+          {"array_bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL, false},
+          {"array_char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR, false},
+          {"array_date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE, false},
+          {"array_datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME, false},
+          {"array_hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME, false},
+          {"array_int8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8, false},
+          {"array_int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16, false},
+          {"array_int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32, false},
+          {"array_int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64, false},
+          {"array_uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8, false},
+          {"array_uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16, false},
+          {"array_uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32, false},
+          {"array_uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64, false},
+          {"array_real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL, false},
+          {"array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL, false}
       };
 
   uint_t fieldsCount = sizeof (fields) / sizeof (fields[0]);
@@ -337,7 +337,7 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
   for (uint_t i = 0; i < COMPLETE_PROC_ARGS; ++i)
     {
       uint_t procType;
-      if ((WProcedureParameter (hnd, procName, i, &procType) != WCS_OK)
+      if ((WProcParamType (hnd, procName, i, &procType) != WCS_OK)
           || (procType != procParamas[i]))
         {
           goto test_proc_complete_field_tab_ret_err;
@@ -347,7 +347,7 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       const char* fieldName;
-      if ((WProcedureParameterField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
+      if ((WProcParamField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
         || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
         {
           goto test_proc_complete_field_tab_ret_err;
@@ -365,7 +365,7 @@ test_proc_complete_field_tab_ret (W_CONNECTOR_HND hnd)
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       const char* fieldName;
-      if ((WProcedureParameterField (hnd, procName, COMPLETE_PROC_ARGS - 1, i, &fieldName, &fieldType) != WCS_OK)
+      if ((WProcParamField (hnd, procName, COMPLETE_PROC_ARGS - 1, i, &fieldName, &fieldType) != WCS_OK)
         || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
         {
           goto test_proc_complete_field_tab_ret_err;
@@ -390,7 +390,7 @@ test_proc_complete_field_tab_ret_err:
 }
 
 static bool
-test_proc_entry_ret_match (W_CONNECTOR_HND hnd, ProcedureEntry* entry)
+test_proc_entry_ret_match (WH_CONNECTION hnd, ProcedureEntry* entry)
 {
   const char suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   char buffer[1024];
@@ -400,12 +400,12 @@ test_proc_entry_ret_match (W_CONNECTOR_HND hnd, ProcedureEntry* entry)
   strcpy (buffer, entry->name);
   strcat (buffer, suffix);
 
-  if ((WProcedureParameter (hnd, buffer, 0, &type) != WCS_OK)
+  if ((WProcParamType (hnd, buffer, 0, &type) != WCS_OK)
       || (type != entry->retRawType))
     {
       goto test_proc_name_match_error;
     }
-  else if (WProcedureParametersCount (hnd, buffer, &paramsCount) != WCS_OK)
+  else if (WProcParamsCount (hnd, buffer, &paramsCount) != WCS_OK)
     goto test_proc_name_match_error;
 
   if (strcmp (entry->name, "table_return_proc_all_type_args") == 0)
@@ -425,7 +425,7 @@ test_proc_name_match_error:
 }
 
 static bool
-test_procedures_list (W_CONNECTOR_HND hnd)
+test_procedures_list (WH_CONNECTION hnd)
 {
   uint_t procsCount = sizeof (_procedures) / sizeof (_procedures[0]);
   cout << "Testing the procedures return values ... ";
@@ -446,7 +446,7 @@ test_procedures_list_error:
 }
 
 static bool
-test_for_errors (W_CONNECTOR_HND hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   uint_t        paramsCount;
   uint_t        type;
@@ -455,32 +455,32 @@ test_for_errors (W_CONNECTOR_HND hnd)
   const char* procName  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
   cout << "Testing against error conditions ... ";
-  if ((WProcedureParametersCount (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParametersCount (NULL, procName, &paramsCount) != WCS_INVALID_ARGS)
-      || (WProcedureParametersCount (hnd, procName, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParametersCount (hnd, NULL, &paramsCount) != WCS_INVALID_ARGS))
+  if ((WProcParamsCount (NULL, NULL, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamsCount (NULL, procName, &paramsCount) != WCS_INVALID_ARGS)
+      || (WProcParamsCount (hnd, procName, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamsCount (hnd, NULL, &paramsCount) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcedureParameter (NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParameter (NULL, procName, 0, &type) != WCS_INVALID_ARGS)
-      || (WProcedureParameter (hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParameter (hnd, NULL, 0, &type) != WCS_INVALID_ARGS))
+  else if ((WProcParamType (NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamType (NULL, procName, 0, &type) != WCS_INVALID_ARGS)
+      || (WProcParamType (hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamType (hnd, NULL, 0, &type) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcedureParameterFieldCount (NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParameterFieldCount (NULL, procName, 0, &fieldCount) != WCS_INVALID_ARGS)
-      || (WProcedureParameterFieldCount (hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParameterFieldCount (hnd, NULL, 0, &fieldCount) != WCS_INVALID_ARGS))
+  else if ((WProcParamFieldCount (NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount (NULL, procName, 0, &fieldCount) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount (hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount (hnd, NULL, 0, &fieldCount) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcedureParameterField (NULL, NULL, 0, 0, NULL, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParameterField (NULL, procName, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS)
-      || (WProcedureParameterField (hnd, procName, 0, 0, NULL, &type) != WCS_INVALID_ARGS)
-      || (WProcedureParameterField (hnd, procName, 0, 0, &fieldName, NULL) != WCS_INVALID_ARGS)
-      || (WProcedureParameterField (hnd, NULL, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS))
+  else if ((WProcParamField (NULL, NULL, 0, 0, NULL, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamField (NULL, procName, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS)
+      || (WProcParamField (hnd, procName, 0, 0, NULL, &type) != WCS_INVALID_ARGS)
+      || (WProcParamField (hnd, procName, 0, 0, &fieldName, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamField (hnd, NULL, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -514,7 +514,7 @@ DefaultUserPassword ()
 int
 main (int argc, const char** argv)
 {
-  W_CONNECTOR_HND       hnd = NULL;
+  WH_CONNECTION       hnd = NULL;
 
   bool success = tc_settup_connection (argc, argv, &hnd);
 

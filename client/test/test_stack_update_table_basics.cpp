@@ -19,419 +19,419 @@ struct BasicValueEntry
 
 BasicValueEntry _values[] =
     {
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
         /* Repeat */
 
-        {WFT_BOOL, "1"},
-        {WFT_CHAR, "\xC2\xA9"},
-        {WFT_DATE, "2013/1/10"},
-        {WFT_DATETIME, "21/11/11 23:2:3"},
-        {WFT_HIRESTIME, "2013/2/28 19:1:27.4"},
-        {WFT_INT8, "-121"},
-        {WFT_INT16, "-8546"},
-        {WFT_INT32, "-742214963"},
-        {WFT_INT64, "-1233411244563200"},
-        {WFT_UINT8, "212"},
-        {WFT_UINT16, "54328"},
-        {WFT_UINT32, "3213965354"},
-        {WFT_UINT64, "923341124456320012"},
-        {WFT_REAL, "-1.12374"},
-        {WFT_RICHREAL, "538.154454223"},
+        {WHC_TYPE_BOOL, "1"},
+        {WHC_TYPE_CHAR, "\xC2\xA9"},
+        {WHC_TYPE_DATE, "2013/1/10"},
+        {WHC_TYPE_DATETIME, "21/11/11 23:2:3"},
+        {WHC_TYPE_HIRESTIME, "2013/2/28 19:1:27.4"},
+        {WHC_TYPE_INT8, "-121"},
+        {WHC_TYPE_INT16, "-8546"},
+        {WHC_TYPE_INT32, "-742214963"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "212"},
+        {WHC_TYPE_UINT16, "54328"},
+        {WHC_TYPE_UINT32, "3213965354"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-1.12374"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
 
     };
 
-static const W_FieldDescriptor _fields[] =
+static const WField _fields[] =
 {
-  {"WFT_BOOL", WFT_BOOL},
-  {"WFT_CHAR", WFT_CHAR},
-  {"WFT_DATE", WFT_DATE},
-  {"WFT_DATETIME", WFT_DATETIME},
-  {"WFT_HIRESTIME", WFT_HIRESTIME},
-  {"WFT_INT8", WFT_INT8},
-  {"WFT_INT16", WFT_INT16},
-  {"WFT_INT32", WFT_INT32},
-  {"WFT_INT64", WFT_INT64},
-  {"WFT_UINT8", WFT_UINT8},
-  {"WFT_UINT16", WFT_UINT16},
-  {"WFT_UINT32", WFT_UINT32},
-  {"WFT_UINT64", WFT_UINT64},
-  {"WFT_REAL", WFT_REAL},
-  {"WFT_RICHREAL", WFT_RICHREAL}
+  {"WHC_TYPE_BOOL", WHC_TYPE_BOOL},
+  {"WHC_TYPE_CHAR", WHC_TYPE_CHAR},
+  {"WHC_TYPE_DATE", WHC_TYPE_DATE},
+  {"WHC_TYPE_DATETIME", WHC_TYPE_DATETIME},
+  {"WHC_TYPE_HIRESTIME", WHC_TYPE_HIRESTIME},
+  {"WHC_TYPE_INT8", WHC_TYPE_INT8},
+  {"WHC_TYPE_INT16", WHC_TYPE_INT16},
+  {"WHC_TYPE_INT32", WHC_TYPE_INT32},
+  {"WHC_TYPE_INT64", WHC_TYPE_INT64},
+  {"WHC_TYPE_UINT8", WHC_TYPE_UINT8},
+  {"WHC_TYPE_UINT16", WHC_TYPE_UINT16},
+  {"WHC_TYPE_UINT32", WHC_TYPE_UINT32},
+  {"WHC_TYPE_UINT64", WHC_TYPE_UINT64},
+  {"WHC_TYPE_REAL", WHC_TYPE_REAL},
+  {"WHC_TYPE_RICHREAL", WHC_TYPE_RICHREAL}
 };
 
 static const uint_t _valuesCount = sizeof (_values) / sizeof (_values[0]);
@@ -442,8 +442,8 @@ get_table_field_name (const uint_t fieldType)
 {
   for (uint_t i = 0; i < _fieldsCount; ++i)
     {
-      if (fieldType == _fields[i].m_FieldType)
-        return _fields[i].m_FieldName;
+      if (fieldType == _fields[i].type)
+        return _fields[i].name;
     }
 
   return NULL;
@@ -451,16 +451,16 @@ get_table_field_name (const uint_t fieldType)
 
 
 static bool
-check_table_description (W_CONNECTOR_HND hnd)
+check_table_description (WH_CONNECTION hnd)
 {
   uint_t type, fcount;
 
   const char* fieldName = NULL;
   uint_t        fieldType = 0;
 
-  if ((WDescribeStackTop (hnd, &type) != WCS_OK)
-      || (type != WFT_TABLE_MASK)
-      || (WDescribeValueGetFieldsCount (hnd, &fcount) != WCS_OK)
+  if ((WStackValueType (hnd, &type) != WCS_OK)
+      || (type != WHC_TYPE_TABLE_MASK)
+      || (WFieldsCount (hnd, &fcount) != WCS_OK)
       || (fcount != _fieldsCount))
     {
       return false;
@@ -469,16 +469,16 @@ check_table_description (W_CONNECTOR_HND hnd)
   for (uint_t i = 0; i < _fieldsCount; ++i)
     {
 
-      if (WDescribeValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
       if (strcmp (fieldName, get_table_field_name( fieldType)) != 0)
         return false;
     }
 
-  if ((WDescribeValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+  if ((WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
       || (fieldName != NULL)
-      || (fieldType != WFT_NOTSET))
+      || (fieldType != WHC_TYPE_NOTSET))
     {
       return false;
     }
@@ -488,7 +488,7 @@ check_table_description (W_CONNECTOR_HND hnd)
 
 
 static bool
-check_table_value (W_CONNECTOR_HND      hnd,
+check_table_value (WH_CONNECTION      hnd,
                    const uint_t         index,
                    const bool           extraCheck)
 {
@@ -498,7 +498,7 @@ check_table_value (W_CONNECTOR_HND      hnd,
 
   if (extraCheck)
     {
-      if (WGetStackValueEntry (hnd,
+      if (WValueEntry (hnd,
                                "some_field_name",
                                row,
                                WIGNORE_OFF,
@@ -508,7 +508,7 @@ check_table_value (W_CONNECTOR_HND      hnd,
         return false;
       }
 
-      if (WGetStackValueEntry (hnd,
+      if (WValueEntry (hnd,
                                fieldName,
                                98012, //Some big row number
                                WIGNORE_OFF,
@@ -518,7 +518,7 @@ check_table_value (W_CONNECTOR_HND      hnd,
         return false;
       }
 
-      if (WGetStackValueEntry (hnd,
+      if (WValueEntry (hnd,
                                fieldName,
                                row,
                                0,
@@ -528,7 +528,7 @@ check_table_value (W_CONNECTOR_HND      hnd,
           return false;
         }
 
-      if (WGetStackValueEntry (hnd,
+      if (WValueEntry (hnd,
                                fieldName,
                                row,
                                WIGNORE_OFF,
@@ -539,7 +539,7 @@ check_table_value (W_CONNECTOR_HND      hnd,
         }
     }
 
-  if (WGetStackValueEntry (hnd,
+  if (WValueEntry (hnd,
                            fieldName,
                            row,
                            WIGNORE_OFF,
@@ -557,18 +557,18 @@ check_table_value (W_CONNECTOR_HND      hnd,
 
 
 static bool
-fill_table_with_values (W_CONNECTOR_HND hnd,
+fill_table_with_values (WH_CONNECTION hnd,
                         const bool      bulk)
 {
-  if (WPushStackValue (hnd, WFT_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+  if (WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
     return false;
 
-  if ( ! bulk && (WUpdateStackFlush (hnd) != WCS_OK))
+  if ( ! bulk && (WFlush (hnd) != WCS_OK))
     return false;
 
   for (uint_t i = 0; i < _valuesCount; ++i)
     {
-      if (WUpdateStackValue (hnd,
+      if (WUpdateValue (hnd,
                              _values[i].type,
                              get_table_field_name (_values[i].type),
                              i / _fieldsCount,
@@ -579,11 +579,11 @@ fill_table_with_values (W_CONNECTOR_HND hnd,
           goto fill_table_fail;
         }
 
-      if ( ! bulk && (WUpdateStackFlush (hnd) != WCS_OK))
+      if ( ! bulk && (WFlush (hnd) != WCS_OK))
         goto fill_table_fail;
     }
 
-  if (WUpdateStackFlush (hnd) != WCS_OK)
+  if (WFlush (hnd) != WCS_OK)
     return false;
 
   return check_table_description (hnd);
@@ -593,7 +593,7 @@ fill_table_fail:
 }
 
 static bool
-test_step_table_fill (W_CONNECTOR_HND hnd)
+test_step_table_fill (WH_CONNECTION hnd)
 {
   cout << "Testing filling a table with basic values (stepping mode)... ";
 
@@ -607,8 +607,8 @@ test_step_table_fill (W_CONNECTOR_HND hnd)
         goto test_step_table_fill_error;
     }
 
-  if ((WPopStackValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) !=WCS_OK))
+  if ((WPopValues (hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush (hnd) !=WCS_OK))
     {
       goto test_step_table_fill_error;
     }
@@ -624,7 +624,7 @@ test_step_table_fill_error:
 
 
 static bool
-test_bulk_table_fill (W_CONNECTOR_HND hnd)
+test_bulk_table_fill (WH_CONNECTION hnd)
 {
   cout << "Testing filling a table with basic values (bulk mode)... ";
 
@@ -637,8 +637,8 @@ test_bulk_table_fill (W_CONNECTOR_HND hnd)
         goto test_bulk_table_fill_error;
     }
 
-  if ((WPopStackValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) !=WCS_OK))
+  if ((WPopValues (hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush (hnd) !=WCS_OK))
     {
       goto test_bulk_table_fill_error;
     }
@@ -655,28 +655,28 @@ test_bulk_table_fill_error:
 
 
 static bool
-test_for_errors (W_CONNECTOR_HND hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   unsigned long long count;
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushStackValue (hnd, WFT_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK) //Just for fun!
-      || (WGetStackValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
-      || (WGetStackValueRowsCount (hnd, &count) != WCS_OK)
+  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK) //Just for fun!
+      || (WValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (hnd, &count) != WCS_OK)
       || (count != 0)
-      || (WGetStackArrayElementsCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WGetStackArrayElementsCount (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WGetStackArrayElementsCount (hnd, "WFT_BOOL", 0, &count) != WCS_INVALID_ROW)
-      || (WGetStackTextLengthCount (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WGetStackTextLengthCount (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WGetStackTextLengthCount (hnd, "WFT_BOOL", 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
-      || (WPopStackValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+      || (WValueArraySize (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueArraySize (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueArraySize (hnd, "WHC_TYPE_BOOL", 0, &count) != WCS_INVALID_ROW)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength (hnd, "WHC_TYPE_BOOL", 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
+      || (WPopValues (hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
@@ -710,7 +710,7 @@ DefaultUserPassword ()
 int
 main (int argc, const char** argv)
 {
-  W_CONNECTOR_HND hnd        = NULL;
+  WH_CONNECTION hnd        = NULL;
 
   bool success = tc_settup_connection (argc, argv, &hnd);
 

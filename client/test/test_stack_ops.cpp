@@ -15,89 +15,89 @@ using namespace std;
 
 uint_t simpleTypes[] =
     {
-        WFT_BOOL,
-        WFT_CHAR,
-        WFT_DATE,
-        WFT_DATETIME,
-        WFT_HIRESTIME,
-        WFT_INT8,
-        WFT_INT16,
-        WFT_INT32,
-        WFT_INT64,
-        WFT_UINT8,
-        WFT_UINT16,
-        WFT_UINT32,
-        WFT_UINT64,
-        WFT_REAL,
-        WFT_RICHREAL,
-        WFT_TEXT,
+        WHC_TYPE_BOOL,
+        WHC_TYPE_CHAR,
+        WHC_TYPE_DATE,
+        WHC_TYPE_DATETIME,
+        WHC_TYPE_HIRESTIME,
+        WHC_TYPE_INT8,
+        WHC_TYPE_INT16,
+        WHC_TYPE_INT32,
+        WHC_TYPE_INT64,
+        WHC_TYPE_UINT8,
+        WHC_TYPE_UINT16,
+        WHC_TYPE_UINT32,
+        WHC_TYPE_UINT64,
+        WHC_TYPE_REAL,
+        WHC_TYPE_RICHREAL,
+        WHC_TYPE_TEXT,
 
-        WFT_ARRAY_MASK | WFT_BOOL,
-        WFT_ARRAY_MASK | WFT_CHAR,
-        WFT_ARRAY_MASK | WFT_DATE,
-        WFT_ARRAY_MASK | WFT_DATETIME,
-        WFT_ARRAY_MASK | WFT_HIRESTIME,
-        WFT_ARRAY_MASK | WFT_INT8,
-        WFT_ARRAY_MASK | WFT_INT16,
-        WFT_ARRAY_MASK | WFT_INT32,
-        WFT_ARRAY_MASK | WFT_INT64,
-        WFT_ARRAY_MASK | WFT_UINT8,
-        WFT_ARRAY_MASK | WFT_UINT16,
-        WFT_ARRAY_MASK | WFT_UINT32,
-        WFT_ARRAY_MASK | WFT_UINT64,
-        WFT_ARRAY_MASK | WFT_REAL,
-        WFT_ARRAY_MASK | WFT_RICHREAL,
-//         WFT_ARRAY_MASK | WFT_TEXT,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL,
+        WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL,
+//         WHC_TYPE_ARRAY_MASK | WHC_TYPE_TEXT,
     };
 
 const uint_t simpleTypesSize = sizeof (simpleTypes) / sizeof (simpleTypes[0]);
 
-W_FieldDescriptor tableFields[] =
+WField tableFields[] =
     {
-        {"bool_field", WFT_BOOL},
-        {"char_field", WFT_CHAR},
-        {"date_field", WFT_DATE},
-        {"datetime_field", WFT_DATETIME},
-        {"hirestime_field", WFT_HIRESTIME},
-        {"int8_field", WFT_INT8},
-        {"int16_field", WFT_INT16},
-        {"int32_field", WFT_INT32},
-        {"int64_field", WFT_INT64},
-        {"uint8_field", WFT_UINT8},
-        {"uint16_field", WFT_UINT16},
-        {"uint32_field", WFT_UINT32},
-        {"uint64_field", WFT_UINT64},
-        {"real_field", WFT_REAL},
-        {"richreal_field", WFT_RICHREAL},
-        {"text_field", WFT_TEXT},
+        {"bool_field", WHC_TYPE_BOOL},
+        {"char_field", WHC_TYPE_CHAR},
+        {"date_field", WHC_TYPE_DATE},
+        {"datetime_field", WHC_TYPE_DATETIME},
+        {"hirestime_field", WHC_TYPE_HIRESTIME},
+        {"int8_field", WHC_TYPE_INT8},
+        {"int16_field", WHC_TYPE_INT16},
+        {"int32_field", WHC_TYPE_INT32},
+        {"int64_field", WHC_TYPE_INT64},
+        {"uint8_field", WHC_TYPE_UINT8},
+        {"uint16_field", WHC_TYPE_UINT16},
+        {"uint32_field", WHC_TYPE_UINT32},
+        {"uint64_field", WHC_TYPE_UINT64},
+        {"real_field", WHC_TYPE_REAL},
+        {"richreal_field", WHC_TYPE_RICHREAL},
+        {"text_field", WHC_TYPE_TEXT},
 
-        {"array_bool_field", WFT_ARRAY_MASK | WFT_BOOL},
-        {"array_char_field",  WFT_ARRAY_MASK | WFT_CHAR},
-        {"array_date_field",  WFT_ARRAY_MASK | WFT_DATE},
-        {"array_datetime_field", WFT_ARRAY_MASK | WFT_DATETIME},
-        {"array_hirestime_field", WFT_ARRAY_MASK | WFT_HIRESTIME},
-        {"array_int8_field", WFT_ARRAY_MASK | WFT_INT8},
-        {"array_int16_field", WFT_ARRAY_MASK | WFT_INT16},
-        {"array_int32_field", WFT_ARRAY_MASK | WFT_INT32},
-        {"array_int64_field", WFT_ARRAY_MASK | WFT_INT64},
-        {"array_uint8_field", WFT_ARRAY_MASK | WFT_UINT8},
-        {"array_uint16_field", WFT_ARRAY_MASK | WFT_UINT16},
-        {"array_uint32_field", WFT_ARRAY_MASK | WFT_UINT32},
-        {"array_uint64_field", WFT_ARRAY_MASK | WFT_UINT64},
-        {"array_real_field", WFT_ARRAY_MASK | WFT_REAL},
-        {"array_richreal_field", WFT_ARRAY_MASK | WFT_RICHREAL}
+        {"array_bool_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL},
+        {"array_char_field",  WHC_TYPE_ARRAY_MASK | WHC_TYPE_CHAR},
+        {"array_date_field",  WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATE},
+        {"array_datetime_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_DATETIME},
+        {"array_hirestime_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_HIRESTIME},
+        {"array_int8_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT8},
+        {"array_int16_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT16},
+        {"array_int32_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT32},
+        {"array_int64_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_INT64},
+        {"array_uint8_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT8},
+        {"array_uint16_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT16},
+        {"array_uint32_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT32},
+        {"array_uint64_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64},
+        {"array_real_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_REAL},
+        {"array_richreal_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL}
     };
 
 const uint_t tableFieldsSize = sizeof (tableFields) / sizeof (tableFields[0]);
 
 static uint_t
 get_field_entry_index (const char*                  field,
-                       const W_FieldDescriptor*       fields,
+                       const WField*       fields,
                        const uint_t                   fieldsSize)
 {
   for (uint_t i = 0; i < fieldsSize; ++i)
     {
-      if (strcmp (fields[i].m_FieldName, field) == 0)
+      if (strcmp (fields[i].name, field) == 0)
         return i;
     }
 
@@ -105,17 +105,17 @@ get_field_entry_index (const char*                  field,
 }
 
 static bool
-match_table_fields_match (W_CONNECTOR_HND               hnd,
-                         const W_FieldDescriptor*       fields,
+match_table_fields_match (WH_CONNECTION               hnd,
+                         const WField*       fields,
                          const uint_t                   fieldsSize)
 {
   uint_t visitedFields = 0;
   uint_t fieldsCount;
   uint_t topType;
 
-  if ((WDescribeStackTop (hnd, &topType) != WCS_OK)
-      || (topType != WFT_TABLE_MASK)
-      || (WDescribeValueGetFieldsCount (hnd, &fieldsCount) != WCS_OK)
+  if ((WStackValueType (hnd, &topType) != WCS_OK)
+      || (topType != WHC_TYPE_TABLE_MASK)
+      || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
       || (fieldsSize != fieldsCount))
     {
       return false;
@@ -126,7 +126,7 @@ match_table_fields_match (W_CONNECTOR_HND               hnd,
       const char* fieldName;
       uint_t        fieldType;
 
-      if (WDescribeValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
       const uint_t index = get_field_entry_index (fieldName,
@@ -135,7 +135,7 @@ match_table_fields_match (W_CONNECTOR_HND               hnd,
       if (index > fieldsSize)
         return false;
 
-      if (fieldType != fields[index].m_FieldType)
+      if (fieldType != fields[index].type)
         return false;
 
       if (GET_BIT (visitedFields, index) != 0)
@@ -155,28 +155,28 @@ match_table_fields_match (W_CONNECTOR_HND               hnd,
 
 
 static bool
-test_stack_bulk_update (W_CONNECTOR_HND hnd)
+test_stack_bulk_update (WH_CONNECTION hnd)
 {
   cout << "Testing stack bulk update ... ";
 
-  if (WPushStackValue (hnd, WFT_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+  if (WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
       goto test_stack_bulk_update_err;
 
   for (uint_t i = 0; i < simpleTypesSize; ++i)
     {
-      if (WPushStackValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
+      if (WPushValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
         goto test_stack_bulk_update_err;
     }
 
-  if (WPushStackValue (hnd, WFT_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+  if (WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
       goto test_stack_bulk_update_err;
 
-  if (WUpdateStackFlush (hnd) != WCS_OK)
+  if (WFlush (hnd) != WCS_OK)
       goto test_stack_bulk_update_err;
 
   if ((match_table_fields_match (hnd, tableFields, tableFieldsSize) == false)
-      || (WPopStackValues (hnd, 1) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+      || (WPopValues (hnd, 1) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_stack_bulk_update_err;
     }
@@ -186,20 +186,20 @@ test_stack_bulk_update (W_CONNECTOR_HND hnd)
       uint_t    type;
       uint_t    fieldsCount;
 
-      if ((WDescribeStackTop (hnd, &type) != WCS_OK)
+      if ((WStackValueType (hnd, &type) != WCS_OK)
            || (type != simpleTypes[i])
-           || (WDescribeValueGetFieldsCount (hnd, &fieldsCount) != WCS_OK)
+           || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
            || (fieldsCount != 0)
-           || (WPopStackValues (hnd, 1) != WCS_OK)
-           || (WUpdateStackFlush (hnd) != WCS_OK))
+           || (WPopValues (hnd, 1) != WCS_OK)
+           || (WFlush (hnd) != WCS_OK))
         {
           goto test_stack_bulk_update_err;
         }
     }
 
   if ((match_table_fields_match (hnd, tableFields, tableFieldsSize) == false)
-      || (WPopStackValues (hnd, 1) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+      || (WPopValues (hnd, 1) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_stack_bulk_update_err;
     }
@@ -214,12 +214,12 @@ test_stack_bulk_update_err:
 }
 
 static bool
-test_stack_step_update (W_CONNECTOR_HND hnd)
+test_stack_step_update (WH_CONNECTION hnd)
 {
   cout << "Testing stack update step by step ... ";
 
-  if ((WPushStackValue (hnd, WFT_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
+  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK)
       || (match_table_fields_match (hnd, tableFields, tableFieldsSize) == false))
     {
       goto test_stack_step_update_err;
@@ -230,29 +230,29 @@ test_stack_step_update (W_CONNECTOR_HND hnd)
       uint_t    type;
       uint_t    fieldsCount;
 
-      if ((WPushStackValue (hnd, simpleTypes[i], 0, NULL) != WCS_OK)
-          || (WUpdateStackFlush (hnd) != WCS_OK))
+      if ((WPushValue (hnd, simpleTypes[i], 0, NULL) != WCS_OK)
+          || (WFlush (hnd) != WCS_OK))
         {
           goto test_stack_step_update_err;
         }
-      else if ((WDescribeStackTop (hnd, &type) != WCS_OK)
+      else if ((WStackValueType (hnd, &type) != WCS_OK)
                || (type != simpleTypes[i])
-               || (WDescribeValueGetFieldsCount (hnd, &fieldsCount) != WCS_OK)
+               || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
                || (fieldsCount != 0))
         {
           goto test_stack_step_update_err;
         }
     }
 
-  if ((WPushStackValue (hnd, WFT_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK)
+  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK)
       || (match_table_fields_match (hnd, tableFields, tableFieldsSize) == false))
     {
       goto test_stack_step_update_err;
     }
 
-  if ((WPopStackValues (hnd, ~0) != WCS_OK)
-      || (WUpdateStackFlush (hnd) != WCS_OK))
+  if ((WPopValues (hnd, ~0) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_stack_step_update_err;
     }
@@ -266,26 +266,26 @@ test_stack_step_update_err:
 }
 
 static bool
-test_for_errors (W_CONNECTOR_HND hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   uint_t type;
-  W_FieldDescriptor invalid1 = { "", WFT_ARRAY_MASK | WFT_BOOL };
-  W_FieldDescriptor invalid2 = { "name", WFT_FIELD_MASK | WFT_INT8} ;
+  WField invalid1 = { "", WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL };
+  WField invalid2 = { "name", WHC_TYPE_FIELD_MASK | WHC_TYPE_INT8} ;
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushStackValue (NULL, WFT_REAL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushStackValue (hnd, WFT_ARRAY_MASK | WFT_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushStackValue (hnd, WFT_FIELD_MASK | WFT_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushStackValue (hnd, WFT_TABLE_MASK , 0, tableFields) != WCS_INVALID_ARGS)
-      || (WPushStackValue (hnd, WFT_TABLE_MASK, 1, &invalid1) != WCS_INVALID_ARGS)
-      || (WPushStackValue (hnd, WFT_TABLE_MASK, 1, &invalid2) != WCS_INVALID_ARGS))
+  if ((WPushValue (NULL, WHC_TYPE_REAL, 0, NULL) != WCS_INVALID_ARGS)
+      || (WPushValue (hnd, WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
+      || (WPushValue (hnd, WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
+      || (WPushValue (hnd, WHC_TYPE_TABLE_MASK , 0, tableFields) != WCS_INVALID_ARGS)
+      || (WPushValue (hnd, WHC_TYPE_TABLE_MASK, 1, &invalid1) != WCS_INVALID_ARGS)
+      || (WPushValue (hnd, WHC_TYPE_TABLE_MASK, 1, &invalid2) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WDescribeStackTop (NULL, NULL) != WCS_INVALID_ARGS)
-            || (WDescribeStackTop (NULL, &type) != WCS_INVALID_ARGS)
-            || (WDescribeStackTop (hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WStackValueType (NULL, NULL) != WCS_INVALID_ARGS)
+            || (WStackValueType (NULL, &type) != WCS_INVALID_ARGS)
+            || (WStackValueType (hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -319,7 +319,7 @@ DefaultUserPassword ()
 int
 main (int argc, const char** argv)
 {
-  W_CONNECTOR_HND hnd        = NULL;
+  WH_CONNECTION hnd        = NULL;
 
 
   bool success = tc_settup_connection (argc, argv, &hnd);

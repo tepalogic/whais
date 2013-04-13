@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 uint_t
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                uint_t* const                  pOutFrameSize)
+                uint_t* const                  outFrameSize)
 {
   uint32_t frameId;
   uint16_t frameSize = 0;
@@ -39,8 +39,8 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
       uint_t chunkSize = FRAME_HDR_SIZE - frameSize;
 
       const uint32_t status = whs_read (pHnd->socket,
-                                              &pHnd->data[frameSize],
-                                              &chunkSize);
+                                        &pHnd->data[frameSize],
+                                        &chunkSize);
       if (status != WOP_OK)
         return WENC_OS_ERROR (status);
       else if (chunkSize == 0)
@@ -80,7 +80,8 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
 
           frameSize += chunkSize;
         }
-      *pOutFrameSize = expected;
+      *outFrameSize = expected;
+
       return WCS_OK;
     }
   case FRAME_TYPE_SERV_BUSY:

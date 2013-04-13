@@ -29,9 +29,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "connector.h"
 
+/* Helper functions to factor to code recieveing/sending frames durring
+   connection autentication step. */
+
 uint_t
 read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
-                uint_t* const                  pOutFrameSize);
+                uint_t* const                  outFrameSize);
 
 uint_t
 write_raw_frame (struct INTERNAL_HANDLER* const pHnd,

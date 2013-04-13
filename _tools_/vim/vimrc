@@ -16,6 +16,7 @@ set cindent
 " configure tabwidth and insert spaces instead of tabs
 set tabstop=4        " tab width is 4 spaces
 set shiftwidth=4     " indent also with 4 spaces
+set softtabstop=4
 
 
 " turn syntax highlighting on
@@ -25,7 +26,7 @@ syntax on
 if has('gui_running')
 	colorscheme wombat
 else
-	colorscheme koehler
+	colorscheme ir_black
 endif
 
 " highlight matching braces
@@ -79,17 +80,20 @@ map <M-Up> [s
 map <C-h> <C-w>h
 map <C-l> <C-w>l
 map <C-j> <C-w>j
-map <C-k> <C-k>j
+map <C-k> <C-w>k
 
 " NERDTree stuff
 
 nmap <F2> :NERDTreeToggle<CR>
 
 function! GnuIndent()
-  setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
-  setlocal shiftwidth=2
-  setlocal tabstop=8
-  setlocal expandtab " expand tabs to spaces
+	setlocal cindent
+  	setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
+  	setlocal shiftwidth=2
+  	setlocal softtabstop=2
+  	setlocal tabstop=8
+  	setlocal expandtab " expand tabs to spaces
+  	setlocal fo-=ro fo+=cql
 endfunction
 
 function! CodingSetTextWidth()
@@ -126,7 +130,7 @@ let g:clang_snippets_engine='clang_complete'
 "
 " Complete options (disable preview scratch window, longest removed to aways
 " show menu)
-set completeopt=menu,menuone
+set completeopt=longest,menuone
 
 " Limit popup menu height
 set pumheight=20

@@ -124,7 +124,7 @@ test_proc_name_match (const char* proc_name)
 }
 
 static bool
-test_procedures_list (W_CONNECTOR_HND hnd)
+test_procedures_list (WH_CONNECTION hnd)
 {
   const char* recvGlbName = NULL;
   const uint_t  procsCount = sizeof (_procedures)/sizeof (_procedures[0]);
@@ -170,7 +170,7 @@ test_procedures_list_error:
 }
 
 static bool
-test_for_errors (W_CONNECTOR_HND hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   uint_t          procsCount;
   const char*   nameFetched;
@@ -226,7 +226,7 @@ DefaultUserPassword ()
 int
 main (int argc, const char** argv)
 {
-  W_CONNECTOR_HND       hnd = NULL;
+  WH_CONNECTION       hnd = NULL;
 
   bool success = tc_settup_connection (argc, argv, &hnd);
 
