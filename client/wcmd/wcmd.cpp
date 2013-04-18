@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <assert.h>
 
-#include "dbs/include/dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 
 #include "wcmd_optglbs.h"
 #include "wcmd_cmdsmgr.h"

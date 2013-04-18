@@ -30,9 +30,10 @@
 
 #include "utils/wthread.h"
 #include "dbs/dbs_mgr.h"
+#include "dbs/dbs_types.h"
 
-namespace pastra
-{
+namespace whisper {
+namespace pastra {
 
 //Some classes forward declarations
 class PersistentTable;
@@ -82,11 +83,13 @@ private:
   void SyncToFile ();
 
   const DBSSettings& m_GlbSettings;
-  WSynchronizer      m_Sync;
+  Lock      m_Sync;
   const std::string  m_DbsWorkDir;
   const std::string  m_Name;
   TABLES             m_Tables;
 };
 
-}
+} //namespace pastra
+} //namespace whisper
+
 #endif                                /* PS_DBSMGR_H_ */

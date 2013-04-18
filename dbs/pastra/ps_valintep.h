@@ -27,8 +27,8 @@
 
 #include "dbs_values.h"
 
-namespace pastra
-{
+namespace whisper {
+namespace pastra {
 
 class PSValInterp
 {
@@ -73,6 +73,7 @@ public:
   static int Alignment (DBS_FIELD_TYPE, bool isArray);
 };
 
-};
+} //namespace pastra
+} //namespace whisper
 
 #endif /* PS_VALINTEP_H_ */

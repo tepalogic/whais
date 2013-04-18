@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include <assert.h>
 
-#include "utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "client_connection.h"
 
@@ -49,7 +49,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
       frameSize += chunkSize;
     }
 
-  frameId = from_le_int32 (&pHnd->data[FRAME_ID_OFF]);
+  frameId = load_le_int32 (&pHnd->data[FRAME_ID_OFF]);
   if (frameId != pHnd->expectedFrameId)
     return WCS_UNEXPECTED_FRAME;
 
@@ -58,7 +58,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
   case FRAME_TYPE_NORMAL:
   case FRAME_TYPE_AUTH_CLNT:
     {
-      const uint16_t expected = from_le_int16 (&pHnd->data[FRAME_SIZE_OFF]);
+      const uint16_t expected = load_le_int16 (&pHnd->data[FRAME_SIZE_OFF]);
 
       if ((expected < frameSize)
           || (expected > pHnd->dataSize))

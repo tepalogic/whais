@@ -35,12 +35,12 @@ find_proc_decl(struct ParserState* pState,
                const uint_t        nameLength,
                const bool_t        referenced)
 {
-  const struct UArray* pProcsList = &(pState->globalStmt.spec.glb.procsDecls);
-  uint_t               procIt     = get_array_count (pProcsList);
+  const struct WArray* pProcsList = &(pState->globalStmt.spec.glb.procsDecls);
+  uint_t               procIt     = wh_array_count (pProcsList);
 
   while (procIt-- > 0)
     {
-      struct Statement* result = (struct Statement*) get_item (pProcsList,
+      struct Statement* result = (struct Statement*) wh_array_get (pProcsList,
           procIt);
 
       assert(result->type == STMT_PROC);
@@ -112,7 +112,7 @@ void
 install_proc_decl(struct ParserState* const pState,
                   struct SemValue* const    pIdentifier)
 {
-  struct UArray* const procs = &(pState->globalStmt.spec.glb.procsDecls);
+  struct WArray* const procs = &(pState->globalStmt.spec.glb.procsDecls);
   struct Statement     stmt;
 
   assert(pState->pCurrentStmt->type == STMT_GLOBAL);
@@ -130,7 +130,7 @@ install_proc_decl(struct ParserState* const pState,
                       FALSE) != NULL)
     {
       char tname[128];
-      copy_text_truncate (tname,
+      wh_copy_first (tname,
                           stmt.spec.proc.name,
                           sizeof tname,
                           stmt.spec.proc.nameLength);
@@ -152,7 +152,7 @@ install_proc_decl(struct ParserState* const pState,
       else
         stmt.spec.proc.procId = pState->globalStmt.spec.glb.procsCount++;
 
-      check = add_item (procs, &stmt);
+      check = wh_array_add (procs, &stmt);
       if (check == NULL)
         {
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -172,7 +172,7 @@ void
 set_proc_rettype(struct ParserState* const pState, struct SemValue* const pType)
 {
   struct DeclaredVar* pRetVar = (struct DeclaredVar*)
-      get_item (&(pState->pCurrentStmt->spec.proc.paramsList), 0);
+      wh_array_get (&(pState->pCurrentStmt->spec.proc.paramsList), 0);
 
   assert(pType->val_type == VAL_TYPE_SPEC);
 

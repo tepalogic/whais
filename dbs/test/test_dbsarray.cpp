@@ -9,13 +9,14 @@
 #include <iostream>
 #include <string.h>
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
-#include "../include/dbs_values.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
+#include "dbs/dbs_values.h"
 
 #include "../pastra/ps_varstorage.h"
 #include "../pastra/ps_arraystrategy.h"
 
+using namespace whisper;
 using namespace pastra;
 
 bool test_bool_array ()

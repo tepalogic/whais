@@ -8,8 +8,8 @@
 #include <iostream>
 #include <cstring>
 
-#include "utils/include/random.h"
-#include "utils/include/utf8.h"
+#include "utils/wrandom.h"
+#include "utils/utf8.h"
 #include "test_client_common.h"
 
 using namespace std;
@@ -40,7 +40,7 @@ insert_a_string (WH_CONNECTION        hnd,
                  const uint64_t         row,
                  const bool             bulk)
 {
-  const uint_t thisStringSize = w_rnd () % MAX_STRING_SIZE;
+  const uint_t thisStringSize = wh_rnd () % MAX_STRING_SIZE;
 
   char* result = new char[MAX_STRING_SIZE];
 
@@ -48,7 +48,7 @@ insert_a_string (WH_CONNECTION        hnd,
 
   while (true)
     {
-      const char* temp = _refStrings[w_rnd () % MAX_REFS_STRINGS];
+      const char* temp = _refStrings[wh_rnd () % MAX_REFS_STRINGS];
 
       if (strlen (result) + strlen (temp) >= thisStringSize)
         break;
@@ -58,7 +58,7 @@ insert_a_string (WH_CONNECTION        hnd,
                               fieldName,
                               row,
                               WIGNORE_OFF,
-                              utf8_strlen (_RC (uint8_t*, result)),
+                              wh_utf8_strlen (_RC (uint8_t*, result)),
                               temp) != WCS_OK)
           || (bulk && (WFlush (hnd) != WCS_OK)))
         {
@@ -78,7 +78,7 @@ insert_a_string (WH_CONNECTION        hnd,
 static bool
 test_simple_text (WH_CONNECTION hnd)
 {
-  uint_t              aSimpleOffset = w_rnd () % 7;
+  uint_t              aSimpleOffset = wh_rnd () % 7;
 
   const char*       ref;
   char              aValue[MAX_STRING_SIZE];
@@ -100,7 +100,7 @@ test_simple_text (WH_CONNECTION hnd)
                                  WIGNORE_ROW,
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
-      || (_SC (int, count) != utf8_strlen (_RC (const uint8_t*, ref)))
+      || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
       || (WStackValueType (hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
     {
@@ -114,7 +114,7 @@ test_simple_text (WH_CONNECTION hnd)
                                WIGNORE_FIELD,
                                WIGNORE_ROW,
                                WIGNORE_OFF,
-                               utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                               wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                &value) != WCS_OK)
         {
           goto test_simple_text_fail;
@@ -136,14 +136,14 @@ test_simple_text (WH_CONNECTION hnd)
                                  WIGNORE_ROW,
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
-      || (_SC (int, count) != utf8_strlen (_RC (const uint8_t*, ref)))
+      || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
       || (WStackValueType (hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;
     }
 
-  aSimpleOffset = w_rnd () % 7;
+  aSimpleOffset = wh_rnd () % 7;
   aValue[0]     = 0;
   while (strlen (aValue) < strlen (ref + aSimpleOffset))
     {
@@ -151,7 +151,7 @@ test_simple_text (WH_CONNECTION hnd)
                                WIGNORE_FIELD,
                                WIGNORE_ROW,
                                WIGNORE_OFF,
-                               utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                               wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                &value) != WCS_OK)
         {
           goto test_simple_text_fail;
@@ -207,7 +207,7 @@ test_table_text (WH_CONNECTION hnd)
 
   for (uint_t row = 0; row < rowsCount; row++)
     {
-      aSimpleOffset = w_rnd () % 7;
+      aSimpleOffset = wh_rnd () % 7;
       aValue[0]     = 0;
       while (strlen (aValue) < strlen (ref[row * _fieldsCount] + aSimpleOffset))
         {
@@ -215,7 +215,7 @@ test_table_text (WH_CONNECTION hnd)
                                    "WHC_TYPE_TEXT",
                                    row,
                                    WIGNORE_OFF,
-                                   utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                                   wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                    &value) != WCS_OK)
             {
               goto test_table_text_fail;
@@ -225,7 +225,7 @@ test_table_text (WH_CONNECTION hnd)
       if (strcmp (aValue, ref[row * _fieldsCount] + aSimpleOffset) != 0)
         goto test_table_text_fail;
 
-      aSimpleOffset = w_rnd () % 7;
+      aSimpleOffset = wh_rnd () % 7;
       aValue[0]     = 0;
       while (strlen (aValue) < strlen (ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
@@ -233,7 +233,7 @@ test_table_text (WH_CONNECTION hnd)
                                    "WHC_TYPE_TEXT_2",
                                    row,
                                    WIGNORE_OFF,
-                                   utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                                   wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
                                    &value) != WCS_OK)
             {
               goto test_table_text_fail;

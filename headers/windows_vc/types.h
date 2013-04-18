@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Avoid some type name redefinition */
 #include "windows.h"
 typedef HANDLE              WH_FILE;
-typedef CRITICAL_SECTION    WH_SYNC;
+typedef CRITICAL_SECTION    WH_LOCK;
 typedef HANDLE              WH_THREAD;
 typedef SOCKET              WH_SOCKET;
 #endif

@@ -15,7 +15,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  init_array (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -26,17 +26,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  destroy_array (&state->parsedValues);
+  wh_array_clean (&state->parsedValues);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = get_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -123,14 +123,14 @@ general_proc_check (struct Statement *glb_stmt,
       return FALSE;
     }
 
-  if (get_array_count (&(proc_stmt->spec.proc.paramsList)) != parameters + 1)
+  if (wh_array_count (&(proc_stmt->spec.proc.paramsList)) != parameters + 1)
     {
       return FALSE;
     }
 
-  while (count < get_array_count (&(proc_stmt->decls)))
+  while (count < wh_array_count (&(proc_stmt->decls)))
     {
-      struct DeclaredVar *var = get_item (&(proc_stmt->decls), count);
+      struct DeclaredVar *var = wh_array_get (&(proc_stmt->decls), count);
       if (IS_TABLE_FIELD (var->type) == FALSE)
         {
           nlocals++;
@@ -149,7 +149,7 @@ static bool_t
 check_procs_decl (struct ParserState *state)
 {
   struct Statement *const glb_stmt = &(state->globalStmt);
-  struct UArray *const proc_decls = &(glb_stmt->spec.glb.procsDecls);
+  struct WArray *const proc_decls = &(glb_stmt->spec.glb.procsDecls);
   struct Statement *proc = NULL;
   struct DeclaredVar *tmp_var = NULL;
   struct DeclaredVar *tmp_table = NULL;
@@ -161,19 +161,19 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  if (get_array_count (proc_decls) != 3)
+  if (wh_array_count (proc_decls) != 3)
     {
       /* more or less procedures declared! */
       return FALSE;
     }
 
-  proc = get_item (proc_decls, 0);
+  proc = wh_array_get (proc_decls, 0);
   if (!general_proc_check (glb_stmt, proc, "ProcId1", 0, 2))
     {
       return FALSE;
     }
   /*check return type */
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 0);
   if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
@@ -199,13 +199,13 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  proc = get_item (proc_decls, 1);
+  proc = wh_array_get (proc_decls, 1);
   if (!general_proc_check (glb_stmt, proc, "ProcId02", 3, 1))
     {
       return FALSE;
     }
   /*check return type */
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 0);
   if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
@@ -226,7 +226,7 @@ check_procs_decl (struct ParserState *state)
     }
 
   /* check parameters */
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 1);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var1", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_INT8))
@@ -234,7 +234,7 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 2);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 2);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var2", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_TEXT))
@@ -242,7 +242,7 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 3);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 3);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_DATETIME))
@@ -250,13 +250,13 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  proc = get_item (proc_decls, 2);
+  proc = wh_array_get (proc_decls, 2);
   if (!general_proc_check (glb_stmt, proc, "ProcId_3_", 6, 3))
     {
       return FALSE;
     }
   /*check return type */
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 0);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 0);
   if ((tmp_var->label != NULL) || (tmp_var->labelLength != 0))
     {
       /* return type not properly encoded */
@@ -275,21 +275,21 @@ check_procs_decl (struct ParserState *state)
     }
 
   /*check parameters  declarations */
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 1);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 1);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var1", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_REAL))
     {
       return FALSE;
     }
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 2);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 2);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var2", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_TEXT))
     {
       return FALSE;
     }
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 3);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 3);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) ||
@@ -299,7 +299,7 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 4);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 4);
   tmp_table = tmp_var;
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var4", tmp_var->labelLength) != 0) ||
@@ -314,7 +314,7 @@ check_procs_decl (struct ParserState *state)
     {
       return FALSE;
     }
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 5);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 5);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var5", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) || (tmp_var->type != T_INT64))
@@ -322,7 +322,7 @@ check_procs_decl (struct ParserState *state)
       return FALSE;
     }
 
-  tmp_var = get_item (&(proc->spec.proc.paramsList), 6);
+  tmp_var = wh_array_get (&(proc->spec.proc.paramsList), 6);
   if ((tmp_var->labelLength != 4) ||
       (strncmp (tmp_var->label, "Var6", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) ||

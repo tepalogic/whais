@@ -26,21 +26,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+namespace whisper
+{
+
 //A global variable to used every one when you need one
 NullLogger NULL_LOGGER;
 
-I_Logger::~I_Logger ()
-{
 
+
+Logger::~Logger ()
+{
 }
 
-Logger::Logger (const char* const pFile, const bool printStart)
-  : I_Logger (),
-    m_StartTick (wh_msec_ticks ()),
-    m_Sync (),
-    m_OutStream (pFile, ios::app | ios::out)
+
+
+FileLogger::FileLogger (const char* const file, const bool printStart)
+  : Logger (),
+    mStartTick (wh_msec_ticks ()),
+    mSync (),
+    mOutStream (file, ios::app | ios::out)
 {
-  if (! m_OutStream.good ())
+  if (! mOutStream.good ())
     {
       throw ios_base::failure ("The file associated with the output stream "
                                "could not be opened");
@@ -50,55 +56,61 @@ Logger::Logger (const char* const pFile, const bool printStart)
     {
       const WTime dayStart = wh_get_currtime ();
 
-      m_OutStream << "\n* Start of the day: " << (int)dayStart.year;
-      m_OutStream << '-' << (int)dayStart.month + 1;
-      m_OutStream << "-" << (int)dayStart.day + 1;
-      m_OutStream << ' ' << (int)dayStart.hour;
-      m_OutStream << ':' << (int)dayStart.min;
-      m_OutStream << ':' << (int)dayStart.sec << "\n\n";
+      mOutStream << "\n* Start of the day: " << (int)dayStart.year;
+      mOutStream << '-' << (int)dayStart.month + 1;
+      mOutStream << "-" << (int)dayStart.day + 1;
+      mOutStream << ' ' << (int)dayStart.hour;
+      mOutStream << ':' << (int)dayStart.min;
+      mOutStream << ':' << (int)dayStart.sec << "\n\n";
     }
 }
 
 void
-Logger::Log (const LOG_TYPE type, const char* pStr)
+FileLogger::Log (const LOG_TYPE type, const char* str)
 {
 
-  WSynchronizerRAII holder (m_Sync);
+  LockRAII holder (mSync);
 
-  const WTICKS ticks = wh_msec_ticks ();
-  const int markSize = PrintTimeMark (type, ticks);
+  const WTICKS ticks    = wh_msec_ticks ();
+  const int    markSize = PrintTimeMark (type, ticks);
 
-  while (*pStr != 0)
+  /* Print white spaces where the time mark should have been for
+     for string messages that have more than one line, to keep
+     a mice indentation. */
+  while (*str != 0)
     {
-      if ((*pStr == '\n') && (*(pStr + 1) != '\n'))
+      if ((*str == '\n') && (*(str + 1) != '\n'))
         {
-          m_OutStream << endl;
+          mOutStream << endl;
           for (int i = 0; i < markSize; ++i)
-            m_OutStream << ' ';
+            mOutStream << ' ';
         }
       else
-        m_OutStream << *pStr;
-      ++pStr;
+        mOutStream << *str;
+
+      ++str;
     }
-  m_OutStream << endl;
-  m_OutStream.flush ();
+  mOutStream << endl;
+  mOutStream.flush ();
 }
 
+
 void
-Logger::Log (const LOG_TYPE type, const string& str)
+FileLogger::Log (const LOG_TYPE type, const string& str)
 {
   Log (type, str.c_str ());
 }
 
+
 uint_t
-Logger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
+FileLogger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
 {
   static char logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
 
   if (type > LOG_DEBUG)
     type = LOG_UNKNOW;
 
-  ticks -= m_StartTick;
+  ticks -= mStartTick;
 
   const uint_t days = ticks / (1000 * 3600 * 24);
   ticks %= (1000 * 3600 * 24);
@@ -112,38 +124,42 @@ Logger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
   const uint_t secs = ticks / 1000;
   ticks %= 1000;
 
-  const char       fill  = m_OutStream.fill ();
-  const streamsize width = m_OutStream.width ();
+  const char       fill  = mOutStream.fill ();
+  const streamsize width = mOutStream.width ();
 
-  m_OutStream << logIds [type];
-  m_OutStream.width (4);
-  m_OutStream.fill ('0');
-  m_OutStream << days << 'd';
-  m_OutStream.width (2);
-  m_OutStream << hours << 'h';
-  m_OutStream.width (2);
-  m_OutStream << mins << 'm';
-  m_OutStream.width (2);
-  m_OutStream << secs << 's';
-  m_OutStream.width (3);
-  m_OutStream << ticks << ": ";
-  m_OutStream.width (0);
-  m_OutStream.fill (0);
+  mOutStream << logIds [type];
+  mOutStream.width (4);
+  mOutStream.fill ('0');
+  mOutStream << days << 'd';
+  mOutStream.width (2);
+  mOutStream << hours << 'h';
+  mOutStream.width (2);
+  mOutStream << mins << 'm';
+  mOutStream.width (2);
+  mOutStream << secs << 's';
+  mOutStream.width (3);
+  mOutStream << ticks << ": ";
+  mOutStream.width (0);
+  mOutStream.fill (0);
 
-  m_OutStream.fill (fill);
-  m_OutStream.width (width);
+  mOutStream.fill (fill);
+  mOutStream.width (width);
 
-  return 20; //The length of the mark!
+  return 20; //The length of the time mark!
 }
+
+
 
 void
 NullLogger::Log (const LOG_TYPE, const char*)
 {
 }
 
+
 void
 NullLogger::Log (const LOG_TYPE, const string&)
 {
 }
 
+} //namespace whisper
 

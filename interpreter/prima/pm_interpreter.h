@@ -32,8 +32,8 @@
 #include "pm_procedures.h"
 #include "pm_units.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 class NameSpace
 {
@@ -100,7 +100,7 @@ private:
 class Session : public I_Session
 {
 public:
-  Session (I_Logger&         log,
+  Session (Logger&         log,
           NameSpaceHolder&   globalNames,
           NameSpaceHolder&   privateNames);
   virtual ~Session ();
@@ -194,7 +194,8 @@ private:
   NameSpaceHolder& m_PrivateNames;
 };
 
-}
+} //namespace prima
+} //namespace whisper
 
 #endif /* PM_INTERPRETER_H_ */
 

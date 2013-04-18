@@ -28,7 +28,9 @@
 
 #include "pm_processor.h"
 
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 inline static uint16_t
 load_le_uint16 (const uint8_t* const pSrc)
@@ -1531,3 +1533,7 @@ Processor::ReleaseSync (const uint8_t sync)
   m_Session.ReleaseProcSync (m_ProcId, sync);
   m_AquiredSync = NO_INDEX;
 }
+
+} //namespace prima
+} //namespace whisper
+

@@ -28,10 +28,11 @@
 
 #include "whisper.h"
 
-#include "utils/include/wthread.h"
+#include "utils/wthread.h"
 
-namespace pastra
-{
+
+namespace whisper {
+namespace pastra {
 
 class I_BTreeKey
 {
@@ -227,7 +228,7 @@ protected:
   virtual I_BTreeNode* LoadNode (const NODE_INDEX node) = 0;
   virtual void         SaveNode (I_BTreeNode* const pNode) = 0;
 
-  WSynchronizer                     m_Sync;
+  Lock                     m_Sync;
   std::map <NODE_INDEX, CachedData> m_NodesKeeper;
 };
 
@@ -290,6 +291,7 @@ remove_array_elemes (uint8_t* const pArray,
     }
 }
 
-}
+} //namespace pastra
+} //namespace whisper
 
 #endif /* PS_BTREE_INDEX_H_ */

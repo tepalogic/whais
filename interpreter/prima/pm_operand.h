@@ -25,15 +25,15 @@
 #ifndef PM_OPERAND_H_
 #define PM_OPERAND_H_
 
-#include "utils/include/wthread.h"
+#include "utils/wthread.h"
 
 #include "interpreter.h"
 #include "operands.h"
 
 #include "pm_table.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
@@ -2881,77 +2881,77 @@ public:
 
   bool IsNull ()
   {
-    WSynchronizerRAII dummy (m_Sync);
+    LockRAII dummy (m_Sync);
     return GetOperand ().IsNull ();
   }
 
   template <class DBS_T>
   void GetValue (DBS_T& outValue)
   {
-    WSynchronizerRAII dummy (m_Sync);
+    LockRAII dummy (m_Sync);
     GetOperand ().GetValue (outValue);
   }
 
   template <class DBS_T>
   void SetValue (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SetValue (value);
   }
 
   template <class DBS_T>
   void SelfAdd (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfSub (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfSub (value);
   }
 
   template <class DBS_T>
   void SelfMul (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfDiv (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfMod (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfAnd (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfAnd (value);
   }
 
   template <class DBS_T>
   void SelfXor (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfXor (value);
   }
 
   template <class DBS_T>
   void SelfOr (const DBS_T& value)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().SelfOr (value);
   }
 
@@ -2963,68 +2963,68 @@ public:
 
   FIELD_INDEX GetField ()
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().GetField ();
   }
 
   I_DBSTable& GetTable ()
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().GetTable ();
   }
 
   StackValue GetFieldAt (const FIELD_INDEX field)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().GetFieldAt (field);
   }
 
   StackValue GetValueAt (const uint64_t index)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().GetValueAt (index);
   }
 
   StackValue Duplicate ()
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().Duplicate ();
   }
 
   void NotifyCopy ()
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     GetOperand ().NotifyCopy ();
   }
 
   TableOperand GetTableOp ()
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().GetTableOp ();
   }
 
   void CopyTableOp (const TableOperand& source)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().CopyTableOp (source);
   }
 
   FieldOperand  GetFieldOp ()
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().GetFieldOp ();
   }
 
   void CopyFieldOp (const FieldOperand& source)
   {
-    WSynchronizerRAII dummy(m_Sync);
+    LockRAII dummy(m_Sync);
     return GetOperand ().CopyFieldOp (source);
   }
 
   I_PMOperand& GetOperand () { return *_RC (I_PMOperand*, m_Storage);  }
 
 private:
-  WSynchronizer m_Sync;
+  Lock m_Sync;
   bool          m_OperandOwner;
   uint64_t      m_Storage[MAX_OP_QWORDS];
 };
@@ -3207,7 +3207,8 @@ private:
   SessionStack&  m_Stack;
 };
 
-}
+} //namespace prima
+} //namespace whisper
 
 #endif /* PM_OPERAND_H_ */
 

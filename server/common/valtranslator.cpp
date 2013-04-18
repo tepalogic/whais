@@ -27,9 +27,10 @@
 #include <cstring>
 #include <limits>
 
-#include "utils/include/utf8.h"
-
+#include "utils/utf8.h"
 #include "valtranslator.h"
+
+using namespace whisper;
 
 static const uint_t   MAX_INTEGER_STR_SIZE  = 32;
 static const uint64_t MAX_SIGNED_ABS        = 0x8000000000000000ull;
@@ -198,13 +199,13 @@ Utf8Translator::Read (const uint8_t*       utf8Src,
       return 1;
     }
 
-  const uint_t result = get_utf8_char_size (*utf8Src);
+  const uint_t result = wh_utf8_cu_count (*utf8Src);
   if ((result == 0) || (result + 1 > srcSize))
     return 0;
   else
     {
       uint32_t ch;
-      if ((decode_utf8_char (utf8Src, &ch) != result)
+      if ((wh_load_utf8_cp (utf8Src, &ch) != result)
           || (ch == 0)
           || (utf8Src[result] != 0))
         {
@@ -703,7 +704,7 @@ Utf8Translator::Write (uint8_t* const      utf8Dest,
   else if (maxSize <= MAX_UTF8_CHAR_SIZE)
     return 0;
 
-  uint_t result = encode_utf8_char (value.m_Value, utf8Dest);
+  uint_t result = wh_store_utf8_cp (value.m_Value, utf8Dest);
   utf8Dest[result++] = 0;
 
   return result;

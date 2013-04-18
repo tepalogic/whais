@@ -325,25 +325,25 @@ WFileCompiledUnit::ProcessHeader ()
   if ((t_buffer[0] != 'W') || (t_buffer[1] != 'O'))
     throw WCompiledUnitException ("Not an whisper object file!", _EXTRA(0));
 
-  m_GlobalsCount = from_le_int32 (t_buffer + WHC_GLOBS_COUNT_OFF);
-  m_ProcsCount   = from_le_int32 (t_buffer + WHC_PROCS_COUNT_OFF);
+  m_GlobalsCount = load_le_int32 (t_buffer + WHC_GLOBS_COUNT_OFF);
+  m_ProcsCount   = load_le_int32 (t_buffer + WHC_PROCS_COUNT_OFF);
 
-  temp32    = from_le_int32 (t_buffer + WHC_TYPEINFO_START_OFF);
-  m_TtySize = from_le_int32 (t_buffer + WHC_TYPEINFO_SIZE_OFF);
+  temp32    = load_le_int32 (t_buffer + WHC_TYPEINFO_START_OFF);
+  m_TtySize = load_le_int32 (t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
   m_TypeInfo.reset (new uint8_t[m_TtySize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
   m_File.Read (m_TypeInfo.get (), m_TtySize);
 
-  temp32        = from_le_int32 (t_buffer + WHC_SYMTABLE_START_OFF);
-  m_SymbolsSize = from_le_int32 (t_buffer + WHC_SYMTABLE_SIZE_OFF);
+  temp32        = load_le_int32 (t_buffer + WHC_SYMTABLE_START_OFF);
+  m_SymbolsSize = load_le_int32 (t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
   m_Symbols.reset (new uint8_t[m_SymbolsSize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
   m_File.Read (m_Symbols.get (), m_SymbolsSize);
 
-  temp32         = from_le_int32 (t_buffer + WHC_CONSTAREA_START_OFF);
-  m_ConstAreaSize = from_le_int32 (t_buffer + WHC_CONSTAREA_SIZE_OFF);
+  temp32         = load_le_int32 (t_buffer + WHC_CONSTAREA_START_OFF);
+  m_ConstAreaSize = load_le_int32 (t_buffer + WHC_CONSTAREA_SIZE_OFF);
 
   m_ConstArea.reset (new uint8_t[m_ConstAreaSize]);
   m_File.Seek (temp32, WHC_SEEK_BEGIN);
@@ -368,9 +368,9 @@ WFileCompiledUnit::LoadProcInMemory (uint_t proc_item)
     return;
 
   const uint8_t* pProcEntry     = m_Procs.get () + (proc_item * WHC_PROC_ENTRY_SIZE);
-  const uint32_t nlocals        = from_le_int16 (pProcEntry + WHC_PROC_ENTRY_NLOCAL_OFF);
-  const uint32_t code_size      = from_le_int32 (pProcEntry + WHC_PROC_ENTRY_CODE_SIZE);
-  const uint32_t body_pos       = from_le_int32 (pProcEntry + WHC_PROC_ENTRY_BODY_OFF);
+  const uint32_t nlocals        = load_le_int16 (pProcEntry + WHC_PROC_ENTRY_NLOCAL_OFF);
+  const uint32_t code_size      = load_le_int32 (pProcEntry + WHC_PROC_ENTRY_CODE_SIZE);
+  const uint32_t body_pos       = load_le_int32 (pProcEntry + WHC_PROC_ENTRY_BODY_OFF);
   const uint_t   proc_body_size = (WHC_PROC_BODY_LOCAL_ENTRY_SIZE * nlocals) +
                                   WHC_PROC_BODY_SYNCS_ENTRY_SYZE + code_size;
 
@@ -414,7 +414,7 @@ WFileCompiledUnit::GetGlobalNameLength (uint_t item)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
   const uint8_t* const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
+  uint32_t             temp32    = load_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
 
   assert (temp32 < m_SymbolsSize);
   return strlen (_RC (const char *, m_Symbols.get ()) +temp32);
@@ -427,7 +427,7 @@ WFileCompiledUnit::RetriveGlobalName (uint_t item)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
   const uint8_t* const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
+  uint32_t             temp32    = load_le_int32 (pGlbEntry + WHC_GLB_ENTRY_NAME_OFF);
 
   assert (temp32 < m_SymbolsSize);
   return _RC (const char *, m_Symbols.get ()) +temp32;
@@ -440,7 +440,7 @@ WFileCompiledUnit::GetGlobalTypeIndex (uint_t item)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
   const uint8_t *const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
+  uint32_t             temp32    = load_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
 
   temp32 &= ~EXTERN_MASK;
   assert (temp32 < m_TtySize);
@@ -454,7 +454,7 @@ WFileCompiledUnit::IsGlobalExternal (uint_t item)
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
   const uint8_t *const pGlbEntry = m_Globals.get () + (WHC_GLOBAL_ENTRY_SIZE * item);
-  uint32_t             temp32    = from_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
+  uint32_t             temp32    = load_le_int32 (pGlbEntry + WHC_GLB_ENTRY_TYPE_OFF);
 
   return (temp32 & EXTERN_MASK) != 0;
 }
@@ -485,7 +485,7 @@ WFileCompiledUnit::GetProcCodeAreaSize (uint_t item)
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return from_le_int32 (m_Procs.get () + (item * WHC_PROC_ENTRY_SIZE) + WHC_PROC_ENTRY_CODE_SIZE);
+  return load_le_int32 (m_Procs.get () + (item * WHC_PROC_ENTRY_SIZE) + WHC_PROC_ENTRY_CODE_SIZE);
 }
 
 const uint8_t*
@@ -509,7 +509,7 @@ WFileCompiledUnit::GetProcLocalsCount (uint_t item)
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return from_le_int16 (m_Procs.get () +
+  return load_le_int16 (m_Procs.get () +
                         (item * WHC_PROC_ENTRY_SIZE) +
                         WHC_PROC_ENTRY_NLOCAL_OFF);
 }
@@ -520,7 +520,7 @@ WFileCompiledUnit::GetProcParametersCount (uint_t item)
   if (item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return from_le_int16 (m_Procs.get () + (item * WHC_PROC_ENTRY_SIZE) + WHC_PROC_ENTRY_NPARMS_OFF);
+  return load_le_int16 (m_Procs.get () + (item * WHC_PROC_ENTRY_SIZE) + WHC_PROC_ENTRY_NPARMS_OFF);
 }
 
 uint_t
@@ -529,7 +529,7 @@ WFileCompiledUnit::GetProcReturnTypeIndex (uint_t proc_item)
   if (proc_item >= m_ProcsCount)
     throw  WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  const uint32_t temp32 = (from_le_int32 (m_Procs.get () +
+  const uint32_t temp32 = (load_le_int32 (m_Procs.get () +
                                           (proc_item * WHC_PROC_ENTRY_SIZE) +
                                           WHC_PROC_ENTRY_TYPE_OFF) &
                            ~EXTERN_MASK);
@@ -543,7 +543,7 @@ WFileCompiledUnit::GetProcNameSize (uint_t proc_item)
   if (proc_item >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  uint_t temp32 = from_le_int32 (m_Procs.get () +
+  uint_t temp32 = load_le_int32 (m_Procs.get () +
                                  (proc_item * WHC_PROC_ENTRY_SIZE) +
                                  WHC_PROC_ENTRY_NAME_OFF);
   assert (temp32 < m_SymbolsSize);
@@ -557,7 +557,7 @@ WFileCompiledUnit::RetriveProcName (uint_t proc_item)
     throw WCompiledUnitException ("Could not get procedure description.",
         _EXTRA(0));
 
-  uint_t temp32 = from_le_int32 (m_Procs.get () +
+  uint_t temp32 = load_le_int32 (m_Procs.get () +
                                  (proc_item * WHC_PROC_ENTRY_SIZE) +
                                  WHC_PROC_ENTRY_NAME_OFF);
   assert (temp32 < m_SymbolsSize);
@@ -578,7 +578,7 @@ WFileCompiledUnit::GetProcLocalTypeIndex (uint_t item_proc, uint_t item_local)
   const uint8_t* pProcEntry = m_ProcData.get ()[item_proc];
   pProcEntry += (item_local * WHC_PROC_BODY_LOCAL_ENTRY_SIZE);
 
-  uint_t temp32 = from_le_int32 (pProcEntry);
+  uint_t temp32 = load_le_int32 (pProcEntry);
   assert (temp32 < m_TtySize);
   return temp32;
 }
@@ -589,7 +589,7 @@ WFileCompiledUnit::IsProcExternal (uint_t item_proc)
   if (item_proc >= m_ProcsCount)
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return (from_le_int32 (m_Procs.get () +
+  return (load_le_int32 (m_Procs.get () +
                          (item_proc * WHC_PROC_ENTRY_SIZE) +
                          WHC_PROC_ENTRY_TYPE_OFF) &
          (EXTERN_MASK)) != 0;

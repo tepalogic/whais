@@ -31,8 +31,8 @@
 
 #include "pm_operand.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 class NameSpace;
 
@@ -96,6 +96,8 @@ private:
   std::vector<GlobalEntry> m_GlobalsEntrys;
 };
 
-}
+} //namespace prima
+} //namespace whisper
+
 
 #endif /* PM_GLOBALS_H_ */

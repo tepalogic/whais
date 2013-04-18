@@ -27,45 +27,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdarg.h>
 #include <assert.h>
 
-static POSTMAN_BAG __postman_bag = NULL;
-static POSTMAN __postman = NULL;
+static WLOG_FUNC_CONTEXT sgLoggerContext = NULL;
+static WLOG_FUNC         sgLogger        = NULL;
 
 void
-register_postman (POSTMAN man, POSTMAN_BAG bag)
+wh_register_logger (WLOG_FUNC man, WLOG_FUNC_CONTEXT bag)
 {
-  __postman_bag = bag;
-  __postman = man;
+  sgLoggerContext = bag;
+  sgLogger = man;
 }
 
-POSTMAN
-get_postman (void)
+
+WLOG_FUNC
+wh_logger (void)
 {
-  return __postman;
+  return sgLogger;
 }
 
-POSTMAN_BAG
-get_postman_bag (void)
+WLOG_FUNC_CONTEXT
+wh_logger_context (void)
 {
-  return __postman_bag;
+  return sgLoggerContext;
 }
+
 
 void
-LOGMSG (uint_t  buffPos,
-        uint_t  msgCode,
-        uint_t  msgType,
-        char* pMessage,
-        va_list args)
+wh_log_msg (uint_t        position,
+            uint_t        code,
+            uint_t        type,
+            char*         formatedMsg,
+            va_list       args)
 {
-  __postman (__postman_bag, buffPos, msgCode, msgType, pMessage, args);
+  sgLogger (sgLoggerContext, position, code, type, formatedMsg, args);
 }
+
 
 char*
-copy_text_truncate (char*       dest,
-                    const char* src,
-                    uint_t        destMax,
-                    uint_t        srcLength)
+wh_copy_first (char*         dest,
+               const char*   src,
+               uint_t        destMax,
+               uint_t        srcLength)
 {
-  assert (destMax > 4);  /* make sure we can hold the '...' string */
+  assert (destMax > 4);  /* Make sure we can hold the '...' string. */
 
   if (srcLength > destMax)
     {
@@ -82,3 +85,4 @@ copy_text_truncate (char*       dest,
 
   return dest;
 }
+

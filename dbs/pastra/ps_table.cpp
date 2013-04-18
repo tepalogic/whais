@@ -27,7 +27,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "utils/include/wfile.h"
+#include "utils/wfile.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs_exception.h"
@@ -35,8 +35,10 @@
 #include "ps_table.h"
 #include "ps_valintep.h"
 
-using namespace pastra;
 using namespace std;
+
+namespace whisper {
+namespace pastra {
 
 static const char PS_TEMP_TABLE_SUFFIX[]   = "pttable_";
 static const char PS_TABLE_FIXFIELDS_EXT[] = "_f";
@@ -336,7 +338,7 @@ create_table_file (const uint64_t            maxFileSize,
   arrange_field_entries(vect, apFieldDescription.get(), rowSize);
   pFields = &vect.front();
 
-  WFile tableFile (pBaseFileName, WHC_FILECREATE_NEW | WHC_FILERDWR);
+  File tableFile (pBaseFileName, WHC_FILECREATE_NEW | WHC_FILERDWR);
 
   auto_ptr<uint8_t> apBuffer(new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    pBuffer = apBuffer.get();
@@ -495,7 +497,7 @@ PersistentTable::InitFromFile ()
   uint64_t   mainTableSize = 0;
   uint8_t    aTableHdr[PS_HEADER_SIZE];
 
-  WFile mainTableFile (m_BaseFileName.c_str(),
+  File mainTableFile (m_BaseFileName.c_str(),
                        WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
 
   mainTableFile.Seek(0, WHC_SEEK_BEGIN);
@@ -849,4 +851,7 @@ TemporalTable::VariableFieldsStore ()
 
   return *m_pVariableFields;
 }
+
+} //namespace pastra
+} //namespace whisper
 

@@ -25,122 +25,125 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <errno.h>
 
-#include "utils/include/wthread.h"
+#include "utils/wthread.h"
 
-WSynchronizer::WSynchronizer ()
+namespace whisper
 {
-  const uint_t result = wh_sync_init (&m_Sync);
+
+Lock::Lock ()
+{
+  const uint_t result = wh_lock_init (&mLock);
   if (result != WOP_OK)
-    throw WSynchException (NULL, _EXTRA (result));
+    throw LockException (NULL, _EXTRA (result));
 }
 
-WSynchronizer::~WSynchronizer ()
+Lock::~Lock ()
 {
-  const uint_t result = wh_sync_destroy (&m_Sync);
+  const uint_t result = wh_lock_destroy (&mLock);
   assert (result == WOP_OK);
 }
 
 void
-WSynchronizer::Enter ()
+Lock::Acquire ()
 {
-  const uint_t result = wh_sync_enter (&m_Sync);
+  const uint_t result = wh_lock_acquire (&mLock);
   if (result != WOP_OK)
-    throw WSynchException (NULL, _EXTRA (result));
+    throw LockException (NULL, _EXTRA (result));
 }
 
 void
-WSynchronizer::Leave ()
+Lock::Release ()
 {
-  const uint_t result = wh_sync_leave (&m_Sync);
+  const uint_t result = wh_lock_release (&mLock);
 
   assert (result == WOP_OK);
 }
 
-WThread::WThread ()
-  : m_Routine (NULL),
-    m_RoutineArgs (NULL),
-    m_Exception (NULL),
-    m_ThreadHnd (0),
-    m_Sync (),
-    m_UnkExceptSignaled (false),
-    m_IgnoreExceptions (false),
-    m_Ended (true),
-    m_NeedsClean (false)
+Thread::Thread ()
+  : mRoutine (NULL),
+    mRoutineArgs (NULL),
+    mException (NULL),
+    mThread (0),
+    mLock (),
+    mUnkExceptSignaled (false),
+    mIgnoreExceptions (false),
+    mEnded (true),
+    mNeedsClean (false)
 {
 }
 
 void
-WThread::Run (WH_THREAD_ROUTINE routine, void* const args)
+Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
 {
   //Wait for the the previous thread to be cleared.
   WaitToEnd ();
 
-  m_Sync.Enter ();
+  mLock.Acquire ();
 
-  assert (m_Ended);
-  assert (m_NeedsClean == false);
+  assert (mEnded);
+  assert (mNeedsClean == false);
 
-  m_Ended       = false;
-  m_Routine     = routine;
-  m_RoutineArgs = args;
+  mEnded       = false;
+  mRoutine     = routine;
+  mRoutineArgs = args;
 
-  const uint_t res = wh_thread_create (&m_ThreadHnd,
-                                       WThread::ThreadWrapperRoutine,
+  const uint_t res = wh_thread_create (&mThread,
+                                       Thread::ThreadWrapperRoutine,
                                        this);
   if (res != WOP_OK)
     {
-      m_Ended = true;
-      m_Sync.Leave ();
-      throw WThreadException (NULL, _EXTRA (errno));
+      mEnded = true;
+      mLock.Release ();
+      throw ThreadException (NULL, _EXTRA (errno));
     }
 
-  m_NeedsClean = true;
+  mNeedsClean = true;
 }
 
-WThread::~WThread ()
+Thread::~Thread ()
 {
   WaitToEnd (false);
 
-  assert (m_NeedsClean == false);
+  assert (mNeedsClean == false);
 
   //If you did not throwed the exception until now,
   //do not do it from during class destructor.
-  delete m_Exception;
+  delete mException;
 }
 
 void
-WThread::WaitToEnd (const bool throwPending)
+Thread::WaitToEnd (const bool throwPending)
 {
-  WSynchronizerRAII holder (m_Sync);
+  LockRAII holder (mLock);
 
-  assert (m_Ended );
+  assert (mEnded );
 
-  if (m_NeedsClean)
-    wh_thread_free (m_ThreadHnd);
+  if (mNeedsClean)
+    wh_thread_free (mThread);
 
-  m_NeedsClean = false;
+  mNeedsClean = false;
 
   if (throwPending)
     ThrowPendingException ();
 }
 
 void
-WThread::ThrowPendingException ()
+Thread::ThrowPendingException ()
 {
-  assert (m_Ended);
+  assert (mEnded);
 
   if (HasExceptionPending () == false)
     return;
 
-  if (m_UnkExceptSignaled)
+  if (mUnkExceptSignaled)
     {
       DiscardException ();
-      throw WThreadException (NULL, _EXTRA (WOP_UNKNOW));
+      throw ThreadException (NULL, _EXTRA (WOP_UNKNOW));
     }
 
-  if (m_Exception != NULL)
+  if (mException != NULL)
     {
-      Exception* pTemp = m_Exception->Clone ();
+      Exception* pTemp = mException->Clone ();
       DiscardException ();
 
       throw pTemp;
@@ -148,32 +151,35 @@ WThread::ThrowPendingException ()
 }
 
 void
-WThread::ThreadWrapperRoutine (void* const args)
+Thread::ThreadWrapperRoutine (void* const args)
 {
-  WThread* const pThread = _RC(WThread*, args);
+  Thread* const pThread = _RC(Thread*, args);
 
   try
   {
-    pThread->m_Routine (pThread->m_RoutineArgs);
+    pThread->mRoutine (pThread->mRoutineArgs);
   }
   catch (Exception &e)
   {
-    if (pThread->m_IgnoreExceptions == false)
-      pThread->m_Exception = e.Clone ();
+    if (pThread->mIgnoreExceptions == false)
+      pThread->mException = e.Clone ();
   }
   catch (Exception* pE)
   {
-    if (pThread->m_IgnoreExceptions == false)
-      pThread->m_Exception = pE;
+    if (pThread->mIgnoreExceptions == false)
+      pThread->mException = pE;
   }
   catch (...)
   {
-    if (pThread->m_IgnoreExceptions == false)
-      pThread->m_UnkExceptSignaled = true;
+    if (pThread->mIgnoreExceptions == false)
+      pThread->mUnkExceptSignaled = true;
   }
 
-  assert (pThread->m_Ended == false);
+  assert (pThread->mEnded == false);
 
-  pThread->m_Ended = true;
-  pThread->m_Sync.Leave ();
+  pThread->mEnded = true;
+  pThread->mLock.Release ();
 }
+
+} //namespace whisper
+

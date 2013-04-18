@@ -9,9 +9,10 @@
 #include <iostream>
 #include <string.h>
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
 
+using namespace whisper;
 
 static DBSFieldDescriptor field_descs[] =
 {

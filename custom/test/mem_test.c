@@ -16,7 +16,7 @@ static size_t test_max_mem;
 static W_ALLOCATED_MEMORY* spListHead      = NULL;
 static uint64_t            sMemAllocations = 0;
 
-static WH_SYNC             sMemSync;
+static WH_LOCK             sMemSync;
 static bool_t              sMemSyncInit;
 
 /* set the maximum memory usage, 0 for unlimited */
@@ -89,18 +89,18 @@ custom_trace_mem_alloc (size_t size, const char *file, uint_t line)
 
   if ( ! sMemSyncInit)
     {
-      wh_sync_init (&sMemSync);
+      wh_lock_init (&sMemSync);
       sMemSyncInit = TRUE;
     }
 
-  wh_sync_enter (&sMemSync);
+  wh_lock_acquire (&sMemSync);
 
   result = (W_ALLOCATED_MEMORY *)custom_mem_alloc (size);
   if (result != NULL)
     --result;
   else
     {
-      wh_sync_leave (&sMemSync);
+      wh_lock_release (&sMemSync);
       return result;
     }
 
@@ -124,7 +124,7 @@ custom_trace_mem_alloc (size_t size, const char *file, uint_t line)
 
   spListHead = result;
 
-  wh_sync_leave (&sMemSync);
+  wh_lock_release (&sMemSync);
 
   return result + 1;
 }
@@ -164,7 +164,7 @@ custom_trace_mem_free (void *ptr, const char *file, uint_t line)
   W_ALLOCATED_MEMORY *pMem = (W_ALLOCATED_MEMORY *)ptr;
 
   assert (sMemSyncInit);
-  wh_sync_enter (&sMemSync);
+  wh_lock_acquire (&sMemSync);
 
   pMem--;
   if (pMem == spListHead)
@@ -183,7 +183,7 @@ custom_trace_mem_free (void *ptr, const char *file, uint_t line)
     }
 
   custom_mem_free (ptr);
-  wh_sync_leave (&sMemSync);
+  wh_lock_release (&sMemSync);
 }
 
 void*

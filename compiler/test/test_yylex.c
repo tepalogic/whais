@@ -39,7 +39,7 @@ test_tokens (void)
   while ((result = yylex (&lvalp, &state)) != 0)
     {
       if (tokens_values[count++] != result ||
-          get_array_count (&(state.parsedValues)) != 0)
+          wh_array_count (&(state.parsedValues)) != 0)
         {
           printf ("FAIL\n");
           return -1;
@@ -80,7 +80,7 @@ test_buff_ids (void)
 
   state.buffer = buff_ids;
   state.bufferSize = strlen (state.buffer);
-  init_array (&state.parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing identifiers...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
@@ -95,7 +95,7 @@ test_buff_ids (void)
       count++;
     }
 
-  if (count != get_array_count (&(state.parsedValues)))
+  if (count != wh_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -120,7 +120,7 @@ test_buff_integers (void)
 
   state.buffer = buff_integers;
   state.bufferSize = strlen (state.buffer);
-  init_array (&state.parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing integers...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
@@ -134,7 +134,7 @@ test_buff_integers (void)
       count++;
     }
 
-  if (count != get_array_count (&(state.parsedValues)))
+  if (count != wh_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -167,7 +167,7 @@ test_buff_reals (void)
 
   state.buffer = buff_reals;
   state.bufferSize = strlen (state.buffer);
-  init_array (&state.parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing reals...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
@@ -182,7 +182,7 @@ test_buff_reals (void)
       count++;
     }
 
-  if (count != get_array_count (&(state.parsedValues)))
+  if (count != wh_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -210,7 +210,7 @@ test_buff_chars (void)
 
   state.buffer = buff_chars;
   state.bufferSize = strlen (state.buffer);
-  init_array (&state.parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing chars...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
@@ -224,7 +224,7 @@ test_buff_chars (void)
       count++;
     }
 
-  if (count != get_array_count (&(state.parsedValues)))
+  if (count != wh_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -252,7 +252,7 @@ test_buff_dates (void)
 
   state.buffer = buff_dates;
   state.bufferSize = strlen (state.buffer);
-  init_array (&state.parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state.parsedValues, sizeof (struct SemValue));
   printf ("Testing dates...");
   while ((result = yylex (&lvalp, &state)) != 0)
     {
@@ -267,7 +267,7 @@ test_buff_dates (void)
       count++;
     }
 
-  if (count != get_array_count (&(state.parsedValues)))
+  if (count != wh_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;
@@ -312,7 +312,7 @@ test_buff_strs (void)
 
   state.buffer = buff_strs;
   state.bufferSize = strlen (state.buffer);
-  init_array (&state.parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state.parsedValues, sizeof (struct SemValue));
   state.strings = create_string_store ();
   printf ("Testing string...");
   while ((result = yylex (&lvalp, &state)) != 0)
@@ -328,7 +328,7 @@ test_buff_strs (void)
       count++;
     }
 
-  if (count != get_array_count (&(state.parsedValues)))
+  if (count != wh_array_count (&(state.parsedValues)))
     {
       printf ("FAIL\n");
       return -2;

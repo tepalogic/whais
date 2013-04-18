@@ -43,23 +43,32 @@ static const uint8_t UTF8_EXTRA_BYTE_SIG   = 0x80;
 static const uint8_t UTF8_EXTRA_BYTE_MASK  = 0xC0;
 static const uint8_t UTF8_MAX_BYTES_COUNT  = 0x08;
 
+/* Get the code units count of an UTF-8 encoded char using the
+ * first code unit. */
 uint_t
-get_utf8_char_size (uint8_t firstUtf8Byte);
+wh_utf8_cu_count (const uint8_t codeUnit);
 
+/* Get the Unicode code point of the first UTF-8 encoded char. */
 uint_t
-decode_utf8_char (const uint8_t *pSource, uint32_t* pCh);
+wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint);
 
+/* Store a Unicode code point using the UTF-8 encoding. */
 uint_t
-encode_utf8_char (uint32_t ch, uint8_t *pDest);
+wh_store_utf8_cp (uint32_t codePoint, uint8_t *dest);
 
+/* Get the reuquired code  unit to store this Unicode code point using
+ * the UTF-8 encoding. */
 uint_t
-utf8_encode_size (uint32_t codePoint);
+wh_utf8_store_size (const uint32_t codePoint);
 
+/*  Get the Unicode code points count from an UTF-8 encoded
+ *  string (null terminated). */
 int
-utf8_strlen (const uint8_t* pSource);
+wh_utf8_strlen (const uint8_t* const utf8Str);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* UTF8_H_ */
+

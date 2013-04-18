@@ -24,113 +24,113 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 
-#include "utils/include/wfile.h"
+#include "utils/wfile.h"
 #include "whisper.h"
 
 using namespace whisper;
 
-WFile::WFile (const char* pFileName, uint_t mode)
-  : m_Handle (0)
+File::File (const char* pFileName, uint_t mode)
+  : mHandle (0)
 {
-  m_Handle = whf_open (pFileName, mode);
-  if (m_Handle == 0)
-    throw WFileException (pFileName, _EXTRA (whf_last_error ()));
+  mHandle = whf_open (pFileName, mode);
+  if (mHandle == 0)
+    throw FileException (pFileName, _EXTRA (whf_last_error ()));
 }
 
-WFile::WFile (const WFile &rSource) :
-  m_Handle (whf_dup (rSource.m_Handle))
+File::File (const File &rSource) :
+  mHandle (whf_dup (rSource.mHandle))
 {
-  if (m_Handle == 0)
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  if (mHandle == 0)
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
-WFile::~WFile ()
+File::~File ()
 {
   /* Close it only if is not already closed */
-  if (m_Handle != 0)
-    whf_close (m_Handle);
+  if (mHandle != 0)
+    whf_close (mHandle);
 }
 
 void
-WFile::Read (uint8_t* pBuffer, uint_t size)
+File::Read (uint8_t* pBuffer, uint_t size)
 {
-  if (!whf_read (m_Handle, pBuffer, size))
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  if (!whf_read (mHandle, pBuffer, size))
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 void
-WFile::Write (const uint8_t* pBuffer, uint_t size)
+File::Write (const uint8_t* pBuffer, uint_t size)
 {
-  if (!whf_write (m_Handle, pBuffer, size))
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  if (!whf_write (mHandle, pBuffer, size))
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 void
-WFile::Seek (const int64_t where, const int whence)
+File::Seek (const int64_t where, const int whence)
 {
-  if (!whf_seek (m_Handle, where, whence))
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  if (!whf_seek (mHandle, where, whence))
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
-uint64_t WFile::Tell ()
+uint64_t File::Tell ()
 {
   uint64_t position;
 
-  if (!whf_tell (m_Handle, &position))
-    throw WFileException (NULL, _EXTRA(whf_last_error ()));
+  if (!whf_tell (mHandle, &position))
+    throw FileException (NULL, _EXTRA(whf_last_error ()));
 
   return position;
 }
 
 void
-WFile::Sync ()
+File::Sync ()
 {
-  if (!whf_sync (m_Handle))
-    throw WFileException (NULL,_EXTRA(whf_last_error ()));
+  if (!whf_sync (mHandle))
+    throw FileException (NULL,_EXTRA(whf_last_error ()));
 }
 
-uint64_t WFile::GetSize () const
+uint64_t File::GetSize () const
 {
   uint64_t size;
 
-  if (!whf_tell_size (m_Handle, &size))
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  if (!whf_tell_size (mHandle, &size))
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 
   return size;
 }
 
 void
-WFile::SetSize (const uint64_t size)
+File::SetSize (const uint64_t size)
 {
-  if (!whf_set_size (m_Handle, size))
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  if (!whf_set_size (mHandle, size))
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 void
-WFile::Close ()
+File::Close ()
 {
-  assert (m_Handle != 0);
+  assert (mHandle != 0);
 
-  if (whf_close (m_Handle))
-    m_Handle = 0;
+  if (whf_close (mHandle))
+    mHandle = 0;
   else
     {
-      m_Handle = 0;
-      throw WFileException (NULL, _EXTRA (whf_last_error ()));
+      mHandle = 0;
+      throw FileException (NULL, _EXTRA (whf_last_error ()));
     }
 }
 
-WFile&
-WFile::operator= (const WFile &rSource)
+File&
+File::operator= (const File &rSource)
 {
   if (&rSource == this)
     return *this;
 
   Close(); // Close the old handler
 
-  m_Handle = whf_dup (rSource.m_Handle);
-  if (m_Handle == 0)
-    throw WFileException (NULL, _EXTRA (whf_last_error ()));
+  mHandle = whf_dup (rSource.mHandle);
+  if (mHandle == 0)
+    throw FileException (NULL, _EXTRA (whf_last_error ()));
 
   return *this;
 }

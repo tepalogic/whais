@@ -27,48 +27,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-using namespace whisper;
+namespace whisper {
 
-class EXCEP_SHL WSocketException : public Exception
+class EXCEP_SHL SocketException : public Exception
 {
 public:
-  WSocketException (const char* message,
-                    const char* file,
-                    uint32_t      line,
-                    uint32_t      extra);
-  virtual Exception*     Clone () const;
-  virtual EXPCEPTION_TYPE Type () const;
-  virtual const char*   Description () const;
+  SocketException (const char*    message,
+                   const char*    file,
+                   uint32_t       line,
+                   uint32_t       extra);
+
+  virtual Exception*        Clone () const;
+  virtual EXPCEPTION_TYPE   Type () const;
+  virtual const char*       Description () const;
 };
 
-class EXCEP_SHL WSocket
+
+class EXCEP_SHL Socket
 {
 public:
-  WSocket (const char* const pServerName,
-           const char* const pService);
-  WSocket (const char* const pServerName,
-           const uint16_t      port);
-  WSocket (const char* const pLocalAddress,
-           const char* const pService,
-           const uint_t        backLog);
-  WSocket (const char* const pLocalAddress,
-           const uint16_t      port,
-           const uint_t        backLog);
-  WSocket (const WH_SOCKET sd);
-  WSocket (const WSocket& source);
-  ~WSocket ();
+  //Client server constructors
+  Socket (const char* const   serverHost,
+          const char* const   service);
 
-  WSocket& operator= (const WSocket& source);
+  Socket (const char* const   serverHost,
+          const uint16_t      port);
 
-  WSocket Accept ();
-  uint_t  Read (const uint_t count, uint8_t* const pBuffer);
-  void    Write (const uint_t count, const uint8_t* const pBuffer);
+  //Server sockets constructors
+  Socket (const char* const    interface,
+          const char* const    service,
+          const uint_t         backLog);
+
+  Socket (const char* const    interface,
+          const uint16_t       port,
+          const uint_t         backLog);
+
+  //Utility constructors
+  Socket (const WH_SOCKET sd);
+  Socket (const Socket& source);
+
+  ~Socket ();
+
+  Socket& operator= (const Socket& source);
+
+  Socket  Accept ();
+
+  uint_t  Read (uint8_t* const buffer, const uint_t maxCount);
+
+  void    Write (const uint8_t* const buffer, const uint_t count);
+
   void    Close ();
 
 private:
-
-  WH_SOCKET m_Socket;
-  bool      m_Owned;
+  WH_SOCKET   mSocket;
+  bool        mOwned;
 
   struct EXCEP_SHL SocketInitialiser
   {
@@ -76,7 +88,7 @@ private:
     {
       if ( ! whs_init ())
         {
-          throw WSocketException ("Network system could not be initialized.",
+          throw SocketException ("Network system could not be initialized.",
                                   _EXTRA (0));
         }
     }
@@ -87,9 +99,13 @@ private:
     }
   };
 
+  // Use the following static member to initialise the socket framework.
+  // Note: in a program that uses the Socket wrapper class, one must not
+  // call 'whs_init ()' or 'whs_clean ()', as this is handled automatically.
   static SocketInitialiser __initer;
 };
 
 
+} //namespace whisper
 
 #endif /* WSOCKET_H_ */

@@ -109,7 +109,7 @@ install_declaration (struct ParserState* const pState,
     {
       /* Already declared! */
       char text[128];
-      copy_text_truncate (text, pDecl->label, sizeof text, pDecl->labelLength);
+      wh_copy_first (text, pDecl->label, sizeof text, pDecl->labelLength);
       w_log_msg (pState, pState->bufferPos, MSG_VAR_DEFINED, text);
     }
   else
@@ -144,7 +144,7 @@ install_declaration (struct ParserState* const pState,
                 {
                   /* Already declared! */
                   char text[128];
-                  copy_text_truncate (text,
+                  wh_copy_first (text,
                                       var.label,
                                       sizeof text,
                                       var.labelLength);
@@ -171,7 +171,7 @@ install_declaration (struct ParserState* const pState,
             {
               /* Already declared! */
               char text[128];
-              copy_text_truncate (text,
+              wh_copy_first (text,
                                   var.label,
                                   sizeof text,
                                   var.labelLength);
@@ -191,7 +191,7 @@ install_declaration (struct ParserState* const pState,
 
               assert (IS_ARRAY (var.type) == FALSE);
               /* Already declared! */
-              copy_text_truncate (text,
+              wh_copy_first (text,
                                   var.label,
                                   sizeof text,
                                   var.labelLength);
@@ -292,7 +292,7 @@ install_field_declaration (struct ParserState*       pState,
         {
           char tname[128];
 
-          copy_text_truncate (tname,
+          wh_copy_first (tname,
                               pSemId->text,
                               sizeof tname,
                               pSemId->length);

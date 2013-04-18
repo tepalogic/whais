@@ -30,8 +30,7 @@
 #include "dbs_types.h"
 #include "dbs_table.h"
 
-struct DBSFieldDescriptor;
-class I_DBSTable;
+namespace whisper {
 
 static const uint64_t DEFAULT_MAX_FILE_SIZE           = 2147483648ul; //2GB
 static const uint32_t DEFAULT_TABLE_CACHE_BLK_SIZE    = 16384u;       //16KB
@@ -108,5 +107,7 @@ DBSReleaseDatabase (I_DBSHandler& hndDatabase);
 DBS_SHL void
 DBSRemoveDatabase (const char* const pName,
                    const char*       pDbsDirectory = NULL);
+
+} //namespace whisper
 
 #endif /* DBS_MGR_H_ */

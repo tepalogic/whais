@@ -29,14 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 
-#include "../whc/wo_format.h"
+#include "utils/le_converter.h"
 #include "compiler/whisperc.h"
-#include "../../utils/include/le_converter.h"
+
+#include "../whc/wo_format.h"
 
 #include "wod_dump.h"
 
 void
-wod_dump_header (WFile& rInObj, std::ostream& rOutputStream)
+wod_dump_header (File& rInObj, std::ostream& rOutputStream)
 {
   uint32_t temp32;
   uint8_t  woheader[WHC_TABLE_SIZE];
@@ -57,28 +58,28 @@ wod_dump_header (WFile& rInObj, std::ostream& rOutputStream)
   rOutputStream << "Language major:\t\t\t\t" << _SC (uint_t, woheader[WHC_LANGVER_MAJ_OFF]) << std::endl;
   rOutputStream << "Language minor:\t\t\t\t" << _SC (uint_t, woheader[WHC_LANGVER_MIN_OFF]) << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_GLOBS_COUNT_OFF);
+  temp32 = load_le_int32 (woheader + WHC_GLOBS_COUNT_OFF);
   rOutputStream << "Globals count:\t\t\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_PROCS_COUNT_OFF);
+  temp32 = load_le_int32 (woheader + WHC_PROCS_COUNT_OFF);
   rOutputStream << "Procedures count:\t\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_TYPEINFO_START_OFF);
+  temp32 = load_le_int32 (woheader + WHC_TYPEINFO_START_OFF);
   rOutputStream << "Type info start position:\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_TYPEINFO_SIZE_OFF);
+  temp32 = load_le_int32 (woheader + WHC_TYPEINFO_SIZE_OFF);
   rOutputStream << "Type info size:\t\t\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_SYMTABLE_START_OFF);
+  temp32 = load_le_int32 (woheader + WHC_SYMTABLE_START_OFF);
   rOutputStream << "Symbols start position:\t\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_SYMTABLE_SIZE_OFF);
+  temp32 = load_le_int32 (woheader + WHC_SYMTABLE_SIZE_OFF);
   rOutputStream << "Symbols size:\t\t\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_CONSTAREA_START_OFF);
+  temp32 = load_le_int32 (woheader + WHC_CONSTAREA_START_OFF);
   rOutputStream << "Constant text area position:\t\t\t" << temp32 << std::endl;
 
-  temp32 = from_le_int32 (woheader + WHC_CONSTAREA_SIZE_OFF);
+  temp32 = load_le_int32 (woheader + WHC_CONSTAREA_SIZE_OFF);
   rOutputStream << "Constant text area size:\t\t\t" << temp32 << std::endl;
 }
 
@@ -227,10 +228,10 @@ wod_dump_nontable_type_info (std::ostream& rOutStream, uint16_t type)
 static void
 wod_dump_table_type_inf (const uint8_t* pTypeDesc, std::ostream& rOutputStream)
 {
-  const uint16_t type = from_le_int16 (pTypeDesc);
+  const uint16_t type = load_le_int16 (pTypeDesc);
   pTypeDesc += sizeof (uint16_t);
 
-  const uint16_t type_size = from_le_int16 (pTypeDesc);
+  const uint16_t type_size = load_le_int16 (pTypeDesc);
   pTypeDesc += sizeof (uint16_t);
 
   if (IS_TABLE (type))
@@ -251,7 +252,7 @@ wod_dump_table_type_inf (const uint8_t* pTypeDesc, std::ostream& rOutputStream)
           rOutputStream << pTypeDesc << " AS ";
           pTypeDesc += strlen (_RC (const char *, pTypeDesc)) + 1;
 
-          uint16_t type = from_le_int16 (pTypeDesc);
+          uint16_t type = load_le_int16 (pTypeDesc);
 
           pTypeDesc += sizeof (uint16_t);
           wod_dump_nontable_type_info (rOutputStream, type);
@@ -264,8 +265,8 @@ wod_dump_table_type_inf (const uint8_t* pTypeDesc, std::ostream& rOutputStream)
 static void
 wod_dump_type_info (const uint8_t* pTypeDesc, std::ostream& rOutputStream)
 {
-  const uint16_t type     = from_le_int16 (pTypeDesc);
-  const uint16_t typeSize = from_le_int16 (pTypeDesc + sizeof (uint16_t));
+  const uint16_t type     = load_le_int16 (pTypeDesc);
+  const uint16_t typeSize = load_le_int16 (pTypeDesc + sizeof (uint16_t));
 
   if ((typeSize < 2) ||
       (pTypeDesc[typeSize + sizeof (uint16_t)] != ';') ||

@@ -26,7 +26,9 @@
 
 #include "pm_general_table.h"
 
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 GeneralTable::GeneralTable ()
   : I_DBSTable ()
@@ -569,3 +571,8 @@ GeneralTable::Instance ()
 
   return singleton;
 }
+
+
+} //namespace prima
+} //namespace whisper
+

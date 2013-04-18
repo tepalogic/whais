@@ -17,8 +17,8 @@
 #undef uint_t128
 
 #include "dbs_real.h"
-#include "utils/include/we_int128.h"
-#include "utils/include/random.h"
+#include "utils/we_int128.h"
+#include "utils/wrandom.h"
 #include "custom/include/test/test_fmw.h"
 
 using namespace std;
@@ -67,8 +67,8 @@ bool test_addition_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd ();
-      j = w_rnd ();
+      i = wh_rnd ();
+      j = wh_rnd ();
 
       const WE_I128 op1 (i);
       const WE_I128 op2 (j);
@@ -122,8 +122,8 @@ bool test_subtraction_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd ();
-      j = w_rnd ();
+      i = wh_rnd ();
+      j = wh_rnd ();
 
       const WE_I128 op1 (i);
       const WE_I128 op2 (j);
@@ -180,8 +180,8 @@ bool test_multiplication_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd () / scale;
-      j = w_rnd () / scale;
+      i = wh_rnd () / scale;
+      j = wh_rnd () / scale;
 
       const WE_I128 op1 (i);
       const WE_I128 op2 (j);
@@ -237,8 +237,8 @@ bool test_division_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd () & MASK;
-      j = w_rnd () & MASK;
+      i = wh_rnd () & MASK;
+      j = wh_rnd () & MASK;
 
       const WE_I128 op1 (i);
       const WE_I128 op2 (j);

@@ -23,12 +23,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include "whisper.h"
-#include "utils/include/wfile.h"
-#include "utils/include/wthread.h"
-#include "utils/include/wsocket.h"
+#include "utils/wfile.h"
+#include "utils/wthread.h"
+#include "utils/wsocket.h"
 
-Exception::Exception (const char* pMessage,
-                        const char* pFile,
+using namespace whisper;
+
+Exception::Exception (const char*     pMessage,
+                        const char*   pFile,
                         uint32_t      line,
                         uint32_t      extra)
   : mErrorMessage ((pMessage == NULL) ? "" : pMessage),
@@ -76,7 +78,7 @@ Exception::Line () const
 
 
 ///////////////////////////////////////////////////////////////////////////////
-WFileException::WFileException (const char* pMessage,
+FileException::FileException (const char* pMessage,
                                 const char* pFile,
                                 uint32_t      line,
                                 uint32_t      extra)
@@ -85,26 +87,26 @@ WFileException::WFileException (const char* pMessage,
 }
 
 Exception*
-WFileException::Clone () const
+FileException::Clone () const
 {
-  return new WFileException (*this);
+  return new FileException (*this);
 }
 
 EXPCEPTION_TYPE
-WFileException::Type () const
+FileException::Type () const
 {
   return FILE_EXCEPTION;
 }
 
 const char*
-WFileException::Description () const
+FileException::Description () const
 {
   return "File IO error.";
 }
 
-//////////////////////////WSynchException/////////////////////////////////////
+//////////////////////////LockException/////////////////////////////////////
 
-WSynchException::WSynchException (const char* message,
+LockException::LockException (const char* message,
                                   const char* file,
                                   uint32_t      line,
                                   uint32_t      extra)
@@ -113,26 +115,26 @@ WSynchException::WSynchException (const char* message,
 }
 
 Exception*
-WSynchException::Clone () const
+LockException::Clone () const
 {
-  return new WSynchException (*this);
+  return new LockException (*this);
 }
 
 EXPCEPTION_TYPE
-WSynchException::Type () const
+LockException::Type () const
 {
   return SYNC_EXCEPTION;
 }
 
 const char*
-WSynchException::Description () const
+LockException::Description () const
 {
   return "A mutex related exception.";
 }
 
-//////////////////////////WThreadException/////////////////////////////////////
+//////////////////////////ThreadException/////////////////////////////////////
 
-WThreadException::WThreadException (const char* message,
+ThreadException::ThreadException (const char* message,
                                     const char* file,
                                     uint32_t      line,
                                     uint32_t      extra)
@@ -141,26 +143,26 @@ WThreadException::WThreadException (const char* message,
 }
 
 Exception*
-WThreadException::Clone () const
+ThreadException::Clone () const
 {
-  return new WThreadException (*this);
+  return new ThreadException (*this);
 }
 
 EXPCEPTION_TYPE
-WThreadException::Type () const
+ThreadException::Type () const
 {
   return THREAD_EXCEPTION;
 }
 
 const char*
-WThreadException::Description () const
+ThreadException::Description () const
 {
   return "Thread related exception.";
 }
 
-//////////////////////////WSocketException////////////////////////////////////
+//////////////////////////SocketException////////////////////////////////////
 
-WSocketException::WSocketException (const char* message,
+SocketException::SocketException (const char* message,
                                     const char* file,
                                     uint32_t      line,
                                     uint32_t      extra)
@@ -169,19 +171,19 @@ WSocketException::WSocketException (const char* message,
 }
 
 Exception*
-WSocketException::Clone () const
+SocketException::Clone () const
 {
-  return new WSocketException (*this);
+  return new SocketException (*this);
 }
 
 EXPCEPTION_TYPE
-WSocketException::Type () const
+SocketException::Type () const
 {
   return SOCKED_EXCEPTION;
 }
 
 const char*
-WSocketException::Description () const
+SocketException::Description () const
 {
 
   return "Network socket related exception";

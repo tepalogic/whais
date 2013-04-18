@@ -28,6 +28,8 @@
 #include "dbs_types.h"
 #include "dbs_values.h"
 
+namespace whisper {
+
 struct CallBackIndexData
 {
   CallBackIndexData () {}
@@ -218,5 +220,7 @@ public:
                                     const ROW_INDEX    maxCount,
                                     const FIELD_INDEX  field) = 0;
 };
+
+} //namespace whisper
 
 #endif /* DBS_TABLE_H_ */

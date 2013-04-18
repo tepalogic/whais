@@ -29,7 +29,9 @@
 #include "pm_typemanager.h"
 
 using namespace std;
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 ///////////////////////////ArrayOperand////////////////////////////////////////
 
@@ -2318,3 +2320,7 @@ RichRealArrayElOperand::Duplicate () const
 
   return StackValue (RichRealOperand (value));
 }
+
+} //namespace prima
+} //namespace whisper
+

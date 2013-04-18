@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sstream>
 
-#include "server/include/server_protocol.h"
+#include "server/server_protocol.h"
 
 #include "server.h"
 #include "connection.h"
@@ -85,8 +85,8 @@ public:
 
   const char*           m_pInterface;
   const char*           m_pPort;
-  WThread                 m_ListenThread;
-  WSocket                 m_Socket;
+  Thread                 m_ListenThread;
+  Socket                 m_Socket;
   auto_array<UserHandler> m_UsersPool;
 
 private:
@@ -97,7 +97,7 @@ private:
 static const uint_t SOCKET_BACK_LOG = 10;
 
 static vector<DBSDescriptors>* spDatabases;
-static Logger*                 spLogger;
+static FileLogger*                 spLogger;
 static bool                    sAcceptUsersConnections;
 static bool                    sServerStopped;
 static auto_array<Listener>*   spaListeners;
@@ -159,7 +159,7 @@ client_handler_routine (void* args)
           pCmds[cmdType] (connection);
         }
   }
-  catch (WSocketException& e)
+  catch (SocketException& e)
   {
       assert (e.Description() != NULL);
 
@@ -253,7 +253,7 @@ listener_routine (void* args)
         spLogger->Log (LOG_INFO, logEntry.str ());
       }
 
-    pListener->m_Socket = WSocket (pListener->m_pInterface,
+    pListener->m_Socket = Socket (pListener->m_pInterface,
                                    pListener->m_pPort,
                                    SOCKET_BACK_LOG);
 
@@ -263,7 +263,7 @@ listener_routine (void* args)
       {
         try
         {
-          WSocket client = pListener->m_Socket.Accept ();
+          Socket client = pListener->m_Socket.Accept ();
           UserHandler* pUsrHnd = pListener->SearchFreeUser ();
 
           if (pUsrHnd != NULL)
@@ -276,11 +276,11 @@ listener_routine (void* args)
             {
               static const uint8_t busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
 
-              client.Write (sizeof busyResp, busyResp);
+              client.Write (busyResp, sizeof busyResp);
               client.Close ();
             }
         }
-        catch (WSocketException& e)
+        catch (SocketException& e)
         {
             if (sAcceptUsersConnections)
               {
@@ -344,7 +344,7 @@ listener_routine (void* args)
 }
 
 void
-StartServer (Logger& log, vector<DBSDescriptors>& databases)
+StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
 {
   spDatabases = &databases;
   spLogger    = &log;

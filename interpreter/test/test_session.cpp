@@ -15,6 +15,8 @@
 #include "interpreter.h"
 #include "custom/include/test/test_fmw.h"
 
+using namespace whisper;
+
 static const char admin[] = "administrator";
 
 static const uint8_t firstCode[] =

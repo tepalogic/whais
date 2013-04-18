@@ -24,7 +24,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  init_array (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -35,17 +35,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  destroy_array (&state->parsedValues);
+  wh_array_clean (&state->parsedValues);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState* pState)
 {
-  int vals_count = get_array_count (&pState->parsedValues);
+  int vals_count = wh_array_count (&pState->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&pState->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&pState->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -136,7 +136,7 @@ check_container_field (struct Statement *stmt,
   if (result != FALSE)
     {
       uint8_t *const buffer =
-        get_buffer_outstream (&stmt->spec.glb.typesDescs);
+        wh_ostream_data (&stmt->spec.glb.typesDescs);
       struct TypeSpec *ts = (struct TypeSpec *) (buffer + var->typeSpecOff);
       result = check_type_spec_fill (ts, field, type);
     }

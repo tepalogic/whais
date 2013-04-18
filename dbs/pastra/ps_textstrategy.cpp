@@ -24,8 +24,8 @@
 
 #include <assert.h>
 
-#include "utils/include/le_converter.h"
-#include "utils/include/utf8.h"
+#include "utils/le_converter.h"
+#include "utils/utf8.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs_exception.h"
@@ -33,8 +33,9 @@
 #include "ps_textstrategy.h"
 
 using namespace std;
-using namespace pastra;
 
+namespace whisper {
+namespace pastra {
 
 static uint64_t
 get_utf8_string_size (const uint8_t *pUtf8Str, uint64_t maxLength)
@@ -43,7 +44,7 @@ get_utf8_string_size (const uint8_t *pUtf8Str, uint64_t maxLength)
 
   while ((maxLength > 0) && (pUtf8Str[0] != 0))
     {
-      const uint_t charSize = get_utf8_char_size(pUtf8Str[0]);
+      const uint_t charSize = wh_utf8_cu_count(pUtf8Str[0]);
       bool validChar = true;
 
       if ((charSize == 0) || (charSize > MIN (6, maxLength)))
@@ -136,7 +137,7 @@ GenericText::CharsCount()
     {
       uint8_t aUtf8Char;
       ReadUtf8 (offset, 1, &aUtf8Char);
-      const uint_t charSize = get_utf8_char_size (aUtf8Char);
+      const uint_t charSize = wh_utf8_cu_count (aUtf8Char);
 
       if ((charSize == 0) || (charSize + offset > m_BytesSize))
         throw DBSException (NULL, _EXTRA (DBSException::INVALID_UTF8_STRING));
@@ -196,7 +197,7 @@ GenericText::CharAt (uint64_t index)
     {
       uint8_t utf8CharCodeUnit;
       ReadUtf8 (chOffset, 1, &utf8CharCodeUnit);
-      chOffset += get_utf8_char_size (utf8CharCodeUnit);
+      chOffset += wh_utf8_cu_count (utf8CharCodeUnit);
 
       ++chIndex;
     }
@@ -223,7 +224,7 @@ GenericText::CharAt (uint64_t index)
             MIN (m_BytesSize - chOffset, sizeof aUtf8Char),
             aUtf8Char);
 
-  const uint_t charSize = decode_utf8_char (aUtf8Char, &chValue);
+  const uint_t charSize = wh_load_utf8_cp (aUtf8Char, &chValue);
   assert ((chOffset + charSize) <= m_BytesSize);
 
   return DBSChar (chValue);
@@ -236,7 +237,7 @@ GenericText::Append (const uint32_t charValue)
   assert (charValue != 0);
 
   uint8_t aUtf8Encoding[UTF8_MAX_BYTES_COUNT];
-  uint_t  encodeSize = encode_utf8_char (charValue, aUtf8Encoding);
+  uint_t  encodeSize = wh_store_utf8_cp (charValue, aUtf8Encoding);
 
   WriteUtf8 (m_BytesSize, encodeSize, aUtf8Encoding);
 
@@ -286,7 +287,7 @@ GenericText::Truncate (uint64_t newCharCount)
     {
       uint8_t utf8Char;
       ReadUtf8 (offset, 1, &utf8Char);
-      offset += get_utf8_char_size (utf8Char);
+      offset += wh_utf8_cu_count (utf8Char);
 
       --newCharCount;
       ++m_CachedCharCount;
@@ -461,11 +462,11 @@ RowFieldText::RowFieldText (VLVarsStore& storage,
                            CACHE_META_DATA_SIZE,
                            cachedMetaData);
 
-      m_CachedCharCount       = from_le_int32 (cachedMetaData);
-      m_CachedCharIndex       = from_le_int32 (
+      m_CachedCharCount       = load_le_int32 (cachedMetaData);
+      m_CachedCharIndex       = load_le_int32 (
                                           cachedMetaData + sizeof (uint32_t)
                                               );
-      m_CachedCharIndexOffset = from_le_int32 (
+      m_CachedCharIndexOffset = load_le_int32 (
                                         cachedMetaData + 2 * sizeof (uint32_t)
                                               );
     }
@@ -495,7 +496,7 @@ RowFieldText::~RowFieldText ()
       //Do not update the elements count if we have not modified ours
       //Someone else might did it in the mean time, so we will do our
       //best to avoid conflicts.
-      if (from_le_int32 (cachedMetaData) < m_CachedCharCount)
+      if (load_le_int32 (cachedMetaData) < m_CachedCharCount)
         store_le_int32 (m_CachedCharCount, cachedMetaData);
 
       //Char index and offset would in the worst case trigger only
@@ -623,7 +624,7 @@ RowFieldText::UpdateCharAt (const uint32_t   charValue,
 {
   assert (charValue != 0);
 
-  const uint32_t utf8CodeUnitsCount = utf8_encode_size (charValue);
+  const uint32_t utf8CodeUnitsCount = wh_utf8_store_size (charValue);
   assert ((utf8CodeUnitsCount > 0)
           && (utf8CodeUnitsCount < UTF8_MAX_BYTES_COUNT));
 
@@ -631,14 +632,14 @@ RowFieldText::UpdateCharAt (const uint32_t   charValue,
   assert (oldChar != 0);
 
   if ((ReferenceCount () > 1)
-      || utf8CodeUnitsCount != utf8_encode_size (oldChar))
+      || utf8CodeUnitsCount != wh_utf8_store_size (oldChar))
     {
       this->GenericText::UpdateCharAt (charValue, index, pIOStrategy);
       return;
     }
 
   uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-  encode_utf8_char (charValue, utf8CodeUnits);
+  wh_store_utf8_cp (charValue, utf8CodeUnits);
   assert (m_CachedCharIndex == index);
   WriteUtf8 (m_CachedCharIndexOffset,
              utf8CodeUnitsCount,
@@ -727,7 +728,7 @@ TemporalText::UpdateCharAt (const uint32_t   charValue,
   assert (this == *pIOStrategy);
   assert (charValue != 0);
 
-  const uint32_t utf8CodeUnitsCount = utf8_encode_size (charValue);
+  const uint32_t utf8CodeUnitsCount = wh_utf8_store_size (charValue);
   assert ((utf8CodeUnitsCount > 0)
           && (utf8CodeUnitsCount < UTF8_MAX_BYTES_COUNT));
 
@@ -735,14 +736,14 @@ TemporalText::UpdateCharAt (const uint32_t   charValue,
   assert (oldChar != 0);
 
   if ((ReferenceCount () > 1)
-      || utf8CodeUnitsCount != utf8_encode_size (oldChar))
+      || utf8CodeUnitsCount != wh_utf8_store_size (oldChar))
     {
       this->GenericText::UpdateCharAt (charValue, index, pIOStrategy);
       return;
     }
 
   uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-  encode_utf8_char (charValue, utf8CodeUnits);
+  wh_store_utf8_cp (charValue, utf8CodeUnits);
   assert (m_CachedCharIndex == index);
   WriteUtf8 (m_CachedCharIndexOffset,
              utf8CodeUnitsCount,
@@ -760,4 +761,8 @@ TemporalText::ClearMyself ()
 {
   delete this;
 }
+
+} //namespace pastra
+} //namespace whisper
+
 

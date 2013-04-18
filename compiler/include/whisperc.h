@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 
-#include <dbs/include/dbs_types.h>
+#include <dbs/dbs_types.h>
 
 typedef enum DBS_FIELD_TYPE VARTYPES;
 

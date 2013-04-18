@@ -36,11 +36,11 @@ alloc_sem_value (struct ParserState* const pState)
 {
   struct SemValue* result      = NULL;
   uint_t           iter        = 0;
-  uint_t           stored_vals = get_array_count (&pState->parsedValues);
+  uint_t           stored_vals = wh_array_count (&pState->parsedValues);
 
   while (iter < stored_vals)
     {
-      result = get_item (&pState->parsedValues, iter);
+      result = wh_array_get (&pState->parsedValues, iter);
       assert (result != NULL);
 
       if (result->val_type == VAL_REUSE)
@@ -50,7 +50,7 @@ alloc_sem_value (struct ParserState* const pState)
    if (result == NULL || result->val_type != VAL_REUSE)
     {
       static struct SemValue dummy;
-      result = (struct SemValue *) add_item (&pState->parsedValues, &dummy);
+      result = (struct SemValue *) wh_array_add (&pState->parsedValues, &dummy);
     }
 
   return result;

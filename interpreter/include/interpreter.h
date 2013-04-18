@@ -29,11 +29,15 @@
 
 #include "whisper.h"
 
-#include "dbs/include/dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 #include "compiler/compiledunit.h"
-#include "utils/include/logger.h"
+#include "utils/logger.h"
 
 #include "operands.h"
+
+namespace whisper
+{
+
 
 class InterException : public Exception
 {
@@ -50,7 +54,7 @@ public:
   {
   }
 
-  virtual Exception*     Clone () const { return new InterException (*this); }
+  virtual Exception*      Clone () const { return new InterException (*this); }
   virtual EXPCEPTION_TYPE Type () const { return INTERPRETER_EXCEPTION; }
   virtual const char*   Description () const
   {
@@ -135,7 +139,7 @@ public:
 class INTERP_SHL I_Session
 {
 public:
-  I_Session (I_Logger& log);
+  I_Session (Logger& log);
   virtual ~I_Session ();
 
   virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
@@ -190,20 +194,22 @@ public:
                                             const uint_t        param,
                                             const uint_t        field) = 0;
 protected:
-  I_Logger& m_Log;
+  Logger& m_Log;
 };
 
 INTERP_SHL void
 InitInterpreter (const char* adminDbsDir = NULL);
 
 INTERP_SHL I_Session&
-GetInstance (const char* pName, I_Logger* pLog = NULL);
+GetInstance (const char* pName, Logger* pLog = NULL);
 
 INTERP_SHL void
 ReleaseInstance (I_Session& hInstance);
 
 INTERP_SHL void
 CleanInterpreter (const bool force = false);
+
+} // namespace whisper
 
 #endif /* INTERPRETER_H_ */
 

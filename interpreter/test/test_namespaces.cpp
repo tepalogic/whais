@@ -15,6 +15,8 @@
 #include "interpreter.h"
 #include "custom/include/test/test_fmw.h"
 
+using namespace whisper;
+
 static const char admin[]    = "administrator";
 static const char test_db1[] = "t_testdb_1";
 static const char test_db2[] = "t_testdb_2";

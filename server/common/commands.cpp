@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include <memory.h>
 
-#include "utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "commands.h"
 #include "stack_cmds.h"
@@ -42,7 +42,7 @@ cmd_value_desc (ClientConnection& rConn)
 
   uint8_t*      data_      = rConn.Data ();
   const char* glbName    = _RC (const char*, data_ + sizeof (uint32_t));
-  uint16_t      fieldHint  = from_le_int16 (data_);
+  uint16_t      fieldHint  = load_le_int16 (data_);
   uint16_t      dataOffset = sizeof (uint32_t) + strlen (glbName) + 1;
   I_Session&    session    = *rConn.Dbs ().m_Session;
   uint_t        rawType;
@@ -254,13 +254,13 @@ cmd_read_stack (ClientConnection& rConn)
   const char* const fieldNameHint = _RC (const char*, data + dataOff);
   dataOff += strlen (fieldNameHint) + 1;
 
-  const uint64_t rowHint = from_le_int64 (data + dataOff);
+  const uint64_t rowHint = load_le_int64 (data + dataOff);
   dataOff += sizeof (uint64_t);
 
-  const uint64_t arrayHint  = from_le_int64 (data + dataOff);
+  const uint64_t arrayHint  = load_le_int64 (data + dataOff);
   dataOff += sizeof (uint64_t);
 
-  const uint64_t textHint  = from_le_int64 (data + dataOff);
+  const uint64_t textHint  = load_le_int64 (data + dataOff);
   dataOff += sizeof (uint64_t);
 
   if ((dataOff != rConn.DataSize ())
@@ -447,7 +447,7 @@ cmd_list_globals (ClientConnection& rConn)
   const I_Session& session = *rConn.Dbs ().m_Session;
 
   const uint32_t glbsCount  = session.GlobalValuesCount ();
-  uint32_t       firstHint  = from_le_int32 (rConn.Data ());
+  uint32_t       firstHint  = load_le_int32 (rConn.Data ());
   uint16_t       dataOffset = 0;
   bool           oneAtLeast = false;
 
@@ -528,7 +528,7 @@ cmd_list_procedures (ClientConnection& rConn)
   const I_Session& session = *rConn.Dbs ().m_Session;
 
   const uint32_t procsCount  = session.ProceduresCount ();
-  uint32_t       firstHint   = from_le_int32 (rConn.Data ());
+  uint32_t       firstHint   = load_le_int32 (rConn.Data ());
   uint16_t       dataOffset  = 0;
   bool           oneAtLeast  = false;
 
@@ -607,7 +607,7 @@ cmd_procedure_param_desc (ClientConnection& rConn)
     }
   I_Session&          session     = *rConn.Dbs ().m_Session;
   uint8_t*            data_       = rConn.Data ();
-  uint16_t            hint        = from_le_int16 (data_);
+  uint16_t            hint        = load_le_int16 (data_);
   const char* const procName    = _RC (const char*,
                                          data_ + 2 * sizeof (uint16_t));
   const uint_t        procNameLen = strlen (procName) + 1;

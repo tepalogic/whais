@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 
 #include "compiler//whisperc.h"
-#include "client/include/whisper_connector.h"
-#include "utils/include/tokenizer.h"
+#include "client/whisper_connector.h"
+#include "utils/tokenizer.h"
 
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_optglbs.h"

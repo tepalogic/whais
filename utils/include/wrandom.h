@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHISPER project
-Copyright (C) 2008  Iulian Popa
+Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -22,43 +22,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include <assert.h>
+#ifndef WRANDOM_H_
+#define WRANDOM_H_
 
-#include "random.h"
+#include "whisper.h"
 
-#define XORSHIFT_DEFAULT_SEED 858495253484946541
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static uint64_t _seed    = XORSHIFT_DEFAULT_SEED;
-static uint64_t _current = XORSHIFT_DEFAULT_SEED;
-
+/* Get the seed used to generate the pseudo randoms. */
 uint64_t
-w_rnd_get_seed ()
-{
-  assert (_seed != 0);
-  return _seed;
-}
+wh_rnd_seed ();
 
+/* Reset the seed to a new value. If the new value is 0 then use
+ * the default one. */
 void
-w_rnd_set_seed (uint64_t seed)
-{
-  if (seed == 0)
-    _seed = XORSHIFT_DEFAULT_SEED;
+wh_rnd_set_seed (uint64_t seed);
 
-  _seed = seed;
-}
-
+/* Generate a pseudo random. */
 uint64_t
-w_rnd ()
-{
-  uint64_t current = _current;
+wh_rnd ();
 
-  current ^= current << 1;
-  current ^= current >> 7;
-  current ^= current << 9;
-
-  assert (current != 0);
-  _current = current;
-
-  return current - 1;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* WRANDOM_H_ */
 

@@ -27,15 +27,17 @@
 #include <memory.h>
 #include <assert.h>
 
-#include "../include/dbs_exception.h"
-#include "utils/include/wfile.h"
-#include "utils/include/wthread.h"
+#include "dbs/dbs_exception.h"
+#include "utils/wfile.h"
+#include "utils/wthread.h"
 
 #include "ps_dbsmgr.h"
 #include "ps_table.h"
 
-using namespace pastra;
 using namespace std;
+
+namespace whisper {
+namespace pastra {
 
 static const char DBS_FILE_EXT[]       = ".pd";
 static const char DBS_FILE_SIGNATURE[] = {
@@ -105,170 +107,12 @@ struct DbsManager
       }
   }
 
-  WSynchronizer m_Sync;
+  Lock m_Sync;
   DBSSettings   m_DBSSettings;
   DATABASES_MAP m_Databases;
 };
 
 static auto_ptr<DbsManager> apDbsManager_;
-
-DBS_SHL void
-DBSInit (const DBSSettings& setup)
-{
-  if (apDbsManager_.get () != NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::ALREADY_INITED));
-
-  apDbsManager_.reset (new DbsManager (setup));
-}
-
-DBS_SHL void
-DBSShoutdown ()
-{
-  if (apDbsManager_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
-
-  //~DbsManager() will be called automatically!
-  apDbsManager_.reset (NULL);
-}
-
-DBS_SHL const DBSSettings&
-DBSGetSeettings ()
-{
-  if (apDbsManager_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
-
-  return apDbsManager_->m_DBSSettings;
-}
-
-DBS_SHL void
-DBSCreateDatabase (const char* const pName,
-                   const char*       pDbsDirectory)
-{
-  if (apDbsManager_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
-
-  if (pDbsDirectory == NULL)
-    pDbsDirectory = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
-
-  string fileName = pDbsDirectory;
-  fileName += pName;
-  fileName += DBS_FILE_EXT;
-
-  WFile dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
-
-  auto_ptr<uint8_t> apBufferHeader (new uint8_t[PS_DBS_HEADER_SIZE]);
-  uint8_t* const    cpHeader = apBufferHeader.get ();
-
-  memcpy (cpHeader + PS_DBS_SIGNATURE_OFF,
-          DBS_FILE_SIGNATURE,
-          PS_DBS_SIGNATURE_LEN);
-
-  *_RC (uint16_t*, cpHeader + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
-  *_RC (uint16_t*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
-  *_RC (uint16_t*, cpHeader + PS_DBS_NUM_TABLES_OFF) = 0;
-  *_RC (uint64_t*, cpHeader + PS_DBS_MAX_FILE_OFF)   =
-                                  apDbsManager_->m_DBSSettings.m_MaxFileSize;
-
-  dbsFile.Write (cpHeader, PS_DBS_HEADER_SIZE);
-}
-
-DBS_SHL  I_DBSHandler&
-DBSRetrieveDatabase (const char* const pName, const char* pDatabaseDir)
-{
-  if (apDbsManager_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
-
-  //Acquire the DBS's manager lock!
-  WSynchronizerRAII syncHolder (apDbsManager_->m_Sync);
-
-  DATABASES_MAP&          rMap = apDbsManager_->m_Databases;
-  DATABASES_MAP::iterator it   = rMap.find (pName);
-
-  if (it == rMap.end ())
-    {
-      if (pDatabaseDir == NULL)
-        pDatabaseDir = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
-
-      rMap.insert (
-          pair<string, DbsElement> (
-                        pName,
-                        DbsElement (DbsHandler (apDbsManager_->m_DBSSettings,
-                                                string (pDatabaseDir),
-                                                string (pName)))
-                                   )
-                  );
-      it = rMap.find (pName);
-      assert (it != rMap.end ());
-    }
-
-  it->second.m_RefCount++;
-
-  return it->second.m_Dbs;
-}
-
-DBS_SHL void
-DBSReleaseDatabase (I_DBSHandler& hndDatabase)
-{
-  if (apDbsManager_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
-
-  //Acquire the DBS's manager lock!
-  WSynchronizerRAII syncHolder (apDbsManager_->m_Sync);
-
-  DATABASES_MAP&          rMap = apDbsManager_->m_Databases;
-  DATABASES_MAP::iterator it;
-
-  for (it = rMap.begin (); it != rMap.end (); ++it)
-    {
-      if (_SC (I_DBSHandler *, &it->second.m_Dbs) == &hndDatabase)
-        {
-          assert (it->second.m_RefCount > 0);
-
-          if (--it->second.m_RefCount == 0)
-            {
-              it->second.m_Dbs.Discard ();
-              rMap.erase (it);
-            }
-          break;
-        }
-    }
-}
-
-DBS_SHL  void
-DBSRemoveDatabase (const char* const pName, const char* pDatabaseDir)
-{
-  if (apDbsManager_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
-
-  //Acquire the DBS's manager lock!
-  WSynchronizerRAII syncHolder (apDbsManager_->m_Sync);
-
-  DATABASES_MAP&          rMap = apDbsManager_->m_Databases;
-  DATABASES_MAP::iterator it   = rMap.find (pName);
-
-  if (it == rMap.end ())
-    {
-      if (pDatabaseDir == NULL)
-        pDatabaseDir = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
-
-      rMap.insert (
-          pair<string, DbsElement> (
-                        pName,
-                        DbsElement (DbsHandler (apDbsManager_->m_DBSSettings,
-                                                string (pDatabaseDir),
-                                                string (pName)))
-                                   )
-                  );
-      it = rMap.find (pName);
-      assert (it != rMap.end ());
-    }
-
-  if (it->second.m_RefCount != 0)
-    throw DBSException (NULL, _EXTRA (DBSException::DATABASE_IN_USE));
-
-  it->second.m_Dbs.RemoveFromStorage ();
-  rMap.erase (it);
-}
 
 
 DbsHandler::DbsHandler (const DBSSettings& globalSettings,
@@ -282,7 +126,7 @@ DbsHandler::DbsHandler (const DBSSettings& globalSettings,
     m_Tables ()
 {
   string fileName = m_DbsWorkDir + m_Name + DBS_FILE_EXT;
-  WFile  inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
+  File  inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
 
   auto_ptr<uint8_t> apBuffer (new uint8_t[inputFile.GetSize ()]);
   uint8_t*          pBuffer = apBuffer.get ();
@@ -347,7 +191,7 @@ I_DBSTable&
 DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
 {
   TABLE_INDEX       iterator = index;
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   if (iterator >= m_Tables.size ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
@@ -370,7 +214,7 @@ DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
 I_DBSTable&
 DbsHandler::RetrievePersistentTable (const char* pTableName)
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   TABLES::iterator it = m_Tables.find (pTableName);
 
@@ -388,7 +232,7 @@ DbsHandler::AddTable (const char* const pTableName,
                       const FIELD_INDEX   fieldsCount,
                       DBSFieldDescriptor* pInOutFields)
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   if ((pTableName == NULL) || (pInOutFields == NULL) || (fieldsCount == 0))
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_PARAMETERS));
@@ -430,7 +274,7 @@ DbsHandler::ReleaseTable (I_DBSTable& hndTable)
       return;
     }
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
     if (&hndTable == _SC (I_DBSTable*, it->second))
@@ -446,7 +290,7 @@ const char*
 DbsHandler::TableName (const TABLE_INDEX index)
 {
   TABLE_INDEX       iterator = index;
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   if (iterator >= m_Tables.size ())
     throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
@@ -468,7 +312,7 @@ DbsHandler::TableName (const TABLE_INDEX index)
 void
 DbsHandler::DeleteTable (const char* const pTableName)
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   TABLES::iterator it = m_Tables.find (pTableName);
 
@@ -498,7 +342,7 @@ DbsHandler::CreateTempTable (const FIELD_INDEX   fieldsCount,
 void
 DbsHandler::Discard ()
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   for (TABLES::iterator it = m_Tables.begin (); it != m_Tables.end (); ++it)
     {
@@ -520,7 +364,7 @@ DbsHandler::SyncToFile ()
   *_RC (uint64_t*, aBuffer + PS_DBS_MAX_FILE_OFF)   = MaxFileSize ();
 
   string fileName (WorkingDir () + m_Name + DBS_FILE_EXT);
-  WFile outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
+  File outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
   outFile.SetSize (0);
   outFile.Write (aBuffer, sizeof aBuffer);
 
@@ -552,7 +396,173 @@ DbsHandler::RemoveFromStorage ()
   whf_remove (fileName.c_str ());
 }
 
+} //namespace pastra
+
+using namespace pastra;
+
+DBS_SHL void
+DBSInit (const DBSSettings& setup)
+{
+  if (apDbsManager_.get () != NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::ALREADY_INITED));
+
+  apDbsManager_.reset (new DbsManager (setup));
+}
+
+DBS_SHL void
+DBSShoutdown ()
+{
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
+  //~DbsManager() will be called automatically!
+  apDbsManager_.reset (NULL);
+}
+
+DBS_SHL const DBSSettings&
+DBSGetSeettings ()
+{
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
+  return apDbsManager_->m_DBSSettings;
+}
+
+DBS_SHL void
+DBSCreateDatabase (const char* const pName,
+                   const char*       pDbsDirectory)
+{
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
+  if (pDbsDirectory == NULL)
+    pDbsDirectory = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
+
+  string fileName = pDbsDirectory;
+  fileName += pName;
+  fileName += DBS_FILE_EXT;
+
+  File dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
+
+  auto_ptr<uint8_t> apBufferHeader (new uint8_t[PS_DBS_HEADER_SIZE]);
+  uint8_t* const    cpHeader = apBufferHeader.get ();
+
+  memcpy (cpHeader + PS_DBS_SIGNATURE_OFF,
+          DBS_FILE_SIGNATURE,
+          PS_DBS_SIGNATURE_LEN);
+
+  *_RC (uint16_t*, cpHeader + PS_DBS_VER_MAJ_OFF)    = PS_DBS_VER_MAJ;
+  *_RC (uint16_t*, cpHeader + PS_DBS_VER_MIN_OFF)    = PS_DBS_VER_MIN;
+  *_RC (uint16_t*, cpHeader + PS_DBS_NUM_TABLES_OFF) = 0;
+  *_RC (uint64_t*, cpHeader + PS_DBS_MAX_FILE_OFF)   =
+                                  apDbsManager_->m_DBSSettings.m_MaxFileSize;
+
+  dbsFile.Write (cpHeader, PS_DBS_HEADER_SIZE);
+}
+
+DBS_SHL  I_DBSHandler&
+DBSRetrieveDatabase (const char* const pName, const char* pDatabaseDir)
+{
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
+  //Acquire the DBS's manager lock!
+  LockRAII syncHolder (apDbsManager_->m_Sync);
+
+  DATABASES_MAP&          rMap = apDbsManager_->m_Databases;
+  DATABASES_MAP::iterator it   = rMap.find (pName);
+
+  if (it == rMap.end ())
+    {
+      if (pDatabaseDir == NULL)
+        pDatabaseDir = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
+
+      rMap.insert (
+          pair<string, DbsElement> (
+                        pName,
+                        DbsElement (DbsHandler (apDbsManager_->m_DBSSettings,
+                                                string (pDatabaseDir),
+                                                string (pName)))
+                                   )
+                  );
+      it = rMap.find (pName);
+      assert (it != rMap.end ());
+    }
+
+  it->second.m_RefCount++;
+
+  return it->second.m_Dbs;
+}
+
+DBS_SHL void
+DBSReleaseDatabase (I_DBSHandler& hndDatabase)
+{
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
+  //Acquire the DBS's manager lock!
+  LockRAII syncHolder (apDbsManager_->m_Sync);
+
+  DATABASES_MAP&          rMap = apDbsManager_->m_Databases;
+  DATABASES_MAP::iterator it;
+
+  for (it = rMap.begin (); it != rMap.end (); ++it)
+    {
+      if (_SC (I_DBSHandler *, &it->second.m_Dbs) == &hndDatabase)
+        {
+          assert (it->second.m_RefCount > 0);
+
+          if (--it->second.m_RefCount == 0)
+            {
+              it->second.m_Dbs.Discard ();
+              rMap.erase (it);
+            }
+          break;
+        }
+    }
+}
+
+DBS_SHL  void
+DBSRemoveDatabase (const char* const pName, const char* pDatabaseDir)
+{
+  if (apDbsManager_.get () == NULL)
+    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+
+  //Acquire the DBS's manager lock!
+  LockRAII syncHolder (apDbsManager_->m_Sync);
+
+  DATABASES_MAP&          rMap = apDbsManager_->m_Databases;
+  DATABASES_MAP::iterator it   = rMap.find (pName);
+
+  if (it == rMap.end ())
+    {
+      if (pDatabaseDir == NULL)
+        pDatabaseDir = apDbsManager_->m_DBSSettings.m_WorkDir.c_str ();
+
+      rMap.insert (
+          pair<string, DbsElement> (
+                        pName,
+                        DbsElement (DbsHandler (apDbsManager_->m_DBSSettings,
+                                                string (pDatabaseDir),
+                                                string (pName)))
+                                   )
+                  );
+      it = rMap.find (pName);
+      assert (it != rMap.end ());
+    }
+
+  if (it->second.m_RefCount != 0)
+    throw DBSException (NULL, _EXTRA (DBSException::DATABASE_IN_USE));
+
+  it->second.m_Dbs.RemoveFromStorage ();
+  rMap.erase (it);
+}
+
+} //namespace whisper
+
 #if  defined (ENABLE_MEMORY_TRACE) && defined (USE_DBS_SHL)
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "PASTRA";
 #endif
+
+

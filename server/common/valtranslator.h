@@ -26,42 +26,42 @@
 
 #include "whisper.h"
 
-#include "dbs/include/dbs_values.h"
+#include "dbs/dbs_values.h"
 
 class Utf8Translator
 {
 public:
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSBool* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSChar* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSDate* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSDateTime* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSHiresTime* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt8* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt16* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt32* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSInt64* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSReal* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSRichReal* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt8* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt16* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt32* pValue);
-  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, DBSUInt64* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSBool* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSChar* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSDate* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSDateTime* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSHiresTime* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSInt8* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSInt16* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSInt32* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSInt64* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSReal* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSRichReal* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSUInt8* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSUInt16* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSUInt32* pValue);
+  static uint_t Read (const uint8_t* utf8Src, const uint_t srcSize, whisper::DBSUInt64* pValue);
 
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSBool& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSChar& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSDate& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSDateTime& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSHiresTime& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt8 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt16 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt32 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSInt64 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSReal& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSRichReal& value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt8 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt16 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt32 &value);
-  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const DBSUInt64 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSBool& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSChar& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSDate& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSDateTime& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSHiresTime& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSInt8 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSInt16 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSInt32 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSInt64 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSReal& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSRichReal& value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSUInt8 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSUInt16 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSUInt32 &value);
+  static uint_t Write (uint8_t* const utf8Dest, const uint_t maxSize, const whisper::DBSUInt64 &value);
 };
 
 #endif /* VALTRANSLATOR_H_ */

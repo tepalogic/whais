@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils/include/auto_array.h"
-#include "utils/include/le_converter.h"
-#include "client/include/whisper_connector.h"
+#include "utils/auto_array.h"
+#include "utils/le_converter.h"
+#include "client/whisper_connector.h"
 
 #include "wcmd_onlinecmds.h"
 #include "wcmd_cmdsmgr.h"

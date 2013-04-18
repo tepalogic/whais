@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SERVER_PROTOCOL_H_
 #define SERVER_PROTOCOL_H_
 
-#include "client/include/whisper_connector.h"
+#include "client/whisper_connector.h"
 
 #define MIN_FRAME_SIZE                  512
 #define MAX_FRAME_SIZE                  65535

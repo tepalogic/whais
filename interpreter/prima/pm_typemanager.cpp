@@ -26,16 +26,18 @@
 #include <memory.h>
 #include <vector>
 
-#include "dbs/include/dbs_types.h"
+#include "dbs/dbs_types.h"
 #include "compiler/whisperc.h"
-#include "utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "pm_typemanager.h"
 #include "pm_interpreter.h"
 #include "pm_general_table.h"
 
 using namespace std;
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 static const uint8_t  TYPE_SPEC_END_MARK = ';';
 
@@ -43,8 +45,8 @@ class TypeSpec
 {
 public:
   TypeSpec (const uint8_t* const pTI)
-    : m_Type (from_le_int16 (pTI)),
-      m_Size (from_le_int16 (pTI + sizeof (uint16_t))),
+    : m_Type (load_le_int16 (pTI)),
+      m_Size (load_le_int16 (pTI + sizeof (uint16_t))),
       m_Data (pTI + 2 * sizeof (uint16_t))
   {
   }
@@ -167,7 +169,7 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
       typeOff += strlen (field.m_pFieldName) + 1;
       assert (typeOff < spec.DataSize () - 2);
 
-      type    =  from_le_int16 (spec.Data () + typeOff);
+      type    =  load_le_int16 (spec.Data () + typeOff);
       typeOff += 2;
 
       field.isArray     = IS_ARRAY (type);
@@ -491,7 +493,7 @@ TypeManager::IsTypeValid (const uint8_t* pTI)
           /* don't check for zero here, because of strlen */
           index += id_len + 1;
 
-          uint16_t type = from_le_int16 (spec.Data () + index);
+          uint16_t type = load_le_int16 (spec.Data () + index);
           /* clear an eventual array mask */
           type = GET_BASIC_TYPE (type);
           if ((type == T_UNKNOWN) || (type >= T_UNDETERMINED))
@@ -517,7 +519,7 @@ TypeManager::GetTypeLength (const uint8_t* pTI)
 }
 
 vector<uint8_t>
-prima::compute_table_typeinfo (I_DBSTable& table)
+compute_table_typeinfo (I_DBSTable& table)
 {
   vector<uint8_t> data;
 
@@ -561,3 +563,7 @@ prima::compute_table_typeinfo (I_DBSTable& table)
 
   return result;
 }
+
+} //naemspace prima
+} //naemspace whisper
+

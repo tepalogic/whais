@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_thread.h"
 
 uint_t
-wh_sync_init (WH_SYNC* pSync)
+wh_lock_init (WH_LOCK* pSync)
 {
   InitializeCriticalSection (pSync);
 
@@ -36,7 +36,7 @@ wh_sync_init (WH_SYNC* pSync)
 }
 
 uint_t
-wh_sync_destroy (WH_SYNC* pSync)
+wh_lock_destroy (WH_LOCK* pSync)
 {
   DeleteCriticalSection (pSync);
 
@@ -44,7 +44,7 @@ wh_sync_destroy (WH_SYNC* pSync)
 }
 
 uint_t
-wh_sync_enter (WH_SYNC* pSync)
+wh_lock_acquire (WH_LOCK* pSync)
 {
   EnterCriticalSection (pSync);
 
@@ -52,7 +52,7 @@ wh_sync_enter (WH_SYNC* pSync)
 }
 
 uint_t
-wh_sync_leave (WH_SYNC* pSync)
+wh_lock_release (WH_LOCK* pSync)
 {
   LeaveCriticalSection (pSync);
 

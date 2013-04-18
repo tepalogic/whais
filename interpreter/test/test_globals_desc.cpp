@@ -17,6 +17,8 @@
 
 static const uint_t MAX_TABLE_FIELDS = 10;
 
+using namespace whisper;
+
 struct TableFieldDesc
 {
   const char* const field_name;

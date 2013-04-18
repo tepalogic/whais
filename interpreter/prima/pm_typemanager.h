@@ -31,8 +31,8 @@
 
 #include "pm_operand.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 class NameSpace;
 
@@ -67,7 +67,8 @@ private:
 std::vector<uint8_t>
 compute_table_typeinfo (I_DBSTable& table);
 
-}
+} //namespace prima
+} //namespace whisper
 
 #endif /* PR_TYPEMANAGER_H_ */
 

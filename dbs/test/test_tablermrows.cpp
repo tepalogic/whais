@@ -11,10 +11,13 @@
 #include <iostream>
 #include <vector>
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
 
 #include "../pastra/ps_table.h"
+
+using namespace whisper;
+using namespace pastra;
 
 struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_UINT32, false}

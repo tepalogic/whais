@@ -31,11 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server_protocol.h"
 
-#include "utils/include/auto_array.h"
-#include "utils/include/wthread.h"
-#include "utils/include/wsocket.h"
+#include "utils/auto_array.h"
+#include "utils/wthread.h"
+#include "utils/wsocket.h"
 
 #include "configuration.h"
+
+using namespace whisper;
 
 struct UserHandler
 {
@@ -54,8 +56,8 @@ struct UserHandler
   }
 
   const DBSDescriptors* m_pDesc;
-  WThread               m_Thread;
-  WSocket               m_Socket;
+  Thread                m_Thread;
+  Socket                m_Socket;
   bool                  m_Root;
   bool                  m_EndConnetion;
 };
@@ -115,6 +117,5 @@ private:
   const ClientConnection& operator= (const ClientConnection&);
 };
 
-
-
 #endif /* CONNECTION_H_ */
+

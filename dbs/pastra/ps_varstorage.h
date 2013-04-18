@@ -27,11 +27,13 @@
 
 #include "whisper.h"
 
-#include "utils/include/wthread.h"
+#include "utils/wthread.h"
 
 #include "ps_container.h"
 #include "ps_blockcache.h"
 
+namespace whisper
+{
 namespace pastra
 {
 
@@ -164,9 +166,10 @@ private:
   uint64_t                       m_FirstFreeEntry;
   uint64_t                       m_EntrysCount;
   uint64_t                       m_RefsCount;
-  WSynchronizer                  m_Sync;
+  Lock                  m_Sync;
 };
 
-}
+} //namespace pastra
+} //namespace whisper
 
 #endif /* PS_VARTSORAGE_H_ */

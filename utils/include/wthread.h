@@ -29,68 +29,71 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-using namespace whisper;
+namespace whisper {
 
-class EXCEP_SHL WSynchronizer
+class EXCEP_SHL Lock
 {
 public:
-  WSynchronizer();
-  ~WSynchronizer();
+  Lock();
+  ~Lock();
 
-  void Enter();
-  void Leave();
+  void Acquire ();
+  void Release ();
 
 private:
-  //Does not support any kind of copy or assignment!
-  WSynchronizer(const WSynchronizer&);
-  WSynchronizer& operator=(const WSynchronizer&);
+  Lock (const Lock&);
+  Lock& operator= (const Lock&);
 
-  WH_SYNC m_Sync;
+  WH_LOCK mLock;
 };
 
-class WSynchronizerRAII
+
+class LockRAII
 {
 public:
-  explicit WSynchronizerRAII (WSynchronizer &rSync) :
-    m_Sync(rSync),
-    m_IsEntered (true)
+  explicit LockRAII (Lock &lock) :
+    mLock (lock),
+    mIsAcquireed (true)
   {
-    m_Sync.Enter();
+    mLock.Acquire ();
   }
 
-  void Enter () { m_IsEntered = true; m_Sync.Enter (); }
-
-  void Leave () { m_IsEntered = false; m_Sync.Leave(); }
-
-  ~WSynchronizerRAII ()
+  ~LockRAII ()
   {
-    if (m_IsEntered)
-      m_Sync.Leave();
+    if (mIsAcquireed)
+      mLock.Release ();
   }
+
+  void Acquire () { mLock.Acquire (); mIsAcquireed = true;}
+
+  void Release () { mIsAcquireed = false; mLock.Release (); }
 
 private:
-  WSynchronizer& m_Sync;
-  bool           m_IsEntered;
-};
-
-class EXCEP_SHL WSynchException : public Exception
-{
-public:
-  WSynchException (const char* message,
-                   const char* file,
-                   uint32_t      line,
-                   uint32_t      extra);
-  virtual Exception*     Clone () const;
-  virtual EXPCEPTION_TYPE Type () const;
-  virtual const char*   Description () const;
+  Lock&       mLock;
+  bool        mIsAcquireed;
 };
 
 
-class EXCEP_SHL WThread
+class EXCEP_SHL LockException : public Exception
 {
 public:
-  WThread ();
-  ~WThread ();
+  LockException (const char*   message,
+                 const char*   file,
+                 uint32_t      line,
+                 uint32_t      extra);
+
+  virtual Exception*        Clone () const;
+  virtual EXPCEPTION_TYPE   Type () const;
+  virtual const char*       Description () const;
+};
+
+
+
+class EXCEP_SHL Thread
+{
+public:
+  Thread ();
+  ~Thread ();
 
   void Run (WH_THREAD_ROUTINE routine, void* const args);
   void WaitToEnd (const bool throwPending = true);
@@ -98,49 +101,57 @@ public:
 
   void IgnoreExceptions (bool ignore)
   {
-    m_IgnoreExceptions = ignore;
+    mIgnoreExceptions = ignore;
   }
+
   void DiscardException ()
   {
-    m_UnkExceptSignaled = false;
-    delete m_Exception;
-    m_Exception = NULL;
+    mUnkExceptSignaled = false;
+    delete mException;
+    mException = NULL;
   }
-  bool IsEnded () const { return m_Ended; }
+
+  bool IsEnded () const { return mEnded; }
+
   bool HasExceptionPending ()
   {
-    return ( m_UnkExceptSignaled || (m_Exception != NULL));
+    return (mUnkExceptSignaled || (mException != NULL));
   }
 
 private:
   static void ThreadWrapperRoutine (void* const);
 
-  WH_THREAD_ROUTINE       m_Routine;
-  void*                   m_RoutineArgs;
-  Exception*             m_Exception;
-  WH_THREAD               m_ThreadHnd;
-  WSynchronizer           m_Sync;
-  bool                    m_UnkExceptSignaled;
-  bool                    m_IgnoreExceptions;
-  bool                    m_Ended;
-  bool                    m_NeedsClean;
+  WH_THREAD_ROUTINE       mRoutine;
+  void*                   mRoutineArgs;
+  Exception*              mException;
+  WH_THREAD               mThread;
+  Lock                    mLock;
+  bool                    mUnkExceptSignaled;
+  bool                    mIgnoreExceptions;
+  bool                    mEnded;
+  bool                    mNeedsClean;
 
-  WThread (const WThread&);
-  WThread& operator= (const WThread&);
+  Thread (const Thread&);
+  Thread& operator= (const Thread&);
 };
 
 
-class EXCEP_SHL WThreadException : public Exception
+class EXCEP_SHL ThreadException : public Exception
 {
 public:
-  WThreadException (const char* message,
-                    const char* file,
-                    uint32_t      line,
-                    uint32_t      extra);
-  virtual Exception*     Clone () const;
+  ThreadException (const char*   message,
+                   const char*   file,
+                   uint32_t      line,
+                   uint32_t      extra);
+
+
+  virtual Exception*      Clone () const;
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const char*   Description () const;
+  virtual const char*     Description () const;
 };
 
 
+} //namespace whisper
+
 #endif /* WTHREAD_H_ */
+

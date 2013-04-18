@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHISPER project
-Copyright (C) 2009  Iulian Popa
+Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -22,26 +22,45 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef RANDOM_H_
-#define RANDOM_H_
+#include <assert.h>
 
-#include "whisper.h"
+#include "wrandom.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define XORSHIFT_DEFAULT_SEED 858495253484946541
+
+static uint64_t _seed    = XORSHIFT_DEFAULT_SEED;
+static uint64_t _current = XORSHIFT_DEFAULT_SEED;
 
 uint64_t
-w_rnd_get_seed ();
+wh_rnd_seed ()
+{
+  assert (_seed != 0);
+  return _seed;
+}
+
 
 void
-w_rnd_set_seed (uint64_t seed);
+wh_rnd_set_seed (uint64_t seed)
+{
+  if (seed == 0)
+    _seed = XORSHIFT_DEFAULT_SEED;
+
+  _seed = seed;
+}
+
 
 uint64_t
-w_rnd ();
+wh_rnd ()
+{
+  uint64_t current = _current;
 
-#ifdef __cplusplus
+  current ^= current << 1;
+  current ^= current >> 7;
+  current ^= current << 9;
+
+  assert (current != 0);
+  _current = current;
+
+  return current - 1;
 }
-#endif
 
-#endif /* RANDOM_H_ */

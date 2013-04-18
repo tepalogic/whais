@@ -47,7 +47,7 @@ static char *MSG_PREFIX[] = {
 };
 
 void
-my_postman (POSTMAN_BAG bag,
+my_postman (WLOG_FUNC_CONTEXT bag,
             uint_t buff_pos,
             uint_t msg_id,
             uint_t msgType, const char * msgFormat, va_list args)

@@ -29,8 +29,8 @@
 
 #include <whisper.h>
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 struct Unit
 {
@@ -78,7 +78,8 @@ private:
   std::vector<Unit*> m_Units;
 };
 
-}
+} //namespace prima
+} //namespace whisper
 
 #endif /* PM_UNITS_H_ */
 

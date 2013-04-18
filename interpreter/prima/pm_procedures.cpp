@@ -30,7 +30,9 @@
 #include "pm_typemanager.h"
 
 using namespace std;
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 uint32_t
 ProcedureManager::AddProcedure (const uint8_t*      pName,
@@ -211,12 +213,12 @@ ProcedureManager::AquireSync (const uint_t procEntry, const uint32_t sync)
 
   do
     {
-      WSynchronizerRAII holder (m_Sync);
+      LockRAII holder (m_Sync);
       const bool aquired = m_SyncStmts[entry.m_SyncIndex + sync];
       if (aquired)
         {
           //Some one has taken this prior! Prepare to try again!
-          holder.Leave ();
+          holder.Release ();
           wh_yield ();
         }
       else
@@ -247,4 +249,7 @@ ProcedureManager::ReleaseSync (const uint_t procEntry, const uint32_t sync)
   assert (m_SyncStmts[entry.m_SyncIndex + sync] == true);
   m_SyncStmts[entry.m_SyncIndex + sync] = false;
 }
+
+} //namespace prima
+} //namespace whisper
 

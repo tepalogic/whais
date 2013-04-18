@@ -17,7 +17,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  init_array (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -28,17 +28,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  destroy_array (&state->parsedValues);
+  wh_array_clean (&state->parsedValues);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = get_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -125,9 +125,9 @@ check_procedure (struct ParserState *state, char * proc_name)
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   struct DeclaredVar *var =
-    (struct DeclaredVar *) get_item (&stmt->spec.proc.paramsList, 0);
-  uint8_t *code = get_buffer_outstream (stmt_query_instrs (stmt));
-  int code_size = get_size_outstream (stmt_query_instrs (stmt));
+    (struct DeclaredVar *) wh_array_get (&stmt->spec.proc.paramsList, 0);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs (stmt));
+  int code_size = wh_ostream_size (stmt_query_instrs (stmt));
   enum W_OPCODE op_expect = W_NA;
 
   /* check the opcode based on the return type */

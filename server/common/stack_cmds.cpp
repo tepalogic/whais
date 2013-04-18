@@ -25,9 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include <sstream>
 
-#include "utils/include/le_converter.h"
-#include "utils/include/auto_array.h"
-#include "utils/include/utf8.h"
+#include "utils/le_converter.h"
+#include "utils/auto_array.h"
+#include "utils/utf8.h"
 #include "server_protocol.h"
 
 #include "stack_cmds.h"
@@ -72,7 +72,7 @@ cmd_pop_stack (ClientConnection& rConn, uint_t* const pDataOff)
                                 );
     }
   SessionStack& rStack = rConn.Stack ();
-  uint32_t      count  = from_le_int32 (rConn.Data () + *pDataOff);
+  uint32_t      count  = load_le_int32 (rConn.Data () + *pDataOff);
 
   *pDataOff += sizeof (uint32_t);
 
@@ -95,7 +95,7 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
   if ((*pDataOff + sizeof (uint16_t)) > dataSize)
     goto push_frame_error;
 
-  type       = from_le_int16 (data + *pDataOff);
+  type       = load_le_int16 (data + *pDataOff);
   *pDataOff += sizeof (uint16_t);
 
   if (type != WHC_TYPE_TABLE_MASK)
@@ -269,7 +269,7 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
       if ((*pDataOff + sizeof (uint16_t)) > dataSize)
         goto push_frame_error;
 
-      const uint16_t fieldsCount = from_le_int16 (data + *pDataOff);
+      const uint16_t fieldsCount = load_le_int16 (data + *pDataOff);
       *pDataOff += sizeof (uint16_t);
 
       if (fieldsCount == 0)
@@ -292,7 +292,7 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
               goto push_frame_error;
             }
 
-          const uint16_t fieldType = from_le_int16 (data + *pDataOff);
+          const uint16_t fieldType = load_le_int16 (data + *pDataOff);
           *pDataOff += sizeof (uint16_t);
 
           fields_[field].isArray     = IS_ARRAY (fieldType);
@@ -527,7 +527,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
   const uint8_t* const data     = rConn.Data ();
   const uint_t         dataSize = rConn.DataSize ();
   SessionStack&        rStack   = rConn.Stack ();
-  uint16_t             type     = from_le_int16 (data + *pDataOff);
+  uint16_t             type     = load_le_int16 (data + *pDataOff);
 
   if (rStack.Size () == 0)
     return WCS_INVALID_ARGS;
@@ -555,7 +555,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               goto update_frame_error;
             }
 
-          const uint64_t rowIndex = from_le_int64 (data + *pDataOff);
+          const uint64_t rowIndex = load_le_int64 (data + *pDataOff);
           *pDataOff += sizeof (uint64_t);
 
           I_DBSTable&    table      = stackTop.GetOperand ().GetTable ();
@@ -575,13 +575,13 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               if (*pDataOff + sizeof (uint16_t) > dataSize)
                 goto update_frame_error;
 
-              uint16_t elCount = from_le_int16 (data + *pDataOff);
+              uint16_t elCount = load_le_int16 (data + *pDataOff);
               *pDataOff += sizeof (uint16_t);
 
               if (elCount == 0)
                 goto update_frame_error;
 
-              uint64_t fromPos = from_le_int64 (data + *pDataOff);
+              uint64_t fromPos = load_le_int64 (data + *pDataOff);
               *pDataOff += sizeof (uint64_t);
 
               if (*pDataOff > dataSize)
@@ -620,13 +620,13 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               if ((*pDataOff + sizeof (uint64_t)) >= dataSize)
                 goto update_frame_error;
 
-              uint64_t offset = from_le_int64 (data + *pDataOff);
+              uint64_t offset = load_le_int64 (data + *pDataOff);
               *pDataOff += sizeof (uint64_t);
 
               do
                 {
                   uint32_t ch    = 0;
-                  uint_t   chLen = decode_utf8_char (data + *pDataOff, &ch);
+                  uint_t   chLen = wh_load_utf8_cp (data + *pDataOff, &ch);
 
                   if (chLen == 0)
                     goto update_frame_error;
@@ -670,7 +670,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           if (*pDataOff + sizeof (uint16_t) > dataSize)
             goto update_frame_error;
 
-          uint16_t elCount = from_le_int16 (data + *pDataOff);
+          uint16_t elCount = load_le_int16 (data + *pDataOff);
           *pDataOff += sizeof (uint16_t);
 
           if (elCount == 0)
@@ -679,7 +679,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           if (*pDataOff + sizeof (uint64_t) > dataSize)
             goto update_frame_error;
 
-          uint64_t fromPos  = from_le_int64 (data + *pDataOff);
+          uint64_t fromPos  = load_le_int64 (data + *pDataOff);
           *pDataOff        += sizeof (uint64_t);
 
           while ((*pDataOff < dataSize) && (elCount > 0))
@@ -712,13 +712,13 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           if ((*pDataOff + sizeof (uint64_t)) > dataSize)
             goto update_frame_error;
 
-          uint64_t offset = from_le_int64 (data + *pDataOff);
+          uint64_t offset = load_le_int64 (data + *pDataOff);
           *pDataOff += sizeof (uint64_t);
 
           do
             {
               uint32_t ch    = 0;
-              uint_t   chLen = decode_utf8_char (data + *pDataOff, &ch);
+              uint_t   chLen = wh_load_utf8_cp (data + *pDataOff, &ch);
 
               if (chLen == 0)
                 goto update_frame_error;

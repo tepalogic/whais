@@ -25,10 +25,10 @@
 #ifndef PM_GENERAL_TABLE_H_
 #define PM_GENERAL_TABLE_H_
 
-#include "dbs/include/dbs_table.h"
+#include "dbs/dbs_table.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 class GeneralTable : public I_DBSTable
 {
@@ -211,6 +211,7 @@ public:
   static GeneralTable& Instance ();
 };
 
-}
+} //namespace prima
+} //namespace whisper
 
 #endif /* PM_GENERAL_TABLE_H_ */

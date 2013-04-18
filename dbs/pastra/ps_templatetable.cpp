@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 
-#include "utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "ps_templatetable.h"
 
@@ -31,8 +31,9 @@
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
 
-using namespace pastra;
 using namespace std;
+
+namespace whisper {
 
 ///////////////////////////////////////////////////////////////////////////////
 I_DBSTable::I_DBSTable ()
@@ -43,6 +44,8 @@ I_DBSTable::~I_DBSTable ()
 {
 }
 
+
+namespace pastra {
 ///////////////////////////////////////////////////////////////////////////////
 
 PrototypeTable::PrototypeTable (DbsHandler& dbs)
@@ -87,7 +90,7 @@ PrototypeTable::~PrototypeTable ()
 void
 PrototypeTable::Flush ()
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   m_RowCache.Flush ();
   FlushNodes ();
@@ -631,7 +634,7 @@ PrototypeTable::AquireIndexField (FieldDescriptor* const pFieldDesc)
   bool aquired = false;
   while ( ! aquired)
     {
-      WSynchronizerRAII syncHolder (m_IndexSync);
+      LockRAII syncHolder (m_IndexSync);
 
       if (pFieldDesc->m_Aquired == 0)
         {
@@ -639,7 +642,7 @@ PrototypeTable::AquireIndexField (FieldDescriptor* const pFieldDesc)
           aquired = true;
         }
 
-      syncHolder.Leave ();
+      syncHolder.Release ();
 
       if ( ! aquired)
         wh_yield ();
@@ -649,7 +652,7 @@ PrototypeTable::AquireIndexField (FieldDescriptor* const pFieldDesc)
 void
 PrototypeTable::ReleaseIndexField (FieldDescriptor* const pFieldDesc)
 {
-  WSynchronizerRAII syncHolder (m_IndexSync);
+  LockRAII syncHolder (m_IndexSync);
 
   assert (pFieldDesc->m_Aquired != 0);
 
@@ -861,7 +864,7 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
         }
     }
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   StoredItem     cachedItem        = m_RowCache.RetriveItem (row);
   uint8_t* const pRawData          = cachedItem.GetDataForUpdate();
@@ -910,7 +913,7 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
       RowFieldText   oldEntryRAII (VariableFieldsStore (),
                                    *fieldFirstEntry,
                                    *fieldValueSize);
-      syncHolder.Leave ();
+      syncHolder.Release ();
 
       VariableFieldsStore ().DecrementRecordRef (*fieldFirstEntry);
       *fieldFirstEntry = newFirstEntry;
@@ -994,7 +997,7 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
         }
     }
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   StoredItem cachedItem           = m_RowCache.RetriveItem (row);
   uint8_t *const pRawData         = cachedItem.GetDataForUpdate();
@@ -1046,7 +1049,7 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
       *fieldFirstEntry = newFirstEntry;
       *fieldValueSize  = newFieldValueSize;
 
-      syncHolder.Leave ();
+      syncHolder.Release ();
     }
   else
     {
@@ -1210,7 +1213,7 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   StoredItem           cachedItem = m_RowCache.RetriveItem (row);
   const uint8_t* const pRawData   = cachedItem.GetDataForRead();
@@ -1266,7 +1269,7 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   StoredItem           cachedItem = m_RowCache.RetriveItem (row);
   const uint8_t *const pRawData   = cachedItem.GetDataForRead();
@@ -1715,7 +1718,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
   const uint_t       byte_off = desc.m_NullBitIndex / 8;
   const uint8_t      bit_off  = desc.m_NullBitIndex % 8;
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   StoredItem     cachedItem = m_RowCache.RetriveItem (row);
   uint8_t *const pRawData   = cachedItem.GetDataForUpdate();
@@ -1741,7 +1744,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
       PSValInterp::Store (pRawData + desc.m_StoreIndex, value);
     }
 
-  syncHolder.Leave ();
+  syncHolder.Release ();
 
   //Update the field index if it exists
   if (m_vIndexNodeMgrs[field] != NULL)
@@ -1790,7 +1793,7 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
   const uint_t  byte_off = desc.m_NullBitIndex / 8;
   const uint8_t bit_off  = desc.m_NullBitIndex % 8;
 
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   StoredItem           cachedItem = m_RowCache.RetriveItem (row);
   const uint8_t* const pRawData   = cachedItem.GetDataForRead ();
@@ -2288,4 +2291,9 @@ TableRmNode::SentinelKey () const
 
   return _key;
 }
+
+
+} //namespace pastra
+} //namespace whisper
+
 

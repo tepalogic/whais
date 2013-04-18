@@ -24,9 +24,8 @@
 
 #include "ps_btree_fields.h"
 
-using namespace pastra;
-
-
+namespace whisper {
+namespace pastra {
 
 FieldIndexNodeManager::FieldIndexNodeManager (std::auto_ptr <I_DataContainer> &container,
                                               const uint_t nodeSize,
@@ -280,4 +279,7 @@ FieldIndexNodeManager::NodeFactory (const NODE_INDEX nodeId)
   assert (result != NULL);
   return result;
 }
+
+} //namespace pastra
+} //namespace whisper
 

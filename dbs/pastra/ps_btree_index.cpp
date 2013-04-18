@@ -27,8 +27,10 @@
 
 #include "ps_btree_index.h"
 
-using namespace pastra;
 using namespace std;
+
+namespace whisper {
+namespace pastra {
 
 I_BTreeNode::I_BTreeNode (I_BTreeNodeManager& nodesManager,
                           const NODE_INDEX    node)
@@ -248,7 +250,7 @@ I_BTreeNode*
 I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
 {
   assert (node != NIL_NODE);
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
   map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.find (node);
 
   if (it == m_NodesKeeper.end ())
@@ -295,7 +297,7 @@ I_BTreeNodeManager::RetrieveNode (const NODE_INDEX node)
 void
 I_BTreeNodeManager::ReleaseNode (const NODE_INDEX node)
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
   map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.find (node);
 
   assert (it != m_NodesKeeper.end ());
@@ -307,7 +309,7 @@ I_BTreeNodeManager::ReleaseNode (const NODE_INDEX node)
 void
 I_BTreeNodeManager::FlushNodes ()
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
   map <NODE_INDEX, CachedData>::iterator it = m_NodesKeeper.begin ();
 
   while (it != m_NodesKeeper.end ())
@@ -485,4 +487,7 @@ BTree::RecursiveDeleteNodeKey (I_BTreeNode& node, const I_BTreeKey& key)
 
   return (keyIndex == 0);
 }
+
+} //namespace pastra
+} //namespace whisper
 

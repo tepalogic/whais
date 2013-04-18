@@ -29,9 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "compiler/compiledunit.h"
 
-#include "../../utils/include/wfile.h"
+#include "utils/wfile.h"
+#include "utils/le_converter.h"
 #include "../whc/wo_format.h"
-#include "../../utils/include/le_converter.h"
 
 int
 main (int argc, char **argv)
@@ -43,7 +43,7 @@ main (int argc, char **argv)
     WodCmdLineParser cmdLine (argc, argv);
 
     {
-      WFile inFileObj (cmdLine.GetSourceFile (), WHC_FILEREAD);
+      File inFileObj (cmdLine.GetSourceFile (), WHC_FILEREAD);
       wod_dump_header (inFileObj, cmdLine.GetOutStream ());
     }
 
@@ -59,7 +59,7 @@ main (int argc, char **argv)
     std::cerr << e.Message () << std::endl;
     retCode = -1;
   }
-  catch (WFileException& e)
+  catch (FileException& e)
   {
     std::cerr << "File IO error " << e.Extra ();
     if (e.Message () != NULL)

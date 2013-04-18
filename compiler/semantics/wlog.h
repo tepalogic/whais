@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WLOG_H_
 
 #include "whisper.h"
-#include "../../utils/include/msglog.h"
+#include "utils/msglog.h"
 #include "../parser/parser.h"
 
 #define MSG_GENERAL_EVENT  0

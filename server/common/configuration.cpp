@@ -28,14 +28,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <algorithm>
 
-#include "utils/include/tokenizer.h"
+#include "utils/tokenizer.h"
 
 #include "server_protocol.h"
 #include "configuration.h"
 
-
-
 using namespace std;
+using namespace whisper;
 
 static const char COMMENT_CHAR          = '#';
 static const char DEFAULT_LISTEN_PORT[] = "1761";
@@ -450,7 +449,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 }
 
 bool
-ParseContextSection (I_Logger&        log,
+ParseContextSection (Logger&        log,
                      ifstream&        config,
                      uint_t&          ioConfigLine,
                      DBSDescriptors&  output)
@@ -753,7 +752,7 @@ ParseContextSection (I_Logger&        log,
 }
 
 bool
-PrepareConfigurationSection (I_Logger& log)
+PrepareConfigurationSection (Logger& log)
 {
   ostringstream logStream;
 
@@ -955,7 +954,7 @@ PrepareConfigurationSection (I_Logger& log)
 }
 
 bool
-PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc)
+PrepareContextSection (Logger& log, DBSDescriptors& ioDesc)
 {
   assert (ioDesc.m_ConfigLine != 0);
 

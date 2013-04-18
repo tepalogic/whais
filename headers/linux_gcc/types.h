@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 typedef int             WH_FILE;
-typedef pthread_mutex_t WH_SYNC;
+typedef pthread_mutex_t WH_LOCK;
 typedef pthread_t       WH_THREAD;
 typedef int             WH_SOCKET;
 

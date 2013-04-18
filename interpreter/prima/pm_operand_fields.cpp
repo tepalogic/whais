@@ -27,7 +27,9 @@
 #include "pm_typemanager.h"
 
 using namespace std;
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 /////////////////////////////TableOperand//////////////////////////////////////
 
@@ -2722,3 +2724,8 @@ ArrayFieldElOperand::Duplicate () const
 
   return StackValue (ArrayOperand (value));
 }
+
+
+} //namespace prima
+} //namespace whisper
+

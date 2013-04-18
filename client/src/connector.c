@@ -28,11 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "server/include/server_protocol.h"
-#include "utils/include/le_converter.h"
-#include "utils/include/random.h"
-#include "utils/include/utf8.h"
-#include "utils/include/enc_3k.h"
+#include "utils/le_converter.h"
+#include "utils/wrandom.h"
+#include "utils/utf8.h"
+#include "utils/enc_3k.h"
+#include "server/server_protocol.h"
 
 #include "connector.h"
 #include "client_connection.h"
@@ -77,7 +77,7 @@ data_size (const struct INTERNAL_HANDLER* const hnd)
 {
   uint_t metaDataSize;
 
-  const uint16_t frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
+  const uint16_t frameSize = load_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
 
   switch (hnd->cipher)
   {
@@ -178,7 +178,7 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
                 const uint8_t                  type)
 {
   uint32_t status    = 0;
-  uint_t   frameSize = from_le_int16 (hnd->data + FRAME_SIZE_OFF);
+  uint_t   frameSize = load_le_int16 (hnd->data + FRAME_SIZE_OFF);
 
   if (hnd->cipher == FRAME_ENCTYPE_3K)
     {
@@ -188,13 +188,13 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
       uint8_t  prev, i;
 
       while (frameSize % sizeof (uint32_t) != 0)
-        hnd->data[frameSize++] = w_rnd () & 0xFF;
+        hnd->data[frameSize++] = wh_rnd () & 0xFF;
 
-      firstKing  = w_rnd () & 0xFFFFFFFF;
+      firstKing  = wh_rnd () & 0xFFFFFFFF;
       store_le_int32 (firstKing,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_FIRST_KING_OFF);
 
-      secondKing = w_rnd () & 0xFFFFFFFF;
+      secondKing = wh_rnd () & 0xFFFFFFFF;
       store_le_int32 (secondKing,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
 
@@ -209,10 +209,10 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
       store_le_int16 (plainSize,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
 
-      store_le_int16 (w_rnd () & 0xFFFF,
+      store_le_int16 (wh_rnd () & 0xFFFF,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
 
-      encrypt_3k_buffer (firstKing,
+      wh_buff_3k_encode (firstKing,
                          secondKing,
                          hnd->encriptionKey,
                          hnd->encKeySize,
@@ -269,7 +269,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
     return WCS_UNEXPECTED_FRAME;
 
   /* The real frame size. */
-  frameSize = from_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
+  frameSize = load_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
   if ((frameSize < FRAME_HDR_SIZE)
       || (frameSize > hnd->dataSize)
       || (hnd->data[FRAME_ENCTYPE_OFF] != hnd->cipher))
@@ -293,7 +293,7 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
       frameRead += chunkSize;
     }
 
-  if (from_le_int32 (hnd->data + FRAME_ID_OFF) != hnd->expectedFrameId)
+  if (load_le_int32 (hnd->data + FRAME_ID_OFF) != hnd->expectedFrameId)
     return WCS_UNEXPECTED_FRAME;
 
   if (hnd->cipher == FRAME_ENCTYPE_3K)
@@ -309,21 +309,21 @@ receive_raw_frame (struct INTERNAL_HANDLER* const hnd)
           prev = hnd->data[FRAME_HDR_SIZE + i];
         }
 
-      firstKing = from_le_int32 (hnd->data +
+      firstKing = load_le_int32 (hnd->data +
                                 FRAME_HDR_SIZE +
                                 ENC_3K_FIRST_KING_OFF);
-      secondKing = from_le_int32 (hnd->data +
+      secondKing = load_le_int32 (hnd->data +
                                   FRAME_HDR_SIZE +
                                   ENC_3K_SECOND_KING_OFF);
 
-      decrypt_3k_buffer (firstKing,
+      wh_buff_3k_decode (firstKing,
                          secondKing,
                          hnd->encriptionKey,
                          hnd->encKeySize,
                          hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
                          frameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF));
 
-      plainSize = from_le_int16 (hnd->data+
+      plainSize = load_le_int16 (hnd->data+
                                  FRAME_HDR_SIZE +
                                  ENC_3K_PLAIN_SIZE_OFF);
 
@@ -346,7 +346,7 @@ send_command (struct INTERNAL_HANDLER* const hnd,
   uint_t         cs       = WCS_OK;
   uint16_t       chkSum   = 0;
 
-  hnd->clientCookie = w_rnd ();
+  hnd->clientCookie = wh_rnd ();
 
   for (index = 0; index < dataSize; index++)
     chkSum += data (hnd)[index];
@@ -376,21 +376,21 @@ recieve_answer (struct INTERNAL_HANDLER* const hnd,
   for (index = 0; index < dataSize; index++)
     chkSum += data (hnd)[index];
 
-  if (chkSum != from_le_int16 (rawData + PLAIN_CRC_OFF))
+  if (chkSum != load_le_int16 (rawData + PLAIN_CRC_OFF))
     {
       cs = WCS_INVALID_FRAME;
       goto recieve_failure;
     }
-  else if (from_le_int32 (rawData + PLAIN_CLNT_COOKIE_OFF) !=
+  else if (load_le_int32 (rawData + PLAIN_CLNT_COOKIE_OFF) !=
            hnd->clientCookie)
     {
       cs = WCS_UNEXPECTED_FRAME;
       goto recieve_failure;
     }
 
-  hnd->serverCookie = from_le_int32 (rawData + PLAIN_SERV_COOKIE_OFF);
+  hnd->serverCookie = load_le_int32 (rawData + PLAIN_SERV_COOKIE_OFF);
 
-  *outRsp = from_le_int16 (rawData + PLAIN_TYPE_OFF);
+  *outRsp = load_le_int16 (rawData + PLAIN_TYPE_OFF);
   if ((*outRsp == CMD_INVALID_RSP) || ((*outRsp & 1) == 0))
     {
       cs = WCS_INVALID_FRAME;
@@ -468,7 +468,7 @@ WConnect (const char* const    host,
        * cipher to be used, version, etc.). */
       uint_t serverFrameSize = 0;
 
-      const uint32_t frameId = from_le_int32 (&result->data[FRAME_ID_OFF]);
+      const uint32_t frameId = load_le_int32 (&result->data[FRAME_ID_OFF]);
 
       if ((frameId != 0)
           || (result->data[FRAME_TYPE_OFF] != FRAME_TYPE_AUTH_CLNT))
@@ -487,7 +487,7 @@ WConnect (const char* const    host,
           status = WCS_ENCTYPE_NOTSUPP;
           goto fail_ret;
         }
-      result->version = from_le_int32 (result->data +
+      result->version = load_le_int32 (result->data +
                                          FRAME_HDR_SIZE +
                                          FRAME_AUTH_VER_OFF);
       if ((result->version & CLIENT_VERSION) == 0)
@@ -499,7 +499,7 @@ WConnect (const char* const    host,
         result->version = CLIENT_VERSION;
 
       /* Make sure we are able to handle server's published max frames size */
-      serverFrameSize = from_le_int16 (result->data +
+      serverFrameSize = load_le_int16 (result->data +
                                          FRAME_HDR_SIZE +
                                          FRAME_AUTH_SIZE_OFF);
       assert (MIN_FRAME_SIZE <= serverFrameSize);
@@ -609,7 +609,7 @@ WPingServer (const WH_CONNECTION hnd)
 
   if ((type != CMD_PING_SERVER_RSP)
       || (data_size (hnd_) != sizeof (uint32_t))
-      || (from_le_int32 (data (hnd_)) != WCS_OK))
+      || (load_le_int32 (data (hnd_)) != WCS_OK))
 
     {
       cs = WCS_INVALID_FRAME;
@@ -645,14 +645,14 @@ list_globals (struct INTERNAL_HANDLER* const hnd,
     }
 
   data_ = data (hnd);
-  if ((cs = from_le_int32 (data_)) != WCS_OK)
+  if ((cs = load_le_int32 (data_)) != WCS_OK)
     goto list_globals_err;
 
   dataOffset  = sizeof (uint32_t);
-  *outCount   = from_le_int32 (data_ + dataOffset);
+  *outCount   = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_GLBINDEX] = from_le_int32 (data_ + dataOffset);
+  hnd->cmdInternal[LIST_GLBINDEX] = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
   hnd->cmdInternal[LIST_GLBOFF]    = dataOffset;
@@ -705,7 +705,7 @@ WListGlobalsFetch (const WH_CONNECTION hnd,
     {
       return WCS_INVALID_ARGS;
     }
-  else if ((cs = from_le_int32 (data (hnd_))) != WCS_OK)
+  else if ((cs = load_le_int32 (data (hnd_))) != WCS_OK)
     goto list_global_fetch_err;
 
   glbsCount  = hnd_->cmdInternal[LIST_GLBSCOUNT];
@@ -784,7 +784,7 @@ list_procedures (struct INTERNAL_HANDLER* const hnd,
     }
 
   data_ = data (hnd);
-  if ((cs = from_le_int32 (data_)) != WCS_OK)
+  if ((cs = load_le_int32 (data_)) != WCS_OK)
     goto list_procedures_err;
 
   else if (data_size (hnd) < 3 * sizeof (uint32_t))
@@ -794,10 +794,10 @@ list_procedures (struct INTERNAL_HANDLER* const hnd,
     }
 
   dataOffset  = sizeof (uint32_t);
-  *outCount   = from_le_int32 (data_ + dataOffset);
+  *outCount   = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_PROCSINDEX] = from_le_int32 (data_ + dataOffset);
+  hnd->cmdInternal[LIST_PROCSINDEX] = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
   hnd->cmdInternal[LIST_PROCOFF]    = dataOffset;
@@ -851,7 +851,7 @@ WListProceduresFetch (const WH_CONNECTION  hnd,
       return WCS_INVALID_ARGS;
     }
 
-  else if ((cs = from_le_int32 (data (hnd_))) != WCS_OK)
+  else if ((cs = load_le_int32 (data (hnd_))) != WCS_OK)
     goto list_procedure_fetch_err;
 
 
@@ -961,20 +961,20 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
 
   data_ = data (hnd);
 
-  if ((cs = from_le_int32 (data_)) != WCS_OK)
+  if ((cs = load_le_int32 (data_)) != WCS_OK)
     goto describe_value_err;
 
   assert (offset == strlen ((char*)data_ + sizeof (uint32_t)) + 1 +
                     sizeof (uint32_t));
 
-  *outRawType = from_le_int16 (data_ + offset);
+  *outRawType = load_le_int16 (data_ + offset);
   hnd->cmdInternal[DESC_RAWTYPE] = *outRawType;
   offset += sizeof (uint16_t);
 
-  hnd->cmdInternal[DESC_FIELD_COUNT] = from_le_int16 (data_ + offset);
+  hnd->cmdInternal[DESC_FIELD_COUNT] = load_le_int16 (data_ + offset);
   offset += sizeof (uint16_t);
 
-  hnd->cmdInternal[DESC_FIELD_HINT] = from_le_int16 (data_ + offset);
+  hnd->cmdInternal[DESC_FIELD_HINT] = load_le_int16 (data_ + offset);
   offset += sizeof (uint16_t);
 
   hnd->cmdInternal[DESC_FIELD_OFFSET] = offset;
@@ -1030,7 +1030,7 @@ WFieldsCount (const WH_CONNECTION  hnd,
     return WCS_INCOMPLETE_CMD;
 
   data_ = data (hnd);
-  if ((cs = from_le_int32 (data_)) != WCS_OK)
+  if ((cs = load_le_int32 (data_)) != WCS_OK)
     goto describe_value_field_cnt_err;
 
   type = hnd_->cmdInternal[DESC_RAWTYPE];
@@ -1074,7 +1074,7 @@ WFetchField (const WH_CONNECTION    hnd,
     return WCS_INCOMPLETE_CMD;
 
   data_ = data (hnd_);
-  if ((cs = from_le_int32 (data_)) != WCS_OK)
+  if ((cs = load_le_int32 (data_)) != WCS_OK)
     goto describe_value_fetch_field_err;
 
 describe_value_fetch_field_again:
@@ -1107,7 +1107,7 @@ describe_value_fetch_field_again:
       *outpFieldName  = (char*)data (hnd_) + offset;
       offset         += strlen (*outpFieldName) + 1;
 
-      *outFieldType  = from_le_int16 (data(hnd_) + offset);
+      *outFieldType  = load_le_int16 (data(hnd_) + offset);
       offset        += sizeof (uint16_t);
 
       ++fieldHint;
@@ -1477,7 +1477,7 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
   assert (hnd != NULL);
   assert (strlen (value) > 0);
 
-  if (utf8_strlen ((const uint8_t*)value) < 0)
+  if (wh_utf8_strlen ((const uint8_t*)value) < 0)
     return WCS_INVALID_ARGS;
 
   else if (cmdSize > max_data_size (hnd))
@@ -1496,15 +1496,15 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
 
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
   {
-      const uint16_t prevType = from_le_int16 (++data_);
+      const uint16_t prevType = load_le_int16 (++data_);
       if (prevType == WHC_TYPE_TEXT)
         {
           data_ += sizeof (uint16_t);
 
-          const uint64_t prevOffset = from_le_int64 (data_);
+          const uint64_t prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const int prevLen = utf8_strlen (data_);
+          const int prevLen = wh_utf8_strlen (data_);
 
           assert (prevLen >= 0);
 
@@ -1574,7 +1574,7 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* const hnd,
   assert (strlen (value) > 0);
   assert (strlen (fieldName) > 0);
 
-  if (utf8_strlen ((const uint8_t*)value) < 0)
+  if (wh_utf8_strlen ((const uint8_t*)value) < 0)
     return WCS_INVALID_ARGS;
 
   else if (cmdSize > max_data_size (hnd))
@@ -1593,7 +1593,7 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* const hnd,
 
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
     {
-      const uint16_t prevType = from_le_int16 (++data_);
+      const uint16_t prevType = load_le_int16 (++data_);
       if (prevType == (WHC_TYPE_TEXT | WHC_TYPE_FIELD_MASK))
         {
           data_ += sizeof (uint16_t);
@@ -1601,13 +1601,13 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* const hnd,
           const char* const prevFieldName = (const char*)data_;
           data_ += strlen (prevFieldName) + 1;
 
-          const uint64_t prevRow = from_le_int64 (data_);
+          const uint64_t prevRow = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const uint64_t prevOffset = from_le_int64 (data_);
+          const uint64_t prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const int prevLen = utf8_strlen (data_);
+          const int prevLen = wh_utf8_strlen (data_);
 
           assert (prevLen >= 0);
 
@@ -1696,18 +1696,18 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* const hnd,
   {
       data_ += hnd->cmdInternal[LAST_UPDATE_OFF];
 
-      const uint16_t prevType = from_le_int16 (++data_);
+      const uint16_t prevType = load_le_int16 (++data_);
       if ((type | WHC_TYPE_ARRAY_MASK) == prevType)
         {
           data_ += sizeof (uint16_t);
 
-          const uint16_t prevCount = from_le_int16 (data_);
+          const uint16_t prevCount = load_le_int16 (data_);
 
           assert (prevCount > 0);
 
           data_ += sizeof (uint16_t);
 
-          const uint64_t prevOffset = from_le_int64 (data_);
+          const uint64_t prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
           if ((prevCount < 0xFFFF) &&
@@ -1798,7 +1798,7 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* const hnd,
 
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
   {
-      const uint16_t prevType = from_le_int16 (++data_);
+      const uint16_t prevType = load_le_int16 (++data_);
       if ((type | WHC_TYPE_ARRAY_MASK | WHC_TYPE_FIELD_MASK) == prevType)
         {
           data_ += sizeof (uint16_t);
@@ -1806,16 +1806,16 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* const hnd,
           const char* prevFielName = (const char*)data_;
           data_ += strlen (prevFielName) + 1;
 
-          const uint64_t prevRow = from_le_int64 (data_);
+          const uint64_t prevRow = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const uint16_t prevCount = from_le_int16 (data_);
+          const uint16_t prevCount = load_le_int16 (data_);
 
           assert (prevCount > 0);
 
           data_ += sizeof (uint16_t);
 
-          const uint64_t prevOffset = from_le_int64 (data_);
+          const uint64_t prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
           if (((prevOffset + prevCount) == arrayOff)
@@ -2045,7 +2045,7 @@ WFlush (const WH_CONNECTION hnd)
   else if (type != CMD_UPDATE_STACK_RSP)
     return WCS_UNEXPECTED_FRAME;
 
-  cs = from_le_int32 (data (hnd_));
+  cs = load_le_int32 (data (hnd_));
 
   memset (hnd_->cmdInternal, 0, sizeof (hnd_->cmdInternal));
   set_data_size (hnd_, 0);
@@ -2107,7 +2107,7 @@ send_stack_read_req (struct INTERNAL_HANDLER* const hnd,
   else if (type != CMD_READ_STACK_RSP)
     return WCS_UNEXPECTED_FRAME;
 
-  cs = from_le_int32 (data (hnd));
+  cs = load_le_int32 (data (hnd));
 
   return cs;
 }
@@ -2124,7 +2124,7 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
   /* Position points at the beginning of the current field,
    * so retrieve the its type. */
   const uint_t nameLen = strlen ((const char*)data_ + position) + 1;
-  uint16_t     type    = from_le_int16 (data_ + position + nameLen);
+  uint16_t     type    = load_le_int16 (data_ + position + nameLen);
 
   position += nameLen + sizeof (uint16_t);
 
@@ -2133,12 +2133,12 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
   /* Do the offset calculations based on the type of the current field. */
   if (type & WHC_TYPE_ARRAY_MASK)
     {
-      const uint_t arraySize = from_le_int64 (data_ + position);
+      const uint_t arraySize = load_le_int64 (data_ + position);
       position += sizeof (uint64_t);
 
       if (arraySize != 0)
         {
-          uint64_t arrayOff = from_le_int64 (data_ + position);
+          uint64_t arrayOff = load_le_int64 (data_ + position);
 
           assert (arrayOff < arraySize);
 
@@ -2154,7 +2154,7 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
                 }
               else
                 {
-                  assert (from_le_int32 (data_ + position) > 0);
+                  assert (load_le_int32 (data_ + position) > 0);
 
                   position += 2 * sizeof (uint64_t);
 
@@ -2179,12 +2179,12 @@ next_table_field_off (struct INTERNAL_HANDLER* const hnd,
     {
       if (type == WHC_TYPE_TEXT)
         {
-          const uint64_t charsCount = from_le_int64 (data_ + position);
+          const uint64_t charsCount = load_le_int64 (data_ + position);
           position += sizeof (uint64_t);
 
           if (charsCount > 0)
             {
-              assert (from_le_int64 (data_ + position) < charsCount);
+              assert (load_le_int64 (data_ + position) < charsCount);
 
               position += sizeof (uint64_t);
               position += strlen ((const char*)data_ + position) + 1;
@@ -2246,19 +2246,19 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
   const uint8_t* const data_    = data (hnd);
   const uint_t         dataSize = data_size (hnd);
 
-  uint16_t type       = from_le_int16 (data_ + sizeof (uint32_t));
+  uint16_t type       = load_le_int16 (data_ + sizeof (uint32_t));
   uint_t   rowOff     = sizeof (uint32_t) + sizeof (uint16_t);
   uint64_t currentRow = 0;
 
   assert (hnd->lastCmdRespReceived == CMD_READ_STACK_RSP);
   assert (dataSize > (uint32_t) + sizeof (uint16_t));
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
-  if (row >= from_le_int64 (data_ + rowOff))
+  if (row >= load_le_int64 (data_ + rowOff))
     return 0;
 
   rowOff     += sizeof (uint64_t);
-  currentRow  = from_le_int64 (data_ + rowOff);
+  currentRow  = load_le_int64 (data_ + rowOff);
   rowOff     += sizeof (uint64_t);
 
   if (currentRow > row)
@@ -2266,7 +2266,7 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
 
   if (type == WHC_TYPE_TABLE_MASK)
     {
-      const uint_t fieldsCount = from_le_int16 (data_ + rowOff);
+      const uint_t fieldsCount = load_le_int16 (data_ + rowOff);
       rowOff += sizeof (uint16_t);
 
       while (currentRow < row)
@@ -2307,14 +2307,14 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
       while ((currentRow < row)
              && (rowOff < dataSize))
         {
-          const uint_t arrayCount = from_le_int64 (data_ + rowOff);
+          const uint_t arrayCount = load_le_int64 (data_ + rowOff);
           rowOff += sizeof (uint64_t);
 
           assert (rowOff <= dataSize);
 
           if (arrayCount > 0)
             {
-              uint_t arrayOff = from_le_int64 (data_ + rowOff);
+              uint_t arrayOff = load_le_int64 (data_ + rowOff);
               rowOff += sizeof (uint64_t);
 
               while ((arrayOff < arrayCount)
@@ -2322,11 +2322,11 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
                 {
                   if (type == WHC_TYPE_TEXT)
                     {
-                      assert (from_le_int64 (data_ + rowOff) > 0);
+                      assert (load_le_int64 (data_ + rowOff) > 0);
 
                       rowOff += sizeof (uint64_t);
 
-                      assert (from_le_int64 (data_ + rowOff) > 0);
+                      assert (load_le_int64 (data_ + rowOff) > 0);
 
                       rowOff += sizeof (uint64_t);
 
@@ -2366,14 +2366,14 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
     {
       if (type == WHC_TYPE_TEXT)
         {
-          const uint_t charsCount = from_le_int64 (data_ + sizeof (uint64_t));
+          const uint_t charsCount = load_le_int64 (data_ + sizeof (uint64_t));
           rowOff += sizeof (uint64_t);
 
           assert (rowOff <= dataSize);
 
           if (charsCount > 0)
             {
-              const uint_t textOff = from_le_int64 (data_ + sizeof (uint64_t));
+              const uint_t textOff = load_le_int64 (data_ + sizeof (uint64_t));
               rowOff += sizeof (uint64_t);
 
               assert (rowOff <= dataSize);
@@ -2414,7 +2414,7 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
 {
   const uint8_t* data_    = data (hnd);
   const uint_t   dataSize = data_size (hnd);
-  const uint64_t elCount  = from_le_int64 (data_ + fromPos);
+  const uint64_t elCount  = load_le_int64 (data_ + fromPos);
   uint64_t       currOff;
 
   assert (sizeof (uint32_t) <= fromPos);
@@ -2430,7 +2430,7 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
 
   assert (fromPos < dataSize);
 
-  currOff = from_le_int64 (data_ + fromPos);
+  currOff = load_le_int64 (data_ + fromPos);
   if (arrayOff < currOff)
     return 0;
 
@@ -2442,7 +2442,7 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
 
       if (type == WHC_TYPE_TEXT)
         {
-          assert (from_le_int64 (data_ + fromPos) > 0);
+          assert (load_le_int64 (data_ + fromPos) > 0);
 
           fromPos += sizeof (uint64_t);
           fromPos += sizeof (uint64_t);
@@ -2481,7 +2481,7 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
 {
   const uint8_t* data_    = data (hnd);
   const uint_t   dataSize = data_size (hnd);
-  const uint64_t elCount  = from_le_int64 (data_ + fromPos);
+  const uint64_t elCount  = load_le_int64 (data_ + fromPos);
   uint64_t       currOff;
 
   *pCharsCount = elCount;
@@ -2492,7 +2492,7 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
 
   assert (fromPos < dataSize);
 
-  currOff = from_le_int64 (data_ + fromPos);
+  currOff = load_le_int64 (data_ + fromPos);
   if (textOff < currOff)
     return 0;
 
@@ -2504,7 +2504,7 @@ text_el_off (struct INTERNAL_HANDLER* const hnd,
          && (fromPos < dataSize))
     {
       uint32_t ch     = 0;
-      uint_t   chSize = decode_utf8_char (data_ +fromPos, &ch);
+      uint_t   chSize = wh_load_utf8_cp (data_ +fromPos, &ch);
 
       assert (chSize > 0);
       assert (fromPos < dataSize);
@@ -2541,7 +2541,7 @@ WValueRowsCount (const WH_CONNECTION        hnd,
     return WCS_INCOMPLETE_CMD;
 
   if ((hnd_->lastCmdRespReceived != CMD_READ_STACK_RSP)
-      || (from_le_int32 (data (hnd)) != WCS_OK))
+      || (load_le_int32 (data (hnd)) != WCS_OK))
     {
       cs = send_stack_read_req (hnd_,
                                 WIGNORE_FIELD,
@@ -2555,15 +2555,15 @@ WValueRowsCount (const WH_CONNECTION        hnd,
   data_ = data (hnd_);
 
   assert (data_size (hnd_) > sizeof (uint32_t) + sizeof (uint16_t));
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
-  type  = from_le_int16 (data_ + sizeof (uint32_t));
+  type  = load_le_int16 (data_ + sizeof (uint32_t));
 
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
   if (type & WHC_TYPE_TABLE_MASK)
     {
-      *outCount = from_le_int64 (data_ +
+      *outCount = load_le_int64 (data_ +
                                    sizeof (uint32_t) +
                                    sizeof (uint16_t));
     }
@@ -2574,7 +2574,7 @@ WValueRowsCount (const WH_CONNECTION        hnd,
 
       assert (offset < data_size (hnd_));
 
-      *outCount = from_le_int64 (data_ + offset);
+      *outCount = load_le_int64 (data_ + offset);
     }
   else
     cs = WCS_TYPE_MISMATCH;
@@ -2607,7 +2607,7 @@ get_stack_value (struct INTERNAL_HANDLER* const hnd,
     return WCS_INCOMPLETE_CMD;
 
   if ((hnd->lastCmdRespReceived != CMD_READ_STACK_RSP)
-      || (from_le_int32 (data (hnd)) != WCS_OK))
+      || (load_le_int32 (data (hnd)) != WCS_OK))
     {
       cs = send_stack_read_req (hnd, field, row, arrayOff, textOff);
 
@@ -2622,7 +2622,7 @@ resend_req_get_stack_entry:
   dataSize   = data_size (hnd);
   dataOffset = sizeof (uint32_t);
 
-  *outType    = from_le_int16 (data_ + dataOffset);
+  *outType    = load_le_int16 (data_ + dataOffset);
   dataOffset += sizeof (uint16_t);
 
   if (*outType == WHC_TYPE_TABLE_MASK)
@@ -2659,7 +2659,7 @@ resend_req_get_stack_entry:
 
       assert (dataOffset < dataSize);
 
-      *outType    = from_le_int16 (data_ + dataOffset);
+      *outType    = load_le_int16 (data_ + dataOffset);
       dataOffset += sizeof (uint16_t);
 
       assert (dataOffset < dataSize);
@@ -2901,7 +2901,7 @@ describe_proc_parameter (struct INTERNAL_HANDLER* const hnd,
     }
 
   data_ = data (hnd);
-  if ((cs = from_le_int32 (data_)) != WCS_OK)
+  if ((cs = load_le_int32 (data_)) != WCS_OK)
     goto describe_proc_parameter_err;
 
   else if ((strcmp ((char*)data_ + sizeof (uint32_t), procedure) != 0)
@@ -2945,7 +2945,7 @@ WProcParamsCount (const WH_CONNECTION   hnd,
     {
       data_ = data (hnd_);
 
-      assert (from_le_int32 (data_) == WCS_OK);
+      assert (load_le_int32 (data_) == WCS_OK);
 
       if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
@@ -2959,9 +2959,9 @@ WProcParamsCount (const WH_CONNECTION   hnd,
   data_ = data (hnd_);
 
   assert (cs == WCS_OK);
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
-  *outCount = from_le_int16 (data_ +
+  *outCount = load_le_int16 (data_ +
                                sizeof (uint32_t) +
                                strlen (procedure) + 1);
 
@@ -2984,26 +2984,26 @@ get_paratmeter_offset (struct INTERNAL_HANDLER* const       hnd,
 
   assert (data_size (hnd) > sizeof (uint32_t) + sizeof (uint16_t));
   assert (hnd->lastCmdRespReceived == CMD_DESC_PROC_PARAM_RSP);
-  assert (from_le_int32 (data (hnd)) == WCS_OK);
+  assert (load_le_int32 (data (hnd)) == WCS_OK);
 
   *outOff  = sizeof (uint32_t);
   *outOff += nameLen;
 
-  count = from_le_int16 (data_ + *outOff); *outOff += sizeof (uint16_t);
-  hint  = from_le_int16 (data_ + *outOff); *outOff += sizeof (uint16_t);
+  count = load_le_int16 (data_ + *outOff); *outOff += sizeof (uint16_t);
+  hint  = load_le_int16 (data_ + *outOff); *outOff += sizeof (uint16_t);
 
   if ((param < hint) || (count < param))
     return WCS_INVALID_ARGS;
 
   for (it = hint; (it < param) && (*outOff < data_size (hnd)); ++it)
     {
-      const uint16_t type = from_le_int16 (data_ + *outOff);
+      const uint16_t type = load_le_int16 (data_ + *outOff);
       *outOff += sizeof (uint16_t);
       if (type & WHC_TYPE_TABLE_MASK)
         {
           uint_t field;
 
-          const uint16_t fieldsCount = from_le_int16 (data_ + *outOff);
+          const uint16_t fieldsCount = load_le_int16 (data_ + *outOff);
 
           *outOff += sizeof (uint16_t);
 
@@ -3049,7 +3049,7 @@ WProcParamType (const WH_CONNECTION     hnd,
     {
       data_ = data (hnd_);
 
-      assert (from_le_int32 (data_) == WCS_OK);
+      assert (load_le_int32 (data_) == WCS_OK);
 
       if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
@@ -3070,14 +3070,14 @@ proc_parameter_try_again:
   data_ = data (hnd_);
 
   assert (cs == WCS_OK);
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
   if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
     goto proc_parameter_err;
 
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
 
-  *outRawType = from_le_int16 (data_ + offset);
+  *outRawType = load_le_int16 (data_ + offset);
 
   assert (cs == WCS_OK);
   return WCS_OK;
@@ -3125,7 +3125,7 @@ WProcParamFieldCount (const WH_CONNECTION       hnd,
     {
       data_ = data (hnd_);
 
-      assert (from_le_int32 (data_) == WCS_OK);
+      assert (load_le_int32 (data_) == WCS_OK);
 
       if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
@@ -3145,7 +3145,7 @@ proc_parameter_field_count_try_again:
   data_ = data (hnd_);
 
   assert (cs == WCS_OK);
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
   if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
     goto proc_parameter_field_count_err;
@@ -3155,7 +3155,7 @@ proc_parameter_field_count_try_again:
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
 
   offset += sizeof (uint16_t);
-  *outCount = from_le_int16 (data_ + offset);
+  *outCount = load_le_int16 (data_ + offset);
 
   assert (cs == WCS_OK);
 
@@ -3209,7 +3209,7 @@ WProcParamField (const WH_CONNECTION   hnd,
   else if (hnd_->lastCmdRespReceived == CMD_DESC_PROC_PARAM_RSP)
     {
       data_ = data (hnd_);
-      assert (from_le_int32 (data_) == WCS_OK);
+      assert (load_le_int32 (data_) == WCS_OK);
 
       if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
@@ -3226,7 +3226,7 @@ proc_parameter_field_try_again:
   data_ = data (hnd_);
 
   assert (cs == WCS_OK);
-  assert (from_le_int32 (data_) == WCS_OK);
+  assert (load_le_int32 (data_) == WCS_OK);
 
   if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
     goto proc_parameter_field_err;
@@ -3236,7 +3236,7 @@ proc_parameter_field_try_again:
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
 
   offset      += sizeof (uint16_t);
-  fieldsCount  = from_le_int16 (data_ + offset);
+  fieldsCount  = load_le_int16 (data_ + offset);
 
   if (fieldsCount <= field)
     {
@@ -3253,7 +3253,7 @@ proc_parameter_field_try_again:
 
   *outpFieldName  = (char*)data_ + offset;
   offset         += strlen (*outpFieldName) + 1;
-  *outFieldType   = from_le_int16 (data_ + offset);
+  *outFieldType   = load_le_int16 (data_ + offset);
 
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
   assert (cs == WCS_OK);

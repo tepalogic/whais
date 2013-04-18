@@ -27,14 +27,15 @@
 
 #include "dbs/dbs_values.h"
 #include "dbs/dbs_mgr.h"
-#include "utils/random.h"
+#include "utils/wrandom.h"
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
 #include "ps_valintep.h"
 
-using namespace pastra;
 using namespace std;
+using namespace whisper;
+using namespace pastra;
 
 static const uint_t MAX_VALUE_RAW_STORAGE = 0x20;
 
@@ -176,7 +177,7 @@ DBSHiresTime::DBSHiresTime (const int32_t year,
 }
 
 DBSText::DBSText (const char* pText)
-  : m_pText (& NullText::GetSingletoneInstace())
+  : m_pText (& pastra::NullText::GetSingletoneInstace())
 {
   if ((pText != NULL) && (*pText != 0))
     {
@@ -463,7 +464,7 @@ DBSText::SetMirror (DBSText& mirror) const
 }
 
 template <class T> void
-init_array (const T* array, uint64_t count, I_ArrayStrategy*& prOutStrategy)
+wh_array_init (const T* array, uint64_t count, I_ArrayStrategy*& prOutStrategy)
 {
   if (count == 0)
     {
@@ -518,91 +519,91 @@ DBSArray::DBSArray ()
 DBSArray::DBSArray (const DBSBool* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSChar* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSDate* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSDateTime* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSHiresTime* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSUInt8* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSUInt16* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSUInt32* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSUInt64* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSReal* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSRichReal* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSInt8* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSInt16* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSInt32* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (const DBSInt64* array, uint64_t count)
   : m_pArray (NULL)
 {
-  init_array (array, count, m_pArray);
+  wh_array_init (array, count, m_pArray);
 }
 
 DBSArray::DBSArray (I_ArrayStrategy& strategy)

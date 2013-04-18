@@ -15,6 +15,8 @@
 #include "interpreter.h"
 #include "custom/include/test/test_fmw.h"
 
+using namespace whisper;
+
 static const uint_t MAX_PROC_PARAM = 10;
 static const uint_t MAX_FIELDS     = 10;
 

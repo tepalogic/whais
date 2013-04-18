@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 
-#include "utils/include/catree.h"
+#include "utils/catree.h"
 
 typedef std::vector<uint64_t> VectInt64;
 

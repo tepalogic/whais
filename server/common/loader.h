@@ -31,6 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "configuration.h"
 
 bool
-LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc);
+LoadDatabase (whisper::FileLogger& log, DBSDescriptors& ioDbsDesc);
 
 #endif /* LOADER_H_ */

@@ -11,6 +11,7 @@
 #include "interpreter/prima/pm_operand.h"
 #include "compiler//wopcodes.h"
 
+using namespace whisper;
 using namespace prima;
 
 static const char admin[] = "administrator";

@@ -16,8 +16,8 @@
 #undef uint_t128
 
 #include "dbs_real.h"
-#include "utils/include/we_int128.h"
-#include "utils/include/random.h"
+#include "utils/we_int128.h"
+#include "utils/wrandom.h"
 #include "custom/include/test/test_fmw.h"
 
 using namespace std;
@@ -37,8 +37,8 @@ test_for_addition_64bit_values ()
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd ();
-      j = w_rnd ();
+      i = wh_rnd ();
+      j = wh_rnd ();
 
       addRes = WE_I128(i) + j;
       if (addRes != WE_I128(j) + i)
@@ -82,8 +82,8 @@ test_for_addition_32bit_values ()
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
-      j = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
+      i = _SC (int32_t, wh_rnd () & 0xFFFFFFFF);
+      j = _SC (int32_t, wh_rnd () & 0xFFFFFFFF);
 
       addRes = WE_I128(i) + j;
       if (addRes != WE_I128(j) + i)
@@ -130,8 +130,8 @@ test_for_addition_mix_values ()
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd ();
-      j = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
+      i = wh_rnd ();
+      j = _SC (int32_t, wh_rnd () & 0xFFFFFFFF);
 
       addRes = WE_I128(i) + j;
       if (addRes != WE_I128(j) + i)
@@ -176,9 +176,9 @@ test_for_reminder_64bit_values ()
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd () & 0x7FFFFFFFFFFFFFFF;
-      j = w_rnd () & 0x7FFFFFFFFFFFFFFF;
-      k = w_rnd () & 0x7FFFFFFFFFFFFFFF;
+      i = wh_rnd () & 0x7FFFFFFFFFFFFFFF;
+      j = wh_rnd () & 0x7FFFFFFFFFFFFFFF;
+      k = wh_rnd () & 0x7FFFFFFFFFFFFFFF;
 
       k %= i;
       k %= j;
@@ -234,9 +234,9 @@ test_for_reminder_32bit_values ()
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd () & 0x7FFFFFFF;
-      j = w_rnd () & 0x7FFFFFFF;
-      k = w_rnd () & 0x7FFFFFFF;
+      i = wh_rnd () & 0x7FFFFFFF;
+      j = wh_rnd () & 0x7FFFFFFF;
+      k = wh_rnd () & 0x7FFFFFFF;
 
       k %= i;
       k %= j;
@@ -297,9 +297,9 @@ test_for_reminder_mix_bit_values ()
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = w_rnd () & 0x7FFFFFFFFFFFFFFF;
-      j = w_rnd () & 0x7FFFFFFF;
-      k = w_rnd () & 0x7FFFFFFFFFFFFFFF;
+      i = wh_rnd () & 0x7FFFFFFFFFFFFFFF;
+      j = wh_rnd () & 0x7FFFFFFF;
+      k = wh_rnd () & 0x7FFFFFFFFFFFFFFF;
 
       k %= i;
       k %= j;
@@ -388,7 +388,7 @@ test_for_special_add_cases ()
           if ((1ll - val1 != -val1 + 1) || (1ll - val2 != -val2 + 1))
             goto test_special_add_fail;
 
-          int64_t temp = w_rnd();
+          int64_t temp = wh_rnd();
 
           if ((temp - val1 != -val1 + temp) || (temp - val2 != -val2 + temp))
             goto test_special_add_fail;

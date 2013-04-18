@@ -33,36 +33,36 @@
 #include "pm_processor.h"
 
 using namespace std;
-using namespace prima;
 
+namespace whisper {
 
-typedef pair<string, NameSpaceHolder> NameSpacePair;
+typedef pair<string, prima::NameSpaceHolder> NameSpacePair;
 
 static const char                 gDBSName[] = "administrator";
-static WSynchronizer                gSync;
-static map<string, NameSpaceHolder> gmNameSpaces;
+static Lock                gSync;
+static map<string, prima::NameSpaceHolder> gmNameSpaces;
 
 INTERP_SHL void
 InitInterpreter (const char* adminDbsDir)
 {
-  WSynchronizerRAII syncHolder (gSync);
+  LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () != 0)
     throw InterException (NULL, _EXTRA (InterException::ALREADY_INITED));
 
   static I_DBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName, adminDbsDir);
 
-  NameSpaceHolder handler (new NameSpace (glbDbsHnd));
+  prima::NameSpaceHolder handler (new prima::NameSpace (glbDbsHnd));
   gmNameSpaces.insert (NameSpacePair (gDBSName, handler));
 }
 
 INTERP_SHL I_Session&
-GetInstance (const char* pName, I_Logger* pLog)
+GetInstance (const char* pName, Logger* pLog)
 {
   if (pLog == NULL)
     pLog = &NULL_LOGGER;
 
-  WSynchronizerRAII syncHolder (gSync);
+  LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
     throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
@@ -72,13 +72,13 @@ GetInstance (const char* pName, I_Logger* pLog)
   else if (strcmp (pName, gDBSName) == 0)
     throw InterException (NULL, _EXTRA (InterException::INVALID_SESSION));
 
-  map<string, NameSpaceHolder>::iterator it = gmNameSpaces.find (pName);
+  map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.find (pName);
   if (it == gmNameSpaces.end ())
     {
       I_DBSHandler& hnd = DBSRetrieveDatabase (pName);
       gmNameSpaces.insert (NameSpacePair (
                                         pName,
-                                        NameSpaceHolder (new NameSpace (hnd))
+                                        prima::NameSpaceHolder (new prima::NameSpace (hnd))
                                          ));
     }
 
@@ -88,36 +88,36 @@ GetInstance (const char* pName, I_Logger* pLog)
   //TODO: 1. Investigate a potential mechanism to avoid allocating session on heap
   //         You need this in order to handle requested for force shout down.
   //      2. Throw an execution exception when pLog is null at this point
-  return *(new Session (*pLog,
+  return *(new prima::Session (*pLog,
                         gmNameSpaces.find (gDBSName)->second, it->second));
 }
 
 INTERP_SHL void
 ReleaseInstance (I_Session& hInstance)
 {
-  WSynchronizerRAII syncHolder (gSync);
+  LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
     throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
 
-  Session* const inst = _SC (Session*, &hInstance);
+  prima::Session* const inst = _SC (prima::Session*, &hInstance);
   delete inst;
 }
 
 INTERP_SHL void
 CleanInterpreter (const bool forced)
 {
-  WSynchronizerRAII syncHolder (gSync);
+  LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
     throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
 
   //TODO: remember to clean the sessions to when the mechanism will
   //be employed
-  map<string, NameSpaceHolder>::iterator it = gmNameSpaces.begin ();
+  map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.begin ();
   while (it != gmNameSpaces.end ())
     {
-      NameSpaceHolder& space = it->second;
+      prima::NameSpaceHolder& space = it->second;
 
       if (forced)
         space.ForceRelease ();
@@ -130,6 +130,18 @@ CleanInterpreter (const bool forced)
   gmNameSpaces.clear ();
 }
 
+////////////////////////////////I_Session//////////////////////////////////////
+
+I_Session::I_Session (Logger& log)
+  : m_Log (log)
+{
+}
+
+I_Session::~I_Session ()
+{
+}
+
+namespace prima {
 ////////////////////////////////NameSpace//////////////////////////////////////
 
 NameSpace::NameSpace (I_DBSHandler& dbsHandler)
@@ -145,21 +157,9 @@ NameSpace::~NameSpace ()
 {
 }
 
-
-////////////////////////////////I_Session//////////////////////////////////////
-
-I_Session::I_Session (I_Logger& log)
-  : m_Log (log)
-{
-}
-
-I_Session::~I_Session ()
-{
-}
-
 //////////////////////////////////Session//////////////////////////////////////
 
-Session::Session (I_Logger&        log,
+Session::Session (Logger&        log,
                   NameSpaceHolder& globalNames,
                   NameSpaceHolder& privateNames)
   : I_Session (log),
@@ -900,7 +900,11 @@ Session::DefineProcedure (const uint8_t*      pName,
                                unit);
 }
 
+} //namespace prima
+} //namespace whisper
+
 #if  defined (ENABLE_MEMORY_TRACE) && defined (USE_INTERP_SHL)
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "PRIMA";
 #endif
+

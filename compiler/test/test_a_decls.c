@@ -15,7 +15,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  init_array (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -26,17 +26,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  destroy_array (&state->parsedValues);
+  wh_array_clean (&state->parsedValues);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = get_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -57,7 +57,7 @@ static bool_t
 check_declared_var (struct Statement *stm,
                     struct DeclaredVar *var, uint_t type)
 {
-  struct OutputStream *os = &stm->spec.glb.typesDescs;
+  struct WOutputStream *os = &stm->spec.glb.typesDescs;
   if ((var == NULL) ||                /* var not found */
       (var->type != type) ||        /* invalid type */
       ((var->varId & GLOBAL_DECL)) == 0)
@@ -65,14 +65,14 @@ check_declared_var (struct Statement *stm,
       return FALSE;
     }
 
-  if ((var->typeSpecOff >= get_size_outstream (os)))
+  if ((var->typeSpecOff >= wh_ostream_size (os)))
     {
       return FALSE;
     }
   else
     {
       struct TypeSpec *ts = (struct TypeSpec *)
-        &(get_buffer_outstream (os)[var->typeSpecOff]);
+        &(wh_ostream_data (os)[var->typeSpecOff]);
       if ((ts->type != type) ||
           (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
         {
@@ -97,7 +97,7 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  count = get_array_count (&(state->globalStmt.decls));
+  count = wh_array_count (&(state->globalStmt.decls));
   if (count != 5)
     {
       /* error: more declarations?!? */

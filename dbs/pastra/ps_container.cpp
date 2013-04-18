@@ -30,7 +30,8 @@
 
 #include "ps_container.h"
 
-using namespace pastra;
+namespace whisper {
+namespace pastra {
 
 static void
 safe_memcpy (uint8_t* pDest, uint8_t* pSrc, uint64_t uCount)
@@ -40,7 +41,7 @@ safe_memcpy (uint8_t* pDest, uint8_t* pSrc, uint64_t uCount)
 }
 
 void
-pastra::append_int_to_str (std::string& dest, uint64_t number)
+append_int_to_str (std::string& dest, uint64_t number)
 {
   const uint_t bitsCount    = sizeof (number) * 8;
   char       buffer[bitsCount];
@@ -77,7 +78,7 @@ FileContainer::FileContainer (const char*  pFileNameBase,
       if (unit != 0)
         append_int_to_str (fileName, unit);
 
-      WFile container (fileName.c_str (), uOpenMode);
+      File container (fileName.c_str (), uOpenMode);
       m_FilesHandles.push_back (container);
     }
 
@@ -86,7 +87,7 @@ FileContainer::FileContainer (const char*  pFileNameBase,
   // Check for structural consistency
   for (uint_t unit = 0; unit < unitsCount; ++unit)
     {
-      WFile& unitFile = m_FilesHandles[unit];
+      File& unitFile = m_FilesHandles[unit];
 
       if ((unitFile.GetSize () != maxFileSize) &&
           ((unit != (unitsCount - 1)) || (unitFile.GetSize () > maxFileSize)))
@@ -127,7 +128,7 @@ FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* pSource)
 
   assert (actualSize <= size);
 
-  WFile& unitFile = m_FilesHandles[unitIndex];
+  File& unitFile = m_FilesHandles[unitIndex];
 
   if (unitFile.GetSize () < unitPosition)
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
@@ -150,7 +151,7 @@ FileContainer::Read (uint64_t from, uint64_t size, uint8_t* pDest)
   if ((unitIndex > unitsCount) || (from + size > Size ()))
     throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
 
-  WFile& unitFile = m_FilesHandles[unitIndex];
+  File& unitFile = m_FilesHandles[unitIndex];
 
   uint64_t actualSize = size;
 
@@ -226,7 +227,7 @@ FileContainer::Size () const
   if (m_FilesHandles.size () == 0)
     return 0;
 
-  const WFile& lastUnitFile = m_FilesHandles[m_FilesHandles.size () - 1];
+  const File& lastUnitFile = m_FilesHandles[m_FilesHandles.size () - 1];
   uint64_t     result       = (m_FilesHandles.size () - 1) * m_MaxFileUnitSize;
 
   result += lastUnitFile.GetSize ();
@@ -249,7 +250,7 @@ FileContainer::ExtendContainer ()
   if (count != 0)
     append_int_to_str (fileName, count);
 
-  WFile unitFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILERDWR);
+  File unitFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILERDWR);
   m_FilesHandles.push_back (unitFile);
 }
 
@@ -417,9 +418,9 @@ TempContainer::FillCache (uint64_t position)
     {
       uint64_t curentId;
 
-      smSync.Enter ();
+      smSync.Acquire ();
       curentId = smTemporalsCount++;
-      smSync.Leave ();
+      smSync.Release ();
 
       assert (m_CacheStartPos == 0);
       assert (m_CacheEndPos == m_CacheSize);
@@ -462,4 +463,8 @@ TempContainer::FillCache (uint64_t position)
 }
 
 uint64_t      TempContainer::smTemporalsCount = 0;
-WSynchronizer TempContainer::smSync;
+Lock TempContainer::smSync;
+
+} //namespace pastra
+} //namespace whisper
+

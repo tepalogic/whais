@@ -26,9 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
+namespace whisper
+{
+
 const std::string
-NextToken (const std::string& text,
-           size_t&            ioPosition,
-           const std::string& delimiters);
+NextToken (const std::string&       text,
+           size_t&                  inoutOff,
+           const std::string&       delims);
+}
 
 #endif /* TOKENIZER_H_ */

@@ -32,172 +32,123 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define INLINE inline
 #endif
 
-static INLINE void
-to_le_int16 (uint8_t* pInOutValue)
-{
-  uint8_t        temp;
-  const uint16_t le_machine = 0x1;
-
-  if (*((uint8_t *) & le_machine))
-    return;     /* no need for conversion */
-
-  temp           = pInOutValue[0];
-  pInOutValue[0] = pInOutValue[1];
-  pInOutValue[1] = temp;
-}
-
-static INLINE void
-to_le_int32 (uint8_t* pInOutValue)
-{
-  uint8_t        temp;
-  const uint16_t le_machine = 0x1;
-
-  if (*((uint8_t *) & le_machine))
-    return;     /* no need for conversion */
-
-  temp           = pInOutValue[0];
-  pInOutValue[0] = pInOutValue[3];
-  pInOutValue[3] = temp;
-  temp           = pInOutValue[1];
-  pInOutValue[1] = pInOutValue[2];
-  pInOutValue[2] = temp;
-}
-
-static INLINE void
-to_le_int64 (uint8_t* pInOutValue)
-{
-  uint8_t        temp;
-  const uint16_t le_machine = 0x1;
-
-
-  if (*((uint8_t *) & le_machine))
-    return;     /* no need for conversion */
-
-  temp           = pInOutValue[0];
-  pInOutValue[0] = pInOutValue[7];
-  pInOutValue[7] = temp;
-  temp           = pInOutValue[1];
-  pInOutValue[1] = pInOutValue[6];
-  pInOutValue[6] = temp;
-  temp           = pInOutValue[2];
-  pInOutValue[2] = pInOutValue[5];
-  pInOutValue[5] = temp;
-  temp           = pInOutValue[3];
-  pInOutValue[3] = pInOutValue[4];
-  pInOutValue[4] = temp;
-}
-
 static INLINE uint16_t
-from_le_int16 (const uint8_t* pValue)
+load_le_int16 (const uint8_t* from)
 {
   uint16_t result;
 
-  result = pValue[1];
+  result = from[1];
   result <<= 8;
-  result += pValue[0];
+  result += from[0];
   return result;
 }
 
+
 static INLINE uint32_t
-from_le_int32 (const uint8_t* pValue)
+load_le_int32 (const uint8_t* from)
 {
   uint32_t result;
 
-  result = pValue[3];
+  result = from[3];
   result <<= 8;
-  result += pValue[2];
+  result += from[2];
   result <<= 8;
-  result += pValue[1];
+  result += from[1];
   result <<= 8;
-  result += pValue[0];
+  result += from[0];
 
   return result;
 }
 
+
 static INLINE uint64_t
-from_le_int64 (const uint8_t* pValue)
+load_le_int64 (const uint8_t* from)
 {
   uint64_t result;
 
-  result = pValue[7];
+  result = from[7];
   result <<= 8;
-  result += pValue[6];
+  result += from[6];
   result <<= 8;
-  result += pValue[5];
+  result += from[5];
   result <<= 8;
-  result += pValue[4];
+  result += from[4];
   result <<= 8;
-  result += pValue[3];
+  result += from[3];
   result <<= 8;
-  result += pValue[2];
+  result += from[2];
   result <<= 8;
-  result += pValue[1];
+  result += from[1];
   result <<= 8;
-  result += pValue[0];
+  result += from[0];
 
   return result;
 }
 
+
+
 static INLINE void
-store_le_int16 (const uint16_t value, uint8_t* const pDest)
+store_le_int16 (const uint16_t value, uint8_t* const to)
 {
-  const uint8_t* pSrc = (const uint8_t*)&value;
+  const uint8_t* from = (const uint8_t*)&value;
   const uint16_t le_machine = 0x1;
 
     if (*((uint8_t*)&le_machine))
       {
         uint_t i;
         for (i = 0; i < sizeof (value); ++i)
-          pDest[i] = pSrc[i];
+          to[i] = from[i];
       }
     else
       {
         uint_t i;
         for (i = 0; i < sizeof (value); ++i)
-          pDest[i] = pSrc[sizeof (value) - (i + 1)];
+          to[i] = from[sizeof (value) - (i + 1)];
       }
 }
 
+
 static INLINE void
-store_le_int32 (const uint32_t value, uint8_t* const pDest)
+store_le_int32 (const uint32_t value, uint8_t* const to)
 {
-  const uint8_t* pSrc = (const uint8_t*)&value;
+  const uint8_t* from = (const uint8_t*)&value;
   const uint16_t le_machine = 0x1;
 
     if (*((uint8_t*)&le_machine))
       {
         uint_t i;
         for (i = 0; i < sizeof (value); ++i)
-          pDest[i] = pSrc[i];
+          to[i] = from[i];
       }
     else
       {
         uint_t i;
         for (i = 0; i < sizeof (value); ++i)
-          pDest[i] = pSrc[sizeof (value) - (i + 1)];
+          to[i] = from[sizeof (value) - (i + 1)];
       }
 }
 
+
 static INLINE void
-store_le_int64 (const uint64_t value, uint8_t* const pDest)
+store_le_int64 (const uint64_t value, uint8_t* const to)
 {
-  const uint8_t* pSrc = (const uint8_t*)&value;
+  const uint8_t* from = (const uint8_t*)&value;
   const uint16_t le_machine = 0x1;
 
     if (*((uint8_t*)&le_machine))
       {
         uint_t i;
         for (i = 0; i < sizeof (value); ++i)
-          pDest[i] = pSrc[i];
+          to[i] = from[i];
       }
     else
       {
         uint_t i;
         for (i = 0; i < sizeof (value); ++i)
-          pDest[i] = pSrc[sizeof (value) - (i + 1)];
+          to[i] = from[sizeof (value) - (i + 1)];
       }
 }
-
 
 
 #endif /* LE_CONVERTER_H_ */
+

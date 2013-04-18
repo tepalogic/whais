@@ -29,7 +29,9 @@
 #include "pm_interpreter.h"
 
 using namespace std;
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 GlobalsManager::~GlobalsManager ()
 {
@@ -130,4 +132,7 @@ GlobalsManager::GetGlobalTI (const uint32_t glbId)
 
   return pType;
 }
+
+} //namespace prima
+} //namespace whisper
 

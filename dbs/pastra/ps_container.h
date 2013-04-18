@@ -31,11 +31,11 @@
 
 #include "dbs_values.h"
 
-#include "utils/include/wfile.h"
-#include "utils/include/wthread.h"
+#include "utils/wfile.h"
+#include "utils/wthread.h"
 
-namespace pastra
-{
+namespace whisper {
+namespace pastra {
 
 void
 append_int_to_str (std::string& dest, uint64_t number);
@@ -91,7 +91,7 @@ private:
   void ExtendContainer ();
 
   const uint64_t       m_MaxFileUnitSize;
-  std::vector< WFile > m_FilesHandles;
+  std::vector< File > m_FilesHandles;
   std::string          m_FileNameBase;
   bool                 m_IsMarked;
 };
@@ -128,7 +128,7 @@ private:
   bool                             m_DirtyCache;
 
   static uint64_t      smTemporalsCount;
-  static WSynchronizer smSync;
+  static Lock smSync;
 };
 
 class WFileContainerException : public DataContainerException
@@ -180,6 +180,8 @@ public:
     FILE_OS_IO_ERROR
   };
 };
-}
+
+} //namespace pastra
+} //namespace whisper
 
 #endif /* PS_CONTAINER_H_ */

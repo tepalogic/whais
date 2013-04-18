@@ -22,163 +22,198 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+#include <assert.h>
+
 #include "utf8.h"
 
 uint_t
-get_utf8_char_size (uint8_t firstUtf8Byte)
+wh_utf8_cu_count (const uint8_t codeUnit)
 {
-  if ((firstUtf8Byte & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
+  if ((codeUnit & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
     return 1;
-  else if ((firstUtf8Byte & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
+
+  else if ((codeUnit & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
     return 2;
-  else if ((firstUtf8Byte & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
+
+  else if ((codeUnit & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
     return 3;
-  else if ((firstUtf8Byte & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
+
+  else if ((codeUnit & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
     return 4;
-  else if ((firstUtf8Byte & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
+
+  else if ((codeUnit & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
     return 5;
-  else if ((firstUtf8Byte & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
+
+  else if ((codeUnit & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
     return 6;
 
-  return 0;
+  return 0; /* Signals en error. */
 }
 
-uint_t
-decode_utf8_char (const uint8_t *pSource, uint32_t* pCh)
-{
-  *pCh = 0;
-  if ((pSource[0] & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
-    {
-      *pCh |= pSource[0] & ~UTF8_7BIT_MASK;
-      return 1;
-    }
-  else if ((pSource[0] & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
-    {
-      *pCh |= pSource[0] & ~UTF8_11BIT_MASK;
-      *pCh <<= 6; *pCh |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      return 2;
-    }
-  else if ((pSource[0] & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
-    {
-      *pCh |= pSource[0] & ~UTF8_16BIT_MASK;
-      *pCh <<= 6; *pCh |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      *pCh <<= 6; *pCh |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-      return 3;
-    }
-  else if ((pSource[0] & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
-    {
-      *pCh |= pSource[0] & ~UTF8_21BIT_MASK;
-      *pCh <<= 6; *pCh |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      *pCh <<= 6; *pCh |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-      *pCh <<= 6; *pCh |= pSource[3] & ~UTF8_EXTRA_BYTE_SIG;
-      return 4;
-    }
-  else if ((pSource[0] & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
-    {
-      *pCh |= pSource[0] & ~UTF8_26BIT_MASK;
-      *pCh <<= 6; *pCh |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-      *pCh <<= 6; *pCh |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-      *pCh <<= 6; *pCh |= pSource[3] & ~UTF8_EXTRA_BYTE_SIG;
-      *pCh <<= 6; *pCh |= pSource[4] & ~UTF8_EXTRA_BYTE_SIG;
-      return 5;
-    }
-  else if ((pSource[0] & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
-    {
-        *pCh |= pSource[0] & ~UTF8_31BIT_MASK;
-        *pCh <<= 6; *pCh |= pSource[1] & ~UTF8_EXTRA_BYTE_SIG;
-        *pCh <<= 6; *pCh |= pSource[2] & ~UTF8_EXTRA_BYTE_SIG;
-        *pCh <<= 6; *pCh |= pSource[3] & ~UTF8_EXTRA_BYTE_SIG;
-        *pCh <<= 6; *pCh |= pSource[4] & ~UTF8_EXTRA_BYTE_SIG;
-        *pCh <<= 6; *pCh |= pSource[5] & ~UTF8_EXTRA_BYTE_SIG;
-        return 6;
-    }
-
-  return 0;
-}
 
 uint_t
-encode_utf8_char (uint32_t ch, uint8_t *pDest)
+wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 {
-  if (ch < 0x80)
+  *outCodePoint = 0;
+  if ((utf8Str[0] & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
     {
-      pDest[0] = ch & 0xFF;
+      *outCodePoint |= utf8Str[0] & ~UTF8_7BIT_MASK;
+
       return 1;
     }
-  else if (ch < 0x800)
+  else if ((utf8Str[0] & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
     {
-      pDest[0] = ((ch >> 6) & 0xFF) | UTF8_11BIT_MASK;
-      pDest[1] = (ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint |= utf8Str[0] & ~UTF8_11BIT_MASK;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
+
       return 2;
     }
-  else if (ch < 0x10000)
+  else if ((utf8Str[0] & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
     {
-      pDest[0] = ((ch >> 12) & 0xFF) | UTF8_16BIT_MASK;
-      pDest[1] = ((ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = (ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint |= utf8Str[0] & ~UTF8_16BIT_MASK;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
+
       return 3;
     }
-  else if (ch < 0x200000)
+  else if ((utf8Str[0] & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
     {
-      pDest[0] = ((ch >> 18) & 0xFF) | UTF8_21BIT_MASK;
-      pDest[1] = ((ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = ((ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[3] = (ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint |= utf8Str[0] & ~UTF8_21BIT_MASK;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[3] & ~UTF8_EXTRA_BYTE_SIG;
+
       return 4;
     }
-  else if (ch < 0x4000000)
+  else if ((utf8Str[0] & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
     {
-      pDest[0] = ((ch >> 24) & 0xFF) | UTF8_26BIT_MASK;
-      pDest[1] = ((ch >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = ((ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[3] = ((ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[4] = (ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint |= utf8Str[0] & ~UTF8_26BIT_MASK;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[3] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[4] & ~UTF8_EXTRA_BYTE_SIG;
+
       return 5;
     }
-  else if (ch < 0x80000000)
+  else if ((utf8Str[0] & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
     {
-      pDest[0] = ((ch >> 30) & 0xFF) | UTF8_31BIT_MASK;
-      pDest[1] = ((ch >> 24) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[2] = ((ch >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[3] = ((ch >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[4] = ((ch >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
-      pDest[5] = (ch & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint |= utf8Str[0] & ~UTF8_31BIT_MASK;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[3] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[4] & ~UTF8_EXTRA_BYTE_SIG;
+      *outCodePoint <<= 6; *outCodePoint |= utf8Str[5] & ~UTF8_EXTRA_BYTE_SIG;
+
       return 6;
     }
 
+  assert (FALSE);
+
   return 0;
 }
+
 
 uint_t
-utf8_encode_size (uint32_t ch)
+wh_store_utf8_cp (uint32_t codePoint, uint8_t* const dest)
 {
-  if (ch < 0x80)
-    return 1;
-  else if (ch < 0x800)
-    return 2;
-  else if (ch < 0x10000)
-    return 3;
-  else if (ch < 0x200000)
-    return 4;
-  else if (ch < 0x4000000)
-    return 5;
-  else if (ch < 0x80000000)
-    return 6;
+  if (codePoint < 0x80)
+    {
+      dest[0] = codePoint & 0xFF;
+
+      return 1;
+    }
+  else if (codePoint < 0x800)
+    {
+      dest[0] = ((codePoint >> 6) & 0xFF) | UTF8_11BIT_MASK;
+      dest[1] = (codePoint & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+
+      return 2;
+    }
+  else if (codePoint < 0x10000)
+    {
+      dest[0] = ((codePoint >> 12) & 0xFF) | UTF8_16BIT_MASK;
+      dest[1] = ((codePoint >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[2] = (codePoint & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+
+      return 3;
+    }
+  else if (codePoint < 0x200000)
+    {
+      dest[0] = ((codePoint >> 18) & 0xFF) | UTF8_21BIT_MASK;
+      dest[1] = ((codePoint >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[2] = ((codePoint >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[3] = (codePoint & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+
+      return 4;
+    }
+  else if (codePoint < 0x4000000)
+    {
+      dest[0] = ((codePoint >> 24) & 0xFF) | UTF8_26BIT_MASK;
+      dest[1] = ((codePoint >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[2] = ((codePoint >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[3] = ((codePoint >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[4] = (codePoint & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+
+      return 5;
+    }
+  else if (codePoint < 0x80000000)
+    {
+      dest[0] = ((codePoint >> 30) & 0xFF) | UTF8_31BIT_MASK;
+      dest[1] = ((codePoint >> 24) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[2] = ((codePoint >> 18) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[3] = ((codePoint >> 12) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[4] = ((codePoint >> 6) & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+      dest[5] = (codePoint & 0x3F) | UTF8_EXTRA_BYTE_SIG;
+
+      return 6;
+    }
+
+  assert (FALSE);
 
   return 0;
 }
 
+
+uint_t
+wh_utf8_store_size (uint32_t codePoint)
+{
+  if (codePoint < 0x80)
+    return 1;
+
+  else if (codePoint < 0x800)
+    return 2;
+
+  else if (codePoint < 0x10000)
+    return 3;
+
+  else if (codePoint < 0x200000)
+    return 4;
+
+  else if (codePoint < 0x4000000)
+    return 5;
+
+  else if (codePoint < 0x80000000)
+    return 6;
+
+  assert (FALSE);
+
+  return 0;
+}
+
+
 int
-utf8_strlen (const uint8_t* pSource)
+wh_utf8_strlen (const uint8_t* utf8Str)
 {
   int result = 0;
-  while (*pSource != 0)
+  while (*utf8Str != 0)
     {
-      uint_t chSize = get_utf8_char_size (pSource[0]);
+      uint_t chSize = wh_utf8_cu_count (utf8Str[0]);
       if (chSize == 0)
         return -1;
 
-      ++result,  pSource += chSize;
+      ++result,  utf8Str += chSize;
     }
 
   return result;
 }
+

@@ -357,8 +357,8 @@ const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 
 static const uint16_t SECOND_BYTE_MARK = 0x80;
 
-struct OutputStream*
-w_opcode_encode (struct OutputStream* pStream, const enum W_OPCODE opcode)
+struct WOutputStream*
+w_opcode_encode (struct WOutputStream* pStream, const enum W_OPCODE opcode)
 {
   uint16_t tempOpcode = opcode;
 
@@ -366,12 +366,12 @@ w_opcode_encode (struct OutputStream* pStream, const enum W_OPCODE opcode)
     {
       tempOpcode |= (SECOND_BYTE_MARK << 8);
 
-     if (output_uint8 (pStream, (uint8_t)((tempOpcode >> 8) & 0xFF)) == NULL)
+     if (wh_ostream_wint8 (pStream, (uint8_t)((tempOpcode >> 8) & 0xFF)) == NULL)
        return NULL;
-     return output_uint8 (pStream, (uint8_t)(tempOpcode & 0xFF));
+     return wh_ostream_wint8 (pStream, (uint8_t)(tempOpcode & 0xFF));
     }
 
-  return output_uint8 (pStream, (uint8_t)tempOpcode);
+  return wh_ostream_wint8 (pStream, (uint8_t)tempOpcode);
 }
 
 enum W_OPCODE

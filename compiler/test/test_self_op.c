@@ -7,7 +7,7 @@
 #include "../semantics/opcodes.h"
 #include "../semantics/procdecl.h"
 
-#include "../../utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "custom/include/test/test_fmw.h"
 
@@ -19,7 +19,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  init_array (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -30,17 +30,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  destroy_array (&state->parsedValues);
+  wh_array_clean (&state->parsedValues);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = get_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->parsedValues);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = get_item (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -66,8 +66,8 @@ static bool_t
 check_procedure_1 (struct ParserState *pState, char* proc_name)
 {
   struct Statement* pStmt    = find_proc_decl (pState, proc_name, strlen (proc_name), FALSE);
-  uint8_t*          pCode    = get_buffer_outstream (stmt_query_instrs (pStmt));
-  int             codeSize = get_size_outstream (stmt_query_instrs (pStmt));
+  uint8_t*          pCode    = wh_ostream_data (stmt_query_instrs (pStmt));
+  int             codeSize = wh_ostream_size (stmt_query_instrs (pStmt));
   enum W_OPCODE     opExpect = W_SELF;
 
   /* check the opcode based on the return type */
@@ -81,8 +81,8 @@ check_procedure_1 (struct ParserState *pState, char* proc_name)
     }
   else
     {
-      uint32_t       index  = from_le_int32 (pCode + 3);
-      const uint8_t* buffer = get_buffer_outstream (&pState->globalStmt.spec.glb.constsArea);
+      uint32_t       index  = load_le_int32 (pCode + 3);
+      const uint8_t* buffer = wh_ostream_data (&pState->globalStmt.spec.glb.constsArea);
 
       buffer += index;
       if (strcmp ((const char *) buffer, "field_1") != 0)
@@ -96,8 +96,8 @@ static bool_t
 check_procedure_2 (struct ParserState *pState, char* proc_name)
 {
   struct Statement* pStmt    = find_proc_decl (pState, proc_name, strlen (proc_name), FALSE);
-  uint8_t*          pCode    = get_buffer_outstream (stmt_query_instrs (pStmt));
-  int             codeSize = get_size_outstream (stmt_query_instrs (pStmt));
+  uint8_t*          pCode    = wh_ostream_data (stmt_query_instrs (pStmt));
+  int             codeSize = wh_ostream_size (stmt_query_instrs (pStmt));
   enum W_OPCODE     opExpect = W_INDTA;
 
   /* check the opcode based on the return type */
@@ -111,8 +111,8 @@ check_procedure_2 (struct ParserState *pState, char* proc_name)
     }
   else
     {
-      uint32_t       index  = from_le_int32 (pCode + 5);
-      const uint8_t* buffer = get_buffer_outstream (&pState->globalStmt.spec.glb.constsArea);
+      uint32_t       index  = load_le_int32 (pCode + 5);
+      const uint8_t* buffer = wh_ostream_data (&pState->globalStmt.spec.glb.constsArea);
 
       buffer += index;
       if (strcmp ((const char *) buffer, "field_2") != 0)

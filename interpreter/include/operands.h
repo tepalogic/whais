@@ -29,10 +29,12 @@
 #include <vector>
 #include <cstring>
 
-#include "dbs/include/dbs_mgr.h"
-#include "dbs/include/dbs_values.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_values.h"
 
-//TODO: Make sure you compute this limit properly  for all architectures
+namespace whisper {
+
+//TODO: Make sure you compute this limit properly for all architectures
 static const uint_t MAX_OP_QWORDS = 6;
 
 class StackValue;
@@ -214,5 +216,7 @@ public:
 private:
   std::vector<StackValue> m_Stack;
 };
+
+} //namespace whisper
 
 #endif /* OPERANDS_H_ */

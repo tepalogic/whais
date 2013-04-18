@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 
 #include "whisperc.h"
-#include "utils/include/wfile.h"
+#include "utils/wfile.h"
 
 #ifndef COMPILEDUNIT_H_
 #define COMPILEDUNIT_H_
@@ -176,7 +176,7 @@ private:
 
 private:
 #pragma warning (disable: 4251)
-  WFile    m_File;
+  File    m_File;
 #pragma warning (default: 4251)
   uint32_t m_GlobalsCount;
   uint32_t m_ProcsCount;

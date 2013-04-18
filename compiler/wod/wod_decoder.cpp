@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wod_dump.h"
 
 
-#include "../../utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 static const uint_t MAX_INT64_LENGTH = 25;        //log (MAX_UINT64) = 19.34
 static const uint_t MAX_RREAL_LENGTH = 64;        //log (MAX_UINT64) = 19.34
@@ -185,7 +185,7 @@ wod_dec_w_ldd (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 
   const uint8_t day   = pInArgs[0];
   const uint8_t month = pInArgs[1];
-  const int16_t year  = _SC (int16_t, from_le_int16 (pInArgs + 2));
+  const int16_t year  = _SC (int16_t, load_le_int16 (pInArgs + 2));
 
   assert (day >= 1 && day <= 31);
   assert (month >= 1 && month <= 12);
@@ -211,7 +211,7 @@ wod_dec_w_lddt (const uint8_t* pInArgs, char* pOp1, char* pOp2)
   const uint8_t hour  = pInArgs[2];
   const uint8_t day   = pInArgs[3];
   const uint8_t month = pInArgs[4];
-  const int16_t year  = _SC (int16_t, from_le_int16 (pInArgs + 5));
+  const int16_t year  = _SC (int16_t, load_le_int16 (pInArgs + 5));
 
   assert (sec < 60);
   assert (min < 60);
@@ -241,13 +241,13 @@ wod_dec_w_ldht (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   char t_str[MAX_INT64_LENGTH];
 
-  const uint32_t u_sec = from_le_int32 (pInArgs);
+  const uint32_t u_sec = load_le_int32 (pInArgs);
   const uint8_t sec    = pInArgs[4];
   const uint8_t min    = pInArgs[5];
   const uint8_t hour   = pInArgs[6];
   const uint8_t day    = pInArgs[7];
   const uint8_t month  = pInArgs[8];
-  const int16_t year   = _SC (int16_t, from_le_int16 (pInArgs + 9));
+  const int16_t year   = _SC (int16_t, load_le_int16 (pInArgs + 9));
 
   assert (sec < 60);
   assert (min < 60);
@@ -280,8 +280,8 @@ wod_dec_w_ldrr (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   char t_str[MAX_RREAL_LENGTH];
 
-  int64_t int_part  = from_le_int64 (pInArgs);
-  int64_t frac_part = from_le_int64 (pInArgs + sizeof (uint64_t));
+  int64_t int_part  = load_le_int64 (pInArgs);
+  int64_t frac_part = load_le_int64 (pInArgs + sizeof (uint64_t));
 
   if ((int_part < 0) || (frac_part < 0))
     {
@@ -321,7 +321,7 @@ wod_dec_w_ldlo16 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   char t_str[MAX_INT64_LENGTH];
 
-  const uint16_t value = from_le_int16 (pInArgs);
+  const uint16_t value = load_le_int16 (pInArgs);
 
   strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
@@ -334,7 +334,7 @@ wod_dec_w_ldlo32 (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   char t_str[MAX_INT64_LENGTH];
 
-  const uint32_t value = from_le_int32 (pInArgs);
+  const uint32_t value = load_le_int32 (pInArgs);
 
   strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
@@ -375,7 +375,7 @@ wod_dec_w_call (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   char t_str[MAX_INT64_LENGTH];
 
-  const uint32_t value = from_le_int32 (pInArgs);
+  const uint32_t value = load_le_int32 (pInArgs);
 
   strcpy (pOp1, into_ascii (value, t_str));
   pOp2[0] = 0;
@@ -458,7 +458,7 @@ wod_dec_w_jf (const uint8_t* pInArgs, char* pOp1, char* pOp2)
 {
   char t_str[MAX_INT64_LENGTH];
 
-  const int32_t temp  = _SC (int32_t, from_le_int32 (pInArgs));
+  const int32_t temp  = _SC (int32_t, load_le_int32 (pInArgs));
   const int64_t value = temp;
 
   strcpy (pOp1, into_ascii (value, t_str, FALSE));

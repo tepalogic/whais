@@ -59,7 +59,7 @@ enum DBS_FIELD_TYPE
 
 struct DBSFieldDescriptor
 {
-  const char*   m_pFieldName;
+  const char*     m_pFieldName;
   DBS_FIELD_TYPE  m_FieldType;
   bool            isArray;
 };

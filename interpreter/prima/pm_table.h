@@ -27,12 +27,12 @@
 
 #include <assert.h>
 
-#include "dbs/include/dbs_mgr.h"
-#include "dbs/include/dbs_table.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_table.h"
 #include "pm_general_table.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 class TableReference
 {
@@ -67,7 +67,8 @@ private:
   uint64_t      m_RefCount;
 };
 
-};
+} //namespace whisper
+} //namespace prima
 
 #endif // PM_TABLE_H_
 

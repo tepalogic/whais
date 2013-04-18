@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace whisper;
 
 void
-wod_dump_header (WFile& rInObj, std::ostream& rOutStream);
+wod_dump_header (File& rInObj, std::ostream& rOutStream);
 
 void
 wod_dump_const_area (WICompiledUnit& rUnit, std::ostream& rOutStream);

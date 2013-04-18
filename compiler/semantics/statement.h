@@ -28,9 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <assert.h>
 
-#include "../../utils/include/array.h"
-/* #include "../../utils/include/list.h" */
-#include "../../utils/include/outstream.h"
+#include "utils/warray.h"
+#include "utils/woutstream.h"
 
 enum STATEMENT_TYPE
 {
@@ -47,9 +46,9 @@ struct StatementGlobalSymbol
 
 struct _GlobalStatmentSpec
 {
-  struct OutputStream typesDescs;  /* describes the variable types */
-  struct OutputStream constsArea;
-  struct UArray       procsDecls;  /* for GLOBAL statement contains the list
+  struct WOutputStream typesDescs;  /* describes the variable types */
+  struct WOutputStream constsArea;
+  struct WArray       procsDecls;  /* for GLOBAL statement contains the list
                                    of procedures */
   uint32_t            procsCount;
 };
@@ -58,13 +57,13 @@ struct _ProcStatementSpec
 {
   const char*      name;         /* name of the procedure */
   uint_t             nameLength;   /* length of the name */
-  struct UArray      paramsList;   /* Used only for procedures
+  struct WArray      paramsList;   /* Used only for procedures
                                     0 - special case for return type
                                     1 - first parameter, 2 second parameter */
-  struct OutputStream code;         /* the execution path for procedure
+  struct WOutputStream code;         /* the execution path for procedure
                                     statements */
-  struct UArray       branchStack;  /* keep track of conditional branches */
-  struct UArray       loopStack;    /* keep the track of looping statements */
+  struct WArray       branchStack;  /* keep track of conditional branches */
+  struct WArray       loopStack;    /* keep the track of looping statements */
   uint32_t            procId;       /* ID of the procedure in the import table */
   uint16_t            syncTracker;
 };
@@ -74,7 +73,7 @@ struct Statement
   struct Statement*   pParentStmt;  /* NULL for global statement */
   uint_t              localsUsed;   /* used to assign IDs to declared variables */
   enum STATEMENT_TYPE type;         /* type of the statement */
-  struct UArray       decls;        /* variables declared in this statement */
+  struct WArray       decls;        /* variables declared in this statement */
   union
   {
     struct _ProcStatementSpec  proc;
@@ -116,21 +115,21 @@ uint32_t
 stmt_get_import_id (const struct Statement* const pProc);
 
 /* some inline functions to access statement members */
-static INLINE struct OutputStream*
+static INLINE struct WOutputStream*
 stmt_query_instrs (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
   return &pStmt->spec.proc.code;
 }
 
-static INLINE struct UArray*
+static INLINE struct WArray*
 stmt_query_branch_stack (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
   return &pStmt->spec.proc.branchStack;
 }
 
-static INLINE struct UArray*
+static INLINE struct WArray*
 stmt_query_loop_stack (struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
@@ -157,7 +156,7 @@ type_spec_cmp (const struct TypeSpec* const pSpec_1,
                const struct TypeSpec* const pSpec_2);
 
 uint_t
-type_spec_fill (struct OutputStream* const      pOutStream,
+type_spec_fill (struct WOutputStream* const      pOutStream,
                 const struct DeclaredVar* const pVar);
 
 int

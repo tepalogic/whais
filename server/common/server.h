@@ -28,12 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils/include/logger.h"
+#include "utils/logger.h"
 
 #include "configuration.h"
 
 void
-StartServer (Logger& log, std::vector<DBSDescriptors>& databases);
+StartServer (whisper::FileLogger& log, std::vector<DBSDescriptors>& databases);
 
 void
 StopServer ();

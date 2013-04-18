@@ -30,9 +30,10 @@
 #include "dbs_exception.h"
 #include "ps_varstorage.h"
 
-
-using namespace pastra;
 using namespace std;
+
+namespace whisper {
+namespace pastra {
 
 StoreEntry::StoreEntry () :
     m_PrevEntry (0),
@@ -79,7 +80,7 @@ VLVarsStore::VLVarsStore ()
 void
 VLVarsStore::RegisterReference ()
 {
-  WSynchronizerRAII hold (m_Sync);
+  LockRAII hold (m_Sync);
 
   ++m_RefsCount;
 }
@@ -88,7 +89,7 @@ void
 VLVarsStore::ReleaseReference ()
 {
   {
-    WSynchronizerRAII hold (m_Sync);
+    LockRAII hold (m_Sync);
 
     assert (m_RefsCount > 0);
 
@@ -170,7 +171,7 @@ VLVarsStore::FinishInit ()
 void
 VLVarsStore::Flush ()
 {
-  WSynchronizerRAII syncHolder (m_Sync);
+  LockRAII syncHolder (m_Sync);
 
   m_EntrysCache.Flush ();
 }
@@ -187,7 +188,7 @@ VLVarsStore::AddRecord (const uint8_t* pBuffer,
 {
   uint64_t resultEntry = 0;
   {
-    WSynchronizerRAII synchHolder(m_Sync);
+    LockRAII synchHolder(m_Sync);
 
     resultEntry            = AllocateEntry (0);
     StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
@@ -218,7 +219,7 @@ VLVarsStore::AddRecord (VLVarsStore& sourceStore,
 {
   uint64_t resultEntry = 0;
   {
-    WSynchronizerRAII synchHolder(m_Sync);
+    LockRAII synchHolder(m_Sync);
 
     resultEntry            = AllocateEntry (0);
     StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
@@ -253,7 +254,7 @@ VLVarsStore::AddRecord (I_DataContainer& sourceContainer,
 {
   uint64_t resultEntry = 0;
   {
-    WSynchronizerRAII synchHolder(m_Sync);
+    LockRAII synchHolder(m_Sync);
 
     resultEntry            = AllocateEntry (0);
     StoredItem  cachedItem = m_EntrysCache.RetriveItem (resultEntry);
@@ -280,7 +281,7 @@ VLVarsStore::GetRecord (uint64_t recordFirstEntry,
 {
   do
     {
-      WSynchronizerRAII synchHolder(m_Sync);
+      LockRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
@@ -302,7 +303,7 @@ VLVarsStore::GetRecord (uint64_t recordFirstEntry,
 
   while (size > 0)
     {
-      WSynchronizerRAII synchHolder(m_Sync);
+      LockRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -338,7 +339,7 @@ VLVarsStore::UpdateRecord (uint64_t       recordFirstEntry,
 
   do
     {
-      WSynchronizerRAII synchHolder(m_Sync);
+      LockRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -372,7 +373,7 @@ VLVarsStore::UpdateRecord (uint64_t       recordFirstEntry,
 
   while (size > 0)
     {
-      WSynchronizerRAII synchHolder(m_Sync);
+      LockRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
@@ -408,7 +409,7 @@ VLVarsStore::UpdateRecord (uint64_t     recordFirstEntry,
 
   do
     {
-      WSynchronizerRAII synchHolder (m_Sync);
+      LockRAII synchHolder (m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -442,7 +443,7 @@ VLVarsStore::UpdateRecord (uint64_t     recordFirstEntry,
 
   do
     {
-      WSynchronizerRAII sourceSyncHolder (sourceStore.m_Sync);
+      LockRAII sourceSyncHolder (sourceStore.m_Sync);
 
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -479,17 +480,17 @@ VLVarsStore::UpdateRecord (uint64_t     recordFirstEntry,
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-      WSynchronizerRAII synchHolder (m_Sync);
+      LockRAII synchHolder (m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
 
-      synchHolder.Leave();
+      synchHolder.Release ();
 
       uint8_t tempBuffer [64];
       uint_t  tempValid = 0;
       {
-        WSynchronizerRAII sourceSynchHolder (sourceStore.m_Sync);
+        LockRAII sourceSynchHolder (sourceStore.m_Sync);
 
         StoredItem  cachedItem = sourceStore.m_EntrysCache.RetriveItem (
                                                               sourceFirstEntry
@@ -503,7 +504,7 @@ VLVarsStore::UpdateRecord (uint64_t     recordFirstEntry,
         sourceFirstEntry = cpEntry->GetNextEntry();
       }
 
-      synchHolder.Enter();
+      synchHolder.Acquire ();
 
       StoredItem  cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
       StoreEntry* cpEntry    = _RC (StoreEntry*,
@@ -552,7 +553,7 @@ VLVarsStore::UpdateRecord (uint64_t         recordFirstEntry,
 
   do
     {
-      WSynchronizerRAII synchHolder(m_Sync);
+      LockRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
@@ -586,7 +587,7 @@ VLVarsStore::UpdateRecord (uint64_t         recordFirstEntry,
 
   while (sourceSize > 0)
     {
-      WSynchronizerRAII synchHolder(m_Sync);
+      LockRAII synchHolder(m_Sync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
               recordFirstEntry = AllocateEntry (prevEntry);
@@ -618,7 +619,7 @@ VLVarsStore::UpdateRecord (uint64_t         recordFirstEntry,
 void
 VLVarsStore::IncrementRecordRef (const uint64_t recordFirstEntry)
 {
-  WSynchronizerRAII synchHolder(m_Sync);
+  LockRAII synchHolder(m_Sync);
 
   StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
 
@@ -635,7 +636,7 @@ VLVarsStore::IncrementRecordRef (const uint64_t recordFirstEntry)
 void
 VLVarsStore::DecrementRecordRef (const uint64_t recordFirstEntry)
 {
-  WSynchronizerRAII synchHolder(m_Sync);
+  LockRAII synchHolder(m_Sync);
 
   StoredItem cachedItem = m_EntrysCache.RetriveItem (recordFirstEntry);
 
@@ -978,3 +979,7 @@ VLVarsStore::AddToFreeList (const uint64_t entry)
 
   pEntHdr->SetNextEntry (entry);
 }
+
+} //namespace pastra
+} //namespace whisper
+

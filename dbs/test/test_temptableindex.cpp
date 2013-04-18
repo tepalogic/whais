@@ -11,17 +11,20 @@
 #include <iostream>
 #include <vector>
 
-#include "utils/include/random.h"
+#include "utils/wrandom.h"
 #include "custom/include/test/test_fmw.h"
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
 
 #include "../pastra/ps_table.h"
 
 struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_UINT64, false}
 };
+
+using namespace whisper;
+using namespace pastra;
 
 const char db_name[] = "t_baza_date_1";
 
@@ -40,10 +43,10 @@ fill_table_with_values (I_DBSTable& table,
   table.CreateFieldIndex (0, NULL, NULL);
   std::cout << "Filling table with values ... " << std::endl;
 
-  w_rnd_set_seed (seed);
+  wh_rnd_set_seed (seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DBSUInt64 value (w_rnd ());
+      DBSUInt64 value (wh_rnd ());
       if (table.AddRow () != index)
         {
           result = false;

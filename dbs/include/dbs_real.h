@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils/include/we_int128.h"
+#include "utils/we_int128.h"
 
 static const int64_t DBS_REAL_PREC      = 1000000ull;
 static const int64_t DBS_RICHREAL_PREC  = 100000000000000ull;

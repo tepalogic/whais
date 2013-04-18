@@ -22,21 +22,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef UARRAY_H
-#define UARRAY_H
+#ifndef WARRAY_H
+#define WARRAY_H
 
 #include "whisper.h"
 
 /*
- * UArray - stores an array of arbitrary elements. The goal of using this
- * structure is to optimise the memory access/usage.
+ * WArray - a generic way to manipulate array of elements.
  */
-struct UArray
+struct WArray
 {
-  size_t realItemSize;
-  size_t userItemSize;
-  uint_t itemsCount;
-  uint_t itemsReserved;
+  size_t   realItemSize;
+  size_t   userItemSize;
+  uint_t   itemsCount;
+  uint_t   itemsReserved;
 
   /* Array of pointers to the array's elements */
   int8_t** arraysList;
@@ -45,31 +44,34 @@ struct UArray
   uint_t   arraysUsed;
 };
 
-#define ARRAY_INCRMENT_SIZE     512        /* in bytes here */
-#define init_array(a, x) init_array_ex((a),\
+/* The size of allocated memory chunk when the array has to be extended. */
+#define ARRAY_INCRMENT_SIZE     512
+#define wh_array_init(a, x) wh_array_init_ex ( \
+                                       (a),\
                                        (x),\
                                        (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\
-                                       sizeof(uint64_t))
+                                       sizeof(uint64_t)\
+                                             )
 
-struct  UArray*
-init_array_ex (struct UArray* pArray,
-               size_t         item_size,
-               uint_t         increment,
-               uint_t         alignmentr);
-
-void*
-add_item (struct UArray* pArray, const void* data);
+struct  WArray*
+wh_array_init_ex (struct WArray* const outArray,
+                  size_t               itemSize,
+                  uint_t               increment,
+                  uint_t               alignment);
 
 void*
-get_item (const struct UArray* pArray, uint_t item);
+wh_array_add (struct WArray* const array, const void* const data);
+
+void*
+wh_array_get (const struct WArray* const array, const uint_t index);
 
 uint_t
-get_array_count (const struct UArray* pArray);
+wh_array_count (const struct WArray* const array);
 
 void
-set_array_count (struct UArray* pArray, uint_t new_count);
+wh_array_resize (struct WArray* const array, const uint_t count);
 
 void
-destroy_array (struct UArray* pArray);
+wh_array_clean (struct WArray* array);
 
-#endif /* UARRAY_H */
+#endif /* WARRAY_H */

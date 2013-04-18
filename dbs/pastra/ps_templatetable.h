@@ -25,7 +25,7 @@
 #ifndef PS_TEMPLATETABLE_H_
 #define PS_TEMPLATETABLE_H_
 
-#include "utils/include/wfile.h"
+#include "utils/wfile.h"
 
 #include "dbs_table.h"
 #include "dbs_types.h"
@@ -37,8 +37,8 @@
 #include "ps_varstorage.h"
 #include "ps_btree_fields.h"
 
-namespace pastra
-{
+namespace whisper {
+namespace pastra {
 
 static const uint_t PS_TABLE_FIELD_TYPE_MASK = 0x00FF;
 static const uint_t PS_TABLE_ARRAY_MASK      = 0x0100;
@@ -304,8 +304,8 @@ protected:
   std::auto_ptr<uint8_t>                m_FieldsDescriptors;
   std::vector<FieldIndexNodeManager*>   m_vIndexNodeMgrs;
   BlockCache                            m_RowCache;
-  WSynchronizer                         m_Sync;
-  WSynchronizer                         m_IndexSync;
+  Lock                         m_Sync;
+  Lock                         m_IndexSync;
 };
 
 class TableRmKey : public I_BTreeKey
@@ -342,5 +342,7 @@ public:
   virtual const I_BTreeKey& SentinelKey () const;
 };
 
-}
+} //namespace pastra
+} //namespace whisper
+
 #endif /* PS_TEMPLATETABLE_H_ */

@@ -10,14 +10,15 @@
 
 #include "whisper.h"
 
-#include "dbs/include/dbs_mgr.h"
-#include "utils/include/logger.h"
+#include "dbs/dbs_mgr.h"
+#include "utils/logger.h"
 
 #include "../common/configuration.h"
 #include "../common/loader.h"
 #include "../common/server.h"
 
 using namespace std;
+using namespace whisper;
 
 static bool sDbsInited         = false;
 static bool sInterpreterInited = false;
@@ -25,7 +26,7 @@ static bool sInterpreterInited = false;
 static vector<DBSDescriptors> databases;
 
 static void
-clean_frameworks (Logger& log)
+clean_frameworks (FileLogger& log)
 {
   if (sInterpreterInited  && sDbsInited)
     {
@@ -109,7 +110,7 @@ int
 main (int argc, char** argv)
 {
   auto_ptr<ifstream> config (NULL);
-  auto_ptr<Logger>   glbLog (NULL);
+  auto_ptr<FileLogger>   glbLog (NULL);
 
   if (argc < 2)
     {
@@ -147,7 +148,7 @@ main (int argc, char** argv)
       if (ParseConfigurationSection (*config, sectionLine) == false)
         return -1;
 
-      glbLog.reset (new Logger (GetAdminSettings ().m_LogFile.c_str ()));
+      glbLog.reset (new FileLogger (GetAdminSettings ().m_LogFile.c_str ()));
 
   }
   catch (...)

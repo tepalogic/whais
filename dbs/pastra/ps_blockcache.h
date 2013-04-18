@@ -31,8 +31,8 @@
 
 #include "whisper.h"
 
-namespace pastra
-{
+namespace whisper {
+namespace pastra  {
 
 class I_BlocksManager
 {
@@ -155,6 +155,7 @@ private:
   std::map <uint64_t, class BlockEntry> m_CachedBlocks;
 };
 
-}
+} //namespace pastra
+} //namespace whisper
 
 #endif /* PS_BLOCKCACHE_H_ */

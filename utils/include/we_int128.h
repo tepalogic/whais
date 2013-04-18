@@ -27,7 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#ifndef int128
+#ifndef int128_t
+
 class WE_I128
 {
 public:
@@ -37,20 +38,20 @@ public:
   }
 
   WE_I128 (const WE_I128& source)
-  : m_Hi (source.m_Hi),
-    m_Lo (source.m_Lo)
+  : mHi (source.mHi),
+    mLo (source.mLo)
   {
   }
 
   template <typename T_INT>
   WE_I128 (const T_INT source)
-    : m_Hi (0),
-      m_Lo (source)
+    : mHi (0),
+      mLo (source)
     {
       if (source < 0)
         {
-          m_Lo = _SC (int64_t, source);
-          m_Hi = ~(_SC (uint64_t, 0));
+          mLo = _SC (int64_t, source);
+          mHi = ~(_SC (uint64_t, 0));
         }
     }
 
@@ -59,12 +60,12 @@ public:
   {
     WE_I128 result (*this);
 
-    result.m_Hi  = ~result.m_Hi;
-    result.m_Lo  = ~result.m_Lo;
-    result.m_Lo += 1;
+    result.mHi  = ~result.mHi;
+    result.mLo  = ~result.mLo;
+    result.mLo += 1;
 
-    if (m_Lo == 0)
-      result.m_Hi += 1;
+    if (mLo == 0)
+      result.mHi += 1;
 
     return result;
   }
@@ -74,11 +75,11 @@ public:
     {
       WE_I128 result (*this);
 
-      result.m_Hi += op.m_Hi;
-      result.m_Lo += op.m_Lo;
+      result.mHi += op.mHi;
+      result.mLo += op.mLo;
 
-      if (result.m_Lo < op.m_Lo)
-        result.m_Hi++;
+      if (result.mLo < op.mLo)
+        result.mHi++;
 
       return result;
     }
@@ -88,11 +89,11 @@ public:
     {
       WE_I128 result (*this);
 
-      if (op.m_Lo > result.m_Lo)
-        result.m_Hi--;
+      if (op.mLo > result.mLo)
+        result.mHi--;
 
-      result.m_Lo -= op.m_Lo;
-      result.m_Hi -= op.m_Hi;
+      result.mLo -= op.mLo;
+      result.mHi -= op.mHi;
 
       return result;
     }
@@ -117,8 +118,8 @@ public:
           top  = -top;
         }
 
-      if ((top.m_Hi == 0) && (top.m_Lo <= 0xFFFFFFFF))
-        tthis = tthis.multiply32 (top.m_Lo);
+      if ((top.mHi == 0) && (top.mLo <= 0xFFFFFFFF))
+        tthis = tthis.multiply32 (top.mLo);
       else
         tthis = tthis.multiply (top);
 
@@ -131,8 +132,7 @@ public:
   WE_I128
   operator/ (const WE_I128& op) const
     {
-      WE_I128 quotient;
-      WE_I128 reminder;
+      WE_I128 quotient, reminder;
 
       WE_I128 tthis (*this);
       WE_I128 top (op);
@@ -151,12 +151,12 @@ public:
           top  = -top;
         }
 
-      if ((top.m_Hi == 0)
-          && ((tthis.m_Hi == 0)
-              || (tthis.m_Hi >= top.m_Lo)
-              || (top.m_Lo <= 0xFFFFFFFF)))
+      if ((top.mHi == 0)
+          && ((tthis.mHi == 0)
+              || (tthis.mHi >= top.mLo)
+              || (top.mLo <= 0xFFFFFFFF)))
         {
-          tthis.devide64 (top.m_Lo, quotient, reminder);
+          tthis.devide64 (top.mLo, quotient, reminder);
         }
       else
         tthis.devide (top, quotient, reminder);
@@ -170,8 +170,7 @@ public:
   WE_I128
   operator% (const WE_I128& op) const
     {
-      WE_I128 quotient;
-      WE_I128 reminder;
+      WE_I128 quotient, reminder;
 
       WE_I128 tthis (*this);
       WE_I128 top (op);
@@ -186,12 +185,12 @@ public:
       if (op < 0)
         top  = -top;
 
-      if ((top.m_Hi == 0)
-          && ((tthis.m_Hi == 0)
-              || (tthis.m_Hi >= top.m_Lo)
-              || (top.m_Lo <= 0xFFFFFFFF)))
+      if ((top.mHi == 0)
+          && ((tthis.mHi == 0)
+              || (tthis.mHi >= top.mLo)
+              || (top.mLo <= 0xFFFFFFFF)))
         {
-          tthis.devide64 (top.m_Lo, quotient, reminder);
+          tthis.devide64 (top.mLo, quotient, reminder);
         }
       else
         tthis.devide (top, quotient, reminder);
@@ -207,8 +206,8 @@ public:
     {
       WE_I128 result = *this;
 
-      result.m_Hi |= op.m_Hi;
-      result.m_Lo |= op.m_Lo;
+      result.mHi |= op.mHi;
+      result.mLo |= op.mLo;
 
       return result;
     }
@@ -218,8 +217,8 @@ public:
     {
       WE_I128 result = *this;
 
-      result.m_Hi &= op.m_Hi;
-      result.m_Lo &= op.m_Lo;
+      result.mHi &= op.mHi;
+      result.mLo &= op.mLo;
 
       return result;
     }
@@ -227,7 +226,7 @@ public:
   bool
   operator== (const WE_I128& op) const
   {
-    return (m_Hi == op.m_Hi) && (m_Lo == op.m_Lo);
+    return (mHi == op.mHi) && (mLo == op.mLo);
   }
 
   bool
@@ -239,13 +238,14 @@ public:
   bool
   operator<  (const WE_I128& op) const
   {
-    if ((_SC (int64_t, m_Hi) < 0) && (_SC (int64_t, op.m_Hi) >= 0))
+    if ((_SC (int64_t, mHi) < 0) && (_SC (int64_t, op.mHi) >= 0))
       return true;
-    if ((_SC (int64_t, m_Hi) > 0) && (_SC (int64_t, op.m_Hi) <= 0))
+
+    if ((_SC (int64_t, mHi) > 0) && (_SC (int64_t, op.mHi) <= 0))
       return false;
 
-    return ((m_Hi < op.m_Hi)
-            || ((m_Hi == op.m_Hi) && ((m_Lo < op.m_Lo))));
+    return ((mHi < op.mHi)
+            || ((mHi == op.mHi) && ((mLo < op.mLo))));
   }
 
   bool
@@ -311,7 +311,7 @@ public:
   int64_t
   Int64 () const
   {
-    return m_Lo;
+    return mLo;
   }
 
 private:
@@ -319,9 +319,9 @@ private:
   const WE_I128&
   lshift96 ()
   {
-    m_Hi = m_Lo;
-    m_Hi <<= 32;
-    m_Lo = 0;
+    mHi = mLo;
+    mHi <<= 32;
+    mLo = 0;
 
     return *this;
   }
@@ -329,8 +329,8 @@ private:
   const WE_I128&
   lshift64 ()
   {
-    m_Hi = m_Lo;
-    m_Lo = 0;
+    mHi = mLo;
+    mLo = 0;
 
     return *this;
   }
@@ -338,9 +338,9 @@ private:
   const WE_I128&
   lshift32 ()
   {
-    m_Hi <<= 32;
-    m_Hi |= (m_Lo >> 32) & 0xFFFFFFFF;
-    m_Lo <<= 32;
+    mHi <<= 32;
+    mHi  |= (mLo >> 32) & 0xFFFFFFFF;
+    mLo <<= 32;
 
     return *this;
   }
@@ -348,9 +348,9 @@ private:
   const WE_I128&
   lshift ()
   {
-    m_Hi <<= 1;
-    m_Hi |= (m_Lo >> 63) & 1;
-    m_Lo <<= 1;
+    mHi <<= 1;
+    mHi  |= (mLo >> 63) & 1;
+    mLo <<= 1;
 
     return *this;
   }
@@ -360,13 +360,13 @@ private:
   {
     const uint64_t one = 1;
 
-    m_Lo = (m_Lo >> 1) & 0x7FFFFFFFFFFFFFFFull;
-    m_Lo |= ((m_Hi & 1) << 63);
+    mLo  = (mLo >> 1) & 0x7FFFFFFFFFFFFFFFull;
+    mLo |= ((mHi & 1) << 63);
 
-    const bool negative = _SC(int64_t, m_Hi) < 0;
-    m_Hi = (m_Hi >> 1) & 0x7FFFFFFFFFFFFFFFull;
+    const bool negative = _SC(int64_t, mHi) < 0;
+    mHi = (mHi >> 1) & 0x7FFFFFFFFFFFFFFFull;
     if (negative)
-      m_Hi |= (one << 63);
+      mHi |= (one << 63);
 
     return *this;
   }
@@ -374,16 +374,16 @@ private:
   WE_I128
   multiply32 (const uint32_t op) const
   {
-    WE_I128 temp   = op * (m_Lo & 0xFFFFFFFF);
+    WE_I128 temp   = op * (mLo & 0xFFFFFFFF);
     WE_I128 result = temp;
 
-    temp    = op * ((m_Lo >> 32) & 0xFFFFFFFF);
+    temp    = op * ((mLo >> 32) & 0xFFFFFFFF);
     result += temp.lshift32 ();
 
-    temp    = op * (m_Hi & 0xFFFFFFFF);
+    temp    = op * (mHi & 0xFFFFFFFF);
     result += temp.lshift64();
 
-    temp    = op * ((m_Hi >> 32) & 0xFFFFFFFF);
+    temp    = op * ((mHi >> 32) & 0xFFFFFFFF);
     result += temp.lshift96 ();
 
     return result;
@@ -392,15 +392,15 @@ private:
   WE_I128
   multiply (const WE_I128& op) const
   {
-    const uint32_t tw0 = m_Lo & 0xFFFFFFFF;
-    const uint32_t tw1 = (m_Lo >> 32) & 0xFFFFFFFF;
-    const uint32_t tw2 = (m_Hi) & 0xFFFFFFFF;
-    const uint32_t tw3 = (m_Hi >> 32) & 0xFFFFFFFF;
+    const uint32_t tw0 = mLo & 0xFFFFFFFF;
+    const uint32_t tw1 = (mLo >> 32) & 0xFFFFFFFF;
+    const uint32_t tw2 = (mHi) & 0xFFFFFFFF;
+    const uint32_t tw3 = (mHi >> 32) & 0xFFFFFFFF;
 
-    const uint64_t opw0 = op.m_Lo & 0xFFFFFFFF;
-    const uint64_t opw1 = (op.m_Lo >> 32) & 0xFFFFFFFF;
-    const uint64_t opw2 = (op.m_Hi) & 0xFFFFFFFF;
-    const uint64_t opw3 = (op.m_Hi >> 32) & 0xFFFFFFFF;
+    const uint64_t opw0 = op.mLo & 0xFFFFFFFF;
+    const uint64_t opw1 = (op.mLo >> 32) & 0xFFFFFFFF;
+    const uint64_t opw2 = (op.mHi) & 0xFFFFFFFF;
+    const uint64_t opw3 = (op.mHi >> 32) & 0xFFFFFFFF;
 
 
     WE_I128 temp   = opw0 * tw0;
@@ -445,11 +445,11 @@ private:
   void
   devide64 (const uint64_t op, WE_I128& quotient, WE_I128& reminder) const
   {
-    quotient.m_Hi = m_Hi / op;
-    quotient.m_Lo = m_Lo / op;
+    quotient.mHi = mHi / op;
+    quotient.mLo = mLo / op;
 
-    reminder.m_Hi = m_Hi % op;
-    reminder.m_Lo = m_Lo % op;
+    reminder.mHi = mHi % op;
+    reminder.mLo = mLo % op;
 
     uint64_t sq = 0xFFFFFFFFFFFFFFFFul / op;
     uint64_t sr = (0xFFFFFFFFFFFFFFFFul % op) + 1;
@@ -457,24 +457,24 @@ private:
     if (sr == op)
       ++sq, sr = 0;
 
-    while (reminder.m_Hi > 0)
+    while (reminder.mHi > 0)
       {
         WE_I128 temp;
 
-        temp      = reminder.m_Hi;
+        temp      = reminder.mHi;
         temp     *= sq;
         quotient += temp;
 
-        temp  = reminder.m_Hi;
+        temp  = reminder.mHi;
         temp *= sr;
 
-        temp += reminder.m_Lo;
+        temp += reminder.mLo;
 
-        quotient.m_Hi += temp.m_Hi / op;
-        quotient      += temp.m_Lo / op;
+        quotient.mHi += temp.mHi / op;
+        quotient      += temp.mLo / op;
 
-        reminder.m_Hi = temp.m_Hi % op;
-        reminder.m_Lo = temp.m_Lo % op;
+        reminder.mHi = temp.mHi % op;
+        reminder.mLo = temp.mLo % op;
       }
   }
 
@@ -487,19 +487,19 @@ private:
     for (uint_t i = 0; i < 128; ++i)
       {
         reminder.lshift ();
-        reminder.m_Lo |= (quotient.m_Hi >> 63) & 1;
+        reminder.mLo |= (quotient.mHi >> 63) & 1;
         quotient.lshift ();
 
         if (reminder >= op)
           {
-            quotient.m_Lo |= 1;
+            quotient.mLo |= 1;
             reminder -= op;
           }
       }
   }
 
-  uint64_t  m_Hi;
-  uint64_t  m_Lo;
+  uint64_t  mHi;
+  uint64_t  mLo;
 };
 
 template <typename T>
@@ -528,7 +528,7 @@ template <typename T>
 WE_I128
 operator/ (const T op1, const WE_I128& op2)
 {
-  return WE_I128(op1) / op2;
+  return WE_I128 (op1) / op2;
 }
 
 
@@ -536,7 +536,7 @@ template <typename T>
 WE_I128
 operator% (const T op1, const WE_I128& op2)
 {
-  return WE_I128(op1) % op2;
+  return WE_I128 (op1) % op2;
 }
 
 static inline int64_t
@@ -547,7 +547,7 @@ toInt64 (const WE_I128& value)
 
 #else
 
-typedef int128 WE_I128;
+typedef int128_t WE_I128;
 
 static inline int64_t
 toInt64 (const WE_I128& value)
@@ -556,6 +556,7 @@ toInt64 (const WE_I128& value)
 }
 
 
-#endif /* uint_t128 */
+#endif /* int128_t */
 
 #endif /* WE_INT128_H_ */
+

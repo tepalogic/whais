@@ -31,8 +31,8 @@
 
 #include "pm_operand.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 struct Unit;
 struct ProcedureEntry
@@ -124,10 +124,11 @@ private:
   std::vector<uint32_t>       m_LocalsTypes;
   std::vector<uint8_t>        m_Definitions;
   std::vector<bool>           m_SyncStmts;
-  WSynchronizer               m_Sync;
+  Lock               m_Sync;
 };
 
-}
+} //namespace prima
+} //namespace whisper
 
 #endif /* PM_PROCEDURES_H_ */
 

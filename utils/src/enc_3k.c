@@ -105,12 +105,12 @@ exchange_16bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 }
 
 void
-encrypt_3k_buffer (const uint32_t       firstKing,
-                   const uint32_t       secondKing,
-                   const uint8_t* const key,
-                   const uint_t         keyLen,
-                   uint8_t*             buffer,
-                   const uint_t         bufferSize)
+wh_buff_3k_encode (const uint32_t           firstKing,
+                   const uint32_t           secondKing,
+                   const uint8_t* const     key,
+                   const uint_t             keyLen,
+                   uint8_t*                 buffer,
+                   const uint_t             bufferSize)
 {
   uint_t pos, b;
 
@@ -119,7 +119,7 @@ encrypt_3k_buffer (const uint32_t       firstKing,
   uint_t keyIndex = firstKing % keyLen;
   for (pos = 0; pos < bufferSize; pos += sizeof (uint32_t))
     {
-      uint64_t message   = from_le_int32 (buffer + pos);
+      uint64_t message   = load_le_int32 (buffer + pos);
       uint32_t thirdKing = 0;
 
       message -= firstKing;
@@ -177,12 +177,12 @@ encrypt_3k_buffer (const uint32_t       firstKing,
 
 
 void
-decrypt_3k_buffer (const uint32_t       firstKing,
-                   const uint32_t       secondKing,
-                   const uint8_t* const key,
-                   const uint_t         keyLen,
-                   uint8_t*             buffer,
-                   const uint_t         bufferSize)
+wh_buff_3k_decode (const uint32_t           firstKing,
+                   const uint32_t           secondKing,
+                   const uint8_t* const     key,
+                   const uint_t             keyLen,
+                   uint8_t*                 buffer,
+                   const uint_t             bufferSize)
 {
   int pos, b;
   assert (bufferSize % sizeof (uint32_t) == 0);
@@ -190,7 +190,7 @@ decrypt_3k_buffer (const uint32_t       firstKing,
   uint_t keyIndex = firstKing % keyLen;
   for (pos = 0; pos < bufferSize; pos += sizeof (uint32_t))
     {
-      uint64_t message   = from_le_int32 (buffer + pos);
+      uint64_t message   = load_le_int32 (buffer + pos);
       uint32_t thirdKing = 0;
 
       thirdKing = key[keyIndex++]; thirdKing <<= 8;

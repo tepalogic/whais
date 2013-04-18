@@ -30,39 +30,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace whisper
 {
 
-class EXCEP_SHL WFileException : public Exception
+class EXCEP_SHL FileException : public Exception
 {
 public:
-  WFileException (const char* pMessage,
-                  const char* pFile,
-                  uint32_t      line,
-                  uint32_t      extra);
+  FileException (const char*   message,
+                 const char*   file,
+                 uint32_t      line,
+                 uint32_t      extra);
 
-  virtual Exception*     Clone () const;
-  virtual EXPCEPTION_TYPE Type () const;
-  virtual const char*   Description () const;
+  virtual Exception*       Clone () const;
+  virtual EXPCEPTION_TYPE  Type () const;
+  virtual const char*      Description () const;
 };
 
-class EXCEP_SHL WFile
+
+class EXCEP_SHL File
 {
 public:
-  explicit WFile (const char* pFileName, uint_t mode = 0);
-  WFile (const WFile& rSource);
-  ~WFile ();
+  explicit File (const char* name, uint_t mode = 0);
 
-  void     Read (uint8_t* pBuffer, uint_t size);
-  void     Write (const uint8_t* pBuffer, uint_t size);
+  File (const File& rSource);
+  File& operator= (const File&);
+
+  ~File ();
+
+  void     Read (uint8_t* buffer, uint_t size);
+
+  void     Write (const uint8_t* buffer, uint_t size);
+
   void     Seek (const int64_t where, const int whence);
+
   uint64_t Tell ();
+
   void     Sync ();
+
   uint64_t GetSize () const;
+
   void     SetSize (const uint64_t size);
+
   void     Close ();
 
-  WFile&   operator= (const WFile&);
 
 private:
-  WH_FILE m_Handle;
+  WH_FILE   mHandle;
 };
 
 } //namespace whisper

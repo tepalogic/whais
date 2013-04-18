@@ -10,11 +10,14 @@
 #include <string.h>
 #include <vector>
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
 
 #include "../pastra/ps_table.h"
 #include "../pastra/ps_valintep.h"
+
+using namespace whisper;
+using namespace pastra;
 
 const char db_name[] = "t_baza_date_1";
 const char tb_name[] = "t_test_tab";

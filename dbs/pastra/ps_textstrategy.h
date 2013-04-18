@@ -30,8 +30,10 @@
 #include "ps_container.h"
 #include "ps_varstorage.h"
 
-namespace pastra
-{
+namespace whisper {
+
+namespace pastra {
+  //Justr forward declarations for now!
   class TemporalText;
   class RowFieldText;
 }
@@ -232,6 +234,8 @@ private:
   RowFieldText operator= (const RowFieldText&);
 };
 
-};
+} //namespace pastra
+} //namespace whisper
+
 
 #endif /* PS_TEXTSTRATEGY_H_ */

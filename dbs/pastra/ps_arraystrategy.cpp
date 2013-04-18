@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs_types.h"
@@ -33,8 +33,9 @@
 #include "ps_arraystrategy.h"
 #include "ps_valintep.h"
 
-using namespace pastra;
 using namespace std;
+
+namespace whisper {
 
 I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType)
   : m_ElementsCount (0),
@@ -47,10 +48,10 @@ I_ArrayStrategy::I_ArrayStrategy (const DBS_FIELD_TYPE elemsType)
   {
     assert ((elemsType >= T_BOOL) && (elemsType < T_TEXT));
 
-    m_ElementRawSize = PSValInterp::Alignment (m_ElementsType, false);
+    m_ElementRawSize = pastra::PSValInterp::Alignment (m_ElementsType, false);
 
-    while (m_ElementRawSize < PSValInterp::Size(m_ElementsType, false))
-      m_ElementRawSize += PSValInterp::Alignment (m_ElementsType, false);
+    while (m_ElementRawSize <pastra::PSValInterp::Size(m_ElementsType, false))
+      m_ElementRawSize +=pastra::PSValInterp::Alignment (m_ElementsType, false);
   }
 }
 
@@ -138,22 +139,23 @@ I_ArrayStrategy::IsRowValue() const
   return false;
 }
 
-TemporalArray&
+pastra::TemporalArray&
 I_ArrayStrategy::GetTemporal()
 {
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-  return * _RC(TemporalArray *, this);
+  return * _RC(pastra::TemporalArray *, this);
 }
 
-RowFieldArray&
+pastra::RowFieldArray&
 I_ArrayStrategy::GetRow()
 {
   throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-  return * _RC(RowFieldArray *, this);
+  return * _RC(pastra::RowFieldArray *, this);
 }
 
+namespace pastra {
 
 NullArray::NullArray (const DBS_FIELD_TYPE elemsType)
   : I_ArrayStrategy (elemsType)
@@ -377,7 +379,7 @@ RowFieldArray::RowFieldArray (VLVarsStore&   storage,
                        sizeof elemetsCount,
                        elemetsCount);
 
-  m_ElementsCount = from_le_int64 (elemetsCount);
+  m_ElementsCount = load_le_int64 (elemetsCount);
 }
 
 RowFieldArray::~RowFieldArray ()
@@ -511,3 +513,7 @@ RowFieldArray::EnableTemporalStorage ()
   m_Storage.DecrementRecordRef (m_FirstRecordEntry);
   m_Storage.ReleaseReference();
 }
+
+} //namespace pastra
+} //namespace whisper
+

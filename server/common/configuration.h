@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "dbs/include/dbs_mgr.h"
-#include "interpreter/include/interpreter.h"
-#include "utils/include/logger.h"
+#include "dbs/dbs_mgr.h"
+#include "interpreter/interpreter.h"
+#include "utils/logger.h"
 
 #include "server_protocol.h"
 
@@ -102,10 +102,10 @@ struct DBSDescriptors
   std::vector<std::string> m_ObjectLibs;
   std::vector<std::string> m_NativeLibs;
 
-  I_DBSHandler*            m_Dbs;
-  I_Session*               m_Session;
+  whisper::I_DBSHandler*            m_Dbs;
+  whisper::I_Session*               m_Session;
 
-  I_Logger*                m_pLogger;
+  whisper::Logger*                m_pLogger;
 };
 
 const std::string&
@@ -124,15 +124,15 @@ bool
 ParseConfigurationSection (std::ifstream& config, uint_t& ioConfigLine);
 
 bool
-ParseContextSection (I_Logger&        log,
+ParseContextSection (whisper::Logger&        log,
                      std::ifstream&   config,
                      uint_t&          ioConfigLine,
                      DBSDescriptors&  output);
 
 bool
-PrepareConfigurationSection (I_Logger& log);
+PrepareConfigurationSection (whisper::Logger& log);
 
 bool
-PrepareContextSection (I_Logger& log, DBSDescriptors& ioDesc);
+PrepareContextSection (whisper::Logger& log, DBSDescriptors& ioDesc);
 
 #endif /* CONFIGURATION_H_ */

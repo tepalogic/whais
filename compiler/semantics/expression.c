@@ -373,7 +373,7 @@ translate_exp_not (struct ParserState* const         pState,
                    const struct ExpResultType* const firstType)
 {
   struct Statement* const    pStmt        = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
   enum W_OPCODE              opcode       = W_NA;
   const uint_t               ftype        = GET_TYPE (firstType->type);
 
@@ -407,7 +407,7 @@ translate_exp_chknull (struct ParserState* const pState,
                        const bool_t              trueIfNull)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const struct ExpResultType result      = {NULL, T_BOOL};
 
   assert (pStmt->type == STMT_PROC);
@@ -428,7 +428,7 @@ translate_exp_add (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   enum W_OPCODE              opcode      = W_NA;
   struct ExpResultType       result;
 
@@ -496,7 +496,7 @@ translate_exp_sub (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -559,7 +559,7 @@ translate_exp_mul (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -621,7 +621,7 @@ translate_exp_div (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -684,7 +684,7 @@ translate_exp_mod (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -723,7 +723,7 @@ translate_exp_less (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -764,7 +764,7 @@ translate_exp_less_equal (struct ParserState* const         pState,
                           const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -805,7 +805,7 @@ translate_exp_grater (struct ParserState* const         pState,
                       const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -846,7 +846,7 @@ translate_exp_grater_equal (struct ParserState* const         pState,
                             const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -887,7 +887,7 @@ translate_exp_equals (struct ParserState* const         pState,
                       const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -929,7 +929,7 @@ translate_exp_not_equals (struct ParserState* const         pState,
                           const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -971,7 +971,7 @@ translate_exp_or (struct ParserState* const         pState,
                   const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1020,7 +1020,7 @@ translate_exp_and (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1067,7 +1067,7 @@ translate_exp_xor (struct ParserState* const        pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1145,7 +1145,7 @@ are_compatible_tables (struct ParserState* const         pState,
           w_log_msg (pState,
                      pState->bufferPos,
                      MSG_NO_FIELD,
-                     copy_text_truncate (temp, pFirstField->label,
+                     wh_copy_first (temp, pFirstField->label,
                                          sizeof temp,
                                          pFirstField->labelLength));
 
@@ -1156,7 +1156,7 @@ are_compatible_tables (struct ParserState* const         pState,
           w_log_msg (pState,
                      pState->bufferPos,
                      MSG_FIELD_NA,
-                     copy_text_truncate (temp,
+                     wh_copy_first (temp,
                                          pFirstField->label,
                                          sizeof temp,
                                          pFirstField->labelLength),
@@ -1178,7 +1178,7 @@ translate_exp_store (struct ParserState* const         pState,
                      const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1262,7 +1262,7 @@ translate_exp_sadd (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1325,7 +1325,7 @@ translate_exp_ssub (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1381,7 +1381,7 @@ translate_exp_smul (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1437,7 +1437,7 @@ translate_exp_sdiv (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1493,7 +1493,7 @@ translate_exp_smod (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1539,7 +1539,7 @@ translate_exp_sand (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1587,7 +1587,7 @@ translate_exp_sxor (struct ParserState* const         pState,
                     const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1635,7 +1635,7 @@ translate_exp_sor (struct ParserState* const         pState,
                    const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1683,7 +1683,7 @@ translate_exp_index (struct ParserState* const         pState,
                      const struct ExpResultType* const secondType)
 {
   struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const uint_t               ftype       = GET_TYPE (firstType->type);
   const uint_t               stype       = GET_TYPE (secondType->type);
   enum W_OPCODE              opcode      = W_NA;
@@ -1893,7 +1893,7 @@ translate_exp_leaf (struct ParserState* const pState,
                     struct Statement*         pStmt,
                     struct SemValue* const    expression)
 {
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const struct ExpResultType r_unk       = { NULL, T_UNKNOWN };
   const struct ExpResultType r_undet     = { NULL, T_UNDETERMINED };
   struct ExpResultType       result      = gResultUnk;
@@ -1924,7 +1924,7 @@ translate_exp_leaf (struct ParserState* const pState,
       if (pVar == NULL)
         {
           char temp[128];
-          copy_text_truncate (temp,
+          wh_copy_first (temp,
                               expression->val.u_id.text,
                               sizeof temp,
                               expression->val.u_id.length);
@@ -1956,7 +1956,7 @@ translate_exp_leaf (struct ParserState* const pState,
           value_8 = value;
           op_code = (pStmt->type == STMT_GLOBAL) ? W_LDGB8 : W_LDLO8;
           if ((w_opcode_encode (pCodeStream, op_code) == NULL) ||
-              output_uint8 (pCodeStream, value_8) == NULL)
+              wh_ostream_wint8 (pCodeStream, value_8) == NULL)
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -1967,7 +1967,7 @@ translate_exp_leaf (struct ParserState* const pState,
           value_16 = value;
           op_code  = (pStmt->type == STMT_GLOBAL) ? W_LDGB16 : W_LDLO16;
           if ((w_opcode_encode (pCodeStream, op_code) == NULL) ||
-              output_uint16 (pCodeStream, value_16) == NULL)
+              wh_ostream_wint16 (pCodeStream, value_16) == NULL)
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -1978,7 +1978,7 @@ translate_exp_leaf (struct ParserState* const pState,
           value_32 = value;
           op_code  = (pStmt->type == STMT_GLOBAL) ? W_LDGB32 : W_LDLO32;
           if ((w_opcode_encode (pCodeStream, op_code) == NULL) ||
-              output_uint32 (pCodeStream, value_32) == NULL)
+              wh_ostream_wint32 (pCodeStream, value_32) == NULL)
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -1995,7 +1995,7 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = expression->val.u_int.is_signed ? T_INT8 : T_UINT8;
           if ((w_opcode_encode (pCodeStream, W_LDI8) == NULL) ||
-              (output_uint8 (pCodeStream,
+              (wh_ostream_wint8 (pCodeStream,
                              (uint8_t)expression->val.u_int.value & value_8) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -2006,7 +2006,7 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = expression->val.u_int.is_signed ? T_INT16 : T_UINT16;
           if ((w_opcode_encode (pCodeStream, W_LDI16) == NULL) ||
-              (output_uint16 (pCodeStream,
+              (wh_ostream_wint16 (pCodeStream,
                               (uint16_t)expression->val.u_int.value & value_16) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -2017,7 +2017,7 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = expression->val.u_int.is_signed ? T_INT32 : T_UINT32;
           if ((w_opcode_encode (pCodeStream, W_LDI32) == NULL) ||
-              (output_uint32 (pCodeStream,
+              (wh_ostream_wint32 (pCodeStream,
                               (uint32_t)expression->val.u_int.value & value_32) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -2028,7 +2028,7 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = expression->val.u_int.is_signed ? T_INT64 : T_UINT64;
           if ((w_opcode_encode (pCodeStream, W_LDI64) == NULL) ||
-              (output_uint64 (pCodeStream, (uint64_t) expression->val.u_int.value) == NULL))
+              (wh_ostream_wint64 (pCodeStream, (uint64_t) expression->val.u_int.value) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2041,7 +2041,7 @@ translate_exp_leaf (struct ParserState* const pState,
 
       result.type = T_CHAR;
       if ((w_opcode_encode (pCodeStream, W_LDC) == NULL)
-          || (output_uint32 (pCodeStream, unicodeCh) == NULL))
+          || (wh_ostream_wint32 (pCodeStream, unicodeCh) == NULL))
         {
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
           return gResultUnk;
@@ -2055,13 +2055,13 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = T_HIRESTIME;
           if ((w_opcode_encode (pCodeStream, W_LDHT) == NULL) ||
-              (output_uint32 (pCodeStream, value->usec) == NULL) ||
-              (output_uint8 (pCodeStream, value->sec) == NULL) ||
-              (output_uint8 (pCodeStream, value->min) == NULL) ||
-              (output_uint8 (pCodeStream, value->hour) == NULL) ||
-              (output_uint8 (pCodeStream, value->day) == NULL) ||
-              (output_uint8 (pCodeStream, value->month) == NULL) ||
-              (output_uint16 (pCodeStream, value->year) == NULL))
+              (wh_ostream_wint32 (pCodeStream, value->usec) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->sec) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->min) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->hour) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->day) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->month) == NULL) ||
+              (wh_ostream_wint16 (pCodeStream, value->year) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2072,12 +2072,12 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = T_DATETIME;
           if ((w_opcode_encode (pCodeStream, W_LDDT) == NULL) ||
-              (output_uint8 (pCodeStream, value->sec) == NULL) ||
-              (output_uint8 (pCodeStream, value->min) == NULL) ||
-              (output_uint8 (pCodeStream, value->hour) == NULL) ||
-              (output_uint8 (pCodeStream, value->day) == NULL) ||
-              (output_uint8 (pCodeStream, value->month) == NULL) ||
-              (output_uint16 (pCodeStream, value->year) == NULL))
+              (wh_ostream_wint8 (pCodeStream, value->sec) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->min) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->hour) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->day) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->month) == NULL) ||
+              (wh_ostream_wint16 (pCodeStream, value->year) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2087,9 +2087,9 @@ translate_exp_leaf (struct ParserState* const pState,
         {
           result.type = T_DATE;
           if ((w_opcode_encode (pCodeStream, W_LDD) == NULL) ||
-              (output_uint8 (pCodeStream, value->day) == NULL) ||
-              (output_uint8 (pCodeStream, value->month) == NULL) ||
-              (output_uint16 (pCodeStream, value->year) == NULL))
+              (wh_ostream_wint8 (pCodeStream, value->day) == NULL) ||
+              (wh_ostream_wint8 (pCodeStream, value->month) == NULL) ||
+              (wh_ostream_wint16 (pCodeStream, value->year) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2100,8 +2100,8 @@ translate_exp_leaf (struct ParserState* const pState,
     {
       result.type = T_RICHREAL;
       if ((w_opcode_encode (pCodeStream, W_LDRR) == NULL) ||
-          (output_uint64 (pCodeStream, expression->val.u_real.integerPart) == NULL) ||
-          (output_uint64 (pCodeStream, expression->val.u_real.fractionalPart) == NULL))
+          (wh_ostream_wint64 (pCodeStream, expression->val.u_real.integerPart) == NULL) ||
+          (wh_ostream_wint64 (pCodeStream, expression->val.u_real.fractionalPart) == NULL))
 
         {
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -2118,7 +2118,7 @@ translate_exp_leaf (struct ParserState* const pState,
       result.type = T_TEXT;
       if ((constPos < 0) ||
           (w_opcode_encode (pCodeStream, W_LDT) == NULL) ||
-          (output_uint32 (pCodeStream, constPos) == NULL))
+          (wh_ostream_wint32 (pCodeStream, constPos) == NULL))
         {
           w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
           return gResultUnk;
@@ -2150,7 +2150,7 @@ translate_exp_call (struct ParserState* const   pState,
                     struct Statement* const     pStmt,
                     struct SemExpression* const callExp)
 {
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
   const struct Statement*    pProc       = NULL;
   const struct DeclaredVar*  pProcVar    = NULL;
   struct SemValue*           pExpArg     = NULL;
@@ -2170,7 +2170,7 @@ translate_exp_call (struct ParserState* const   pState,
     {
       w_log_msg (pState, pState->bufferPos,
                  MSG_NO_PROC,
-                 copy_text_truncate (temp,
+                 wh_copy_first (temp,
                                      callExp->pFirstOp->val.u_id.text,
                                      sizeof temp,
                                      callExp->pFirstOp->val.u_id.length));
@@ -2195,7 +2195,7 @@ translate_exp_call (struct ParserState* const   pState,
           w_log_msg (pState,
                      pState->bufferPos,
                      MSG_PROC_MORE_ARGS,
-                     copy_text_truncate (temp,
+                     wh_copy_first (temp,
                                          callExp->pFirstOp->val.u_id.text,
                                          sizeof temp,
                                          callExp->pFirstOp->val.u_id.length),
@@ -2219,7 +2219,7 @@ translate_exp_call (struct ParserState* const   pState,
           w_log_msg (pState,
                      pState->bufferPos,
                      MSG_PROC_ARG_COUNT,
-                     copy_text_truncate (temp, pProc->spec.proc.name,
+                     wh_copy_first (temp, pProc->spec.proc.name,
                                          sizeof temp,
                                          pProc->spec.proc.nameLength),
                                          argCount);
@@ -2246,7 +2246,7 @@ translate_exp_call (struct ParserState* const   pState,
                   w_log_msg (pState,
                              pState->bufferPos,
                              MSG_PROC_ARG_NA,
-                             copy_text_truncate (temp,
+                             wh_copy_first (temp,
                                                  pProc->spec.proc.name,
                                                  sizeof temp,
                                                  pProc->spec.proc.nameLength),
@@ -2275,7 +2275,7 @@ translate_exp_call (struct ParserState* const   pState,
                       w_log_msg (pState,
                                  pState->bufferPos,
                                  MSG_PROC_ARG_NA,
-                                 copy_text_truncate (temp,
+                                 wh_copy_first (temp,
                                                      pProc->spec.proc.name,
                                                      sizeof temp,
                                                      pProc->spec.proc.nameLength),
@@ -2291,7 +2291,7 @@ translate_exp_call (struct ParserState* const   pState,
                   w_log_msg (pState,
                              pState->bufferPos,
                              MSG_PROC_ARG_NA,
-                             copy_text_truncate (temp,
+                             wh_copy_first (temp,
                                                  pProc->spec.proc.name,
                                                  sizeof temp,
                                                  pProc->spec.proc.nameLength),
@@ -2309,7 +2309,7 @@ translate_exp_call (struct ParserState* const   pState,
               w_log_msg (pState,
                          pState->bufferPos,
                          MSG_PROC_ARG_COUNT,
-                         copy_text_truncate (temp, pProc->spec.proc.name,
+                         wh_copy_first (temp, pProc->spec.proc.name,
                                              sizeof temp,
                                              pProc->spec.proc.nameLength),
                          argCount);
@@ -2329,7 +2329,7 @@ translate_exp_call (struct ParserState* const   pState,
       w_log_msg (pState,
                  pState->bufferPos,
                  MSG_PROC_LESS_ARGS,
-                 copy_text_truncate (temp,
+                 wh_copy_first (temp,
                                      callExp->pFirstOp->val.u_id.text,
                                      sizeof temp,
                                      callExp->pFirstOp->val.u_id.length),
@@ -2341,7 +2341,7 @@ translate_exp_call (struct ParserState* const   pState,
     free_sem_value (callExp->pFirstOp);
 
   if ((w_opcode_encode (pCodeStream, W_CALL) == NULL) ||
-      (output_uint32 (pCodeStream, stmt_get_import_id (pProc)) == NULL))
+      (wh_ostream_wint32 (pCodeStream, stmt_get_import_id (pProc)) == NULL))
     {
       w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return gResultUnk;
@@ -2366,7 +2366,7 @@ translate_exp_tabval (struct ParserState* const   pState,
                       struct SemExpression* const pCallExp)
 {
   const struct DeclaredVar*   pVarField  = NULL;
-  struct OutputStream* const  pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
+  struct WOutputStream* const  pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
   struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
   struct SemExpression* const pSecondExp = &pCallExp->pSecondOp->val.u_exp;
   struct SemId* const         pId        = &pCallExp->pThirdOp->val.u_id;
@@ -2420,7 +2420,7 @@ translate_exp_tabval (struct ParserState* const   pState,
     {
       char temp[128];
 
-      copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
+      wh_copy_first (temp, pId->text, sizeof temp, pId->length);
       w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_ERD, temp);
 
       pState->abortError = TRUE;
@@ -2434,7 +2434,7 @@ translate_exp_tabval (struct ParserState* const   pState,
 
     if ((constPos < 0) ||
         (w_opcode_encode (pInstrs, W_INDTA) == NULL) ||
-        (output_uint32 (pInstrs, constPos) == NULL))
+        (wh_ostream_wint32 (pInstrs, constPos) == NULL))
       {
         w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
         return gResultUnk;
@@ -2459,7 +2459,7 @@ translate_exp_field (struct ParserState* const   pState,
                      struct SemExpression* const pCallExp)
 {
   const struct DeclaredVar*   pVarField  = NULL;
-  struct OutputStream* const  pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
+  struct WOutputStream* const  pInstrs    = stmt_query_instrs (pState->pCurrentStmt);
   struct SemExpression* const pFirstExp  = &pCallExp->pFirstOp->val.u_exp;
   struct SemId* const         pId        = &pCallExp->pSecondOp->val.u_id;
   struct ExpResultType        tableType;
@@ -2494,7 +2494,7 @@ translate_exp_field (struct ParserState* const   pState,
     {
       char temp[128];
 
-      copy_text_truncate (temp, pId->text, sizeof temp, pId->length);
+      wh_copy_first (temp, pId->text, sizeof temp, pId->length);
       w_log_msg (pState, pState->bufferPos, MSG_MEMSEL_ERD, temp);
 
       pState->abortError = TRUE;
@@ -2508,7 +2508,7 @@ translate_exp_field (struct ParserState* const   pState,
 
     if ((constPos < 0) ||
         (w_opcode_encode (pInstrs, W_SELF) == NULL) ||
-        (output_uint32 (pInstrs, constPos) == NULL))
+        (wh_ostream_wint32 (pInstrs, constPos) == NULL))
       {
         w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
         return gResultUnk;
@@ -2531,7 +2531,7 @@ translate_exp_tree (struct ParserState* const   pState,
                     struct Statement* const     pStmt,
                     struct SemExpression* const pTreeHead)
 {
-  struct OutputStream* const pCodeStream    = stmt_query_instrs (pState->pCurrentStmt);
+  struct WOutputStream* const pCodeStream    = stmt_query_instrs (pState->pCurrentStmt);
   bool_t                     needsJmpAdjust = FALSE;
   int                      jmpPosition;
   int                      jmpDataPos;
@@ -2570,11 +2570,11 @@ translate_exp_tree (struct ParserState* const   pState,
        * the second expression when is unnecessary!
        * Use 0 for jump offset just to reserve the space. It will be corrected
        * after we parse the second expression */
-      jmpPosition = get_size_outstream (pCodeStream);
+      jmpPosition = wh_ostream_size (pCodeStream);
       if (pTreeHead->opcode == OP_OR)
         {
           if ((w_opcode_encode (pCodeStream, W_JT) == NULL) ||
-              (output_uint32 (pCodeStream, 0) == NULL))
+              (wh_ostream_wint32 (pCodeStream, 0) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
@@ -2584,14 +2584,14 @@ translate_exp_tree (struct ParserState* const   pState,
       else if (pTreeHead->opcode == OP_AND)
         {
           if ((w_opcode_encode (pCodeStream, W_JF) == NULL) ||
-              (output_uint32 (pCodeStream, 0) == NULL))
+              (wh_ostream_wint32 (pCodeStream, 0) == NULL))
             {
               w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return gResultUnk;
             }
           needsJmpAdjust = TRUE;
         }
-      jmpDataPos = get_size_outstream (pCodeStream) - sizeof (uint32_t);
+      jmpDataPos = wh_ostream_size (pCodeStream) - sizeof (uint32_t);
     }
 
   if (pTreeHead->pSecondOp != NULL)
@@ -2619,9 +2619,9 @@ translate_exp_tree (struct ParserState* const   pState,
   if (needsJmpAdjust && (GET_TYPE (secondType.type) == T_BOOL))
     {
       /* lets correct some jumps offsets */
-      int                currentPos = get_size_outstream (pCodeStream) - jmpPosition;
+      int                currentPos = wh_ostream_size (pCodeStream) - jmpPosition;
       const uint8_t* const pCurrPos   = (uint8_t*)&currentPos;
-      uint8_t* const       pCode      = get_buffer_outstream (pCodeStream);
+      uint8_t* const       pCode      = wh_ostream_data (pCodeStream);
 
       /* Fix the jump offset! */
       pCode[jmpDataPos + 0] = pCurrPos[0];
@@ -2637,7 +2637,7 @@ YYSTYPE
 translate_exp (struct ParserState* pState, YYSTYPE exp)
 {
   struct Statement* const    pCurrStmt   = pState->pCurrentStmt;
-  struct OutputStream* const pCodeStream = stmt_query_instrs (pCurrStmt);
+  struct WOutputStream* const pCodeStream = stmt_query_instrs (pCurrStmt);
 
   assert (exp->val_type = VAL_EXP_LINK);
   assert (pCurrStmt->type == STMT_PROC);
@@ -2656,7 +2656,7 @@ YYSTYPE
 translate_return_exp (struct ParserState* pState, YYSTYPE exp)
 {
   struct Statement* const         pCurrStmt   = pState->pCurrentStmt;
-  struct OutputStream* const      pCodeStream = stmt_query_instrs (pCurrStmt);
+  struct WOutputStream* const      pCodeStream = stmt_query_instrs (pCurrStmt);
   const struct DeclaredVar* const pRetVar     = stmt_get_param (pCurrStmt, 0);
 
   struct ExpResultType retType = gResultUnk;

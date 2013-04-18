@@ -10,26 +10,27 @@
 #include <iostream>
 #include <string.h>
 
-#include "utils/random.h"
+#include "utils/wrandom.h"
 #include "utils/wthread.h"
 #include "custom/include/test/test_fmw.h"
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
-#include "../include/dbs_values.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
+#include "dbs/dbs_values.h"
 
+using namespace whisper;
 
 const uint_t _elemsCount = 1000000;
 
 DBSDateTime
 get_random_datetime ()
 {
-  int16_t year  = w_rnd () & 0xFFFF;
-  uint8_t month = w_rnd () % 12 + 1;
-  uint8_t day   = w_rnd () % 27 + 1;
-  uint8_t hour  = w_rnd () % 24;
-  uint8_t mins  = w_rnd () % 60;
-  uint8_t secs  = w_rnd () % 60;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
 
   return DBSDateTime (year, month, day, hour, mins, secs);
 }
@@ -37,13 +38,13 @@ get_random_datetime ()
 DBSHiresTime
 get_random_hirestime ()
 {
-  int16_t year  = w_rnd () & 0xFFFF;
-  uint8_t month = w_rnd () % 12 + 1;
-  uint8_t day   = w_rnd () % 27 + 1;
-  uint8_t hour  = w_rnd () % 24;
-  uint8_t mins  = w_rnd () % 60;
-  uint8_t secs  = w_rnd () % 60;
-  uint32_t  mic = w_rnd () % 1000000000;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
+  uint32_t  mic = wh_rnd () % 1000000000;
 
   return DBSHiresTime (year, month, day, hour, mins, secs, mic);
 }
@@ -53,9 +54,9 @@ get_random_hirestime ()
 DBSDate
 get_random_date ()
 {
-  int16_t year  = w_rnd () & 0xFFFF;
-  uint8_t month = w_rnd () % 12 + 1;
-  uint8_t day   = w_rnd () % 27 + 1;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
 
   return DBSDate (year, month, day);
 }
@@ -151,7 +152,7 @@ test_array_with_int8 (void *)
   DBSArray array (_SC (DBSUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (DBSUInt8 ( w_rnd () & 0xFF));
+    array.AddElement (DBSUInt8 ( wh_rnd () & 0xFF));
 
   array.Sort ();
 
@@ -266,7 +267,7 @@ test_array_with_int8_r (void *)
   DBSArray array (_SC (DBSUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (DBSUInt8 (w_rnd () & 0xFF));
+    array.AddElement (DBSUInt8 (wh_rnd () & 0xFF));
 
   array.Sort (true);
 
@@ -295,7 +296,7 @@ main ()
   DBSInit (DBSSettings ());
 
   {
-    WThread th[8];
+    Thread th[8];
 
     th[0].Run (test_array_with_dates, NULL);
     th[1].Run (test_array_with_datetimes, NULL);

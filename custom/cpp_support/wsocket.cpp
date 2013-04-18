@@ -25,156 +25,161 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <stdio.h>
 
-#include "utils/include/wsocket.h"
+#include "utils/wsocket.h"
 
-WSocket::WSocket (const char* const pServerName,
-                  const char* const pService)
-  : m_Socket (INVALID_SOCKET),
-    m_Owned (false)
+namespace whisper {
+
+Socket::Socket (const char* const   serverHost,
+                const char* const   service)
+  : mSocket (INVALID_SOCKET),
+    mOwned (false)
 {
-  const uint32_t e = whs_create_client (pServerName, pService, &m_Socket);
+  const uint32_t e = whs_create_client (serverHost, service, &mSocket);
 
   if (e != WOP_OK)
-    throw WSocketException (NULL, _EXTRA (e));
+    throw SocketException (NULL, _EXTRA (e));
 
-  m_Owned = true;
+  mOwned = true;
 }
 
-WSocket::WSocket (const char* const pServerName,
-                  const uint16_t      port)
-  : m_Socket (INVALID_SOCKET),
-    m_Owned (false)
+
+Socket::Socket (const char* const   serverHost,
+                const uint16_t      port)
+  : mSocket (INVALID_SOCKET),
+    mOwned (false)
+{
+  uint32_t e;
+  char     service[16];
+
+  sprintf (service, "%u", port);
+  e = whs_create_client (serverHost, service, &mSocket);
+
+  if (e != WOP_OK)
+    throw SocketException (NULL, _EXTRA (e));
+
+  mOwned = true;
+}
+
+Socket::Socket (const char* const     interface,
+                const char* const     service,
+                const uint_t          backLog)
+  : mSocket (INVALID_SOCKET),
+    mOwned (false)
+{
+  const uint32_t e = whs_create_server (interface,
+                                        service,
+                                        backLog,
+                                        &mSocket);
+  if (e != WOP_OK)
+    throw SocketException (NULL, _EXTRA (e));
+
+  mOwned = true;
+}
+
+Socket::Socket (const char* const   interface,
+                const uint16_t      port,
+                const uint_t        backLog)
+  : mSocket (INVALID_SOCKET),
+    mOwned (false)
 {
   uint32_t e;
   char   service[16];
 
   sprintf (service, "%u", port);
-  e = whs_create_client (pServerName, service, &m_Socket);
+  e = whs_create_server (interface, service, backLog, &mSocket);
 
   if (e != WOP_OK)
-    throw WSocketException (NULL, _EXTRA (e));
+    throw SocketException (NULL, _EXTRA (e));
 
-  m_Owned = true;
+  mOwned = true;
 }
 
-WSocket::WSocket (const char* const pLocalAddress,
-                  const char* const pService,
-                  const uint_t        backLog)
-  : m_Socket (INVALID_SOCKET),
-    m_Owned (false)
-{
-  const uint32_t e = whs_create_server (pLocalAddress,
-                                       pService,
-                                       backLog,
-                                       &m_Socket);
-
-  if (e != WOP_OK)
-    throw WSocketException (NULL, _EXTRA (e));
-
-  m_Owned = true;
-}
-
-WSocket::WSocket (const char* const pLocalAddress,
-                  const uint16_t      port,
-                  const uint_t        backLog)
-  : m_Socket (INVALID_SOCKET),
-    m_Owned (false)
-{
-  uint32_t e;
-  char   service[16];
-
-  sprintf (service, "%u", port);
-  e = whs_create_server (pLocalAddress, service, backLog, &m_Socket);
-
-  if (e != WOP_OK)
-    throw WSocketException (NULL, _EXTRA (e));
-
-  m_Owned = true;
-}
-
-WSocket::WSocket (const WH_SOCKET sd)
-  : m_Socket (sd),
-    m_Owned ((sd != INVALID_SOCKET) ? true : false)
+Socket::Socket (const WH_SOCKET sd)
+  : mSocket (sd),
+    mOwned ((sd != INVALID_SOCKET) ? true : false)
 {
 }
 
-WSocket::WSocket (const WSocket& source)
-  : m_Socket (source.m_Socket),
-    m_Owned (source.m_Owned)
+Socket::Socket (const Socket& source)
+  : mSocket (source.mSocket),
+    mOwned (source.mOwned)
 {
-  _CC (bool&, source.m_Owned) = false;
+  _CC (bool&, source.mOwned) = false;
 }
 
-WSocket::~WSocket ()
+Socket::~Socket ()
 {
-  if (m_Owned)
+  if (mOwned)
     {
-      assert (m_Socket != INVALID_SOCKET);
-      whs_close (m_Socket);
+      assert (mSocket != INVALID_SOCKET);
+      whs_close (mSocket);
     }
 }
 
-WSocket&
-WSocket::operator= (const WSocket& source)
+Socket&
+Socket::operator= (const Socket& source)
 {
   if (this != &source)
     {
-      if (m_Owned)
-        whs_close (m_Socket);
+      if (mOwned)
+        whs_close (mSocket);
 
-      m_Socket = source.m_Socket;
-      m_Owned  = source.m_Owned;
+      mSocket = source.mSocket;
+      mOwned  = source.mOwned;
 
-      _CC (bool&, source.m_Owned) = false;
+      _CC (bool&, source.mOwned) = false;
     }
   return *this;
 }
 
-WSocket
-WSocket::Accept ()
+Socket
+Socket::Accept ()
 {
   WH_SOCKET      client = INVALID_SOCKET;
-  const uint32_t e      = whs_accept (m_Socket, &client);
+  const uint32_t e      = whs_accept (mSocket, &client);
 
   if (e != WOP_OK )
-    throw WSocketException (NULL, _EXTRA (e));
+    throw SocketException (NULL, _EXTRA (e));
 
   assert (client != INVALID_SOCKET);
 
-  return WSocket (client);
+  return Socket (client);
 }
 
 uint_t
-WSocket::Read (const uint_t count, uint8_t* const pBuffer)
+Socket::Read (uint8_t* const buffer, const uint_t maxCount)
 {
-  uint_t         result = count;
-  const uint32_t e      = whs_read (m_Socket, pBuffer, &result);
+  uint_t         result = maxCount;
+  const uint32_t e      = whs_read (mSocket, buffer, &result);
 
   if (e != WOP_OK)
-    throw WSocketException (NULL, _EXTRA (e));
+    throw SocketException (NULL, _EXTRA (e));
 
   return result;
 }
 
 void
-WSocket::Write (const uint_t count, const uint8_t* const pBuffer)
+Socket::Write (const uint8_t* const buffer, const uint_t count)
 {
-  const uint32_t e = whs_write (m_Socket, pBuffer, count);
+  const uint32_t e = whs_write (mSocket, buffer, count);
 
   if (e != WOP_OK)
-    throw WSocketException (NULL, _EXTRA (e));
+    throw SocketException (NULL, _EXTRA (e));
 }
 
 void
-WSocket::Close ()
+Socket::Close ()
 {
-  if (! m_Owned)
+  if (! mOwned)
     return;
 
-  assert (m_Socket != INVALID_SOCKET);
+  assert (mSocket != INVALID_SOCKET);
 
-  whs_close (m_Socket);
+  whs_close (mSocket);
 
-  m_Socket = INVALID_SOCKET;
-  m_Owned  = false;
+  mSocket = INVALID_SOCKET;
+  mOwned  = false;
 }
+
+} //namespace whisper
+

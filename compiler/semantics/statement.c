@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
-#include "utils/include/le_converter.h"
+#include "utils/le_converter.h"
 
 #include "vardecl.h"
 #include "brlo_stmts.h"
@@ -38,10 +38,10 @@ init_glbl_stmt (struct Statement* pStmt)
   memset (pStmt, 0, sizeof (*pStmt));
   pStmt->type = STMT_GLOBAL;
 
-  init_outstream (0, &(pStmt->spec.glb.typesDescs));
-  init_outstream (0, &(pStmt->spec.glb.constsArea));
-  init_array (&pStmt->spec.glb.procsDecls, sizeof (struct Statement));
-  init_array (&pStmt->decls, sizeof (struct DeclaredVar));
+  wh_ostream_init (0, &(pStmt->spec.glb.typesDescs));
+  wh_ostream_init (0, &(pStmt->spec.glb.constsArea));
+  wh_array_init (&pStmt->spec.glb.procsDecls, sizeof (struct Statement));
+  wh_array_init (&pStmt->decls, sizeof (struct DeclaredVar));
 
   return TRUE;
 }
@@ -49,21 +49,21 @@ init_glbl_stmt (struct Statement* pStmt)
 void
 clear_glbl_stmt (struct Statement* pGlbStmt)
 {
-  uint_t procId = get_array_count (&(pGlbStmt->spec.glb.procsDecls));
+  uint_t procId = wh_array_count (&(pGlbStmt->spec.glb.procsDecls));
 
   assert (pGlbStmt->pParentStmt == NULL);
   assert (pGlbStmt->type == STMT_GLOBAL);
 
   while (procId-- > 0)
     {
-      struct Statement* pProc = get_item (&(pGlbStmt->spec.glb.procsDecls), procId);
+      struct Statement* pProc = wh_array_get (&(pGlbStmt->spec.glb.procsDecls), procId);
       clear_proc_stmt (pProc);
     }
 
-  destroy_outstream (&pGlbStmt->spec.glb.typesDescs);
-  destroy_outstream (&pGlbStmt->spec.glb.constsArea);
-  destroy_array (&(pGlbStmt->spec.glb.procsDecls));
-  destroy_array (&(pGlbStmt->decls));
+  wh_ostream_clean (&pGlbStmt->spec.glb.typesDescs);
+  wh_ostream_clean (&pGlbStmt->spec.glb.constsArea);
+  wh_array_clean (&(pGlbStmt->spec.glb.procsDecls));
+  wh_array_clean (&(pGlbStmt->decls));
 
   pGlbStmt->type = STMT_ERR;
 
@@ -83,15 +83,15 @@ init_proc_stmt (struct Statement* pParentStmt,
   pOutStmt->pParentStmt           = pParentStmt;
   pOutStmt->spec.proc.syncTracker = 0;
 
-  init_array (&pOutStmt->spec.proc.paramsList, sizeof (struct DeclaredVar));
-  init_array (&pOutStmt->decls, sizeof (struct DeclaredVar));
-  init_array (stmt_query_branch_stack (pOutStmt), sizeof (struct Branch));
-  init_array (stmt_query_loop_stack (pOutStmt), sizeof (struct Loop));
+  wh_array_init (&pOutStmt->spec.proc.paramsList, sizeof (struct DeclaredVar));
+  wh_array_init (&pOutStmt->decls, sizeof (struct DeclaredVar));
+  wh_array_init (stmt_query_branch_stack (pOutStmt), sizeof (struct Branch));
+  wh_array_init (stmt_query_loop_stack (pOutStmt), sizeof (struct Loop));
 
-  init_outstream (0, stmt_query_instrs (pOutStmt));
+  wh_ostream_init (0, stmt_query_instrs (pOutStmt));
 
   /* reserve space for return type */
-  if (add_item (&(pOutStmt->spec.proc.paramsList), &retType) == NULL)
+  if (wh_array_add (&(pOutStmt->spec.proc.paramsList), &retType) == NULL)
     return FALSE;
 
   pOutStmt->localsUsed++;
@@ -106,12 +106,12 @@ clear_proc_stmt (struct Statement* pStmt)
   assert (pStmt->type == STMT_PROC);
   assert ((pStmt->spec.proc.name != NULL) && (pStmt->spec.proc.nameLength != 0));
 
-  destroy_array (&(pStmt->spec.proc.paramsList));
-  destroy_array (&(pStmt->decls));
-  destroy_array (stmt_query_branch_stack (pStmt));
-  destroy_array (stmt_query_loop_stack (pStmt));
+  wh_array_clean (&(pStmt->spec.proc.paramsList));
+  wh_array_clean (&(pStmt->decls));
+  wh_array_clean (stmt_query_branch_stack (pStmt));
+  wh_array_clean (stmt_query_loop_stack (pStmt));
 
-  destroy_outstream (stmt_query_instrs (pStmt));
+  wh_ostream_clean (stmt_query_instrs (pStmt));
 
   pStmt->type = STMT_ERR;
 
@@ -127,11 +127,11 @@ stmt_find_declaration (struct Statement* pStmt,
 {
   struct DeclaredVar* result      = NULL;
   uint_t              count       = 0;
-  uint_t              stored_vals = get_array_count (&pStmt->decls);
+  uint_t              stored_vals = wh_array_count (&pStmt->decls);
 
   while (count < stored_vals)
     {
-      result = get_item (&pStmt->decls, count);
+      result = wh_array_get (&pStmt->decls, count);
       assert (result != NULL);
 
       if ((IS_TABLE_FIELD (result->type) == FALSE) &&
@@ -160,12 +160,12 @@ stmt_find_declaration (struct Statement* pStmt,
   if (pStmt->pParentStmt != NULL)
     {
       /* let's check if is a parameter */
-      stored_vals = get_array_count (&pStmt->spec.proc.paramsList);
+      stored_vals = wh_array_count (&pStmt->spec.proc.paramsList);
       /* index 0 is reserved to hold the return type */
       count = 1;
       while (count < stored_vals)
         {
-          result = get_item (&pStmt->spec.proc.paramsList, count);
+          result = wh_array_get (&pStmt->spec.proc.paramsList, count);
           assert (result != NULL);
 
           if ((IS_TABLE_FIELD (result->type) == FALSE) &&
@@ -204,7 +204,7 @@ stmt_add_declaration (struct Statement* const   pStmt,
                       struct DeclaredVar*       pVar,
                       const bool_t              parameter)
 {
-  struct OutputStream *pOutStream = NULL;
+  struct WOutputStream *pOutStream = NULL;
 
   if (IS_TABLE_FIELD (pVar->type))
       pVar->varId = ~0; /* Set the id to a generic value! */
@@ -232,10 +232,10 @@ stmt_add_declaration (struct Statement* const   pStmt,
   if (parameter)
     {
       assert (pStmt->pParentStmt != NULL);
-      pVar = add_item (&pStmt->spec.proc.paramsList, pVar);
+      pVar = wh_array_add (&pStmt->spec.proc.paramsList, pVar);
     }
   else
-    pVar = add_item (&pStmt->decls, pVar);
+    pVar = wh_array_add (&pStmt->decls, pVar);
 
   return (struct DeclaredVar*)pVar;
 }
@@ -246,7 +246,7 @@ stmt_get_param (const struct Statement* const pStmt, uint_t param)
   assert (pStmt->type == STMT_PROC);
 
   return (struct DeclaredVar *)
-    get_item (&pStmt->spec.proc.paramsList, param);
+    wh_array_get (&pStmt->spec.proc.paramsList, param);
 }
 
 uint_t
@@ -254,7 +254,7 @@ stmt_get_param_count (const struct Statement* const pStmt)
 {
   assert (pStmt->type == STMT_PROC);
 
-  return get_array_count (&pStmt->spec.proc.paramsList) - 1;
+  return wh_array_count (&pStmt->spec.proc.paramsList) - 1;
 }
 
 uint32_t
@@ -272,8 +272,8 @@ is_type_spec_valid (const struct TypeSpec* pType)
 {
   bool_t result = TRUE;
 
-  const uint16_t htype = from_le_int16 ((uint8_t*)&pType->type);
-  const uint16_t hsize = from_le_int16 ((uint8_t*)&pType->dataSize);
+  const uint16_t htype = load_le_int16 ((uint8_t*)&pType->type);
+  const uint16_t hsize = load_le_int16 ((uint8_t*)&pType->dataSize);
 
   if (((htype == T_UNKNOWN) || (htype > T_UNDETERMINED)) &&
       (IS_FIELD (htype) == FALSE) &&
@@ -385,7 +385,7 @@ type_spec_cmp (const struct TypeSpec* const pSpec_1,
 }
 
 static uint_t
-type_spec_fill_table_field (struct OutputStream* const pStream,
+type_spec_fill_table_field (struct WOutputStream* const pStream,
                             const struct DeclaredVar*  pFieldList)
 {
   uint_t   result = 0;
@@ -393,10 +393,10 @@ type_spec_fill_table_field (struct OutputStream* const pStream,
 
   while (pFieldList && IS_TABLE_FIELD (pFieldList->type))
     {
-      if ((output_data (pStream,
+      if ((wh_ostream_write (pStream,
                         (uint8_t*)pFieldList->label,
                         pFieldList->labelLength) == NULL) ||
-          (output_uint8 (pStream, 0) == NULL))
+          (wh_ostream_wint8 (pStream, 0) == NULL))
         {
           result = TYPE_SPEC_ERROR;
           break;
@@ -404,7 +404,7 @@ type_spec_fill_table_field (struct OutputStream* const pStream,
 
       result += pFieldList->labelLength + 1;
       store_le_int16 (GET_TYPE (pFieldList->type), (uint8_t*)&le_type);
-      if (output_uint16 (pStream, le_type) == NULL)
+      if (wh_ostream_wint16 (pStream, le_type) == NULL)
         {
           result = TYPE_SPEC_ERROR;
           break;
@@ -418,11 +418,11 @@ type_spec_fill_table_field (struct OutputStream* const pStream,
 }
 
 static uint_t
-type_spec_fill_table (struct OutputStream* const     pStream,
+type_spec_fill_table (struct WOutputStream* const     pStream,
                       const struct DeclaredVar*const pVar)
 {
   uint_t   result  = 0;
-  uint_t   specOff = get_size_outstream (pStream);
+  uint_t   specOff = wh_ostream_size (pStream);
   uint16_t le_type;
 
   assert (IS_TABLE (pVar->type));
@@ -431,8 +431,8 @@ type_spec_fill_table (struct OutputStream* const     pStream,
 
   /* output the type and a dummy length to fill
    * after fields are output */
-  if ((output_uint16 (pStream, le_type) != NULL) &&
-      (output_uint16 (pStream, 0) != NULL))
+  if ((wh_ostream_wint16 (pStream, le_type) != NULL) &&
+      (wh_ostream_wint16 (pStream, 0) != NULL))
     {
       result = type_spec_fill_table_field (pStream, pVar->extra);
     }
@@ -440,11 +440,11 @@ type_spec_fill_table (struct OutputStream* const     pStream,
     result = TYPE_SPEC_ERROR;
 
   if ((result != TYPE_SPEC_ERROR) &&
-      (output_uint8 (pStream, TYPE_SPEC_END_MARK) != NULL) &&
-      (output_uint8 (pStream, 0) != NULL))
+      (wh_ostream_wint8 (pStream, TYPE_SPEC_END_MARK) != NULL) &&
+      (wh_ostream_wint8 (pStream, 0) != NULL))
     {
       struct TypeSpec *ts = (struct TypeSpec*)
-                            (get_buffer_outstream (pStream) + specOff);
+                            (wh_ostream_data (pStream) + specOff);
       result += 2 * sizeof (uint8_t);
       store_le_int16 (result, (uint8_t*)&ts->dataSize);
     }
@@ -455,7 +455,7 @@ type_spec_fill_table (struct OutputStream* const     pStream,
 }
 
 static uint_t
-type_spec_fill_array (struct OutputStream* const      pStream,
+type_spec_fill_array (struct WOutputStream* const      pStream,
                       const struct DeclaredVar* const pVar)
 {
   uint_t          result = 0;
@@ -468,7 +468,7 @@ type_spec_fill_array (struct OutputStream* const      pStream,
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
 
-  if (output_data (pStream, (uint8_t *)&spec, sizeof spec) != NULL)
+  if (wh_ostream_write (pStream, (uint8_t *)&spec, sizeof spec) != NULL)
     result = sizeof spec;
   else
     result = TYPE_SPEC_ERROR;
@@ -477,7 +477,7 @@ type_spec_fill_array (struct OutputStream* const      pStream,
 }
 
 static uint_t
-type_spec_fill_field (struct OutputStream* const      pStream,
+type_spec_fill_field (struct WOutputStream* const      pStream,
                       const struct DeclaredVar* const pVar)
 {
   uint_t          result = 0;
@@ -490,7 +490,7 @@ type_spec_fill_field (struct OutputStream* const      pStream,
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
 
-  if (output_data (pStream, (uint8_t *)&spec, sizeof spec) != NULL)
+  if (wh_ostream_write (pStream, (uint8_t *)&spec, sizeof spec) != NULL)
     result = sizeof spec;
   else
     result = TYPE_SPEC_ERROR;
@@ -499,7 +499,7 @@ type_spec_fill_field (struct OutputStream* const      pStream,
 }
 
 static uint_t
-type_spec_fill_basic (struct OutputStream* const      pStream,
+type_spec_fill_basic (struct WOutputStream* const      pStream,
                       const struct DeclaredVar* const pVar)
 {
   uint_t          result = 0;
@@ -517,7 +517,7 @@ type_spec_fill_basic (struct OutputStream* const      pStream,
   spec.data[1] = 0;
 
 
-  if (output_data (pStream, (uint8_t *)&spec, sizeof spec) != NULL)
+  if (wh_ostream_write (pStream, (uint8_t *)&spec, sizeof spec) != NULL)
     result = sizeof spec;
   else
     result = TYPE_SPEC_ERROR;
@@ -526,12 +526,12 @@ type_spec_fill_basic (struct OutputStream* const      pStream,
 }
 
 uint_t
-type_spec_fill (struct OutputStream* const      pStream,
+type_spec_fill (struct WOutputStream* const      pStream,
                 const struct DeclaredVar* const pVar)
 {
 
   uint_t              result = 0;
-  struct OutputStream temporalStream;
+  struct WOutputStream temporalStream;
 
   if (IS_TABLE_FIELD (pVar->type))
     {
@@ -540,7 +540,7 @@ type_spec_fill (struct OutputStream* const      pStream,
       return 0;
     }
 
-  init_outstream (OUTSTREAM_INCREMENT_SIZE, &temporalStream);
+  wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &temporalStream);
 
   if ( ! (IS_FIELD (pVar->type)
           || IS_ARRAY (pVar->type)
@@ -564,24 +564,24 @@ type_spec_fill (struct OutputStream* const      pStream,
     return result;
   else
     {
-      result = find_type_spec (get_buffer_outstream (pStream),
-                               get_size_outstream (pStream),
+      result = find_type_spec (wh_ostream_data (pStream),
+                               wh_ostream_size (pStream),
                                (struct TypeSpec*)
-                               get_buffer_outstream (&temporalStream));
+                               wh_ostream_data (&temporalStream));
     }
 
   if (result == TYPE_SPEC_INVALID_POS)
     {
-      result = get_size_outstream (pStream);
-      if (output_data (pStream,
-                          get_buffer_outstream (&temporalStream),
-                          get_size_outstream (&temporalStream)) == NULL)
+      result = wh_ostream_size (pStream);
+      if (wh_ostream_write (pStream,
+                          wh_ostream_data (&temporalStream),
+                          wh_ostream_size (&temporalStream)) == NULL)
         {
           return TYPE_SPEC_INVALID_POS;
         }
     }
 
-  destroy_outstream (&temporalStream);
+  wh_ostream_clean (&temporalStream);
 
   return result;
 }
@@ -591,11 +591,11 @@ add_text_const (struct Statement* const pStmt,
                 const uint8_t* const    pText,
                 const uint_t            testSize)
 {
-  struct OutputStream *pStream  = (pStmt->type == STMT_GLOBAL) ?
+  struct WOutputStream *pStream  = (pStmt->type == STMT_GLOBAL) ?
                                    &pStmt->spec.glb.constsArea :
                                    &pStmt->pParentStmt->spec.glb.constsArea;
-  const uint8_t* pStreamBuff = get_buffer_outstream (pStream);
-  const uint_t   streamSize  = get_size_outstream (pStream);
+  const uint8_t* pStreamBuff = wh_ostream_data (pStream);
+  const uint_t   streamSize  = wh_ostream_size (pStream);
   int          iterator;
 
   assert ((pStmt->type == STMT_GLOBAL) || (pStmt->type == STMT_PROC));
@@ -607,11 +607,11 @@ add_text_const (struct Statement* const pStmt,
         return iterator;
       }
 
-  if (output_data (pStream, pText, testSize) == NULL)
+  if (wh_ostream_write (pStream, pText, testSize) == NULL)
     return -1;
 
   /* make sure you add a zero just in case */
-  if ((pText[testSize - 1] != 0) && (output_uint8 (pStream, 0) == NULL))
+  if ((pText[testSize - 1] != 0) && (wh_ostream_wint8 (pStream, 0) == NULL))
     return -1;
 
   return streamSize;

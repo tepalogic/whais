@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <cstring>
 
-#include "utils/include/utf8.h"
-#include "client/include/whisper_connector.h"
+#include "utils/utf8.h"
+#include "client/whisper_connector.h"
 
 #include "wcmd_execcmd.h"
 #include "wcmd_cmdsmgr.h"
@@ -138,14 +138,14 @@ update_stack_value (const WH_CONNECTION         hnd,
 
   //Send one character at a time to avoid large parameter errors.
   uint_t       utf8TextOff  = 0;
-  const uint_t utf8ValueLen = utf8_strlen (_RC (const uint8_t*, value));
+  const uint_t utf8ValueLen = wh_utf8_strlen (_RC (const uint8_t*, value));
   uint_t       valueOff     = 0;
   while ((utf8TextOff < utf8ValueLen)
          && (wcs == WCS_OK))
     {
       assert (valueOff < strlen (value));
 
-      const uint_t charSize = get_utf8_char_size (value[valueOff]);
+      const uint_t charSize = wh_utf8_cu_count (value[valueOff]);
 
       char tempBuffer[UTF8_MAX_BYTES_COUNT];
       memcpy (tempBuffer, value + valueOff, charSize);
@@ -265,7 +265,7 @@ parse_value (const string& cmdLine,
                 }
 
               uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-              uint_t  utf8UnitsCount = encode_utf8_char (charCode,
+              uint_t  utf8UnitsCount = wh_store_utf8_cp (charCode,
                                                          utf8CodeUnits);
               assert (utf8UnitsCount > 0);
               oValue.append (_RC (const char*, utf8CodeUnits),
@@ -877,7 +877,7 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
               if (wcs != WCS_OK)
                 goto fetch_result_fail;
 
-              offset += utf8_strlen (_RC (const uint8_t*, retValue));
+              offset += wh_utf8_strlen (_RC (const uint8_t*, retValue));
 
               cout << retValue;
             }

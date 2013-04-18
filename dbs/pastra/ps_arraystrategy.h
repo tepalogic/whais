@@ -32,8 +32,10 @@
 #include "ps_container.h"
 #include "ps_varstorage.h"
 
-namespace pastra
-{
+namespace whisper {
+
+namespace pastra {
+  //Just forward class declarations
   class TemporalArray;
   class RowFieldArray;
 }
@@ -89,7 +91,6 @@ private:
   I_ArrayStrategy (const I_ArrayStrategy&);
   I_ArrayStrategy& operator= (const I_ArrayStrategy&);
 };
-
 
 namespace pastra
 {
@@ -180,6 +181,8 @@ private:
   static const uint_t METADATA_SIZE = sizeof (uint64_t);
 };
 
-}
+} //namespace pastra
+} //namespace whisper
+
 #endif /* PS_ARRAYSTRATEGY_H_ */
 

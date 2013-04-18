@@ -11,13 +11,16 @@
 #include <iostream>
 #include <vector>
 
-#include "utils/include/random.h"
+#include "utils/wrandom.h"
 #include "custom/include/test/test_fmw.h"
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
 
 #include "../pastra/ps_table.h"
+
+using namespace whisper;
+using namespace pastra;
 
 struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_DATETIME, false}
@@ -34,12 +37,12 @@ static DBSDateTime _max_date (0x7FFF, 12, 31, 23, 59, 59);
 DBSDateTime
 get_random_datetime ()
 {
-  int16_t year  = w_rnd () & 0xFFFF;
-  uint8_t month = w_rnd () % 12 + 1;
-  uint8_t day   = w_rnd () % 27 + 1;
-  uint8_t hour  = w_rnd () % 24;
-  uint8_t mins  = w_rnd () % 60;
-  uint8_t secs  = w_rnd () % 60;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
 
   return DBSDateTime (year, month, day, hour, mins, secs);
 }
@@ -57,7 +60,7 @@ fill_table_with_values (I_DBSTable& table,
   table.CreateFieldIndex (0, NULL, NULL);
   std::cout << "Filling table with values ... " << std::endl;
 
-  w_rnd_set_seed (seed);
+  wh_rnd_set_seed (seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
       DBSDateTime value = get_random_datetime ();

@@ -31,7 +31,7 @@
 #include "whisper.h"
 
 #include "compiler/whisperc.h"
-#include "utils/include/array.h"
+#include "utils/warray.h"
 
 #include "strstore.h"
 #include "../semantics/statement.h"
@@ -174,7 +174,7 @@ struct ParserState
   uint_t            bufferSize;
   uint_t            bufferPos;           /* Use this offset to get the next token */
   StringStoreHnd    strings;             /* String container to hold constant strings */
-  struct UArray     parsedValues;        /* Array to store the semantics values parsed */
+  struct WArray     parsedValues;        /* Array to store the semantics values parsed */
   struct Statement  globalStmt;          /* the global statement */
   struct Statement* pCurrentStmt;
   bool_t            abortError;          /* set to true to abort parsing. */

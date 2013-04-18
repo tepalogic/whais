@@ -33,16 +33,16 @@ extern "C"
 typedef void (*WH_THREAD_ROUTINE) (void*);
 
 uint_t
-wh_sync_init (WH_SYNC* pSync);
+wh_lock_init (WH_LOCK* pSync);
 
 uint_t
-wh_sync_destroy (WH_SYNC* pSync);
+wh_lock_destroy (WH_LOCK* pSync);
 
 uint_t
-wh_sync_enter (WH_SYNC* pSync);
+wh_lock_acquire (WH_LOCK* pSync);
 
 uint_t
-wh_sync_leave (WH_SYNC* pSync);
+wh_lock_release (WH_LOCK* pSync);
 
 uint_t
 wh_thread_create (WH_THREAD*        pThread,

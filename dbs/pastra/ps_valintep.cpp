@@ -29,8 +29,9 @@
 #include "dbs_values.h"
 
 using namespace std;
-using namespace pastra;
-using namespace whisper;
+
+namespace whisper {
+namespace pastra {
 
 static const int PS_BOOL_SIZE                = 1;
 static const int PS_CHAR_SIZE                = 4;
@@ -458,3 +459,8 @@ PSValInterp::Alignment (DBS_FIELD_TYPE type, bool isArray)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
   }
 }
+
+
+} //namespace pastra
+} //namespace whisper
+

@@ -34,9 +34,8 @@
 #include "ps_container.h"
 #include "ps_valintep.h"
 
-namespace pastra
-
-{
+namespace whisper {
+namespace pastra {
 
 template <class DBS_T>
 class T_BTreeKey : public I_BTreeKey
@@ -706,6 +705,7 @@ private:
   FieldIndexNodeManager& operator= (const FieldIndexNodeManager&);
 };
 
-}
+} //namespace pastra
+} //namespace whisper
 
 #endif /* PS_BTREE_FIELDS_H_ */

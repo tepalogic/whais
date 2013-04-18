@@ -27,10 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "server/include/server_protocol.h"
-#include "utils/include/le_converter.h"
-#include "utils/include/random.h"
-#include "utils/include/enc_3k.h"
+#include "server/server_protocol.h"
+#include "utils/le_converter.h"
+#include "utils/wrandom.h"
+#include "utils/enc_3k.h"
 
 #include "connection.h"
 
@@ -101,11 +101,11 @@ ClientConnection::ClientConnection (UserHandler&            client,
   m_Data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = GetAdminSettings().m_Cipher;;
 
 
-  m_UserHandler.m_Socket.Write (authFrameLen, m_Data);
+  m_UserHandler.m_Socket.Write (m_Data, authFrameLen);
   ReciveRawClientFrame ();
 
   m_Cipher = GetAdminSettings().m_Cipher;
-  const uint32_t protocolVer = from_le_int32 (
+  const uint32_t protocolVer = load_le_int32 (
                               &m_Data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_VER_OFF]
                                              );
   if ((m_FrameSize < authFrameLen)
@@ -321,8 +321,8 @@ ClientConnection::ReciveRawClientFrame ()
   while (frameRead < FRAME_HDR_SIZE)
     {
       uint16_t chunkSize;
-      chunkSize = m_UserHandler.m_Socket.Read (FRAME_HDR_SIZE - frameRead,
-                                               &m_Data[frameRead]);
+      chunkSize = m_UserHandler.m_Socket.Read (&m_Data[frameRead],
+                                               FRAME_HDR_SIZE - frameRead);
       if (chunkSize == 0)
         throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
 
@@ -344,7 +344,7 @@ ClientConnection::ReciveRawClientFrame ()
     throw ConnectionException ("Unexpected frame type received.", _EXTRA (0));
   }
 
-  m_FrameSize = from_le_int16 (m_Data + FRAME_SIZE_OFF);
+  m_FrameSize = load_le_int16 (m_Data + FRAME_SIZE_OFF);
 
   if ((m_FrameSize < frameRead)
       || (m_FrameSize > m_DataSize))
@@ -355,8 +355,8 @@ ClientConnection::ReciveRawClientFrame ()
   while (frameRead < m_FrameSize)
     {
       uint16_t chunkSize;
-      chunkSize = m_UserHandler.m_Socket.Read (m_FrameSize - frameRead,
-                                               &m_Data[frameRead]);
+      chunkSize = m_UserHandler.m_Socket.Read (&m_Data[frameRead],
+                                               m_FrameSize - frameRead);
       if (chunkSize == 0)
         throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
 
@@ -365,7 +365,7 @@ ClientConnection::ReciveRawClientFrame ()
 
   assert (frameRead == m_FrameSize);
 
-  const uint32_t frameId = from_le_int32 (m_Data + FRAME_ID_OFF);
+  const uint32_t frameId = load_le_int32 (m_Data + FRAME_ID_OFF);
   if (frameId != m_WaitingFrameId)
     {
       throw ConnectionException ("Connection with peer is out of sync",
@@ -385,13 +385,13 @@ ClientConnection::ReciveRawClientFrame ()
           prev = m_Data[FRAME_HDR_SIZE + i];
         }
 
-      const uint32_t firstKing = from_le_int32 (m_Data +
+      const uint32_t firstKing = load_le_int32 (m_Data +
                                                 FRAME_HDR_SIZE +
                                                 ENC_3K_FIRST_KING_OFF);
-      const uint32_t secondKing = from_le_int32 (m_Data +
+      const uint32_t secondKing = load_le_int32 (m_Data +
                                                  FRAME_HDR_SIZE +
                                                  ENC_3K_SECOND_KING_OFF);
-      decrypt_3k_buffer (
+      wh_buff_3k_decode (
                       firstKing,
                       secondKing,
                       _RC (const uint8_t*, m_Key.c_str ()),
@@ -400,7 +400,7 @@ ClientConnection::ReciveRawClientFrame ()
                       m_FrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
                          );
 
-      const uint16_t plainSize = from_le_int16 (m_Data +
+      const uint16_t plainSize = load_le_int16 (m_Data +
                                                 FRAME_HDR_SIZE +
                                                 ENC_3K_PLAIN_SIZE_OFF);
       m_FrameSize = plainSize;
@@ -419,13 +419,13 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
       const uint16_t plainSize = m_FrameSize;
 
       while (m_FrameSize % sizeof (uint32_t) != 0)
-        m_Data[m_FrameSize++] = w_rnd () & 0xFF;
+        m_Data[m_FrameSize++] = wh_rnd () & 0xFF;
 
-      const uint32_t firstKing  = w_rnd () & 0xFFFFFFFF;
+      const uint32_t firstKing  = wh_rnd () & 0xFFFFFFFF;
       store_le_int32 (firstKing,
                       m_Data + FRAME_HDR_SIZE + ENC_3K_FIRST_KING_OFF);
 
-      const uint32_t secondKing = w_rnd () & 0xFFFFFFFF;
+      const uint32_t secondKing = wh_rnd () & 0xFFFFFFFF;
       store_le_int32 (secondKing,
                       m_Data + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
 
@@ -440,10 +440,10 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
 
       store_le_int16 (plainSize,
                       m_Data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
-      store_le_int16 (w_rnd () & 0xFFFF,
+      store_le_int16 (wh_rnd () & 0xFFFF,
                       m_Data + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
 
-      encrypt_3k_buffer (
+      wh_buff_3k_encode (
                       firstKing,
                       secondKing,
                       _RC (const uint8_t*, m_Key.c_str ()),
@@ -459,7 +459,7 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
   m_Data[FRAME_TYPE_OFF]    = type;
   m_Data[FRAME_ENCTYPE_OFF] = m_Cipher;
 
-  m_UserHandler.m_Socket.Write (m_FrameSize, m_Data);
+  m_UserHandler.m_Socket.Write (m_Data, m_FrameSize);
 
   m_FrameSize    = 0;  //This frame content is not valid anymore.
   m_ClientCookie = ~0; //Make sure the client cookie is reread.
@@ -470,7 +470,7 @@ ClientConnection::ReadCommand ()
 {
   ReciveRawClientFrame ();
 
-  const uint32_t servCookie = from_le_int32 (
+  const uint32_t servCookie = load_le_int32 (
                                 RawCmdData () + PLAIN_SERV_COOKIE_OFF
                                             );
   if (servCookie != m_ServerCookie)
@@ -486,12 +486,12 @@ ClientConnection::ReadCommand ()
   for (uint_t i = 0; i < respSize; i++)
     chkSum += Data ()[i];
 
-  if (chkSum != from_le_int16 (RawCmdData () + PLAIN_CRC_OFF))
+  if (chkSum != load_le_int16 (RawCmdData () + PLAIN_CRC_OFF))
     throw ConnectionException ("Frame with invalid CRC received.", _EXTRA (0));
 
-  m_ClientCookie = from_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
+  m_ClientCookie = load_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
 
-  m_LastReceivedCmd = from_le_int16 (RawCmdData () + PLAIN_TYPE_OFF);
+  m_LastReceivedCmd = load_le_int16 (RawCmdData () + PLAIN_TYPE_OFF);
   assert ((m_LastReceivedCmd & 1) == 0);
 
   return m_LastReceivedCmd;
@@ -504,7 +504,7 @@ ClientConnection::SendCmdResponse (const uint16_t respType)
   assert ((m_LastReceivedCmd + 1) == respType);
 
   const uint16_t respSize = DataSize ();
-  m_ServerCookie = w_rnd ();
+  m_ServerCookie = wh_rnd ();
 
   store_le_int32 (m_ClientCookie, RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
   store_le_int32 (m_ServerCookie, RawCmdData () + PLAIN_SERV_COOKIE_OFF);

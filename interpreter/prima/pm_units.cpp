@@ -29,7 +29,9 @@
 #include "interpreter.h"
 
 using namespace std;
-using namespace prima;
+
+namespace whisper {
+namespace prima {
 
 ////////////////////////////////Unit///////////////////////////////////////////
 
@@ -177,3 +179,5 @@ UnitsManager::GetProcIndex (const uint32_t unitIndex,
   return m_Units[unitIndex]->GetProcId (unitProcIndex);
 }
 
+} //namespace prima
+} //namespace whisper

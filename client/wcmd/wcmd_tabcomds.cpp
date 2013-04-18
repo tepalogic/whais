@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "dbs/include/dbs_mgr.h"
+#include "dbs/dbs_mgr.h"
 
 #include "wcmd_tabcomds.h"
 #include "wcmd_cmdsmgr.h"

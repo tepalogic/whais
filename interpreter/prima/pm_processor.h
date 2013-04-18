@@ -27,8 +27,8 @@
 
 #include "pm_interpreter.h"
 
-namespace prima
-{
+namespace whisper {
+namespace prima {
 
 class Processor
 {
@@ -65,7 +65,9 @@ private:
   static const uint16_t NO_INDEX = 0xFFFF;
 };
 
-}
+} //namespace prima
+} //namespace whisper
+
 
 #endif //PM_PROCESSOR_H_
 

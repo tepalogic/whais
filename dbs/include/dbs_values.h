@@ -39,6 +39,8 @@ typedef DBS_REAL_T REAL_T;
 typedef DBS_RICHREAL_T RICHREAL_T;
 #endif
 
+namespace whisper {
+
 struct DBSBool
 {
   DBSBool ()
@@ -1441,5 +1443,7 @@ public:
 private:
   I_ArrayStrategy       *m_pArray;
 };
+
+} //namespace whisper
 
 #endif /* DBS_VALUES_H_ */

@@ -11,12 +11,15 @@
 #include <iostream>
 #include <vector>
 
-#include "utils/include/random.h"
+#include "utils/wrandom.h"
 
-#include "../include/dbs_mgr.h"
-#include "../include/dbs_exception.h"
+#include "dbs/dbs_mgr.h"
+#include "dbs/dbs_exception.h"
 
 #include "../pastra/ps_table.h"
+
+using namespace whisper;
+using namespace pastra;
 
 struct DBSFieldDescriptor field_desc[] = {
     {"test_field", T_REAL, false}
@@ -45,8 +48,8 @@ MaxValue ()
 DBSReal
 get_random_real ()
 {
-  int64_t intPart  = _SC (int32_t, w_rnd () & 0xFFFFFFFF);
-  int64_t fracPart = _SC (int16_t, w_rnd () & 0xFFFF);
+  int64_t intPart  = _SC (int32_t, wh_rnd () & 0xFFFFFFFF);
+  int64_t fracPart = _SC (int16_t, wh_rnd () & 0xFFFF);
 
   if (((intPart < 0) && (fracPart > 0))
       || ((intPart > 0) && (fracPart < 0)))
@@ -70,7 +73,7 @@ fill_table_with_values (I_DBSTable& table,
   table.CreateFieldIndex (0, NULL, NULL);
   std::cout << "Filling table with values ... " << std::endl;
 
-  w_rnd_set_seed (seed);
+  wh_rnd_set_seed (seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
       DBSReal value = get_random_real ();

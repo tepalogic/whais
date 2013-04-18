@@ -24,41 +24,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef MSGLOG_H_
 #define MSGLOG_H_
 
-#include "whisper.h"
-#include "stdarg.h"
+#include <stdarg.h>
 
-typedef const void *POSTMAN_BAG;
+#include "whisper.h"
+
+typedef const void* WLOG_FUNC_CONTEXT;
 
 #define IGNORE_BUFFER_POS      (uint_t)(~0)
 
-typedef void (*POSTMAN) (POSTMAN_BAG bag,
-                         uint_t      bufferPosition,
-                         uint_t      msgCode,
-                         uint_t      msgType,
-                         char*     msgFormat,
-                         va_list     args);
+typedef void (*WLOG_FUNC) (WLOG_FUNC_CONTEXT      bag,
+                           uint_t                 msgPosition,
+                           uint_t                 msgCode,
+                           uint_t                 msgType,
+                           char*                  msgFormat,
+                           va_list                args);
+
+/* Allow one to personalize the message handling for messages generated
+ * during compilation phase. */
 
 void
-register_postman (POSTMAN man, POSTMAN_BAG handle);
+wh_register_logger (WLOG_FUNC callback, WLOG_FUNC_CONTEXT context);
 
-POSTMAN
-get_postman (void);
+WLOG_FUNC
+wh_logger (void);
 
-POSTMAN_BAG
-get_postman_bag (void);
+WLOG_FUNC_CONTEXT
+wh_logger_context (void);
 
+/* Called whenever a message has to be generated. */
 void
-LOGMSG (uint_t  buff_pos,
-        uint_t  msgCode,
-        uint_t  msgType,
-        char* msgFormat,
-        va_list args);
+wh_log_msg (uint_t          position,
+            uint_t          code,
+            uint_t          type,
+            char*           formatedMsg,
+            va_list         args);
 
-/* utils for LOGMSG arguments */
+/* Utility function to truncate and append '...' when the source
+ * is too large. */
 char*
-copy_text_truncate (char*       dest,
-                   const char*  src,
-                   uint_t         destMax,
-                   uint_t         srcLength);
+wh_copy_first (char*        dest,
+               const char*  src,
+               uint_t       destMax,
+               uint_t       srcLength);
 
 #endif /*MSGLOG_H_ */

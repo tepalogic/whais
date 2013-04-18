@@ -27,31 +27,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-const std::string
-NextToken (const std::string& input,
-          size_t&             ioPosition,
-          const string&       delimiters)
+namespace whisper
 {
-  ioPosition = input.find_first_not_of (delimiters, ioPosition);
 
-  if (ioPosition == string::npos)
+const std::string
+NextToken (const std::string&     text,
+           size_t&                inoutOff,
+           const string&          delims)
+{
+  inoutOff = text.find_first_not_of (delims, inoutOff);
+
+  if (inoutOff == string::npos)
     return string ();
 
-  assert (ioPosition != string::npos);
-  assert (ioPosition < input.length ());
+  assert (inoutOff != string::npos);
+  assert (inoutOff < text.length ());
 
-  size_t lastPos = input.find_first_of (delimiters, ioPosition);
+  size_t lastPos = text.find_first_of (delims, inoutOff);
 
   if (lastPos == string::npos)
-    lastPos = input.length () - 1;
+    lastPos = text.length () - 1;
+
   else
     --lastPos;
 
-  assert (ioPosition <= lastPos);
+  assert (inoutOff <= lastPos);
 
-  string result = input.substr (ioPosition, lastPos - ioPosition + 1);
+  string result = text.substr (inoutOff, lastPos - inoutOff + 1);
 
-  ioPosition = lastPos + 1;
+  inoutOff = lastPos + 1;
 
   return result;
 }
+
+} //namespace whisper
+

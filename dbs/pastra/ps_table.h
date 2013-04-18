@@ -27,8 +27,8 @@
 
 #include "ps_templatetable.h"
 
-namespace pastra
-{
+namespace whisper {
+namespace pastra {
 
 class PersistentTable : public PrototypeTable
 {
@@ -102,7 +102,8 @@ protected:
   VLVarsStore*                 m_pVariableFields;
 };
 
-}
+} //namespa pastra
+} //namespa whisper
 
 #endif  /* PS_TABLE_H_ */
 

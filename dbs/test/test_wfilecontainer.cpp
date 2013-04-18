@@ -14,6 +14,7 @@
 #include "custom/include/test/test_fmw.h"
 #include "../pastra/ps_container.h"
 
+using namespace whisper;
 using namespace pastra;
 
 uint8_t buffer[1468];

@@ -28,15 +28,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "loader.h"
 
-#include "dbs/include/dbs_mgr.h"
-#include "interpreter/include/interpreter.h"
+#include "dbs/dbs_mgr.h"
+#include "interpreter/interpreter.h"
 #include "compiler//compiledunit.h"
-#include "utils/include/logger.h"
+#include "utils/logger.h"
 
 using namespace std;
+using namespace whisper;
 
 bool
-LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc)
+LoadDatabase (FileLogger& log, DBSDescriptors& ioDbsDesc)
 {
   ostringstream logEntry;
 
@@ -48,8 +49,8 @@ LoadDatabase (Logger& log, DBSDescriptors& ioDbsDesc)
   ioDbsDesc.m_Dbs = &DBSRetrieveDatabase (ioDbsDesc.m_DbsName.c_str (),
                                           ioDbsDesc.m_DbsDirectory.c_str ());
 
-  std::auto_ptr<I_Logger> apLogger (
-                         new Logger (ioDbsDesc.m_DbsLogFile.c_str (), true)
+  std::auto_ptr<Logger> apLogger (
+                         new FileLogger (ioDbsDesc.m_DbsLogFile.c_str (), true)
                                    );
 
   if (ioDbsDesc.m_DbsName != GlobalContextDatabase ())

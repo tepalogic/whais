@@ -28,6 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "wthread.h"
 
+namespace whisper
+{
+
 enum LOG_TYPE
 {
   LOG_UNKNOW,
@@ -38,41 +41,43 @@ enum LOG_TYPE
   LOG_DEBUG
 };
 
-class I_Logger
+class Logger
 {
 public:
-  virtual ~I_Logger ();
+  virtual ~Logger ();
 
-  virtual void Log (const LOG_TYPE type, const char* pStr) = 0;
+  virtual void Log (const LOG_TYPE type, const char* str) = 0;
   virtual void Log (const LOG_TYPE type, const std::string& str) = 0;
 };
 
-class Logger : public I_Logger
+class FileLogger : public Logger
 {
 public:
-  Logger (const char* const pFile, const bool printStart = true);
+  FileLogger (const char* const file, const bool printStart = true);
 
-  void Log (const LOG_TYPE type, const char* pStr);
+  void Log (const LOG_TYPE type, const char* str);
   void Log (const LOG_TYPE type, const std::string& str);
 
 private:
-  Logger (const I_Logger&);
-  Logger& operator= (const I_Logger&);
+  FileLogger (const Logger&);
+  FileLogger& operator= (const Logger&);
 
   uint_t PrintTimeMark (LOG_TYPE type, WTICKS ticks);
 
-  WTICKS        m_StartTick;
-  WSynchronizer m_Sync;
-  std::ofstream m_OutStream;
+  WTICKS        mStartTick;
+  Lock mSync;
+  std::ofstream mOutStream;
 };
 
-class NullLogger : public I_Logger
+class NullLogger : public Logger
 {
 public:
-  void Log (const LOG_TYPE type, const char* pStr);
+  void Log (const LOG_TYPE type, const char* str);
   void Log (const LOG_TYPE type, const std::string& str);
 };
 
 extern NullLogger NULL_LOGGER;
+
+} //namespace whisper
 
 #endif /* LOGGER_H_ */

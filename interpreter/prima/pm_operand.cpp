@@ -27,8 +27,9 @@
 #include "pm_typemanager.h"
 
 using namespace std;
-using namespace prima;
 
+namespace whisper {
+namespace prima {
 
 /////////////////////////////////////I_PMOperand//////////////////////////////
 
@@ -3246,7 +3247,11 @@ LocalOperand::CopyFieldOp (const FieldOperand& fieldOp)
   op.CopyFieldOp (fieldOp);
 }
 
+} //namespace prima
+
 ////////////////////////////////////SessionStack///////////////////////////////
+
+using namespace prima;
 
 SessionStack::SessionStack ()
   : m_Stack ()
@@ -3461,3 +3466,6 @@ SessionStack::operator[] (const uint_t index)
 
   return m_Stack[index];
 }
+
+} //namespace whisper
+
