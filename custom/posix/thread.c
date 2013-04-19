@@ -34,12 +34,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 uint_t
-wh_lock_init (WH_LOCK* pSync)
+wh_lock_init (WH_LOCK* pLock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_init (pSync, NULL);
+    result = pthread_mutex_init (pLock, NULL);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -47,14 +47,15 @@ wh_lock_init (WH_LOCK* pSync)
 
   return result;
 }
+
 
 uint_t
-wh_lock_destroy (WH_LOCK* pSync)
+wh_lock_destroy (WH_LOCK* pLock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_destroy (pSync);
+    result = pthread_mutex_destroy (pLock);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -62,14 +63,15 @@ wh_lock_destroy (WH_LOCK* pSync)
 
   return result;
 }
+
 
 uint_t
-wh_lock_acquire (WH_LOCK* pSync)
+wh_lock_acquire (WH_LOCK* pLock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_lock (pSync);
+    result = pthread_mutex_lock (pLock);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -77,14 +79,15 @@ wh_lock_acquire (WH_LOCK* pSync)
 
   return result;
 }
+
 
 uint_t
-wh_lock_release (WH_LOCK* pSync)
+wh_lock_release (WH_LOCK* pLock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_unlock (pSync);
+    result = pthread_mutex_unlock (pLock);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -92,6 +95,7 @@ wh_lock_release (WH_LOCK* pSync)
 
   return result;
 }
+
 
 uint_t
 wh_thread_create (WH_THREAD*       pThread,
@@ -110,11 +114,13 @@ wh_thread_create (WH_THREAD*       pThread,
   return result;
 }
 
+
 uint_t
 wh_thread_free (WH_THREAD thread)
 {
   return WOP_OK;
 }
+
 
 void
 wh_yield ()
@@ -122,8 +128,10 @@ wh_yield ()
   sched_yield ();
 }
 
+
 void
 wh_sleep (uint_t millisecs)
 {
   usleep (millisecs * 1000);
 }
+

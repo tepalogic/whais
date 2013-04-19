@@ -41,16 +41,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 WH_FILE
-whf_open (const char* pFileName, uint_t mode)
+whf_open (const char* file, uint_t mode)
 {
   int         openMode = O_LARGEFILE;
   const int   accMode  = (S_IRUSR | S_IWUSR | S_IRGRP);
-  WH_FILE result   = -1;
+  WH_FILE     result   = -1;
 
   if (mode & WHC_FILECREATE_NEW)
     openMode |= O_CREAT | O_EXCL;
+
   else if (mode & WHC_FILECREATE)
     openMode |= O_CREAT;
+
   else
     openMode |= 0; /* WHC_FILEOPEN_EXISTING */
 
@@ -59,25 +61,29 @@ whf_open (const char* pFileName, uint_t mode)
 
   if ((mode & WHC_FILERDWR) == WHC_FILERDWR)
     openMode |= O_RDWR;
+
   else
     {
       openMode |= (mode & WHC_FILEREAD) ? O_RDONLY : 0;
       openMode |= (mode & WHC_FILEWRITE) ? O_WRONLY : 0;
     }
 
-  result =  open (pFileName, openMode, accMode);
+  result = open (file, openMode, accMode);
   return (result < 0) ? 0 : result;
 }
+
 
 WH_FILE
-whf_dup (WH_FILE f_hnd)
+whf_dup (WH_FILE hnd)
 {
-  WH_FILE result = dup (f_hnd);
+  WH_FILE result = dup (hnd);
+
   return (result < 0) ? 0 : result;
 }
 
+
 bool_t
-whf_seek (WH_FILE f_hnd, int64_t where, int whence)
+whf_seek (WH_FILE hnd, int64_t where, int whence)
 {
   switch (whence)
     {
@@ -93,19 +99,20 @@ whf_seek (WH_FILE f_hnd, int64_t where, int whence)
     default:
       assert (0);
     }
-  return (lseek64 (f_hnd, where, whence) != POSIX_FAIL_RET);
+  return (lseek64 (hnd, where, whence) != POSIX_FAIL_RET);
 }
 
+
 bool_t
-whf_read (WH_FILE f_hnd, uint8_t* pBuffer, uint_t size)
+whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
 {
   bool_t result      = TRUE;
   uint_t actualCount = 0;
 
   while (actualCount < size)
     {
-      uint_t count = read (f_hnd,
-                           pBuffer + actualCount,
+      uint_t count = read (hnd,
+                           dstBuffer + actualCount,
                            size - actualCount);
       if (count == POSIX_FAIL_RET)
         {
@@ -129,16 +136,17 @@ whf_read (WH_FILE f_hnd, uint8_t* pBuffer, uint_t size)
   return result;
 }
 
+
 bool_t
-whf_write (WH_FILE f_hnd, const uint8_t* pBuffer, uint_t size)
+whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
 {
   bool_t result       = TRUE;
   uint_t actual_count = 0;
 
   while (actual_count < size)
     {
-      uint_t count = write (f_hnd,
-                            pBuffer + actual_count,
+      uint_t count = write (hnd,
+                            srcBuffer + actual_count,
                             size - actual_count);
       if (count == POSIX_FAIL_RET)
         {
@@ -154,45 +162,52 @@ whf_write (WH_FILE f_hnd, const uint8_t* pBuffer, uint_t size)
   return result;
 }
 
-bool_t
-whf_tell (WH_FILE f_hnd, uint64_t* pOutPosition)
-{
-  *pOutPosition = lseek64 (f_hnd, 0, SEEK_CUR);
 
-  return (*pOutPosition != POSIX_FAIL_RET);
+bool_t
+whf_tell (WH_FILE hnd, uint64_t* outPosition)
+{
+  *outPosition = lseek64 (hnd, 0, SEEK_CUR);
+
+  return (*outPosition != POSIX_FAIL_RET);
 }
 
-bool_t
-whf_sync (WH_FILE f_hnd)
-{
-  return (fsync (f_hnd) != POSIX_FAIL_RET);
-}
 
 bool_t
-whf_tell_size (WH_FILE f_hnd, uint64_t* pOutSize)
+whf_sync (WH_FILE hnd)
+{
+  return (fsync (hnd) != POSIX_FAIL_RET);
+}
+
+
+bool_t
+whf_tell_size (WH_FILE hnd, uint64_t* outSize)
 {
   struct stat64 buf;
 
-  if (fstat64 (f_hnd, &buf) == POSIX_FAIL_RET)
+  if (fstat64 (hnd, &buf) == POSIX_FAIL_RET)
     return FALSE;
 
-  *pOutSize = buf.st_size;
+  *outSize = buf.st_size;
   return TRUE;
 }
 
+
 bool_t
-whf_set_size (WH_FILE f_hnd, uint64_t size)
+whf_set_size (WH_FILE hnd, uint64_t newSize)
 {
-  if (ftruncate (f_hnd, size) != 0)
+  if (ftruncate (hnd, newSize) != 0)
     return FALSE;
+
   return TRUE;
 }
 
+
 bool_t
-whf_close (WH_FILE f_hnd)
+whf_close (WH_FILE hnd)
 {
-  return (close (f_hnd) != POSIX_FAIL_RET);
+  return (close (hnd) != POSIX_FAIL_RET);
 }
+
 
 uint32_t
 whf_last_error ()
@@ -201,10 +216,11 @@ whf_last_error ()
   return errno;
 }
 
+
 bool_t
-whf_err_to_str (uint64_t error_code, char* str, uint_t strSize)
+whf_err_to_str (uint64_t errorCode, char* str, uint_t strSize)
 {
-  const char* const pMessage = strerror_r ((int) error_code, str, strSize);
+  const char* const pMessage = strerror_r ((int) errorCode, str, strSize);
 
   assert (strSize > 0);
   assert (str != NULL);
@@ -220,14 +236,16 @@ whf_err_to_str (uint64_t error_code, char* str, uint_t strSize)
   return FALSE;
 }
 
+
 bool_t
-whf_remove (const char* pFileName)
+whf_remove (const char* file)
 {
-  if (unlink (pFileName) == 0)
+  if (unlink (file) == 0)
     return TRUE;
   /* else */
   return FALSE;
 }
+
 
 const char*
 whf_dir_delim ()
@@ -235,15 +253,20 @@ whf_dir_delim ()
   return "/";
 }
 
+
 const char*
 whf_current_dir ()
 {
   return "./";
 }
 
+
 bool_t
-whf_is_absolute (const char* pPath)
+whf_is_absolute (const char* path)
 {
-  assert (pPath != NULL);
-  return ((pPath[0] == '/') || (pPath[0] == '~'));
+  assert (path != NULL);
+
+  return path[0] == '/';
 }
+
+

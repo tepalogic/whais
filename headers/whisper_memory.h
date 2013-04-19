@@ -65,20 +65,21 @@ extern "C"
 #ifdef ENABLE_MEMORY_TRACE
 
 void*
-custom_trace_mem_alloc (size_t      size,
-                        const char* pFile,
-                        uint_t      line);
+custom_trace_mem_alloc (size_t          size,
+                        const char*     file,
+                        uint_t          line);
 
 void*
-custom_trace_mem_realloc (void*       oldPtr,
-                          size_t      newSize,
-                          const char* pFile,
-                          uint_t      line);
+custom_trace_mem_realloc (void*           oldPtr,
+                          size_t          newSize,
+                          const char*     file,
+                          uint_t          line);
 
 void
-custom_trace_mem_free (void*       ptr,
-                       const char* pFile,
-                       uint_t      line);
+custom_trace_mem_free (void*              ptr,
+                       const char*        file,
+                       uint_t             line);
+
 #endif /* ENABLE_MEMORY_TRACE */
 
 void* custom_mem_alloc (size_t size);
@@ -99,7 +100,7 @@ void*
 operator new (std::size_t size, const std::nothrow_t&) throw();
 
 void*
-operator new (std::size_t size, const char* pFile, uint_t line);
+operator new (std::size_t size, const char* file, uint_t line);
 
 void*
 operator new[] (std::size_t size) throw (std::bad_alloc);
@@ -108,7 +109,7 @@ void*
 operator new[] (std::size_t size, const std::nothrow_t&) throw();
 
 void*
-operator new[] (std::size_t size, const char* pFile, uint_t line);
+operator new[] (std::size_t size, const char* file, uint_t line);
 
 void
 operator delete (void* ptr) throw ();

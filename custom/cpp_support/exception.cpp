@@ -27,14 +27,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wthread.h"
 #include "utils/wsocket.h"
 
-using namespace whisper;
 
-Exception::Exception (const char*     pMessage,
-                        const char*   pFile,
-                        uint32_t      line,
-                        uint32_t      extra)
-  : mErrorMessage ((pMessage == NULL) ? "" : pMessage),
-    mFile (pFile),
+namespace whisper {
+
+Exception::Exception (const char*     message,
+                      const char*     file,
+                      uint32_t        line,
+                      uint32_t        extra)
+  : mErrorMessage ((message == NULL) ? "" : message),
+    mFile (file),
     mLine (line),
     mExtra (extra)
 {
@@ -76,13 +77,13 @@ Exception::Line () const
   return mLine;
 }
 
+////////////////////FileException/////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-FileException::FileException (const char* pMessage,
-                                const char* pFile,
-                                uint32_t      line,
-                                uint32_t      extra)
-  : Exception (pMessage, pFile, line, extra)
+FileException::FileException (const char*   message,
+                              const char*   file,
+                              uint32_t      line,
+                              uint32_t      extra)
+  : Exception (message, file, line, extra)
 {
 }
 
@@ -106,10 +107,10 @@ FileException::Description () const
 
 //////////////////////////LockException/////////////////////////////////////
 
-LockException::LockException (const char* message,
-                                  const char* file,
-                                  uint32_t      line,
-                                  uint32_t      extra)
+LockException::LockException (const char*   message,
+                              const char*   file,
+                              uint32_t      line,
+                              uint32_t      extra)
   : Exception (message, file, line, extra)
 {
 }
@@ -129,7 +130,7 @@ LockException::Type () const
 const char*
 LockException::Description () const
 {
-  return "A mutex related exception.";
+  return "Thread synchronize error.";
 }
 
 //////////////////////////ThreadException/////////////////////////////////////
@@ -157,15 +158,15 @@ ThreadException::Type () const
 const char*
 ThreadException::Description () const
 {
-  return "Thread related exception.";
+  return "Thread execution error.";
 }
 
 //////////////////////////SocketException////////////////////////////////////
 
-SocketException::SocketException (const char* message,
-                                    const char* file,
-                                    uint32_t      line,
-                                    uint32_t      extra)
+SocketException::SocketException (const char*   message,
+                                  const char*   file,
+                                  uint32_t      line,
+                                  uint32_t      extra)
   : Exception (message, file, line, extra)
 {
 }
@@ -186,5 +187,8 @@ const char*
 SocketException::Description () const
 {
 
-  return "Network socket related exception";
+  return "Network IO error.";
 }
+
+} //namespace whisper
+

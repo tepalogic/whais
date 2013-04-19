@@ -37,8 +37,8 @@ custom_mem_alloc (size_t size)
 }
 
 void*
-custom_mem_realloc (void*  oldPtr,
-                    size_t newSize)
+custom_mem_realloc (void*     oldPtr,
+                    size_t    newSize)
 {
   return realloc (oldPtr, newSize);
 }
@@ -69,7 +69,7 @@ operator new (std::size_t size) throw (std::bad_alloc)
 }
 
 void*
-operator new (std::size_t size, const std::nothrow_t&) throw()
+operator new (std::size_t size, const std::nothrow_t&) throw ()
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc (size);
@@ -81,14 +81,14 @@ operator new (std::size_t size, const std::nothrow_t&) throw()
 }
 
 void*
-operator new (std::size_t size, const char* pFile, uint_t line)
+operator new (std::size_t size, const char* file, uint_t line)
 {
 #ifndef ENABLE_MEMORY_TRACE
-  (void)pFile;
+  (void)file;
   (void)line;
   void *ptr = custom_mem_alloc (size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, pFile, line);
+  void *ptr = custom_trace_mem_alloc (size, file, line);
 #endif
 
   if (ptr == NULL)
@@ -112,7 +112,7 @@ operator new [] (std::size_t size) throw (std::bad_alloc)
 }
 
 void*
-operator new[] (std::size_t size, const std::nothrow_t&) throw()
+operator new[] (std::size_t size, const std::nothrow_t&) throw ()
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc (size);
@@ -124,14 +124,14 @@ operator new[] (std::size_t size, const std::nothrow_t&) throw()
 }
 
 void*
-operator new [] (size_t size, const char* pFile, uint_t line)
+operator new [] (std::size_t size, const char* file, uint_t line)
 {
 #ifndef ENABLE_MEMORY_TRACE
-  (void)pFile;
+  (void)file;
   (void)line;
   void *ptr = custom_mem_alloc (size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, pFile, line);
+  void *ptr = custom_trace_mem_alloc (size, file, line);
 #endif
 
   if (ptr == NULL)

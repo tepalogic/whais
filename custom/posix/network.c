@@ -50,26 +50,27 @@ whs_init ()
   return TRUE;
 }
 
+
 uint32_t
-whs_create_client (const char* const        pServer,
-                  const char* const        pPort,
-                  WH_SOCKET* const           pOutSocket)
+whs_create_client (const char* const       server,
+                  const char* const        port,
+                  WH_SOCKET* const         outSocket)
 {
   struct addrinfo  hints    = {0, };
   struct addrinfo* pResults = NULL;
   struct addrinfo* pIt      = NULL;
   uint32_t         status   = ~0;
-  int            sd       = -1;
-  const int      on       = 1;
+  int              sd       = -1;
+  const int        on       = 1;
 
-  assert (pServer != NULL);
-  assert (pPort != NULL);
+  assert (server != NULL);
+  assert (port != NULL);
 
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_ADDRCONFIG;
 
-  status = getaddrinfo (pServer, pPort, &hints, &pResults);
+  status = getaddrinfo (server, port, &hints, &pResults);
   if (status != 0)
     return status;
 
@@ -88,6 +89,7 @@ whs_create_client (const char* const        pServer,
         }
       else if (connect (sd, pIt->ai_addr, pIt->ai_addrlen) == 0)
           break;
+
       else
         {
           status = errno;
@@ -103,18 +105,19 @@ whs_create_client (const char* const        pServer,
   if (pIt != NULL)
     {
       /* We have a connected socket */
-      *pOutSocket = sd;
+      *outSocket = sd;
       return WOP_OK;
     }
 
   return status;
 }
 
+
 uint32_t
-whs_create_server (const char* const       pLocalAdress,
-                  const char* const       pPort,
-                  const uint_t              listenBackLog,
-                  WH_SOCKET* const          pOutSocket)
+whs_create_server (const char* const       localAddress,
+                  const char* const        localPort,
+                  const uint_t             listenBackLog,
+                  WH_SOCKET* const         outSocket)
 {
   struct addrinfo  hints    = {0, };
   struct addrinfo* pResults = NULL;
@@ -123,13 +126,13 @@ whs_create_server (const char* const       pLocalAdress,
   int            sd       = -1;
   const int      on       = 1;
 
-  assert (pPort != NULL);
+  assert (localPort != NULL);
 
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_ADDRCONFIG | AI_NUMERICHOST | AI_PASSIVE;
 
-  status = getaddrinfo (pLocalAdress, pPort, &hints, &pResults);
+  status = getaddrinfo (localAddress, localPort, &hints, &pResults);
   if (status != 0)
     return status;
 
@@ -149,6 +152,7 @@ whs_create_server (const char* const       pLocalAdress,
         }
       else if (bind (sd, pIt->ai_addr, pIt->ai_addrlen) == 0)
         break;
+
       else
         {
           status = errno;
@@ -171,29 +175,31 @@ whs_create_server (const char* const       pLocalAdress,
           return status;
         }
 
-      *pOutSocket = sd;
+      *outSocket = sd;
       return WOP_OK;
     }
 
   return status;
 }
 
+
 uint32_t
 whs_accept (const WH_SOCKET      sd,
-                  WH_SOCKET* const     pConnectSocket)
+            WH_SOCKET* const     outSocket)
 {
-  int csd = accept (sd, NULL, NULL);
-  if (csd < 0)
+  const int clientSD = accept (sd, NULL, NULL);
+  if (clientSD < 0)
     return errno;
 
-  *pConnectSocket = csd;
+  *outSocket = clientSD;
   return WOP_OK;
 }
 
+
 uint32_t
 whs_write (const WH_SOCKET      sd,
-                 const uint8_t*       pBuffer,
-                 const uint_t         count)
+           const uint8_t*       srcBuffer,
+           const uint_t         count)
 {
   uint_t wrote = 0;
 
@@ -201,7 +207,7 @@ whs_write (const WH_SOCKET      sd,
 
   while (wrote < count)
     {
-      const ssize_t chunk = send (sd, pBuffer + wrote, count - wrote, 0);
+      const ssize_t chunk = send (sd, srcBuffer + wrote, count - wrote, 0);
       if (chunk < 0)
         {
           if (errno != EAGAIN)
@@ -221,31 +227,28 @@ whs_write (const WH_SOCKET      sd,
 
 uint32_t
 whs_read (const WH_SOCKET           sd,
-                uint8_t*                  pOutBuffer,
-                uint_t* const             pIOCount)
+                uint8_t*            dstBuffer,
+                uint_t* const       inoutCount)
 {
-  if (*pIOCount == 0)
+  if (*inoutCount == 0)
     return EINVAL;
 
-  while (TRUE)
+  const ssize_t chunk = recv (sd, dstBuffer, *inoutCount, 0);
+  if (chunk < 0)
     {
-      const ssize_t chunk = recv (sd, pOutBuffer, *pIOCount, 0);
-      if (chunk < 0)
-        {
-          if (errno != EAGAIN)
-            return errno;
-        }
-      else
-        {
-          assert (chunk <= *pIOCount);
+      if (errno != EAGAIN)
+        return errno;
+    }
+  else
+    {
+      assert (chunk <= *inoutCount);
 
-          *pIOCount = chunk;
-          break;
-        }
+      *inoutCount = chunk;
     }
 
   return WOP_OK;
 }
+
 
 void
 whs_close (const WH_SOCKET sd)
@@ -253,6 +256,7 @@ whs_close (const WH_SOCKET sd)
   shutdown (sd, SHUT_RDWR);
   close (sd);
 }
+
 
 void
 whs_clean ()

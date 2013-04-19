@@ -35,7 +35,6 @@ Socket::Socket (const char* const   serverHost,
     mOwned (false)
 {
   const uint32_t e = whs_create_client (serverHost, service, &mSocket);
-
   if (e != WOP_OK)
     throw SocketException (NULL, _EXTRA (e));
 
@@ -52,13 +51,14 @@ Socket::Socket (const char* const   serverHost,
   char     service[16];
 
   sprintf (service, "%u", port);
-  e = whs_create_client (serverHost, service, &mSocket);
 
+  e = whs_create_client (serverHost, service, &mSocket);
   if (e != WOP_OK)
     throw SocketException (NULL, _EXTRA (e));
 
   mOwned = true;
 }
+
 
 Socket::Socket (const char* const     interface,
                 const char* const     service,
@@ -76,6 +76,7 @@ Socket::Socket (const char* const     interface,
   mOwned = true;
 }
 
+
 Socket::Socket (const char* const   interface,
                 const uint16_t      port,
                 const uint_t        backLog)
@@ -86,13 +87,14 @@ Socket::Socket (const char* const   interface,
   char   service[16];
 
   sprintf (service, "%u", port);
-  e = whs_create_server (interface, service, backLog, &mSocket);
 
+  e = whs_create_server (interface, service, backLog, &mSocket);
   if (e != WOP_OK)
     throw SocketException (NULL, _EXTRA (e));
 
   mOwned = true;
 }
+
 
 Socket::Socket (const WH_SOCKET sd)
   : mSocket (sd),
@@ -100,12 +102,14 @@ Socket::Socket (const WH_SOCKET sd)
 {
 }
 
-Socket::Socket (const Socket& source)
-  : mSocket (source.mSocket),
-    mOwned (source.mOwned)
+
+Socket::Socket (const Socket& src)
+  : mSocket (src.mSocket),
+    mOwned (src.mOwned)
 {
-  _CC (bool&, source.mOwned) = false;
+  _CC (bool&, src.mOwned) = false;
 }
+
 
 Socket::~Socket ()
 {
@@ -116,21 +120,23 @@ Socket::~Socket ()
     }
 }
 
+
 Socket&
-Socket::operator= (const Socket& source)
+Socket::operator= (const Socket& src)
 {
-  if (this != &source)
+  if (this != &src)
     {
       if (mOwned)
         whs_close (mSocket);
 
-      mSocket = source.mSocket;
-      mOwned  = source.mOwned;
+      mSocket = src.mSocket;
+      mOwned  = src.mOwned;
 
-      _CC (bool&, source.mOwned) = false;
+      _CC (bool&, src.mOwned) = false;
     }
   return *this;
 }
+
 
 Socket
 Socket::Accept ()
@@ -146,6 +152,7 @@ Socket::Accept ()
   return Socket (client);
 }
 
+
 uint_t
 Socket::Read (uint8_t* const buffer, const uint_t maxCount)
 {
@@ -158,6 +165,7 @@ Socket::Read (uint8_t* const buffer, const uint_t maxCount)
   return result;
 }
 
+
 void
 Socket::Write (const uint8_t* const buffer, const uint_t count)
 {
@@ -166,6 +174,7 @@ Socket::Write (const uint8_t* const buffer, const uint_t count)
   if (e != WOP_OK)
     throw SocketException (NULL, _EXTRA (e));
 }
+
 
 void
 Socket::Close ()

@@ -59,6 +59,8 @@ Lock::Release ()
   assert (result == WOP_OK);
 }
 
+/////////////////////////////Thread////////////////////////////////////////////
+
 Thread::Thread ()
   : mRoutine (NULL),
     mRoutineArgs (NULL),
@@ -143,10 +145,10 @@ Thread::ThrowPendingException ()
 
   if (mException != NULL)
     {
-      Exception* pTemp = mException->Clone ();
+      Exception* clone = mException->Clone ();
       DiscardException ();
 
-      throw pTemp;
+      throw clone;
     }
 }
 

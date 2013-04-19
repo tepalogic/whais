@@ -43,6 +43,7 @@ public:
 };
 
 
+
 class EXCEP_SHL Socket
 {
 public:
@@ -64,11 +65,11 @@ public:
 
   //Utility constructors
   Socket (const WH_SOCKET sd);
-  Socket (const Socket& source);
+  Socket (const Socket& src);
 
   ~Socket ();
 
-  Socket& operator= (const Socket& source);
+  Socket& operator= (const Socket& src);
 
   Socket  Accept ();
 

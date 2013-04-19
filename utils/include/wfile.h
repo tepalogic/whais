@@ -44,12 +44,13 @@ public:
 };
 
 
+
 class EXCEP_SHL File
 {
 public:
   explicit File (const char* name, uint_t mode = 0);
 
-  File (const File& rSource);
+  File (const File& src);
   File& operator= (const File&);
 
   ~File ();

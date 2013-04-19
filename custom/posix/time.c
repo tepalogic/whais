@@ -30,14 +30,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/time.h>
 #include <time.h>
 #include <assert.h>
+
 #include "whisper.h"
+
 
 WTime
 wh_get_currtime ()
 {
-  WTime result;
-  struct tm timeUtc;
-  time_t currTime = time (NULL);
+  time_t  currTime = time (NULL);
+
+  WTime       result;
+  struct tm   timeUtc;
 
   assert (currTime != (time_t)-1);
   localtime_r (&currTime, &timeUtc);
@@ -52,6 +55,7 @@ wh_get_currtime ()
   return result;
 }
 
+
 WTICKS
 wh_msec_ticks ()
 {
@@ -60,7 +64,4 @@ wh_msec_ticks ()
 
   return ((WTICKS)tv.tv_sec * 1000ul) + (WTICKS)(tv.tv_usec / 1000);
 }
-
-
-
 
