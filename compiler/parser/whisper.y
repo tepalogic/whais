@@ -100,9 +100,9 @@ global_block_statement: /* empty */
                       | proc_decl_stmt global_block_statement
                       | extern_proc_decl_stmt global_block_statement
                       | EXTERN
-                            { state->externDeclaration = TRUE; } 
+                            { state->externDecl = TRUE; } 
                         var_decl_stmt
-                            { state->externDeclaration = FALSE; }
+                            { state->externDecl = FALSE; }
                         global_block_statement
 ;
 
@@ -114,7 +114,7 @@ return_stmt: RETURN exp ';'
 ;
 
 var_decl_stmt: LET id_list AS type_spec ';'
-		          { $$ = install_list_declrs(state, $2, $4); CHK_SEM_ERROR; }
+		          { $$ = add_list_declaration (state, $2, $4); CHK_SEM_ERROR; }
 
 id_list: IDENTIFIER  
 			{ $$ = add_id_to_list(NULL, $1); }
@@ -217,28 +217,28 @@ cont_clause: /* empty */
 container_type_decl: IDENTIFIER AS basic_type_spec ',' container_type_decl
                     	{
                     		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = install_field_declaration(state,
+                    		$$ = add_field_declaration(state,
                     			$1, $3, (struct DeclaredVar *)$5);
                             CHK_SEM_ERROR;
                     	} 
                    | IDENTIFIER AS array_type_spec ',' container_type_decl
                     	{
                     		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = install_field_declaration(state,
+                    		$$ = add_field_declaration(state,
                     			$1, $3, (struct DeclaredVar *)$5);
                             CHK_SEM_ERROR;
                     	}                
                    | IDENTIFIER AS basic_type_spec
                     	{
                     		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = install_field_declaration(state,
+                    		$$ = add_field_declaration(state,
                     			$1, $3, NULL);
                             CHK_SEM_ERROR;
                     	}                
                    | IDENTIFIER AS array_type_spec
                     	{
                     		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = install_field_declaration(state,
+                    		$$ = add_field_declaration(state,
                     			$1, $3, NULL);
                             CHK_SEM_ERROR;
                     	}
@@ -268,9 +268,9 @@ proc_decl_stmt: PROCEDURE IDENTIFIER
 
 extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER 
                             {
-                                state->externDeclaration = TRUE;
+                                state->externDecl = TRUE;
                                 install_proc_decl(state, $3);
-                                state->externDeclaration = FALSE;
+                                state->externDecl = FALSE;
                                 CHK_SEM_ERROR;
                             }
                        '(' procedure_parameter_decl ')'
@@ -306,11 +306,11 @@ procedure_parameter_decl: /* empty */
 
 list_of_paramaters_decl: IDENTIFIER AS type_spec
                            {
-                                $$ =  add_prcdcl_list(NULL, $1, $3);
+                                $$ =  add_proc_param_decl(NULL, $1, $3);
                            }
                        | IDENTIFIER AS type_spec ',' list_of_paramaters_decl
                            {
-                                $$ = add_prcdcl_list($5, $1, $3);
+                                $$ = add_proc_param_decl($5, $1, $3);
                            }
 ;
 
@@ -532,14 +532,14 @@ const_exp: WHISPER_INTEGER
             }
          | W_TRUE
             {
-                $1 = alloc_boolean_sem_value(state, TRUE);
+                $1 = alloc_bool_sem_value(state, TRUE);
                 CHK_SEM_ERROR;
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR; 
             }
          | W_FALSE
             {
-                $1 = alloc_boolean_sem_value(state, FALSE);
+                $1 = alloc_bool_sem_value(state, FALSE);
                 CHK_SEM_ERROR;
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR; 

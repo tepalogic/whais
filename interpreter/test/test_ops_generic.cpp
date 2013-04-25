@@ -113,7 +113,7 @@ get_line_from_buffer (const char * buffer, uint_t buff_pos)
 }
 
 void
-my_postman (WHC_MESSENGER_ARG data,
+my_postman (WH_MESSENGER_CTXT data,
             uint_t            buff_pos,
             uint_t            msg_id,
             uint_t            msgType,

@@ -15,7 +15,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->values, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -26,17 +26,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  wh_array_clean (&state->parsedValues);
+  wh_array_clean (&state->values);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = wh_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->values);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -115,7 +115,7 @@ general_proc_check (struct Statement *glb_stmt,
   uint_t count = 0;
   uint_t nlocals = 0;
   if ((proc_stmt->type != STMT_PROC) ||
-      (proc_stmt->pParentStmt != glb_stmt) ||
+      (proc_stmt->parent != glb_stmt) ||
       (proc_stmt->spec.proc.nameLength != strlen (proc_name)) ||
       (strncmp (proc_stmt->spec.proc.name, proc_name, proc_stmt->spec.proc.nameLength) != 0))
     {
@@ -155,7 +155,7 @@ check_procs_decl (struct ParserState *state)
   struct DeclaredVar *tmp_table = NULL;
   uint_t type = T_INT16;
 
-  if ((glb_stmt->pParentStmt != NULL) || (glb_stmt->type != STMT_GLOBAL))
+  if ((glb_stmt->parent != NULL) || (glb_stmt->type != STMT_GLOBAL))
     {
       /* not a global statement */
       return FALSE;

@@ -79,18 +79,18 @@ char test_prog_3[] = ""
 bool_t
 test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
-  WHC_HANDLER handler;
+  WH_COMPILED_UNIT handler;
   bool_t test_result = TRUE;
 
   last_msg_code = 0xFF, last_msg_type = 0XFF;
-  handler = wh_hnd_create (test_buffer,
+  handler = wh_compiler_load (test_buffer,
                             strlen (test_buffer),
-                            &my_postman, (WHC_MESSENGER_ARG) test_buffer);
+                            &my_postman, (WH_MESSENGER_CTXT) test_buffer);
 
   if (handler != NULL)
     {
       test_result = FALSE;
-      wh_hnd_destroy (handler);
+      wh_compiler_discard (handler);
     }
   else
     {

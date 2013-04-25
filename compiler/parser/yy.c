@@ -34,10 +34,13 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <assert.h>
 
 #include "whisper.h"
 #include "whisper.tab.h"
+
+#include "utils/utf8.h"
 #include "compiler/wopcodes.h"
 
 #include "parser.h"
@@ -51,176 +54,184 @@ is_space (char c)
 }
 
 INLINE static bool_t
-is_numeric (char c, bool_t is_hexa)
+is_numeric (const char c, const bool_t isHex)
 {
   return (c >= '0' && c <= '9') ||
-         (is_hexa && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
+         (isHex && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
 }
 
 INLINE static bool_t
-is_alpha (char c)
+is_alpha (const char c)
 {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
 INLINE static bool_t
-is_idlegal (char c)
+is_idlegal (const char c)
 {
   return is_numeric (c, FALSE) || is_alpha (c) || (c == '_');
 }
 
 INLINE static bool_t
-is_eol (char c)
+is_eol (const char c)
 {
   return (c == 0x0A || c == 0x0D);
 }
 
+/* Identify the token type. */
 typedef enum
 {
-  TK_CHAR,             /* represents a value of type char (e.g 'a') */
-  TK_STRING,           /* represents a string */
-  TK_DATETIME,         /* represents a date and time */
-  TK_IDENTIFIER,       /* could be a keyword or an identifier */
-  TK_NUMERIC,          /* contains only digits */
-  TK_OPERATOR,         /* could be an operator */
-  TK_REAL,             /* a real number */
-  TK_KEYWORD,          /* the token is a key word */
-  TK_UNDETERMINED,     /* token type is not yet determined */
-  TK_ERROR             /* an obvious syntax error was encountered */
+  TK_CHAR,             /* A character constant. (e.g 'a') */
+  TK_STRING,           /* A string constant. (e.g. "String"). */
+  TK_DATETIME,         /* Date /moment constant. */
+  TK_IDENTIFIER,       /* An identifier */
+  TK_NUMERIC,          /* An integer constant.  */
+  TK_OPERATOR,         /* Expression operator (e.g. '+' , '-', '<='). */
+  TK_REAL,             /* A real number */
+  TK_KEYWORD,          /* Keyword. */
+  TK_UNDETERMINED,     /* Undetermined token type. */
+  TK_ERROR             /* Error signaler. */
 } TOKEN_TYPE;
 
 /*
- * get_next_token()
- *
- * Find the next word in buffer, ignoring any white spaces
- * Warning!!! This function modifies the input buffer
+ * Read the next token from buffer, ignoring any white spaces
  */
 static TOKEN_TYPE
-get_next_token (const char*  pBuffer,
-                char const** pOutPToken,
-                uint_t*      pOutTokenLen)
+next_token (const char*     buffer,
+            char const**    outToken,
+            uint_t* const   outTokenLen)
 {
   TOKEN_TYPE result = TK_UNDETERMINED;
 
-  assert (pOutPToken != NULL);
-  assert (pOutTokenLen != NULL);
+  assert (outToken != NULL);
+  assert (outTokenLen != NULL);
 
-  while (is_space (*pBuffer))
-    ++pBuffer;
+  while (is_space (*buffer))
+    ++buffer;
 
-  if (*pBuffer == '#')
+  if (*buffer == '#')
     {
       /* skip line with commentaries and try again */
-      while (!is_eol (*pBuffer))
-        ++pBuffer;
-      return get_next_token (pBuffer, pOutPToken, pOutTokenLen);
+      while (!is_eol (*buffer))
+        ++buffer;
+
+      return next_token (buffer, outToken, outTokenLen);
     }
 
-  *pOutPToken   = pBuffer;
-  *pOutTokenLen = 0;
+  *outToken    = buffer;
+  *outTokenLen = 0;
 
-  if ((*pBuffer == '-') && is_numeric (pBuffer[1], FALSE))
-    pBuffer++;
+  if ((*buffer == '-') && is_numeric (buffer[1], FALSE))
+    buffer++;
 
-  if (is_numeric (*pBuffer, FALSE))
+  if (is_numeric (*buffer, FALSE))
     {
       bool_t isHexa = FALSE;
 
-      if ((pBuffer[0] == '0') && (pBuffer[1] == 'x' || pBuffer[1] == 'X'))
+      if ((buffer[0] == '0')
+          && (buffer[1] == 'x' || buffer[1] == 'X'))
         {
           isHexa  = TRUE;
-          pBuffer += 2;
+          buffer += 2;
         }
 
-      while (is_numeric (*pBuffer, isHexa))
-        pBuffer++;
+      while (is_numeric (*buffer, isHexa))
+        buffer++;
 
       result = TK_NUMERIC;
-      if ((*pBuffer == '.') && (isHexa == FALSE))
+      if ((*buffer == '.') && (isHexa == FALSE))
         {
-          ++pBuffer;
+          ++buffer;
 
-          while (is_numeric (*pBuffer, FALSE))
-            ++pBuffer;
+          while (is_numeric (*buffer, FALSE))
+            ++buffer;
 
           result = TK_REAL;
         }
     }
-  else if (is_idlegal (*pBuffer))
+  else if (is_idlegal (*buffer))
     {
-      while (is_idlegal (*pBuffer))
-        pBuffer++;
+      while (is_idlegal (*buffer))
+        buffer++;
 
       result = TK_IDENTIFIER;
     }
-  else if (*pBuffer == '<' || *pBuffer == '>' || *pBuffer == '!' ||
-
-           *pBuffer == '+' || *pBuffer == '-' ||
-           *pBuffer == '*' || *pBuffer == '/' || *pBuffer == '%' ||
-           *pBuffer == '&' || *pBuffer == '^' || *pBuffer == '|' ||
-
-           *pBuffer == '=')
+  else if ((*buffer == '<' || *buffer == '>' || *buffer == '!')
+           || (*buffer == '+' || *buffer == '-')
+           || (*buffer == '*' || *buffer == '/' || *buffer == '%')
+           || (*buffer == '&' || *buffer == '^' || *buffer == '|')
+           || (*buffer == '='))
     {
-      pBuffer++;
+      buffer++;
 
-      if (*pBuffer == '=')
-        pBuffer++;
+      if (*buffer == '=')
+        buffer++;
 
       result = TK_OPERATOR;
     }
-  else if (*pBuffer == '\"')
+  else if (*buffer == '\"')
     {
+      bool_t escaped;
       do
         {
-          pBuffer++;
+          buffer++;
+          escaped = FALSE;
 
-          if (is_eol (*pBuffer) || (*pBuffer == 0))
+          if (*buffer == '\\')
+            escaped = TRUE, ++buffer;
+
+          if (is_eol (*buffer) || (*buffer == 0))
             {
               /* an new line or end of buffer
                * encountered before ending \" */
               return TK_ERROR;
             }
         }
-      while ((*pBuffer != '\"') ||
-             ((*(pBuffer - 1) == '\\') && (*(pBuffer - 2) != '\\')));
+      while ((*buffer != '\"') || escaped);
 
-      pBuffer++;
+      buffer++;
 
       result = TK_STRING;
     }
-  else if (*pBuffer == '\'')
+  else if (*buffer == '\'')
     {
+      bool_t    escaped;
+      uint32_t  firstChar, firstSize;
       do
         {
-          pBuffer++;
+          buffer++;
+          escaped = FALSE;
 
-          if (is_eol (*pBuffer) || (*pBuffer == 0))
+          if (*buffer == '\\')
+            escaped = TRUE, ++buffer;
+
+          if (is_eol (*buffer) || (*buffer == 0))
             {
               /* an new line or end of buffer
                * encountered before ending \' */
               return TK_ERROR;
             }
         }
-      while ((*pBuffer != '\'') ||
-             ((*(pBuffer - 1) == '\\') && (*(pBuffer - 2) != '\\')));
+      while ((*buffer != '\'') || escaped);
 
-      pBuffer++;
+      buffer++;
 
-      if ((*pOutPToken)[1] == '\\' || (*pOutPToken)[2] == '\'')
-        {
-          /* this clearly is not a date time entry */
+      firstSize = wh_load_utf8_cp ((const uint8_t*) (*outToken + 1),
+                                   &firstChar);
+      if ((*outToken[1 + firstSize] == '\'') || (*outToken[1] == '\\'))
           result = TK_CHAR;
-        }
+
       else
         result = TK_DATETIME;
     }
   else
-    pBuffer++;
+    buffer++;
 
-  *pOutTokenLen = (uint_t) (pBuffer - *pOutPToken);
+  *outTokenLen = (uint_t) (buffer - *outToken);
 
   return result;
 }
+
 
 typedef struct
 {
@@ -228,243 +239,242 @@ typedef struct
   uint_t      token;
 } TOKEN_SEMANTIC;
 
-/*
- * This is the longest keyword string length including the
- * ending NULL. Currently this has the value for "UNRESTRICTED".
- * Please update this if you add a new keyword longer than it.
- */
+/* The longest string length of a keyword. */
 #define MAX_KEYWORD_LEN 13
 
-static TOKEN_SEMANTIC keywords[] = {
-                                      {"AND", AND},
-                                      {"ARRAY", ARRAY},
-                                      {"AS", AS},
-                                      {"BOOL", BOOL},
-                                      {"BREAK", BREAK},
-                                      {"CHARACTER", CHARACTER},
-                                      {"CONTINUE", CONTINUE},
-                                      {"DATE", DATE},
-                                      {"DATETIME", DATETIME},
-                                      {"DO", DO},
-                                      {"ELSE", ELSE},
-                                      {"ELSEIF", ELSEIF},
-                                      {"END", END},
-                                      {"ENDPROC", ENDPROC},
-                                      {"ENDSYNC", ENDSYNC},
-                                      {"EXTERN", EXTERN},
-                                      {"FALSE", W_FALSE},
-                                      {"FIELD", FIELD},
-                                      {"FOREACH", FOREACH},
-                                      {"HIRESTIME", HIRESTIME},
-                                      {"IF", IF},
-                                      {"IN", IN},
-                                      {"INT8", INT8},
-                                      {"INT16", INT16},
-                                      {"INT32", INT32},
-                                      {"INT64", INT64},
-                                      {"LET", LET},
-                                      {"OF", OF},
-                                      {"OR", OR},
-                                      {"NOT", NOT},
-                                      {"NULL", WHISPER_NULL},
-                                      {"REAL", REAL},
-                                      {"RETURN", RETURN},
-                                      {"RICHREAL", RICHREAL},
-                                      {"PROCEDURE", PROCEDURE},
-                                      {"SYNC", SYNC},
-                                      {"TABLE", TABLE},
-                                      {"TEXT", TEXT},
-                                      {"THEN", THEN},
-                                      {"TRUE", W_TRUE},
-                                      {"UNTIL", UNTIL},
-                                      {"UNSIGNED", UNSIGNED},
-                                      {"WHILE", WHILE},
-                                      {"XOR", XOR},
+static TOKEN_SEMANTIC sgKeywords[] = {
+                                        {"AND", AND},
+                                        {"ARRAY", ARRAY},
+                                        {"AS", AS},
+                                        {"BOOL", BOOL},
+                                        {"BREAK", BREAK},
+                                        {"CHARACTER", CHARACTER},
+                                        {"CONTINUE", CONTINUE},
+                                        {"DATE", DATE},
+                                        {"DATETIME", DATETIME},
+                                        {"DO", DO},
+                                        {"ELSE", ELSE},
+                                        {"ELSEIF", ELSEIF},
+                                        {"END", END},
+                                        {"ENDPROC", ENDPROC},
+                                        {"ENDSYNC", ENDSYNC},
+                                        {"EXTERN", EXTERN},
+                                        {"FALSE", W_FALSE},
+                                        {"FIELD", FIELD},
+                                        {"FOREACH", FOREACH},
+                                        {"HIRESTIME", HIRESTIME},
+                                        {"IF", IF},
+                                        {"IN", IN},
+                                        {"INT8", INT8},
+                                        {"INT16", INT16},
+                                        {"INT32", INT32},
+                                        {"INT64", INT64},
+                                        {"LET", LET},
+                                        {"OF", OF},
+                                        {"OR", OR},
+                                        {"NOT", NOT},
+                                        {"NULL", WHISPER_NULL},
+                                        {"REAL", REAL},
+                                        {"RETURN", RETURN},
+                                        {"RICHREAL", RICHREAL},
+                                        {"PROCEDURE", PROCEDURE},
+                                        {"SYNC", SYNC},
+                                        {"TABLE", TABLE},
+                                        {"TEXT", TEXT},
+                                        {"THEN", THEN},
+                                        {"TRUE", W_TRUE},
+                                        {"UNTIL", UNTIL},
+                                        {"UNSIGNED", UNSIGNED},
+                                        {"WHILE", WHILE},
+                                        {"XOR", XOR},
 
-                                      /* some aliases of our own */
-                                      {"NUMBER", INT32},
-                                      {NULL, 0}
+                                        /* some aliases of our own */
+                                        {"NUMBER", INT32},
+                                        {NULL, 0}
                                     };
 
+/* Get the semantic of specified keyword. */
 static int
-parse_keyword (const char* keyWord, uint_t keyLen)
+parse_keyword (const char* keyword, uint_t keyLen)
 {
-  uint_t count;
-  char   key_upcase[MAX_KEYWORD_LEN];
+  uint_t i;
+  char   normalKey[MAX_KEYWORD_LEN];
 
   if (keyLen >= MAX_KEYWORD_LEN)
     return 0;
 
-  for (count = 0; count < keyLen; count++)
-    {
-      key_upcase[count] = keyWord[count];
+  /* Normalize the key, by conveting to the uppercase form. */
+  for (i = 0; i < keyLen; i++)
+    normalKey[i] = toupper (keyword[i]);
 
-      if (keyWord[count] >= 'a' && keyWord[count] <= 'z')
-        key_upcase[count] += ('A' - 'a');
-    }
-  key_upcase[count] = 0; /* add NULL at the end */
+  normalKey[i] = 0; /* add NULL at the end */
 
-  count = 0;
-  while (keywords[count].text != NULL)
+  /* Now search the key. */
+  i = 0;
+  while (sgKeywords[i].text != NULL)
     {
-      if (strcmp (keywords[count].text, key_upcase) == 0)
+      if (strcmp (sgKeywords[i].text, normalKey) == 0)
         break;
 
-      ++count;
+      ++i;
     }
 
-  return keywords[count].token;
+  return sgKeywords[i].token;
 }
 
-#define COMPOSED_OPERATOR_LEN    2    /* A compose operator has exactly 2 chars */
+/* Thestring length of composed operator. */
+#define COMPOSED_OPERATOR_LEN    2
 
-static TOKEN_SEMANTIC composed_operators[] = {
-                                               {"==", EQ},
-                                               {"!=", NE},
-                                               {"<=", LE},
-                                               {">=", GE},
-                                               {"+=", SADD},
-                                               {"-=", SSUB},
-                                               {"*=", SMUL},
-                                               {"/=", SDIV},
-                                               {"%=", SMOD},
-                                               {"&=", SAND},
-                                               {"^=", SXOR},
-                                               {"|=", SOR},
-                                               {NULL, 0}
-                                             };
+static TOKEN_SEMANTIC sgMultiCharOps[] = {
+                                           {"==", EQ},
+                                           {"!=", NE},
+                                           {"<=", LE},
+                                           {">=", GE},
+                                           {"+=", SADD},
+                                           {"-=", SSUB},
+                                           {"*=", SMUL},
+                                           {"/=", SDIV},
+                                           {"%=", SMOD},
+                                           {"&=", SAND},
+                                           {"^=", SXOR},
+                                           {"|=", SOR},
+                                           {NULL, 0}
+                                         };
 
 static int
-parse_composed_operator (const char* pOpText)
+parse_multichar_operator (const char* op)
 {
-  uint_t count = 0;
+  uint_t i = 0;
 
-  while (composed_operators[count].text != NULL)
+  if (strlen (op) != COMPOSED_OPERATOR_LEN)
+    return 0;
+
+  while (sgMultiCharOps[i].text != NULL)
     {
-      if (strncmp (composed_operators[count].text, pOpText, COMPOSED_OPERATOR_LEN) == 0)
+      if (strcmp (sgMultiCharOps[i].text, op) == 0)
         break;
 
-      ++count;
+      ++i;
     }
 
-  return composed_operators[count].token;
+  return sgMultiCharOps[i].token;
 }
 
 static uint_t
-parse_integer (const char* pBuffer,
-               uint_t      bufferLen,
-               uint64_t*   pOutVal,
-               bool_t*     pOutSigned)
+parse_integer (const char*      buffer,
+               uint_t            bufferLen,
+               uint64_t* const  outValue,
+               bool_t* const    outSigned)
 {
   const uint_t oldLen   = bufferLen;
   uint_t       base     = 10;
   bool_t       negative = FALSE;
 
-  assert (pBuffer != NULL);
+  assert (buffer != NULL);
   assert (bufferLen != 0);
-  assert (pOutVal != NULL);
+  assert (outValue != NULL);
 
-  *pOutVal    = 0;
-  *pOutSigned = FALSE;
-  if (pBuffer[0] == '-' && bufferLen > 1 && is_numeric (pBuffer[1], FALSE))
+  *outValue    = 0;
+  *outSigned   = FALSE;
+  if ((buffer[0] == '-')
+      && (bufferLen > 1)
+      && is_numeric (buffer[1], FALSE))
     {
       negative = TRUE;
-      pBuffer++;
-      bufferLen--;
+      ++buffer, --bufferLen;
     }
 
-  if (pBuffer[0] == '0' && bufferLen > 1 && (pBuffer[1] == 'x' || pBuffer[1] == 'X'))
+  if ((buffer[0] == '0')
+      && (bufferLen > 1)
+      && (buffer[1] == 'x' || buffer[1] == 'X'))
     {
-      bufferLen -= 2;
-      pBuffer   += 2;
-      base      = 16;        /* hexa decimal notation */
+      base = 16; /* hexa decimal notation */
+      buffer +=2, bufferLen -= 2;
     }
-  else if (pBuffer[0] == '0')
-    {
-      bufferLen -= 1;
-      pBuffer   += 1;
-    }
+  else if (buffer[0] == '0')
+    ++buffer, --bufferLen;
 
   if (negative)
-    *pOutSigned = TRUE;
+    *outSigned = TRUE;
 
   while (bufferLen > 0)
     {
       uint8_t digit;
 
-      if (*pBuffer >= '0' && *pBuffer <= '9')
-        digit = (*pBuffer - '0');
+      if (*buffer >= '0' && *buffer <= '9')
+        digit = (*buffer - '0');
+
       else if (base == 16)
         {
-          if (*pBuffer >= 'a' && *pBuffer <= 'f')
-            digit = ((*pBuffer - 'a') + 10);
-          else if (*pBuffer >= 'A' && *pBuffer <= 'F')
-            digit = ((*pBuffer - 'A') + 10);
+          if (*buffer >= 'a' && *buffer <= 'f')
+            digit = ((*buffer - 'a') + 10);
+
+          else if (*buffer >= 'A' && *buffer <= 'F')
+            digit = ((*buffer - 'A') + 10);
+
           else
-            break;                /* no more hexa digits for you */
+            break;
         }
       else
-        break;                /* no more digits for you */
+        break;
 
-      *pOutVal *= base;
-      *pOutVal += digit;
+      *outValue *= base;
+      *outValue += digit;
 
-      pBuffer++;
-      bufferLen--;
+      ++buffer, --bufferLen;
     }
 
   if (negative)
-    *pOutVal *= -1;
+    *outValue *= -1;
 
   return (oldLen - bufferLen);
 }
 
 static uint_t
-parse_real_value (const char*      pBuffer,
-                  uint_t           bufferLen,
-                  struct SemCReal* pOutReal)
+parse_real (const char*      buffer,
+            uint_t            bufferLen,
+            struct SemCReal* outReal)
 {
   const uint_t oldLen            = bufferLen;
   bool_t       foundDecimalPoint = FALSE;
   bool_t       negative          = FALSE;
   uint64_t     precision         = 1;
 
-  assert (pBuffer != NULL);
+  assert (buffer != NULL);
   assert (bufferLen != 0);
-  assert (pOutReal != NULL);
+  assert (outReal != NULL);
 
-  pOutReal->integerPart    = 0;
-  pOutReal->fractionalPart = 0;
+  outReal->integerPart    = 0;
+  outReal->fractionalPart = 0;
 
-  if ((pBuffer[0] == '-') &&
+  if ((buffer[0] == '-') &&
       (bufferLen > 1) &&
-      is_numeric (pBuffer[1], FALSE))
+      is_numeric (buffer[1], FALSE))
     {
       negative = TRUE;
-      pBuffer++;
-      bufferLen--;
+      ++buffer, --bufferLen;
     }
 
   while (bufferLen > 0)
     {
       int digit = 0;
 
-      if (*pBuffer >= '0' && *pBuffer <= '9')
+      if (*buffer >= '0' && *buffer <= '9')
         {
-          digit += (*pBuffer - '0');
+          digit += (*buffer - '0');
           if (! foundDecimalPoint)
             {
-              pOutReal->integerPart *= 10;
-              pOutReal->integerPart += digit;
+              outReal->integerPart *= 10;
+              outReal->integerPart += digit;
             }
           else
             {
               precision               *= 10;
-              pOutReal->fractionalPart *= 10;
-              pOutReal->fractionalPart += digit;
+              outReal->fractionalPart *= 10;
+              outReal->fractionalPart += digit;
             }
         }
-      else if (*pBuffer == '.')
+      else if (*buffer == '.')
         {
           if (foundDecimalPoint == TRUE)
             {
@@ -474,156 +484,166 @@ parse_real_value (const char*      pBuffer,
           foundDecimalPoint = TRUE;
         }
       else
-        break;  /* nothing for us here */
+        break;
 
-      pBuffer++;
-      bufferLen--;
+      ++buffer, --bufferLen;
     }
 
   for (; precision < W_LDRR_PRECISSION; precision *= 10)
-    pOutReal->fractionalPart *= 10;
+    outReal->fractionalPart *= 10;
 
   if (negative)
     {
-      pOutReal->integerPart    = -pOutReal->integerPart;
-      pOutReal->fractionalPart = -pOutReal->fractionalPart;
+      outReal->integerPart    = -outReal->integerPart;
+      outReal->fractionalPart = -outReal->fractionalPart;
     }
 
   return (oldLen - bufferLen);
 }
 
 static uint_t
-parse_character (const char* pBuffer,
+parse_character (const char* buffer,
                 uint_t       bufferLen,
-                char*      pOutChar)
+                uint32_t*    outChar)
 {
   uint_t result = 0;
 
-  assert (pBuffer != NULL);
+  assert (buffer != NULL);
   assert (bufferLen != 0);
-  assert (pOutChar != NULL);
+  assert (outChar != NULL);
 
-  *pOutChar = 0;
-
-  if (*pBuffer == '\\')
+  if (*buffer == '\\')
     {
       if (bufferLen > 0)
-        {
-          ++pBuffer;
-          ++result;
-          --bufferLen;
-        }
+        ++buffer, ++bufferLen, ++result;
+
       else
-        return 0;       /* error */
+        return 0; /* error */
 
-      if (*pBuffer == '\\')
+      if (*buffer == '\\')
         {
-          *pOutChar = '\\';
+          *outChar = '\\';
           ++result;
         }
-      else if (*pBuffer == 'n')
+      else if (*buffer == 'n')
         {
-          *pOutChar = '\n';
+          *outChar = '\n';
           ++result;
         }
-      else if (*pBuffer == 'r')
+      else if (*buffer == 'r')
         {
-          *pOutChar = '\r';
+          *outChar = '\r';
           ++result;
         }
-      else if (*pBuffer == 'f')
+      else if (*buffer == 'f')
         {
-          *pOutChar = '\f';
+          *outChar = '\f';
           ++result;
         }
-      else if (*pBuffer == 't')
+      else if (*buffer == 't')
         {
-          *pOutChar = '\t';
+          *outChar = '\t';
           ++result;
         }
-      else if (*pBuffer == 'v')
+      else if (*buffer == 'v')
         {
-          *pOutChar = '\v';
+          *outChar = '\v';
           ++result;
         }
-      else if (*pBuffer == 'b')
+      else if (*buffer == 'b')
         {
-          *pOutChar = '\b';
+          *outChar = '\b';
           ++result;
         }
-      else if (*pBuffer == 'a')
+      else if (*outChar == 'a')
         {
-          *pOutChar = '\a';
+          *outChar = '\a';
           ++result;
         }
-      else if (*pBuffer == '\'')
+      else if (*outChar == '\'')
         {
-          *pOutChar = '\'';
+          *outChar = '\'';
           ++result;
         }
-      else if (*pBuffer == '\"')
+      else if (*outChar == '\"')
         {
-          *pOutChar = '\"';
+          *outChar = '\"';
           ++result;
         }
-      else if (is_numeric (*pBuffer, FALSE))
+      else if (is_numeric (*buffer, FALSE))
         {
-          uint64_t  intValue = 0;
-          bool_t    dummy;
+          uint64_t  value    = 0;
+          bool_t    negative = FALSE;
 
-          result    += parse_integer (pBuffer, bufferLen, &intValue, &dummy);
-          *pOutChar  = (char) intValue;
+          if (result <= 0xFFFFFFFF)
+            {
+              result += parse_integer (buffer, bufferLen, &value, &negative);
+              if (negative || (value > 0xFFFFFFFF))
+                return 0;
+
+              *outChar = value;
+            }
+          else
+            result = 0;
         }
     }
   else
-    {
-      *pOutChar = *pBuffer;
-      result    = 1;
-    }
+    result = wh_load_utf8_cp ((uint8_t*)buffer, outChar);
 
   return result;
 }
 
 static uint_t
-parse_string (const char* pBuffer,
+parse_string (const char* buffer,
               uint_t      bufferLen,
-              char*     pOutString,
-              uint_t*     oOutStringLen)
+              char*       destination,
+              uint_t*     outDestinationLen)
 {
   const uint_t oldLen = bufferLen;
 
-  assert (pBuffer != NULL);
+  assert (buffer != NULL);
   assert (bufferLen != 0);
-  assert (pOutString != NULL);
+  assert (destination != NULL);
 
-  *oOutStringLen = 0;
+  *outDestinationLen = 0;
 
-  while ((bufferLen > 0) && (*pBuffer != '\"'))
+  while ((bufferLen > 0) && (*buffer != '\"'))
     {
-      uint_t result = parse_character (pBuffer, bufferLen, pOutString);
+      uint32_t currChar = 0;
+      uint_t   result;
 
-      if (result != 0)
+      if (buffer[0] == '\\')
+        result = parse_character (buffer, bufferLen, &currChar);
+
+      else
+        currChar = buffer[0], result = 1;
+
+
+      /* Currently there is support for Unicode only through UTF-8.
+         Cannot handle trough escape chars the full range of Unicode. */
+      if ((result != 0)
+          || (currChar <= 0xFF))
         {
-          pBuffer   += result;
+          buffer    += result;
           bufferLen -= result;
 
-          pOutString++;
-          (*oOutStringLen)++;
+          *destination++      = currChar;
+          *outDestinationLen += result;
         }
       else
         return 0;
     }
 
-  *pOutString = 0;      /* add the null character */
-  (*oOutStringLen)++;
+  *destination = 0;      /* add the null character */
+  (*outDestinationLen)++;
 
   return (oldLen - bufferLen);
 }
 
 static uint_t
-parse_time_value (const char*      pBuffer,
+parse_time_value (const char*      buffer,
                   uint_t           bufferLen,
-                  struct SemCTime* pOutTime)
+                  struct SemCTime* outTime)
 {
   int64_t  intVal;
   uint_t   intValLen = 0;
@@ -631,178 +651,159 @@ parse_time_value (const char*      pBuffer,
   bool_t   dummy;
 
   /* initialise the structure with default valid values */
-  memset (pOutTime, 0, sizeof (pOutTime[0]));
-  pOutTime->month = pOutTime->day = 1;
+  memset (outTime, 0, sizeof (outTime[0]));
+  outTime->month = outTime->day = 1;
 
   /* found the year part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t*)&intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t*)&intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->year = (int16_t) intVal;
+      outTime->year = (int16_t) intVal;
     }
   else
     return 0;   /* parsing error */
 
-  if (pBuffer[0] == '\'')
+  if (buffer[0] == '\'')
     return result;      /* end of date/time entry */
-  else if (pBuffer[0] != '/')
+
+  else if (buffer[0] != '/')
     {
       /* no date delimiter */
       return 0; /* parsing error */
     }
   else
-    {
-      ++result;
-      ++pBuffer;
-      --bufferLen;
-    }
+    ++result, ++buffer, --bufferLen;
 
   /* found the month part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t*)&intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t*)&intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->month = (uint8_t) intVal;
+      outTime->month = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
 
-  if (pBuffer[0] == '\'')
+  if (buffer[0] == '\'')
     return result;      /* end of date/time entry */
-  else if (pBuffer[0] != '/')
+
+  else if (buffer[0] != '/')
     {
       /* no date delimiter */
       return 0; /* parsing error */
     }
   else
-    {
-      ++result,
-      ++pBuffer,
-      --bufferLen;
-    }
+    ++result, ++buffer, --bufferLen;
 
   /* found the day part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->day = (uint8_t) intVal;
+      outTime->day = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
 
-  if (pBuffer[0] == '\'')
+  if (buffer[0] == '\'')
     return result;      /* end of date/time entry */
-  else if (pBuffer[0] != ' ')
+
+  else if (buffer[0] != ' ')
     {
       /* no date delimiter */
       return 0; /* parsing error */
     }
   else
-    {
-      ++result;
-      ++pBuffer;
-      --bufferLen;
-    }
+    ++result, ++buffer, --bufferLen;
 
   /* found the hour part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->hour = (uint8_t) intVal;
+      outTime->hour = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
 
-  if (pBuffer[0] != ':')
+  if (buffer[0] != ':')
     {
       /* no time delimiter */
       return 0; /* parsing error */
     }
   else
-    {
-      ++result;
-      ++pBuffer;
-      --bufferLen;
-    }
+    ++result, ++buffer, --bufferLen;
 
   /* found the minute part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->min = (uint8_t) intVal;
+      outTime->min = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
 
-  if (pBuffer[0] == '\'')
+  if (buffer[0] == '\'')
     return result;
-  else if (pBuffer[0] != ':')
+
+  else if (buffer[0] != ':')
     {
       /* no time delimiter */
       return 0; /* parsing error */
     }
   else
-    {
-      ++result;
-      ++pBuffer;
-      --bufferLen;
-    }
+    ++result, ++buffer, --bufferLen;
 
   /* found the second part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->sec = (uint8_t) intVal;
+      outTime->sec = (uint8_t) intVal;
     }
   else
     return 0;   /* parsing error */
 
-  if (pBuffer[0] == '\'')
+  if (buffer[0] == '\'')
     return result;
-  else if (pBuffer[0] != '.')
+
+  else if (buffer[0] != '.')
     {
       /* no time delimiter */
       return 0; /* parsing error */
     }
   else
-    {
-      ++result;
-      ++pBuffer;
-      --bufferLen;
-    }
+    ++result, ++buffer, --bufferLen;
 
   /* found the microsecond part */
-  intValLen = parse_integer (pBuffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
-      pBuffer   += intValLen;
+      buffer    += intValLen;
       bufferLen -= intValLen;
 
-      pOutTime->usec = (uint32_t) intVal;
+      outTime->usec = (uint32_t) intVal;
     }
   else
     return 0;   /* parsing error */
@@ -811,36 +812,41 @@ parse_time_value (const char*      pBuffer,
 }
 
 int
-yylex (YYSTYPE * lvalp, struct ParserState* pState)
+yylex (YYSTYPE * lvalp, struct ParserState* parser)
 {
-  int result = 0;
-  const char* pBuffer   = pState->buffer;
-  const char* pToken    = NULL;
+  int           result    = 0;
+  const char*   buffer    = parser->buffer;
+  const char*   pToken    = NULL;
   uint_t        tokenLen  = 0;
   TOKEN_TYPE    tokenType = TK_ERROR;
-  uint_t        bufferOff = pState->bufferPos;
+  uint_t        bufferOff = parser->bufferPos;
 
-  if (pState->bufferPos > pState->bufferSize)
+  if (parser->bufferPos > parser->bufferSize)
     return 0;
 
-  /* recall where to start from */
-  pBuffer   += bufferOff;
-  tokenType  = get_next_token (pBuffer, &pToken, &tokenLen);
+  /* Recall where to start from */
+  buffer    += bufferOff;
+  tokenType  = next_token (buffer, &pToken, &tokenLen);
 
-  /* remember to start from here  next time */
-  pState->bufferPos += (uint_t) ((pToken + tokenLen) - pBuffer);
+  /* Start from here next call. */
+  parser->bufferPos += (uint_t) ((pToken + tokenLen) - buffer);
 
-  /* allocate storage for value */
-  *lvalp = NULL;                /* if we are to crash... make it loud */
-  if ((tokenType != TK_UNDETERMINED) && (tokenType != TK_OPERATOR) &&
-      ((tokenType != TK_IDENTIFIER) || ((result = parse_keyword (pToken, tokenLen)) == 0)))
+  /* Allocate storage for semantic value, if the token type demands it. */
+  *lvalp = NULL;
+  if ((tokenType != TK_UNDETERMINED)
+      && (tokenType != TK_OPERATOR)
+      && ((tokenType != TK_IDENTIFIER)
+          || ((result = parse_keyword (pToken, tokenLen)) == 0)))
     {
-      /* if the token is not a key word */
-      *lvalp = alloc_sem_value (pState);
+      *lvalp = alloc_sem_value (parser);
       if (*lvalp == NULL)
         {
-          w_log_msg (pState, IGNORE_BUFFER_POS, pState->bufferPos, MSG_NO_MEM);
-          return 0;
+          log_message (parser,
+                       IGNORE_BUFFER_POS,
+                       parser->bufferPos,
+                       MSG_NO_MEM);
+
+          return 0; /* error */
         }
     }
   else if (tokenType == TK_IDENTIFIER)
@@ -850,27 +856,28 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
       return result;
     }
   else if (tokenLen == 1)
-    return *pToken;
+    return *pToken; /* The token is most likely an operator. */
 
+  /* Initialise the semantic value, based on the token type. */
   switch (tokenType)
     {
     case TK_IDENTIFIER:
       /* parsing was successful */
       (*lvalp)->val_type        = VAL_ID;
-      (*lvalp)->val.u_id.text   = pToken;
+      (*lvalp)->val.u_id.name   = pToken;
       (*lvalp)->val.u_id.length = tokenLen;
 
       result = IDENTIFIER;
       break;
 
     case TK_OPERATOR:
-      return parse_composed_operator (pToken);
+      return parse_multichar_operator (pToken);
 
     case TK_NUMERIC:
       result = parse_integer (pToken,
                               tokenLen,
                               &((*lvalp)->val.u_int.value),
-                              &((*lvalp)->val.u_int.is_signed));
+                              &((*lvalp)->val.u_int.isSigned));
       if (result != 0)
         {                        /* parsing was successful */
           (*lvalp)->val_type = VAL_C_INT;
@@ -886,7 +893,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
                                     tokenLen - 1,
                                     &((*lvalp)->val.u_char.value));
           if (pToken[result] != '\'')
-            result = 0;
+            result = 0; /* error */
         }
       else
         result = 0;                /* error */
@@ -902,14 +909,16 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
       if ((tokenLen > 1) || (pToken[0] != '\"'))
         {
           pToken++;
-          (*lvalp)->val.u_text.text = alloc_str (pState->strings, tokenLen - 1);
+          (*lvalp)->val.u_text.text = alloc_str (parser->strings,
+                                                 tokenLen - 1);
           result = parse_string (pToken,
                                  tokenLen,
-                                 (*lvalp)->val.u_text.text,
+                                 (char* )(*lvalp)->val.u_text.text,
                                  &(*lvalp)->val.u_text.length);
 
           if (pToken[result] != '\"')
             result = 0;
+
           else
             {
               /* parsing was successful, result contains the
@@ -944,18 +953,16 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
       break;
 
     case TK_REAL:
-      result = parse_real_value (pToken, tokenLen, &((*lvalp)->val.u_real));
+      result = parse_real (pToken, tokenLen, &((*lvalp)->val.u_real));
       if (result != 0)
         {
-          /* parsing was successful */
           (*lvalp)->val_type = VAL_C_REAL;
           result             = WHISPER_REAL;
         }
       break;
 
     default:
-      /* What I'm doing here? Return an error!*/
-      result = 0;
+      result = 0;  /* error */
     }
 
   return result;
@@ -964,9 +971,10 @@ yylex (YYSTYPE * lvalp, struct ParserState* pState)
 /* this is internally used by yyparse()
  * it's declaration is found on wisper.y */
 int
-yyerror (struct ParserState* pState, const char* msg)
+yyerror (struct ParserState* parser, const char* msg)
 {
-  w_log_msg (pState, pState->bufferPos, MSG_COMPILER_ERR);
+  log_message (parser, parser->bufferPos, MSG_COMPILER_ERR);
 
   return 0;
 }
+

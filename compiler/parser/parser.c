@@ -26,48 +26,55 @@
  *            related to semantic value objects management.
  */
 
+#include <assert.h>
+
 #include "parser.h"
 #include "../semantics/wlog.h"
 
-#include <assert.h>
 
 struct SemValue*
-alloc_sem_value (struct ParserState* const pState)
+alloc_sem_value (struct ParserState* const parser)
 {
   struct SemValue* result      = NULL;
   uint_t           iter        = 0;
-  uint_t           stored_vals = wh_array_count (&pState->parsedValues);
+  uint_t           stored_vals = wh_array_count (&parser->values);
 
   while (iter < stored_vals)
     {
-      result = wh_array_get (&pState->parsedValues, iter);
+      result = wh_array_get (&parser->values, iter);
       assert (result != NULL);
 
       if (result->val_type == VAL_REUSE)
         break;                        /* found something to be reused */
+
       iter++;
     }
+
    if (result == NULL || result->val_type != VAL_REUSE)
     {
       static struct SemValue dummy;
-      result = (struct SemValue *) wh_array_add (&pState->parsedValues, &dummy);
+      result = (struct SemValue*) wh_array_add (&parser->values, &dummy);
     }
 
   return result;
 }
 
+
 struct SemValue*
-alloc_boolean_sem_value (struct ParserState* const pState, const bool_t initialValue)
+alloc_bool_sem_value (struct ParserState* const parser,
+                         const bool_t              value)
 {
-  struct SemValue *val = alloc_sem_value (pState);
+  struct SemValue *val = alloc_sem_value (parser);
 
   if (val == NULL)
-    w_log_msg (pState, IGNORE_BUFFER_POS, pState->bufferPos, MSG_NO_MEM);
+    log_message (parser, IGNORE_BUFFER_POS, parser->bufferPos, MSG_NO_MEM);
+
   else
     {
       val->val_type         = VAL_C_BOOL;
-      val->val.u_bool.value = (initialValue != 0);
+      val->val.u_bool.value = (value != 0);
     }
 
   return val;
 }
+

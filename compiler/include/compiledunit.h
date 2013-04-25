@@ -100,8 +100,8 @@ class COMPILER_SHL WBufferCompiledUnit : public WICompiledUnit
 public:
   WBufferCompiledUnit (const uint8_t*    pBuffer,
                        uint_t            bufferSize,
-                       WHC_MESSENGER     messenger,
-                       WHC_MESSENGER_ARG messengerContext);
+                       WH_MESSENGER     messenger,
+                       WH_MESSENGER_CTXT messengerContext);
   virtual ~WBufferCompiledUnit ();
 
   virtual uint_t         GetTypeInformationSize ();
@@ -133,7 +133,7 @@ private:
     WBufferCompiledUnit& operator= (WBufferCompiledUnit&);
 
 private:
-    WHC_HANDLER m_Handler;
+    WH_COMPILED_UNIT m_Handler;
 };
 
 class COMPILER_SHL WFileCompiledUnit : public WICompiledUnit

@@ -17,7 +17,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->values, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -28,17 +28,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  wh_array_clean (&state->parsedValues);
+  wh_array_clean (&state->values);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = wh_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->values);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -157,11 +157,11 @@ check_procedure (struct ParserState *state, char * proc_name)
         {
           return FALSE;
         }
-      else if (w_opcode_decode (code + 9) != op_expect)
+      else if (decode_opcode (code + 9) != op_expect)
         {
           return FALSE;
         }
-      else if (w_opcode_decode (code + 2) != W_JF)
+      else if (decode_opcode (code + 2) != W_JF)
         {
           return FALSE;
         }
@@ -176,7 +176,7 @@ check_procedure (struct ParserState *state, char * proc_name)
         {
           return FALSE;
         }
-      else if (w_opcode_decode (code + 4) != op_expect)
+      else if (decode_opcode (code + 4) != op_expect)
         {
           return FALSE;
         }

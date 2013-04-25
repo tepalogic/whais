@@ -135,7 +135,7 @@ WhcCmdLineParser::DisplayUsage () const
   using namespace std;
 
   unsigned int ver_maj, ver_min;
-  wh_get_libver (&ver_maj, &ver_min);
+  wh_compiler_libver (&ver_maj, &ver_min);
 
   cout << "Whisper Compiler ver. " << ver_maj << '.' << ver_min;
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl

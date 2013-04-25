@@ -214,9 +214,9 @@ extern "C"
 {
 #endif
 
-COMPILER_SHL unsigned int
-wh_decode_opcode (const unsigned char*  pCode,
-                   enum W_OPCODE* const pOutOpcode);
+COMPILER_SHL uint_t
+wh_compiler_decode_op (const uint8_t*        instrs,
+                       enum W_OPCODE* const  outOpcode);
 #ifdef __cplusplus
 }
 #endif

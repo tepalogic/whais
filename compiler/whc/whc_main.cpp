@@ -141,7 +141,7 @@ main (int argc, char **argv)
   WOutputStream      glbsTableStream;
   WOutputStream      procsTableStream;
 
-  wh_get_lang_ver (&langVerMaj, &langVerMin);
+  wh_compiler_language_ver (&langVerMaj, &langVerMin);
   wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &symbolsStream);
   wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &glbsTableStream);
   wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &procsTableStream);

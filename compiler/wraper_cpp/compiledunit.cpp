@@ -35,11 +35,11 @@ using namespace whisper;
 
 WBufferCompiledUnit::WBufferCompiledUnit (const uint8_t*    pBuuffer,
                                           uint_t            bufferSize,
-                                          WHC_MESSENGER     messenger,
-                                          WHC_MESSENGER_ARG messengerContext) :
+                                          WH_MESSENGER     messenger,
+                                          WH_MESSENGER_CTXT messengerContext) :
   m_Handler (NULL)
 {
-  m_Handler = wh_hnd_create (_RC (const char*, pBuuffer),
+  m_Handler = wh_compiler_load (_RC (const char*, pBuuffer),
                               bufferSize,
                               messenger,
                               messengerContext);
@@ -50,14 +50,14 @@ WBufferCompiledUnit::WBufferCompiledUnit (const uint8_t*    pBuuffer,
 WBufferCompiledUnit::~WBufferCompiledUnit ()
 {
   if (m_Handler != NULL)
-    wh_hnd_destroy (m_Handler);
+    wh_compiler_discard (m_Handler);
 }
 
 uint_t
 WBufferCompiledUnit::GetTypeInformationSize ()
 {
   const uint8_t* pDummy;
-  const uint_t   result = wh_get_typedec_pool (m_Handler, &pDummy);
+  const uint_t   result = wh_unit_type_descriptors (m_Handler, &pDummy);
 
   return result;
 }
@@ -67,7 +67,7 @@ WBufferCompiledUnit::RetriveTypeInformation ()
 {
   const uint8_t* pTypeInfo = NULL;
 
-  wh_get_typedec_pool (m_Handler, &pTypeInfo);
+  wh_unit_type_descriptors (m_Handler, &pTypeInfo);
 
   return pTypeInfo;
 }
@@ -76,7 +76,7 @@ uint_t
 WBufferCompiledUnit::GetConstAreaSize ()
 {
   const uint8_t* pDummy;
-  const uint_t   result = wh_get_const_area (m_Handler, &pDummy);
+  const uint_t   result = wh_unit_constants (m_Handler, &pDummy);
 
   return result;
 }
@@ -86,7 +86,7 @@ WBufferCompiledUnit::RetrieveConstArea ()
 {
   const uint8_t* pConstArea = NULL;
 
-  wh_get_const_area (m_Handler, &pConstArea);
+  wh_unit_constants (m_Handler, &pConstArea);
 
   return pConstArea;
 }
@@ -94,135 +94,135 @@ WBufferCompiledUnit::RetrieveConstArea ()
 uint_t
 WBufferCompiledUnit::GetGlobalsCount ()
 {
-  return wh_get_globals_count (m_Handler);
+  return wh_unit_globals_count (m_Handler);
 }
 
 uint_t
 WBufferCompiledUnit::GetProceduresCount ()
 {
-  return wh_get_procs_count (m_Handler);
+  return wh_unit_procedures_count (m_Handler);
 }
 
 uint_t
 WBufferCompiledUnit::GetGlobalNameLength (uint_t item)
 {
-  WHC_GLBVAR_DESC globalDesc = {NULL, };
+  WCompilerGlobalDesc globalDesc = {NULL, };
 
-  if (!wh_get_global (m_Handler, item, &globalDesc))
+  if (!wh_unit_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  return globalDesc.m_NameLength;
+  return globalDesc.nameLength;
 }
 
 const char*
 WBufferCompiledUnit::RetriveGlobalName (uint_t item)
 {
-  WHC_GLBVAR_DESC globalDesc;
+  WCompilerGlobalDesc globalDesc;
 
-  if (!wh_get_global (m_Handler, item, &globalDesc))
+  if (!wh_unit_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  return globalDesc.m_Name;
+  return globalDesc.name;
 }
 
 uint_t
 WBufferCompiledUnit::GetGlobalTypeIndex (uint_t item)
 {
-  WHC_GLBVAR_DESC globalDesc;
+  WCompilerGlobalDesc globalDesc;
 
-  if (!wh_get_global (m_Handler, item, &globalDesc))
+  if (!wh_unit_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
   const uint8_t* pTemp;
-  wh_get_typedec_pool (m_Handler, &pTemp);
+  wh_unit_type_descriptors (m_Handler, &pTemp);
 
-  assert (pTemp && (pTemp <= globalDesc.m_Type));
+  assert (pTemp && (pTemp <= globalDesc.type));
 
-  return globalDesc.m_Type - pTemp;
+  return globalDesc.type - pTemp;
 
 }
 
 bool_t
 WBufferCompiledUnit::IsGlobalExternal (uint_t item)
 {
-  WHC_GLBVAR_DESC globalDesc;
+  WCompilerGlobalDesc globalDesc;
 
-  if (!wh_get_global (m_Handler, item, &globalDesc))
+  if (!wh_unit_global (m_Handler, item, &globalDesc))
     throw WCompiledUnitException ("Could not get the global variable descriptor.", _EXTRA(0));
 
-  return (globalDesc.m_Defined == FALSE);
+  return (globalDesc.defined == FALSE);
 }
 
 uint_t
 WBufferCompiledUnit::GetProcSyncStatementsCount (uint_t item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, item, &desc))
+  if (!wh_unit_procedure (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.m_SyncsCount;
+  return desc.syncsCount;
 }
 
 uint_t
 WBufferCompiledUnit::GetProcCodeAreaSize (uint_t item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, item, &desc))
+  if (!wh_unit_procedure (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.m_CodeSize;
+  return desc.codeSize;
 }
 
 const uint8_t*
 WBufferCompiledUnit::RetriveProcCodeArea (uint_t item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, item, &desc))
+  if (!wh_unit_procedure (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.m_Code;
+  return desc.code;
 }
 
 uint_t
 WBufferCompiledUnit::GetProcLocalsCount (uint_t item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, item, &desc))
+  if (!wh_unit_procedure (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.m_LocalsCount;
+  return desc.localsCount;
 }
 
 uint_t
 WBufferCompiledUnit::GetProcParametersCount (uint_t item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, item, &desc))
+  if (!wh_unit_procedure (m_Handler, item, &desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  return desc.m_ParamsCount;
+  return desc.paramsCount;
 }
 
 uint_t
 WBufferCompiledUnit::GetProcReturnTypeIndex (uint_t proc_item)
 {
-  WHC_PROC_HANDLER hProc = wh_get_proc_hnd (m_Handler, proc_item);
+  WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get (m_Handler, proc_item);
 
   if (hProc == NULL)
     throw WCompiledUnitException ("Could not create the  procedure handle.", _EXTRA(0));
 
   const uint8_t* pTemp;
-  wh_get_typedec_pool (m_Handler, &pTemp);
+  wh_unit_type_descriptors (m_Handler, &pTemp);
 
-  assert (pTemp && (pTemp <= wh_get_proc_rettype (m_Handler, hProc)));
-  uint_t result = wh_get_proc_rettype (m_Handler, hProc) - pTemp;
+  assert (pTemp && (pTemp <= wh_procedure_return_type (m_Handler, hProc)));
+  uint_t result = wh_procedure_return_type (m_Handler, hProc) - pTemp;
 
-  wh_release_proc_hnd (m_Handler, hProc);
+  wh_unit_procedure_release (m_Handler, hProc);
 
   return result;
 }
@@ -230,23 +230,23 @@ WBufferCompiledUnit::GetProcReturnTypeIndex (uint_t proc_item)
 uint_t
 WBufferCompiledUnit::GetProcNameSize (uint_t proc_item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, proc_item, &desc))
+  if (!wh_unit_procedure (m_Handler, proc_item, &desc))
     throw WCompiledUnitException ("Could not get the procedure's description.", _EXTRA(0));
 
-  return desc.m_NameLength;
+  return desc.nameLength;
 }
 
 const char*
 WBufferCompiledUnit::RetriveProcName (uint_t proc_item)
 {
-  WHC_PROC_DESC desc;
+  WCompilerProcedureDesc desc;
 
-  if (!wh_get_proc (m_Handler, proc_item, &desc))
+  if (!wh_unit_procedure (m_Handler, proc_item, &desc))
     throw WCompiledUnitException ("Could not get procedure's description.", _EXTRA(0));
 
-  return desc.m_Name;
+  return desc.name;
 }
 
 uint_t
@@ -256,24 +256,24 @@ WBufferCompiledUnit::GetProcLocalTypeIndex (uint_t item_proc, uint_t item_local)
     return GetProcReturnTypeIndex (item_proc);
 
   const uint8_t* pLocalType;
-  WHC_PROC_DESC  proc_desc;
+  WCompilerProcedureDesc  proc_desc;
 
-  if (!wh_get_proc (m_Handler, item_proc, &proc_desc))
+  if (!wh_unit_procedure (m_Handler, item_proc, &proc_desc))
     throw WCompiledUnitException ("Could not get procedure description.", _EXTRA(0));
 
-  WHC_PROC_HANDLER hProc = wh_get_proc_hnd (m_Handler, item_proc);
+  WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get (m_Handler, item_proc);
 
   if (hProc == NULL)
     throw WCompiledUnitException ("Could not create the  procedure handle.", _EXTRA(0));
 
-  pLocalType = wh_get_local_type (m_Handler, hProc, item_local);
+  pLocalType = wh_procedure_local_type (m_Handler, hProc, item_local);
 
-  wh_release_proc_hnd (m_Handler, hProc);
+  wh_unit_procedure_release (m_Handler, hProc);
   if (pLocalType == NULL)
     throw WCompiledUnitException ("Could not get local variable type.", _EXTRA(0));
 
   const uint8_t* pLocalDesc;
-  wh_get_typedec_pool (m_Handler, &pLocalDesc);
+  wh_unit_type_descriptors (m_Handler, &pLocalDesc);
 
   assert (pLocalDesc && (pLocalDesc <= pLocalType));
   return pLocalType - pLocalDesc;

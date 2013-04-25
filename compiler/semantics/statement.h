@@ -33,47 +33,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 enum STATEMENT_TYPE
 {
-  STMT_ERR = 0, /* Inva;od type */
+  STMT_ERR = 0,     /* Invalid type */
   STMT_GLOBAL,
   STMT_PROC
 };
 
 struct StatementGlobalSymbol
 {
-  char* symbol;
+  char*   symbol;
   uint_t  index;
 };
 
 struct _GlobalStatmentSpec
 {
-  struct WOutputStream typesDescs;  /* describes the variable types */
+  struct WOutputStream typesDescs;  /* Holds the variable types. */
   struct WOutputStream constsArea;
-  struct WArray       procsDecls;  /* for GLOBAL statement contains the list
-                                   of procedures */
-  uint32_t            procsCount;
+  struct WArray        procsDecls;  /* for GLOBAL statement contains the list
+                                      of procedures */
+  uint32_t             procsCount;
 };
 
 struct _ProcStatementSpec
 {
-  const char*      name;         /* name of the procedure */
-  uint_t             nameLength;   /* length of the name */
+  const char*        name;         /* Procedure name. */
+  uint_t             nameLength;   /* Length of the procedure name. */
   struct WArray      paramsList;   /* Used only for procedures
-                                    0 - special case for return type
-                                    1 - first parameter, 2 second parameter */
-  struct WOutputStream code;         /* the execution path for procedure
-                                    statements */
-  struct WArray       branchStack;  /* keep track of conditional branches */
-  struct WArray       loopStack;    /* keep the track of looping statements */
-  uint32_t            procId;       /* ID of the procedure in the import table */
-  uint16_t            syncTracker;
+                                      0 - special case for return type
+                                      1 - first parameter,
+                                      2 - second parameter. etc */
+  struct WOutputStream code;         /* Procedure's execution instructions.*/
+  struct WArray        branchStack;  /* Keeps track of conditional branches.*/
+  struct WArray        loopStack;    /* Keeps track of looping statements */
+  uint32_t             procId;       /* Procedure's ID in the import table. */
+  uint16_t             syncTracker;  /* Keeps track of sync staments. */
 };
 
 struct Statement
 {
-  struct Statement*   pParentStmt;  /* NULL for global statement */
-  uint_t              localsUsed;   /* used to assign IDs to declared variables */
-  enum STATEMENT_TYPE type;         /* type of the statement */
-  struct WArray       decls;        /* variables declared in this statement */
+  struct Statement*   parent;      /* NULL for global statement */
+  uint_t              localsUsed;  /* Local values of this statement. */
+  enum STATEMENT_TYPE type;
+  struct WArray       decls;       /* The local variables declared
+                                      in this statement */
   union
   {
     struct _ProcStatementSpec  proc;
@@ -82,61 +83,62 @@ struct Statement
 };
 
 bool_t
-init_glbl_stmt (struct Statement* pStmt);
+init_glbl_stmt (struct Statement* stmt);
 
 void
-clear_glbl_stmt (struct Statement* pGlbStmt);
+clear_glbl_stmt (struct Statement* stmt);
 
 bool_t
-init_proc_stmt (struct Statement* pParentStmt, struct Statement* pOutStmt);
+init_proc_stmt (struct Statement* parent, struct Statement* outStmt);
 
 void
-clear_proc_stmt (struct Statement* pStmt);
+clear_proc_stmt (struct Statement* stmt);
 
 struct DeclaredVar*
-stmt_find_declaration (struct Statement* pStmt,
-                       const char*       pName,
+stmt_find_declaration (struct Statement* stmt,
+                       const char*       name,
                        const uint_t      nameLength,
                        const bool_t      recursive,
-                       const bool_t      refferenced);
+                       const bool_t      reffered);
 
 struct DeclaredVar*
-stmt_add_declaration (struct Statement* const   pStmt,
-                      struct DeclaredVar*       pVar,
-                      const bool_t              parameter);
+stmt_add_declaration (struct Statement* const   stmt,
+                      struct DeclaredVar*       var,
+                      const bool_t              procPram);
 
 const struct DeclaredVar*
-stmt_get_param (const struct Statement* const pStmt, uint_t param);
+stmt_get_param (const struct Statement* const stmt, const uint_t param);
 
 uint_t
-stmt_get_param_count (const struct Statement* const pStmt);
+stmt_get_param_count (const struct Statement* const stmt);
 
 uint32_t
-stmt_get_import_id (const struct Statement* const pProc);
+stmt_get_import_id (const struct Statement* const proc);
 
 /* some inline functions to access statement members */
 static INLINE struct WOutputStream*
-stmt_query_instrs (struct Statement* const pStmt)
+stmt_query_instrs (struct Statement* const stmt)
 {
-  assert (pStmt->type == STMT_PROC);
-  return &pStmt->spec.proc.code;
+  assert (stmt->type == STMT_PROC);
+  return &stmt->spec.proc.code;
 }
 
 static INLINE struct WArray*
-stmt_query_branch_stack (struct Statement* const pStmt)
+stmt_query_branch_stack (struct Statement* const stmt)
 {
-  assert (pStmt->type == STMT_PROC);
-  return &pStmt->spec.proc.branchStack;
+  assert (stmt->type == STMT_PROC);
+  return &stmt->spec.proc.branchStack;
 }
 
 static INLINE struct WArray*
-stmt_query_loop_stack (struct Statement* const pStmt)
+stmt_query_loop_stack (struct Statement* const stmt)
 {
-  assert (pStmt->type == STMT_PROC);
-  return &pStmt->spec.proc.loopStack;
+  assert (stmt->type == STMT_PROC);
+  return &stmt->spec.proc.loopStack;
 }
 
-/*****************************Type specification section ***************/
+/**************************Type specification section ***************/
+
 #define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
 #define TYPE_SPEC_ERROR         0xFFFFFFFD
@@ -145,23 +147,24 @@ struct TypeSpec
 {
   uint16_t type;
   uint16_t dataSize;
-  uint8_t  data[2];     /* keep this last */
+  uint8_t  data[2];     /* VLA - Keep this last. */
 };
 
 bool_t
-is_type_spec_valid (const struct TypeSpec* pSpec);
+is_type_spec_valid (const struct TypeSpec* spec);
 
 bool_t
-type_spec_cmp (const struct TypeSpec* const pSpec_1,
-               const struct TypeSpec* const pSpec_2);
+compare_type_spec (const struct TypeSpec* const spec1,
+                   const struct TypeSpec* const spec2);
 
 uint_t
-type_spec_fill (struct WOutputStream* const      pOutStream,
-                const struct DeclaredVar* const pVar);
+fill_type_spec (struct WOutputStream* const     typeStream,
+                const struct DeclaredVar* const var);
 
 int
-add_text_const (struct Statement* const pStmt,
-                const uint8_t* const    pText,
-                const uint_t            textSize);
+add_constant_text (struct Statement* const stmt,
+                   const uint8_t* const    text,
+                   const uint_t            textSize);
 
 #endif /*STATEMENT_H_ */
+

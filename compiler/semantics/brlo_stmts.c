@@ -32,65 +32,63 @@
 #include "wlog.h"
 
 void
-begin_if_stmt (struct ParserState* const pState,
+begin_if_stmt (struct ParserState* const parser,
                YYSTYPE                   expression,
                enum BRANCH_TYPE          branchType)
 {
-  struct Statement* const    pStmt        = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  struct WArray* const       pBranchStack = stmt_query_branch_stack (pStmt);
-  struct Branch              branch;
+  struct Statement* const     stmt = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
 
-  if ( ! translate_bool_exp (pState, expression))
+  struct WArray* const branchStack = stmt_query_branch_stack (stmt);
+  struct Branch        branch;
+
+  if ( ! translate_bool_exp (parser, expression))
     {
-      /* errors encountered */
-      assert (pState->abortError == TRUE);
+      assert (parser->abortError == TRUE);
+
       return;
     }
 
-  /* reserve space for latter */
-  if ((w_opcode_encode (pCodeStream, W_JFC) == NULL) ||
-      (wh_ostream_wint32 (pCodeStream, 0) == NULL))
+  /* Reserve space for latter when we have to put the correct offset. */
+  if ((encode_opcode (code, W_JFC) == NULL)
+      || (wh_ostream_wint32 (code, 0) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
 
   branch.type     = branchType;
-  branch.startPos = wh_ostream_size (pCodeStream) - sizeof (uint32_t) - 1;
+  branch.startPos = wh_ostream_size (code) - sizeof (uint32_t) - 1;
   branch.elsePos  = 0;
 
-  if (wh_array_add (pBranchStack, &branch) == NULL)
-    {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
-
-      return;
-    }
+  if (wh_array_add (branchStack, &branch) == NULL)
+    log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 }
 
 void
-begin_else_stmt (struct ParserState* const pState)
+begin_else_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    pStmt        = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  struct WArray* const       pBranchStack = stmt_query_branch_stack (pStmt);
-  uint_t                     branchId     = wh_array_count (pBranchStack) - 1;
-  struct Branch*             pBranchIt    = wh_array_get (pBranchStack, branchId);
-  int32_t                    jumpOffest   = 0;
+  struct Statement* const     stmt = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
 
-  /* last if or elseif statement needs to know where to exit */
-  if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
-      (wh_ostream_wint32 (pCodeStream, 0) == NULL))
+  struct WArray* const branchStack = stmt_query_branch_stack (stmt);
+  uint_t               branchId    = wh_array_count (branchStack) - 1;
+  struct Branch*       branchIt    = wh_array_get (branchStack, branchId);
+  int32_t              jumpOffest  = 0;
+
+  /* Last if or elseif statement needs to know where to exit */
+  if ((encode_opcode (code, W_JMP) == NULL)
+      || (wh_ostream_wint32 (code, 0) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
 
-  pBranchIt->elsePos = wh_ostream_size (pCodeStream) - sizeof (uint32_t) - 1;
-  jumpOffest         = wh_ostream_size (pCodeStream) - pBranchIt->startPos;
-  memcpy (wh_ostream_data (pCodeStream) + pBranchIt->startPos + 1,
+  branchIt->elsePos = wh_ostream_size (code) - sizeof (uint32_t) - 1;
+  jumpOffest        = wh_ostream_size (code) - branchIt->startPos;
+  memcpy (wh_ostream_data (code) + branchIt->startPos + 1,
           &jumpOffest,
           sizeof jumpOffest);
 }
@@ -100,354 +98,365 @@ begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
 {
   begin_else_stmt (state);
 
-  if (!state->abortError)
-    {
-      begin_if_stmt (state, exp, BT_ELSEIF);
-    }
+  if ( ! state->abortError)
+    begin_if_stmt (state, exp, BT_ELSEIF);
 }
 
 void
-finalize_if_stmt (struct ParserState* const pState)
+finalize_if_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    pStmt        = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream  = stmt_query_instrs (pStmt);
-  struct WArray* const       pBranchStack = stmt_query_branch_stack (pStmt);
-  uint_t                     branchId     = wh_array_count (pBranchStack);
-  const struct Branch*       pBranchIt    = NULL;
+  struct Statement* const    stmt  = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
+
+  struct WArray* const  branchStack = stmt_query_branch_stack (stmt);
+  uint_t                branchId    = wh_array_count (branchStack);
+  const struct Branch*  branchIt    = NULL;
 
   do
     {
-      int32_t jumpOffset = wh_ostream_size (pCodeStream);
+      int32_t jumpOffset = wh_ostream_size (code);
 
-      pBranchIt = wh_array_get (pBranchStack, --branchId);
+      branchIt = wh_array_get (branchStack, --branchId);
 
-      if (pBranchIt->elsePos == 0)
+      if (branchIt->elsePos == 0)
         {
-          /* handle the lack of an else statement */
-          assert (pBranchIt->startPos > 0);
+          /* Handle the lack of an else statement. */
+          assert (branchIt->startPos > 0);
 
-          jumpOffset -= pBranchIt->startPos;
+          jumpOffset -= branchIt->startPos;
           assert (jumpOffset > 0);
-          memcpy (wh_ostream_data (pCodeStream) + pBranchIt->startPos + 1, &jumpOffset,
+          memcpy (wh_ostream_data (code) + branchIt->startPos + 1,
+                  &jumpOffset,
                   sizeof jumpOffset);
         }
       else
         {
-          /*handle the skip of the else or elseif statements */
-          jumpOffset -= pBranchIt->elsePos;
+          /* Skip the else or elseif statements. */
+          jumpOffset -= branchIt->elsePos;
+
           assert (jumpOffset > 0);
-          memcpy (wh_ostream_data (pCodeStream) + pBranchIt->elsePos + 1,
+
+          memcpy (wh_ostream_data (code) + branchIt->elsePos + 1,
                   &jumpOffset,
                   sizeof jumpOffset);
         }
 
     }
-  while (pBranchIt->type == BT_ELSEIF);
+  while (branchIt->type == BT_ELSEIF);
 
-  /* update the stack */
-  wh_array_resize (pBranchStack, branchId);
+  wh_array_resize (branchStack, branchId);
 }
 
 void
-begin_while_stmt (struct ParserState* const pState, YYSTYPE exp)
+begin_while_stmt (struct ParserState* const parser, YYSTYPE exp)
 {
-  struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  struct WArray* const       pLoopStack  = stmt_query_loop_stack (pStmt);
-  struct Loop                loop;
+  struct Statement* const     stmt = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
+
+  struct WArray* const loopsStack  = stmt_query_loop_stack (stmt);
+  struct Loop          loop;
 
   loop.type     = LE_WHILE_BEGIN;
-  loop.startPos = wh_ostream_size (pCodeStream);
+  loop.startPos = wh_ostream_size (code);
 
-  if ( ! translate_bool_exp (pState, exp))
+  if ( ! translate_bool_exp (parser, exp))
     {
-      /* errors encountered */
-      assert (pState->abortError == TRUE);
-      return;
-    }
-
-  loop.endPos = wh_ostream_size (pCodeStream);
-  if ((w_opcode_encode (pCodeStream, W_JFC) == NULL) ||
-      (wh_ostream_wint32 (pCodeStream, 0) == NULL))
-    {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      assert (parser->abortError == TRUE);
 
       return;
     }
 
-  if (wh_array_add (pLoopStack, &loop) == NULL)
+  loop.endPos = wh_ostream_size (code);
+  if ((encode_opcode (code, W_JFC) == NULL)
+      || (wh_ostream_wint32 (code, 0) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+      return;
+    }
+
+  if (wh_array_add (loopsStack, &loop) == NULL)
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
 }
 
 void
-finalize_while_stmt (struct ParserState* const pState)
+finalize_while_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    pStmt           = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream     = stmt_query_instrs (pStmt);
-  uint8_t* const             pCode           = wh_ostream_data (pCodeStream);
-  struct WArray* const       pLoopStack      = stmt_query_loop_stack (pStmt);
-  uint_t                     loopId          = wh_array_count (pLoopStack);
-  const struct Loop*         pLoopIt         = NULL;
-  int32_t                    endWhileLoop    = wh_ostream_size (pCodeStream);
-  int32_t                    endWhileStmtPos = 0;
-  int32_t                    offset          = 0;
+  struct Statement* const     stmt    = parser->pCurrentStmt;
+  struct WOutputStream* const stream  = stmt_query_instrs (stmt);
+  uint8_t* const              code    = wh_ostream_data (stream);
 
-  if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
-      (wh_ostream_wint32 (pCodeStream, 0) == NULL))
+  struct WArray* const loopsStack = stmt_query_loop_stack (stmt);
+  uint_t               loopId     = wh_array_count (loopsStack);
+  const struct Loop*   loopIt     = NULL;
+
+  int32_t  endWhileLoopPos = wh_ostream_size (stream);
+  int32_t  endWhileStmtPos = 0;
+  int32_t  offset          = 0;
+
+  if ((encode_opcode (stream, W_JMP) == NULL)
+      || (wh_ostream_wint32 (stream, 0) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
 
-  endWhileStmtPos = wh_ostream_size (pCodeStream);
+  endWhileStmtPos = wh_ostream_size (stream);
 
   do
     {
-      pLoopIt = wh_array_get (pLoopStack, --loopId);
-      switch (pLoopIt->type)
+      loopIt = wh_array_get (loopsStack, --loopId);
+      switch (loopIt->type)
         {
         case LE_BREAK:
         case LE_WHILE_BEGIN:
-          offset = endWhileStmtPos - pLoopIt->endPos;
+          offset = endWhileStmtPos - loopIt->endPos;
           break;
 
         default:
           /* Continue statements should be already handled in case
            * of while statements */
-          assert (0);
+          assert (FALSE);
         }
-      /* make the jump corrections */
-      memcpy (pCode + pLoopIt->endPos + 1, &offset, sizeof offset);
+      /* Make the jump corrections. */
+      memcpy (code + loopIt->endPos + 1, &offset, sizeof offset);
     }
-  while ((pLoopIt->type == LE_CONTINUE) || (pLoopIt->type == LE_BREAK));
+  while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
-  assert (pLoopIt->type == LE_WHILE_BEGIN);
-  /* path the loop jump */
-  offset = pLoopIt->startPos - endWhileLoop;
-  memcpy (pCode + endWhileLoop + 1, &offset, sizeof offset);
+  assert (loopIt->type == LE_WHILE_BEGIN);
 
-  /* update the loop stack */
-  wh_array_resize (pLoopStack, loopId);
+  offset = loopIt->startPos - endWhileLoopPos;
+  memcpy (code + endWhileLoopPos + 1, &offset, sizeof offset);
+
+  wh_array_resize (loopsStack, loopId);
 }
 
 void
-begin_until_stmt (struct ParserState* const pState)
+begin_until_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  struct WArray* const       pLoopStack  = stmt_query_loop_stack (pStmt);
-  struct Loop                loop;
+  struct Statement* const     stmt       = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
+
+  struct WArray* const loopsStack  = stmt_query_loop_stack (stmt);
+  struct Loop          loop;
 
   loop.type     = LE_UNTIL_BEGIN;
-  loop.startPos = wh_ostream_size (pCodeStream);
+  loop.startPos = wh_ostream_size (code);
   loop.endPos   = 0;
 
-  if (wh_array_add (pLoopStack, &loop) == NULL)
-    w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+  if (wh_array_add (loopsStack, &loop) == NULL)
+    log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 }
 
 void
-finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp)
+finalize_until_stmt (struct ParserState* const parser, YYSTYPE exp)
 {
-  struct Statement* const    pStmt           = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream     = stmt_query_instrs (pStmt);
-  uint8_t *const             pCode           = wh_ostream_data (pCodeStream);
-  struct WArray* const       pLoopStack      = stmt_query_loop_stack (pStmt);
-  uint_t                     loopId          = wh_array_count (pLoopStack);
-  struct Loop*               pLoopIt         = NULL;
-  int32_t                    untilExpPos     = wh_ostream_size (pCodeStream);
-  int32_t                    endUntilStmtPos = 0;
-  int32_t                    offset          = 0;
+  struct Statement* const     stmt   = parser->pCurrentStmt;
+  struct WOutputStream* const stream = stmt_query_instrs (stmt);
+  uint8_t *const              code   = wh_ostream_data (stream);
 
-  if ( ! translate_bool_exp (pState, exp))
+  struct WArray* const loopsStack = stmt_query_loop_stack (stmt);
+  uint_t               loopId     = wh_array_count (loopsStack);
+  struct Loop*         loopIt     = NULL;
+
+  int32_t untilExpPos     = wh_ostream_size (stream);
+  int32_t endUntilStmtPos = 0;
+  int32_t offset          = 0;
+
+  if ( ! translate_bool_exp (parser, exp))
     {
-      /* errors encountered */
-      assert (pState->abortError == TRUE);
+      assert (parser->abortError == TRUE);
+
       return;
     }
 
-  if ((w_opcode_encode (pCodeStream, W_JTC) == NULL) ||
-      (wh_ostream_wint32 (pCodeStream, 0) == NULL))
+  if ((encode_opcode (stream, W_JTC) == NULL)
+      || (wh_ostream_wint32 (stream, 0) == NULL))
     {
-      /* errors encountered */
-      assert (pState->abortError == TRUE);
+      assert (parser->abortError == TRUE);
+
       return;
     }
-  endUntilStmtPos = wh_ostream_size (pCodeStream);
+
+  endUntilStmtPos = wh_ostream_size (stream);
 
   do
     {
-      pLoopIt = wh_array_get (pLoopStack, --loopId);
-      switch (pLoopIt->type)
+      loopIt = wh_array_get (loopsStack, --loopId);
+      switch (loopIt->type)
         {
         case LE_CONTINUE:
-          offset = untilExpPos - pLoopIt->endPos;
+          offset = untilExpPos - loopIt->endPos;
           break;
 
         case LE_BREAK:
-          offset = endUntilStmtPos - pLoopIt->endPos;
+          offset = endUntilStmtPos - loopIt->endPos;
           break;
 
         case LE_UNTIL_BEGIN:
-          /* JCT 0x01020304 should be encoded on 5 bytes */
-          pLoopIt->endPos = endUntilStmtPos - 5;
-          offset          = pLoopIt->startPos - pLoopIt->endPos;
+          /* JCT 0x01020304 should be encoded with 5 bytes */
+          loopIt->endPos = endUntilStmtPos - 5;
+          offset         = loopIt->startPos - loopIt->endPos;
           break;
 
         default:
           assert (0);
         }
-      memcpy (pCode + pLoopIt->endPos + 1, &offset, sizeof offset);
+      memcpy (code + loopIt->endPos + 1, &offset, sizeof offset);
     }
-  while ((pLoopIt->type == LE_CONTINUE) || (pLoopIt->type == LE_BREAK));
+  while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
-  /* update the loop stack */
-  wh_array_resize (pLoopStack, loopId);
+  wh_array_resize (loopsStack, loopId);
 }
 
 void
-handle_break_stmt (struct ParserState* const pState)
+handle_break_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    pStmt      = pState->pCurrentStmt;
-  struct WOutputStream* const pCode      = stmt_query_instrs (pStmt);
-  struct WArray* const       pLoopStack = stmt_query_loop_stack (pStmt);
-  struct Loop                loop;
+  struct Statement* const     stmt  = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
 
-  if (wh_array_count (pLoopStack) == 0)
+  struct WArray* const loopsStack = stmt_query_loop_stack (stmt);
+  struct Loop          loop;
+
+  if (wh_array_count (loopsStack) == 0)
     {
-      w_log_msg (pState, pState->bufferPos, MSG_BREAK_NOLOOP);
+      log_message (parser, parser->bufferPos, MSG_BREAK_NOLOOP);
 
       return;
     }
 
   loop.type     = LE_BREAK;
   loop.startPos = 0;
-  loop.endPos   = wh_ostream_size (pCode);
+  loop.endPos   = wh_ostream_size (code);
 
-  if (wh_array_add (pLoopStack, &loop) == NULL)
+  if (wh_array_add (loopsStack, &loop) == NULL)
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
 
-  if ((w_opcode_encode (pCode, W_JMP) == NULL) ||
-      (wh_ostream_wint32 (pCode, 0) == NULL))
+  if ((encode_opcode (code, W_JMP) == NULL) ||
+      (wh_ostream_wint32 (code, 0) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
     }
 }
 
 void
-handle_continue_stmt (struct ParserState* const pState)
+handle_continue_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    pStmt       = pState->pCurrentStmt;
-  struct WOutputStream* const pCodeStream = stmt_query_instrs (pStmt);
-  struct WArray* const       pLoopStack  = stmt_query_loop_stack (pStmt);
-  uint_t                     loopId      = wh_array_count (pLoopStack);
-  const struct Loop*         pLoopIt     = NULL;
-  struct Loop                loop;
+  struct Statement* const     stmt = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
+
+  struct WArray* const loopsStack = stmt_query_loop_stack (stmt);
+  uint_t               loopId     = wh_array_count (loopsStack);
+  const struct Loop*   loopIt     = NULL;
+  struct Loop          loop;
 
   while (loopId != 0)
     {
-      pLoopIt = wh_array_get (pLoopStack, --loopId);
-      if ((pLoopIt->type != LE_CONTINUE) && (pLoopIt->type != LE_BREAK))
+      loopIt = wh_array_get (loopsStack, --loopId);
+      if ((loopIt->type != LE_CONTINUE) && (loopIt->type != LE_BREAK))
         break;
+
       else
-        pLoopIt = NULL;
+        loopIt = NULL;
     }
 
-  if (pLoopIt == NULL)
+  if (loopIt == NULL)
     {
-      w_log_msg (pState, pState->bufferPos, MSG_CONTINUE_NOLOOP);
+      log_message (parser, parser->bufferPos, MSG_CONTINUE_NOLOOP);
 
       return;
     }
 
   loop.type   = LE_CONTINUE;
-  loop.endPos = wh_ostream_size (pCodeStream);
-  switch (pLoopIt->type)
+  loop.endPos = wh_ostream_size (code);
+  switch (loopIt->type)
     {
     case LE_UNTIL_BEGIN:
-      if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
-          (wh_ostream_wint32 (pCodeStream, 0) == NULL))
+      if ((encode_opcode (code, W_JMP) == NULL) ||
+          (wh_ostream_wint32 (code, 0) == NULL))
         {
-          w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
           return;
         }
 
-      if (wh_array_add (pLoopStack, &loop) == NULL)
-        w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      if (wh_array_add (loopsStack, &loop) == NULL)
+        log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       break;
 
     case LE_WHILE_BEGIN:
-      if ((w_opcode_encode (pCodeStream, W_JMP) == NULL) ||
-          (wh_ostream_wint32 (pCodeStream, pLoopIt->startPos - loop.endPos) == NULL))
+      if ((encode_opcode (code, W_JMP) == NULL) ||
+          (wh_ostream_wint32 (code, loopIt->startPos - loop.endPos) == NULL))
         {
-          w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
           return;
         }
-      /* this statement won't need jump correction latter */
+      /* This statement doesn't need jump correction. */
       break;
+
     default:
       assert (0);
     }
 }
 
 void
-begin_sync_stmt (struct ParserState* const pState)
+begin_sync_stmt (struct ParserState* const parser)
 {
-  struct Statement *const    pStmt       = pState->pCurrentStmt;
-  struct WOutputStream *const pCodeStream = stmt_query_instrs (pStmt);
-  const uint_t               stmtsCount  = pStmt->spec.proc.syncTracker / 2;
+  struct Statement *const     stmt       = parser->pCurrentStmt;
+  struct WOutputStream *const code       = stmt_query_instrs (stmt);
+  const uint_t                stmtsCount = stmt->spec.proc.syncTracker / 2;
 
-  if (pStmt->spec.proc.syncTracker & 1)
+  if (stmt->spec.proc.syncTracker & 1)
     {
-      w_log_msg (pState, pState->bufferPos, MSG_SYNC_NA);
+      log_message (parser, parser->bufferPos, MSG_SYNC_NA);
 
       return;
     }
   else if (stmtsCount > 255)
     {
-      w_log_msg (pState, pState->bufferPos, MSG_SYNC_MANY);
+      log_message (parser, parser->bufferPos, MSG_SYNC_MANY);
 
       return;
     }
 
-  if ((w_opcode_encode (pCodeStream, W_BSYNC) == NULL) ||
-      (wh_ostream_wint8 (pCodeStream, stmtsCount) == NULL))
+  if ((encode_opcode (code, W_BSYNC) == NULL)
+      || (wh_ostream_wint8 (code, stmtsCount) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
-  /* update the keeper */
-  pStmt->spec.proc.syncTracker++;
+
+  stmt->spec.proc.syncTracker++;
 }
 
 void
-finalize_sync_stmt (struct ParserState* const pState)
+finalize_sync_stmt (struct ParserState* const parser)
 {
-  struct Statement *const    pStmt       = pState->pCurrentStmt;
-  struct WOutputStream *const pCodeStream = stmt_query_instrs (pStmt);
-  const uint_t               stmtsCount  = pStmt->spec.proc.syncTracker / 2;
+  struct Statement *const     stmt       = parser->pCurrentStmt;
+  struct WOutputStream *const code       = stmt_query_instrs (stmt);
+  const uint_t                stmtsCount = stmt->spec.proc.syncTracker / 2;
 
-  assert (pStmt->spec.proc.syncTracker & 1);
+  assert (stmt->spec.proc.syncTracker & 1);
 
-  if ((w_opcode_encode (pCodeStream, W_ESYNC) == NULL) ||
-      (wh_ostream_wint8 (pCodeStream, stmtsCount) == NULL))
+  if ((encode_opcode (code, W_ESYNC) == NULL)
+      || (wh_ostream_wint8 (code, stmtsCount) == NULL))
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
       return;
     }
-  /* update the keeper */
-  pStmt->spec.proc.syncTracker++;
+
+  stmt->spec.proc.syncTracker++;
 }
+

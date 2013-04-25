@@ -18,7 +18,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->values, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -29,17 +29,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  wh_array_clean (&state->parsedValues);
+  wh_array_clean (&state->values);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = wh_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->values);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -100,7 +100,7 @@ check_procedure_1 (struct ParserState *state, char * proc_name)
   int cond_exp_pos = 5;
   int while_end_pos = 0;
 
-  if (w_opcode_decode (code + cond_exp_pos + 2) != W_JFC)
+  if (decode_opcode (code + cond_exp_pos + 2) != W_JFC)
     {
       return FALSE;
     }
@@ -108,7 +108,7 @@ check_procedure_1 (struct ParserState *state, char * proc_name)
     {
       while_end_pos = get_int32 (code + cond_exp_pos + 3);
       while_end_pos += cond_exp_pos + 2;
-      if (w_opcode_decode (code + while_end_pos - 5) != W_JMP)
+      if (decode_opcode (code + while_end_pos - 5) != W_JMP)
         {
           return FALSE;
         }
@@ -125,7 +125,7 @@ check_procedure_1 (struct ParserState *state, char * proc_name)
 
   /* check the break statement */
   shift = cond_exp_pos + 2 + 5 + 2 + 5;
-  if (w_opcode_decode (code + shift) != W_JMP)
+  if (decode_opcode (code + shift) != W_JMP)
     {
       return FALSE;
     }
@@ -137,18 +137,18 @@ check_procedure_1 (struct ParserState *state, char * proc_name)
 
   /* check the continue statement */
   shift = cond_exp_pos + 2 + 5 + 2;
-  if (w_opcode_decode (code + shift) != W_JFC)
+  if (decode_opcode (code + shift) != W_JFC)
     {
       return FALSE;
     }
   shift += get_int32 (code + shift + 1);
   shift += 2;
-  if (w_opcode_decode (code + shift) != W_JFC)
+  if (decode_opcode (code + shift) != W_JFC)
     {
       return FALSE;
     }
   shift += 5;
-  if (w_opcode_decode (code + shift) != W_JMP)
+  if (decode_opcode (code + shift) != W_JMP)
     {
       return FALSE;
     }
@@ -172,19 +172,19 @@ check_procedure_2 (struct ParserState *state, char * proc_name)
 
   /* check continue statement */
   shift = 5 + 2;
-  if (w_opcode_decode (code + shift) != W_JFC)
+  if (decode_opcode (code + shift) != W_JFC)
     {
       return FALSE;
     }
   shift += 5;
-  if (w_opcode_decode (code + shift) != W_JMP)
+  if (decode_opcode (code + shift) != W_JMP)
     {
       return FALSE;
     }
   shift += get_int32 (code + shift + 1);
   cond_exp_pos = shift;
   shift += 2;
-  if (w_opcode_decode (code + shift) != W_JTC)
+  if (decode_opcode (code + shift) != W_JTC)
     {
       return FALSE;
     }
@@ -196,7 +196,7 @@ check_procedure_2 (struct ParserState *state, char * proc_name)
 
   /* check the break statement */
   shift = cond_exp_pos - 5;
-  if (w_opcode_decode (code + shift) != W_JMP)
+  if (decode_opcode (code + shift) != W_JMP)
     {
       return FALSE;
     }

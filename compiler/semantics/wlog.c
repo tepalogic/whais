@@ -174,51 +174,53 @@ static const struct MsgCodeEntry messages[] = {
 static const struct MsgCodeEntry*
 find_string (uint_t msgCode)
 {
-  uint_t count = 0;
-  while ((msgCode != messages[count].id) && (messages[count].id != 0))
-    {
-      count++;
-    }
+  uint_t i = 0;
 
-  if (messages[count].msg == NULL)
-    {
-      return NULL;
-    }
-  return &messages[count];
+  while ((msgCode != messages[i].id) && (messages[i].id != 0))
+      ++i;
+
+  if (messages[i].msg == NULL)
+    return NULL;
+
+  return &messages[i];
 }
 
 void
-w_log_msg (struct ParserState* pState, uint_t buffPos, uint_t msgCode, ...)
+log_message (struct ParserState* parser, uint_t buffPos, uint_t msgCode, ...)
 {
-  va_list args;
-  const struct MsgCodeEntry *pMsgEntry = find_string (msgCode);
+  const struct MsgCodeEntry* entry = find_string (msgCode);
 
-  if (pMsgEntry == NULL)
+  va_list args;
+
+  if (entry == NULL)
     {
-      w_log_msg (pState, IGNORE_BUFFER_POS, MSG_INT_ERR);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_INT_ERR);
       return;
     }
 
   va_start (args, msgCode);
-  if (pState->messenger != NULL)
+  if (parser->messenger != NULL)
     {
-      pState->messenger (pState->messengerContext,
+      parser->messenger (parser->messengerCtxt,
                         buffPos,
                         msgCode,
-                        pMsgEntry->type,
-                        pMsgEntry->msg,
+                        entry->type,
+                        entry->msg,
                         args);
     }
   else
     {
-      /* don not send the message */
-      assert (pState->messengerContext == NULL);
+      /* Just don't send the message. */
+      assert (parser->messengerCtxt == NULL);
     }
-  if ((pMsgEntry->type == MSG_ERROR_EVENT) ||
-      (pMsgEntry->type == MSG_INTERNAL_ERROR) ||
-      (pMsgEntry->type == MSG_GENERAL_EVENT))
+
+  if ((entry->type == MSG_ERROR_EVENT)
+      || (entry->type == MSG_INTERNAL_ERROR)
+      || (entry->type == MSG_GENERAL_EVENT))
     {
-      pState->abortError = TRUE;
+      parser->abortError = TRUE;
     }
+
   va_end (args);
 }
+

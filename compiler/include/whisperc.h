@@ -27,132 +27,172 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 
+#include "whisper.h"
+
 #include <dbs/dbs_types.h>
 
-typedef enum DBS_FIELD_TYPE VARTYPES;
-
-#define T_ARRAY_MASK          0x0100    /* The variable is an array */
-#define T_FIELD_MASK          0x0200    /* A 'field of' variable */
-#define T_TABLE_MASK          0x0400    /* The variable is a table */
-
-#define T_TABLE_FIELD_MASK    0x0800    /* The variable is a table */
-#define T_L_VALUE             0x1000    /* Is a genuine l-value */
-
-#define IS_ARRAY(type)          ((((type) & (T_FIELD_MASK | T_ARRAY_MASK)) == T_ARRAY_MASK))
-#define IS_FIELD(type)          (((type) & T_FIELD_MASK) != 0)
-#define IS_TABLE(type)          (((type) & T_TABLE_MASK) != 0)
-
-#define IS_TABLE_FIELD(type)    (((type) & T_TABLE_FIELD_MASK) != 0)
-#define IS_L_VALUE(type)        (((type) & T_L_VALUE) != 0)
-
-#define MARK_ARRAY(type)        ((type) |= T_ARRAY_MASK)
-#define MARK_FIELD(type)        ((type) |= T_FIELD_MASK)
-#define MARK_TABLE(type)        ((type) |= T_TABLE_MASK)
-#define MARK_TABLE_FIELD(type)  ((type) |= T_TABLE_FIELD_MASK)
-#define MARK_L_VALUE(type)      ((type) |= T_L_VALUE)
-
-#define GET_TYPE(type)          ((type) & ~(T_L_VALUE | T_TABLE_FIELD_MASK))
-#define GET_FIELD_TYPE(type)    ((type) & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD_MASK))
-#define GET_BASIC_TYPE(type)    ((type) & 0xFF)
 
 
-typedef const void* WHC_HANDLER;
-typedef const void* WHC_PROC_HANDLER;
-typedef const void* WHC_MESSENGER_ARG;
-typedef void        (*WHC_MESSENGER) (WHC_MESSENGER_ARG data,
-                                      unsigned int      buffPos,
-                                      unsigned int      msgId,
-                                      unsigned int      msgType,
-                                      const char*       pMessage,
-                                      va_list           args);
+#define T_ARRAY_MASK           0x0100    /* Holds an array of values. */
+#define T_FIELD_MASK           0x0200    /* It's a 'field of' variable. */
+#define T_TABLE_MASK           0x0400    /* It's a table variable. */
 
-#define WHC_IGNORE_BUFFER_POS      (uint_t)(-1)
+#define T_TABLE_FIELD          0x0800    /* Internal flag for table fields. */
+#define T_L_VALUE              0x1000    /* Internal flag for l-values. */
+
+#define IS_ARRAY(type)         ((((type) \
+                                 & (T_FIELD_MASK | T_ARRAY_MASK)) == \
+                                   T_ARRAY_MASK))
+#define IS_FIELD(type)         (((type) & T_FIELD_MASK) != 0)
+#define IS_TABLE(type)         (((type) & T_TABLE_MASK) != 0)
+
+#define IS_TABLE_FIELD(type)   (((type) & T_TABLE_FIELD) != 0)
+#define IS_L_VALUE(type)       (((type) & T_L_VALUE) != 0)
+
+#define MARK_ARRAY(type)       ((type) |= T_ARRAY_MASK)
+#define MARK_FIELD(type)       ((type) |= T_FIELD_MASK)
+#define MARK_TABLE(type)       ((type) |= T_TABLE_MASK)
+#define MARK_TABLE_FIELD(type) ((type) |= T_TABLE_FIELD)
+#define MARK_L_VALUE(type)     ((type) |= T_L_VALUE)
+
+#define GET_TYPE(type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
+#define GET_FIELD_TYPE(type)   ((type) \
+                                 & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
+#define GET_BASIC_TYPE(type)   ((type) & 0xFF)
+
+
+
+typedef const void*     WH_COMPILED_UNIT;
+typedef const void*     WH_COMPILED_UNIT_PROC;
+typedef const void*     WH_MESSENGER_CTXT;
+
+
+typedef void  (*WH_MESSENGER) (WH_MESSENGER_CTXT    context,
+                               uint_t               buffPos,
+                               uint_t               msgId,
+                               uint_t               msgType,
+                               const char*          message,
+                               va_list              args);
+
+
+
+#define WHC_IGNORE_BUFFER_POS        (uint_t)(-1)
+
+
 
 typedef struct
 {
-  const char*          m_Name;       /* global variable name */
-  unsigned int         m_NameLength; /* length of the name */
-  const unsigned char* m_Type;       /* describe the type of the variable */
-  unsigned char        m_Defined;    /* 0 for externally declared global variables */
-} WHC_GLBVAR_DESC;
+  const char*           name;         /* Name of the global variable. */
+  uint_t                nameLength;   /* Length of the name. Name is not
+                                         null terminated. */
+  const uint8_t*        type;         /* Compiled binary type description. */
+  bool_t                defined;      /* Shortcut to specify if the compilation
+                                         unit holds the definition of this
+                                         global values, or it's a external
+                                         declaration. */
+} WCompilerGlobalDesc;
+
 
 typedef struct
 {
-  const char*          m_Name;
-  unsigned int         m_NameLength;
-  unsigned int         m_ParamsCount;
-  unsigned int         m_LocalsCount;
-  unsigned int         m_SyncsCount;
-  unsigned int         m_CodeSize;
-  const unsigned char* m_Code;
-  unsigned char        m_Defined;
-} WHC_PROC_DESC;
+  const char*      name;        /* Name of the procedure. */
+  uint_t           nameLength;  /* The name is not null terminated. */
+  uint_t           paramsCount; /* Parameters count of this procedure. */
+  uint_t           localsCount; /* Local variables used by this procedure
+                                   (including the parameters variables). */
+  uint_t           syncsCount;  /* Count of sync statements defined in
+                                   this procedure. */
+  uint_t           codeSize;    /* Compiled binary code size. */
+  const uint8_t*   code;        /* Compiled binary code for this procedure. */
+  bool_t           defined;     /* Shortcut flag to specify if this procedure
+                                   is defined in this compilation unit, or it's
+                                   an external declaration. */
+} WCompilerProcedureDesc;
+
+
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-WHC_HANDLER
-wh_hnd_create (const char*       pBuffer,
-                unsigned          bufferSize,
-                WHC_MESSENGER     messenger,
-                WHC_MESSENGER_ARG messengerContext);
+/* Load a buffer containing a WHISPER program. The supplied messenger is used
+   to report compiler related information (e.g. errors, warnings, etc.). */
+WH_COMPILED_UNIT
+wh_compiler_load (const char*          sourceCode,
+                  unsigned             sourceSize,
+                  WH_MESSENGER         messenger,
+                  WH_MESSENGER_CTXT    messengerContext);
 
+/* Free the resources associated with a compiled unit. */
 void
-wh_hnd_destroy (WHC_HANDLER hnd);
+wh_compiler_discard (WH_COMPILED_UNIT hnd);
 
-unsigned int
-wh_get_globals_count (WHC_HANDLER hnd);
+/* Get the globals count declared in a compiled unit. */
+uint_t
+wh_unit_globals_count (WH_COMPILED_UNIT hnd);
 
-unsigned int
-wh_get_global (WHC_HANDLER      hnd,
-                unsigned int     globalId,
-                WHC_GLBVAR_DESC* pOutDescript);
+/* Get the description of global variable from a compiled unit. */
+uint_t
+wh_unit_global (WH_COMPILED_UNIT            hnd,
+                const uint_t                id,
+                WCompilerGlobalDesc* const  outDesription);
 
-unsigned int
-wh_get_procs_count (WHC_HANDLER hnd);
+/* Get the procedures count declared in a compiled unit. */
+uint_t
+wh_unit_procedures_count (WH_COMPILED_UNIT hnd);
 
-unsigned int
-wh_get_proc (WHC_HANDLER  hnd,
-            unsigned int   procId,
-            WHC_PROC_DESC* pOutDesc);
+/* Get the description of a procedure from a compiled unit. */
+uint_t
+wh_unit_procedure (WH_COMPILED_UNIT              hnd,
+                   uint_t                        id,
+                   WCompilerProcedureDesc* const outDesription);
 
-WHC_PROC_HANDLER
-wh_get_proc_hnd (WHC_HANDLER  hnd,
-                  unsigned int procId);
+/* Get a pointer to to the compiled binary type descriptors. */
+uint_t
+wh_unit_type_descriptors (WH_COMPILED_UNIT      hnd,
+                         const uint8_t**        ppTypePool);
 
+/* Get a pinter to the compiled binary constants area. */
+uint_t
+wh_unit_constants (WH_COMPILED_UNIT           hnd,
+                   const uint8_t**            ppConstPool);
+
+/* Get a procedure handler to get detailed information about
+   it's components. */
+WH_COMPILED_UNIT_PROC
+wh_unit_procedure_get (WH_COMPILED_UNIT hnd, const uint_t id);
+
+/* Release the resources associated a procedure handler. */
 void
-wh_release_proc_hnd (WHC_HANDLER      hnd,
-                      WHC_PROC_HANDLER hProc);
+wh_unit_procedure_release (WH_COMPILED_UNIT            hnd,
+                           WH_COMPILED_UNIT_PROC       proc);
 
-const unsigned char*
-wh_get_proc_rettype (WHC_HANDLER      hnd,
-                      WHC_PROC_HANDLER hProc);
+/* Get the compiled binary type representation of the procedure's
+   return type. */
+const uint8_t*
+wh_procedure_return_type (WH_COMPILED_UNIT           hnd,
+                          WH_COMPILED_UNIT_PROC      proc);
 
-const unsigned char*
-wh_get_local_type (WHC_HANDLER      hnd,
-                    WHC_PROC_HANDLER hProc,
-                    unsigned int     localId);
-
-unsigned int
-wh_get_typedec_pool (WHC_HANDLER           hnd,
-                      const unsigned char** pOutPTypes);
-
-unsigned int
-wh_get_const_area (WHC_HANDLER           hnd,
-                    const unsigned char** pOutPConsts);
+/* Get the compiled binary type representation of a procedure's
+   local variable */
+const uint8_t*
+wh_procedure_local_type (WH_COMPILED_UNIT           hnd,
+                         WH_COMPILED_UNIT_PROC      proc,
+                         const uint_t               id);
 
 COMPILER_SHL void
-wh_get_libver (unsigned int* pOutMajor,
-                unsigned int* pOutMinor);
+wh_compiler_libver (uint_t* const   outMajor,
+                    uint_t* const   outMinor);
 
+/* Get the version of the language specification this library uses. */
 COMPILER_SHL void
-wh_get_lang_ver (unsigned int* pOutMajor,
-                  unsigned int* pOutMinor);
+wh_compiler_language_ver (uint_t* const   outMajor,
+                          uint_t* const   outMinor);
 
 #ifdef __cplusplus
 }       /* extern "C" */
 #endif
 
 #endif  /* WHISPERC_H */
+

@@ -44,3 +44,4 @@ char*
 alloc_str (StringStoreHnd store, uint_t length);
 
 #endif /* STRSTORE_H */
+

@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define IS_GLOBAL(x)     (((x) & GLOBAL_DECL) != 0)
 #define IS_EXTERNAL(x)   (((x) & EXTERN_DECL) != 0)
-#define IS_REFERENCED(x) (((x) & NOTREF_DECL) == 0)
+#define IS_REFERRED(x)   (((x) & NOTREF_DECL) == 0)
 
 #define MARK_AS_GLOBAL(x)           ((x) |= GLOBAL_DECL)
 #define MARK_AS_EXTERNAL(x)         ((x) |= EXTERN_DECL)
@@ -56,38 +56,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct DeclaredVar
 {
-  const char*       label;        /* not necessarily  null terminated */
-  struct DeclaredVar* extra;        /* only for tables, list to/next field entries */
-  uint32_t            typeSpecOff;
-  uint32_t            varId;
-  uint32_t            offset;       /* offset position */
-  uint16_t            labelLength;  /* label's length */
-  uint16_t            type;         /* type of this variable */
+  const char*         label;
+  struct DeclaredVar* extra;        /* Field entries list for tables. */
+  uint32_t            typeSpecOff;  /* Offset in the type spec pool. */
+  uint32_t            varId;        /* Internal id to refer it. */
+  uint32_t            offset;       /* Code offset for argumenting errors. */
+  uint16_t            labelLength;  /* Label's length */
+  uint16_t            type;         /* Type of this variable */
 };
 
 YYSTYPE
 add_id_to_list (YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
-create_type_spec (struct ParserState* pState,
-                  uint16_t            type);
+create_type_spec (struct ParserState* parser, const uint16_t type);
 
-struct DeclaredVar *
-install_declaration (struct ParserState* const pState,
-                     YYSTYPE                   pVar,
-                     YYSTYPE                   pType,
-                     const bool_t              paramter,
-                     const bool_t              unique);
-
-YYSTYPE
-install_list_declrs (struct ParserState* pState,
-                     YYSTYPE             pVars,
-                     YYSTYPE             pType);
+struct DeclaredVar*
+add_declaration (struct ParserState* const parser,
+                 YYSTYPE                   var,
+                 YYSTYPE                   type,
+                 const bool_t              paramter,
+                 const bool_t              unique);
 
 YYSTYPE
-install_field_declaration (struct ParserState*       pState,
-                           YYSTYPE                   pVar,
-                           YYSTYPE                   pType,
-                           struct DeclaredVar* const pExtra);
+add_list_declaration (struct ParserState* parser,
+                      YYSTYPE             vars,
+                      YYSTYPE             type);
+
+YYSTYPE
+add_field_declaration (struct ParserState*       parser,
+                       YYSTYPE                   var,
+                       YYSTYPE                   type,
+                       struct DeclaredVar* const extra);
 
 #endif /* VARDECL_H */
+

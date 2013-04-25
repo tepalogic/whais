@@ -34,8 +34,6 @@
 #define YYSTYPE struct SemValue*
 #endif
 
-/* Handle if elseif else conditional statements */
-
 enum BRANCH_TYPE
 {
   BT_UNKNOWN,
@@ -51,20 +49,20 @@ struct Branch
 };
 
 void
-begin_if_stmt (struct ParserState* const pState,
+begin_if_stmt (struct ParserState* const parser,
                YYSTYPE                   expression,
                enum BRANCH_TYPE          branchType);
 
 void
-begin_else_stmt (struct ParserState* const pState);
+begin_else_stmt (struct ParserState* const parser);
 
 void
-begin_elseif_stmt (struct ParserState* const pState, YYSTYPE exp);
+begin_elseif_stmt (struct ParserState* const parser, YYSTYPE exp);
 
 void
-finalize_if_stmt (struct ParserState* const pState);
+finalize_if_stmt (struct ParserState* const parser);
 
-/* Handle loop statements */
+
 
 enum LOOP_ELEMENT_TYPE
 {
@@ -84,27 +82,29 @@ struct Loop
 };
 
 void
-begin_while_stmt (struct ParserState*const pState, YYSTYPE exp);
+begin_while_stmt (struct ParserState* const parser, YYSTYPE exp);
 
 void
-finalize_while_stmt (struct ParserState* const pState);
+finalize_while_stmt (struct ParserState* const parser);
 
 void
-begin_until_stmt (struct ParserState* const pState);
+begin_until_stmt (struct ParserState* const parser);
 
 void
-finalize_until_stmt (struct ParserState* const pState, YYSTYPE exp);
+finalize_until_stmt (struct ParserState* const parser, YYSTYPE exp);
 
 void
-handle_break_stmt (struct ParserState* const pState);
+handle_break_stmt (struct ParserState* const parser);
 
 void
-handle_continue_stmt (struct ParserState* const pState);
+handle_continue_stmt (struct ParserState* const parser);
+
 
 void
-begin_sync_stmt (struct ParserState* const pState);
+begin_sync_stmt (struct ParserState* const parser);
 
 void
-finalize_sync_stmt (struct ParserState* const pState);
+finalize_sync_stmt (struct ParserState* const parser);
 
 #endif /* BRLO_STMTS_H */
+

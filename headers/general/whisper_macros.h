@@ -25,11 +25,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHISPER_MACROS_H
 #define WHISPER_MACROS_H
 
-#define TRUE    1
-#define FALSE   0
+#ifndef TRUE
+#define TRUE    (1)
+#endif
 
+#ifndef FALSE
+#define FALSE   (0)
+#endif
+
+#ifndef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
+#endif
+
+#ifndef MAX
 #define MAX(a,b) ((a)<(b)?(b):(a))
+#endif
 
 #endif /*WHISPER_MACROS_H */
 

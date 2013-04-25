@@ -18,7 +18,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->values, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -29,17 +29,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  wh_array_clean (&state->parsedValues);
+  wh_array_clean (&state->values);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState *state)
 {
-  int vals_count = wh_array_count (&state->parsedValues);
+  int vals_count = wh_array_count (&state->values);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get (&state->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -123,7 +123,7 @@ check_procedure_1 (struct ParserState *state, char * proc_name)
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
 
-  if (w_opcode_decode (code + 2) != op_expect)
+  if (decode_opcode (code + 2) != op_expect)
     {
       return FALSE;
     }
@@ -138,7 +138,7 @@ check_procedure_1 (struct ParserState *state, char * proc_name)
       shift += 2;
     }
 
-  if (w_opcode_decode (code + shift + 2) != W_RET)
+  if (decode_opcode (code + shift + 2) != W_RET)
     {
       return FALSE;
     }
@@ -157,7 +157,7 @@ check_procedure_2 (struct ParserState *state, char * proc_name)
   int shift = 0;
   int shift_exit = 0;
 
-  if (w_opcode_decode (code + 2) != op_expect)
+  if (decode_opcode (code + 2) != op_expect)
     {
       return FALSE;
     }
@@ -170,7 +170,7 @@ check_procedure_2 (struct ParserState *state, char * proc_name)
     }
   shift -= 5;                        /* jmp uint32 */
 
-  if (w_opcode_decode (code + 2 + shift) != W_JMP)
+  if (decode_opcode (code + 2 + shift) != W_JMP)
 
     {
       return FALSE;
@@ -178,7 +178,7 @@ check_procedure_2 (struct ParserState *state, char * proc_name)
 
   shift_exit = get_int32 (code + 3 + shift);
 
-  if (w_opcode_decode (code + 2 + shift + shift_exit + 2) != W_RET)
+  if (decode_opcode (code + 2 + shift + shift_exit + 2) != W_RET)
     {
       return FALSE;
     }
@@ -197,7 +197,7 @@ check_procedure_3 (struct ParserState *state, char * proc_name)
   int if_exit = 0;
   int elseif_skip = 0;
 
-  if (w_opcode_decode (code + 2) != op_expect)
+  if (decode_opcode (code + 2) != op_expect)
     {
       return FALSE;
     }
@@ -207,7 +207,7 @@ check_procedure_3 (struct ParserState *state, char * proc_name)
 
   shift -= 5;                        /* jmp uint32 */
 
-  if (w_opcode_decode (code + shift) != W_JMP)
+  if (decode_opcode (code + shift) != W_JMP)
 
     {
       return FALSE;
@@ -215,13 +215,13 @@ check_procedure_3 (struct ParserState *state, char * proc_name)
 
   if_exit = get_int32 (code + shift + 1) + shift;
 
-  if (w_opcode_decode (code + if_exit + 2) != W_RET)
+  if (decode_opcode (code + if_exit + 2) != W_RET)
     {
       return FALSE;
     }
 
   shift += 5 + 2;
-  if (w_opcode_decode (code + shift) != op_expect)
+  if (decode_opcode (code + shift) != op_expect)
     {
       return FALSE;
     }
@@ -247,7 +247,7 @@ check_procedure_4 (struct ParserState *state, char * proc_name)
   int elseif_skip = 0;
   int elseif_exit = 0;
 
-  if (w_opcode_decode (code + 2) != op_expect)
+  if (decode_opcode (code + 2) != op_expect)
     {
       return FALSE;
     }
@@ -257,7 +257,7 @@ check_procedure_4 (struct ParserState *state, char * proc_name)
 
   shift -= 5;                        /* jmp uint32 */
 
-  if (w_opcode_decode (code + shift) != W_JMP)
+  if (decode_opcode (code + shift) != W_JMP)
 
     {
       return FALSE;
@@ -265,13 +265,13 @@ check_procedure_4 (struct ParserState *state, char * proc_name)
 
   if_exit = get_int32 (code + shift + 1) + shift;
 
-  if (w_opcode_decode (code + if_exit + 2) != W_RET)
+  if (decode_opcode (code + if_exit + 2) != W_RET)
     {
       return FALSE;
     }
 
   shift += 5 + 2;
-  if (w_opcode_decode (code + shift) != op_expect)
+  if (decode_opcode (code + shift) != op_expect)
     {
       return FALSE;
     }

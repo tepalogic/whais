@@ -24,7 +24,7 @@ init_state_for_test (struct ParserState *state, const char * buffer)
   state->buffer = buffer;
   state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
-  wh_array_init (&state->parsedValues, sizeof (struct SemValue));
+  wh_array_init (&state->values, sizeof (struct SemValue));
 
   init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
@@ -35,17 +35,17 @@ free_state (struct ParserState *state)
 {
   release_string_store (state->strings);
   clear_glbl_stmt (&(state->globalStmt));
-  wh_array_clean (&state->parsedValues);
+  wh_array_clean (&state->values);
 
 }
 
 static bool_t
 check_used_vals (struct ParserState* pState)
 {
-  int vals_count = wh_array_count (&pState->parsedValues);
+  int vals_count = wh_array_count (&pState->values);
   while (--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get (&pState->parsedValues, vals_count);
+      struct SemValue *val = wh_array_get (&pState->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -152,7 +152,7 @@ check_vars_decl (struct ParserState *state)
   struct DeclaredVar *table_2 = NULL;
 
   if (state->globalStmt.type != STMT_GLOBAL ||
-      state->globalStmt.pParentStmt != NULL)
+      state->globalStmt.parent != NULL)
     {
       return FALSE;
     }

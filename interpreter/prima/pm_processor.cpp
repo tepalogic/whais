@@ -1485,7 +1485,7 @@ Processor::Run ()
   {
     while (m_CodePos < m_CodeSize)
       {
-        int64_t offset = wh_decode_opcode (m_pCode + m_CodePos, &opcode);
+        int64_t offset = wh_compiler_decode_op (m_pCode + m_CodePos, &opcode);
 
         assert (opcode < _SC (int,
                               (sizeof operations / sizeof operations[0])));

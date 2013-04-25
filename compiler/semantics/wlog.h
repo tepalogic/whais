@@ -39,7 +39,7 @@ struct MsgCodeEntry
 {
   uint_t  id;
   uint_t  type;
-  char* msg;
+  char*   msg;
 };
 
 /* general eventes related errors, base 100 */
@@ -121,6 +121,7 @@ struct MsgCodeEntry
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
 
 void
-w_log_msg (struct ParserState *pState, uint_t buffPos, uint_t msgCode, ...);
+log_message (struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);
 
 #endif /*WLOG_H_ */
+
