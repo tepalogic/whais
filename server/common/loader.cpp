@@ -69,7 +69,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& ioDbsDesc)
       log.Log (LOG_INFO, logEntry.str ());
       logEntry.str ("");
 
-      WFileCompiledUnit unit (it->c_str ());
+      CompiledFileUnit unit (it->c_str ());
       ioDbsDesc.m_Session->LoadCompiledUnit (unit);
     }
 

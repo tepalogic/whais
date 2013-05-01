@@ -32,12 +32,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MSGLOG_H_
 
 void
-my_postman (WH_MESSENGER_CTXT data,
-            uint_t            buffOff,
-            uint_t            msgId,
-            uint_t            msgType,
-            const char*       msgFormat,
-            va_list           args);
+whc_messenger (WH_MESSENGER_CTXT data,
+               uint_t            buffOff,
+               uint_t            msgId,
+               uint_t            msgType,
+               const char*       msgFormat,
+               va_list           args);
 
 #endif /* MSGLOG_H_ */
 

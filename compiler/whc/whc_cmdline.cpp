@@ -32,95 +32,112 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whc_cmdline.h"
 
-using namespace whisper;
+using namespace std;
+
+namespace whisper {
+namespace whc {
 
 static inline bool
 isStrEqual (const char* str1, const char* str2)
 {
-  return::strcmp (str1, str2) == 0;
+  return strcmp (str1, str2) == 0;
 }
 
-WhcCmdLineParser::WhcCmdLineParser (int argc, char **argv) :
-  m_ArgCount (argc),
-  m_Args (argv),
-  m_SourceFile (NULL),
-  m_OutputFile (NULL),
-  m_ShowHelp (false),
-  m_OutputFileOwn (true)
+CmdLineParser::CmdLineParser (int argc, char** argv)
+  : mArgCount (argc),
+    mArgs (argv),
+    mSourceFile (NULL),
+    mOutputFile (NULL),
+    mShowHelp (false),
+    mOutputFileOwn (true)
 {
   Parse ();
 }
 
-WhcCmdLineParser::~WhcCmdLineParser ()
+CmdLineParser::~CmdLineParser ()
 {
-  if (m_OutputFileOwn)
-    delete [] m_OutputFile;
+  if (mOutputFileOwn)
+    delete [] mOutputFile;
 }
 
 void
-WhcCmdLineParser::Parse ()
+CmdLineParser::Parse ()
 {
-  using namespace std;
-
   int index = 1;
-  if (index >= m_ArgCount)
-    throw WhcCmdLineException ("No arguments! Use --help first!", _EXTRA (0));
 
-  while (index < m_ArgCount)
+  if (index >= mArgCount)
+    throw CmdLineException ("No arguments! Use --help first!", _EXTRA (0));
+
+  while (index < mArgCount)
     {
-      if (isStrEqual (m_Args[index], "-h") ||
-          isStrEqual (m_Args[index], "--help"))
+      if (isStrEqual (mArgs[index], "-h")
+          || isStrEqual (mArgs[index], "--help"))
         {
-          m_ShowHelp = true;
+          mShowHelp = true;
           ++index;
         }
-      else if (isStrEqual (m_Args[index], "-o"))
+      else if (isStrEqual (mArgs[index], "-o"))
         {
-          if ((void *) m_OutputFile != NULL)
-            throw WhcCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
+          if ((void *) mOutputFile != NULL)
+            {
+              throw CmdLineException ("Parameter '-o' is given twice",
+                                      _EXTRA (0));
+            }
 
-          if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
-            throw WhcCmdLineException ("Missing file name argument for for parameter '-o'.",
-                                       _EXTRA (0));
+          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
+            {
+              throw CmdLineException (
+                         "Missing file name argument for for parameter '-o'.",
+                         _EXTRA (0)
+                                        );
+            }
           else
-            m_OutputFile = m_Args[index++];
+            mOutputFile = mArgs[index++];
 
-          m_OutputFileOwn = false;
+          mOutputFileOwn = false;
         }
-      else if ((m_Args[index][0] != '-') && (m_Args[index][0] != '\\'))
+      else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
         {
-          if ((void *) m_SourceFile != NULL)
-            throw WhcCmdLineException ("The object file was already specified!", _EXTRA (0));
+          if (mSourceFile != NULL)
+            {
+              throw CmdLineException ("The object file was already specified!",
+                                       _EXTRA (0));
+            }
 
-          m_SourceFile = m_Args[index++];
+          mSourceFile = mArgs[index++];
         }
       else
-        throw WhcCmdLineException ("Unknown arguments! Use --help first!", _EXTRA (0));
+        {
+          throw CmdLineException ("Unknown arguments! Use --help first!",
+                                  _EXTRA (0));
+        }
     }
 
   CheckArguments ();
 }
 
 void
-WhcCmdLineParser::CheckArguments ()
+CmdLineParser::CheckArguments ()
 {
-  if (m_ShowHelp)
+  if (mShowHelp)
     {
       DisplayUsage ();
       exit (0);
     }
-  else if (m_SourceFile == NULL)
-    throw WhcCmdLineException ("No given input file!", _EXTRA(0));
-  else if (m_OutputFile == NULL)
-  {
-    const char  fileExt[]   = ".wo";
-    const uint_t  fileNameLen = strlen (m_SourceFile);
-    char* const tempBuffer  = new char[fileNameLen + sizeof fileExt];
+  else if (mSourceFile == NULL)
+    throw CmdLineException ("No given input file!", _EXTRA(0));
 
-    m_OutputFile = tempBuffer;
-    strcpy (tempBuffer, m_SourceFile);
-    if ((m_SourceFile[fileNameLen - 1] == 'w') &&
-        (m_SourceFile[fileNameLen - 2] == '.'))
+  else if (mOutputFile == NULL)
+  {
+    const char    fileExt[]   = ".wo";
+    const uint_t  fileNameLen = strlen (mSourceFile);
+    char* const   tempBuffer  = new char[fileNameLen + sizeof fileExt];
+
+    mOutputFile = tempBuffer;
+    strcpy (tempBuffer, mSourceFile);
+
+    if ((mSourceFile[fileNameLen - 1] == 'w') &&
+        (mSourceFile[fileNameLen - 2] == '.'))
       {
         strcat (tempBuffer, "o");
       }
@@ -130,7 +147,7 @@ WhcCmdLineParser::CheckArguments ()
 }
 
 void
-WhcCmdLineParser::DisplayUsage () const
+CmdLineParser::DisplayUsage () const
 {
   using namespace std;
 
@@ -142,4 +159,6 @@ WhcCmdLineParser::DisplayUsage () const
        << "Usage: whisperc  input_file [-o output_file] [--help | -h]" << endl;
 }
 
+} //namespace whc
+} //namespace whisper
 

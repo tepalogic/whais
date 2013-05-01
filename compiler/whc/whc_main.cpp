@@ -39,31 +39,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 using namespace whisper;
+using namespace whisper::whc;
 
 uint8_t wh_header[WHC_TABLE_SIZE] = { 0, };
 
 static void
-fill_globals_table (WICompiledUnit&      rUnit,
-                    struct WOutputStream* pSymbolsStream,
-                    struct WOutputStream* pGlblsTableStream)
+fill_globals_table (WIFunctionalUnit&     unit,
+                    struct WOutputStream* symbols,
+                    struct WOutputStream* glblsTable)
 {
-  const uint_t globals_count = rUnit.GetGlobalsCount ();
+  const uint_t globals_count = unit.GlobalsCount ();
 
   for (uint_t glbIt = 0; glbIt < globals_count; ++glbIt)
     {
-      uint32_t glbTypeIndex = rUnit.GetGlobalTypeIndex (glbIt);
-      uint32_t glbNameIndex = wh_ostream_size (pSymbolsStream);
+      uint32_t glbTypeIndex = unit.GlobalTypeOff (glbIt);
+      uint32_t glbNameIndex = wh_ostream_size (symbols);
 
-      if (rUnit.IsGlobalExternal (glbIt))
+      if (unit.IsGlobalExternal (glbIt))
         glbTypeIndex |= EXTERN_MASK;
 
-      if ((wh_ostream_wint32 (pGlblsTableStream, glbTypeIndex) == NULL) ||
-          (wh_ostream_wint32 (pGlblsTableStream, glbNameIndex) == NULL) ||
-          (wh_ostream_write (pSymbolsStream,
-                       _RC (const uint8_t *,
-                            rUnit.RetriveGlobalName (glbIt)),
-                            rUnit.GetGlobalNameLength (glbIt)) == NULL) ||
-          (wh_ostream_wint8 (pSymbolsStream, 0) == NULL))
+      if ((wh_ostream_wint32 (glblsTable, glbTypeIndex) == NULL)
+          || (wh_ostream_wint32 (glblsTable, glbNameIndex) == NULL)
+          || (wh_ostream_write (symbols,
+                                _RC (const uint8_t *,
+                                     unit.RetriveGlobalName (glbIt)),
+                                unit.GlobalNameLength (glbIt)) == NULL)
+          || (wh_ostream_wint8 (symbols, 0) == NULL))
         {
           throw bad_alloc ();
         }
@@ -71,58 +72,59 @@ fill_globals_table (WICompiledUnit&      rUnit,
 }
 
 static void
-process_procedures_table (WICompiledUnit&    rUnit,
-                          File&             rDestFile,
-                          WOutputStream*      pSymbolsStream,
-                          WOutputStream*      pProcTableStream)
+process_procedures_table (WIFunctionalUnit&   unit,
+                          File&               destFile,
+                          WOutputStream*      symbols,
+                          WOutputStream*      procTable)
 {
-  const uint_t proc_count = rUnit.GetProceduresCount ();
+  const uint_t proc_count = unit.ProceduresCount ();
 
   for (uint_t procIt = 0; procIt < proc_count; ++procIt)
     {
-      const uint16_t localsCount  = rUnit.GetProcLocalsCount (procIt);
-      const uint16_t paramsCound  = rUnit.GetProcParametersCount (procIt);
-      const uint32_t procOff      = rDestFile.Tell ();
-      const uint32_t procCodeSize = rUnit.GetProcCodeAreaSize (procIt);
-      uint32_t       procRetType  = rUnit.GetProcReturnTypeIndex (procIt);
+      const uint16_t localsCount  = unit.ProcLocalsCount (procIt);
+      const uint16_t paramsCound  = unit.ProcParametersCount (procIt);
+      const uint32_t procOff      = destFile.Tell ();
+      const uint32_t procCodeSize = unit.ProcCodeAreaSize (procIt);
+      uint32_t       procRetType  = unit.GetProcReturnTypeOff (procIt);
 
       assert (localsCount >= paramsCound);
 
       for (uint_t localIt = 0; localIt < localsCount; ++localIt)
         {
-          const uint32_t localTypeOff = rUnit.GetProcLocalTypeIndex (procIt,
+          const uint32_t localTypeOff = unit.GetProcLocalTypeOff (procIt,
                                                                      localIt);
           uint8_t offset[sizeof (localTypeOff)];
           store_le_int32 (localTypeOff, offset);
 
-          rDestFile.Write (offset, sizeof offset);
+          destFile.Write (offset, sizeof offset);
         }
 
-      if (rUnit.IsProcExternal (procIt))
+      if (unit.IsProcExternal (procIt))
         procRetType |= EXTERN_MASK;
       else
         {
-          uint8_t n_sync_stmts = rUnit.GetProcSyncStatementsCount (procIt);
-          rDestFile.Write (_RC (uint8_t *, &n_sync_stmts),
+          uint8_t n_sync_stmts = unit.ProcSyncStatementsCount (procIt);
+          destFile.Write (_RC (uint8_t *, &n_sync_stmts),
                            sizeof n_sync_stmts);
-          rDestFile.Write (rUnit.RetriveProcCodeArea (procIt),
-                           rUnit.GetProcCodeAreaSize (procIt));
+          destFile.Write (unit.RetriveProcCodeArea (procIt),
+                           unit.ProcCodeAreaSize (procIt));
         }
 
-      if ((wh_ostream_wint32 (pProcTableStream, wh_ostream_size (pSymbolsStream)) == NULL) ||
-          (wh_ostream_wint32 (pProcTableStream, procOff) == NULL) ||
-          (wh_ostream_wint32 (pProcTableStream, procRetType) == NULL) ||
-          (wh_ostream_wint16 (pProcTableStream, localsCount) == NULL) ||
-          (wh_ostream_wint16 (pProcTableStream, paramsCound) == NULL) ||
-          (wh_ostream_wint32 (pProcTableStream, procCodeSize) == NULL))
+      if ((wh_ostream_wint32 (procTable, wh_ostream_size (symbols)) == NULL)
+          || (wh_ostream_wint32 (procTable, procOff) == NULL)
+          || (wh_ostream_wint32 (procTable, procRetType) == NULL)
+          || (wh_ostream_wint16 (procTable, localsCount) == NULL)
+          || (wh_ostream_wint16 (procTable, paramsCound) == NULL)
+          || (wh_ostream_wint32 (procTable, procCodeSize) == NULL))
         {
           throw bad_alloc ();
         }
 
-      if ((wh_ostream_write (pSymbolsStream,
-                           _RC (const uint8_t *, rUnit.RetriveProcName (procIt)),
-                           rUnit.GetProcNameSize (procIt)) == NULL) ||
-           (wh_ostream_wint8 (pSymbolsStream, 0) == NULL))
+      if ((wh_ostream_write (symbols,
+                             _RC (const uint8_t *,
+                                  unit.RetriveProcName (procIt)),
+                             unit.GetProcNameSize (procIt)) == NULL)
+          || (wh_ostream_wint8 (symbols, 0) == NULL))
         {
           throw bad_alloc ();
         }
@@ -132,11 +134,11 @@ process_procedures_table (WICompiledUnit&    rUnit,
 int
 main (int argc, char **argv)
 {
-  uint_t            buffSize = 0;
-  int               retCode  = 0;
-  uint_t            langVerMaj;
-  uint_t            langVerMin;
-  auto_ptr<uint8_t> buffer (NULL);
+  uint_t             buffSize = 0;
+  int                retCode  = 0;
+  uint_t             langVerMaj;
+  uint_t             langVerMin;
+  auto_ptr<uint8_t>  buffer (NULL);
   WOutputStream      symbolsStream;
   WOutputStream      glbsTableStream;
   WOutputStream      procsTableStream;
@@ -148,25 +150,25 @@ main (int argc, char **argv)
 
   try
   {
+    CmdLineParser args (argc, argv);
 
-    WhcCmdLineParser args (argc, argv);
-
-    File inputFile (args.GetSourceFile (), WHC_FILEREAD);
+    File inputFile (args.SourceFile (), WHC_FILEREAD);
     buffSize = inputFile.GetSize ();
 
-    if (buffSize >= 0xFFFFFFFE)
-      throw - 1;                // we can not handle files these size anyway
-
     buffer.reset (new uint8_t[_SC (unsigned int, buffSize + 1)]);
-    buffer.get ()[buffSize] = 0;  //ensures the null terminator
+    buffer.get ()[buffSize] = 0;  //Ensures the null terminator.
 
     inputFile.Seek (0, WHC_SEEK_CURR);
     inputFile.Read (buffer.get (), _SC (unsigned int, buffSize));
     assert (inputFile.Tell () == buffSize);
     inputFile.Close ();
 
-    WBufferCompiledUnit unit (buffer.get (), buffSize, my_postman, buffer.get ());
-    File               outputFile (args.GetOutputFile (), WHC_FILEWRITE | WHC_FILECREATE);
+    CompiledBufferUnit unit (buffer.get (),
+                             buffSize,
+                             whc_messenger,
+                             buffer.get ());
+
+    File outputFile (args.OutputFile (), WHC_FILEWRITE | WHC_FILECREATE);
 
     outputFile.SetSize (0);
     outputFile.Seek (0, WHC_SEEK_BEGIN);
@@ -174,7 +176,10 @@ main (int argc, char **argv)
     //reserve space for header file
     outputFile.Write (wh_header, sizeof wh_header);
 
-    process_procedures_table (unit, outputFile, &symbolsStream, &procsTableStream);
+    process_procedures_table (unit,
+                              outputFile,
+                              &symbolsStream,
+                              &procsTableStream);
     fill_globals_table (unit, &symbolsStream, &glbsTableStream);
 
     store_le_int32 (wh_ostream_size (&glbsTableStream) / WHC_GLOBAL_ENTRY_SIZE,
@@ -189,11 +194,11 @@ main (int argc, char **argv)
     assert ((wh_ostream_size (&procsTableStream) % WHC_PROC_ENTRY_SIZE) == 0);
 
     store_le_int32 (outputFile.Tell (), wh_header + WHC_TYPEINFO_START_OFF);
-    store_le_int32 (unit.GetTypeInformationSize (),
+    store_le_int32 (unit.TypeAreaSize (),
                     wh_header + WHC_TYPEINFO_SIZE_OFF);
 
-    outputFile.Write (unit.RetriveTypeInformation (),
-                      unit.GetTypeInformationSize ());
+    outputFile.Write (unit.RetriveTypeArea (),
+                      unit.TypeAreaSize ());
 
     store_le_int32 (outputFile.Tell (), wh_header + WHC_SYMTABLE_START_OFF);
     store_le_int32 (wh_ostream_size (&symbolsStream),
@@ -203,11 +208,11 @@ main (int argc, char **argv)
                       wh_ostream_size (&symbolsStream));
 
     store_le_int32 (outputFile.Tell (), wh_header + WHC_CONSTAREA_START_OFF);
-    store_le_int32 (unit.GetConstAreaSize (),
+    store_le_int32 (unit.ConstsAreaSize (),
                     wh_header + WHC_CONSTAREA_SIZE_OFF);
 
     outputFile.Write (unit.RetrieveConstArea (),
-                      unit.GetConstAreaSize ());
+                      unit.ConstsAreaSize ());
     outputFile.Write (wh_ostream_data (&glbsTableStream),
                       wh_ostream_size (&glbsTableStream));
     outputFile.Write (wh_ostream_data (&procsTableStream),
@@ -228,17 +233,20 @@ main (int argc, char **argv)
   catch (FileException & e)
   {
     std::cerr << "File IO error: " << e.Extra ();
+
     if (e.Message () != NULL)
       std::cerr << ": " << e.Message () << std::endl;
+
     else
       std::cerr << '.' << std::endl;
+
     retCode = -1;
   }
-  catch (WCompiledUnitException&)
+  catch (FunctionalUnitException&)
   {
     retCode = -1;
   }
-  catch (WhcCmdLineException& e)
+  catch (CmdLineException& e)
   {
     std::cerr << e.Message () << std::endl;
   }
@@ -247,16 +255,19 @@ main (int argc, char **argv)
     std::cerr << "error : " << e.Message () << std::endl;
     std::cerr << "file: " << e.File() << " : " << e.Line() << std::endl;
     std::cerr << "Extra: " << e.Extra() << std::endl;
+
     retCode = -1;
   }
   catch (std::bad_alloc&)
   {
     std::cerr << "Memory allocation failed!" << std::endl;
+
     retCode = -1;
   }
   catch (...)
   {
     std::cerr << "Unknown exception thrown!" << std::endl;
+
     retCode = -1;
   }
 
@@ -271,3 +282,4 @@ main (int argc, char **argv)
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "WHC";
 #endif
+

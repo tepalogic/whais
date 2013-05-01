@@ -179,25 +179,25 @@ Session::~Session ()
 }
 
 void
-Session::LoadCompiledUnit (WICompiledUnit& unit)
+Session::LoadCompiledUnit (WIFunctionalUnit& unit)
 {
   UnitsManager&  unitMgr   = m_PrivateNames.Get ().GetUnitsManager ();
-  const uint32_t unitIndex = unitMgr.AddUnit (unit.GetGlobalsCount (),
-                                              unit.GetProceduresCount (),
+  const uint32_t unitIndex = unitMgr.AddUnit (unit.GlobalsCount (),
+                                              unit.ProceduresCount (),
                                               unit.RetrieveConstArea (),
-                                              unit.GetConstAreaSize ());
+                                              unit.ConstsAreaSize ());
 
   TypeManager& typeMgr = m_PrivateNames.Get ().GetTypeManager ();
 
   try
   {
-    for (uint_t glbIt = 0; glbIt < unit.GetGlobalsCount(); ++glbIt)
+    for (uint_t glbIt = 0; glbIt < unit.GlobalsCount(); ++glbIt)
       {
-        const uint_t         typeOff = unit.GetGlobalTypeIndex (glbIt);
-        const uint8_t* const pTI     = unit.RetriveTypeInformation () + typeOff;
+        const uint_t         typeOff = unit.GlobalTypeOff (glbIt);
+        const uint8_t* const pTI     = unit.RetriveTypeArea () + typeOff;
         const uint8_t* const pName   = _RC (const uint8_t*,
                                             unit.RetriveGlobalName (glbIt));
-        const uint_t nameLength = unit.GetGlobalNameLength (glbIt);
+        const uint_t nameLength = unit.GlobalNameLength (glbIt);
         const bool   external   = (unit.IsGlobalExternal (glbIt) != FALSE);
 
         const uint32_t glbIndex = DefineGlobalValue (pName,
@@ -208,22 +208,22 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
         unitMgr.SetGlobalIndex (unitIndex, glbIt, glbIndex);
       }
 
-    for (uint_t procIt = 0; procIt < unit.GetProceduresCount (); ++procIt)
+    for (uint_t procIt = 0; procIt < unit.ProceduresCount (); ++procIt)
       {
         const uint8_t* const pName     = _RC (const uint8_t*,
                                               unit.RetriveProcName (procIt));
         const uint_t       nameLength  = unit.GetProcNameSize (procIt);
         const bool         external    = (unit.IsProcExternal (procIt) != FALSE);
-        const uint_t       localsCount = unit.GetProcLocalsCount (procIt);
-        const uint_t       argsCount   = unit.GetProcParametersCount (procIt);
+        const uint_t       localsCount = unit.ProcLocalsCount (procIt);
+        const uint_t       argsCount   = unit.ProcParametersCount (procIt);
         vector<uint32_t>   typesOffset;
         vector<StackValue> values;
 
         for (uint_t localIt = 0; localIt < localsCount; ++localIt)
           {
             const uint8_t* const pLocalTI =
-                                  unit.RetriveTypeInformation () +
-                                  unit.GetProcLocalTypeIndex (procIt, localIt);
+                                  unit.RetriveTypeArea () +
+                                  unit.GetProcLocalTypeOff (procIt, localIt);
 
             const uint_t sizeTI = TypeManager::GetTypeLength (pLocalTI);
             auto_ptr<uint8_t> apTI (new uint8_t [sizeTI]);
@@ -246,11 +246,11 @@ Session::LoadCompiledUnit (WICompiledUnit& unit)
                                   nameLength,
                                   localsCount,
                                   argsCount,
-                                  unit.GetProcSyncStatementsCount (procIt),
+                                  unit.ProcSyncStatementsCount (procIt),
                                   values,
                                   &typesOffset[0],
                                   unit.RetriveProcCodeArea (procIt),
-                                  unit.GetProcCodeAreaSize (procIt),
+                                  unit.ProcCodeAreaSize (procIt),
                                   external,
                                   unitMgr.GetUnit (unitIndex)
                                                        );

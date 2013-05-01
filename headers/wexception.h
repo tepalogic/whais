@@ -42,7 +42,7 @@ enum EXPCEPTION_TYPE
   DUMP_CMD_LINE_EXCEPTION,
   FILE_EXCEPTION,
   FILE_CONTAINER_EXCEPTION,
-  UNIT_COMPILE_EXCEPTION,
+  FUNCTIONAL_UNIT_EXCEPTION,
   SYNC_EXCEPTION,
   THREAD_EXCEPTION,
   INTERPRETER_EXCEPTION,
@@ -54,9 +54,9 @@ class EXCEP_SHL Exception
 {
 public:
   Exception (const char*   message,
-              const char*   file,
-              uint32_t      line,
-              uint32_t      extra);
+             const char*   file,
+             uint32_t      line,
+             uint32_t      extra);
   Exception (const Exception& source);
 
   virtual ~Exception ();
@@ -66,7 +66,7 @@ public:
   const char*   File () const;
   uint32_t      Line () const;
 
-  virtual Exception*     Clone () const = 0;
+  virtual Exception*      Clone () const = 0;
   virtual EXPCEPTION_TYPE Type () const = 0;
   virtual const char*     Description () const = 0;
 

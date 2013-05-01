@@ -24,14 +24,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
+#include "compiler/compiledunit.h"
+#include "utils/wfile.h"
+#include "utils/le_converter.h"
+
+#include "../whc/wo_format.h"
 #include "wod_dump.h"
 #include "wod_cmdline.h"
 
-#include "compiler/compiledunit.h"
-
-#include "utils/wfile.h"
-#include "utils/le_converter.h"
-#include "../whc/wo_format.h"
+using namespace whisper;
+using namespace whisper::wod;
 
 int
 main (int argc, char **argv)
@@ -40,21 +42,21 @@ main (int argc, char **argv)
 
   try
   {
-    WodCmdLineParser cmdLine (argc, argv);
+    CmdLineParser cmdLine (argc, argv);
 
     {
-      File inFileObj (cmdLine.GetSourceFile (), WHC_FILEREAD);
-      wod_dump_header (inFileObj, cmdLine.GetOutStream ());
+      File inFileObj (cmdLine.SourceFile (), WHC_FILEREAD);
+      wod_dump_header (inFileObj, cmdLine.OutStream ());
     }
 
-    WFileCompiledUnit inUnit (cmdLine.GetSourceFile ());
+    CompiledFileUnit inUnit (cmdLine.SourceFile ());
 
-    wod_dump_const_area (inUnit, cmdLine.GetOutStream ());
-    wod_dump_globals_tables (inUnit, cmdLine.GetOutStream ());
-    wod_dump_procs (inUnit, cmdLine.GetOutStream (), false);
+    wod_dump_const_area (inUnit, cmdLine.OutStream ());
+    wod_dump_globals_tables (inUnit, cmdLine.OutStream ());
+    wod_dump_procs (inUnit, cmdLine.OutStream (), false);
 
   }
-  catch (WCompiledUnitException& e)
+  catch (FunctionalUnitException& e)
   {
     std::cerr << e.Message () << std::endl;
     retCode = -1;
@@ -68,7 +70,7 @@ main (int argc, char **argv)
       std::cerr << '.' << std::endl;
     retCode = -1;
   }
-  catch (WodCmdLineException& e)
+  catch (CmdLineException& e)
   {
     std::cerr << e.Message () << std::endl;
   } catch (Exception & e)

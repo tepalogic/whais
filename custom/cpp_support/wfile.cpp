@@ -33,21 +33,21 @@ File::File (const char* name, uint_t mode)
   : mHandle (0)
 {
   mHandle = whf_open (name, mode);
-  if (mHandle == 0)
+  if (mHandle == _SC (WH_FILE, -1))
     throw FileException (name, _EXTRA (whf_last_error ()));
 }
 
 File::File (const File &src) :
   mHandle (whf_dup (src.mHandle))
 {
-  if (mHandle == 0)
+  if (mHandle == _SC (WH_FILE, -1))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
 File::~File ()
 {
   /* Close it only if is not already closed */
-  if (mHandle != 0)
+  if (mHandle != _SC (WH_FILE, -1))
     whf_close (mHandle);
 }
 
@@ -109,11 +109,12 @@ File::SetSize (const uint64_t size)
 void
 File::Close ()
 {
-  assert (mHandle != 0);
+  assert (mHandle != _SC (WH_FILE, -1));
 
-  mHandle = 0;
   if ( ! whf_close (mHandle))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
+
+  mHandle = _SC (WH_FILE, -1);
 }
 
 File&
@@ -125,7 +126,7 @@ File::operator= (const File &src)
   Close(); // Close the old handler
 
   mHandle = whf_dup (src.mHandle);
-  if (mHandle == 0)
+  if (mHandle == _SC (WH_FILE, -1))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 
   return *this;

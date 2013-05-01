@@ -486,7 +486,7 @@ main ()
 
     I_Session& commonSession = GetInstance (NULL);
 
-    WBufferCompiledUnit dummy (dummyProgram,
+    CompiledBufferUnit dummy (dummyProgram,
                                sizeof dummyProgram,
                                my_postman,
                                dummyProgram);

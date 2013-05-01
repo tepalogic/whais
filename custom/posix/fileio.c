@@ -69,7 +69,7 @@ whf_open (const char* file, uint_t mode)
     }
 
   result = open (file, openMode, accMode);
-  return (result < 0) ? 0 : result;
+  return ((result < 0) ? -1 : result);
 }
 
 

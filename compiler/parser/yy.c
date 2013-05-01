@@ -171,14 +171,12 @@ next_token (const char*     buffer,
     }
   else if (*buffer == '\"')
     {
-      bool_t escaped;
       do
         {
           buffer++;
-          escaped = FALSE;
 
           if (*buffer == '\\')
-            escaped = TRUE, ++buffer;
+            buffer += 2;
 
           if (is_eol (*buffer) || (*buffer == 0))
             {
@@ -187,7 +185,7 @@ next_token (const char*     buffer,
               return TK_ERROR;
             }
         }
-      while ((*buffer != '\"') || escaped);
+      while (*buffer != '\"');
 
       buffer++;
 
@@ -195,15 +193,15 @@ next_token (const char*     buffer,
     }
   else if (*buffer == '\'')
     {
-      bool_t    escaped;
-      uint32_t  firstChar, firstSize;
+      uint_t dummy;
+      uint_t entrySize = 1;
+
       do
         {
           buffer++;
-          escaped = FALSE;
 
           if (*buffer == '\\')
-            escaped = TRUE, ++buffer;
+            buffer += 2, ++entrySize;
 
           if (is_eol (*buffer) || (*buffer == 0))
             {
@@ -212,13 +210,33 @@ next_token (const char*     buffer,
               return TK_ERROR;
             }
         }
-      while ((*buffer != '\'') || escaped);
+      while (*buffer != '\'');
 
       buffer++;
 
-      firstSize = wh_load_utf8_cp ((const uint8_t*) (*outToken + 1),
-                                   &firstChar);
-      if ((*outToken[1 + firstSize] == '\'') || (*outToken[1] == '\\'))
+      if (((*outToken)[1] == '\\')
+          && is_numeric ((*outToken)[entrySize], FALSE))
+        {
+          bool_t hexa = FALSE;
+
+          if (((*outToken)[entrySize++] == '0')
+              && (((*outToken)[entrySize] == 'x')
+                  || ((*outToken)[entrySize] == 'X')))
+            {
+              ++entrySize;
+              hexa = TRUE;
+            }
+
+          while (is_numeric ((*outToken)[entrySize], hexa))
+            ++entrySize;
+        }
+      else
+        {
+          entrySize += wh_load_utf8_cp ((const uint8_t*)(*outToken + entrySize),
+                                        &dummy);
+        }
+
+      if ((*outToken)[entrySize] == '\'')
           result = TK_CHAR;
 
       else
@@ -227,7 +245,7 @@ next_token (const char*     buffer,
   else
     buffer++;
 
-  *outTokenLen = (uint_t) (buffer - *outToken);
+  *outTokenLen = (uint_t)(buffer - (*outToken));
 
   return result;
 }
@@ -346,12 +364,9 @@ parse_multichar_operator (const char* op)
 {
   uint_t i = 0;
 
-  if (strlen (op) != COMPOSED_OPERATOR_LEN)
-    return 0;
-
   while (sgMultiCharOps[i].text != NULL)
     {
-      if (strcmp (sgMultiCharOps[i].text, op) == 0)
+      if (strncmp (sgMultiCharOps[i].text, op, COMPOSED_OPERATOR_LEN) == 0)
         break;
 
       ++i;
@@ -515,7 +530,7 @@ parse_character (const char* buffer,
   if (*buffer == '\\')
     {
       if (bufferLen > 0)
-        ++buffer, ++bufferLen, ++result;
+        ++buffer, --bufferLen, ++result;
 
       else
         return 0; /* error */
@@ -555,19 +570,19 @@ parse_character (const char* buffer,
           *outChar = '\b';
           ++result;
         }
-      else if (*outChar == 'a')
+      else if (*buffer == 'a')
         {
           *outChar = '\a';
           ++result;
         }
-      else if (*outChar == '\'')
+      else if (*buffer == '\'')
         {
           *outChar = '\'';
           ++result;
         }
-      else if (*outChar == '\"')
+      else if (*buffer == '"')
         {
-          *outChar = '\"';
+          *outChar = '"';
           ++result;
         }
       else if (is_numeric (*buffer, FALSE))
@@ -575,16 +590,11 @@ parse_character (const char* buffer,
           uint64_t  value    = 0;
           bool_t    negative = FALSE;
 
-          if (result <= 0xFFFFFFFF)
-            {
-              result += parse_integer (buffer, bufferLen, &value, &negative);
-              if (negative || (value > 0xFFFFFFFF))
-                return 0;
+          result += parse_integer (buffer, bufferLen, &value, &negative);
+          if (negative || (value > 0xFFFFFFFF))
+            return 0;
 
-              *outChar = value;
-            }
-          else
-            result = 0;
+          *outChar = value;
         }
     }
   else
@@ -628,14 +638,14 @@ parse_string (const char* buffer,
           bufferLen -= result;
 
           *destination++      = currChar;
-          *outDestinationLen += result;
+          *outDestinationLen += 1;
         }
       else
         return 0;
     }
 
-  *destination = 0;      /* add the null character */
-  (*outDestinationLen)++;
+  *destination        = 0;      /* add the null character */
+  *outDestinationLen += 1;
 
   return (oldLen - bufferLen);
 }

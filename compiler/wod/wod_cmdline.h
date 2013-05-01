@@ -29,22 +29,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-namespace whisper
-{
+namespace whisper {
+namespace wod {
 
-class WodCmdLineParser
+class CmdLineParser
 {
 public:
-  WodCmdLineParser (int argc, char** argv);
-  ~WodCmdLineParser ();
+  CmdLineParser (int argc, char** argv);
+  ~CmdLineParser ();
 
-  const char* GetSourceFile () const
+  const char* SourceFile () const
   {
-    return m_SourceFile;
+    return mSourceFile;
   }
-  std::ostream& GetOutStream () const
+  std::ostream& OutStream () const
   {
-    return *m_OutStream;
+    return *mOutStream;
   }
 
 private:
@@ -53,41 +53,44 @@ private:
   void CheckArguments ();
 
 private:
-  int         m_ArgCount;
-  char**      m_Args;
-  const char* m_SourceFile;
-  std::ostream* m_OutStream;
-  bool          m_ShowHelp;
+  int           mArgCount;
+  char**        mArgs;
+  const char*   mSourceFile;
+  std::ostream* mOutStream;
+  bool          mShowHelp;
 
 };
 
-class WodCmdLineException : public Exception
+class CmdLineException : public Exception
 {
 public:
-  WodCmdLineException (const char* pMessage,
-                       const char* pFile,
-                       uint32_t      line,
-                       uint32_t      extra)
-    : Exception (pMessage, pFile, line, extra)
+  CmdLineException (const char*   message,
+                    const char*   file,
+                    uint32_t      line,
+                    uint32_t      extra)
+    : Exception (message, file, line, extra)
   {
   }
 
-  virtual ~WodCmdLineException ()
+  virtual ~CmdLineException ()
   {
   };
 
   virtual Exception* Clone () const
   {
-    return new WodCmdLineException (*this);
+    return new CmdLineException (*this);
   }
 
   virtual EXPCEPTION_TYPE Type () const { return DUMP_CMD_LINE_EXCEPTION; }
-  virtual const char*   Description () const
+
+  virtual const char* Description () const
   {
     return "Invalid command line.";
   }
 };
 
+} //namespace wod
 } //namespace whisper
 
 #endif /* WOD_CMDLINE_H_ */
+

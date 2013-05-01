@@ -257,7 +257,7 @@ main ()
 
     I_Session& commonSession = GetInstance (NULL);
 
-    WBufferCompiledUnit callBuf (callTestProgram,
+    CompiledBufferUnit callBuf (callTestProgram,
                                  sizeof callTestProgram,
                                  my_postman,
                                  callTestProgram);

@@ -34,49 +34,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/wfile.h"
 
-using namespace whisper;
+namespace whisper {
+namespace wod {
 
 void
-wod_dump_header (File& rInObj, std::ostream& rOutStream);
+wod_dump_header (File& obj, std::ostream& output);
 
 void
-wod_dump_const_area (WICompiledUnit& rUnit, std::ostream& rOutStream);
+wod_dump_const_area (WIFunctionalUnit& unit, std::ostream& output);
 
 void
-wod_dump_globals_tables (WICompiledUnit& rUnit, std::ostream& rOutStream);
+wod_dump_globals_tables (WIFunctionalUnit& unit, std::ostream& output);
 
 void
-wod_dump_procs (WICompiledUnit& rUnit, std::ostream& rOutStream, bool_t showCode);
+wod_dump_procs (WIFunctionalUnit&     unit,
+                std::ostream&         output,
+                bool_t                showCode);
 
-class WDumpException : public Exception
+class DumpException : public Exception
 {
 public:
-  WDumpException (const char* pMessage,
-                  const char* pFile,
-                  uint32_t      line,
-                  uint32_t      extra)
-    : Exception (pMessage, pFile, line, extra)
+  DumpException (const char*      message,
+                 const char*      file,
+                 uint32_t         line,
+                 uint32_t         extra)
+    : Exception (message, file, line, extra)
   {
   }
-  virtual ~ WDumpException ()
+
+  virtual ~DumpException ()
   {
   };
 
-  virtual Exception*     Clone () const { return new WDumpException (*this); }
+  virtual Exception* Clone () const { return new DumpException (*this); }
+
   virtual EXPCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
-  virtual const char*   Description () const
+
+  virtual const char* Description () const
   {
     return "General exception by object dumper.";
   }
 };
 
-typedef uint_t (*FDECODE_OPCODE) (const uint8_t* pInArgs,
-                                  char*        pOp1,
-                                  char*        pOp2);
+typedef uint_t (*FDECODE_OPCODE) (const uint8_t*      args,
+                                  char* const         op1,
+                                  char* const         op2);
 
 extern FDECODE_OPCODE wod_decode_table[];
-extern const char*  wod_str_table[];
+extern const char*    wod_str_table[];
 
 #define MAX_OP_STRING 128
 
+} //namespace wod
+} //namespace whisper
+
 #endif /* WOD_DUMP_H_ */
+

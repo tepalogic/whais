@@ -33,169 +33,176 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace whisper
 {
 
-class COMPILER_SHL WICompiledUnit
+class COMPILER_SHL WIFunctionalUnit
 {
 public:
-  WICompiledUnit ()
+  WIFunctionalUnit ()
   {
   }
 
-  virtual ~WICompiledUnit ()
+  virtual ~WIFunctionalUnit ()
   {
   };
 
-  virtual uint_t         GetTypeInformationSize () = 0;
-  virtual const uint8_t* RetriveTypeInformation () = 0;
-  virtual uint_t         GetConstAreaSize () = 0;
+  virtual uint_t         TypeAreaSize () = 0;
+  virtual const uint8_t* RetriveTypeArea () = 0;
+  virtual uint_t         ConstsAreaSize () = 0;
   virtual const uint8_t* RetrieveConstArea () = 0;
 
-  virtual uint_t         GetGlobalsCount () = 0;
-  virtual uint_t         GetGlobalNameLength (uint_t item) = 0;
-  virtual const char*  RetriveGlobalName (uint_t item) = 0;
-  virtual uint_t         GetGlobalTypeIndex (uint_t item) = 0;
-  virtual bool_t         IsGlobalExternal (uint_t item) = 0;
+  virtual uint_t         GlobalsCount () = 0;
+  virtual uint_t         GlobalNameLength (const uint_t id) = 0;
+  virtual const char*    RetriveGlobalName (const uint_t id) = 0;
+  virtual uint_t         GlobalTypeOff (const uint_t id) = 0;
+  virtual bool_t         IsGlobalExternal (const uint_t id) = 0;
 
-  virtual uint_t         GetProceduresCount () = 0;
-  virtual uint_t         GetProcSyncStatementsCount (uint_t item) = 0;
-  virtual uint_t         GetProcCodeAreaSize (uint_t item) = 0;
-  virtual const uint8_t* RetriveProcCodeArea (uint_t item) = 0;
-  virtual uint_t         GetProcLocalsCount (uint_t item) = 0;
-  virtual uint_t         GetProcParametersCount (uint_t item) = 0;
-  virtual uint_t         GetProcReturnTypeIndex (uint_t proc_item) = 0;
-  virtual uint_t         GetProcNameSize (uint_t proc_item) = 0;
-  virtual const char*  RetriveProcName (uint_t proc_item) = 0;
-  virtual uint_t         GetProcLocalTypeIndex (uint_t item_proc,
-                                                uint_t item_local) = 0;
-  virtual bool_t         IsProcExternal (uint_t item_proc) = 0;
+  virtual uint_t         ProceduresCount () = 0;
+  virtual uint_t         ProcSyncStatementsCount (const uint_t id) = 0;
+  virtual uint_t         ProcCodeAreaSize (const uint_t id) = 0;
+  virtual const uint8_t* RetriveProcCodeArea (const uint_t id) = 0;
+  virtual uint_t         ProcLocalsCount (const uint_t id) = 0;
+  virtual uint_t         ProcParametersCount (const uint_t id) = 0;
+  virtual uint_t         GetProcReturnTypeOff (const uint_t id) = 0;
+  virtual uint_t         GetProcNameSize (const uint_t id) = 0;
+  virtual const char*    RetriveProcName (const uint_t id) = 0;
+  virtual uint_t         GetProcLocalTypeOff (uint_t procId,
+                                              uint_t localId) = 0;
+  virtual bool_t         IsProcExternal (uint_t procId) = 0;
 };
 
-class COMPILER_SHL WCompiledUnitException : public Exception
+class COMPILER_SHL FunctionalUnitException : public Exception
 {
 public:
-  WCompiledUnitException (const char* pMessage,
-                          const char* pFile,
-                          uint32_t      line,
-                          uint32_t      extra)
-    : Exception (pMessage, pFile, line, extra)
+  FunctionalUnitException (const char*  message,
+                           const char*   file,
+                           uint32_t      line,
+                           uint32_t      extra)
+    : Exception (message, file, line, extra)
   {
   }
 
-  virtual ~WCompiledUnitException ()
+  virtual ~FunctionalUnitException ()
   {
   };
 
-  virtual Exception*     Clone () const
+  virtual Exception* Clone () const
   {
-    return new WCompiledUnitException (*this);
+    return new FunctionalUnitException (*this);
   }
-  virtual EXPCEPTION_TYPE Type () const { return UNIT_COMPILE_EXCEPTION; }
-  virtual const char*   Description () const
+
+  virtual EXPCEPTION_TYPE Type () const { return FUNCTIONAL_UNIT_EXCEPTION; }
+
+  virtual const char* Description () const
   {
-    return "Could not compile unit!";
+    return "Functional unit operation request faailed!";
   }
 };
 
-class COMPILER_SHL WBufferCompiledUnit : public WICompiledUnit
+
+
+class COMPILER_SHL CompiledBufferUnit : public WIFunctionalUnit
 {
 public:
-  WBufferCompiledUnit (const uint8_t*    pBuffer,
-                       uint_t            bufferSize,
-                       WH_MESSENGER     messenger,
-                       WH_MESSENGER_CTXT messengerContext);
-  virtual ~WBufferCompiledUnit ();
+  CompiledBufferUnit (const uint8_t*    buffer,
+                      uint_t            bufferSize,
+                      WH_MESSENGER      messenger,
+                      WH_MESSENGER_CTXT messengerContext);
+  virtual ~CompiledBufferUnit ();
 
-  virtual uint_t         GetTypeInformationSize ();
-  virtual const uint8_t* RetriveTypeInformation ();
-  virtual uint_t         GetConstAreaSize ();
+  virtual uint_t         TypeAreaSize ();
+  virtual const uint8_t* RetriveTypeArea ();
+  virtual uint_t         ConstsAreaSize ();
   virtual const uint8_t* RetrieveConstArea ();
 
-  virtual uint_t        GetGlobalsCount ();
-  virtual uint_t        GetGlobalNameLength (uint_t item);
-  virtual const char* RetriveGlobalName (uint_t item);
-  virtual uint_t        GetGlobalTypeIndex (uint_t item);
-  virtual bool_t        IsGlobalExternal (uint_t item);
+  virtual uint_t        GlobalsCount ();
+  virtual uint_t        GlobalNameLength (const uint_t id);
+  virtual const char*   RetriveGlobalName (const uint_t id);
+  virtual uint_t        GlobalTypeOff (const uint_t id);
+  virtual bool_t        IsGlobalExternal (const uint_t id);
 
-  virtual uint_t         GetProceduresCount ();
-  virtual uint_t         GetProcSyncStatementsCount (uint_t item);
-  virtual uint_t         GetProcCodeAreaSize (uint_t item);
-  virtual const uint8_t* RetriveProcCodeArea (uint_t item);
-  virtual uint_t         GetProcLocalsCount (uint_t item);
-  virtual uint_t         GetProcParametersCount (uint_t item);
-  virtual uint_t         GetProcReturnTypeIndex (uint_t proc_item);
-  virtual uint_t         GetProcNameSize (uint_t proc_item);
-  virtual const char*  RetriveProcName (uint_t proc_item);
-  virtual uint_t         GetProcLocalTypeIndex (uint_t item_proc,
-                                                uint_t item_local);
-  virtual bool_t         IsProcExternal (uint_t item_proc);
-
-private:
-    WBufferCompiledUnit (WBufferCompiledUnit&);
-    WBufferCompiledUnit& operator= (WBufferCompiledUnit&);
+  virtual uint_t         ProceduresCount ();
+  virtual uint_t         ProcSyncStatementsCount (const uint_t id);
+  virtual uint_t         ProcCodeAreaSize (const uint_t id);
+  virtual const uint8_t* RetriveProcCodeArea (const uint_t id);
+  virtual uint_t         ProcLocalsCount (const uint_t id);
+  virtual uint_t         ProcParametersCount (const uint_t id);
+  virtual uint_t         GetProcReturnTypeOff (const uint_t id);
+  virtual uint_t         GetProcNameSize (const uint_t id);
+  virtual const char*    RetriveProcName (const uint_t id);
+  virtual uint_t         GetProcLocalTypeOff (uint_t procId,
+                                              uint_t localId);
+  virtual bool_t         IsProcExternal (uint_t procId);
 
 private:
-    WH_COMPILED_UNIT m_Handler;
+    CompiledBufferUnit (CompiledBufferUnit&);
+    CompiledBufferUnit& operator= (CompiledBufferUnit&);
+
+private:
+    WH_COMPILED_UNIT mHandler;
 };
 
-class COMPILER_SHL WFileCompiledUnit : public WICompiledUnit
+
+
+class COMPILER_SHL CompiledFileUnit : public WIFunctionalUnit
 {
 
 public:
-  explicit WFileCompiledUnit (const char* pFileName);
-  virtual ~WFileCompiledUnit ();
+  explicit CompiledFileUnit (const char* file);
+  virtual ~CompiledFileUnit ();
 
-  virtual uint_t         GetTypeInformationSize ();
-  virtual const uint8_t* RetriveTypeInformation ();
+  virtual uint_t         TypeAreaSize ();
+  virtual const uint8_t* RetriveTypeArea ();
 
-  virtual uint_t         GetGlobalsCount ();
-  virtual uint_t         GetGlobalNameLength (uint_t item);
-  virtual const char*  RetriveGlobalName (uint_t item);
-  virtual uint_t         GetGlobalTypeIndex (uint_t item);
-  virtual bool_t         IsGlobalExternal (uint_t item);
-  virtual uint_t         GetConstAreaSize ();
+  virtual uint_t         GlobalsCount ();
+  virtual uint_t         GlobalNameLength (const uint_t id);
+  virtual const char*    RetriveGlobalName (const uint_t id);
+  virtual uint_t         GlobalTypeOff (const uint_t id);
+  virtual bool_t         IsGlobalExternal (const uint_t id);
+  virtual uint_t         ConstsAreaSize ();
   virtual const uint8_t* RetrieveConstArea ();
 
-  virtual uint_t         GetProceduresCount ();
-  virtual uint_t         GetProcSyncStatementsCount (uint_t item);
-  virtual uint_t         GetProcCodeAreaSize (uint_t item);
-  virtual const uint8_t* RetriveProcCodeArea (uint_t item);
-  virtual uint_t         GetProcLocalsCount (uint_t item);
-  virtual uint_t         GetProcParametersCount (uint_t item);
-  virtual uint_t         GetProcReturnTypeIndex (uint_t proc_item);
-  virtual uint_t         GetProcNameSize (uint_t proc_item);
-  virtual const char*  RetriveProcName (uint_t proc_item);
-  virtual uint_t         GetProcLocalTypeIndex (uint_t item_proc,
-                                                uint_t item_local);
-  virtual bool_t         IsProcExternal (uint_t item_proc);
+  virtual uint_t         ProceduresCount ();
+  virtual uint_t         ProcSyncStatementsCount (const uint_t id);
+  virtual uint_t         ProcCodeAreaSize (const uint_t id);
+  virtual const uint8_t* RetriveProcCodeArea (const uint_t id);
+  virtual uint_t         ProcLocalsCount (const uint_t id);
+  virtual uint_t         ProcParametersCount (const uint_t id);
+  virtual uint_t         GetProcReturnTypeOff (const uint_t id);
+  virtual uint_t         GetProcNameSize (const uint_t id);
+  virtual const char*    RetriveProcName (const uint_t id);
+  virtual uint_t         GetProcLocalTypeOff (uint_t procId,
+                                              uint_t localId);
+  virtual bool_t         IsProcExternal (uint_t procId);
 
 private:
-  WFileCompiledUnit (WFileCompiledUnit&);
-  WFileCompiledUnit& operator= (WFileCompiledUnit&);
+  CompiledFileUnit (CompiledFileUnit&);
+  CompiledFileUnit& operator= (CompiledFileUnit&);
 
   void ProcessHeader ();
-  void LoadProcInMemory (uint_t proc_item);
+  void LoadProcInMemory (const uint_t id);
 
 private:
 #pragma warning (disable: 4251)
-  File    m_File;
+  File     mFile;
 #pragma warning (default: 4251)
-  uint32_t m_GlobalsCount;
-  uint32_t m_ProcsCount;
-  uint32_t m_TtySize;
-  uint32_t m_SymbolsSize;
-  uint32_t m_ConstAreaSize;
+  uint32_t mGlobalsCount;
+  uint32_t mProcsCount;
+  uint32_t mTypeAreaSize;
+  uint32_t mSymbolsSize;
+  uint32_t mConstAreaSize;
 
 #pragma warning (disable: 4251)
   //Ignore this warning at the STL auto_ptr does not
   //have any static memebers
-  std::auto_ptr<uint8_t>  m_TypeInfo;
-  std::auto_ptr<uint8_t>  m_Symbols;
-  std::auto_ptr<uint8_t>  m_ConstArea;
-  std::auto_ptr<uint8_t>  m_Globals;
-  std::auto_ptr<uint8_t>  m_Procs;
-  std::auto_ptr<uint8_t*> m_ProcData;
+  std::auto_ptr<uint8_t>  mTypeInfo;
+  std::auto_ptr<uint8_t>  mSymbols;
+  std::auto_ptr<uint8_t>  mConstArea;
+  std::auto_ptr<uint8_t>  mGlobals;
+  std::auto_ptr<uint8_t>  mProcs;
+  std::auto_ptr<uint8_t*> mProcData;
 #pragma warning (default: 4251)
 };
 
 } //namespace whisper
 
 #endif /* COMPILEDUNIT_H_ */
+

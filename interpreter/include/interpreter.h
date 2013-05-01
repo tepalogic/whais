@@ -142,7 +142,7 @@ public:
   I_Session (Logger& log);
   virtual ~I_Session ();
 
-  virtual void LoadCompiledUnit (WICompiledUnit& unit) = 0;
+  virtual void LoadCompiledUnit (WIFunctionalUnit& unit) = 0;
   virtual void ExecuteProcedure (const char* const pProcName,
                                  SessionStack&       stack) = 0;
 

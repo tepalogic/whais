@@ -37,7 +37,7 @@ whf_open (const char* pFileName, uint_t mode)
   DWORD       dwDesiredAccess = 0;
   DWORD       dwCreation      = 0;
   DWORD       dwFlagsAndAttr  = 0;
-  WH_FILE result;
+  WH_FILE     result;
 
   if (mode & WHC_FILECREATE_NEW)
     dwCreation |= CREATE_NEW;
@@ -59,7 +59,7 @@ whf_open (const char* pFileName, uint_t mode)
                        dwCreation,
                        dwFlagsAndAttr,
                        NULL);
-  result = (result == INVALID_HANDLE_VALUE) ? NULL : result;
+  result = (result == INVALID_HANDLE_VALUE) ? (WH_FILE)-1 : result;
   return result;
 }
 

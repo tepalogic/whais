@@ -105,7 +105,7 @@ public:
           NameSpaceHolder&   privateNames);
   virtual ~Session ();
 
-  virtual void LoadCompiledUnit (WICompiledUnit& unit);
+  virtual void LoadCompiledUnit (WIFunctionalUnit& unit);
   virtual void ExecuteProcedure (const char* const pProcName,
                                  SessionStack&       stack);
 

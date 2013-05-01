@@ -182,7 +182,7 @@ load_unit (I_Session&           session,
 
   try
   {
-    WBufferCompiledUnit unit (unitCode,
+    CompiledBufferUnit unit (unitCode,
                               unitCodeSize,
                               my_postman,
                               unitCode);

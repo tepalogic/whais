@@ -27,22 +27,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-namespace whisper
-{
+namespace whisper {
+namespace whc {
 
-class WhcCmdLineParser
+class CmdLineParser
 {
 public:
-  WhcCmdLineParser (int argc, char **argv);
-  ~WhcCmdLineParser ();
+  CmdLineParser (int argc, char **argv);
+  ~CmdLineParser ();
 
-  const char* GetSourceFile () const
+  const char* SourceFile () const
   {
-    return m_SourceFile;
+    return mSourceFile;
   }
-  const char* GetOutputFile () const
+  const char* OutputFile () const
   {
-    return m_OutputFile;
+    return mOutputFile;
   }
 
 private:
@@ -51,40 +51,43 @@ private:
   void CheckArguments ();
 
 private:
-  int         m_ArgCount;
-  char**      m_Args;
-  const char* m_SourceFile;
-  const char* m_OutputFile;
-  bool        m_ShowHelp;
-  bool        m_OutputFileOwn;
+  int         mArgCount;
+  char**      mArgs;
+  const char* mSourceFile;
+  const char* mOutputFile;
+  bool        mShowHelp;
+  bool        mOutputFileOwn;
 };
 
-class WhcCmdLineException : public Exception
+class CmdLineException : public Exception
 {
 public:
-  WhcCmdLineException (const char* pMessage,
-                       const char* pFile,
+  CmdLineException (const char*   message,
+                       const char*   file,
                        uint32_t      line,
                        uint32_t      extra)
-    : Exception (pMessage, pFile, line, extra)
+    : Exception (message, file, line, extra)
   {
   }
 
-  virtual ~WhcCmdLineException ()
+  virtual ~CmdLineException ()
   {
   };
 
-  virtual Exception*     Clone () const
+  virtual Exception* Clone () const
   {
-    return new WhcCmdLineException (*this);
+    return new CmdLineException (*this);
   }
+
   virtual EXPCEPTION_TYPE Type () const { return COMPILER_CMD_LINE_EXCEPTION; }
-  virtual const char*   Description () const
+
+  virtual const char* Description () const
   {
     return "Invalid command line.";
   }
 };
 
+} //namespace whc
 } //namespace whisper
 
 // Declaration of error codes
@@ -92,3 +95,4 @@ public:
 #define ECMD_LINE_INVAL_ARGS     2
 
 #endif // __WHC_CMDLINE_H
+

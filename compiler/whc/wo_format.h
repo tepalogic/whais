@@ -65,3 +65,4 @@ const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof (uint32_t);
 const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof (uint8_t);
 
 #endif /* WO_FORMAT_H_ */
+

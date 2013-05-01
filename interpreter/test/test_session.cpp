@@ -206,7 +206,7 @@ load_units (I_Session& testSession)
 
   try
   {
-      WBufferCompiledUnit firstUnit (firstCode, sizeof firstCode, my_postman, firstCode);
+      CompiledBufferUnit firstUnit (firstCode, sizeof firstCode, my_postman, firstCode);
       testSession.LoadCompiledUnit (firstUnit);
       std::cout << "Loading first unit  OK" << std::endl;
 
@@ -222,7 +222,7 @@ load_units (I_Session& testSession)
 
   try
   {
-      WBufferCompiledUnit secondUnit (secondCode, sizeof secondCode, my_postman, secondCode);
+      CompiledBufferUnit secondUnit (secondCode, sizeof secondCode, my_postman, secondCode);
       testSession.LoadCompiledUnit (secondUnit);
       std::cout << "Loading second unit  OK" << std::endl;
   }
@@ -242,7 +242,7 @@ check_global_def_err (I_Session& testSession)
 
   try
   {
-    WBufferCompiledUnit unit (notDefGlbCode,
+    CompiledBufferUnit unit (notDefGlbCode,
                               sizeof notDefGlbCode,
                               my_postman,
                               notDefGlbCode);
@@ -274,7 +274,7 @@ check_global_doubledef_err (I_Session& testSession)
 
   try
   {
-    WBufferCompiledUnit unit (doubleDefGlbCode,
+    CompiledBufferUnit unit (doubleDefGlbCode,
                               sizeof doubleDefGlbCode,
                               my_postman,
                               doubleDefGlbCode);
@@ -306,7 +306,7 @@ check_global_diffdef_err (I_Session& testSession)
 
   try
   {
-    WBufferCompiledUnit unit (diffDefGlbCode,
+    CompiledBufferUnit unit (diffDefGlbCode,
                               sizeof diffDefGlbCode,
                               my_postman,
                               diffDefGlbCode);
@@ -339,7 +339,7 @@ check_proc_def_err (I_Session& testSession)
 
   try
   {
-    WBufferCompiledUnit unit (notDefProcCode,
+    CompiledBufferUnit unit (notDefProcCode,
                               sizeof notDefProcCode,
                               my_postman,
                               notDefProcCode);
@@ -371,7 +371,7 @@ check_proc_doubledef_err (I_Session& testSession)
 
   try
   {
-    WBufferCompiledUnit unit (doubleDefProcCode,
+    CompiledBufferUnit unit (doubleDefProcCode,
                               sizeof doubleDefProcCode,
                               my_postman,
                               doubleDefProcCode);
@@ -403,7 +403,7 @@ check_proc_diffdef_err (I_Session& testSession)
 
   try
   {
-    WBufferCompiledUnit unit (diffDefProcCode,
+    CompiledBufferUnit unit (diffDefProcCode,
                               sizeof diffDefProcCode,
                               my_postman,
                               diffDefProcCode);

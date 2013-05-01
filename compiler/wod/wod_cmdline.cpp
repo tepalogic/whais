@@ -30,7 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wod_cmdline.h"
 
 using namespace std;
-using namespace whisper;
+
+namespace whisper {
+namespace wod {
 
 #define VER_MAJOR       0
 #define VER_MINOR       4
@@ -41,74 +43,86 @@ isStrEqual (const char* str1, const char* str2)
   return::strcmp (str1, str2) == 0;
 }
 
-WodCmdLineParser::WodCmdLineParser (int argc, char ** argv) :
-    m_ArgCount (argc),
-    m_Args (argv),
-    m_SourceFile (NULL),
-    m_OutStream (&cout),
-    m_ShowHelp (false)
+CmdLineParser::CmdLineParser (int argc, char ** argv)
+  : mArgCount (argc),
+    mArgs (argv),
+    mSourceFile (NULL),
+    mOutStream (&cout),
+    mShowHelp (false)
 {
   Parse ();
 }
 
-WodCmdLineParser::~WodCmdLineParser ()
+CmdLineParser::~CmdLineParser ()
 {
-  if (m_OutStream != &cout)
-    delete m_OutStream;
+  if (mOutStream != &cout)
+    delete mOutStream;
 }
 
 void
-WodCmdLineParser::Parse ()
+CmdLineParser::Parse ()
 {
   int index = 1;
-  if (index >= m_ArgCount)
-    throw WodCmdLineException ("No arguments! Use --help first!", _EXTRA(0));
+  if (index >= mArgCount)
+    throw CmdLineException ("No arguments! Use --help first!", _EXTRA(0));
 
-  while (index < m_ArgCount)
+  while (index < mArgCount)
     {
-      if (isStrEqual (m_Args[index], "-h") ||
-          isStrEqual (m_Args[index], "--help"))
+      if (isStrEqual (mArgs[index], "-h") ||
+          isStrEqual (mArgs[index], "--help"))
         {
-          m_ShowHelp = true;
+          mShowHelp = true;
           ++index;
         }
-      else if (isStrEqual (m_Args[index], "-o"))
+      else if (isStrEqual (mArgs[index], "-o"))
         {
-          if (m_OutStream != &cout)
-            throw WodCmdLineException ("Parameter '-o' is given twice", _EXTRA (0));
+          if (mOutStream != &cout)
+            {
+              throw CmdLineException ("Parameter '-o' is given twice",
+                                      _EXTRA (0));
+            }
 
-          if ((++index >= m_ArgCount) || (m_Args[index][0] == '-'))
-            throw WodCmdLineException ("Missing file name argument for parameter -o", _EXTRA(0));
+          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
+            {
+              throw CmdLineException (
+                                "Missing file name argument for parameter -o",
+                                _EXTRA(0));
+            }
           else
-            m_OutStream = new ofstream (m_Args[index++]);
+            mOutStream = new ofstream (mArgs[index++]);
         }
-      else if ((m_Args[index][0] != '-') && (m_Args[index][0] != '\\'))
+      else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
         {
-          if ((void *) m_SourceFile != NULL)
-            throw WodCmdLineException ("The source file was already specified!", _EXTRA(0));
-
-          m_SourceFile = m_Args[index++];
+          if ((void *) mSourceFile != NULL)
+            {
+              throw CmdLineException ("The source file was already specified!",
+                                      _EXTRA(0));
+            }
+          mSourceFile = mArgs[index++];
         }
       else
-        throw WodCmdLineException ("Unknown arguments! Use --help first!", _EXTRA(0));
+        {
+          throw CmdLineException ("Unknown arguments! Use --help first!",
+                                  _EXTRA(0));
+        }
     }
   CheckArguments ();
 }
 
 void
-WodCmdLineParser::CheckArguments ()
+CmdLineParser::CheckArguments ()
 {
-  if (m_ShowHelp)
+  if (mShowHelp)
     {
       DisplayUsage ();
       exit (0);
     }
-  else if (m_SourceFile == NULL)
-    throw WodCmdLineException ("No given input file!", _EXTRA(0));
+  else if (mSourceFile == NULL)
+    throw CmdLineException ("No given input file!", _EXTRA(0));
 }
 
 void
-WodCmdLineParser::DisplayUsage () const
+CmdLineParser::DisplayUsage () const
 {
   using namespace std;
 
@@ -116,3 +130,7 @@ WodCmdLineParser::DisplayUsage () const
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
        << "Usage: wod input_file [-o output_file] [--help | -h]" << endl;
 }
+
+} //namespace wod
+} //namespace whisper
+
