@@ -37,16 +37,16 @@ namespace prima {
 struct Unit;
 struct ProcedureEntry
 {
-  uint32_t m_LocalsCount;
-  uint32_t m_ArgsCount;
-  uint32_t m_SyncCount;
-  uint32_t m_SyncIndex;
-  uint32_t m_LocalsIndex;
-  uint32_t m_IdIndex;
-  uint32_t m_TypeOff;
-  uint32_t m_CodeIndex;
-  uint32_t m_CodeSize;
-  Unit*    m_pUnit;
+  uint32_t mLocalsCount;
+  uint32_t mArgsCount;
+  uint32_t mSyncCount;
+  uint32_t mSyncIndex;
+  uint32_t mLocalsIndex;
+  uint32_t mIdIndex;
+  uint32_t mTypeOff;
+  uint32_t mCodeIndex;
+  uint32_t mCodeSize;
+  Unit*    mpUnit;
 };
 
 class NameSpace;
@@ -55,18 +55,18 @@ class ProcedureManager
 {
 public:
   ProcedureManager (NameSpace& space)
-    : m_NameSpace (space),
-      m_ProcsEntrys (),
-      m_Identifiers (),
-      m_LocalsValues (),
-      m_LocalsTypes (),
-      m_Definitions (),
-      m_SyncStmts (),
-      m_Sync ()
+    : mNameSpace (space),
+      mProcsEntrys (),
+      mIdentifiers (),
+      mLocalsValues (),
+      mLocalsTypes (),
+      mDefinitions (),
+      mSyncStmts (),
+      mSync ()
   {
   }
 
-  uint_t Count () const { return m_ProcsEntrys.size (); };
+  uint_t Count () const { return mProcsEntrys.size (); };
 
   uint32_t AddProcedure (const uint8_t*           pName,
                          const uint_t             nameLength,
@@ -117,14 +117,14 @@ private:
   static const uint32_t GLOBAL_ID     = 0x80000000;
   static const uint32_t INVALID_ENTRY = 0xFFFFFFFF;
 
-  NameSpace&                  m_NameSpace;
-  std::vector<ProcedureEntry> m_ProcsEntrys;
-  std::vector<uint8_t>        m_Identifiers;
-  std::vector<StackValue>     m_LocalsValues;
-  std::vector<uint32_t>       m_LocalsTypes;
-  std::vector<uint8_t>        m_Definitions;
-  std::vector<bool>           m_SyncStmts;
-  Lock               m_Sync;
+  NameSpace&                  mNameSpace;
+  std::vector<ProcedureEntry> mProcsEntrys;
+  std::vector<uint8_t>        mIdentifiers;
+  std::vector<StackValue>     mLocalsValues;
+  std::vector<uint32_t>       mLocalsTypes;
+  std::vector<uint8_t>        mDefinitions;
+  std::vector<bool>           mSyncStmts;
+  Lock               mSync;
 };
 
 } //namespace prima

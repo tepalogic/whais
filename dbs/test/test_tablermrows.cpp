@@ -26,14 +26,14 @@ struct DBSFieldDescriptor field_desc[] = {
 static uint_t gElemsCount = 5000000; /* Scale this down for debug purposes! */
 
 bool
-fill_table (I_DBSTable& table)
+fill_table (ITable& table)
 {
   std::cout << "Fill table with " << gElemsCount << " elements ... " << std::endl;
 
   bool result = true;
   for (uint32_t index = 0; index < gElemsCount; ++index)
     {
-      DBSUInt32 fieldValue (index);
+      DUInt32 fieldValue (index);
       uint_t rowIndex = table.AddRow ();
 
       if (rowIndex != index)
@@ -42,7 +42,7 @@ fill_table (I_DBSTable& table)
           break;
         }
 
-      table.SetEntry (rowIndex, 0, fieldValue);
+      table.Set (rowIndex, 0, fieldValue);
 
       std::cout << index + 1 << " (" << gElemsCount << ")\r";
     }
@@ -52,7 +52,7 @@ fill_table (I_DBSTable& table)
 }
 
 bool
-remove_first_rows (I_DBSTable& table)
+remove_first_rows (ITable& table)
 {
   std::cout << "Deleting " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
@@ -67,8 +67,8 @@ remove_first_rows (I_DBSTable& table)
         }
       else
         {
-          DBSUInt32 fieldValue;
-          table.SetEntry (rowIndex, 0, fieldValue);
+          DUInt32 fieldValue;
+          table.Set (rowIndex, 0, fieldValue);
         }
 
       if (table.AddReusedRow() != rowIndex)
@@ -85,7 +85,7 @@ remove_first_rows (I_DBSTable& table)
 }
 
 bool
-restore_first_rows (I_DBSTable& table)
+restore_first_rows (ITable& table)
 {
   std::cout << "Restore the first " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
@@ -94,8 +94,8 @@ restore_first_rows (I_DBSTable& table)
 
   for (uint32_t rowIndex = 1; rowIndex <= count; ++rowIndex)
     {
-      DBSUInt32 fieldValue (rowIndex);
-      table.SetEntry (rowIndex, 0, fieldValue);
+      DUInt32 fieldValue (rowIndex);
+      table.Set (rowIndex, 0, fieldValue);
 
       if ((rowIndex < count) && (table.AddReusedRow() != (rowIndex + 1)))
         {
@@ -117,7 +117,7 @@ restore_first_rows (I_DBSTable& table)
 }
 
 bool
-test_for_radius_rows (I_DBSTable& table)
+test_for_radius_rows (ITable& table)
 {
   std::cout << "Delete rows symmetrically ... " << std::endl;
   bool result = true;
@@ -126,9 +126,9 @@ test_for_radius_rows (I_DBSTable& table)
 
   for (uint_t rowIndex = 0; rowIndex < count; ++rowIndex)
     {
-      DBSUInt32 fieldValue;
-      table.SetEntry ((gElemsCount / 2) - rowIndex, 0, fieldValue);
-      table.SetEntry ((gElemsCount / 2) + count - rowIndex, 0, fieldValue);
+      DUInt32 fieldValue;
+      table.Set ((gElemsCount / 2) - rowIndex, 0, fieldValue);
+      table.Set ((gElemsCount / 2) + count - rowIndex, 0, fieldValue);
 
       if (table.AddReusedRow() != ((gElemsCount / 2) - rowIndex))
         {
@@ -152,8 +152,8 @@ test_for_radius_rows (I_DBSTable& table)
               result = false;
               break;
             }
-          DBSUInt32 fieldValue (rowIndex);
-          table.SetEntry (rowIndex, 0, fieldValue);
+          DUInt32 fieldValue (rowIndex);
+          table.Set (rowIndex, 0, fieldValue);
 
           std::cout << rowIndex - ((gElemsCount / 2) - count + 1) << " (" << count * 2 << ")\r";
 
@@ -182,8 +182,8 @@ main (int argc, char **argv)
 
   I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
   handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
-  I_DBSTable& table        = handler.RetrievePersistentTable ("t_test_tab");
-  I_DBSTable& spawnedTable = table.Spawn ();
+  ITable& table        = handler.RetrievePersistentTable ("t_test_tab");
+  ITable& spawnedTable = table.Spawn ();
 
   success = success && fill_table (table);
   success = success && remove_first_rows (table);

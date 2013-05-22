@@ -40,306 +40,306 @@ I_PMOperand::IsNull () const
 }
 
 void
-I_PMOperand::GetValue (DBSBool& outValue) const
+I_PMOperand::GetValue (DBool& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSChar& outValue) const
+I_PMOperand::GetValue (DChar& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSDate& outValue) const
+I_PMOperand::GetValue (DDate& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSDateTime& outValue) const
+I_PMOperand::GetValue (DDateTime& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSHiresTime& outValue) const
+I_PMOperand::GetValue (DHiresTime& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSInt8& outValue) const
+I_PMOperand::GetValue (DInt8& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSInt16& outValue) const
+I_PMOperand::GetValue (DInt16& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSInt32& outValue) const
+I_PMOperand::GetValue (DInt32& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSInt64& outValue) const
+I_PMOperand::GetValue (DInt64& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSReal& outValue) const
+I_PMOperand::GetValue (DReal& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSRichReal& outValue) const
+I_PMOperand::GetValue (DRichReal& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSUInt8& outValue) const
+I_PMOperand::GetValue (DUInt8& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSUInt16& outValue) const
+I_PMOperand::GetValue (DUInt16& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSUInt32& outValue) const
+I_PMOperand::GetValue (DUInt32& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSText& outValue) const
+I_PMOperand::GetValue (DText& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSArray& outValue) const
+I_PMOperand::GetValue (DArray& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::GetValue (DBSUInt64& outValue) const
+I_PMOperand::GetValue (DUInt64& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSBool& value)
+I_PMOperand::SetValue (const DBool& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSChar& value)
+I_PMOperand::SetValue (const DChar& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSDate& value)
+I_PMOperand::SetValue (const DDate& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSDateTime& value)
+I_PMOperand::SetValue (const DDateTime& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSHiresTime& value)
+I_PMOperand::SetValue (const DHiresTime& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSInt8& value)
+I_PMOperand::SetValue (const DInt8& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSInt16& value)
+I_PMOperand::SetValue (const DInt16& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSInt32& value)
+I_PMOperand::SetValue (const DInt32& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSInt64& value)
+I_PMOperand::SetValue (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSReal& value)
+I_PMOperand::SetValue (const DReal& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSRichReal& value)
+I_PMOperand::SetValue (const DRichReal& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSUInt8& value)
+I_PMOperand::SetValue (const DUInt8& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSUInt16& value)
+I_PMOperand::SetValue (const DUInt16& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSUInt32& value)
+I_PMOperand::SetValue (const DUInt32& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSUInt64& value)
+I_PMOperand::SetValue (const DUInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSText& value)
+I_PMOperand::SetValue (const DText& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SetValue (const DBSArray& value)
+I_PMOperand::SetValue (const DArray& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfAdd (const DBSInt64& value)
+I_PMOperand::SelfAdd (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfAdd (const DBSRichReal& value)
+I_PMOperand::SelfAdd (const DRichReal& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfAdd (const DBSChar& value)
+I_PMOperand::SelfAdd (const DChar& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfAdd (const DBSText& value)
+I_PMOperand::SelfAdd (const DText& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 void
-I_PMOperand::SelfSub (const DBSInt64& value)
-{
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
-}
-
-void
-I_PMOperand::SelfSub (const DBSRichReal& value)
+I_PMOperand::SelfSub (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfMul (const DBSInt64& value)
+I_PMOperand::SelfSub (const DRichReal& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfMul (const DBSRichReal& value)
+I_PMOperand::SelfMul (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfDiv (const DBSInt64& value)
+I_PMOperand::SelfMul (const DRichReal& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfDiv (const DBSRichReal& value)
+I_PMOperand::SelfDiv (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfMod (const DBSInt64& value)
+I_PMOperand::SelfDiv (const DRichReal& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfAnd (const DBSInt64& value)
+I_PMOperand::SelfMod (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfAnd (const DBSBool& value)
+I_PMOperand::SelfAnd (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfXor (const DBSInt64& value)
+I_PMOperand::SelfAnd (const DBool& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfXor (const DBSBool& value)
+I_PMOperand::SelfXor (const DInt64& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfOr (const DBSInt64& value)
+I_PMOperand::SelfXor (const DBool& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-I_PMOperand::SelfOr (const DBSBool& value)
+I_PMOperand::SelfOr (const DInt64& value)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
+I_PMOperand::SelfOr (const DBool& value)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -350,7 +350,7 @@ I_PMOperand::GetField ()
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
-I_DBSTable&
+ITable&
 I_PMOperand::GetTable ()
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
@@ -417,103 +417,103 @@ NullOperand::IsNull () const
 }
 
 void
-NullOperand::GetValue (DBSBool& outValue) const
+NullOperand::GetValue (DBool& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSChar& outValue) const
+NullOperand::GetValue (DChar& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSDate& outValue) const
+NullOperand::GetValue (DDate& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSDateTime& outValue) const
+NullOperand::GetValue (DDateTime& outValue) const
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
 }
 
 void
-NullOperand::GetValue (DBSHiresTime& outValue) const
+NullOperand::GetValue (DHiresTime& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSInt8& outValue) const
+NullOperand::GetValue (DInt8& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSInt16& outValue) const
+NullOperand::GetValue (DInt16& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSInt32& outValue) const
+NullOperand::GetValue (DInt32& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSInt64& outValue) const
+NullOperand::GetValue (DInt64& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSReal& outValue) const
+NullOperand::GetValue (DReal& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSRichReal& outValue) const
+NullOperand::GetValue (DRichReal& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSUInt8& outValue) const
+NullOperand::GetValue (DUInt8& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSUInt16& outValue) const
+NullOperand::GetValue (DUInt16& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSUInt32& outValue) const
+NullOperand::GetValue (DUInt32& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSUInt64& outValue) const
+NullOperand::GetValue (DUInt64& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSText& outValue) const
+NullOperand::GetValue (DText& outValue) const
 {
   assign_null (outValue);
 }
 
 void
-NullOperand::GetValue (DBSArray& outValue) const
+NullOperand::GetValue (DArray& outValue) const
 {
   assign_null (outValue);
 }
@@ -539,37 +539,37 @@ BoolOperand::~BoolOperand ()
 bool
 BoolOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-BoolOperand::GetValue (DBSBool& outValue) const
+BoolOperand::GetValue (DBool& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-BoolOperand::SetValue (const DBSBool& value)
+BoolOperand::SetValue (const DBool& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-BoolOperand::SelfAnd (const DBSBool& value)
+BoolOperand::SelfAnd (const DBool& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-BoolOperand::SelfXor (const DBSBool& value)
+BoolOperand::SelfXor (const DBool& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-BoolOperand::SelfOr (const DBSBool& value)
+BoolOperand::SelfOr (const DBool& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -593,29 +593,29 @@ CharOperand::~CharOperand ()
 bool
 CharOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-CharOperand::GetValue (DBSChar& outValue) const
+CharOperand::GetValue (DChar& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-CharOperand::GetValue (DBSText& outValue) const
+CharOperand::GetValue (DText& outValue) const
 {
-  DBSText text;
+  DText text;
 
-  text.Append (m_Value);
+  text.Append (mValue);
 
   outValue = text;
 }
 
 void
-CharOperand::SetValue (const DBSChar& value)
+CharOperand::SetValue (const DChar& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 uint_t
@@ -639,28 +639,28 @@ DateOperand::~DateOperand ()
 bool
 DateOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-DateOperand::GetValue (DBSDate& outValue) const
+DateOperand::GetValue (DDate& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-DateOperand::GetValue (DBSDateTime& outValue) const
+DateOperand::GetValue (DDateTime& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSDateTime temp;
+      const DDateTime temp;
       outValue = temp;
     }
   else
     {
-      const DBSDateTime temp (m_Value.m_Year,
-                              m_Value.m_Month,
-                              m_Value.m_Day,
+      const DDateTime temp (mValue.mYear,
+                              mValue.mMonth,
+                              mValue.mDay,
                               0,
                               0,
                               0);
@@ -669,18 +669,18 @@ DateOperand::GetValue (DBSDateTime& outValue) const
 }
 
 void
-DateOperand::GetValue (DBSHiresTime& outValue) const
+DateOperand::GetValue (DHiresTime& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSHiresTime temp;
+      const DHiresTime temp;
       outValue = temp;
     }
   else
     {
-      const DBSHiresTime temp (m_Value.m_Year,
-                              m_Value.m_Month,
-                              m_Value.m_Day,
+      const DHiresTime temp (mValue.mYear,
+                              mValue.mMonth,
+                              mValue.mDay,
                               0,
                               0,
                               0,
@@ -690,9 +690,9 @@ DateOperand::GetValue (DBSHiresTime& outValue) const
 }
 
 void
-DateOperand::SetValue (const DBSDate& value)
+DateOperand::SetValue (const DDate& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 uint_t
@@ -716,57 +716,57 @@ DateTimeOperand::~DateTimeOperand ()
 bool
 DateTimeOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-DateTimeOperand::GetValue (DBSDate& outValue) const
+DateTimeOperand::GetValue (DDate& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSDate temp;
+      const DDate temp;
       outValue = temp;
     }
   else
     {
-      const DBSDate temp (m_Value.m_Year,
-                          m_Value.m_Month,
-                          m_Value.m_Day);
+      const DDate temp (mValue.mYear,
+                          mValue.mMonth,
+                          mValue.mDay);
       outValue = temp;
     }
 }
 
 void
-DateTimeOperand::GetValue (DBSDateTime& outValue) const
+DateTimeOperand::GetValue (DDateTime& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-DateTimeOperand::GetValue (DBSHiresTime& outValue) const
+DateTimeOperand::GetValue (DHiresTime& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSHiresTime temp;
+      const DHiresTime temp;
       outValue = temp;
     }
   else
     {
-      const DBSHiresTime temp (m_Value.m_Year,
-                              m_Value.m_Month,
-                              m_Value.m_Day,
-                              m_Value.m_Hour,
-                              m_Value.m_Minutes,
-                              m_Value.m_Seconds,
+      const DHiresTime temp (mValue.mYear,
+                              mValue.mMonth,
+                              mValue.mDay,
+                              mValue.mHour,
+                              mValue.mMinutes,
+                              mValue.mSeconds,
                               0);
       outValue = temp;
     }
 }
 
 void
-DateTimeOperand::SetValue (const DBSDateTime& value)
+DateTimeOperand::SetValue (const DDateTime& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 uint_t
@@ -787,7 +787,7 @@ DateTimeOperand::Duplicate () const
 bool
 HiresTimeOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 HiresTimeOperand::~HiresTimeOperand ()
@@ -795,52 +795,52 @@ HiresTimeOperand::~HiresTimeOperand ()
 }
 
 void
-HiresTimeOperand::GetValue (DBSDate& outValue) const
+HiresTimeOperand::GetValue (DDate& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSDate temp;
+      const DDate temp;
       outValue = temp;
     }
   else
     {
-      const DBSDate temp (m_Value.m_Year,
-                          m_Value.m_Month,
-                          m_Value.m_Day);
+      const DDate temp (mValue.mYear,
+                          mValue.mMonth,
+                          mValue.mDay);
       outValue = temp;
     }
 }
 
 void
-HiresTimeOperand::GetValue (DBSDateTime& outValue) const
+HiresTimeOperand::GetValue (DDateTime& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSDateTime temp;
+      const DDateTime temp;
       outValue = temp;
     }
   else
     {
-      const DBSDateTime temp (m_Value.m_Year,
-                              m_Value.m_Month,
-                              m_Value.m_Day,
-                              m_Value.m_Hour,
-                              m_Value.m_Minutes,
-                              m_Value.m_Seconds);
+      const DDateTime temp (mValue.mYear,
+                              mValue.mMonth,
+                              mValue.mDay,
+                              mValue.mHour,
+                              mValue.mMinutes,
+                              mValue.mSeconds);
       outValue = temp;
     }
 }
 
 void
-HiresTimeOperand::GetValue (DBSHiresTime& outValue) const
+HiresTimeOperand::GetValue (DHiresTime& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-HiresTimeOperand::SetValue (const DBSHiresTime& value)
+HiresTimeOperand::SetValue (const DHiresTime& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 uint_t
@@ -861,7 +861,7 @@ HiresTimeOperand::Duplicate () const
 bool
 UInt8Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 UInt8Operand::~UInt8Operand ()
@@ -869,143 +869,143 @@ UInt8Operand::~UInt8Operand ()
 }
 
 void
-UInt8Operand::GetValue (DBSInt8& outValue) const
+UInt8Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSInt16& outValue) const
+UInt8Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSInt32& outValue) const
+UInt8Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSInt64& outValue) const
+UInt8Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSRichReal& outValue) const
+UInt8Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt8Operand::GetValue (DBSReal& outValue) const
+UInt8Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt8Operand::GetValue (DBSUInt8& outValue) const
+UInt8Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSUInt16& outValue) const
+UInt8Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSUInt32& outValue) const
+UInt8Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-UInt8Operand::GetValue (DBSUInt64& outValue) const
+UInt8Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-UInt8Operand::SetValue (const DBSUInt8& value)
+UInt8Operand::SetValue (const DUInt8& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-UInt8Operand::SelfAdd (const DBSInt64& value)
+UInt8Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-UInt8Operand::SelfSub (const DBSInt64& value)
+UInt8Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-UInt8Operand::SelfMul (const DBSInt64& value)
+UInt8Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-UInt8Operand::SelfDiv (const DBSInt64& value)
+UInt8Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-UInt8Operand::SelfMod (const DBSInt64& value)
+UInt8Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-UInt8Operand::SelfAnd (const DBSInt64& value)
+UInt8Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-UInt8Operand::SelfXor (const DBSInt64& value)
+UInt8Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-UInt8Operand::SelfOr (const DBSInt64& value)
+UInt8Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -1029,148 +1029,148 @@ UInt16Operand::~UInt16Operand ()
 bool
 UInt16Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 
 void
-UInt16Operand::GetValue (DBSInt8& outValue) const
+UInt16Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSInt16& outValue) const
+UInt16Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSInt32& outValue) const
+UInt16Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSInt64& outValue) const
+UInt16Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSRichReal& outValue) const
+UInt16Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt16Operand::GetValue (DBSReal& outValue) const
+UInt16Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt16Operand::GetValue (DBSUInt8& outValue) const
+UInt16Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSUInt16& outValue) const
+UInt16Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSUInt32& outValue) const
+UInt16Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-UInt16Operand::GetValue (DBSUInt64& outValue) const
+UInt16Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-UInt16Operand::SetValue (const DBSUInt16& value)
+UInt16Operand::SetValue (const DUInt16& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-UInt16Operand::SelfAdd (const DBSInt64& value)
+UInt16Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-UInt16Operand::SelfSub (const DBSInt64& value)
+UInt16Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-UInt16Operand::SelfMul (const DBSInt64& value)
+UInt16Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-UInt16Operand::SelfDiv (const DBSInt64& value)
+UInt16Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-UInt16Operand::SelfMod (const DBSInt64& value)
+UInt16Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-UInt16Operand::SelfAnd (const DBSInt64& value)
+UInt16Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-UInt16Operand::SelfXor (const DBSInt64& value)
+UInt16Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-UInt16Operand::SelfOr (const DBSInt64& value)
+UInt16Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -1195,148 +1195,148 @@ UInt32Operand::~UInt32Operand ()
 bool
 UInt32Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 
 void
-UInt32Operand::GetValue (DBSInt8& outValue) const
+UInt32Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSInt16& outValue) const
+UInt32Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSInt32& outValue) const
+UInt32Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSInt64& outValue) const
+UInt32Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSRichReal& outValue) const
+UInt32Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt32Operand::GetValue (DBSReal& outValue) const
+UInt32Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt32Operand::GetValue (DBSUInt8& outValue) const
+UInt32Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSUInt16& outValue) const
+UInt32Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSUInt32& outValue) const
+UInt32Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-UInt32Operand::GetValue (DBSUInt64& outValue) const
+UInt32Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-UInt32Operand::SetValue (const DBSUInt32& value)
+UInt32Operand::SetValue (const DUInt32& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-UInt32Operand::SelfAdd (const DBSInt64& value)
+UInt32Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-UInt32Operand::SelfSub (const DBSInt64& value)
+UInt32Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-UInt32Operand::SelfMul (const DBSInt64& value)
+UInt32Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-UInt32Operand::SelfDiv (const DBSInt64& value)
+UInt32Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-UInt32Operand::SelfMod (const DBSInt64& value)
+UInt32Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-UInt32Operand::SelfAnd (const DBSInt64& value)
+UInt32Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-UInt32Operand::SelfXor (const DBSInt64& value)
+UInt32Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-UInt32Operand::SelfOr (const DBSInt64& value)
+UInt32Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -1360,148 +1360,148 @@ UInt64Operand::~UInt64Operand ()
 bool
 UInt64Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 
 void
-UInt64Operand::GetValue (DBSInt8& outValue) const
+UInt64Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSInt16& outValue) const
+UInt64Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSInt32& outValue) const
+UInt64Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSInt64& outValue) const
+UInt64Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSRichReal& outValue) const
+UInt64Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt64Operand::GetValue (DBSReal& outValue) const
+UInt64Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-UInt64Operand::GetValue (DBSUInt8& outValue) const
+UInt64Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSUInt16& outValue) const
+UInt64Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSUInt32& outValue) const
+UInt64Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-UInt64Operand::GetValue (DBSUInt64& outValue) const
+UInt64Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-UInt64Operand::SetValue (const DBSUInt64& value)
+UInt64Operand::SetValue (const DUInt64& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-UInt64Operand::SelfAdd (const DBSInt64& value)
+UInt64Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-UInt64Operand::SelfSub (const DBSInt64& value)
+UInt64Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-UInt64Operand::SelfMul (const DBSInt64& value)
+UInt64Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-UInt64Operand::SelfDiv (const DBSInt64& value)
+UInt64Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-UInt64Operand::SelfMod (const DBSInt64& value)
+UInt64Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-UInt64Operand::SelfAnd (const DBSInt64& value)
+UInt64Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-UInt64Operand::SelfXor (const DBSInt64& value)
+UInt64Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-UInt64Operand::SelfOr (const DBSInt64& value)
+UInt64Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -1525,147 +1525,147 @@ Int8Operand::~Int8Operand ()
 bool
 Int8Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-Int8Operand::GetValue (DBSInt8& outValue) const
+Int8Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)  = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value) = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)  = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue) = _SC (int8_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSInt16& outValue) const
+Int8Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSInt32& outValue) const
+Int8Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSInt64& outValue) const
+Int8Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSRichReal& outValue) const
+Int8Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int8Operand::GetValue (DBSReal& outValue) const
+Int8Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int8Operand::GetValue (DBSUInt8& outValue) const
+Int8Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSUInt16& outValue) const
+Int8Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSUInt32& outValue) const
+Int8Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-Int8Operand::GetValue (DBSUInt64& outValue) const
+Int8Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-Int8Operand::SetValue (const DBSInt8& value)
+Int8Operand::SetValue (const DInt8& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-Int8Operand::SelfAdd (const DBSInt64& value)
+Int8Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-Int8Operand::SelfSub (const DBSInt64& value)
+Int8Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-Int8Operand::SelfMul (const DBSInt64& value)
+Int8Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-Int8Operand::SelfDiv (const DBSInt64& value)
+Int8Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-Int8Operand::SelfMod (const DBSInt64& value)
+Int8Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-Int8Operand::SelfAnd (const DBSInt64& value)
+Int8Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-Int8Operand::SelfXor (const DBSInt64& value)
+Int8Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-Int8Operand::SelfOr (const DBSInt64& value)
+Int8Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -1689,147 +1689,147 @@ Int16Operand::~Int16Operand ()
 bool
 Int16Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-Int16Operand::GetValue (DBSInt8& outValue) const
+Int16Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSInt16& outValue) const
+Int16Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSInt32& outValue) const
+Int16Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSInt64& outValue) const
+Int16Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSRichReal& outValue) const
+Int16Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int16Operand::GetValue (DBSReal& outValue) const
+Int16Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int16Operand::GetValue (DBSUInt8& outValue) const
+Int16Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSUInt16& outValue) const
+Int16Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSUInt32& outValue) const
+Int16Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-Int16Operand::GetValue (DBSUInt64& outValue) const
+Int16Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-Int16Operand::SetValue (const DBSInt16& value)
+Int16Operand::SetValue (const DInt16& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-Int16Operand::SelfAdd (const DBSInt64& value)
+Int16Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-Int16Operand::SelfSub (const DBSInt64& value)
+Int16Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-Int16Operand::SelfMul (const DBSInt64& value)
+Int16Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-Int16Operand::SelfDiv (const DBSInt64& value)
+Int16Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-Int16Operand::SelfMod (const DBSInt64& value)
+Int16Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-Int16Operand::SelfAnd (const DBSInt64& value)
+Int16Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-Int16Operand::SelfXor (const DBSInt64& value)
+Int16Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-Int16Operand::SelfOr (const DBSInt64& value)
+Int16Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -1854,147 +1854,147 @@ Int32Operand::~Int32Operand ()
 bool
 Int32Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-Int32Operand::GetValue (DBSInt8& outValue) const
+Int32Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSInt16& outValue) const
+Int32Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSInt32& outValue) const
+Int32Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSInt64& outValue) const
+Int32Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSRichReal& outValue) const
+Int32Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int32Operand::GetValue (DBSReal& outValue) const
+Int32Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int32Operand::GetValue (DBSUInt8& outValue) const
+Int32Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSUInt16& outValue) const
+Int32Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSUInt32& outValue) const
+Int32Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-Int32Operand::GetValue (DBSUInt64& outValue) const
+Int32Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-Int32Operand::SetValue (const DBSInt32& value)
+Int32Operand::SetValue (const DInt32& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-Int32Operand::SelfAdd (const DBSInt64& value)
+Int32Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-Int32Operand::SelfSub (const DBSInt64& value)
+Int32Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-Int32Operand::SelfMul (const DBSInt64& value)
+Int32Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-Int32Operand::SelfDiv (const DBSInt64& value)
+Int32Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-Int32Operand::SelfMod (const DBSInt64& value)
+Int32Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-Int32Operand::SelfAnd (const DBSInt64& value)
+Int32Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-Int32Operand::SelfXor (const DBSInt64& value)
+Int32Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-Int32Operand::SelfOr (const DBSInt64& value)
+Int32Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -2018,147 +2018,147 @@ Int64Operand::~Int64Operand ()
 bool
 Int64Operand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-Int64Operand::GetValue (DBSInt8& outValue) const
+Int64Operand::GetValue (DInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int8_t&, outValue.m_Value)  = _SC (int8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSInt16& outValue) const
+Int64Operand::GetValue (DInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int16_t&, outValue.m_Value) = _SC (int16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mValue) = _SC (int16_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSInt32& outValue) const
+Int64Operand::GetValue (DInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int32_t&, outValue.m_Value) = _SC (int32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int32_t&, outValue.mValue) = _SC (int32_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSInt64& outValue) const
+Int64Operand::GetValue (DInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)   = m_Value.m_IsNull;
-  _CC (int64_t&, outValue.m_Value) = _SC (int64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSRichReal& outValue) const
+Int64Operand::GetValue (DRichReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSRichReal temp;
+      const DRichReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSRichReal temp (m_Value.m_Value);
+      const DRichReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int64Operand::GetValue (DBSReal& outValue) const
+Int64Operand::GetValue (DReal& outValue) const
 {
-  if (m_Value.IsNull ())
+  if (mValue.IsNull ())
     {
-      const DBSReal temp;
+      const DReal temp;
       outValue = temp;
     }
   else
     {
-      const DBSReal temp (m_Value.m_Value);
+      const DReal temp (mValue.mValue);
       outValue = temp;
     }
 }
 
 void
-Int64Operand::GetValue (DBSUInt8& outValue) const
+Int64Operand::GetValue (DUInt8& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint8_t&, outValue.m_Value)  = _SC (uint8_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSUInt16& outValue) const
+Int64Operand::GetValue (DUInt16& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint16_t&, outValue.m_Value) = _SC (uint16_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSUInt32& outValue) const
+Int64Operand::GetValue (DUInt32& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint32_t&, outValue.m_Value) = _SC (uint32_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
 }
 
 void
-Int64Operand::GetValue (DBSUInt64& outValue) const
+Int64Operand::GetValue (DUInt64& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)    = m_Value.m_IsNull;
-  _CC (uint64_t&, outValue.m_Value) = _SC (uint64_t, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
+  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
 }
 
 void
-Int64Operand::SetValue (const DBSInt64& value)
+Int64Operand::SetValue (const DInt64& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-Int64Operand::SelfAdd (const DBSInt64& value)
+Int64Operand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-Int64Operand::SelfSub (const DBSInt64& value)
+Int64Operand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-Int64Operand::SelfMul (const DBSInt64& value)
+Int64Operand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-Int64Operand::SelfDiv (const DBSInt64& value)
+Int64Operand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-Int64Operand::SelfMod (const DBSInt64& value)
+Int64Operand::SelfMod (const DInt64& value)
 {
-  m_Value = internal_mod (m_Value, value);
+  mValue = internal_mod (mValue, value);
 }
 
 void
-Int64Operand::SelfAnd (const DBSInt64& value)
+Int64Operand::SelfAnd (const DInt64& value)
 {
-  m_Value = internal_and (m_Value, value);
+  mValue = internal_and (mValue, value);
 }
 
 void
-Int64Operand::SelfXor (const DBSInt64& value)
+Int64Operand::SelfXor (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 void
-Int64Operand::SelfOr (const DBSInt64& value)
+Int64Operand::SelfOr (const DInt64& value)
 {
-  m_Value = internal_xor (m_Value, value);
+  mValue = internal_xor (mValue, value);
 }
 
 uint_t
@@ -2183,74 +2183,74 @@ RealOperand::~RealOperand ()
 bool
 RealOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-RealOperand::GetValue (DBSReal& outValue) const
+RealOperand::GetValue (DReal& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-RealOperand::GetValue (DBSRichReal& outValue) const
+RealOperand::GetValue (DRichReal& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull)      = m_Value.m_IsNull;
-  _CC (RICHREAL_T&, outValue.m_Value) = _SC (RICHREAL_T, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull)      = mValue.mIsNull;
+  _CC (RICHREAL_T&, outValue.mValue) = _SC (RICHREAL_T, mValue.mValue);
 }
 
 void
-RealOperand::SetValue (const DBSReal& value)
+RealOperand::SetValue (const DReal& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-RealOperand::SelfAdd (const DBSInt64& value)
+RealOperand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-RealOperand::SelfAdd (const DBSRichReal& value)
+RealOperand::SelfAdd (const DRichReal& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-RealOperand::SelfSub (const DBSInt64& value)
+RealOperand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-RealOperand::SelfSub (const DBSRichReal& value)
+RealOperand::SelfSub (const DRichReal& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-RealOperand::SelfMul (const DBSInt64& value)
+RealOperand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-RealOperand::SelfMul (const DBSRichReal& value)
+RealOperand::SelfMul (const DRichReal& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-RealOperand::SelfDiv (const DBSInt64& value)
+RealOperand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-RealOperand::SelfDiv (const DBSRichReal& value)
+RealOperand::SelfDiv (const DRichReal& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 uint_t
@@ -2274,74 +2274,74 @@ RichRealOperand::~RichRealOperand ()
 bool
 RichRealOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-RichRealOperand::GetValue (DBSReal& outValue) const
+RichRealOperand::GetValue (DReal& outValue) const
 {
-  _CC (bool&, outValue.m_IsNull) = m_Value.m_IsNull;
-  _CC (REAL_T&, outValue.m_Value) = _SC (REAL_T, m_Value.m_Value);
+  _CC (bool&, outValue.mIsNull) = mValue.mIsNull;
+  _CC (REAL_T&, outValue.mValue) = _SC (REAL_T, mValue.mValue);
 }
 
 void
-RichRealOperand::GetValue (DBSRichReal& outValue) const
+RichRealOperand::GetValue (DRichReal& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-RichRealOperand::SetValue (const DBSRichReal& value)
+RichRealOperand::SetValue (const DRichReal& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-RichRealOperand::SelfAdd (const DBSInt64& value)
+RichRealOperand::SelfAdd (const DInt64& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-RichRealOperand::SelfAdd (const DBSRichReal& value)
+RichRealOperand::SelfAdd (const DRichReal& value)
 {
-  m_Value = internal_add (m_Value, value);
+  mValue = internal_add (mValue, value);
 }
 
 void
-RichRealOperand::SelfSub (const DBSInt64& value)
+RichRealOperand::SelfSub (const DInt64& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-RichRealOperand::SelfSub (const DBSRichReal& value)
+RichRealOperand::SelfSub (const DRichReal& value)
 {
-  m_Value = internal_sub (m_Value, value);
+  mValue = internal_sub (mValue, value);
 }
 
 void
-RichRealOperand::SelfMul (const DBSInt64& value)
+RichRealOperand::SelfMul (const DInt64& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-RichRealOperand::SelfMul (const DBSRichReal& value)
+RichRealOperand::SelfMul (const DRichReal& value)
 {
-  m_Value = internal_mul (m_Value, value);
+  mValue = internal_mul (mValue, value);
 }
 
 void
-RichRealOperand::SelfDiv (const DBSInt64& value)
+RichRealOperand::SelfDiv (const DInt64& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 void
-RichRealOperand::SelfDiv (const DBSRichReal& value)
+RichRealOperand::SelfDiv (const DRichReal& value)
 {
-  m_Value = internal_div (m_Value, value);
+  mValue = internal_div (mValue, value);
 }
 
 uint_t
@@ -2365,37 +2365,37 @@ TextOperand::~TextOperand ()
 bool
 TextOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-TextOperand::GetValue (DBSText& outValue) const
+TextOperand::GetValue (DText& outValue) const
 {
-  outValue = m_Value;
+  outValue = mValue;
 }
 
 void
-TextOperand::SetValue (const DBSText& value)
+TextOperand::SetValue (const DText& value)
 {
-  m_Value = value;
+  mValue = value;
 }
 
 void
-TextOperand::SelfAdd (const DBSChar& value)
+TextOperand::SelfAdd (const DChar& value)
 {
-  m_Value.Append (value);
+  mValue.Append (value);
 }
 
 void
-TextOperand::SelfAdd (const DBSText& value)
+TextOperand::SelfAdd (const DText& value)
 {
-  m_Value.Append (value);
+  mValue.Append (value);
 }
 
 StackValue
 TextOperand::GetValueAt (const uint64_t index)
 {
-  return StackValue (CharTextElOperand (m_Value, index));
+  return StackValue (CharTextElOperand (mValue, index));
 }
 
 uint_t
@@ -2413,7 +2413,7 @@ TextOperand::Duplicate () const
 void
 TextOperand::NotifyCopy ()
 {
-  m_Value.SetMirror (m_Value);
+  mValue.MakeMirror (mValue);
 }
 
 ///////////////////////////////CharTextOperand/////////////////////////////////
@@ -2430,25 +2430,25 @@ CharTextElOperand::IsNull () const
 }
 
 void
-CharTextElOperand::GetValue (DBSChar& outValue) const
+CharTextElOperand::GetValue (DChar& outValue) const
 {
-  outValue = m_Text.GetCharAtIndex (m_Index);
+  outValue = mText.CharAt (mIndex);
 }
 
 void
-CharTextElOperand::GetValue (DBSText& outValue) const
+CharTextElOperand::GetValue (DText& outValue) const
 {
-  DBSChar ch = m_Text.GetCharAtIndex (m_Index);
-  DBSText text;
+  DChar ch = mText.CharAt (mIndex);
+  DText text;
 
   text.Append (ch);
   outValue = text;
 }
 
 void
-CharTextElOperand::SetValue (const DBSChar& value)
+CharTextElOperand::SetValue (const DChar& value)
 {
-  m_Text.SetCharAtIndex (value, m_Index);
+  mText.CharAt (mIndex, value);
 }
 
 uint_t
@@ -2460,7 +2460,7 @@ CharTextElOperand::GetType ()
 StackValue
 CharTextElOperand::Duplicate () const
 {
-  DBSChar ch;
+  DChar ch;
   GetValue (ch);
 
   return StackValue (CharOperand (ch));
@@ -2469,14 +2469,14 @@ CharTextElOperand::Duplicate () const
 void
 CharTextElOperand::NotifyCopy ()
 {
-  m_Text.SetMirror (m_Text);
+  mText.MakeMirror (mText);
 }
 
 ///////////////////////GlobalOperand///////////////////////////////////////////
 
 GlobalOperand::GlobalOperand (GlobalValue& value) :
     I_PMOperand (),
-    m_Value (value)
+    mValue (value)
 {
 }
 
@@ -2488,762 +2488,762 @@ GlobalOperand::~GlobalOperand ()
 bool
 GlobalOperand::IsNull () const
 {
-  return m_Value.IsNull ();
+  return mValue.IsNull ();
 }
 
 void
-GlobalOperand::GetValue (DBSBool& outValue) const
+GlobalOperand::GetValue (DBool& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSChar& outValue) const
+GlobalOperand::GetValue (DChar& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSDate& outValue) const
+GlobalOperand::GetValue (DDate& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSDateTime& outValue) const
+GlobalOperand::GetValue (DDateTime& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSHiresTime& outValue) const
+GlobalOperand::GetValue (DHiresTime& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSInt8& outValue) const
+GlobalOperand::GetValue (DInt8& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSInt16& outValue) const
+GlobalOperand::GetValue (DInt16& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSInt32& outValue) const
+GlobalOperand::GetValue (DInt32& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSInt64& outValue) const
+GlobalOperand::GetValue (DInt64& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSReal& outValue) const
+GlobalOperand::GetValue (DReal& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSRichReal& outValue) const
+GlobalOperand::GetValue (DRichReal& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSUInt8& outValue) const
+GlobalOperand::GetValue (DUInt8& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSUInt16& outValue) const
+GlobalOperand::GetValue (DUInt16& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSUInt32& outValue) const
+GlobalOperand::GetValue (DUInt32& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSUInt64& outValue) const
+GlobalOperand::GetValue (DUInt64& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSText& outValue) const
+GlobalOperand::GetValue (DText& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::GetValue (DBSArray& outValue) const
+GlobalOperand::GetValue (DArray& outValue) const
 {
-  m_Value.GetValue (outValue);
+  mValue.GetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSBool& outValue)
+GlobalOperand::SetValue (const DBool& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSChar& outValue)
+GlobalOperand::SetValue (const DChar& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSDate& outValue)
+GlobalOperand::SetValue (const DDate& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSDateTime& outValue)
+GlobalOperand::SetValue (const DDateTime& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSHiresTime& outValue)
+GlobalOperand::SetValue (const DHiresTime& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSInt8& outValue)
+GlobalOperand::SetValue (const DInt8& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSInt16& outValue)
+GlobalOperand::SetValue (const DInt16& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSInt32& outValue)
+GlobalOperand::SetValue (const DInt32& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSInt64& outValue)
+GlobalOperand::SetValue (const DInt64& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSReal& outValue)
+GlobalOperand::SetValue (const DReal& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSRichReal& outValue)
+GlobalOperand::SetValue (const DRichReal& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSUInt8& outValue)
+GlobalOperand::SetValue (const DUInt8& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSUInt16& outValue)
+GlobalOperand::SetValue (const DUInt16& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSUInt32& outValue)
+GlobalOperand::SetValue (const DUInt32& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSUInt64& outValue)
+GlobalOperand::SetValue (const DUInt64& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSText& outValue)
+GlobalOperand::SetValue (const DText& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SetValue (const DBSArray& outValue)
+GlobalOperand::SetValue (const DArray& outValue)
 {
-  m_Value.SetValue (outValue);
+  mValue.SetValue (outValue);
 }
 
 void
-GlobalOperand::SelfAdd (const DBSInt64& value)
+GlobalOperand::SelfAdd (const DInt64& value)
 {
-  m_Value.SelfAdd (value);
+  mValue.SelfAdd (value);
 }
 
 void
-GlobalOperand::SelfAdd (const DBSRichReal& value)
+GlobalOperand::SelfAdd (const DRichReal& value)
 {
-  m_Value.SelfAdd (value);
+  mValue.SelfAdd (value);
 }
 
 void
-GlobalOperand::SelfAdd (const DBSChar& value)
+GlobalOperand::SelfAdd (const DChar& value)
 {
-  m_Value.SelfAdd (value);
+  mValue.SelfAdd (value);
 }
 
 void
-GlobalOperand::SelfAdd (const DBSText& value)
+GlobalOperand::SelfAdd (const DText& value)
 {
-  m_Value.SelfAdd (value);
+  mValue.SelfAdd (value);
 }
 void
-GlobalOperand::SelfSub (const DBSInt64& value)
+GlobalOperand::SelfSub (const DInt64& value)
 {
-  m_Value.SelfSub (value);
-}
-
-void
-GlobalOperand::SelfSub (const DBSRichReal& value)
-{
-  m_Value.SelfSub (value);
+  mValue.SelfSub (value);
 }
 
 void
-GlobalOperand::SelfMul (const DBSInt64& value)
+GlobalOperand::SelfSub (const DRichReal& value)
 {
-  m_Value.SelfMul (value);
+  mValue.SelfSub (value);
 }
 
 void
-GlobalOperand::SelfMul (const DBSRichReal& value)
+GlobalOperand::SelfMul (const DInt64& value)
 {
-  m_Value.SelfMul (value);
+  mValue.SelfMul (value);
 }
 
 void
-GlobalOperand::SelfDiv (const DBSInt64& value)
+GlobalOperand::SelfMul (const DRichReal& value)
 {
-  m_Value.SelfDiv (value);
+  mValue.SelfMul (value);
 }
 
 void
-GlobalOperand::SelfDiv (const DBSRichReal& value)
+GlobalOperand::SelfDiv (const DInt64& value)
 {
-  m_Value.SelfDiv (value);
+  mValue.SelfDiv (value);
 }
 
 void
-GlobalOperand::SelfMod (const DBSInt64& value)
+GlobalOperand::SelfDiv (const DRichReal& value)
 {
-  m_Value.SelfMod (value);
+  mValue.SelfDiv (value);
 }
 
 void
-GlobalOperand::SelfAnd (const DBSInt64& value)
+GlobalOperand::SelfMod (const DInt64& value)
 {
-  m_Value.SelfAnd (value);
+  mValue.SelfMod (value);
 }
 
 void
-GlobalOperand::SelfAnd (const DBSBool& value)
+GlobalOperand::SelfAnd (const DInt64& value)
 {
-  m_Value.SelfAnd (value);
+  mValue.SelfAnd (value);
 }
 
 void
-GlobalOperand::SelfXor (const DBSInt64& value)
+GlobalOperand::SelfAnd (const DBool& value)
 {
-  m_Value.SelfXor (value);
+  mValue.SelfAnd (value);
 }
 
 void
-GlobalOperand::SelfXor (const DBSBool& value)
+GlobalOperand::SelfXor (const DInt64& value)
 {
-  m_Value.SelfXor (value);
+  mValue.SelfXor (value);
 }
 
 void
-GlobalOperand::SelfOr (const DBSInt64& value)
+GlobalOperand::SelfXor (const DBool& value)
 {
-  m_Value.SelfOr (value);
+  mValue.SelfXor (value);
 }
 
 void
-GlobalOperand::SelfOr (const DBSBool& value)
+GlobalOperand::SelfOr (const DInt64& value)
 {
-  m_Value.SelfOr (value);
+  mValue.SelfOr (value);
+}
+
+void
+GlobalOperand::SelfOr (const DBool& value)
+{
+  mValue.SelfOr (value);
 }
 
 uint_t
 GlobalOperand::GetType ()
 {
-  return m_Value.GetType ();
+  return mValue.GetType ();
 }
 
 FIELD_INDEX
 GlobalOperand::GetField ()
 {
-  return m_Value.GetField ();
+  return mValue.GetField ();
 }
 
-I_DBSTable&
+ITable&
 GlobalOperand::GetTable ()
 {
-  return m_Value.GetTable ();
+  return mValue.GetTable ();
 }
 
 StackValue
 GlobalOperand::GetFieldAt (const FIELD_INDEX field)
 {
-  return m_Value.GetFieldAt (field);
+  return mValue.GetFieldAt (field);
 }
 
 StackValue
 GlobalOperand::GetValueAt (const uint64_t index)
 {
-  return m_Value.GetValueAt (index);
+  return mValue.GetValueAt (index);
 }
 
 StackValue
 GlobalOperand::Duplicate () const
 {
-  return m_Value.Duplicate ();
+  return mValue.Duplicate ();
 }
 
 void
 GlobalOperand::NotifyCopy ()
 {
-  m_Value.NotifyCopy ();
+  mValue.NotifyCopy ();
 }
 
 
 TableOperand
 GlobalOperand::GetTableOp ()
 {
-  return m_Value.GetTableOp ();
+  return mValue.GetTableOp ();
 }
 
 void
 GlobalOperand::CopyTableOp (const TableOperand& tableOp)
 {
-  m_Value.CopyTableOp (tableOp);
+  mValue.CopyTableOp (tableOp);
 }
 
 FieldOperand
 GlobalOperand::GetFieldOp ()
 {
-  return m_Value.GetFieldOp ();
+  return mValue.GetFieldOp ();
 }
 
 void
 GlobalOperand::CopyFieldOp (const FieldOperand& fieldOp)
 {
-  m_Value.CopyFieldOp (fieldOp);
+  mValue.CopyFieldOp (fieldOp);
 }
 
 ////////////////////////////////////LocalOperand///////////////////////////////
 
 LocalOperand::LocalOperand (SessionStack& stack, const uint64_t index)
   : I_PMOperand (),
-    m_Index (index),
-    m_Stack (stack)
+    mIndex (index),
+    mStack (stack)
 {
 }
 
 bool
 LocalOperand::IsNull () const
 {
-  return m_Stack[m_Index].GetOperand ().IsNull ();
+  return mStack[mIndex].GetOperand ().IsNull ();
 }
 
 void
-LocalOperand::GetValue (DBSBool& outValue) const
+LocalOperand::GetValue (DBool& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSChar& outValue) const
+LocalOperand::GetValue (DChar& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSDate& outValue) const
+LocalOperand::GetValue (DDate& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSDateTime& outValue) const
+LocalOperand::GetValue (DDateTime& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSHiresTime& outValue) const
+LocalOperand::GetValue (DHiresTime& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSInt8& outValue) const
+LocalOperand::GetValue (DInt8& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSInt16& outValue) const
+LocalOperand::GetValue (DInt16& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSInt32& outValue) const
+LocalOperand::GetValue (DInt32& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSInt64& outValue) const
+LocalOperand::GetValue (DInt64& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSReal& outValue) const
+LocalOperand::GetValue (DReal& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSRichReal& outValue) const
+LocalOperand::GetValue (DRichReal& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSUInt8& outValue) const
+LocalOperand::GetValue (DUInt8& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSUInt16& outValue) const
+LocalOperand::GetValue (DUInt16& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSUInt32& outValue) const
+LocalOperand::GetValue (DUInt32& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSUInt64& outValue) const
+LocalOperand::GetValue (DUInt64& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSText& outValue) const
+LocalOperand::GetValue (DText& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::GetValue (DBSArray& outValue) const
+LocalOperand::GetValue (DArray& outValue) const
 {
-  m_Stack[m_Index].GetOperand ().GetValue (outValue);
+  mStack[mIndex].GetOperand ().GetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSBool& outValue)
+LocalOperand::SetValue (const DBool& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSChar& outValue)
+LocalOperand::SetValue (const DChar& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSDate& outValue)
+LocalOperand::SetValue (const DDate& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSDateTime& outValue)
+LocalOperand::SetValue (const DDateTime& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSHiresTime& outValue)
+LocalOperand::SetValue (const DHiresTime& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSInt8& outValue)
+LocalOperand::SetValue (const DInt8& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSInt16& outValue)
+LocalOperand::SetValue (const DInt16& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSInt32& outValue)
+LocalOperand::SetValue (const DInt32& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSInt64& outValue)
+LocalOperand::SetValue (const DInt64& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSReal& outValue)
+LocalOperand::SetValue (const DReal& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSRichReal& outValue)
+LocalOperand::SetValue (const DRichReal& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSUInt8& outValue)
+LocalOperand::SetValue (const DUInt8& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSUInt16& outValue)
+LocalOperand::SetValue (const DUInt16& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSUInt32& outValue)
+LocalOperand::SetValue (const DUInt32& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSUInt64& outValue)
+LocalOperand::SetValue (const DUInt64& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSText& outValue)
+LocalOperand::SetValue (const DText& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SetValue (const DBSArray& outValue)
+LocalOperand::SetValue (const DArray& outValue)
 {
-  m_Stack[m_Index].GetOperand ().SetValue (outValue);
+  mStack[mIndex].GetOperand ().SetValue (outValue);
 }
 
 void
-LocalOperand::SelfAdd (const DBSInt64& value)
+LocalOperand::SelfAdd (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfAdd (value);
+  mStack[mIndex].GetOperand ().SelfAdd (value);
 }
 
 void
-LocalOperand::SelfAdd (const DBSRichReal& value)
+LocalOperand::SelfAdd (const DRichReal& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfAdd (value);
+  mStack[mIndex].GetOperand ().SelfAdd (value);
 }
 
 void
-LocalOperand::SelfAdd (const DBSChar& value)
+LocalOperand::SelfAdd (const DChar& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfAdd (value);
+  mStack[mIndex].GetOperand ().SelfAdd (value);
 }
 
 void
-LocalOperand::SelfAdd (const DBSText& value)
+LocalOperand::SelfAdd (const DText& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfAdd (value);
+  mStack[mIndex].GetOperand ().SelfAdd (value);
 }
 void
-LocalOperand::SelfSub (const DBSInt64& value)
+LocalOperand::SelfSub (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfSub (value);
-}
-
-void
-LocalOperand::SelfSub (const DBSRichReal& value)
-{
-  m_Stack[m_Index].GetOperand ().SelfSub (value);
+  mStack[mIndex].GetOperand ().SelfSub (value);
 }
 
 void
-LocalOperand::SelfMul (const DBSInt64& value)
+LocalOperand::SelfSub (const DRichReal& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfMul (value);
+  mStack[mIndex].GetOperand ().SelfSub (value);
 }
 
 void
-LocalOperand::SelfMul (const DBSRichReal& value)
+LocalOperand::SelfMul (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfMul (value);
+  mStack[mIndex].GetOperand ().SelfMul (value);
 }
 
 void
-LocalOperand::SelfDiv (const DBSInt64& value)
+LocalOperand::SelfMul (const DRichReal& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfDiv (value);
+  mStack[mIndex].GetOperand ().SelfMul (value);
 }
 
 void
-LocalOperand::SelfDiv (const DBSRichReal& value)
+LocalOperand::SelfDiv (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfDiv (value);
+  mStack[mIndex].GetOperand ().SelfDiv (value);
 }
 
 void
-LocalOperand::SelfMod (const DBSInt64& value)
+LocalOperand::SelfDiv (const DRichReal& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfMod (value);
+  mStack[mIndex].GetOperand ().SelfDiv (value);
 }
 
 void
-LocalOperand::SelfAnd (const DBSInt64& value)
+LocalOperand::SelfMod (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfAnd (value);
+  mStack[mIndex].GetOperand ().SelfMod (value);
 }
 
 void
-LocalOperand::SelfAnd (const DBSBool& value)
+LocalOperand::SelfAnd (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfAnd (value);
+  mStack[mIndex].GetOperand ().SelfAnd (value);
 }
 
 void
-LocalOperand::SelfXor (const DBSInt64& value)
+LocalOperand::SelfAnd (const DBool& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfXor (value);
+  mStack[mIndex].GetOperand ().SelfAnd (value);
 }
 
 void
-LocalOperand::SelfXor (const DBSBool& value)
+LocalOperand::SelfXor (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfXor (value);
+  mStack[mIndex].GetOperand ().SelfXor (value);
 }
 
 void
-LocalOperand::SelfOr (const DBSInt64& value)
+LocalOperand::SelfXor (const DBool& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfOr (value);
+  mStack[mIndex].GetOperand ().SelfXor (value);
 }
 
 void
-LocalOperand::SelfOr (const DBSBool& value)
+LocalOperand::SelfOr (const DInt64& value)
 {
-  m_Stack[m_Index].GetOperand ().SelfOr (value);
+  mStack[mIndex].GetOperand ().SelfOr (value);
+}
+
+void
+LocalOperand::SelfOr (const DBool& value)
+{
+  mStack[mIndex].GetOperand ().SelfOr (value);
 }
 
 uint_t
 LocalOperand::GetType ()
 {
-  return m_Stack[m_Index].GetOperand ().GetType ();
+  return mStack[mIndex].GetOperand ().GetType ();
 }
 
 FIELD_INDEX
 LocalOperand::GetField ()
 {
-  return m_Stack[m_Index].GetOperand ().GetField ();
+  return mStack[mIndex].GetOperand ().GetField ();
 }
 
-I_DBSTable&
+ITable&
 LocalOperand::GetTable ()
 {
-  return m_Stack[m_Index].GetOperand ().GetTable ();
+  return mStack[mIndex].GetOperand ().GetTable ();
 }
 
 StackValue
 LocalOperand::GetFieldAt (const FIELD_INDEX field)
 {
-  return m_Stack[m_Index].GetOperand ().GetFieldAt (field);
+  return mStack[mIndex].GetOperand ().GetFieldAt (field);
 }
 
 StackValue
 LocalOperand::GetValueAt (const uint64_t index)
 {
-  return m_Stack[m_Index].GetOperand ().GetValueAt (index);
+  return mStack[mIndex].GetOperand ().GetValueAt (index);
 }
 
 StackValue
 LocalOperand::Duplicate () const
 {
-  return m_Stack[m_Index].GetOperand ().Duplicate ();
+  return mStack[mIndex].GetOperand ().Duplicate ();
 }
 
 TableOperand
 LocalOperand::GetTableOp ()
 {
-  I_PMOperand& op = _SC (I_PMOperand&, m_Stack[m_Index].GetOperand ());
+  I_PMOperand& op = _SC (I_PMOperand&, mStack[mIndex].GetOperand ());
   return op.GetTableOp ();
 }
 
 void
 LocalOperand::CopyTableOp (const TableOperand& tableOp)
 {
-  I_PMOperand& op = _SC (I_PMOperand&, m_Stack[m_Index].GetOperand ());
+  I_PMOperand& op = _SC (I_PMOperand&, mStack[mIndex].GetOperand ());
   op.CopyTableOp (tableOp);
 }
 
 FieldOperand
 LocalOperand::GetFieldOp ()
 {
-  I_PMOperand& op = _SC (I_PMOperand&, m_Stack[m_Index].GetOperand ());
+  I_PMOperand& op = _SC (I_PMOperand&, mStack[mIndex].GetOperand ());
   return op.GetFieldOp ();
 }
 
 void
 LocalOperand::CopyFieldOp (const FieldOperand& fieldOp)
 {
-  I_PMOperand& op = _SC (I_PMOperand&, m_Stack[m_Index].GetOperand ());
+  I_PMOperand& op = _SC (I_PMOperand&, mStack[mIndex].GetOperand ());
   op.CopyFieldOp (fieldOp);
 }
 
@@ -3254,14 +3254,14 @@ LocalOperand::CopyFieldOp (const FieldOperand& fieldOp)
 using namespace prima;
 
 SessionStack::SessionStack ()
-  : m_Stack ()
+  : mStack ()
 {
 }
 
 SessionStack::~SessionStack ()
 {
-  if (m_Stack.size () > 0)
-    Pop (m_Stack.size ());
+  if (mStack.size () > 0)
+    Pop (mStack.size ());
 }
 
 void
@@ -3274,7 +3274,7 @@ SessionStack::Push ()
 }
 
 void
-SessionStack::Push (const DBSBool& value)
+SessionStack::Push (const DBool& value)
 {
   BoolOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3283,7 +3283,7 @@ SessionStack::Push (const DBSBool& value)
 }
 
 void
-SessionStack::Push (const DBSChar& value)
+SessionStack::Push (const DChar& value)
 {
   CharOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3292,7 +3292,7 @@ SessionStack::Push (const DBSChar& value)
 }
 
 void
-SessionStack::Push (const DBSDate& value)
+SessionStack::Push (const DDate& value)
 {
   DateOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3301,7 +3301,7 @@ SessionStack::Push (const DBSDate& value)
 }
 
 void
-SessionStack::Push (const DBSDateTime& value)
+SessionStack::Push (const DDateTime& value)
 {
   DateTimeOperand stackOp (value);
   StackValue      stackValue (stackOp);
@@ -3310,7 +3310,7 @@ SessionStack::Push (const DBSDateTime& value)
 }
 
 void
-SessionStack::Push (const DBSHiresTime& value)
+SessionStack::Push (const DHiresTime& value)
 {
   HiresTimeOperand stackOp (value);
   StackValue       stackValue (stackOp);
@@ -3319,7 +3319,7 @@ SessionStack::Push (const DBSHiresTime& value)
 }
 
 void
-SessionStack::Push (const DBSInt8& value)
+SessionStack::Push (const DInt8& value)
 {
   Int8Operand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3328,7 +3328,7 @@ SessionStack::Push (const DBSInt8& value)
 }
 
 void
-SessionStack::Push (const DBSInt16& value)
+SessionStack::Push (const DInt16& value)
 {
   Int16Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -3337,7 +3337,7 @@ SessionStack::Push (const DBSInt16& value)
 }
 
 void
-SessionStack::Push (const DBSInt32& value)
+SessionStack::Push (const DInt32& value)
 {
   Int32Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -3346,7 +3346,7 @@ SessionStack::Push (const DBSInt32& value)
 }
 
 void
-SessionStack::Push (const DBSInt64& value)
+SessionStack::Push (const DInt64& value)
 {
   Int64Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -3355,7 +3355,7 @@ SessionStack::Push (const DBSInt64& value)
 }
 
 void
-SessionStack::Push (const DBSUInt8& value)
+SessionStack::Push (const DUInt8& value)
 {
   UInt8Operand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -3364,7 +3364,7 @@ SessionStack::Push (const DBSUInt8& value)
 }
 
 void
-SessionStack::Push (const DBSUInt16& value)
+SessionStack::Push (const DUInt16& value)
 {
   UInt16Operand stackOp (value);
   StackValue    stackValue (stackOp);
@@ -3373,7 +3373,7 @@ SessionStack::Push (const DBSUInt16& value)
 }
 
 void
-SessionStack::Push (const DBSUInt32& value)
+SessionStack::Push (const DUInt32& value)
 {
   UInt32Operand stackOp (value);
   StackValue    stackValue (stackOp);
@@ -3382,7 +3382,7 @@ SessionStack::Push (const DBSUInt32& value)
 }
 
 void
-SessionStack::Push (const DBSUInt64& value)
+SessionStack::Push (const DUInt64& value)
 {
   UInt64Operand stackOp (value);
   StackValue    stackValue (stackOp);
@@ -3391,7 +3391,7 @@ SessionStack::Push (const DBSUInt64& value)
 }
 
 void
-SessionStack::Push (const DBSReal& value)
+SessionStack::Push (const DReal& value)
 {
   RealOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3400,7 +3400,7 @@ SessionStack::Push (const DBSReal& value)
 }
 
 void
-SessionStack::Push (const DBSRichReal& value)
+SessionStack::Push (const DRichReal& value)
 {
   RichRealOperand stackOp (value);
   StackValue      stackValue (stackOp);
@@ -3409,7 +3409,7 @@ SessionStack::Push (const DBSRichReal& value)
 }
 
 void
-SessionStack::Push (const DBSText& value)
+SessionStack::Push (const DText& value)
 {
   TextOperand stackOp (value);
   StackValue  stackValue (stackOp);
@@ -3418,7 +3418,7 @@ SessionStack::Push (const DBSText& value)
 }
 
 void
-SessionStack::Push (const DBSArray& value)
+SessionStack::Push (const DArray& value)
 {
   ArrayOperand stackOp (value);
   StackValue   stackValue (stackOp);
@@ -3427,7 +3427,7 @@ SessionStack::Push (const DBSArray& value)
 }
 
 void
-SessionStack::Push (I_DBSHandler& dbsHnd, I_DBSTable& table)
+SessionStack::Push (I_DBSHandler& dbsHnd, ITable& table)
 {
   TableOperand stackOp(dbsHnd, table);
   StackValue stackValue (stackOp);
@@ -3438,33 +3438,33 @@ SessionStack::Push (I_DBSHandler& dbsHnd, I_DBSTable& table)
 void
 SessionStack::Push (const StackValue& value)
 {
-  m_Stack.push_back (value);
+  mStack.push_back (value);
 }
 
 void
 SessionStack::Pop (const uint_t count)
 {
-  if (count > m_Stack.size ())
+  if (count > mStack.size ())
     throw DBSException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
 
-  uint_t topIndex = m_Stack.size () - 1;
+  uint_t topIndex = mStack.size () - 1;
   for (uint_t index = 0; index < count; ++index, --topIndex)
-    m_Stack.pop_back ();
+    mStack.pop_back ();
 }
 
 size_t
 SessionStack::Size () const
 {
-  return m_Stack.size ();
+  return mStack.size ();
 }
 
 StackValue&
 SessionStack::operator[] (const uint_t index)
 {
-  if (index > m_Stack.size ())
+  if (index > mStack.size ())
     throw DBSException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
 
-  return m_Stack[index];
+  return mStack[index];
 }
 
 } //namespace whisper

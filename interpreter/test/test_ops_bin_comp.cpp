@@ -119,13 +119,13 @@ test_op_eqXX (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
 
-  return result == DBSBool ((first == second));
+  return result == DBool ((first == second));
 }
 
 template <typename DBS_T> bool
@@ -160,13 +160,13 @@ test_op_neXX (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
 
-  return result == DBSBool ((first != second));
+  return result == DBool ((first != second));
 }
 
 template <typename DBS_T> bool
@@ -201,13 +201,13 @@ test_op_ltXX (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
 
-  return result == DBSBool ((first < second));
+  return result == DBool ((first < second));
 }
 
 template <typename DBS_T> bool
@@ -242,13 +242,13 @@ test_op_leXX (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
 
-  return result == DBSBool ((first <= second));
+  return result == DBool ((first <= second));
 }
 
 template <typename DBS_T> bool
@@ -283,13 +283,13 @@ test_op_gtXX (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
 
-  return result == DBSBool ((first > second));
+  return result == DBool ((first > second));
 }
 
 template <typename DBS_T> bool
@@ -324,13 +324,13 @@ test_op_geXX (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
 
-  return result == DBSBool ((first >= second));
+  return result == DBool ((first >= second));
 }
 
 
@@ -361,266 +361,266 @@ main ()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "integer (same values)",
                                         W_EQ,
-                                        DBSInt8 (),
-                                        DBSInt8 ());
+                                        DInt8 (),
+                                        DInt8 ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "integer (diff values)",
                                         W_EQ,
-                                        DBSInt8 (-10),
-                                        DBSInt8 (1));
+                                        DInt8 (-10),
+                                        DInt8 (1));
 
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "bool (same values)",
                                         W_EQB,
-                                        DBSBool (),
-                                        DBSBool ());
+                                        DBool (),
+                                        DBool ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "bool (different values)",
                                         W_EQB,
-                                        DBSBool (true),
-                                        DBSBool (false));
+                                        DBool (true),
+                                        DBool (false));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "char (same values)",
                                         W_EQC,
-                                        DBSChar (),
-                                        DBSChar ());
+                                        DChar (),
+                                        DChar ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "char (different values)",
                                         W_EQC,
-                                        DBSChar ('A'),
-                                        DBSChar ('B'));
+                                        DChar ('A'),
+                                        DChar ('B'));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "date (same values)",
                                         W_EQD,
-                                        DBSDate (),
-                                        DBSDate ());
+                                        DDate (),
+                                        DDate ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "date (different values)",
                                         W_EQD,
-                                        DBSDate (-123, 1,1),
-                                        DBSDate (134, 1, 1));
+                                        DDate (-123, 1,1),
+                                        DDate (134, 1, 1));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "datetime (same values)",
                                         W_EQDT,
-                                        DBSDateTime (),
-                                        DBSDateTime ());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "datetime (different values)",
                                         W_EQDT,
-                                        DBSDateTime (-123, 1,1, 0, 59, 59 ),
-                                        DBSDateTime (-123, 1, 2, 0, 0, 0));
+                                        DDateTime (-123, 1,1, 0, 59, 59 ),
+                                        DDateTime (-123, 1, 2, 0, 0, 0));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "hirestime (same values)",
                                         W_EQHT,
-                                        DBSDateTime (),
-                                        DBSDateTime ());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "hirestime (different values)",
                                         W_EQHT,
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59,0 ),
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59, 1));
+                                        DHiresTime (-123, 1, 1, 0, 58, 59,0 ),
+                                        DHiresTime (-123, 1, 1, 0, 58, 59, 1));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "real (same values)",
                                         W_EQR,
-                                        DBSReal (),
-                                        DBSReal ());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "real (different values)",
                                         W_EQR,
-                                        DBSReal (-1.0 ),
-                                        DBSReal ( 1.0));
+                                        DReal (-1.0 ),
+                                        DReal ( 1.0));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "richreal (same values)",
                                         W_EQRR,
-                                        DBSReal (),
-                                        DBSReal ());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "richreal (different values)",
                                         W_EQRR,
-                                        DBSRichReal (-1.0 ),
-                                        DBSRichReal ( 1.0));
+                                        DRichReal (-1.0 ),
+                                        DRichReal ( 1.0));
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "text (same values)",
                                         W_EQT,
-                                        DBSText (),
-                                        DBSText ());
+                                        DText (),
+                                        DText ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "text (different values)",
                                         W_EQT,
-                                        DBSText ("A"),
-                                        DBSText ("B"));
+                                        DText ("A"),
+                                        DText ("B"));
 
     //Inequality
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "integer (same values)",
                                         W_NE,
-                                        DBSInt8 (),
-                                        DBSInt8 ());
+                                        DInt8 (),
+                                        DInt8 ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "integer (diff values)",
                                         W_NE,
-                                        DBSInt8 (-10),
-                                        DBSInt8 (1));
+                                        DInt8 (-10),
+                                        DInt8 (1));
 
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "bool (same values)",
                                         W_NEB,
-                                        DBSBool (),
-                                        DBSBool ());
+                                        DBool (),
+                                        DBool ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "bool (different values)",
                                         W_NEB,
-                                        DBSBool (true),
-                                        DBSBool (false));
+                                        DBool (true),
+                                        DBool (false));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "char (same values)",
                                         W_NEC,
-                                        DBSChar (),
-                                        DBSChar ());
+                                        DChar (),
+                                        DChar ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "char (different values)",
                                         W_NEC,
-                                        DBSChar ('A'),
-                                        DBSChar ('B'));
+                                        DChar ('A'),
+                                        DChar ('B'));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "date (same values)",
                                         W_NED,
-                                        DBSDate (),
-                                        DBSDate ());
+                                        DDate (),
+                                        DDate ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "date (different values)",
                                         W_NED,
-                                        DBSDate (-123, 1,1),
-                                        DBSDate (134, 1, 1));
+                                        DDate (-123, 1,1),
+                                        DDate (134, 1, 1));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "datetime (same values)",
                                         W_NEDT,
-                                        DBSDateTime (),
-                                        DBSDateTime ());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "datetime (different values)",
                                         W_NEDT,
-                                        DBSDateTime (-123, 1,1, 0, 59, 59 ),
-                                        DBSDateTime (-123, 1, 2, 0, 0, 0));
+                                        DDateTime (-123, 1,1, 0, 59, 59 ),
+                                        DDateTime (-123, 1, 2, 0, 0, 0));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "hirestime (same values)",
                                         W_NEHT,
-                                        DBSDateTime (),
-                                        DBSDateTime ());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "hirestime (different values)",
                                         W_NEHT,
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59,0 ),
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59, 1));
+                                        DHiresTime (-123, 1, 1, 0, 58, 59,0 ),
+                                        DHiresTime (-123, 1, 1, 0, 58, 59, 1));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "real (same values)",
                                         W_NER,
-                                        DBSReal (),
-                                        DBSReal ());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "real (different values)",
                                         W_NER,
-                                        DBSReal (-1.0 ),
-                                        DBSReal ( 1.0));
+                                        DReal (-1.0 ),
+                                        DReal ( 1.0));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "richreal (same values)",
                                         W_NERR,
-                                        DBSReal (),
-                                        DBSReal ());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "richreal (different values)",
                                         W_NERR,
-                                        DBSRichReal (-1.0 ),
-                                        DBSRichReal ( 1.0));
+                                        DRichReal (-1.0 ),
+                                        DRichReal ( 1.0));
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "text (same values)",
                                         W_NET,
-                                        DBSText (),
-                                        DBSText ());
+                                        DText (),
+                                        DText ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "text (different values)",
                                         W_NET,
-                                        DBSText ("A"),
-                                        DBSText ("B"));
+                                        DText ("A"),
+                                        DText ("B"));
 
     //Smaller
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_LT,
-                                        DBSInt8 (-10),
-                                        DBSInt8 (1));
+                                        DInt8 (-10),
+                                        DInt8 (1));
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "char",
                                         W_LTC,
-                                        DBSChar ('A'),
-                                        DBSChar ('B'));
+                                        DChar ('A'),
+                                        DChar ('B'));
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "date",
                                         W_LTD,
-                                        DBSDate (-123, 1,1),
-                                        DBSDate (134, 1, 1));
+                                        DDate (-123, 1,1),
+                                        DDate (134, 1, 1));
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "datetime",
                                         W_LTDT,
-                                        DBSDateTime (-123, 1,1, 0, 59, 59 ),
-                                        DBSDateTime (-123, 1, 2, 0, 0, 0));
+                                        DDateTime (-123, 1,1, 0, 59, 59 ),
+                                        DDateTime (-123, 1, 2, 0, 0, 0));
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "hirestime",
                                         W_LTHT,
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59,0 ),
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59, 1));
+                                        DHiresTime (-123, 1, 1, 0, 58, 59,0 ),
+                                        DHiresTime (-123, 1, 1, 0, 58, 59, 1));
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "real",
                                         W_LTR,
-                                        DBSReal (-1.0 ),
-                                        DBSReal ( 1.0));
+                                        DReal (-1.0 ),
+                                        DReal ( 1.0));
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_LTRR,
-                                        DBSRichReal (-1.0 ),
-                                        DBSRichReal ( 1.0));
+                                        DRichReal (-1.0 ),
+                                        DRichReal ( 1.0));
 
     //Smaller or equal
 
@@ -628,44 +628,44 @@ main ()
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_LE,
-                                        DBSInt8 (-10),
-                                        DBSInt8 (1));
+                                        DInt8 (-10),
+                                        DInt8 (1));
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "char",
                                         W_LEC,
-                                        DBSChar ('A'),
-                                        DBSChar ('B'));
+                                        DChar ('A'),
+                                        DChar ('B'));
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "date",
                                         W_LED,
-                                        DBSDate (-123, 1,1),
-                                        DBSDate (134, 1, 1));
+                                        DDate (-123, 1,1),
+                                        DDate (134, 1, 1));
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "datetime",
                                         W_LEDT,
-                                        DBSDateTime (-123, 1,1, 0, 59, 59 ),
-                                        DBSDateTime (-123, 1, 2, 0, 0, 0));
+                                        DDateTime (-123, 1,1, 0, 59, 59 ),
+                                        DDateTime (-123, 1, 2, 0, 0, 0));
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "hirestime",
                                         W_LEHT,
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59,0 ),
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59, 1));
+                                        DHiresTime (-123, 1, 1, 0, 58, 59,0 ),
+                                        DHiresTime (-123, 1, 1, 0, 58, 59, 1));
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "real",
                                         W_LER,
-                                        DBSReal (-1.0 ),
-                                        DBSReal ( 1.0));
+                                        DReal (-1.0 ),
+                                        DReal ( 1.0));
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_LERR,
-                                        DBSRichReal (-1.0 ),
-                                        DBSRichReal ( 1.0));
+                                        DRichReal (-1.0 ),
+                                        DRichReal ( 1.0));
 
     //Greater
 
@@ -673,44 +673,44 @@ main ()
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_GT,
-                                        DBSInt8 (-10),
-                                        DBSInt8 (1));
+                                        DInt8 (-10),
+                                        DInt8 (1));
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "char",
                                         W_GTC,
-                                        DBSChar ('A'),
-                                        DBSChar ('B'));
+                                        DChar ('A'),
+                                        DChar ('B'));
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "date",
                                         W_GTD,
-                                        DBSDate (-123, 1,1),
-                                        DBSDate (134, 1, 1));
+                                        DDate (-123, 1,1),
+                                        DDate (134, 1, 1));
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "datetime",
                                         W_GTDT,
-                                        DBSDateTime (-123, 1,1, 0, 59, 59 ),
-                                        DBSDateTime (-123, 1, 2, 0, 0, 0));
+                                        DDateTime (-123, 1,1, 0, 59, 59 ),
+                                        DDateTime (-123, 1, 2, 0, 0, 0));
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "hirestime",
                                         W_GTHT,
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59,0 ),
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59, 1));
+                                        DHiresTime (-123, 1, 1, 0, 58, 59,0 ),
+                                        DHiresTime (-123, 1, 1, 0, 58, 59, 1));
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "real",
                                         W_GTR,
-                                        DBSReal (-1.0 ),
-                                        DBSReal ( 1.0));
+                                        DReal (-1.0 ),
+                                        DReal ( 1.0));
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_GTRR,
-                                        DBSRichReal (-1.0 ),
-                                        DBSRichReal ( 1.0));
+                                        DRichReal (-1.0 ),
+                                        DRichReal ( 1.0));
 
 
     //Greater or equal than
@@ -718,44 +718,44 @@ main ()
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_GE,
-                                        DBSInt8 (-10),
-                                        DBSInt8 (1));
+                                        DInt8 (-10),
+                                        DInt8 (1));
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "char",
                                         W_GEC,
-                                        DBSChar ('A'),
-                                        DBSChar ('B'));
+                                        DChar ('A'),
+                                        DChar ('B'));
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "date",
                                         W_GED,
-                                        DBSDate (-123, 1,1),
-                                        DBSDate (134, 1, 1));
+                                        DDate (-123, 1,1),
+                                        DDate (134, 1, 1));
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "datetime",
                                         W_GEDT,
-                                        DBSDateTime (-123, 1,1, 0, 59, 59 ),
-                                        DBSDateTime (-123, 1, 2, 0, 0, 0));
+                                        DDateTime (-123, 1,1, 0, 59, 59 ),
+                                        DDateTime (-123, 1, 2, 0, 0, 0));
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "hirestime",
                                         W_GEHT,
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59,0 ),
-                                        DBSHiresTime (-123, 1, 1, 0, 58, 59, 1));
+                                        DHiresTime (-123, 1, 1, 0, 58, 59,0 ),
+                                        DHiresTime (-123, 1, 1, 0, 58, 59, 1));
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "real",
                                         W_GER,
-                                        DBSReal (-1.0 ),
-                                        DBSReal ( 1.0));
+                                        DReal (-1.0 ),
+                                        DReal ( 1.0));
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_GERR,
-                                        DBSRichReal (-1.0 ),
-                                        DBSRichReal ( 1.0));
+                                        DRichReal (-1.0 ),
+                                        DRichReal ( 1.0));
 
 
     ReleaseInstance (commonSession);

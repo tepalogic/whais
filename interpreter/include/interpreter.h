@@ -194,7 +194,7 @@ public:
                                             const uint_t        param,
                                             const uint_t        field) = 0;
 protected:
-  Logger& m_Log;
+  Logger& mLog;
 };
 
 INTERP_SHL void

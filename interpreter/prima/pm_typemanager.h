@@ -48,7 +48,7 @@ public:
   const uint8_t* GetType (const uint32_t offset) const;
 
   GlobalValue CreateGlobalValue (uint8_t* const pInOutTI,
-                                 I_DBSTable*    pPersistentTable);
+                                 ITable*    pPersistentTable);
   StackValue  CreateLocalValue (uint8_t* const pInOutTI);
 
   static bool   IsTypeValid (const uint8_t* pTI);
@@ -60,12 +60,12 @@ private:
   TypeManager (const TypeManager&);
   TypeManager& operator= (const TypeManager&);
 
-  NameSpace&           m_NameSpace;
-  std::vector<uint8_t> m_TypesDescriptions;
+  NameSpace&           mNameSpace;
+  std::vector<uint8_t> mTypesDescriptions;
 };
 
 std::vector<uint8_t>
-compute_table_typeinfo (I_DBSTable& table);
+compute_table_typeinfo (ITable& table);
 
 } //namespace prima
 } //namespace whisper

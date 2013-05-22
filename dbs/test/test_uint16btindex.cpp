@@ -34,21 +34,21 @@ static uint_t _removedRows = _rowsCount / 10;
 
 
 bool
-fill_table_with_values (I_DBSTable& table,
+fill_table_with_values (ITable& table,
                         const uint32_t rowCount,
                         uint64_t seed,
-                        DBSArray& tableValues)
+                        DArray& tableValues)
 {
   bool     result = true;
-  DBSUInt16 prev;
+  DUInt16 prev;
 
-  table.CreateFieldIndex (0, NULL, NULL);
+  table.CreateIndex (0, NULL, NULL);
   std::cout << "Filling table with values ... " << std::endl;
 
   wh_rnd_set_seed (seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DBSUInt16 value (wh_rnd () & 0xFFFF);
+      DUInt16 value (wh_rnd () & 0xFFFF);
       if (table.AddRow () != index)
         {
           result = false;
@@ -61,37 +61,37 @@ fill_table_with_values (I_DBSTable& table,
           std::cout.flush ();
         }
 
-      table.SetEntry (index, 0, value);
-      tableValues.AddElement (value);
+      table.Set (index, 0, value);
+      tableValues.Add (value);
 
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DBSArray values = table.GetMatchingRows (DBSUInt16 (),
-                                           DBSUInt16 (0xFFFF),
+  DArray values = table.MatchRows (DUInt16 (),
+                                           DUInt16 (0xFFFF),
                                            0,
                                            ~0,
                                            0,
                                            ~0,
                                            0);
-  if ((values.ElementsCount() != tableValues.ElementsCount ()) ||
-      (values.ElementsCount () != rowCount))
+  if ((values.Count() != tableValues.Count ()) ||
+      (values.Count () != rowCount))
     {
       result = false;
     }
 
   for (uint_t checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
     {
-      DBSUInt16 rowValue;
-      DBSUInt64 rowIndex;
+      DUInt16 rowValue;
+      DUInt64 rowIndex;
 
-      values.GetElement (rowIndex, checkIndex);
+      values.Get (checkIndex, rowIndex);
       assert (rowIndex.IsNull() == false);
 
-      table.GetEntry (rowIndex.m_Value, 0, rowValue);
+      table.Get (rowIndex.mValue, 0, rowValue);
 
-      DBSUInt16 generated;
-      tableValues.GetElement (generated, rowIndex.m_Value);
+      DUInt16 generated;
+      tableValues.Get (rowIndex.mValue, generated);
       assert (generated.IsNull() == false);
 
       if (((rowValue == generated) == false) ||
@@ -116,16 +116,16 @@ fill_table_with_values (I_DBSTable& table,
 }
 
 bool
-fill_table_with_first_nulls (I_DBSTable& table, const uint32_t rowCount)
+fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
 
-  DBSUInt16 nullValue;
+  DUInt16 nullValue;
 
   for (uint64_t index = 0; index < rowCount; ++index)
     {
-      table.SetEntry (index, 0, nullValue);
+      table.Set (index, 0, nullValue);
 
       if (((index * 100) % rowCount) == 0)
         {
@@ -134,7 +134,7 @@ fill_table_with_first_nulls (I_DBSTable& table, const uint32_t rowCount)
         }
     }
 
-  DBSArray values = table.GetMatchingRows (nullValue,
+  DArray values = table.MatchRows (nullValue,
                                            nullValue,
                                            0,
                                            ~0,
@@ -144,20 +144,20 @@ fill_table_with_first_nulls (I_DBSTable& table, const uint32_t rowCount)
 
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
-      DBSUInt64 element;
-      values.GetElement (element, index);
+      DUInt64 element;
+      values.Get (index, element);
 
-      if (element.IsNull() || (element.m_Value != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
-      DBSUInt16 rowValue;
-      table.GetEntry (index, 0, rowValue);
+      DUInt16 rowValue;
+      table.Get (index, 0, rowValue);
 
       if (rowValue.IsNull() == false)
         result = false;
     }
 
-  if (values.ElementsCount() != rowCount)
+  if (values.Count() != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -166,15 +166,15 @@ fill_table_with_first_nulls (I_DBSTable& table, const uint32_t rowCount)
 }
 
 bool
-test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
+test_table_index_survival (I_DBSHandler& dbsHnd, DArray& tableValues)
 {
   bool result = true;
   std::cout << "Test index survival ... ";
 
-  I_DBSTable& table = dbsHnd.RetrievePersistentTable (tb_name);
+  ITable& table = dbsHnd.RetrievePersistentTable (tb_name);
 
-  DBSUInt16 nullValue;
-  DBSArray  values  = table.GetMatchingRows (nullValue,
+  DUInt16 nullValue;
+  DArray  values  = table.MatchRows (nullValue,
                                              nullValue,
                                              0,
                                              ~0,
@@ -183,21 +183,21 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
                                              0);
   for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
-      DBSUInt64 element;
-      values.GetElement (element, index);
+      DUInt64 element;
+      values.Get (index, element);
 
-      if (element.IsNull() || (element.m_Value != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
-      DBSUInt16 rowValue;
-      table.GetEntry (index, 0, rowValue);
+      DUInt16 rowValue;
+      table.Get (index, 0, rowValue);
 
       if (rowValue.IsNull() == false)
         result = false;
     }
 
-  values  = table.GetMatchingRows (nullValue,
-                                   DBSUInt16 (0xFFFF),
+  values  = table.MatchRows (nullValue,
+                                   DUInt16 (0xFFFF),
                                    0,
                                    ~0,
                                    _removedRows,
@@ -206,17 +206,17 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
-      DBSUInt64 element;
-      values.GetElement (element, index - _removedRows);
+      DUInt64 element;
+      values.Get (index - _removedRows, element);
 
-      DBSUInt16 rowValue;
-      table.GetEntry (element.m_Value, 0, rowValue);
+      DUInt16 rowValue;
+      table.Get (element.mValue, 0, rowValue);
 
       if (rowValue.IsNull() == true)
         result = false;
 
-      DBSUInt16 generatedValue;
-      tableValues.GetElement (generatedValue, element.m_Value);
+      DUInt16 generatedValue;
+      tableValues.Get (element.mValue, generatedValue);
       if ((rowValue == generatedValue) == false)
         result = false;
     }
@@ -228,46 +228,46 @@ test_table_index_survival (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 }
 
 void
-callback_index_create (CallBackIndexData* const pData)
+callback_index_create (CreateIndexCallbackContext* const pData)
 {
-  if (((pData->m_RowIndex * 100) % pData->m_RowsCount) == 0)
+  if (((pData->mRowIndex * 100) % pData->mRowsCount) == 0)
     {
-      std::cout << (pData->m_RowIndex * 100) / pData->m_RowsCount << "%\r";
+      std::cout << (pData->mRowIndex * 100) / pData->mRowsCount << "%\r";
       std::cout.flush ();
     }
 }
 
 bool
-test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
+test_index_creation (I_DBSHandler& dbsHnd, DArray& tableValues)
 {
-  CallBackIndexData data;
+  CreateIndexCallbackContext data;
   bool result = true;
   std::cout << "Test index creation ... " << std::endl;
 
-  I_DBSTable& table = dbsHnd.RetrievePersistentTable (tb_name);
+  ITable& table = dbsHnd.RetrievePersistentTable (tb_name);
 
-  table.RemoveFieldIndex (0);
+  table.RemoveIndex (0);
 
   for (uint64_t index = 0; index < _removedRows; ++index)
     {
-      DBSUInt16 rowValue;
-      tableValues.GetElement (rowValue, index);
+      DUInt16 rowValue;
+      tableValues.Get (index, rowValue);
 
-      table.SetEntry (index, 0, rowValue);
+      table.Set (index, 0, rowValue);
     }
 
 
-  table.CreateFieldIndex (0, callback_index_create, &data);
+  table.CreateIndex (0, callback_index_create, &data);
 
-  DBSArray values  = table.GetMatchingRows (DBSUInt16 (),
-                                            DBSUInt16 (0xFFFF),
+  DArray values  = table.MatchRows (DUInt16 (),
+                                            DUInt16 (0xFFFF),
                                             0,
                                             ~0,
                                             0,
                                             ~0,
                                             0);
 
-  if (values.ElementsCount() != _rowsCount)
+  if (values.Count() != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -276,14 +276,14 @@ test_index_creation (I_DBSHandler& dbsHnd, DBSArray& tableValues)
 
   for (uint64_t index = 0; (index < _rowsCount) && result; ++index)
     {
-      DBSUInt16 rowValue;
-      table.GetEntry (index, 0, rowValue);
+      DUInt16 rowValue;
+      table.Get (index, 0, rowValue);
 
       if (rowValue.IsNull() == true)
         result = false;
 
-      DBSUInt16 generatedValue;
-      tableValues.GetElement (generatedValue, index);
+      DUInt16 generatedValue;
+      tableValues.Get (index, generatedValue);
       if ((rowValue == generatedValue) == false)
         result = false;
 
@@ -319,9 +319,9 @@ main (int argc, char **argv)
   handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
 
   {
-    DBSArray tableValues (_SC (DBSUInt16*, NULL));
+    DArray tableValues (_SC (DUInt16*, NULL));
     {
-      I_DBSTable& table = handler.RetrievePersistentTable (tb_name);
+      ITable& table = handler.RetrievePersistentTable (tb_name);
 
       success = success && fill_table_with_values (table, _rowsCount, 0, tableValues);
       success = success && fill_table_with_first_nulls (table, _removedRows);

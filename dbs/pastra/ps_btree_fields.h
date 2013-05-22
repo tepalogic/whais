@@ -32,35 +32,38 @@
 
 #include "ps_btree_index.h"
 #include "ps_container.h"
-#include "ps_valintep.h"
+#include "ps_serializer.h"
 
 namespace whisper {
 namespace pastra {
 
+
+
 template <class DBS_T>
-class T_BTreeKey : public I_BTreeKey
+class T_BTreeKey : public IBTreeKey
 {
 public:
   T_BTreeKey (const DBS_T& value, const ROW_INDEX row)
-    : m_RowPart (row),
-      m_ValuePart (value)
+    : mRowPart (row),
+      mValuePart (value)
   {
   }
 
   bool operator< (const T_BTreeKey& key) const
   {
-    if (m_ValuePart < key.m_ValuePart)
+    if (mValuePart < key.mValuePart)
       return true;
-    else if (m_ValuePart == key.m_ValuePart)
-      return m_RowPart < key.m_RowPart;
+
+    else if (mValuePart == key.mValuePart)
+      return mRowPart < key.mRowPart;
 
     return false;
   }
 
   bool operator== (const T_BTreeKey& key) const
   {
-    return (m_ValuePart == key.m_ValuePart) &&
-           (m_RowPart == key.m_RowPart);
+    return (mRowPart == key.mRowPart)
+           && (mValuePart == key.mValuePart);
   }
 
   bool operator> (const T_BTreeKey& key) const
@@ -68,195 +71,190 @@ public:
     return ! ((*this < key) || (*this == key));
   }
 
-  const ROW_INDEX m_RowPart;
-  const DBS_T     m_ValuePart;
+  const ROW_INDEX mRowPart;
+  const DBS_T     mValuePart;
 };
 
-typedef T_BTreeKey <DBSBool>      BoolBTreeKey;
-typedef T_BTreeKey <DBSChar>      CharBTreeKey;
-typedef T_BTreeKey <DBSUInt8>     UInt8BTreeKey;
-typedef T_BTreeKey <DBSUInt16>    UInt16BTreeKey;
-typedef T_BTreeKey <DBSUInt32>    UInt32BTreeKey;
-typedef T_BTreeKey <DBSUInt64>    UInt64BTreeKey;
-typedef T_BTreeKey <DBSInt8>      Int8BTreeKey;
-typedef T_BTreeKey <DBSInt16>     Int16BTreeKey;
-typedef T_BTreeKey <DBSInt32>     Int32BTreeKey;
-typedef T_BTreeKey <DBSInt64>     Int64BTreeKey;
-typedef T_BTreeKey <DBSDate>      DateBTreeKey;
-typedef T_BTreeKey <DBSDateTime>  DateTimeBTreeKey;
-typedef T_BTreeKey <DBSHiresTime> HiresTimeBTreeKey;
-typedef T_BTreeKey <DBSReal>      RealBTreeKey;
-typedef T_BTreeKey <DBSRichReal>  RichRealBTreeKey;
 
-class I_BTreeFieldIndexNode : public I_BTreeNode
+
+typedef T_BTreeKey<DBool>      BoolBTreeKey;
+typedef T_BTreeKey<DChar>      CharBTreeKey;
+typedef T_BTreeKey<DUInt8>     UInt8BTreeKey;
+typedef T_BTreeKey<DUInt16>    UInt16BTreeKey;
+typedef T_BTreeKey<DUInt32>    UInt32BTreeKey;
+typedef T_BTreeKey<DUInt64>    UInt64BTreeKey;
+typedef T_BTreeKey<DInt8>      Int8BTreeKey;
+typedef T_BTreeKey<DInt16>     Int16BTreeKey;
+typedef T_BTreeKey<DInt32>     Int32BTreeKey;
+typedef T_BTreeKey<DInt64>     Int64BTreeKey;
+typedef T_BTreeKey<DDate>      DateBTreeKey;
+typedef T_BTreeKey<DDateTime>  DateTimeBTreeKey;
+typedef T_BTreeKey<DHiresTime> HiresTimeBTreeKey;
+typedef T_BTreeKey<DReal>      RealBTreeKey;
+typedef T_BTreeKey<DRichReal>  RichRealBTreeKey;
+
+
+
+class IBTreeFieldIndexNode : public IBTreeNode
 {
 public:
-   I_BTreeFieldIndexNode (I_BTreeNodeManager& nodesManager,
+   IBTreeFieldIndexNode (IBTreeNodeManager&   nodesManager,
                          const NODE_INDEX     node)
-     : I_BTreeNode (nodesManager, node)
+     : IBTreeNode (nodesManager, node)
    {
    }
-   virtual ~I_BTreeFieldIndexNode () {}
 
-   virtual void GetRows (KEY_INDEX fromPos,
-                         KEY_INDEX toPos,
-                         DBSArray& output) const = 0;
+   virtual void GetRows (KEY_INDEX    fromPos,
+                         KEY_INDEX    toPos,
+                         DArray&      output) const = 0;
 };
 
-template <class T, class DBS_T, uint_t T_SIZE>
-class T_BTreeNode : public I_BTreeFieldIndexNode
+
+template <class DBS_T, class T, uint_t T_SIZE>
+class DBS_BTreeNode : public IBTreeFieldIndexNode
 {
 public:
-  T_BTreeNode (I_BTreeNodeManager& nodesManager, const NODE_INDEX node)
-    : I_BTreeFieldIndexNode (nodesManager, node)
+  DBS_BTreeNode (IBTreeNodeManager& nodesManager, const NODE_INDEX node)
+    : IBTreeFieldIndexNode (nodesManager, node)
   {
   }
 
-  virtual ~T_BTreeNode ()
-  {
-  }
-
-  //Implementations of I_BTreeNode interface
-  virtual uint_t
-  KeysPerNode () const
+  virtual uint_t KeysPerNode () const
   {
     assert (sizeof (NodeHeader) % 16 == 0);
 
-    uint_t result = m_NodesMgr.RawNodeSize () - sizeof (NodeHeader);
+    uint_t result = mNodesMgr.NodeRawSize () - sizeof (NodeHeader);
 
     if (IsLeaf())
       result /= sizeof (ROW_INDEX) + T_SIZE;
+
     else
       result /= sizeof (ROW_INDEX) + sizeof (NODE_INDEX) + T_SIZE;
 
     return result;
   }
 
-  virtual KEY_INDEX GetParentKeyIndex (const I_BTreeNode& parent) const
+  virtual KEY_INDEX GetParentKeyIndex (const IBTreeNode& parent) const
   {
-    assert (GetKeysCount () > 0);
+    assert (KeysCount () > 0);
 
     KEY_INDEX result = ~0;
 
-    parent.FindBiggerOrEqual (GetKey (0), result);
+    parent.FindBiggerOrEqual (GetKey (0), &result);
 
     assert (parent.IsEqual (GetKey (0), result));
-    assert (NodeId () == parent.GetNodeOfKey (result));
+    assert (NodeId () == parent.NodeIdOfKey (result));
 
     return result;
   }
 
-  virtual NODE_INDEX GetNodeOfKey (const KEY_INDEX key) const
+  virtual NODE_INDEX NodeIdOfKey (const KEY_INDEX key) const
   {
-    assert (key < GetKeysCount ());
+    assert (key < KeysCount ());
     assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
     assert (IsLeaf () == false);
 
-    const ROW_INDEX* const  pRowParts   = _RC (const ROW_INDEX*,
-                                               DataToRead ());
-    const NODE_INDEX* const pChildNodes = _RC (
-                                    const NODE_INDEX*,
-                                    pRowParts + KeysPerNode ()
-                                              );
-    return pChildNodes[key];
+    const ROW_INDEX* const  rows       = _RC (const ROW_INDEX*, DataForRead ());
+    const NODE_INDEX* const childNodes = _RC (const NODE_INDEX*,
+                                              rows + KeysPerNode ());
+    return childNodes[key];
   }
 
   virtual void SetNodeOfKey (const KEY_INDEX  keyIndex,
                              const NODE_INDEX childNode)
   {
-    assert (keyIndex < GetKeysCount ());
+    assert (keyIndex < KeysCount ());
     assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
     assert (IsLeaf () == false);
 
-    ROW_INDEX* const  pRowParts   = _RC (ROW_INDEX*, DataToWrite ());
-    NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*,
-                                         pRowParts + KeysPerNode ());
+    ROW_INDEX* const  rows       = _RC (ROW_INDEX*, DataForWrite ());
+    NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
 
-    pChildNodes[keyIndex] = childNode;
+    childNodes[keyIndex] = childNode;
   }
 
-
-  virtual void AdjustKeyNode (const I_BTreeNode& childNode,
+  virtual void AdjustKeyNode (const IBTreeNode&  childNode,
                               const KEY_INDEX    keyIndex)
   {
-    const T_BTreeNode& node = _SC (const T_BTreeNode&, childNode);
+    const DBS_BTreeNode& node = _SC (const DBS_BTreeNode&, childNode);
 
     const T_BTreeKey<DBS_T> zeroKey  = node.GetKey (0);
 
-    if (zeroKey.m_ValuePart.IsNull ())
+    if (zeroKey.mValuePart.IsNull ())
       {
-        if (GetKey (keyIndex).m_ValuePart.IsNull () == false)
-          SetNullKeysCount (GetNullKeysCount () + 1);
+        if (GetKey (keyIndex).mValuePart.IsNull () == false)
+          NullKeysCount (NullKeysCount () + 1);
       }
     else
       {
-        if (GetKey (keyIndex).m_ValuePart.IsNull ())
-          SetNullKeysCount (GetNullKeysCount () - 1);
+        if (GetKey (keyIndex).mValuePart.IsNull ())
+          NullKeysCount (NullKeysCount () - 1);
       }
 
     SetKey (zeroKey, keyIndex);
   }
 
-  virtual KEY_INDEX InsertKey (const I_BTreeKey& key)
+  virtual KEY_INDEX InsertKey (const IBTreeKey& key)
   {
     assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
 
     const T_BTreeKey<DBS_T>& theKey   = _SC (const T_BTreeKey<DBS_T>&, key);
     KEY_INDEX                keyIndex = ~0;
 
-    if (GetKeysCount () == 0)
+    if (KeysCount () == 0)
       {
-        SetKeysCount (1);
-        if (theKey.m_ValuePart.IsNull ())
-          SetNullKeysCount (1);
+        KeysCount (1);
+
+        if (theKey.mValuePart.IsNull ())
+          NullKeysCount (1);
 
         SetKey (theKey, 0);
+
         return 0;
       }
-    else if (FindBiggerOrEqual (key, keyIndex) == false)
+    else if (FindBiggerOrEqual (key, &keyIndex) == false)
       keyIndex = 0;
+
     else
       ++keyIndex;
 
-    ROW_INDEX* const pRowParts = _RC (ROW_INDEX*, DataToWrite ());
-    const KEY_INDEX  lastKey   = GetKeysCount () - 1;
+    ROW_INDEX* const rows    = _RC (ROW_INDEX*, DataForWrite ());
+    const KEY_INDEX  lastKey = KeysCount () - 1;
 
     if (IsLeaf () == false)
       {
-        NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*,
-                                             pRowParts + KeysPerNode ());
-        uint8_t* const pValueParts = _RC (uint8_t*,
-                                          pChildNodes + KeysPerNode ());
+        NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
 
-        make_array_room (_RC (uint8_t*, pRowParts),
-                         lastKey,
+        uint8_t* const values = _RC (uint8_t*, childNodes + KeysPerNode ());
+
+        make_array_room (lastKey,
                          keyIndex,
-                         sizeof (ROW_INDEX));
+                         sizeof (ROW_INDEX),
+                         _RC (uint8_t*, rows));
 
-        make_array_room (_RC (uint8_t*, pChildNodes),
-                         lastKey,
+        make_array_room (lastKey,
                          keyIndex,
-                         sizeof (NODE_INDEX));
+                         sizeof (NODE_INDEX),
+                         _RC (uint8_t*, childNodes));
 
-        make_array_room (pValueParts, lastKey, keyIndex, T_SIZE);
+        make_array_room (lastKey, keyIndex, T_SIZE, values);
       }
     else
       {
-        uint8_t* const pValueParts = _RC (uint8_t*,
-                                          pRowParts + KeysPerNode ());
+        uint8_t* const values = _RC (uint8_t*, rows + KeysPerNode ());
 
-        make_array_room (_RC (uint8_t*, pRowParts),
-                         lastKey,
+        make_array_room (lastKey,
                          keyIndex,
-                         sizeof (ROW_INDEX));
+                         sizeof (ROW_INDEX),
+                         _RC (uint8_t*, rows));
 
-        make_array_room (pValueParts, lastKey, keyIndex, T_SIZE);
+        make_array_room (lastKey, keyIndex, T_SIZE, values);
       }
 
-    if (theKey.m_ValuePart.IsNull ())
-      SetNullKeysCount (GetNullKeysCount () + 1);
+    if (theKey.mValuePart.IsNull ())
+      NullKeysCount (NullKeysCount () + 1);
 
-    SetKeysCount (GetKeysCount () + 1);
+    KeysCount (KeysCount () + 1);
     SetKey (theKey, keyIndex);
 
     return keyIndex;
@@ -264,246 +262,230 @@ public:
 
   virtual void RemoveKey (const KEY_INDEX keyIndex)
   {
-    assert (keyIndex < GetKeysCount ());
+    assert (keyIndex < KeysCount ());
     assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
 
-    const uint_t      lastKey   = GetKeysCount () - 1;
-    ROW_INDEX* const  pRowParts = _RC (ROW_INDEX*, DataToWrite ());
+    const uint_t     lastKey = KeysCount () - 1;
+    ROW_INDEX* const rows    = _RC (ROW_INDEX*, DataForWrite ());
 
     if (IsLeaf () == false)
       {
-        NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*,
-                                             pRowParts + KeysPerNode ());
-        uint8_t* const pValuesPart    = _RC (uint8_t*,
-                                             pChildNodes + KeysPerNode ());
+        NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
 
-        remove_array_elemes (_RC (uint8_t*, pRowParts),
-                             lastKey,
-                             keyIndex,
-                             sizeof (ROW_INDEX));
+        uint8_t* const values = _RC (uint8_t*, childNodes + KeysPerNode ());
 
-        remove_array_elemes (_RC (uint8_t*, pChildNodes),
-                             lastKey,
+        remove_array_elemes (lastKey,
                              keyIndex,
-                             sizeof (NODE_INDEX));
+                             sizeof (ROW_INDEX),
+                             _RC (uint8_t*, rows));
 
-        remove_array_elemes (_RC (uint8_t*, pValuesPart),
-                             lastKey,
+        remove_array_elemes (lastKey,
                              keyIndex,
-                             T_SIZE);
+                             sizeof (NODE_INDEX),
+                             _RC (uint8_t*, childNodes));
+
+        remove_array_elemes (lastKey, keyIndex, T_SIZE, values);
       }
     else
       {
-         uint8_t* const pValuesPart = _RC (uint8_t*,
-                                           pRowParts + KeysPerNode ());
+         uint8_t* const values = _RC (uint8_t*, rows + KeysPerNode ());
 
-         remove_array_elemes (_RC (uint8_t*, pRowParts),
-                              lastKey,
+         remove_array_elemes (lastKey,
                               keyIndex,
-                              sizeof (ROW_INDEX));
+                              sizeof (ROW_INDEX),
+                              _RC (uint8_t*, rows));
 
-         remove_array_elemes (_RC (uint8_t*, pValuesPart),
-                              lastKey,
-                              keyIndex,
-                              T_SIZE);
-
+         remove_array_elemes (lastKey, keyIndex, T_SIZE, values);
       }
 
-    if (keyIndex >= (GetKeysCount () - GetNullKeysCount ()))
-      SetNullKeysCount (GetNullKeysCount () - 1);
+    if (keyIndex >= (KeysCount () - NullKeysCount ()))
+      NullKeysCount (NullKeysCount () - 1);
 
-    SetKeysCount (GetKeysCount () - 1);
+    KeysCount (KeysCount () - 1);
   }
 
   virtual void Split (const NODE_INDEX parent)
   {
     assert (NeedsSpliting ());
 
-    const KEY_INDEX          splitKeyIndex   = GetKeysCount () / 2;
-    const T_BTreeKey<DBS_T>  splitKey        = GetKey (splitKeyIndex);
+    const KEY_INDEX         splitKeyIndex = KeysCount () / 2;
+    const T_BTreeKey<DBS_T> splitKey      = GetKey (splitKeyIndex);
 
-    BTreeNodeRAI parentNode (m_NodesMgr.RetrieveNode (parent));
+    BTreeNodeRAII parentNode (mNodesMgr.RetrieveNode (parent));
 
     const KEY_INDEX  insertPosition  = parentNode->InsertKey (splitKey);
-    const NODE_INDEX allocatedNodeId = m_NodesMgr.AllocateNode (
-                                                             parent,
-                                                             insertPosition
-                                                               );
-    BTreeNodeRAI allocatedNode (m_NodesMgr.RetrieveNode (allocatedNodeId));
+    const NODE_INDEX allocatedNodeId = mNodesMgr.AllocateNode (parent,
+                                                               insertPosition);
+    BTreeNodeRAII allocatedNode (mNodesMgr.RetrieveNode (allocatedNodeId));
 
-    allocatedNode->SetLeaf (IsLeaf ());
+    allocatedNode->Leaf (IsLeaf ());
     allocatedNode->MarkAsUsed ();
-    allocatedNode->SetKeysCount (GetKeysCount () - splitKeyIndex);
+    allocatedNode->KeysCount (KeysCount () - splitKeyIndex);
 
-    if (GetKeysCount () - GetNullKeysCount () < splitKeyIndex)
-      allocatedNode->SetNullKeysCount (GetKeysCount () - splitKeyIndex);
+    if (KeysCount () - NullKeysCount () < splitKeyIndex)
+      allocatedNode->NullKeysCount (KeysCount () - splitKeyIndex);
+
     else
-      allocatedNode->SetNullKeysCount (GetNullKeysCount ());
+      allocatedNode->NullKeysCount (NullKeysCount ());
 
-    assert (GetNullKeysCount () <= GetKeysCount ());
-    assert (allocatedNode->GetNullKeysCount () <=
-            allocatedNode->GetNullKeysCount ());
+    assert (NullKeysCount () <= KeysCount ());
+    assert (allocatedNode->NullKeysCount () <= allocatedNode->NullKeysCount ());
 
-    for (KEY_INDEX index = splitKeyIndex;
-         index < GetKeysCount ();
-         ++index)
+    for (KEY_INDEX index = splitKeyIndex; index < KeysCount (); ++index)
       {
-        _SC (T_BTreeNode*, &(*allocatedNode))->SetKey (GetKey (index),
-                                                       index - splitKeyIndex);
+        _SC (DBS_BTreeNode*, &(*allocatedNode))->SetKey (GetKey (index),
+                                                         index - splitKeyIndex);
       }
 
-    if (IsLeaf () == false)
+    if ( ! IsLeaf ())
       {
-        for (KEY_INDEX index = splitKeyIndex; index < GetKeysCount (); ++index)
+        for (KEY_INDEX index = splitKeyIndex; index < KeysCount (); ++index)
           {
-            _SC (T_BTreeNode*, &(*allocatedNode))->T_BTreeNode::SetNodeOfKey (
-                                            index - splitKeyIndex,
-                                            T_BTreeNode::GetNodeOfKey (index)
-                                                                             );
+            _SC (DBS_BTreeNode*, &(*allocatedNode))->SetNodeOfKey (
+                                                        index - splitKeyIndex,
+                                                        NodeIdOfKey (index)
+                                                                  );
           }
       }
-    SetNullKeysCount (GetNullKeysCount () - allocatedNode->GetNullKeysCount ());
-    SetKeysCount (splitKeyIndex);
-    assert (GetNullKeysCount () <= GetKeysCount ());
 
-    allocatedNode->SetNext (NodeId());
-    allocatedNode->SetPrev (GetPrev());
-    SetPrev (allocatedNodeId);
-    if (allocatedNode->GetPrev() != NIL_NODE)
+    NullKeysCount (NullKeysCount () - allocatedNode->NullKeysCount ());
+    KeysCount (splitKeyIndex);
+
+    assert (NullKeysCount () <= KeysCount ());
+
+    allocatedNode->Next (NodeId());
+    allocatedNode->Prev (Prev());
+    Prev (allocatedNodeId);
+    if (allocatedNode->Prev() != NIL_NODE)
       {
-        BTreeNodeRAI prevNode (
-            m_NodesMgr.RetrieveNode (allocatedNode->GetPrev())
+        BTreeNodeRAII prevNode (
+            mNodesMgr.RetrieveNode (allocatedNode->Prev())
                               );
-        prevNode->SetNext (allocatedNodeId);
+        prevNode->Next (allocatedNodeId);
       }
   }
 
-  virtual void Join (bool toRight)
+  virtual void Join (const bool toRight)
   {
     if (toRight)
       {
-        assert (GetNext() != NIL_NODE);
+        assert (Next () != NIL_NODE);
 
-        BTreeNodeRAI nextNode (m_NodesMgr.RetrieveNode (GetNext ()));
+        BTreeNodeRAII next (mNodesMgr.RetrieveNode (Next ()));
 
-        T_BTreeNode* const pNextNode    = _SC (T_BTreeNode*,  &(*nextNode));
-        const KEY_INDEX    oldKeysCount = pNextNode->GetKeysCount ();
+        DBS_BTreeNode* const nextNode     = _SC (DBS_BTreeNode*, &(*next));
+        const KEY_INDEX      oldKeysCount = nextNode->KeysCount ();
 
-        assert ((pNextNode->GetNullKeysCount() == 0) ||
-            ( GetKeysCount () == GetNullKeysCount ()));
+        assert ((nextNode->NullKeysCount() == 0) ||
+            ( KeysCount () == NullKeysCount ()));
 
-        pNextNode->SetKeysCount (oldKeysCount + GetKeysCount ());
-        pNextNode->SetNullKeysCount (pNextNode->GetNullKeysCount () +
-                                     GetNullKeysCount ());
+        nextNode->KeysCount (oldKeysCount + KeysCount ());
+        nextNode->NullKeysCount (nextNode->NullKeysCount () + NullKeysCount ());
 
-        for (KEY_INDEX index = 0; index < GetKeysCount (); ++index)
-          pNextNode->SetKey (GetKey (index), index + oldKeysCount);
+        for (KEY_INDEX index = 0; index < KeysCount (); ++index)
+          nextNode->SetKey (GetKey (index), index + oldKeysCount);
 
         if (IsLeaf () == false)
           {
-            for (KEY_INDEX index = 0; index < GetKeysCount (); ++index)
+            for (KEY_INDEX index = 0; index < KeysCount (); ++index)
               {
-                pNextNode->T_BTreeNode::SetNodeOfKey (
-                                          index + oldKeysCount,
-                                          T_BTreeNode::GetNodeOfKey (index)
-                                                     );
+                nextNode->SetNodeOfKey (index + oldKeysCount,
+                                        NodeIdOfKey (index));
               }
           }
-        nextNode->SetPrev (GetPrev ());
-        if (GetPrev () != NIL_NODE)
+
+        nextNode->Prev (Prev ());
+        if (Prev () != NIL_NODE)
           {
-            BTreeNodeRAI prevNode (m_NodesMgr.RetrieveNode (GetPrev ()));
-            prevNode->SetNext (GetNext ());
+            BTreeNodeRAII prev (mNodesMgr.RetrieveNode (Prev ()));
+            prev->Next (Next ());
           }
 
-        assert (pNextNode->GetNullKeysCount () <= pNextNode->GetKeysCount ());
-        assert (pNextNode->GetKeysCount () <= pNextNode->KeysPerNode());
+        assert (nextNode->NullKeysCount () <= nextNode->KeysCount ());
+        assert (nextNode->KeysCount () <= nextNode->KeysPerNode());
       }
     else
       {
-        assert (GetPrev () != NIL_NODE);
+        assert (Prev () != NIL_NODE);
 
-        BTreeNodeRAI       prevNode (m_NodesMgr.RetrieveNode (GetPrev ()));
-        T_BTreeNode* const pPrevNode    = _SC (T_BTreeNode*, &(*prevNode));
-        const KEY_INDEX    oldKeysCount = GetKeysCount ();
+        BTreeNodeRAII prev (mNodesMgr.RetrieveNode (Prev ()));
 
-        SetKeysCount (oldKeysCount + pPrevNode->GetKeysCount ());
-        SetNullKeysCount (GetNullKeysCount () + pPrevNode->GetNullKeysCount());
+        DBS_BTreeNode* const prevNode     = _SC (DBS_BTreeNode*, &(*prev));
+        const KEY_INDEX      oldKeysCount = KeysCount ();
 
-        for (KEY_INDEX index = 0; index < pPrevNode->GetKeysCount (); ++index)
-          SetKey (pPrevNode->GetKey (index), index + oldKeysCount);
+        KeysCount (oldKeysCount + prevNode->KeysCount ());
+        NullKeysCount (NullKeysCount () + prevNode->NullKeysCount());
+
+        for (KEY_INDEX index = 0; index < prevNode->KeysCount (); ++index)
+          SetKey (prevNode->GetKey (index), index + oldKeysCount);
 
         if (IsLeaf () == false)
           {
-            for (KEY_INDEX index = 0;
-                 index < pPrevNode->GetKeysCount ();
-                 ++index)
+            for (KEY_INDEX index = 0; index < prevNode->KeysCount (); ++index)
               {
                 SetNodeOfKey (index + oldKeysCount,
-                              pPrevNode->T_BTreeNode::GetNodeOfKey (index));
+                              prevNode->NodeIdOfKey (index));
               }
           }
 
-        SetPrev (prevNode->GetPrev ());
-        if (GetPrev () != NIL_NODE)
+        Prev (prev->Prev ());
+        if (Prev () != NIL_NODE)
           {
-            BTreeNodeRAI prevNode (m_NodesMgr.RetrieveNode (GetPrev ()));
-            prevNode->SetNext (NodeId ());
+            BTreeNodeRAII prev (mNodesMgr.RetrieveNode (Prev ()));
+
+            prev->Next (NodeId ());
           }
 
-        assert (GetNullKeysCount () <= GetKeysCount() );
-        assert (GetKeysCount () <= KeysPerNode());
+        assert (NullKeysCount () <= KeysCount() );
+        assert (KeysCount () <= KeysPerNode());
       }
   }
 
-  virtual bool IsLess (const I_BTreeKey& key, KEY_INDEX keyIndex) const
+  virtual bool IsLess (const IBTreeKey& key, const KEY_INDEX keyIndex) const
   {
-    assert (keyIndex  < GetKeysCount ());
+    assert (keyIndex  < KeysCount ());
+
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
 
     return theKey < GetKey (keyIndex);
   }
 
-  virtual bool IsEqual (const I_BTreeKey& key, KEY_INDEX keyIndex) const
+  virtual bool IsEqual (const IBTreeKey& key, const KEY_INDEX keyIndex) const
   {
-    assert (keyIndex  < GetKeysCount ());
+    assert (keyIndex  < KeysCount ());
+
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
 
     return theKey == GetKey (keyIndex);
   }
 
-  virtual bool IsBigger (const I_BTreeKey& key, KEY_INDEX keyIndex) const
+  virtual bool IsBigger (const IBTreeKey& key, const KEY_INDEX keyIndex) const
   {
-    assert (keyIndex  < GetKeysCount ());
+    assert (keyIndex  < KeysCount ());
+
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
 
     return theKey > GetKey (keyIndex);
   }
 
-  virtual const I_BTreeKey& SentinelKey () const
-  {
-    static T_BTreeKey<DBS_T> _sentinel (DBS_T (std::numeric_limits<T>::max ()),
-                                        ~0ull);
-
-    return _sentinel;
-  }
+  virtual const IBTreeKey& SentinelKey () const;
 
   virtual void GetRows (KEY_INDEX fromPos,
                         KEY_INDEX toPos,
-                        DBSArray& output) const
+                        DArray& output) const
   {
     assert (fromPos >= toPos);
-    assert (fromPos < GetKeysCount ());
-    assert (output.ElementsType() == T_UINT64);
+    assert (fromPos < KeysCount ());
+    assert (output.Type() == T_UINT64);
 
-    const ROW_INDEX* const pRowParts = _RC (const ROW_INDEX*, DataToRead ());
+    const ROW_INDEX* const rows = _RC (const ROW_INDEX*, DataForRead ());
 
     if ((toPos == 0) && IsEqual (SentinelKey (), toPos))
       ++toPos;
 
     while (fromPos >= toPos)
       {
-        output.AddElement (DBSUInt64 (pRowParts[fromPos]));
+        output.Add (DUInt64 (rows[fromPos]));
         if (fromPos == 0)
           break;
         fromPos--;
@@ -513,192 +495,132 @@ public:
 private:
   const T_BTreeKey<DBS_T> GetKey (const KEY_INDEX keyIndex) const
   {
-    assert (keyIndex < GetKeysCount ());
-    assert (GetNullKeysCount () <= GetKeysCount ());
+    assert (keyIndex < KeysCount ());
+    assert (NullKeysCount () <= KeysCount ());
 
-    const ROW_INDEX *const pRowParts = _RC (const ROW_INDEX*, DataToRead ());
+    const ROW_INDEX *const rows = _RC (const ROW_INDEX*, DataForRead ());
 
-    if (keyIndex >= GetKeysCount() - GetNullKeysCount ())
-      return T_BTreeKey<DBS_T> (DBS_T (), pRowParts[keyIndex]);
+    if (keyIndex >= KeysCount() - NullKeysCount ())
+      return T_BTreeKey<DBS_T> (DBS_T (), rows[keyIndex]);
 
     DBS_T value;
     if (IsLeaf())
       {
-        const uint8_t* const pValueParts = _RC (const uint8_t*,
-                                                pRowParts + KeysPerNode ());
-        PSValInterp::Retrieve (pValueParts + keyIndex * T_SIZE, &value);
+        const uint8_t* const values = _RC (const uint8_t*,
+                                           rows + KeysPerNode ());
+        Serializer::Load (values + keyIndex * T_SIZE, &value);
       }
     else
       {
-        const NODE_INDEX* const pChildNodes = _RC (const NODE_INDEX*,
-                                                   pRowParts + KeysPerNode ());
+        const NODE_INDEX* const childNodes = _RC (const NODE_INDEX*,
+                                                  rows + KeysPerNode ());
 
-        const uint8_t* const pValueParts = _RC (const uint8_t*,
-                                                pChildNodes + KeysPerNode ());
+        const uint8_t* const values = _RC (const uint8_t*,
+                                           childNodes + KeysPerNode ());
 
-        PSValInterp::Retrieve (pValueParts + keyIndex * T_SIZE, &value);
+        Serializer::Load (values + keyIndex * T_SIZE, &value);
       }
 
 
-    return T_BTreeKey<DBS_T> (value, pRowParts[keyIndex]);
+    return T_BTreeKey<DBS_T> (value, rows[keyIndex]);
   }
 
-  void SetKey (const T_BTreeKey<DBS_T> &key,const KEY_INDEX keyIndex)
+  void SetKey (const T_BTreeKey<DBS_T> &key, const KEY_INDEX keyIndex)
   {
-    assert (keyIndex < GetKeysCount ());
-    assert (GetNullKeysCount () <= GetKeysCount ());
+    assert (keyIndex < KeysCount ());
+    assert (NullKeysCount () <= KeysCount ());
 
-    ROW_INDEX *const pRowParts = _RC (ROW_INDEX*, DataToWrite ());
+    ROW_INDEX *const rows = _RC (ROW_INDEX*, DataForWrite ());
 
-    if (keyIndex < GetKeysCount() - GetNullKeysCount ())
+    if (keyIndex < KeysCount() - NullKeysCount ())
       {
         if (IsLeaf ())
           {
-            uint8_t* const pValueParts = _RC (uint8_t*,
-                                              pRowParts + KeysPerNode ());
+            uint8_t* const values = _RC (uint8_t*, rows + KeysPerNode ());
 
-            PSValInterp::Store (pValueParts + keyIndex * T_SIZE,
-                                key.m_ValuePart);
+            Serializer::Store (values + keyIndex * T_SIZE, key.mValuePart);
           }
         else
           {
-            NODE_INDEX* const pChildNodes = _RC (NODE_INDEX*,
-                                                 pRowParts + KeysPerNode ());
+            NODE_INDEX* const childNodes = _RC (NODE_INDEX*,
+                                                rows + KeysPerNode ());
 
-            uint8_t* const pValueParts = _RC (uint8_t*,
-                                              pChildNodes + KeysPerNode ());
+            uint8_t* const values = _RC (uint8_t*, childNodes + KeysPerNode ());
 
-            PSValInterp::Store (pValueParts + keyIndex * T_SIZE,
-                                key.m_ValuePart);
+            Serializer::Store (values + keyIndex * T_SIZE, key.mValuePart);
           }
       }
-    pRowParts[keyIndex] = key.m_RowPart;
+    rows[keyIndex] = key.mRowPart;
   }
 };
 
 
-//Specialization for DBSBool
-template <> inline const I_BTreeKey&
-T_BTreeNode <bool, DBSBool, 1>::SentinelKey () const
-{
-  static BoolBTreeKey _sentinel (DBSBool (true), ~0ull);
-  return _sentinel;
-}
 
-//Specializations for DBSDate
-template <> inline const I_BTreeKey&
-T_BTreeNode <void, DBSDate, 4>::SentinelKey () const
-{
-  static DateBTreeKey _sentinel (DBSDate (0x7FFF, 12, 31), ~0ull);
-  return _sentinel;
-}
+typedef DBS_BTreeNode<DBool, bool, 1>             BoolBTreeNode;
+typedef DBS_BTreeNode<DChar, uint32_t, 4>         CharBTreeNode;
+typedef DBS_BTreeNode<DDate, void, 4>             DateBTreeNode;
+typedef DBS_BTreeNode<DDateTime, void, 7>         DateTimeBTreeNode;
+typedef DBS_BTreeNode<DHiresTime, void, 11>       HiresTimeBTreeNode;
+typedef DBS_BTreeNode<DUInt8, uint8_t, 1>         UInt8BTreeNode;
+typedef DBS_BTreeNode<DUInt16, uint16_t, 2>       UInt16BTreeNode;
+typedef DBS_BTreeNode<DUInt32, uint32_t, 4>       UInt32BTreeNode;
+typedef DBS_BTreeNode<DUInt64, uint64_t, 8>       UInt64BTreeNode;
+typedef DBS_BTreeNode<DInt8, int8_t, 1>           Int8BTreeNode;
+typedef DBS_BTreeNode<DInt16, int16_t, 2>         Int16BTreeNode;
+typedef DBS_BTreeNode<DInt32, int32_t, 4>         Int32BTreeNode;
+typedef DBS_BTreeNode<DInt64, int64_t, 8>         Int64BTreeNode;
+typedef DBS_BTreeNode<DReal, REAL_T, 8>           RealBTreeNode;
+typedef DBS_BTreeNode<DRichReal, RICHREAL_T, 14>  RichRealBTreeNode;
 
-//Specialization for DateTime
-template <> inline const I_BTreeKey&
-T_BTreeNode <void, DBSDateTime, 7>::SentinelKey () const
-{
-  static DateTimeBTreeKey _sentinel (DBSDateTime (0x7FFF, 12, 31, 23, 59, 59),
-                                     ~0ull);
-  return _sentinel;
-}
 
-//Specialization of DBSHiresTime
 
-template <> inline const I_BTreeKey&
-T_BTreeNode <void, DBSHiresTime, 11>::SentinelKey () const
-{
-  static HiresTimeBTreeKey _sentinel (DBSHiresTime (0x7FFF,
-                                                    12,
-                                                    31,
-                                                    23,
-                                                    59,
-                                                    59,
-                                                    999999999),
-                                      ~0ull);
-  return _sentinel;
-}
-
-template <> inline const I_BTreeKey&
-T_BTreeNode<REAL_T, DBSReal, 8>::SentinelKey () const
-{
-  static const int64_t intPart  = 0xFFFFFFFFFFull >> 1;
-  static const int64_t fracPart = DBS_REAL_PREC - 1;
-
-  static RealBTreeKey _sentinel (DBSReal (REAL_T (intPart,
-                                                  fracPart,
-                                                  DBS_REAL_PREC)),
-                                 ~0ull);
-  return _sentinel;
-}
-
-template <> inline const I_BTreeKey&
-T_BTreeNode<RICHREAL_T, DBSRichReal, 14>::SentinelKey () const
-{
-  static const int64_t intPart  = ~0ull >> 1;
-  static const int64_t fracPart = DBS_RICHREAL_PREC - 1;
-
-  static RichRealBTreeKey _sentinel (
-                DBSRichReal (RICHREAL_T (intPart,fracPart,DBS_RICHREAL_PREC)),
-                ~0ull
-                                   );
-  return _sentinel;
-}
-
-typedef T_BTreeNode <bool, DBSBool, 1>             BoolBTreeNode;
-typedef T_BTreeNode <uint32_t, DBSChar, 4>         CharBTreeNode;
-typedef T_BTreeNode <void, DBSDate, 4>             DateBTreeNode;
-typedef T_BTreeNode <void, DBSDateTime, 7>         DateTimeBTreeNode;
-typedef T_BTreeNode <void, DBSHiresTime, 11>       HiresTimeBTreeNode;
-typedef T_BTreeNode <uint8_t, DBSUInt8, 1>         UInt8BTreeNode;
-typedef T_BTreeNode <uint16_t, DBSUInt16, 2>       UInt16BTreeNode;
-typedef T_BTreeNode <uint32_t, DBSUInt32, 4>       UInt32BTreeNode;
-typedef T_BTreeNode <uint64_t, DBSUInt64, 8>       UInt64BTreeNode;
-typedef T_BTreeNode <int8_t, DBSInt8, 1>           Int8BTreeNode;
-typedef T_BTreeNode <int16_t, DBSInt16, 2>         Int16BTreeNode;
-typedef T_BTreeNode <int32_t, DBSInt32, 4>         Int32BTreeNode;
-typedef T_BTreeNode <int64_t, DBSInt64, 8>         Int64BTreeNode;
-typedef T_BTreeNode <REAL_T, DBSReal, 8>           RealBTreeNode;
-typedef T_BTreeNode <RICHREAL_T, DBSRichReal, 14>  RichRealBTreeNode;
-
-class FieldIndexNodeManager : public I_BTreeNodeManager
+class FieldIndexNodeManager : public IBTreeNodeManager
 {
 public:
-  FieldIndexNodeManager (std::auto_ptr <I_DataContainer> &container,
-                         const uint_t nodeSize,
-                         const uint_t maxCacheMem,
-                         const DBS_FIELD_TYPE nodeType,
-                         const bool create);
+  FieldIndexNodeManager (std::auto_ptr<IDataContainer>& container,
+                         const uint_t                   nodeSize,
+                         const uint_t                   maxCacheMem,
+                         const DBS_FIELD_TYPE           nodeType,
+                         const bool                     create);
   virtual ~FieldIndexNodeManager();
 
+  void MarkForRemoval ();
 
-  void     MarkForRemoval ();
-  uint64_t GetIndexRawSize () const;
+  uint64_t IndexRawSize () const;
 
-  //Implementations of I_BTreeNodeManager
-  virtual uint64_t    RawNodeSize () const;
-  virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent,
-                                    const KEY_INDEX  parentKey);
-  virtual void        FreeNode (const NODE_INDEX node);
+  virtual uint64_t NodeRawSize () const;
 
-  virtual NODE_INDEX  GetRootNodeId ();
-  virtual void        SetRootNodeId (const NODE_INDEX node);
+  virtual NODE_INDEX AllocateNode (const NODE_INDEX parent,
+                                   const KEY_INDEX  parentKey);
+
+  virtual void FreeNode (const NODE_INDEX nodeId);
+
+  virtual NODE_INDEX RootNodeId ();
+
+  virtual void RootNodeId (const NODE_INDEX nodeId);
 
 protected:
-  virtual uint_t       MaxCachedNodes ();
-  virtual I_BTreeNode* LoadNode (const NODE_INDEX node);
-  virtual void         SaveNode (I_BTreeNode* const node);
+  virtual uint_t MaxCachedNodes ();
 
-  void         InitContainer ();
-  void         UpdateContainer ();
-  void         InitFromContainer ();
-  I_BTreeNode* NodeFactory (const NODE_INDEX nodeId);
+  virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId);
 
-  const uint_t                          m_NodeSize;
-  const uint_t                          m_MaxCachedMem;
-  NODE_INDEX                            m_RootNode;
-  NODE_INDEX                            m_FirstFreeNode;
-  std::auto_ptr<I_DataContainer>        m_Container;
-  const DBS_FIELD_TYPE                  m_FieldType;
+  virtual void SaveNode (IBTreeNode* const nodeId);
+
+  void InitContainer ();
+
+  void UpdateContainer ();
+
+  void InitFromContainer ();
+
+  IBTreeNode* NodeFactory (const NODE_INDEX nodeId);
+
+
+  const uint_t                          mNodeSize;
+  const uint_t                          mMaxCachedMem;
+  NODE_INDEX                            mRootNode;
+  NODE_INDEX                            mFirstFreeNode;
+  std::auto_ptr<IDataContainer>         mContainer;
+  const DBS_FIELD_TYPE                  mFieldType;
 
 private:
   FieldIndexNodeManager (const FieldIndexNodeManager&);
@@ -709,3 +631,4 @@ private:
 } //namespace whisper
 
 #endif /* PS_BTREE_FIELDS_H_ */
+

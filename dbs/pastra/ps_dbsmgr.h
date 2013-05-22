@@ -35,46 +35,57 @@
 namespace whisper {
 namespace pastra {
 
-//Some classes forward declarations
+
+//Forward declarations
 class PersistentTable;
+
+
 
 class DbsHandler : public I_DBSHandler
 {
 public:
-  DbsHandler (const DBSSettings& globalSettings,
-              const std::string& dbsDirectory,
-              const std::string& dbsName);
-  DbsHandler (const DbsHandler& source);
+  DbsHandler (const DBSSettings&    settings,
+              const std::string&    directory,
+              const std::string&    name);
+  DbsHandler (const DbsHandler&     source);
   virtual ~DbsHandler ();
 
-  virtual TABLE_INDEX  PersistentTablesCount ();
-  virtual I_DBSTable&  RetrievePersistentTable (const TABLE_INDEX index);
-  virtual I_DBSTable&  RetrievePersistentTable (const char* pTableName);
-  virtual void         ReleaseTable (I_DBSTable&);
-  virtual void         AddTable (const char* const pTableName,
-                                 const FIELD_INDEX   fieldsCount,
-                                 DBSFieldDescriptor* pInOutFields);
-  virtual void         DeleteTable (const char* const pTableName);
+  virtual TABLE_INDEX PersistentTablesCount ();
 
-  virtual I_DBSTable&  CreateTempTable (const FIELD_INDEX   fieldsCount,
-                                        DBSFieldDescriptor* pInOutFields);
+  virtual ITable& RetrievePersistentTable (const TABLE_INDEX index);
+
+  virtual ITable& RetrievePersistentTable (const char* name);
+
+  virtual void ReleaseTable (ITable&);
+
+  virtual void AddTable (const char* const      name,
+                         const FIELD_INDEX      fieldsCount,
+                         DBSFieldDescriptor*    inoutFields);
+
+  virtual void DeleteTable (const char* const name);
+
+  virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
+                                   DBSFieldDescriptor* inoutFields);
+
   virtual const char* TableName (const TABLE_INDEX index);
 
   void Discard ();
+
   void RemoveFromStorage ();
 
   const std::string& WorkingDir () const
   {
-    return m_DbsWorkDir;
+    return mGlbSettings.mWorkDir;
   }
+
   const std::string& TemporalDir () const
   {
-    return m_GlbSettings.m_TempDir;
+    return mGlbSettings.mTempDir;
   }
 
   uint64_t MaxFileSize () const
   {
-    return m_GlbSettings.m_MaxFileSize;
+    return mGlbSettings.mMaxFileSize;
   }
 
 private:
@@ -82,14 +93,15 @@ private:
 
   void SyncToFile ();
 
-  const DBSSettings& m_GlbSettings;
-  Lock      m_Sync;
-  const std::string  m_DbsWorkDir;
-  const std::string  m_Name;
-  TABLES             m_Tables;
+  const DBSSettings&      mGlbSettings;
+  Lock                    mSync;
+  const std::string       mDbsLocationDir;
+  const std::string       mName;
+  TABLES                  mTables;
 };
 
 } //namespace pastra
 } //namespace whisper
 
 #endif                                /* PS_DBSMGR_H_ */
+

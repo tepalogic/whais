@@ -29,141 +29,141 @@ test_nulliness()
   uint8_t nullUtf8[] = {0x00};
 
   {
-    DBSText textSingleton;
-    DBSText textTemporal (nullUtf8);
+    DText textSingleton;
+    DText textTemporal (nullUtf8);
 
     if (textSingleton.IsNull() == false)
       result = false;
-    else if (textSingleton.GetCharactersCount() != 0)
+    else if (textSingleton.Count() != 0)
       result = false;
-    else if (textSingleton.GetRawUtf8Count() != 0)
+    else if (textSingleton.RawSize () != 0)
       result = false;
     else if (textTemporal.IsNull() == false)
       result = false;
-    else if (textTemporal.GetCharactersCount() != 0)
+    else if (textTemporal.Count() != 0)
       result = false;
-    else if (textTemporal.GetRawUtf8Count() != 0)
+    else if (textTemporal.RawSize () != 0)
       result = false;
-    else if (textSingleton.GetCharAtIndex(0).m_IsNull == false)
+    else if (textSingleton.CharAt(0).mIsNull == false)
       return false;
-    else if (textTemporal.GetCharAtIndex(0).m_IsNull == false)
+    else if (textTemporal.CharAt(0).mIsNull == false)
       return false;
   }
 
   if (result)
     {
-      DBSText textSingleton;
-      textSingleton.Append (DBSChar (0x42));
+      DText textSingleton;
+      textSingleton.Append (DChar (0x42));
 
       if (textSingleton.IsNull() != false)
         result = false;
-      else if (textSingleton.GetCharactersCount() != 1)
+      else if (textSingleton.Count() != 1)
         result = false;
-      else if (textSingleton.GetRawUtf8Count() != 1)
+      else if (textSingleton.RawSize () != 1)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_IsNull != false)
+      else if (textSingleton.CharAt(0).mIsNull != false)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_Value != 0x42)
+      else if (textSingleton.CharAt(0).mValue != 0x42)
         result = false;
     }
 
   if (result)
     {
-      DBSText textTemporal (nullUtf8);
-      textTemporal.Append (DBSChar (0x281));
+      DText textTemporal (nullUtf8);
+      textTemporal.Append (DChar (0x281));
 
       if (textTemporal.IsNull() != false)
         result = false;
-      else if (textTemporal.GetCharactersCount() != 1)
+      else if (textTemporal.Count() != 1)
         result = false;
-      else if (textTemporal.GetRawUtf8Count() != 2)
+      else if (textTemporal.RawSize () != 2)
         result = false;
-      else if (textTemporal.GetCharAtIndex(0).m_IsNull != false)
+      else if (textTemporal.CharAt(0).mIsNull != false)
         result = false;
-      else if (textTemporal.GetCharAtIndex(0).m_Value != 0x281)
+      else if (textTemporal.CharAt(0).mValue != 0x281)
         result = false;
     }
 
   if (result)
     {
-      DBSText textSingleton;
-      textSingleton.Append (DBSChar (0x942));
+      DText textSingleton;
+      textSingleton.Append (DChar (0x942));
 
       if (textSingleton.IsNull() != false)
         result = false;
-      else if (textSingleton.GetCharactersCount() != 1)
+      else if (textSingleton.Count() != 1)
         result = false;
-      else if (textSingleton.GetRawUtf8Count() != 3)
+      else if (textSingleton.RawSize () != 3)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_IsNull != false)
+      else if (textSingleton.CharAt(0).mIsNull != false)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_Value != 0x942)
+      else if (textSingleton.CharAt(0).mValue != 0x942)
         result = false;
     }
 
   if (result)
     {
-      DBSText textSingleton;
-      textSingleton.Append (DBSChar (0x10942));
+      DText textSingleton;
+      textSingleton.Append (DChar (0x10942));
 
       if (textSingleton.IsNull() != false)
         result = false;
-      else if (textSingleton.GetCharactersCount() != 1)
+      else if (textSingleton.Count() != 1)
         result = false;
-      else if (textSingleton.GetRawUtf8Count() != 4)
+      else if (textSingleton.RawSize () != 4)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_IsNull != false)
+      else if (textSingleton.CharAt(0).mIsNull != false)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_Value != 0x10942)
+      else if (textSingleton.CharAt(0).mValue != 0x10942)
         result = false;
     }
   if (result)
     {
-      DBSText textSingleton;
-      textSingleton.Append (DBSChar (0x3010942));
+      DText textSingleton;
+      textSingleton.Append (DChar (0x3010942));
 
       if (textSingleton.IsNull() != false)
         result = false;
-      else if (textSingleton.GetCharactersCount() != 1)
+      else if (textSingleton.Count() != 1)
         result = false;
-      else if (textSingleton.GetRawUtf8Count() != 5)
+      else if (textSingleton.RawSize () != 5)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_IsNull != false)
+      else if (textSingleton.CharAt(0).mIsNull != false)
         result = false;
-      else if (textSingleton.GetCharAtIndex(0).m_Value != 0x3010942)
+      else if (textSingleton.CharAt(0).mValue != 0x3010942)
         result = false;
     }
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_cont_1";
 
-      VLVarsStore storage;
+      VariableSizeStore storage;
       storage.Init(temp_file_base.c_str(), 0, 713);
       storage.RegisterReference ();
       storage.MarkForRemoval();
 
       uint64_t allocated_entry = storage.AddRecord (NULL, 0);
 
-      DBSText textVarRaw  (*(new RowFieldText(storage, allocated_entry, 0)));
+      DText textVarRaw  (*(new RowFieldText(storage, allocated_entry, 0)));
 
       if (textVarRaw.IsNull() == false)
         return false;
 
-      textVarRaw.Append (DBSChar (0x71201200));
+      textVarRaw.Append (DChar (0x71201200));
 
       if (textVarRaw.IsNull() != false)
         result = false;
-      else if (textVarRaw.GetCharactersCount() != 1)
+      else if (textVarRaw.Count() != 1)
         result = false;
-      else if (textVarRaw.GetRawUtf8Count() != 6)
+      else if (textVarRaw.RawSize () != 6)
         result = false;
-      else if (textVarRaw.GetCharAtIndex(0).m_IsNull != false)
+      else if (textVarRaw.CharAt(0).mIsNull != false)
         result = false;
-      else if (textVarRaw.GetCharAtIndex(0).m_Value != 0x71201200)
+      else if (textVarRaw.CharAt(0).mValue != 0x71201200)
         result = false;
-      else if (textVarRaw.GetCharAtIndex(1).m_IsNull == false)
+      else if (textVarRaw.CharAt(1).mIsNull == false)
         result = false;
 
       storage.Flush ();
@@ -195,25 +195,25 @@ test_text_append ()
 
   if (result)
     {
-      DBSText destinationText;
-      const DBSText originalText (_RC(const uint8_t*, pOriginalText));
+      DText destinationText;
+      const DText originalText (_RC(const uint8_t*, pOriginalText));
       const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
-      if (originalText.GetCharactersCount() != charsCount)
+      if (originalText.Count() != charsCount)
         result = false;
       else
         {
           destinationText.Append (originalText);
-          if (destinationText.GetCharactersCount() != originalText.GetCharactersCount())
+          if (destinationText.Count() != originalText.Count())
             result = false;
-          else if (destinationText.GetRawUtf8Count() != originalText.GetRawUtf8Count())
+          else if (destinationText.RawSize () != originalText.RawSize ())
             result = false;
           else
             {
               for (uint_t index = 0; index < charsCount; ++index)
-                if ( destinationText.GetCharAtIndex(index).m_IsNull ||
-                    (destinationText.GetCharAtIndex(index).m_Value != originalText.GetCharAtIndex(index).m_Value) ||
-                    (destinationText.GetCharAtIndex(index).m_Value != charValues[index]))
+                if ( destinationText.CharAt(index).mIsNull ||
+                    (destinationText.CharAt(index).mValue != originalText.CharAt(index).mValue) ||
+                    (destinationText.CharAt(index).mValue != charValues[index]))
                     result = false;
 
             }
@@ -222,12 +222,12 @@ test_text_append ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;;
       temp_file_base += "ps_t_text";
 
       uint64_t allocated_entry = 0;
 
-      const DBSText originalText (_RC(const uint8_t*, pOriginalText));
+      const DText originalText (_RC(const uint8_t*, pOriginalText));
       const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
       {
@@ -235,7 +235,7 @@ test_text_append ()
         strcpy (_RC (char*, tempBuff) + 12, pOriginalText);
         store_le_int32 ((sizeof charValues / sizeof (uint32_t)), tempBuff);
 
-        VLVarsStore storage;
+        VariableSizeStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
         storage.RegisterReference ();
 
@@ -247,33 +247,33 @@ test_text_append ()
         storage.Flush ();
       }
 
-      if (originalText.GetCharactersCount() != charsCount)
+      if (originalText.Count() != charsCount)
         result = false;
       else
         {
-          VLVarsStore storage;
+          VariableSizeStore storage;
 
           storage.Init(temp_file_base.c_str(), 1, 713);
           storage.RegisterReference ();
           storage.MarkForRemoval();
 
           {
-            DBSText destinationText (
+            DText destinationText (
                       *(new RowFieldText(storage,
                                         allocated_entry,
-                                        originalText.GetRawUtf8Count () + 12))
+                                        originalText.RawSize () + 12))
                                     );
 
-            if (destinationText.GetCharactersCount() != originalText.GetCharactersCount())
+            if (destinationText.Count() != originalText.Count())
               result = false;
-            else if (destinationText.GetRawUtf8Count() != originalText.GetRawUtf8Count())
+            else if (destinationText.RawSize () != originalText.RawSize ())
               result = false;
             else
               {
                 for (uint_t index = 0; index < charsCount; ++index)
-                  if ( destinationText.GetCharAtIndex(index).m_IsNull ||
-                      (destinationText.GetCharAtIndex(index).m_Value != originalText.GetCharAtIndex(index).m_Value) ||
-                      (destinationText.GetCharAtIndex(index).m_Value != charValues[index]))
+                  if ( destinationText.CharAt(index).mIsNull ||
+                      (destinationText.CharAt(index).mValue != originalText.CharAt(index).mValue) ||
+                      (destinationText.CharAt(index).mValue != charValues[index]))
                       result = false;
               }
           }
@@ -293,39 +293,39 @@ test_character_insertion ()
 
   if (result)
     {
-      DBSText originalText (_RC(const uint8_t*, pOriginalText));
+      DText originalText (_RC(const uint8_t*, pOriginalText));
       const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
-      if (originalText.GetCharactersCount() != charsCount)
+      if (originalText.Count() != charsCount)
         result = false;
       else
         {
-          DBSChar test_char = DBSChar ('A');
-          originalText.SetCharAtIndex (test_char, 0);
+          DChar test_char = DChar ('A');
+          originalText.CharAt (0, test_char);
 
-          if (originalText.GetCharactersCount() != charsCount)
+          if (originalText.Count() != charsCount)
             result = false;
-          else if (originalText.GetCharAtIndex(0).m_Value != 'A')
+          else if (originalText.CharAt(0).mValue != 'A')
             result = false;
 
           if (result)
             {
-              DBSChar test_char = DBSChar(0x3412);
-              originalText.SetCharAtIndex (test_char, charsCount - 1);
+              DChar test_char = DChar(0x3412);
+              originalText.CharAt (charsCount - 1, test_char);
 
-              if (originalText.GetCharactersCount() != charsCount)
+              if (originalText.Count() != charsCount)
                 result = false;
-              else if (originalText.GetCharAtIndex(charsCount - 1).m_Value != 0x3412)
+              else if (originalText.CharAt(charsCount - 1).mValue != 0x3412)
                 result = false;
             }
 
           if (result)
             {
-              std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+              std::string temp_file_base = DBSGetSeettings ().mWorkDir;
               temp_file_base += "ps_t_text";
               uint64_t allocated_entry = 0;
 
-              VLVarsStore storage;
+              VariableSizeStore storage;
               storage.Init(temp_file_base.c_str(), 0, 713);
               storage.RegisterReference ();
               storage.MarkForRemoval();
@@ -339,7 +339,7 @@ test_character_insertion ()
                                   (sizeof charValues / sizeof (uint32_t)) + 12
                                                   );
 
-              DBSText originalText (
+              DText originalText (
                     *(new RowFieldText(
                               storage,
                               allocated_entry,
@@ -347,12 +347,12 @@ test_character_insertion ()
                                       ))
                                    );
 
-              DBSChar test_char = DBSChar(0x211356);
-              originalText.SetCharAtIndex (test_char, charsCount / 2);
+              DChar test_char = DChar(0x211356);
+              originalText.CharAt (charsCount / 2, test_char);
 
-              if (originalText.GetCharactersCount() != charsCount)
+              if (originalText.Count() != charsCount)
                 result = false;
-              else if (originalText.GetCharAtIndex(charsCount / 2).m_Value != 0x211356)
+              else if (originalText.CharAt(charsCount / 2).mValue != 0x211356)
                 result = false;
 
               storage.Flush ();
@@ -370,11 +370,11 @@ test_text_mirroring ()
   std::cout << "Testing for text mirroring ... ";
   bool result = true;
 
-  const DBSText arbiter (_RC(const uint8_t*, "Love is all you need!"));
-  const DBSText arbiter2 (_RC(const uint8_t*, "B"));
+  const DText arbiter (_RC(const uint8_t*, "Love is all you need!"));
+  const DText arbiter2 (_RC(const uint8_t*, "B"));
 
-  DBSText firstText (_RC(const uint8_t*, "A"));
-  DBSText secondText (firstText);
+  DText firstText (_RC(const uint8_t*, "A"));
+  DText secondText (firstText);
 
   if (firstText != secondText)
     result = false;
@@ -383,12 +383,12 @@ test_text_mirroring ()
   if ((firstText == secondText) || (secondText != arbiter))
     result = false;
 
-  firstText.SetMirror (secondText);
+  firstText.MakeMirror (secondText);
   if (firstText != secondText)
     result = false;
 
 
-  secondText.SetCharAtIndex (DBSChar ('B'), 0);
+  secondText.CharAt (0, DChar ('B'));
   if ((secondText != firstText) || (secondText != arbiter2))
     result = false;
 

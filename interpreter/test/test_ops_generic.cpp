@@ -155,7 +155,7 @@ test_op_cts (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSInt8 op(-10);
+  DInt8 op(-10);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -185,7 +185,7 @@ test_op_inull (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSDate op;
+  DDate op;
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
@@ -200,10 +200,10 @@ test_op_inull (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSBool (true) )
+  if (result != DBool (true) )
     return false;
 
   return true;
@@ -219,7 +219,7 @@ test_op_nnull (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSDate op;
+  DDate op;
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -234,13 +234,13 @@ test_op_nnull (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (stack.Size () != 1)
     return false;
 
-  if (result == DBSBool (true) )
+  if (result == DBool (true) )
     return false;
 
   return true;
@@ -252,18 +252,18 @@ test_op_call (Session& session)
   std::cout << "Testing opcode call...\n";
   SessionStack stack;
 
-  stack.Push (DBSUInt8 (10));
-  stack.Push (DBSUInt16 (2));
+  stack.Push (DUInt8 (10));
+  stack.Push (DUInt16 (2));
 
   session.ExecuteProcedure ("p2", stack);
 
   if (stack.Size () != 1)
     return false;
 
-  DBSUInt8 result;
+  DUInt8 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSUInt8 (24) )
+  if (result != DUInt8 (24) )
     return false;
 
   return true;
@@ -274,10 +274,10 @@ test_op_text_index (Session& session)
 {
   std::cout << "Testing opcode for text indexing...\n";
   SessionStack stack;
-  DBSChar value('A');
+  DChar value('A');
   LocalOperand localOp(stack, 0);
 
-  DBSText text ("A");
+  DText text ("A");
   stack.Push (text);
   stack.Push (StackValue (localOp));
 
@@ -286,16 +286,16 @@ test_op_text_index (Session& session)
   if (stack.Size () != 2)
     return false;
 
-  DBSChar result;
+  DChar result;
   stack[1].GetOperand ().GetValue (result);
 
   if (result != value )
     return false;
 
   stack[0].GetOperand ().GetValue (text);
-  value = text.GetCharAtIndex (0);
+  value = text.CharAt (0);
 
-  if (value != DBSChar('B') )
+  if (value != DChar('B') )
     return false;
 
   return true;
@@ -306,11 +306,11 @@ test_op_array_index (Session& session)
 {
   std::cout << "Testing opcode for array indexing...\n";
   SessionStack stack;
-  DBSInt8 value(0x23);
+  DInt8 value(0x23);
   LocalOperand localOp(stack, 0);
 
-  DBSArray array;
-  array.AddElement (value);
+  DArray array;
+  array.Add (value);
 
   stack.Push (array);
   stack.Push (StackValue (localOp));
@@ -320,16 +320,16 @@ test_op_array_index (Session& session)
   if (stack.Size () != 2)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[1].GetOperand ().GetValue (result);
 
   if (result != value )
     return false;
 
   stack[0].GetOperand ().GetValue (array);
-  array.GetElement (value, 0);
+  array.Get (0, value);
 
-  if (value != DBSInt8 (10) )
+  if (value != DInt8 (10) )
     return false;
 
   return true;
@@ -342,12 +342,12 @@ test_op_table_index (Session& session)
   SessionStack stack;
 
   DBSFieldDescriptor fd = { "value", T_INT8, false};
-  DBSInt8 value(0x23);
+  DInt8 value(0x23);
   LocalOperand localOp(stack, 0);
 
-  I_DBSTable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  ITable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
   tempTable.AddReusedRow ();
-  tempTable.SetEntry (0, 0, value);
+  tempTable.Set (0, 0, value);
 
   stack.Push (session.DBSHandler (), tempTable);
   stack.Push (StackValue (localOp));
@@ -357,19 +357,19 @@ test_op_table_index (Session& session)
   if (stack.Size () != 2)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[1].GetOperand ().GetValue (result);
 
   if (result != value )
     return false;
 
-  I_DBSTable& stackTable = stack[0].GetOperand ().GetTable ();
+  ITable& stackTable = stack[0].GetOperand ().GetTable ();
 
   if (&stackTable != &tempTable)
     return false;
 
-  stackTable.GetEntry (0, 0, value);
-  if (value != DBSInt8  (10) )
+  stackTable.Get (0, 0, value);
+  if (value != DInt8  (10) )
     return false;
 
   return true;
@@ -382,12 +382,12 @@ test_op_field_index (Session& session)
   SessionStack stack;
 
   DBSFieldDescriptor fd = { "value", T_INT8, false};
-  DBSInt8 value(0x23);
+  DInt8 value(0x23);
   LocalOperand localOp(stack, 0);
 
-  I_DBSTable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  ITable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
   tempTable.AddReusedRow ();
-  tempTable.SetEntry (0, 0, value);
+  tempTable.Set (0, 0, value);
 
   stack.Push (session.DBSHandler (), tempTable);
   stack.Push (StackValue (localOp));
@@ -397,19 +397,19 @@ test_op_field_index (Session& session)
   if (stack.Size () != 2)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[1].GetOperand ().GetValue (result);
 
   if (result != value )
     return false;
 
-  I_DBSTable& stackTable = stack[0].GetOperand ().GetTable ();
+  ITable& stackTable = stack[0].GetOperand ().GetTable ();
 
   if (&stackTable != &tempTable)
     return false;
 
-  stackTable.GetEntry (0, 0, value);
-  if (value != DBSInt8  (10) )
+  stackTable.Get (0, 0, value);
+  if (value != DInt8  (10) )
     return false;
 
   return true;
@@ -425,7 +425,7 @@ test_op_jfc (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSBool op(false);
+  DBool op(false);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -449,15 +449,15 @@ test_op_jfc (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (0) )
+  if (result != DInt8 (0) )
     return false;
 
   stack.Pop (1);
 
-  op = DBSBool (true);
+  op = DBool (true);
   stack.Push (op);
 
   session.ExecuteProcedure (field_proc, stack);
@@ -467,7 +467,7 @@ test_op_jfc (Session& session)
 
    stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (1) )
+  if (result != DInt8 (1) )
     return false;
 
   return true;
@@ -483,7 +483,7 @@ test_op_jtc (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSBool op(true);
+  DBool op(true);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -507,15 +507,15 @@ test_op_jtc (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (0) )
+  if (result != DInt8 (0) )
     return false;
 
   stack.Pop (1);
 
-  op = DBSBool (false);
+  op = DBool (false);
   stack.Push (op);
 
   session.ExecuteProcedure (field_proc, stack);
@@ -525,7 +525,7 @@ test_op_jtc (Session& session)
 
    stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (1) )
+  if (result != DInt8 (1) )
     return false;
 
   return true;
@@ -542,7 +542,7 @@ test_op_jf (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSBool op(false);
+  DBool op(false);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -566,15 +566,15 @@ test_op_jf (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (0) )
+  if (result != DInt8 (0) )
     return false;
 
   stack.Pop (1);
 
-  op = DBSBool (true);
+  op = DBool (true);
   stack.Push (op);
 
   session.ExecuteProcedure (field_proc, stack);
@@ -584,7 +584,7 @@ test_op_jf (Session& session)
 
    stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (1) )
+  if (result != DInt8 (1) )
     return false;
 
   return true;
@@ -600,7 +600,7 @@ test_op_jt (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSBool op(true);
+  DBool op(true);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -624,15 +624,15 @@ test_op_jt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (0) )
+  if (result != DInt8 (0) )
     return false;
 
   stack.Pop (1);
 
-  op = DBSBool (false);
+  op = DBool (false);
   stack.Push (op);
 
   session.ExecuteProcedure (field_proc, stack);
@@ -642,7 +642,7 @@ test_op_jt (Session& session)
 
    stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (1) )
+  if (result != DInt8 (1) )
     return false;
 
   return true;
@@ -659,7 +659,7 @@ test_op_jmp (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSBool op(true);
+  DBool op(true);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_JMP, testCode + opSize);
@@ -681,10 +681,10 @@ test_op_jmp (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt8 result;
+  DInt8 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result != DBSInt8 (10) )
+  if (result != DInt8 (10) )
     return false;
 
   return true;

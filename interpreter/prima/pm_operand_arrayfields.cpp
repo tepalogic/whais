@@ -40,38 +40,38 @@ CharTextFieldElOperand::IsNull () const
 }
 
 void
-CharTextFieldElOperand::GetValue (DBSChar& outValue) const
+CharTextFieldElOperand::GetValue (DChar& outValue) const
 {
-  I_DBSTable& table = m_pRefTable->GetTable ();
+  ITable& table = mpRefTable->GetTable ();
 
-  DBSText text;
-  table.GetEntry (m_Row, m_Field, text);
+  DText text;
+  table.Get (mRow, mField, text);
 
-  outValue = text.GetCharAtIndex (m_Index);
+  outValue = text.CharAt (mIndex);
 
   assert (outValue.IsNull () == false);
 }
 
 void
-CharTextFieldElOperand::GetValue (DBSText& outValue) const
+CharTextFieldElOperand::GetValue (DText& outValue) const
 {
-  DBSChar ch;
+  DChar ch;
   this->GetValue (ch);
 
-  outValue = DBSText ();
+  outValue = DText ();
   outValue.Append (ch);
 }
 
 void
-CharTextFieldElOperand::SetValue (const DBSChar& value)
+CharTextFieldElOperand::SetValue (const DChar& value)
 {
-  I_DBSTable& table = m_pRefTable->GetTable ();
+  ITable& table = mpRefTable->GetTable ();
 
-  DBSText text;
-  table.GetEntry (m_Row, m_Field, text);
+  DText text;
+  table.Get (mRow, mField, text);
 
-  text.SetCharAtIndex(value, m_Index);
-  table.SetEntry (m_Row, m_Field, text);
+  text.CharAt (mIndex, value);
+  table.Set (mRow, mField, text);
 }
 
 uint_t
@@ -83,7 +83,7 @@ CharTextFieldElOperand::GetType ()
 StackValue
 CharTextFieldElOperand::Duplicate () const
 {
-  DBSChar ch;
+  DChar ch;
   Get (ch);
 
   return StackValue (CharOperand (ch));
@@ -93,13 +93,13 @@ CharTextFieldElOperand::Duplicate () const
 
 BaseArrayFieldElOperand::~BaseArrayFieldElOperand ()
 {
-  m_pRefTable->DecrementRefCount ();
+  mpRefTable->DecrementRefCount ();
 }
 
 void
 BaseArrayFieldElOperand::NotifyCopy ()
 {
-  m_pRefTable->IncrementRefCount ();
+  mpRefTable->IncrementRefCount ();
 }
 
 //////////////////////////BoolArrayFieldElOperand///////////////////////////////////
@@ -111,21 +111,21 @@ BoolArrayFieldElOperand::IsNull () const
 }
 
 void
-BoolArrayFieldElOperand::GetValue (DBSBool& outValue) const
+BoolArrayFieldElOperand::GetValue (DBool& outValue) const
 {
   Get (outValue);
 }
 
 void
-BoolArrayFieldElOperand::SetValue (const DBSBool& value)
+BoolArrayFieldElOperand::SetValue (const DBool& value)
 {
   Set (value);
 }
 
 void
-BoolArrayFieldElOperand::SelfAnd (const DBSBool& value)
+BoolArrayFieldElOperand::SelfAnd (const DBool& value)
 {
-  DBSBool currValue;
+  DBool currValue;
   Get (currValue);
 
   currValue = internal_and (currValue, value);
@@ -134,9 +134,9 @@ BoolArrayFieldElOperand::SelfAnd (const DBSBool& value)
 }
 
 void
-BoolArrayFieldElOperand::SelfXor (const DBSBool& value)
+BoolArrayFieldElOperand::SelfXor (const DBool& value)
 {
-  DBSBool currValue;
+  DBool currValue;
   Get (currValue);
 
   currValue = internal_xor (currValue, value);
@@ -145,9 +145,9 @@ BoolArrayFieldElOperand::SelfXor (const DBSBool& value)
 }
 
 void
-BoolArrayFieldElOperand::SelfOr (const DBSBool& value)
+BoolArrayFieldElOperand::SelfOr (const DBool& value)
 {
-  DBSBool currValue;
+  DBool currValue;
   Get (currValue);
 
   currValue = internal_or (currValue, value);
@@ -165,7 +165,7 @@ BoolArrayFieldElOperand::GetType ()
 StackValue
 BoolArrayFieldElOperand::Duplicate () const
 {
-  DBSBool value;
+  DBool value;
   Get (value);
 
   return StackValue (BoolOperand (value));
@@ -180,23 +180,23 @@ CharArrayFieldElOperand::IsNull () const
 }
 
 void
-CharArrayFieldElOperand::GetValue (DBSChar& outValue) const
+CharArrayFieldElOperand::GetValue (DChar& outValue) const
 {
   Get (outValue);
 }
 
 void
-CharArrayFieldElOperand::GetValue (DBSText& outValue) const
+CharArrayFieldElOperand::GetValue (DText& outValue) const
 {
-  DBSChar ch;
+  DChar ch;
   Get (ch);
 
-  outValue = DBSText ();
+  outValue = DText ();
   outValue.Append (ch);
 }
 
 void
-CharArrayFieldElOperand::SetValue (const DBSChar& value)
+CharArrayFieldElOperand::SetValue (const DChar& value)
 {
   Set (value);
 }
@@ -210,7 +210,7 @@ CharArrayFieldElOperand::GetType ()
 StackValue
 CharArrayFieldElOperand::Duplicate () const
 {
-  DBSChar ch;
+  DChar ch;
   Get (ch);
 
   return StackValue (CharOperand (ch));
@@ -226,34 +226,34 @@ DateArrayFieldElOperand::IsNull () const
 }
 
 void
-DateArrayFieldElOperand::GetValue (DBSDate& outValue) const
+DateArrayFieldElOperand::GetValue (DDate& outValue) const
 {
   Get (outValue);
 }
 
 void
-DateArrayFieldElOperand::GetValue (DBSDateTime& outValue) const
+DateArrayFieldElOperand::GetValue (DDateTime& outValue) const
 {
-  DBSDate currValue;
+  DDate currValue;
   Get (currValue);
 
-  outValue = DBSDateTime (currValue.m_Year,
-                          currValue.m_Month,
-                          currValue.m_Day,
+  outValue = DDateTime (currValue.mYear,
+                          currValue.mMonth,
+                          currValue.mDay,
                           0,
                           0,
                           0);
 }
 
 void
-DateArrayFieldElOperand::GetValue (DBSHiresTime& outValue) const
+DateArrayFieldElOperand::GetValue (DHiresTime& outValue) const
 {
-  DBSDate currValue;
+  DDate currValue;
   Get (currValue);
 
-  outValue = DBSHiresTime (currValue.m_Year,
-                           currValue.m_Month,
-                           currValue.m_Day,
+  outValue = DHiresTime (currValue.mYear,
+                           currValue.mMonth,
+                           currValue.mDay,
                            0,
                            0,
                            0,
@@ -261,7 +261,7 @@ DateArrayFieldElOperand::GetValue (DBSHiresTime& outValue) const
 }
 
 void
-DateArrayFieldElOperand::SetValue (const DBSDate& value)
+DateArrayFieldElOperand::SetValue (const DDate& value)
 {
   Set (value);
 }
@@ -275,7 +275,7 @@ DateArrayFieldElOperand::GetType ()
 StackValue
 DateArrayFieldElOperand::Duplicate () const
 {
-  DBSDate value;
+  DDate value;
   Get (value);
 
   return StackValue (DateOperand (value));
@@ -291,37 +291,37 @@ DateTimeArrayFieldElOperand::IsNull () const
 }
 
 void
-DateTimeArrayFieldElOperand::GetValue (DBSDate& outValue) const
+DateTimeArrayFieldElOperand::GetValue (DDate& outValue) const
 {
-  DBSDateTime currValue;
+  DDateTime currValue;
   Get (currValue);
 
-  outValue = DBSDate (currValue.m_Year, currValue.m_Month, currValue.m_Day);
+  outValue = DDate (currValue.mYear, currValue.mMonth, currValue.mDay);
 }
 
 void
-DateTimeArrayFieldElOperand::GetValue (DBSDateTime& outValue) const
+DateTimeArrayFieldElOperand::GetValue (DDateTime& outValue) const
 {
   Get (outValue);
 }
 
 void
-DateTimeArrayFieldElOperand::GetValue (DBSHiresTime& outValue) const
+DateTimeArrayFieldElOperand::GetValue (DHiresTime& outValue) const
 {
-  DBSDateTime currValue;
+  DDateTime currValue;
   Get (currValue);
 
-  outValue = DBSHiresTime (currValue.m_Year,
-                           currValue.m_Month,
-                           currValue.m_Day,
-                           currValue.m_Hour,
-                           currValue.m_Minutes,
-                           currValue.m_Seconds,
+  outValue = DHiresTime (currValue.mYear,
+                           currValue.mMonth,
+                           currValue.mDay,
+                           currValue.mHour,
+                           currValue.mMinutes,
+                           currValue.mSeconds,
                            0);
 }
 
 void
-DateTimeArrayFieldElOperand::SetValue (const DBSDateTime& value)
+DateTimeArrayFieldElOperand::SetValue (const DDateTime& value)
 {
   Set (value);
 }
@@ -335,7 +335,7 @@ DateTimeArrayFieldElOperand::GetType ()
 StackValue
 DateTimeArrayFieldElOperand::Duplicate () const
 {
-  DBSDateTime value;
+  DDateTime value;
   Get (value);
 
   return StackValue (DateTimeOperand (value));
@@ -350,36 +350,36 @@ HiresTimeArrayFieldElOperand::IsNull () const
 }
 
 void
-HiresTimeArrayFieldElOperand::GetValue (DBSDate& outValue) const
+HiresTimeArrayFieldElOperand::GetValue (DDate& outValue) const
 {
-  DBSHiresTime currValue;
+  DHiresTime currValue;
   Get (currValue);
 
-  outValue = DBSDate (currValue.m_Year, currValue.m_Month, currValue.m_Day);
+  outValue = DDate (currValue.mYear, currValue.mMonth, currValue.mDay);
 }
 
 void
-HiresTimeArrayFieldElOperand::GetValue (DBSDateTime& outValue) const
+HiresTimeArrayFieldElOperand::GetValue (DDateTime& outValue) const
 {
-  DBSHiresTime currValue;
+  DHiresTime currValue;
   Get (currValue);
 
-  outValue = DBSDateTime (currValue.m_Year,
-                          currValue.m_Month,
-                          currValue.m_Day,
-                          currValue.m_Hour,
-                          currValue.m_Minutes,
-                          currValue.m_Seconds);
+  outValue = DDateTime (currValue.mYear,
+                          currValue.mMonth,
+                          currValue.mDay,
+                          currValue.mHour,
+                          currValue.mMinutes,
+                          currValue.mSeconds);
 }
 
 void
-HiresTimeArrayFieldElOperand::GetValue (DBSHiresTime& outValue) const
+HiresTimeArrayFieldElOperand::GetValue (DHiresTime& outValue) const
 {
   Get (outValue);
 }
 
 void
-HiresTimeArrayFieldElOperand::SetValue (const DBSHiresTime& value)
+HiresTimeArrayFieldElOperand::SetValue (const DHiresTime& value)
 {
   Set (value);
 }
@@ -393,7 +393,7 @@ HiresTimeArrayFieldElOperand::GetType ()
 StackValue
 HiresTimeArrayFieldElOperand::Duplicate () const
 {
-  DBSHiresTime value;
+  DHiresTime value;
   Get (value);
 
   return StackValue (HiresTimeOperand (value));
@@ -408,102 +408,102 @@ UInt8ArrayFieldElOperand::IsNull () const
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
   Get (outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+UInt8ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt8ArrayFieldElOperand::SetValue (const DBSUInt8& value)
+UInt8ArrayFieldElOperand::SetValue (const DUInt8& value)
 {
   Set (value);
 }
 
 void
-UInt8ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -512,9 +512,9 @@ UInt8ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -523,9 +523,9 @@ UInt8ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -534,9 +534,9 @@ UInt8ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -545,9 +545,9 @@ UInt8ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -556,9 +556,9 @@ UInt8ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_and (currValue, value);
@@ -567,9 +567,9 @@ UInt8ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_xor (currValue, value);
@@ -578,9 +578,9 @@ UInt8ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-UInt8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+UInt8ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSUInt8 currValue;
+  DUInt8 currValue;
   Get (currValue);
 
   currValue = internal_or (currValue, value);
@@ -597,7 +597,7 @@ UInt8ArrayFieldElOperand::GetType ()
 StackValue
 UInt8ArrayFieldElOperand::Duplicate () const
 {
-  DBSUInt8 value;
+  DUInt8 value;
   Get (value);
 
   return StackValue (UInt8Operand (value));
@@ -613,102 +613,102 @@ UInt16ArrayFieldElOperand::IsNull () const
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
   Get (outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+UInt16ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt16ArrayFieldElOperand::SetValue (const DBSUInt16& value)
+UInt16ArrayFieldElOperand::SetValue (const DUInt16& value)
 {
   Set (value);
 }
 
 void
-UInt16ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -717,9 +717,9 @@ UInt16ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -728,9 +728,9 @@ UInt16ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -739,9 +739,9 @@ UInt16ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -750,9 +750,9 @@ UInt16ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -761,9 +761,9 @@ UInt16ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -772,9 +772,9 @@ UInt16ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -783,9 +783,9 @@ UInt16ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-UInt16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+UInt16ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSUInt16 currValue;
+  DUInt16 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -802,7 +802,7 @@ UInt16ArrayFieldElOperand::GetType ()
 StackValue
 UInt16ArrayFieldElOperand::Duplicate () const
 {
-  DBSUInt16 value;
+  DUInt16 value;
   Get (value);
 
   return StackValue (UInt16Operand (value));
@@ -818,102 +818,102 @@ UInt32ArrayFieldElOperand::IsNull () const
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
   Get (outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+UInt32ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt32ArrayFieldElOperand::SetValue (const DBSUInt32& value)
+UInt32ArrayFieldElOperand::SetValue (const DUInt32& value)
 {
   Set (value);
 }
 
 void
-UInt32ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -922,9 +922,9 @@ UInt32ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -933,9 +933,9 @@ UInt32ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -944,9 +944,9 @@ UInt32ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -955,9 +955,9 @@ UInt32ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -966,9 +966,9 @@ UInt32ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -977,9 +977,9 @@ UInt32ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -988,9 +988,9 @@ UInt32ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-UInt32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+UInt32ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSUInt32 currValue;
+  DUInt32 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -1007,7 +1007,7 @@ UInt32ArrayFieldElOperand::GetType ()
 StackValue
 UInt32ArrayFieldElOperand::Duplicate () const
 {
-  DBSUInt32 value;
+  DUInt32 value;
   Get (value);
 
   return StackValue (UInt32Operand (value));
@@ -1022,102 +1022,102 @@ UInt64ArrayFieldElOperand::IsNull () const
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+UInt64ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
   Get (outValue);
 }
 
 void
-UInt64ArrayFieldElOperand::SetValue (const DBSUInt64& value)
+UInt64ArrayFieldElOperand::SetValue (const DUInt64& value)
 {
   Set (value);
 }
 
 void
-UInt64ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -1126,9 +1126,9 @@ UInt64ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -1137,9 +1137,9 @@ UInt64ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -1148,9 +1148,9 @@ UInt64ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -1159,9 +1159,9 @@ UInt64ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -1170,9 +1170,9 @@ UInt64ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -1181,9 +1181,9 @@ UInt64ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -1192,9 +1192,9 @@ UInt64ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-UInt64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+UInt64ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSUInt64 currValue;
+  DUInt64 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -1211,7 +1211,7 @@ UInt64ArrayFieldElOperand::GetType ()
 StackValue
 UInt64ArrayFieldElOperand::Duplicate () const
 {
-  DBSUInt64 value;
+  DUInt64 value;
   Get (value);
 
   return StackValue (UInt64Operand (value));
@@ -1226,102 +1226,102 @@ Int8ArrayFieldElOperand::IsNull () const
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+Int8ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
   Get (outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+Int8ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+Int8ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+Int8ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+Int8ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+Int8ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+Int8ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+Int8ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+Int8ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+Int8ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int8ArrayFieldElOperand::SetValue (const DBSInt8& value)
+Int8ArrayFieldElOperand::SetValue (const DInt8& value)
 {
   Set (value);
 }
 
 void
-Int8ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -1330,9 +1330,9 @@ Int8ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -1341,9 +1341,9 @@ Int8ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -1352,9 +1352,9 @@ Int8ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -1363,9 +1363,9 @@ Int8ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -1374,9 +1374,9 @@ Int8ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -1385,9 +1385,9 @@ Int8ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -1396,9 +1396,9 @@ Int8ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-Int8ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+Int8ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSInt8 currValue;
+  DInt8 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -1415,7 +1415,7 @@ Int8ArrayFieldElOperand::GetType ()
 StackValue
 Int8ArrayFieldElOperand::Duplicate () const
 {
-  DBSInt8 value;
+  DInt8 value;
   Get (value);
 
   return StackValue (Int8Operand (value));
@@ -1431,102 +1431,102 @@ Int16ArrayFieldElOperand::IsNull () const
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+Int16ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+Int16ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
   Get (outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+Int16ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+Int16ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+Int16ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+Int16ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+Int16ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+Int16ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+Int16ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+Int16ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int16ArrayFieldElOperand::SetValue (const DBSInt16& value)
+Int16ArrayFieldElOperand::SetValue (const DInt16& value)
 {
   Set (value);
 }
 
 void
-Int16ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -1535,9 +1535,9 @@ Int16ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -1546,9 +1546,9 @@ Int16ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -1557,9 +1557,9 @@ Int16ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -1568,9 +1568,9 @@ Int16ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -1579,9 +1579,9 @@ Int16ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -1590,9 +1590,9 @@ Int16ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -1601,9 +1601,9 @@ Int16ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-Int16ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+Int16ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSInt16 currValue;
+  DInt16 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -1620,7 +1620,7 @@ Int16ArrayFieldElOperand::GetType ()
 StackValue
 Int16ArrayFieldElOperand::Duplicate () const
 {
-  DBSInt16 value;
+  DInt16 value;
   Get (value);
 
   return StackValue (Int16Operand (value));
@@ -1635,102 +1635,102 @@ Int32ArrayFieldElOperand::IsNull () const
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+Int32ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+Int32ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+Int32ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
   Get (outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+Int32ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+Int32ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+Int32ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+Int32ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+Int32ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+Int32ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+Int32ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int32ArrayFieldElOperand::SetValue (const DBSInt32& value)
+Int32ArrayFieldElOperand::SetValue (const DInt32& value)
 {
   Set (value);
 }
 
 void
-Int32ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -1739,9 +1739,9 @@ Int32ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -1750,9 +1750,9 @@ Int32ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -1761,9 +1761,9 @@ Int32ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -1772,9 +1772,9 @@ Int32ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -1783,9 +1783,9 @@ Int32ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -1794,9 +1794,9 @@ Int32ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -1805,9 +1805,9 @@ Int32ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-Int32ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+Int32ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSInt32 currValue;
+  DInt32 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -1824,7 +1824,7 @@ Int32ArrayFieldElOperand::GetType ()
 StackValue
 Int32ArrayFieldElOperand::Duplicate () const
 {
-  DBSInt32 value;
+  DInt32 value;
   Get (value);
 
   return StackValue (Int32Operand (value));
@@ -1839,102 +1839,102 @@ Int64ArrayFieldElOperand::IsNull () const
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSInt8& outValue) const
+Int64ArrayFieldElOperand::GetValue (DInt8& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSInt16& outValue) const
+Int64ArrayFieldElOperand::GetValue (DInt16& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSInt32& outValue) const
+Int64ArrayFieldElOperand::GetValue (DInt32& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSInt64& outValue) const
+Int64ArrayFieldElOperand::GetValue (DInt64& outValue) const
 {
   Get (outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+Int64ArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSReal& outValue) const
+Int64ArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSUInt8& outValue) const
+Int64ArrayFieldElOperand::GetValue (DUInt8& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSUInt16& outValue) const
+Int64ArrayFieldElOperand::GetValue (DUInt16& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSUInt32& outValue) const
+Int64ArrayFieldElOperand::GetValue (DUInt32& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::GetValue (DBSUInt64& outValue) const
+Int64ArrayFieldElOperand::GetValue (DUInt64& outValue) const
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-Int64ArrayFieldElOperand::SetValue (const DBSInt64& value)
+Int64ArrayFieldElOperand::SetValue (const DInt64& value)
 {
   Set (value);
 }
 
 void
-Int64ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -1943,9 +1943,9 @@ Int64ArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfSub (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -1954,9 +1954,9 @@ Int64ArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfMul (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -1965,9 +1965,9 @@ Int64ArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -1976,9 +1976,9 @@ Int64ArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfMod (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfMod (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_mod (currValue, value);
@@ -1987,9 +1987,9 @@ Int64ArrayFieldElOperand::SelfMod (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfAnd (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_and(currValue, value);
@@ -1998,9 +1998,9 @@ Int64ArrayFieldElOperand::SelfAnd (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfXor (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfXor (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_xor(currValue, value);
@@ -2009,9 +2009,9 @@ Int64ArrayFieldElOperand::SelfXor (const DBSInt64& value)
 }
 
 void
-Int64ArrayFieldElOperand::SelfOr (const DBSInt64& value)
+Int64ArrayFieldElOperand::SelfOr (const DInt64& value)
 {
-  DBSInt64 currValue;
+  DInt64 currValue;
   Get (currValue);
 
   currValue = internal_or(currValue, value);
@@ -2028,7 +2028,7 @@ Int64ArrayFieldElOperand::GetType ()
 StackValue
 Int64ArrayFieldElOperand::Duplicate () const
 {
-  DBSInt64 value;
+  DInt64 value;
   Get (value);
 
   return StackValue (Int64Operand (value));
@@ -2043,30 +2043,30 @@ RealArrayFieldElOperand::IsNull () const
 }
 
 void
-RealArrayFieldElOperand::GetValue (DBSReal& outValue) const
+RealArrayFieldElOperand::GetValue (DReal& outValue) const
 {
   Get (outValue);
 }
 
 void
-RealArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+RealArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   number_convert (currValue, outValue);
 }
 
 void
-RealArrayFieldElOperand::SetValue (const DBSReal& value)
+RealArrayFieldElOperand::SetValue (const DReal& value)
 {
   Set (value);
 }
 
 void
-RealArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+RealArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -2075,9 +2075,9 @@ RealArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-RealArrayFieldElOperand::SelfAdd (const DBSRichReal& value)
+RealArrayFieldElOperand::SelfAdd (const DRichReal& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -2086,9 +2086,9 @@ RealArrayFieldElOperand::SelfAdd (const DBSRichReal& value)
 }
 
 void
-RealArrayFieldElOperand::SelfSub (const DBSInt64& value)
+RealArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -2097,9 +2097,9 @@ RealArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-RealArrayFieldElOperand::SelfSub (const DBSRichReal& value)
+RealArrayFieldElOperand::SelfSub (const DRichReal& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -2108,9 +2108,9 @@ RealArrayFieldElOperand::SelfSub (const DBSRichReal& value)
 }
 
 void
-RealArrayFieldElOperand::SelfMul (const DBSInt64& value)
+RealArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -2119,9 +2119,9 @@ RealArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-RealArrayFieldElOperand::SelfMul (const DBSRichReal& value)
+RealArrayFieldElOperand::SelfMul (const DRichReal& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -2130,9 +2130,9 @@ RealArrayFieldElOperand::SelfMul (const DBSRichReal& value)
 }
 
 void
-RealArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+RealArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -2141,9 +2141,9 @@ RealArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-RealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
+RealArrayFieldElOperand::SelfDiv (const DRichReal& value)
 {
-  DBSReal currValue;
+  DReal currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -2160,7 +2160,7 @@ RealArrayFieldElOperand::GetType ()
 StackValue
 RealArrayFieldElOperand::Duplicate () const
 {
-  DBSReal value;
+  DReal value;
   Get (value);
 
   return StackValue (RealOperand (value));
@@ -2176,28 +2176,28 @@ RichRealArrayFieldElOperand::IsNull () const
 }
 
 void
-RichRealArrayFieldElOperand::GetValue (DBSReal& outValue) const
+RichRealArrayFieldElOperand::GetValue (DReal& outValue) const
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 }
 
 void
-RichRealArrayFieldElOperand::GetValue (DBSRichReal& outValue) const
+RichRealArrayFieldElOperand::GetValue (DRichReal& outValue) const
 {
   Get (outValue);
 }
 
 void
-RichRealArrayFieldElOperand::SetValue (const DBSRichReal& value)
+RichRealArrayFieldElOperand::SetValue (const DRichReal& value)
 {
   Set (value);
 }
 
 void
-RichRealArrayFieldElOperand::SelfAdd (const DBSInt64& value)
+RichRealArrayFieldElOperand::SelfAdd (const DInt64& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -2206,9 +2206,9 @@ RichRealArrayFieldElOperand::SelfAdd (const DBSInt64& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfAdd (const DBSRichReal& value)
+RichRealArrayFieldElOperand::SelfAdd (const DRichReal& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_add (currValue, value);
@@ -2217,9 +2217,9 @@ RichRealArrayFieldElOperand::SelfAdd (const DBSRichReal& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfSub (const DBSInt64& value)
+RichRealArrayFieldElOperand::SelfSub (const DInt64& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -2228,9 +2228,9 @@ RichRealArrayFieldElOperand::SelfSub (const DBSInt64& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfSub (const DBSRichReal& value)
+RichRealArrayFieldElOperand::SelfSub (const DRichReal& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_sub (currValue, value);
@@ -2239,9 +2239,9 @@ RichRealArrayFieldElOperand::SelfSub (const DBSRichReal& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfMul (const DBSInt64& value)
+RichRealArrayFieldElOperand::SelfMul (const DInt64& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -2250,9 +2250,9 @@ RichRealArrayFieldElOperand::SelfMul (const DBSInt64& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfMul (const DBSRichReal& value)
+RichRealArrayFieldElOperand::SelfMul (const DRichReal& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_mul (currValue, value);
@@ -2261,9 +2261,9 @@ RichRealArrayFieldElOperand::SelfMul (const DBSRichReal& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfDiv (const DBSInt64& value)
+RichRealArrayFieldElOperand::SelfDiv (const DInt64& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -2272,9 +2272,9 @@ RichRealArrayFieldElOperand::SelfDiv (const DBSInt64& value)
 }
 
 void
-RichRealArrayFieldElOperand::SelfDiv (const DBSRichReal& value)
+RichRealArrayFieldElOperand::SelfDiv (const DRichReal& value)
 {
-  DBSRichReal currValue;
+  DRichReal currValue;
   Get (currValue);
 
   currValue = internal_div (currValue, value);
@@ -2292,7 +2292,7 @@ RichRealArrayFieldElOperand::GetType ()
 StackValue
 RichRealArrayFieldElOperand::Duplicate () const
 {
-  DBSRichReal value;
+  DRichReal value;
   Get (value);
 
   return StackValue (RichRealOperand (value));

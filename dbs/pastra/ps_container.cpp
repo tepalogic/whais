@@ -30,142 +30,224 @@
 
 #include "ps_container.h"
 
+using namespace std;
+
 namespace whisper {
 namespace pastra {
 
-static void
-safe_memcpy (uint8_t* pDest, uint8_t* pSrc, uint64_t uCount)
+
+static inline void
+safe_memcpy (uint8_t* to, uint8_t* from, uint64_t count)
 {
-  while (uCount-- > 0)
-    *pDest++ = *pSrc++;
+  while (count-- > 0)
+    *to++ = *from++;
 }
 
+
 void
-append_int_to_str (std::string& dest, uint64_t number)
+append_int_to_str (uint64_t number, string& inoutStr)
 {
-  const uint_t bitsCount    = sizeof (number) * 8;
-  char       buffer[bitsCount];
-  char*      conv         = &buffer[bitsCount - 1];
+  const uint_t bitsCount = sizeof (number) * 8;
+
+  char   buffer[bitsCount];
+  char*  conv = &buffer[bitsCount - 1];
 
   *conv = 0;
   do
     {
       conv--;
-      *conv  = _SC (char, ('0' + (number % 10)));
+
+      *conv   = _SC (char, ('0' + (number % 10)));
       number /= 10;
     }
   while (number != 0);
 
-  dest += conv;
+  inoutStr += conv;
 }
 
-FileContainer::FileContainer (const char*  pFileNameBase,
-                              const uint64_t maxFileSize,
-                              const uint64_t unitsCount)
-  : m_MaxFileUnitSize (maxFileSize),
-    m_FilesHandles (),
-    m_FileNameBase (pFileNameBase),
-    m_IsMarked (false)
-{
-  uint_t uOpenMode;
 
-  uOpenMode = (unitsCount > 0) ? WHC_FILEOPEN_EXISTING : WHC_FILECREATE_NEW;
-  uOpenMode |= WHC_FILERDWR;
+
+Exception*
+WFileContainerException::Clone () const
+{
+  return new WFileContainerException (*this);
+}
+
+
+EXPCEPTION_TYPE
+WFileContainerException::Type () const
+{
+  return FILE_CONTAINER_EXCEPTION;
+}
+
+
+const char*
+WFileContainerException::Description () const
+{
+  switch (Extra ())
+    {
+    case INVALID_PARAMETERS:
+      return "Invalid parameters.";
+
+    case CONTAINTER_INVALID:
+      return "Container inconsistency detected.";
+
+    case INVALID_ACCESS_POSITION:
+      return "Container accessed outside bounds.";
+
+    case FILE_OS_IO_ERROR:
+      return "Container internal file IO error.";
+
+    default:
+      assert (false);
+
+      return "Unknown container exception";
+    }
+  return NULL;
+}
+
+
+
+IDataContainer::~IDataContainer ()
+{
+}
+
+
+
+FileContainer::FileContainer (const char*       baseName,
+                              const uint64_t    maxFileSize,
+                              const uint64_t    unitsCount)
+  : mMaxFileUnitSize (maxFileSize),
+    mFilesHandles (),
+    mFileNamePrefix (baseName),
+    mToRemove (false)
+{
+  uint_t openMode;
+
+  openMode  = (unitsCount > 0) ? WHC_FILEOPEN_EXISTING : WHC_FILECREATE_NEW;
+  openMode |= WHC_FILERDWR;
 
   for (uint_t unit = 0; unit < unitsCount; ++unit)
     {
-      std::string fileName = m_FileNameBase;
-      if (unit != 0)
-        append_int_to_str (fileName, unit);
+      string baseName = mFileNamePrefix;
 
-      File container (fileName.c_str (), uOpenMode);
-      m_FilesHandles.push_back (container);
+      if (unit != 0)
+        append_int_to_str (unit, baseName);
+
+      File container (baseName.c_str (), openMode);
+      mFilesHandles.push_back (container);
     }
 
-  assert (m_FilesHandles.size () == unitsCount);
+  assert (mFilesHandles.size () == unitsCount);
 
   // Check for structural consistency
   for (uint_t unit = 0; unit < unitsCount; ++unit)
     {
-      File& unitFile = m_FilesHandles[unit];
+      File& file = mFilesHandles[unit];
 
-      if ((unitFile.GetSize () != maxFileSize) &&
-          ((unit != (unitsCount - 1)) || (unitFile.GetSize () > maxFileSize)))
+      if ((file.GetSize () != maxFileSize)
+          && ((unit != (unitsCount - 1)) || (file.GetSize () > maxFileSize)))
         {
-          throw WFileContainerException ("Inconsistent container!",
-                                         _EXTRA (WFileContainerException::CONTAINTER_INVALID));
+          throw WFileContainerException (
+                         "Inconsistent container!",
+                         _EXTRA (WFileContainerException::CONTAINTER_INVALID)
+                                        );
         }
     }
 }
 
+
 FileContainer::~FileContainer ()
 {
-  if (m_IsMarked)
-    Colapse (0, Size() );
+  if (mToRemove)
+    Colapse (0, Size () );
 }
 
+
 void
-FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* pSource)
+FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
 {
-  const uint_t unitsCount   = m_FilesHandles.size ();
-  uint64_t     unitIndex    = to / m_MaxFileUnitSize;
-  uint64_t     unitPosition = to % m_MaxFileUnitSize;
+  const uint_t unitsCount   = mFilesHandles.size ();
+  uint64_t     unitIndex    = to / mMaxFileUnitSize;
+  uint64_t     unitPosition = to % mMaxFileUnitSize;
 
   if (unitIndex > unitsCount)
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
+    {
+      throw WFileContainerException (
+                   NULL,
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                                    );
+    }
   else if (unitIndex == unitsCount)
     {
       if (unitPosition != 0)
-        throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
+        {
+          throw WFileContainerException (
+                   NULL,
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                                        );
+        }
       else
         ExtendContainer ();
     }
 
   uint64_t actualSize = size;
 
-  if ((actualSize + unitPosition) > m_MaxFileUnitSize)
-    actualSize = m_MaxFileUnitSize - unitPosition;
+  if ((actualSize + unitPosition) > mMaxFileUnitSize)
+    actualSize = mMaxFileUnitSize - unitPosition;
 
   assert (actualSize <= size);
 
-  File& unitFile = m_FilesHandles[unitIndex];
+  File& file = mFilesHandles[unitIndex];
 
-  if (unitFile.GetSize () < unitPosition)
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
+  if (file.GetSize () < unitPosition)
+    {
+      throw WFileContainerException (
+                   NULL,
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                                    );
+    }
 
-  unitFile.Seek (unitPosition, WHC_SEEK_BEGIN);
-  unitFile.Write (pSource, actualSize);
+  file.Seek (unitPosition, WHC_SEEK_BEGIN);
+  file.Write (buffer, actualSize);
 
-  //Let write the rest
+  //Write the rest
   if (actualSize < size)
-    Write (to + actualSize, size - actualSize, pSource + actualSize);
+    Write (to + actualSize, size - actualSize, buffer + actualSize);
 }
 
+
 void
-FileContainer::Read (uint64_t from, uint64_t size, uint8_t* pDest)
+FileContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
 {
-  const uint_t unitsCount   = m_FilesHandles.size ();
-  uint64_t     unitIndex    = from / m_MaxFileUnitSize;
-  uint64_t     unitPosition = from % m_MaxFileUnitSize;
+  const uint_t unitsCount   = mFilesHandles.size ();
+  uint64_t     unitIndex    = from / mMaxFileUnitSize;
+  uint64_t     unitPosition = from % mMaxFileUnitSize;
 
   if ((unitIndex > unitsCount) || (from + size > Size ()))
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
+    {
+      throw WFileContainerException (
+                     NULL,
+                     _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                                    );
+    }
 
-  File& unitFile = m_FilesHandles[unitIndex];
+  File& file = mFilesHandles[unitIndex];
 
   uint64_t actualSize = size;
 
-  if (actualSize + unitPosition > unitFile.GetSize ())
-    actualSize = unitFile.GetSize () - unitPosition;
+  if (actualSize + unitPosition > file.GetSize ())
+    actualSize = file.GetSize () - unitPosition;
 
-  unitFile.Seek (unitPosition, WHC_SEEK_BEGIN);
-  unitFile.Read (pDest, actualSize);
+  file.Seek (unitPosition, WHC_SEEK_BEGIN);
+  file.Read (buffer, actualSize);
 
-  //Lets read the rest
-  if (actualSize != size)
-    Read (from + actualSize, size - actualSize, pDest + actualSize);
+  //Read the rest
+  if (actualSize < size)
+    Read (from + actualSize, size - actualSize, buffer + actualSize);
 
 }
+
 
 void
 FileContainer::Colapse (uint64_t from, uint64_t to)
@@ -174,12 +256,17 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
   const uint64_t intervalSize  = to - from;
   const uint64_t containerSize = Size ();
 
-  if ((to < from) || (to > containerSize))
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_PARAMETERS));
+  if ((to < from) || (containerSize < to))
+    {
+      throw WFileContainerException (
+                         NULL,
+                         _EXTRA (WFileContainerException::INVALID_PARAMETERS)
+                                    );
+    }
   else if (intervalSize == 0)
     return;
 
-  std::auto_ptr< uint8_t > aBuffer (new uint8_t[bufferSize]);
+  auto_ptr<uint8_t> buffer (new uint8_t[bufferSize]);
 
   while (to < containerSize)
     {
@@ -188,125 +275,128 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
       if (stepSize + to > containerSize)
         stepSize = containerSize - to;
 
-      Read (to, stepSize, aBuffer.get ());
-      Write (from, stepSize, aBuffer.get ());
+      Read (to, stepSize, buffer.get ());
+      Write (from, stepSize, buffer.get ());
 
-      to   += stepSize;
-      from += stepSize;
+      to += stepSize, from += stepSize;
     }
 
-  //Let's delete the remaining junk.
+  //Delete the remaining content.
   const uint64_t newSize      = containerSize - intervalSize;
-  int          lastUnit     = newSize / m_MaxFileUnitSize;
-  const int    lastUnitSize = newSize % m_MaxFileUnitSize;
+  int            lastUnit     = newSize / mMaxFileUnitSize;
+  const int      lastUnitSize = newSize % mMaxFileUnitSize;
 
   if (newSize == 0)
     --lastUnit;
+
   else
-    m_FilesHandles[lastUnit].SetSize (lastUnitSize);
+    mFilesHandles[lastUnit].SetSize (lastUnitSize);
 
-  for (int unit = m_FilesHandles.size () - 1; unit > lastUnit; --unit)
+  for (int unit = mFilesHandles.size () - 1; unit > lastUnit; --unit)
     {
-      m_FilesHandles[unit].Close ();
+      mFilesHandles[unit].Close ();
 
-      std::string fileName = m_FileNameBase;
+      string baseName = mFileNamePrefix;
+
       if (unit != 0)
-        append_int_to_str (fileName, unit);
+        append_int_to_str (unit, baseName);
 
-      if (!whf_remove (fileName.c_str ()))
-        throw WFileContainerException (NULL, _EXTRA (WFileContainerException::FILE_OS_IO_ERROR));
-
-      m_FilesHandles.pop_back ();
+      if ( ! whf_remove (baseName.c_str ()))
+        {
+          throw WFileContainerException (
+                           NULL,
+                           _EXTRA (WFileContainerException::FILE_OS_IO_ERROR)
+                                        );
+        }
+      mFilesHandles.pop_back ();
     }
-
 }
+
 
 uint64_t
 FileContainer::Size () const
 {
-  if (m_FilesHandles.size () == 0)
+  if (mFilesHandles.size () == 0)
     return 0;
 
-  const File& lastUnitFile = m_FilesHandles[m_FilesHandles.size () - 1];
-  uint64_t     result       = (m_FilesHandles.size () - 1) * m_MaxFileUnitSize;
+  const File&  lastUnitFile = mFilesHandles[mFilesHandles.size () - 1];
+  uint64_t     result       = (mFilesHandles.size () - 1) * mMaxFileUnitSize;
 
   result += lastUnitFile.GetSize ();
 
   return result;
 }
 
+
 void
 FileContainer::MarkForRemoval()
 {
-  m_IsMarked = true;
+  mToRemove = true;
 }
+
 
 void
 FileContainer::ExtendContainer ()
 {
-  uint_t      count    = m_FilesHandles.size ();
-  std::string fileName = m_FileNameBase;
+  uint_t count    = mFilesHandles.size ();
+  string baseName = mFileNamePrefix;
 
   if (count != 0)
-    append_int_to_str (fileName, count);
+    append_int_to_str (count, baseName);
 
-  File unitFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILERDWR);
-  m_FilesHandles.push_back (unitFile);
+  File unitFile (baseName.c_str (), WHC_FILECREATE_NEW | WHC_FILERDWR);
+  mFilesHandles.push_back (unitFile);
 }
 
-//////////////WTempFileContainer///////////////////////////////////////////////
 
-FileTempContainer::FileTempContainer (const char*  pFileNameBase,
-                                      const uint32_t uMaxFileSize)
-  : FileContainer (pFileNameBase, uMaxFileSize, 0)
+
+TemporalFileContainer::TemporalFileContainer (const char*    baseName,
+                                              const uint32_t maxFileSize)
+  : FileContainer (baseName, maxFileSize, 0)
 {
   MarkForRemoval ();
 }
 
-FileTempContainer::~FileTempContainer ()
+
+
+TemporalContainer::TemporalContainer (const uint_t reservedMemory)
+  : IDataContainer (),
+    mFileContainer (NULL),
+    mCache (new uint8_t[reservedMemory]),
+    mCacheStartPos (0),
+    mCacheEndPos (0),
+    mCacheSize (reservedMemory),
+    mDirtyCache (false)
 {
 }
 
-//////////////////WTemCotainer/////////////////////////////////////////////////
-
-TempContainer::TempContainer (const char* pTempDirectory,
-                              const uint_t  uReservedMemory)
-  : I_DataContainer (),
-    m_FileContainer (NULL),
-    m_Cache (new uint8_t[uReservedMemory]),
-    m_CacheStartPos (0),
-    m_CacheEndPos (0),
-    m_CacheSize (uReservedMemory),
-    m_DirtyCache (false)
-{
-}
-
-TempContainer::~TempContainer ()
-{
-}
 
 void
-TempContainer::Write (uint64_t to, uint64_t size, const uint8_t* pSource)
+TemporalContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
 {
   if (to > Size ())
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
+    {
+      throw WFileContainerException (
+                   NULL,
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                                    );
+    }
 
   while (size > 0)
     {
-      assert ((m_CacheStartPos % m_CacheSize) == 0);
-      if ((to >= m_CacheStartPos) && (to < (m_CacheStartPos + m_CacheSize)))
+      assert ((mCacheStartPos % mCacheSize) == 0);
+
+      if ((to >= mCacheStartPos) && (to < (mCacheStartPos + mCacheSize)))
         {
-          const uint_t toWrite = MIN (size, m_CacheStartPos + m_CacheSize - to);
-          memcpy (m_Cache.get () + (to - m_CacheStartPos), pSource, toWrite);
+          const uint_t toWrite = MIN (size, mCacheStartPos + mCacheSize - to);
 
-          if (to + toWrite > m_CacheEndPos)
-            m_CacheEndPos = to + toWrite;
+          memcpy (mCache.get () + (to - mCacheStartPos), buffer, toWrite);
 
-          m_DirtyCache = true;
-          to    += toWrite;
-          pSource += toWrite;
-          size      -= toWrite;
+          if (to + toWrite > mCacheEndPos)
+            mCacheEndPos = to + toWrite;
 
+          mDirtyCache = true;
+          to += toWrite, buffer += toWrite, size -= toWrite;
         }
       else
         FillCache (to);
@@ -314,156 +404,164 @@ TempContainer::Write (uint64_t to, uint64_t size, const uint8_t* pSource)
 }
 
 void
-TempContainer::Read (uint64_t from, uint64_t size, uint8_t* pDest)
+TemporalContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
 {
   if (from + size > Size ())
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION));
+    {
+      throw WFileContainerException (
+                   NULL,
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                                    );
+    }
 
   while (size > 0)
     {
-      assert ((m_CacheStartPos % m_CacheSize) == 0);
-      if ((from >= m_CacheStartPos) && (from < m_CacheEndPos))
+      assert ((mCacheStartPos % mCacheSize) == 0);
+
+      if ((from >= mCacheStartPos) && (from < mCacheEndPos))
         {
-          const uint_t toRead = MIN (size, m_CacheEndPos - from);
-          memcpy (pDest, m_Cache.get () + (from - m_CacheStartPos), toRead);
+          const uint_t toRead = MIN (size, mCacheEndPos - from);
 
-          from  += toRead;
-          pDest += toRead;
-          size  -= toRead;
+          memcpy (buffer, mCache.get () + (from - mCacheStartPos), toRead);
 
+          from += toRead, buffer += toRead, size -= toRead;
         }
       else
         FillCache (from);
     }
 }
 
+
 void
-TempContainer::Colapse (uint64_t from, uint64_t to)
+TemporalContainer::Colapse (uint64_t from, uint64_t to)
 {
-  if (from > to)
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_PARAMETERS));
-
-  if (to > Size ())
-    throw WFileContainerException (NULL, _EXTRA (WFileContainerException::INVALID_PARAMETERS));
-
-  if (m_FileContainer.get () != NULL)
+  if ((to < from) || (Size () < to))
     {
-      //Flush the buffer first!
-      if (m_DirtyCache)
+      throw WFileContainerException (
+                         NULL,
+                         _EXTRA (WFileContainerException::INVALID_PARAMETERS)
+                                    );
+    }
+
+  if (mFileContainer.get () != NULL)
+    {
+      if (mDirtyCache)
         {
-          m_FileContainer->Write (m_CacheStartPos, m_CacheEndPos - m_CacheStartPos, m_Cache.get ());
-          m_DirtyCache = false;
+          mFileContainer->Write (mCacheStartPos,
+                                 mCacheEndPos - mCacheStartPos,
+                                 mCache.get ());
+          mDirtyCache = false;
         }
 
-      m_FileContainer->Colapse (from, to);
+      mFileContainer->Colapse (from, to);
 
-      if (m_FileContainer->Size () < from)
+      if (mFileContainer->Size () < from)
         FillCache (0);
+
       else
         FillCache (from);
     }
   else
     {
-      uint8_t* const pMem        = m_Cache.get();
-      const uint_t   colapseSize = m_CacheEndPos - to;
+      uint8_t* const cache_      = mCache.get();
+      const uint_t   colapseSize = mCacheEndPos - to;
 
-      safe_memcpy ( pMem + from, pMem + to, colapseSize);
-      m_CacheEndPos -= (to - from);
+      safe_memcpy (cache_ + from, cache_ + to, colapseSize);
+      mCacheEndPos -= (to - from);
     }
 
-  if ((m_FileContainer.get () != NULL) && (m_CacheSize > m_FileContainer->Size()))
-    m_FileContainer.reset (NULL);
-
+  if ((mFileContainer.get () != NULL) && (mCacheSize > mFileContainer->Size()))
+    mFileContainer.reset (NULL);
 }
 
 void
-TempContainer::MarkForRemoval ()
+TemporalContainer::MarkForRemoval ()
 {
-  return ; //This is automatically deleted. Nothing to do here!
+  return ; //This will be deleted automatically. Nothing to do here!
 }
 
 uint64_t
-TempContainer::Size () const
+TemporalContainer::Size () const
 {
-  assert ((m_CacheStartPos % m_CacheSize) == 0);
-  assert (m_CacheStartPos <= m_CacheEndPos);
+  assert ((mCacheStartPos % mCacheSize) == 0);
+  assert (mCacheStartPos <= mCacheEndPos);
 
-  if (m_FileContainer.get () != NULL)
+  if (mFileContainer.get () != NULL)
     {
-      const uint64_t result = m_FileContainer->Size ();
+      const uint64_t result = mFileContainer->Size ();
 
-      assert (result >= m_CacheStartPos);
+      assert (result >= mCacheStartPos);
 
-      return MAX (result, m_CacheEndPos);
+      return MAX (result, mCacheEndPos);
     }
 
-  assert (m_CacheStartPos == 0);
-  assert (m_CacheEndPos <= m_CacheSize);
+  assert (mCacheStartPos == 0);
+  assert (mCacheEndPos <= mCacheSize);
 
-  return m_CacheEndPos;
+  return mCacheEndPos;
 }
 
 void
-TempContainer::FillCache (uint64_t position)
+TemporalContainer::FillCache (uint64_t position)
 {
-  position -= (position % m_CacheSize);
+  position -= (position % mCacheSize);
 
-  assert ((m_CacheStartPos % m_CacheSize) == 0);
-  assert ((position % m_CacheSize) == 0);
+  assert ((mCacheStartPos % mCacheSize) == 0);
+  assert ((position % mCacheSize) == 0);
 
-  if (m_CacheStartPos == position)
+  if (mCacheStartPos == position)
     return;
 
-  if (m_FileContainer.get () == NULL)
+  if (mFileContainer.get () == NULL)
     {
-      uint64_t curentId;
-
       smSync.Acquire ();
-      curentId = smTemporalsCount++;
+      const uint64_t currentId = smTemporalsCount++;
       smSync.Release ();
 
-      assert (m_CacheStartPos == 0);
-      assert (m_CacheEndPos == m_CacheSize);
-      assert (position == m_CacheSize);
+      assert (mCacheStartPos == 0);
+      assert (mCacheEndPos == mCacheSize);
+      assert (position == mCacheSize);
 
       const DBSSettings& settings = DBSGetSeettings ();
 
-      std::string baseFile (settings.m_WorkDir);
-      baseFile += "wtemp";
-      append_int_to_str (baseFile, curentId);
-      baseFile += ".tmp";
+      string baseName (settings.mTempDir);
+      baseName += "wtemp";
+      append_int_to_str (currentId, baseName);
+      baseName += ".tmp";
 
+      mFileContainer.reset (new TemporalFileContainer (baseName.c_str (),
+                                                       settings.mMaxFileSize));
 
-      m_FileContainer.reset (new FileTempContainer (baseFile.c_str (),
-                                                    settings.m_MaxFileSize));
-      m_FileContainer->Write (0, m_CacheEndPos, m_Cache.get ());
+      mFileContainer->Write (0, mCacheEndPos, mCache.get ());
 
-      m_CacheStartPos = m_CacheEndPos = position;
-      m_DirtyCache    = false;
+      mCacheStartPos = mCacheEndPos = position;
+      mDirtyCache    = false;
 
       return;
     }
   else
     {
-      if (m_DirtyCache)
+      if (mDirtyCache)
         {
-          m_FileContainer->Write (m_CacheStartPos,
-                                  m_CacheEndPos - m_CacheStartPos,
-                                  m_Cache.get ());
-          m_DirtyCache = false;
+          mFileContainer->Write (mCacheStartPos,
+                                  mCacheEndPos - mCacheStartPos,
+                                  mCache.get ());
+          mDirtyCache = false;
         }
 
-      const uint_t toRead = MIN (m_CacheSize,
-                                 m_FileContainer->Size() - position);
+      const uint_t toRead = MIN (mCacheSize,
+                                 mFileContainer->Size() - position);
 
-      m_FileContainer->Read (position, toRead, m_Cache.get ());
-      m_CacheStartPos = position;
-      m_CacheEndPos   = m_CacheStartPos + toRead;
+      mFileContainer->Read (position, toRead, mCache.get ());
+
+      mCacheStartPos = position;
+      mCacheEndPos   = mCacheStartPos + toRead;
     }
 }
 
-uint64_t      TempContainer::smTemporalsCount = 0;
-Lock TempContainer::smSync;
+
+uint64_t  TemporalContainer::smTemporalsCount = 0;
+Lock      TemporalContainer::smSync;
 
 } //namespace pastra
 } //namespace whisper

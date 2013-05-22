@@ -52,71 +52,71 @@ public:
 
   virtual bool IsNull () const = 0;
 
-  virtual void GetValue (DBSBool& outValue) const = 0;
-  virtual void GetValue (DBSChar& outValue) const = 0;
-  virtual void GetValue (DBSDate& outValue) const = 0;
-  virtual void GetValue (DBSDateTime& outValue) const = 0;
-  virtual void GetValue (DBSHiresTime& outValue) const = 0;
-  virtual void GetValue (DBSInt8& outValue) const = 0;
-  virtual void GetValue (DBSInt16& outValue) const = 0;
-  virtual void GetValue (DBSInt32& outValue) const = 0;
-  virtual void GetValue (DBSInt64& outValue) const = 0;
-  virtual void GetValue (DBSReal& outValue) const = 0;
-  virtual void GetValue (DBSRichReal& outValue) const = 0;
-  virtual void GetValue (DBSUInt8& outValue) const = 0;
-  virtual void GetValue (DBSUInt16& outValue) const = 0;
-  virtual void GetValue (DBSUInt32& outValue) const = 0;
-  virtual void GetValue (DBSUInt64& outValue) const = 0;
-  virtual void GetValue (DBSText& outValue) const = 0;
-  virtual void GetValue (DBSArray& outValue) const = 0;
+  virtual void GetValue (DBool& outValue) const = 0;
+  virtual void GetValue (DChar& outValue) const = 0;
+  virtual void GetValue (DDate& outValue) const = 0;
+  virtual void GetValue (DDateTime& outValue) const = 0;
+  virtual void GetValue (DHiresTime& outValue) const = 0;
+  virtual void GetValue (DInt8& outValue) const = 0;
+  virtual void GetValue (DInt16& outValue) const = 0;
+  virtual void GetValue (DInt32& outValue) const = 0;
+  virtual void GetValue (DInt64& outValue) const = 0;
+  virtual void GetValue (DReal& outValue) const = 0;
+  virtual void GetValue (DRichReal& outValue) const = 0;
+  virtual void GetValue (DUInt8& outValue) const = 0;
+  virtual void GetValue (DUInt16& outValue) const = 0;
+  virtual void GetValue (DUInt32& outValue) const = 0;
+  virtual void GetValue (DUInt64& outValue) const = 0;
+  virtual void GetValue (DText& outValue) const = 0;
+  virtual void GetValue (DArray& outValue) const = 0;
 
-  virtual void SetValue (const DBSBool& value) = 0;
-  virtual void SetValue (const DBSChar& value) = 0;
-  virtual void SetValue (const DBSDate& value) = 0;
-  virtual void SetValue (const DBSDateTime& value) = 0;
-  virtual void SetValue (const DBSHiresTime& value) = 0;
-  virtual void SetValue (const DBSInt8& value) = 0;
-  virtual void SetValue (const DBSInt16& value) = 0;
-  virtual void SetValue (const DBSInt32& value) = 0;
-  virtual void SetValue (const DBSInt64& value) = 0;
-  virtual void SetValue (const DBSReal& value) = 0;
-  virtual void SetValue (const DBSRichReal& value) = 0;
-  virtual void SetValue (const DBSUInt8& value) = 0;
-  virtual void SetValue (const DBSUInt16& value) = 0;
-  virtual void SetValue (const DBSUInt32& value) = 0;
-  virtual void SetValue (const DBSUInt64& value) = 0;
-  virtual void SetValue (const DBSText& value) = 0;
-  virtual void SetValue (const DBSArray& value) = 0;
+  virtual void SetValue (const DBool& value) = 0;
+  virtual void SetValue (const DChar& value) = 0;
+  virtual void SetValue (const DDate& value) = 0;
+  virtual void SetValue (const DDateTime& value) = 0;
+  virtual void SetValue (const DHiresTime& value) = 0;
+  virtual void SetValue (const DInt8& value) = 0;
+  virtual void SetValue (const DInt16& value) = 0;
+  virtual void SetValue (const DInt32& value) = 0;
+  virtual void SetValue (const DInt64& value) = 0;
+  virtual void SetValue (const DReal& value) = 0;
+  virtual void SetValue (const DRichReal& value) = 0;
+  virtual void SetValue (const DUInt8& value) = 0;
+  virtual void SetValue (const DUInt16& value) = 0;
+  virtual void SetValue (const DUInt32& value) = 0;
+  virtual void SetValue (const DUInt64& value) = 0;
+  virtual void SetValue (const DText& value) = 0;
+  virtual void SetValue (const DArray& value) = 0;
 
-  virtual void SelfAdd (const DBSInt64& value) = 0;
-  virtual void SelfAdd (const DBSRichReal& value) = 0;
-  virtual void SelfAdd (const DBSChar& value) = 0;
-  virtual void SelfAdd (const DBSText& value) = 0;
+  virtual void SelfAdd (const DInt64& value) = 0;
+  virtual void SelfAdd (const DRichReal& value) = 0;
+  virtual void SelfAdd (const DChar& value) = 0;
+  virtual void SelfAdd (const DText& value) = 0;
 
-  virtual void SelfSub (const DBSInt64& value) = 0;
-  virtual void SelfSub (const DBSRichReal& value) = 0;
+  virtual void SelfSub (const DInt64& value) = 0;
+  virtual void SelfSub (const DRichReal& value) = 0;
 
-  virtual void SelfMul (const DBSInt64& value) = 0;
-  virtual void SelfMul (const DBSRichReal& value) = 0;
+  virtual void SelfMul (const DInt64& value) = 0;
+  virtual void SelfMul (const DRichReal& value) = 0;
 
-  virtual void SelfDiv (const DBSInt64& value) = 0;
-  virtual void SelfDiv (const DBSRichReal& value) = 0;
+  virtual void SelfDiv (const DInt64& value) = 0;
+  virtual void SelfDiv (const DRichReal& value) = 0;
 
-  virtual void SelfMod (const DBSInt64& value) = 0;
+  virtual void SelfMod (const DInt64& value) = 0;
 
-  virtual void SelfAnd (const DBSInt64& value) = 0;
-  virtual void SelfAnd (const DBSBool& value) = 0;
+  virtual void SelfAnd (const DInt64& value) = 0;
+  virtual void SelfAnd (const DBool& value) = 0;
 
-  virtual void SelfXor (const DBSInt64& value) = 0;
-  virtual void SelfXor (const DBSBool& value) = 0;
+  virtual void SelfXor (const DInt64& value) = 0;
+  virtual void SelfXor (const DBool& value) = 0;
 
-  virtual void SelfOr (const DBSInt64& value) = 0;
-  virtual void SelfOr (const DBSBool& value) = 0;
+  virtual void SelfOr (const DInt64& value) = 0;
+  virtual void SelfOr (const DBool& value) = 0;
 
   virtual uint_t GetType () = 0;
 
   virtual FIELD_INDEX   GetField () = 0;
-  virtual I_DBSTable&   GetTable () = 0;
+  virtual ITable&   GetTable () = 0;
   virtual StackValue    GetFieldAt (const FIELD_INDEX field) = 0;
   virtual StackValue    GetValueAt (const uint64_t index) = 0;
 
@@ -136,29 +136,29 @@ public:
     const I_Operand& compileTest = op;
     (void)compileTest;  //Just to make sure the right type is used.
 
-    assert (sizeof (OP_T) <= sizeof (m_Storage));
+    assert (sizeof (OP_T) <= sizeof (mStorage));
 
-    _placement_new (m_Storage, op);
+    _placement_new (mStorage, op);
   }
 
   StackValue (const StackValue& source)
   {
     I_Operand& op = _CC (I_Operand&,
-                         _RC (const I_Operand&, source.m_Storage));
+                         _RC (const I_Operand&, source.mStorage));
     op.NotifyCopy ();
 
-    memcpy (&m_Storage, &source.m_Storage, sizeof m_Storage);
+    memcpy (&mStorage, &source.mStorage, sizeof mStorage);
   }
 
   StackValue&
   operator= (const StackValue& source)
   {
     I_Operand& op = _CC (I_Operand&,
-                         _RC (const I_Operand&, source.m_Storage));
+                         _RC (const I_Operand&, source.mStorage));
     op.NotifyCopy ();
 
     Clear ();
-    memcpy (&m_Storage, &source.m_Storage, sizeof m_Storage);
+    memcpy (&mStorage, &source.mStorage, sizeof mStorage);
 
     return *this;
   }
@@ -168,7 +168,7 @@ public:
     Clear ();
   }
 
-  I_Operand& GetOperand () { return *_RC (I_Operand*, m_Storage);  }
+  I_Operand& GetOperand () { return *_RC (I_Operand*, mStorage);  }
 
 private:
   void Clear ()
@@ -176,7 +176,7 @@ private:
     GetOperand ().~I_Operand ();
   }
 
-  uint64_t m_Storage [MAX_OP_QWORDS];
+  uint64_t mStorage [MAX_OP_QWORDS];
 };
 
 class INTERP_SHL SessionStack
@@ -186,24 +186,24 @@ public:
   ~SessionStack ();
 
   void  Push ();
-  void  Push (const DBSBool& value);
-  void  Push (const DBSChar& value);
-  void  Push (const DBSDate& value);
-  void  Push (const DBSDateTime& value);
-  void  Push (const DBSHiresTime& value);
-  void  Push (const DBSInt8& value);
-  void  Push (const DBSInt16& value);
-  void  Push (const DBSInt32& value);
-  void  Push (const DBSInt64& value);
-  void  Push (const DBSReal& value);
-  void  Push (const DBSRichReal& value);
-  void  Push (const DBSUInt8& value);
-  void  Push (const DBSUInt16& value);
-  void  Push (const DBSUInt32& value);
-  void  Push (const DBSUInt64& value);
-  void  Push (const DBSText& value);
-  void  Push (const DBSArray& value);
-  void  Push (I_DBSHandler& dbs, I_DBSTable& table);
+  void  Push (const DBool& value);
+  void  Push (const DChar& value);
+  void  Push (const DDate& value);
+  void  Push (const DDateTime& value);
+  void  Push (const DHiresTime& value);
+  void  Push (const DInt8& value);
+  void  Push (const DInt16& value);
+  void  Push (const DInt32& value);
+  void  Push (const DInt64& value);
+  void  Push (const DReal& value);
+  void  Push (const DRichReal& value);
+  void  Push (const DUInt8& value);
+  void  Push (const DUInt16& value);
+  void  Push (const DUInt32& value);
+  void  Push (const DUInt64& value);
+  void  Push (const DText& value);
+  void  Push (const DArray& value);
+  void  Push (I_DBSHandler& dbs, ITable& table);
 
   void  Push (const StackValue& value);
 
@@ -214,7 +214,7 @@ public:
   StackValue& operator[] (const uint_t index);
 
 private:
-  std::vector<StackValue> m_Stack;
+  std::vector<StackValue> mStack;
 };
 
 } //namespace whisper

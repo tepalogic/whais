@@ -38,53 +38,53 @@ namespace prima {
 void
 Unit::SetGlobalId (const uint32_t globalIndex, const uint32_t globalId)
 {
-  if (globalIndex >= m_GlbsCount)
+  if (globalIndex >= mGlbsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
 
-  _RC (uint32_t*, m_UnitData)[globalIndex] = globalId;
+  _RC (uint32_t*, mUnitData)[globalIndex] = globalId;
 }
 
 void
 Unit::SetProcId (const uint32_t procIndex, const uint32_t procId)
 {
-  if (procIndex >= m_ProcsCount)
+  if (procIndex >= mProcsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
 
-  _RC (uint32_t*, m_UnitData)[m_GlbsCount + procIndex] = procId;
+  _RC (uint32_t*, mUnitData)[mGlbsCount + procIndex] = procId;
 }
 
 uint32_t
 Unit::GetGlobalId (const uint32_t globalIndex) const
 {
-  if (globalIndex >= m_GlbsCount)
+  if (globalIndex >= mGlbsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
 
-  return _RC (const uint32_t*, m_UnitData)[globalIndex];
+  return _RC (const uint32_t*, mUnitData)[globalIndex];
 }
 
 uint32_t
 Unit::GetProcId (const uint32_t procIndex) const
 {
-  if (procIndex >= m_ProcsCount)
+  if (procIndex >= mProcsCount)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
 
-  return _RC (const uint32_t*, m_UnitData)[m_GlbsCount + procIndex];
+  return _RC (const uint32_t*, mUnitData)[mGlbsCount + procIndex];
 }
 
 const uint8_t*
 Unit::GetConstData (const uint32_t offset) const
 {
-  if (offset >= m_ConstSize)
+  if (offset >= mConstSize)
     throw InterException (NULL,
                           _EXTRA (InterException::INVALID_UNIT_DATA_OFF));
 
-  const uint8_t* pData = m_UnitData;
+  const uint8_t* pData = mUnitData;
 
-  pData += (m_GlbsCount + m_ProcsCount) * sizeof (uint32_t) + offset;
+  pData += (mGlbsCount + mProcsCount) * sizeof (uint32_t) + offset;
 
   return pData;
 }
@@ -93,8 +93,8 @@ Unit::GetConstData (const uint32_t offset) const
 
 UnitsManager::~UnitsManager ()
 {
-  for (uint32_t index = 0; index < m_Units.size (); ++index)
-    delete [] _RC (uint8_t*, m_Units[index]);
+  for (uint32_t index = 0; index < mUnits.size (); ++index)
+    delete [] _RC (uint8_t*, mUnits[index]);
 }
 
 uint32_t
@@ -109,16 +109,16 @@ UnitsManager::AddUnit (const uint32_t glbsCount,
   auto_ptr<uint8_t> apUnitData (new uint8_t[entrySize]);
   Unit* const  pEntry = _RC (Unit*, apUnitData.get ());
 
-  pEntry->m_GlbsCount  = glbsCount;
-  pEntry->m_ProcsCount = procsCount;
-  pEntry->m_ConstSize  = constAreaSize;
+  pEntry->mGlbsCount  = glbsCount;
+  pEntry->mProcsCount = procsCount;
+  pEntry->mConstSize  = constAreaSize;
 
-  memcpy (pEntry->m_UnitData + ((glbsCount + procsCount) * sizeof (uint32_t)),
+  memcpy (pEntry->mUnitData + ((glbsCount + procsCount) * sizeof (uint32_t)),
           pConstData,
           constAreaSize);
 
-  const uint32_t result = m_Units.size();
-  m_Units.push_back (pEntry);
+  const uint32_t result = mUnits.size();
+  mUnits.push_back (pEntry);
   apUnitData.release ();
 
   return result;
@@ -127,18 +127,18 @@ UnitsManager::AddUnit (const uint32_t glbsCount,
 void
 UnitsManager::RemoveLastUnit ()
 {
-  assert (m_Units.size () > 0);
+  assert (mUnits.size () > 0);
 
-  delete [] _RC (uint8_t*, m_Units[m_Units.size () - 1]);
-  m_Units.pop_back ();
+  delete [] _RC (uint8_t*, mUnits[mUnits.size () - 1]);
+  mUnits.pop_back ();
 }
 
 Unit&
 UnitsManager::GetUnit (const uint32_t unitIndex)
 {
-  assert (unitIndex < m_Units.size ());
+  assert (unitIndex < mUnits.size ());
 
-  return *m_Units[unitIndex];
+  return *mUnits[unitIndex];
 }
 
 void
@@ -146,9 +146,9 @@ UnitsManager::SetGlobalIndex (const uint32_t unitIndex,
                               const uint32_t unitGlbIndex,
                               const uint32_t glbMgrIndex)
 {
-  assert (unitIndex < m_Units.size ());
+  assert (unitIndex < mUnits.size ());
 
-  m_Units[unitIndex]->SetGlobalId (unitGlbIndex, glbMgrIndex);
+  mUnits[unitIndex]->SetGlobalId (unitGlbIndex, glbMgrIndex);
 }
 
 void
@@ -156,27 +156,27 @@ UnitsManager::SetProcIndex (const uint32_t unitIndex,
                             const uint32_t unitProcIndex,
                             const uint32_t procMgrIndex)
 {
-  assert (unitIndex < m_Units.size ());
+  assert (unitIndex < mUnits.size ());
 
-  m_Units[unitIndex]->SetProcId (unitProcIndex, procMgrIndex);
+  mUnits[unitIndex]->SetProcId (unitProcIndex, procMgrIndex);
 }
 
 uint32_t
 UnitsManager::GetGlobalIndex (const uint32_t unitIndex,
                               const uint32_t unitGlbIndex) const
 {
-  assert (unitIndex < m_Units.size ());
+  assert (unitIndex < mUnits.size ());
 
- return m_Units[unitIndex]->GetGlobalId (unitGlbIndex);
+ return mUnits[unitIndex]->GetGlobalId (unitGlbIndex);
 }
 
 uint32_t
 UnitsManager::GetProcIndex (const uint32_t unitIndex,
                             const uint32_t unitProcIndex) const
 {
-  assert (unitIndex < m_Units.size ());
+  assert (unitIndex < mUnits.size ());
 
-  return m_Units[unitIndex]->GetProcId (unitProcIndex);
+  return mUnits[unitIndex]->GetProcId (unitProcIndex);
 }
 
 } //namespace prima

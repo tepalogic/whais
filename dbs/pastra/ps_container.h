@@ -28,149 +28,144 @@
 #include <vector>
 #include <string>
 
-
-#include "dbs_values.h"
-
 #include "utils/wfile.h"
 #include "utils/wthread.h"
+#include "dbs/dbs_values.h"
 
 namespace whisper {
 namespace pastra {
 
+static const uint_t DEFAULT_TEMP_MEM_RESERVED = 4096; //4KB
+
 void
 append_int_to_str (std::string& dest, uint64_t number);
+
 
 class DataContainerException : public Exception
 {
 public:
-  DataContainerException (const char* message,
-                          const char* file,
+  DataContainerException (const char*   message,
+                          const char*   file,
                           uint32_t      line,
                           uint32_t      extra)
     : Exception (message, file, line, extra)
   {
   }
-  virtual ~DataContainerException ()
+};
+
+
+
+class IDataContainer
+{
+public:
+  IDataContainer ()
   {
   }
-};
 
-class I_DataContainer
-{
-public:
-  I_DataContainer ()
-  {}
-  virtual ~ I_DataContainer ()
-  {}
+  virtual ~IDataContainer ();
 
-  virtual void     Write (uint64_t to, uint64_t size, const uint8_t* pSource) = 0;
-  virtual void     Read (uint64_t from, uint64_t size, uint8_t* pDest) = 0;
-  virtual void     Colapse (uint64_t from, uint64_t to) = 0;
+  virtual void Write (uint64_t to, uint64_t size, const uint8_t* buffer) = 0;
+
+  virtual void Read (uint64_t from, uint64_t size, uint8_t* buffer) = 0;
+
+  virtual void Colapse (uint64_t from, uint64_t to) = 0;
+
   virtual uint64_t Size () const = 0;
-  virtual void     MarkForRemoval () = 0;
+
+  virtual void MarkForRemoval () = 0;
 };
 
 
-class FileContainer : public I_DataContainer
+
+class FileContainer : public IDataContainer
 {
 public:
-  FileContainer (const char*  pFileNameBase,
-                 const uint64_t maxFileSize,
-                 const uint64_t unitsCount);
+  FileContainer (const char*       baseFile,
+                 const uint64_t    maxFileSize,
+                 const uint64_t    unitsCount);
 
   virtual ~FileContainer ();
 
-  // WIDataContainer virtual functions
-  virtual void     Write (uint64_t to, uint64_t size, const uint8_t* pSource);
-  virtual void     Read (uint64_t from, uint64_t size, uint8_t* pDest);
-  virtual void     Colapse (uint64_t from, uint64_t to);
+  virtual void Write (uint64_t to, uint64_t size, const uint8_t* buffer);
+
+  virtual void Read (uint64_t from, uint64_t size, uint8_t* buffer);
+
+  virtual void Colapse (uint64_t from, uint64_t to);
+
   virtual uint64_t Size () const;
-  virtual void     MarkForRemoval ();
+
+  virtual void MarkForRemoval ();
 
 private:
   void ExtendContainer ();
 
-  const uint64_t       m_MaxFileUnitSize;
-  std::vector< File > m_FilesHandles;
-  std::string          m_FileNameBase;
-  bool                 m_IsMarked;
+  const uint64_t       mMaxFileUnitSize;
+  std::vector< File >  mFilesHandles;
+  std::string          mFileNamePrefix;
+  bool                 mToRemove;
 };
 
-class FileTempContainer : public FileContainer
+
+
+class TemporalFileContainer : public FileContainer
 {
 public:
-  FileTempContainer (const char*  pFileNameBase,
-                     const uint32_t maxFileSize);
-  virtual ~FileTempContainer ();
+  TemporalFileContainer (const char*    baseName,
+                         const uint32_t maxFileSize);
 };
 
-class TempContainer : public I_DataContainer
+
+
+class TemporalContainer : public IDataContainer
 {
 public:
-  TempContainer (const char* pTempDirectory, const uint_t uReservedMemory);
-  virtual ~TempContainer ();
+  explicit TemporalContainer (
+                        const uint_t reservedMemory = DEFAULT_TEMP_MEM_RESERVED
+                             );
 
-  // WIDataContainer virtual functions
-  virtual void     Write (uint64_t to, uint64_t size, const uint8_t* pSource);
-  virtual void     Read (uint64_t from, uint64_t size, uint8_t* pDest);
-  virtual void     Colapse (uint64_t from, uint64_t to);
+  virtual void Write (uint64_t to, uint64_t size, const uint8_t* buffer);
+
+  virtual void Read (uint64_t from, uint64_t size, uint8_t* buffer);
+
+  virtual void Colapse (uint64_t from, uint64_t to);
+
   virtual uint64_t Size () const;
-  virtual void     MarkForRemoval ();
+
+  virtual void MarkForRemoval ();
 
 private:
   void  FillCache (uint64_t position);
 
-  std::auto_ptr<FileTempContainer> m_FileContainer;
-  std::auto_ptr<uint8_t>           m_Cache;
-  uint64_t                         m_CacheStartPos;
-  uint64_t                         m_CacheEndPos;
-  const uint_t                     m_CacheSize;
-  bool                             m_DirtyCache;
+  std::auto_ptr<TemporalFileContainer> mFileContainer;
+  std::auto_ptr<uint8_t>               mCache;
+  uint64_t                             mCacheStartPos;
+  uint64_t                             mCacheEndPos;
+  const uint_t                         mCacheSize;
+  bool                                 mDirtyCache;
 
   static uint64_t      smTemporalsCount;
   static Lock smSync;
 };
 
+
+
 class WFileContainerException : public DataContainerException
 {
 public:
   explicit
-  WFileContainerException (const char* message,
-                           const char* file,
+  WFileContainerException (const char*   message,
+                           const char*   file,
                            uint32_t      line,
                            uint32_t      extra)
     : DataContainerException (message, file, line, extra)
   {
   }
 
-  virtual ~WFileContainerException ()
-  {
-  }
+  virtual Exception* Clone () const;
 
-  virtual Exception*     Clone () const
-  {
-    return new WFileContainerException (*this);
-  }
-  virtual EXPCEPTION_TYPE Type () const { return FILE_CONTAINER_EXCEPTION; }
-  virtual const char*   Description () const
-  {
-    switch (Extra ())
-      {
-      case INVALID_PARAMETERS:
-        return "Invalid parameters.";
-      case CONTAINTER_INVALID:
-        return "Container inconsistency detected.";
-      case INVALID_ACCESS_POSITION:
-          return "Container accessed outside bounds.";
-      case FILE_OS_IO_ERROR:
-          return "Container internal file IO error.";
-      default:
-          assert (false);
-          return "Unknown container exception";
-      }
+  virtual EXPCEPTION_TYPE Type () const;
 
-    return NULL;
-  }
+  virtual const char*   Description () const;
 
   enum
   {

@@ -38,24 +38,24 @@ class NameSpace;
 
 struct GlobalEntry
 {
-  uint32_t  m_IdOffet;
-  uint32_t  m_TypeOffset;
+  uint32_t  mIdOffet;
+  uint32_t  mTypeOffset;
 };
 
 class GlobalsManager
 {
 public:
   GlobalsManager (NameSpace& space)
-    : m_Names (space),
-      m_Identifiers (),
-      m_Storage (),
-      m_GlobalsEntrys ()
+    : mNames (space),
+      mIdentifiers (),
+      mStorage (),
+      mGlobalsEntrys ()
   {
   }
 
   ~GlobalsManager ();
 
-  uint_t Count () const { return m_GlobalsEntrys.size (); };
+  uint_t Count () const { return mGlobalsEntrys.size (); };
 
   uint32_t           AddGlobal (const uint8_t*     pName,
                                 const uint_t       nameLength,
@@ -90,10 +90,10 @@ private:
   static const uint32_t GLOBAL_ID     = 0x80000000;
   static const uint32_t INVALID_ENTRY = 0xFFFFFFFF;
 
-  NameSpace&               m_Names;
-  std::vector<uint8_t>     m_Identifiers;
-  std::vector<GlobalValue> m_Storage;
-  std::vector<GlobalEntry> m_GlobalsEntrys;
+  NameSpace&               mNames;
+  std::vector<uint8_t>     mIdentifiers;
+  std::vector<GlobalValue> mStorage;
+  std::vector<GlobalEntry> mGlobalsEntrys;
 };
 
 } //namespace prima

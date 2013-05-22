@@ -31,7 +31,7 @@
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
-#include "ps_valintep.h"
+#include "ps_serializer.h"
 
 using namespace std;
 using namespace whisper;
@@ -58,24 +58,27 @@ is_leap_year (const int year)
     return false;
 }
 
+
 static bool
 is_valid_date (const int year, const uint_t month, const uint_t day)
 {
-  const uint_t mnth = month - 1;
-  static uint_t monthDays[12] =
-                              {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
+  const uint_t  mnth          = month - 1;
+  static uint_t monthDays[12] = { 31, 28, 31, 30, 31, 30,
+                                  31, 31, 30, 31, 30, 31 };
   if (mnth > 11)
     return false;
+
   else if (day == 0)
     return false;
 
   if ((mnth != 1) && (day > monthDays [mnth]))
     return false;
+
   else if (mnth == 1)
     {
       if (is_leap_year (year) && (day > (monthDays[1] + 1)))
         return false;
+
       else if (day > monthDays[1])
         return false;
     }
@@ -83,222 +86,249 @@ is_valid_date (const int year, const uint_t month, const uint_t day)
   return true;
 }
 
+
 static bool
-is_valid_datetime (const int  year,
-                   const uint_t month,
-                   const uint_t day,
-                   const uint_t hour,
-                   const uint_t min,
-                   const uint_t sec)
+is_valid_datetime (const int          year,
+                   const uint_t       month,
+                   const uint_t       day,
+                   const uint_t       hour,
+                   const uint_t       min,
+                   const uint_t       sec)
 {
   if (is_valid_date (year, month, day) == false)
     return false;
-  else
-    if ((hour > 23) || (min > 59) || (sec > 59))
+
+  else if ((hour > 23) || (min > 59) || (sec > 59))
       return false;
 
   return true;
 }
 
+
 static bool
-is_valid_hiresdate (const int  year,
-                    const uint_t month,
-                    const uint_t day,
-                    const uint_t hour,
-                    const uint_t min,
-                    const uint_t sec,
-                    const uint_t microsec)
+is_valid_hiresdate (const int       year,
+                    const uint_t    month,
+                    const uint_t    day,
+                    const uint_t    hour,
+                    const uint_t    min,
+                    const uint_t    sec,
+                    const uint_t    microsec)
 {
   if (is_valid_datetime (year, month, day, hour, min, sec) == false)
     return false;
-  else
-    if (microsec > 999999999)
+
+  else if (microsec > 999999999)
       return false;
 
   return true;
 }
 
-DBSDate::DBSDate (const int32_t year, const uint8_t month, const uint8_t day)
-  : m_Year (year),
-    m_Month (month),
-    m_Day (day),
-    m_IsNull (false)
+
+
+
+DDate::DDate (const int32_t year, const uint8_t month, const uint8_t day)
+  : mYear (year),
+    mMonth (month),
+    mDay (day),
+    mIsNull (false)
 {
-  if ((m_IsNull == false) && (is_valid_date (year, month, day) == false))
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATE));
+  if ((mIsNull == false)
+      && ! is_valid_date (year, month, day))
+    {
+      throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATE));
+    }
 }
 
-DBSDateTime::DBSDateTime (const int32_t year,
-                          const uint8_t month,
-                          const uint8_t day,
-                          const uint8_t hour,
-                          const uint8_t minutes,
-                          const uint8_t seconds)
-  : m_Year (year),
-    m_Month (month),
-    m_Day (day),
-    m_Hour (hour),
-    m_Minutes (minutes),
-    m_Seconds (seconds),
-    m_IsNull (false)
-{
-  if ((m_IsNull == false) &&
-      (is_valid_datetime (year, month, day, hour, minutes, seconds) == false))
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
-}
 
-DBSHiresTime::DBSHiresTime (const int32_t year,
-                            const uint8_t month,
-                            const uint8_t day,
-                            const uint8_t hour,
-                            const uint8_t minutes,
-                            const uint8_t seconds,
-                            const uint32_t microsec)
-  : m_Microsec (microsec),
-    m_Year (year),
-    m_Month (month),
-    m_Day (day),
-    m_Hour (hour),
-    m_Minutes (minutes),
-    m_Seconds (seconds),
-    m_IsNull (false)
+
+DDateTime::DDateTime (const int32_t     year,
+                      const uint8_t     month,
+                      const uint8_t     day,
+                      const uint8_t     hour,
+                      const uint8_t     minutes,
+                      const uint8_t     seconds)
+  : mYear (year),
+    mMonth (month),
+    mDay (day),
+    mHour (hour),
+    mMinutes (minutes),
+    mSeconds (seconds),
+    mIsNull (false)
 {
-  if ((m_IsNull == false) &&
-      (is_valid_hiresdate (year,
-                           month,
-                           day,
-                           hour,
-                           minutes,
-                           seconds,
-                           microsec) == false))
+  if ((mIsNull == false)
+       && ! is_valid_datetime (year, month, day, hour, minutes, seconds))
     {
       throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
     }
 }
 
-DBSText::DBSText (const char* pText)
-  : m_pText (& pastra::NullText::GetSingletoneInstace())
-{
-  if ((pText != NULL) && (*pText != 0))
-    {
-      std::auto_ptr<I_TextStrategy> apText (
-                                 new TemporalText (_RC (const uint8_t*, pText))
-                                           );
-      apText.get ()->IncreaseReferenceCount ();
 
-      m_pText = apText.release ();
-      assert (m_pText->ReferenceCount () == 1);
-      assert (m_pText->ShareCount () == 0);
+
+DHiresTime::DHiresTime (const int32_t    year,
+                        const uint8_t    month,
+                        const uint8_t    day,
+                        const uint8_t    hour,
+                        const uint8_t    minutes,
+                        const uint8_t    seconds,
+                        const uint32_t   microsec)
+  : mMicrosec (microsec),
+    mYear (year),
+    mMonth (month),
+    mDay (day),
+    mHour (hour),
+    mMinutes (minutes),
+    mSeconds (seconds),
+    mIsNull (false)
+{
+  if ((mIsNull == false)
+      && ! is_valid_hiresdate (year,
+                               month,
+                               day,
+                               hour,
+                               minutes,
+                               seconds,
+                               microsec))
+    {
+      throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
     }
 }
 
-DBSText::DBSText (const uint8_t *pUtf8String)
-  : m_pText (& NullText::GetSingletoneInstace())
+
+
+DText::DText (const char* text)
+  : mText (&pastra::NullText::GetSingletoneInstace ())
 {
-  if ((pUtf8String != NULL) && (*pUtf8String != 0))
+  if ((text != NULL) && (text[0] != 0))
     {
-      std::auto_ptr<I_TextStrategy> apText (new TemporalText (pUtf8String));
-      apText.get ()->IncreaseReferenceCount ();
+      auto_ptr<ITextStrategy> strategy (
+                               new TemporalText (_RC (const uint8_t*, text))
+                                       );
+      strategy.get ()->IncreaseReferenceCount ();
 
-      m_pText = apText.release ();
-      assert (m_pText->ReferenceCount () == 1);
-      assert (m_pText->ShareCount () == 0);
+      mText = strategy.release ();
+
+      assert (mText->ReferenceCount () == 1);
+      assert (mText->ShareCount () == 0);
     }
-
 }
 
-DBSText::DBSText (I_TextStrategy& text)
-  : m_pText (NULL)
+
+DText::DText (const uint8_t *utf8Src)
+  : mText (& NullText::GetSingletoneInstace())
+{
+  if ((utf8Src != NULL) && (utf8Src[0] != 0))
+    {
+      auto_ptr<ITextStrategy> strategy (new TemporalText (utf8Src));
+      strategy.get ()->IncreaseReferenceCount ();
+
+      mText = strategy.release ();
+
+      assert (mText->ReferenceCount () == 1);
+      assert (mText->ShareCount () == 0);
+    }
+}
+
+
+DText::DText (ITextStrategy& text)
+  : mText (NULL)
 {
   if (text.ShareCount () == 0)
     text.IncreaseReferenceCount ();
+
   else
     {
       assert (text.ReferenceCount () == 1);
+
       text.IncreaseShareCount ();
     }
 
-  m_pText = &text;
+  mText = &text;
 }
 
-DBSText::DBSText (const DBSText& sourceText)
-  : m_pText (NULL)
+
+DText::DText (const DText& source)
+  : mText (NULL)
 {
-  if (sourceText.m_pText->ShareCount() > 0)
+  if (source.mText->ShareCount() > 0)
     {
-      assert (sourceText.m_pText->ReferenceCount () == 1);
+      assert (source.mText->ReferenceCount () == 1);
 
-      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      auto_ptr<ITextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*sourceText.m_pText,
-                                 sourceText.m_pText->BytesCount());
+      newText.get()->Duplicate (*source.mText,
+                                 source.mText->BytesCount());
 
-      m_pText = newText.release ();
-      assert (m_pText->ShareCount () == 0);
-      assert (m_pText->ReferenceCount () == 1);
+      mText = newText.release ();
+
+      assert (mText->ShareCount () == 0);
+      assert (mText->ReferenceCount () == 1);
     }
   else
     {
-      sourceText.m_pText->IncreaseReferenceCount ();
-      m_pText = sourceText.m_pText;
+      source.mText->IncreaseReferenceCount ();
+      mText = source.mText;
     }
 
-  assert (m_pText != NULL);
+  assert (mText != NULL);
 }
 
-DBSText &
-DBSText::operator= (const DBSText& sourceText)
+
+DText &
+DText::operator= (const DText& source)
 {
-  if (this == &sourceText)
+  if (this == &source)
     return *this;
 
-  I_TextStrategy* const pText = m_pText;
+  ITextStrategy* const oldText = mText;
 
-  if (sourceText.m_pText->ShareCount() > 0)
+  if (source.mText->ShareCount() > 0)
     {
-      assert (sourceText.m_pText->ReferenceCount () == 1);
+      assert (source.mText->ReferenceCount () == 1);
 
-      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      auto_ptr<ITextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*sourceText.m_pText,
-                                 sourceText.m_pText->BytesCount ());
+      newText.get()->Duplicate (*source.mText,
+                                 source.mText->BytesCount ());
 
-      m_pText = newText.release ();
-      assert (m_pText->ShareCount () == 0);
-      assert (m_pText->ReferenceCount () == 1);
+      mText = newText.release ();
+
+      assert (mText->ShareCount () == 0);
+      assert (mText->ReferenceCount () == 1);
     }
   else
     {
-      sourceText.m_pText->IncreaseReferenceCount();
-      m_pText = sourceText.m_pText;
+      source.mText->IncreaseReferenceCount();
+      mText = source.mText;
     }
 
-  if (pText->ShareCount () > 0)
-    pText->DecreaseShareCount ();
+  if (oldText->ShareCount () > 0)
+    oldText->DecreaseShareCount ();
+
   else
-    pText->DecreaseReferenceCount ();
+    oldText->DecreaseReferenceCount ();
 
   return *this;
 }
 
+
 bool
-DBSText::operator== (const DBSText& text) const
+DText::operator== (const DText& text) const
 {
-  if (m_pText == text.m_pText)
+  if (mText == text.mText)
     return true;
 
-  if (IsNull() != text.IsNull())
+  if (IsNull () != text.IsNull ())
     return false;
 
-  if (IsNull() == true)
+  if (IsNull () == true)
     return true;
 
-  uint64_t textSize = GetRawUtf8Count();
+  uint64_t textSize = RawSize ();
 
   assert (textSize != 0);
-  assert (text.GetRawUtf8Count() != 0);
+  assert (text.RawSize () != 0);
 
-  if (textSize != text.GetRawUtf8Count())
+  if (textSize != text.RawSize ())
     return false;
 
   uint64_t offset = 0;
@@ -307,10 +337,10 @@ DBSText::operator== (const DBSText& text) const
 
   while (textSize > 0)
   {
-    uint_t chunkSize = MIN (sizeof first, textSize);
+    const uint_t chunkSize = MIN (sizeof first, textSize);
 
-    GetRawUtf8 (offset, chunkSize, first);
-    text.GetRawUtf8 (offset, chunkSize, second);
+    RawRead (offset, chunkSize, first);
+    text.RawRead (offset, chunkSize, second);
 
     if (memcmp (first, second, chunkSize) != 0)
       return false;
@@ -321,173 +351,193 @@ DBSText::operator== (const DBSText& text) const
   return true;
 }
 
-DBSText::~DBSText ()
+
+DText::~DText ()
 {
-  if (m_pText->ShareCount () > 0)
-    m_pText->DecreaseShareCount ();
+  if (mText->ShareCount () > 0)
+    mText->DecreaseShareCount ();
+
   else
-    m_pText->DecreaseReferenceCount();
+    mText->DecreaseReferenceCount();
 }
+
 
 bool
-DBSText::IsNull () const
+DText::IsNull () const
 {
-  return (m_pText->BytesCount() == 0);
+  return (mText->BytesCount () == 0);
 }
 
-uint64_t
-DBSText::GetCharactersCount () const
-{
-  return m_pText->CharsCount();
-}
 
 uint64_t
-DBSText::GetRawUtf8Count () const
+DText::Count () const
 {
-  return m_pText->BytesCount();
+  return mText->CharsCount ();
 }
+
+
+uint64_t
+DText::RawSize () const
+{
+  return mText->BytesCount ();
+}
+
 
 void
-DBSText::GetRawUtf8 (uint64_t offset,
-                     uint64_t count,
-                     uint8_t* const pBuffer) const
+DText::RawRead (uint64_t        offset,
+                uint64_t        count,
+                uint8_t* const  dest) const
 {
   if (IsNull())
     return;
 
-  count = min (count, m_pText->BytesCount());
-  m_pText->ReadUtf8 (offset, count, pBuffer);
+  count = min (count, mText->BytesCount());
+
+  mText->ReadUtf8 (offset, count, dest);
 }
 
+
 void
-DBSText::Append (const DBSChar& character)
+DText::Append (const DChar& ch)
 {
-  if ((character.m_IsNull) || (character.m_Value == 0))
+  if ((ch.mIsNull) || (ch.mValue == 0))
     return ;
 
-  if (m_pText->ReferenceCount() > 1)
+  if (mText->ReferenceCount() > 1)
     {
-      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      auto_ptr<ITextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*m_pText, m_pText->BytesCount ());
+      newText.get()->Duplicate (*mText, mText->BytesCount ());
 
-      m_pText->DecreaseReferenceCount();
-      m_pText = newText.release ();
+      mText->DecreaseReferenceCount();
+      mText = newText.release ();
 
-      assert (m_pText->ShareCount () == 0);
-      assert (m_pText->ReferenceCount () == 1);
+      assert (mText->ShareCount () == 0);
+      assert (mText->ReferenceCount () == 1);
     }
 
-  assert (m_pText->ReferenceCount() != 0);
+  assert (mText->ReferenceCount() != 0);
 
-  m_pText->Append (character.m_Value);
+  mText->Append (ch.mValue);
 }
 
+
 void
-DBSText::Append (const DBSText& text)
+DText::Append (const DText& text)
 {
   if (text.IsNull())
     return;
 
-  if (m_pText->ReferenceCount() > 1)
+  if (mText->ReferenceCount() > 1)
     {
-      auto_ptr<I_TextStrategy> newText (new TemporalText(NULL));
+      auto_ptr<ITextStrategy> newText (new TemporalText(NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*m_pText, m_pText->BytesCount ());
+      newText.get()->Duplicate (*mText, mText->BytesCount ());
 
-      m_pText->DecreaseReferenceCount();
-      m_pText = newText.release ();
+      mText->DecreaseReferenceCount();
+      mText = newText.release ();
 
-      assert (m_pText->ShareCount () == 0);
-      assert (m_pText->ReferenceCount () == 1);
+      assert (mText->ShareCount () == 0);
+      assert (mText->ReferenceCount () == 1);
     }
 
-  m_pText->Append (*text.m_pText);
+  mText->Append (*text.mText);
 }
 
-DBSChar
-DBSText::GetCharAtIndex(const uint64_t index) const
+
+DChar
+DText::CharAt(const uint64_t index) const
 {
-  return m_pText->CharAt (index);
+  return mText->CharAt (index);
 }
+
 
 void
-DBSText::SetCharAtIndex (const DBSChar& rCharacter, const uint64_t index)
+DText::CharAt (const uint64_t index, const DChar& ch)
 {
-  const uint64_t charsCount = m_pText->CharsCount();
+  const uint64_t charsCount = mText->CharsCount();
 
   if (charsCount == index)
     {
-      Append (rCharacter);
+      Append (ch);
+
       return ;
     }
   else if (charsCount < index)
     throw DBSException (NULL, _EXTRA (DBSException::STRING_INDEX_TOO_BIG));
 
-  if (rCharacter.IsNull ())
-    m_pText->Truncate (index);
+  if (ch.IsNull ())
+    mText->Truncate (index);
+
   else
-    m_pText->UpdateCharAt (rCharacter.m_Value, index, &m_pText);
+    mText->UpdateCharAt (ch.mValue, index, &mText);
 }
+
 
 void
-DBSText::SetMirror (DBSText& mirror) const
+DText::MakeMirror (DText& inoutText) const
 {
-  if (m_pText->ReferenceCount() == 1)
-    m_pText->IncreaseShareCount ();
+  if (mText->ReferenceCount() == 1)
+    mText->IncreaseShareCount ();
+
   else
     {
-      auto_ptr<I_TextStrategy> newText (new TemporalText (NULL));
+      auto_ptr<ITextStrategy> newText (new TemporalText (NULL));
       newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*m_pText, m_pText->BytesCount ());
-      m_pText->DecreaseReferenceCount ();
+      newText.get()->Duplicate (*mText, mText->BytesCount ());
+      mText->DecreaseReferenceCount ();
 
-      _CC (DBSText*, this)->m_pText = newText.release ();
+      _CC (DText*, this)->mText = newText.release ();
 
-      assert (m_pText->ShareCount () == 0);
-      assert (m_pText->ReferenceCount () == 1);
+      assert (mText->ShareCount () == 0);
+      assert (mText->ReferenceCount () == 1);
 
-      m_pText->IncreaseShareCount ();
+      mText->IncreaseShareCount ();
     }
 
-  assert (m_pText->ReferenceCount () == 1);
+  assert (mText->ReferenceCount () == 1);
 
-  if (this != &mirror)
+  if (this != &inoutText)
     {
-      if (mirror.m_pText->ShareCount () > 0)
-        mirror.m_pText->DecreaseShareCount ();
-      else
-        mirror.m_pText->DecreaseReferenceCount ();
+      if (inoutText.mText->ShareCount () > 0)
+        inoutText.mText->DecreaseShareCount ();
 
-      mirror.m_pText = m_pText;
+      else
+        inoutText.mText->DecreaseReferenceCount ();
+
+      inoutText.mText = mText;
     }
 }
 
+
 template <class T> void
-wh_array_init (const T* array, uint64_t count, I_ArrayStrategy*& prOutStrategy)
+wh_array_init (const T* const       array,
+               const uint64_t       count,
+               IArrayStrategy**     outStrategy)
 {
   if (count == 0)
     {
       assert (array == NULL);
-      prOutStrategy = & NullArray::GetSingletoneInstace (
-                                                       array[0].GetDBSType ());
 
-      return; // We finished here!
+      *outStrategy = &NullArray::GetSingletoneInstace (array[0].DBSType ());
+
+      return;
     }
 
   if (array == NULL)
-    throw DBSException (NULL, _EXTRA(DBSException::INVALID_PARAMETERS));
+    throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
 
-  auto_ptr <TemporalArray> apArray (new TemporalArray (array[0].GetDBSType ()));
-  prOutStrategy = apArray.get ();
+  auto_ptr<TemporalArray> autoP (new TemporalArray (array[0].DBSType ()));
+  *outStrategy = autoP.get ();
 
-  uint64_t currentOffset = 0;
+  uint64_t currentOffset  = 0;
   uint_t   valueIncrement = 0;
 
-  while (valueIncrement < _SC(uint_t,  PSValInterp::Size (
-                                                        array[0].GetDBSType (),
-                                                        false)))
-  valueIncrement += PSValInterp::Alignment (array[0].GetDBSType (), false);
+  while (valueIncrement <
+           _SC(uint_t,  Serializer::Size (array[0].DBSType (), false)))
+    {
+      valueIncrement += Serializer::Alignment (array[0].DBSType (), false);
+    }
 
   for (uint64_t index = 0; index < count; ++index)
     {
@@ -498,618 +548,705 @@ wh_array_init (const T* array, uint64_t count, I_ArrayStrategy*& prOutStrategy)
 
       assert (valueIncrement <= (sizeof rawStorage));
 
-      PSValInterp::Store (rawStorage, array[index]);
-      prOutStrategy->WriteRaw(currentOffset, valueIncrement, rawStorage);
+      Serializer::Store (rawStorage, array[index]);
+      (*outStrategy)->WriteRaw(currentOffset, valueIncrement, rawStorage);
       currentOffset += valueIncrement;
     }
 
-  prOutStrategy->IncrementReferenceCount();
+  (*outStrategy)->IncrementReferenceCount();
 
-  assert (prOutStrategy->ShareCount () == 0);
-  assert (prOutStrategy->ReferenceCount () == 1);
+  assert ((*outStrategy)->ShareCount () == 0);
+  assert ((*outStrategy)->ReferenceCount () == 1);
 
-  apArray.release ();
+  autoP.release ();
 }
 
-DBSArray::DBSArray ()
-  : m_pArray (&NullArray::GetSingletoneInstace (T_UNDETERMINED))
+
+DArray::DArray ()
+  : mArray (&NullArray::GetSingletoneInstace (T_UNDETERMINED))
 {
 }
 
-DBSArray::DBSArray (const DBSBool* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DBool* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSChar* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DChar* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSDate* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DDate* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSDateTime* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DDateTime* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSHiresTime* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DHiresTime* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSUInt8* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DUInt8* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSUInt16* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DUInt16* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSUInt32* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DUInt32* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSUInt64* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DUInt64* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSReal* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DReal* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSRichReal* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DRichReal* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSInt8* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DInt8* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSInt16* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DInt16* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSInt32* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DInt32* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (const DBSInt64* array, uint64_t count)
-  : m_pArray (NULL)
+
+DArray::DArray (const DInt64* const array, const uint64_t count)
+  : mArray (NULL)
 {
-  wh_array_init (array, count, m_pArray);
+  wh_array_init (array, count, &mArray);
 }
 
-DBSArray::DBSArray (I_ArrayStrategy& strategy)
-  : m_pArray (NULL)
+
+DArray::DArray (IArrayStrategy& array)
+  : mArray (NULL)
 {
-  if (strategy.ShareCount () == 0)
-    strategy.IncrementReferenceCount();
+  if (array.ShareCount () == 0)
+    array.IncrementReferenceCount();
+
   else
-   strategy.IncrementShareCount ();
+   array.IncrementShareCount ();
 
-  m_pArray = &strategy;
+  mArray = &array;
 }
 
-DBSArray::DBSArray (const DBSArray& rSource)
-  : m_pArray (NULL)
+
+DArray::DArray (const DArray& source)
+  : mArray (NULL)
 {
-  if (rSource.m_pArray->ShareCount () == 0)
+  if (source.mArray->ShareCount () == 0)
     {
-      m_pArray = rSource.m_pArray;
-      m_pArray->IncrementReferenceCount ();
+      mArray = source.mArray;
+      mArray->IncrementReferenceCount ();
     }
   else
     {
-      assert (rSource.m_pArray->ReferenceCount() == 1);
+      assert (source.mArray->ReferenceCount() == 1);
 
-      auto_ptr<I_ArrayStrategy> newStrategy (
-          new TemporalArray (rSource.m_pArray->Type ()));
+      auto_ptr<IArrayStrategy> newStrategy (
+                                    new TemporalArray (source.mArray->Type ())
+                                           );
 
-      newStrategy->Clone (*rSource.m_pArray);
+      newStrategy->Clone (*source.mArray);
       newStrategy->IncrementReferenceCount ();
-      m_pArray = newStrategy.release ();
+      mArray = newStrategy.release ();
 
-      assert (m_pArray->ShareCount() == 0);
-      assert (m_pArray->ReferenceCount() == 1);
+      assert (mArray->ShareCount() == 0);
+      assert (mArray->ReferenceCount() == 1);
     }
 }
 
-DBSArray::~DBSArray ()
+
+DArray::~DArray ()
 {
-  if (m_pArray->ShareCount () == 0)
-    m_pArray->DecrementReferenceCount ();
+  if (mArray->ShareCount () == 0)
+    mArray->DecrementReferenceCount ();
+
   else
-    m_pArray->DecrementShareCount ();
+    mArray->DecrementShareCount ();
 }
 
-DBSArray &
-DBSArray::operator= (const DBSArray& rSource)
+
+DArray &
+DArray::operator= (const DArray& source)
 {
-  if (&rSource == this)
+  if (&source == this)
     return *this;
 
-  if ((ElementsType() != T_UNDETERMINED) &&
-      rSource.ElementsType () != ElementsType ())
+  if ((Type () != T_UNDETERMINED)
+      && source.Type () != Type ())
     {
-      throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+      throw DBSException (NULL, _EXTRA (DBSException::INVALID_ARRAY_TYPE));
     }
 
-  I_ArrayStrategy* pTemp = m_pArray;
+  IArrayStrategy* const oldArray = mArray;
 
-  if (rSource.m_pArray->ShareCount () == 0)
+  if (source.mArray->ShareCount () == 0)
     {
-      m_pArray = rSource.m_pArray;
-      m_pArray->IncrementReferenceCount ();
+      mArray = source.mArray;
+      mArray->IncrementReferenceCount ();
     }
   else
     {
-      assert (rSource.m_pArray->ReferenceCount() == 1);
+      assert (source.mArray->ReferenceCount() == 1);
 
-      auto_ptr<I_ArrayStrategy> newStrategy (
-          new TemporalArray (rSource.m_pArray->Type ()));
+      auto_ptr<IArrayStrategy> newStrategy (
+                                    new TemporalArray (source.mArray->Type ())
+                                           );
 
-      newStrategy->Clone (*rSource.m_pArray);
+      newStrategy->Clone (*source.mArray);
       newStrategy->IncrementReferenceCount ();
-      m_pArray = newStrategy.release ();
+      mArray = newStrategy.release ();
 
-      assert (m_pArray->ShareCount() == 0);
-      assert (m_pArray->ReferenceCount() == 1);
+      assert (mArray->ShareCount() == 0);
+      assert (mArray->ReferenceCount() == 1);
     }
 
-  if (pTemp->ShareCount () == 0)
-    pTemp->DecrementReferenceCount ();
+  if (oldArray->ShareCount () == 0)
+    oldArray->DecrementReferenceCount ();
+
   else
-    pTemp->DecrementShareCount ();
+    oldArray->DecrementShareCount ();
 
   return *this;
 }
 
+
 uint64_t
-DBSArray::ElementsCount () const
+DArray::Count () const
 {
-  return m_pArray->Count();
+  return mArray->Count ();
 }
 
+
 DBS_FIELD_TYPE
-DBSArray::ElementsType () const
+DArray::Type () const
 {
-  return m_pArray->Type();
+  return mArray->Type ();
 }
+
 
 static int
 get_aligned_elem_size (DBS_FIELD_TYPE type)
 {
   int result = 0;
-  while (result < PSValInterp::Size(type, false))
-    result += PSValInterp::Alignment (type, false);
+
+  while (result < Serializer::Size(type, false))
+    result += Serializer::Alignment (type, false);
 
   return result;
 }
 
+
 static void
-prepare_array_strategy (I_ArrayStrategy*& pArrayStrategy)
+prepare_array_strategy (IArrayStrategy** inoutStrategy)
 {
-  assert (pArrayStrategy->ReferenceCount () > 0);
-  assert ((pArrayStrategy->ShareCount () == 0) ||
-          (pArrayStrategy->ReferenceCount () == 1));
+  assert ((*inoutStrategy)->ReferenceCount () > 0);
+  assert (((*inoutStrategy)->ShareCount () == 0)
+          || ((*inoutStrategy)->ReferenceCount () == 1));
 
-  if (pArrayStrategy->ReferenceCount() == 1)
-    return ; //Do not change anything
+  if ((*inoutStrategy)->ReferenceCount () == 1)
+    return ; //Do not change anything!
 
-  auto_ptr <I_ArrayStrategy> newStrategy (
-                                new TemporalArray (pArrayStrategy->Type())
-                                         );
+  auto_ptr<IArrayStrategy> newStrategy (
+                              new TemporalArray ((*inoutStrategy)->Type ())
+                                       );
 
-  newStrategy->Clone (*pArrayStrategy);
-  pArrayStrategy->DecrementReferenceCount();
-  pArrayStrategy = newStrategy.release();
-  pArrayStrategy->IncrementReferenceCount();
+  newStrategy->Clone (*(*inoutStrategy));
+  (*inoutStrategy)->DecrementReferenceCount ();
+  *inoutStrategy = newStrategy.release ();
+  (*inoutStrategy)->IncrementReferenceCount ();
 
-  assert (pArrayStrategy->ShareCount () == 0);
-  assert (pArrayStrategy->ReferenceCount () == 1);
+  assert ((*inoutStrategy)->ShareCount () == 0);
+  assert ((*inoutStrategy)->ReferenceCount () == 1);
 }
 
+
 template <class T> inline uint64_t
-add_array_element (const T& element, I_ArrayStrategy*& pArrayStrategy)
+add_array_element (const T& element, IArrayStrategy** inoutStrategy)
 {
-  if (pArrayStrategy->Type() != element.GetDBSType ())
+  if ((*inoutStrategy)->Type () != element.DBSType ())
     {
-      if (pArrayStrategy->Type () != T_UNDETERMINED)
-        throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+      if ((*inoutStrategy)->Type () != T_UNDETERMINED)
+        throw DBSException (NULL, _EXTRA (DBSException::INVALID_ARRAY_TYPE));
 
-      assert (pArrayStrategy ==
-              &NullArray::GetSingletoneInstace (T_UNDETERMINED));
-      pArrayStrategy = &NullArray::GetSingletoneInstace (element.GetDBSType ());
+      assert ((*inoutStrategy) ==
+                &NullArray::GetSingletoneInstace (T_UNDETERMINED));
 
-      return add_array_element (element, pArrayStrategy);
+      *inoutStrategy = &NullArray::GetSingletoneInstace (element.DBSType ());
+
+      return add_array_element (element, inoutStrategy);
     }
-  else if (element.IsNull())
+  else if (element.IsNull ())
     throw DBSException (NULL, _EXTRA (DBSException::NULL_ARRAY_ELEMENT));
 
   static const uint_t storageSize = get_aligned_elem_size (
-                                                    element.GetDBSType ()
+                                                    element.DBSType ()
                                                           );
-  prepare_array_strategy (pArrayStrategy);
+  prepare_array_strategy (inoutStrategy);
 
   uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
   assert (storageSize <= sizeof rawElement);
-  PSValInterp::Store (rawElement, element);
-  pArrayStrategy->WriteRaw (pArrayStrategy->RawSize(),
-                            storageSize,
-                            rawElement);
 
-  assert ((pArrayStrategy->RawSize() % storageSize) == 0);
+  Serializer::Store (rawElement, element);
+  (*inoutStrategy)->WriteRaw ((*inoutStrategy)->RawSize (),
+                              storageSize,
+                              rawElement);
 
-  return (pArrayStrategy->Count() - 1);
+  assert (((*inoutStrategy)->RawSize() % storageSize) == 0);
+
+  return ((*inoutStrategy)->Count () - 1);
 }
+
 
 uint64_t
-DBSArray::AddElement (const DBSBool& value)
+DArray::Add (const DBool& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSChar& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSDate& value)
+DArray::Add (const DChar& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSDateTime& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSHiresTime& value)
+DArray::Add (const DDate& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSUInt8& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSUInt16& value)
+DArray::Add (const DDateTime& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSUInt32& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSUInt64& value)
+DArray::Add (const DHiresTime& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSReal& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSRichReal& value)
+DArray::Add (const DUInt8& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSInt8& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSInt16& value)
+DArray::Add (const DUInt16& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
 
-uint64_t
-DBSArray::AddElement (const DBSInt32& value)
-{
-  return add_array_element (value, m_pArray);
-}
 
 uint64_t
-DBSArray::AddElement (const DBSInt64& value)
+DArray::Add (const DUInt32& value)
 {
-  return add_array_element (value, m_pArray);
+  return add_array_element (value, &mArray);
 }
+
+
+uint64_t
+DArray::Add (const DUInt64& value)
+{
+  return add_array_element (value, &mArray);
+}
+
+
+uint64_t
+DArray::Add (const DReal& value)
+{
+  return add_array_element (value, &mArray);
+}
+
+
+uint64_t
+DArray::Add (const DRichReal& value)
+{
+  return add_array_element (value, &mArray);
+}
+
+
+uint64_t
+DArray::Add (const DInt8& value)
+{
+  return add_array_element (value, &mArray);
+}
+
+
+uint64_t
+DArray::Add (const DInt16& value)
+{
+  return add_array_element (value, &mArray);
+}
+
+
+uint64_t
+DArray::Add (const DInt32& value)
+{
+  return add_array_element (value, &mArray);
+}
+
+
+uint64_t
+DArray::Add (const DInt64& value)
+{
+  return add_array_element (value, &mArray);
+}
+
 
 template <class T> void
-get_array_element (T&                     outElement,
-                   I_ArrayStrategy* const pArrayStrategy,
-                   const uint64_t         index)
+get_array_element (IArrayStrategy&        strategy,
+                   const uint64_t         index,
+                   T&                     outElement)
 {
-  if (pArrayStrategy->Count() <= index)
+  if (strategy.Count() <= index)
     throw DBSException (NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
-  else if (pArrayStrategy->Type() != outElement.GetDBSType ())
+
+  else if (strategy.Type() != outElement.DBSType ())
     throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
   static const uint_t storageSize = get_aligned_elem_size (
-                                                    outElement.GetDBSType ());
-
+                                                    outElement.DBSType ()
+                                                          );
   uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
   assert (sizeof rawElement >= storageSize);
 
-  pArrayStrategy->ReadRaw (index* storageSize, storageSize, rawElement);
-  PSValInterp::Retrieve (rawElement, &outElement);
+  strategy.ReadRaw (index * storageSize, storageSize, rawElement);
+  Serializer::Load (rawElement, &outElement);
 }
+
 
 void
-DBSArray::GetElement (DBSBool& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DBool& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSChar& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DChar& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSDate& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DDate& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSDateTime& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DDateTime& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSHiresTime& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DHiresTime& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSUInt8& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DUInt8& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSUInt16& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DUInt16& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSUInt32& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DUInt32& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSUInt64& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DUInt64& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSReal& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DReal& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSRichReal& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DRichReal& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSInt8& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DInt8& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSInt16& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DInt16& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSInt32& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DInt32& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
+
 
 void
-DBSArray::GetElement (DBSInt64& outValue, const uint64_t index) const
+DArray::Get (const uint64_t index, DInt64& outValue) const
 {
-  get_array_element (outValue, m_pArray, index);
+  get_array_element (*mArray, index, outValue);
 }
 
 
-template <class T>  inline void
-set_array_element (I_ArrayStrategy*& pArrayStrategy,
-                   const T&          value,
-                   const uint64_t    index)
+template<class T>
+inline void
+set_array_element (const T&          value,
+                   const uint64_t    index,
+                   IArrayStrategy**  inoutStrategy)
 {
-  if (index == pArrayStrategy->Count())
+  if (index == (*inoutStrategy)->Count ())
     {
-      add_array_element (value, pArrayStrategy);
+      add_array_element (value, inoutStrategy);
       return ;
     }
-  else if (index > pArrayStrategy->Count())
-    throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
+  else if (index > (*inoutStrategy)->Count())
+    throw DBSException(NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
 
-  prepare_array_strategy (pArrayStrategy);
+  prepare_array_strategy (inoutStrategy);
   static const uint_t storageSize = get_aligned_elem_size (
-                                                    pArrayStrategy->Type());
-
+                                                    (*inoutStrategy)->Type()
+                                                          );
   if (value.IsNull())
-      pArrayStrategy->CollapseRaw (index* storageSize, storageSize);
+      (*inoutStrategy)->CollapseRaw (index * storageSize, storageSize);
+
   else
     {
       uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
-      PSValInterp::Store (rawElement, value);
-      pArrayStrategy->WriteRaw(storageSize* index, storageSize, rawElement);
+
+      Serializer::Store (rawElement, value);
+      (*inoutStrategy)->WriteRaw (storageSize * index, storageSize, rawElement);
     }
 }
 
-void
-DBSArray::SetElement (const DBSBool& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
 
 void
-DBSArray::SetElement (const DBSChar& newValue, const uint64_t index)
+DArray::Set (const uint64_t index, const DBool& newValue)
 {
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSDate& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSDateTime& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSHiresTime& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement ( const DBSUInt8& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSUInt16& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSUInt32& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSUInt64& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSReal& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
-
-void
-DBSArray::SetElement (const DBSRichReal& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
+  set_array_element (newValue, index, &mArray);
 }
 
 
 void
-DBSArray::SetElement (const DBSInt8& newValue, const uint64_t index)
+DArray::Set (const uint64_t index, const DChar& newValue)
 {
-  set_array_element (m_pArray, newValue, index);
+  set_array_element (newValue, index, &mArray);
 }
 
-void
-DBSArray::SetElement (const DBSInt16& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
 
 void
-DBSArray::SetElement (const DBSInt32& newValue, const uint64_t index)
+DArray::Set (const uint64_t index, const DDate& newValue)
 {
-  set_array_element (m_pArray, newValue, index);
+  set_array_element (newValue, index, &mArray);
 }
 
-void
-DBSArray::SetElement (const DBSInt64& newValue, const uint64_t index)
-{
-  set_array_element (m_pArray, newValue, index);
-}
 
 void
-DBSArray::RemoveElement (const uint64_t index)
+DArray::Set (const uint64_t index, const DDateTime& newValue)
 {
-  if (index >= m_pArray->Count())
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DHiresTime& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index,  const DUInt8& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DUInt16& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DUInt32& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DUInt64& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DReal& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DRichReal& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DInt8& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DInt16& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DInt32& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Set (const uint64_t index, const DInt64& newValue)
+{
+  set_array_element (newValue, index, &mArray);
+}
+
+
+void
+DArray::Remove (const uint64_t index)
+{
+  if (index >= mArray->Count ())
     throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
-  prepare_array_strategy (m_pArray);
+  prepare_array_strategy (&mArray);
 
-  const uint_t storageSize = get_aligned_elem_size (m_pArray->Type());
+  const uint_t storageSize = get_aligned_elem_size (mArray->Type());
 
-  m_pArray->CollapseRaw (index*storageSize, storageSize);
+  mArray->CollapseRaw (index * storageSize, storageSize);
 }
 
 
-template <class DBS_T> int64_t
-partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
+template<class DBS_T>
+int64_t
+partition (int64_t            from,
+           int64_t            to,
+           DArray&            inoutArray,
+           bool* const        outAlreadySorted)
 {
   assert (from < to);
-  assert (to < _SC(int64_t, array.ElementsCount()));
+  assert (to < _SC (int64_t, inoutArray.Count ()));
 
   const int64_t pivotIndex = (from + to) / 2;
   DBS_T         leftEl;
@@ -1117,16 +1254,16 @@ partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
   DBS_T         rightEl;
   DBS_T         temp;
 
-  array.GetElement (pivot, pivotIndex);
-  array.GetElement (leftEl, from);
+  inoutArray.Get (pivotIndex, pivot);
+  inoutArray.Get (from, leftEl);
 
-  alreadySorted = false;
+  *outAlreadySorted = false;
   if (leftEl <= pivot)
     {
       temp = leftEl;
       while (from < to)
         {
-          array.GetElement (leftEl, from + 1);
+          inoutArray.Get (from + 1, leftEl);
           if ((leftEl <= pivot) && (temp <= leftEl))
             {
               ++from;
@@ -1136,16 +1273,17 @@ partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
             break;
         }
       if (from == to)
-        alreadySorted = true;
+        *outAlreadySorted = true;
     }
 
   while (from < to)
     {
       while (from <= to)
         {
-          array.GetElement (leftEl, from);
+          inoutArray.Get (from, leftEl);
           if (leftEl < pivot)
             ++from;
+
           else
             break;
         }
@@ -1154,9 +1292,10 @@ partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
         {
           while (from < to)
             {
-              array.GetElement (temp, from + 1);
+              inoutArray.Get (from + 1, temp);
               if (temp == pivot)
                 ++from;
+
               else
                 break;
             }
@@ -1166,9 +1305,10 @@ partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
 
       while (from <= to)
         {
-          array.GetElement (rightEl, to);
+          inoutArray.Get (to, rightEl);
           if (pivot < rightEl)
             --to;
+
           else
             break;
         }
@@ -1184,8 +1324,8 @@ partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
             }
           else
             {
-              array.SetElement (leftEl, to);
-              array.SetElement (rightEl, from);
+              inoutArray.Set (to, leftEl);
+              inoutArray.Set (from, rightEl);
             }
         }
     }
@@ -1193,14 +1333,16 @@ partition (DBSArray& array, int64_t from, int64_t to, bool& alreadySorted)
   return from;
 }
 
-template <class DBS_T> int64_t
-partition_reverse (DBSArray& array,
-                   int64_t   from,
-                   int64_t   to,
-                   bool&     alreadySorted)
+
+template<class DBS_T>
+int64_t
+partition_reverse (int64_t            from,
+                   int64_t            to,
+                   DArray&            inoutArray,
+                   bool* const        outAlreadySorted)
 {
   assert (from < to);
-  assert (to < _SC(int64_t, array.ElementsCount()));
+  assert (to < _SC (int64_t, inoutArray.Count()));
 
   const int64_t pivotIndex = (from + to) / 2;
   DBS_T         leftEl;
@@ -1208,16 +1350,16 @@ partition_reverse (DBSArray& array,
   DBS_T         rightEl;
   DBS_T         temp;
 
-  array.GetElement (pivot, pivotIndex);
-  array.GetElement (leftEl, from);
+  inoutArray.Get (pivotIndex, pivot);
+  inoutArray.Get (from, leftEl);
 
-  alreadySorted = false;
+  *outAlreadySorted = false;
   if (leftEl >= pivot)
     {
       temp = leftEl;
       while (from < to)
         {
-          array.GetElement (leftEl, from + 1);
+          inoutArray.Get (from + 1, leftEl);
           if ((leftEl >= pivot) && (temp >= leftEl))
             {
               ++from;
@@ -1226,17 +1368,19 @@ partition_reverse (DBSArray& array,
           else
             break;
         }
+
       if (from == to)
-        alreadySorted = true;
+        *outAlreadySorted = true;
     }
 
   while (from < to)
     {
       while (from <= to)
         {
-          array.GetElement (leftEl, from);
+          inoutArray.Get (from, leftEl);
           if (pivot < leftEl)
             ++from;
+
           else
             break;
         }
@@ -1245,9 +1389,10 @@ partition_reverse (DBSArray& array,
         {
           while (from < to)
             {
-              array.GetElement (temp, from + 1);
+              inoutArray.Get (from + 1, temp);
               if (temp == pivot)
                 ++from;
+
               else
                 break;
             }
@@ -1257,9 +1402,10 @@ partition_reverse (DBSArray& array,
 
       while (from <= to)
         {
-          array.GetElement (rightEl, to);
+          inoutArray.Get (to, rightEl);
           if (rightEl < pivot)
             --to;
+
           else
             break;
         }
@@ -1275,8 +1421,8 @@ partition_reverse (DBSArray& array,
             }
           else
             {
-              array.SetElement (leftEl, to);
-              array.SetElement (rightEl, from);
+              inoutArray.Set (to, leftEl);
+              inoutArray.Set (from, rightEl);
             }
         }
     }
@@ -1287,143 +1433,172 @@ partition_reverse (DBSArray& array,
 struct _partition_t
 {
   _partition_t (uint64_t from, uint64_t to)
-    : m_From (from),
-      m_To (to)
+    : mFrom (from),
+      mTo (to)
   {
   }
-  int64_t m_From;
-  int64_t m_To;
+  int64_t mFrom;
+  int64_t mTo;
 };
 
-template <class DBS_T> void
-quick_sort (DBSArray&  array, int64_t from, int64_t to, const bool reverse)
+template<class DBS_T>
+void
+quick_sort (int64_t           from,
+            int64_t           to,
+            const bool        reverse,
+            DArray&           inoutArray)
 {
   assert (from <= to);
 
-  std::vector <_partition_t> partStack;
+  vector<_partition_t> partStack;
+
   partStack.push_back ( _partition_t (from, to));
 
   do
     {
-      _partition_t current = partStack [partStack.size() - 1];
+      _partition_t current = partStack[partStack.size () - 1];
       partStack.pop_back();
 
-      if (current.m_From >= current.m_To)
+      if (current.mFrom >= current.mTo)
         continue;
 
       int64_t pivot;
       bool    alreadySorted;
 
       if (reverse)
-        pivot = partition_reverse<DBS_T> (array,
-                                          current.m_From,
-                                          current.m_To,
-                                          alreadySorted);
+        {
+          pivot = partition_reverse<DBS_T> (current.mFrom,
+                                            current.mTo,
+                                            inoutArray,
+                                            &alreadySorted);
+        }
       else
-        pivot = partition<DBS_T> (array,
-                                  current.m_From,
-                                  current.m_To,
-                                  alreadySorted);
+        {
+          pivot = partition<DBS_T> (current.mFrom,
+                                    current.mTo,
+                                    inoutArray,
+                                    &alreadySorted);
+        }
 
       if (alreadySorted == false)
         {
-          if ((pivot + 1) < current.m_To)
-            partStack.push_back (_partition_t (pivot + 1, current.m_To));
+          if ((pivot + 1) < current.mTo)
+            partStack.push_back (_partition_t (pivot + 1, current.mTo));
 
-          if (current.m_From < (pivot - 1))
-            partStack.push_back (_partition_t (current.m_From, pivot - 1));
+          if (current.mFrom < (pivot - 1))
+            partStack.push_back (_partition_t (current.mFrom, pivot - 1));
         }
-    } while (partStack.size() > 0);
+    }
+  while (partStack.size () > 0);
 }
 
+
 void
-DBSArray::Sort (bool reverse)
+DArray::Sort (bool reverse)
 {
-  switch (ElementsType ())
+  switch (Type ())
   {
   case T_BOOL:
-    quick_sort<DBSBool> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DBool> (0, Count () - 1, reverse, *this);
     break;
+
   case T_CHAR:
-    quick_sort<DBSChar> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DChar> (0, Count () - 1, reverse, *this);
     break;
+
   case T_DATE:
-    quick_sort<DBSDate> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DDate> (0, Count () - 1, reverse, *this);
     break;
+
   case T_DATETIME:
-    quick_sort<DBSDateTime> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DDateTime> (0, Count () - 1, reverse, *this);
     break;
+
   case T_HIRESTIME:
-    quick_sort<DBSHiresTime> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DHiresTime> (0, Count () - 1, reverse, *this);
     break;
+
   case T_UINT8:
-    quick_sort<DBSUInt8> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DUInt8> (0, Count () - 1, reverse, *this);
     break;
+
   case T_UINT16:
-    quick_sort<DBSUInt16> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DUInt16> (0, Count () - 1, reverse, *this);
     break;
+
   case T_UINT32:
-    quick_sort<DBSUInt32> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DUInt32> (0, Count () - 1, reverse, *this);
     break;
+
   case T_UINT64:
-    quick_sort<DBSUInt64> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DUInt64> (0, Count () - 1, reverse, *this);
     break;
+
   case T_REAL:
-    quick_sort<DBSReal> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DReal> (0, Count () - 1, reverse, *this);
     break;
+
   case T_RICHREAL:
-    quick_sort<DBSRichReal> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DRichReal> (0, Count () - 1, reverse, *this);
     break;
+
   case T_INT8:
-    quick_sort<DBSInt8> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DInt8> (0, Count () - 1, reverse, *this);
     break;
+
   case T_INT16:
-    quick_sort<DBSInt16> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DInt16> (0, Count () - 1, reverse, *this);
     break;
+
   case T_INT32:
-    quick_sort<DBSInt32> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DInt32> (0, Count () - 1, reverse, *this);
     break;
+
   case T_INT64:
-    quick_sort<DBSInt64> (*this, 0, ElementsCount () - 1, reverse);
+    quick_sort<DInt64> (0, Count () - 1, reverse, *this);
     break;
+
   default:
     assert (false);
   }
 }
 
 void
-DBSArray::SetMirror (DBSArray& mirror) const
+DArray::MakeMirror (DArray& inoutArray) const
 {
-  if (m_pArray->ReferenceCount() == 1)
-    m_pArray->IncrementShareCount ();
+  if (mArray->ReferenceCount() == 1)
+    mArray->IncrementShareCount ();
+
   else
     {
-      assert (m_pArray->ShareCount () == 0);
+      assert (mArray->ShareCount () == 0);
 
-      auto_ptr<I_ArrayStrategy> newStrategy (
-          new TemporalArray (m_pArray->Type ()));
+      auto_ptr<IArrayStrategy> newStrategy (
+                                      new TemporalArray (mArray->Type ())
+                                           );
 
-      newStrategy->Clone (*m_pArray);
+      newStrategy->Clone (*mArray);
       newStrategy->IncrementReferenceCount ();
-      m_pArray->DecrementReferenceCount ();
-      _CC (DBSArray*, this)->m_pArray = newStrategy.release ();
+      mArray->DecrementReferenceCount ();
+      _CC (DArray*, this)->mArray = newStrategy.release ();
 
-      assert (m_pArray->ShareCount() == 0);
-      assert (m_pArray->ReferenceCount() == 1);
+      assert (mArray->ShareCount() == 0);
+      assert (mArray->ReferenceCount() == 1);
 
-      m_pArray->IncrementShareCount ();
+      mArray->IncrementShareCount ();
     }
 
-  assert (m_pArray->ReferenceCount () == 1);
+  assert (mArray->ReferenceCount () == 1);
 
-  if (this != &mirror)
+  if (this != &inoutArray)
     {
-      if (mirror.m_pArray->ShareCount () == 0)
-        mirror.m_pArray->DecrementReferenceCount ();
-      else
-        mirror.m_pArray->DecrementShareCount ();
+      if (inoutArray.mArray->ShareCount () == 0)
+        inoutArray.mArray->DecrementReferenceCount ();
 
-      mirror.m_pArray = m_pArray;
+      else
+        inoutArray.mArray->DecrementShareCount ();
+
+      inoutArray.mArray = mArray;
     }
 }
 

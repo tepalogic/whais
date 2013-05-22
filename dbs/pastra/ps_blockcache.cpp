@@ -27,25 +27,33 @@
 #include "ps_blockcache.h"
 
 using namespace std;
-using namespace whisper;
-using namespace pastra;
 
-BlockCache::BlockCache () :
-    m_pManager (NULL),
-    m_ItemSize (0),
-    m_MaxBlocks (0),
-    m_BlockSize (0),
-    m_CachedBlocks ()
+namespace whisper {
+namespace pastra {
+
+IBlocksManager::~IBlocksManager ()
 {
 }
 
+
+
+BlockCache::BlockCache ()
+  : mManager (NULL),
+    mItemSize (0),
+    mBlockSize (0),
+    mMaxCachedBlocks (0),
+    mCachedBlocks ()
+{
+}
+
+
 BlockCache::~BlockCache ()
 {
-  if (m_ItemSize == 0)
+  if (mItemSize == 0)
     return ; //This has not been initialized. So nothing to do here!
 
-  map<uint64_t, BlockEntry>::iterator it = m_CachedBlocks.begin ();
-  while (it != m_CachedBlocks.end ())
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin ();
+  while (it != mCachedBlocks.end ())
     {
       assert (it->second.IsInUse() == false);
       assert (it->second.IsDirty () == false);
@@ -55,39 +63,41 @@ BlockCache::~BlockCache ()
     }
 }
 
+
 void
-BlockCache::Init (I_BlocksManager& blocksMgr,
+BlockCache::Init (IBlocksManager&  blocksMgr,
                   const uint_t     itemSize,
                   const uint_t     blockSize,
-                  const uint_t     maxBlockCount)
+                  const uint_t     maxCachedBlocks)
 {
   assert (itemSize > 0);
   assert (blockSize > 0);
-  assert (maxBlockCount > 0);
+  assert (maxCachedBlocks > 0);
 
-  m_pManager = &blocksMgr;
+  mManager = &blocksMgr;
 
-  if ((itemSize && maxBlockCount) == 0)
+  if ((itemSize == 0) || (maxCachedBlocks == 0))
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
 
-  if ((m_ItemSize || m_BlockSize || m_MaxBlocks) != 0)
+  /* Expect a clean initialization. */
+  if ((mItemSize | mBlockSize | mMaxCachedBlocks) != 0)
       throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
-  m_ItemSize  = itemSize;
-  m_MaxBlocks = maxBlockCount;
-  m_BlockSize = blockSize;
+  mItemSize         = itemSize;
+  mMaxCachedBlocks  = maxCachedBlocks;
+  mBlockSize        = blockSize;
 
-  if (m_BlockSize < m_ItemSize)
-    m_BlockSize = m_ItemSize;
+  if (mBlockSize < mItemSize)
+    mBlockSize = mItemSize;
 }
 
 void
 BlockCache::Flush ()
 {
-  assert (m_ItemSize != 0);
+  assert (mItemSize != 0);
 
-  map<uint64_t, BlockEntry>::iterator it = m_CachedBlocks.begin ();
-  while (it != m_CachedBlocks.end ())
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin ();
+  while (it != mCachedBlocks.end ())
     {
       FlushItem (it->first);
       ++it;
@@ -97,64 +107,61 @@ BlockCache::Flush ()
 StoredItem
 BlockCache::RetriveItem (const uint64_t item)
 {
-  const uint_t   itemsPerBlock = m_BlockSize / m_ItemSize;
+  const uint_t   itemsPerBlock = mBlockSize / mItemSize;
   const uint64_t baseBlockItem = (item / itemsPerBlock) * itemsPerBlock;
 
-  map<uint64_t, BlockEntry>::iterator it = m_CachedBlocks.find (baseBlockItem);
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.find (baseBlockItem);
 
-  if (it != m_CachedBlocks.end ())
-    return StoredItem (it->second, (item % itemsPerBlock) * m_ItemSize);
+  /* Check if the item is in cache. */
+  if (it != mCachedBlocks.end ())
+    return StoredItem (it->second, (item % itemsPerBlock) * mItemSize);
 
-  if (m_CachedBlocks.size () >= m_MaxBlocks)
+  /* Make sure you have room to cache the new item. */
+  if (mCachedBlocks.size () >= mMaxCachedBlocks)
     {
-      it = m_CachedBlocks.begin ();
-      while (it != m_CachedBlocks.end ())
+      it = mCachedBlocks.begin ();
+      while (it != mCachedBlocks.end ())
         {
           if (it->second.IsInUse ())
             continue ;
 
-          uint8_t* const pBlockData = it->second.Data ();
+          uint8_t* const data_ = it->second.Data ();
 
           if (it->second.IsDirty ())
-            m_pManager->StoreItems (pBlockData,
-                                    it->first,
-                                    itemsPerBlock);
+            mManager->StoreItems (it->first, itemsPerBlock, data_);
 
-          delete [] pBlockData;
-          m_CachedBlocks.erase (it++);
+          delete [] data_;
+
+          mCachedBlocks.erase (it++);
         }
     }
 
-  //If we are here we have to allocate something anyway
-  std::auto_ptr<uint8_t> apBlockData (new uint8_t[m_BlockSize]);
-  uint8_t* const         pBlockData = apBlockData.get ();
+  auto_ptr<uint8_t> block (new uint8_t[mBlockSize]);
+  uint8_t* const    data_ = block.get ();
 
-  m_CachedBlocks.insert (pair<uint64_t, BlockEntry>
-                         (baseBlockItem, BlockEntry (pBlockData)));
-  apBlockData.release();
+  mCachedBlocks.insert (pair<uint64_t, BlockEntry> (baseBlockItem,
+                                                    BlockEntry (data_)));
+  block.release();
 
-  m_pManager->RetrieveItems (pBlockData, baseBlockItem, itemsPerBlock);
+  mManager->RetrieveItems (baseBlockItem, itemsPerBlock, data_);
 
-  return StoredItem (m_CachedBlocks.find (baseBlockItem)->second,
-                     (item % itemsPerBlock) * m_ItemSize);
+  return StoredItem (mCachedBlocks.find (baseBlockItem)->second,
+                     (item % itemsPerBlock) * mItemSize);
 }
 
 void
 BlockCache::FlushItem (const uint64_t item)
 {
-  const uint_t   itemsPerBlock = m_BlockSize / m_ItemSize;
+  const uint_t   itemsPerBlock = mBlockSize / mItemSize;
   const uint64_t baseBlockItem = (item / itemsPerBlock) * itemsPerBlock;
 
-  map<uint64_t, BlockEntry>::iterator it = m_CachedBlocks.find (baseBlockItem);
-
-  if (it == m_CachedBlocks.end ())
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.find (baseBlockItem);
+  if (it == mCachedBlocks.end ())
     return;
 
   if (it->second.IsDirty ())
     {
-      m_pManager->StoreItems (it->second.Data (),
-                              baseBlockItem,
-                              itemsPerBlock);
+      mManager->StoreItems (baseBlockItem, itemsPerBlock, it->second.Data ());
       it->second.MarkClean ();
     }
 }
@@ -162,17 +169,19 @@ BlockCache::FlushItem (const uint64_t item)
 void
 BlockCache::RefreshItem (const uint64_t item)
 {
-  const uint_t   itemsPerBlock = m_BlockSize / m_ItemSize;
+  const uint_t   itemsPerBlock = mBlockSize / mItemSize;
   const uint64_t baseBlockItem = (item / itemsPerBlock) * itemsPerBlock;
 
-  map<uint64_t, BlockEntry>::iterator it = m_CachedBlocks.find (baseBlockItem);
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.find (baseBlockItem);
 
-  if (it == m_CachedBlocks.end ())
+  if (it == mCachedBlocks.end ())
     return;
 
   assert (it->second.IsDirty () == false);
-  m_pManager->RetrieveItems (it->second.Data (),
-                             baseBlockItem,
-                             itemsPerBlock);
+
+  mManager->RetrieveItems (baseBlockItem, itemsPerBlock, it->second.Data ());
 }
+
+} //namespace pastra
+} //namespace whisper
 

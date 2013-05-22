@@ -115,7 +115,7 @@ test_op_notb (Session& session)
   std::cout << "Testing opcode notb...\n";
   SessionStack stack;
 
-  const DBSBool value(false);
+  const DBool value(false);
 
   stack.Push (value);
 
@@ -124,10 +124,10 @@ test_op_notb (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result.IsNull () || (result.m_Value == value.m_Value))
+  if (result.IsNull () || (result.mValue == value.mValue))
     return false;
 
   return true;
@@ -139,7 +139,7 @@ test_op_not (Session& session)
   std::cout << "Testing opcode not...\n";
   SessionStack stack;
 
-  const DBSInt16 value(0x21);
+  const DInt16 value(0x21);
 
   stack.Push (value);
 
@@ -148,10 +148,10 @@ test_op_not (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt16 result;
+  DInt16 result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result.IsNull () || (result.m_Value != ~value.m_Value))
+  if (result.IsNull () || (result.mValue != ~value.mValue))
     return false;
 
   return true;
@@ -178,7 +178,7 @@ test_op_andXX (Session&       session,
   DBS_T result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result.IsNull () || (result != DBS_T (val1.m_Value & val2.m_Value)))
+  if (result.IsNull () || (result != DBS_T (val1.mValue & val2.mValue)))
     return false;
 
   return true;
@@ -205,7 +205,7 @@ test_op_orXX (Session&        session,
   DBS_T result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result.IsNull () || (result != DBS_T (val1.m_Value | val2.m_Value)))
+  if (result.IsNull () || (result != DBS_T (val1.mValue | val2.mValue)))
     return false;
 
   return true;
@@ -232,7 +232,7 @@ test_op_xorXX (Session&       session,
   DBS_T result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result.IsNull () || (result != DBS_T (val1.m_Value ^ val2.m_Value)))
+  if (result.IsNull () || (result != DBS_T (val1.mValue ^ val2.mValue)))
     return false;
 
   return true;
@@ -252,8 +252,8 @@ main ()
   InitInterpreter ();
 
   {
-    const DBSBool  val1_b (true), val2_b (false);
-    const DBSInt64 val1_i (11), val2_i (23);
+    const DBool  val1_b (true), val2_b (false);
+    const DInt64 val1_i (11), val2_i (23);
 
     I_Session& commonSession = GetInstance (NULL);
 

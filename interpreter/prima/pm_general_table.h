@@ -30,178 +30,178 @@
 namespace whisper {
 namespace prima {
 
-class GeneralTable : public I_DBSTable
+class GeneralTable : public ITable
 {
 public:
   GeneralTable ();
 
   virtual bool               IsTemporal () const;
-  virtual I_DBSTable&        Spawn () const;
-  virtual FIELD_INDEX        GetFieldsCount ();
-  virtual FIELD_INDEX        GetFieldIndex (const char* pFieldName);
-  virtual DBSFieldDescriptor GetFieldDescriptor (const FIELD_INDEX field);
-  virtual ROW_INDEX          GetAllocatedRows ();
+  virtual ITable&        Spawn () const;
+  virtual FIELD_INDEX        FieldsCount ();
+  virtual FIELD_INDEX        RetrieveField (const char* pFieldName);
+  virtual DBSFieldDescriptor DescribeField (const FIELD_INDEX field);
+  virtual ROW_INDEX          AllocatedRows ();
 
   virtual ROW_INDEX AddRow ();
   virtual ROW_INDEX AddReusedRow ();
   virtual void      MarkRowForReuse (const ROW_INDEX row);
 
-  virtual void CreateFieldIndex (const FIELD_INDEX                 field,
+  virtual void CreateIndex (const FIELD_INDEX                 field,
                                  CREATE_INDEX_CALLBACK_FUNC* const cbFunc,
-                                 CallBackIndexData* const          pCbData);
-  virtual void RemoveFieldIndex (const FIELD_INDEX field);
-  virtual bool IsFieldIndexed (const FIELD_INDEX field) const;
+                                 CreateIndexCallbackContext* const          pCbData);
+  virtual void RemoveIndex (const FIELD_INDEX field);
+  virtual bool IsIndexed (const FIELD_INDEX field) const;
 
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSBool& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSChar& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSDate& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSDateTime& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSHiresTime& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt8& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt16& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt32& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSInt64& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSReal& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSRichReal& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt8& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt16& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt32& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSUInt64& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSText& value);
-  virtual void SetEntry (const ROW_INDEX row, const FIELD_INDEX field, const DBSArray& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DBool& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DChar& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DDate& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DDateTime& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DHiresTime& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DInt8& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DInt16& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DInt32& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DInt64& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DReal& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DRichReal& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DUInt8& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DUInt16& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DUInt32& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DUInt64& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DText& value);
+  virtual void Set (const ROW_INDEX row, const FIELD_INDEX field, const DArray& value);
 
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSBool& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSChar& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSDate& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSDateTime& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSHiresTime& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt8& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt16& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt32& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSInt64& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSReal& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSRichReal& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt8& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt16& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt32& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSUInt64& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSText& outValue);
-  virtual void GetEntry (const ROW_INDEX row, const FIELD_INDEX field, DBSArray& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DBool& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DChar& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DDate& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DDateTime& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DHiresTime& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DInt8& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DInt16& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DInt32& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DInt64& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DReal& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DRichReal& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DUInt8& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DUInt16& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DUInt32& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DUInt64& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DText& outValue);
+  virtual void Get (const ROW_INDEX row, const FIELD_INDEX field, DArray& outValue);
 
-  virtual DBSArray GetMatchingRows (const DBSBool&    min,
-                                    const DBSBool&    max,
+  virtual DArray MatchRows (const DBool&    min,
+                                    const DBool&    max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSChar&    min,
-                                    const DBSChar&    max,
+  virtual DArray MatchRows (const DChar&    min,
+                                    const DChar&    max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSDate&    min,
-                                    const DBSDate&    max,
+  virtual DArray MatchRows (const DDate&    min,
+                                    const DDate&    max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSDateTime& min,
-                                    const DBSDateTime& max,
+  virtual DArray MatchRows (const DDateTime& min,
+                                    const DDateTime& max,
                                     const ROW_INDEX    fromRow,
                                     const ROW_INDEX    toRow,
                                     const ROW_INDEX    ignoreFirst,
                                     const ROW_INDEX    maxCount,
                                     const FIELD_INDEX  field);
 
-  virtual DBSArray GetMatchingRows (const DBSHiresTime& min,
-                                    const DBSHiresTime& max,
+  virtual DArray MatchRows (const DHiresTime& min,
+                                    const DHiresTime& max,
                                     const ROW_INDEX     fromRow,
                                     const ROW_INDEX     toRow,
                                     const ROW_INDEX     ignoreFirst,
                                     const ROW_INDEX     maxCount,
                                     const FIELD_INDEX   field);
 
-  virtual DBSArray GetMatchingRows (const DBSUInt8&   min,
-                                    const DBSUInt8&   max,
+  virtual DArray MatchRows (const DUInt8&   min,
+                                    const DUInt8&   max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSUInt16&  min,
-                                    const DBSUInt16&  max,
+  virtual DArray MatchRows (const DUInt16&  min,
+                                    const DUInt16&  max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSUInt32&  min,
-                                    const DBSUInt32&  max,
+  virtual DArray MatchRows (const DUInt32&  min,
+                                    const DUInt32&  max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSUInt64&  min,
-                                    const DBSUInt64&  max,
+  virtual DArray MatchRows (const DUInt64&  min,
+                                    const DUInt64&  max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSInt8&    min,
-                                    const DBSInt8&    max,
+  virtual DArray MatchRows (const DInt8&    min,
+                                    const DInt8&    max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSInt16&   min,
-                                    const DBSInt16&   max,
+  virtual DArray MatchRows (const DInt16&   min,
+                                    const DInt16&   max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSInt32&   min,
-                                    const DBSInt32&   max,
+  virtual DArray MatchRows (const DInt32&   min,
+                                    const DInt32&   max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSInt64&   min,
-                                    const DBSInt64&   max,
+  virtual DArray MatchRows (const DInt64&   min,
+                                    const DInt64&   max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSReal&    min,
-                                    const DBSReal&    max,
+  virtual DArray MatchRows (const DReal&    min,
+                                    const DReal&    max,
                                     const ROW_INDEX   fromRow,
                                     const ROW_INDEX   toRow,
                                     const ROW_INDEX   ignoreFirst,
                                     const ROW_INDEX   maxCount,
                                     const FIELD_INDEX field);
 
-  virtual DBSArray GetMatchingRows (const DBSRichReal& min,
-                                    const DBSRichReal& max,
+  virtual DArray MatchRows (const DRichReal& min,
+                                    const DRichReal& max,
                                     const ROW_INDEX    fromRow,
                                     const ROW_INDEX    toRow,
                                     const ROW_INDEX    ignoreFirst,

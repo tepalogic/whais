@@ -34,10 +34,10 @@ namespace prima {
 
 struct Unit
 {
-  uint32_t m_GlbsCount;
-  uint32_t m_ProcsCount;
-  uint32_t m_ConstSize;
-  uint8_t  m_UnitData[1];
+  uint32_t mGlbsCount;
+  uint32_t mProcsCount;
+  uint32_t mConstSize;
+  uint8_t  mUnitData[1];
 
   void SetGlobalId (const uint32_t globalIndex, const uint32_t globalId);
   void SetProcId (const uint32_t procIndex, const uint32_t procId);
@@ -51,7 +51,7 @@ class UnitsManager
 {
 public:
   UnitsManager ()
-    : m_Units ()
+    : mUnits ()
   {
   }
 
@@ -75,7 +75,7 @@ public:
                          const uint32_t unitProcIndex) const;
 
 private:
-  std::vector<Unit*> m_Units;
+  std::vector<Unit*> mUnits;
 };
 
 } //namespace prima

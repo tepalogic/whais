@@ -45,42 +45,42 @@ class TypeSpec
 {
 public:
   TypeSpec (const uint8_t* const pTI)
-    : m_Type (load_le_int16 (pTI)),
-      m_Size (load_le_int16 (pTI + sizeof (uint16_t))),
-      m_Data (pTI + 2 * sizeof (uint16_t))
+    : mType (load_le_int16 (pTI)),
+      mSize (load_le_int16 (pTI + sizeof (uint16_t))),
+      mData (pTI + 2 * sizeof (uint16_t))
   {
   }
 
   uint16_t RawSize () const
   {
-    return m_Size + 2 * sizeof (uint16_t);
+    return mSize + 2 * sizeof (uint16_t);
   }
 
   uint16_t DataSize () const
   {
-    return m_Size;
+    return mSize;
   }
 
   bool operator== (const TypeSpec& second) const
     {
-      if ((m_Type == second.m_Type ) && (m_Size == second.m_Size))
-        return (memcmp (m_Data, second.m_Data, m_Size) == 0);
+      if ((mType == second.mType ) && (mSize == second.mSize))
+        return (memcmp (mData, second.mData, mSize) == 0);
 
       return false;
     }
 
-  uint16_t       Type () const { return m_Type; }
-  const uint8_t* Data () const { return m_Data; }
+  uint16_t       Type () const { return mType; }
+  const uint8_t* Data () const { return mData; }
 
 private:
-  const uint16_t       m_Type;
-  const uint16_t       m_Size;
-  const uint8_t* const m_Data;
+  const uint16_t       mType;
+  const uint16_t       mSize;
+  const uint8_t* const mData;
 };
 
 TypeManager::TypeManager (NameSpace& space)
-  : m_NameSpace (space),
-    m_TypesDescriptions ()
+  : mNameSpace (space),
+    mTypesDescriptions ()
 {
 }
 
@@ -97,18 +97,18 @@ TypeManager::FindType (const uint8_t* const pTI)
 
   uint32_t result = 0;
 
-  while (result < m_TypesDescriptions.size ())
+  while (result < mTypesDescriptions.size ())
     {
-      assert (IsTypeValid (&m_TypesDescriptions[result]));
+      assert (IsTypeValid (&mTypesDescriptions[result]));
 
-      const TypeSpec specIt (&m_TypesDescriptions[result]);
+      const TypeSpec specIt (&mTypesDescriptions[result]);
 
       if (spec == specIt)
         return result;
 
       result += specIt.RawSize();
 
-      assert (result <= m_TypesDescriptions.size ());
+      assert (result <= mTypesDescriptions.size ());
     }
 
   return INVALID_OFFSET;
@@ -124,11 +124,11 @@ TypeManager::AddType (const uint8_t* const pTI)
   if (result != INVALID_OFFSET)
     return result;
 
-  result = m_TypesDescriptions.size ();
+  result = mTypesDescriptions.size ();
 
   const TypeSpec spec (pTI);
 
-  m_TypesDescriptions.insert (m_TypesDescriptions.end (),
+  mTypesDescriptions.insert (mTypesDescriptions.end (),
                               pTI,
                               pTI + spec.RawSize ());
   return result;
@@ -137,16 +137,16 @@ TypeManager::AddType (const uint8_t* const pTI)
 const uint8_t*
 TypeManager::GetType (const uint32_t offset) const
 {
-  assert ((offset == 0) || (offset < m_TypesDescriptions.size ()));
+  assert ((offset == 0) || (offset < mTypesDescriptions.size ()));
 
-  const uint8_t *const pTypeDescription = &m_TypesDescriptions[offset];
+  const uint8_t *const pTypeDescription = &mTypesDescriptions[offset];
 
   assert (IsTypeValid (pTypeDescription));
 
   return pTypeDescription;
 }
 
-static I_DBSTable&
+static ITable&
 create_non_persistent_table (I_DBSHandler&  dbsHndler,
                              uint8_t* const pInOutTI)
 {
@@ -164,16 +164,16 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
       DBSFieldDescriptor field;
       uint16_t           type;
 
-      field.m_pFieldName = _RC (const char*, spec.Data () + typeOff);
+      field.name = _RC (const char*, spec.Data () + typeOff);
 
-      typeOff += strlen (field.m_pFieldName) + 1;
+      typeOff += strlen (field.name) + 1;
       assert (typeOff < spec.DataSize () - 2);
 
       type    =  load_le_int16 (spec.Data () + typeOff);
       typeOff += 2;
 
       field.isArray     = IS_ARRAY (type);
-      field.m_FieldType = _SC (DBS_FIELD_TYPE, GET_BASIC_TYPE (type));
+      field.type = _SC (DBS_FIELD_TYPE, GET_BASIC_TYPE (type));
 
       vFields.push_back (field);
     }
@@ -181,22 +181,22 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
   if (vFields.size () == 0)
     return GeneralTable::Instance ();
 
-  I_DBSTable& table = dbsHndler.CreateTempTable (vFields.size (),
+  ITable& table = dbsHndler.CreateTempTable (vFields.size (),
                                                  &vFields[0]);
-  assert (table.GetFieldsCount () == vFields.size ());
+  assert (table.FieldsCount () == vFields.size ());
 
   typeOff = 0;
   for (uint_t fieldIndex = 0; fieldIndex < vFields.size (); ++fieldIndex)
     {
-      DBSFieldDescriptor field   = table.GetFieldDescriptor (fieldIndex);
-      uint16_t           type    = field.m_FieldType;
-      const uint_t       nameLen = strlen (field.m_pFieldName) + 1;
+      DBSFieldDescriptor field   = table.DescribeField (fieldIndex);
+      uint16_t           type    = field.type;
+      const uint_t       nameLen = strlen (field.name) + 1;
 
       if (field.isArray)
         MARK_ARRAY (type);
 
       memcpy (_CC (uint8_t*, spec.Data()) + typeOff,
-              field.m_pFieldName,
+              field.name,
               nameLen);
       typeOff += nameLen;
       store_le_int16 (type, _CC (uint8_t*, spec.Data()) + typeOff);
@@ -208,7 +208,7 @@ create_non_persistent_table (I_DBSHandler&  dbsHndler,
 
 GlobalValue
 TypeManager::CreateGlobalValue (uint8_t*    pInOutTI,
-                                I_DBSTable* pPersistentTable)
+                                ITable* pPersistentTable)
 {
   assert (TypeManager::IsTypeValid (pInOutTI));
 
@@ -220,37 +220,37 @@ TypeManager::CreateGlobalValue (uint8_t*    pInOutTI,
       switch (spec.Type ())
       {
       case T_BOOL:
-        return GlobalValue (BoolOperand (DBSBool ()));
+        return GlobalValue (BoolOperand (DBool ()));
       case T_CHAR:
-        return GlobalValue (CharOperand (DBSChar ()));
+        return GlobalValue (CharOperand (DChar ()));
       case T_DATE:
-        return GlobalValue (DateOperand (DBSDate ()));
+        return GlobalValue (DateOperand (DDate ()));
       case T_DATETIME:
-        return GlobalValue (DateTimeOperand (DBSDateTime ()));
+        return GlobalValue (DateTimeOperand (DDateTime ()));
       case T_HIRESTIME:
-        return GlobalValue (HiresTimeOperand (DBSHiresTime ()));
+        return GlobalValue (HiresTimeOperand (DHiresTime ()));
       case T_INT8:
-        return GlobalValue (Int8Operand (DBSInt8 ()));
+        return GlobalValue (Int8Operand (DInt8 ()));
       case T_INT16:
-        return GlobalValue (Int16Operand (DBSInt16 ()));
+        return GlobalValue (Int16Operand (DInt16 ()));
       case T_INT32:
-        return GlobalValue (Int32Operand (DBSInt32 ()));
+        return GlobalValue (Int32Operand (DInt32 ()));
       case T_INT64:
-        return GlobalValue (Int64Operand (DBSInt64 ()));
+        return GlobalValue (Int64Operand (DInt64 ()));
       case T_UINT8:
-        return GlobalValue (UInt8Operand (DBSUInt8 ()));
+        return GlobalValue (UInt8Operand (DUInt8 ()));
       case T_UINT16:
-        return GlobalValue (UInt16Operand (DBSUInt16 ()));
+        return GlobalValue (UInt16Operand (DUInt16 ()));
       case T_UINT32:
-        return GlobalValue (UInt32Operand (DBSUInt32 ()));
+        return GlobalValue (UInt32Operand (DUInt32 ()));
       case T_UINT64:
-        return GlobalValue (UInt64Operand (DBSUInt64 ()));
+        return GlobalValue (UInt64Operand (DUInt64 ()));
       case T_REAL:
-        return GlobalValue (RealOperand (DBSReal ()));
+        return GlobalValue (RealOperand (DReal ()));
       case T_RICHREAL:
-        return GlobalValue (RichRealOperand (DBSRichReal ()));
+        return GlobalValue (RichRealOperand (DRichReal ()));
       case T_TEXT:
-        return GlobalValue (TextOperand (DBSText ()));
+        return GlobalValue (TextOperand (DText ()));
       default:
         assert (false);
       }
@@ -261,42 +261,42 @@ TypeManager::CreateGlobalValue (uint8_t*    pInOutTI,
       switch (GET_BASIC_TYPE (spec.Type ()))
       {
       case T_BOOL:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSBool*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DBool*) NULL)));
       case T_CHAR:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSChar*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DChar*) NULL)));
       case T_DATE:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSDate*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DDate*) NULL)));
       case T_DATETIME:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSDateTime*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DDateTime*) NULL)));
       case T_HIRESTIME:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSHiresTime*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DHiresTime*) NULL)));
       case T_INT8:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSInt8*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DInt8*) NULL)));
       case T_INT16:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSInt16*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DInt16*) NULL)));
       case T_INT32:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSInt32*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DInt32*) NULL)));
       case T_INT64:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSInt64*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DInt64*) NULL)));
       case T_UINT8:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt8*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DUInt8*) NULL)));
       case T_UINT16:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt16*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DUInt16*) NULL)));
       case T_UINT32:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt32*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DUInt32*) NULL)));
       case T_UINT64:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSUInt64*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DUInt64*) NULL)));
       case T_REAL:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSReal*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DReal*) NULL)));
       case T_RICHREAL:
-        return GlobalValue (ArrayOperand ( DBSArray ((DBSRichReal*) NULL)));
+        return GlobalValue (ArrayOperand ( DArray ((DRichReal*) NULL)));
       case T_TEXT:
         throw InterException (NULL,
                               _EXTRA (InterException::TEXT_ARRAY_NOT_SUPP));
       case T_UNDETERMINED:
         //Just a default
         assert (false);
-        return GlobalValue (ArrayOperand ( DBSArray ()));
+        return GlobalValue (ArrayOperand ( DArray ()));
       default:
         assert (false);
       }
@@ -310,15 +310,15 @@ TypeManager::CreateGlobalValue (uint8_t*    pInOutTI,
     {
       if (pPersistentTable == NULL)
         {
-          I_DBSTable& table = create_non_persistent_table (
-                                             m_NameSpace.GetDBSHandler (),
+          ITable& table = create_non_persistent_table (
+                                             mNameSpace.GetDBSHandler (),
                                              pInOutTI
                                                           );
-          return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(),
+          return GlobalValue (TableOperand (mNameSpace.GetDBSHandler(),
                                             table));
         }
       else
-        return GlobalValue (TableOperand (m_NameSpace.GetDBSHandler(),
+        return GlobalValue (TableOperand (mNameSpace.GetDBSHandler(),
                                           *pPersistentTable));
     }
   assert (false);
@@ -337,37 +337,37 @@ TypeManager::CreateLocalValue (uint8_t* pInOutTI)
       switch (spec.Type ())
       {
       case T_BOOL:
-        return StackValue (BoolOperand (DBSBool ()));
+        return StackValue (BoolOperand (DBool ()));
       case T_CHAR:
-        return StackValue (CharOperand (DBSChar ()));
+        return StackValue (CharOperand (DChar ()));
       case T_DATE:
-        return StackValue (DateOperand (DBSDate ()));
+        return StackValue (DateOperand (DDate ()));
       case T_DATETIME:
-        return StackValue (DateTimeOperand (DBSDateTime ()));
+        return StackValue (DateTimeOperand (DDateTime ()));
       case T_HIRESTIME:
-        return StackValue (HiresTimeOperand (DBSHiresTime ()));
+        return StackValue (HiresTimeOperand (DHiresTime ()));
       case T_INT8:
-        return StackValue (Int8Operand (DBSInt8 ()));
+        return StackValue (Int8Operand (DInt8 ()));
       case T_INT16:
-        return StackValue (Int16Operand (DBSInt16 ()));
+        return StackValue (Int16Operand (DInt16 ()));
       case T_INT32:
-        return StackValue (Int32Operand (DBSInt32 ()));
+        return StackValue (Int32Operand (DInt32 ()));
       case T_INT64:
-        return StackValue (Int64Operand (DBSInt64 ()));
+        return StackValue (Int64Operand (DInt64 ()));
       case T_REAL:
-        return StackValue (RealOperand (DBSReal ()));
+        return StackValue (RealOperand (DReal ()));
       case T_RICHREAL:
-        return StackValue (RichRealOperand (DBSRichReal ()));
+        return StackValue (RichRealOperand (DRichReal ()));
       case T_TEXT:
-        return StackValue (TextOperand (DBSText ()));
+        return StackValue (TextOperand (DText ()));
       case T_UINT8:
-        return StackValue (UInt8Operand (DBSUInt8 ()));
+        return StackValue (UInt8Operand (DUInt8 ()));
       case T_UINT16:
-        return StackValue (UInt16Operand (DBSUInt16 ()));
+        return StackValue (UInt16Operand (DUInt16 ()));
       case T_UINT32:
-        return StackValue (UInt32Operand (DBSUInt32 ()));
+        return StackValue (UInt32Operand (DUInt32 ()));
       case T_UINT64:
-        return StackValue (UInt64Operand (DBSUInt64 ()));
+        return StackValue (UInt64Operand (DUInt64 ()));
       default:
         assert (false);
       }
@@ -377,41 +377,41 @@ TypeManager::CreateLocalValue (uint8_t* pInOutTI)
       switch (GET_BASIC_TYPE (spec.Type ()))
       {
       case T_BOOL:
-        return StackValue (ArrayOperand ( DBSArray ((DBSBool*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DBool*) NULL)));
       case T_CHAR:
-        return StackValue (ArrayOperand ( DBSArray ((DBSChar*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DChar*) NULL)));
       case T_DATE:
-        return StackValue (ArrayOperand ( DBSArray ((DBSDate*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DDate*) NULL)));
       case T_DATETIME:
-        return StackValue (ArrayOperand ( DBSArray ((DBSDateTime*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DDateTime*) NULL)));
       case T_HIRESTIME:
-        return StackValue (ArrayOperand ( DBSArray ((DBSHiresTime*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DHiresTime*) NULL)));
       case T_INT8:
-        return StackValue (ArrayOperand ( DBSArray ((DBSInt8*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DInt8*) NULL)));
       case T_INT16:
-        return StackValue (ArrayOperand ( DBSArray ((DBSInt16*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DInt16*) NULL)));
       case T_INT32:
-        return StackValue (ArrayOperand ( DBSArray ((DBSInt32*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DInt32*) NULL)));
       case T_INT64:
-        return StackValue (ArrayOperand ( DBSArray ((DBSInt64*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DInt64*) NULL)));
       case T_UINT8:
-        return StackValue (ArrayOperand ( DBSArray ((DBSUInt8*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DUInt8*) NULL)));
       case T_UINT16:
-        return StackValue (ArrayOperand ( DBSArray ((DBSUInt16*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DUInt16*) NULL)));
       case T_UINT32:
-        return StackValue (ArrayOperand ( DBSArray ((DBSUInt32*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DUInt32*) NULL)));
       case T_UINT64:
-        return StackValue (ArrayOperand ( DBSArray ((DBSUInt64*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DUInt64*) NULL)));
       case T_REAL:
-        return StackValue (ArrayOperand ( DBSArray ((DBSReal*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DReal*) NULL)));
       case T_RICHREAL:
-        return StackValue (ArrayOperand ( DBSArray ((DBSRichReal*) NULL)));
+        return StackValue (ArrayOperand ( DArray ((DRichReal*) NULL)));
       case T_TEXT:
         throw InterException (NULL,
                               _EXTRA (InterException::TEXT_ARRAY_NOT_SUPP));
       case T_UNDETERMINED:
         //Just a default
-        return StackValue (ArrayOperand (DBSArray ()));
+        return StackValue (ArrayOperand (DArray ()));
       default:
         assert (false);
       }
@@ -422,11 +422,11 @@ TypeManager::CreateLocalValue (uint8_t* pInOutTI)
     }
   else if (IS_TABLE (spec.Type ()))
     {
-      I_DBSTable& table = create_non_persistent_table (
-                                             m_NameSpace.GetDBSHandler (),
+      ITable& table = create_non_persistent_table (
+                                             mNameSpace.GetDBSHandler (),
                                              pInOutTI);
 
-      return StackValue (TableOperand (m_NameSpace.GetDBSHandler(), table));
+      return StackValue (TableOperand (mNameSpace.GetDBSHandler(), table));
     }
 
   assert (false);
@@ -519,22 +519,22 @@ TypeManager::GetTypeLength (const uint8_t* pTI)
 }
 
 vector<uint8_t>
-compute_table_typeinfo (I_DBSTable& table)
+compute_table_typeinfo (ITable& table)
 {
   vector<uint8_t> data;
 
-  const FIELD_INDEX fieldsCount = table.GetFieldsCount ();
+  const FIELD_INDEX fieldsCount = table.FieldsCount ();
   for (FIELD_INDEX fieldId = 0; fieldId < fieldsCount; ++fieldId)
     {
-      DBSFieldDescriptor field = table.GetFieldDescriptor (fieldId);
+      DBSFieldDescriptor field = table.DescribeField (fieldId);
 
-      const uint_t nameLen = strlen (field.m_pFieldName) + 1;
+      const uint_t nameLen = strlen (field.name) + 1;
 
       data.insert (data.end (),
-                   field.m_pFieldName,
-                   field.m_pFieldName + nameLen);
+                   field.name,
+                   field.name + nameLen);
 
-      uint16_t type = field.m_FieldType;
+      uint16_t type = field.type;
       if (field.isArray)
         MARK_ARRAY (type);
 

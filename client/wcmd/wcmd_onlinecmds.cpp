@@ -499,35 +499,35 @@ AddOnlineTableCommands ()
 
   CmdEntry entry;
 
-  entry.m_showStatus   = false;
-  entry.m_pCmdText     = "global";
-  entry.m_pCmdDesc     = globalShowDesc;
-  entry.m_pExtHelpDesc = globalShowDescExt;
-  entry.m_cmd          = cmdGlobalList;
+  entry.mshowStatus   = false;
+  entry.mpCmdText     = "global";
+  entry.mpCmdDesc     = globalShowDesc;
+  entry.mpExtHelpDesc = globalShowDescExt;
+  entry.mcmd          = cmdGlobalList;
 
   RegisterCommand (entry);
 
-  entry.m_showStatus   = false;
-  entry.m_pCmdText     = "procedure";
-  entry.m_pCmdDesc     = procShowDesc;
-  entry.m_pExtHelpDesc = procShowDescExt;
-  entry.m_cmd          = cmdProcList;
+  entry.mshowStatus   = false;
+  entry.mpCmdText     = "procedure";
+  entry.mpCmdDesc     = procShowDesc;
+  entry.mpExtHelpDesc = procShowDescExt;
+  entry.mcmd          = cmdProcList;
 
   RegisterCommand (entry);
 
-  entry.m_showStatus   = false;
-  entry.m_pCmdText     = "ping";
-  entry.m_pCmdDesc     = pingShowDesc;
-  entry.m_pExtHelpDesc = pingShowDescExt;
-  entry.m_cmd          = cmdPing;
+  entry.mshowStatus   = false;
+  entry.mpCmdText     = "ping";
+  entry.mpCmdDesc     = pingShowDesc;
+  entry.mpExtHelpDesc = pingShowDescExt;
+  entry.mcmd          = cmdPing;
 
   RegisterCommand (entry);
 
-  entry.m_showStatus   = false;
-  entry.m_pCmdText     = "exec";
-  entry.m_pCmdDesc     = execShowDesc;
-  entry.m_pExtHelpDesc = execShowDescExt;
-  entry.m_cmd          = cmdExec;
+  entry.mshowStatus   = false;
+  entry.mpCmdText     = "exec";
+  entry.mpCmdDesc     = execShowDesc;
+  entry.mpExtHelpDesc = execShowDescExt;
+  entry.mcmd          = cmdExec;
 
   RegisterCommand (entry);
 }

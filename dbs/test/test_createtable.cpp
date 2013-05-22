@@ -14,40 +14,19 @@
 #include "dbs/dbs_exception.h"
 
 #include "../pastra/ps_table.h"
-#include "../pastra/ps_valintep.h"
+#include "../pastra/ps_serializer.h"
 
 using namespace whisper;
 using namespace pastra;
 
-static int
-get_next_alignment (int size)
-{
-  if (size == 12)
-    return 4; //Special case of sizeof (RICHREAL_T) == 12.
-
-  int result = 1;
-
-  assert (size > 0);
-
-  size &= 0x7;
-  size |= 0x8;
-
-  while ((size & 1) == 0)
-    {
-      result <<= 1;
-      size >>= 1;
-    }
-
-  return result;
-}
 
 bool
 operator!= (const DBSFieldDescriptor& field_1,
             const DBSFieldDescriptor& field_2)
 {
-  return (field_1.m_FieldType != field_2.m_FieldType) ||
+  return (field_1.type != field_2.type) ||
          (field_1.isArray != field_2.isArray) ||
-         (strcmp (field_1.m_pFieldName, field_2.m_pFieldName) != 0);
+         (strcmp (field_1.name, field_2.name) != 0);
 }
 
 bool
@@ -70,8 +49,8 @@ test_for_no_args (I_DBSHandler& rDbs)
   try
   {
     DBSFieldDescriptor temp;
-    temp.m_pFieldName = "dummy";
-    temp.m_FieldType = T_BOOL;
+    temp.name = "dummy";
+    temp.type = T_BOOL;
     temp.isArray = false;
 
     if (result)
@@ -98,9 +77,9 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
 
   std::cout << "Test for invalid fields ... ";
 
-  temp.m_FieldType = _SC (DBS_FIELD_TYPE, 78);
+  temp.type = _SC (DBS_FIELD_TYPE, 78);
   temp.isArray = false;
-  temp.m_pFieldName = "good_name";
+  temp.name = "good_name";
 
   try
   {
@@ -112,8 +91,8 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
       result = true;
   }
 
-  temp.m_pFieldName = "1bad_name?";
-  temp.m_FieldType = T_TEXT;
+  temp.name = "1bad_name?";
+  temp.type = T_TEXT;
 
   try
   {
@@ -133,11 +112,11 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
   {
     DBSFieldDescriptor more_temps[3];
 
-    temp.m_pFieldName = "field_1";
+    temp.name = "field_1";
     more_temps[0] = temp;
-    temp.m_pFieldName = "field_2";
+    temp.name = "field_2";
     more_temps[1] = temp;
-    temp.m_pFieldName = "field_1";
+    temp.name = "field_1";
     more_temps[2] = temp;
 
     if( result )
@@ -165,21 +144,17 @@ test_for_one_field (I_DBSHandler& rDbs)
   std::cout << "Test with one field ... ";
 
   DBSFieldDescriptor temp;
-  temp.m_pFieldName = "dummy";
-  temp.m_FieldType = T_INT16;
+  temp.name = "dummy";
+  temp.type = T_INT16;
   temp.isArray = false;
 
   rDbs.AddTable ("t_test_tab", 1, &temp);
-  I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
+  ITable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
-  uint_t rowSize = (_RC (pastra::PrototypeTable &, table)).GetRowSize ();
-
+  uint_t rowSize = (_RC (pastra::PrototypeTable &, table)).RowSize ();
 
   //Check if we added the byte to keep the null bit.
-  if (_SC (int, rowSize + 1) <= pastra::PSValInterp::Size(T_INT16, false))
-    result = false;
-  else if (get_next_alignment (rowSize) <
-      pastra::PSValInterp::Alignment (T_INT16, false))
+  if (rowSize != (pastra::Serializer::Size(T_INT16, false) + 1))
     result = false;
 
   rDbs.ReleaseTable (table);
@@ -211,45 +186,35 @@ test_for_fields (I_DBSHandler& rDbs,
   std::cout << "Test with fields with count " << fieldsCount << " ... ";
 
   rDbs.AddTable ("t_test_tab", fieldsCount, pDesc);
-  I_DBSTable& table = rDbs.RetrievePersistentTable ("t_test_tab");
+  ITable& table = rDbs.RetrievePersistentTable ("t_test_tab");
 
-  std::vector <uint32_t > nullPositions;
-  std::vector <StorageInterval> storage;
+  std::vector<uint32_t > nullPositions;
+  std::vector<StorageInterval> storage;
 
-  if (table.GetFieldsCount () != fieldsCount)
+  if (table.FieldsCount () != fieldsCount)
     result = false;
 
   for (uint32_t fieldIndex = 0;
-      result && (fieldIndex < fieldsCount);
+       result && (fieldIndex < fieldsCount);
       ++fieldIndex)
     {
-      FieldDescriptor& descr = _SC(PrototypeTable &, table).GetFieldDescriptorInternal (fieldIndex);
+      FieldDescriptor& descr = _SC(PrototypeTable&, table).GetFieldDescriptorInternal (fieldIndex);
 
-      if (descr.m_NullBitIndex >= _SC(PrototypeTable &, table).GetRowSize () * 8)
+      if (descr.mNullBitIndex != fieldIndex)
         {
           result = false;
           break;
         }
 
-      for (uint_t index = 0; index < nullPositions.size (); ++index)
-        {
-          if (descr.m_NullBitIndex == nullPositions[index])
-            {
-              result = false;
-              break;
-            }
-        }
-
-      if (descr.m_NullBitIndex)
-        nullPositions.push_back (descr.m_NullBitIndex);
+      nullPositions.push_back (descr.mNullBitIndex);
 
       if (! result)
         break;
 
-      uint_t elem_start = descr.m_StoreIndex;
+      uint_t elem_start = descr.mRowDataOff;
       uint_t elem_end = elem_start +
-          PSValInterp::Size (_SC (DBS_FIELD_TYPE, descr.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK),
-                                (descr.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0);
+          Serializer::Size (_SC (DBS_FIELD_TYPE, descr.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK),
+                            (descr.mTypeDesc & PS_TABLE_ARRAY_MASK) != 0);
 
       for (uint_t index = 0; index < storage.size (); ++index)
         {
@@ -257,8 +222,8 @@ test_for_fields (I_DBSHandler& rDbs,
               (elem_start <= storage[index].mEnd))
               || ((storage[index].mBegin >= elem_end) &&
                   (elem_end <= storage[index].mEnd))
-              || ((storage[index].mBegin >= descr.m_NullBitIndex) &&
-                (descr.m_NullBitIndex <= storage[index].mEnd) && descr.m_NullBitIndex) )
+              || (elem_start >= elem_end)
+              || (storage[index].mBegin <= descr.mNullBitIndex / 8))
             {
               result = false;
               break;
@@ -268,8 +233,8 @@ test_for_fields (I_DBSHandler& rDbs,
 
       if (result)
         {
-          DBSFieldDescriptor desc = table.GetFieldDescriptor(fieldIndex);
-          uint_t array_index = desc.m_pFieldName[0] - 'a';
+          DBSFieldDescriptor desc = table.DescribeField(fieldIndex);
+          uint_t array_index = desc.name[0] - 'a';
           if (desc != pDesc[array_index])
             {
               result = false;

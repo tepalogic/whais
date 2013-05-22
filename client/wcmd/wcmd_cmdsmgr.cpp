@@ -139,7 +139,7 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
           cout << left << it->first;
           cout.width (prevWidth);
           cout.fill (prevFill);
-          cout << it->second.m_pCmdDesc << endl;
+          cout << it->second.mpCmdDesc << endl;
 
           ++it;
         }
@@ -157,7 +157,7 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
           cout << "Command not found: " << token << endl;
           return false;
         }
-      cout << pEntry->m_pExtHelpDesc << endl;
+      cout << pEntry->mpExtHelpDesc << endl;
     }
 
   return true;
@@ -168,12 +168,12 @@ InitCmdManager ()
 {
   CmdEntry entry;
 
-  entry.m_pCmdText     = "help";
-  entry.m_pCmdDesc     = descHelp;
-  entry.m_pExtHelpDesc = descExtHelp;
-  entry.m_cmd          = cmdHelp;
-  entry.m_context      = NULL;
-  entry.m_showStatus   = false;
+  entry.mpCmdText     = "help";
+  entry.mpCmdDesc     = descHelp;
+  entry.mpExtHelpDesc = descExtHelp;
+  entry.mcmd          = cmdHelp;
+  entry.mcontext      = NULL;
+  entry.mshowStatus   = false;
 
   RegisterCommand (entry);
 }
@@ -181,11 +181,11 @@ InitCmdManager ()
 void
 RegisterCommand (const CmdEntry& entry)
 {
-  assert (entry.m_pCmdText != NULL);
-  assert (entry.m_pCmdDesc != NULL);
-  assert (entry.m_pExtHelpDesc != NULL);
+  assert (entry.mpCmdText != NULL);
+  assert (entry.mpCmdDesc != NULL);
+  assert (entry.mpExtHelpDesc != NULL);
 
-  pair<string, CmdEntry> cmdEntry (entry.m_pCmdText, entry);
+  pair<string, CmdEntry> cmdEntry (entry.mpCmdText, entry);
 
   sCommands.insert (cmdEntry);
 }

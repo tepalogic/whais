@@ -33,13 +33,13 @@ bool
 operator!= (const DBSFieldDescriptor& field_1,
             const DBSFieldDescriptor& field_2)
 {
-  return (field_1.m_FieldType != field_2.m_FieldType) ||
+  return (field_1.type != field_2.type) ||
          (field_1.isArray != field_2.isArray) ||
-         (strcmp (field_1.m_pFieldName, field_2.m_pFieldName) != 0);
+         (strcmp (field_1.name, field_2.name) != 0);
 }
 
 static bool
-test_fields (I_DBSTable& table)
+test_fields (ITable& table)
 {
 
   DBSFieldDescriptor field_d;
@@ -47,47 +47,47 @@ test_fields (I_DBSTable& table)
   std::cout << "Real fields' order: " << std::endl;
   for (uint_t index = 0; index < descCount; ++index)
     {
-      field_d = table.GetFieldDescriptor (index);
-      std::cout << "\t" << field_d.m_pFieldName << std::endl;
+      field_d = table.DescribeField (index);
+      std::cout << "\t" << field_d.name << std::endl;
     }
 
-  if (table.GetFieldsCount () != descCount)
+  if (table.FieldsCount () != descCount)
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("Field_1"));
+  field_d = table.DescribeField (table.RetrieveField ("Field_1"));
   if (field_d != field_descs[0])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("AnotherField"));
+  field_d = table.DescribeField (table.RetrieveField ("AnotherField"));
   if (field_d != field_descs[1])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("dumy2field_"));
+  field_d = table.DescribeField (table.RetrieveField ("dumy2field_"));
   if (field_d != field_descs[2])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("dumy21field_"));
+  field_d = table.DescribeField (table.RetrieveField ("dumy21field_"));
   if (field_d != field_descs[3])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("dumy22field_"));
+  field_d = table.DescribeField (table.RetrieveField ("dumy22field_"));
   if (field_d != field_descs[4])
     return false;
 
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_data"));
+  field_d = table.DescribeField (table.RetrieveField ("f_data"));
   if (field_d != field_descs[5])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_int16"));
+  field_d = table.DescribeField (table.RetrieveField ("f_int16"));
   if (field_d != field_descs[6])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_hirestime"));
+  field_d = table.DescribeField (table.RetrieveField ("f_hirestime"));
   if (field_d != field_descs[7])
     return false;
 
-  field_d = table.GetFieldDescriptor (table.GetFieldIndex ("f_int8"));
+  field_d = table.DescribeField (table.RetrieveField ("f_int8"));
   if (field_d != field_descs[8])
     return false;
 
@@ -107,7 +107,7 @@ main ()
 
   I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
   handler.AddTable ("table_1", descCount, field_descs);
-  I_DBSTable& table = handler.RetrievePersistentTable ("table_1");
+  ITable& table = handler.RetrievePersistentTable ("table_1");
   handler.ReleaseTable (table);
   DBSReleaseDatabase (handler);
   DBSShoutdown ();
@@ -116,9 +116,9 @@ main ()
       DBSInit (DBSSettings ());
 
       I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
-      I_DBSTable& table = handler.RetrievePersistentTable ("table_1");
+      ITable& table = handler.RetrievePersistentTable ("table_1");
 
-      if (table.GetFieldsCount () != descCount)
+      if (table.FieldsCount () != descCount)
         success = false;
       else
         {
@@ -126,7 +126,7 @@ main ()
 
           if (success)
             {
-              I_DBSTable& spawnedTable = table.Spawn ();
+              ITable& spawnedTable = table.Spawn ();
               success = test_fields (spawnedTable);
               handler.ReleaseTable (spawnedTable);
             }

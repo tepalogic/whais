@@ -78,8 +78,8 @@ typedef FIELD_VALUE::iterator   FIELD_VALUE_IT;
 struct TableParameter
 {
   TableParameter ()
-    : m_Fields (),
-      m_RowsCount (0)
+    : mFields (),
+      mRowsCount (0)
   {
   }
 
@@ -89,10 +89,10 @@ struct TableParameter
             const uint_t           type,
             const string&          value)
   {
-    if (m_RowsCount < (row + 1))
-      m_RowsCount = row + 1;
+    if (mRowsCount < (row + 1))
+      mRowsCount = row + 1;
 
-    if (! m_Fields[field].SetValue (row, type, value))
+    if (! mFields[field].SetValue (row, type, value))
       {
         cout << "Invalid command format.";
         cout << "Field '" << field << "' has different types values.\n";
@@ -103,8 +103,8 @@ struct TableParameter
     return true;
   }
 
-  FIELD_VALUE  m_Fields;
-  uint_t       m_RowsCount;
+  FIELD_VALUE  mFields;
+  uint_t       mRowsCount;
 };
 
 uint_t
@@ -650,8 +650,8 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
     }
 
   vector<WField> fields;
-  for (FIELD_VALUE_IT it = table.m_Fields.begin ();
-       it != table.m_Fields.end ();
+  for (FIELD_VALUE_IT it = table.mFields.begin ();
+       it != table.mFields.end ();
        ++it)
     {
       WField fd;
@@ -662,18 +662,18 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
       fields.push_back (fd);
     }
 
-  assert (fields.size () == table.m_Fields.size ());
+  assert (fields.size () == table.mFields.size ());
   assert (fields.size () > 0);
 
   wcs = WPushValue (hnd, WHC_TYPE_TABLE_MASK, fields.size (), &fields[0]);
   if (wcs != WCS_OK)
     goto proc_param_connector_error;
 
-  assert (table.m_RowsCount > 0);
-  for (uint_t row = 0; row < table.m_RowsCount; ++row)
+  assert (table.mRowsCount > 0);
+  for (uint_t row = 0; row < table.mRowsCount; ++row)
     {
-      for (FIELD_VALUE_IT it = table.m_Fields.begin ();
-           it != table.m_Fields.end ();
+      for (FIELD_VALUE_IT it = table.mFields.begin ();
+           it != table.mFields.end ();
            ++it)
         {
           FIELD_ENTRY_IT entry = it->second.mValues.find (row);

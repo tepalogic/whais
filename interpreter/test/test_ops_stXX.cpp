@@ -99,8 +99,8 @@ test_op_stb (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSBool op;
-  DBSBool op2(true);
+  DBool op;
+  DBool op2(true);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -121,7 +121,7 @@ test_op_stb (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSBool result;
+  DBool result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result != op2)
@@ -142,8 +142,8 @@ test_op_stc (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSChar op;
-  DBSChar op2('A');
+  DChar op;
+  DChar op2('A');
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -164,7 +164,7 @@ test_op_stc (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSChar result;
+  DChar result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result != op2)
@@ -185,8 +185,8 @@ test_op_std (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSDate op;
-  DBSDate op2(1989, 12, 25);
+  DDate op;
+  DDate op2(1989, 12, 25);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -208,7 +208,7 @@ test_op_std (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSDate result;
+  DDate result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result != op2)
@@ -229,8 +229,8 @@ test_op_stdt (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSDateTime op;
-  DBSDateTime op2(1989, 12, 25, 12, 0, 0);
+  DDateTime op;
+  DDateTime op2(1989, 12, 25, 12, 0, 0);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -251,7 +251,7 @@ test_op_stdt (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSDateTime result;
+  DDateTime result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result != op2)
@@ -272,8 +272,8 @@ test_op_stht (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSHiresTime op;
-  DBSHiresTime op2(1989, 12, 25, 12, 0, 0, 1);
+  DHiresTime op;
+  DHiresTime op2(1989, 12, 25, 12, 0, 0, 1);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -294,7 +294,7 @@ test_op_stht (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSHiresTime result;
+  DHiresTime result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result != op2)
@@ -360,8 +360,8 @@ test_op_stt (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSText op;
-  DBSText op2(_RC (const uint8_t*, "Testing the best way to future!"));
+  DText op;
+  DText op2(_RC (const uint8_t*, "Testing the best way to future!"));
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -382,7 +382,7 @@ test_op_stt (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSText result;
+  DText result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result != op2)
@@ -403,16 +403,16 @@ test_op_stta (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  const DBSUInt32 firstVal (0x31);
-  const DBSUInt32 secondVal (0x32);
+  const DUInt32 firstVal (0x31);
+  const DUInt32 secondVal (0x32);
 
   DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
 
-  I_DBSTable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
-  I_DBSTable& secondTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  ITable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  ITable& secondTable = session.DBSHandler ().CreateTempTable (1, &fd);
 
-  secondTable.SetEntry (secondTable.AddReusedRow (), 0, firstVal);
-  secondTable.SetEntry (secondTable.AddReusedRow (), 0, secondVal);
+  secondTable.Set (secondTable.AddReusedRow (), 0, firstVal);
+  secondTable.Set (secondTable.AddReusedRow (), 0, secondVal);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -440,7 +440,7 @@ test_op_stta (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  I_DBSTable& result = stack[0].GetOperand ().GetTable ();
+  ITable& result = stack[0].GetOperand ().GetTable ();
 
   if (&result != &secondTable)
     return false;
@@ -460,12 +460,12 @@ test_op_stf (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  const DBSUInt32 firstVal (0x31);
-  const DBSUInt32 secondVal (0x32);
+  const DUInt32 firstVal (0x31);
+  const DUInt32 secondVal (0x32);
 
   DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
 
-  I_DBSTable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
+  ITable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
   TableOperand tableOp (session.DBSHandler (), firstTable);
 
   FieldOperand op;
@@ -498,7 +498,7 @@ test_op_stf (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  I_DBSTable& result = stack[0].GetOperand ().GetTable ();
+  ITable& result = stack[0].GetOperand ().GetTable ();
 
   if (&result != &firstTable)
     return false;
@@ -521,11 +521,11 @@ test_op_sta (Session& session)
   uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
   SessionStack stack;
 
-  DBSArray op;
-  DBSArray op2;
+  DArray op;
+  DArray op2;
 
-  op2.AddElement (DBSUInt8 (11));
-  op2.AddElement (DBSUInt8 (12));
+  op2.Add (DUInt8 (11));
+  op2.Add (DUInt8 (12));
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);
@@ -546,18 +546,18 @@ test_op_sta (Session& session)
   if (stack[0].GetOperand ().IsNull ())
     return false;
 
-  DBSArray result;
+  DArray result;
   stack[0].GetOperand ().GetValue (result);
 
-  if (result.ElementsCount () != op2.ElementsCount ())
+  if (result.Count () != op2.Count ())
     return false;
 
-  for (uint_t index = 0; index < result.ElementsCount (); ++index)
+  for (uint_t index = 0; index < result.Count (); ++index)
     {
-      DBSUInt8 first, second;
+      DUInt8 first, second;
 
-      result.GetElement (first, index);
-      op2.GetElement (second, index);
+      result.Get (index, first);
+      op2.Get (index, second);
 
       if (first != second)
         return false;
@@ -593,54 +593,54 @@ main ()
     success = success && test_op_std (_SC (Session&, commonSession));
     success = success && test_op_stdt (_SC (Session&, commonSession));
     success = success && test_op_stht (_SC (Session&, commonSession));
-    success = success && test_op_stXX<DBSInt8> (
+    success = success && test_op_stXX<DInt8> (
                                           _SC (Session&, commonSession),
                                           W_STI8,
                                           "8 bit integer"
                                                 );
-    success = success && test_op_stXX<DBSInt16> (
+    success = success && test_op_stXX<DInt16> (
                                           _SC (Session&, commonSession),
                                           W_STI16,
                                           "16 bit integer"
                                                  );
-    success = success && test_op_stXX<DBSInt32> (
+    success = success && test_op_stXX<DInt32> (
                                           _SC (Session&, commonSession),
                                           W_STI32,
                                           "32 bit integer"
                                                  );
-    success = success && test_op_stXX<DBSInt64> (
+    success = success && test_op_stXX<DInt64> (
                                           _SC (Session&, commonSession),
                                           W_STI64,
                                           "64 bit integer"
                                                  );
-    success = success && test_op_stXX<DBSUInt8> (
+    success = success && test_op_stXX<DUInt8> (
                                           _SC (Session&, commonSession),
                                           W_STUI8,
                                           "8 bit unsigned integer"
                                                 );
-    success = success && test_op_stXX<DBSUInt16> (
+    success = success && test_op_stXX<DUInt16> (
                                           _SC (Session&, commonSession),
                                           W_STUI16,
                                           "16 bit unsigned integer"
                                                  );
-    success = success && test_op_stXX<DBSUInt32> (
+    success = success && test_op_stXX<DUInt32> (
                                           _SC (Session&, commonSession),
                                           W_STUI32,
                                           "32 bit unsigned integer"
                                                  );
-    success = success && test_op_stXX<DBSUInt64> (
+    success = success && test_op_stXX<DUInt64> (
                                            _SC (Session&, commonSession),
                                            W_STUI64,
                                            "64 bit unsigned integer"
                                                  );
 
-    success = success && test_op_stXX<DBSReal> (
+    success = success && test_op_stXX<DReal> (
                                            _SC (Session&, commonSession),
                                            W_STR,
                                            "real"
                                                 );
 
-    success = success && test_op_stXX<DBSRichReal> (
+    success = success && test_op_stXX<DRichReal> (
                                            _SC (Session&, commonSession),
                                            W_STRR,
                                            "rich real"

@@ -36,28 +36,28 @@ class Listener
 {
 public:
   Listener ()
-    : m_pInterface (NULL),
-      m_pPort (NULL),
-      m_ListenThread (),
-      m_Socket (INVALID_SOCKET),
-      m_UsersPool (GetAdminSettings ().m_MaxConnections)
+    : mpInterface (NULL),
+      mpPort (NULL),
+      mListenThread (),
+      mSocket (INVALID_SOCKET),
+      mUsersPool (GetAdminSettings ().mMaxConnections)
   {
-    m_ListenThread.IgnoreExceptions (true);
+    mListenThread.IgnoreExceptions (true);
   }
 
   ~Listener ()
   {
-    assert (m_ListenThread.IsEnded ());
+    assert (mListenThread.IsEnded ());
   }
 
   UserHandler* SearchFreeUser ()
   {
-    assert (m_UsersPool.Size () > 0);
+    assert (mUsersPool.Size () > 0);
 
-    for (uint_t index = 0; index < m_UsersPool.Size (); ++index)
+    for (uint_t index = 0; index < mUsersPool.Size (); ++index)
       {
-        if (m_UsersPool[index].m_Thread.IsEnded ())
-          return &m_UsersPool[index];
+        if (mUsersPool[index].mThread.IsEnded ())
+          return &mUsersPool[index];
       }
 
     return NULL;
@@ -67,27 +67,27 @@ public:
   {
     //If no exception has be thrown by now, there is
     //no point to do it now when we are about to close.
-    m_ListenThread.IgnoreExceptions (true);
-    m_ListenThread.DiscardException ();
+    mListenThread.IgnoreExceptions (true);
+    mListenThread.DiscardException ();
 
     //Cancel any pending IO operations.
-    m_Socket.Close ();
+    mSocket.Close ();
 
-    for (uint_t index = 0; index < m_UsersPool.Size (); ++index)
+    for (uint_t index = 0; index < mUsersPool.Size (); ++index)
       {
-        m_UsersPool[index].m_Thread.IgnoreExceptions (true);
-        m_UsersPool[index].m_Thread.DiscardException ();
+        mUsersPool[index].mThread.IgnoreExceptions (true);
+        mUsersPool[index].mThread.DiscardException ();
 
-        m_UsersPool[index].m_EndConnetion = true;
-        m_UsersPool[index].m_Socket.Close ();
+        mUsersPool[index].mEndConnetion = true;
+        mUsersPool[index].mSocket.Close ();
       }
   }
 
-  const char*           m_pInterface;
-  const char*           m_pPort;
-  Thread                 m_ListenThread;
-  Socket                 m_Socket;
-  auto_array<UserHandler> m_UsersPool;
+  const char*           mpInterface;
+  const char*           mpPort;
+  Thread                 mListenThread;
+  Socket                 mSocket;
+  auto_array<UserHandler> mUsersPool;
 
 private:
   Listener (const Listener& );
@@ -180,8 +180,8 @@ client_handler_routine (void* args)
   }
   catch (ConnectionException& e)
   {
-      if (pClient->m_pDesc != NULL)
-        pClient->m_pDesc->m_pLogger->Log (LOG_ERROR, e.Message ());
+      if (pClient->mpDesc != NULL)
+        pClient->mpDesc->mpLogger->Log (LOG_ERROR, e.Message ());
       else
         spLogger->Log (LOG_ERROR, e.Message ());
   }
@@ -225,8 +225,8 @@ client_handler_routine (void* args)
       StopServer ();
   }
 
-  pClient->m_Socket.Close ();
-  pClient->m_EndConnetion = true;
+  pClient->mSocket.Close ();
+  pClient->mEndConnetion = true;
 }
 
 void
@@ -234,10 +234,10 @@ listener_routine (void* args)
 {
   Listener* const pListener = _RC (Listener*, args);
 
-  assert (pListener->m_UsersPool.Size () > 0);
-  assert (pListener->m_ListenThread.IsEnded () == false);
-  assert (pListener->m_ListenThread.HasExceptionPending () == false);
-  assert (pListener->m_pPort != NULL);
+  assert (pListener->mUsersPool.Size () > 0);
+  assert (pListener->mListenThread.IsEnded () == false);
+  assert (pListener->mListenThread.HasExceptionPending () == false);
+  assert (pListener->mpPort != NULL);
 
   try
   {
@@ -245,16 +245,16 @@ listener_routine (void* args)
         ostringstream logEntry;
 
         logEntry << "Listening ";
-        logEntry << ((pListener->m_pInterface == NULL) ?
+        logEntry << ((pListener->mpInterface == NULL) ?
                      "*" :
-                     pListener->m_pInterface);
-        logEntry <<'@' << pListener->m_pPort << ".\n";
+                     pListener->mpInterface);
+        logEntry <<'@' << pListener->mpPort << ".\n";
 
         spLogger->Log (LOG_INFO, logEntry.str ());
       }
 
-    pListener->m_Socket = Socket (pListener->m_pInterface,
-                                   pListener->m_pPort,
+    pListener->mSocket = Socket (pListener->mpInterface,
+                                   pListener->mpPort,
                                    SOCKET_BACK_LOG);
 
     bool acceptUserConnections = sAcceptUsersConnections;
@@ -263,14 +263,14 @@ listener_routine (void* args)
       {
         try
         {
-          Socket client = pListener->m_Socket.Accept ();
+          Socket client = pListener->mSocket.Accept ();
           UserHandler* pUsrHnd = pListener->SearchFreeUser ();
 
           if (pUsrHnd != NULL)
             {
-              pUsrHnd->m_Socket = client;
-              pUsrHnd->m_EndConnetion = false;
-              pUsrHnd->m_Thread.Run (client_handler_routine, pUsrHnd);
+              pUsrHnd->mSocket = client;
+              pUsrHnd->mEndConnetion = false;
+              pUsrHnd->mThread.Run (client_handler_routine, pUsrHnd);
             }
           else
             {
@@ -354,7 +354,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   assert (databases.size () > 0);
 
   const ServerSettings& server = GetAdminSettings ();
-  auto_array<Listener> listeners (server.m_Listens.size ());
+  auto_array<Listener> listeners (server.mListens.size ());
 
   spaListeners = &listeners;
 
@@ -365,17 +365,17 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
     {
       Listener* const pEnt = &listeners[index];
 
-      assert (pEnt->m_ListenThread.IsEnded ());
+      assert (pEnt->mListenThread.IsEnded ());
 
-      pEnt->m_pInterface = (server.m_Listens[index].m_Interface.size () == 0) ?
+      pEnt->mpInterface = (server.mListens[index].mInterface.size () == 0) ?
                            NULL :
-                           server.m_Listens[index].m_Interface.c_str ();
-      pEnt->m_pPort = server.m_Listens[index].m_Service.c_str ();
-      pEnt->m_ListenThread.Run (listener_routine, pEnt);
+                           server.mListens[index].mInterface.c_str ();
+      pEnt->mpPort = server.mListens[index].mService.c_str ();
+      pEnt->mListenThread.Run (listener_routine, pEnt);
     }
 
   for (uint_t index = 0; index < listeners.Size (); ++index)
-    listeners[index].m_ListenThread.WaitToEnd (false);
+    listeners[index].mListenThread.WaitToEnd (false);
 
   spaListeners = NULL;
 

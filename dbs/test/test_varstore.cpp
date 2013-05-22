@@ -42,7 +42,7 @@ bool test_pattern (uint8_t *pattern, uint_t size, uint8_t seed)
   return true;
 }
 
-bool test_record (VLVarsStore* storage,
+bool test_record (VariableSizeStore* storage,
                   uint8_t*const pattern,
                   uint_t seed,
                   uint_t firstEntry,
@@ -63,10 +63,10 @@ bool test_record_create ()
   std::cout << "Testing record creation ... ";
 
   {
-    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
-    VLVarsStore storage;
+    VariableSizeStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
 
     init_pattern (pattern1, sizeof pattern1, 31);
@@ -104,14 +104,14 @@ bool test_record_create ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_ps_varstore";
 
       uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VLVarsStore storage;
+      VariableSizeStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
@@ -137,14 +137,14 @@ test_record_removal ()
   std::cout << "Testing record removal ... ";
 
   {
-    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
-    VLVarsStore storage;
+    VariableSizeStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
     if (result)
@@ -170,14 +170,14 @@ test_record_removal ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_ps_varstore";
 
       uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VLVarsStore storage;
+      VariableSizeStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
@@ -197,14 +197,14 @@ bool test_record_update ()
   std::cout << "Testing record update ... ";
 
   {
-    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
     storageSize = ((storageSize + 47 ) /48) * 64;
 
-    VLVarsStore storage;
+    VariableSizeStore storage;
     storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
 
     if (result)
@@ -236,14 +236,14 @@ bool test_record_update ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_ps_varstore";
 
       uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
 
       storageSize = ((storageSize + 47 ) /48) * 64;
 
-      VLVarsStore storage;
+      VariableSizeStore storage;
       storage.Init(temp_file_base.c_str(), storageSize, TEST_UNIT_MAX_SIZE);
       storage.MarkForRemoval ();
 
@@ -276,13 +276,13 @@ test_record_container_update ()
 
   do
    {
-    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
-    TempContainer container (DBSGetSeettings ().m_WorkDir.c_str (), 1024);
+    TemporalContainer container (1024);
     container.Write (0, sizeof testBuffer, testBuffer);
 
-    VLVarsStore storage;
+    VariableSizeStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 
@@ -340,13 +340,13 @@ test_record_record_update ()
 
   do
    {
-    std::string temp_file_base = DBSGetSeettings ().m_WorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
-    TempContainer container (DBSGetSeettings ().m_WorkDir.c_str (), 1024);
+    TemporalContainer container (1024);
     container.Write (0, sizeof testBuffer, testBuffer);
 
-    VLVarsStore storage;
+    VariableSizeStore storage;
     storage.Init(temp_file_base.c_str(), 0, TEST_UNIT_MAX_SIZE);
     storage.MarkForRemoval ();
 

@@ -36,13 +36,13 @@ typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
 
 struct CmdEntry
 {
-  const char*     m_pCmdText;
-  const char*     m_pCmdDesc;
-  const char*     m_pExtHelpDesc;
-  ENTRY_CMD         m_cmd;
-  ENTRY_CMD_CONTEXT m_context;
+  const char*     mpCmdText;
+  const char*     mpCmdDesc;
+  const char*     mpExtHelpDesc;
+  ENTRY_CMD         mcmd;
+  ENTRY_CMD_CONTEXT mcontext;
 
-  bool              m_showStatus;
+  bool              mshowStatus;
 };
 
 void

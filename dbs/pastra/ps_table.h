@@ -27,79 +27,92 @@
 
 #include "ps_templatetable.h"
 
+
 namespace whisper {
 namespace pastra {
+
+
 
 class PersistentTable : public PrototypeTable
 {
 public:
-  PersistentTable (DbsHandler& dbsHandler, const std::string& tableName);
-  PersistentTable (DbsHandler&               dbsHandler,
-                   const std::string&        tableName,
-                   const DBSFieldDescriptor* pFields,
-                   const uint_t              fieldsCount,
-                   const bool                temporal = false);
-
+  PersistentTable (DbsHandler& dbs, const std::string& name);
+  PersistentTable (DbsHandler&                     dbs,
+                   const std::string&              name,
+                   const DBSFieldDescriptor* const fields,
+                   const uint_t                    fieldsCount);
   PersistentTable (const PrototypeTable& prototype);
   virtual ~PersistentTable ();
 
   void RemoveFromDatabase ();
 
-  //Implementations for I_DBSTable
-  virtual bool        IsTemporal () const;
-  virtual I_DBSTable& Spawn () const;
+  virtual bool IsTemporal () const;
+
+  virtual ITable& Spawn () const;
+
+protected:
+  virtual void Flush ();
+
+  virtual void MakeHeaderPersistent ();
+
+  virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
+
+  virtual IDataContainer& RowsContainer ();
+
+  virtual IDataContainer& TableContainer ();
+
+  virtual VariableSizeStore& VSStore ();
+
+
+  const DBSSettings&           mDbsSettings;
+  uint64_t                     mMaxFileSize;
+  uint64_t                     mVSDataSize;
+  std::string                  mFileNamePrefix;
+  std::auto_ptr<FileContainer> mTableData;
+  std::auto_ptr<FileContainer> mRowsData;
+  VariableSizeStore*           mVSData;
+  bool                         mRemoved;
 
 private:
   void InitFromFile ();
+
   void InitIndexedFields ();
+
   void InitVariableStorages();
-
-protected:
-  virtual void                 Flush ();
-  virtual void                 MakeHeaderPersistent ();
-  virtual I_DataContainer*     CreateIndexContainer (const FIELD_INDEX field);
-  virtual I_DataContainer&     FixedFieldsContainer ();
-  virtual I_DataContainer&     MainTableContainer ();
-  virtual VLVarsStore&         VariableFieldsStore ();
-
-  //Data members
-  const DBSSettings&           m_DbsSettings;
-  uint64_t                     m_MaxFileSize;
-  uint64_t                     m_VariableStorageSize;
-  std::string                  m_BaseFileName;
-  std::auto_ptr<FileContainer> m_apMainTable;
-  std::auto_ptr<FileContainer> m_apFixedFields;
-  VLVarsStore*                 m_pVariableFields;
-  bool                         m_Removed;
 };
+
+
 
 class TemporalTable : public PrototypeTable
 {
 public:
 
-  TemporalTable (DbsHandler&               dbsHandler,
-                 const DBSFieldDescriptor* pFields,
-                 const FIELD_INDEX         fieldsCount);
+  TemporalTable (DbsHandler&                     dbs,
+                 const DBSFieldDescriptor* const fields,
+                 const FIELD_INDEX               fieldsCount);
   TemporalTable (const PrototypeTable& protoype);
-
   virtual ~TemporalTable ();
 
-  //Implementations for I_DBSTable
-  virtual bool        IsTemporal () const;
-  virtual I_DBSTable& Spawn () const;
+  virtual bool IsTemporal () const;
+
+  virtual ITable& Spawn () const;
 
 protected:
-  virtual void                 Flush ();
-  virtual void                 MakeHeaderPersistent ();
-  virtual I_DataContainer*     CreateIndexContainer (const FIELD_INDEX field);
-  virtual I_DataContainer&     FixedFieldsContainer ();
-  virtual I_DataContainer&     MainTableContainer ();
-  virtual VLVarsStore&         VariableFieldsStore ();
+  virtual void Flush ();
 
-  //Data members
-  std::auto_ptr<TempContainer> m_apMainTable;
-  std::auto_ptr<TempContainer> m_apFixedFields;
-  VLVarsStore*                 m_pVariableFields;
+  virtual void MakeHeaderPersistent ();
+
+  virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
+
+  virtual IDataContainer& RowsContainer ();
+
+  virtual IDataContainer& TableContainer ();
+
+  virtual VariableSizeStore& VSStore ();
+
+  std::auto_ptr<TemporalContainer>  mTableData;
+  std::auto_ptr<TemporalContainer>  mRowsData;
+  VariableSizeStore*                mVSData;
 };
 
 } //namespa pastra

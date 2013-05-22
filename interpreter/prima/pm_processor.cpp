@@ -79,7 +79,7 @@ op_func_ldc (Processor& processor, int64_t& offset)
   const uint8_t* const pData = processor.Code () +
                                processor.CurrentOffset () +
                                offset;
-  DBSChar value (load_le_uint32 (pData));
+  DChar value (load_le_uint32 (pData));
 
   processor.GetStack ().Push (value);
 
@@ -92,7 +92,7 @@ op_func_ldi8 (Processor& processor, int64_t& offset)
   const uint8_t* const pData = processor.Code () +
                                processor.CurrentOffset () +
                                offset;
-  DBSUInt8 value (*pData);
+  DUInt8 value (*pData);
 
   processor.GetStack ().Push (value);
 
@@ -105,7 +105,7 @@ op_func_ldi16 (Processor& processor, int64_t& offset)
   const uint8_t* const pData = processor.Code () +
                                processor.CurrentOffset () +
                                offset;
-  DBSUInt16 value (load_le_uint16 (pData));
+  DUInt16 value (load_le_uint16 (pData));
 
   processor.GetStack ().Push (value);
 
@@ -118,7 +118,7 @@ op_func_ldi32 (Processor& processor, int64_t& offset)
   const uint8_t* const pData = processor.Code () +
                                processor.CurrentOffset () +
                                offset;
-  DBSUInt32 value (load_le_uint32 (pData));
+  DUInt32 value (load_le_uint32 (pData));
 
   processor.GetStack ().Push (value);
 
@@ -131,7 +131,7 @@ op_func_ldi64 (Processor& processor, int64_t& offset)
   const uint8_t* const pData = processor.Code () +
                                processor.CurrentOffset () +
                                offset;
-  DBSUInt64 value (load_le_uint64 (pData));
+  DUInt64 value (load_le_uint64 (pData));
 
   processor.GetStack ().Push (value);
 
@@ -147,7 +147,7 @@ op_func_ldd (Processor& processor, int64_t& offset)
   const uint8_t day   = pData[0];
   const uint8_t month = pData[1];
   const int16_t year  = load_le_uint16 (pData + 2);
-  DBSDate value (year, month, day);
+  DDate value (year, month, day);
 
   processor.GetStack ().Push (value);
 
@@ -166,7 +166,7 @@ op_func_lddt (Processor& processor, int64_t& offset)
   const uint8_t day   = pData[3];
   const uint8_t month = pData[4];
   const int16_t year  = load_le_uint16 (pData + 5);
-  DBSDateTime value (year, month, day, hour, min, sec);
+  DDateTime value (year, month, day, hour, min, sec);
 
   processor.GetStack ().Push (value);
 
@@ -186,7 +186,7 @@ op_func_ldht (Processor& processor, int64_t& offset)
   const uint8_t  day   = pData[7];
   const uint8_t  month = pData[8];
   const int16_t  year  = load_le_uint16 (pData + 9);
-  DBSHiresTime value (year, month, day, hour, min, sec, usec);
+  DHiresTime value (year, month, day, hour, min, sec, usec);
 
   processor.GetStack ().Push (value);
 
@@ -206,7 +206,7 @@ op_func_ldrr (Processor& processor, int64_t& offset)
   const RICHREAL_T basicValue (intPart,
                                fracPart,
                                W_LDRR_PRECISSION);
-  DBSRichReal value (basicValue);
+  DRichReal value (basicValue);
   processor.GetStack ().Push (value);
 
   offset += (sizeof (uint64_t) + sizeof (uint64_t));
@@ -223,7 +223,7 @@ op_func_ldt (Processor& processor, int64_t& offset)
 
   assert (pTextSrc != NULL);
 
-  DBSText value (pTextSrc);
+  DText value (pTextSrc);
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint32_t);
@@ -232,14 +232,14 @@ op_func_ldt (Processor& processor, int64_t& offset)
 static void
 op_func_ldbt (Processor& processor, int64_t& offset)
 {
-  DBSBool value (true);
+  DBool value (true);
   processor.GetStack ().Push (value);
 }
 
 static void
 op_func_ldbf (Processor& processor, int64_t& offset)
 {
-  DBSBool value (false);
+  DBool value (false);
   processor.GetStack ().Push (value);
 }
 
@@ -417,7 +417,7 @@ op_func_inull (Processor& processor, int64_t& offset)
            stackSize);
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
-  DBSBool result (source.IsNull ());
+  DBool result (source.IsNull ());
 
   stack.Pop (1);
   stack.Push (result);
@@ -433,7 +433,7 @@ op_func_nnull (Processor& processor, int64_t& offset)
            stackSize);
 
   I_Operand& source = stack[stackSize - 1].GetOperand ();
-  DBSBool result (! source.IsNull ());
+  DBool result (! source.IsNull ());
 
   stack.Pop (1);
   stack.Push (result);
@@ -493,7 +493,7 @@ op_func_addXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value + secondOp.m_Value);
+    result = DBS_T (firstOp.mValue + secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -508,13 +508,13 @@ op_func_addt (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  DBSText firstOp;
+  DText firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
 
-  DBSText secondOp;
+  DText secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSText result;
+  DText result;
   if (firstOp.IsNull ())
     result = secondOp;
   else if (secondOp.IsNull ())
@@ -550,7 +550,7 @@ op_func_andXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value & secondOp.m_Value);
+    result = DBS_T (firstOp.mValue & secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -580,7 +580,7 @@ op_func_divXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value / secondOp.m_Value);
+    result = DBS_T (firstOp.mValue / secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -601,7 +601,7 @@ op_func_eqXX (Processor& processor, int64_t& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSBool result (firstOp == secondOp);
+  DBool result (firstOp == secondOp);
 
   stack.Pop (2);
   stack.Push (result);
@@ -622,7 +622,7 @@ op_func_geXX (Processor& processor, int64_t& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSBool result ((firstOp < secondOp) == false);
+  DBool result ((firstOp < secondOp) == false);
 
   stack.Pop (2);
   stack.Push (result);
@@ -643,7 +643,7 @@ op_func_gtXX (Processor& processor, int64_t& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSBool result (((firstOp < secondOp) || (firstOp == secondOp)) == false);
+  DBool result (((firstOp < secondOp) || (firstOp == secondOp)) == false);
 
   stack.Pop (2);
   stack.Push (result);
@@ -664,7 +664,7 @@ op_func_leXX (Processor& processor, int64_t& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSBool result ((firstOp < secondOp) || (firstOp == secondOp));
+  DBool result ((firstOp < secondOp) || (firstOp == secondOp));
 
   stack.Pop (2);
   stack.Push (result);
@@ -685,7 +685,7 @@ op_func_ltXX (Processor& processor, int64_t& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSBool result (firstOp < secondOp);
+  DBool result (firstOp < secondOp);
 
   stack.Pop (2);
   stack.Push (result);
@@ -700,22 +700,22 @@ op_func_mod (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  DBSInt64 firstOp;
+  DInt64 firstOp;
   stack[stackSize - 2].GetOperand ().GetValue (firstOp);
 
-  DBSInt64 secondOp;
+  DInt64 secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  if (secondOp == DBSInt64 (0))
+  if (secondOp == DInt64 (0))
     throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
 
-  DBSInt64 result;
+  DInt64 result;
   if (firstOp.IsNull ())
     result = secondOp;
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBSInt64 (firstOp.m_Value % secondOp.m_Value);
+    result = DInt64 (firstOp.mValue % secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -742,7 +742,7 @@ op_func_mulXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value * secondOp.m_Value);
+    result = DBS_T (firstOp.mValue * secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -763,7 +763,7 @@ op_func_neXX (Processor& processor, int64_t& offset)
   DBS_T secondOp;
   stack[stackSize - 1].GetOperand ().GetValue (secondOp);
 
-  DBSBool result ((firstOp == secondOp) == false);
+  DBool result ((firstOp == secondOp) == false);
 
   stack.Pop (2);
   stack.Push (result);
@@ -783,14 +783,14 @@ op_func_notXX (Processor& processor, int64_t& offset)
 
   DBS_T result;
   if (operand.IsNull () == false)
-    result = DBS_T (~operand.m_Value);
+    result = DBS_T (~operand.mValue);
 
   stack.Pop (1);
   stack.Push (result);
 }
 
 template <> void
-op_func_notXX<DBSBool> (Processor& processor, int64_t& offset)
+op_func_notXX<DBool> (Processor& processor, int64_t& offset)
 {
   SessionStack& stack     = processor.GetStack ();
   const size_t  stackSize = stack.Size ();
@@ -798,12 +798,12 @@ op_func_notXX<DBSBool> (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSBool operand;
+  DBool operand;
   stack[stackSize - 1].GetOperand ().GetValue (operand);
 
-  DBSBool result;
+  DBool result;
   if (operand.IsNull () == false)
-    result = DBSBool (! operand.m_Value);
+    result = DBool (! operand.mValue);
 
   stack.Pop (1);
   stack.Push (result);
@@ -831,7 +831,7 @@ op_func_orXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value | secondOp.m_Value);
+    result = DBS_T (firstOp.mValue | secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -858,7 +858,7 @@ op_func_subXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value - secondOp.m_Value);
+    result = DBS_T (firstOp.mValue - secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -885,7 +885,7 @@ op_func_xorXX (Processor& processor, int64_t& offset)
   else if (secondOp.IsNull ())
     result = firstOp;
   else
-    result = DBS_T (firstOp.m_Value ^ secondOp.m_Value);
+    result = DBS_T (firstOp.mValue ^ secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -900,10 +900,10 @@ op_func_jf (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSBool firstOp;
+  DBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
 
-  if ((firstOp.IsNull() == false) && (firstOp.m_Value == false))
+  if ((firstOp.IsNull() == false) && (firstOp.mValue == false))
     {
       const uint8_t* const pData = processor.Code () +
                                    processor.CurrentOffset () +
@@ -925,11 +925,11 @@ op_func_jfc (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSBool firstOp;
+  DBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
   stack.Pop (1);
 
-  if ((firstOp.IsNull() == false) && (firstOp.m_Value == false))
+  if ((firstOp.IsNull() == false) && (firstOp.mValue == false))
     {
       const uint8_t* const pData = processor.Code () +
                                    processor.CurrentOffset () +
@@ -951,10 +951,10 @@ op_func_jt (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSBool firstOp;
+  DBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
 
-  if ((firstOp.IsNull() == false) && firstOp.m_Value )
+  if ((firstOp.IsNull() == false) && firstOp.mValue )
     {
       const uint8_t* const pData = processor.Code () +
                                    processor.CurrentOffset () +
@@ -976,11 +976,11 @@ op_func_jtc (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSBool firstOp;
+  DBool firstOp;
   stack[stackSize - 1].GetOperand ().GetValue (firstOp);
   stack.Pop (1);
 
-  if ((firstOp.IsNull() == false) && firstOp.m_Value)
+  if ((firstOp.IsNull() == false) && firstOp.mValue)
     {
       const uint8_t* const pData = processor.Code () +
                                    processor.CurrentOffset () +
@@ -1013,14 +1013,14 @@ op_func_ind (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSUInt64 index;
+  DUInt64 index;
   stack[stackSize - 1].GetOperand ().GetValue (index);
 
   if (index.IsNull ())
     throw InterException (NULL, _EXTRA (EXCEPTION_CODE));
 
   StackValue result =
-      stack[stackSize - 2].GetOperand ().GetValueAt (index.m_Value);
+      stack[stackSize - 2].GetOperand ().GetValueAt (index.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -1035,7 +1035,7 @@ op_func_indta (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  DBSUInt64 index;
+  DUInt64 index;
   stack[stackSize - 1].GetOperand ().GetValue (index);
 
   if (index.IsNull ())
@@ -1052,11 +1052,11 @@ op_func_indta (Processor& processor, int64_t& offset)
 
   offset += sizeof (uint32_t);
 
-  FIELD_INDEX field = tableOp.GetTable ().GetFieldIndex (_RC (const char*,
+  FIELD_INDEX field = tableOp.GetTable ().RetrieveField (_RC (const char*,
                                                               pTextSrc));
 
   FieldOperand fieldOp (tableOp, field);
-  StackValue   result = fieldOp.GetValueAt (index.m_Value);
+  StackValue   result = fieldOp.GetValueAt (index.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -1082,7 +1082,7 @@ op_func_self (Processor& processor, int64_t& offset)
 
   offset += sizeof (uint32_t);
 
-  FIELD_INDEX field = tableOp.GetTable ().GetFieldIndex (_RC (const char*,
+  FIELD_INDEX field = tableOp.GetTable ().RetrieveField (_RC (const char*,
                                                               pTextSrc));
 
   FieldOperand fieldOp (tableOp, field);
@@ -1293,25 +1293,25 @@ static OP_FUNC operations[] = {
                                 op_func_ldgb32,
                                 op_func_cts,
 
-                                op_func_stXX<DBSBool>,
-                                op_func_stXX<DBSChar>,
-                                op_func_stXX<DBSDate>,
-                                op_func_stXX<DBSDateTime>,
-                                op_func_stXX<DBSHiresTime>,
-                                op_func_stXX<DBSInt8>,
-                                op_func_stXX<DBSInt16>,
-                                op_func_stXX<DBSInt32>,
-                                op_func_stXX<DBSInt64>,
-                                op_func_stXX<DBSReal>,
-                                op_func_stXX<DBSRichReal>,
-                                op_func_stXX<DBSText>,
-                                op_func_stXX<DBSUInt8>,
-                                op_func_stXX<DBSUInt16>,
-                                op_func_stXX<DBSUInt32>,
-                                op_func_stXX<DBSUInt64>,
+                                op_func_stXX<DBool>,
+                                op_func_stXX<DChar>,
+                                op_func_stXX<DDate>,
+                                op_func_stXX<DDateTime>,
+                                op_func_stXX<DHiresTime>,
+                                op_func_stXX<DInt8>,
+                                op_func_stXX<DInt16>,
+                                op_func_stXX<DInt32>,
+                                op_func_stXX<DInt64>,
+                                op_func_stXX<DReal>,
+                                op_func_stXX<DRichReal>,
+                                op_func_stXX<DText>,
+                                op_func_stXX<DUInt8>,
+                                op_func_stXX<DUInt16>,
+                                op_func_stXX<DUInt32>,
+                                op_func_stXX<DUInt64>,
                                 op_func_stta,
                                 op_func_stf,
-                                op_func_stXX<DBSArray>,
+                                op_func_stXX<DArray>,
 
                                 op_func_inull,
                                 op_func_nnull,
@@ -1319,88 +1319,88 @@ static OP_FUNC operations[] = {
                                 op_func_call,
                                 op_func_ret,
 
-                                op_func_addXX<DBSInt64>,
-                                op_func_addXX<DBSReal>,
-                                op_func_addXX<DBSRichReal>,
+                                op_func_addXX<DInt64>,
+                                op_func_addXX<DReal>,
+                                op_func_addXX<DRichReal>,
                                 op_func_addt,
 
-                                op_func_andXX<DBSInt64>,
-                                op_func_andXX<DBSBool>,
+                                op_func_andXX<DInt64>,
+                                op_func_andXX<DBool>,
 
-                                op_func_divXX<DBSInt64>,
-                                op_func_divXX<DBSReal>,
-                                op_func_divXX<DBSRichReal>,
+                                op_func_divXX<DInt64>,
+                                op_func_divXX<DReal>,
+                                op_func_divXX<DRichReal>,
 
-                                op_func_eqXX<DBSInt64>,
-                                op_func_eqXX<DBSBool>,
-                                op_func_eqXX<DBSChar>,
-                                op_func_eqXX<DBSDate>,
-                                op_func_eqXX<DBSDateTime>,
-                                op_func_eqXX<DBSHiresTime>,
-                                op_func_eqXX<DBSReal>,
-                                op_func_eqXX<DBSRichReal>,
-                                op_func_eqXX<DBSText>,
+                                op_func_eqXX<DInt64>,
+                                op_func_eqXX<DBool>,
+                                op_func_eqXX<DChar>,
+                                op_func_eqXX<DDate>,
+                                op_func_eqXX<DDateTime>,
+                                op_func_eqXX<DHiresTime>,
+                                op_func_eqXX<DReal>,
+                                op_func_eqXX<DRichReal>,
+                                op_func_eqXX<DText>,
 
-                                op_func_geXX<DBSInt64>,
-                                op_func_geXX<DBSChar>,
-                                op_func_geXX<DBSDate>,
-                                op_func_geXX<DBSDateTime>,
-                                op_func_geXX<DBSHiresTime>,
-                                op_func_geXX<DBSReal>,
-                                op_func_geXX<DBSRichReal>,
+                                op_func_geXX<DInt64>,
+                                op_func_geXX<DChar>,
+                                op_func_geXX<DDate>,
+                                op_func_geXX<DDateTime>,
+                                op_func_geXX<DHiresTime>,
+                                op_func_geXX<DReal>,
+                                op_func_geXX<DRichReal>,
 
-                                op_func_gtXX<DBSInt64>,
-                                op_func_gtXX<DBSChar>,
-                                op_func_gtXX<DBSDate>,
-                                op_func_gtXX<DBSDateTime>,
-                                op_func_gtXX<DBSHiresTime>,
-                                op_func_gtXX<DBSReal>,
-                                op_func_gtXX<DBSRichReal>,
+                                op_func_gtXX<DInt64>,
+                                op_func_gtXX<DChar>,
+                                op_func_gtXX<DDate>,
+                                op_func_gtXX<DDateTime>,
+                                op_func_gtXX<DHiresTime>,
+                                op_func_gtXX<DReal>,
+                                op_func_gtXX<DRichReal>,
 
-                                op_func_leXX<DBSInt64>,
-                                op_func_leXX<DBSChar>,
-                                op_func_leXX<DBSDate>,
-                                op_func_leXX<DBSDateTime>,
-                                op_func_leXX<DBSHiresTime>,
-                                op_func_leXX<DBSReal>,
-                                op_func_leXX<DBSRichReal>,
+                                op_func_leXX<DInt64>,
+                                op_func_leXX<DChar>,
+                                op_func_leXX<DDate>,
+                                op_func_leXX<DDateTime>,
+                                op_func_leXX<DHiresTime>,
+                                op_func_leXX<DReal>,
+                                op_func_leXX<DRichReal>,
 
-                                op_func_ltXX<DBSInt64>,
-                                op_func_ltXX<DBSChar>,
-                                op_func_ltXX<DBSDate>,
-                                op_func_ltXX<DBSDateTime>,
-                                op_func_ltXX<DBSHiresTime>,
-                                op_func_ltXX<DBSReal>,
-                                op_func_ltXX<DBSRichReal>,
+                                op_func_ltXX<DInt64>,
+                                op_func_ltXX<DChar>,
+                                op_func_ltXX<DDate>,
+                                op_func_ltXX<DDateTime>,
+                                op_func_ltXX<DHiresTime>,
+                                op_func_ltXX<DReal>,
+                                op_func_ltXX<DRichReal>,
 
                                 op_func_mod,
 
-                                op_func_mulXX<DBSInt64>,
-                                op_func_mulXX<DBSReal>,
-                                op_func_mulXX<DBSRichReal>,
+                                op_func_mulXX<DInt64>,
+                                op_func_mulXX<DReal>,
+                                op_func_mulXX<DRichReal>,
 
-                                op_func_neXX<DBSInt64>,
-                                op_func_neXX<DBSBool>,
-                                op_func_neXX<DBSChar>,
-                                op_func_neXX<DBSDate>,
-                                op_func_neXX<DBSDateTime>,
-                                op_func_neXX<DBSHiresTime>,
-                                op_func_neXX<DBSReal>,
-                                op_func_neXX<DBSRichReal>,
-                                op_func_neXX<DBSText>,
+                                op_func_neXX<DInt64>,
+                                op_func_neXX<DBool>,
+                                op_func_neXX<DChar>,
+                                op_func_neXX<DDate>,
+                                op_func_neXX<DDateTime>,
+                                op_func_neXX<DHiresTime>,
+                                op_func_neXX<DReal>,
+                                op_func_neXX<DRichReal>,
+                                op_func_neXX<DText>,
 
-                                op_func_notXX<DBSInt64>,
-                                op_func_notXX<DBSBool>,
+                                op_func_notXX<DInt64>,
+                                op_func_notXX<DBool>,
 
-                                op_func_orXX<DBSInt64>,
-                                op_func_orXX<DBSBool>,
+                                op_func_orXX<DInt64>,
+                                op_func_orXX<DBool>,
 
-                                op_func_subXX<DBSInt64>,
-                                op_func_subXX<DBSReal>,
-                                op_func_subXX<DBSRichReal>,
+                                op_func_subXX<DInt64>,
+                                op_func_subXX<DReal>,
+                                op_func_subXX<DRichReal>,
 
-                                op_func_xorXX<DBSInt64>,
-                                op_func_xorXX<DBSBool>,
+                                op_func_xorXX<DInt64>,
+                                op_func_xorXX<DBool>,
 
                                 op_func_jf,
                                 op_func_jfc,
@@ -1417,30 +1417,30 @@ static OP_FUNC operations[] = {
                                 op_func_bsync,
                                 op_func_esync,
 
-                                op_func_sadd<DBSInt64>,
-                                op_func_sadd<DBSRichReal>,
-                                op_func_sadd<DBSChar>,
-                                op_func_sadd<DBSText>,
+                                op_func_sadd<DInt64>,
+                                op_func_sadd<DRichReal>,
+                                op_func_sadd<DChar>,
+                                op_func_sadd<DText>,
 
-                                op_func_ssub<DBSInt64>,
-                                op_func_ssub<DBSRichReal>,
+                                op_func_ssub<DInt64>,
+                                op_func_ssub<DRichReal>,
 
-                                op_func_smul<DBSInt64>,
-                                op_func_smul<DBSRichReal>,
+                                op_func_smul<DInt64>,
+                                op_func_smul<DRichReal>,
 
-                                op_func_sdiv<DBSInt64>,
-                                op_func_sdiv<DBSRichReal>,
+                                op_func_sdiv<DInt64>,
+                                op_func_sdiv<DRichReal>,
 
-                                op_func_smod<DBSInt64>,
+                                op_func_smod<DInt64>,
 
-                                op_func_sand<DBSInt64>,
-                                op_func_sand<DBSBool>,
+                                op_func_sand<DInt64>,
+                                op_func_sand<DBool>,
 
-                                op_func_sxor<DBSInt64>,
-                                op_func_sxor<DBSBool>,
+                                op_func_sxor<DInt64>,
+                                op_func_sxor<DBool>,
 
-                                op_func_sor<DBSInt64>,
-                                op_func_sor<DBSBool>
+                                op_func_sor<DInt64>,
+                                op_func_sor<DBool>
                               };
 
 /////////////////////////////Processor/////////////////////////////////////////
@@ -1449,29 +1449,29 @@ static OP_FUNC operations[] = {
 Processor::Processor (Session&       session,
                       SessionStack&  stack,
                       const uint_t   procId)
-  : m_Session (session),
-    m_Stack (stack),
-    m_ProcUnit (m_Session.ProcUnit (procId)),
-    m_pCode (m_Session.ProcCode (procId)),
-    m_CodeSize (m_Session.ProcCodeSize (procId)),
-    m_CodePos (0),
-    m_LocalsCount (m_Session.LocalsCount (procId)),
-    m_StackBegin (stack.Size () - m_Session.ArgsCount (procId)),
-    m_ProcId (procId),
-    m_AquiredSync (NO_INDEX)
+  : mSession (session),
+    mStack (stack),
+    mProcUnit (mSession.ProcUnit (procId)),
+    mpCode (mSession.ProcCode (procId)),
+    mCodeSize (mSession.ProcCodeSize (procId)),
+    mCodePos (0),
+    mLocalsCount (mSession.LocalsCount (procId)),
+    mStackBegin (stack.Size () - mSession.ArgsCount (procId)),
+    mProcId (procId),
+    mAquiredSync (NO_INDEX)
 {
 
-  for (uint32_t localIndex = session.ArgsCount (m_ProcId) + 1;
-       localIndex < m_LocalsCount;
+  for (uint32_t localIndex = session.ArgsCount (mProcId) + 1;
+       localIndex < mLocalsCount;
        ++localIndex)
     {
-      StackValue localValue = session.ProcLocalValue (m_ProcId, localIndex);
+      StackValue localValue = session.ProcLocalValue (mProcId, localIndex);
       stack.Push (localValue);
     }
 
   //Count only procedure's parameters and local values,
   //but not the result value too.
-  if ((m_LocalsCount - 1) > stack.Size ())
+  if ((mLocalsCount - 1) > stack.Size ())
     throw InterException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
 }
 
@@ -1483,9 +1483,9 @@ Processor::Run ()
 
   try
   {
-    while (m_CodePos < m_CodeSize)
+    while (mCodePos < mCodeSize)
       {
-        int64_t offset = wh_compiler_decode_op (m_pCode + m_CodePos, &opcode);
+        int64_t offset = wh_compiler_decode_op (mpCode + mCodePos, &opcode);
 
         assert (opcode < _SC (int,
                               (sizeof operations / sizeof operations[0])));
@@ -1494,44 +1494,44 @@ Processor::Run ()
 
         operations[opcode] (*this, offset);
 
-        m_CodePos += offset;
-        assert ((m_CodePos <= m_CodeSize)
-                || (_SC (uint64_t, offset) == m_CodeSize));
+        mCodePos += offset;
+        assert ((mCodePos <= mCodeSize)
+                || (_SC (uint64_t, offset) == mCodeSize));
       }
   }
   catch (...)
   {
-      if (m_AquiredSync != NO_INDEX)
-        ReleaseSync (m_AquiredSync);
+      if (mAquiredSync != NO_INDEX)
+        ReleaseSync (mAquiredSync);
 
-      assert (m_Stack.Size () >= m_StackBegin);
+      assert (mStack.Size () >= mStackBegin);
 
       throw;
   }
 
   //After a procedure execution, only the return value should be present
   //on the stack
-  assert (m_Stack.Size () == (m_StackBegin + 1));
+  assert (mStack.Size () == (mStackBegin + 1));
 }
 
 void
 Processor::AquireSync (const uint8_t sync)
 {
-  if (m_AquiredSync != NO_INDEX)
+  if (mAquiredSync != NO_INDEX)
     throw InterException (NULL, _EXTRA (InterException::NEESTED_SYNC_REQ));
 
-  m_Session.AquireProcSync (m_ProcId, sync);
-  m_AquiredSync = sync;
+  mSession.AquireProcSync (mProcId, sync);
+  mAquiredSync = sync;
 }
 
 void
 Processor::ReleaseSync (const uint8_t sync)
 {
-  if (m_AquiredSync != sync)
+  if (mAquiredSync != sync)
     throw InterException (NULL, _EXTRA (InterException::SYNC_NOT_AQUIRED));
 
-  m_Session.ReleaseProcSync (m_ProcId, sync);
-  m_AquiredSync = NO_INDEX;
+  mSession.ReleaseProcSync (mProcId, sync);
+  mAquiredSync = NO_INDEX;
 }
 
 } //namespace prima

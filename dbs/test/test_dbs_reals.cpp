@@ -22,6 +22,7 @@
 #include "custom/include/test/test_fmw.h"
 
 using namespace std;
+using namespace whisper;
 
 uint64_t _iterationsCount = 5000000;
 

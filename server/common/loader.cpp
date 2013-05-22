@@ -42,27 +42,27 @@ LoadDatabase (FileLogger& log, DBSDescriptors& ioDbsDesc)
   ostringstream logEntry;
 
 
-  logEntry << "Loading database: " << ioDbsDesc.m_DbsName;
+  logEntry << "Loading database: " << ioDbsDesc.mDbsName;
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str ("");
 
-  ioDbsDesc.m_Dbs = &DBSRetrieveDatabase (ioDbsDesc.m_DbsName.c_str (),
-                                          ioDbsDesc.m_DbsDirectory.c_str ());
+  ioDbsDesc.mDbs = &DBSRetrieveDatabase (ioDbsDesc.mDbsName.c_str (),
+                                          ioDbsDesc.mDbsDirectory.c_str ());
 
   std::auto_ptr<Logger> apLogger (
-                         new FileLogger (ioDbsDesc.m_DbsLogFile.c_str (), true)
+                         new FileLogger (ioDbsDesc.mDbsLogFile.c_str (), true)
                                    );
 
-  if (ioDbsDesc.m_DbsName != GlobalContextDatabase ())
+  if (ioDbsDesc.mDbsName != GlobalContextDatabase ())
     {
-      ioDbsDesc.m_Session = &GetInstance (ioDbsDesc.m_DbsName.c_str (),
+      ioDbsDesc.mSession = &GetInstance (ioDbsDesc.mDbsName.c_str (),
                                           apLogger.get ());
     }
   else
-    ioDbsDesc.m_Session = &GetInstance (NULL, &log);
+    ioDbsDesc.mSession = &GetInstance (NULL, &log);
 
-  for (vector<string>::iterator it = ioDbsDesc.m_ObjectLibs.begin ();
-       it != ioDbsDesc.m_ObjectLibs.end ();
+  for (vector<string>::iterator it = ioDbsDesc.mObjectLibs.begin ();
+       it != ioDbsDesc.mObjectLibs.end ();
        ++it)
     {
       logEntry << "... Loading compiled object unit '" << *it << "'.";
@@ -70,10 +70,10 @@ LoadDatabase (FileLogger& log, DBSDescriptors& ioDbsDesc)
       logEntry.str ("");
 
       CompiledFileUnit unit (it->c_str ());
-      ioDbsDesc.m_Session->LoadCompiledUnit (unit);
+      ioDbsDesc.mSession->LoadCompiledUnit (unit);
     }
 
-  ioDbsDesc.m_pLogger = apLogger.release ();
+  ioDbsDesc.mpLogger = apLogger.release ();
 
   return true;
 }

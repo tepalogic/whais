@@ -37,34 +37,34 @@ namespace prima {
 class TableReference
 {
 public:
-  TableReference (I_DBSHandler& dbsHnd, I_DBSTable& table)
-    : m_DbsHnd (dbsHnd),
-      m_Table (table),
-      m_RefCount (0)
+  TableReference (I_DBSHandler& dbsHnd, ITable& table)
+    : mDbsHnd (dbsHnd),
+      mTable (table),
+      mRefCount (0)
   {
   }
 
-  void IncrementRefCount () { ++m_RefCount; }
+  void IncrementRefCount () { ++mRefCount; }
   void DecrementRefCount ()
   {
-    assert (m_RefCount > 0);
-    if (--m_RefCount == 0)
+    assert (mRefCount > 0);
+    if (--mRefCount == 0)
       delete this;
   }
 
-  I_DBSTable&   GetTable () { assert (m_RefCount > 0); return m_Table; }
-  I_DBSHandler& GetDBSHandler () { assert (m_RefCount > 0); return m_DbsHnd; }
+  ITable&   GetTable () { assert (mRefCount > 0); return mTable; }
+  I_DBSHandler& GetDBSHandler () { assert (mRefCount > 0); return mDbsHnd; }
 
 private:
   ~TableReference ()
   {
-    if (&m_Table != &GeneralTable::Instance ())
-      m_DbsHnd.ReleaseTable (m_Table);
+    if (&mTable != &GeneralTable::Instance ())
+      mDbsHnd.ReleaseTable (mTable);
   }
 
-  I_DBSHandler& m_DbsHnd;
-  I_DBSTable&   m_Table;
-  uint64_t      m_RefCount;
+  I_DBSHandler& mDbsHnd;
+  ITable&   mTable;
+  uint64_t      mRefCount;
 };
 
 } //namespace whisper

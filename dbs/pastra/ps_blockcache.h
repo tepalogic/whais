@@ -34,102 +34,137 @@
 namespace whisper {
 namespace pastra  {
 
-class I_BlocksManager
+class IBlocksManager
 {
 public:
-  I_BlocksManager () {}
-  virtual ~I_BlocksManager () {}
+  IBlocksManager ()
+  {
+  }
 
-  virtual void StoreItems (const uint8_t* pSrcBuffer,
-                           uint64_t       firstItem,
-                           uint_t         itemsCount) = 0;
-  virtual void RetrieveItems (uint8_t* pDestBuffer,
-                              uint64_t firstItem,
-                              uint_t   itemsCount) = 0;
+  virtual ~IBlocksManager();
+
+
+  virtual void StoreItems (uint64_t           firstItem,
+                           uint_t             itemsCount,
+                           const uint8_t*     from) = 0;
+
+  virtual void RetrieveItems (uint64_t    firstItem,
+                              uint_t      itemsCount,
+                              uint8_t*    to) = 0;
 };
 
 
 class BlockEntry
 {
 public:
-  explicit BlockEntry (uint8_t* const pData) :
-      m_pData (pData),
-      m_ReferenceCount (0),
-      m_Flags (0)
+  explicit BlockEntry (uint8_t* const data)
+    : mData (data),
+      mReferenceCount (0),
+      mFlags (0)
   {
-    assert (pData != NULL);
+    assert (data != NULL);
   }
 
-  bool  IsDirty () const { return (m_Flags & BLOCK_ENTRY_DIRTY) != 0;}
-  bool  IsInUse () const { return m_ReferenceCount > 0;  }
+  bool IsDirty () const
+  {
+    return (mFlags & BLOCK_ENTRY_DIRTY) != 0;
+  }
 
-  void  MarkDirty () { m_Flags |= BLOCK_ENTRY_DIRTY; }
-  void  MarkClean () { m_Flags &= ~BLOCK_ENTRY_DIRTY; }
+  bool IsInUse () const
+  {
+    return mReferenceCount > 0;
+  }
 
-  void  RegisterUser () { m_ReferenceCount++; }
-  void  ReleaseUser () {  assert ( m_ReferenceCount > 0); m_ReferenceCount--; }
+  void MarkDirty ()
+  {
+    mFlags |= BLOCK_ENTRY_DIRTY;
+  }
 
-  uint8_t* Data () { return m_pData; }
+  void MarkClean ()
+  {
+    mFlags &= ~BLOCK_ENTRY_DIRTY;
+  }
+
+  void RegisterUser ()
+  {
+    mReferenceCount++;
+  }
+
+  void ReleaseUser ()
+  {
+    assert ( mReferenceCount > 0);
+
+    mReferenceCount--;
+  }
+
+  uint8_t* Data ()
+  {
+    return mData;
+  }
 
 private:
-  static const uint32_t BLOCK_ENTRY_DIRTY = 0x00000001;
+  uint8_t* const    mData;
+  uint32_t          mReferenceCount;
+  uint32_t          mFlags;
 
-  uint8_t* const m_pData;
-  uint32_t       m_ReferenceCount;
-  uint32_t       m_Flags;
+  static const uint32_t BLOCK_ENTRY_DIRTY = 0x00000001;
 };
+
+
 
 class StoredItem
 {
 public:
-  StoredItem (BlockEntry& blockEntry, uint_t itemOffset) :
-    m_BlockEntry (&blockEntry),
-    m_ItemOffset (itemOffset)
+  StoredItem (BlockEntry& blockEntry, const uint_t itemOffset)
+    : mBlockEntry (&blockEntry),
+      mItemOffset (itemOffset)
   {
-    m_BlockEntry->RegisterUser ();
+    mBlockEntry->RegisterUser ();
   }
 
-  StoredItem (const StoredItem& rSource) :
-    m_BlockEntry (rSource.m_BlockEntry),
-    m_ItemOffset (rSource.m_ItemOffset)
+  StoredItem (const StoredItem& src) :
+    mBlockEntry (src.mBlockEntry),
+    mItemOffset (src.mItemOffset)
   {
-    m_BlockEntry->RegisterUser ();
+    mBlockEntry->RegisterUser ();
   }
 
   ~StoredItem ()
   {
-    m_BlockEntry->ReleaseUser ();
+    mBlockEntry->ReleaseUser ();
   }
 
-  StoredItem& operator= (const StoredItem& rSource)
+  StoredItem& operator= (const StoredItem& src)
   {
-    if (this == &rSource)
+    if (this == &src)
       return *this;
 
-    rSource.m_BlockEntry->RegisterUser ();
-    m_BlockEntry->ReleaseUser ();
+    src.mBlockEntry->RegisterUser ();
+    mBlockEntry->ReleaseUser ();
 
-    m_BlockEntry = rSource.m_BlockEntry;
-    m_ItemOffset = rSource.m_ItemOffset;
+    _CC (BlockEntry*&, mBlockEntry) = src.mBlockEntry;
+    _CC (uint_t&,      mItemOffset) = src.mItemOffset;
 
     return *this;
   }
 
   uint8_t* GetDataForUpdate () const
   {
-    m_BlockEntry->MarkDirty ();
-    return m_BlockEntry->Data () + m_ItemOffset;
+    mBlockEntry->MarkDirty ();
+    return mBlockEntry->Data () + mItemOffset;
   }
 
   const uint8_t* GetDataForRead () const
   {
-    return m_BlockEntry->Data () + m_ItemOffset;
+    return mBlockEntry->Data () + mItemOffset;
   }
 
 protected:
-  BlockEntry* m_BlockEntry;
-  uint_t      m_ItemOffset;
+  BlockEntry* const mBlockEntry;
+  const uint_t      mItemOffset;
 };
+
+
 
 class BlockCache
 {
@@ -137,22 +172,27 @@ public:
   BlockCache ();
   ~BlockCache ();
 
-  void       Init (I_BlocksManager& blocksMgr,
-                   const uint_t     itemSize,
-                   const uint_t     blockSize,
-                   const uint_t     maxBlockCount);
-  void       Flush ();
-  void       FlushItem (const uint64_t item);
-  void       RefreshItem (const uint64_t item);
+
+  void Init (IBlocksManager&      blocksMgr,
+             const uint_t         itemSize,
+             const uint_t         blockSize,
+             const uint_t         maxCachedBlocks);
+
+  void Flush ();
+
+  void FlushItem (const uint64_t item);
+
+  void RefreshItem (const uint64_t item);
+
   StoredItem RetriveItem (const uint64_t item);
 
 private:
-  I_BlocksManager* m_pManager;
-  uint_t           m_ItemSize;
-  uint_t           m_MaxBlocks;
-  uint_t           m_BlockSize;
+  IBlocksManager*  mManager;
+  uint_t           mItemSize;
+  uint_t           mBlockSize;
+  uint_t           mMaxCachedBlocks;
 
-  std::map <uint64_t, class BlockEntry> m_CachedBlocks;
+  std::map<uint64_t, class BlockEntry> mCachedBlocks;
 };
 
 } //namespace pastra

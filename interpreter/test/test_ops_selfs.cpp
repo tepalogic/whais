@@ -128,7 +128,7 @@ test_op_saddXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value + second.m_Value))
+  if (result != DBS_T (first.mValue + second.mValue))
     return false;
 
   return true;
@@ -175,7 +175,7 @@ test_op_ssubXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value - second.m_Value))
+  if (result != DBS_T (first.mValue - second.mValue))
     return false;
 
   return true;
@@ -222,7 +222,7 @@ test_op_smulXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value * second.m_Value))
+  if (result != DBS_T (first.mValue * second.mValue))
     return false;
 
   return true;
@@ -269,7 +269,7 @@ test_op_sdivXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value / second.m_Value))
+  if (result != DBS_T (first.mValue / second.mValue))
     return false;
 
   return true;
@@ -316,7 +316,7 @@ test_op_smodXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value % second.m_Value))
+  if (result != DBS_T (first.mValue % second.mValue))
     return false;
 
   return true;
@@ -363,7 +363,7 @@ test_op_sandXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value & second.m_Value))
+  if (result != DBS_T (first.mValue & second.mValue))
     return false;
 
   return true;
@@ -410,7 +410,7 @@ test_op_sxorXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value ^ second.m_Value))
+  if (result != DBS_T (first.mValue ^ second.mValue))
     return false;
 
   return true;
@@ -457,7 +457,7 @@ test_op_sorXX (Session& session,
   if (result != modified)
     return false;
 
-  if (result != DBS_T (first.m_Value | second.m_Value))
+  if (result != DBS_T (first.mValue | second.mValue))
     return false;
 
   return true;
@@ -480,9 +480,9 @@ main ()
   InitInterpreter ();
 
   {
-    DBSBool     val1_b (true), val2_b (false);
-    DBSInt16    val1_i (100), val2_i (26);
-    DBSRichReal val1_rr (123.11), val2_rr (23.12);
+    DBool     val1_b (true), val2_b (false);
+    DInt16    val1_i (100), val2_i (26);
+    DRichReal val1_rr (123.11), val2_rr (23.12);
 
     I_Session& commonSession = GetInstance (NULL);
 

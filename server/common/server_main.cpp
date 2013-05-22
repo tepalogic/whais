@@ -36,22 +36,22 @@ clean_frameworks (FileLogger& log)
            dbsIterator != databases.rend ();
            ++dbsIterator)
         {
-          if (dbsIterator->m_Session != NULL)
-              ReleaseInstance (*(dbsIterator->m_Session));
+          if (dbsIterator->mSession != NULL)
+              ReleaseInstance (*(dbsIterator->mSession));
 
-          if (dbsIterator->m_Dbs != NULL)
-            DBSReleaseDatabase (*(dbsIterator->m_Dbs));
+          if (dbsIterator->mDbs != NULL)
+            DBSReleaseDatabase (*(dbsIterator->mDbs));
 
-          if (dbsIterator->m_pLogger != NULL)
+          if (dbsIterator->mpLogger != NULL)
             {
-              dbsIterator->m_pLogger->Log (LOG_INFO,
+              dbsIterator->mpLogger->Log (LOG_INFO,
                                            "Database context ended!");
-              delete dbsIterator->m_pLogger;
+              delete dbsIterator->mpLogger;
             }
 
           ostringstream logEntry;
           logEntry << "Cleaned resourses for database '";
-          logEntry << dbsIterator->m_DbsName << "'.\n";
+          logEntry << dbsIterator->mDbsName << "'.\n";
           log.Log (LOG_INFO, logEntry.str ());
         }
     }
@@ -148,7 +148,7 @@ main (int argc, char** argv)
       if (ParseConfigurationSection (*config, sectionLine) == false)
         return -1;
 
-      glbLog.reset (new FileLogger (GetAdminSettings ().m_LogFile.c_str ()));
+      glbLog.reset (new FileLogger (GetAdminSettings ().mLogFile.c_str ()));
 
   }
   catch (...)
@@ -186,16 +186,16 @@ main (int argc, char** argv)
              dbsIterator != databases.end ();
              ++dbsIterator)
           {
-            if (dbsIterator->m_DbsName == dbs.m_DbsName)
+            if (dbsIterator->mDbsName == dbs.mDbsName)
               {
-                logEntry << "Duplicate entry '" << dbs.m_DbsName << "'. ";
+                logEntry << "Duplicate entry '" << dbs.mDbsName << "'. ";
                 logEntry << "Ignoring the last configuration entry.\n";
                 glbLog->Log (LOG_ERROR, logEntry.str ());
                 continue;
               }
           }
 
-        if (dbs.m_DbsName == GlobalContextDatabase ())
+        if (dbs.mDbsName == GlobalContextDatabase ())
           databases.insert (databases.begin (), dbs);
         else
           databases.push_back (dbs);
@@ -206,7 +206,7 @@ main (int argc, char** argv)
         glbLog->Log (LOG_CRITICAL, "No session were configured.");
         return -1;
       }
-    else if (databases[0].m_DbsName != GlobalContextDatabase())
+    else if (databases[0].mDbsName != GlobalContextDatabase())
       {
         ostringstream noGlbMsg;
         noGlbMsg << "No entry for global section '";
@@ -219,18 +219,18 @@ main (int argc, char** argv)
     const ServerSettings& confSettings = GetAdminSettings ();
 
     DBSSettings dbsSettings;
-    dbsSettings.m_TableCacheBlkCount   = confSettings.m_TableCacheBlockCount;
-    dbsSettings.m_TableCacheBlkSize    = confSettings.m_TableCacheBlockSize;
-    dbsSettings.m_WorkDir              = confSettings.m_WorkDirectory;
-    dbsSettings.m_TempDir              = confSettings.m_TempDirectory;
-    dbsSettings.m_VLStoreCacheBlkCount = confSettings.m_VLBlockCount;
-    dbsSettings.m_VLStoreCacheBlkSize  = confSettings.m_VLBlockSize;
-    dbsSettings.m_VLValueCacheSize     = confSettings.m_TempValuesCache;
+    dbsSettings.mTableCacheBlkCount   = confSettings.mTableCacheBlockCount;
+    dbsSettings.mTableCacheBlkSize    = confSettings.mTableCacheBlockSize;
+    dbsSettings.mWorkDir              = confSettings.mWorkDirectory;
+    dbsSettings.mTempDir              = confSettings.mTempDirectory;
+    dbsSettings.mVLStoreCacheBlkCount = confSettings.mVLBlockCount;
+    dbsSettings.mVLStoreCacheBlkSize  = confSettings.mVLBlockSize;
+    dbsSettings.mVLValueCacheSize     = confSettings.mTempValuesCache;
 
     DBSInit (dbsSettings);
     sDbsInited = true;
 
-    InitInterpreter (databases[0].m_DbsDirectory.c_str ());
+    InitInterpreter (databases[0].mDbsDirectory.c_str ());
     sInterpreterInited = true;
 
     for (dbsIterator = databases.begin ();

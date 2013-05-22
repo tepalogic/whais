@@ -30,6 +30,7 @@
 #include "dbs_real.h"
 #include "dbs_exception.h"
 
+namespace whisper {
 
 #ifndef REAL_T
 typedef DBS_REAL_T REAL_T;
@@ -39,323 +40,359 @@ typedef DBS_REAL_T REAL_T;
 typedef DBS_RICHREAL_T RICHREAL_T;
 #endif
 
-namespace whisper {
 
-struct DBSBool
+struct DBool
 {
-  DBSBool ()
-    : m_Value (),
-      m_IsNull (true)
+  DBool ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSBool (const bool value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DBool (const bool value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSBool (const DBSBool& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
-  {}
-
-  DBSBool& operator= (const DBSBool& source)
+  DBool (const DBool& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
-    _CC (bool&, m_Value) = source.m_Value;
-    _CC (bool&, m_IsNull) = source.m_IsNull;
+  }
+
+  DBool& operator= (const DBool& source)
+  {
+    _CC (bool&, mValue)  = source.mValue;
+    _CC (bool&, mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSBool& source) const
+  bool operator< (const DBool& source) const
   {
     if (IsNull () && (source.IsNull () == false))
       return true;
 
     if (source.IsNull () == false)
-      if ((m_Value == false) && (source.m_Value == true))
-        return true;
+      {
+        if ((mValue == false) && (source.mValue == true))
+          return true;
+      }
 
     return false;
   }
 
-  bool operator== (const DBSBool& source) const
+  bool operator== (const DBool& source) const
   {
-    if (m_IsNull != source.m_IsNull)
+    if (mIsNull != source.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == source.m_Value);
+    return (mValue == source.mValue);
   }
 
-  bool operator<= (const DBSBool& second) const
+  bool operator<= (const DBool& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSBool& second) const
+  bool operator!= (const DBool& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSBool& second) const
+  bool operator> (const DBool& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSBool& second) const
+  bool operator>= (const DBool& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE GetDBSType() const { return T_BOOL; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_BOOL;
+  }
 
-  const bool m_Value;
-  const bool m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const bool mValue;
+  const bool mIsNull;
 };
 
-struct DBSChar
+struct DChar
 {
-  DBSChar ()
-    : m_Value (),
-      m_IsNull (true)
+  DChar ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSChar (const uint32_t ch)
-    : m_Value (ch),
-      m_IsNull (false)
+  explicit DChar (const uint32_t ch)
+    : mValue (ch),
+      mIsNull (false)
   {
   }
 
-  DBSChar (const DBSChar& source) :
-    m_Value (source.m_Value), m_IsNull (source.m_IsNull)
+  DChar (const DChar& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSChar& operator= (const DBSChar& source)
+  DChar& operator= (const DChar& source)
   {
-    _CC (uint32_t&, m_Value) = source.m_Value;
-    _CC (bool&, m_IsNull)    = source.m_IsNull;
+    _CC (uint32_t&, mValue)  = source.mValue;
+    _CC (bool&,     mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSChar& second) const
+  bool operator< (const DChar& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSChar& second) const
+  bool operator== (const DChar& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSChar& second) const
+  bool operator<= (const DChar& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSChar& second) const
+  bool operator!= (const DChar& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSChar& second) const
+  bool operator> (const DChar& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSChar& second) const
+  bool operator>= (const DChar& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_CHAR; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_CHAR;
+  }
 
-  const uint32_t m_Value;                //4 bytes to hold an UTF-8 character
-  const bool     m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const uint32_t mValue;
+  const bool     mIsNull;
 };
 
-struct DBS_SHL DBSDate
+struct DBS_SHL DDate
 {
-  DBSDate ()
-    : m_Year (),
-      m_Month (),
-      m_Day (),
-      m_IsNull (true)
+  DDate ()
+    : mYear (),
+      mMonth (),
+      mDay (),
+      mIsNull (true)
   {
   }
 
-  DBSDate (const int32_t year,
-           const uint8_t month,
-           const uint8_t day);
+  DDate (const int32_t year,
+         const uint8_t month,
+         const uint8_t day);
 
-  DBSDate (const DBSDate& source)
-    : m_Year (source.m_Year),
-      m_Month (source.m_Month),
-      m_Day (source.m_Day),
-      m_IsNull (source.m_IsNull)
+  DDate (const DDate& source)
+    : mYear (source.mYear),
+      mMonth (source.mMonth),
+      mDay (source.mDay),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSDate& operator= (const DBSDate& source)
+  DDate& operator= (const DDate& source)
   {
-    _CC( int16_t&, m_Year)   = source.m_Year;
-    _CC( uint8_t&, m_Month)  = source.m_Month;
-    _CC( uint8_t&, m_Day)    = source.m_Day;
-    _CC( bool&,    m_IsNull) = source.m_IsNull;
+    _CC (int16_t&, mYear)   = source.mYear;
+    _CC (uint8_t&, mMonth)  = source.mMonth;
+    _CC (uint8_t&, mDay)    = source.mDay;
+    _CC (bool&,    mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSDate& second) const
+  bool operator< (const DDate& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
       {
-        if (m_Year < second.m_Year)
+        if (mYear < second.mYear)
           return true;
-        else if (m_Year == second.m_Year)
+
+        else if (mYear == second.mYear)
           {
-            if (m_Month < second.m_Month)
+            if (mMonth < second.mMonth)
               return true;
-            else if (m_Month == second.m_Month)
-              return m_Day < second.m_Day;
+
+            else if (mMonth == second.mMonth)
+              return mDay < second.mDay;
           }
       }
 
     return false;
   }
 
-  bool operator== (const DBSDate& second) const
+  bool operator== (const DDate& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Year == second.m_Year) &&
-           (m_Month == second.m_Month) &&
-           (m_Day  == second.m_Day);
+    return (mYear == second.mYear)
+            && (mMonth == second.mMonth)
+            && (mDay  == second.mDay);
 
   }
 
-  bool operator<= (const DBSDate& second) const
+  bool operator<= (const DDate& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSDate& second) const
+  bool operator!= (const DDate& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSDate& second) const
+  bool operator> (const DDate& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSDate& second) const
+  bool operator>= (const DDate& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_DATE; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE  DBSType() const
+  {
+    return T_DATE;
+  }
 
-  const int16_t m_Year;
-  const uint8_t m_Month;
-  const uint8_t m_Day;
-  const bool    m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const int16_t mYear;
+  const uint8_t mMonth;
+  const uint8_t mDay;
+  const bool    mIsNull;
 };
 
-struct DBS_SHL DBSDateTime
+struct DBS_SHL DDateTime
 {
-  DBSDateTime ()
-    : m_Year (),
-      m_Month (),
-      m_Day (),
-      m_Hour (),
-      m_Minutes (),
-      m_Seconds (),
-      m_IsNull (true)
+  DDateTime ()
+    : mYear (),
+      mMonth (),
+      mDay (),
+      mHour (),
+      mMinutes (),
+      mSeconds (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSDateTime (const int32_t year,
-                        const uint8_t mounth,
-                        const uint8_t day,
-                        const uint8_t hour,
-                        const uint8_t minutes,
-                        const uint8_t seconds);
+  explicit DDateTime (const int32_t year,
+                      const uint8_t mounth,
+                      const uint8_t day,
+                      const uint8_t hour,
+                      const uint8_t minutes,
+                      const uint8_t seconds);
 
-  DBSDateTime (const DBSDateTime& source)
-    : m_Year (source.m_Year),
-      m_Month (source.m_Month),
-      m_Day (source.m_Day),
-      m_Hour (source.m_Hour),
-      m_Minutes (source.m_Minutes),
-      m_Seconds (source.m_Seconds),
-      m_IsNull (source.m_IsNull)
+  DDateTime (const DDateTime& source)
+    : mYear (source.mYear),
+      mMonth (source.mMonth),
+      mDay (source.mDay),
+      mHour (source.mHour),
+      mMinutes (source.mMinutes),
+      mSeconds (source.mSeconds),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSDateTime& operator= (const DBSDateTime& source)
+  DDateTime& operator= (const DDateTime& source)
   {
-    _CC( int16_t&, m_Year)    = source.m_Year;
-    _CC( uint8_t&, m_Month)   = source.m_Month;
-    _CC( uint8_t&, m_Day)     = source.m_Day;
-    _CC( uint8_t&, m_Hour)    = source.m_Hour;
-    _CC( uint8_t&, m_Minutes) = source.m_Minutes;
-    _CC( uint8_t&, m_Seconds) = source.m_Seconds;
-    _CC( bool&,    m_IsNull)  = source.m_IsNull;
+    _CC (int16_t&, mYear)    = source.mYear;
+    _CC (uint8_t&, mMonth)   = source.mMonth;
+    _CC (uint8_t&, mDay)     = source.mDay;
+    _CC (uint8_t&, mHour)    = source.mHour;
+    _CC (uint8_t&, mMinutes) = source.mMinutes;
+    _CC (uint8_t&, mSeconds) = source.mSeconds;
+    _CC (bool&,    mIsNull)  = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSDateTime& second) const
+  bool operator< (const DDateTime& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
       {
-        if (m_Year < second.m_Year)
+        if (mYear < second.mYear)
           return true;
-        else if (m_Year == second.m_Year)
+
+        else if (mYear == second.mYear)
           {
-            if (m_Month < second.m_Month)
+            if (mMonth < second.mMonth)
               return true;
-            else if (m_Month == second.m_Month)
+
+            else if (mMonth == second.mMonth)
               {
-                if (m_Day < second.m_Day)
+                if (mDay < second.mDay)
                   return true;
-                else if (m_Day == second.m_Day)
+
+                else if (mDay == second.mDay)
                   {
-                    if (m_Hour < second.m_Hour)
+                    if (mHour < second.mHour)
                       return true;
-                    else if (m_Hour == second.m_Hour)
+
+                    else if (mHour == second.mHour)
                       {
-                        if (m_Minutes < second.m_Minutes)
+                        if (mMinutes < second.mMinutes)
                           return true;
-                        else if (m_Minutes == second.m_Minutes)
-                          return m_Seconds < second.m_Seconds;
+
+                        else if (mMinutes == second.mMinutes)
+                          return mSeconds < second.mSeconds;
                       }
                   }
               }
@@ -365,134 +402,147 @@ struct DBS_SHL DBSDateTime
     return false;
   }
 
-  bool operator== (const DBSDateTime& second) const
+  bool operator== (const DDateTime& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Year == second.m_Year) &&
-           (m_Month == second.m_Month) &&
-           (m_Day  == second.m_Day) &&
-           (m_Hour == second.m_Hour) &&
-           (m_Minutes == second.m_Minutes) &&
-           (m_Seconds == second.m_Seconds);
+    return (mYear == second.mYear)
+            && (mMonth == second.mMonth)
+            && (mDay  == second.mDay)
+            && (mHour == second.mHour)
+            && (mMinutes == second.mMinutes)
+            && (mSeconds == second.mSeconds);
   }
 
-  bool operator<= (const DBSDateTime& second) const
+  bool operator<= (const DDateTime& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSDateTime& second) const
+  bool operator!= (const DDateTime& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSDateTime& second) const
+  bool operator> (const DDateTime& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSDateTime& second) const
+  bool operator>= (const DDateTime& second) const
   {
     return (*this < second) == false;
   }
 
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_DATETIME;
+  }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_DATETIME; }
-  bool IsNull () const { return m_IsNull; }
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
 
-  const int16_t m_Year;
-  const uint8_t m_Month;
-  const uint8_t m_Day;
-  const uint8_t m_Hour;
-  const uint8_t m_Minutes;
-  const uint8_t m_Seconds;
-  const bool    m_IsNull;
+  const int16_t mYear;
+  const uint8_t mMonth;
+  const uint8_t mDay;
+  const uint8_t mHour;
+  const uint8_t mMinutes;
+  const uint8_t mSeconds;
+  const bool    mIsNull;
 };
 
-struct DBS_SHL DBSHiresTime
+struct DBS_SHL DHiresTime
 {
 
-  DBSHiresTime ()
-    : m_Microsec (),
-      m_Year (),
-      m_Month (),
-      m_Day (),
-      m_Hour (),
-      m_Minutes (),
-      m_Seconds (),
-      m_IsNull (true)
+  DHiresTime ()
+    : mMicrosec (),
+      mYear (),
+      mMonth (),
+      mDay (),
+      mHour (),
+      mMinutes (),
+      mSeconds (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSHiresTime (const int32_t year,
-                         const uint8_t month,
-                         const uint8_t day,
-                         const uint8_t hour,
-                         const uint8_t minutes,
-                         const uint8_t seconds,
-                         const uint32_t microsec);
+  explicit DHiresTime (const int32_t year,
+                       const uint8_t month,
+                       const uint8_t day,
+                       const uint8_t hour,
+                       const uint8_t minutes,
+                       const uint8_t seconds,
+                       const uint32_t microsec);
 
-  DBSHiresTime (const DBSHiresTime& source)
-    : m_Microsec (source.m_Microsec),
-      m_Year (source.m_Year),
-      m_Month (source.m_Month),
-      m_Day (source.m_Day),
-      m_Hour (source.m_Hour),
-      m_Minutes (source.m_Minutes),
-      m_Seconds (source.m_Seconds),
-      m_IsNull (source.m_IsNull)
+  DHiresTime (const DHiresTime& source)
+    : mMicrosec (source.mMicrosec),
+      mYear (source.mYear),
+      mMonth (source.mMonth),
+      mDay (source.mDay),
+      mHour (source.mHour),
+      mMinutes (source.mMinutes),
+      mSeconds (source.mSeconds),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSHiresTime& operator= (const DBSHiresTime& source)
+  DHiresTime& operator= (const DHiresTime& source)
   {
-    _CC( uint32_t&, m_Microsec) = source.m_Microsec;
-    _CC( int16_t&,  m_Year)     = source.m_Year;
-    _CC( uint8_t&,  m_Month)    = source.m_Month;
-    _CC( uint8_t&,  m_Day)      = source.m_Day;
-    _CC( uint8_t&,  m_Hour)     = source.m_Hour;
-    _CC( uint8_t&,  m_Minutes)  = source.m_Minutes;
-    _CC( uint8_t&,  m_Seconds)  = source.m_Seconds;
-    _CC( bool&,     m_IsNull)   = source.m_IsNull;
+    _CC (uint32_t&, mMicrosec) = source.mMicrosec;
+    _CC (int16_t&,  mYear)     = source.mYear;
+    _CC (uint8_t&,  mMonth)    = source.mMonth;
+    _CC (uint8_t&,  mDay)      = source.mDay;
+    _CC (uint8_t&,  mHour)     = source.mHour;
+    _CC (uint8_t&,  mMinutes)  = source.mMinutes;
+    _CC (uint8_t&,  mSeconds)  = source.mSeconds;
+    _CC (bool&,     mIsNull)   = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSHiresTime& second) const
+  bool operator< (const DHiresTime& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
       {
-        if (m_Year < second.m_Year)
+        if (mYear < second.mYear)
           return true;
-        else if (m_Year == second.m_Year)
+
+        else if (mYear == second.mYear)
           {
-            if (m_Month < second.m_Month)
+            if (mMonth < second.mMonth)
               return true;
-            else if (m_Month == second.m_Month)
+
+            else if (mMonth == second.mMonth)
               {
-                if (m_Day < second.m_Day)
+                if (mDay < second.mDay)
                   return true;
-                else if (m_Day == second.m_Day)
+
+                else if (mDay == second.mDay)
                   {
-                    if (m_Hour < second.m_Hour)
+                    if (mHour < second.mHour)
                       return true;
-                    else if (m_Hour == second.m_Hour)
+
+                    else if (mHour == second.mHour)
                       {
-                        if (m_Minutes < second.m_Minutes)
+                        if (mMinutes < second.mMinutes)
                           return true;
-                        else if (m_Minutes == second.m_Minutes)
+
+                        else if (mMinutes == second.mMinutes)
                           {
-                            if (m_Seconds < second.m_Seconds)
+                            if (mSeconds < second.mSeconds)
                               return true;
-                            else if (m_Seconds == second.m_Seconds)
-                              return m_Microsec < second.m_Microsec;
+
+                            else if (mSeconds == second.mSeconds)
+                              return mMicrosec < second.mMicrosec;
                           }
                       }
                   }
@@ -503,945 +553,1049 @@ struct DBS_SHL DBSHiresTime
     return false;
   }
 
-  bool operator== (const DBSHiresTime& second) const
+  bool operator== (const DHiresTime& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Year == second.m_Year) &&
-           (m_Month == second.m_Month) &&
-           (m_Day  == second.m_Day) &&
-           (m_Hour == second.m_Hour) &&
-           (m_Minutes == second.m_Minutes) &&
-           (m_Seconds == second.m_Seconds) &&
-           (m_Microsec == second.m_Microsec);
+    return (mYear == second.mYear)
+            && (mMonth == second.mMonth)
+            && (mDay  == second.mDay)
+            && (mHour == second.mHour)
+            && (mMinutes == second.mMinutes)
+            && (mSeconds == second.mSeconds)
+            && (mMicrosec == second.mMicrosec);
   }
 
-  bool operator<= (const DBSHiresTime& second) const
+  bool operator<= (const DHiresTime& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSHiresTime& second) const
+  bool operator!= (const DHiresTime& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSHiresTime& second) const
+  bool operator> (const DHiresTime& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSHiresTime& second) const
+  bool operator>= (const DHiresTime& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_HIRESTIME; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_HIRESTIME;
+  }
 
-  const uint32_t m_Microsec;
-  const int16_t  m_Year;
-  const uint8_t  m_Month;
-  const uint8_t  m_Day;
-  const uint8_t  m_Hour;
-  const uint8_t  m_Minutes;
-  const uint8_t  m_Seconds;
-  const bool     m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const uint32_t mMicrosec;
+  const int16_t  mYear;
+  const uint8_t  mMonth;
+  const uint8_t  mDay;
+  const uint8_t  mHour;
+  const uint8_t  mMinutes;
+  const uint8_t  mSeconds;
+  const bool     mIsNull;
 
 };
 
-struct DBSUInt8
+struct DUInt8
 {
-  DBSUInt8 ()
-    : m_Value (),
-      m_IsNull (true)
+  DUInt8 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSUInt8 (const uint8_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DUInt8 (const uint8_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSUInt8 (const DBSUInt8& source) :
-    m_Value (source.m_Value),
-    m_IsNull (source.m_IsNull)
+  DUInt8 (const DUInt8& source) :
+    mValue (source.mValue),
+    mIsNull (source.mIsNull)
   {
   }
 
-  DBSUInt8& operator= (const DBSUInt8& source)
+  DUInt8& operator= (const DUInt8& source)
   {
-    _CC( uint8_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)   = source.m_IsNull;
+    _CC (uint8_t&, mValue)   = source.mValue;
+    _CC (bool&,    mIsNull)  = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSUInt8& second) const
+  bool operator< (const DUInt8& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSUInt8& second) const
+  bool operator== (const DUInt8& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSUInt8& second) const
+  bool operator<= (const DUInt8& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSUInt8& second) const
+  bool operator!= (const DUInt8& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSUInt8& second) const
+  bool operator> (const DUInt8& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSUInt8& second) const
+  bool operator>= (const DUInt8& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT8; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE  DBSType() const
+  {
+    return T_UINT8;
+  }
 
-  const uint8_t m_Value;
-  const bool    m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const uint8_t mValue;
+  const bool    mIsNull;
 };
 
-struct DBSUInt16
+struct DUInt16
 {
-  DBSUInt16 ()
-    : m_Value (),
-      m_IsNull (true)
+  DUInt16 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSUInt16 (const uint16_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DUInt16 (const uint16_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSUInt16 (const DBSUInt16& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DUInt16 (const DUInt16& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSUInt16& operator= (const DBSUInt16& source)
+  DUInt16& operator= (const DUInt16& source)
   {
-    _CC( uint16_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)    = source.m_IsNull;
+    _CC (uint16_t&, mValue)  = source.mValue;
+    _CC (bool&,     mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSUInt16& second) const
+  bool operator< (const DUInt16& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSUInt16& second) const
+  bool operator== (const DUInt16& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSUInt16& second) const
+  bool operator<= (const DUInt16& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSUInt16& second) const
+  bool operator!= (const DUInt16& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSUInt16& second) const
+  bool operator> (const DUInt16& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSUInt16& second) const
+  bool operator>= (const DUInt16& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT16; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE  DBSType() const
+  {
+    return T_UINT16;
+  }
 
-  const uint16_t m_Value;
-  const bool     m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const uint16_t mValue;
+  const bool     mIsNull;
 };
 
-struct DBSUInt32
+struct DUInt32
 {
-  DBSUInt32 ()
-    : m_Value (),
-      m_IsNull (true)
+  DUInt32 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSUInt32 (const uint32_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DUInt32 (const uint32_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSUInt32 (const DBSUInt32& source) :
-    m_Value (source.m_Value),
-    m_IsNull (source.m_IsNull)
+  DUInt32 (const DUInt32& source) :
+    mValue (source.mValue),
+    mIsNull (source.mIsNull)
   {}
 
-  DBSUInt32& operator= (const DBSUInt32& source)
+  DUInt32& operator= (const DUInt32& source)
   {
-    _CC( uint32_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)    = source.m_IsNull;
+    _CC (uint32_t&, mValue)  = source.mValue;
+    _CC (bool&,     mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSUInt32& second) const
+  bool operator< (const DUInt32& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSUInt32& second) const
+  bool operator== (const DUInt32& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSUInt32& second) const
+  bool operator<= (const DUInt32& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSUInt32& second) const
+  bool operator!= (const DUInt32& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSUInt32& second) const
+  bool operator> (const DUInt32& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSUInt32& second) const
+  bool operator>= (const DUInt32& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT32; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_UINT32;
+  }
 
-  const uint32_t m_Value;
-  const bool     m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const uint32_t mValue;
+  const bool     mIsNull;
 };
 
-struct DBSUInt64
+struct DUInt64
 {
-  DBSUInt64 ()
-    : m_Value (),
-      m_IsNull (true)
+  DUInt64 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSUInt64 (const uint64_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DUInt64 (const uint64_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSUInt64 (const DBSUInt64& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DUInt64 (const DUInt64& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSUInt64& operator= (const DBSUInt64& source)
+  DUInt64& operator= (const DUInt64& source)
   {
-    _CC( uint64_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)    = source.m_IsNull;
+    _CC (uint64_t&, mValue)  = source.mValue;
+    _CC (bool&,     mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSUInt64& second) const
+  bool operator< (const DUInt64& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSUInt64& second) const
+  bool operator== (const DUInt64& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSUInt64& second) const
+  bool operator<= (const DUInt64& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSUInt64& second) const
+  bool operator!= (const DUInt64& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSUInt64& second) const
+  bool operator> (const DUInt64& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSUInt64& second) const
+  bool operator>= (const DUInt64& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_UINT64; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_UINT64;
+  }
 
-  const uint64_t m_Value;
-  const bool     m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const uint64_t mValue;
+  const bool     mIsNull;
 };
 
-struct DBSInt8
+struct DInt8
 {
-  DBSInt8 ()
-    : m_Value (),
-      m_IsNull (true)
+  DInt8 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSInt8 (const int8_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DInt8 (const int8_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSInt8 (const DBSInt8& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DInt8 (const DInt8& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSInt8& operator= (const DBSInt8& source)
+  DInt8& operator= (const DInt8& source)
   {
-    _CC( int8_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)  = source.m_IsNull;
+    _CC (int8_t&, mValue)   = source.mValue;
+    _CC (bool&,   mIsNull)  = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSInt8& second) const
+  bool operator< (const DInt8& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSInt8& second) const
+  bool operator== (const DInt8& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSInt8& second) const
+  bool operator<= (const DInt8& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSInt8& second) const
+  bool operator!= (const DInt8& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSInt8& second) const
+  bool operator> (const DInt8& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSInt8& second) const
+  bool operator>= (const DInt8& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_INT8; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_INT8;
+  }
 
-  const int8_t m_Value;
-  const bool   m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const int8_t mValue;
+  const bool   mIsNull;
 };
 
-struct DBSInt16
+struct DInt16
 {
-  DBSInt16 ()
-    : m_Value (),
-      m_IsNull (true)
+  DInt16 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSInt16 (const int16_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DInt16 (const int16_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSInt16 (const DBSInt16& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DInt16 (const DInt16& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSInt16& operator= (const DBSInt16& source)
+  DInt16& operator= (const DInt16& source)
   {
-    _CC( int16_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)   = source.m_IsNull;
+    _CC (int16_t&, mValue)  = source.mValue;
+    _CC (bool&,    mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSInt16& second) const
+  bool operator< (const DInt16& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSInt16& second) const
+  bool operator== (const DInt16& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSInt16& second) const
+  bool operator<= (const DInt16& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSInt16& second) const
+  bool operator!= (const DInt16& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSInt16& second) const
+  bool operator> (const DInt16& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSInt16& second) const
+  bool operator>= (const DInt16& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_INT16; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_INT16;
+  }
 
-  const int16_t m_Value;
-  bool          m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const int16_t mValue;
+  bool          mIsNull;
 };
 
-struct DBSInt32
+struct DInt32
 {
-  DBSInt32 ()
-    : m_Value (),
-      m_IsNull (true)
+  DInt32 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSInt32 (const int32_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DInt32 (const int32_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSInt32 (const DBSInt32& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DInt32 (const DInt32& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSInt32& operator= (const DBSInt32& source)
+  DInt32& operator= (const DInt32& source)
   {
-    _CC( int32_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)   = source.m_IsNull;
+    _CC (int32_t&, mValue)   = source.mValue;
+    _CC (bool&,    mIsNull)  = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSInt32& second) const
+  bool operator< (const DInt32& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSInt32& second) const
+  bool operator== (const DInt32& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSInt32& second) const
+  bool operator<= (const DInt32& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSInt32& second) const
+  bool operator!= (const DInt32& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSInt32& second) const
+  bool operator> (const DInt32& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSInt32& second) const
+  bool operator>= (const DInt32& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_INT32; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_INT32;
+  }
 
-  const int32_t m_Value;
-  const bool    m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const int32_t mValue;
+  const bool    mIsNull;
 };
 
-struct DBSInt64
+struct DInt64
 {
-  DBSInt64 ()
-    : m_Value (),
-      m_IsNull (true)
+  DInt64 ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  explicit DBSInt64 (const int64_t value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DInt64 (const int64_t value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSInt64 (const DBSInt64& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DInt64 (const DInt64& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSInt64& operator= (const DBSInt64& source)
+  DInt64& operator= (const DInt64& source)
   {
-    _CC( int64_t&, m_Value) = source.m_Value;
-    _CC( bool&, m_IsNull)   = source.m_IsNull;
+    _CC (int64_t&, mValue)  = source.mValue;
+    _CC (bool&,    mIsNull) = source.mIsNull;
     return *this;
   }
 
-  bool operator< (const DBSInt64& second) const
+  bool operator< (const DInt64& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return m_Value < second.m_Value;
+      return mValue < second.mValue;
 
     return false;
   }
 
-  bool operator== (const DBSInt64& second) const
+  bool operator== (const DInt64& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSInt64& second) const
+  bool operator<= (const DInt64& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSInt64& second) const
+  bool operator!= (const DInt64& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSInt64& second) const
+  bool operator> (const DInt64& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSInt64& second) const
+  bool operator>= (const DInt64& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_INT64; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_INT64;
+  }
 
-  const int64_t m_Value;
-  const bool    m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const int64_t mValue;
+  const bool    mIsNull;
 };
 
-struct DBSReal
+struct DReal
 {
-  DBSReal () :
-    m_Value (),
-    m_IsNull (true)
+  DReal () :
+    mValue (),
+    mIsNull (true)
   {
   }
 
-  explicit DBSReal (const REAL_T value)
-    : m_Value (value),
-      m_IsNull (false)
+  explicit DReal (const REAL_T value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSReal (const DBSReal& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DReal (const DReal& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSReal& operator= (const DBSReal& source)
+  DReal& operator= (const DReal& source)
   {
-    _CC( REAL_T&, m_Value)  = source.m_Value;
-    _CC( bool&,   m_IsNull) = source.m_IsNull;
+    _CC (REAL_T&, mValue)  = source.mValue;
+    _CC (bool&,   mIsNull) = source.mIsNull;
+
     return *this;
   }
 
-  bool operator< (const DBSReal& second) const
+  bool operator< (const DReal& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return (m_Value < second.m_Value);
+      return (mValue < second.mValue);
     return false;
   }
 
-  bool operator== (const DBSReal& second) const
+  bool operator== (const DReal& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSReal& second) const
+  bool operator<= (const DReal& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSReal& second) const
+  bool operator!= (const DReal& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSReal& second) const
+  bool operator> (const DReal& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSReal& second) const
+  bool operator>= (const DReal& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_REAL; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_REAL;
+  }
 
-  const REAL_T m_Value;
-  const bool   m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const REAL_T mValue;
+  const bool   mIsNull;
 };
 
-struct DBSRichReal
+struct DRichReal
 {
-  DBSRichReal ()
-    : m_Value (),
-      m_IsNull (true)
+  DRichReal ()
+    : mValue (),
+      mIsNull (true)
   {
   }
 
-  DBSRichReal (const RICHREAL_T value)
-    : m_Value (value),
-      m_IsNull (false)
+  DRichReal (const RICHREAL_T value)
+    : mValue (value),
+      mIsNull (false)
   {
   }
 
-  DBSRichReal (const DBSRichReal& source)
-    : m_Value (source.m_Value),
-      m_IsNull (source.m_IsNull)
+  DRichReal (const DRichReal& source)
+    : mValue (source.mValue),
+      mIsNull (source.mIsNull)
   {
   }
 
-  DBSRichReal& operator= (const DBSRichReal& source)
+  DRichReal& operator= (const DRichReal& source)
   {
-    _CC( RICHREAL_T&, m_Value)  = source.m_Value;
-    _CC( bool&,       m_IsNull) = source.m_IsNull;
+    _CC (RICHREAL_T&, mValue)  = source.mValue;
+    _CC (bool&,       mIsNull) = source.mIsNull;
     return *this;
   }
 
-  bool operator< (const DBSRichReal& second) const
+  bool operator< (const DRichReal& second) const
   {
     if (IsNull () && (second.IsNull () == false))
       return true;
 
     if (second.IsNull () == false)
-      return (m_Value < second.m_Value);
+      return (mValue < second.mValue);
     return false;
   }
 
-  bool operator== (const DBSRichReal& second) const
+  bool operator== (const DRichReal& second) const
   {
-    if (m_IsNull != second.m_IsNull)
+    if (mIsNull != second.mIsNull)
       return false;
 
-    if (m_IsNull == true)
+    if (mIsNull == true)
       return true;
 
-    return (m_Value == second.m_Value);
+    return (mValue == second.mValue);
   }
 
-  bool operator<= (const DBSRichReal& second) const
+  bool operator<= (const DRichReal& second) const
   {
     return (*this < second) || (*this == second);
   }
 
-  bool operator!= (const DBSRichReal& second) const
+  bool operator!= (const DRichReal& second) const
   {
     return (*this == second) == false;
   }
 
-  bool operator> (const DBSRichReal& second) const
+  bool operator> (const DRichReal& second) const
   {
     return (*this <= second) == false;
   }
 
-  bool operator>= (const DBSRichReal& second) const
+  bool operator>= (const DRichReal& second) const
   {
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_RICHREAL; }
-  bool IsNull () const { return m_IsNull; }
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_RICHREAL;
+  }
 
-  const RICHREAL_T m_Value;
-  const bool       m_IsNull;
+  bool IsNull () const
+  {
+    return mIsNull;
+  }
+
+  const RICHREAL_T mValue;
+  const bool       mIsNull;
 };
 
 
-class I_TextStrategy;
-class DBS_SHL DBSText
+class ITextStrategy;
+class DBS_SHL DText
 {
 public:
-  explicit DBSText (const char* pText = NULL);
-  explicit DBSText (const uint8_t* pUtf8String);
-  explicit DBSText (I_TextStrategy& text);
+  explicit DText (const char* text = NULL);
+  explicit DText (const uint8_t* utf8Src);
+  explicit DText (ITextStrategy& text);
 
-  DBSText (const DBSText& sourceText);
-  DBSText& operator= (const DBSText& sourceText);
-  bool operator== (const DBSText& text) const ;
-  bool operator!= (const DBSText& text) const
+  DText (const DText& source);
+  DText& operator= (const DText& source);
+
+  bool operator== (const DText& text) const;
+
+  bool operator!= (const DText& text) const
   {
     return (*this == text) == false;
   }
 
-  virtual ~DBSText ();
+  virtual ~DText ();
 
   bool IsNull () const;
 
-  uint64_t GetCharactersCount() const;
-  uint64_t GetRawUtf8Count() const;
-  void     GetRawUtf8 (uint64_t       offset,
-                       uint64_t       count,
-                       uint8_t* const pBuffer) const;
+  uint64_t Count() const;
 
-  void Append (const DBSChar& character);
-  void Append (const DBSText& text);
+  uint64_t RawSize () const;
 
-  DBSChar GetCharAtIndex(const uint64_t index) const;
-  void    SetCharAtIndex (const DBSChar& rCharacter, const uint64_t index);
+  void RawRead (uint64_t offset, uint64_t count, uint8_t* dest) const;
 
-  void SetMirror (DBSText& mirror) const;
+  void Append (const DChar& ch);
+  void Append (const DText& text);
 
-  DBS_FIELD_TYPE  GetDBSType() const { return T_TEXT; }
-  operator I_TextStrategy&() const { return *m_pText; }
+  DChar CharAt (const uint64_t index) const;
+  void  CharAt (const uint64_t index, const DChar& ch);
+
+  void MakeMirror (DText& mirror) const;
+
+  DBS_FIELD_TYPE DBSType() const
+  {
+    return T_TEXT;
+  }
+
+  operator ITextStrategy&() const
+  {
+    return *mText;
+  }
 
 private:
-  I_TextStrategy* m_pText;
+  ITextStrategy*      mText;
 };
 
-class I_ArrayStrategy;
-class DBS_SHL DBSArray
+class IArrayStrategy;
+class DBS_SHL DArray
 {
 public:
 
-  DBSArray ();
-  explicit DBSArray (const DBSBool* array, uint64_t count = 0);
-  explicit DBSArray (const DBSChar* array, uint64_t count = 0);
-  explicit DBSArray (const DBSDate* array, uint64_t count = 0);
-  explicit DBSArray (const DBSDateTime* array, uint64_t count = 0);
-  explicit DBSArray (const DBSHiresTime* array, uint64_t count = 0);
-  explicit DBSArray (const DBSUInt8* array, uint64_t count = 0);
-  explicit DBSArray (const DBSUInt16* array, uint64_t count = 0);
-  explicit DBSArray (const DBSUInt32* array, uint64_t count = 0);
-  explicit DBSArray (const DBSUInt64* array, uint64_t count = 0);
-  explicit DBSArray (const DBSReal* array, uint64_t count = 0);
-  explicit DBSArray (const DBSRichReal* array, uint64_t count = 0);
-  explicit DBSArray (const DBSInt8* array, uint64_t count = 0);
-  explicit DBSArray (const DBSInt16* array, uint64_t count = 0);
-  explicit DBSArray (const DBSInt32* array, uint64_t count = 0);
-  explicit DBSArray (const DBSInt64* array, uint64_t count = 0);
+  DArray ();
+  explicit DArray (const DBool* const array, const uint64_t count = 0);
+  explicit DArray (const DChar* const array, const uint64_t count = 0);
+  explicit DArray (const DDate* const array, const uint64_t count = 0);
+  explicit DArray (const DDateTime* const array, const uint64_t count = 0);
+  explicit DArray (const DHiresTime* const array, const uint64_t count = 0);
+  explicit DArray (const DUInt8* const array, const uint64_t count = 0);
+  explicit DArray (const DUInt16* const array, const uint64_t count = 0);
+  explicit DArray (const DUInt32* const array, const uint64_t count = 0);
+  explicit DArray (const DUInt64* const array, const uint64_t count = 0);
+  explicit DArray (const DReal* const array, const uint64_t count = 0);
+  explicit DArray (const DRichReal* const array, const uint64_t count = 0);
+  explicit DArray (const DInt8* const array, const uint64_t count = 0);
+  explicit DArray (const DInt16* const array, const uint64_t count = 0);
+  explicit DArray (const DInt32* const array, const uint64_t count = 0);
+  explicit DArray (const DInt64* const array, const uint64_t count = 0);
 
-  explicit DBSArray (I_ArrayStrategy& array);
+  explicit DArray (IArrayStrategy& array);
 
-  virtual ~DBSArray ();
+  virtual ~DArray ();
 
-  DBSArray (const DBSArray& rSource);
-  DBSArray& operator= (const DBSArray& rSource);
+  DArray (const DArray& source);
+  DArray& operator= (const DArray& source);
 
-  bool           IsNull () const { return ElementsCount() == 0; }
-  uint64_t       ElementsCount () const;
-  DBS_FIELD_TYPE ElementsType () const;
+  bool IsNull () const
+  {
+    return Count() == 0;
+  }
 
-  uint64_t AddElement (const DBSBool& value);
-  uint64_t AddElement (const DBSChar& value);
-  uint64_t AddElement (const DBSDate& value);
-  uint64_t AddElement (const DBSDateTime& value);
-  uint64_t AddElement (const DBSHiresTime& value);
-  uint64_t AddElement (const DBSUInt8& value);
-  uint64_t AddElement (const DBSUInt16& value);
-  uint64_t AddElement (const DBSUInt32& value);
-  uint64_t AddElement (const DBSUInt64& value);
-  uint64_t AddElement (const DBSReal& value);
-  uint64_t AddElement (const DBSRichReal& value);
-  uint64_t AddElement (const DBSInt8& value);
-  uint64_t AddElement (const DBSInt16& value);
-  uint64_t AddElement (const DBSInt32& value);
-  uint64_t AddElement (const DBSInt64& value);
+  uint64_t Count () const;
 
-  void GetElement (DBSBool& outValue, const uint64_t index) const;
-  void GetElement (DBSChar& outValue, const uint64_t index) const;
-  void GetElement (DBSDate& outValue, const uint64_t index) const;
-  void GetElement (DBSDateTime& outValue, const uint64_t index) const;
-  void GetElement (DBSHiresTime& outValue, const uint64_t index) const;
-  void GetElement (DBSUInt8& outValue, const uint64_t index) const;
-  void GetElement (DBSUInt16& outValue, const uint64_t index) const;
-  void GetElement (DBSUInt32& outValue, const uint64_t index) const;
-  void GetElement (DBSUInt64& outValue, const uint64_t index) const;
-  void GetElement (DBSReal& outValue, const uint64_t index) const;
-  void GetElement (DBSRichReal& outValue, const uint64_t index) const;
-  void GetElement (DBSInt8& outValue, const uint64_t index) const;
-  void GetElement (DBSInt16& outValue, const uint64_t index) const;
-  void GetElement (DBSInt32& outValue, const uint64_t index) const;
-  void GetElement (DBSInt64& outValue, const uint64_t index) const;
+  DBS_FIELD_TYPE Type () const;
 
-  void SetElement (const DBSBool& newValue, const uint64_t index);
-  void SetElement (const DBSChar& newValue, const uint64_t index);
-  void SetElement (const DBSDate& newValue, const uint64_t index);
-  void SetElement (const DBSDateTime& newValue, const uint64_t index);
-  void SetElement (const DBSHiresTime& newValue, const uint64_t index);
-  void SetElement (const DBSUInt8& newValue, const uint64_t index);
-  void SetElement (const DBSUInt16& newValue, const uint64_t index);
-  void SetElement (const DBSUInt32& newValue, const uint64_t index);
-  void SetElement (const DBSUInt64& newValue, const uint64_t index);
-  void SetElement (const DBSReal& newValue, const uint64_t index);
-  void SetElement (const DBSRichReal& newValue, const uint64_t index);
-  void SetElement (const DBSInt8& newValue, const uint64_t index);
-  void SetElement (const DBSInt16& newValue, const uint64_t index);
-  void SetElement (const DBSInt32& newValue, const uint64_t index);
-  void SetElement (const DBSInt64& newValue, const uint64_t index);
+  uint64_t Add (const DBool& value);
+  uint64_t Add (const DChar& value);
+  uint64_t Add (const DDate& value);
+  uint64_t Add (const DDateTime& value);
+  uint64_t Add (const DHiresTime& value);
+  uint64_t Add (const DUInt8& value);
+  uint64_t Add (const DUInt16& value);
+  uint64_t Add (const DUInt32& value);
+  uint64_t Add (const DUInt64& value);
+  uint64_t Add (const DReal& value);
+  uint64_t Add (const DRichReal& value);
+  uint64_t Add (const DInt8& value);
+  uint64_t Add (const DInt16& value);
+  uint64_t Add (const DInt32& value);
+  uint64_t Add (const DInt64& value);
 
-  void RemoveElement (const uint64_t index);
+  void Get (const uint64_t index, DBool& outValue) const;
+  void Get (const uint64_t index, DChar& outValue) const;
+  void Get (const uint64_t index, DDate& outValue) const;
+  void Get (const uint64_t index, DDateTime& outValue) const;
+  void Get (const uint64_t index, DHiresTime& outValue) const;
+  void Get (const uint64_t index, DUInt8& outValue) const;
+  void Get (const uint64_t index, DUInt16& outValue) const;
+  void Get (const uint64_t index, DUInt32& outValue) const;
+  void Get (const uint64_t index, DUInt64& outValue) const;
+  void Get (const uint64_t index, DReal& outValue) const;
+  void Get (const uint64_t index, DRichReal& outValue) const;
+  void Get (const uint64_t index, DInt8& outValue) const;
+  void Get (const uint64_t index, DInt16& outValue) const;
+  void Get (const uint64_t index, DInt32& outValue) const;
+  void Get (const uint64_t index, DInt64& outValue) const;
+
+  void Set (const uint64_t index, const DBool& value);
+  void Set (const uint64_t index, const DChar& value);
+  void Set (const uint64_t index, const DDate& value);
+  void Set (const uint64_t index, const DDateTime& value);
+  void Set (const uint64_t index, const DHiresTime& value);
+  void Set (const uint64_t index, const DUInt8& value);
+  void Set (const uint64_t index, const DUInt16& value);
+  void Set (const uint64_t index, const DUInt32& value);
+  void Set (const uint64_t index, const DUInt64& value);
+  void Set (const uint64_t index, const DReal& value);
+  void Set (const uint64_t index, const DRichReal& value);
+  void Set (const uint64_t index, const DInt8& value);
+  void Set (const uint64_t index, const DInt16& value);
+  void Set (const uint64_t index, const DInt32& value);
+  void Set (const uint64_t index, const DInt64& value);
+
+  void Remove (const uint64_t index);
+
   void Sort (bool reverse = false);
-  void SetMirror (DBSArray& mirror) const;
 
-  operator I_ArrayStrategy&() const { return *m_pArray; }
+  void MakeMirror (DArray& mirror) const;
+
+  operator IArrayStrategy&() const
+  {
+    return *mArray;
+  }
 
 private:
-  I_ArrayStrategy       *m_pArray;
+  IArrayStrategy       *mArray;
 };
 
 } //namespace whisper

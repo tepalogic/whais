@@ -44,7 +44,7 @@ cmd_value_desc (ClientConnection& rConn)
   const char* glbName    = _RC (const char*, data_ + sizeof (uint32_t));
   uint16_t      fieldHint  = load_le_int16 (data_);
   uint16_t      dataOffset = sizeof (uint32_t) + strlen (glbName) + 1;
-  I_Session&    session    = *rConn.Dbs ().m_Session;
+  I_Session&    session    = *rConn.Dbs ().mSession;
   uint_t        rawType;
 
   if (rConn.DataSize () < dataOffset)
@@ -158,8 +158,8 @@ cmd_value_desc (ClientConnection& rConn)
 
           if (IS_TABLE (rawType))
             {
-              I_DBSTable&       table       = op->GetTable ();
-              const FIELD_INDEX fieldsCount = table.GetFieldsCount ();
+              ITable&       table       = op->GetTable ();
+              const FIELD_INDEX fieldsCount = table.FieldsCount ();
 
               if (fieldHint >= fieldsCount)
                 {
@@ -180,11 +180,11 @@ cmd_value_desc (ClientConnection& rConn)
               bool oneAtLeast = false;
               do
                 {
-                  const DBSFieldDescriptor fd = table.GetFieldDescriptor (
+                  const DBSFieldDescriptor fd = table.DescribeField (
                                                                       fieldHint
                                                                           );
-                  const uint_t fieldLen  = strlen (fd.m_pFieldName) + 1;
-                  uint_t       fieldType = fd.m_FieldType;
+                  const uint_t fieldLen  = strlen (fd.name) + 1;
+                  uint_t       fieldType = fd.type;
 
                   if (fd.isArray)
                     MARK_ARRAY (fieldType);
@@ -195,7 +195,7 @@ cmd_value_desc (ClientConnection& rConn)
                       break;
                     }
 
-                  strcpy (_RC (char*, data_ + dataOffset), fd.m_pFieldName);
+                  strcpy (_RC (char*, data_ + dataOffset), fd.name);
                   dataOffset += fieldLen;
 
                   store_le_int16 (fieldType, data_ + dataOffset);
@@ -280,9 +280,9 @@ cmd_read_stack (ClientConnection& rConn)
 
       if (IS_TABLE (valType))
         {
-          I_DBSTable& table     = topValue.GetOperand ().GetTable ();
+          ITable& table     = topValue.GetOperand ().GetTable ();
           FIELD_INDEX fieldHint = (fieldNameHint[0] != 0) ?
-                                  table.GetFieldIndex (fieldNameHint) : 0;
+                                  table.RetrieveField (fieldNameHint) : 0;
 
           status = cmd_read_table_stack_top (rConn,
                                              topValue,
@@ -405,7 +405,7 @@ static void
 cmd_execute_procedure (ClientConnection& rConn)
 {
   const char* procName   = _RC (const char*, rConn.Data ());
-  I_Session&    session    = *rConn.Dbs ().m_Session;
+  I_Session&    session    = *rConn.Dbs ().mSession;
   SessionStack& stack      = rConn.Stack ();
 
   session.ExecuteProcedure (procName, stack);
@@ -444,7 +444,7 @@ cmd_list_globals (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  const I_Session& session = *rConn.Dbs ().m_Session;
+  const I_Session& session = *rConn.Dbs ().mSession;
 
   const uint32_t glbsCount  = session.GlobalValuesCount ();
   uint32_t       firstHint  = load_le_int32 (rConn.Data ());
@@ -525,7 +525,7 @@ cmd_list_procedures (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  const I_Session& session = *rConn.Dbs ().m_Session;
+  const I_Session& session = *rConn.Dbs ().mSession;
 
   const uint32_t procsCount  = session.ProceduresCount ();
   uint32_t       firstHint   = load_le_int32 (rConn.Data ());
@@ -605,7 +605,7 @@ cmd_procedure_param_desc (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  I_Session&          session     = *rConn.Dbs ().m_Session;
+  I_Session&          session     = *rConn.Dbs ().mSession;
   uint8_t*            data_       = rConn.Data ();
   uint16_t            hint        = load_le_int16 (data_);
   const char* const procName    = _RC (const char*,

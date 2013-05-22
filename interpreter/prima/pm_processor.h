@@ -39,28 +39,28 @@ public:
   void AquireSync (const uint8_t sync);
   void ReleaseSync (const uint8_t sync);
 
-  Session&       GetSession () const { return m_Session; }
-  SessionStack&  GetStack () const { return m_Stack; }
-  const Unit&    GetUnit () const { return m_ProcUnit; }
+  Session&       GetSession () const { return mSession; }
+  SessionStack&  GetStack () const { return mStack; }
+  const Unit&    GetUnit () const { return mProcUnit; }
 
-  const uint8_t* Code () const { return m_pCode; }
-  uint64_t       CurrentOffset () const { return m_CodePos; }
-  uint64_t       CodeSize () const { return m_CodeSize; }
+  const uint8_t* Code () const { return mpCode; }
+  uint64_t       CurrentOffset () const { return mCodePos; }
+  uint64_t       CodeSize () const { return mCodeSize; }
 
-  size_t         LocalsCount () const { return m_LocalsCount; }
-  size_t         StackBegin () const { return m_StackBegin; }
+  size_t         LocalsCount () const { return mLocalsCount; }
+  size_t         StackBegin () const { return mStackBegin; }
 
 private:
-  Session&       m_Session;
-  SessionStack&  m_Stack;
-  const Unit&    m_ProcUnit;
-  const uint8_t* m_pCode;
-  const uint64_t m_CodeSize;
-  uint64_t       m_CodePos;
-  const uint_t   m_LocalsCount;
-  const size_t   m_StackBegin;
-  const uint32_t m_ProcId;
-  uint16_t       m_AquiredSync;
+  Session&       mSession;
+  SessionStack&  mStack;
+  const Unit&    mProcUnit;
+  const uint8_t* mpCode;
+  const uint64_t mCodeSize;
+  uint64_t       mCodePos;
+  const uint_t   mLocalsCount;
+  const size_t   mStackBegin;
+  const uint32_t mProcId;
+  uint16_t       mAquiredSync;
 
   static const uint16_t NO_INDEX = 0xFFFF;
 };

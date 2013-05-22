@@ -127,14 +127,14 @@ test_op_addXX (Session& session,
   else if (second.IsNull ())
     return result == first;
 
-  return result == DBS_T (first.m_Value + second.m_Value);
+  return result == DBS_T (first.mValue + second.mValue);
 }
 
 static bool
 test_op_addt (Session& session,
               const char* pDesc,
-              DBSText first,
-              DBSText second)
+              DText first,
+              DText second)
 {
   std::cout << "Testing " << pDesc << " addition...\n";
   const uint32_t procId = session.FindProcedure (
@@ -161,7 +161,7 @@ test_op_addt (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSText result;
+  DText result;
   stack[0].GetOperand ().GetValue (result);
 
   if (result.IsNull ())
@@ -212,7 +212,7 @@ test_op_subXX (Session& session,
   else if (second.IsNull ())
     return result == first;
 
-  return result == DBS_T (first.m_Value - second.m_Value);
+  return result == DBS_T (first.mValue - second.mValue);
 }
 
 template <typename DBS_T> bool
@@ -255,7 +255,7 @@ test_op_mulXX (Session& session,
   else if (second.IsNull ())
     return result == first;
 
-  return result == DBS_T (first.m_Value * second.m_Value);
+  return result == DBS_T (first.mValue * second.mValue);
 }
 
 template <typename DBS_T> bool
@@ -298,15 +298,15 @@ test_op_divXX (Session& session,
   else if (second.IsNull ())
     return result == first;
 
-  return result == DBS_T (first.m_Value / second.m_Value);
+  return result == DBS_T (first.mValue / second.mValue);
 }
 
 static bool
 test_op_mod (Session& session,
                const char* desc,
                const W_OPCODE opcode,
-               const DBSUInt64 first,
-               const DBSUInt64 second)
+               const DUInt64 first,
+               const DUInt64 second)
 {
   std::cout << "Testing " << desc << " modulo ...\n";
   const uint32_t procId = session.FindProcedure (
@@ -332,7 +332,7 @@ test_op_mod (Session& session,
   if (stack.Size () != 1)
     return false;
 
-  DBSUInt64 result;
+  DUInt64 result;
   stack[0].GetOperand ().GetValue (result);
 
   if (first.IsNull ())
@@ -340,7 +340,7 @@ test_op_mod (Session& session,
   else if (second.IsNull ())
     return result == first;
 
-  return result == DBSUInt64 (first.m_Value % second.m_Value);
+  return result == DUInt64 (first.mValue % second.mValue);
 }
 
 
@@ -370,66 +370,66 @@ main ()
 
     success = success && test_op_addt (_SC (Session&, commonSession),
                                         "text (first null)",
-                                        DBSText (),
-                                        DBSText ("World!"));
+                                        DText (),
+                                        DText ("World!"));
     success = success && test_op_addt (_SC (Session&, commonSession),
                                         "text (second null)",
-                                        DBSText ("Hello, "),
-                                        DBSText ());
+                                        DText ("Hello, "),
+                                        DText ());
 
     success = success && test_op_addt (_SC (Session&, commonSession),
                                         "text (no nulls)",
-                                        DBSText ("Hello, "),
-                                        DBSText ("World!"));
+                                        DText ("Hello, "),
+                                        DText ("World!"));
 
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_ADD,
-                                        DBSUInt64 (10),
-                                        DBSUInt64 (20));
+                                        DUInt64 (10),
+                                        DUInt64 (20));
 
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "integer with first null",
                                         W_ADD,
-                                        DBSUInt8 (),
-                                        DBSUInt8 (20));
+                                        DUInt8 (),
+                                        DUInt8 (20));
 
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "integer with second null",
                                         W_ADD,
-                                        DBSInt16 (10),
-                                        DBSInt16 ());
+                                        DInt16 (10),
+                                        DInt16 ());
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "real",
                                         W_ADDR,
-                                        DBSReal (10.00),
-                                        DBSReal (20.00));
+                                        DReal (10.00),
+                                        DReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "real with first null",
                                         W_ADDR,
-                                        DBSReal (),
-                                        DBSReal (20.00));
+                                        DReal (),
+                                        DReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "real with second null",
                                         W_ADDR,
-                                        DBSReal (10.00),
-                                        DBSReal ());
+                                        DReal (10.00),
+                                        DReal ());
 
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_ADDRR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal (20.00));
+                                        DRichReal (10.00),
+                                        DRichReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_ADDRR,
-                                        DBSRichReal (),
-                                        DBSRichReal (20.00));
+                                        DRichReal (),
+                                        DRichReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_ADDR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal ());
+                                        DRichReal (10.00),
+                                        DRichReal ());
 
 
     //Substraction
@@ -437,154 +437,154 @@ main ()
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_SUB,
-                                        DBSUInt64 (10),
-                                        DBSUInt64 (20));
+                                        DUInt64 (10),
+                                        DUInt64 (20));
 
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "integer with first null",
                                         W_SUB,
-                                        DBSUInt8 (),
-                                        DBSUInt8 (20));
+                                        DUInt8 (),
+                                        DUInt8 (20));
 
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "integer with second null",
                                         W_SUB,
-                                        DBSInt16 (10),
-                                        DBSInt16 ());
+                                        DInt16 (10),
+                                        DInt16 ());
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "real",
                                         W_SUBR,
-                                        DBSReal (10.00),
-                                        DBSReal (20.00));
+                                        DReal (10.00),
+                                        DReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "real with first null",
                                         W_SUBR,
-                                        DBSReal (),
-                                        DBSReal (20.00));
+                                        DReal (),
+                                        DReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "real with second null",
                                         W_SUBR,
-                                        DBSReal (10.00),
-                                        DBSReal ());
+                                        DReal (10.00),
+                                        DReal ());
 
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_SUBRR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal (20.00));
+                                        DRichReal (10.00),
+                                        DRichReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_SUBRR,
-                                        DBSRichReal (),
-                                        DBSRichReal (20.00));
+                                        DRichReal (),
+                                        DRichReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_SUBR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal ());
+                                        DRichReal (10.00),
+                                        DRichReal ());
 
     //Multiplication
 
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_MUL,
-                                        DBSUInt64 (10),
-                                        DBSUInt64 (20));
+                                        DUInt64 (10),
+                                        DUInt64 (20));
 
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "integer with first null",
                                         W_MUL,
-                                        DBSUInt8 (),
-                                        DBSUInt8 (20));
+                                        DUInt8 (),
+                                        DUInt8 (20));
 
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "integer with second null",
                                         W_MUL,
-                                        DBSInt16 (10),
-                                        DBSInt16 ());
+                                        DInt16 (10),
+                                        DInt16 ());
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "real",
                                         W_MULR,
-                                        DBSReal (10.00),
-                                        DBSReal (20.00));
+                                        DReal (10.00),
+                                        DReal (20.00));
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "real with first null",
                                         W_MULR,
-                                        DBSReal (),
-                                        DBSReal (20.00));
+                                        DReal (),
+                                        DReal (20.00));
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "real with second null",
                                         W_MULR,
-                                        DBSReal (10.00),
-                                        DBSReal ());
+                                        DReal (10.00),
+                                        DReal ());
 
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_MULRR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal (20.00));
+                                        DRichReal (10.00),
+                                        DRichReal (20.00));
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_MULRR,
-                                        DBSRichReal (),
-                                        DBSRichReal (20.00));
+                                        DRichReal (),
+                                        DRichReal (20.00));
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_MULRR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal ());
+                                        DRichReal (10.00),
+                                        DRichReal ());
 
     //Divide
 
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "integer",
                                         W_DIV,
-                                        DBSUInt64 (10),
-                                        DBSUInt64 (20));
+                                        DUInt64 (10),
+                                        DUInt64 (20));
 
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "integer with first null",
                                         W_DIV,
-                                        DBSUInt8 (),
-                                        DBSUInt8 (20));
+                                        DUInt8 (),
+                                        DUInt8 (20));
 
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "integer with second null",
                                         W_DIV,
-                                        DBSInt16 (10),
-                                        DBSInt16 ());
+                                        DInt16 (10),
+                                        DInt16 ());
 
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "real",
                                         W_DIVR,
-                                        DBSReal (10.00),
-                                        DBSReal (20.00));
+                                        DReal (10.00),
+                                        DReal (20.00));
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "real with first null",
                                         W_DIVR,
-                                        DBSReal (),
-                                        DBSReal (20.00));
+                                        DReal (),
+                                        DReal (20.00));
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "real with second null",
                                         W_DIVR,
-                                        DBSReal (10.00),
-                                        DBSReal ());
+                                        DReal (10.00),
+                                        DReal ());
 
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "richreal",
                                         W_DIVRR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal (20.00));
+                                        DRichReal (10.00),
+                                        DRichReal (20.00));
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_DIVRR,
-                                        DBSRichReal (),
-                                        DBSRichReal (20.00));
+                                        DRichReal (),
+                                        DRichReal (20.00));
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_DIVRR,
-                                        DBSRichReal (10.00),
-                                        DBSRichReal ());
+                                        DRichReal (10.00),
+                                        DRichReal ());
 
 
     //Modulo
@@ -592,20 +592,20 @@ main ()
     success = success && test_op_mod (_SC (Session&, commonSession),
                                       "integer",
                                       W_MOD,
-                                      DBSUInt64 (10),
-                                      DBSUInt64 (20));
+                                      DUInt64 (10),
+                                      DUInt64 (20));
 
     success = success && test_op_mod (_SC (Session&, commonSession),
                                       "integer with first null",
                                       W_MOD,
-                                      DBSUInt64 (),
-                                      DBSUInt64 (20));
+                                      DUInt64 (),
+                                      DUInt64 (20));
 
     success = success && test_op_mod (_SC (Session&, commonSession),
                                       "integer with second null",
                                       W_MOD,
-                                      DBSUInt64 (10),
-                                      DBSUInt64 ());
+                                      DUInt64 (10),
+                                      DUInt64 ());
 
     ReleaseInstance (commonSession);
   }

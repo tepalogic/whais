@@ -96,9 +96,9 @@ colapse_container (uint_t max_file_size, const uint_t container_size)
 static bool
 check_temp_container (uint_t uTestContainerSize)
 {
-  const uint_t uContainerSize = 761;
+  const uint_t storeSize = 761;
   const uint_t uStepSize = 100;
-  TempContainer container ("./", uContainerSize);
+  TemporalContainer container (storeSize);
 
   uint8_t marker = 0;
   uint64_t current_pos = 0;

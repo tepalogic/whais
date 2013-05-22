@@ -41,7 +41,7 @@ internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return _SC (T_DEST, firstOp.m_Value + secondOp.m_Value);
+  return _SC (T_DEST, firstOp.mValue + secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -50,7 +50,7 @@ internal_sub (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value - secondOp.m_Value);
+  return T_DEST (firstOp.mValue - secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -59,7 +59,7 @@ internal_mul (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value * secondOp.m_Value);
+  return T_DEST (firstOp.mValue * secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -68,7 +68,7 @@ internal_div (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value / secondOp.m_Value);
+  return T_DEST (firstOp.mValue / secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -77,7 +77,7 @@ internal_mod (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value % secondOp.m_Value);
+  return T_DEST (firstOp.mValue % secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -86,7 +86,7 @@ internal_and (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value & secondOp.m_Value);
+  return T_DEST (firstOp.mValue & secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -95,7 +95,7 @@ internal_xor (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value ^ secondOp.m_Value);
+  return T_DEST (firstOp.mValue ^ secondOp.mValue);
 }
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -104,13 +104,13 @@ internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
   if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
-  return T_DEST (firstOp.m_Value ^ secondOp.m_Value);
+  return T_DEST (firstOp.mValue ^ secondOp.mValue);
 }
 
 template <typename T_SRC, typename T_DEST> void
 number_convert (const T_SRC& from, T_DEST& to)
 {
-  to = from.IsNull () ? T_DEST () : _SC (T_DEST, from.m_Value);
+  to = from.IsNull () ? T_DEST () : _SC (T_DEST, from.mValue);
 }
 
 
@@ -123,70 +123,70 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void GetValue (DBSArray& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
+  virtual void GetValue (DText& outValue) const;
+  virtual void GetValue (DArray& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
-  virtual void SetValue (const DBSChar& value);
-  virtual void SetValue (const DBSDate& value);
-  virtual void SetValue (const DBSDateTime& value);
-  virtual void SetValue (const DBSHiresTime& value);
-  virtual void SetValue (const DBSInt8& value);
-  virtual void SetValue (const DBSInt16& value);
-  virtual void SetValue (const DBSInt32& value);
-  virtual void SetValue (const DBSInt64& value);
-  virtual void SetValue (const DBSReal& value);
-  virtual void SetValue (const DBSRichReal& value);
-  virtual void SetValue (const DBSUInt8& value);
-  virtual void SetValue (const DBSUInt16& value);
-  virtual void SetValue (const DBSUInt32& value);
-  virtual void SetValue (const DBSUInt64& value);
-  virtual void SetValue (const DBSText& value);
-  virtual void SetValue (const DBSArray& value);
+  virtual void SetValue (const DBool& value);
+  virtual void SetValue (const DChar& value);
+  virtual void SetValue (const DDate& value);
+  virtual void SetValue (const DDateTime& value);
+  virtual void SetValue (const DHiresTime& value);
+  virtual void SetValue (const DInt8& value);
+  virtual void SetValue (const DInt16& value);
+  virtual void SetValue (const DInt32& value);
+  virtual void SetValue (const DInt64& value);
+  virtual void SetValue (const DReal& value);
+  virtual void SetValue (const DRichReal& value);
+  virtual void SetValue (const DUInt8& value);
+  virtual void SetValue (const DUInt16& value);
+  virtual void SetValue (const DUInt32& value);
+  virtual void SetValue (const DUInt64& value);
+  virtual void SetValue (const DText& value);
+  virtual void SetValue (const DArray& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
-  virtual void SelfAdd (const DBSChar& value);
-  virtual void SelfAdd (const DBSText& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
+  virtual void SelfAdd (const DChar& value);
+  virtual void SelfAdd (const DText& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfAnd (const DBSBool& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfAnd (const DBool& value);
 
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfXor (const DBSBool& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfXor (const DBool& value);
 
-  virtual void SelfOr (const DBSInt64& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfOr (const DInt64& value);
+  virtual void SelfOr (const DBool& value);
 
   //Special treatment for these
   virtual FIELD_INDEX   GetField ();
-  virtual I_DBSTable&   GetTable ();
+  virtual ITable&   GetTable ();
   virtual StackValue    GetFieldAt (const FIELD_INDEX field);
   virtual StackValue    GetValueAt (const uint64_t index);
 
@@ -211,23 +211,23 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void GetValue (DBSArray& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
+  virtual void GetValue (DText& outValue) const;
+  virtual void GetValue (DArray& outValue) const;
 
   virtual uint_t GetType ();
 
@@ -237,187 +237,187 @@ public:
 class BoolOperand : public I_PMOperand
 {
 public:
-  explicit BoolOperand (const DBSBool& value)
+  explicit BoolOperand (const DBool& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~BoolOperand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
+  virtual void SetValue (const DBool& value);
 
-  virtual void SelfAnd (const DBSBool& value);
-  virtual void SelfXor (const DBSBool& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfAnd (const DBool& value);
+  virtual void SelfXor (const DBool& value);
+  virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSBool m_Value;
+  DBool mValue;
 };
 
 class CharOperand : public I_PMOperand
 {
 public:
-  explicit CharOperand (const DBSChar& value)
+  explicit CharOperand (const DChar& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~CharOperand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DText& outValue) const;
 
-  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DChar& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSChar m_Value;
+  DChar mValue;
 };
 
 class DateOperand : public I_PMOperand
 {
 public:
-  explicit DateOperand (const DBSDate& value)
+  explicit DateOperand (const DDate& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~DateOperand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDate& value);
+  virtual void SetValue (const DDate& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSDate m_Value;
+  DDate mValue;
 };
 
 class DateTimeOperand : public I_PMOperand
 {
 public:
-  explicit DateTimeOperand (const DBSDateTime& value)
+  explicit DateTimeOperand (const DDateTime& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~DateTimeOperand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDateTime& value);
+  virtual void SetValue (const DDateTime& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSDateTime m_Value;
+  DDateTime mValue;
 };
 
 class HiresTimeOperand : public I_PMOperand
 {
 public:
-  explicit HiresTimeOperand (const DBSHiresTime& value)
+  explicit HiresTimeOperand (const DHiresTime& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~HiresTimeOperand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSHiresTime& value);
+  virtual void SetValue (const DHiresTime& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSHiresTime m_Value;
+  DHiresTime mValue;
 };
 
 class UInt8Operand : public I_PMOperand
 {
 public:
-  explicit UInt8Operand (const DBSUInt8& value)
+  explicit UInt8Operand (const DUInt8& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~UInt8Operand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt8& value);
+  virtual void SetValue (const DUInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSUInt8 m_Value;
+  DUInt8 mValue;
 };
 
 class UInt16Operand : public I_PMOperand
 {
 public:
-  explicit UInt16Operand (const DBSUInt16& value)
+  explicit UInt16Operand (const DUInt16& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -425,47 +425,47 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt16& value);
+  virtual void SetValue (const DUInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSUInt16 m_Value;
+  DUInt16 mValue;
 };
 
 class UInt32Operand : public I_PMOperand
 {
 public:
-  explicit UInt32Operand (const DBSUInt32& value)
+  explicit UInt32Operand (const DUInt32& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -473,47 +473,47 @@ public:
 
   virtual ~UInt32Operand ();
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt32& value);
+  virtual void SetValue (const DUInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSUInt32 m_Value;
+  DUInt32 mValue;
 };
 
 class UInt64Operand : public I_PMOperand
 {
 public:
-  explicit UInt64Operand (const DBSUInt64& value)
+  explicit UInt64Operand (const DUInt64& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -521,47 +521,47 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DUInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSUInt64 m_Value;
+  DUInt64 mValue;
 };
 
-class Int8Operand : public I_PMOperand, public DBSInt8
+class Int8Operand : public I_PMOperand, public DInt8
 {
 public:
-  explicit Int8Operand (const DBSInt8& value)
+  explicit Int8Operand (const DInt8& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -569,47 +569,47 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt8& value);
+  virtual void SetValue (const DInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSInt8 m_Value;
+  DInt8 mValue;
 };
 
-class Int16Operand : public I_PMOperand, public DBSInt16
+class Int16Operand : public I_PMOperand, public DInt16
 {
 public:
-  explicit Int16Operand (const DBSInt16& value)
+  explicit Int16Operand (const DInt16& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -617,142 +617,142 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt16& value);
+  virtual void SetValue (const DInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSInt16 m_Value;
+  DInt16 mValue;
 };
 
 class Int32Operand : public I_PMOperand
 {
 public:
-  explicit Int32Operand (const DBSInt32& value)
+  explicit Int32Operand (const DInt32& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~Int32Operand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt32& value);
+  virtual void SetValue (const DInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSInt32 m_Value;
+  DInt32 mValue;
 };
 
 class Int64Operand : public I_PMOperand
 {
 public:
-  explicit Int64Operand (const DBSInt64& value)
+  explicit Int64Operand (const DInt64& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual ~Int64Operand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt64& value);
+  virtual void SetValue (const DInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSInt64 m_Value;
+  DInt64 mValue;
 };
 
 
 class RealOperand : public I_PMOperand
 {
 public:
-  explicit RealOperand (const DBSReal& value)
+  explicit RealOperand (const DReal& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -760,37 +760,37 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSReal& value);
+  virtual void SetValue (const DReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSReal m_Value;
+  DReal mValue;
 };
 
 class RichRealOperand : public I_PMOperand
 {
 public:
-  explicit RichRealOperand (const DBSRichReal& value)
+  explicit RichRealOperand (const DRichReal& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
 
@@ -798,48 +798,48 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSRichReal& value);
+  virtual void SetValue (const DRichReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  DBSRichReal m_Value;
+  DRichReal mValue;
 };
 
 class TextOperand : public I_PMOperand
 {
 public:
-  explicit TextOperand (const DBSText& value)
+  explicit TextOperand (const DText& value)
     : I_PMOperand (),
-      m_Value (value)
+      mValue (value)
   {
   }
   virtual bool IsNull () const;
 
   virtual ~TextOperand ();
 
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void SetValue (const DBSText& value);
+  virtual void GetValue (DText& outValue) const;
+  virtual void SetValue (const DText& value);
 
-  virtual void SelfAdd (const DBSChar& value);
-  virtual void SelfAdd (const DBSText& value);
+  virtual void SelfAdd (const DChar& value);
+  virtual void SelfAdd (const DText& value);
 
   virtual uint_t GetType ();
 
@@ -849,26 +849,26 @@ public:
   virtual void       NotifyCopy ();
 
 private:
-  DBSText m_Value;
+  DText mValue;
 };
 
 class CharTextElOperand : public I_PMOperand
 {
 public:
-  CharTextElOperand (DBSText &text, const uint64_t index)
+  CharTextElOperand (DText &text, const uint64_t index)
     : I_PMOperand (),
-      m_Index (index),
-      m_Text ()
+      mIndex (index),
+      mText ()
   {
-    text.SetMirror (m_Text);
+    text.MakeMirror (mText);
   }
 
   CharTextElOperand (const CharTextElOperand& source)
     : I_PMOperand (),
-      m_Index (source.m_Index),
-      m_Text ()
+      mIndex (source.mIndex),
+      mText ()
   {
-    source.m_Text.SetMirror (m_Text);
+    source.mText.MakeMirror (mText);
   }
 
 
@@ -876,10 +876,10 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DText& outValue) const;
 
-  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DChar& value);
 
   virtual uint_t GetType ();
 
@@ -887,25 +887,25 @@ public:
   virtual void       NotifyCopy ();
 
 private:
-  const uint64_t m_Index;
-  DBSText        m_Text;
+  const uint64_t mIndex;
+  DText        mText;
 };
 
 class ArrayOperand : public I_PMOperand
 {
 public:
-  explicit ArrayOperand (const DBSArray& array)
+  explicit ArrayOperand (const DArray& array)
     : I_PMOperand (),
-      m_Value (array),
-      m_FirstArrayType (array.ElementsType ())
+      mValue (array),
+      mFirstArrayType (array.Type ())
     {
     }
   virtual ~ArrayOperand ();
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSArray& outValue) const;
-  virtual void SetValue (const DBSArray& value);
+  virtual void GetValue (DArray& outValue) const;
+  virtual void SetValue (const DArray& value);
 
   virtual uint_t GetType ();
 
@@ -915,41 +915,41 @@ public:
   virtual void       NotifyCopy ();
 
 private:
-  DBSArray m_Value;
-  uint16_t m_FirstArrayType;
+  DArray mValue;
+  uint16_t mFirstArrayType;
 };
 
 class BaseArrayElOperand : public I_PMOperand
 {
 protected:
-  BaseArrayElOperand (DBSArray& array, const uint64_t index)
+  BaseArrayElOperand (DArray& array, const uint64_t index)
     : I_PMOperand (),
-      m_ElementIndex (index),
-      m_Array  ()
+      mElementIndex (index),
+      mArray  ()
   {
-    array.SetMirror (m_Array);
+    array.MakeMirror (mArray);
   }
 
   BaseArrayElOperand (const BaseArrayElOperand& source)
     : I_PMOperand (),
-      m_ElementIndex (source.m_ElementIndex),
-      m_Array ()
+      mElementIndex (source.mElementIndex),
+      mArray ()
   {
-    source.m_Array.SetMirror (m_Array);
+    source.mArray.MakeMirror (mArray);
   }
 
   virtual ~BaseArrayElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
-    m_Array.GetElement (out, m_ElementIndex);
+    mArray.Get (mElementIndex, out);
 
     assert (out.IsNull () == false);
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    m_Array.SetElement (value, m_ElementIndex);
+    mArray.Set (mElementIndex, value);
   }
 
   virtual void NotifyCopy ();
@@ -957,27 +957,27 @@ protected:
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
 
-  const uint64_t m_ElementIndex;
-  DBSArray       m_Array;
+  const uint64_t mElementIndex;
+  DArray       mArray;
 };
 
 class BoolArrayElOperand : public BaseArrayElOperand
 {
 public:
-  BoolArrayElOperand (DBSArray& array, const uint64_t index)
+  BoolArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
+  virtual void SetValue (const DBool& value);
 
-  virtual void SelfAnd (const DBSBool& value);
-  virtual void SelfXor (const DBSBool& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfAnd (const DBool& value);
+  virtual void SelfXor (const DBool& value);
+  virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
@@ -987,17 +987,17 @@ public:
 class CharArrayElOperand : public BaseArrayElOperand
 {
 public:
-  CharArrayElOperand (DBSArray& array, const uint64_t index)
+  CharArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DText& outValue) const;
 
-  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DChar& value);
 
   virtual uint_t GetType ();
 
@@ -1007,18 +1007,18 @@ public:
 class DateArrayElOperand : public BaseArrayElOperand
 {
 public:
-  DateArrayElOperand (DBSArray& array, const uint64_t index)
+  DateArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDate& value);
+  virtual void SetValue (const DDate& value);
 
   virtual uint_t GetType ();
 
@@ -1028,18 +1028,18 @@ public:
 class DateTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
-  DateTimeArrayElOperand (DBSArray& array, const uint64_t index)
+  DateTimeArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDateTime& value);
+  virtual void SetValue (const DDateTime& value);
 
   virtual uint_t GetType ();
 
@@ -1049,18 +1049,18 @@ public:
 class HiresTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
-  HiresTimeArrayElOperand (DBSArray& array, const uint64_t index)
+  HiresTimeArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSHiresTime& value);
+  virtual void SetValue (const DHiresTime& value);
 
   virtual uint_t GetType ();
 
@@ -1070,40 +1070,40 @@ public:
 class UInt8ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt8ArrayElOperand (DBSArray& array, const uint64_t index)
+  UInt8ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt8& value);
+  virtual void SetValue (const DUInt8& value);
 
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1113,39 +1113,39 @@ public:
 class UInt16ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt16ArrayElOperand (DBSArray& array, const uint64_t index)
+  UInt16ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt16& value);
+  virtual void SetValue (const DUInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1155,39 +1155,39 @@ public:
 class UInt32ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt32ArrayElOperand (DBSArray& array, const uint64_t index)
+  UInt32ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt32& value);
+  virtual void SetValue (const DUInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1197,39 +1197,39 @@ public:
 class UInt64ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt64ArrayElOperand (DBSArray& array, const uint64_t index)
+  UInt64ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DUInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1239,39 +1239,39 @@ public:
 class Int8ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int8ArrayElOperand (DBSArray& array, const uint64_t index)
+  Int8ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt8& value);
+  virtual void SetValue (const DInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1281,39 +1281,39 @@ public:
 class Int16ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int16ArrayElOperand (DBSArray& array, const uint64_t index)
+  Int16ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt16& value);
+  virtual void SetValue (const DInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1323,39 +1323,39 @@ public:
 class Int32ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int32ArrayElOperand (DBSArray& array, const uint64_t index)
+  Int32ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt32& value);
+  virtual void SetValue (const DInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1365,39 +1365,39 @@ public:
 class Int64ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int64ArrayElOperand (DBSArray& array, const uint64_t index)
+  Int64ArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt64& value);
+  virtual void SetValue (const DInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1407,29 +1407,29 @@ public:
 class RealArrayElOperand : public BaseArrayElOperand
 {
 public:
-  RealArrayElOperand (DBSArray& array, const uint64_t index)
+  RealArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSReal& value);
+  virtual void SetValue (const DReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
@@ -1439,29 +1439,29 @@ public:
 class RichRealArrayElOperand : public BaseArrayElOperand
 {
 public:
-  RichRealArrayElOperand (DBSArray& array, const uint64_t index)
+  RichRealArrayElOperand (DArray& array, const uint64_t index)
     : BaseArrayElOperand (array, index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSRichReal& value);
+  virtual void SetValue (const DRichReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
@@ -1471,18 +1471,18 @@ public:
 class TableOperand : public I_PMOperand
 {
 public:
-  TableOperand (I_DBSHandler& dbsHnd, I_DBSTable& table)
+  TableOperand (I_DBSHandler& dbsHnd, ITable& table)
     : I_PMOperand (),
-      m_pRefTable (new TableReference (dbsHnd, table))
+      mpRefTable (new TableReference (dbsHnd, table))
   {
-    m_pRefTable->IncrementRefCount ();
+    mpRefTable->IncrementRefCount ();
   }
 
   TableOperand (const TableOperand& source)
     : I_PMOperand (),
-      m_pRefTable (source.m_pRefTable)
+      mpRefTable (source.mpRefTable)
   {
-    m_pRefTable->IncrementRefCount ();
+    mpRefTable->IncrementRefCount ();
   }
 
   virtual ~TableOperand ();
@@ -1491,9 +1491,9 @@ public:
   {
     if (this != &pSource)
       {
-        m_pRefTable->DecrementRefCount ();
-        m_pRefTable = pSource.m_pRefTable;
-        m_pRefTable->IncrementRefCount ();
+        mpRefTable->DecrementRefCount ();
+        mpRefTable = pSource.mpRefTable;
+        mpRefTable->IncrementRefCount ();
       }
     return *this;
   }
@@ -1503,13 +1503,13 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
-  virtual I_DBSTable& GetTable ();
+  virtual ITable& GetTable ();
 
   TableReference& GetTableRef () const
   {
-    assert (m_pRefTable != NULL);
+    assert (mpRefTable != NULL);
 
-    return *m_pRefTable;
+    return *mpRefTable;
   }
 
   virtual StackValue Duplicate () const;
@@ -1519,16 +1519,16 @@ public:
   virtual void          CopyTableOp (const TableOperand& source);
 
 private:
-  TableReference* m_pRefTable;
+  TableReference* mpRefTable;
 };
 
 class FieldOperand : public I_PMOperand
 {
 public:
   FieldOperand (const uint32_t fieldType = T_UNDETERMINED)
-    : m_pRefTable (NULL),
-      m_Field (~0),
-      m_FieldType (fieldType)
+    : mpRefTable (NULL),
+      mField (~0),
+      mFieldType (fieldType)
   {
     assert (GET_BASIC_TYPE (fieldType) <= T_UNDETERMINED);
     assert (GET_BASIC_TYPE (fieldType) > T_UNKNOWN);
@@ -1545,7 +1545,7 @@ public:
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
-  virtual I_DBSTable& GetTable ();
+  virtual ITable& GetTable ();
   virtual StackValue  GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
@@ -1555,9 +1555,9 @@ public:
   virtual void          CopyFieldOp (const FieldOperand& source);
 
 private:
-  TableReference* m_pRefTable;
-  FIELD_INDEX     m_Field;
-  uint32_t        m_FieldType;
+  TableReference* mpRefTable;
+  FIELD_INDEX     mField;
+  uint32_t        mFieldType;
 };
 
 class BaseFieldElOperand : public I_PMOperand
@@ -1566,36 +1566,36 @@ protected:
   BaseFieldElOperand (TableReference*   pTableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : m_Row (row),
-      m_pRefTable (pTableRef),
-      m_Field (field)
+    : mRow (row),
+      mpRefTable (pTableRef),
+      mField (field)
   {
-    m_pRefTable->IncrementRefCount ();
+    mpRefTable->IncrementRefCount ();
   }
 
   BaseFieldElOperand (const BaseFieldElOperand& source)
     : I_PMOperand (),
-      m_Row (source.m_Row),
-      m_pRefTable (source.m_pRefTable),
-      m_Field (source.m_Field)
+      mRow (source.mRow),
+      mpRefTable (source.mpRefTable),
+      mField (source.mField)
   {
-    m_pRefTable->IncrementRefCount ();
+    mpRefTable->IncrementRefCount ();
   }
 
   virtual ~BaseFieldElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
-    I_DBSTable& table = m_pRefTable->GetTable ();
+    ITable& table = mpRefTable->GetTable ();
 
-    table.GetEntry (m_Row, m_Field, out);
+    table.Get (mRow, mField, out);
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    I_DBSTable& table = m_pRefTable->GetTable ();
+    ITable& table = mpRefTable->GetTable ();
 
-    table.SetEntry (m_Row, m_Field, value);
+    table.Set (mRow, mField, value);
   }
 
   virtual void NotifyCopy ();
@@ -1607,9 +1607,9 @@ private:
 
   BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
 
-  const ROW_INDEX   m_Row;
-  TableReference*   m_pRefTable;
-  const FIELD_INDEX m_Field;
+  const ROW_INDEX   mRow;
+  TableReference*   mpRefTable;
+  const FIELD_INDEX mField;
 };
 
 class BoolFieldElOperand : public BaseFieldElOperand
@@ -1624,13 +1624,13 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
+  virtual void SetValue (const DBool& value);
 
-  virtual void SelfAnd (const DBSBool& value);
-  virtual void SelfXor (const DBSBool& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfAnd (const DBool& value);
+  virtual void SelfXor (const DBool& value);
+  virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
@@ -1649,10 +1649,10 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DText& outValue) const;
 
-  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DChar& value);
 
   virtual uint_t GetType ();
 
@@ -1671,11 +1671,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDate& value);
+  virtual void SetValue (const DDate& value);
 
   virtual uint_t GetType ();
 
@@ -1695,11 +1695,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDateTime& value);
+  virtual void SetValue (const DDateTime& value);
 
   virtual uint_t GetType ();
 
@@ -1718,11 +1718,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSHiresTime& value);
+  virtual void SetValue (const DHiresTime& value);
 
   virtual uint_t GetType ();
 
@@ -1741,32 +1741,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt8& value);
+  virtual void SetValue (const DUInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1785,32 +1785,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt16& value);
+  virtual void SetValue (const DUInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1829,32 +1829,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt32& value);
+  virtual void SetValue (const DUInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1873,32 +1873,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DUInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1917,32 +1917,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt8& value);
+  virtual void SetValue (const DInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -1961,32 +1961,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt16& value);
+  virtual void SetValue (const DInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2005,32 +2005,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt32& value);
+  virtual void SetValue (const DInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2049,32 +2049,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt64& value);
+  virtual void SetValue (const DInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2093,22 +2093,22 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSReal& value);
+  virtual void SetValue (const DReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
@@ -2127,22 +2127,22 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSRichReal& value);
+  virtual void SetValue (const DRichReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
@@ -2161,11 +2161,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void SetValue (const DBSText& value);
+  virtual void GetValue (DText& outValue) const;
+  virtual void SetValue (const DText& value);
 
-  virtual void SelfAdd (const DBSChar& value);
-  virtual void SelfAdd (const DBSText& value);
+  virtual void SelfAdd (const DChar& value);
+  virtual void SelfAdd (const DText& value);
 
   virtual uint_t GetType ();
 
@@ -2186,8 +2186,8 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSArray& outValue) const;
-  virtual void SetValue (const DBSArray& value);
+  virtual void GetValue (DArray& outValue) const;
+  virtual void SetValue (const DArray& value);
 
   virtual uint_t GetType ();
 
@@ -2204,23 +2204,23 @@ public:
                           const FIELD_INDEX field,
                           const uint64_t    index)
     : BaseFieldElOperand (pTableRef, row, field),
-      m_Index (index)
+      mIndex (index)
   {
   }
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DText& outValue) const;
 
-  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DChar& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 
 private:
-  const uint64_t    m_Index;
+  const uint64_t    mIndex;
 };
 
 class BaseArrayFieldElOperand : public I_PMOperand
@@ -2230,47 +2230,47 @@ protected:
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
-     : m_Index (index),
-       m_Row (row),
-       m_pRefTable (pTableRef),
-       m_Field (field)
+     : mIndex (index),
+       mRow (row),
+       mpRefTable (pTableRef),
+       mField (field)
   {
-    m_pRefTable->IncrementRefCount ();
+    mpRefTable->IncrementRefCount ();
   }
 
   BaseArrayFieldElOperand (const BaseArrayFieldElOperand& source)
-     : m_Index (source.m_Index),
-       m_Row (source.m_Row),
-       m_pRefTable (source.m_pRefTable),
-       m_Field (source.m_Field)
+     : mIndex (source.mIndex),
+       mRow (source.mRow),
+       mpRefTable (source.mpRefTable),
+       mField (source.mField)
   {
-    m_pRefTable->IncrementRefCount ();
+    mpRefTable->IncrementRefCount ();
   }
 
   virtual ~BaseArrayFieldElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& outValue) const
   {
-    I_DBSTable& table = m_pRefTable->GetTable ();
+    ITable& table = mpRefTable->GetTable ();
 
-    DBSArray array;
-    table.GetEntry (m_Row, m_Field, array);
+    DArray array;
+    table.Get (mRow, mField, array);
 
-    array.GetElement (outValue, m_Index);
+    array.Get (mIndex, outValue);
     assert (outValue.IsNull () == false);
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    I_DBSTable& table = m_pRefTable->GetTable ();
+    ITable& table = mpRefTable->GetTable ();
 
-    DBSArray array;
+    DArray array;
 
-    if (m_Row < table.GetAllocatedRows () )
-      table.GetEntry (m_Row, m_Field, array);
+    if (mRow < table.AllocatedRows () )
+      table.Get (mRow, mField, array);
 
-    array.SetElement (value, m_Index);
-    table.SetEntry (m_Row, m_Field, array);
+    array.Set (mIndex, value);
+    table.Set (mRow, mField, array);
   }
 
   virtual void NotifyCopy ();
@@ -2278,10 +2278,10 @@ protected:
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
 
-  const uint64_t    m_Index;
-  const ROW_INDEX   m_Row;
-  TableReference*   m_pRefTable;
-  const FIELD_INDEX m_Field;
+  const uint64_t    mIndex;
+  const ROW_INDEX   mRow;
+  TableReference*   mpRefTable;
+  const FIELD_INDEX mField;
 };
 
 class BoolArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2297,13 +2297,13 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
+  virtual void SetValue (const DBool& value);
 
-  virtual void SelfAnd (const DBSBool& value);
-  virtual void SelfXor (const DBSBool& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfAnd (const DBool& value);
+  virtual void SelfXor (const DBool& value);
+  virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
@@ -2323,10 +2323,10 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DText& outValue) const;
 
-  virtual void SetValue (const DBSChar& value);
+  virtual void SetValue (const DChar& value);
 
   virtual uint_t GetType ();
 
@@ -2346,11 +2346,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDate& value);
+  virtual void SetValue (const DDate& value);
 
   virtual uint_t GetType ();
 
@@ -2370,11 +2370,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSDateTime& value);
+  virtual void SetValue (const DDateTime& value);
 
   virtual uint_t GetType ();
 
@@ -2394,11 +2394,11 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
 
-  virtual void SetValue (const DBSHiresTime& value);
+  virtual void SetValue (const DHiresTime& value);
 
   virtual uint_t GetType ();
 
@@ -2418,32 +2418,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt8& value);
+  virtual void SetValue (const DUInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2463,32 +2463,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt16& value);
+  virtual void SetValue (const DUInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2508,32 +2508,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt32& value);
+  virtual void SetValue (const DUInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2553,32 +2553,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSUInt64& value);
+  virtual void SetValue (const DUInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2598,32 +2598,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt8& value);
+  virtual void SetValue (const DInt8& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2643,32 +2643,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt16& value);
+  virtual void SetValue (const DInt16& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2688,32 +2688,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt32& value);
+  virtual void SetValue (const DInt32& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2733,32 +2733,32 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
 
-  virtual void SetValue (const DBSInt64& value);
+  virtual void SetValue (const DInt64& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
+  virtual void SelfAdd (const DInt64& value);
 
-  virtual void SelfSub (const DBSInt64& value);
+  virtual void SelfSub (const DInt64& value);
 
-  virtual void SelfMul (const DBSInt64& value);
+  virtual void SelfMul (const DInt64& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
+  virtual void SelfDiv (const DInt64& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfOr (const DBSInt64& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
@@ -2778,22 +2778,22 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSReal& value);
+  virtual void SetValue (const DReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
@@ -2813,22 +2813,22 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
 
-  virtual void SetValue (const DBSRichReal& value);
+  virtual void SetValue (const DRichReal& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
   virtual uint_t GetType ();
 
@@ -2840,24 +2840,24 @@ class GlobalValue
 public:
   template <class OP_T>
   explicit GlobalValue (const OP_T& op)
-    : m_Sync (),
-      m_OperandOwner (true)
+    : mSync (),
+      mOperandOwner (true)
   {
     const I_PMOperand& compileTest = op;
     (void)compileTest; //Just to make sure OP_T is a valid type!
 
-    assert (sizeof (OP_T) <= sizeof (m_Storage));
-    _placement_new (m_Storage, op);
+    assert (sizeof (OP_T) <= sizeof (mStorage));
+    _placement_new (mStorage, op);
   }
 
   GlobalValue (const GlobalValue& source)
-    : m_Sync (),
-      m_OperandOwner (source.m_OperandOwner)
+    : mSync (),
+      mOperandOwner (source.mOperandOwner)
   {
-    for (uint_t i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
-      m_Storage[i] = source.m_Storage[i];
+    for (uint_t i = 0; i < sizeof (mStorage) / sizeof (mStorage[0]); ++i)
+      mStorage[i] = source.mStorage[i];
 
-    _CC (bool&, source.m_OperandOwner) = false;
+    _CC (bool&, source.mOperandOwner) = false;
   }
 
   const GlobalValue& operator= (const GlobalValue& source)
@@ -2865,93 +2865,93 @@ public:
     if (this == &source)
       return *this;
 
-    m_OperandOwner = source.m_OperandOwner;
-    for (uint_t i = 0; i < sizeof (m_Storage) / sizeof (m_Storage[0]); ++i)
-      m_Storage[i] = source.m_Storage[i];
+    mOperandOwner = source.mOperandOwner;
+    for (uint_t i = 0; i < sizeof (mStorage) / sizeof (mStorage[0]); ++i)
+      mStorage[i] = source.mStorage[i];
 
-    _CC (bool&, source.m_OperandOwner) = false;
+    _CC (bool&, source.mOperandOwner) = false;
     return *this;
   }
 
   ~GlobalValue ()
   {
-    if (m_OperandOwner)
+    if (mOperandOwner)
       GetOperand ().~I_PMOperand ();
   }
 
   bool IsNull ()
   {
-    LockRAII dummy (m_Sync);
+    LockRAII dummy (mSync);
     return GetOperand ().IsNull ();
   }
 
   template <class DBS_T>
   void GetValue (DBS_T& outValue)
   {
-    LockRAII dummy (m_Sync);
+    LockRAII dummy (mSync);
     GetOperand ().GetValue (outValue);
   }
 
   template <class DBS_T>
   void SetValue (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SetValue (value);
   }
 
   template <class DBS_T>
   void SelfAdd (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfSub (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfSub (value);
   }
 
   template <class DBS_T>
   void SelfMul (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfDiv (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfMod (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfAnd (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfAnd (value);
   }
 
   template <class DBS_T>
   void SelfXor (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfXor (value);
   }
 
   template <class DBS_T>
   void SelfOr (const DBS_T& value)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().SelfOr (value);
   }
 
@@ -2963,70 +2963,70 @@ public:
 
   FIELD_INDEX GetField ()
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().GetField ();
   }
 
-  I_DBSTable& GetTable ()
+  ITable& GetTable ()
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().GetTable ();
   }
 
   StackValue GetFieldAt (const FIELD_INDEX field)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().GetFieldAt (field);
   }
 
   StackValue GetValueAt (const uint64_t index)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().GetValueAt (index);
   }
 
   StackValue Duplicate ()
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().Duplicate ();
   }
 
   void NotifyCopy ()
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     GetOperand ().NotifyCopy ();
   }
 
   TableOperand GetTableOp ()
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().GetTableOp ();
   }
 
   void CopyTableOp (const TableOperand& source)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().CopyTableOp (source);
   }
 
   FieldOperand  GetFieldOp ()
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().GetFieldOp ();
   }
 
   void CopyFieldOp (const FieldOperand& source)
   {
-    LockRAII dummy(m_Sync);
+    LockRAII dummy(mSync);
     return GetOperand ().CopyFieldOp (source);
   }
 
-  I_PMOperand& GetOperand () { return *_RC (I_PMOperand*, m_Storage);  }
+  I_PMOperand& GetOperand () { return *_RC (I_PMOperand*, mStorage);  }
 
 private:
-  Lock m_Sync;
-  bool          m_OperandOwner;
-  uint64_t      m_Storage[MAX_OP_QWORDS];
+  Lock mSync;
+  bool          mOperandOwner;
+  uint64_t      mStorage[MAX_OP_QWORDS];
 };
 
 class GlobalOperand : public I_PMOperand
@@ -3037,71 +3037,71 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void GetValue (DBSArray& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
+  virtual void GetValue (DText& outValue) const;
+  virtual void GetValue (DArray& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
-  virtual void SetValue (const DBSChar& value);
-  virtual void SetValue (const DBSDate& value);
-  virtual void SetValue (const DBSDateTime& value);
-  virtual void SetValue (const DBSHiresTime& value);
-  virtual void SetValue (const DBSInt8& value);
-  virtual void SetValue (const DBSInt16& value);
-  virtual void SetValue (const DBSInt32& value);
-  virtual void SetValue (const DBSInt64& value);
-  virtual void SetValue (const DBSReal& value);
-  virtual void SetValue (const DBSRichReal& value);
-  virtual void SetValue (const DBSUInt8& value);
-  virtual void SetValue (const DBSUInt16& value);
-  virtual void SetValue (const DBSUInt32& value);
-  virtual void SetValue (const DBSUInt64& value);
-  virtual void SetValue (const DBSText& value);
-  virtual void SetValue (const DBSArray& value);
+  virtual void SetValue (const DBool& value);
+  virtual void SetValue (const DChar& value);
+  virtual void SetValue (const DDate& value);
+  virtual void SetValue (const DDateTime& value);
+  virtual void SetValue (const DHiresTime& value);
+  virtual void SetValue (const DInt8& value);
+  virtual void SetValue (const DInt16& value);
+  virtual void SetValue (const DInt32& value);
+  virtual void SetValue (const DInt64& value);
+  virtual void SetValue (const DReal& value);
+  virtual void SetValue (const DRichReal& value);
+  virtual void SetValue (const DUInt8& value);
+  virtual void SetValue (const DUInt16& value);
+  virtual void SetValue (const DUInt32& value);
+  virtual void SetValue (const DUInt64& value);
+  virtual void SetValue (const DText& value);
+  virtual void SetValue (const DArray& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
-  virtual void SelfAdd (const DBSChar& value);
-  virtual void SelfAdd (const DBSText& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
+  virtual void SelfAdd (const DChar& value);
+  virtual void SelfAdd (const DText& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfAnd (const DBSBool& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfAnd (const DBool& value);
 
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfXor (const DBSBool& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfXor (const DBool& value);
 
-  virtual void SelfOr (const DBSInt64& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfOr (const DInt64& value);
+  virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
-  virtual I_DBSTable& GetTable ();
+  virtual ITable& GetTable ();
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual StackValue  GetValueAt (const uint64_t index);
 
@@ -3116,7 +3116,7 @@ public:
 
 private:
 
-  GlobalValue& m_Value;
+  GlobalValue& mValue;
 };
 
 class LocalOperand : public I_PMOperand
@@ -3126,71 +3126,71 @@ public:
 
   virtual bool IsNull () const;
 
-  virtual void GetValue (DBSBool& outValue) const;
-  virtual void GetValue (DBSChar& outValue) const;
-  virtual void GetValue (DBSDate& outValue) const;
-  virtual void GetValue (DBSDateTime& outValue) const;
-  virtual void GetValue (DBSHiresTime& outValue) const;
-  virtual void GetValue (DBSInt8& outValue) const;
-  virtual void GetValue (DBSInt16& outValue) const;
-  virtual void GetValue (DBSInt32& outValue) const;
-  virtual void GetValue (DBSInt64& outValue) const;
-  virtual void GetValue (DBSReal& outValue) const;
-  virtual void GetValue (DBSRichReal& outValue) const;
-  virtual void GetValue (DBSUInt8& outValue) const;
-  virtual void GetValue (DBSUInt16& outValue) const;
-  virtual void GetValue (DBSUInt32& outValue) const;
-  virtual void GetValue (DBSUInt64& outValue) const;
-  virtual void GetValue (DBSText& outValue) const;
-  virtual void GetValue (DBSArray& outValue) const;
+  virtual void GetValue (DBool& outValue) const;
+  virtual void GetValue (DChar& outValue) const;
+  virtual void GetValue (DDate& outValue) const;
+  virtual void GetValue (DDateTime& outValue) const;
+  virtual void GetValue (DHiresTime& outValue) const;
+  virtual void GetValue (DInt8& outValue) const;
+  virtual void GetValue (DInt16& outValue) const;
+  virtual void GetValue (DInt32& outValue) const;
+  virtual void GetValue (DInt64& outValue) const;
+  virtual void GetValue (DReal& outValue) const;
+  virtual void GetValue (DRichReal& outValue) const;
+  virtual void GetValue (DUInt8& outValue) const;
+  virtual void GetValue (DUInt16& outValue) const;
+  virtual void GetValue (DUInt32& outValue) const;
+  virtual void GetValue (DUInt64& outValue) const;
+  virtual void GetValue (DText& outValue) const;
+  virtual void GetValue (DArray& outValue) const;
 
-  virtual void SetValue (const DBSBool& value);
-  virtual void SetValue (const DBSChar& value);
-  virtual void SetValue (const DBSDate& value);
-  virtual void SetValue (const DBSDateTime& value);
-  virtual void SetValue (const DBSHiresTime& value);
-  virtual void SetValue (const DBSInt8& value);
-  virtual void SetValue (const DBSInt16& value);
-  virtual void SetValue (const DBSInt32& value);
-  virtual void SetValue (const DBSInt64& value);
-  virtual void SetValue (const DBSReal& value);
-  virtual void SetValue (const DBSRichReal& value);
-  virtual void SetValue (const DBSUInt8& value);
-  virtual void SetValue (const DBSUInt16& value);
-  virtual void SetValue (const DBSUInt32& value);
-  virtual void SetValue (const DBSUInt64& value);
-  virtual void SetValue (const DBSText& value);
-  virtual void SetValue (const DBSArray& value);
+  virtual void SetValue (const DBool& value);
+  virtual void SetValue (const DChar& value);
+  virtual void SetValue (const DDate& value);
+  virtual void SetValue (const DDateTime& value);
+  virtual void SetValue (const DHiresTime& value);
+  virtual void SetValue (const DInt8& value);
+  virtual void SetValue (const DInt16& value);
+  virtual void SetValue (const DInt32& value);
+  virtual void SetValue (const DInt64& value);
+  virtual void SetValue (const DReal& value);
+  virtual void SetValue (const DRichReal& value);
+  virtual void SetValue (const DUInt8& value);
+  virtual void SetValue (const DUInt16& value);
+  virtual void SetValue (const DUInt32& value);
+  virtual void SetValue (const DUInt64& value);
+  virtual void SetValue (const DText& value);
+  virtual void SetValue (const DArray& value);
 
-  virtual void SelfAdd (const DBSInt64& value);
-  virtual void SelfAdd (const DBSRichReal& value);
-  virtual void SelfAdd (const DBSChar& value);
-  virtual void SelfAdd (const DBSText& value);
+  virtual void SelfAdd (const DInt64& value);
+  virtual void SelfAdd (const DRichReal& value);
+  virtual void SelfAdd (const DChar& value);
+  virtual void SelfAdd (const DText& value);
 
-  virtual void SelfSub (const DBSInt64& value);
-  virtual void SelfSub (const DBSRichReal& value);
+  virtual void SelfSub (const DInt64& value);
+  virtual void SelfSub (const DRichReal& value);
 
-  virtual void SelfMul (const DBSInt64& value);
-  virtual void SelfMul (const DBSRichReal& value);
+  virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DRichReal& value);
 
-  virtual void SelfDiv (const DBSInt64& value);
-  virtual void SelfDiv (const DBSRichReal& value);
+  virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DRichReal& value);
 
-  virtual void SelfMod (const DBSInt64& value);
+  virtual void SelfMod (const DInt64& value);
 
-  virtual void SelfAnd (const DBSInt64& value);
-  virtual void SelfAnd (const DBSBool& value);
+  virtual void SelfAnd (const DInt64& value);
+  virtual void SelfAnd (const DBool& value);
 
-  virtual void SelfXor (const DBSInt64& value);
-  virtual void SelfXor (const DBSBool& value);
+  virtual void SelfXor (const DInt64& value);
+  virtual void SelfXor (const DBool& value);
 
-  virtual void SelfOr (const DBSInt64& value);
-  virtual void SelfOr (const DBSBool& value);
+  virtual void SelfOr (const DInt64& value);
+  virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
-  virtual I_DBSTable& GetTable ();
+  virtual ITable& GetTable ();
   virtual StackValue  GetFieldAt (const FIELD_INDEX field);
   virtual StackValue  GetValueAt (const uint64_t index);
 
@@ -3203,8 +3203,8 @@ public:
   virtual void          CopyFieldOp (const FieldOperand& source);
 
 private:
-  const uint64_t m_Index;
-  SessionStack&  m_Stack;
+  const uint64_t mIndex;
+  SessionStack&  mStack;
 };
 
 } //namespace prima

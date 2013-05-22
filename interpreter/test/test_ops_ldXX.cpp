@@ -141,9 +141,9 @@ test_op_ldc (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSChar value;
+  DChar value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSChar (0x53525150))
+  if (value != DChar (0x53525150))
     return false;
 
   return true;
@@ -171,9 +171,9 @@ test_op_ldi8 (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt8 value;
+  DInt8 value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt8 (0xD8))
+  if (value != DInt8 (0xD8))
     return false;
 
   return true;
@@ -202,9 +202,9 @@ test_op_ldi16 (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt16 value;
+  DInt16 value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt16 (0xB4A1))
+  if (value != DInt16 (0xB4A1))
     return false;
 
   return true;
@@ -234,9 +234,9 @@ test_op_ldi32 (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt32 value;
+  DInt32 value;
   stack[0].GetOperand ().GetValue (value);
-  if ((value == DBSInt32 (0x3421D4F1)) == false)
+  if ((value == DInt32 (0x3421D4F1)) == false)
     return false;
 
   return true;
@@ -270,9 +270,9 @@ test_op_ldi64 (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSInt64 value;
+  DInt64 value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSInt64 (0x383736353421D4F1))
+  if (value != DInt64 (0x383736353421D4F1))
     return false;
 
   return true;
@@ -302,9 +302,9 @@ test_op_ldd (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSDate value;
+  DDate value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSDate (0xD1F1, 0x06, 0x05))
+  if (value != DDate (0xD1F1, 0x06, 0x05))
     return false;
 
   return true;
@@ -338,9 +338,9 @@ test_op_lddt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSDateTime value;
+  DDateTime value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSDateTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23))
+  if (value != DDateTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23))
     return false;
 
   return true;
@@ -378,10 +378,10 @@ test_op_ldht (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSHiresTime value;
+  DHiresTime value;
   stack[0].GetOperand ().GetValue (value);
   if (value !=
-      DBSHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x01020304))
+      DHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x01020304))
     return false;
 
   return true;
@@ -424,9 +424,9 @@ test_op_ldrr (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSRichReal value;
+  DRichReal value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSRichReal (RICHREAL_T (-5,
+  if (value != DRichReal (RICHREAL_T (-5,
                                         -99999999999922,
                                         DBS_RICHREAL_PREC)))
     {
@@ -463,9 +463,9 @@ test_op_ldt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSText      value;
+  DText      value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSText ((uint8_t*)someText + 2))
+  if (value != DText ((uint8_t*)someText + 2))
     return false;
 
   return true;
@@ -492,9 +492,9 @@ test_op_ldbt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSBool value;
+  DBool value;
   stack[0].GetOperand ().GetValue (value);
-  if ((value == DBSBool (true)) == false)
+  if ((value == DBool (true)) == false)
     return false;
 
   return true;
@@ -521,9 +521,9 @@ test_op_ldbf (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  DBSBool value;
+  DBool value;
   stack[0].GetOperand ().GetValue (value);
-  if (value != DBSBool (false))
+  if (value != DBool (false))
     return false;
 
   return true;

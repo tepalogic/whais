@@ -100,44 +100,44 @@ static const char tableRmIndDescExt[] =
 static void
 print_field_desc (const DBSFieldDescriptor& desc, const bool indexed)
 {
-  cout << desc.m_pFieldName << " : ";
+  cout << desc.name << " : ";
 
   if (desc.isArray)
     cout << "ARRAY OF ";
 
-  if (desc.m_FieldType == T_BOOL)
+  if (desc.type == T_BOOL)
     cout << "BOOL";
-  else if (desc.m_FieldType == T_CHAR)
+  else if (desc.type == T_CHAR)
     cout << "CHAR";
-  else if (desc.m_FieldType == T_DATE)
+  else if (desc.type == T_DATE)
     cout << "DATE";
-  else if (desc.m_FieldType == T_DATETIME)
+  else if (desc.type == T_DATETIME)
     cout << "DATETIME";
-  else if (desc.m_FieldType == T_HIRESTIME)
+  else if (desc.type == T_HIRESTIME)
     cout << "HIRESTIME";
-  else if (desc.m_FieldType == T_INT8)
+  else if (desc.type == T_INT8)
     cout << "INT8";
-  else if (desc.m_FieldType == T_INT16)
+  else if (desc.type == T_INT16)
     cout << "INT16";
-  else if (desc.m_FieldType == T_INT32)
+  else if (desc.type == T_INT32)
     cout << "INT32";
-  else if (desc.m_FieldType == T_INT64)
+  else if (desc.type == T_INT64)
     cout << "INT64";
-  else if (desc.m_FieldType == T_UINT8)
+  else if (desc.type == T_UINT8)
     cout << "UINT8";
-  else if (desc.m_FieldType == T_UINT16)
+  else if (desc.type == T_UINT16)
     cout << "UINT16";
-  else if (desc.m_FieldType == T_UINT32)
+  else if (desc.type == T_UINT32)
     cout << "UINT32";
-  else if (desc.m_FieldType == T_UINT64)
+  else if (desc.type == T_UINT64)
     cout << "UINT64";
-  else if (desc.m_FieldType == T_REAL)
+  else if (desc.type == T_REAL)
     cout << "REAL";
-  else if (desc.m_FieldType == T_RICHREAL)
+  else if (desc.type == T_RICHREAL)
     cout << "RICHREAL";
-  else if (desc.m_FieldType == T_RICHREAL)
+  else if (desc.type == T_RICHREAL)
     cout << "RICHREAL";
-  else if (desc.m_FieldType == T_TEXT)
+  else if (desc.type == T_TEXT)
     cout << "TEXT";
   else
     {
@@ -186,7 +186,7 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       assert (token.length () > 0);
 
       fieldsNames.push_back (token);
-      desc.m_pFieldName = fieldsNames.back ().c_str ();
+      desc.name = fieldsNames.back ().c_str ();
 
       if (linePos >= cmdLine.length ())
         goto invalid_args;
@@ -204,39 +204,39 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         }
 
       if (token == "BOOL")
-        desc.m_FieldType = T_BOOL;
+        desc.type = T_BOOL;
       else if (token == "CHAR")
-        desc.m_FieldType = T_CHAR;
+        desc.type = T_CHAR;
       else if (token == "DATE")
-        desc.m_FieldType = T_DATE;
+        desc.type = T_DATE;
       else if (token == "DATETIME")
-        desc.m_FieldType = T_DATETIME;
+        desc.type = T_DATETIME;
       else if (token == "HIRESTIME")
-        desc.m_FieldType = T_HIRESTIME;
+        desc.type = T_HIRESTIME;
       else if (token == "INT8")
-        desc.m_FieldType = T_INT8;
+        desc.type = T_INT8;
       else if (token == "INT16")
-        desc.m_FieldType = T_INT16;
+        desc.type = T_INT16;
       else if (token == "INT32")
-        desc.m_FieldType = T_INT32;
+        desc.type = T_INT32;
       else if (token == "INT64")
-        desc.m_FieldType = T_INT64;
+        desc.type = T_INT64;
       else if (token == "UINT8")
-        desc.m_FieldType = T_UINT8;
+        desc.type = T_UINT8;
       else if (token == "UINT16")
-        desc.m_FieldType = T_UINT16;
+        desc.type = T_UINT16;
       else if (token == "UINT32")
-        desc.m_FieldType = T_UINT32;
+        desc.type = T_UINT32;
       else if (token == "UINT64")
-        desc.m_FieldType = T_UINT64;
+        desc.type = T_UINT64;
       else if (token == "REAL")
-        desc.m_FieldType = T_REAL;
+        desc.type = T_REAL;
       else if (token == "RICHREAL")
-        desc.m_FieldType = T_RICHREAL;
+        desc.type = T_RICHREAL;
       else if (token == "RICHREAL")
-        desc.m_FieldType = T_RICHREAL;
+        desc.type = T_RICHREAL;
       else if (token == "TEXT")
-        desc.m_FieldType = T_TEXT;
+        desc.type = T_TEXT;
       else
         goto invalid_args;
 
@@ -353,16 +353,16 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           {
             token = CmdLineNextToken (cmdLine, linePos);
 
-            I_DBSTable&       table      = dbsHnd.RetrievePersistentTable (
+            ITable&       table      = dbsHnd.RetrievePersistentTable (
                                                                 token.c_str ());
-            const FIELD_INDEX fieldCount = table.GetFieldsCount ();
+            const FIELD_INDEX fieldCount = table.FieldsCount ();
 
             cout << "Table '"<< token << "' fields description:\n";
 
             for (FIELD_INDEX index = 0; index < fieldCount; ++index)
               {
-                DBSFieldDescriptor desc = table.GetFieldDescriptor (index);
-                print_field_desc (desc, table.IsFieldIndexed (index));
+                DBSFieldDescriptor desc = table.DescribeField (index);
+                print_field_desc (desc, table.IsIndexed (index));
               }
 
             dbsHnd.ReleaseTable (table);
@@ -382,17 +382,17 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 }
 
 static void
-create_index_call_back (CallBackIndexData* cbData)
+create_index_call_back (CreateIndexCallbackContext* cbData)
 {
-  if (cbData->m_RowsCount == 0)
+  if (cbData->mRowsCount == 0)
     {
       cout << "100%";
       return;
     }
 
-  if (((cbData->m_RowIndex * 100) % cbData->m_RowsCount) == 0)
+  if (((cbData->mRowIndex * 100) % cbData->mRowsCount) == 0)
     {
-      cout << '\r' << (cbData->m_RowIndex * 100) / cbData->m_RowsCount << '%';
+      cout << '\r' << (cbData->mRowIndex * 100) / cbData->mRowsCount << '%';
       cout.flush ();
     }
 }
@@ -404,7 +404,7 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
-  I_DBSTable*          pTable  = NULL;
+  ITable*          pTable  = NULL;
   bool                 result  = true;
 
   assert (token == "table_index");
@@ -437,20 +437,20 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       {
         token = CmdLineNextToken (cmdLine, linePos);
 
-        const FIELD_INDEX field = pTable->GetFieldIndex (token.c_str ());
+        const FIELD_INDEX field = pTable->RetrieveField (token.c_str ());
 
-        if ( ! pTable->IsFieldIndexed (field))
+        if ( ! pTable->IsIndexed (field))
           {
             if (level >= VL_INFO)
               {
-                CallBackIndexData data;
-                pTable->CreateFieldIndex (field,
+                CreateIndexCallbackContext data;
+                pTable->CreateIndex (field,
                                           create_index_call_back,
                                           &data);
                 cout << endl;
               }
             else
-              pTable->CreateFieldIndex (field, NULL, NULL);
+              pTable->CreateIndex (field, NULL, NULL);
           }
       }
       catch (const Exception& e)
@@ -488,7 +488,7 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
-  I_DBSTable*          pTable  = NULL;
+  ITable*          pTable  = NULL;
   bool                 result  = true;
 
   assert (token == "table_rmindex");
@@ -520,14 +520,14 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       {
         token = CmdLineNextToken (cmdLine, linePos);
 
-        const FIELD_INDEX field = pTable->GetFieldIndex (token.c_str ());
+        const FIELD_INDEX field = pTable->RetrieveField (token.c_str ());
 
-        if (pTable->IsFieldIndexed (field))
+        if (pTable->IsIndexed (field))
           {
             if (level >= VL_INFO)
               cout << "Removing index for " << token << ".\n";
 
-            pTable->RemoveFieldIndex (field);
+            pTable->RemoveIndex (field);
           }
         else
           if (level > VL_INFO)
@@ -566,45 +566,45 @@ AddOfflineTableCommands ()
 {
   CmdEntry entry;
 
-  entry.m_context = &(GetDBSHandler ());
+  entry.mcontext = &(GetDBSHandler ());
 
-  entry.m_showStatus   = false;
-  entry.m_pCmdText     = "table";
-  entry.m_pCmdDesc     = tableShowDesc;
-  entry.m_pExtHelpDesc = tableShowDescEXt;
-  entry.m_cmd          = cmdTablePrint;
-
-  RegisterCommand (entry);
-
-  entry.m_showStatus   = true;
-  entry.m_pCmdText     = "table_add";
-  entry.m_pCmdDesc     = tableAddDesc;
-  entry.m_pExtHelpDesc = tableAddDescExt;
-  entry.m_cmd          = cmdTableAdd;
+  entry.mshowStatus   = false;
+  entry.mpCmdText     = "table";
+  entry.mpCmdDesc     = tableShowDesc;
+  entry.mpExtHelpDesc = tableShowDescEXt;
+  entry.mcmd          = cmdTablePrint;
 
   RegisterCommand (entry);
 
-  entry.m_showStatus   = true;
-  entry.m_pCmdText     = "table_remove";
-  entry.m_pCmdDesc     = tableRmDesc;
-  entry.m_pExtHelpDesc = tableRmDescExt;
-  entry.m_cmd          = cmdTableRemove;
+  entry.mshowStatus   = true;
+  entry.mpCmdText     = "table_add";
+  entry.mpCmdDesc     = tableAddDesc;
+  entry.mpExtHelpDesc = tableAddDescExt;
+  entry.mcmd          = cmdTableAdd;
 
   RegisterCommand (entry);
 
-  entry.m_showStatus   = true;
-  entry.m_pCmdText     = "table_index";
-  entry.m_pCmdDesc     = tableAddIndDesc;
-  entry.m_pExtHelpDesc = tableAddIndDescExt;
-  entry.m_cmd          = cmdTableAddIndex;
+  entry.mshowStatus   = true;
+  entry.mpCmdText     = "table_remove";
+  entry.mpCmdDesc     = tableRmDesc;
+  entry.mpExtHelpDesc = tableRmDescExt;
+  entry.mcmd          = cmdTableRemove;
 
   RegisterCommand (entry);
 
-  entry.m_showStatus   = true;
-  entry.m_pCmdText     = "table_rmindex";
-  entry.m_pCmdDesc     = tableRmIndDesc;
-  entry.m_pExtHelpDesc = tableRmIndDescExt;
-  entry.m_cmd          = cmdTableRmIndex;
+  entry.mshowStatus   = true;
+  entry.mpCmdText     = "table_index";
+  entry.mpCmdDesc     = tableAddIndDesc;
+  entry.mpExtHelpDesc = tableAddIndDescExt;
+  entry.mcmd          = cmdTableAddIndex;
+
+  RegisterCommand (entry);
+
+  entry.mshowStatus   = true;
+  entry.mpCmdText     = "table_rmindex";
+  entry.mpCmdDesc     = tableRmIndDesc;
+  entry.mpExtHelpDesc = tableRmIndDescExt;
+  entry.mcmd          = cmdTableRmIndex;
 
   RegisterCommand (entry);
 }

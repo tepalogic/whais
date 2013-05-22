@@ -15,64 +15,64 @@ class auto_array
 {
 public:
   auto_array ()
-    : m_pT (NULL),
-      m_Size (0)
+    : mpT (NULL),
+      mSize (0)
   {
   }
 
   auto_array (const unsigned int size)
-    : m_pT (new T [size]),
-      m_Size (size)
+    : mpT (new T [size]),
+      mSize (size)
   {
   }
 
   ~auto_array ()
   {
-    delete [] m_pT;
+    delete [] mpT;
   }
 
   T& operator[] (const unsigned int i)
   {
 
-    if (i >= m_Size)
+    if (i >= mSize)
       throw std::out_of_range ("Index is bigger then the array size.");
 
-    return m_pT[i];
+    return mpT[i];
   }
 
   const T& operator[] (const unsigned int i) const
   {
 
-    if (i >= m_Size)
+    if (i >= mSize)
       throw std::out_of_range ("Index is bigger then the array size.");
 
-    return m_pT[i];
+    return mpT[i];
   }
 
   unsigned int Size () const
   {
-    return m_Size;
+    return mSize;
   }
 
   T* Size (const unsigned int newSize)
   {
     if (newSize == 0)
       {
-        delete [] m_pT;
+        delete [] mpT;
 
-        m_pT   = NULL;
-        m_Size = 0;
+        mpT   = NULL;
+        mSize = 0;
 
-        return m_pT;
+        return mpT;
       }
 
-    const unsigned min = (newSize < m_Size) ? newSize : m_Size;
+    const unsigned min = (newSize < mSize) ? newSize : mSize;
     T* const pNewArray = new T[newSize];
 
     try
     {
         for (unsigned int i = 0; i < min; ++i)
-          pNewArray[i] = m_pT[i];
+          pNewArray[i] = mpT[i];
     }
     catch (...)
     {
@@ -80,10 +80,10 @@ public:
         throw;
     }
 
-    m_Size = newSize;
-    m_pT   = pNewArray;
+    mSize = newSize;
+    mpT   = pNewArray;
 
-    return m_pT;
+    return mpT;
   }
 
   T* Reset (const unsigned int newSize)
@@ -91,7 +91,7 @@ public:
     T* const pNewArray = ((newSize == 0) ? NULL : new T[newSize]);
     try
     {
-        delete [] m_pT;
+        delete [] mpT;
     }
     catch (...)
     {
@@ -99,15 +99,15 @@ public:
         throw;
     }
 
-    m_Size = newSize;
-    m_pT   = pNewArray;
+    mSize = newSize;
+    mpT   = pNewArray;
 
-    return m_pT;
+    return mpT;
   }
 
 private:
-  T*           m_pT;
-  unsigned int m_Size;
+  T*           mpT;
+  unsigned int mSize;
 
   auto_array (const auto_array&);
   auto_array& operator= (const auto_array&);

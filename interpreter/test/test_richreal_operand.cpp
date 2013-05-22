@@ -16,15 +16,15 @@ using namespace prima;
 
 static const char admin[] = "administrator";
 
-DBSArray
+DArray
 get_test_array ()
 {
-  DBSArray array;
+  DArray array;
 
-  array.AddElement (DBSRichReal (1.00));
-  array.AddElement (DBSRichReal (2.00));
-  array.AddElement (DBSRichReal (3.0));
-  array.AddElement (DBSRichReal (5.17));
+  array.Add (DRichReal (1.00));
+  array.Add (DRichReal (2.00));
+  array.Add (DRichReal (3.0));
+  array.Add (DRichReal (5.17));
 
   return array;
 }
@@ -259,48 +259,48 @@ test_op_invalid_conv (I_Operand& op)
 {
   bool result = true;
 
-  result = result && test_operand_for_conv<DBSReal> (op);
-  result = result && test_operand_for_conv<DBSRichReal> (op);
+  result = result && test_operand_for_conv<DReal> (op);
+  result = result && test_operand_for_conv<DRichReal> (op);
 
-  result = result && test_operand_for_exceptions<DBSUInt8> (op);
-  result = result && test_operand_for_exceptions<DBSUInt16> (op);
-  result = result && test_operand_for_exceptions<DBSUInt32> (op);
-  result = result && test_operand_for_exceptions<DBSUInt64> (op);
-  result = result && test_operand_for_exceptions<DBSInt8> (op);
-  result = result && test_operand_for_exceptions<DBSInt16> (op);
-  result = result && test_operand_for_exceptions<DBSInt32> (op);
-  result = result && test_operand_for_exceptions<DBSInt64> (op);
-  result = result && test_operand_for_exceptions<DBSBool> (op);
-  result = result && test_operand_for_exceptions<DBSChar> (op);
-  result = result && test_operand_for_exceptions<DBSDate> (op);
-  result = result && test_operand_for_exceptions<DBSDateTime> (op);
-  result = result && test_operand_for_exceptions<DBSHiresTime> (op);
-  result = result && test_operand_for_exceptions<DBSText> (op);
-  result = result && test_operand_for_exceptions<DBSArray> (op);
+  result = result && test_operand_for_exceptions<DUInt8> (op);
+  result = result && test_operand_for_exceptions<DUInt16> (op);
+  result = result && test_operand_for_exceptions<DUInt32> (op);
+  result = result && test_operand_for_exceptions<DUInt64> (op);
+  result = result && test_operand_for_exceptions<DInt8> (op);
+  result = result && test_operand_for_exceptions<DInt16> (op);
+  result = result && test_operand_for_exceptions<DInt32> (op);
+  result = result && test_operand_for_exceptions<DInt64> (op);
+  result = result && test_operand_for_exceptions<DBool> (op);
+  result = result && test_operand_for_exceptions<DChar> (op);
+  result = result && test_operand_for_exceptions<DDate> (op);
+  result = result && test_operand_for_exceptions<DDateTime> (op);
+  result = result && test_operand_for_exceptions<DHiresTime> (op);
+  result = result && test_operand_for_exceptions<DText> (op);
+  result = result && test_operand_for_exceptions<DArray> (op);
 
-  result = result && (! test_self_add<DBSChar> (op));
-  result = result && test_self_add<DBSInt64> (op);
-  result = result && test_self_add<DBSRichReal> (op);
+  result = result && (! test_self_add<DChar> (op));
+  result = result && test_self_add<DInt64> (op);
+  result = result && test_self_add<DRichReal> (op);
 
-  result = result && test_self_sub<DBSInt64> (op);
-  result = result && test_self_sub<DBSRichReal> (op);
+  result = result && test_self_sub<DInt64> (op);
+  result = result && test_self_sub<DRichReal> (op);
 
-  result = result && test_self_mul<DBSInt64> (op);
-  result = result && test_self_mul<DBSRichReal> (op);
+  result = result && test_self_mul<DInt64> (op);
+  result = result && test_self_mul<DRichReal> (op);
 
-  result = result && test_self_div<DBSInt64> (op);
-  result = result && test_self_div<DBSRichReal> (op);
+  result = result && test_self_div<DInt64> (op);
+  result = result && test_self_div<DRichReal> (op);
 
-  result = result && (! test_self_mod<DBSInt64> (op));
+  result = result && (! test_self_mod<DInt64> (op));
 
-  result = result && (! test_self_and<DBSBool> (op));
-  result = result && (! test_self_and<DBSInt64> (op));
+  result = result && (! test_self_and<DBool> (op));
+  result = result && (! test_self_and<DInt64> (op));
 
-  result = result && ( ! test_self_xor<DBSBool> (op));
-  result = result && ( ! test_self_xor<DBSInt64> (op));
+  result = result && ( ! test_self_xor<DBool> (op));
+  result = result && ( ! test_self_xor<DInt64> (op));
 
-  result = result && ( ! test_self_or<DBSBool> (op));
-  result = result && ( ! test_self_or<DBSInt64> (op));
+  result = result && ( ! test_self_or<DBool> (op));
+  result = result && ( ! test_self_or<DInt64> (op));
 
   try
   {
@@ -365,7 +365,7 @@ test_null_write (I_Operand& op, DBS_T value)
 }
 
 template <typename DBS_T> bool
-test_array_read_value (DBSArray array, const DBS_T testVal)
+test_array_read_value (DArray array, const DBS_T testVal)
 {
   bool  result = true;
   ArrayOperand arrayOp (array);
@@ -374,7 +374,7 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
   I_Operand* pOp = NULL;
 
   for (uint_t index = 0;
-       (index < array.ElementsCount ()) && result;
+       (index < array.Count ()) && result;
        ++index)
     {
       sv = arrayOp.GetValueAt (index);
@@ -383,13 +383,13 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
 
       DBS_T first, second;
       pOp->GetValue (first);
-      array.GetElement (second, index);
+      array.Get (index, second);
 
       if ( (first != second) && ( ! test_op_invalid_conv (*pOp) ))
         result = false;
     }
 
-  sv = arrayOp.GetValueAt (array.ElementsCount () - 1);
+  sv = arrayOp.GetValueAt (array.Count () - 1);
   pOp = &sv.GetOperand ();
   result &= test_op_invalid_conv (*pOp);
   pOp->SetValue (testVal);
@@ -397,7 +397,7 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
   DBS_T val;
 
   arrayOp.GetValue (array);
-  array.GetElement (val, array.ElementsCount () - 1);
+  array.Get (array.Count () - 1, val);
 
   if ( val != testVal)
     result = false;
@@ -406,31 +406,31 @@ test_array_read_value (DBSArray array, const DBS_T testVal)
 }
 
 template <typename DBS_T> bool
-test_table_value (I_DBSTable& table, DBSArray& array, const DBS_T testVal)
+test_table_value (ITable& table, DArray& array, const DBS_T testVal)
 {
   bool result = true;
-  DBSArray fieldArray;
+  DArray fieldArray;
   DBS_T    simpleVal;
 
-  table.GetEntry (0,
-                  table.GetFieldIndex ("simple_type"),
+  table.Get (0,
+                  table.RetrieveField ("simple_type"),
                   simpleVal);
-  table.GetEntry (0,
-                  table.GetFieldIndex ("array_type"),
+  table.Get (0,
+                  table.RetrieveField ("array_type"),
                   fieldArray);
 
   if (testVal != simpleVal)
     return false;
 
-  if (array.ElementsCount () != fieldArray.ElementsCount())
+  if (array.Count () != fieldArray.Count())
     return false;
 
-  for (uint64_t el = 0; el < array.ElementsCount (); ++el)
+  for (uint64_t el = 0; el < array.Count (); ++el)
     {
       DBS_T firstVal, secondVal;
 
-      fieldArray.GetElement (firstVal, el);
-      array.GetElement (secondVal, el);
+      fieldArray.Get (el, firstVal);
+      array.Get (el, secondVal);
 
       if (firstVal != secondVal)
         result = false;
@@ -441,7 +441,7 @@ test_table_value (I_DBSTable& table, DBSArray& array, const DBS_T testVal)
 
 template <typename DBS_T> bool
 test_array_tableread_value (I_DBSHandler& dbsHnd,
-                            DBSArray      array,
+                            DArray      array,
                             const DBS_T   testVal)
 {
   bool  result = true;
@@ -453,27 +453,27 @@ test_array_tableread_value (I_DBSHandler& dbsHnd,
   DBSFieldDescriptor fd[2];
 
   fd[0].isArray      = true;
-  fd[0].m_FieldType  = testVal.GetDBSType ();
-  fd[0].m_pFieldName = "array_type";
+  fd[0].type  = testVal.DBSType ();
+  fd[0].name = "array_type";
 
   fd[1].isArray      = false;
-  fd[1].m_FieldType  = testVal.GetDBSType ();
-  fd[1].m_pFieldName = "simple_type";
+  fd[1].type  = testVal.DBSType ();
+  fd[1].name = "simple_type";
 
-  I_DBSTable& testTable = dbsHnd.CreateTempTable (2, fd);
+  ITable& testTable = dbsHnd.CreateTempTable (2, fd);
   const ROW_INDEX row = testTable.AddReusedRow ();
   {
     TableOperand tableOp (dbsHnd, testTable);
-    FieldOperand fieldArrayOp (tableOp, testTable.GetFieldIndex ("array_type"));
+    FieldOperand fieldArrayOp (tableOp, testTable.RetrieveField ("array_type"));
     FieldOperand fieldSimpleOp (tableOp,
-                                testTable.GetFieldIndex ("simple_type"));
+                                testTable.RetrieveField ("simple_type"));
 
     svArray = fieldArrayOp.GetValueAt (row);
     svSimple = fieldSimpleOp.GetValueAt (row);
   }
 
   DBS_T firstArrayVal;
-  array.GetElement (firstArrayVal, row);
+  array.Get (row, firstArrayVal);
 
   assert (testVal != firstArrayVal);
 
@@ -484,7 +484,7 @@ test_array_tableread_value (I_DBSHandler& dbsHnd,
 
   result &= test_table_value (testTable, array, firstArrayVal);
 
-  array.SetElement (testVal, 0);
+  array.Set (0, testVal);
   svArrayEl = svArray.GetOperand ().GetValueAt (0);
 
   result &= test_op_invalid_conv (svArrayEl.GetOperand ());
@@ -515,14 +515,14 @@ main ()
 
   {
     I_DBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
-    RichRealOperand op (DBSRichReal (10));
+    RichRealOperand op (DRichReal (10));
     success = success && test_op_invalid_conv (op);
-    success = success && test_null_write (op, DBSRichReal (0.0));
+    success = success && test_null_write (op, DRichReal (0.0));
     success = success && test_array_read_value (get_test_array (),
-                                                DBSRichReal (0));
+                                                DRichReal (0));
     success = success && test_array_tableread_value (dbsHnd,
                                                      get_test_array (),
-                                                     DBSRichReal (0.0));
+                                                     DRichReal (0.0));
 
     DBSReleaseDatabase (dbsHnd);
   }

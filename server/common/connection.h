@@ -42,24 +42,24 @@ using namespace whisper;
 struct UserHandler
 {
   UserHandler ()
-    : m_pDesc (NULL),
-      m_Thread (),
-      m_Socket (INVALID_SOCKET),
-      m_EndConnetion (true)
+    : mpDesc (NULL),
+      mThread (),
+      mSocket (INVALID_SOCKET),
+      mEndConnetion (true)
   {
-    m_Thread.IgnoreExceptions (true);
+    mThread.IgnoreExceptions (true);
   }
 
   ~UserHandler ()
   {
-    assert (m_Thread.IsEnded ());
+    assert (mThread.IsEnded ());
   }
 
-  const DBSDescriptors* m_pDesc;
-  Thread                m_Thread;
-  Socket                m_Socket;
-  bool                  m_Root;
-  bool                  m_EndConnetion;
+  const DBSDescriptors* mpDesc;
+  Thread                mThread;
+  Socket                mSocket;
+  bool                  mRoot;
+  bool                  mEndConnetion;
 };
 
 class ConnectionException : public Exception
@@ -90,27 +90,27 @@ public:
   uint32_t ReadCommand ();
   void     SendCmdResponse (const uint16_t respType);
 
-  const DBSDescriptors&  Dbs () { return *m_UserHandler.m_pDesc; }
-  SessionStack&          Stack () { return m_Stack; }
-  bool                   IsAdmin () const { return m_UserHandler.m_Root; }
+  const DBSDescriptors&  Dbs () { return *mUserHandler.mpDesc; }
+  SessionStack&          Stack () { return mStack; }
+  bool                   IsAdmin () const { return mUserHandler.mRoot; }
 private:
   uint8_t* RawCmdData ();
 
   void ReciveRawClientFrame ();
   void SendRawClientFrame (const uint8_t type);
 
-  UserHandler&        m_UserHandler;
-  SessionStack        m_Stack;
-  uint32_t            m_WaitingFrameId;
-  uint32_t            m_ClientCookie;
-  uint32_t            m_ServerCookie;
-  uint16_t            m_LastReceivedCmd;
-  uint16_t            m_FrameSize;
-  uint8_t             m_Version;
-  uint8_t             m_Cipher;
-  uint_t              m_DataSize;
-  uint8_t*            m_Data;
-  std::string         m_Key;
+  UserHandler&        mUserHandler;
+  SessionStack        mStack;
+  uint32_t            mWaitingFrameId;
+  uint32_t            mClientCookie;
+  uint32_t            mServerCookie;
+  uint16_t            mLastReceivedCmd;
+  uint16_t            mFrameSize;
+  uint8_t             mVersion;
+  uint8_t             mCipher;
+  uint_t              mDataSize;
+  uint8_t*            mData;
+  std::string         mKey;
 
 
   ClientConnection (const ClientConnection&);

@@ -206,27 +206,27 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
           ListenEntry entry;
 
           token = NextToken (line, pos, " \t=@#");
-          entry.m_Interface = token;
+          entry.mInterface = token;
 
           token = NextToken (line, pos, " \t@#");
-          entry.m_Service = token;
+          entry.mService = token;
 
-          if (entry.m_Interface == "*")
-            entry.m_Interface = "";
-          if (entry.m_Service == "")
-            entry.m_Service = DEFAULT_LISTEN_PORT;
+          if (entry.mInterface == "*")
+            entry.mInterface = "";
+          if (entry.mService == "")
+            entry.mService = DEFAULT_LISTEN_PORT;
 
-          gMainSettings.m_Listens.push_back (entry);
+          gMainSettings.mListens.push_back (entry);
         }
       else if (token == gEntMaxConnections)
         {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_MaxConnections = atoi (token.c_str ());
+          gMainSettings.mMaxConnections = atoi (token.c_str ());
         }
       else if (token == gEntMaxFrameSize)
        {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_MaxFrameSize = atoi (token.c_str ());
+          gMainSettings.mMaxFrameSize = atoi (token.c_str ());
        }
       else if (token == gEntEncryption)
         {
@@ -234,9 +234,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
           std::transform(token.begin(), token.end(), token.begin(), ::tolower);
 
           if (token == CIPHER_PLAIN)
-            gMainSettings.m_Cipher = FRAME_ENCTYPE_PLAIN;
+            gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;
           else if (token == CIPHER_3K)
-            gMainSettings.m_Cipher = FRAME_ENCTYPE_3K;
+            gMainSettings.mCipher = FRAME_ENCTYPE_3K;
           else
             {
               cerr << "The cipher '" << token << "' is not supported. ";
@@ -249,9 +249,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       else if (token == gEntTableBlkCount)
         {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_TableCacheBlockCount = atoi (token.c_str ());
+          gMainSettings.mTableCacheBlockCount = atoi (token.c_str ());
 
-          if (gMainSettings.m_TableCacheBlockCount == 0)
+          if (gMainSettings.mTableCacheBlockCount == 0)
             {
               cerr << "Configuration error at line " << ioConfigLine << ".\n";
               return false;
@@ -260,9 +260,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       else if (token == gEntTableBlkSize)
         {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_TableCacheBlockSize = atoi (token.c_str ());
+          gMainSettings.mTableCacheBlockSize = atoi (token.c_str ());
 
-          if (gMainSettings.m_TableCacheBlockSize == 0)
+          if (gMainSettings.mTableCacheBlockSize == 0)
             {
               cerr << "Configuration error at line " << ioConfigLine << ".\n";
               return false;
@@ -271,9 +271,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       else if (token == gEntVlBlkCount)
         {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_VLBlockCount = atoi (token.c_str ());
+          gMainSettings.mVLBlockCount = atoi (token.c_str ());
 
-          if (gMainSettings.m_VLBlockCount == 0)
+          if (gMainSettings.mVLBlockCount == 0)
             {
               cerr << "Configuration error at line " << ioConfigLine << ".\n";
               return false;
@@ -282,9 +282,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       else if (token == gEntVlBlkSize)
         {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_VLBlockSize = atoi (token.c_str ());
+          gMainSettings.mVLBlockSize = atoi (token.c_str ());
 
-          if (gMainSettings.m_VLBlockSize == 0)
+          if (gMainSettings.mVLBlockSize == 0)
             {
               cerr << "Configuration error at line " << ioConfigLine << ".\n";
               return false;
@@ -293,9 +293,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       else if (token == gEntTempCache)
         {
           token = NextToken (line, pos, delimiters);
-          gMainSettings.m_TempValuesCache = atoi (token.c_str ());
+          gMainSettings.mTempValuesCache = atoi (token.c_str ());
 
-          if (gMainSettings.m_TempValuesCache == 0)
+          if (gMainSettings.mTempValuesCache == 0)
             {
               cerr << "Configuration error at line " << ioConfigLine << ".\n";
               return false;
@@ -318,7 +318,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
               if (get_enclose_entry (cerr,
                                      entry,
                                      token.at (0),
-                                     gMainSettings.m_LogFile) == false)
+                                     gMainSettings.mLogFile) == false)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
@@ -328,7 +328,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
             }
           else
-            gMainSettings.m_LogFile = token;
+            gMainSettings.mLogFile = token;
         }
       else if (token == gEntTempDir)
         {
@@ -347,7 +347,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
               if (get_enclose_entry (cerr,
                                      entry,
                                      token.at (0),
-                                     gMainSettings.m_TempDirectory) == false)
+                                     gMainSettings.mTempDirectory) == false)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
@@ -356,9 +356,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
                 }
             }
           else
-            gMainSettings.m_TempDirectory = token;
+            gMainSettings.mTempDirectory = token;
 
-          string& dir = gMainSettings.m_WorkDirectory;
+          string& dir = gMainSettings.mWorkDirectory;
 
           if ((dir.size () != 0)
               && (dir[dir.size () - 1] != whf_dir_delim()[0]))
@@ -383,7 +383,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
               if (get_enclose_entry (cerr,
                                      entry,
                                      token.at (0),
-                                     gMainSettings.m_WorkDirectory) == false)
+                                     gMainSettings.mWorkDirectory) == false)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
@@ -392,9 +392,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
                 }
             }
           else
-            gMainSettings.m_WorkDirectory = token;
+            gMainSettings.mWorkDirectory = token;
 
-          string& dir = gMainSettings.m_TempDirectory;
+          string& dir = gMainSettings.mTempDirectory;
 
           if ((dir.size () != 0)
               && (dir[dir.size () - 1] != whf_dir_delim()[0]))
@@ -406,9 +406,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
         {
           token = NextToken (line, pos, delimiters);
           if (token == "false")
-            gMainSettings.m_ShowDebugLog = false;
+            gMainSettings.mShowDebugLog = false;
           else if (token == "true")
-            gMainSettings.m_ShowDebugLog = true;
+            gMainSettings.mShowDebugLog = true;
           else
             {
               cerr << "Unkown to assign '" << token << "\' to 'show_debug' ";
@@ -426,7 +426,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
         }
     }
 
-  if (gMainSettings.m_WorkDirectory.length () == 0)
+  if (gMainSettings.mWorkDirectory.length () == 0)
     {
       cerr << "The configuration main section does not ";
       cerr << "have a '"<< gEntWorkDir << "' entry.\n";
@@ -434,10 +434,10 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       return false;
     }
 
-  if (gMainSettings.m_TempDirectory.length () == 0)
-    gMainSettings.m_TempDirectory = gMainSettings.m_WorkDirectory;
+  if (gMainSettings.mTempDirectory.length () == 0)
+    gMainSettings.mTempDirectory = gMainSettings.mWorkDirectory;
 
-  if (gMainSettings.m_LogFile.length () == 0)
+  if (gMainSettings.mLogFile.length () == 0)
     {
       cerr << "The configuration main section does not ";
       cerr << "have a '"<< gEntLogFile << "' entry.\n";
@@ -500,7 +500,7 @@ ParseContextSection (Logger&        log,
               if (get_enclose_entry (logEntry,
                                      entry,
                                      token.at (0),
-                                     output.m_DbsName) == false)
+                                     output.mDbsName) == false)
                 {
                   logEntry << "Unmatched "<< token.at (0);
                   logEntry << " in configuration file at line ";
@@ -511,7 +511,7 @@ ParseContextSection (Logger&        log,
 
             }
           else
-            output.m_DbsName = token;
+            output.mDbsName = token;
         }
        else if (token == gEntWorkDir)
         {
@@ -530,7 +530,7 @@ ParseContextSection (Logger&        log,
              if (get_enclose_entry (cerr,
                                     entry,
                                     token.at (0),
-                                    output.m_DbsDirectory) == false)
+                                    output.mDbsDirectory) == false)
                {
                  cerr << "Unmatched "<< token.at (0);
                  cerr << " in configuration file at line ";
@@ -539,9 +539,9 @@ ParseContextSection (Logger&        log,
                }
             }
           else
-            output.m_DbsDirectory = token;
+            output.mDbsDirectory = token;
 
-          string& dir = output.m_DbsDirectory;
+          string& dir = output.mDbsDirectory;
 
           if ((dir.size () != 0)
               && (dir[dir.size () - 1] != whf_dir_delim()[0]))
@@ -566,7 +566,7 @@ ParseContextSection (Logger&        log,
               if (get_enclose_entry (cerr,
                                      entry,
                                      token.at (0),
-                                     output.m_DbsLogFile) == false)
+                                     output.mDbsLogFile) == false)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
@@ -576,7 +576,7 @@ ParseContextSection (Logger&        log,
 
             }
           else
-            output.m_DbsLogFile = token;
+            output.mDbsLogFile = token;
         }
        else if (token==gEntObjectLib)
         {
@@ -613,9 +613,9 @@ ParseContextSection (Logger&        log,
 
            if ( ! whf_is_absolute (libEntry.c_str ()))
              {
-               libEntry = gMainSettings.m_WorkDirectory + libEntry;
+               libEntry = gMainSettings.mWorkDirectory + libEntry;
              }
-           output.m_ObjectLibs.push_back (libEntry);
+           output.mObjectLibs.push_back (libEntry);
         }
        else if (token==gEntNativeLib)
         {
@@ -652,13 +652,13 @@ ParseContextSection (Logger&        log,
 
            if ( ! whf_is_absolute (libEntry.c_str ()))
              {
-               libEntry = gMainSettings.m_WorkDirectory + libEntry;
+               libEntry = gMainSettings.mWorkDirectory + libEntry;
              }
-           output.m_NativeLibs.push_back (libEntry);
+           output.mNativeLibs.push_back (libEntry);
         }
        else if (token == gEntRootPasswrd)
         {
-           if (output.m_RootPass.size () > 0)
+           if (output.mRootPass.size () > 0)
              {
                logEntry << "Configuration error at line ";
                logEntry << ioConfigLine << ". ";
@@ -684,7 +684,7 @@ ParseContextSection (Logger&        log,
                if (get_enclose_entry (logEntry,
                                       entry,
                                       token.at (0),
-                                      output.m_RootPass) == false)
+                                      output.mRootPass) == false)
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
@@ -695,11 +695,11 @@ ParseContextSection (Logger&        log,
 
              }
            else
-             output.m_RootPass = token;
+             output.mRootPass = token;
         }
        else if (token == gEntUserPasswrd)
         {
-           if (output.m_UserPasswd.size () > 0)
+           if (output.mUserPasswd.size () > 0)
              {
                logEntry << "Configuration error at line ";
                logEntry << ioConfigLine << ". ";
@@ -726,7 +726,7 @@ ParseContextSection (Logger&        log,
                if (get_enclose_entry (logEntry,
                                       entry,
                                       token.at (0),
-                                      output.m_UserPasswd) == false)
+                                      output.mUserPasswd) == false)
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
@@ -737,7 +737,7 @@ ParseContextSection (Logger&        log,
 
              }
            else
-             output.m_UserPasswd = token;
+             output.mUserPasswd = token;
         }
       else
         {
@@ -756,38 +756,38 @@ PrepareConfigurationSection (Logger& log)
 {
   ostringstream logStream;
 
-  if (gMainSettings.m_Listens.size () == 0)
+  if (gMainSettings.mListens.size () == 0)
     {
       ListenEntry defaultEnt = {"", DEFAULT_LISTEN_PORT};
-      gMainSettings.m_Listens.push_back (defaultEnt);
+      gMainSettings.mListens.push_back (defaultEnt);
     }
 
-  if (gMainSettings.m_MaxConnections == 0)
+  if (gMainSettings.mMaxConnections == 0)
     {
-      if (gMainSettings.m_ShowDebugLog)
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG,
                      "The number of maximum simultaneous connections per "
                      "interface set to default.");
         }
-      gMainSettings.m_MaxConnections = DEFAULT_MAX_CONNS;
+      gMainSettings.mMaxConnections = DEFAULT_MAX_CONNS;
     }
 
   logStream << "Maximum simultaneous connections per interface set at ";
-  logStream << gMainSettings.m_MaxConnections << ".";
+  logStream << gMainSettings.mMaxConnections << ".";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.m_Cipher == 0)
+  if (gMainSettings.mCipher == 0)
     {
-      if (gMainSettings.m_ShowDebugLog)
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG, "The communication cipher is set to default.");
         }
-      gMainSettings.m_Cipher = FRAME_ENCTYPE_PLAIN;
+      gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;
     }
   logStream << "Communication cipher is set to '";
-  switch (gMainSettings.m_Cipher)
+  switch (gMainSettings.mCipher)
   {
   case FRAME_ENCTYPE_PLAIN:
     logStream << CIPHER_PLAIN;
@@ -802,17 +802,17 @@ PrepareConfigurationSection (Logger& log)
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.m_MaxFrameSize == 0)
+  if (gMainSettings.mMaxFrameSize == 0)
     {
-      if (gMainSettings.m_ShowDebugLog)
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG,
                    "The maximum communication frame size set to default.");
         }
-      gMainSettings.m_MaxFrameSize = DEFAULT_FRAME_SIZE;
+      gMainSettings.mMaxFrameSize = DEFAULT_FRAME_SIZE;
     }
-  else if ((gMainSettings.m_MaxFrameSize < MIN_FRAME_SIZE)
-            || (MAX_FRAME_SIZE < gMainSettings.m_MaxFrameSize))
+  else if ((gMainSettings.mMaxFrameSize < MIN_FRAME_SIZE)
+            || (MAX_FRAME_SIZE < gMainSettings.mMaxFrameSize))
     {
       logStream << "The maximum frame size set to a invalid value. ";
       logStream << "The value should be set between " << MIN_FRAME_SIZE;
@@ -824,56 +824,56 @@ PrepareConfigurationSection (Logger& log)
     }
 
   logStream << "Maximum communication frame size set to ";
-  logStream << gMainSettings.m_MaxFrameSize <<" bytes.";
+  logStream << gMainSettings.mMaxFrameSize <<" bytes.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.m_TableCacheBlockSize == 0)
+  if (gMainSettings.mTableCacheBlockSize == 0)
     {
-      gMainSettings.m_TableCacheBlockSize = DEFAULT_TABLE_CACHE_BLOCK_SIZE;
-      if (gMainSettings.m_ShowDebugLog)
+      gMainSettings.mTableCacheBlockSize = DEFAULT_TABLE_CACHE_BLOCK_SIZE;
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG,
                    "The table cache block size is set to default value.");
         }
     }
 
-  if (gMainSettings.m_TableCacheBlockSize < MIN_TABLE_CACHE_BLOCK_SIZE)
+  if (gMainSettings.mTableCacheBlockSize < MIN_TABLE_CACHE_BLOCK_SIZE)
     {
-      gMainSettings.m_TableCacheBlockSize = MIN_TABLE_CACHE_BLOCK_SIZE;
+      gMainSettings.mTableCacheBlockSize = MIN_TABLE_CACHE_BLOCK_SIZE;
       log.Log (LOG_INFO,
                "The table cache block size was set to less than minimum. ");
     }
   logStream << "Table cache block size set at ";
-  logStream << gMainSettings.m_TableCacheBlockSize << " bytes.";
+  logStream << gMainSettings.mTableCacheBlockSize << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.m_TableCacheBlockCount == 0)
+  if (gMainSettings.mTableCacheBlockCount == 0)
     {
-      gMainSettings.m_TableCacheBlockCount = DEFAULT_TABLE_CACHE_BLOCK_COUNT;
-      if (gMainSettings.m_ShowDebugLog)
+      gMainSettings.mTableCacheBlockCount = DEFAULT_TABLE_CACHE_BLOCK_COUNT;
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG,
                    "The table cache block count is set to default values.");
         }
     }
-  if (gMainSettings.m_TableCacheBlockCount < MIN_TABLE_CACHE_BLOCK_COUNT)
+  if (gMainSettings.mTableCacheBlockCount < MIN_TABLE_CACHE_BLOCK_COUNT)
     {
-      gMainSettings.m_TableCacheBlockCount = MIN_TABLE_CACHE_BLOCK_COUNT;
+      gMainSettings.mTableCacheBlockCount = MIN_TABLE_CACHE_BLOCK_COUNT;
       log.Log (LOG_INFO,
                "The table cache block count was set to less than minimum. ");
     }
   logStream << "Table cache block count set at ";
-  logStream << gMainSettings.m_TableCacheBlockCount << '.';
+  logStream << gMainSettings.mTableCacheBlockCount << '.';
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //VLS
-  if (gMainSettings.m_VLBlockSize == 0)
+  if (gMainSettings.mVLBlockSize == 0)
     {
-      gMainSettings.m_VLBlockSize = DEFAULT_VL_BLOCK_SIZE;
-      if (gMainSettings.m_ShowDebugLog)
+      gMainSettings.mVLBlockSize = DEFAULT_VL_BLOCK_SIZE;
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (
                    LOG_DEBUG,
@@ -882,9 +882,9 @@ PrepareConfigurationSection (Logger& log)
                   );
         }
     }
-  if (gMainSettings.m_VLBlockSize < MIN_VL_BLOCK_SIZE)
+  if (gMainSettings.mVLBlockSize < MIN_VL_BLOCK_SIZE)
     {
-      gMainSettings.m_VLBlockSize = MIN_VL_BLOCK_SIZE;
+      gMainSettings.mVLBlockSize = MIN_VL_BLOCK_SIZE;
       log.Log (
                LOG_INFO,
                  "The table cache block size was "
@@ -892,14 +892,14 @@ PrepareConfigurationSection (Logger& log)
               );
     }
   logStream << "Table VL store cache block size set at ";
-  logStream << gMainSettings.m_VLBlockSize << " bytes.";
+  logStream << gMainSettings.mVLBlockSize << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.m_VLBlockCount == 0)
+  if (gMainSettings.mVLBlockCount == 0)
     {
-      gMainSettings.m_VLBlockCount = DEFAULT_VL_BLOCK_COUNT;
-      if (gMainSettings.m_ShowDebugLog)
+      gMainSettings.mVLBlockCount = DEFAULT_VL_BLOCK_COUNT;
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (
                    LOG_DEBUG,
@@ -909,9 +909,9 @@ PrepareConfigurationSection (Logger& log)
         }
     }
 
-  if (gMainSettings.m_VLBlockCount < MIN_VL_BLOCK_COUNT)
+  if (gMainSettings.mVLBlockCount < MIN_VL_BLOCK_COUNT)
     {
-      gMainSettings.m_VLBlockCount = MIN_VL_BLOCK_COUNT;
+      gMainSettings.mVLBlockCount = MIN_VL_BLOCK_COUNT;
       log.Log (
                LOG_INFO,
                  "The table VL store he block count was set "
@@ -919,15 +919,15 @@ PrepareConfigurationSection (Logger& log)
                );
     }
   logStream << "Table VL store cache block count set at ";
-  logStream << gMainSettings.m_VLBlockCount << '.';
+  logStream << gMainSettings.mVLBlockCount << '.';
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //Temporal values
-  if (gMainSettings.m_TempValuesCache == 0)
+  if (gMainSettings.mTempValuesCache == 0)
     {
-      gMainSettings.m_TempValuesCache = DEFAULT_TEMP_CACHE;
-      if (gMainSettings.m_ShowDebugLog)
+      gMainSettings.mTempValuesCache = DEFAULT_TEMP_CACHE;
+      if (gMainSettings.mShowDebugLog)
         {
           log.Log (
                    LOG_DEBUG,
@@ -936,9 +936,9 @@ PrepareConfigurationSection (Logger& log)
                    );
         }
     }
-  if (gMainSettings.m_TempValuesCache < MIN_TEMP_CACHE)
+  if (gMainSettings.mTempValuesCache < MIN_TEMP_CACHE)
     {
-      gMainSettings.m_TempValuesCache = MIN_TEMP_CACHE;
+      gMainSettings.mTempValuesCache = MIN_TEMP_CACHE;
       log.Log (
                LOG_INFO,
                  "The temporal values cache was set "
@@ -946,7 +946,7 @@ PrepareConfigurationSection (Logger& log)
                );
     }
   logStream << "The temporal values cache set at ";
-  logStream << gMainSettings.m_TempValuesCache << " bytes.";
+  logStream << gMainSettings.mTempValuesCache << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
@@ -956,36 +956,36 @@ PrepareConfigurationSection (Logger& log)
 bool
 PrepareContextSection (Logger& log, DBSDescriptors& ioDesc)
 {
-  assert (ioDesc.m_ConfigLine != 0);
+  assert (ioDesc.mConfigLine != 0);
 
   ostringstream logStream;
 
-  if (ioDesc.m_UserPasswd.size () == 0)
+  if (ioDesc.mUserPasswd.size () == 0)
     {
       logStream << "A user password for the database ";
       logStream << "section starting at line ";
-      logStream << ioDesc.m_ConfigLine;
+      logStream << ioDesc.mConfigLine;
       logStream << " was not set.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if (ioDesc.m_RootPass.size () == 0)
+  if (ioDesc.mRootPass.size () == 0)
     {
       logStream << "A root password for the database ";
       logStream << "section starting at line ";
-      logStream << ioDesc.m_ConfigLine;
+      logStream << ioDesc.mConfigLine;
       logStream << " was not set.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if (ioDesc.m_DbsName.length () == 0)
+  if (ioDesc.mDbsName.length () == 0)
     {
       logStream << "Database section starting line ";
-      logStream << ioDesc.m_ConfigLine;
+      logStream << ioDesc.mConfigLine;
       logStream << " does not have a '";
       logStream << gEntDBSName << "' entry.";
       log.Log (LOG_ERROR, logStream.str ());
@@ -993,10 +993,10 @@ PrepareContextSection (Logger& log, DBSDescriptors& ioDesc)
       return false;
     }
 
-  if (ioDesc.m_DbsDirectory.length () == 0)
+  if (ioDesc.mDbsDirectory.length () == 0)
     {
       logStream << "Database section starting line ";
-      logStream << ioDesc.m_ConfigLine;
+      logStream << ioDesc.mConfigLine;
       logStream << " does not have a '";
       logStream << gEntWorkDir << "' entry.";
       log.Log (LOG_ERROR, logStream.str ());
@@ -1004,10 +1004,10 @@ PrepareContextSection (Logger& log, DBSDescriptors& ioDesc)
       return false;
     }
 
-  if (ioDesc.m_DbsLogFile.length () == 0)
+  if (ioDesc.mDbsLogFile.length () == 0)
     {
       logStream << "Database section starting line ";
-      logStream << ioDesc.m_ConfigLine;
+      logStream << ioDesc.mConfigLine;
       logStream << " does not have a '";
       logStream << gEntLogFile << "' entry.";
       log.Log (LOG_ERROR, logStream.str ());
@@ -1015,8 +1015,8 @@ PrepareContextSection (Logger& log, DBSDescriptors& ioDesc)
       return false;
     }
 
-  if ( ! whf_is_absolute (ioDesc.m_DbsLogFile.c_str ()))
-    ioDesc.m_DbsLogFile = ioDesc.m_DbsDirectory + ioDesc.m_DbsLogFile;
+  if ( ! whf_is_absolute (ioDesc.mDbsLogFile.c_str ()))
+    ioDesc.mDbsLogFile = ioDesc.mDbsDirectory + ioDesc.mDbsLogFile;
 
   return true;
 }

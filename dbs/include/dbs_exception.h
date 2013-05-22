@@ -35,11 +35,11 @@ namespace whisper
 class DBS_SHL DBSException : public Exception
 {
 public:
-  DBSException (const char* pMessage,
-                const char* pFile,
-                uint32_t uLine,
-                uint32_t extra)
-    : Exception (pMessage, pFile, uLine, extra)
+  DBSException (const char*     message,
+                const char*     file,
+                uint32_t        line,
+                uint32_t        extra)
+    : Exception (message, file, line, extra)
   {
   }
 
@@ -85,6 +85,7 @@ public:
     {
       return new DBSException (*this);
     }
+
   virtual EXPCEPTION_TYPE Type () const
     {
       return DBS_EXCEPTION;
@@ -96,60 +97,88 @@ public:
         {
         case OPER_NOT_SUPPORTED:
           return "Operation not supported.";
+
         case ALREADY_INITED:
           return  "Already initialised.";
+
         case NOT_INITED:
           return  "Not initialised.";
+
         case DATABASE_NOT_SUPP:
           return "Database not supplied.";
+
         case INAVLID_DATABASE:
           return "Invalid database.";
+
         case DATABASE_NOT_FOUND:
           return "Database not found.";
+
         case DATABASE_IN_USE:
           return "Database is in use.";
+
         case TABLE_INCONSITENCY:
           return "Tables is inconsistent.";
+
         case TABLE_NOT_FOUND:
           return "Table not found.";
+
         case TABLE_EXISTS:
           return "Table already exists.";
+
         case TABLE_IN_USE:
           return "Table is in use.";
+
         case TABLE_INVALID:
           return "Invalid table.";
+
         case FIELD_NAME_INVALID:
           return "Invalid field name.";
+
         case FIELD_NAME_DUPLICATED:
           return "Field name duplication.";
+
         case FIELD_TYPE_INVALID:
           return "Invalid field type.";
+
         case FIELD_NOT_FOUND:
           return "Field not found.";
+
         case FIELD_NOT_INDEXED:
           return "Field is not indexed.";
+
         case FIELD_INDEXED:
           return "Field is indexed";
+
         case GENERAL_CONTROL_ERROR:
           return "Internal control error detected.";
+
         case INVALID_PARAMETERS:
           return "Invalid parameters";
+
         case INVALID_UTF8_STRING:
           return "String is not UTF8 encoded.";
+
         case STRING_INDEX_TOO_BIG:
           return "Text string has less elements.";
+
         case ARRAY_INDEX_TOO_BIG:
           return "Array has less elements.";
+
         case INVALID_ARRAY_TYPE:
           return "Array of invalid type elements.";
+
         case NULL_ARRAY_ELEMENT:
           return "An array could not hold a NULL element.";
+
         case INVALID_DATE:
           return "Invalid representation of a DATE.";
+
         case INVALID_DATETIME:
           return "Invalid representation of a DATETIME.";
+
         case INVALID_HIRESTIME:
           return "Invalid representation of a HIRESTIME.";
+
         default:
           assert (false);
           return "Unknown exception code.";

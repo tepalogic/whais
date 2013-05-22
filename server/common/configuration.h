@@ -38,74 +38,74 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct ListenEntry
 {
-  std::string m_Interface;
-  std::string m_Service;
+  std::string mInterface;
+  std::string mService;
 };
 
 struct ServerSettings
 {
   ServerSettings ()
-    : m_MaxConnections (0),
-      m_MaxFrameSize (0),
-      m_TableCacheBlockSize (0),
-      m_TableCacheBlockCount (0),
-      m_VLBlockSize (0),
-      m_VLBlockCount (0),
-      m_TempValuesCache (0),
-      m_WorkDirectory (),
-      m_TempDirectory (),
-      m_LogFile (),
-      m_Listens (),
-      m_Cipher (0),
-      m_ShowDebugLog (false)
+    : mMaxConnections (0),
+      mMaxFrameSize (0),
+      mTableCacheBlockSize (0),
+      mTableCacheBlockCount (0),
+      mVLBlockSize (0),
+      mVLBlockCount (0),
+      mTempValuesCache (0),
+      mWorkDirectory (),
+      mTempDirectory (),
+      mLogFile (),
+      mListens (),
+      mCipher (0),
+      mShowDebugLog (false)
   {
   }
 
-  uint_t      m_MaxConnections;
-  uint_t      m_MaxFrameSize;
-  uint_t      m_TableCacheBlockSize;
-  uint_t      m_TableCacheBlockCount;
-  uint_t      m_VLBlockSize;
-  uint_t      m_VLBlockCount;
-  uint_t      m_TempValuesCache;
-  std::string m_WorkDirectory;
-  std::string m_TempDirectory;
-  std::string m_LogFile;
+  uint_t      mMaxConnections;
+  uint_t      mMaxFrameSize;
+  uint_t      mTableCacheBlockSize;
+  uint_t      mTableCacheBlockCount;
+  uint_t      mVLBlockSize;
+  uint_t      mVLBlockCount;
+  uint_t      mTempValuesCache;
+  std::string mWorkDirectory;
+  std::string mTempDirectory;
+  std::string mLogFile;
 
-  std::vector<ListenEntry> m_Listens;
+  std::vector<ListenEntry> mListens;
 
-  uint8_t     m_Cipher;
-  bool        m_ShowDebugLog;
+  uint8_t     mCipher;
+  bool        mShowDebugLog;
 
 };
 
 struct DBSDescriptors
 {
   DBSDescriptors (const uint_t configLine)
-    : m_ConfigLine (configLine),
-      m_DbsName (),
-      m_DbsDirectory (),
-      m_ObjectLibs (),
-      m_NativeLibs (),
-      m_Dbs (NULL),
-      m_Session (NULL),
-      m_pLogger (NULL)
+    : mConfigLine (configLine),
+      mDbsName (),
+      mDbsDirectory (),
+      mObjectLibs (),
+      mNativeLibs (),
+      mDbs (NULL),
+      mSession (NULL),
+      mpLogger (NULL)
   {
   }
 
-  uint_t                   m_ConfigLine;
-  std::string              m_DbsName;
-  std::string              m_DbsDirectory;
-  std::string              m_DbsLogFile;
-  std::string              m_RootPass;
-  std::string              m_UserPasswd;
-  std::vector<std::string> m_ObjectLibs;
-  std::vector<std::string> m_NativeLibs;
+  uint_t                   mConfigLine;
+  std::string              mDbsName;
+  std::string              mDbsDirectory;
+  std::string              mDbsLogFile;
+  std::string              mRootPass;
+  std::string              mUserPasswd;
+  std::vector<std::string> mObjectLibs;
+  std::vector<std::string> mNativeLibs;
 
-  whisper::I_DBSHandler*            m_Dbs;
-  whisper::I_Session*               m_Session;
+  whisper::I_DBSHandler*            mDbs;
+  whisper::I_Session*               mSession;
 
-  whisper::Logger*                m_pLogger;
+  whisper::Logger*                mpLogger;
 };
 
 const std::string&

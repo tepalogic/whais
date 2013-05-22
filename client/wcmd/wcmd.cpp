@@ -147,9 +147,9 @@ ExecuteCommandLine (const std::string& cmdLine)
       return false;
     }
 
-  bool cmdResult = pEntry->m_cmd (normalizeCmd, pEntry->m_context);
+  bool cmdResult = pEntry->mcmd (normalizeCmd, pEntry->mcontext);
 
-  if (pEntry->m_showStatus && (GetVerbosityLevel () > VL_STATUS))
+  if (pEntry->mshowStatus && (GetVerbosityLevel () > VL_STATUS))
     cout << command << " : " << (cmdResult ? "OK" : "FAIL") << endl;
 
   return cmdResult;
@@ -192,12 +192,12 @@ ExecuteInteractively ()
 {
   CmdEntry entry;
 
-  entry.m_pCmdText     = "quit";
-  entry.m_pCmdDesc     = descExit;
-  entry.m_pExtHelpDesc = descExtExit;
-  entry.m_cmd          = cmdExit;
-  entry.m_context      = &sFinishInteraction;
-  entry.m_showStatus   = false;
+  entry.mpCmdText     = "quit";
+  entry.mpCmdDesc     = descExit;
+  entry.mpExtHelpDesc = descExtExit;
+  entry.mcmd          = cmdExit;
+  entry.mcontext      = &sFinishInteraction;
+  entry.mshowStatus   = false;
 
   RegisterCommand (entry);
 
@@ -245,7 +245,7 @@ InitDBS ()
         }
 
       DBSSettings settings;
-      settings.m_WorkDir = settings.m_TempDir = workDir;
+      settings.mWorkDir = settings.mTempDir = workDir;
       DBSInit (settings);
     }
 

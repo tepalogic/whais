@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <iostream>
 #include <string.h>
+#include <stdlib.h>
 
 #include "utils/wrandom.h"
 #include "utils/wthread.h"
@@ -20,9 +21,9 @@
 
 using namespace whisper;
 
-const uint_t _elemsCount = 1000000;
+uint_t _elemsCount = 1000000;
 
-DBSDateTime
+DDateTime
 get_random_datetime ()
 {
   int16_t year  = wh_rnd () & 0xFFFF;
@@ -32,10 +33,10 @@ get_random_datetime ()
   uint8_t mins  = wh_rnd () % 60;
   uint8_t secs  = wh_rnd () % 60;
 
-  return DBSDateTime (year, month, day, hour, mins, secs);
+  return DDateTime (year, month, day, hour, mins, secs);
 }
 
-DBSHiresTime
+DHiresTime
 get_random_hirestime ()
 {
   int16_t year  = wh_rnd () & 0xFFFF;
@@ -46,40 +47,40 @@ get_random_hirestime ()
   uint8_t secs  = wh_rnd () % 60;
   uint32_t  mic = wh_rnd () % 1000000000;
 
-  return DBSHiresTime (year, month, day, hour, mins, secs, mic);
+  return DHiresTime (year, month, day, hour, mins, secs, mic);
 }
 
 
 
-DBSDate
+DDate
 get_random_date ()
 {
   int16_t year  = wh_rnd () & 0xFFFF;
   uint8_t month = wh_rnd () % 12 + 1;
   uint8_t day   = wh_rnd () % 27 + 1;
 
-  return DBSDate (year, month, day);
+  return DDate (year, month, day);
 }
 
 void
 test_array_with_dates (void *)
 {
   std::cout << "Testing array sort with dates ...\n";
-  DBSArray array (_SC (DBSDate*, NULL));
+  DArray array (_SC (DDate*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (get_random_date ());
+    array.Add (get_random_date ());
 
   array.Sort ();
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 0;
 
-  DBSDate lastValue;
+  DDate lastValue;
   for (uint_t index = 0; index < _elemsCount; ++index)
     {
-      DBSDate currValue;
-      array.GetElement (currValue, index);
+      DDate currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 1;
 
@@ -93,21 +94,21 @@ void
 test_array_with_datetimes (void *)
 {
   std::cout << "Testing array sort with datetimes ...\n";
-  DBSArray array (_SC (DBSDateTime*, NULL));
+  DArray array (_SC (DDateTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (get_random_datetime ());
+    array.Add (get_random_datetime ());
 
   array.Sort ();
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 2;
 
-  DBSDateTime lastValue;
+  DDateTime lastValue;
   for (uint_t index = 0; index < _elemsCount; ++index)
     {
-      DBSDateTime currValue;
-      array.GetElement (currValue, index);
+      DDateTime currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 3;
 
@@ -121,21 +122,21 @@ void
 test_array_with_hirestimes (void *)
 {
   std::cout << "Testing array sort with hirestimes ...\n";
-  DBSArray array (_SC (DBSHiresTime*, NULL));
+  DArray array (_SC (DHiresTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (get_random_hirestime ());
+    array.Add (get_random_hirestime ());
 
   array.Sort ();
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 4;
 
-  DBSHiresTime lastValue;
+  DHiresTime lastValue;
   for (uint_t index = 0; index < _elemsCount; ++index)
     {
-      DBSHiresTime currValue;
-      array.GetElement (currValue, index);
+      DHiresTime currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 5;
 
@@ -149,21 +150,21 @@ void
 test_array_with_int8 (void *)
 {
   std::cout << "Testing array sort with int8 ...\n";
-  DBSArray array (_SC (DBSUInt8*, NULL));
+  DArray array (_SC (DUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (DBSUInt8 ( wh_rnd () & 0xFF));
+    array.Add (DUInt8 ( wh_rnd () & 0xFF));
 
   array.Sort ();
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 6;
 
-  DBSUInt8 lastValue;
+  DUInt8 lastValue;
   for (uint_t index = 0; index < _elemsCount; ++index)
     {
-      DBSUInt8 currValue;
-      array.GetElement (currValue, index);
+      DUInt8 currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 7;
 
@@ -178,21 +179,21 @@ void
 test_array_with_dates_r (void *)
 {
   std::cout << "Testing array reverse sort with dates ...\n";
-  DBSArray array (_SC (DBSDate*, NULL));
+  DArray array (_SC (DDate*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (get_random_date ());
+    array.Add (get_random_date ());
 
   array.Sort (true);
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 8;
 
-  DBSDate lastValue;
+  DDate lastValue;
   for (uint_t index = _elemsCount; index-- > 0;)
     {
-      DBSDate currValue;
-      array.GetElement (currValue, index);
+      DDate currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 9;
 
@@ -207,21 +208,21 @@ void
 test_array_with_datetimes_r (void *)
 {
   std::cout << "Testing array reverse sort with datetimes ...\n";
-  DBSArray array (_SC (DBSDateTime*, NULL));
+  DArray array (_SC (DDateTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (get_random_datetime ());
+    array.Add (get_random_datetime ());
 
   array.Sort (true);
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 10;
 
-  DBSDateTime lastValue;
+  DDateTime lastValue;
   for (uint_t index = _elemsCount; index-- > 0 ;)
     {
-      DBSDateTime currValue;
-      array.GetElement (currValue, index);
+      DDateTime currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 11;
 
@@ -235,21 +236,21 @@ void
 test_array_with_hirestimes_r (void *)
 {
   std::cout << "Testing array reverse sort with hirestimes ...\n";
-  DBSArray array (_SC (DBSHiresTime*, NULL));
+  DArray array (_SC (DHiresTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (get_random_hirestime ());
+    array.Add (get_random_hirestime ());
 
   array.Sort (true);
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 12;
 
-  DBSHiresTime lastValue;
+  DHiresTime lastValue;
   for (uint_t index = _elemsCount; index-- > 0;)
     {
-      DBSHiresTime currValue;
-      array.GetElement (currValue, index);
+      DHiresTime currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 13;
 
@@ -264,21 +265,21 @@ void
 test_array_with_int8_r (void *)
 {
   std::cout << "Testing array reverse sort with int8 ...\n";
-  DBSArray array (_SC (DBSUInt8*, NULL));
+  DArray array (_SC (DUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.AddElement (DBSUInt8 (wh_rnd () & 0xFF));
+    array.Add (DUInt8 (wh_rnd () & 0xFF));
 
   array.Sort (true);
 
-  if (array.ElementsCount () != _elemsCount)
+  if (array.Count () != _elemsCount)
     throw 14;
 
-  DBSUInt8 lastValue;
+  DUInt8 lastValue;
   for (uint_t index = _elemsCount; index-- > 0;)
     {
-    DBSUInt8 currValue;
-      array.GetElement (currValue, index);
+    DUInt8 currValue;
+      array.Get (index, currValue);
       if (currValue < lastValue)
         throw 15;
 
@@ -289,9 +290,15 @@ test_array_with_int8_r (void *)
 }
 
 int
-main ()
+main (int argc, char** argv)
 {
   bool success = true;
+
+  if (argc > 1)
+    _elemsCount = atol (argv[1]);
+
+
+  std::cout << "Sorting array with " << _elemsCount << " elements.\n";
 
   DBSInit (DBSSettings ());
 
@@ -325,3 +332,4 @@ main ()
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "T";
 #endif
+

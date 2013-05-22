@@ -27,7 +27,7 @@
 
 #include "ps_templatetable.h"
 
-#include "ps_valintep.h"
+#include "ps_serializer.h"
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
 
@@ -35,89 +35,92 @@ using namespace std;
 
 namespace whisper {
 
-///////////////////////////////////////////////////////////////////////////////
-I_DBSTable::I_DBSTable ()
+
+
+ITable::ITable ()
 {
 }
 
-I_DBSTable::~I_DBSTable ()
+
+ITable::~ITable ()
 {
 }
+
 
 
 namespace pastra {
-///////////////////////////////////////////////////////////////////////////////
+
+
 
 PrototypeTable::PrototypeTable (DbsHandler& dbs)
-  : m_Dbs (dbs),
-    m_RowsCount (0),
-    m_RootNode (NIL_NODE),
-    m_FirstUnallocatedRoot (NIL_NODE),
-    m_RowSize (0),
-    m_DescriptorsSize (0),
-    m_FieldsCount (0),
-    m_FieldsDescriptors(NULL),
-    m_Sync (),
-    m_IndexSync ()
+  : mDbs (dbs),
+    mRowsCount (0),
+    mRootNode (NIL_NODE),
+    mUnallocatedHead (NIL_NODE),
+    mRowSize (0),
+    mDescriptorsSize (0),
+    mFieldsCount (0),
+    mFieldsDescriptors(NULL),
+    mSync (),
+    mIndexSync ()
 {
 }
+
 
 PrototypeTable::PrototypeTable (const PrototypeTable& prototype)
-  : m_Dbs (prototype.m_Dbs),
-    m_RowsCount (0),
-    m_RootNode (NIL_NODE),
-    m_FirstUnallocatedRoot (NIL_NODE),
-    m_RowSize (prototype.m_RowSize),
-    m_DescriptorsSize (prototype.m_DescriptorsSize),
-    m_FieldsCount (prototype.m_FieldsCount),
-    m_FieldsDescriptors(),
-    m_vIndexNodeMgrs (),
-    m_Sync (),
-    m_IndexSync ()
+  : mDbs (prototype.mDbs),
+    mRowsCount (0),
+    mRootNode (NIL_NODE),
+    mUnallocatedHead (NIL_NODE),
+    mRowSize (prototype.mRowSize),
+    mDescriptorsSize (prototype.mDescriptorsSize),
+    mFieldsCount (prototype.mFieldsCount),
+    mFieldsDescriptors (),
+    mvIndexNodeMgrs (),
+    mSync (),
+    mIndexSync ()
 {
-  //TODO: In future make sure the two prototypes are
-  //      sharing the same memory for fields.
-  m_FieldsDescriptors.reset (new uint8_t [m_DescriptorsSize]);
-  memcpy (m_FieldsDescriptors.get (),
-          prototype.m_FieldsDescriptors.get (),
-          m_DescriptorsSize);
+  //TODO: Should be possible for the two prototypes to share the same memory
+  //      for fields descriptors.
+  mFieldsDescriptors.reset (new uint8_t [mDescriptorsSize]);
+
+  memcpy (mFieldsDescriptors.get (),
+          prototype.mFieldsDescriptors.get (),
+          mDescriptorsSize);
 }
 
-PrototypeTable::~PrototypeTable ()
-{
-}
 
 void
 PrototypeTable::Flush ()
 {
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  m_RowCache.Flush ();
+  mRowCache.Flush ();
   FlushNodes ();
 }
 
+
 FIELD_INDEX
-PrototypeTable::GetFieldsCount ()
+PrototypeTable::FieldsCount ()
 {
-  return m_FieldsCount;
+  return mFieldsCount;
 }
 
-FIELD_INDEX
-PrototypeTable::GetFieldIndex (const char* pFieldName)
-{
-  const FieldDescriptor* const pDesc = _RC (const FieldDescriptor*,
-                                            m_FieldsDescriptors.get ());
-  uint64_t iterator = m_FieldsCount * sizeof(FieldDescriptor);
 
-  for (FIELD_INDEX index = 0; index < m_FieldsCount; ++index)
+FIELD_INDEX
+PrototypeTable::RetrieveField (const char* name)
+{
+  const char* fieldName = _RC (const char*, mFieldsDescriptors.get ());
+
+  //Initial iterator points at the at the first field's name.
+  fieldName += mFieldsCount * sizeof(FieldDescriptor);
+
+  for (FIELD_INDEX index = 0; index < mFieldsCount; ++index)
     {
-      if (strcmp(_RC (const char*,
-                 m_FieldsDescriptors.get() + iterator),
-                 pFieldName) == 0)
-        {
-          return index;
-        }
-      iterator += strlen(_RC(const char*, pDesc) + iterator) + 1;
+      if (strcmp (fieldName, name) == 0)
+        return index;
+
+      fieldName += strlen (fieldName) + 1;
     }
 
   throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
@@ -125,65 +128,66 @@ PrototypeTable::GetFieldIndex (const char* pFieldName)
 
 
 DBSFieldDescriptor
-PrototypeTable::GetFieldDescriptor (const FIELD_INDEX field)
+PrototypeTable::DescribeField (const FIELD_INDEX field)
 {
-  const FieldDescriptor* const pDesc = _RC(const FieldDescriptor*,
-                                           m_FieldsDescriptors.get ());
-
-  if (field >= m_FieldsCount)
+  if (field >= mFieldsCount)
     throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+
+  const FieldDescriptor* const desc = _RC(const FieldDescriptor*,
+                                          mFieldsDescriptors.get ());
 
   DBSFieldDescriptor result;
 
-  result.isArray      = (pDesc[field].m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0;
-  result.m_FieldType  = _SC (
-                           DBS_FIELD_TYPE,
-                           pDesc[field].m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK
-                            );
-  result.m_pFieldName = _RC (const char*, pDesc) + pDesc[field].m_NameOffset;
+  result.isArray = (desc[field].mTypeDesc & PS_TABLE_ARRAY_MASK) != 0;
+  result.type    = _SC (DBS_FIELD_TYPE,
+                        desc[field].mTypeDesc & PS_TABLE_FIELD_TYPE_MASK);
+  result.name    = _RC (const char*, desc) + desc[field].mNameOffset;
 
   return result;
 }
 
+
 ROW_INDEX
-PrototypeTable::GetAllocatedRows ()
+PrototypeTable::AllocatedRows ()
 {
-  return m_RowsCount;
+  return mRowsCount;
 }
+
 
 ROW_INDEX
 PrototypeTable::AddRow ()
 {
-  uint64_t lastRowPosition = m_RowsCount * m_RowSize;
-  uint_t   toWrite         = m_RowSize;
+  uint64_t lastRowPosition = mRowsCount * mRowSize;
+  uint_t   toWrite         = mRowSize;
+
   uint8_t  dummyValue[128];
 
-  m_RowCache.FlushItem (m_RowsCount - 1);
+  mRowCache.FlushItem (mRowsCount - 1);
 
   memset(dummyValue, 0xFF, sizeof(dummyValue));
 
   while (toWrite > 0)
     {
-      uint_t writeChunk = MIN (toWrite, sizeof (dummyValue));
+      const uint_t writeChunk = MIN (toWrite, sizeof (dummyValue));
 
-      FixedFieldsContainer ().Write (lastRowPosition, writeChunk, dummyValue);
+      RowsContainer ().Write (lastRowPosition, writeChunk, dummyValue);
 
-      toWrite         -= writeChunk;
-      lastRowPosition += writeChunk;
+      toWrite -= writeChunk, lastRowPosition += writeChunk;
     }
 
   NODE_INDEX dummyNode;
   KEY_INDEX  dummyKey;
   BTree      removedRows (*this);
 
-  removedRows.InsertKey (TableRmKey (m_RowsCount), dummyNode, dummyKey);
+  removedRows.InsertKey (TableRmKey (mRowsCount), &dummyNode, &dummyKey);
 
-  m_RowCache.RefreshItem (m_RowsCount++);
+  // The rows count has to be update before the procedure code is executed.
+  // Otherway the new content will not be refreshed.
+  mRowCache.RefreshItem (mRowsCount++);
 
-  assert (m_RowsCount > 0);
-
-  return m_RowsCount - 1;
+  return mRowsCount - 1;
 }
+
 
 ROW_INDEX
 PrototypeTable::AddReusedRow ()
@@ -194,260 +198,290 @@ PrototypeTable::AddReusedRow ()
   TableRmKey   key (0);
   BTree        removedRows (*this);
 
-  if (removedRows.FindBiggerOrEqual(key, node, keyIndex) == false)
+  if (removedRows.FindBiggerOrEqual(key, &node, &keyIndex) == false)
     result = PrototypeTable::AddRow ();
+
   else
     {
-      BTreeNodeRAI       keyNode (RetrieveNode (node));
-      TableRmNode* const pNode = _SC (TableRmNode *, &(*keyNode));
+      BTreeNodeRAII keyNode (RetrieveNode (node));
+
+      TableRmNode* const  node = _SC (TableRmNode *, &(*keyNode));
 
       assert (keyNode->IsLeaf() );
-      assert (keyIndex < keyNode->GetKeysCount());
+      assert (keyIndex < keyNode->KeysCount());
 
-      const uint64_t *const pRows = _RC (const uint64_t*,
-                                         pNode->DataToRead ());
-      result = pRows [keyIndex];
+      const uint64_t* const rows = _RC (const uint64_t*, node->DataForRead ());
+
+      result = rows[keyIndex];
     }
-
   return result;
 }
+
 
 void
 PrototypeTable::MarkRowForReuse (const ROW_INDEX row)
 {
-  FIELD_INDEX fieldsCount = m_FieldsCount;
-
-  StoredItem cachedItem (m_RowCache.RetriveItem (row));
-  uint8_t* const pRawData = cachedItem.GetDataForUpdate();
-
-    while (fieldsCount-- > 0)
-      {
-        const FieldDescriptor& field = GetFieldDescriptorInternal (
-                                                                fieldsCount);
-
-        uint_t  byte_off = field.m_NullBitIndex / 8;
-        uint8_t bit_off  = field.m_NullBitIndex % 8;
-
-        pRawData[byte_off] |= (1 << bit_off);
-      }
-
-    NODE_INDEX   node;
-    KEY_INDEX    keyIndex;
-    TableRmKey   key (row);
-    BTree        removedRows (*this);
-
-    removedRows.InsertKey (key, node, keyIndex);
-}
-
-template <class T> static void
-insert_row_field (PrototypeTable&  table,
-                  BTree&            tree,
-                  const ROW_INDEX   row,
-                  const FIELD_INDEX field)
-{
-  T rowValue;
-  table.GetEntry (row, field, rowValue);
-
-
   NODE_INDEX dummyNode;
   KEY_INDEX  dummyKey;
 
-  T_BTreeKey<T> keyValue (rowValue, row);
-  tree.InsertKey (keyValue, dummyNode, dummyKey);
+  FIELD_INDEX fieldsCount = mFieldsCount;
+
+  StoredItem cachedItem (mRowCache.RetriveItem (row));
+  uint8_t* const rowData = cachedItem.GetDataForUpdate();
+
+    while (fieldsCount-- > 0)
+      {
+        const FieldDescriptor& field = GetFieldDescriptorInternal (fieldsCount);
+
+        const uint8_t bitOff  = field.mNullBitIndex % 8;
+        const uint_t  byteOff = field.mNullBitIndex / 8;
+
+        rowData[byteOff] |= (1 << bitOff);
+      }
+
+    TableRmKey key (row);
+    BTree      removedRows (*this);
+
+    removedRows.InsertKey (key, &dummyNode, &dummyKey);
 }
 
-void
-PrototypeTable::CreateFieldIndex (const FIELD_INDEX                 field,
-                                  CREATE_INDEX_CALLBACK_FUNC* const cbFunc,
-                                  CallBackIndexData* const          pCbData)
+
+template<class T> static void
+insert_row_field (PrototypeTable&         table,
+                  BTree&                  tree,
+                  const ROW_INDEX         row,
+                  const FIELD_INDEX       field)
 {
-  if (PrototypeTable::IsFieldIndexed (field))
+  NODE_INDEX dummyNode;
+  KEY_INDEX  dummyKey;
+
+  T rowValue;
+  table.Get (row, field, rowValue);
+
+  T_BTreeKey<T> keyValue (rowValue, row);
+
+  tree.InsertKey (keyValue, &dummyNode, &dummyKey);
+}
+
+
+void
+PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
+                             CREATE_INDEX_CALLBACK_FUNC* const cbFunc,
+                             CreateIndexCallbackContext* const cbContext)
+{
+  if (PrototypeTable::IsIndexed (field))
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_INDEXED));
 
-  if ((cbFunc == NULL) && (pCbData != NULL))
+  if ((cbFunc == NULL) && (cbContext != NULL))
     throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
 
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if ((desc.m_TypeDesc == T_TEXT) ||
-      (desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) != 0)
-    throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+  if ((desc.mTypeDesc == T_TEXT)
+      || (desc.mTypeDesc & PS_TABLE_ARRAY_MASK) != 0)
+    {
+      throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+    }
 
   const uint_t nodeSizeKB  = 16; //16KB
 
-  auto_ptr<I_DataContainer> apIndexContainer ( CreateIndexContainer (field));
-  auto_ptr<FieldIndexNodeManager> apFieldMgr (
-                            new FieldIndexNodeManager (apIndexContainer,
+  auto_ptr<IDataContainer> indexContainer (CreateIndexContainer (field));
+  auto_ptr<FieldIndexNodeManager> nodeMgr (
+                            new FieldIndexNodeManager (indexContainer,
                                                        nodeSizeKB * 1024,
                                                        0x400000, //4MB
                                                        _SC (DBS_FIELD_TYPE,
-                                                            desc.m_TypeDesc),
+                                                            desc.mTypeDesc),
                                                        true)
-                                             );
+                                          );
 
-  BTreeNodeRAI rootNode (apFieldMgr->RetrieveNode (
-                                     apFieldMgr->AllocateNode (NIL_NODE, 0))
-                                                  );
-  rootNode->SetNext (NIL_NODE);
-  rootNode->SetPrev (NIL_NODE);
-  rootNode->SetKeysCount (0);
-  rootNode->SetLeaf (true);
+  BTreeNodeRAII rootNode (nodeMgr->RetrieveNode (
+                                     nodeMgr->AllocateNode (NIL_NODE, 0))
+                                                );
+  rootNode->Next (NIL_NODE);
+  rootNode->Prev (NIL_NODE);
+  rootNode->KeysCount (0);
+  rootNode->Leaf (true);
   rootNode->InsertKey (rootNode->SentinelKey ());
 
-  apFieldMgr->SetRootNodeId (rootNode->NodeId());
-  BTree fieldTree (*apFieldMgr.get ());
+  nodeMgr->RootNodeId (rootNode->NodeId());
+  BTree fieldTree (*nodeMgr.get ());
 
-  for (ROW_INDEX row = 0; row < m_RowsCount; ++row)
+  for (ROW_INDEX row = 0; row < mRowsCount; ++row)
     {
-      switch (desc.m_TypeDesc)
+      switch (desc.mTypeDesc)
       {
       case T_BOOL:
-        insert_row_field<DBSBool> (*this, fieldTree, row, field);
+        insert_row_field<DBool> (*this, fieldTree, row, field);
         break;
+
       case T_CHAR:
-        insert_row_field<DBSChar> (*this, fieldTree, row, field);
+        insert_row_field<DChar> (*this, fieldTree, row, field);
         break;
+
       case T_DATE:
-        insert_row_field<DBSDate> (*this, fieldTree, row, field);
+        insert_row_field<DDate> (*this, fieldTree, row, field);
         break;
+
       case T_DATETIME:
-        insert_row_field<DBSDateTime> (*this, fieldTree, row, field);
+        insert_row_field<DDateTime> (*this, fieldTree, row, field);
         break;
+
       case T_HIRESTIME:
-        insert_row_field<DBSHiresTime> (*this, fieldTree, row, field);
+        insert_row_field<DHiresTime> (*this, fieldTree, row, field);
         break;
+
       case T_UINT8:
-        insert_row_field<DBSUInt8> (*this, fieldTree, row, field);
+        insert_row_field<DUInt8> (*this, fieldTree, row, field);
         break;
+
       case T_UINT16:
-        insert_row_field<DBSUInt16> (*this, fieldTree, row, field);
+        insert_row_field<DUInt16> (*this, fieldTree, row, field);
         break;
+
       case T_UINT32:
-        insert_row_field<DBSUInt32> (*this, fieldTree, row, field);
+        insert_row_field<DUInt32> (*this, fieldTree, row, field);
         break;
+
       case T_UINT64:
-        insert_row_field<DBSUInt64> (*this, fieldTree, row, field);
+        insert_row_field<DUInt64> (*this, fieldTree, row, field);
         break;
+
       case T_INT8:
-        insert_row_field<DBSInt8> (*this, fieldTree, row, field);
+        insert_row_field<DInt8> (*this, fieldTree, row, field);
         break;
+
       case T_INT16:
-        insert_row_field<DBSInt16> (*this, fieldTree, row, field);
+        insert_row_field<DInt16> (*this, fieldTree, row, field);
         break;
+
       case T_INT32:
-        insert_row_field<DBSInt32> (*this, fieldTree, row, field);
+        insert_row_field<DInt32> (*this, fieldTree, row, field);
         break;
+
       case T_INT64:
-        insert_row_field<DBSInt64> (*this, fieldTree, row, field);
+        insert_row_field<DInt64> (*this, fieldTree, row, field);
         break;
+
       case T_REAL:
-        insert_row_field<DBSReal> (*this, fieldTree, row, field);
+        insert_row_field<DReal> (*this, fieldTree, row, field);
         break;
+
       case T_RICHREAL:
-        insert_row_field<DBSRichReal> (*this, fieldTree, row, field);
+        insert_row_field<DRichReal> (*this, fieldTree, row, field);
         break;
+
       default:
         assert (false);
       }
 
       if (cbFunc != NULL)
         {
-          if (pCbData != NULL)
+          if (cbContext != NULL)
             {
-              pCbData->m_RowsCount = m_RowsCount;
-              pCbData->m_RowIndex  = row;
+              cbContext->mRowsCount = mRowsCount;
+              cbContext->mRowIndex  = row;
             }
-          cbFunc (pCbData);
+          cbFunc (cbContext);
         }
     }
 
-  desc.m_IndexNodeSizeKB = nodeSizeKB;
-  desc.m_IndexUnitsCount = 1;
+  desc.mIndexNodeSizeKB = nodeSizeKB;
+  desc.mIndexUnitsCount = 1;
+
   MakeHeaderPersistent ();
 
-  assert (m_vIndexNodeMgrs[field] == NULL);
-  m_vIndexNodeMgrs[field] = apFieldMgr.release ();
+  assert (mvIndexNodeMgrs[field] == NULL);
+
+  mvIndexNodeMgrs[field] = nodeMgr.release ();
 }
 
+
 void
-PrototypeTable::RemoveFieldIndex (const FIELD_INDEX field)
+PrototypeTable::RemoveIndex (const FIELD_INDEX field)
 {
-  if (PrototypeTable::IsFieldIndexed(field) == false)
+  if (PrototypeTable::IsIndexed (field) == false)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_INDEXED));
 
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  assert (desc.m_IndexNodeSizeKB > 0);
-  assert (desc.m_IndexUnitsCount > 0);
+  assert (desc.mIndexNodeSizeKB > 0);
+  assert (desc.mIndexUnitsCount > 0);
 
-  desc.m_IndexNodeSizeKB = 0;
-  desc.m_IndexUnitsCount = 0;
+  desc.mIndexNodeSizeKB = 0;
+  desc.mIndexUnitsCount = 0;
+
   MakeHeaderPersistent ();
 
-  auto_ptr <FieldIndexNodeManager> apFieldMgr (m_vIndexNodeMgrs [field]);
-  m_vIndexNodeMgrs[field] = NULL;
+  auto_ptr<FieldIndexNodeManager> fieldMgr (mvIndexNodeMgrs[field]);
+  mvIndexNodeMgrs[field] = NULL;
 
-  apFieldMgr->MarkForRemoval ();
+  fieldMgr->MarkForRemoval ();
 }
+
 
 bool
-PrototypeTable::IsFieldIndexed (const FIELD_INDEX field) const
+PrototypeTable::IsIndexed (const FIELD_INDEX field) const
 {
-  if (field >= m_FieldsCount)
+  if (field >= mFieldsCount)
     throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
 
-  assert (m_vIndexNodeMgrs.size () == m_FieldsCount);
+  assert (mvIndexNodeMgrs.size () == mFieldsCount);
 
-  return (m_vIndexNodeMgrs[field] != NULL);
+  return (mvIndexNodeMgrs[field] != NULL);
 }
+
 
 uint_t
-PrototypeTable::GetRowSize() const
+PrototypeTable::RowSize () const
 {
-  return m_RowSize;
+  return mRowSize;
 }
+
 
 FieldDescriptor&
 PrototypeTable::GetFieldDescriptorInternal(const FIELD_INDEX field) const
 {
-  FieldDescriptor* const pDesc = _RC(FieldDescriptor*,
-                                     m_FieldsDescriptors.get ());
+  FieldDescriptor* const desc = _RC(FieldDescriptor*,
+                                    mFieldsDescriptors.get ());
 
-  if (field >= m_FieldsCount)
+  if (field >= mFieldsCount)
     throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
 
-  return pDesc[field];
+  return desc[field];
 }
 
+
 uint64_t
-PrototypeTable::RawNodeSize () const
+PrototypeTable::NodeRawSize () const
 {
   return TableRmNode::RAW_NODE_SIZE;
 }
+
 
 NODE_INDEX
 PrototypeTable::AllocateNode (const NODE_INDEX parent,
                               const KEY_INDEX  parentKey)
 {
-  NODE_INDEX nodeIndex = m_FirstUnallocatedRoot;
+  NODE_INDEX nodeIndex = mUnallocatedHead;
 
   if (nodeIndex != NIL_NODE)
     {
-      BTreeNodeRAI freeNode (RetrieveNode (nodeIndex));
+      BTreeNodeRAII freeNode (RetrieveNode (nodeIndex));
 
-      m_FirstUnallocatedRoot = freeNode->GetNext ();
+      mUnallocatedHead = freeNode->Next ();
       MakeHeaderPersistent ();
     }
   else
     {
-      assert (MainTableContainer ().Size () % RawNodeSize () == 0);
+      assert (TableContainer ().Size () % NodeRawSize () == 0);
 
-      nodeIndex = MainTableContainer ().Size () / RawNodeSize ();
+      nodeIndex = TableContainer ().Size () / NodeRawSize ();
     }
 
   if (parent != NIL_NODE)
     {
-      BTreeNodeRAI parentNode (RetrieveNode (parent));
+      BTreeNodeRAII parentNode (RetrieveNode (parent));
       parentNode->SetNodeOfKey (parentKey, nodeIndex);
 
       assert (parentNode->IsLeaf() == false);
@@ -456,41 +490,46 @@ PrototypeTable::AllocateNode (const NODE_INDEX parent,
   return nodeIndex;
 }
 
+
 void
 PrototypeTable::FreeNode (const NODE_INDEX nodeId)
 {
-  BTreeNodeRAI node (RetrieveNode (nodeId));
+  BTreeNodeRAII node (RetrieveNode (nodeId));
 
   node->MarkAsRemoved();
-  node->SetNext (m_FirstUnallocatedRoot);
+  node->Next (mUnallocatedHead);
 
-  m_FirstUnallocatedRoot = node->NodeId();
+  mUnallocatedHead = node->NodeId();
+
   MakeHeaderPersistent ();
 }
 
-NODE_INDEX
-PrototypeTable::GetRootNodeId ()
-{
-  if (m_RootNode == NIL_NODE)
-    {
-      BTreeNodeRAI rootNode (RetrieveNode (AllocateNode (NIL_NODE, 0)));
 
-      rootNode->SetNext (NIL_NODE);
-      rootNode->SetPrev (NIL_NODE);
-      rootNode->SetKeysCount (0);
-      rootNode->SetLeaf (true);
+NODE_INDEX
+PrototypeTable::RootNodeId ()
+{
+  if (mRootNode == NIL_NODE)
+    {
+      BTreeNodeRAII rootNode (RetrieveNode (AllocateNode (NIL_NODE, 0)));
+
+      rootNode->Next (NIL_NODE);
+      rootNode->Prev (NIL_NODE);
+      rootNode->KeysCount (0);
+      rootNode->Leaf (true);
       rootNode->InsertKey (rootNode->SentinelKey ());
 
-      SetRootNodeId (rootNode->NodeId());
+      RootNodeId (rootNode->NodeId());
     }
 
-  return m_RootNode;
+  return mRootNode;
 }
 
+
 void
-PrototypeTable::SetRootNodeId (const NODE_INDEX node)
+PrototypeTable::RootNodeId (const NODE_INDEX node)
 {
-  m_RootNode = node;
+  mRootNode = node;
+
   MakeHeaderPersistent ();
 }
 
@@ -501,125 +540,127 @@ PrototypeTable::MaxCachedNodes ()
   return 128;
 }
 
-I_BTreeNode*
-PrototypeTable::LoadNode (const NODE_INDEX node)
+
+IBTreeNode*
+PrototypeTable::LoadNode (const NODE_INDEX nodeId)
 {
-  std::auto_ptr<TableRmNode> apNode (new TableRmNode (*this, node));
+  auto_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
 
-  assert (MainTableContainer ().Size () % RawNodeSize () == 0);
+  assert (TableContainer ().Size () % NodeRawSize () == 0);
 
-  if (MainTableContainer ().Size () > node * RawNodeSize ())
+  if (TableContainer ().Size () > nodeId * NodeRawSize ())
     {
-      MainTableContainer ().Read (apNode->NodeId () * RawNodeSize (),
-                                  RawNodeSize (),
-                                  apNode->RawData ());
+      TableContainer ().Read (node->NodeId () * NodeRawSize (),
+                              NodeRawSize (),
+                              node->RawData ());
     }
   else
     {
       //Reserve space for this node
-      assert (MainTableContainer ().Size () == (node * RawNodeSize ()));
-      MainTableContainer ().Write (MainTableContainer ().Size (),
-                                   RawNodeSize (),
-                                   apNode->RawData ());
+      assert (TableContainer ().Size () == (nodeId * NodeRawSize ()));
+
+      TableContainer ().Write (TableContainer ().Size (),
+                               NodeRawSize (),
+                               node->RawData ());
     }
 
-  apNode->MarkClean ();
-  assert (apNode->NodeId () == node);
+  node->MarkClean ();
+  assert (node->NodeId () == nodeId);
 
-  return apNode.release ();
+  return node.release ();
 }
 
 
 void
-PrototypeTable::SaveNode (I_BTreeNode* const pNode)
+PrototypeTable::SaveNode (IBTreeNode* const node)
 {
-  if (pNode->IsDirty () == false)
+  if (node->IsDirty () == false)
     return ;
 
-  MainTableContainer ().Write (pNode->NodeId() * RawNodeSize (),
-                                   RawNodeSize (),
-                                   pNode->RawData ());
-  pNode->MarkClean ();
+  TableContainer ().Write (node->NodeId() * NodeRawSize (),
+                           NodeRawSize (),
+                           node->RawData ());
+  node->MarkClean ();
 }
+
 
 void
-PrototypeTable::StoreItems (const uint8_t* pSrcBuffer,
-                            uint64_t       firstItem,
-                            uint_t         itemsCount)
+PrototypeTable::StoreItems (uint64_t       firstItem,
+                            uint_t         itemsCount,
+                            const uint8_t* from)
 {
-  if (itemsCount + firstItem > m_RowsCount)
-    itemsCount = m_RowsCount - firstItem;
+  if (itemsCount + firstItem > mRowsCount)
+    itemsCount = mRowsCount - firstItem;
 
-  FixedFieldsContainer ().Write (firstItem * m_RowSize,
-                                 itemsCount * m_RowSize,
-                                 pSrcBuffer);
+  RowsContainer ().Write (firstItem * mRowSize, itemsCount * mRowSize, from);
 }
+
 
 void
-PrototypeTable::RetrieveItems (uint8_t* pDestBuffer,
-                               uint64_t  firstItem,
-                               uint_t    itemsCount)
+PrototypeTable::RetrieveItems (uint64_t  firstItem,
+                               uint_t    itemsCount,
+                               uint8_t*  to)
 {
-  if (itemsCount + firstItem > m_RowsCount)
-    itemsCount = m_RowsCount - firstItem;
+  if (itemsCount + firstItem > mRowsCount)
+    itemsCount = mRowsCount - firstItem;
 
-  FixedFieldsContainer ().Read (firstItem * m_RowSize,
-                                itemsCount * m_RowSize,
-                                pDestBuffer);
+  RowsContainer ().Read (firstItem * mRowSize, itemsCount * mRowSize, to);
 }
+
 
 void
 PrototypeTable::CheckRowToDelete (const ROW_INDEX row)
 {
-  bool isRowDeleted = true;
+  bool allFieldsNull = true;
 
-  StoredItem     cachedItem   = m_RowCache.RetriveItem (row);
-  uint8_t *const pRawData     = cachedItem.GetDataForUpdate();
+  StoredItem     cachedItem = mRowCache.RetriveItem (row);
+  uint8_t* const rowData    = cachedItem.GetDataForUpdate();
 
-  for (FIELD_INDEX index = 0; index < m_FieldsCount; index += 8)
+  for (FIELD_INDEX index = 0; index < mFieldsCount; index += 8)
     {
       const FieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
       const uint8_t          bitsSet   = ~0;
 
-      if ( pRawData [fieldDesc.m_NullBitIndex / 8] != bitsSet)
+      if ( rowData[fieldDesc.mNullBitIndex / 8] != bitsSet)
         {
-          isRowDeleted = false;
+          allFieldsNull = false;
           break;
         }
     }
 
-  if (isRowDeleted)
+  if (allFieldsNull)
     {
       NODE_INDEX   dumyNode;
       KEY_INDEX    dummyKey;
       BTree        removedNodes (*this);
       TableRmKey   key (row);
 
-      removedNodes.InsertKey (key, dumyNode, dummyKey);
+      removedNodes.InsertKey (key, &dumyNode, &dummyKey);
     }
 }
+
 
 void
 PrototypeTable::CheckRowToReuse (const ROW_INDEX row)
 {
-  bool wasRowDeleted = true;
+  bool allFieldsNull = true;
 
-  StoredItem     cachedItem = m_RowCache.RetriveItem (row);
-  uint8_t *const pRawData   = cachedItem.GetDataForUpdate();
+  StoredItem     cachedItem = mRowCache.RetriveItem (row);
+  uint8_t* const rowData    = cachedItem.GetDataForUpdate();
 
-  for (FIELD_INDEX index = 0; index < m_FieldsCount; index += 8)
+  for (FIELD_INDEX index = 0; index < mFieldsCount; index += 8)
     {
       const FieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
       const uint8_t          bitsSet   = ~0;
 
-      if ( pRawData [fieldDesc.m_NullBitIndex / 8] != bitsSet)
+      if ( rowData[fieldDesc.mNullBitIndex / 8] != bitsSet)
         {
-          wasRowDeleted = false;
+          allFieldsNull = false;
           break;
         }
     }
 
-  if (wasRowDeleted)
+  if (allFieldsNull)
     {
       BTree        removedNodes (*this);
       TableRmKey   key (row);
@@ -628,294 +669,310 @@ PrototypeTable::CheckRowToReuse (const ROW_INDEX row)
     }
 }
 
-void
-PrototypeTable::AquireIndexField (FieldDescriptor* const pFieldDesc)
-{
-  bool aquired = false;
-  while ( ! aquired)
-    {
-      LockRAII syncHolder (m_IndexSync);
 
-      if (pFieldDesc->m_Aquired == 0)
+void
+PrototypeTable::AcquireFieldIndex (FieldDescriptor* const field)
+{
+  while (true)
+    {
+      LockRAII syncHolder (mIndexSync);
+
+      if (field->mAcquired == 0)
         {
-          pFieldDesc->m_Aquired = 1;
-          aquired = true;
+          field->mAcquired = 1;
+          break;
         }
 
       syncHolder.Release ();
-
-      if ( ! aquired)
-        wh_yield ();
+      wh_yield ();
     }
 }
 
+
 void
-PrototypeTable::ReleaseIndexField (FieldDescriptor* const pFieldDesc)
+PrototypeTable::ReleaseIndexField (FieldDescriptor* const field)
 {
-  LockRAII syncHolder (m_IndexSync);
+  LockRAII syncHolder (mIndexSync);
 
-  assert (pFieldDesc->m_Aquired != 0);
+  assert (field->mAcquired == 1);
 
-  pFieldDesc->m_Aquired = 0;
-
+  field->mAcquired = 0;
 }
 
-void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSChar&    value)
-{
-  StoreEntry (row, field, value);
-}
 
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSBool&    value)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DChar&         value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSDate&    value)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DBool&          value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX    row,
-                          const FIELD_INDEX  field,
-                          const DBSDateTime& value)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DDate&          value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX     row,
-                          const FIELD_INDEX   field,
-                          const DBSHiresTime& value)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DDateTime&      value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSInt8&    value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DHiresTime&      value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSInt16&   value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DInt8&           value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSInt32&   value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DInt16&          value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSInt64&   value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DInt32&          value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSReal&    value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DInt64&          value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX    row,
-                          const FIELD_INDEX  field,
-                          const DBSRichReal& value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DReal&           value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSUInt8&   value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DRichReal&       value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSUInt16&  value)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DUInt8&         value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSUInt32&  value)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DUInt16&       value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSUInt64&  value)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DUInt32&       value)
 {
   StoreEntry (row, field, value);
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSText&    value)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DUInt64&       value)
+{
+  StoreEntry (row, field, value);
+}
+
+
+void
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DText&         value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if (row == m_RowsCount)
+  if (row == mRowsCount)
     AddRow ();
-  else if (row > m_RowsCount)
+
+  else if (row > mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
+  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
+      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
   uint64_t newFirstEntry     = ~0ull;
   uint64_t newFieldValueSize = 0;
+
   if (value.IsNull() == false)
     {
-      I_TextStrategy& text = value;
+      ITextStrategy& text = value;
       if (text.IsRowValue ())
         {
           RowFieldText& value = text.GetRow ();
 
-          if (&value.m_Storage != &VariableFieldsStore ())
-            {
-              newFirstEntry = VariableFieldsStore ().AddRecord (
-                                  value.m_Storage,
-                                  value.m_FirstEntry,
-                                  0,
-                                  value.m_BytesSize +
-                                    RowFieldText::CACHE_META_DATA_SIZE);
+          newFieldValueSize = value.mBytesSize +
+                                RowFieldText::CACHE_META_DATA_SIZE;
 
-              newFieldValueSize = value.m_BytesSize +
-                                  RowFieldText::CACHE_META_DATA_SIZE;
+          if (&value.mStorage != &VSStore ())
+            {
+              newFirstEntry = VSStore ().AddRecord (
+                                                        value.mStorage,
+                                                        value.mFirstEntry,
+                                                        0,
+                                                        newFieldValueSize
+                                                               );
             }
           else
             {
-              value.m_Storage.IncrementRecordRef (value.m_FirstEntry);
+              value.mStorage.IncrementRecordRef (value.mFirstEntry);
 
-              newFirstEntry     = value.m_FirstEntry;
-              newFieldValueSize = value.m_BytesSize +
-                                  RowFieldText::CACHE_META_DATA_SIZE;
+              newFirstEntry = value.mFirstEntry;
             }
         }
       else
         {
           TemporalText& value = text.GetTemporal();
 
-          assert (value.m_BytesSize > 0);
-          if (value.m_BytesSize >= RowFieldText::MAX_BYTES_COUNT)
+          assert (value.mBytesSize > 0);
+
+          if (value.mBytesSize >= RowFieldText::MAX_BYTES_COUNT)
             {
               throw DBSException (NULL,
                                   _EXTRA (DBSException::OPER_NOT_SUPPORTED));
             }
 
-          newFieldValueSize = value.m_BytesSize +
-                              RowFieldText::CACHE_META_DATA_SIZE;
+          newFieldValueSize = value.mBytesSize +
+                                RowFieldText::CACHE_META_DATA_SIZE;
 
           assert (value.CharsCount () <= RowFieldText::MAX_CHARS_COUNT);
 
-          uint8_t aCachedData[RowFieldText::CACHE_META_DATA_SIZE];
+          uint8_t headerData[RowFieldText::CACHE_META_DATA_SIZE];
 
-          store_le_int32 (value.CharsCount (), aCachedData);
-          store_le_int32 (value.m_CachedCharIndex,
-                          aCachedData + sizeof (uint32_t));
-          store_le_int32 (value.m_CachedCharIndexOffset,
-                          aCachedData + 2 * sizeof (uint32_t));
+          store_le_int32 (value.CharsCount (), headerData);
+          store_le_int32 (value.mCachedCharIndex,
+                          headerData + sizeof (uint32_t));
+          store_le_int32 (value.mCachedCharIndexOffset,
+                          headerData + 2 * sizeof (uint32_t));
 
-          newFirstEntry = VariableFieldsStore ().AddRecord (
-                                                  aCachedData,
-                                                  sizeof (aCachedData)
+          newFirstEntry = VSStore ().AddRecord (
+                                                          headerData,
+                                                          sizeof (headerData)
                                                             );
-          VariableFieldsStore ().UpdateRecord (newFirstEntry,
-                                               sizeof (aCachedData),
-                                               value.m_Storage,
+          VSStore ().UpdateRecord (newFirstEntry,
+                                               sizeof (headerData),
+                                               value.mStorage,
                                                0,
-                                               value.m_BytesSize);
+                                               value.mBytesSize);
         }
     }
 
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  StoredItem     cachedItem        = m_RowCache.RetriveItem (row);
-  uint8_t* const pRawData          = cachedItem.GetDataForUpdate();
+  StoredItem     cachedItem        = mRowCache.RetriveItem (row);
+  uint8_t* const rowData           = cachedItem.GetDataForUpdate();
   const uint8_t  bitsSet           = ~0;
   bool           fieldValueWasNull = false;
 
   uint64_t* const fieldFirstEntry = _RC (uint64_t*,
-                                         pRawData + desc.m_StoreIndex + 0);
+                                         rowData + desc.mRowDataOff + 0);
   uint64_t* const fieldValueSize  = _RC (
-                            uint64_t*,
-                            pRawData + desc.m_StoreIndex + sizeof (uint64_t)
+                              uint64_t*,
+                              rowData + desc.mRowDataOff + sizeof (uint64_t)
                                          );
-  assert (desc.m_NullBitIndex > 0);
 
-  const uint_t  byte_off = desc.m_NullBitIndex / 8;
-  const uint8_t bit_off  = desc.m_NullBitIndex % 8;
+  const uint_t  byteOff = desc.mNullBitIndex / 8;
+  const uint8_t bitOff  = desc.mNullBitIndex % 8;
 
-  if ((pRawData [byte_off] & (1 << bit_off)) != 0)
+  if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
 
   if (fieldValueWasNull && value.IsNull ())
     return ;
+
   else if ( (fieldValueWasNull == false) && value.IsNull())
     {
-      pRawData [byte_off] |= (1 << bit_off);
+      rowData[byteOff] |= (1 << bitOff);
 
-      if (pRawData [byte_off] == bitsSet)
+      if (rowData[byteOff] == bitsSet)
         CheckRowToDelete (row);
 
       return;
     }
   else if (value.IsNull() == false)
     {
-      if (pRawData [byte_off] == bitsSet)
+      if (rowData[byteOff] == bitsSet)
         {
           assert (fieldValueWasNull == true);
+
           CheckRowToReuse (row);
         }
-      pRawData [byte_off] &= ~(1 << bit_off);
+      rowData[byteOff] &= ~(1 << bitOff);
     }
 
   if (fieldValueWasNull == false)
     {
       //Postpone the removal of the actual record entries
-      //to allow other threads gain access to 'm_Sync' faster.
-      RowFieldText   oldEntryRAII (VariableFieldsStore (),
-                                   *fieldFirstEntry,
-                                   *fieldValueSize);
+      //to allow other threads gain access to 'mSync' faster.
+      RowFieldText oldEntryRAII (VSStore (),
+                                 *fieldFirstEntry,
+                                 *fieldValueSize);
       syncHolder.Release ();
 
-      VariableFieldsStore ().DecrementRecordRef (*fieldFirstEntry);
+      VSStore ().DecrementRecordRef (*fieldFirstEntry);
       *fieldFirstEntry = newFirstEntry;
       *fieldValueSize  = newFieldValueSize;
 
@@ -927,24 +984,25 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
     }
 }
 
+
 void
-PrototypeTable::SetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const DBSArray&   value)
+PrototypeTable::Set (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     const DArray&          value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-
-  if (row == m_RowsCount)
+  if (row == mRowsCount)
     AddRow ();
-  else if (row > m_RowsCount)
+
+  else if (row > mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ( ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0) ||
-          ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
-            _SC(uint_t, value.ElementsType())))
+  if (((desc.mTypeDesc & PS_TABLE_ARRAY_MASK) == 0)
+      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+           _SC (uint_t, value.Type())))
     {
-      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
 
   uint64_t      newFirstEntry     = ~0;
@@ -954,23 +1012,24 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
 
   if (value.IsNull() == false)
     {
-      I_ArrayStrategy& array = value;
+      IArrayStrategy& array = value;
       if (array.IsRowValue())
         {
           RowFieldArray& value = array.GetRow();
-          if (&value.m_Storage == &VariableFieldsStore ())
+
+          if (&value.mStorage == &VSStore ())
             {
-              value.m_Storage.IncrementRecordRef (value.m_FirstRecordEntry);
+              value.mStorage.IncrementRecordRef (value.mFirstRecordEntry);
 
               newFieldValueSize = value.RawSize ();
-              newFirstEntry     = value.m_FirstRecordEntry;
+              newFirstEntry     = value.mFirstRecordEntry;
             }
           else
             {
               newFieldValueSize = value.RawSize();
-              newFirstEntry     = VariableFieldsStore ().AddRecord (
-                                                      value.m_Storage,
-                                                      value.m_FirstRecordEntry,
+              newFirstEntry     = VSStore ().AddRecord (
+                                                      value.mStorage,
+                                                      value.mFirstRecordEntry,
                                                       0,
                                                       newFieldValueSize
                                                                    );
@@ -982,70 +1041,71 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
           newFieldValueSize    = value.RawSize();
 
           uint8_t elemsCount[RowFieldArray::METADATA_SIZE];
+
           store_le_int64 (value.Count(), elemsCount);
 
-          newFirstEntry = VariableFieldsStore ().AddRecord (
+          newFirstEntry = VSStore ().AddRecord (
                                                         elemsCount,
                                                         sizeof (elemsCount)
                                                             );
-          VariableFieldsStore ().UpdateRecord (newFirstEntry,
+          VSStore ().UpdateRecord (newFirstEntry,
                                                sizeof elemsCount,
-                                               value.m_Storage,
+                                               value.mStorage,
                                                0,
                                                newFieldValueSize);
           newFieldValueSize += sizeof elemsCount;
         }
     }
 
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  StoredItem cachedItem           = m_RowCache.RetriveItem (row);
-  uint8_t *const pRawData         = cachedItem.GetDataForUpdate();
+  StoredItem     cachedItem = mRowCache.RetriveItem (row);
+  uint8_t *const rowData    = cachedItem.GetDataForUpdate();
 
   uint64_t *const fieldFirstEntry = _RC (uint64_t*,
-                                         pRawData + desc.m_StoreIndex + 0);
+                                         rowData + desc.mRowDataOff + 0);
   uint64_t *const fieldValueSize  = _RC (
                             uint64_t*,
-                            pRawData + desc.m_StoreIndex + sizeof (uint64_t)
+                            rowData + desc.mRowDataOff + sizeof (uint64_t)
                                         );
-  assert (desc.m_NullBitIndex > 0);
+  const uint_t  byteOff = desc.mNullBitIndex / 8;
+  const uint8_t bitOff  = desc.mNullBitIndex % 8;
 
-  const uint_t  byte_off = desc.m_NullBitIndex / 8;
-  const uint8_t bit_off  = desc.m_NullBitIndex % 8;
-
-  if ((pRawData [byte_off] & (1 << bit_off)) != 0)
+  if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
 
   if (fieldValueWasNull && value.IsNull ())
     return ;
+
   else if ( (fieldValueWasNull == false) && value.IsNull())
     {
-      pRawData [byte_off] |= (1 << bit_off);
+      rowData[byteOff] |= (1 << bitOff);
 
-      if (pRawData [byte_off] == bitsSet)
+      if (rowData[byteOff] == bitsSet)
         CheckRowToDelete (row);
 
       return ;
     }
   else if (value.IsNull() == false)
     {
-      if (pRawData [byte_off] == bitsSet)
+      if (rowData[byteOff] == bitsSet)
         {
           assert (fieldValueWasNull == true);
+
           CheckRowToReuse (row);
         }
-      pRawData [byte_off] &= ~(1 << bit_off);
+      rowData[byteOff] &= ~(1 << bitOff);
     }
 
   if (fieldValueWasNull == false)
     {
       //Postpone the removal of the actual record entries
-      //to allow other threads gain access to 'm_Sync' faster.
-      RowFieldArray   oldEntryRAII (VariableFieldsStore (),
+      //to allow other threads gain access to 'mSync' faster.
+      RowFieldArray   oldEntryRAII (VSStore (),
                                     *fieldFirstEntry,
-                                    value.ElementsType ());
+                                    value.Type ());
 
-      VariableFieldsStore ().DecrementRecordRef (*fieldFirstEntry);
+      VSStore ().DecrementRecordRef (*fieldFirstEntry);
       *fieldFirstEntry = newFirstEntry;
       *fieldValueSize  = newFieldValueSize;
 
@@ -1058,187 +1118,206 @@ PrototypeTable::SetEntry (const ROW_INDEX   row,
     }
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSChar&          outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                    const FIELD_INDEX       field,
+                    DChar&                  outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSBool&          outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DBool&                 outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSDate&          outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DDate&                 outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSDateTime&      outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DDateTime&             outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSHiresTime&     outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DHiresTime&            outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSInt8&          outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt8&                 outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSInt16&         outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt16&                outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSInt32&         outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt32&                outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSInt64&         outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt64&                outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSReal&          outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DReal&                 outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSRichReal&      outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DRichReal&             outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSUInt8&         outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt8&                outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSUInt16&        outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt16&               outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSUInt32&        outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt32&               outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSUInt64&        outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt64&               outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
 
-static I_TextStrategy*
-allocate_row_field_text (VLVarsStore&   store,
-                         const uint64_t firstRecordEntry,
-                         const uint64_t valueSize)
+
+static ITextStrategy*
+allocate_row_field_text (VariableSizeStore&   store,
+                         const uint64_t       firstRecordEntry,
+                         const uint64_t       valueSize)
 {
-  I_TextStrategy* const pTextStrategy = new RowFieldText (store,
-                                                          firstRecordEntry,
-                                                          valueSize);
-  return pTextStrategy;
+  ITextStrategy* const strategy = new RowFieldText (store,
+                                                    firstRecordEntry,
+                                                    valueSize);
+  return strategy;
 }
+
 
 static RowFieldArray*
-allocate_row_field_array (VLVarsStore&         store,
-                          const uint64_t       firstRecordEntry,
-                          const DBS_FIELD_TYPE type)
+allocate_row_field_array (VariableSizeStore&        store,
+                          const uint64_t            firstRecordEntry,
+                          const DBS_FIELD_TYPE      type)
 {
   return new RowFieldArray (store, firstRecordEntry, type);
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
+PrototypeTable::Get (const ROW_INDEX   row,
                           const FIELD_INDEX field,
-                          DBSText&          outValue)
+                          DText&          outValue)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if (row >= m_RowsCount)
+  if (row >= mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-      ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
+  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
+      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  StoredItem           cachedItem = m_RowCache.RetriveItem (row);
-  const uint8_t* const pRawData   = cachedItem.GetDataForRead();
+  StoredItem           cachedItem = mRowCache.RetriveItem (row);
+  const uint8_t* const rowData    = cachedItem.GetDataForRead();
 
   const uint64_t& fieldFirstEntry = *_RC (
                                       const uint64_t*,
-                                      pRawData + desc.m_StoreIndex + 0
+                                      rowData + desc.mRowDataOff + 0
                                          );
   const uint64_t& fieldValueSize  = *_RC (
                               const uint64_t*,
-                              pRawData + desc.m_StoreIndex + sizeof (uint64_t)
+                              rowData + desc.mRowDataOff + sizeof (uint64_t)
                                          );
-  const uint_t  byte_off = desc.m_NullBitIndex / 8;
-  const uint8_t bit_off  = desc.m_NullBitIndex % 8;
+  const uint_t  byteOff = desc.mNullBitIndex / 8;
+  const uint8_t bitOff  = desc.mNullBitIndex % 8;
 
-  outValue.~DBSText ();
-  if (pRawData[byte_off] & (1 << bit_off))
-    _placement_new (&outValue, DBSText ());
+  outValue.~DText ();
+  if (rowData[byteOff] & (1 << bitOff))
+    _placement_new (&outValue, DText ());
+
   else
     {
       _placement_new (
                        &outValue,
-                       DBSText (
+                       DText (
                            *allocate_row_field_text (
-                                                     VariableFieldsStore (),
+                                                     VSStore (),
                                                      fieldFirstEntry,
                                                      fieldValueSize
                                                      )
@@ -1247,120 +1326,131 @@ PrototypeTable::GetEntry (const ROW_INDEX   row,
     }
 }
 
+
 void
-PrototypeTable::GetEntry (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DBSArray&         outValue)
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DArray&                outValue)
 {
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if (row >= m_RowsCount)
+  if (row >= mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if (((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) == 0)
-      ||
-          (((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
-              _SC(uint_t, outValue.ElementsType()))
-          &&
-          (outValue.ElementsType () != T_UNDETERMINED)))
-
+  if (((desc.mTypeDesc & PS_TABLE_ARRAY_MASK) == 0)
+      || (((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+             _SC(uint_t, outValue.Type ()))
+          && (outValue.Type () != T_UNDETERMINED)))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  StoredItem           cachedItem = m_RowCache.RetriveItem (row);
-  const uint8_t *const pRawData   = cachedItem.GetDataForRead();
+  StoredItem           cachedItem = mRowCache.RetriveItem (row);
+  const uint8_t *const rowData   = cachedItem.GetDataForRead();
 
   const uint64_t& fieldFirstEntry = *_RC (
                                           const uint64_t*,
-                                          pRawData + desc.m_StoreIndex + 0
+                                          rowData + desc.mRowDataOff + 0
                                          );
 
-  const uint_t  byte_off = desc.m_NullBitIndex / 8;
-  const uint8_t bit_off  = desc.m_NullBitIndex % 8;
+  const uint_t  byteOff = desc.mNullBitIndex / 8;
+  const uint8_t bitOff  = desc.mNullBitIndex % 8;
 
-  outValue.~DBSArray ();
-  if (pRawData[byte_off] & (1 << bit_off))
+  outValue.~DArray ();
+  if (rowData[byteOff] & (1 << bitOff))
     {
-      switch (desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK)
+      switch (desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK)
       {
       case T_BOOL:
-        _placement_new (&outValue, DBSArray(_SC(DBSBool *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DBool *, NULL)));
         break;
+
       case T_CHAR:
-        _placement_new (&outValue, DBSArray(_SC(DBSChar *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DChar *, NULL)));
         break;
+
       case T_DATE:
-        _placement_new (&outValue, DBSArray(_SC(DBSDate *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DDate *, NULL)));
         break;
+
       case T_DATETIME:
-        _placement_new (&outValue, DBSArray(_SC(DBSDateTime *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DDateTime *, NULL)));
         break;
+
       case T_HIRESTIME:
-        _placement_new (&outValue, DBSArray(_SC(DBSHiresTime *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DHiresTime *, NULL)));
         break;
+
       case T_UINT8:
-        _placement_new (&outValue, DBSArray(_SC(DBSUInt8 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DUInt8 *, NULL)));
         break;
+
       case T_UINT16:
-        _placement_new (&outValue, DBSArray(_SC(DBSUInt16 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DUInt16 *, NULL)));
         break;
+
       case T_UINT32:
-        _placement_new (&outValue, DBSArray(_SC(DBSUInt32 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DUInt32 *, NULL)));
         break;
+
       case T_UINT64:
-        _placement_new (&outValue, DBSArray(_SC(DBSUInt64 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DUInt64 *, NULL)));
         break;
+
       case T_REAL:
-        _placement_new (&outValue, DBSArray(_SC(DBSReal *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DReal *, NULL)));
         break;
+
       case T_RICHREAL:
-        _placement_new (&outValue, DBSArray(_SC(DBSRichReal *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DRichReal *, NULL)));
         break;
+
       case T_INT8:
-        _placement_new (&outValue, DBSArray(_SC(DBSInt8 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DInt8 *, NULL)));
         break;
+
       case T_INT16:
-        _placement_new (&outValue, DBSArray(_SC(DBSInt16 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DInt16 *, NULL)));
         break;
+
       case T_INT32:
-        _placement_new (&outValue, DBSArray(_SC(DBSInt32 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DInt32 *, NULL)));
         break;
+
       case T_INT64:
-        _placement_new (&outValue, DBSArray(_SC(DBSInt64 *, NULL)));
+        _placement_new (&outValue, DArray(_SC(DInt64 *, NULL)));
         break;
+
       default:
-        assert (0);
+        assert (false);
       }
     }
   else
     {
-      I_ArrayStrategy& rowArray = *allocate_row_field_array (
-                               VariableFieldsStore (),
+      IArrayStrategy& rowArray = *allocate_row_field_array (
+                               VSStore (),
                                fieldFirstEntry,
-                              _SC (
-                                   DBS_FIELD_TYPE,
-                                   desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK
-                                  )
+                              _SC (DBS_FIELD_TYPE,
+                                   desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK)
                                                             );
-      _placement_new ( &outValue, DBSArray (rowArray));
+      _placement_new (&outValue, DArray (rowArray));
     }
 }
 
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSBool&    min,
-                                 const DBSBool&    max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+DArray
+PrototypeTable::MatchRows (const DBool&       min,
+                           const DBool&       max,
+                           const ROW_INDEX    fromRow,
+                           const ROW_INDEX    toRow,
+                           const ROW_INDEX    ignoreFirst,
+                           const ROW_INDEX    maxCount,
+                           const FIELD_INDEX  field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1374,16 +1464,17 @@ PrototypeTable::GetMatchingRows (const DBSBool&    min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSChar&    min,
-                                 const DBSChar&    max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DChar&         min,
+                           const DChar&         max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1397,16 +1488,17 @@ PrototypeTable::GetMatchingRows (const DBSChar&    min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSDate&    min,
-                                 const DBSDate&    max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DDate&         min,
+                           const DDate&         max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1420,16 +1512,17 @@ PrototypeTable::GetMatchingRows (const DBSDate&    min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSDateTime& min,
-                                 const DBSDateTime& max,
-                                 const ROW_INDEX    fromRow,
-                                 const ROW_INDEX    toRow,
-                                 const ROW_INDEX    ignoreFirst,
-                                 const ROW_INDEX    maxCount,
-                                 const FIELD_INDEX  field)
+
+DArray
+PrototypeTable::MatchRows (const DDateTime&     min,
+                           const DDateTime&     max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1443,16 +1536,17 @@ PrototypeTable::GetMatchingRows (const DBSDateTime& min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSHiresTime& min,
-                                 const DBSHiresTime& max,
-                                 const ROW_INDEX     fromRow,
-                                 const ROW_INDEX     toRow,
-                                 const ROW_INDEX     ignoreFirst,
-                                 const ROW_INDEX     maxCount,
-                                 const FIELD_INDEX   field)
+
+DArray
+PrototypeTable::MatchRows (const DHiresTime&     min,
+                           const DHiresTime&     max,
+                           const ROW_INDEX       fromRow,
+                           const ROW_INDEX       toRow,
+                           const ROW_INDEX       ignoreFirst,
+                           const ROW_INDEX       maxCount,
+                           const FIELD_INDEX     field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1466,16 +1560,17 @@ PrototypeTable::GetMatchingRows (const DBSHiresTime& min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSUInt8&   min,
-                                 const DBSUInt8&   max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DUInt8&        min,
+                           const DUInt8&        max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1489,16 +1584,17 @@ PrototypeTable::GetMatchingRows (const DBSUInt8&   min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSUInt16&  min,
-                                 const DBSUInt16&  max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DUInt16&       min,
+                           const DUInt16&       max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1512,16 +1608,17 @@ PrototypeTable::GetMatchingRows (const DBSUInt16&  min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSUInt32&  min,
-                                 const DBSUInt32&  max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DUInt32&       min,
+                           const DUInt32&       max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1535,16 +1632,17 @@ PrototypeTable::GetMatchingRows (const DBSUInt32&  min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSUInt64&  min,
-                                 const DBSUInt64&  max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DUInt64&       min,
+                           const DUInt64&       max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1558,16 +1656,17 @@ PrototypeTable::GetMatchingRows (const DBSUInt64&  min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSInt8&    min,
-                                 const DBSInt8&    max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DInt8&         min,
+                           const DInt8&         max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1581,16 +1680,17 @@ PrototypeTable::GetMatchingRows (const DBSInt8&    min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSInt16&   min,
-                                 const DBSInt16&   max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DInt16&        min,
+                           const DInt16&        max,
+                           const ROW_INDEX      fromRow,
+                           const ROW_INDEX      toRow,
+                           const ROW_INDEX      ignoreFirst,
+                           const ROW_INDEX      maxCount,
+                           const FIELD_INDEX    field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1604,16 +1704,17 @@ PrototypeTable::GetMatchingRows (const DBSInt16&   min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSInt32&   min,
-                                 const DBSInt32&   max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DInt32&       min,
+                           const DInt32&       max,
+                           const ROW_INDEX     fromRow,
+                           const ROW_INDEX     toRow,
+                           const ROW_INDEX     ignoreFirst,
+                           const ROW_INDEX     maxCount,
+                           const FIELD_INDEX   field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1627,16 +1728,17 @@ PrototypeTable::GetMatchingRows (const DBSInt32&   min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSInt64&   min,
-                                 const DBSInt64&   max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DInt64&       min,
+                           const DInt64&       max,
+                           const ROW_INDEX     fromRow,
+                           const ROW_INDEX     toRow,
+                           const ROW_INDEX     ignoreFirst,
+                           const ROW_INDEX     maxCount,
+                           const FIELD_INDEX   field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1650,16 +1752,17 @@ PrototypeTable::GetMatchingRows (const DBSInt64&   min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSReal&    min,
-                                 const DBSReal&    max,
-                                 const ROW_INDEX   fromRow,
-                                 const ROW_INDEX   toRow,
-                                 const ROW_INDEX   ignoreFirst,
-                                 const ROW_INDEX   maxCount,
-                                 const FIELD_INDEX field)
+
+DArray
+PrototypeTable::MatchRows (const DReal&        min,
+                           const DReal&        max,
+                           const ROW_INDEX     fromRow,
+                           const ROW_INDEX     toRow,
+                           const ROW_INDEX     ignoreFirst,
+                           const ROW_INDEX     maxCount,
+                           const FIELD_INDEX   field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1673,16 +1776,17 @@ PrototypeTable::GetMatchingRows (const DBSReal&    min,
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
 
-DBSArray
-PrototypeTable::GetMatchingRows (const DBSRichReal& min,
-                                 const DBSRichReal& max,
-                                 const ROW_INDEX    fromRow,
-                                 const ROW_INDEX    toRow,
-                                 const ROW_INDEX    ignoreFirst,
-                                 const ROW_INDEX    maxCount,
-                                 const FIELD_INDEX  field)
+
+DArray
+PrototypeTable::MatchRows (const DRichReal&    min,
+                           const DRichReal&    max,
+                           const ROW_INDEX     fromRow,
+                           const ROW_INDEX     toRow,
+                           const ROW_INDEX     ignoreFirst,
+                           const ROW_INDEX     maxCount,
+                           const FIELD_INDEX   field)
 {
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       return MatchRowsWithIndex (min,
                                  max,
@@ -1695,6 +1799,7 @@ PrototypeTable::GetMatchingRows (const DBSRichReal& min,
 
   return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
 }
+
 
 template <class T> void
 PrototypeTable::StoreEntry (const ROW_INDEX   row,
@@ -1705,8 +1810,9 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
   //Check if we are trying to write a different value
   T currentValue;
 
-  if (row == m_RowsCount)
+  if (row == mRowsCount)
     AddRow ();
+
   else
     RetrieveEntry (row, field, currentValue);
 
@@ -1715,53 +1821,51 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
 
   const uint8_t      bitsSet  = ~0;
   FieldDescriptor&   desc     = GetFieldDescriptorInternal (field);
-  const uint_t       byte_off = desc.m_NullBitIndex / 8;
-  const uint8_t      bit_off  = desc.m_NullBitIndex % 8;
+  const uint_t       byteOff = desc.mNullBitIndex / 8;
+  const uint8_t      bitOff  = desc.mNullBitIndex % 8;
 
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  StoredItem     cachedItem = m_RowCache.RetriveItem (row);
-  uint8_t *const pRawData   = cachedItem.GetDataForUpdate();
-
-  assert (desc.m_NullBitIndex > 0);
+  StoredItem     cachedItem = mRowCache.RetriveItem (row);
+  uint8_t *const rowData   = cachedItem.GetDataForUpdate();
 
   if (value.IsNull ())
     {
-      assert ((pRawData [byte_off] & (1 << bit_off)) == 0);
+      assert ((rowData[byteOff] & (1 << bitOff)) == 0);
 
-      pRawData [byte_off] |= (1 << bit_off);
+      rowData[byteOff] |= (1 << bitOff);
 
-      if (pRawData [byte_off] == bitsSet)
+      if (rowData[byteOff] == bitsSet)
         CheckRowToDelete (row);
     }
   else
     {
-      if (pRawData [byte_off] == bitsSet)
+      if (rowData[byteOff] == bitsSet)
         CheckRowToReuse (row);
 
-      pRawData [byte_off] &= ~(1 << bit_off);
+      rowData[byteOff] &= ~(1 << bitOff);
 
-      PSValInterp::Store (pRawData + desc.m_StoreIndex, value);
+      Serializer::Store (rowData + desc.mRowDataOff, value);
     }
 
   syncHolder.Release ();
 
   //Update the field index if it exists
-  if (m_vIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != NULL)
     {
       NODE_INDEX        dummyNode;
       KEY_INDEX         dummyKey;
 
-      AquireIndexField (&desc);
+      AcquireFieldIndex (&desc);
 
       try
         {
-          BTree fieldIndexTree (*m_vIndexNodeMgrs[field]);
+          BTree fieldIndexTree (*mvIndexNodeMgrs[field]);
 
           fieldIndexTree.RemoveKey (T_BTreeKey<T> (currentValue, row));
           fieldIndexTree.InsertKey (T_BTreeKey<T> (value, row),
-                                    dummyNode,
-                                    dummyKey);
+                                    &dummyNode,
+                                    &dummyKey);
         }
       catch (...)
         {
@@ -1772,6 +1876,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
     }
 }
 
+
 template <class T> void
 PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
                                const FIELD_INDEX field,
@@ -1779,36 +1884,35 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if (row >= m_RowsCount)
+  if (row >= mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-        ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
-        _SC(uint_t,  outValue.GetDBSType ())))
+  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
+      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+            _SC(uint_t,  outValue.DBSType ())))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  T* const      pDest    = &outValue;
-  const uint_t  byte_off = desc.m_NullBitIndex / 8;
-  const uint8_t bit_off  = desc.m_NullBitIndex % 8;
+  const uint_t  byteOff = desc.mNullBitIndex / 8;
+  const uint8_t bitOff  = desc.mNullBitIndex % 8;
 
-  LockRAII syncHolder (m_Sync);
+  LockRAII syncHolder (mSync);
 
-  StoredItem           cachedItem = m_RowCache.RetriveItem (row);
-  const uint8_t* const pRawData   = cachedItem.GetDataForRead ();
+  StoredItem           cachedItem = mRowCache.RetriveItem (row);
+  const uint8_t* const rowData   = cachedItem.GetDataForRead ();
 
-  if (pRawData[byte_off] & (1 << bit_off))
+  if (rowData[byteOff] & (1 << bitOff))
     {
-      pDest->~T ();
-      _placement_new (pDest, T ());
+      outValue.~T();
+      _placement_new (&outValue, T ());
     }
   else
-    PSValInterp::Retrieve (pRawData + desc.m_StoreIndex, pDest);
+    Serializer::Load (rowData + desc.mRowDataOff, &outValue);
 }
 
 
-template <class T> DBSArray
+template <class T> DArray
 PrototypeTable::MatchRowsWithIndex (const T&          min,
                                     const T&          max,
                                     const ROW_INDEX   fromRow,
@@ -1819,117 +1923,125 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
 {
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if ((desc.m_TypeDesc & PS_TABLE_ARRAY_MASK) ||
-        ((desc.m_TypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
-        _SC(uint_t, min.GetDBSType ())))
+  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
+      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+            _SC(uint_t, min.DBSType ())))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
+  toRow = MIN (toRow, ((mRowsCount > 0) ? mRowsCount - 1 : 0));
 
-  FieldIndexNodeManager* const pNodeMgr = m_vIndexNodeMgrs[field];
-  DBSArray                     result (_SC (DBSUInt64*, NULL));
-  NODE_INDEX                   node;
-  KEY_INDEX                    key;
+  FieldIndexNodeManager* const nodeMgr = mvIndexNodeMgrs[field];
+
+  DArray                       result (_SC (DUInt64*, NULL));
+  NODE_INDEX                   nodeId;
+  KEY_INDEX                    keyIndex;
   const T_BTreeKey<T>          firstKey (min, fromRow);
   const T_BTreeKey<T>          lastKey (max, toRow);
 
-  assert (pNodeMgr != NULL);
+  assert (nodeMgr != NULL);
 
-  AquireIndexField (&desc);
+  AcquireFieldIndex (&desc);
 
   try
     {
-      BTree fieldIndexTree (*pNodeMgr);
+      BTree fieldIndexTree (*nodeMgr);
 
-      if ( (fieldIndexTree.FindBiggerOrEqual (firstKey, node, key) == false) ||
-           (maxCount == 0))
+      if ( (fieldIndexTree.FindBiggerOrEqual (firstKey, &nodeId, &keyIndex) ==
+              false)
+          || (maxCount == 0))
         {
           goto force_return;
         }
 
-      BTreeNodeRAI currentNode (pNodeMgr->RetrieveNode (node));
+      BTreeNodeRAII currentNode (nodeMgr->RetrieveNode (nodeId));
 
       while (ignoreFirst > 0)
         {
-          if (ignoreFirst <= key)
+          if (ignoreFirst <= keyIndex)
             {
-              key         -= ignoreFirst;
-              ignoreFirst = 0;
+              keyIndex    -= ignoreFirst;
+              ignoreFirst  = 0;
             }
           else
             {
-              NODE_INDEX nextNode = currentNode->GetNext ();
+              NODE_INDEX nextNode = currentNode->Next ();
 
               if (nextNode == NIL_NODE)
                 goto force_return;
 
-              node        = nextNode;
-              currentNode = pNodeMgr->RetrieveNode (node);
-              assert (currentNode->GetKeysCount() > 0);
+              nodeId      = nextNode;
+              currentNode = nodeMgr->RetrieveNode (nodeId);
 
-              ignoreFirst -= (key + 1);
-              key          = currentNode->GetKeysCount () - 1;
+              assert (currentNode->KeysCount() > 0);
+
+              ignoreFirst -= (keyIndex + 1);
+              keyIndex     = currentNode->KeysCount () - 1;
             }
         }
 
 
-      assert (key < currentNode->GetKeysCount ());
+      assert (keyIndex < currentNode->KeysCount ());
 
       while (true)
         {
-          I_BTreeFieldIndexNode* pNode    = _SC (
-                                                 I_BTreeFieldIndexNode*,
-                                                 &*currentNode
-                                                );
-          KEY_INDEX              toKey    = ~0;;
-          bool                   lastNode = false;
+          IBTreeFieldIndexNode* node = _SC (IBTreeFieldIndexNode*,
+                                            &*currentNode);
 
-          if (pNode->FindBiggerOrEqual (lastKey, toKey) == false)
+          KEY_INDEX toKey    = ~0;;
+          bool      lastNode = false;
+
+          if (node->FindBiggerOrEqual (lastKey, &toKey) == false)
             toKey = 0;
+
           else
             {
               lastNode = true;
               toKey ++;
             }
 
-          assert (key >= toKey);
+          assert (keyIndex >= toKey);
 
-          if (maxCount <= (key - toKey + 1))
+          if (maxCount <= (keyIndex - toKey + 1))
             {
               toKey += maxCount;
               maxCount = 0;
             }
           else
-            maxCount -= (key - toKey + 1);
+            maxCount -= (keyIndex - toKey + 1);
 
-          pNode->GetRows (key, toKey, result);
+          node->GetRows (keyIndex, toKey, result);
 
-          if (lastNode || (pNode->GetNext() == NIL_NODE) || (maxCount == 0))
+          if (lastNode || (node->Next() == NIL_NODE) || (maxCount == 0))
             break;
+
           else
             {
-              currentNode = pNodeMgr->RetrieveNode (pNode->GetNext ());
+              currentNode = nodeMgr->RetrieveNode (node->Next ());
 
-              assert (currentNode->GetKeysCount() > 0);
-              key = currentNode->GetKeysCount () - 1;
+              assert (currentNode->KeysCount() > 0);
+
+              keyIndex = currentNode->KeysCount () - 1;
             }
         }
     }
   catch (...)
     {
       ReleaseIndexField (&desc);
+
       throw;
     }
 
 force_return:
+
   ReleaseIndexField (&desc);
+
   return result;
 }
 
 
-template <class T> DBSArray
+template <class T> DArray
 PrototypeTable::MatchRows (const T&          min,
                            const T&          max,
                            const ROW_INDEX   fromRow,
@@ -1938,16 +2050,16 @@ PrototypeTable::MatchRows (const T&          min,
                            ROW_INDEX         maxCount,
                            const FIELD_INDEX field)
 {
-  toRow = MIN (toRow, ((m_RowsCount > 0) ? m_RowsCount - 1 : 0));
+  toRow = MIN (toRow, ((mRowsCount > 0) ? mRowsCount - 1 : 0));
 
-  DBSArray result (_SC (DBSUInt64*, NULL));
-  T        rowValue;
+  DArray result (_SC (DUInt64*, NULL));
+  T      rowValue;
 
   for (ROW_INDEX row = fromRow; (row <= toRow) && (maxCount > 0); ++row)
     {
-      GetEntry (field, row, rowValue);
+      Get (field, row, rowValue);
 
-      if ( (rowValue < min) || (max < rowValue))
+      if ((rowValue < min) || (max < rowValue))
         continue;
 
       if (ignoreFirst > 0)
@@ -1958,333 +2070,332 @@ PrototypeTable::MatchRows (const T&          min,
 
       --maxCount;
 
-      result.AddElement (DBSUInt64 (row));
+      result.Add (DUInt64 (row));
     }
 
   return result;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 
 TableRmNode::TableRmNode (PrototypeTable& table, const NODE_INDEX nodeId)
-  : I_BTreeNode (table, nodeId)
+  : IBTreeNode (table, nodeId)
 {
   assert ((sizeof (NodeHeader) % ( 2 * sizeof  (uint64_t)) == 0));
-  assert (RAW_NODE_SIZE == m_NodesMgr.RawNodeSize ());
+  assert (RAW_NODE_SIZE == mNodesMgr.NodeRawSize ());
 }
 
-TableRmNode::~TableRmNode ()
-{
-}
 
 uint_t
 TableRmNode::KeysPerNode () const
 {
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
 
-  uint_t result = m_NodesMgr.RawNodeSize () - sizeof (NodeHeader);
+  uint_t result = mNodesMgr.NodeRawSize () - sizeof (NodeHeader);
 
   if (IsLeaf ())
     result /= sizeof (uint64_t);
+
   else
     result /= sizeof (uint64_t) + sizeof (NODE_INDEX);
 
   return result;
 }
 
+
 KEY_INDEX
-TableRmNode::GetParentKeyIndex (const I_BTreeNode& parent) const
+TableRmNode::GetParentKeyIndex (const IBTreeNode& parent) const
 {
-  assert (GetKeysCount() > 0);
+  assert (KeysCount() > 0);
 
   KEY_INDEX               result;
-  const NODE_INDEX* const pKeys = _RC ( const NODE_INDEX*, DataToRead ());
+  const NODE_INDEX* const keys = _RC ( const NODE_INDEX*, DataForRead ());
 
-  const TableRmKey key (pKeys[0]);
+  const TableRmKey key (keys[0]);
 
-  parent.FindBiggerOrEqual (key, result);
+  parent.FindBiggerOrEqual (key, &result);
 
   assert (parent.IsEqual (key, result));
-  assert (NodeId () == parent.GetNodeOfKey (result));
+  assert (NodeId () == parent.NodeIdOfKey (result));
 
   return result;
 }
 
+
 NODE_INDEX
-TableRmNode::GetNodeOfKey (const KEY_INDEX keyIndex) const
+TableRmNode::NodeIdOfKey (const KEY_INDEX keyIndex) const
 {
-  assert (keyIndex < GetKeysCount ());
+  assert (keyIndex < KeysCount ());
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
   assert (IsLeaf () == false);
 
   const uint_t            firstKeyOff = KeysPerNode () * sizeof (uint64_t);
-  const NODE_INDEX* const cpFirstKey = _RC (
-                                            const NODE_INDEX*,
-                                            DataToRead() + firstKeyOff
-                                           );
-
-  return cpFirstKey [keyIndex];
+  const NODE_INDEX* const keys        = _RC (const NODE_INDEX*,
+                                             DataForRead() + firstKeyOff);
+  return keys[keyIndex];
 }
+
 
 void
-TableRmNode::AdjustKeyNode (const I_BTreeNode& childNode, const KEY_INDEX keyIndex)
+TableRmNode::AdjustKeyNode (const IBTreeNode&   childNode,
+                            const KEY_INDEX     keyIndex)
 {
-  assert (childNode.NodeId () == GetNodeOfKey (keyIndex));
+  assert (childNode.NodeId () == NodeIdOfKey (keyIndex));
   assert (IsLeaf() == false);
 
-  const TableRmNode& child         = _SC (const TableRmNode&, childNode);
-  NODE_INDEX* const pKeys          = _RC (NODE_INDEX*, DataToWrite ());
-  const NODE_INDEX* const pSrcKeys = _RC (
-                                          const NODE_INDEX*,
-                                          child.DataToRead ()
-                                         );
+  const TableRmNode&      child     = _SC (const TableRmNode&, childNode);
+  NODE_INDEX* const       keys      = _RC (NODE_INDEX*, DataForWrite ());
+  const NODE_INDEX* const childKeys = _RC (const NODE_INDEX*,
+                                           child.DataForRead ());
 
-  pKeys [keyIndex] = pSrcKeys [0];
+  keys[keyIndex] = childKeys[0];
 }
+
 
 void
 TableRmNode::SetNodeOfKey (const KEY_INDEX keyIndex, const NODE_INDEX childNode)
 {
 
-  assert (keyIndex < GetKeysCount ());
+  assert (keyIndex < KeysCount ());
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
   assert (IsLeaf () == false);
 
   const uint_t      keysOffset = KeysPerNode() * sizeof (uint64_t);
-  NODE_INDEX* const cpFirstKey = _RC (NODE_INDEX*, DataToWrite () + keysOffset);
-
-  cpFirstKey[keyIndex] = childNode;
+  NODE_INDEX* const keys       = _RC (NODE_INDEX*,
+                                      DataForWrite () + keysOffset);
+  keys[keyIndex] = childNode;
 }
 
+
 KEY_INDEX
-TableRmNode::InsertKey (const I_BTreeKey& key)
+TableRmNode::InsertKey (const IBTreeKey& key)
 {
-  if (GetKeysCount () > 0)
+  if (KeysCount () > 0)
     {
       KEY_INDEX keyIndex;
-      KEY_INDEX lastKey = GetKeysCount () - 1;
+      KEY_INDEX lastKey = KeysCount () - 1;
 
       assert (lastKey < (KeysPerNode() - 1));
 
-      if (FindBiggerOrEqual (key, keyIndex) == false)
+      if (FindBiggerOrEqual (key, &keyIndex) == false)
         keyIndex = 0;
+
       else
-        keyIndex ++;
+        keyIndex++;
 
       assert ((keyIndex == 0) || IsLess (key, keyIndex - 1));
 
-      uint64_t* const pRows = _RC (uint64_t *, DataToWrite ());
+      uint64_t* const rows = _RC (uint64_t *, DataForWrite ());
 
-      make_array_room (_RC (uint8_t*, pRows),
-                       lastKey,
+      make_array_room (lastKey,
                        keyIndex,
-                       sizeof (uint64_t));
-      SetKeysCount (GetKeysCount() + 1);
-      pRows[keyIndex] = *( _SC(const TableRmKey *, &key));
+                       sizeof (uint64_t),
+                       _RC (uint8_t*, rows));
+      KeysCount (KeysCount() + 1);
+      rows[keyIndex] = *(_SC(const TableRmKey*, &key));
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX* const pNodes = _RC (NODE_INDEX*, pRows + KeysPerNode());
-          make_array_room (_RC (uint8_t*, pNodes),
-                           lastKey,
+          NODE_INDEX* const nodes = _RC (NODE_INDEX*, rows + KeysPerNode());
+          make_array_room (lastKey,
                            keyIndex,
-                           sizeof (NODE_INDEX));
+                           sizeof (NODE_INDEX),
+                           _RC (uint8_t*, nodes));
         }
 
       return keyIndex;
     }
 
-  uint64_t* const pRows = _RC (uint64_t *, DataToWrite ());
-  pRows [0]             = *( _SC(const TableRmKey *, &key));
+  uint64_t* const rows = _RC (uint64_t *, DataForWrite ());
 
-  SetKeysCount (1);
+  rows[0] = *( _SC(const TableRmKey *, &key));
+
+  KeysCount (1);
 
   return 0;
 }
 
+
 void
 TableRmNode::RemoveKey (const KEY_INDEX keyIndex)
 {
-  uint_t lastKey = GetKeysCount () - 1;
+  uint_t lastKey = KeysCount () - 1;
 
   assert (lastKey < (KeysPerNode() - 1));
 
-  uint64_t* const pRows = _RC (uint64_t *, DataToWrite ());
-  remove_array_elemes (_RC (uint8_t*, pRows),
-                       lastKey,
+  uint64_t* const rows = _RC (uint64_t *, DataForWrite ());
+  remove_array_elemes (lastKey,
                        keyIndex,
-                       sizeof (uint64_t));
+                       sizeof (uint64_t),
+                       _RC (uint8_t*, rows));
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX* const pNodes = _RC (
-                                      NODE_INDEX*,
-                                      pRows + TableRmNode::KeysPerNode()
-                                     );
-      remove_array_elemes (_RC (uint8_t*, pNodes),
-                           lastKey,
+      NODE_INDEX* const nodes = _RC (NODE_INDEX*,
+                                     rows + TableRmNode::KeysPerNode());
+      remove_array_elemes (lastKey,
                            keyIndex,
-                           sizeof (NODE_INDEX));
+                           sizeof (NODE_INDEX),
+                           _RC (uint8_t*, nodes));
     }
 
-  SetKeysCount (GetKeysCount () - 1);
+  KeysCount (KeysCount () - 1);
 }
+
 
 void
 TableRmNode::Split ( const NODE_INDEX parentId)
 {
   assert (NeedsSpliting ());
 
-  const uint64_t* const pRows    = _RC (const uint64_t *, DataToRead ());
-  const KEY_INDEX       splitKey = GetKeysCount() / 2;
+  const uint64_t* const rows     = _RC (const uint64_t *, DataForRead ());
+  const KEY_INDEX       splitKey = KeysCount() / 2;
 
-  BTreeNodeRAI     parentNode (m_NodesMgr.RetrieveNode (parentId));
-  const TableRmKey key (pRows[splitKey]);
+  BTreeNodeRAII parentNode (mNodesMgr.RetrieveNode (parentId));
+
+  const TableRmKey key (rows[splitKey]);
   const KEY_INDEX  insertionPos    = parentNode->InsertKey (key);
-  const NODE_INDEX allocatedNodeId = m_NodesMgr.AllocateNode (
-                                                              parentId,
-                                                              insertionPos
-                                                             );
-  BTreeNodeRAI allocatedNode (m_NodesMgr.RetrieveNode (allocatedNodeId));
+  const NODE_INDEX allocatedNodeId = mNodesMgr.AllocateNode (parentId,
+                                                             insertionPos);
 
-  allocatedNode->SetLeaf (IsLeaf ());
+  BTreeNodeRAII allocatedNode (mNodesMgr.RetrieveNode (allocatedNodeId));
+
+  allocatedNode->Leaf (IsLeaf ());
   allocatedNode->MarkAsUsed();
 
-  uint64_t* const pSplitRows = _RC (uint64_t*, allocatedNode->DataToWrite ());
+  uint64_t* const newRows = _RC (uint64_t*, allocatedNode->DataForWrite ());
 
-  for (uint_t index = splitKey; index < GetKeysCount (); ++index)
-    pSplitRows [index - splitKey] = pRows [index];
+  for (uint_t index = splitKey; index < KeysCount (); ++index)
+    newRows[index - splitKey] = rows[index];
 
   if (IsLeaf () == false)
     {
-      const NODE_INDEX* const pNodes = _RC (const NODE_INDEX*,
-                                            pRows + KeysPerNode ());
-      NODE_INDEX* const pSplitNodes = _RC (NODE_INDEX*,
-                                           pSplitRows + KeysPerNode ());
+      const NODE_INDEX* const nodes = _RC (const NODE_INDEX*,
+                                           rows + KeysPerNode ());
+      NODE_INDEX* const newNodes = _RC (NODE_INDEX*,
+                                        newRows + KeysPerNode ());
 
-      for (uint_t index = splitKey; index < GetKeysCount (); ++index)
-        pSplitNodes [index - splitKey] = pNodes [index];
+      for (uint_t index = splitKey; index < KeysCount (); ++index)
+        newNodes[index - splitKey] = nodes[index];
     }
 
-  allocatedNode->SetKeysCount (GetKeysCount() - splitKey);
-  SetKeysCount (splitKey);
+  allocatedNode->KeysCount (KeysCount() - splitKey);
+  KeysCount (splitKey);
 
-  allocatedNode->SetNext (NodeId());
-  allocatedNode->SetPrev (GetPrev());
-  SetPrev (allocatedNodeId);
-  if (allocatedNode->GetPrev() != NIL_NODE)
+  allocatedNode->Next (NodeId());
+  allocatedNode->Prev (Prev());
+  Prev (allocatedNodeId);
+  if (allocatedNode->Prev() != NIL_NODE)
     {
-      BTreeNodeRAI prevNode (m_NodesMgr.RetrieveNode (allocatedNode->GetPrev()));
-      prevNode->SetNext (allocatedNodeId);
+      BTreeNodeRAII prevNode (mNodesMgr.RetrieveNode (allocatedNode->Prev()));
+      prevNode->Next (allocatedNodeId);
     }
 }
 
+
 void
-TableRmNode::Join (bool toRight)
+TableRmNode::Join (const bool toRight)
 {
   assert (NeedsJoining ());
 
-  uint64_t *const   pRows  = _RC (uint64_t *, DataToWrite ());
-  NODE_INDEX* const pNodes = _RC (
-                                  NODE_INDEX*,
-                                  pRows + TableRmNode::KeysPerNode ()
-                                 );
+  uint64_t *const   rows  = _RC (uint64_t *,  DataForWrite ());
+  NODE_INDEX* const nodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
+
   if (toRight)
     {
-      assert (GetNext () != NIL_NODE);
-      BTreeNodeRAI       nextNode (m_NodesMgr.RetrieveNode (GetNext ()));
-      TableRmNode* const pNextNode = _SC (TableRmNode*, &(*nextNode));
-      uint64_t *const    pDestRows = _RC (
-                                          uint64_t*,
-                                          pNextNode->DataToWrite ()
-                                         );
+      assert (Next () != NIL_NODE);
 
-      for (uint_t index = 0; index < GetKeysCount (); ++index)
-        pDestRows [index + pNextNode->GetKeysCount ()] = pRows [index];
+      BTreeNodeRAII next (mNodesMgr.RetrieveNode (Next ()));
+
+      TableRmNode* const nextNode = _SC (TableRmNode*, &(*next));
+      uint64_t *const    destRows = _RC (uint64_t*, nextNode->DataForWrite ());
+
+      for (uint_t index = 0; index < KeysCount (); ++index)
+        destRows[index + nextNode->KeysCount ()] = rows[index];
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX* const pDestNodes = _RC (
-                                      NODE_INDEX*,
-                                      pDestRows + TableRmNode::KeysPerNode ()
-                                             );
+          NODE_INDEX* const destNodes = _RC (NODE_INDEX*,
+                                             destRows + KeysPerNode ());
 
-          for (uint_t index = 0; index < GetKeysCount(); ++index)
-            pDestNodes [index + pNextNode->GetKeysCount ()] = pNodes [index];
+          for (uint_t index = 0; index < KeysCount (); ++index)
+            destNodes[index + nextNode->KeysCount ()] = nodes[index];
         }
 
-      nextNode->SetKeysCount (nextNode->GetKeysCount () + GetKeysCount ());
-      nextNode->SetPrev (GetPrev ());
+      nextNode->KeysCount (nextNode->KeysCount () + KeysCount ());
+      nextNode->Prev (Prev ());
 
-      if (GetPrev () != NIL_NODE)
+      if (Prev () != NIL_NODE)
         {
-          BTreeNodeRAI prevNode (m_NodesMgr.RetrieveNode (GetPrev ()));
-          prevNode->SetNext (GetNext ());
+          BTreeNodeRAII prevNode (mNodesMgr.RetrieveNode (Prev ()));
+          prevNode->Next (Next ());
         }
     }
   else
     {
-      assert (GetPrev () != NIL_NODE);
+      assert (Prev () != NIL_NODE);
 
-      BTreeNodeRAI       prevNode (m_NodesMgr.RetrieveNode (GetPrev ()));
-      TableRmNode* const pPrevNode = _SC (TableRmNode*, &(*prevNode));
-      uint64_t *const    pSrcRows  = _RC (
-                                          uint64_t*,
-                                          pPrevNode->DataToWrite ()
-                                         );
+      BTreeNodeRAII prev (mNodesMgr.RetrieveNode (Prev ()));
 
-      for (uint_t index = 0; index < prevNode->GetKeysCount(); ++index)
-        pRows [index + GetKeysCount ()] = pSrcRows [index];
+      TableRmNode* const prevNode = _SC (TableRmNode*, &(*prev));
+      uint64_t *const    srcRows  = _RC (uint64_t*, prevNode->DataForWrite ());
+
+      for (uint_t index = 0; index < prevNode->KeysCount(); ++index)
+        rows[index + KeysCount ()] = srcRows[index];
 
       if (IsLeaf () == false)
         {
-          NODE_INDEX* const pSrcNodes = _RC (
-                                       NODE_INDEX*,
-                                       pSrcRows + TableRmNode::KeysPerNode ()
-                                            );
+          NODE_INDEX* const srcNodes = _RC (NODE_INDEX*,
+                                            srcRows + KeysPerNode ());
 
-          for (uint_t index = 0; index < prevNode->GetKeysCount (); ++index)
-            pNodes [index + GetKeysCount ()] = pSrcNodes [index];
+          for (uint_t index = 0; index < prevNode->KeysCount (); ++index)
+            nodes[index + KeysCount ()] = srcNodes[index];
         }
 
-      SetKeysCount (GetKeysCount () + prevNode->GetKeysCount());
-      SetPrev (prevNode->GetPrev ());
-      if (GetPrev () != NIL_NODE)
+      KeysCount (KeysCount () + prevNode->KeysCount());
+      Prev (prevNode->Prev ());
+      if (Prev () != NIL_NODE)
         {
-          BTreeNodeRAI prevNode (m_NodesMgr.RetrieveNode (GetPrev ()));
-          prevNode->SetNext (NodeId ());
+          BTreeNodeRAII prevNode (mNodesMgr.RetrieveNode (Prev ()));
+          prevNode->Next (NodeId ());
         }
     }
 }
 
-bool
-TableRmNode::IsLess (const I_BTreeKey& key, KEY_INDEX keyIndex) const
-{
-  const uint64_t *const pRows = _RC ( const uint64_t*, DataToRead ());
-  const TableRmKey    tKey (*_SC (const TableRmKey*, &key));
-
-  return tKey < pRows [keyIndex];
-}
 
 bool
-TableRmNode::IsEqual (const I_BTreeKey& key, KEY_INDEX keyIndex) const
+TableRmNode::IsLess (const IBTreeKey& key, const KEY_INDEX keyIndex) const
 {
-  const uint64_t *const pRows = _RC ( const uint64_t*, DataToRead ());
-  const TableRmKey    tKey (*_SC (const TableRmKey*, &key));
+  const uint64_t *const rows = _RC ( const uint64_t*, DataForRead ());
 
-  return tKey == pRows [keyIndex];
+  const TableRmKey tKey (*_SC (const TableRmKey*, &key));
+
+  return tKey < rows[keyIndex];
 }
+
 
 bool
-TableRmNode::IsBigger (const I_BTreeKey& key, KEY_INDEX keyIndex) const
+TableRmNode::IsEqual (const IBTreeKey& key, const KEY_INDEX keyIndex) const
 {
-  const uint64_t *const pRows = _RC ( const uint64_t*, DataToRead ());
-  const TableRmKey    tKey (*_SC (const TableRmKey*, &key));
+  const uint64_t *const rows = _RC ( const uint64_t*, DataForRead ());
 
-  return tKey > pRows [keyIndex];
+  const TableRmKey tKey (*_SC (const TableRmKey*, &key));
+
+  return tKey == rows[keyIndex];
 }
 
-const I_BTreeKey&
+
+bool
+TableRmNode::IsBigger (const IBTreeKey& key, KEY_INDEX const keyIndex) const
+{
+  const uint64_t *const rows = _RC ( const uint64_t*, DataForRead ());
+
+  const TableRmKey tKey (*_SC (const TableRmKey*, &key));
+
+  return tKey > rows[keyIndex];
+}
+
+
+const IBTreeKey&
 TableRmNode::SentinelKey () const
 {
   static TableRmKey _key (~0);

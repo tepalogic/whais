@@ -41,60 +41,60 @@ public:
   NameSpace (I_DBSHandler& dbsHandler);
   ~NameSpace ();
 
-  I_DBSHandler&     GetDBSHandler () { return m_DbsHandler; }
-  TypeManager&      GetTypeManager () { return m_TypeManager; }
-  GlobalsManager&   GetGlobalsManager () { return m_GlbsManager; }
-  ProcedureManager& GetProcedureManager () { return m_ProcsManager; }
-  UnitsManager&     GetUnitsManager () { return m_UnitsManager; }
+  I_DBSHandler&     GetDBSHandler () { return mDbsHandler; }
+  TypeManager&      GetTypeManager () { return mTypeManager; }
+  GlobalsManager&   GetGlobalsManager () { return mGlbsManager; }
+  ProcedureManager& GetProcedureManager () { return mProcsManager; }
+  UnitsManager&     GetUnitsManager () { return mUnitsManager; }
 
 private:
-  I_DBSHandler&    m_DbsHandler;
-  TypeManager      m_TypeManager;
-  GlobalsManager   m_GlbsManager;
-  ProcedureManager m_ProcsManager;
-  UnitsManager     m_UnitsManager;
+  I_DBSHandler&    mDbsHandler;
+  TypeManager      mTypeManager;
+  GlobalsManager   mGlbsManager;
+  ProcedureManager mProcsManager;
+  UnitsManager     mUnitsManager;
 };
 
 class NameSpaceHolder
 {
 public:
   explicit NameSpaceHolder (NameSpace* pSpace = NULL)
-    : m_pSpace (pSpace),
-      m_RefsCount (0)
+    : mpSpace (pSpace),
+      mRefsCount (0)
   {
-    assert (m_pSpace != NULL);
+    assert (mpSpace != NULL);
   }
 
   NameSpaceHolder (const NameSpaceHolder& source)
-    : m_pSpace (source.m_pSpace),
-      m_RefsCount (source.m_RefsCount)
+    : mpSpace (source.mpSpace),
+      mRefsCount (source.mRefsCount)
   {
-    _CC (NameSpace*&, source.m_pSpace) = NULL;
-    _CC (uint64_t&, source.m_RefsCount)  = 0;
+    _CC (NameSpace*&, source.mpSpace) = NULL;
+    _CC (uint64_t&, source.mRefsCount)  = 0;
   }
 
   ~NameSpaceHolder ()
   {
-    assert (m_RefsCount == 0);
-    if (m_pSpace != NULL)
+    assert (mRefsCount == 0);
+    if (mpSpace != NULL)
       {
-        I_DBSHandler& dbsHandler = m_pSpace->GetDBSHandler ();
-        delete m_pSpace;
+        I_DBSHandler& dbsHandler = mpSpace->GetDBSHandler ();
+        delete mpSpace;
         DBSReleaseDatabase (dbsHandler);
       }
   }
 
-  NameSpace& Get () { assert (m_RefsCount > 0); return *m_pSpace; }
-  uint64_t   RefsCount () { return m_RefsCount; }
-  void       IncRefsCount () { ++m_RefsCount; }
-  void       DecRefsCount () { assert (m_RefsCount > 0); --m_RefsCount; }
-  void       ForceRelease () { m_RefsCount = 0; }
+  NameSpace& Get () { assert (mRefsCount > 0); return *mpSpace; }
+  uint64_t   RefsCount () { return mRefsCount; }
+  void       IncRefsCount () { ++mRefsCount; }
+  void       DecRefsCount () { assert (mRefsCount > 0); --mRefsCount; }
+  void       ForceRelease () { mRefsCount = 0; }
 
 private:
   const NameSpaceHolder& operator= (const NameSpaceHolder& source);
 
-  NameSpace* m_pSpace;
-  uint64_t   m_RefsCount;
+  NameSpace* mpSpace;
+  uint64_t   mRefsCount;
 };
 
 class Session : public I_Session
@@ -177,7 +177,7 @@ private:
                               const uint_t      nameLength,
                               const uint8_t*    pTI,
                               const bool        external,
-                              I_DBSTable* const pPersistentTable);
+                              ITable* const pPersistentTable);
   uint32_t DefineProcedure (const uint8_t*           pName,
                             const uint_t             nameLength,
                             const uint32_t           localsCount,
@@ -190,8 +190,8 @@ private:
                             const bool               external,
                             Unit&                    unit);
 
-  NameSpaceHolder& m_GlobalNames;
-  NameSpaceHolder& m_PrivateNames;
+  NameSpaceHolder& mGlobalNames;
+  NameSpaceHolder& mPrivateNames;
 };
 
 } //namespace prima
