@@ -154,7 +154,7 @@ callback_index_create (CreateIndexCallbackContext* const pData)
 }
 
 bool
-test_index_creation (ITable& table, I_DBSHandler& dbsHnd, DArray& tableValues)
+test_index_creation (ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
 {
   CreateIndexCallbackContext data;
   bool result = true;
@@ -223,7 +223,7 @@ main (int argc, char **argv)
     DBSCreateDatabase (db_name);
   }
 
-  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
   {
     DArray    tableValues (_SC (DUInt64*, NULL));

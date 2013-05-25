@@ -118,11 +118,11 @@ test_op_stb (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -161,11 +161,11 @@ test_op_stc (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DChar result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -205,11 +205,11 @@ test_op_std (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DDate result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -248,11 +248,11 @@ test_op_stdt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DDateTime result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -291,11 +291,11 @@ test_op_stht (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DHiresTime result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -336,11 +336,11 @@ test_op_stXX (Session&       session,
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -379,11 +379,11 @@ test_op_stt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DText result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != op2)
     return false;
@@ -426,10 +426,10 @@ test_op_stta (Session& session)
   stack.Push (session.DBSHandler (), firstTable);
   stack.Push (session.DBSHandler (), secondTable);
 
-  if (stack[0].GetOperand ().IsNull () == false)
+  if (stack[0].Operand ().IsNull () == false)
     return false;
 
-  if (stack[1].GetOperand ().IsNull ())
+  if (stack[1].Operand ().IsNull ())
     return false;
 
   session.ExecuteProcedure (procName, stack);
@@ -437,10 +437,10 @@ test_op_stta (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
-  ITable& result = stack[0].GetOperand ().GetTable ();
+  ITable& result = stack[0].Operand ().GetTable ();
 
   if (&result != &secondTable)
     return false;
@@ -484,10 +484,10 @@ test_op_stf (Session& session)
   stack.Push (sv1);
   stack.Push (sv2);
 
-  if (stack[0].GetOperand ().IsNull () == false)
+  if (stack[0].Operand ().IsNull () == false)
     return false;
 
-  if (stack[1].GetOperand ().IsNull ())
+  if (stack[1].Operand ().IsNull ())
     return false;
 
   session.ExecuteProcedure (procName, stack);
@@ -495,15 +495,15 @@ test_op_stf (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
-  ITable& result = stack[0].GetOperand ().GetTable ();
+  ITable& result = stack[0].Operand ().GetTable ();
 
   if (&result != &firstTable)
     return false;
 
-  if (stack[0].GetOperand ().GetField () != 0)
+  if (stack[0].Operand ().GetField () != 0)
     return false;
 
   return true;
@@ -543,11 +543,11 @@ test_op_sta (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull ())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DArray result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.Count () != op2.Count ())
     return false;
@@ -579,7 +579,7 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit dummy (dummyProgram,
                                sizeof dummyProgram,

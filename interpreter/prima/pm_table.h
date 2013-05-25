@@ -31,29 +31,49 @@
 #include "dbs/dbs_table.h"
 #include "pm_general_table.h"
 
+
+
 namespace whisper {
 namespace prima {
+
+
 
 class TableReference
 {
 public:
-  TableReference (I_DBSHandler& dbsHnd, ITable& table)
-    : mDbsHnd (dbsHnd),
+  TableReference (IDBSHandler& dbs, ITable& table)
+    : mDbsHnd (dbs),
       mTable (table),
       mRefCount (0)
   {
   }
 
-  void IncrementRefCount () { ++mRefCount; }
+  void IncrementRefCount ()
+  {
+    ++mRefCount;
+  }
+
   void DecrementRefCount ()
   {
     assert (mRefCount > 0);
+
     if (--mRefCount == 0)
       delete this;
   }
 
-  ITable&   GetTable () { assert (mRefCount > 0); return mTable; }
-  I_DBSHandler& GetDBSHandler () { assert (mRefCount > 0); return mDbsHnd; }
+  ITable& GetTable ()
+  {
+    assert (mRefCount > 0);
+
+    return mTable;
+  }
+
+  IDBSHandler& GetDBSHandler ()
+  {
+    assert (mRefCount > 0);
+
+    return mDbsHnd;
+  }
 
 private:
   ~TableReference ()
@@ -62,9 +82,9 @@ private:
       mDbsHnd.ReleaseTable (mTable);
   }
 
-  I_DBSHandler& mDbsHnd;
-  ITable&   mTable;
-  uint64_t      mRefCount;
+  IDBSHandler&    mDbsHnd;
+  ITable&          mTable;
+  uint64_t         mRefCount;
 };
 
 } //namespace whisper

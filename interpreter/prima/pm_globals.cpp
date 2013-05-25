@@ -30,8 +30,12 @@
 
 using namespace std;
 
+
+
 namespace whisper {
 namespace prima {
+
+
 
 GlobalsManager::~GlobalsManager ()
 {
@@ -39,36 +43,39 @@ GlobalsManager::~GlobalsManager ()
        it != mStorage.end ();
        ++it)
     {
-      it->GetOperand ().~I_PMOperand();
+      it->Operand ().~BaseOperand();
     }
 }
 
+
 uint32_t
-GlobalsManager::AddGlobal (const uint8_t*     pName,
-                           const uint_t       nameLength,
-                           GlobalValue&       value,
-                           const uint32_t     typeOffset)
+GlobalsManager::AddGlobal (const uint8_t* const name,
+                           const uint_t         nameLength,
+                           const GlobalValue&   value,
+                           const uint32_t       typeOffset)
 {
-  assert (FindGlobal (pName, nameLength) == INVALID_ENTRY);
+  assert (FindGlobal (name, nameLength) == INVALID_ENTRY);
   assert (mGlobalsEntrys.size () == mStorage.size ());
 
   const uint32_t result   = mGlobalsEntrys.size ();
   const uint32_t IdOffset = mIdentifiers.size ();
 
-  mIdentifiers.insert (mIdentifiers.end (), pName, pName + nameLength);
+  mIdentifiers.insert (mIdentifiers.end (), name, name + nameLength);
   mIdentifiers.push_back (0);
 
   mStorage.push_back (value);
 
   const GlobalEntry entry = {IdOffset, typeOffset};
+
   mGlobalsEntrys.push_back (entry);
 
   return result;
 }
 
+
 uint32_t
-GlobalsManager::FindGlobal (const uint8_t* pName,
-                            const uint_t   nameLength)
+GlobalsManager::FindGlobal (const uint8_t* const name,
+                            const uint_t         nameLength)
 {
   assert (mGlobalsEntrys.size () == mStorage.size ());
 
@@ -76,12 +83,15 @@ GlobalsManager::FindGlobal (const uint8_t* pName,
 
   while (iterator < mGlobalsEntrys.size ())
     {
-      const GlobalEntry& entry      = mGlobalsEntrys[iterator];
-      const char*      pEntryName = _RC (const char*,
-                                           &mIdentifiers [entry.mIdOffet]);
+      const GlobalEntry& entry     = mGlobalsEntrys[iterator];
+      const char* const  entryName = _RC (const char*,
+                                          &mIdentifiers [entry.mIdOffet]);
 
-      if (strncmp (pEntryName, _RC (const char*, pName), nameLength) == 0)
-        return iterator;
+      if ((strlen (entryName) == nameLength)
+          && memcmp (entryName, name, nameLength) == 0)
+        {
+          return iterator;
+        }
 
       ++iterator;
     }
@@ -89,18 +99,6 @@ GlobalsManager::FindGlobal (const uint8_t* pName,
   return INVALID_ENTRY;
 }
 
-GlobalValue&
-GlobalsManager::GetGlobal (const uint32_t glbId)
-{
-  const uint32_t index = glbId & ~GLOBAL_ID;
-
-  assert (mGlobalsEntrys.size () == mStorage.size ());
-
-  if ((IsValid (glbId) == false) || (index >= mStorage.size ()))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
-
-  return mStorage[index];
-}
 
 const uint8_t*
 GlobalsManager::Name (const uint_t index) const
@@ -113,8 +111,21 @@ GlobalsManager::Name (const uint_t index) const
   return  &mIdentifiers [entry.mIdOffet];
 }
 
+GlobalValue&
+GlobalsManager::Value (const uint32_t glbId)
+{
+  const uint32_t index = glbId & ~GLOBAL_ID;
+
+  assert (mGlobalsEntrys.size () == mStorage.size ());
+
+  if ((IsValid (glbId) == false) || (index >= mStorage.size ()))
+    throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
+
+  return mStorage[index];
+}
+
 const uint8_t*
-GlobalsManager::GetGlobalTI (const uint32_t glbId)
+GlobalsManager::TypeDescription (const uint32_t glbId)
 {
   const uint32_t index = glbId & ~GLOBAL_ID;
 
@@ -126,7 +137,9 @@ GlobalsManager::GetGlobalTI (const uint32_t glbId)
     throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   TypeManager&   typeMgr = mNames.GetTypeManager ();
-  const uint8_t* pType   = typeMgr.GetType (mGlobalsEntrys[index].mTypeOffset);
+  const uint8_t* pType   = typeMgr.TypeDescription (
+                                          mGlobalsEntrys[index].mTypeOffset
+                                                   );
 
   assert (typeMgr.IsTypeValid (pType));
 

@@ -41,7 +41,7 @@ class PersistentTable;
 
 
 
-class DbsHandler : public I_DBSHandler
+class DbsHandler : public IDBSHandler
 {
 public:
   DbsHandler (const DBSSettings&    settings,

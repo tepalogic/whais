@@ -125,7 +125,7 @@ test_op_notb (Session& session)
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull () || (result.mValue == value.mValue))
     return false;
@@ -149,7 +149,7 @@ test_op_not (Session& session)
     return false;
 
   DInt16 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull () || (result.mValue != ~value.mValue))
     return false;
@@ -176,7 +176,7 @@ test_op_andXX (Session&       session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull () || (result != DBS_T (val1.mValue & val2.mValue)))
     return false;
@@ -203,7 +203,7 @@ test_op_orXX (Session&        session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull () || (result != DBS_T (val1.mValue | val2.mValue)))
     return false;
@@ -230,7 +230,7 @@ test_op_xorXX (Session&       session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull () || (result != DBS_T (val1.mValue ^ val2.mValue)))
     return false;
@@ -255,7 +255,7 @@ main ()
     const DBool  val1_b (true), val2_b (false);
     const DInt64 val1_i (11), val2_i (23);
 
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit callBuf (callTestProgram,
                                  sizeof callTestProgram,

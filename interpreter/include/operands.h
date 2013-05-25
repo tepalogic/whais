@@ -39,16 +39,16 @@ static const uint_t MAX_OP_QWORDS = 6;
 
 class StackValue;
 
-class INTERP_SHL I_Operand
+class INTERP_SHL IOperand
 {
+  friend class StackValue;
+
 public:
-  I_Operand ()
+  IOperand ()
   {
   }
 
-  virtual ~I_Operand ()
-  {
-  }
+  virtual ~IOperand ();
 
   virtual bool IsNull () const = 0;
 
@@ -115,17 +115,22 @@ public:
 
   virtual uint_t GetType () = 0;
 
-  virtual FIELD_INDEX   GetField () = 0;
-  virtual ITable&   GetTable () = 0;
-  virtual StackValue    GetFieldAt (const FIELD_INDEX field) = 0;
-  virtual StackValue    GetValueAt (const uint64_t index) = 0;
+  virtual FIELD_INDEX GetField () = 0;
+
+  virtual ITable& GetTable () = 0;
+
+  virtual StackValue GetFieldAt (const FIELD_INDEX field) = 0;
+
+  virtual StackValue GetValueAt (const uint64_t index) = 0;
 
   virtual StackValue Duplicate () const = 0;
 
 protected:
-  friend class StackValue;
+
   virtual void NotifyCopy () = 0;
 };
+
+
 
 class StackValue
 {
@@ -133,7 +138,7 @@ public:
   template <class OP_T>
   explicit StackValue (const OP_T& op)
   {
-    const I_Operand& compileTest = op;
+    const IOperand& compileTest = op;
     (void)compileTest;  //Just to make sure the right type is used.
 
     assert (sizeof (OP_T) <= sizeof (mStorage));
@@ -143,18 +148,23 @@ public:
 
   StackValue (const StackValue& source)
   {
-    I_Operand& op = _CC (I_Operand&,
-                         _RC (const I_Operand&, source.mStorage));
+    IOperand& op = _CC (IOperand&, _RC (const IOperand&, source.mStorage));
+
     op.NotifyCopy ();
 
     memcpy (&mStorage, &source.mStorage, sizeof mStorage);
   }
 
+  ~StackValue ()
+  {
+    Clear ();
+  }
+
   StackValue&
   operator= (const StackValue& source)
   {
-    I_Operand& op = _CC (I_Operand&,
-                         _RC (const I_Operand&, source.mStorage));
+    IOperand& op = _CC (IOperand&, _RC (const IOperand&, source.mStorage));
+
     op.NotifyCopy ();
 
     Clear ();
@@ -163,21 +173,21 @@ public:
     return *this;
   }
 
-  ~StackValue ()
+  IOperand& Operand ()
   {
-    Clear ();
+    return *_RC (IOperand*, mStorage);
   }
-
-  I_Operand& GetOperand () { return *_RC (I_Operand*, mStorage);  }
 
 private:
   void Clear ()
   {
-    GetOperand ().~I_Operand ();
+    Operand ().~IOperand ();
   }
 
-  uint64_t mStorage [MAX_OP_QWORDS];
+  uint64_t mStorage[MAX_OP_QWORDS];
 };
+
+
 
 class INTERP_SHL SessionStack
 {
@@ -203,7 +213,7 @@ public:
   void  Push (const DUInt64& value);
   void  Push (const DText& value);
   void  Push (const DArray& value);
-  void  Push (I_DBSHandler& dbs, ITable& table);
+  void  Push (IDBSHandler& dbs, ITable& table);
 
   void  Push (const StackValue& value);
 
@@ -217,6 +227,8 @@ private:
   std::vector<StackValue> mStack;
 };
 
+
 } //namespace whisper
 
 #endif /* OPERANDS_H_ */
+

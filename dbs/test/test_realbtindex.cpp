@@ -195,7 +195,7 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 }
 
 bool
-test_table_index_survival (I_DBSHandler& dbsHnd, DArray& tableValues)
+test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
 {
   bool result = true;
   std::cout << "Test index survival ... ";
@@ -267,7 +267,7 @@ callback_index_create (CreateIndexCallbackContext* const pData)
 }
 
 bool
-test_index_creation (I_DBSHandler& dbsHnd, DArray& tableValues)
+test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
 {
   CreateIndexCallbackContext data;
   bool result = true;
@@ -344,7 +344,7 @@ main (int argc, char **argv)
     DBSCreateDatabase (db_name);
   }
 
-  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
   handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
 
   {

@@ -34,13 +34,19 @@
 namespace whisper {
 namespace prima {
 
+
+
 class NameSpace;
+
+
 
 struct GlobalEntry
 {
   uint32_t  mIdOffet;
   uint32_t  mTypeOffset;
 };
+
+
 
 class GlobalsManager
 {
@@ -55,18 +61,23 @@ public:
 
   ~GlobalsManager ();
 
-  uint_t Count () const { return mGlobalsEntrys.size (); };
+  uint_t Count () const
+  {
+    return mGlobalsEntrys.size ();
+  }
 
-  uint32_t           AddGlobal (const uint8_t*     pName,
-                                const uint_t       nameLength,
-                                GlobalValue&       value,
-                                const uint32_t     tiOffset);
-  uint32_t           FindGlobal (const uint8_t *const pName,
-                                 const uint_t         nameLength);
+  uint32_t AddGlobal (const uint8_t* const name,
+                      const uint_t         nameLength,
+                      const GlobalValue&   value,
+                      const uint32_t       tiOffset);
 
-  GlobalValue&       GetGlobal (const uint32_t glbId);
-  const uint8_t*     Name (const uint_t index) const;
-  const uint8_t*     GetGlobalTI (const uint32_t glbId);
+  uint32_t FindGlobal (const uint8_t *const name, const uint_t nameLength);
+
+  const uint8_t* Name (const uint_t index) const;
+
+  GlobalValue& Value (const uint32_t glbId);
+
+  const uint8_t* TypeDescription (const uint32_t glbId);
 
   static bool IsValid (const uint32_t glbId)
   {

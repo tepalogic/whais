@@ -154,7 +154,7 @@ print_field_desc (const DBSFieldDescriptor& desc, const bool indexed)
 static bool
 cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  I_DBSHandler&              dbsHnd  = *_RC (I_DBSHandler*, context);
+  IDBSHandler&              dbsHnd  = *_RC (IDBSHandler*, context);
   size_t                     linePos = 0;
   string                     token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL       level   = GetVerbosityLevel ();
@@ -278,7 +278,7 @@ invalid_args:
 static bool
 cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  I_DBSHandler&        dbsHnd  = *_RC (I_DBSHandler*, context);
+  IDBSHandler&        dbsHnd  = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
@@ -327,7 +327,7 @@ invalid_args:
 static bool
 cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  I_DBSHandler&        dbsHnd  = *_RC (I_DBSHandler*, context);
+  IDBSHandler&        dbsHnd  = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
@@ -400,7 +400,7 @@ create_index_call_back (CreateIndexCallbackContext* cbData)
 static bool
 cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  I_DBSHandler&        dbsHnd  = *_RC (I_DBSHandler*, context);
+  IDBSHandler&        dbsHnd  = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
@@ -484,7 +484,7 @@ invalid_args:
 static bool
 cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  I_DBSHandler&        dbsHnd  = *_RC (I_DBSHandler*, context);
+  IDBSHandler&        dbsHnd  = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();

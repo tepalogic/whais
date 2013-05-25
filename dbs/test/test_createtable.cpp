@@ -30,7 +30,7 @@ operator!= (const DBSFieldDescriptor& field_1,
 }
 
 bool
-test_for_no_args (I_DBSHandler& rDbs)
+test_for_no_args (IDBSHandler& rDbs)
 {
   bool result = false;
 
@@ -70,7 +70,7 @@ test_for_no_args (I_DBSHandler& rDbs)
 }
 
 bool
-test_for_invalid_fields (I_DBSHandler& rDbs)
+test_for_invalid_fields (IDBSHandler& rDbs)
 {
   bool result = false;
   DBSFieldDescriptor temp;
@@ -137,7 +137,7 @@ test_for_invalid_fields (I_DBSHandler& rDbs)
 }
 
 bool
-test_for_one_field (I_DBSHandler& rDbs)
+test_for_one_field (IDBSHandler& rDbs)
 {
   bool result = true;
 
@@ -177,7 +177,7 @@ struct StorageInterval
   };
 
 bool
-test_for_fields (I_DBSHandler& rDbs,
+test_for_fields (IDBSHandler& rDbs,
                  DBSFieldDescriptor* pDesc,
                  const uint32_t fieldsCount)
 {
@@ -302,7 +302,7 @@ main ()
     DBSCreateDatabase (db_name);
   }
 
-  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
   success = test_for_no_args (handler);
   success = success && test_for_invalid_fields (handler);

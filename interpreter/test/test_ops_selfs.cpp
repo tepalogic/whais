@@ -120,10 +120,10 @@ test_op_saddXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -167,10 +167,10 @@ test_op_ssubXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -214,10 +214,10 @@ test_op_smulXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -261,10 +261,10 @@ test_op_sdivXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -308,10 +308,10 @@ test_op_smodXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -355,10 +355,10 @@ test_op_sandXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -402,10 +402,10 @@ test_op_sxorXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -449,10 +449,10 @@ test_op_sorXX (Session& session,
     return false;
 
   DBS_T modified;
-  stack[0].GetOperand ().GetValue (modified);
+  stack[0].Operand ().GetValue (modified);
 
   DBS_T result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != modified)
     return false;
@@ -484,7 +484,7 @@ main ()
     DInt16    val1_i (100), val2_i (26);
     DRichReal val1_rr (123.11), val2_rr (23.12);
 
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit dummy (dummyProgram,
                                sizeof dummyProgram,

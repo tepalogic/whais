@@ -143,7 +143,7 @@ my_postman (WH_MESSENGER_CTXT data,
 }
 
 bool
-load_unit (I_Session&           session,
+load_unit (ISession&           session,
            const uint8_t* const unitCode,
            const uint_t         unitCodeSize)
 {
@@ -201,7 +201,7 @@ find_field_desc (const char* const   name,
 }
 
 static bool
-test_fields_are_ok (I_Session&            session,
+test_fields_are_ok (ISession&            session,
                     const char*         glbName,
                     const uint_t          glbId,
                     TableFieldDesc*       fields,
@@ -262,7 +262,7 @@ test_fields_are_ok (I_Session&            session,
   return true;
 }
 
-bool test_globals (I_Session&     session,
+bool test_globals (ISession&     session,
                    GlobalDescs    glb_desc[],
                    const uint_t   glbs_count)
 {
@@ -353,8 +353,8 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& adminSession = GetInstance (NULL);
-    I_Session& userSession  = GetInstance (test_db1);
+    ISession& adminSession = GetInstance (NULL);
+    ISession& userSession  = GetInstance (test_db1);
 
     success = true;
     success = success && load_unit (adminSession,

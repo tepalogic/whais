@@ -120,7 +120,7 @@ test_op_eqXX (Session& session,
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -161,7 +161,7 @@ test_op_neXX (Session& session,
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -202,7 +202,7 @@ test_op_ltXX (Session& session,
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -243,7 +243,7 @@ test_op_leXX (Session& session,
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -284,7 +284,7 @@ test_op_gtXX (Session& session,
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -325,7 +325,7 @@ test_op_geXX (Session& session,
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -348,7 +348,7 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit dummy (dummyProgram,
                                sizeof dummyProgram,

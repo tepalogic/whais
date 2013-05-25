@@ -201,7 +201,7 @@ test_op_inull (Session& session)
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DBool (true) )
     return false;
@@ -235,7 +235,7 @@ test_op_nnull (Session& session)
     return false;
 
   DBool result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (stack.Size () != 1)
     return false;
@@ -261,7 +261,7 @@ test_op_call (Session& session)
     return false;
 
   DUInt8 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DUInt8 (24) )
     return false;
@@ -287,12 +287,12 @@ test_op_text_index (Session& session)
     return false;
 
   DChar result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != value )
     return false;
 
-  stack[0].GetOperand ().GetValue (text);
+  stack[0].Operand ().GetValue (text);
   value = text.CharAt (0);
 
   if (value != DChar('B') )
@@ -321,12 +321,12 @@ test_op_array_index (Session& session)
     return false;
 
   DInt8 result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != value )
     return false;
 
-  stack[0].GetOperand ().GetValue (array);
+  stack[0].Operand ().GetValue (array);
   array.Get (0, value);
 
   if (value != DInt8 (10) )
@@ -358,12 +358,12 @@ test_op_table_index (Session& session)
     return false;
 
   DInt8 result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].GetOperand ().GetTable ();
+  ITable& stackTable = stack[0].Operand ().GetTable ();
 
   if (&stackTable != &tempTable)
     return false;
@@ -398,12 +398,12 @@ test_op_field_index (Session& session)
     return false;
 
   DInt8 result;
-  stack[1].GetOperand ().GetValue (result);
+  stack[1].Operand ().GetValue (result);
 
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].GetOperand ().GetTable ();
+  ITable& stackTable = stack[0].Operand ().GetTable ();
 
   if (&stackTable != &tempTable)
     return false;
@@ -450,7 +450,7 @@ test_op_jfc (Session& session)
     return false;
 
   DInt8 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (0) )
     return false;
@@ -465,7 +465,7 @@ test_op_jfc (Session& session)
   if (stack.Size () != 1)
     return false;
 
-   stack[0].GetOperand ().GetValue (result);
+   stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (1) )
     return false;
@@ -508,7 +508,7 @@ test_op_jtc (Session& session)
     return false;
 
   DInt8 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (0) )
     return false;
@@ -523,7 +523,7 @@ test_op_jtc (Session& session)
   if (stack.Size () != 1)
     return false;
 
-   stack[0].GetOperand ().GetValue (result);
+   stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (1) )
     return false;
@@ -567,7 +567,7 @@ test_op_jf (Session& session)
     return false;
 
   DInt8 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (0) )
     return false;
@@ -582,7 +582,7 @@ test_op_jf (Session& session)
   if (stack.Size () != 1)
     return false;
 
-   stack[0].GetOperand ().GetValue (result);
+   stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (1) )
     return false;
@@ -625,7 +625,7 @@ test_op_jt (Session& session)
     return false;
 
   DInt8 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (0) )
     return false;
@@ -640,7 +640,7 @@ test_op_jt (Session& session)
   if (stack.Size () != 1)
     return false;
 
-   stack[0].GetOperand ().GetValue (result);
+   stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (1) )
     return false;
@@ -682,7 +682,7 @@ test_op_jmp (Session& session)
     return false;
 
   DInt8 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result != DInt8 (10) )
     return false;
@@ -704,7 +704,7 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit callBuf (callTestProgram,
                                  sizeof callTestProgram,

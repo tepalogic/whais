@@ -35,67 +35,29 @@
 
 #include "operands.h"
 
+
+
 namespace whisper
 {
+
 
 
 class InterException : public Exception
 {
 public:
-  explicit InterException (const char*  message,
-                           const char*  file,
-                           const uint32_t line,
-                           const uint32_t extra)
+  explicit InterException (const char* const message,
+                           const char* const file,
+                           const uint32_t    line,
+                           const uint32_t    extra)
     : Exception (message, file, line, extra)
   {
   }
 
-  virtual ~InterException ()
-  {
-  }
+  virtual Exception* Clone () const;
 
-  virtual Exception*      Clone () const { return new InterException (*this); }
-  virtual EXPCEPTION_TYPE Type () const { return INTERPRETER_EXCEPTION; }
-  virtual const char*   Description () const
-  {
-    switch (Extra ())
-      {
-        case INVALID_OP_CONVERSION:
-          return "Invalid operand conversion.";
-        case INVALID_OP_REQ:
-          return "Invalid operand request.";
-        case INVALID_GLOBAL_REQ:
-          return "Invalid global value request.";
-        case INVALID_TYPE_DESC:
-          return "Invalid type description.";
-        case DUPLICATE_DEFINITION:
-          return "Definition two global symbols with the same name.";
-        case EXTERNAL_FIRST:
-          return "An external declaration of a symbol encountered before "
-                 "it's definition.";
-        case EXTERNAL_MISMATCH:
-          return "Declaration of an external symbol is different from "
-                 "its definition.";
-        case INVALID_PROC_REQ:
-          return "Invalid procedure request.";
-        case INVALID_LOCAL_REQ:
-          return "Invalid local value request.";
-        case ALREADY_INITED:
-          return "Already initialized.";
-        case NOT_INITED:
-          return "Not initialized.";
-         case INVALID_SESSION:
-          return "Invalid session.";
-         case SESSION_IN_USE:
-          return "Session in use.";
-         case TEXT_ARRAY_NOT_SUPP:
-          return "The current implementation does not have support for "
-                 "text arrays.";
-         default:
-             assert (false);
-             return "Unknown exception.";
-      }
-  }
+  virtual EXPCEPTION_TYPE Type () const;
+
+  virtual const char* Description () const;
 
   enum
   {
@@ -136,78 +98,90 @@ public:
   };
 };
 
-class INTERP_SHL I_Session
+
+
+class INTERP_SHL ISession
 {
 public:
-  I_Session (Logger& log);
-  virtual ~I_Session ();
+  ISession (Logger& log);
+  virtual ~ISession ();
 
   virtual void LoadCompiledUnit (WIFunctionalUnit& unit) = 0;
-  virtual void ExecuteProcedure (const char* const pProcName,
+
+  virtual void ExecuteProcedure (const char* const   name,
                                  SessionStack&       stack) = 0;
 
   virtual uint_t GlobalValuesCount () const = 0;
+
   virtual uint_t ProceduresCount () const = 0;
 
   virtual const char* GlobalValueName (const uint_t index) const = 0;
+
   virtual const char* ProcedureName (const uint_t index) const = 0;
 
   virtual uint_t GlobalValueRawType (const uint32_t index) = 0;
   virtual uint_t GlobalValueRawType (const char* const name) = 0;
+
   virtual uint_t GlobalValueFieldsCount (const uint32_t index) = 0;
   virtual uint_t GlobalValueFieldsCount (const char* const name) = 0;
 
   virtual const char* GlobalValueFieldName (const uint32_t index,
-                                              const uint32_t field) = 0;
-  virtual const char* GlobalValueFieldName (const char* const name,
-                                              const uint32_t      field) = 0;
+                                            const uint32_t field) = 0;
+  virtual const char* GlobalValueFieldName (const char* const   name,
+                                            const uint32_t      field) = 0;
 
   virtual uint_t GlobalValueFieldType (const uint32_t index,
                                        const uint32_t field) = 0;
-  virtual uint_t GlobalValueFieldType (const char* const name,
+  virtual uint_t GlobalValueFieldType (const char* const   name,
                                        const uint32_t      field) = 0;
 
   virtual uint_t ProcedureParametersCount (const uint_t id) const = 0;
   virtual uint_t ProcedureParametersCount (const char* const name) const = 0;
+
   virtual uint_t ProcedurePameterRawType (const uint_t id,
                                           const uint_t param) = 0;
-  virtual uint_t ProcedurePameterRawType (const char* const name,
+  virtual uint_t ProcedurePameterRawType (const char* const   name,
                                           const uint_t        param) = 0;
+
   virtual uint_t ProcedurePameterFieldsCount (const uint_t id,
                                               const uint_t param) = 0;
-  virtual uint_t ProcedurePameterFieldsCount (const char* const name,
+  virtual uint_t ProcedurePameterFieldsCount (const char* const   name,
                                               const uint_t        param ) = 0;
-  virtual const char* ProcedurePameterFieldName (
-                                                const uint_t id,
-                                                const uint_t param,
-                                                const uint_t field
-                                                  ) = 0;
-  virtual const char* ProcedurePameterFieldName (
-                                                const char* const name,
-                                                const uint_t        param,
-                                                const uint_t        field
-                                                  ) = 0;
+
+  virtual const char* ProcedurePameterFieldName (const uint_t id,
+                                                 const uint_t param,
+                                                 const uint_t field ) = 0;
+  virtual const char* ProcedurePameterFieldName (const char* const   name,
+                                                 const uint_t        param,
+                                                 const uint_t        field) = 0;
+
   virtual uint_t ProcedurePameterFieldType (const uint_t id,
                                             const uint_t param,
                                             const uint_t field) = 0;
-  virtual uint_t ProcedurePameterFieldType (const char* const name,
+  virtual uint_t ProcedurePameterFieldType (const char* const   name,
                                             const uint_t        param,
                                             const uint_t        field) = 0;
 protected:
   Logger& mLog;
 };
 
+
+
 INTERP_SHL void
 InitInterpreter (const char* adminDbsDir = NULL);
 
-INTERP_SHL I_Session&
-GetInstance (const char* pName, Logger* pLog = NULL);
+
+INTERP_SHL ISession&
+GetInstance (const char* name, Logger* log = NULL);
+
 
 INTERP_SHL void
-ReleaseInstance (I_Session& hInstance);
+ReleaseInstance (ISession& instance);
+
 
 INTERP_SHL void
 CleanInterpreter (const bool force = false);
+
 
 } // namespace whisper
 

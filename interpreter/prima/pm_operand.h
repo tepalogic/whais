@@ -32,8 +32,12 @@
 
 #include "pm_table.h"
 
+
+
 namespace whisper {
 namespace prima {
+
+
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
@@ -44,6 +48,7 @@ internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
   return _SC (T_DEST, firstOp.mValue + secondOp.mValue);
 }
 
+
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_sub (const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -52,6 +57,7 @@ internal_sub (const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST (firstOp.mValue - secondOp.mValue);
 }
+
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_mul (const T_DEST& firstOp, const T_SRC& secondOp)
@@ -62,6 +68,7 @@ internal_mul (const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST (firstOp.mValue * secondOp.mValue);
 }
 
+
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_div (const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -70,6 +77,7 @@ internal_div (const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST (firstOp.mValue / secondOp.mValue);
 }
+
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_mod (const T_DEST& firstOp, const T_SRC& secondOp)
@@ -80,6 +88,7 @@ internal_mod (const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST (firstOp.mValue % secondOp.mValue);
 }
 
+
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_and (const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -88,6 +97,7 @@ internal_and (const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST (firstOp.mValue & secondOp.mValue);
 }
+
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_xor (const T_DEST& firstOp, const T_SRC& secondOp)
@@ -98,6 +108,7 @@ internal_xor (const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST (firstOp.mValue ^ secondOp.mValue);
 }
 
+
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -107,6 +118,7 @@ internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST (firstOp.mValue ^ secondOp.mValue);
 }
 
+
 template <typename T_SRC, typename T_DEST> void
 number_convert (const T_SRC& from, T_DEST& to)
 {
@@ -114,10 +126,14 @@ number_convert (const T_SRC& from, T_DEST& to)
 }
 
 
+
+
 class TableOperand;
 class FieldOperand;
 
-class I_PMOperand : public I_Operand
+
+
+class BaseOperand : public IOperand
 {
 public:
 
@@ -184,26 +200,32 @@ public:
   virtual void SelfOr (const DInt64& value);
   virtual void SelfOr (const DBool& value);
 
-  //Special treatment for these
-  virtual FIELD_INDEX   GetField ();
-  virtual ITable&   GetTable ();
-  virtual StackValue    GetFieldAt (const FIELD_INDEX field);
-  virtual StackValue    GetValueAt (const uint64_t index);
+  virtual FIELD_INDEX GetField ();
 
-  virtual TableOperand  GetTableOp ();
-  virtual void          CopyTableOp (const TableOperand& source);
+  virtual ITable& GetTable ();
 
-  virtual FieldOperand  GetFieldOp ();
-  virtual void          CopyFieldOp (const FieldOperand& source);
+  virtual StackValue GetFieldAt (const FIELD_INDEX field);
 
-  virtual void          NotifyCopy ();
+  virtual StackValue GetValueAt (const uint64_t index);
+
+  virtual TableOperand GetTableOp ();
+
+  virtual void CopyTableOp (const TableOperand& source);
+
+  virtual FieldOperand GetFieldOp ();
+
+  virtual void CopyFieldOp (const FieldOperand& source);
+
+  virtual void NotifyCopy ();
 };
 
-class NullOperand : public I_PMOperand
+
+
+class NullOperand : public BaseOperand
 {
 public:
   NullOperand ()
-    : I_PMOperand ()
+    : BaseOperand ()
   {
   }
 
@@ -234,15 +256,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
-class BoolOperand : public I_PMOperand
+
+class BoolOperand : public BaseOperand
 {
 public:
   explicit BoolOperand (const DBool& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~BoolOperand ();
 
   virtual bool IsNull () const;
 
@@ -251,7 +273,9 @@ public:
   virtual void SetValue (const DBool& value);
 
   virtual void SelfAnd (const DBool& value);
+
   virtual void SelfXor (const DBool& value);
+
   virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
@@ -262,15 +286,15 @@ private:
   DBool mValue;
 };
 
-class CharOperand : public I_PMOperand
+
+class CharOperand : public BaseOperand
 {
 public:
   explicit CharOperand (const DChar& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~CharOperand ();
 
   virtual bool IsNull () const;
 
@@ -287,15 +311,15 @@ private:
   DChar mValue;
 };
 
-class DateOperand : public I_PMOperand
+
+class DateOperand : public BaseOperand
 {
 public:
   explicit DateOperand (const DDate& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~DateOperand ();
 
   virtual bool IsNull () const;
 
@@ -313,15 +337,15 @@ private:
   DDate mValue;
 };
 
-class DateTimeOperand : public I_PMOperand
+
+class DateTimeOperand : public BaseOperand
 {
 public:
   explicit DateTimeOperand (const DDateTime& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~DateTimeOperand ();
 
   virtual bool IsNull () const;
 
@@ -339,15 +363,15 @@ private:
   DDateTime mValue;
 };
 
-class HiresTimeOperand : public I_PMOperand
+
+class HiresTimeOperand : public BaseOperand
 {
 public:
   explicit HiresTimeOperand (const DHiresTime& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~HiresTimeOperand ();
 
   virtual bool IsNull () const;
 
@@ -365,15 +389,15 @@ private:
   DHiresTime mValue;
 };
 
-class UInt8Operand : public I_PMOperand
+
+class UInt8Operand : public BaseOperand
 {
 public:
   explicit UInt8Operand (const DUInt8& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~UInt8Operand ();
 
   virtual bool IsNull () const;
 
@@ -401,7 +425,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -412,16 +438,15 @@ private:
   DUInt8 mValue;
 };
 
-class UInt16Operand : public I_PMOperand
+
+class UInt16Operand : public BaseOperand
 {
 public:
   explicit UInt16Operand (const DUInt16& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-
-  virtual ~UInt16Operand ();
 
   virtual bool IsNull () const;
 
@@ -460,18 +485,17 @@ private:
   DUInt16 mValue;
 };
 
-class UInt32Operand : public I_PMOperand
+
+class UInt32Operand : public BaseOperand
 {
 public:
   explicit UInt32Operand (const DUInt32& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
 
   virtual bool IsNull () const;
-
-  virtual ~UInt32Operand ();
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -497,7 +521,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -508,16 +534,15 @@ private:
   DUInt32 mValue;
 };
 
-class UInt64Operand : public I_PMOperand
+
+class UInt64Operand : public BaseOperand
 {
 public:
   explicit UInt64Operand (const DUInt64& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-
-  virtual ~UInt64Operand ();
 
   virtual bool IsNull () const;
 
@@ -545,7 +570,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -556,16 +583,15 @@ private:
   DUInt64 mValue;
 };
 
-class Int8Operand : public I_PMOperand, public DInt8
+
+class Int8Operand : public BaseOperand, public DInt8
 {
 public:
   explicit Int8Operand (const DInt8& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-
-  virtual ~Int8Operand ();
 
   virtual bool IsNull () const;
 
@@ -593,7 +619,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -604,16 +632,15 @@ private:
   DInt8 mValue;
 };
 
-class Int16Operand : public I_PMOperand, public DInt16
+
+class Int16Operand : public BaseOperand, public DInt16
 {
 public:
   explicit Int16Operand (const DInt16& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-
-  virtual ~Int16Operand ();
 
   virtual bool IsNull () const;
 
@@ -641,7 +668,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -652,15 +681,15 @@ private:
   DInt16 mValue;
 };
 
-class Int32Operand : public I_PMOperand
+
+class Int32Operand : public BaseOperand
 {
 public:
   explicit Int32Operand (const DInt32& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~Int32Operand ();
 
   virtual bool IsNull () const;
 
@@ -688,7 +717,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -699,15 +730,15 @@ private:
   DInt32 mValue;
 };
 
-class Int64Operand : public I_PMOperand
+
+class Int64Operand : public BaseOperand
 {
 public:
   explicit Int64Operand (const DInt64& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-  virtual ~Int64Operand ();
 
   virtual bool IsNull () const;
 
@@ -735,7 +766,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -747,16 +780,14 @@ private:
 };
 
 
-class RealOperand : public I_PMOperand
+class RealOperand : public BaseOperand
 {
 public:
   explicit RealOperand (const DReal& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-
-  virtual ~RealOperand ();
 
   virtual bool IsNull () const;
 
@@ -785,16 +816,15 @@ private:
   DReal mValue;
 };
 
-class RichRealOperand : public I_PMOperand
+
+class RichRealOperand : public BaseOperand
 {
 public:
   explicit RichRealOperand (const DRichReal& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
-
-  virtual ~RichRealOperand ();
 
   virtual bool IsNull () const;
 
@@ -823,19 +853,20 @@ private:
   DRichReal mValue;
 };
 
-class TextOperand : public I_PMOperand
+
+class TextOperand : public BaseOperand
 {
 public:
   explicit TextOperand (const DText& value)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (value)
   {
   }
+
   virtual bool IsNull () const;
 
-  virtual ~TextOperand ();
-
   virtual void GetValue (DText& outValue) const;
+
   virtual void SetValue (const DText& value);
 
   virtual void SelfAdd (const DChar& value);
@@ -846,17 +877,19 @@ public:
   virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
-  virtual void       NotifyCopy ();
+
+  virtual void NotifyCopy ();
 
 private:
   DText mValue;
 };
 
-class CharTextElOperand : public I_PMOperand
+
+class CharTextElOperand : public BaseOperand
 {
 public:
   CharTextElOperand (DText &text, const uint64_t index)
-    : I_PMOperand (),
+    : BaseOperand (),
       mIndex (index),
       mText ()
   {
@@ -864,15 +897,12 @@ public:
   }
 
   CharTextElOperand (const CharTextElOperand& source)
-    : I_PMOperand (),
+    : BaseOperand (),
       mIndex (source.mIndex),
       mText ()
   {
     source.mText.MakeMirror (mText);
   }
-
-
-  virtual ~CharTextElOperand ();
 
   virtual bool IsNull () const;
 
@@ -884,27 +914,29 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
-  virtual void       NotifyCopy ();
+
+  virtual void NotifyCopy ();
 
 private:
   const uint64_t mIndex;
-  DText        mText;
+  DText          mText;
 };
 
-class ArrayOperand : public I_PMOperand
+
+class ArrayOperand : public BaseOperand
 {
 public:
   explicit ArrayOperand (const DArray& array)
-    : I_PMOperand (),
+    : BaseOperand (),
       mValue (array),
       mFirstArrayType (array.Type ())
     {
     }
-  virtual ~ArrayOperand ();
 
   virtual bool IsNull () const;
 
   virtual void GetValue (DArray& outValue) const;
+
   virtual void SetValue (const DArray& value);
 
   virtual uint_t GetType ();
@@ -912,18 +944,20 @@ public:
   virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
-  virtual void       NotifyCopy ();
+
+  virtual void NotifyCopy ();
 
 private:
-  DArray mValue;
-  uint16_t mFirstArrayType;
+  DArray    mValue;
+  uint16_t  mFirstArrayType;
 };
 
-class BaseArrayElOperand : public I_PMOperand
+
+class BaseArrayElOperand : public BaseOperand
 {
 protected:
   BaseArrayElOperand (DArray& array, const uint64_t index)
-    : I_PMOperand (),
+    : BaseOperand (),
       mElementIndex (index),
       mArray  ()
   {
@@ -931,14 +965,13 @@ protected:
   }
 
   BaseArrayElOperand (const BaseArrayElOperand& source)
-    : I_PMOperand (),
+    : BaseOperand (),
       mElementIndex (source.mElementIndex),
       mArray ()
   {
     source.mArray.MakeMirror (mArray);
   }
 
-  virtual ~BaseArrayElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
@@ -961,6 +994,7 @@ private:
   DArray       mArray;
 };
 
+
 class BoolArrayElOperand : public BaseArrayElOperand
 {
 public:
@@ -976,13 +1010,16 @@ public:
   virtual void SetValue (const DBool& value);
 
   virtual void SelfAnd (const DBool& value);
+
   virtual void SelfXor (const DBool& value);
+
   virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class CharArrayElOperand : public BaseArrayElOperand
 {
@@ -1003,6 +1040,7 @@ public:
 
   virtual StackValue Duplicate () const;
 };
+
 
 class DateArrayElOperand : public BaseArrayElOperand
 {
@@ -1025,6 +1063,7 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class DateTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
@@ -1046,6 +1085,7 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class HiresTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
@@ -1066,6 +1106,7 @@ public:
 
   virtual StackValue Duplicate () const;
 };
+
 
 class UInt8ArrayElOperand : public BaseArrayElOperand
 {
@@ -1102,13 +1143,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class UInt16ArrayElOperand : public BaseArrayElOperand
 {
@@ -1144,13 +1188,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class UInt32ArrayElOperand : public BaseArrayElOperand
 {
@@ -1186,13 +1233,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class UInt64ArrayElOperand : public BaseArrayElOperand
 {
@@ -1228,13 +1278,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class Int8ArrayElOperand : public BaseArrayElOperand
 {
@@ -1270,7 +1323,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1312,13 +1367,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class Int32ArrayElOperand : public BaseArrayElOperand
 {
@@ -1354,13 +1412,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class Int64ArrayElOperand : public BaseArrayElOperand
 {
@@ -1396,13 +1457,16 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
 };
+
 
 class RealArrayElOperand : public BaseArrayElOperand
 {
@@ -1436,6 +1500,7 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class RichRealArrayElOperand : public BaseArrayElOperand
 {
 public:
@@ -1468,21 +1533,22 @@ public:
   virtual StackValue Duplicate () const;
 };
 
-class TableOperand : public I_PMOperand
+
+class TableOperand : public BaseOperand
 {
 public:
-  TableOperand (I_DBSHandler& dbsHnd, ITable& table)
-    : I_PMOperand (),
-      mpRefTable (new TableReference (dbsHnd, table))
+  TableOperand (IDBSHandler& dbsHnd, ITable& table)
+    : BaseOperand (),
+      mTableRef (new TableReference (dbsHnd, table))
   {
-    mpRefTable->IncrementRefCount ();
+    mTableRef->IncrementRefCount ();
   }
 
   TableOperand (const TableOperand& source)
-    : I_PMOperand (),
-      mpRefTable (source.mpRefTable)
+    : BaseOperand (),
+      mTableRef (source.mTableRef)
   {
-    mpRefTable->IncrementRefCount ();
+    mTableRef->IncrementRefCount ();
   }
 
   virtual ~TableOperand ();
@@ -1491,9 +1557,9 @@ public:
   {
     if (this != &pSource)
       {
-        mpRefTable->DecrementRefCount ();
-        mpRefTable = pSource.mpRefTable;
-        mpRefTable->IncrementRefCount ();
+        mTableRef->DecrementRefCount ();
+        mTableRef = pSource.mTableRef;
+        mTableRef->IncrementRefCount ();
       }
     return *this;
   }
@@ -1502,31 +1568,35 @@ public:
 
   virtual uint_t GetType ();
 
-  virtual StackValue  GetFieldAt (const FIELD_INDEX field);
+  virtual StackValue GetFieldAt (const FIELD_INDEX field);
+
   virtual ITable& GetTable ();
 
   TableReference& GetTableRef () const
   {
-    assert (mpRefTable != NULL);
+    assert (mTableRef != NULL);
 
-    return *mpRefTable;
+    return *mTableRef;
   }
 
   virtual StackValue Duplicate () const;
-  virtual void       NotifyCopy ();
 
-  virtual TableOperand  GetTableOp ();
-  virtual void          CopyTableOp (const TableOperand& source);
+  virtual void NotifyCopy ();
+
+  virtual TableOperand GetTableOp ();
+
+  virtual void CopyTableOp (const TableOperand& source);
 
 private:
-  TableReference* mpRefTable;
+  TableReference* mTableRef;
 };
 
-class FieldOperand : public I_PMOperand
+
+class FieldOperand : public BaseOperand
 {
 public:
   FieldOperand (const uint32_t fieldType = T_UNDETERMINED)
-    : mpRefTable (NULL),
+    : mTableRef (NULL),
       mField (~0),
       mFieldType (fieldType)
   {
@@ -1545,55 +1615,63 @@ public:
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
+
   virtual ITable& GetTable ();
-  virtual StackValue  GetValueAt (const uint64_t index);
+
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
-  virtual void       NotifyCopy ();
+  virtual void NotifyCopy ();
 
-  virtual FieldOperand  GetFieldOp ();
-  virtual void          CopyFieldOp (const FieldOperand& source);
+  virtual FieldOperand GetFieldOp ();
+
+  virtual void CopyFieldOp (const FieldOperand& source);
 
 private:
-  TableReference* mpRefTable;
-  FIELD_INDEX     mField;
-  uint32_t        mFieldType;
+  TableReference*   mTableRef;
+  FIELD_INDEX       mField;
+  uint32_t          mFieldType;
 };
 
-class BaseFieldElOperand : public I_PMOperand
+
+class BaseFieldElOperand : public BaseOperand
 {
+  friend class CharTextFieldElOperand;
+  friend class TextFieldElOperand;
+  friend class ArrayFieldElOperand;
+
 protected:
-  BaseFieldElOperand (TableReference*   pTableRef,
+  BaseFieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
     : mRow (row),
-      mpRefTable (pTableRef),
+      mTableRef (tableRef),
       mField (field)
   {
-    mpRefTable->IncrementRefCount ();
+    mTableRef->IncrementRefCount ();
   }
 
   BaseFieldElOperand (const BaseFieldElOperand& source)
-    : I_PMOperand (),
+    : BaseOperand (),
       mRow (source.mRow),
-      mpRefTable (source.mpRefTable),
+      mTableRef (source.mTableRef),
       mField (source.mField)
   {
-    mpRefTable->IncrementRefCount ();
+    mTableRef->IncrementRefCount ();
   }
 
   virtual ~BaseFieldElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
-    ITable& table = mpRefTable->GetTable ();
+    ITable& table = mTableRef->GetTable ();
 
     table.Get (mRow, mField, out);
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    ITable& table = mpRefTable->GetTable ();
+    ITable& table = mTableRef->GetTable ();
 
     table.Set (mRow, mField, value);
   }
@@ -1601,24 +1679,21 @@ protected:
   virtual void NotifyCopy ();
 
 private:
-  friend class CharTextFieldElOperand;
-  friend class TextFieldElOperand;
-  friend class ArrayFieldElOperand;
-
   BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
 
-  const ROW_INDEX   mRow;
-  TableReference*   mpRefTable;
-  const FIELD_INDEX mField;
+  const ROW_INDEX       mRow;
+  TableReference*       mTableRef;
+  const FIELD_INDEX     mField;
 };
+
 
 class BoolFieldElOperand : public BaseFieldElOperand
 {
 public:
-  BoolFieldElOperand (TableReference*   pTableRef,
+  BoolFieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1629,7 +1704,9 @@ public:
   virtual void SetValue (const DBool& value);
 
   virtual void SelfAnd (const DBool& value);
+
   virtual void SelfXor (const DBool& value);
+
   virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
@@ -1637,13 +1714,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class CharFieldElOperand : public BaseFieldElOperand
 {
 public:
-  CharFieldElOperand (TableReference*   pTableRef,
+  CharFieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1659,13 +1737,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class DateFieldElOperand : public BaseFieldElOperand
 {
 public:
-  DateFieldElOperand (TableReference*   pTableRef,
+  DateFieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1682,14 +1761,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class DateTimeFieldElOperand : public BaseFieldElOperand
 {
 public:
 
-  DateTimeFieldElOperand (TableReference*   pTableRef,
+  DateTimeFieldElOperand (TableReference*   tableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1706,13 +1786,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class HiresTimeFieldElOperand : public BaseFieldElOperand
 {
 public:
-  HiresTimeFieldElOperand (TableReference*   pTableRef,
+  HiresTimeFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1729,13 +1810,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt8FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt8FieldElOperand (TableReference*   pTableRef,
+  UInt8FieldElOperand (TableReference*   tableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1765,7 +1847,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1773,13 +1857,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt16FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt16FieldElOperand (TableReference*   pTableRef,
+  UInt16FieldElOperand (TableReference*   tableRef,
                         const ROW_INDEX   row,
                         const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1809,7 +1894,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1817,13 +1904,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt32FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt32FieldElOperand (TableReference*   pTableRef,
+  UInt32FieldElOperand (TableReference*   tableRef,
                         const ROW_INDEX   row,
                         const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1853,7 +1941,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1861,13 +1951,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt64FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt64FieldElOperand (TableReference*   pTableRef,
+  UInt64FieldElOperand (TableReference*   tableRef,
                         const ROW_INDEX   row,
                         const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1897,7 +1988,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1905,13 +1998,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int8FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int8FieldElOperand (TableReference*   pTableRef,
+  Int8FieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1941,7 +2035,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1949,13 +2045,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int16FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int16FieldElOperand (TableReference*   pTableRef,
+  Int16FieldElOperand (TableReference*   tableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -1985,7 +2082,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -1993,13 +2092,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int32FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int32FieldElOperand (TableReference*   pTableRef,
+  Int32FieldElOperand (TableReference*   tableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -2029,7 +2129,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2037,13 +2139,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int64FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int64FieldElOperand (TableReference*   pTableRef,
+  Int64FieldElOperand (TableReference*   tableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -2073,7 +2176,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2081,13 +2186,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class RealFieldElOperand : public BaseFieldElOperand
 {
 public:
-  RealFieldElOperand (TableReference*   pTableRef,
+  RealFieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -2115,13 +2221,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class RichRealFieldElOperand : public BaseFieldElOperand
 {
 public:
-  RichRealFieldElOperand (TableReference*   pTableRef,
+  RichRealFieldElOperand (TableReference*   tableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -2149,13 +2256,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class TextFieldElOperand : public BaseFieldElOperand
 {
 public:
-  TextFieldElOperand (TableReference*   pTableRef,
+  TextFieldElOperand (TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -2174,13 +2282,14 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class ArrayFieldElOperand : public BaseFieldElOperand
 {
 public:
-  ArrayFieldElOperand (TableReference*   pTableRef,
+  ArrayFieldElOperand (TableReference*   tableRef,
                        const ROW_INDEX   row,
                        const FIELD_INDEX field)
-    : BaseFieldElOperand (pTableRef, row, field)
+    : BaseFieldElOperand (tableRef, row, field)
   {
   }
 
@@ -2196,14 +2305,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class CharTextFieldElOperand : public BaseFieldElOperand
 {
 public:
-  CharTextFieldElOperand (TableReference*   pTableRef,
+  CharTextFieldElOperand (TableReference*   tableRef,
                           const ROW_INDEX   row,
                           const FIELD_INDEX field,
                           const uint64_t    index)
-    : BaseFieldElOperand (pTableRef, row, field),
+    : BaseFieldElOperand (tableRef, row, field),
       mIndex (index)
   {
   }
@@ -2223,35 +2333,36 @@ private:
   const uint64_t    mIndex;
 };
 
-class BaseArrayFieldElOperand : public I_PMOperand
+
+class BaseArrayFieldElOperand : public BaseOperand
 {
 protected:
-  BaseArrayFieldElOperand (TableReference*   pTableRef,
+  BaseArrayFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
      : mIndex (index),
        mRow (row),
-       mpRefTable (pTableRef),
+       mTableRef (tableRef),
        mField (field)
   {
-    mpRefTable->IncrementRefCount ();
+    mTableRef->IncrementRefCount ();
   }
 
   BaseArrayFieldElOperand (const BaseArrayFieldElOperand& source)
      : mIndex (source.mIndex),
        mRow (source.mRow),
-       mpRefTable (source.mpRefTable),
+       mTableRef (source.mTableRef),
        mField (source.mField)
   {
-    mpRefTable->IncrementRefCount ();
+    mTableRef->IncrementRefCount ();
   }
 
   virtual ~BaseArrayFieldElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& outValue) const
   {
-    ITable& table = mpRefTable->GetTable ();
+    ITable& table = mTableRef->GetTable ();
 
     DArray array;
     table.Get (mRow, mField, array);
@@ -2262,7 +2373,7 @@ protected:
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    ITable& table = mpRefTable->GetTable ();
+    ITable& table = mTableRef->GetTable ();
 
     DArray array;
 
@@ -2280,18 +2391,19 @@ private:
 
   const uint64_t    mIndex;
   const ROW_INDEX   mRow;
-  TableReference*   mpRefTable;
+  TableReference*   mTableRef;
   const FIELD_INDEX mField;
 };
+
 
 class BoolArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  BoolArrayFieldElOperand (TableReference*   pTableRef,
+  BoolArrayFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2302,7 +2414,9 @@ public:
   virtual void SetValue (const DBool& value);
 
   virtual void SelfAnd (const DBool& value);
+
   virtual void SelfXor (const DBool& value);
+
   virtual void SelfOr (const DBool& value);
 
   virtual uint_t GetType ();
@@ -2310,14 +2424,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class CharArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  CharArrayFieldElOperand (TableReference*   pTableRef,
+  CharArrayFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2333,14 +2448,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class DateArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  DateArrayFieldElOperand (TableReference*   pTableRef,
+  DateArrayFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2360,11 +2476,11 @@ public:
 class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  DateTimeArrayFieldElOperand (TableReference*   pTableRef,
+  DateTimeArrayFieldElOperand (TableReference*   tableRef,
                                const ROW_INDEX   row,
                                const FIELD_INDEX field,
                                const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2384,11 +2500,11 @@ public:
 class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  HiresTimeArrayFieldElOperand (TableReference*   pTableRef,
+  HiresTimeArrayFieldElOperand (TableReference*   tableRef,
                                 const ROW_INDEX   row,
                                 const FIELD_INDEX field,
                                 const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2408,11 +2524,11 @@ public:
 class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt8ArrayFieldElOperand (TableReference*   pTableRef,
+  UInt8ArrayFieldElOperand (TableReference*   tableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2442,7 +2558,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2450,14 +2568,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt16ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt16ArrayFieldElOperand (TableReference*   pTableRef,
+  UInt16ArrayFieldElOperand (TableReference*   tableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
                              const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2495,14 +2614,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt32ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt32ArrayFieldElOperand (TableReference*   pTableRef,
+  UInt32ArrayFieldElOperand (TableReference*   tableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
                              const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2532,7 +2652,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2540,14 +2662,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class UInt64ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt64ArrayFieldElOperand (TableReference*   pTableRef,
+  UInt64ArrayFieldElOperand (TableReference*   tableRef,
                              const ROW_INDEX   row,
                              const FIELD_INDEX field,
                              const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2577,7 +2700,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2588,11 +2713,11 @@ public:
 class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int8ArrayFieldElOperand (TableReference*   pTableRef,
+  Int8ArrayFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2622,7 +2747,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2630,14 +2757,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int16ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int16ArrayFieldElOperand (TableReference*   pTableRef,
+  Int16ArrayFieldElOperand (TableReference*   tableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2667,7 +2795,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2675,14 +2805,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int32ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int32ArrayFieldElOperand (TableReference*   pTableRef,
+  Int32ArrayFieldElOperand (TableReference*   tableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2712,7 +2843,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2720,14 +2853,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class Int64ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int64ArrayFieldElOperand (TableReference*   pTableRef,
+  Int64ArrayFieldElOperand (TableReference*   tableRef,
                             const ROW_INDEX   row,
                             const FIELD_INDEX field,
                             const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2757,7 +2891,9 @@ public:
   virtual void SelfMod (const DInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
+
   virtual void SelfXor (const DInt64& value);
+
   virtual void SelfOr (const DInt64& value);
 
   virtual uint_t GetType ();
@@ -2765,14 +2901,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class RealArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  RealArrayFieldElOperand (TableReference*   pTableRef,
+  RealArrayFieldElOperand (TableReference*   tableRef,
                            const ROW_INDEX   row,
                            const FIELD_INDEX field,
                            const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2800,14 +2937,15 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class RichRealArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  RichRealArrayFieldElOperand (TableReference*   pTableRef,
+  RichRealArrayFieldElOperand (TableReference*   tableRef,
                                const ROW_INDEX   row,
                                const FIELD_INDEX field,
                                const uint64_t    index)
-    : BaseArrayFieldElOperand (pTableRef, row, field, index)
+    : BaseArrayFieldElOperand (tableRef, row, field, index)
   {
   }
 
@@ -2835,6 +2973,7 @@ public:
   virtual StackValue Duplicate () const;
 };
 
+
 class GlobalValue
 {
 public:
@@ -2843,7 +2982,7 @@ public:
     : mSync (),
       mOperandOwner (true)
   {
-    const I_PMOperand& compileTest = op;
+    const BaseOperand& compileTest = op;
     (void)compileTest; //Just to make sure OP_T is a valid type!
 
     assert (sizeof (OP_T) <= sizeof (mStorage));
@@ -2876,164 +3015,185 @@ public:
   ~GlobalValue ()
   {
     if (mOperandOwner)
-      GetOperand ().~I_PMOperand ();
+      Operand ().~BaseOperand ();
   }
 
   bool IsNull ()
   {
     LockRAII dummy (mSync);
-    return GetOperand ().IsNull ();
+
+    return Operand ().IsNull ();
   }
 
   template <class DBS_T>
   void GetValue (DBS_T& outValue)
   {
     LockRAII dummy (mSync);
-    GetOperand ().GetValue (outValue);
+
+    Operand ().GetValue (outValue);
   }
 
   template <class DBS_T>
   void SetValue (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SetValue (value);
+
+    Operand ().SetValue (value);
   }
 
   template <class DBS_T>
   void SelfAdd (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfAdd (value);
+
+    Operand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfSub (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfSub (value);
+
+    Operand ().SelfSub (value);
   }
 
   template <class DBS_T>
   void SelfMul (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfAdd (value);
+
+    Operand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfDiv (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfAdd (value);
+
+    Operand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfMod (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfAdd (value);
+
+    Operand ().SelfAdd (value);
   }
 
   template <class DBS_T>
   void SelfAnd (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfAnd (value);
+
+    Operand ().SelfAnd (value);
   }
 
   template <class DBS_T>
   void SelfXor (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfXor (value);
+
+    Operand ().SelfXor (value);
   }
 
   template <class DBS_T>
   void SelfOr (const DBS_T& value)
   {
     LockRAII dummy(mSync);
-    GetOperand ().SelfOr (value);
+
+    Operand ().SelfOr (value);
   }
 
   uint_t GetType ()
   {
-    return GetOperand ().GetType ();
+    return Operand ().GetType ();
   }
 
 
   FIELD_INDEX GetField ()
   {
     LockRAII dummy(mSync);
-    return GetOperand ().GetField ();
+
+    return Operand ().GetField ();
   }
 
   ITable& GetTable ()
   {
     LockRAII dummy(mSync);
-    return GetOperand ().GetTable ();
+
+    return Operand ().GetTable ();
   }
 
   StackValue GetFieldAt (const FIELD_INDEX field)
   {
     LockRAII dummy(mSync);
-    return GetOperand ().GetFieldAt (field);
+    return Operand ().GetFieldAt (field);
+
   }
 
   StackValue GetValueAt (const uint64_t index)
   {
     LockRAII dummy(mSync);
-    return GetOperand ().GetValueAt (index);
+
+    return Operand ().GetValueAt (index);
   }
 
   StackValue Duplicate ()
   {
     LockRAII dummy(mSync);
-    return GetOperand ().Duplicate ();
+
+    return Operand ().Duplicate ();
   }
 
   void NotifyCopy ()
   {
     LockRAII dummy(mSync);
-    GetOperand ().NotifyCopy ();
+    Operand ().NotifyCopy ();
   }
 
   TableOperand GetTableOp ()
   {
     LockRAII dummy(mSync);
-    return GetOperand ().GetTableOp ();
+
+    return Operand ().GetTableOp ();
   }
 
   void CopyTableOp (const TableOperand& source)
   {
     LockRAII dummy(mSync);
-    return GetOperand ().CopyTableOp (source);
+
+    return Operand ().CopyTableOp (source);
   }
 
   FieldOperand  GetFieldOp ()
   {
     LockRAII dummy(mSync);
-    return GetOperand ().GetFieldOp ();
+
+    return Operand ().GetFieldOp ();
   }
 
   void CopyFieldOp (const FieldOperand& source)
   {
     LockRAII dummy(mSync);
-    return GetOperand ().CopyFieldOp (source);
+
+    return Operand ().CopyFieldOp (source);
   }
 
-  I_PMOperand& GetOperand () { return *_RC (I_PMOperand*, mStorage);  }
+  BaseOperand& Operand () { return *_RC (BaseOperand*, mStorage);  }
 
 private:
-  Lock mSync;
+  Lock          mSync;
   bool          mOperandOwner;
+
   uint64_t      mStorage[MAX_OP_QWORDS];
 };
 
-class GlobalOperand : public I_PMOperand
+
+class GlobalOperand : public BaseOperand
 {
 public:
   GlobalOperand (GlobalValue& global);
-  ~GlobalOperand ();
 
   virtual bool IsNull () const;
 
@@ -3101,25 +3261,30 @@ public:
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
+
   virtual ITable& GetTable ();
-  virtual StackValue  GetFieldAt (const FIELD_INDEX field);
-  virtual StackValue  GetValueAt (const uint64_t index);
+
+  virtual StackValue GetFieldAt (const FIELD_INDEX field);
+
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
-  virtual void       NotifyCopy ();
+  virtual void NotifyCopy ();
 
-  virtual TableOperand  GetTableOp ();
-  virtual void          CopyTableOp (const TableOperand& source);
+  virtual TableOperand GetTableOp ();
 
-  virtual FieldOperand  GetFieldOp ();
-  virtual void          CopyFieldOp (const FieldOperand& source);
+  virtual void CopyTableOp (const TableOperand& source);
+
+  virtual FieldOperand GetFieldOp ();
+
+  virtual void CopyFieldOp (const FieldOperand& source);
 
 private:
-
-  GlobalValue& mValue;
+  GlobalValue&    mValue;
 };
 
-class LocalOperand : public I_PMOperand
+
+class LocalOperand : public BaseOperand
 {
 public:
   LocalOperand (SessionStack& stack, const uint64_t index);
@@ -3190,22 +3355,28 @@ public:
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
+
   virtual ITable& GetTable ();
-  virtual StackValue  GetFieldAt (const FIELD_INDEX field);
-  virtual StackValue  GetValueAt (const uint64_t index);
+
+  virtual StackValue GetFieldAt (const FIELD_INDEX field);
+
+  virtual StackValue GetValueAt (const uint64_t index);
 
   virtual StackValue Duplicate () const;
 
-  virtual TableOperand  GetTableOp ();
-  virtual void          CopyTableOp (const TableOperand& source);
+  virtual TableOperand GetTableOp ();
 
-  virtual FieldOperand  GetFieldOp ();
-  virtual void          CopyFieldOp (const FieldOperand& source);
+  virtual void CopyTableOp (const TableOperand& source);
+
+  virtual FieldOperand GetFieldOp ();
+
+  virtual void CopyFieldOp (const FieldOperand& source);
 
 private:
-  const uint64_t mIndex;
-  SessionStack&  mStack;
+  const uint64_t      mIndex;
+  SessionStack&       mStack;
 };
+
 
 } //namespace prima
 } //namespace whisper

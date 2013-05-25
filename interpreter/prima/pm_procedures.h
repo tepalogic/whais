@@ -31,25 +31,33 @@
 
 #include "pm_operand.h"
 
+
+
 namespace whisper {
 namespace prima {
 
+
+
+class  NameSpace;
 struct Unit;
+
+
+
 struct ProcedureEntry
 {
-  uint32_t mLocalsCount;
-  uint32_t mArgsCount;
-  uint32_t mSyncCount;
-  uint32_t mSyncIndex;
-  uint32_t mLocalsIndex;
-  uint32_t mIdIndex;
-  uint32_t mTypeOff;
-  uint32_t mCodeIndex;
-  uint32_t mCodeSize;
-  Unit*    mpUnit;
+  uint32_t    mLocalsCount;
+  uint32_t    mArgsCount;
+  uint32_t    mSyncCount;
+  uint32_t    mSyncIndex;
+  uint32_t    mLocalsIndex;
+  uint32_t    mIdIndex;
+  uint32_t    mTypeOff;
+  uint32_t    mCodeIndex;
+  uint32_t    mCodeSize;
+  Unit*       mUnit;
 };
 
-class NameSpace;
+
 
 class ProcedureManager
 {
@@ -66,34 +74,45 @@ public:
   {
   }
 
-  uint_t Count () const { return mProcsEntrys.size (); };
+  uint_t Count () const
+  {
+    return mProcsEntrys.size ();
+  }
 
-  uint32_t AddProcedure (const uint8_t*           pName,
+  uint32_t AddProcedure (const uint8_t* const     name,
                          const uint_t             nameLength,
                          const uint32_t           localsCount,
                          const uint32_t           argsCount,
                          const uint32_t           syncCount,
                          std::vector<StackValue>& localValues,
-                         const uint32_t*          pTypesOffset,
-                         const uint8_t*           pCode,
+                         const uint32_t*          typesOffset,
+                         const uint8_t*           code,
                          const uint32_t           codeSize,
                          Unit&                    unit);
-  uint32_t GetProcedure (const uint8_t* pName,
-                         const uint_t   nameLength) const;
 
-  const uint8_t* Name (const uint_t procEntry) const;
-  Unit&          GetUnit (const uint_t procEntry) const;
-  uint32_t       LocalsCount (const uint_t procEntry) const;
-  uint32_t       ArgsCount (const uint_t procEntry) const;
+  uint32_t GetProcedure (const uint8_t* const name,
+                         const uint_t         nameLength) const;
 
-  const StackValue& LocalValue (const uint_t   procEntry,
-                                const uint32_t local) const;
-  const uint8_t*    LocalTI (const uint_t   procEntry,
-                             const uint32_t local) const;
-  const uint8_t*    Code (const uint_t procEntry, uint64_t* pOutCodeSize) const;
+  const uint8_t* Name (const uint_t procId) const;
 
-  void AquireSync (const uint_t procEntry, const uint32_t sync);
-  void ReleaseSync (const uint_t procEntry, const uint32_t sync);
+  Unit& GetUnit (const uint_t procId) const;
+
+  uint32_t LocalsCount (const uint_t procId) const;
+
+  uint32_t ArgsCount (const uint_t procId) const;
+
+  const StackValue& LocalValue (const uint_t    procId,
+                                const uint32_t  local) const;
+
+  const uint8_t* LocalTypeDescription (const uint_t     procId,
+                                       const uint32_t   local) const;
+
+  const uint8_t* Code (const uint_t procId, uint_t* const outCodeSize) const;
+
+  void AquireSync (const uint_t procId, const uint32_t sync);
+
+  void ReleaseSync (const uint_t procId, const uint32_t sync);
+
 
   static bool IsValid (const uint32_t entry)
   {
@@ -110,6 +129,7 @@ public:
     entry |= GLOBAL_ID;
   }
 
+
 private:
   ProcedureManager (const ProcedureManager&);
   ProcedureManager& operator= (const ProcedureManager&);
@@ -124,8 +144,9 @@ private:
   std::vector<uint32_t>       mLocalsTypes;
   std::vector<uint8_t>        mDefinitions;
   std::vector<bool>           mSyncStmts;
-  Lock               mSync;
+  Lock                        mSync;
 };
+
 
 } //namespace prima
 } //namespace whisper

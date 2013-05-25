@@ -44,7 +44,7 @@ cmd_value_desc (ClientConnection& rConn)
   const char* glbName    = _RC (const char*, data_ + sizeof (uint32_t));
   uint16_t      fieldHint  = load_le_int16 (data_);
   uint16_t      dataOffset = sizeof (uint32_t) + strlen (glbName) + 1;
-  I_Session&    session    = *rConn.Dbs ().mSession;
+  ISession&    session    = *rConn.Dbs ().mSession;
   uint_t        rawType;
 
   if (rConn.DataSize () < dataOffset)
@@ -141,7 +141,7 @@ cmd_value_desc (ClientConnection& rConn)
       else
         {
           SessionStack& stack = rConn.Stack ();
-          I_Operand*    op;
+          IOperand*    op;
 
           if (stack.Size() == 0)
             {
@@ -149,7 +149,7 @@ cmd_value_desc (ClientConnection& rConn)
               goto cmd_glb_desc_err;
             }
 
-          op = &stack[stack.Size () - 1].GetOperand ();
+          op = &stack[stack.Size () - 1].Operand ();
           rawType = op->GetType ();
           store_le_int32 (WCS_OK, data_);
 
@@ -276,11 +276,11 @@ cmd_read_stack (ClientConnection& rConn)
       dataOff = sizeof (uint32_t) + sizeof (uint16_t);
 
       StackValue&    topValue = rConn.Stack ()[rConn.Stack ().Size () - 1];
-      const uint16_t valType  = topValue.GetOperand ().GetType ();
+      const uint16_t valType  = topValue.Operand ().GetType ();
 
       if (IS_TABLE (valType))
         {
-          ITable& table     = topValue.GetOperand ().GetTable ();
+          ITable& table     = topValue.Operand ().GetTable ();
           FIELD_INDEX fieldHint = (fieldNameHint[0] != 0) ?
                                   table.RetrieveField (fieldNameHint) : 0;
 
@@ -405,7 +405,7 @@ static void
 cmd_execute_procedure (ClientConnection& rConn)
 {
   const char* procName   = _RC (const char*, rConn.Data ());
-  I_Session&    session    = *rConn.Dbs ().mSession;
+  ISession&    session    = *rConn.Dbs ().mSession;
   SessionStack& stack      = rConn.Stack ();
 
   session.ExecuteProcedure (procName, stack);
@@ -444,7 +444,7 @@ cmd_list_globals (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  const I_Session& session = *rConn.Dbs ().mSession;
+  const ISession& session = *rConn.Dbs ().mSession;
 
   const uint32_t glbsCount  = session.GlobalValuesCount ();
   uint32_t       firstHint  = load_le_int32 (rConn.Data ());
@@ -525,7 +525,7 @@ cmd_list_procedures (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  const I_Session& session = *rConn.Dbs ().mSession;
+  const ISession& session = *rConn.Dbs ().mSession;
 
   const uint32_t procsCount  = session.ProceduresCount ();
   uint32_t       firstHint   = load_le_int32 (rConn.Data ());
@@ -605,7 +605,7 @@ cmd_procedure_param_desc (ClientConnection& rConn)
                               _EXTRA (0)
                                 );
     }
-  I_Session&          session     = *rConn.Dbs ().mSession;
+  ISession&          session     = *rConn.Dbs ().mSession;
   uint8_t*            data_       = rConn.Data ();
   uint16_t            hint        = load_le_int16 (data_);
   const char* const procName    = _RC (const char*,

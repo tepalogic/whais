@@ -110,7 +110,7 @@ test_op_ldnull (Session& session)
   if (stack.Size () != 1)
     return false;
 
-  if (stack[0].GetOperand ().IsNull () == false)
+  if (stack[0].Operand ().IsNull () == false)
     return false;
 
   return true;
@@ -142,7 +142,7 @@ test_op_ldc (Session& session)
     return false;
 
   DChar value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DChar (0x53525150))
     return false;
 
@@ -172,7 +172,7 @@ test_op_ldi8 (Session& session)
     return false;
 
   DInt8 value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DInt8 (0xD8))
     return false;
 
@@ -203,7 +203,7 @@ test_op_ldi16 (Session& session)
     return false;
 
   DInt16 value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DInt16 (0xB4A1))
     return false;
 
@@ -235,7 +235,7 @@ test_op_ldi32 (Session& session)
     return false;
 
   DInt32 value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if ((value == DInt32 (0x3421D4F1)) == false)
     return false;
 
@@ -271,7 +271,7 @@ test_op_ldi64 (Session& session)
     return false;
 
   DInt64 value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DInt64 (0x383736353421D4F1))
     return false;
 
@@ -303,7 +303,7 @@ test_op_ldd (Session& session)
     return false;
 
   DDate value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DDate (0xD1F1, 0x06, 0x05))
     return false;
 
@@ -339,7 +339,7 @@ test_op_lddt (Session& session)
     return false;
 
   DDateTime value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DDateTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23))
     return false;
 
@@ -379,7 +379,7 @@ test_op_ldht (Session& session)
     return false;
 
   DHiresTime value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value !=
       DHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x01020304))
     return false;
@@ -425,7 +425,7 @@ test_op_ldrr (Session& session)
     return false;
 
   DRichReal value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DRichReal (RICHREAL_T (-5,
                                         -99999999999922,
                                         DBS_RICHREAL_PREC)))
@@ -464,7 +464,7 @@ test_op_ldt (Session& session)
     return false;
 
   DText      value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DText ((uint8_t*)someText + 2))
     return false;
 
@@ -493,7 +493,7 @@ test_op_ldbt (Session& session)
     return false;
 
   DBool value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if ((value == DBool (true)) == false)
     return false;
 
@@ -522,7 +522,7 @@ test_op_ldbf (Session& session)
     return false;
 
   DBool value;
-  stack[0].GetOperand ().GetValue (value);
+  stack[0].Operand ().GetValue (value);
   if (value != DBool (false))
     return false;
 
@@ -542,7 +542,7 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit dummy (dummyProgram,
                                sizeof dummyProgram,

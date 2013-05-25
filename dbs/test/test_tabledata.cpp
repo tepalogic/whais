@@ -279,7 +279,7 @@ type_to_text (uint_t type)
 
 
 static void
-print_table_fields (I_DBSHandler& rDbs, const char* tb_name)
+print_table_fields (IDBSHandler& rDbs, const char* tb_name)
 {
   uint_t      fieldIndex = 0;
   ITable& table      = rDbs.RetrievePersistentTable (tb_name);
@@ -367,7 +367,7 @@ test_fixed_values_vector_reverse (ITable& table,
 }
 
 template <class T> bool
-test_fixed_value_field (I_DBSHandler& rDbs, std::vector<T> &valuesVect)
+test_fixed_value_field (IDBSHandler& rDbs, std::vector<T> &valuesVect)
 {
 
   uint_t fieldIndex = ~0;
@@ -429,7 +429,7 @@ test_fixed_value_field (ITable& table, std::vector<T> &valuesVect)
 }
 
 bool
-test_fixed_values_table (I_DBSHandler& rDbs)
+test_fixed_values_table (IDBSHandler& rDbs)
 {
   std::cout << "Testing fixed values ... ";
   bool result = true;
@@ -564,7 +564,7 @@ test_vector_values_table (ITable& table, uint_t fieldIndex, std::vector<T> &test
 }
 
 template <class T> bool
-test_variable_field_array (I_DBSHandler& rDbs, std::vector<T> &testVect)
+test_variable_field_array (IDBSHandler& rDbs, std::vector<T> &testVect)
 {
 
   uint_t fieldIndex = ~0;
@@ -626,7 +626,7 @@ test_variable_field_array (ITable& table, std::vector<T> &testVect)
 }
 
 bool
-test_text_value_table (I_DBSHandler& rDbs, std::vector<DText> &vectText)
+test_text_value_table (IDBSHandler& rDbs, std::vector<DText> &vectText)
 {
   uint_t fieldIndex = 0;
   bool result = true;
@@ -755,7 +755,7 @@ test_text_value_table (ITable& table, std::vector<DText> &vectText)
 }
 
 bool
-test_variable_values_table (I_DBSHandler& rDbs)
+test_variable_values_table (IDBSHandler& rDbs)
 {
   std::cout << "Testing variable values ... ";
   bool result = true;
@@ -792,7 +792,7 @@ test_variable_values_table (I_DBSHandler& rDbs)
 }
 
 bool
-test_full_value_table (I_DBSHandler& rDbs)
+test_full_value_table (IDBSHandler& rDbs)
 {
   std::cout << "Testing all values ... ";
   bool result = true;
@@ -850,7 +850,7 @@ test_full_value_table (I_DBSHandler& rDbs)
 }
 
 bool
-test_full_value_temp_table (I_DBSHandler& rDbs)
+test_full_value_temp_table (IDBSHandler& rDbs)
 {
   std::cout << "Testing all values on temporal table... ";
   bool result = true;
@@ -915,7 +915,7 @@ main ()
     DBSCreateDatabase (db_name);
   }
 
-  I_DBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
   success = success && test_fixed_values_table (handler);
   success = success && test_variable_values_table (handler);

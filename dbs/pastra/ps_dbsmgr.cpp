@@ -124,7 +124,7 @@ static auto_ptr<DbsManager> dbsMgrs_;
 DbsHandler::DbsHandler (const DBSSettings&    settings,
                         const std::string&    locationDir,
                         const std::string&    name)
-  : I_DBSHandler (),
+  : IDBSHandler (),
     mGlbSettings (settings),
     mSync (),
     mDbsLocationDir (locationDir),
@@ -173,7 +173,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
 
 
 DbsHandler::DbsHandler (const DbsHandler& source)
-  : I_DBSHandler (),
+  : IDBSHandler (),
     mGlbSettings (source.mGlbSettings),
     mSync (),
     mDbsLocationDir (source.mDbsLocationDir),
@@ -491,7 +491,7 @@ DBSCreateDatabase (const char* const name,
 }
 
 
-DBS_SHL  I_DBSHandler&
+DBS_SHL  IDBSHandler&
 DBSRetrieveDatabase (const char* const name, const char* path)
 {
   if (dbsMgrs_.get () == NULL)
@@ -527,7 +527,7 @@ DBSRetrieveDatabase (const char* const name, const char* path)
 
 
 DBS_SHL void
-DBSReleaseDatabase (I_DBSHandler& hnd)
+DBSReleaseDatabase (IDBSHandler& hnd)
 {
   if (dbsMgrs_.get () == NULL)
     throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
@@ -539,7 +539,7 @@ DBSReleaseDatabase (I_DBSHandler& hnd)
 
   for (it = dbses.begin (); it != dbses.end (); ++it)
     {
-      if (_SC (I_DBSHandler *, &it->second.mDbs) == &hnd)
+      if (_SC (IDBSHandler *, &it->second.mDbs) == &hnd)
         {
           assert (it->second.mRefCount > 0);
 

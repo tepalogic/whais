@@ -38,8 +38,8 @@ load_le_int16 (const uint8_t* from)
   uint16_t result;
 
   result = from[1];
-  result <<= 8;
-  result += from[0];
+  result <<= 8; result |= from[0];
+
   return result;
 }
 
@@ -50,12 +50,9 @@ load_le_int32 (const uint8_t* from)
   uint32_t result;
 
   result = from[3];
-  result <<= 8;
-  result += from[2];
-  result <<= 8;
-  result += from[1];
-  result <<= 8;
-  result += from[0];
+  result <<= 8; result |= from[2];
+  result <<= 8; result |= from[1];
+  result <<= 8; result |= from[0];
 
   return result;
 }
@@ -67,20 +64,13 @@ load_le_int64 (const uint8_t* from)
   uint64_t result;
 
   result = from[7];
-  result <<= 8;
-  result += from[6];
-  result <<= 8;
-  result += from[5];
-  result <<= 8;
-  result += from[4];
-  result <<= 8;
-  result += from[3];
-  result <<= 8;
-  result += from[2];
-  result <<= 8;
-  result += from[1];
-  result <<= 8;
-  result += from[0];
+  result <<= 8; result |= from[6];
+  result <<= 8; result |= from[5];
+  result <<= 8; result |= from[4];
+  result <<= 8; result |= from[3];
+  result <<= 8; result |= from[2];
+  result <<= 8; result |= from[1];
+  result <<= 8; result |= from[0];
 
   return result;
 }

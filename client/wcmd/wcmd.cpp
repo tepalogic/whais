@@ -291,7 +291,7 @@ OpenDB ()
   if (level >= VL_INFO)
     cout << "Opening database: " << workDB << " ... ";
 
-  I_DBSHandler& dbsHnd = DBSRetrieveDatabase (workDB.c_str ());
+  IDBSHandler& dbsHnd = DBSRetrieveDatabase (workDB.c_str ());
   SetDbsHandler (dbsHnd);
 
   if (level >= VL_INFO)

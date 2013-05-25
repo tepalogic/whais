@@ -33,34 +33,67 @@ namespace prima {
 class Processor
 {
 public:
-  Processor (Session& session, SessionStack& stack, const uint32_t procId);
+  Processor (Session&           session,
+             SessionStack&      stack,
+             const uint32_t     procedureId);
 
   void Run ();
+
   void AquireSync (const uint8_t sync);
+
   void ReleaseSync (const uint8_t sync);
 
-  Session&       GetSession () const { return mSession; }
-  SessionStack&  GetStack () const { return mStack; }
-  const Unit&    GetUnit () const { return mProcUnit; }
+  Session& GetSession () const
+  {
+    return mSession;
+  }
 
-  const uint8_t* Code () const { return mpCode; }
-  uint64_t       CurrentOffset () const { return mCodePos; }
-  uint64_t       CodeSize () const { return mCodeSize; }
+  SessionStack& GetStack () const
+  {
+    return mStack;
+  }
 
-  size_t         LocalsCount () const { return mLocalsCount; }
-  size_t         StackBegin () const { return mStackBegin; }
+  const Unit& GetUnit () const
+  {
+    return mProcUnit;
+  }
+
+  const uint8_t* Code () const
+  {
+    return mCode;
+  }
+
+  uint64_t CurrentOffset () const
+  {
+    return mCodePos;
+  }
+
+  uint64_t CodeSize () const
+  {
+    return mCodeSize;
+  }
+
+  size_t LocalsCount () const
+  {
+    return mLocalsCount;
+  }
+
+  size_t StackBegin () const
+  {
+    return mStackBegin;
+  }
 
 private:
-  Session&       mSession;
-  SessionStack&  mStack;
-  const Unit&    mProcUnit;
-  const uint8_t* mpCode;
-  const uint64_t mCodeSize;
-  uint64_t       mCodePos;
-  const uint_t   mLocalsCount;
-  const size_t   mStackBegin;
-  const uint32_t mProcId;
-  uint16_t       mAquiredSync;
+  Session&          mSession;
+  SessionStack&     mStack;
+  const Unit&       mProcUnit;
+  const uint8_t*    mCode;
+  const uint64_t    mCodeSize;
+  uint64_t          mCodePos;
+  const uint_t      mLocalsCount;
+  const size_t      mStackBegin;
+  const uint32_t    mProcId;
+  uint16_t          mAquiredSync;
 
   static const uint16_t NO_INDEX = 0xFFFF;
 };

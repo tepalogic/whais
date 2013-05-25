@@ -25,47 +25,15 @@
 #include <assert.h>
 
 #include "compiler/wopcodes.h"
+#include "utils/le_converter.h"
 
 #include "pm_processor.h"
+
 
 
 namespace whisper {
 namespace prima {
 
-inline static uint16_t
-load_le_uint16 (const uint8_t* const pSrc)
-{
-  uint16_t result = pSrc[1];
-  result <<= 8; result |= pSrc[0];
-
-  return result;
-}
-
-inline static uint32_t
-load_le_uint32 (const uint8_t* const pSrc)
-{
-  uint32_t result = pSrc[3];
-  result <<= 8; result |= pSrc[2];
-  result <<= 8; result |= pSrc[1];
-  result <<= 8; result |= pSrc[0];
-
-  return result;
-}
-
-inline static uint64_t
-load_le_uint64 (const uint8_t* const pSrc)
-{
-  uint64_t result = pSrc[7];
-  result <<= 8; result |= pSrc[6];
-  result <<= 8; result |= pSrc[5];
-  result <<= 8; result |= pSrc[4];
-  result <<= 8; result |= pSrc[3];
-  result <<= 8; result |= pSrc[2];
-  result <<= 8; result |= pSrc[1];
-  result <<= 8; result |= pSrc[0];
-
-  return result;
-}
 
 static void
 op_func_ldnull (Processor& processor, int64_t&)
@@ -73,80 +41,91 @@ op_func_ldnull (Processor& processor, int64_t&)
   processor.GetStack ().Push ();
 }
 
+
 static void
 op_func_ldc (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  DChar value (load_le_uint32 (pData));
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+
+  DChar value (load_le_int32 (data));
 
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint32_t);
 }
 
+
 static void
 op_func_ldi8 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  DUInt8 value (*pData);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  DUInt8 value (*data);
 
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint8_t);
 }
 
+
 static void
 op_func_ldi16 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  DUInt16 value (load_le_uint16 (pData));
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  DUInt16 value (load_le_int16 (data));
 
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint16_t);
 }
 
+
 static void
 op_func_ldi32 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  DUInt32 value (load_le_uint32 (pData));
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+
+  DUInt32 value (load_le_int32 (data));
 
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint32_t);
 }
 
+
 static void
 op_func_ldi64 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  DUInt64 value (load_le_uint64 (pData));
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+
+  DUInt64 value (load_le_int64 (data));
 
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint64_t);
 }
 
+
 static void
 op_func_ldd (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint8_t day   = pData[0];
-  const uint8_t month = pData[1];
-  const int16_t year  = load_le_uint16 (pData + 2);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+
+  const uint8_t day   = data[0];
+  const uint8_t month = data[1];
+  const int16_t year  = load_le_int16 (data + 2);
+
   DDate value (year, month, day);
 
   processor.GetStack ().Push (value);
@@ -154,18 +133,20 @@ op_func_ldd (Processor& processor, int64_t& offset)
   offset += 2 + sizeof (uint16_t);
 }
 
+
 static void
 op_func_lddt (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint8_t sec   = pData[0];
-  const uint8_t min   = pData[1];
-  const uint8_t hour  = pData[2];
-  const uint8_t day   = pData[3];
-  const uint8_t month = pData[4];
-  const int16_t year  = load_le_uint16 (pData + 5);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const uint8_t sec   = data[0];
+  const uint8_t min   = data[1];
+  const uint8_t hour  = data[2];
+  const uint8_t day   = data[3];
+  const uint8_t month = data[4];
+  const int16_t year  = load_le_int16 (data + 5);
+
   DDateTime value (year, month, day, hour, min, sec);
 
   processor.GetStack ().Push (value);
@@ -173,19 +154,21 @@ op_func_lddt (Processor& processor, int64_t& offset)
   offset += 5 + sizeof (uint16_t);
 }
 
+
 static void
 op_func_ldht (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint32_t usec  = load_le_uint32 (pData);
-  const uint8_t  sec   = pData[4];
-  const uint8_t  min   = pData[5];
-  const uint8_t  hour  = pData[6];
-  const uint8_t  day   = pData[7];
-  const uint8_t  month = pData[8];
-  const int16_t  year  = load_le_uint16 (pData + 9);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const uint32_t usec  = load_le_int32 (data);
+  const uint8_t  sec   = data[4];
+  const uint8_t  min   = data[5];
+  const uint8_t  hour  = data[6];
+  const uint8_t  day   = data[7];
+  const uint8_t  month = data[8];
+  const int16_t  year  = load_le_int16 (data + 9);
+
   DHiresTime value (year, month, day, hour, min, sec, usec);
 
   processor.GetStack ().Push (value);
@@ -193,63 +176,71 @@ op_func_ldht (Processor& processor, int64_t& offset)
   offset += sizeof (uint32_t) + 5 + sizeof (uint16_t);
 }
 
+
 static void
 op_func_ldrr (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  int64_t intPart  = load_le_uint64 (pData);
-  int64_t fracPart = load_le_uint64 (pData + sizeof (uint64_t));
+  int64_t intPart  = load_le_int64 (data);
+  int64_t fracPart = load_le_int64 (data + sizeof (uint64_t));
 
-  const RICHREAL_T basicValue (intPart,
-                               fracPart,
-                               W_LDRR_PRECISSION);
+  const RICHREAL_T basicValue (intPart, fracPart, W_LDRR_PRECISSION);
+
   DRichReal value (basicValue);
   processor.GetStack ().Push (value);
 
   offset += (sizeof (uint64_t) + sizeof (uint64_t));
 }
 
+
 static void
 op_func_ldt (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint32_t textOff  = load_le_uint32 (pData);
-  const uint8_t* pTextSrc = processor.GetUnit ().GetConstData (textOff);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  assert (pTextSrc != NULL);
+  const uint32_t textOff = load_le_int32 (data);
+  const uint8_t* text    = processor.GetUnit ().GetConstData (textOff);
 
-  DText value (pTextSrc);
+  assert (text != NULL);
+
+  DText value (text);
+
   processor.GetStack ().Push (value);
 
   offset += sizeof (uint32_t);
 }
+
 
 static void
 op_func_ldbt (Processor& processor, int64_t& offset)
 {
   DBool value (true);
+
   processor.GetStack ().Push (value);
 }
+
 
 static void
 op_func_ldbf (Processor& processor, int64_t& offset)
 {
   DBool value (false);
+
   processor.GetStack ().Push (value);
 }
+
 
 static void
 op_func_ldlo8 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint8_t localIndex = *pData;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const uint8_t localIndex = *data;
 
   assert (localIndex < processor.LocalsCount ());
 
@@ -260,14 +251,15 @@ op_func_ldlo8 (Processor& processor, int64_t& offset)
 
   offset += sizeof (uint8_t);
 }
+
 
 static void
 op_func_ldlo16 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint16_t localIndex = load_le_uint16 (pData);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const uint16_t localIndex = load_le_int16 (data);
 
   assert (localIndex < processor.LocalsCount ());
 
@@ -279,13 +271,14 @@ op_func_ldlo16 (Processor& processor, int64_t& offset)
   offset += sizeof (uint16_t);
 }
 
+
 static void
 op_func_ldlo32 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
-  const uint32_t localIndex = load_le_uint32 (pData);
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
+  const uint32_t localIndex = load_le_int32 (data);
 
   assert (localIndex < processor.LocalsCount ());
 
@@ -297,14 +290,15 @@ op_func_ldlo32 (Processor& processor, int64_t& offset)
   offset += sizeof (uint32_t);
 }
 
+
 static void
 op_func_ldgb8 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  const uint8_t  globalIndex = *pData;
+  const uint8_t  globalIndex = *data;
   const uint32_t glbId       = processor.GetUnit ().GetGlobalId (globalIndex);
   StackValue     glbValue    = processor.GetSession ().GetGlobalValue (glbId);
 
@@ -313,14 +307,15 @@ op_func_ldgb8 (Processor& processor, int64_t& offset)
   offset += sizeof (uint8_t);
 }
 
+
 static void
 op_func_ldgb16 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  const uint16_t globalIndex = load_le_uint16 (pData);
+  const uint16_t globalIndex = load_le_int16 (data);
   const uint32_t glbId       = processor.GetUnit ().GetGlobalId (globalIndex);
   StackValue     glbValue    = processor.GetSession ().GetGlobalValue (glbId);
 
@@ -329,14 +324,15 @@ op_func_ldgb16 (Processor& processor, int64_t& offset)
   offset += sizeof (uint16_t);
 }
 
+
 static void
 op_func_ldgb32 (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  const uint32_t globalIndex = load_le_uint32 (pData);
+  const uint32_t globalIndex = load_le_int32 (data);
   const uint32_t glbId       = processor.GetUnit ().GetGlobalId (globalIndex);
   StackValue     glbValue    = processor.GetSession ().GetGlobalValue (glbId);
 
@@ -344,6 +340,7 @@ op_func_ldgb32 (Processor& processor, int64_t& offset)
 
   offset += sizeof (uint32_t);
 }
+
 
 static void
 op_func_cts (Processor& processor, int64_t& offset)
@@ -354,6 +351,7 @@ op_func_cts (Processor& processor, int64_t& offset)
   processor.GetStack ().Pop (1);
 }
 
+
 template <class T> static void
 op_func_stXX (Processor& processor, int64_t& offset)
 {
@@ -363,15 +361,17 @@ op_func_stXX (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& src  = stack[stackSize - 1].GetOperand ();
-  I_Operand& dest = stack[stackSize - 2].GetOperand ();
+  IOperand& src  = stack[stackSize - 1].Operand ();
+  IOperand& dest = stack[stackSize - 2].Operand ();
 
   T value;
+
   src.GetValue (value);
   dest.SetValue (value);
 
   stack.Pop (1);
 }
+
 
 static void
 op_func_stta (Processor& processor, int64_t& offset)
@@ -382,13 +382,14 @@ op_func_stta (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () -1 + 2) <=
           stackSize);
 
-  I_PMOperand& src  = _SC (I_PMOperand&, stack[stackSize - 1].GetOperand ());
-  I_PMOperand& dest = _SC (I_PMOperand&, stack[stackSize - 2].GetOperand ());
+  BaseOperand& src  = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
+  BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
 
   dest.CopyTableOp (src.GetTableOp());
 
   stack.Pop (1);
 }
+
 
 static void
 op_func_stf (Processor& processor, int64_t& offset)
@@ -399,13 +400,14 @@ op_func_stf (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_PMOperand& src  = _SC (I_PMOperand&, stack[stackSize - 1].GetOperand ());
-  I_PMOperand& dest = _SC (I_PMOperand&, stack[stackSize - 2].GetOperand ());
+  BaseOperand& src  = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
+  BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
 
   dest.CopyFieldOp (src.GetFieldOp());
 
   stack.Pop (1);
 }
+
 
 static void
 op_func_inull (Processor& processor, int64_t& offset)
@@ -416,12 +418,13 @@ op_func_inull (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
            stackSize);
 
-  I_Operand& source = stack[stackSize - 1].GetOperand ();
+  IOperand& source = stack[stackSize - 1].Operand ();
   DBool result (source.IsNull ());
 
   stack.Pop (1);
   stack.Push (result);
 }
+
 
 static void
 op_func_nnull (Processor& processor, int64_t& offset)
@@ -432,29 +435,33 @@ op_func_nnull (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
            stackSize);
 
-  I_Operand& source = stack[stackSize - 1].GetOperand ();
+  IOperand& source = stack[stackSize - 1].Operand ();
   DBool result (! source.IsNull ());
 
   stack.Pop (1);
   stack.Push (result);
 }
 
+
 static void
 op_func_call (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  const uint32_t prcMgrId = load_le_uint32 (pData);
+  const uint32_t procId = load_le_int32 (data);
+
   offset += sizeof (uint32_t);
 
-  Session&             session      = processor.GetSession ();
-  SessionStack&        stack        = processor.GetStack ();
+  Session&      session = processor.GetSession ();
+  SessionStack& stack   = processor.GetStack ();
 
-  Processor procedure (session, stack, prcMgrId);
+  Processor procedure (session, stack, procId);
+
   procedure.Run ();
 }
+
 
 static void
 op_func_ret (Processor& processor, int64_t& offset)
@@ -464,13 +471,14 @@ op_func_ret (Processor& processor, int64_t& offset)
 
   assert ((processor.StackBegin () + processor.LocalsCount ()) <= stackSize);
 
-  StackValue result = stack[stackSize - 1].GetOperand().Duplicate ();
+  StackValue result = stack[stackSize - 1].Operand().Duplicate ();
 
   stack.Pop (stackSize - processor.StackBegin());
   stack.Push (result);
 
   offset = processor.CodeSize (); //Signal the procedure return
 }
+
 
 template <class DBS_T> static void
 op_func_addXX (Processor& processor, int64_t& offset)
@@ -482,22 +490,25 @@ op_func_addXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue + secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 static void
 op_func_addt (Processor& processor, int64_t& offset)
@@ -509,16 +520,18 @@ op_func_addt (Processor& processor, int64_t& offset)
           stackSize);
 
   DText firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DText secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DText result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     {
       result = firstOp;
@@ -528,6 +541,7 @@ op_func_addt (Processor& processor, int64_t& offset)
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_andXX (Processor& processor, int64_t& offset)
@@ -539,22 +553,25 @@ op_func_andXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue & secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_divXX (Processor& processor, int64_t& offset)
@@ -566,10 +583,10 @@ op_func_divXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   if (secondOp == DBS_T (0))
     throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
@@ -577,14 +594,17 @@ op_func_divXX (Processor& processor, int64_t& offset)
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue / secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_eqXX (Processor& processor, int64_t& offset)
@@ -596,16 +616,17 @@ op_func_eqXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBool result (firstOp == secondOp);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_geXX (Processor& processor, int64_t& offset)
@@ -617,16 +638,17 @@ op_func_geXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBool result ((firstOp < secondOp) == false);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_gtXX (Processor& processor, int64_t& offset)
@@ -638,16 +660,17 @@ op_func_gtXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBool result (((firstOp < secondOp) || (firstOp == secondOp)) == false);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_leXX (Processor& processor, int64_t& offset)
@@ -659,16 +682,17 @@ op_func_leXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBool result ((firstOp < secondOp) || (firstOp == secondOp));
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_ltXX (Processor& processor, int64_t& offset)
@@ -680,16 +704,17 @@ op_func_ltXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBool result (firstOp < secondOp);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 static void
 op_func_mod (Processor& processor, int64_t& offset)
@@ -701,10 +726,10 @@ op_func_mod (Processor& processor, int64_t& offset)
           stackSize);
 
   DInt64 firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DInt64 secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   if (secondOp == DInt64 (0))
     throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
@@ -712,14 +737,17 @@ op_func_mod (Processor& processor, int64_t& offset)
   DInt64 result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DInt64 (firstOp.mValue % secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_mulXX (Processor& processor, int64_t& offset)
@@ -731,22 +759,25 @@ op_func_mulXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue * secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_neXX (Processor& processor, int64_t& offset)
@@ -758,16 +789,17 @@ op_func_neXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBool result ((firstOp == secondOp) == false);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_notXX (Processor& processor, int64_t& offset)
@@ -779,7 +811,7 @@ op_func_notXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T operand;
-  stack[stackSize - 1].GetOperand ().GetValue (operand);
+  stack[stackSize - 1].Operand ().GetValue (operand);
 
   DBS_T result;
   if (operand.IsNull () == false)
@@ -788,6 +820,7 @@ op_func_notXX (Processor& processor, int64_t& offset)
   stack.Pop (1);
   stack.Push (result);
 }
+
 
 template <> void
 op_func_notXX<DBool> (Processor& processor, int64_t& offset)
@@ -799,7 +832,7 @@ op_func_notXX<DBool> (Processor& processor, int64_t& offset)
           stackSize);
 
   DBool operand;
-  stack[stackSize - 1].GetOperand ().GetValue (operand);
+  stack[stackSize - 1].Operand ().GetValue (operand);
 
   DBool result;
   if (operand.IsNull () == false)
@@ -820,22 +853,25 @@ op_func_orXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue | secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_subXX (Processor& processor, int64_t& offset)
@@ -847,22 +883,25 @@ op_func_subXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue - secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 template <class DBS_T> static void
 op_func_xorXX (Processor& processor, int64_t& offset)
@@ -874,22 +913,25 @@ op_func_xorXX (Processor& processor, int64_t& offset)
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].GetOperand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   DBS_T result;
   if (firstOp.IsNull ())
     result = secondOp;
+
   else if (secondOp.IsNull ())
     result = firstOp;
+
   else
     result = DBS_T (firstOp.mValue ^ secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 static void
 op_func_jf (Processor& processor, int64_t& offset)
@@ -901,20 +943,22 @@ op_func_jf (Processor& processor, int64_t& offset)
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 1].Operand ().GetValue (firstOp);
 
   if ((firstOp.IsNull() == false) && (firstOp.mValue == false))
     {
-      const uint8_t* const pData = processor.Code () +
-                                   processor.CurrentOffset () +
-                                   offset;
+      const uint8_t* const data = processor.Code () +
+                                    processor.CurrentOffset () +
+                                    offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_uint32 (pData));
+      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
+
       offset = jmpOffset;
     }
   else
     offset += sizeof (uint32_t);
 }
+
 
 static void
 op_func_jfc (Processor& processor, int64_t& offset)
@@ -926,21 +970,22 @@ op_func_jfc (Processor& processor, int64_t& offset)
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 1].Operand ().GetValue (firstOp);
   stack.Pop (1);
 
   if ((firstOp.IsNull() == false) && (firstOp.mValue == false))
     {
-      const uint8_t* const pData = processor.Code () +
-                                   processor.CurrentOffset () +
-                                   offset;
+      const uint8_t* const data = processor.Code () +
+                                    processor.CurrentOffset () +
+                                    offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_uint32 (pData));
+      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
       offset = jmpOffset;
     }
   else
     offset += sizeof (uint32_t);
 }
+
 
 static void
 op_func_jt (Processor& processor, int64_t& offset)
@@ -952,20 +997,21 @@ op_func_jt (Processor& processor, int64_t& offset)
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 1].Operand ().GetValue (firstOp);
 
   if ((firstOp.IsNull() == false) && firstOp.mValue )
     {
-      const uint8_t* const pData = processor.Code () +
-                                   processor.CurrentOffset () +
-                                   offset;
+      const uint8_t* const data = processor.Code () +
+                                    processor.CurrentOffset () +
+                                    offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_uint32 (pData));
+      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
       offset = jmpOffset;
     }
   else
     offset += sizeof (uint32_t);
 }
+
 
 static void
 op_func_jtc (Processor& processor, int64_t& offset)
@@ -977,32 +1023,34 @@ op_func_jtc (Processor& processor, int64_t& offset)
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].GetOperand ().GetValue (firstOp);
+  stack[stackSize - 1].Operand ().GetValue (firstOp);
   stack.Pop (1);
 
   if ((firstOp.IsNull() == false) && firstOp.mValue)
     {
-      const uint8_t* const pData = processor.Code () +
-                                   processor.CurrentOffset () +
-                                   offset;
+      const uint8_t* const data = processor.Code () +
+                                    processor.CurrentOffset () +
+                                    offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_uint32 (pData));
+      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
       offset = jmpOffset;
     }
   else
     offset += sizeof (uint32_t);
 }
 
+
 static void
 op_func_jmp (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const pData = processor.Code () +
-                               processor.CurrentOffset () +
-                               offset;
+  const uint8_t* const data = processor.Code () +
+                                processor.CurrentOffset () +
+                                offset;
 
-  const int32_t jmpOffset = _SC (int32_t, load_le_uint32 (pData));
+  const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
   offset = jmpOffset;
 }
+
 
 template <uint_t EXCEPTION_CODE> void
 op_func_ind (Processor& processor, int64_t& offset)
@@ -1014,17 +1062,17 @@ op_func_ind (Processor& processor, int64_t& offset)
           stackSize);
 
   DUInt64 index;
-  stack[stackSize - 1].GetOperand ().GetValue (index);
+  stack[stackSize - 1].Operand ().GetValue (index);
 
   if (index.IsNull ())
     throw InterException (NULL, _EXTRA (EXCEPTION_CODE));
 
-  StackValue result =
-      stack[stackSize - 2].GetOperand ().GetValueAt (index.mValue);
+  StackValue result = stack[stackSize - 2].Operand ().GetValueAt (index.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 static void
 op_func_indta (Processor& processor, int64_t& offset)
@@ -1036,31 +1084,31 @@ op_func_indta (Processor& processor, int64_t& offset)
           stackSize);
 
   DUInt64 index;
-  stack[stackSize - 1].GetOperand ().GetValue (index);
+  stack[stackSize - 1].Operand ().GetValue (index);
 
   if (index.IsNull ())
     throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_NULL));
 
-  I_PMOperand& op = _SC (I_PMOperand&, stack[stackSize - 2].GetOperand ());
+  BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
   TableOperand tableOp = op.GetTableOp ();
 
   const uint8_t* const  pData = processor.Code () +
-                                processor.CurrentOffset () +
-                                offset;
-  const uint32_t        textOff  = load_le_uint32 (pData);
-  const uint8_t* const  pTextSrc = processor.GetUnit ().GetConstData (textOff);
+                                  processor.CurrentOffset () +
+                                  offset;
+  const uint32_t       textOff = load_le_int32 (pData);
+  const uint8_t* const text    = processor.GetUnit ().GetConstData (textOff);
 
   offset += sizeof (uint32_t);
 
   FIELD_INDEX field = tableOp.GetTable ().RetrieveField (_RC (const char*,
-                                                              pTextSrc));
-
+                                                              text));
   FieldOperand fieldOp (tableOp, field);
   StackValue   result = fieldOp.GetValueAt (index.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
 
 static void
 op_func_self (Processor& processor, int64_t& offset)
@@ -1071,20 +1119,19 @@ op_func_self (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 1) <=
           stackSize);
 
-  I_PMOperand& op = _SC (I_PMOperand&, stack[stackSize - 1].GetOperand ());
+  BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
   TableOperand tableOp = op.GetTableOp ();
 
-  const uint8_t* const  pData = processor.Code () +
-                                processor.CurrentOffset () +
-                                offset;
-  const uint32_t        textOff  = load_le_uint32 (pData);
-  const uint8_t* const  pTextSrc = processor.GetUnit ().GetConstData (textOff);
+  const uint8_t* const  data = processor.Code () +
+                                 processor.CurrentOffset () +
+                                 offset;
+  const uint32_t        textOff = load_le_int32 (data);
+  const uint8_t* const  text    = processor.GetUnit ().GetConstData (textOff);
 
   offset += sizeof (uint32_t);
 
   FIELD_INDEX field = tableOp.GetTable ().RetrieveField (_RC (const char*,
-                                                              pTextSrc));
-
+                                                              text));
   FieldOperand fieldOp (tableOp, field);
   StackValue   result (fieldOp);
 
@@ -1092,29 +1139,34 @@ op_func_self (Processor& processor, int64_t& offset)
   stack.Push (result);
 }
 
+
 static void
 op_func_bsync (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const  pData = processor.Code () +
-                                processor.CurrentOffset () +
-                                offset;
-  const uint8_t syncStmt = *pData;
+  const uint8_t* const  data = processor.Code () +
+                                 processor.CurrentOffset () +
+                               offset;
+  const uint8_t syncStmt = *data;
+
   offset += sizeof (uint8_t);
 
   processor.AquireSync (syncStmt);
 }
 
+
 static void
 op_func_esync (Processor& processor, int64_t& offset)
 {
-  const uint8_t* const  pData = processor.Code () +
+  const uint8_t* const data = processor.Code () +
                                 processor.CurrentOffset () +
                                 offset;
-  const uint8_t syncStmt = *pData;
+  const uint8_t syncStmt = *data;
+
   offset += sizeof (uint8_t);
 
   processor.ReleaseSync (syncStmt);
 }
+
 
 template <class DBS_T> static void
 op_func_sadd (Processor& processor, int64_t& offset)
@@ -1125,15 +1177,16 @@ op_func_sadd (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfAdd (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_ssub (Processor& processor, int64_t& offset)
@@ -1144,15 +1197,16 @@ op_func_ssub (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfSub (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_smul (Processor& processor, int64_t& offset)
@@ -1163,15 +1217,16 @@ op_func_smul (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfMul (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_sdiv (Processor& processor, int64_t& offset)
@@ -1182,15 +1237,16 @@ op_func_sdiv (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfDiv (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_smod (Processor& processor, int64_t& offset)
@@ -1201,15 +1257,16 @@ op_func_smod (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfMod (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_sand (Processor& processor, int64_t& offset)
@@ -1220,15 +1277,16 @@ op_func_sand (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfAnd (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_sxor (Processor& processor, int64_t& offset)
@@ -1239,15 +1297,16 @@ op_func_sxor (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfXor (delta);
 
   stack.Pop (1);
 }
+
 
 template <class DBS_T> static void
 op_func_sor (Processor& processor, int64_t& offset)
@@ -1258,17 +1317,21 @@ op_func_sor (Processor& processor, int64_t& offset)
   assert ((processor.StackBegin () + processor.LocalsCount () - 1 + 2) <=
           stackSize);
 
-  I_Operand& destOp = stack[stackSize - 2].GetOperand ();
+  IOperand& destOp = stack[stackSize - 2].Operand ();
 
   DBS_T delta;
-  stack[stackSize - 1].GetOperand ().GetValue (delta);
+  stack[stackSize - 1].Operand ().GetValue (delta);
 
   destOp.SelfOr (delta);
 
   stack.Pop (1);
 }
 
+
+
 typedef void (*OP_FUNC) (Processor& processor, int64_t& ioOffset);
+
+
 
 static OP_FUNC operations[] = {
                                 NULL,
@@ -1443,21 +1506,20 @@ static OP_FUNC operations[] = {
                                 op_func_sor<DBool>
                               };
 
-/////////////////////////////Processor/////////////////////////////////////////
 
 
-Processor::Processor (Session&       session,
-                      SessionStack&  stack,
-                      const uint_t   procId)
+Processor::Processor (Session&          session,
+                      SessionStack&     stack,
+                      const uint_t      procedureId)
   : mSession (session),
     mStack (stack),
-    mProcUnit (mSession.ProcUnit (procId)),
-    mpCode (mSession.ProcCode (procId)),
-    mCodeSize (mSession.ProcCodeSize (procId)),
+    mProcUnit (mSession.ProcUnit (procedureId)),
+    mCode (mSession.ProcCode (procedureId)),
+    mCodeSize (mSession.ProcCodeSize (procedureId)),
     mCodePos (0),
-    mLocalsCount (mSession.LocalsCount (procId)),
-    mStackBegin (stack.Size () - mSession.ArgsCount (procId)),
-    mProcId (procId),
+    mLocalsCount (mSession.LocalsCount (procedureId)),
+    mStackBegin (stack.Size () - mSession.ArgsCount (procedureId)),
+    mProcId (procedureId),
     mAquiredSync (NO_INDEX)
 {
 
@@ -1485,16 +1547,16 @@ Processor::Run ()
   {
     while (mCodePos < mCodeSize)
       {
-        int64_t offset = wh_compiler_decode_op (mpCode + mCodePos, &opcode);
+        int64_t offset = wh_compiler_decode_op (mCode + mCodePos, &opcode);
 
-        assert (opcode < _SC (int,
-                              (sizeof operations / sizeof operations[0])));
+        assert (opcode < _SC (int, (sizeof operations / sizeof operations[0])));
         assert (opcode != 0);
         assert ((offset > 0) && (offset < 3));
 
         operations[opcode] (*this, offset);
 
         mCodePos += offset;
+
         assert ((mCodePos <= mCodeSize)
                 || (_SC (uint64_t, offset) == mCodeSize));
       }
@@ -1514,6 +1576,7 @@ Processor::Run ()
   assert (mStack.Size () == (mStackBegin + 1));
 }
 
+
 void
 Processor::AquireSync (const uint8_t sync)
 {
@@ -1524,6 +1587,7 @@ Processor::AquireSync (const uint8_t sync)
   mAquiredSync = sync;
 }
 
+
 void
 Processor::ReleaseSync (const uint8_t sync)
 {
@@ -1533,6 +1597,7 @@ Processor::ReleaseSync (const uint8_t sync)
   mSession.ReleaseProcSync (mProcId, sync);
   mAquiredSync = NO_INDEX;
 }
+
 
 } //namespace prima
 } //namespace whisper

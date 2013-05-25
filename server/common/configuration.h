@@ -102,8 +102,8 @@ struct DBSDescriptors
   std::vector<std::string> mObjectLibs;
   std::vector<std::string> mNativeLibs;
 
-  whisper::I_DBSHandler*            mDbs;
-  whisper::I_Session*               mSession;
+  whisper::IDBSHandler*            mDbs;
+  whisper::ISession*               mSession;
 
   whisper::Logger*                mpLogger;
 };

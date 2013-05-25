@@ -105,7 +105,7 @@ main ()
     DBSCreateDatabase ("baza_date_1");
   }
 
-  I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
+  IDBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
   handler.AddTable ("table_1", descCount, field_descs);
   ITable& table = handler.RetrievePersistentTable ("table_1");
   handler.ReleaseTable (table);
@@ -115,7 +115,7 @@ main ()
     {
       DBSInit (DBSSettings ());
 
-      I_DBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
+      IDBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
       ITable& table = handler.RetrievePersistentTable ("table_1");
 
       if (table.FieldsCount () != descCount)

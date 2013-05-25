@@ -28,7 +28,7 @@ get_test_array ()
 }
 
 template <typename DBS_T> bool
-test_self_add (I_Operand& op)
+test_self_add (IOperand& op)
 {
   bool result = true;
 
@@ -51,7 +51,7 @@ test_self_add (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_sub (I_Operand& op)
+test_self_sub (IOperand& op)
 {
   bool result = true;
 
@@ -74,7 +74,7 @@ test_self_sub (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_mul (I_Operand& op)
+test_self_mul (IOperand& op)
 {
   bool result = true;
 
@@ -97,7 +97,7 @@ test_self_mul (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_div (I_Operand& op)
+test_self_div (IOperand& op)
 {
   bool result = true;
 
@@ -120,7 +120,7 @@ test_self_div (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_mod (I_Operand& op)
+test_self_mod (IOperand& op)
 {
   bool result = true;
 
@@ -143,7 +143,7 @@ test_self_mod (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_and (I_Operand& op)
+test_self_and (IOperand& op)
 {
   bool result = true;
 
@@ -166,7 +166,7 @@ test_self_and (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_xor (I_Operand& op)
+test_self_xor (IOperand& op)
 {
   bool result = true;
 
@@ -189,7 +189,7 @@ test_self_xor (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_self_or (I_Operand& op)
+test_self_or (IOperand& op)
 {
   bool result = true;
 
@@ -213,7 +213,7 @@ test_self_or (I_Operand& op)
 
 
 template <typename DBS_T> bool
-test_operand_for_exceptions (I_Operand& op)
+test_operand_for_exceptions (IOperand& op)
 {
   bool result = false;
 
@@ -235,7 +235,7 @@ test_operand_for_exceptions (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_operand_for_conv (I_Operand& op)
+test_operand_for_conv (IOperand& op)
 {
   bool result = true;
 
@@ -253,7 +253,7 @@ test_operand_for_conv (I_Operand& op)
 }
 
 bool
-test_op_invalid_conv (I_Operand& op)
+test_op_invalid_conv (IOperand& op)
 {
   bool result = true;
 
@@ -349,7 +349,7 @@ test_op_invalid_conv (I_Operand& op)
 }
 
 template <typename DBS_T> bool
-test_null_write (I_Operand& op, DBS_T value)
+test_null_write (IOperand& op, DBS_T value)
 {
   bool result = true;
 
@@ -369,14 +369,14 @@ test_array_read_value (DArray array, const DBS_T testVal)
   ArrayOperand arrayOp (array);
   NullOperand nullOp;
   StackValue sv (nullOp);
-  I_Operand* pOp = NULL;
+  IOperand* pOp = NULL;
 
   for (uint_t index = 0;
        (index < array.Count ()) && result;
        ++index)
     {
       sv = arrayOp.GetValueAt (index);
-      pOp = &sv.GetOperand ();
+      pOp = &sv.Operand ();
 
 
       DBS_T first, second;
@@ -388,7 +388,7 @@ test_array_read_value (DArray array, const DBS_T testVal)
     }
 
   sv = arrayOp.GetValueAt (array.Count () - 1);
-  pOp = &sv.GetOperand ();
+  pOp = &sv.Operand ();
   result &= test_op_invalid_conv (*pOp);
   pOp->SetValue (testVal);
 
@@ -438,7 +438,7 @@ test_table_value (ITable& table, DArray& array, const DBS_T testVal)
 }
 
 template <typename DBS_T> bool
-test_array_tableread_value (I_DBSHandler& dbsHnd,
+test_array_tableread_value (IDBSHandler& dbsHnd,
                             DArray      array,
                             const DBS_T   testVal)
 {
@@ -475,24 +475,24 @@ test_array_tableread_value (I_DBSHandler& dbsHnd,
 
   assert (testVal != firstArrayVal);
 
-  result &= test_op_invalid_conv (svSimple.GetOperand ());
+  result &= test_op_invalid_conv (svSimple.Operand ());
 
-  svArray.GetOperand ().SetValue (array);
-  svSimple.GetOperand ().SetValue (firstArrayVal);
+  svArray.Operand ().SetValue (array);
+  svSimple.Operand ().SetValue (firstArrayVal);
 
   result &= test_table_value (testTable, array, firstArrayVal);
 
   array.Set (0, testVal);
-  svArrayEl = svArray.GetOperand ().GetValueAt (0);
+  svArrayEl = svArray.Operand ().GetValueAt (0);
 
-  result &= test_op_invalid_conv (svArrayEl.GetOperand ());
+  result &= test_op_invalid_conv (svArrayEl.Operand ());
 
-  svArrayEl.GetOperand ().SetValue (testVal);
-  svSimple.GetOperand ().SetValue (testVal);
+  svArrayEl.Operand ().SetValue (testVal);
+  svSimple.Operand ().SetValue (testVal);
 
   result &= test_table_value (testTable, array, testVal);
 
-  result &= test_null_write (svSimple.GetOperand (), DBS_T ());
+  result &= test_null_write (svSimple.Operand (), DBS_T ());
 
   result &= test_table_value (testTable, array, DBS_T ());
 
@@ -512,7 +512,7 @@ main ()
   DBSCreateDatabase (admin);
 
   {
-    I_DBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
+    IDBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
     BoolOperand op (DBool (true));
     success = success && test_op_invalid_conv (op);
     success = success && test_null_write (op, DBool (true));

@@ -310,7 +310,7 @@ cmd_push_stack (ClientConnection& rConn, uint_t* const pDataOff)
               return WCS_OP_NOTSUPP;
             }
         }
-      I_DBSHandler& dbs   = *rConn.Dbs().mDbs;
+      IDBSHandler& dbs   = *rConn.Dbs().mDbs;
       ITable&   table = dbs.CreateTempTable (fieldsCount, fields_);
 
       rStack.Push (dbs, table);
@@ -347,7 +347,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -358,7 +358,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -369,7 +369,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -380,7 +380,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -391,7 +391,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -402,7 +402,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -413,7 +413,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -424,7 +424,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -435,7 +435,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -446,7 +446,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -457,7 +457,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -468,7 +468,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -479,7 +479,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -490,7 +490,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -501,7 +501,7 @@ read_value (StackValue&         dest,
                                      dataSize - *pDataOff,
                                      &value);
       if (result > minSize)
-        dest.GetOperand ().SetValue (value);
+        dest.Operand ().SetValue (value);
     }
     break;
 
@@ -558,11 +558,11 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           const uint64_t rowIndex = load_le_int64 (data + *pDataOff);
           *pDataOff += sizeof (uint64_t);
 
-          ITable&    table      = stackTop.GetOperand ().GetTable ();
+          ITable&    table      = stackTop.Operand ().GetTable ();
           const uint32_t fieldIndex = table.RetrieveField (fieldName);
 
-          StackValue field    = stackTop.GetOperand ().GetFieldAt (fieldIndex);
-          StackValue rowValue = field.GetOperand ().GetValueAt (rowIndex);
+          StackValue field    = stackTop.Operand ().GetFieldAt (fieldIndex);
+          StackValue rowValue = field.Operand ().GetValueAt (rowIndex);
 
           if (type & WHC_TYPE_ARRAY_MASK)
             {
@@ -589,7 +589,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
 
               while ((*pDataOff < dataSize) && (elCount > 0))
                 {
-                  I_Operand& operand         = rowValue.GetOperand ();
+                  IOperand& operand         = rowValue.Operand ();
                   StackValue arrayValuevalue = operand.GetValueAt (fromPos);
 
                   const uint_t len = read_value (arrayValuevalue,
@@ -615,7 +615,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               DText fieldText;
 
               if (rowIndex < table.AllocatedRows ())
-                rowValue.GetOperand().GetValue (fieldText);
+                rowValue.Operand().GetValue (fieldText);
 
               if ((*pDataOff + sizeof (uint64_t)) >= dataSize)
                 goto update_frame_error;
@@ -643,7 +643,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
               *pDataOff += sizeof (uint8_t);
 
               assert (*pDataOff <= dataSize);
-              rowValue.GetOperand ().SetValue (fieldText);
+              rowValue.Operand ().SetValue (fieldText);
             }
           else
             {
@@ -684,7 +684,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
 
           while ((*pDataOff < dataSize) && (elCount > 0))
             {
-              I_Operand& operand    = stackTop.GetOperand ();
+              IOperand& operand    = stackTop.Operand ();
               StackValue arrayValue = operand.GetValueAt (fromPos);
 
               const uint_t len = read_value (arrayValue,
@@ -707,7 +707,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
       else if (type == WHC_TYPE_TEXT)
         {
           DText fieldText;
-          stackTop.GetOperand ().GetValue (fieldText);
+          stackTop.Operand ().GetValue (fieldText);
 
           if ((*pDataOff + sizeof (uint64_t)) > dataSize)
             goto update_frame_error;
@@ -734,7 +734,7 @@ cmd_update_stack_top (ClientConnection& rConn, uint_t* const pDataOff)
           while (data[*pDataOff] != 0);
           *pDataOff += sizeof (uint8_t);
 
-          stackTop.GetOperand ().SetValue (fieldText);
+          stackTop.Operand ().SetValue (fieldText);
         }
       else
         {
@@ -792,7 +792,7 @@ write_value (StackValue&      source,
              uint8_t* const   data,
              const uint16_t   maxDataSize)
 {
-  I_Operand& valueOp = source.GetOperand ();
+  IOperand& valueOp = source.Operand ();
   uint_t result = 0;
 
   switch (valueOp.GetType ())
@@ -801,7 +801,7 @@ write_value (StackValue&      source,
     {
 
       DBool value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -810,7 +810,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_CHAR:
     {
       DChar value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -819,7 +819,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_DATE:
     {
       DDate value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -828,7 +828,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_DATETIME:
     {
       DDateTime value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -837,7 +837,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_HIRESTIME:
     {
       DHiresTime value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -849,7 +849,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_INT64:
     {
       DInt64 value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -861,7 +861,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_UINT64:
     {
       DUInt64 value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -870,7 +870,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_REAL:
     {
       DReal value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -879,7 +879,7 @@ write_value (StackValue&      source,
   case WHC_TYPE_RICHREAL:
     {
       DRichReal value;
-      source.GetOperand ().GetValue (value);
+      source.Operand ().GetValue (value);
 
       result = Utf8Translator::Write (data, maxDataSize, value);
     }
@@ -904,8 +904,8 @@ cmd_read_basic_stack_top (ClientConnection& rConn,
 
   assert (*pDataOffset <= maxDataSize);
   assert (rConn.Stack ().Size () > 0);
-  assert ((value.GetOperand ().GetType() >= T_BOOL)
-          && (value.GetOperand ().GetType () < T_TEXT));
+  assert ((value.Operand ().GetType() >= T_BOOL)
+          && (value.Operand ().GetType () < T_TEXT));
 
   const uint16_t length = write_value (value,
                                        data + *pDataOffset,
@@ -934,7 +934,7 @@ cmd_read_array_stack_top (ClientConnection& rConn,
 
   {
     DArray temp;
-    value.GetOperand ().GetValue (temp);
+    value.Operand ().GetValue (temp);
 
     if (*pDataOffset + sizeof (uint64_t) >= maxDataSize)
       return WCS_LARGE_RESPONSE;
@@ -958,12 +958,12 @@ cmd_read_array_stack_top (ClientConnection& rConn,
 
   for (uint64_t index = hintOffset; index < maxCount; ++index)
     {
-      StackValue   el        = value.GetOperand ().GetValueAt (index);
+      StackValue   el        = value.Operand ().GetValueAt (index);
       const uint_t writeSize = write_value (el,
                                             data + *pDataOffset,
                                             maxDataSize - *pDataOffset);
 
-      assert (! el.GetOperand ().IsNull());
+      assert (! el.Operand ().IsNull());
 
       if (writeSize == 0)
         {
@@ -990,11 +990,11 @@ cmd_read_text_stack_top (ClientConnection& rConn,
 
   assert (*pDataOffset < maxDataSize);
   assert (rConn.Stack ().Size () > 0);
-  assert (value.GetOperand ().GetType() == T_TEXT);
+  assert (value.Operand ().GetType() == T_TEXT);
 
   {
     DText temp;
-    value.GetOperand ().GetValue (temp);
+    value.Operand ().GetValue (temp);
 
     if (*pDataOffset + sizeof (uint64_t) >= maxDataSize)
       return WCS_LARGE_ARGS;
@@ -1018,11 +1018,11 @@ cmd_read_text_stack_top (ClientConnection& rConn,
 
   for (uint64_t index = hintOffset; index < maxCount; ++index)
     {
-      StackValue   el        = value.GetOperand ().GetValueAt (index);
+      StackValue   el        = value.Operand ().GetValueAt (index);
       const uint_t writeSize = write_value (el,
                                             data + *pDataOffset,
                                             maxDataSize - *pDataOffset);
-      assert (! el.GetOperand ().IsNull());
+      assert (! el.Operand ().IsNull());
 
       if (writeSize == 0)
         {
@@ -1058,7 +1058,7 @@ cmd_read_table_field_internal (ClientConnection& rConn,
   uint_t          cs          = WCS_OK;
   uint8_t* const  data        = rConn.Data ();
   const uint_t    maxDataSize = rConn.DataSize ();
-  ITable&     table       = tableValue.GetOperand ().GetTable ();
+  ITable&     table       = tableValue.Operand ().GetTable ();
 
   DBSFieldDescriptor fd      = table.DescribeField (hintField);
   const uint_t       nameLen = strlen (fd.name) + 1;
@@ -1069,8 +1069,8 @@ cmd_read_table_field_internal (ClientConnection& rConn,
   memcpy (data + *pDataOffset, fd.name, nameLen);
   *pDataOffset += nameLen;
 
-  StackValue fieldVal = tableValue.GetOperand ().GetFieldAt (hintField);
-  StackValue rowValue = fieldVal.GetOperand ().GetValueAt (hintRow);
+  StackValue fieldVal = tableValue.Operand ().GetFieldAt (hintField);
+  StackValue rowValue = fieldVal.Operand ().GetValueAt (hintRow);
 
   if (fd.isArray)
     {
@@ -1127,11 +1127,11 @@ cmd_read_field_stack_top (ClientConnection& rConn,
 {
   assert (*pDataOffset < rConn.MaxSize ());
   assert (rConn.Stack ().Size () > 0);
-  assert (IS_FIELD (topValue.GetOperand ().GetType()));
+  assert (IS_FIELD (topValue.Operand ().GetType()));
 
   uint8_t* const    data  = rConn.Data ();
-  ITable&       table = topValue.GetOperand ().GetTable ();
-  const FIELD_INDEX field = topValue.GetOperand ().GetField ();
+  ITable&       table = topValue.Operand ().GetTable ();
+  const FIELD_INDEX field = topValue.Operand ().GetField ();
 
   DBSFieldDescriptor fieldDesc = table.DescribeField (field);
 
@@ -1159,7 +1159,7 @@ cmd_read_field_stack_top (ClientConnection& rConn,
     {
       const uint16_t  prevOffset = *pDataOffset;
 
-      StackValue  el = topValue.GetOperand ().GetFieldAt (row);
+      StackValue  el = topValue.Operand ().GetFieldAt (row);
 
       if (fieldDesc.isArray)
         {
@@ -1216,11 +1216,11 @@ cmd_read_table_stack_top (ClientConnection& rConn,
 {
   assert (*pDataOffset < rConn.MaxSize ());
   assert (rConn.Stack ().Size () > 0);
-  assert (IS_TABLE (topValue.GetOperand ().GetType()));
+  assert (IS_TABLE (topValue.Operand ().GetType()));
 
   uint8_t* const  data        = rConn.Data ();
   const uint_t    maxDataSize = rConn.MaxSize ();
-  ITable&     table       = topValue.GetOperand ().GetTable ();
+  ITable&     table       = topValue.Operand ().GetTable ();
 
   const FIELD_INDEX fieldsCount = table.FieldsCount();
   const ROW_INDEX   rowsCount   = table.AllocatedRows ();

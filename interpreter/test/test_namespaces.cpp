@@ -300,7 +300,7 @@ my_postman (WH_MESSENGER_CTXT data,
 
 
 bool
-test_fault (I_Session& session,
+test_fault (ISession& session,
             const uint8_t* const unitCode,
             const uint_t         unitCodeSize,
             const uint_t         expectedCode)
@@ -335,7 +335,7 @@ test_fault (I_Session& session,
 }
 
 bool
-load_common_session (I_Session& testSession)
+load_common_session (ISession& testSession)
 {
   bool result = true;
 
@@ -358,7 +358,7 @@ load_common_session (I_Session& testSession)
 }
 
 bool
-load_unit (I_Session&           session,
+load_unit (ISession&           session,
            const uint8_t* const unitCode,
            const uint_t         unitCodeSize)
 {
@@ -396,9 +396,9 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
-    I_Session& db1Session    = GetInstance (test_db1);
-    I_Session& db2Session    = GetInstance (test_db2);
+    ISession& commonSession = GetInstance (NULL);
+    ISession& db1Session    = GetInstance (test_db1);
+    ISession& db2Session    = GetInstance (test_db2);
 
     success = true;
     success = success && load_common_session (commonSession);

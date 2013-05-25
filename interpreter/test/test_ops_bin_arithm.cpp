@@ -120,7 +120,7 @@ test_op_addXX (Session& session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (first.IsNull ())
     return result == second;
@@ -162,7 +162,7 @@ test_op_addt (Session& session,
     return false;
 
   DText result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (result.IsNull ())
     return false;
@@ -205,7 +205,7 @@ test_op_subXX (Session& session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (first.IsNull ())
     return result == second;
@@ -248,7 +248,7 @@ test_op_mulXX (Session& session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (first.IsNull ())
     return result == second;
@@ -291,7 +291,7 @@ test_op_divXX (Session& session,
     return false;
 
   DBS_T result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (first.IsNull ())
     return result == second;
@@ -333,7 +333,7 @@ test_op_mod (Session& session,
     return false;
 
   DUInt64 result;
-  stack[0].GetOperand ().GetValue (result);
+  stack[0].Operand ().GetValue (result);
 
   if (first.IsNull ())
     return result == second;
@@ -357,7 +357,7 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
 
     CompiledBufferUnit dummy (dummyProgram,
                                sizeof dummyProgram,

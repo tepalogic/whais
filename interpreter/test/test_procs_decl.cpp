@@ -174,7 +174,7 @@ my_postman (WH_MESSENGER_CTXT data,
 }
 
 bool
-load_unit (I_Session&           session,
+load_unit (ISession&           session,
            const uint8_t* const unitCode,
            const uint_t         unitCodeSize)
 {
@@ -235,7 +235,7 @@ find_proc_desc (const char* name,
 }
 
 bool
-test_fields_are_ok (I_Session&          session,
+test_fields_are_ok (ISession&          session,
                     const char*       procName,
                     const uint_t        paramId,
                     FieldDesc*          fields,
@@ -297,7 +297,7 @@ test_fields_are_ok (I_Session&          session,
 }
 
 bool
-test_func_paramter (I_Session&     session,
+test_func_paramter (ISession&     session,
                     const char*  procName,
                     const uint_t   paramId,
                     ParameterDesc* param)
@@ -330,7 +330,7 @@ test_func_paramter (I_Session&     session,
 }
 
 bool
-test_procedures (I_Session&     session,
+test_procedures (ISession&     session,
                  ProcDesc       procedures[],
                  const uint_t   procsCount)
 {
@@ -423,8 +423,8 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& adminSession = GetInstance (NULL);
-    I_Session& userSession  = GetInstance (test_db1);
+    ISession& adminSession = GetInstance (NULL);
+    ISession& userSession  = GetInstance (test_db1);
 
     success = true;
     success = success && load_unit (adminSession,

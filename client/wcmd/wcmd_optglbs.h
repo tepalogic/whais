@@ -94,9 +94,9 @@ uint64_t
 GetMaximumFileSize ();
 
 void
-SetDbsHandler (I_DBSHandler& dbsHandler);
+SetDbsHandler (IDBSHandler& dbsHandler);
 
-I_DBSHandler&
+IDBSHandler&
 GetDBSHandler ();
 
 bool

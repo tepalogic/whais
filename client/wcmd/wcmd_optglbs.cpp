@@ -36,7 +36,7 @@ static string        sWorkingDirectory (whf_current_dir ());
 static string        sDBName;
 static VERBOSE_LEVEL sVerbLevel   = VL_ERROR;
 static uint64_t      sMaxFileSize = 0x80000000; //default: 2GB
-static I_DBSHandler* s_pDBSHnd    = NULL;
+static IDBSHandler* s_pDBSHnd    = NULL;
 
 static string        sRemoteHost;
 static string        sConnectPort;
@@ -190,12 +190,12 @@ GetMaximumFileSize ()
 }
 
 void
-SetDbsHandler (I_DBSHandler& dbsHandler)
+SetDbsHandler (IDBSHandler& dbsHandler)
 {
   s_pDBSHnd = &dbsHandler;
 }
 
-I_DBSHandler&
+IDBSHandler&
 GetDBSHandler ()
 {
   assert (s_pDBSHnd != NULL);

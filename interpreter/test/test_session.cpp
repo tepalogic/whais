@@ -200,7 +200,7 @@ my_postman (WH_MESSENGER_CTXT data,
 }
 
 bool
-load_units (I_Session& testSession)
+load_units (ISession& testSession)
 {
   bool result = true;
 
@@ -236,7 +236,7 @@ load_units (I_Session& testSession)
 }
 
 bool
-check_global_def_err (I_Session& testSession)
+check_global_def_err (ISession& testSession)
 {
   bool result = false;
 
@@ -268,7 +268,7 @@ check_global_def_err (I_Session& testSession)
 }
 
 bool
-check_global_doubledef_err (I_Session& testSession)
+check_global_doubledef_err (ISession& testSession)
 {
   bool result = false;
 
@@ -300,7 +300,7 @@ check_global_doubledef_err (I_Session& testSession)
 }
 
 bool
-check_global_diffdef_err (I_Session& testSession)
+check_global_diffdef_err (ISession& testSession)
 {
   bool result = false;
 
@@ -333,7 +333,7 @@ check_global_diffdef_err (I_Session& testSession)
 
 
 bool
-check_proc_def_err (I_Session& testSession)
+check_proc_def_err (ISession& testSession)
 {
   bool result = false;
 
@@ -365,7 +365,7 @@ check_proc_def_err (I_Session& testSession)
 }
 
 bool
-check_proc_doubledef_err (I_Session& testSession)
+check_proc_doubledef_err (ISession& testSession)
 {
   bool result = false;
 
@@ -397,7 +397,7 @@ check_proc_doubledef_err (I_Session& testSession)
 }
 
 bool
-check_proc_diffdef_err (I_Session& testSession)
+check_proc_diffdef_err (ISession& testSession)
 {
   bool result = false;
 
@@ -441,7 +441,7 @@ main ()
   InitInterpreter ();
 
   {
-    I_Session& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance (NULL);
     success = true;
 
     success = success && load_units (commonSession);
