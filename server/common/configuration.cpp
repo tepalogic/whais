@@ -36,18 +36,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 using namespace whisper;
 
-static const char COMMENT_CHAR          = '#';
-static const char DEFAULT_LISTEN_PORT[] = "1761";
-static const char CLEAR_LOG_STREAM[]    = "";
+static const char COMMENT_CHAR                      = '#';
+static const char DEFAULT_LISTEN_PORT[]             = "1761";
+static const char CLEAR_LOG_STREAM[]                = "";
 
-static const char CIPHER_PLAIN[]        = "plain";
-static const char CIPHER_3K[]           = "3k";
+static const char CIPHER_PLAIN[]                    = "plain";
+static const char CIPHER_3K[]                       = "3k";
 
-static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE  = 1024;
-static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT = 128;
-static const uint_t MIN_VL_BLOCK_SIZE           = 1024;
-static const uint_t MIN_VL_BLOCK_COUNT          = 128;
-static const uint_t MIN_TEMP_CACHE              = 128;
+static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE      = 1024;
+static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT     = 128;
+static const uint_t MIN_VL_BLOCK_SIZE               = 1024;
+static const uint_t MIN_VL_BLOCK_COUNT              = 128;
+static const uint_t MIN_TEMP_CACHE                  = 128;
 
 static const uint_t DEFAULT_MAX_CONNS               = 64;
 static const uint_t DEFAULT_TABLE_CACHE_BLOCK_SIZE  = 4098;
@@ -55,6 +55,7 @@ static const uint_t DEFAULT_TABLE_CACHE_BLOCK_COUNT = 1024;
 static const uint_t DEFAULT_VL_BLOCK_SIZE           = 1024;
 static const uint_t DEFAULT_VL_BLOCK_COUNT          = 4098;
 static const uint_t DEFAULT_TEMP_CACHE              = 512;
+
 
 static const string gEntPort ("listen");
 static const string gEntMaxConnections ("max_connections");
@@ -75,14 +76,16 @@ static const string gEntNativeLib ("load_native");
 static const string gEntRootPasswrd("root_password");
 static const string gEntUserPasswrd("user_password");
 
-
 static ServerSettings gMainSettings;
 
+
+
+// Helper function to retrieve '...' or "..." text entries.
 static bool
-get_enclose_entry (ostream&      os,
-                   const string& line,
-                   const char  encChar,
-                   string&       output)
+get_enclose_entry (ostream&         os,
+                   const string&    line,
+                   const char       encChar,
+                   string&          output)
 {
   assert (line.at (0) == encChar);
 
@@ -102,6 +105,7 @@ get_enclose_entry (ostream&      os,
   return encEnded;
 }
 
+
 const string&
 GlobalContextDatabase ()
 {
@@ -110,29 +114,33 @@ GlobalContextDatabase ()
   return dbsName;
 }
 
+
 const ServerSettings&
 GetAdminSettings ()
 {
   return gMainSettings;
 }
 
-bool
-SeekAtConfigurationSection (ifstream& config, uint_t& oConfigLine)
-{
-  static const string identifier = "[CONFIG]";
-  static const string delimiters = " \t";
 
-  oConfigLine = 0;
+bool
+SeekAtConfigurationSection (ifstream& config, uint_t& outConfigLine)
+{
+  static const string identifier("[CONFIG]");
+  static const string delimiters(" \t");
+
+  outConfigLine = 0;
   config.clear ();
   config.seekg (0);
+
   while (! config.eof ())
     {
       string line;
+
       getline (config, line);
 
-      ++oConfigLine;
+      ++outConfigLine;
 
-      size_t pos = 0;
+      size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
 
       if ((token.length () > 0) && (token.at (0) == COMMENT_CHAR))
@@ -141,26 +149,27 @@ SeekAtConfigurationSection (ifstream& config, uint_t& oConfigLine)
       if (token == identifier)
         return true;
     }
-
   return false;
 }
 
+
 bool
-FindNextContextSection (std::ifstream& config, uint_t& ioConfigLine)
+FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine)
 {
-  static const string identifier = "[SESSION]";
-  static const string delimiters = " \t";
+  static const string identifier("[SESSION]");
+  static const string delimiters(" \t");
 
   while (! config.eof ())
     {
       assert (config.good());
 
       string line;
+
       getline (config, line);
 
-      ++ioConfigLine;
+      ++inoutConfigLine;
 
-      size_t pos = 0;
+      size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
 
       if ((token.length () > 0) && (token.at (0) == COMMENT_CHAR))
@@ -173,10 +182,11 @@ FindNextContextSection (std::ifstream& config, uint_t& ioConfigLine)
   return false;
 }
 
+
 bool
-ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
+ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 {
-  static const string delimiters = " \t=";
+  static const string delimiters(" \t=");
 
   while ( !  config.eof ())
     {
@@ -185,7 +195,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       string line;
       getline (config, line);
 
-      ++ioConfigLine;
+      ++inoutConfigLine;
 
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
@@ -213,6 +223,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (entry.mInterface == "*")
             entry.mInterface = "";
+
           if (entry.mService == "")
             entry.mService = DEFAULT_LISTEN_PORT;
 
@@ -235,8 +246,10 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (token == CIPHER_PLAIN)
             gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;
+
           else if (token == CIPHER_3K)
             gMainSettings.mCipher = FRAME_ENCTYPE_3K;
+
           else
             {
               cerr << "The cipher '" << token << "' is not supported. ";
@@ -253,7 +266,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (gMainSettings.mTableCacheBlockCount == 0)
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
         }
@@ -264,7 +279,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (gMainSettings.mTableCacheBlockSize == 0)
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
         }
@@ -275,7 +292,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (gMainSettings.mVLBlockCount == 0)
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
         }
@@ -286,7 +305,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (gMainSettings.mVLBlockSize == 0)
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
         }
@@ -297,7 +318,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if (gMainSettings.mTempValuesCache == 0)
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
         }
@@ -307,7 +330,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
 
@@ -322,7 +347,8 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
-                  cerr << ioConfigLine << ".\n";
+                  cerr << inoutConfigLine << ".\n";
+
                   return false;
                 }
 
@@ -336,7 +362,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
 
@@ -351,7 +379,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
-                  cerr << ioConfigLine << ".\n";
+                  cerr << inoutConfigLine << ".\n";
                   return false;
                 }
             }
@@ -372,7 +400,9 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
 
@@ -387,7 +417,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
-                  cerr << ioConfigLine << ".\n";
+                  cerr << inoutConfigLine << ".\n";
                   return false;
                 }
             }
@@ -405,14 +435,17 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
       else if (token == gEntShowDbg)
         {
           token = NextToken (line, pos, delimiters);
+
           if (token == "false")
             gMainSettings.mShowDebugLog = false;
+
           else if (token == "true")
             gMainSettings.mShowDebugLog = true;
+
           else
             {
               cerr << "Unkown to assign '" << token << "\' to 'show_debug' ";
-              cerr << "at line " << ioConfigLine << ". ";
+              cerr << "at line " << inoutConfigLine << ". ";
               cerr << "Valid value are only 'true' or 'false'.\n";
 
               return false;
@@ -420,7 +453,7 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
         }
       else
         {
-          cerr << "At line " << ioConfigLine << ": Don't know what to do ";
+          cerr << "At line " << inoutConfigLine << ": Don't know what to do ";
           cerr << "with '" << token <<"'.\n";
           return false;
         }
@@ -448,10 +481,11 @@ ParseConfigurationSection (ifstream& config, uint_t& ioConfigLine)
   return true;
 }
 
+
 bool
-ParseContextSection (Logger&        log,
+ParseContextSection (Logger&          log,
                      ifstream&        config,
-                     uint_t&          ioConfigLine,
+                     uint_t&          inoutConfigLine,
                      DBSDescriptors&  output)
 {
   ostringstream logEntry;
@@ -464,7 +498,7 @@ ParseContextSection (Logger&        log,
       string line;
       getline (config, line);
 
-      ++ioConfigLine;
+      ++inoutConfigLine;
 
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
@@ -475,9 +509,9 @@ ParseContextSection (Logger&        log,
       if (token.at (0) == '[')
         {
           //Another configuration section starts from here.
-          //Another configuration section starts from here.
           config.clear ();
           config.seekg (lastPos);
+
           break;
         }
 
@@ -488,8 +522,9 @@ ParseContextSection (Logger&        log,
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               logEntry << "Configuration error at line ";
-              logEntry << ioConfigLine << ".\n";
+              logEntry << inoutConfigLine << ".\n";
               log.Log (LOG_CRITICAL, logEntry.str ());
+
               return false;
             }
 
@@ -504,8 +539,9 @@ ParseContextSection (Logger&        log,
                 {
                   logEntry << "Unmatched "<< token.at (0);
                   logEntry << " in configuration file at line ";
-                  logEntry << ioConfigLine << ".\n";
+                  logEntry << inoutConfigLine << ".\n";
                   log.Log (LOG_CRITICAL, logEntry.str ());
+
                   return false;
                 }
 
@@ -519,7 +555,9 @@ ParseContextSection (Logger&        log,
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line ";
+              cerr << inoutConfigLine << ".\n";
+
               return false;
             }
 
@@ -534,7 +572,8 @@ ParseContextSection (Logger&        log,
                {
                  cerr << "Unmatched "<< token.at (0);
                  cerr << " in configuration file at line ";
-                 cerr << ioConfigLine << ".\n";
+                 cerr << inoutConfigLine << ".\n";
+
                  return false;
                }
             }
@@ -555,7 +594,7 @@ ParseContextSection (Logger&        log,
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line " << ioConfigLine << ".\n";
+              cerr << "Configuration error at line " << inoutConfigLine << ".\n";
               return false;
             }
 
@@ -570,7 +609,8 @@ ParseContextSection (Logger&        log,
                 {
                   cerr << "Unmatched "<< token.at (0);
                   cerr << " in configuration file at line ";
-                  cerr << ioConfigLine << ".\n";
+                  cerr << inoutConfigLine << ".\n";
+
                   return false;
                 }
 
@@ -585,8 +625,9 @@ ParseContextSection (Logger&        log,
            if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
-               logEntry << ioConfigLine << ".\n";
+               logEntry << inoutConfigLine << ".\n";
                log.Log (LOG_CRITICAL, logEntry.str ());
+
                return false;
              }
 
@@ -602,8 +643,9 @@ ParseContextSection (Logger&        log,
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
-                   logEntry << ioConfigLine << ".\n";
+                   logEntry << inoutConfigLine << ".\n";
                    log.Log (LOG_CRITICAL, logEntry.str ());
+
                    return false;
                  }
 
@@ -624,8 +666,9 @@ ParseContextSection (Logger&        log,
            if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
-               logEntry << ioConfigLine << ".\n";
+               logEntry << inoutConfigLine << ".\n";
                log.Log (LOG_CRITICAL, logEntry.str ());
+
                return false;
              }
 
@@ -641,8 +684,9 @@ ParseContextSection (Logger&        log,
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
-                   logEntry << ioConfigLine << ".\n";
+                   logEntry << inoutConfigLine << ".\n";
                    log.Log (LOG_CRITICAL, logEntry.str ());
+
                    return false;
                  }
 
@@ -661,10 +705,11 @@ ParseContextSection (Logger&        log,
            if (output.mRootPass.size () > 0)
              {
                logEntry << "Configuration error at line ";
-               logEntry << ioConfigLine << ". ";
+               logEntry << inoutConfigLine << ". ";
                logEntry << "The root password for this database was ";
                logEntry << "already set.\n";
                log.Log (LOG_CRITICAL, logEntry.str ());
+
                return false;
              }
            token = NextToken (line, pos, delimiters);
@@ -672,8 +717,9 @@ ParseContextSection (Logger&        log,
            if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
-               logEntry << ioConfigLine << ".\n";
+               logEntry << inoutConfigLine << ".\n";
                log.Log (LOG_CRITICAL, logEntry.str ());
+
                return false;
              }
 
@@ -688,8 +734,9 @@ ParseContextSection (Logger&        log,
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
-                   logEntry << ioConfigLine << ".\n";
+                   logEntry << inoutConfigLine << ".\n";
                    log.Log (LOG_CRITICAL, logEntry.str ());
+
                    return false;
                  }
 
@@ -702,10 +749,11 @@ ParseContextSection (Logger&        log,
            if (output.mUserPasswd.size () > 0)
              {
                logEntry << "Configuration error at line ";
-               logEntry << ioConfigLine << ". ";
+               logEntry << inoutConfigLine << ". ";
                logEntry << "The user password for this database was ";
                logEntry << "already set.\n";
                log.Log (LOG_CRITICAL, logEntry.str ());
+
                return false;
              }
 
@@ -714,8 +762,9 @@ ParseContextSection (Logger&        log,
            if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
-               logEntry << ioConfigLine << ".\n";
+               logEntry << inoutConfigLine << ".\n";
                log.Log (LOG_CRITICAL, logEntry.str ());
+
                return false;
              }
 
@@ -730,8 +779,9 @@ ParseContextSection (Logger&        log,
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
-                   logEntry << ioConfigLine << ".\n";
+                   logEntry << inoutConfigLine << ".\n";
                    log.Log (LOG_CRITICAL, logEntry.str ());
+
                    return false;
                  }
 
@@ -741,9 +791,10 @@ ParseContextSection (Logger&        log,
         }
       else
         {
-          logEntry << "At line " << ioConfigLine << ": Don't know what to do ";
+          logEntry << "At line " << inoutConfigLine << ": Don't know what to do ";
           logEntry << "with '" << token <<"'.\n";
           log.Log (LOG_CRITICAL, logEntry.str ());
+
           return false;
         }
     }
@@ -786,19 +837,23 @@ PrepareConfigurationSection (Logger& log)
         }
       gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;
     }
+
   logStream << "Communication cipher is set to '";
   switch (gMainSettings.mCipher)
   {
   case FRAME_ENCTYPE_PLAIN:
     logStream << CIPHER_PLAIN;
     break;
+
   case FRAME_ENCTYPE_3K:
     logStream << CIPHER_3K;
     break;
+
   default:
     assert (false);
   }
   logStream << "'.";
+
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
@@ -817,7 +872,6 @@ PrepareConfigurationSection (Logger& log)
       logStream << "The maximum frame size set to a invalid value. ";
       logStream << "The value should be set between " << MIN_FRAME_SIZE;
       logStream << " and " << MAX_FRAME_SIZE << " bytes.";
-
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
@@ -864,6 +918,7 @@ PrepareConfigurationSection (Logger& log)
       log.Log (LOG_INFO,
                "The table cache block count was set to less than minimum. ");
     }
+
   logStream << "Table cache block count set at ";
   logStream << gMainSettings.mTableCacheBlockCount << '.';
   log.Log (LOG_INFO, logStream.str ());
@@ -882,6 +937,7 @@ PrepareConfigurationSection (Logger& log)
                   );
         }
     }
+
   if (gMainSettings.mVLBlockSize < MIN_VL_BLOCK_SIZE)
     {
       gMainSettings.mVLBlockSize = MIN_VL_BLOCK_SIZE;
@@ -953,70 +1009,66 @@ PrepareConfigurationSection (Logger& log)
   return true;
 }
 
+
 bool
-PrepareContextSection (Logger& log, DBSDescriptors& ioDesc)
+PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
 {
-  assert (ioDesc.mConfigLine != 0);
+  assert (inoutDesc.mConfigLine != 0);
 
   ostringstream logStream;
 
-  if (ioDesc.mUserPasswd.size () == 0)
+  if (inoutDesc.mUserPasswd.size () == 0)
     {
       logStream << "A user password for the database ";
       logStream << "section starting at line ";
-      logStream << ioDesc.mConfigLine;
-      logStream << " was not set.";
+      logStream << inoutDesc.mConfigLine << " was not set.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if (ioDesc.mRootPass.size () == 0)
+  if (inoutDesc.mRootPass.size () == 0)
     {
       logStream << "A root password for the database ";
       logStream << "section starting at line ";
-      logStream << ioDesc.mConfigLine;
-      logStream << " was not set.";
+      logStream << inoutDesc.mConfigLine << " was not set.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if (ioDesc.mDbsName.length () == 0)
+  if (inoutDesc.mDbsName.length () == 0)
     {
       logStream << "Database section starting line ";
-      logStream << ioDesc.mConfigLine;
-      logStream << " does not have a '";
-      logStream << gEntDBSName << "' entry.";
+      logStream << inoutDesc.mConfigLine;
+      logStream << " does not have a '" << gEntDBSName << "' entry.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if (ioDesc.mDbsDirectory.length () == 0)
+  if (inoutDesc.mDbsDirectory.length () == 0)
     {
       logStream << "Database section starting line ";
-      logStream << ioDesc.mConfigLine;
-      logStream << " does not have a '";
-      logStream << gEntWorkDir << "' entry.";
+      logStream << inoutDesc.mConfigLine;
+      logStream << " does not have a '" << gEntWorkDir << "' entry.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if (ioDesc.mDbsLogFile.length () == 0)
+  if (inoutDesc.mDbsLogFile.length () == 0)
     {
       logStream << "Database section starting line ";
-      logStream << ioDesc.mConfigLine;
-      logStream << " does not have a '";
-      logStream << gEntLogFile << "' entry.";
+      logStream << inoutDesc.mConfigLine;
+      logStream << " does not have a '" << gEntLogFile << "' entry.";
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;
     }
 
-  if ( ! whf_is_absolute (ioDesc.mDbsLogFile.c_str ()))
-    ioDesc.mDbsLogFile = ioDesc.mDbsDirectory + ioDesc.mDbsLogFile;
+  if ( ! whf_is_absolute (inoutDesc.mDbsLogFile.c_str ()))
+    inoutDesc.mDbsLogFile = inoutDesc.mDbsDirectory + inoutDesc.mDbsLogFile;
 
   return true;
 }

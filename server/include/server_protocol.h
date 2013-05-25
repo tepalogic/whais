@@ -282,3 +282,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define USER_CMDS_COUNT         ((CMD_PING_SERVER - USER_CMD_BASE) / 2 + 1)
 
 #endif /* SERVER_PROTOCOL_H_ */
+

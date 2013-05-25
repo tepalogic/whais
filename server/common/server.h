@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "configuration.h"
 
+
+
 void
 StartServer (whisper::FileLogger& log, std::vector<DBSDescriptors>& databases);
 
@@ -39,5 +41,5 @@ void
 StopServer ();
 
 
-
 #endif /* SERVER_H_ */
+

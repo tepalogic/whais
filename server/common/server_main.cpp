@@ -42,11 +42,10 @@ clean_frameworks (FileLogger& log)
           if (dbsIterator->mDbs != NULL)
             DBSReleaseDatabase (*(dbsIterator->mDbs));
 
-          if (dbsIterator->mpLogger != NULL)
+          if (dbsIterator->mLogger != NULL)
             {
-              dbsIterator->mpLogger->Log (LOG_INFO,
-                                           "Database context ended!");
-              delete dbsIterator->mpLogger;
+              dbsIterator->mLogger->Log (LOG_INFO, "Database context ended!");
+              delete dbsIterator->mLogger;
             }
 
           ostringstream logEntry;
@@ -63,7 +62,9 @@ clean_frameworks (FileLogger& log)
     DBSShoutdown ();
 }
 
+
 #ifndef ARCH_WINDOWS_VC
+
 
 static void
 sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
@@ -73,6 +74,7 @@ sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 
   StopServer ();
 }
+
 
 static bool
 set_signals ()
@@ -88,7 +90,10 @@ set_signals ()
 
  return true;
 }
+
+
 #else
+
 
 static BOOL WINAPI
 ServerStopHandler (DWORD)
@@ -103,18 +108,21 @@ set_signals ()
 {
  return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
 }
+
+
 #endif
 
 
 int
 main (int argc, char** argv)
 {
-  auto_ptr<ifstream> config (NULL);
-  auto_ptr<FileLogger>   glbLog (NULL);
+  auto_ptr<ifstream>   config (NULL);
+  auto_ptr<FileLogger> glbLog (NULL);
 
   if (argc < 2)
     {
       cerr << "Main configuration file was not passed as argument!\n";
+
       return EINVAL;
     }
   else
@@ -124,6 +132,7 @@ main (int argc, char** argv)
         {
           cerr << "Could not open the configuration file ";
           cerr << '\'' << argv[1] << "'.\n";
+
           return EINVAL;
         }
     }
@@ -131,6 +140,7 @@ main (int argc, char** argv)
   if (! whs_init ())
     {
       cerr << "Couldn't not init the network socket framework\n";
+
       return ENOTSOCK;
     }
 
@@ -143,6 +153,7 @@ main (int argc, char** argv)
           cerr << "Cannot find the CONFIG section in configuration file!\n";
           return -1;
         }
+
       assert (sectionLine > 0);
 
       if (ParseConfigurationSection (*config, sectionLine) == false)
@@ -197,6 +208,7 @@ main (int argc, char** argv)
 
         if (dbs.mDbsName == GlobalContextDatabase ())
           databases.insert (databases.begin (), dbs);
+
         else
           databases.push_back (dbs);
       }
@@ -209,6 +221,7 @@ main (int argc, char** argv)
     else if (databases[0].mDbsName != GlobalContextDatabase())
       {
         ostringstream noGlbMsg;
+
         noGlbMsg << "No entry for global section '";
         noGlbMsg << GlobalContextDatabase ();
         noGlbMsg << "' was found.";
@@ -260,6 +273,7 @@ main (int argc, char** argv)
     glbLog->Log (LOG_CRITICAL, logEntry.str ());
 
     clean_frameworks (*glbLog);
+
     return -1;
 
   }
@@ -296,3 +310,4 @@ main (int argc, char** argv)
 
   return 0;
 }
+

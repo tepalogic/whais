@@ -27,32 +27,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "server/server_protocol.h"
 #include "utils/le_converter.h"
 #include "utils/wrandom.h"
 #include "utils/enc_3k.h"
+#include "server/server_protocol.h"
 
 #include "connection.h"
 
-static const uint32_t FRAME_SERVER_VERS  = 0x00000001;
 
 using namespace std;
 
-ConnectionException::ConnectionException (const char* pMessage,
-                                          const char* pFile,
+
+
+static const uint32_t FRAME_SERVER_VERS  = 0x00000001;
+
+
+
+ConnectionException::ConnectionException (const char*   message,
+                                          const char*   file,
                                           uint32_t      line,
                                           uint32_t      extra)
-  : Exception (pMessage, pFile, line, extra)
+  : Exception (message, file, line, extra)
 {
 }
+
 
 Exception*
 ConnectionException::Clone () const
 {
-  ConnectionException* pResult = new ConnectionException (*this);
-
-  return pResult;
+  return new ConnectionException (*this);
 }
+
 
 EXPCEPTION_TYPE
 ConnectionException::Type () const
@@ -60,11 +65,13 @@ ConnectionException::Type () const
   return CONNECTION_EXCEPTION;
 }
 
+
 const char*
 ConnectionException::Description () const
 {
   return NULL;
 }
+
 
 ClientConnection::ClientConnection (UserHandler&            client,
                                     vector<DBSDescriptors>& databases)
@@ -85,12 +92,13 @@ ClientConnection::ClientConnection (UserHandler&            client,
   if (mCipher == FRAME_ENCTYPE_3K)
     mDataSize -= mDataSize % sizeof (uint32_t);
 
-  mUserHandler.mpDesc = NULL;
+  mUserHandler.mDesc = NULL;
   const uint16_t authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
 
   memset (&mData[0], 0, authFrameLen);
 
   assert (authFrameLen <= MIN_FRAME_SIZE);
+
   store_le_int16 (authFrameLen, &mData[FRAME_SIZE_OFF]);
   mData[FRAME_TYPE_OFF]    = FRAME_TYPE_AUTH_CLNT;
   mData[FRAME_ENCTYPE_OFF] = FRAME_ENCTYPE_PLAIN;
@@ -99,7 +107,6 @@ ClientConnection::ClientConnection (UserHandler&            client,
   store_le_int32 (mVersion, &mData[FRAME_HDR_SIZE + FRAME_AUTH_VER_OFF]);
   store_le_int16 (mDataSize, &mData[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]);
   mData[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = GetAdminSettings().mCipher;;
-
 
   mUserHandler.mSocket.Write (mData, authFrameLen);
   ReciveRawClientFrame ();
@@ -125,7 +132,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
 
   const string dbsName = _RC (const char*,
                               &mData[FRAME_HDR_SIZE +
-                                      FRAME_AUTH_RSP_FIXED_SIZE]);
+                                FRAME_AUTH_RSP_FIXED_SIZE]);
 
   for (vector<DBSDescriptors>::iterator it = databases.begin ();
       it != databases.end ();
@@ -133,32 +140,27 @@ ClientConnection::ClientConnection (UserHandler&            client,
     {
       if (it->mDbsName == dbsName)
         {
-          mUserHandler.mpDesc = &it[0];
+          mUserHandler.mDesc = &it[0];
           break;
         }
     }
 
-  if (mUserHandler.mpDesc == NULL)
-    {
-      throw ConnectionException ("Failed to retrieve database.",
-                                 _EXTRA (0));
-    }
+  if (mUserHandler.mDesc == NULL)
+    throw ConnectionException ("Failed to retrieve database.", _EXTRA (0));
 
   mUserHandler.mRoot =
-        (mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0) ?
-          true :
-          false;
+        (mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0) ? true : false;
 
   if (mCipher == FRAME_ENCTYPE_PLAIN)
     {
       const string passwd = _RC (const char*,
-                                   mData +
+                                 mData +
                                    FRAME_HDR_SIZE +
                                    FRAME_AUTH_RSP_FIXED_SIZE +
                                    dbsName.size () + 1);
       if (mUserHandler.mRoot)
         {
-          if (mUserHandler.mpDesc->mRootPass != passwd)
+          if (mUserHandler.mDesc->mRootPass != passwd)
             {
               throw ConnectionException (
                                 "Failed to authenticate database root user.",
@@ -167,11 +169,11 @@ ClientConnection::ClientConnection (UserHandler&            client,
 
             }
           else
-            mKey = mUserHandler.mpDesc->mRootPass;
+            mKey = mUserHandler.mDesc->mRootPass;
         }
       else
         {
-          if (mUserHandler.mpDesc->mUserPasswd != passwd)
+          if (mUserHandler.mDesc->mUserPasswd != passwd)
             {
               throw ConnectionException (
                                     "Failed to authenticate database user.",
@@ -179,16 +181,16 @@ ClientConnection::ClientConnection (UserHandler&            client,
                                         );
             }
           else
-            mKey = mUserHandler.mpDesc->mUserPasswd;
+            mKey = mUserHandler.mDesc->mUserPasswd;
         }
     }
   else if (mCipher == FRAME_ENCTYPE_3K)
     {
       if (mUserHandler.mRoot)
-         mKey = mUserHandler.mpDesc->mRootPass;
+         mKey = mUserHandler.mDesc->mRootPass;
 
       else
-        mKey = mUserHandler.mpDesc->mUserPasswd;
+        mKey = mUserHandler.mDesc->mUserPasswd;
     }
   else
     {
@@ -197,10 +199,12 @@ ClientConnection::ClientConnection (UserHandler&            client,
 
 }
 
+
 ClientConnection::~ClientConnection ()
 {
   delete [] mData;
 }
+
 
 uint_t
 ClientConnection::MaxSize () const
@@ -226,6 +230,7 @@ ClientConnection::MaxSize () const
 
   return mDataSize - metaDataSize;
 }
+
 
 uint_t
 ClientConnection::DataSize () const
@@ -253,6 +258,7 @@ ClientConnection::DataSize () const
 
 }
 
+
 uint8_t*
 ClientConnection::Data ()
 {
@@ -274,6 +280,7 @@ ClientConnection::Data ()
 
   return mData + metaDataSize;
 }
+
 
 void
 ClientConnection::DataSize (const uint16_t size)
@@ -301,6 +308,7 @@ ClientConnection::DataSize (const uint16_t size)
   assert (mFrameSize <= mDataSize);
 }
 
+
 uint8_t*
 ClientConnection::RawCmdData ()
 {
@@ -313,6 +321,7 @@ ClientConnection::RawCmdData ()
   return NULL;
 }
 
+
 void
 ClientConnection::ReciveRawClientFrame ()
 {
@@ -320,9 +329,9 @@ ClientConnection::ReciveRawClientFrame ()
 
   while (frameRead < FRAME_HDR_SIZE)
     {
-      uint16_t chunkSize;
-      chunkSize = mUserHandler.mSocket.Read (&mData[frameRead],
-                                               FRAME_HDR_SIZE - frameRead);
+      const uint16_t chunkSize =
+                   mUserHandler.mSocket.Read (&mData[frameRead],
+                                             FRAME_HDR_SIZE - frameRead);
       if (chunkSize == 0)
         throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
 
@@ -335,12 +344,15 @@ ClientConnection::ReciveRawClientFrame ()
   case FRAME_TYPE_AUTH_CLNT_RSP:
     //These are legitimate frame types that could be received by a server.
     break;
+
   case FRAME_TYPE_TIMEOUT:
     throw ConnectionException ("Client peer has signaled a timeout condition.",
                                _EXTRA (0));
     break;
+
   default:
     assert (false);
+
     throw ConnectionException ("Unexpected frame type received.", _EXTRA (0));
   }
 
@@ -354,9 +366,9 @@ ClientConnection::ReciveRawClientFrame ()
 
   while (frameRead < mFrameSize)
     {
-      uint16_t chunkSize;
-      chunkSize = mUserHandler.mSocket.Read (&mData[frameRead],
-                                               mFrameSize - frameRead);
+      const uint16_t chunkSize =
+                   mUserHandler.mSocket.Read (&mData[frameRead],
+                                              mFrameSize - frameRead);
       if (chunkSize == 0)
         throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
 
@@ -386,11 +398,11 @@ ClientConnection::ReciveRawClientFrame ()
         }
 
       const uint32_t firstKing = load_le_int32 (mData +
-                                                FRAME_HDR_SIZE +
-                                                ENC_3K_FIRST_KING_OFF);
+                                                  FRAME_HDR_SIZE +
+                                                  ENC_3K_FIRST_KING_OFF);
       const uint32_t secondKing = load_le_int32 (mData +
-                                                 FRAME_HDR_SIZE +
-                                                 ENC_3K_SECOND_KING_OFF);
+                                                   FRAME_HDR_SIZE +
+                                                   ENC_3K_SECOND_KING_OFF);
       wh_buff_3k_decode (
                       firstKing,
                       secondKing,
@@ -401,12 +413,13 @@ ClientConnection::ReciveRawClientFrame ()
                          );
 
       const uint16_t plainSize = load_le_int16 (mData +
-                                                FRAME_HDR_SIZE +
-                                                ENC_3K_PLAIN_SIZE_OFF);
+                                                  FRAME_HDR_SIZE +
+                                                  ENC_3K_PLAIN_SIZE_OFF);
       mFrameSize = plainSize;
       store_le_int16 (plainSize, mData + FRAME_SIZE_OFF);
     }
 }
+
 
 void
 ClientConnection::SendRawClientFrame (const uint8_t type)
@@ -465,6 +478,7 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
   mClientCookie = ~0; //Make sure the client cookie is reread.
 }
 
+
 uint32_t
 ClientConnection::ReadCommand ()
 {
@@ -479,19 +493,17 @@ ClientConnection::ReadCommand ()
                                  _EXTRA (0));
     }
 
-
-
-  const uint16_t  respSize = DataSize ();
   uint16_t        chkSum   = 0;
+  const uint16_t  respSize = DataSize ();
   for (uint_t i = 0; i < respSize; i++)
     chkSum += Data ()[i];
 
   if (chkSum != load_le_int16 (RawCmdData () + PLAIN_CRC_OFF))
     throw ConnectionException ("Frame with invalid CRC received.", _EXTRA (0));
 
-  mClientCookie = load_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
-
+  mClientCookie    = load_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
   mLastReceivedCmd = load_le_int16 (RawCmdData () + PLAIN_TYPE_OFF);
+
   assert ((mLastReceivedCmd & 1) == 0);
 
   return mLastReceivedCmd;
@@ -518,3 +530,4 @@ ClientConnection::SendCmdResponse (const uint16_t respType)
 
   SendRawClientFrame (FRAME_TYPE_NORMAL);
 }
+

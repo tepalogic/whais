@@ -25,12 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LOADER_H_
 #define LOADER_H_
 
-
 #include "whisper.h"
 
 #include "configuration.h"
 
 bool
-LoadDatabase (whisper::FileLogger& log, DBSDescriptors& ioDbsDesc);
+LoadDatabase (whisper::FileLogger& log, DBSDescriptors& inoutDesc);
 
 #endif /* LOADER_H_ */
+

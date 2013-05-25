@@ -30,14 +30,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "connection.h"
 #include "commands.h"
 
+
 using namespace std;
+
 
 class Listener
 {
 public:
   Listener ()
-    : mpInterface (NULL),
-      mpPort (NULL),
+    : mInterface (NULL),
+      mPort (NULL),
       mListenThread (),
       mSocket (INVALID_SOCKET),
       mUsersPool (GetAdminSettings ().mMaxConnections)
@@ -83,10 +85,10 @@ public:
       }
   }
 
-  const char*           mpInterface;
-  const char*           mpPort;
-  Thread                 mListenThread;
-  Socket                 mSocket;
+  const char*             mInterface;
+  const char*             mPort;
+  Thread                  mListenThread;
+  Socket                  mSocket;
   auto_array<UserHandler> mUsersPool;
 
 private:
@@ -94,29 +96,33 @@ private:
   Listener& operator= (const Listener&);
 };
 
+
+
 static const uint_t SOCKET_BACK_LOG = 10;
 
-static vector<DBSDescriptors>* spDatabases;
-static FileLogger*                 spLogger;
-static bool                    sAcceptUsersConnections;
-static bool                    sServerStopped;
-static auto_array<Listener>*   spaListeners;
+static vector<DBSDescriptors>*     sDbsDescriptors;
+static FileLogger*                 sMainLog;
+static bool                        sAcceptUsersConnections;
+static bool                        sServerStopped;
+static auto_array<Listener>*       sListeners;
+
+
 
 void
 client_handler_routine (void* args)
 {
-  UserHandler* const pClient = _RC (UserHandler*, args);
+  UserHandler* const client = _RC (UserHandler*, args);
 
-  assert (pClient != NULL);
-  assert (spDatabases != NULL);
+  assert (client != NULL);
+  assert (sDbsDescriptors != NULL);
 
   try
   {
-      ClientConnection connection (*pClient, *spDatabases);
+      ClientConnection connection (*client, *sDbsDescriptors);
 
       while (true)
         {
-          const COMMAND_HANDLER* pCmds;
+          const COMMAND_HANDLER* cmds;
 
           uint16_t cmdType = connection.ReadCommand ();
 
@@ -138,7 +144,7 @@ client_handler_routine (void* args)
                   throw ConnectionException ("Invalid user command received.",
                                              _EXTRA (cmdType));
                 }
-              pCmds = gpUserCommands;
+              cmds = gpUserCommands;
             }
           else
             {
@@ -151,12 +157,13 @@ client_handler_routine (void* args)
               else if (! connection.IsAdmin ())
                 {
                   throw ConnectionException ("Regular user requested to "
-                                             "execute admin command.",
+                                               "execute admin command.",
                                              _EXTRA (cmdType));
                 }
-              pCmds = gpAdminCommands;
+              cmds = gpAdminCommands;
             }
-          pCmds[cmdType] (connection);
+
+          cmds[cmdType] (connection);
         }
   }
   catch (SocketException& e)
@@ -174,16 +181,17 @@ client_handler_routine (void* args)
       logEntry <<"Extra: " << e.Extra () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
-      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (ConnectionException& e)
   {
-      if (pClient->mpDesc != NULL)
-        pClient->mpDesc->mpLogger->Log (LOG_ERROR, e.Message ());
+      if (client->mDesc != NULL)
+        client->mDesc->mLogger->Log (LOG_ERROR, e.Message ());
+
       else
-        spLogger->Log (LOG_ERROR, e.Message ());
+        sMainLog->Log (LOG_ERROR, e.Message ());
   }
   catch (Exception& e)
   {
@@ -199,13 +207,13 @@ client_handler_routine (void* args)
       logEntry <<"Extra: " << e.Extra () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
-      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (std::bad_alloc&)
   {
-      spLogger->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+      sMainLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
 
       StopServer ();
   }
@@ -215,29 +223,30 @@ client_handler_routine (void* args)
 
       logEntry << "General system failure: " << e.what() << endl;
 
-      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (...)
   {
-      spLogger->Log (LOG_CRITICAL, "Unknown exception!");
+      sMainLog->Log (LOG_CRITICAL, "Unknown exception!");
       StopServer ();
   }
 
-  pClient->mSocket.Close ();
-  pClient->mEndConnetion = true;
+  client->mSocket.Close ();
+  client->mEndConnetion = true;
 }
+
 
 void
 listener_routine (void* args)
 {
-  Listener* const pListener = _RC (Listener*, args);
+  Listener* const listener = _RC (Listener*, args);
 
-  assert (pListener->mUsersPool.Size () > 0);
-  assert (pListener->mListenThread.IsEnded () == false);
-  assert (pListener->mListenThread.HasExceptionPending () == false);
-  assert (pListener->mpPort != NULL);
+  assert (listener->mUsersPool.Size () > 0);
+  assert (listener->mListenThread.IsEnded () == false);
+  assert (listener->mListenThread.HasExceptionPending () == false);
+  assert (listener->mPort != NULL);
 
   try
   {
@@ -245,17 +254,17 @@ listener_routine (void* args)
         ostringstream logEntry;
 
         logEntry << "Listening ";
-        logEntry << ((pListener->mpInterface == NULL) ?
-                     "*" :
-                     pListener->mpInterface);
-        logEntry <<'@' << pListener->mpPort << ".\n";
+        logEntry << ((listener->mInterface == NULL) ?
+                       "*" :
+                       listener->mInterface);
+        logEntry << '@' << listener->mPort << ".\n";
 
-        spLogger->Log (LOG_INFO, logEntry.str ());
+        sMainLog->Log (LOG_INFO, logEntry.str ());
       }
 
-    pListener->mSocket = Socket (pListener->mpInterface,
-                                   pListener->mpPort,
-                                   SOCKET_BACK_LOG);
+    listener->mSocket = Socket (listener->mInterface,
+                                listener->mPort,
+                                SOCKET_BACK_LOG);
 
     bool acceptUserConnections = sAcceptUsersConnections;
 
@@ -263,14 +272,16 @@ listener_routine (void* args)
       {
         try
         {
-          Socket client = pListener->mSocket.Accept ();
-          UserHandler* pUsrHnd = pListener->SearchFreeUser ();
+          Socket client = listener->mSocket.Accept ();
 
-          if (pUsrHnd != NULL)
+          UserHandler* const hnd = listener->SearchFreeUser ();
+
+          if (hnd != NULL)
             {
-              pUsrHnd->mSocket = client;
-              pUsrHnd->mEndConnetion = false;
-              pUsrHnd->mThread.Run (client_handler_routine, pUsrHnd);
+              hnd->mSocket       = client;
+              hnd->mEndConnetion = false;
+
+              hnd->mThread.Run (client_handler_routine, hnd);
             }
           else
             {
@@ -295,7 +306,7 @@ listener_routine (void* args)
                 logEntry <<"Extra: " << e.Extra () << " (";
                 logEntry << e.File () << ':' << e.Line() << ").\n";
 
-                spLogger->Log (LOG_ERROR, logEntry.str ());
+                sMainLog->Log (LOG_ERROR, logEntry.str ());
               }
         }
         acceptUserConnections = sAcceptUsersConnections;
@@ -316,13 +327,13 @@ listener_routine (void* args)
       logEntry <<"Extra: " << e.Extra () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
-      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (std::bad_alloc&)
   {
-      spLogger->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+      sMainLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
 
       StopServer ();
   }
@@ -332,72 +343,76 @@ listener_routine (void* args)
 
       logEntry << "General system failure: " << e.what() << endl;
 
-      spLogger->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (...)
   {
-      spLogger->Log (LOG_CRITICAL, "Listener received unexpected exception!");
+      sMainLog->Log (LOG_CRITICAL, "Listener received unexpected exception!");
       StopServer ();
   }
 }
 
+
 void
 StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
 {
-  spDatabases = &databases;
-  spLogger    = &log;
+  sDbsDescriptors = &databases;
+  sMainLog        = &log;
 
   log.Log (LOG_DEBUG, "Server started!");
 
   assert (databases.size () > 0);
 
   const ServerSettings& server = GetAdminSettings ();
+
   auto_array<Listener> listeners (server.mListens.size ());
 
-  spaListeners = &listeners;
+  sListeners = &listeners;
 
   sAcceptUsersConnections = true;
   sServerStopped          = false;
 
   for (uint_t index = 0; index < listeners.Size (); ++index)
     {
-      Listener* const pEnt = &listeners[index];
+      Listener* const listener = &listeners[index];
 
-      assert (pEnt->mListenThread.IsEnded ());
+      assert (listener->mListenThread.IsEnded ());
 
-      pEnt->mpInterface = (server.mListens[index].mInterface.size () == 0) ?
-                           NULL :
-                           server.mListens[index].mInterface.c_str ();
-      pEnt->mpPort = server.mListens[index].mService.c_str ();
-      pEnt->mListenThread.Run (listener_routine, pEnt);
+      listener->mInterface = (server.mListens[index].mInterface.size () == 0) ?
+                               NULL :
+                               server.mListens[index].mInterface.c_str ();
+      listener->mPort = server.mListens[index].mService.c_str ();
+      listener->mListenThread.Run (listener_routine, listener);
     }
 
   for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].mListenThread.WaitToEnd (false);
 
-  spaListeners = NULL;
+  sListeners = NULL;
 
   log.Log (LOG_DEBUG, "Server stopped!");
 }
 
+
 void
 StopServer ()
 {
-  if ((spaListeners == NULL)  || (spLogger == NULL))
+  if ((sListeners == NULL)  || (sMainLog == NULL))
     return; //Ignore! The server probably did not even start.
 
-  spLogger->Log (LOG_INFO, "Server asked to shutdown.");
+  sMainLog->Log (LOG_INFO, "Server asked to shutdown.");
 
   sAcceptUsersConnections = false;
   sServerStopped          = true;
 
-  for (uint_t index = 0; index < spaListeners->Size (); ++index)
-    (*spaListeners)[index].Close ();
+  for (uint_t index = 0; index < sListeners->Size (); ++index)
+    (*sListeners)[index].Close ();
 }
 
 #ifdef ENABLE_MEMORY_TRACE
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "WHISPER";
 #endif
+

@@ -29,20 +29,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "server_protocol.h"
 
 #include "utils/auto_array.h"
 #include "utils/wthread.h"
 #include "utils/wsocket.h"
+#include "server/server_protocol.h"
 
 #include "configuration.h"
 
+
 using namespace whisper;
+
 
 struct UserHandler
 {
   UserHandler ()
-    : mpDesc (NULL),
+    : mDesc (NULL),
       mThread (),
       mSocket (INVALID_SOCKET),
       mEndConnetion (true)
@@ -55,25 +57,31 @@ struct UserHandler
     assert (mThread.IsEnded ());
   }
 
-  const DBSDescriptors* mpDesc;
+  const DBSDescriptors* mDesc;
   Thread                mThread;
   Socket                mSocket;
   bool                  mRoot;
   bool                  mEndConnetion;
 };
 
+
+
 class ConnectionException : public Exception
 {
 public:
-  ConnectionException (const char* pMessage,
-                       const char* pFile,
+  ConnectionException (const char*   message,
+                       const char*   file,
                        uint32_t      line,
                        uint32_t      extra);
 
-  virtual Exception*     Clone () const;
+  virtual Exception* Clone () const;
+
   virtual EXPCEPTION_TYPE Type () const;
-  virtual const char*   Description () const;
+
+  virtual const char* Description () const;
 };
+
+
 
 class ClientConnection
 {
@@ -82,21 +90,39 @@ public:
                     std::vector<DBSDescriptors>& databases);
   ~ClientConnection ();
 
-  uint_t      MaxSize () const;
-  uint_t      DataSize () const;
-  void        DataSize (const uint16_t size);
-  uint8_t*    Data ();
+  uint_t MaxSize () const;
+
+  uint_t DataSize () const;
+  void   DataSize (const uint16_t size);
+
+  uint8_t* Data ();
 
   uint32_t ReadCommand ();
-  void     SendCmdResponse (const uint16_t respType);
 
-  const DBSDescriptors&  Dbs () { return *mUserHandler.mpDesc; }
-  SessionStack&          Stack () { return mStack; }
-  bool                   IsAdmin () const { return mUserHandler.mRoot; }
+  void SendCmdResponse (const uint16_t respType);
+
+  const DBSDescriptors& Dbs ()
+  {
+    assert (mUserHandler.mDesc != NULL);
+
+    return *mUserHandler.mDesc;
+  }
+
+  SessionStack& Stack ()
+  {
+    return mStack;
+  }
+
+  bool IsAdmin () const
+  {
+    return mUserHandler.mRoot;
+  }
+
 private:
   uint8_t* RawCmdData ();
 
   void ReciveRawClientFrame ();
+
   void SendRawClientFrame (const uint8_t type);
 
   UserHandler&        mUserHandler;

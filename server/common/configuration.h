@@ -36,11 +36,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server_protocol.h"
 
+
+
 struct ListenEntry
 {
   std::string mInterface;
   std::string mService;
 };
+
+
 
 struct ServerSettings
 {
@@ -61,23 +65,24 @@ struct ServerSettings
   {
   }
 
-  uint_t      mMaxConnections;
-  uint_t      mMaxFrameSize;
-  uint_t      mTableCacheBlockSize;
-  uint_t      mTableCacheBlockCount;
-  uint_t      mVLBlockSize;
-  uint_t      mVLBlockCount;
-  uint_t      mTempValuesCache;
-  std::string mWorkDirectory;
-  std::string mTempDirectory;
-  std::string mLogFile;
-
+  uint_t                   mMaxConnections;
+  uint_t                   mMaxFrameSize;
+  uint_t                   mTableCacheBlockSize;
+  uint_t                   mTableCacheBlockCount;
+  uint_t                   mVLBlockSize;
+  uint_t                   mVLBlockCount;
+  uint_t                   mTempValuesCache;
+  std::string              mWorkDirectory;
+  std::string              mTempDirectory;
+  std::string              mLogFile;
   std::vector<ListenEntry> mListens;
-
-  uint8_t     mCipher;
-  bool        mShowDebugLog;
+  uint8_t                  mCipher;
+  bool                     mShowDebugLog;
 
 };
+
+
+
 
 struct DBSDescriptors
 {
@@ -89,23 +94,21 @@ struct DBSDescriptors
       mNativeLibs (),
       mDbs (NULL),
       mSession (NULL),
-      mpLogger (NULL)
+      mLogger (NULL)
   {
   }
 
-  uint_t                   mConfigLine;
-  std::string              mDbsName;
-  std::string              mDbsDirectory;
-  std::string              mDbsLogFile;
-  std::string              mRootPass;
-  std::string              mUserPasswd;
-  std::vector<std::string> mObjectLibs;
-  std::vector<std::string> mNativeLibs;
-
+  uint_t                           mConfigLine;
+  std::string                      mDbsName;
+  std::string                      mDbsDirectory;
+  std::string                      mDbsLogFile;
+  std::string                      mRootPass;
+  std::string                      mUserPasswd;
+  std::vector<std::string>         mObjectLibs;
+  std::vector<std::string>         mNativeLibs;
   whisper::IDBSHandler*            mDbs;
   whisper::ISession*               mSession;
-
-  whisper::Logger*                mpLogger;
+  whisper::Logger*                 mLogger;
 };
 
 const std::string&
@@ -115,24 +118,25 @@ const ServerSettings&
 GetAdminSettings ();
 
 bool
-SeekAtConfigurationSection (std::ifstream& config, uint_t& oConfigLine);
+SeekAtConfigurationSection (std::ifstream& config, uint_t& outConfigLine);
 
 bool
-FindNextContextSection (std::ifstream& config, uint_t& ioConfigLine);
+FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseConfigurationSection (std::ifstream& config, uint_t& ioConfigLine);
+ParseConfigurationSection (std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
 ParseContextSection (whisper::Logger&        log,
-                     std::ifstream&   config,
-                     uint_t&          ioConfigLine,
-                     DBSDescriptors&  output);
+                     std::ifstream&          config,
+                     uint_t&                 inoutConfigLine,
+                     DBSDescriptors&         output);
 
 bool
 PrepareConfigurationSection (whisper::Logger& log);
 
 bool
-PrepareContextSection (whisper::Logger& log, DBSDescriptors& ioDesc);
+PrepareContextSection (whisper::Logger& log, DBSDescriptors& inoutDesc);
 
 #endif /* CONFIGURATION_H_ */
+

@@ -26,43 +26,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include <vector>
 
-#include "loader.h"
-
 #include "dbs/dbs_mgr.h"
 #include "interpreter/interpreter.h"
 #include "compiler//compiledunit.h"
 #include "utils/logger.h"
 
+#include "loader.h"
+
+
 using namespace std;
 using namespace whisper;
 
+
+
 bool
-LoadDatabase (FileLogger& log, DBSDescriptors& ioDbsDesc)
+LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
 {
   ostringstream logEntry;
 
 
-  logEntry << "Loading database: " << ioDbsDesc.mDbsName;
+  logEntry << "Loading database: " << inoutDesc.mDbsName;
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str ("");
 
-  ioDbsDesc.mDbs = &DBSRetrieveDatabase (ioDbsDesc.mDbsName.c_str (),
-                                          ioDbsDesc.mDbsDirectory.c_str ());
+  inoutDesc.mDbs = &DBSRetrieveDatabase (inoutDesc.mDbsName.c_str (),
+                                         inoutDesc.mDbsDirectory.c_str ());
 
-  std::auto_ptr<Logger> apLogger (
-                         new FileLogger (ioDbsDesc.mDbsLogFile.c_str (), true)
-                                   );
+  std::auto_ptr<Logger> dbsLogger (
+                         new FileLogger (inoutDesc.mDbsLogFile.c_str (), true)
+                                  );
 
-  if (ioDbsDesc.mDbsName != GlobalContextDatabase ())
+  if (inoutDesc.mDbsName != GlobalContextDatabase ())
     {
-      ioDbsDesc.mSession = &GetInstance (ioDbsDesc.mDbsName.c_str (),
-                                          apLogger.get ());
+      inoutDesc.mSession = &GetInstance (inoutDesc.mDbsName.c_str (),
+                                         dbsLogger.get ());
     }
   else
-    ioDbsDesc.mSession = &GetInstance (NULL, &log);
+    inoutDesc.mSession = &GetInstance (NULL, &log);
 
-  for (vector<string>::iterator it = ioDbsDesc.mObjectLibs.begin ();
-       it != ioDbsDesc.mObjectLibs.end ();
+  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin ();
+       it != inoutDesc.mObjectLibs.end ();
        ++it)
     {
       logEntry << "... Loading compiled object unit '" << *it << "'.";
@@ -70,10 +73,11 @@ LoadDatabase (FileLogger& log, DBSDescriptors& ioDbsDesc)
       logEntry.str ("");
 
       CompiledFileUnit unit (it->c_str ());
-      ioDbsDesc.mSession->LoadCompiledUnit (unit);
+      inoutDesc.mSession->LoadCompiledUnit (unit);
     }
 
-  ioDbsDesc.mpLogger = apLogger.release ();
+  inoutDesc.mLogger = dbsLogger.release ();
 
   return true;
 }
+
