@@ -28,9 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-typedef const void* WLOG_FUNC_CONTEXT;
-
 #define IGNORE_BUFFER_POS      (uint_t)(~0)
+
+
+
+typedef const void* WLOG_FUNC_CONTEXT;
 
 typedef void (*WLOG_FUNC) (WLOG_FUNC_CONTEXT      bag,
                            uint_t                 msgPosition,
@@ -39,17 +41,20 @@ typedef void (*WLOG_FUNC) (WLOG_FUNC_CONTEXT      bag,
                            char*                  msgFormat,
                            va_list                args);
 
+
 /* Allow one to personalize the message handling for messages generated
  * during compilation phase. */
-
 void
 wh_register_logger (WLOG_FUNC callback, WLOG_FUNC_CONTEXT context);
+
 
 WLOG_FUNC
 wh_logger (void);
 
+
 WLOG_FUNC_CONTEXT
 wh_logger_context (void);
+
 
 /* Called whenever a message has to be generated. */
 void
@@ -59,12 +64,11 @@ wh_log_msg (uint_t          position,
             char*           formatedMsg,
             va_list         args);
 
+
 /* Utility function to truncate and append '...' when the source
  * is too large. */
 char*
-wh_copy_first (char*        dest,
-               const char*  src,
-               uint_t       destMax,
-               uint_t       srcLength);
+wh_copy_first (char* dest, const char* src, uint_t destMax, uint_t srcLength);
 
 #endif /*MSGLOG_H_ */
+

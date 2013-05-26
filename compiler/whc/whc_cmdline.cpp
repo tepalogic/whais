@@ -159,6 +159,26 @@ CmdLineParser::DisplayUsage () const
        << "Usage: whisperc  input_file [-o output_file] [--help | -h]" << endl;
 }
 
+
+
+Exception*
+CmdLineException::Clone () const
+{
+  return new CmdLineException (*this);
+}
+
+EXCEPTION_TYPE
+CmdLineException::Type () const
+{
+  return COMPILER_CMD_LINE_EXCEPTION;
+}
+
+const char*
+CmdLineException::Description () const
+{
+  return "Invalid command line.";
+}
+
 } //namespace whc
 } //namespace whisper
 

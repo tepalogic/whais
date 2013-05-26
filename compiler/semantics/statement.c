@@ -140,9 +140,9 @@ stmt_find_declaration (struct Statement* stmt,
 
       assert (result != NULL);
 
-      if ((IS_TABLE_FIELD (result->type) == FALSE) &&
-          (nameLength == result->labelLength) &&
-          (strncmp (name, result->label, nameLength) == 0))
+      if ((IS_TABLE_FIELD (result->type) == FALSE)
+          && (nameLength == result->labelLength)
+          && (strncmp (name, result->label, nameLength) == 0))
         {
           if (reffered &&  ! IS_REFERRED (result->varId))
             {
@@ -174,9 +174,9 @@ stmt_find_declaration (struct Statement* stmt,
           result = wh_array_get (&stmt->spec.proc.paramsList, i);
           assert (result != NULL);
 
-          if ((IS_TABLE_FIELD (result->type) == FALSE) &&
-              (nameLength == result->labelLength) &&
-              (strncmp (name, result->label, nameLength) == 0))
+          if ((IS_TABLE_FIELD (result->type) == FALSE)
+              && (nameLength == result->labelLength)
+              && (strncmp (name, result->label, nameLength) == 0))
             {
               if (reffered && ! IS_REFERRED (result->varId))
                 {

@@ -33,10 +33,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_optglbs.h"
 
+
+
 using namespace std;
 using namespace whisper;
 
+
+
 static const uint_t MAX_DECODED_STRING = 256;
+
+
+
 
 static const char*
 decode_basic_type (const uint16_t type)
@@ -45,42 +52,59 @@ decode_basic_type (const uint16_t type)
   {
   case T_BOOL:
     return "BOOL";
+
   case T_CHAR:
     return "CHARACTER";
+
   case T_DATE:
     return "DATE";
+
   case T_DATETIME:
     return "DATETIME";
+
   case T_HIRESTIME:
     return "HIRESTIME";
+
   case T_UINT8:
     return "UNSIGNED INT8";
+
   case T_UINT16:
     return "UNSIGNED INT16";
+
   case T_UINT32:
     return "UNSIGNED INT32";
+
   case T_UINT64:
     return "UNSIGNED INT64";
+
   case T_INT8:
     return "INT8";
+
   case T_INT16:
     return "INT16";
+
   case T_INT32:
     return "INT32";
+
   case T_INT64:
     return "INT64";
+
   case T_REAL:
     return "REAL";
+
   case T_RICHREAL:
     return "RICHREAL";
+
   case T_TEXT:
     return "TEXT";
+
   default:
     assert (false);
   }
 
   return NULL;
 }
+
 
 string
 wcmd_decode_typeinfo (unsigned int type)
@@ -92,8 +116,8 @@ wcmd_decode_typeinfo (unsigned int type)
 
   if (IS_ARRAY(type))
     {
-      result += "ARRAY";
-      arrayDesc = true;
+      result    += "ARRAY";
+      arrayDesc  = true;
     }
 
   if (arrayDesc)
@@ -103,11 +127,13 @@ wcmd_decode_typeinfo (unsigned int type)
 
       result += " OF ";
       result += decode_basic_type (GET_BASIC_TYPE (type));
+
       return result;
     }
 
   return decode_basic_type (GET_BASIC_TYPE (type));
 }
+
 
 map<string, CmdEntry> sCommands;
 static const char descHelp[]    = "Display help on available commands.";
@@ -139,7 +165,7 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
           cout << left << it->first;
           cout.width (prevWidth);
           cout.fill (prevFill);
-          cout << it->second.mpCmdDesc << endl;
+          cout << it->second.mDesc << endl;
 
           ++it;
         }
@@ -151,65 +177,70 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
     {
       token = CmdLineNextToken (cmdLine, currPosition);
 
-      const CmdEntry *pEntry = FindCmdEntry (token.c_str ());
-      if (pEntry == NULL)
+      const CmdEntry *entry = FindCmdEntry (token.c_str ());
+      if (entry == NULL)
         {
           cout << "Command not found: " << token << endl;
           return false;
         }
-      cout << pEntry->mpExtHelpDesc << endl;
+      cout << entry->mExtendedDesc << endl;
     }
 
   return true;
 }
+
 
 void
 InitCmdManager ()
 {
   CmdEntry entry;
 
-  entry.mpCmdText     = "help";
-  entry.mpCmdDesc     = descHelp;
-  entry.mpExtHelpDesc = descExtHelp;
-  entry.mcmd          = cmdHelp;
-  entry.mcontext      = NULL;
-  entry.mshowStatus   = false;
+  entry.mName         = "help";
+  entry.mDesc         = descHelp;
+  entry.mExtendedDesc = descExtHelp;
+  entry.mCmd          = cmdHelp;
+  entry.mContext      = NULL;
+  entry.mShowStatus   = false;
 
   RegisterCommand (entry);
 }
 
+
 void
 RegisterCommand (const CmdEntry& entry)
 {
-  assert (entry.mpCmdText != NULL);
-  assert (entry.mpCmdDesc != NULL);
-  assert (entry.mpExtHelpDesc != NULL);
+  assert (entry.mName != NULL);
+  assert (entry.mDesc != NULL);
+  assert (entry.mExtendedDesc != NULL);
 
-  pair<string, CmdEntry> cmdEntry (entry.mpCmdText, entry);
+  pair<string, CmdEntry> cmdEntry (entry.mName, entry);
 
   sCommands.insert (cmdEntry);
 }
 
+
 const CmdEntry*
-FindCmdEntry (const char* pCommand)
+FindCmdEntry (const char* const name)
 {
-  const string command = pCommand;
-  CmdEntry*    pEnt    = NULL;
+  const string command = name;
+  CmdEntry*    entry    = NULL;
 
   map<string, CmdEntry>::iterator it = sCommands.find (command);
   if (it != sCommands.end ())
-    pEnt = &it->second;
+    entry = &it->second;
 
-  return pEnt;
+  return entry;
 }
 
+
 const string
-CmdLineNextToken (const string& cmdLine, size_t& ioPosition)
+CmdLineNextToken (const string& cmdLine, size_t& inoutPosition)
 {
   static string delimiters = " \t";
 
-  return NextToken (cmdLine, ioPosition, delimiters);
+  return NextToken (cmdLine, inoutPosition, delimiters);
 }
+
 
 void
 printException (ostream& outputStream, const Exception& e)
@@ -240,6 +271,7 @@ printException (ostream& outputStream, const Exception& e)
   else
     {
       assert (false);
+
       outputStream << "Unknown exception throwed.\n";
     }
 
@@ -252,5 +284,4 @@ printException (ostream& outputStream, const Exception& e)
       outputStream << "line: " << e.Line () << endl;
     }
 }
-
 

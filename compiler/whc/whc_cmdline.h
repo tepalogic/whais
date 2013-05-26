@@ -27,8 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+
+
 namespace whisper {
 namespace whc {
+
+
 
 class CmdLineParser
 {
@@ -40,6 +44,7 @@ public:
   {
     return mSourceFile;
   }
+
   const char* OutputFile () const
   {
     return mOutputFile;
@@ -47,7 +52,9 @@ public:
 
 private:
   void Parse ();
+
   void DisplayUsage () const;
+
   void CheckArguments ();
 
 private:
@@ -70,21 +77,11 @@ public:
   {
   }
 
-  virtual ~CmdLineException ()
-  {
-  };
+  virtual Exception* Clone () const;
 
-  virtual Exception* Clone () const
-  {
-    return new CmdLineException (*this);
-  }
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual EXPCEPTION_TYPE Type () const { return COMPILER_CMD_LINE_EXCEPTION; }
-
-  virtual const char* Description () const
-  {
-    return "Invalid command line.";
-  }
+  virtual const char* Description () const;
 };
 
 } //namespace whc

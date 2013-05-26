@@ -28,9 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "whisper.h"
-#include "dbs/dbs_mgr.h"
 
-using namespace whisper;
+#include "dbs/dbs_mgr.h"
 
 typedef enum
 {
@@ -48,17 +47,22 @@ typedef enum
 const std::string&
 GetRemoteHostName ();
 
+
 void
-SetRemoteHostName (const char* pHostName);
+SetRemoteHostName (const char* const host);
+
 
 const std::string&
 GetConnectionPort ();
 
+
 void
-SetConnectionPort (const char* pPort);
+SetConnectionPort (const char* const port);
+
 
 uint_t
 GetUserId ();
+
 
 void
 SetUserId (const uint_t userId);
@@ -66,41 +70,53 @@ SetUserId (const uint_t userId);
 const std::string&
 GetUserPassword ();
 
+
 void
-SetUserPassword (const char* pPassword);
+SetUserPassword (const char* const password);
+
 
 const std::string&
 GetWorkingDirectory ();
 
+
 void
-SetWorkingDirectory (const char* pDirectory);
+SetWorkingDirectory (const char* const directory);
+
 
 const std::string&
 GetWorkingDB ();
 
 void
-SetWorkingDB (const char* pDBName);
+SetWorkingDB (const char* const dbName);
+
 
 VERBOSE_LEVEL
 GetVerbosityLevel ();
 
+
 void
 SetVerbosityLevel (const uint_t level);
+
 
 bool
 SetMaximumFileSize (std::string size);
 
+
 uint64_t
 GetMaximumFileSize ();
 
-void
-SetDbsHandler (IDBSHandler& dbsHandler);
 
-IDBSHandler&
+void
+SetDbsHandler (whisper::IDBSHandler& dbs);
+
+
+whisper::IDBSHandler&
 GetDBSHandler ();
+
 
 bool
 IsDatabaseRemote ();
+
 
 #endif //WCMD_OPTGLBS_H_
 

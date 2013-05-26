@@ -34,7 +34,7 @@ namespace whisper
 {
 
 //Base class to handle all exceptions
-enum EXPCEPTION_TYPE
+enum EXCEPTION_TYPE
 {
   COMPILER_CMD_LINE_EXCEPTION,
   DBS_EXCEPTION,
@@ -66,9 +66,11 @@ public:
   const char*   File () const;
   uint32_t      Line () const;
 
-  virtual Exception*      Clone () const = 0;
-  virtual EXPCEPTION_TYPE Type () const = 0;
-  virtual const char*     Description () const = 0;
+  virtual Exception* Clone () const = 0;
+
+  virtual EXCEPTION_TYPE Type () const = 0;
+
+  virtual const char* Description () const = 0;
 
 private:
 

@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+
+
 /*
  * WArray - a generic way to manipulate array of elements.
  */
@@ -44,6 +46,8 @@ struct WArray
   uint_t   arraysUsed;
 };
 
+
+
 /* The size of allocated memory chunk when the array has to be extended. */
 #define ARRAY_INCRMENT_SIZE     512
 #define wh_array_init(a, x) wh_array_init_ex ( \
@@ -59,19 +63,25 @@ wh_array_init_ex (struct WArray* const outArray,
                   uint_t               increment,
                   uint_t               alignment);
 
+
 void*
 wh_array_add (struct WArray* const array, const void* const data);
+
 
 void*
 wh_array_get (const struct WArray* const array, const uint_t index);
 
+
 uint_t
 wh_array_count (const struct WArray* const array);
 
+
 void
 wh_array_resize (struct WArray* const array, const uint_t count);
+
 
 void
 wh_array_clean (struct WArray* array);
 
 #endif /* WARRAY_H */
+

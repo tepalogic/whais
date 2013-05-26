@@ -89,7 +89,7 @@ public:
     return new FunctionalUnitException (*this);
   }
 
-  virtual EXPCEPTION_TYPE Type () const { return FUNCTIONAL_UNIT_EXCEPTION; }
+  virtual EXCEPTION_TYPE Type () const { return FUNCTIONAL_UNIT_EXCEPTION; }
 
   virtual const char* Description () const
   {

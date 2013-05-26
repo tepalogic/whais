@@ -27,8 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/wthread.h"
 
+
+
 namespace whisper
 {
+
+
 
 Lock::Lock ()
 {
@@ -37,11 +41,14 @@ Lock::Lock ()
     throw LockException (NULL, _EXTRA (result));
 }
 
+
 Lock::~Lock ()
 {
   const uint_t result = wh_lock_destroy (&mLock);
+
   assert (result == WOP_OK);
 }
+
 
 void
 Lock::Acquire ()
@@ -51,6 +58,7 @@ Lock::Acquire ()
     throw LockException (NULL, _EXTRA (result));
 }
 
+
 void
 Lock::Release ()
 {
@@ -59,7 +67,8 @@ Lock::Release ()
   assert (result == WOP_OK);
 }
 
-/////////////////////////////Thread////////////////////////////////////////////
+
+
 
 Thread::Thread ()
   : mRoutine (NULL),
@@ -73,6 +82,7 @@ Thread::Thread ()
     mNeedsClean (false)
 {
 }
+
 
 void
 Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
@@ -102,6 +112,7 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
   mNeedsClean = true;
 }
 
+
 Thread::~Thread ()
 {
   WaitToEnd (false);
@@ -112,6 +123,7 @@ Thread::~Thread ()
   //do not do it from during class destructor.
   delete mException;
 }
+
 
 void
 Thread::WaitToEnd (const bool throwPending)
@@ -128,6 +140,7 @@ Thread::WaitToEnd (const bool throwPending)
   if (throwPending)
     ThrowPendingException ();
 }
+
 
 void
 Thread::ThrowPendingException ()
@@ -151,6 +164,7 @@ Thread::ThrowPendingException ()
       throw clone;
     }
 }
+
 
 void
 Thread::ThreadWrapperRoutine (void* const args)
@@ -182,6 +196,7 @@ Thread::ThreadWrapperRoutine (void* const args)
   pThread->mEnded = true;
   pThread->mLock.Release ();
 }
+
 
 } //namespace whisper
 

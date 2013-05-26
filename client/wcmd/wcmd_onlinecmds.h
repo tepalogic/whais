@@ -35,3 +35,4 @@ const char*
 wcmd_translate_status (const uint32_t cs);
 
 #endif /* WCMD_ONLINECMDS_H_ */
+

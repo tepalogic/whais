@@ -64,9 +64,17 @@ public:
       mLock.Release ();
   }
 
-  void Acquire () { mLock.Acquire (); mIsAcquireed = true;}
+  void Acquire ()
+  {
+    mLock.Acquire ();
+    mIsAcquireed = true;
+  }
 
-  void Release () { mIsAcquireed = false; mLock.Release (); }
+  void Release ()
+  {
+    mIsAcquireed = false;
+    mLock.Release ();
+  }
 
 private:
   Lock&       mLock;
@@ -82,9 +90,11 @@ public:
                  uint32_t      line,
                  uint32_t      extra);
 
-  virtual Exception*        Clone () const;
-  virtual EXPCEPTION_TYPE   Type () const;
-  virtual const char*       Description () const;
+  virtual Exception* Clone () const;
+
+  virtual EXCEPTION_TYPE Type () const;
+
+  virtual const char* Description () const;
 };
 
 
@@ -96,7 +106,9 @@ public:
   ~Thread ();
 
   void Run (WH_THREAD_ROUTINE routine, void* const args);
+
   void WaitToEnd (const bool throwPending = true);
+
   void ThrowPendingException ();
 
   void IgnoreExceptions (bool ignore)
@@ -107,11 +119,15 @@ public:
   void DiscardException ()
   {
     mUnkExceptSignaled = false;
+
     delete mException;
     mException = NULL;
   }
 
-  bool IsEnded () const { return mEnded; }
+  bool IsEnded () const
+  {
+    return mEnded;
+  }
 
   bool HasExceptionPending ()
   {
@@ -120,6 +136,9 @@ public:
 
 private:
   static void ThreadWrapperRoutine (void* const);
+
+  Thread (const Thread&);
+  Thread& operator= (const Thread&);
 
   WH_THREAD_ROUTINE       mRoutine;
   void*                   mRoutineArgs;
@@ -130,10 +149,8 @@ private:
   bool                    mIgnoreExceptions;
   bool                    mEnded;
   bool                    mNeedsClean;
-
-  Thread (const Thread&);
-  Thread& operator= (const Thread&);
 };
+
 
 
 class EXCEP_SHL ThreadException : public Exception
@@ -145,9 +162,11 @@ public:
                    uint32_t      extra);
 
 
-  virtual Exception*      Clone () const;
-  virtual EXPCEPTION_TYPE Type () const;
-  virtual const char*     Description () const;
+  virtual Exception* Clone () const;
+
+  virtual EXCEPTION_TYPE Type () const;
+
+  virtual const char* Description () const;
 };
 
 

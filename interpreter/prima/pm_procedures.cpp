@@ -91,10 +91,11 @@ ProcedureManager::GetProcedure (const uint8_t* const name,
 {
   for (uint32_t index = 0; index < mProcsEntrys.size (); ++index)
     {
-      if ((strlen (_RC (const char*, name)) == nameLength)
-          && (memcmp (name,
-                      &mIdentifiers[mProcsEntrys[index].mIdIndex],
-                      nameLength) == 0))
+      const char* const entryName =
+              _RC (const char*, &mIdentifiers[mProcsEntrys[index].mIdIndex]);
+
+      if ((strlen (entryName) == nameLength)
+          && (memcmp (name, entryName, nameLength) == 0))
         {
           return index;
         }

@@ -76,7 +76,7 @@ public:
 
   virtual Exception* Clone () const;
 
-  virtual EXPCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type () const;
 
   virtual const char* Description () const;
 };

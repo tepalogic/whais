@@ -38,9 +38,11 @@ public:
                  uint32_t      line,
                  uint32_t      extra);
 
-  virtual Exception*       Clone () const;
-  virtual EXPCEPTION_TYPE  Type () const;
-  virtual const char*      Description () const;
+  virtual Exception* Clone () const;
+
+  virtual EXCEPTION_TYPE Type () const;
+
+  virtual const char* Description () const;
 };
 
 

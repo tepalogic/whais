@@ -27,9 +27,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "msglog.h"
 
+
+
+
 static const char *MSG_PREFIX[] = {
   "", "error ", "warning ", "error "
 };
+
+
 
 static uint_t
 get_line_from_buffer (const char* buffer, uint_t bufferOff)
@@ -62,6 +67,7 @@ get_line_from_buffer (const char* buffer, uint_t bufferOff)
     }
   return result;
 }
+
 
 void
 whc_messenger (WH_MESSENGER_CTXT    data,

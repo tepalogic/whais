@@ -68,7 +68,7 @@ public:
 
   virtual Exception* Clone () const { return new DumpException (*this); }
 
-  virtual EXPCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
+  virtual EXCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
 
   virtual const char* Description () const
   {

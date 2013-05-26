@@ -28,25 +28,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "wcmd_optglbs.h"
 
-using namespace std;
 
-const uint64_t       MINIMUM_FILE_SIZE = 0x100000; //1 MB
+
+using namespace std;
+using namespace whisper;
+
+
+
+static const uint64_t   MINIMUM_FILE_SIZE = 0x100000;    //1 MB
+static const char       DEFAULT_PORT[]    = "1761";
+static const uint_t     DEFUALT_USER      = 1;
+
 
 static string        sWorkingDirectory (whf_current_dir ());
 static string        sDBName;
-static VERBOSE_LEVEL sVerbLevel   = VL_ERROR;
-static uint64_t      sMaxFileSize = 0x80000000; //default: 2GB
-static IDBSHandler* s_pDBSHnd    = NULL;
-
+static VERBOSE_LEVEL sVerbLevel       = VL_ERROR;
+static uint64_t      sMaxFileSize     = 0x80000000; //default: 2GB
+static IDBSHandler*  sDBSHnd          = NULL;
 static string        sRemoteHost;
 static string        sConnectPort;
 static string        sPassword;
+static int           sUserId          = -1;
 
-static int         sUserId  = -1;
 
-static const char  DEFAULT_PORT[] = "1761";
-
-static const uint_t  DEFUALT_USER   = 1;
 
 const string&
 GetRemoteHostName ()
@@ -54,11 +58,13 @@ GetRemoteHostName ()
   return sRemoteHost;
 }
 
+
 void
-SetRemoteHostName (const char* pHostName)
+SetRemoteHostName (const char* const host)
 {
-  sRemoteHost = pHostName;
+  sRemoteHost = host;
 }
+
 
 const string&
 GetConnectionPort ()
@@ -69,11 +75,13 @@ GetConnectionPort ()
   return sConnectPort;
 }
 
+
 void
-SetConnectionPort (const char* pPort)
+SetConnectionPort (const char* const port)
 {
-  sConnectPort = pPort;
+  sConnectPort = port;
 }
+
 
 uint_t
 GetUserId ()
@@ -84,11 +92,13 @@ GetUserId ()
   return sUserId;
 }
 
+
 void
 SetUserId (const uint_t userId)
 {
   sUserId = (userId > 0) ? 1 : 0;
 }
+
 
 const string&
 GetUserPassword ()
@@ -96,11 +106,13 @@ GetUserPassword ()
   return sPassword;
 }
 
+
 void
-SetUserPassword (const char* pPassword)
+SetUserPassword (const char* const password)
 {
-  sPassword = pPassword;
+  sPassword = password;
 }
+
 
 const string&
 GetWorkingDirectory ()
@@ -108,11 +120,13 @@ GetWorkingDirectory ()
   return sWorkingDirectory;
 }
 
+
 void
-SetWorkingDirectory (const char* pDirectory)
+SetWorkingDirectory (const char* const directory)
 {
-  sWorkingDirectory = pDirectory;
+  sWorkingDirectory = directory;
 }
+
 
 const string&
 GetWorkingDB ()
@@ -120,11 +134,13 @@ GetWorkingDB ()
   return sDBName;
 }
 
+
 void
-SetWorkingDB (const char* pDBName)
+SetWorkingDB (const char* const dbName)
 {
-  sDBName = pDBName;
+  sDBName = dbName;
 }
+
 
 VERBOSE_LEVEL
 GetVerbosityLevel ()
@@ -132,14 +148,16 @@ GetVerbosityLevel ()
   return sVerbLevel;
 }
 
+
 void
 SetVerbosityLevel (const uint_t level)
 {
   sVerbLevel = _SC (VERBOSE_LEVEL, MIN (level, VL_MAX));
 }
 
+
 bool
-SetMaximumFileSize (std::string size)
+SetMaximumFileSize (string size)
 {
   static const string digits = "0123456789";
 
@@ -158,16 +176,19 @@ SetMaximumFileSize (std::string size)
           multiplier     = 1024;
           size [lastPos] = 0;
           break;
+
         case 'm':
         case 'M':
           multiplier     = 1024 * 1024;
           size [lastPos] = 0;
           break;
+
         case 'g':
         case 'G':
           multiplier     = 1024 * 1024 * 1024;
           size [lastPos] = 0;
           break;
+
         default:
           return false;
         }
@@ -189,18 +210,22 @@ GetMaximumFileSize ()
   return sMaxFileSize;
 }
 
+
 void
-SetDbsHandler (IDBSHandler& dbsHandler)
+SetDbsHandler (IDBSHandler& dbs)
 {
-  s_pDBSHnd = &dbsHandler;
+  sDBSHnd = &dbs;
 }
+
 
 IDBSHandler&
 GetDBSHandler ()
 {
-  assert (s_pDBSHnd != NULL);
-  return *s_pDBSHnd;
+  assert (sDBSHnd != NULL);
+
+  return *sDBSHnd;
 }
+
 
 bool
 IsDatabaseRemote ()
@@ -210,3 +235,4 @@ IsDatabaseRemote ()
 
   return false;
 }
+

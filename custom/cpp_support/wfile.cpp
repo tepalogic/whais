@@ -27,7 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wfile.h"
 #include "whisper.h"
 
+
+
 namespace whisper {
+
 
 File::File (const char* name, uint_t mode)
   : mHandle (0)
@@ -37,12 +40,14 @@ File::File (const char* name, uint_t mode)
     throw FileException (name, _EXTRA (whf_last_error ()));
 }
 
+
 File::File (const File &src) :
   mHandle (whf_dup (src.mHandle))
 {
   if (mHandle == _SC (WH_FILE, -1))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
+
 
 File::~File ()
 {
@@ -51,12 +56,14 @@ File::~File ()
     whf_close (mHandle);
 }
 
+
 void
 File::Read (uint8_t* pBuffer, uint_t size)
 {
   if ( ! whf_read (mHandle, pBuffer, size))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
+
 
 void
 File::Write (const uint8_t* pBuffer, uint_t size)
@@ -65,12 +72,14 @@ File::Write (const uint8_t* pBuffer, uint_t size)
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
+
 void
 File::Seek (const int64_t where, const int whence)
 {
   if ( ! whf_seek (mHandle, where, whence))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
+
 
 uint64_t File::Tell ()
 {
@@ -82,12 +91,14 @@ uint64_t File::Tell ()
   return position;
 }
 
+
 void
 File::Sync ()
 {
   if ( ! whf_sync (mHandle))
     throw FileException (NULL,_EXTRA(whf_last_error ()));
 }
+
 
 uint64_t File::GetSize () const
 {
@@ -99,12 +110,14 @@ uint64_t File::GetSize () const
   return size;
 }
 
+
 void
 File::SetSize (const uint64_t size)
 {
   if ( ! whf_set_size (mHandle, size))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
+
 
 void
 File::Close ()
@@ -116,6 +129,7 @@ File::Close ()
 
   mHandle = _SC (WH_FILE, -1);
 }
+
 
 File&
 File::operator= (const File &src)
@@ -131,6 +145,7 @@ File::operator= (const File &src)
 
   return *this;
 }
+
 
 } //namespace whisper
 

@@ -31,6 +31,9 @@
 extern "C" {
 #endif
 
+
+
+
 static const uint8_t UTF8_7BIT_MASK  = 0x00;
 static const uint8_t UTF8_11BIT_MASK = 0xC0;
 static const uint8_t UTF8_16BIT_MASK = 0xE0;
@@ -43,28 +46,35 @@ static const uint8_t UTF8_EXTRA_BYTE_SIG   = 0x80;
 static const uint8_t UTF8_EXTRA_BYTE_MASK  = 0xC0;
 static const uint8_t UTF8_MAX_BYTES_COUNT  = 0x08;
 
+
+
 /* Get the code units count of an UTF-8 encoded char using the
  * first code unit. */
 uint_t
 wh_utf8_cu_count (const uint8_t codeUnit);
 
+
 /* Get the Unicode code point of the first UTF-8 encoded char. */
 uint_t
 wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint);
 
+
 /* Store a Unicode code point using the UTF-8 encoding. */
 uint_t
 wh_store_utf8_cp (uint32_t codePoint, uint8_t *dest);
+
 
 /* Get the reuquired code  unit to store this Unicode code point using
  * the UTF-8 encoding. */
 uint_t
 wh_utf8_store_size (const uint32_t codePoint);
 
+
 /*  Get the Unicode code points count from an UTF-8 encoded
  *  string (null terminated). */
 int
 wh_utf8_strlen (const uint8_t* const utf8Str);
+
 
 #ifdef __cplusplus
 }

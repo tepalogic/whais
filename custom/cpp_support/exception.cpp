@@ -41,6 +41,7 @@ Exception::Exception (const char*     message,
 {
 }
 
+
 Exception::Exception (const Exception& source)
   : mErrorMessage (source.mErrorMessage),
     mFile (source.mFile),
@@ -49,9 +50,11 @@ Exception::Exception (const Exception& source)
 {
 }
 
+
 Exception::~Exception ()
 {
 }
+
 
 uint32_t
 Exception::Extra () const
@@ -59,11 +62,13 @@ Exception::Extra () const
   return mExtra;
 }
 
+
 const char*
 Exception::Message () const
 {
   return mErrorMessage.c_str ();
 }
+
 
 const char*
 Exception::File () const
@@ -71,13 +76,15 @@ Exception::File () const
   return mFile;
 }
 
+
 uint32_t
 Exception::Line () const
 {
   return mLine;
 }
 
-////////////////////FileException/////////////////////////////////////////////
+
+
 
 FileException::FileException (const char*   message,
                               const char*   file,
@@ -87,17 +94,20 @@ FileException::FileException (const char*   message,
 {
 }
 
+
 Exception*
 FileException::Clone () const
 {
   return new FileException (*this);
 }
 
-EXPCEPTION_TYPE
+
+EXCEPTION_TYPE
 FileException::Type () const
 {
   return FILE_EXCEPTION;
 }
+
 
 const char*
 FileException::Description () const
@@ -105,7 +115,7 @@ FileException::Description () const
   return "File IO error.";
 }
 
-//////////////////////////LockException/////////////////////////////////////
+
 
 LockException::LockException (const char*   message,
                               const char*   file,
@@ -115,17 +125,20 @@ LockException::LockException (const char*   message,
 {
 }
 
+
 Exception*
 LockException::Clone () const
 {
   return new LockException (*this);
 }
 
-EXPCEPTION_TYPE
+
+EXCEPTION_TYPE
 LockException::Type () const
 {
   return SYNC_EXCEPTION;
 }
+
 
 const char*
 LockException::Description () const
@@ -133,15 +146,16 @@ LockException::Description () const
   return "Thread synchronize error.";
 }
 
-//////////////////////////ThreadException/////////////////////////////////////
 
-ThreadException::ThreadException (const char* message,
-                                    const char* file,
-                                    uint32_t      line,
-                                    uint32_t      extra)
+
+ThreadException::ThreadException (const char*   message,
+                                  const char*   file,
+                                  uint32_t      line,
+                                  uint32_t      extra)
   : Exception (message, file, line, extra)
 {
 }
+
 
 Exception*
 ThreadException::Clone () const
@@ -149,11 +163,13 @@ ThreadException::Clone () const
   return new ThreadException (*this);
 }
 
-EXPCEPTION_TYPE
+
+EXCEPTION_TYPE
 ThreadException::Type () const
 {
   return THREAD_EXCEPTION;
 }
+
 
 const char*
 ThreadException::Description () const
@@ -161,7 +177,8 @@ ThreadException::Description () const
   return "Thread execution error.";
 }
 
-//////////////////////////SocketException////////////////////////////////////
+
+
 
 SocketException::SocketException (const char*   message,
                                   const char*   file,
@@ -171,17 +188,20 @@ SocketException::SocketException (const char*   message,
 {
 }
 
+
 Exception*
 SocketException::Clone () const
 {
   return new SocketException (*this);
 }
 
-EXPCEPTION_TYPE
+
+EXCEPTION_TYPE
 SocketException::Type () const
 {
   return SOCKED_EXCEPTION;
 }
+
 
 const char*
 SocketException::Description () const
@@ -189,6 +209,7 @@ SocketException::Description () const
 
   return "Network IO error.";
 }
+
 
 } //namespace whisper
 

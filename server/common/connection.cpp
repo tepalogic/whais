@@ -59,7 +59,7 @@ ConnectionException::Clone () const
 }
 
 
-EXPCEPTION_TYPE
+EXCEPTION_TYPE
 ConnectionException::Type () const
 {
   return CONNECTION_EXCEPTION;

@@ -103,8 +103,9 @@ static const char descExit[]    = "Terminate execution.";
 static const char descExtExit[] = "Terminate execution.\n"
                                     "Usage:\n"
                                     "  quit";
-
 static bool sFinishInteraction = false;
+
+
 
 static void
 PrintHelpUsage ()
@@ -112,18 +113,21 @@ PrintHelpUsage ()
   cout << usageDescription;
 }
 
+
 static void
 PrintWrongUsage ()
 {
-  std::cout << " wcmd: invalid arguments. Use --help!" << std::endl;
+  cout << " wcmd: invalid arguments. Use --help!" << endl;
 }
 
+
 static bool
-ExecuteCommandLine (const std::string& cmdLine)
+ExecuteCommandLine (const string& cmdLine)
 {
   assert (cmdLine.length () > 0);
 
-  static string spaces = " \t";
+  static const string spaces = " \t";
+
   size_t firstPos = cmdLine.find_first_not_of (spaces);
   size_t lastPos  = cmdLine.find_last_not_of (spaces);
 
@@ -133,30 +137,32 @@ ExecuteCommandLine (const std::string& cmdLine)
   if (firstPos == lastPos)
     return true;
 
-  string normalizeCmd = cmdLine.substr (firstPos, lastPos - firstPos + 1);
+  const string normalizeCmd = cmdLine.substr (firstPos,
+                                              lastPos - firstPos + 1);
 
   assert (normalizeCmd != "");
 
   size_t          pos     = 0;
   const string    command = CmdLineNextToken (normalizeCmd, pos);
-  const CmdEntry* pEntry  = FindCmdEntry (command.c_str ());
+  const CmdEntry* cmd  = FindCmdEntry (command.c_str ());
 
-  if (pEntry == NULL)
+  if (cmd == NULL)
     {
       cout << "Invalid command '" << command << "'." <<  endl;
       return false;
     }
 
-  bool cmdResult = pEntry->mcmd (normalizeCmd, pEntry->mcontext);
+  const bool cmdResult = cmd->mCmd (normalizeCmd, cmd->mContext);
 
-  if (pEntry->mshowStatus && (GetVerbosityLevel () > VL_STATUS))
+  if (cmd->mShowStatus && (GetVerbosityLevel () > VL_STATUS))
     cout << command << " : " << (cmdResult ? "OK" : "FAIL") << endl;
 
   return cmdResult;
 }
 
+
 static bool
-ExecuteCommandBatch (const std::string& line)
+ExecuteCommandBatch (const string& line)
 {
   size_t lastSemicolonPos = 0;
   while (lastSemicolonPos < line.length ())
@@ -178,26 +184,29 @@ ExecuteCommandBatch (const std::string& line)
   return true;
 }
 
+
 static bool
 cmdExit (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  bool* pFinishInteraction = _RC(bool*, context);
+  bool* finished = _RC (bool*, context);
 
-  *pFinishInteraction = true;
+  *finished = true;
+
   return true;
 }
+
 
 void
 ExecuteInteractively ()
 {
   CmdEntry entry;
 
-  entry.mpCmdText     = "quit";
-  entry.mpCmdDesc     = descExit;
-  entry.mpExtHelpDesc = descExtExit;
-  entry.mcmd          = cmdExit;
-  entry.mcontext      = &sFinishInteraction;
-  entry.mshowStatus   = false;
+  entry.mName         = "quit";
+  entry.mDesc         = descExit;
+  entry.mExtendedDesc = descExtExit;
+  entry.mCmd          = cmdExit;
+  entry.mContext      = &sFinishInteraction;
+  entry.mShowStatus   = false;
 
   RegisterCommand (entry);
 
@@ -214,6 +223,7 @@ ExecuteInteractively ()
         break;
     }
 }
+
 
 static void
 InitDBS ()
@@ -253,6 +263,7 @@ InitDBS ()
     cout << "done." << endl;
 }
 
+
 static void
 StopDBS ()
 {
@@ -264,7 +275,6 @@ StopDBS ()
   if (GetVerbosityLevel () >= VL_DEBUG)
     cout << "Stopping the DBS framework." << endl;
 }
-
 
 
 static void
@@ -282,6 +292,7 @@ CreateDB (const string& dbDirectory)
     cout << "done." << endl;
 }
 
+
 static void
 OpenDB ()
 {
@@ -298,6 +309,7 @@ OpenDB ()
     cout << "done." << endl;
 }
 
+
 static void
 RemoveDB ()
 {
@@ -313,11 +325,12 @@ RemoveDB ()
     cout << "done." << endl;
 }
 
+
 int
 main (const int argc, char *argv[])
 {
-  int         result     = 0;
-  int         currentArg = 1;
+  int           result     = 0;
+  int           currentArg = 1;
   bool          createDB   = false;
   bool          removeDB   = false;
   string        script;
@@ -353,6 +366,7 @@ main (const int argc, char *argv[])
           if ((currentArg == argc) || (GetWorkingDB ().length () != 0))
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetWorkingDB (argv[currentArg++]);
@@ -365,6 +379,7 @@ main (const int argc, char *argv[])
           if ((currentArg == argc) || (GetWorkingDB ().length () != 0))
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetWorkingDB (argv[currentArg++]);
@@ -377,6 +392,7 @@ main (const int argc, char *argv[])
           if ((currentArg == argc) || (GetWorkingDB ().length () != 0))
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetWorkingDB (argv[currentArg++]);
@@ -388,6 +404,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetRemoteHostName (argv[currentArg++]);
@@ -399,6 +416,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetConnectionPort (argv[currentArg++]);
@@ -410,6 +428,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetUserId (atoi (argv[currentArg++]));
@@ -421,6 +440,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetUserPassword (argv[currentArg++]);
@@ -432,6 +452,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetWorkingDirectory (argv[currentArg++]);
@@ -443,6 +464,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
 
@@ -455,6 +477,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           SetVerbosityLevel (atoi (argv[currentArg++]));
@@ -466,6 +489,7 @@ main (const int argc, char *argv[])
           if (currentArg == argc)
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
           script = argv [currentArg++];
@@ -478,12 +502,14 @@ main (const int argc, char *argv[])
               ( ! SetMaximumFileSize (argv[currentArg++])))
             {
               PrintWrongUsage ();
+
               return EINVAL;
             }
         }
       else
         {
           PrintWrongUsage ();
+
           return EINVAL;
         }
     }
@@ -575,3 +601,4 @@ main (const int argc, char *argv[])
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "WCMD";
 #endif
+

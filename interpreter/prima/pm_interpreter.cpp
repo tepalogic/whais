@@ -156,7 +156,7 @@ InterException::Clone () const
 }
 
 
-EXPCEPTION_TYPE
+EXCEPTION_TYPE
 InterException::Type () const
 {
   return INTERPRETER_EXCEPTION;

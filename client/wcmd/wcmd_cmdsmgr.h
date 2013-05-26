@@ -31,34 +31,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "wexception.h"
 
+
+
 typedef void* ENTRY_CMD_CONTEXT;
 typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
 
+
+
 struct CmdEntry
 {
-  const char*     mpCmdText;
-  const char*     mpCmdDesc;
-  const char*     mpExtHelpDesc;
-  ENTRY_CMD         mcmd;
-  ENTRY_CMD_CONTEXT mcontext;
+  const char*       mName;
+  const char*       mDesc;
+  const char*       mExtendedDesc;
 
-  bool              mshowStatus;
+  ENTRY_CMD         mCmd;
+  ENTRY_CMD_CONTEXT mContext;
+
+  bool              mShowStatus;
 };
+
 
 void
 InitCmdManager ();
 
+
 void
 RegisterCommand (const CmdEntry& entry);
 
+
 const CmdEntry*
-FindCmdEntry (const char* pCommand);
+FindCmdEntry (const char* const pCommand);
+
 
 const std::string
-CmdLineNextToken (const std::string& cmdLine, size_t& ioPosition);
+CmdLineNextToken (const std::string& cmdLine, size_t& inoutPosition);
+
 
 void
 printException (std::ostream& outputStream, const whisper::Exception& e);
+
 
 std::string
 wcmd_decode_typeinfo (unsigned int type);

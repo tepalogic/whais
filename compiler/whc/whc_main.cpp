@@ -37,11 +37,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whc_cmdline.h"
 #include "wo_format.h"
 
+
+
 using namespace std;
 using namespace whisper;
 using namespace whisper::whc;
 
+
 uint8_t wh_header[WHC_TABLE_SIZE] = { 0, };
+
 
 static void
 fill_globals_table (WIFunctionalUnit&     unit,
@@ -70,6 +74,7 @@ fill_globals_table (WIFunctionalUnit&     unit,
         }
     }
 }
+
 
 static void
 process_procedures_table (WIFunctionalUnit&   unit,
@@ -130,6 +135,7 @@ process_procedures_table (WIFunctionalUnit&   unit,
         }
     }
 }
+
 
 int
 main (int argc, char **argv)
@@ -277,6 +283,7 @@ main (int argc, char **argv)
 
   return retCode;
 }
+
 
 #ifdef ENABLE_MEMORY_TRACE
 uint32_t WMemoryTracker::smInitCount = 0;

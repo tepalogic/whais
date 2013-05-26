@@ -86,7 +86,7 @@ public:
       return new DBSException (*this);
     }
 
-  virtual EXPCEPTION_TYPE Type () const
+  virtual EXCEPTION_TYPE Type () const
     {
       return DBS_EXCEPTION;
     }

@@ -28,8 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "wthread.h"
 
+
+
 namespace whisper
 {
+
+
 
 enum LOG_TYPE
 {
@@ -41,6 +45,8 @@ enum LOG_TYPE
   LOG_DEBUG
 };
 
+
+
 class Logger
 {
 public:
@@ -49,6 +55,8 @@ public:
   virtual void Log (const LOG_TYPE type, const char* str) = 0;
   virtual void Log (const LOG_TYPE type, const std::string& str) = 0;
 };
+
+
 
 class FileLogger : public Logger
 {
@@ -65,9 +73,10 @@ private:
   uint_t PrintTimeMark (LOG_TYPE type, WTICKS ticks);
 
   WTICKS        mStartTick;
-  Lock mSync;
+  Lock          mSync;
   std::ofstream mOutStream;
 };
+
 
 class NullLogger : public Logger
 {

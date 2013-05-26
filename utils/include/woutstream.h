@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define OUTSTREAM_INCREMENT_SIZE    512
 
 
+
 struct WOutputStream
 {
   uint8_t* data;
@@ -41,19 +42,23 @@ struct WOutputStream
   uint_t   reserved;
 };
 
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
 
 /* Initialise the buffer builder. */
 struct WOutputStream*
 wh_ostream_init (const uint_t                increment,
                  struct WOutputStream* const outStream);
 
+
 /* Clean the resources associated with this buffer. */
 void
 wh_ostream_clean (struct WOutputStream* const stream);
+
 
 /* Send a chink of data to the stream. */
 struct WOutputStream*
@@ -61,11 +66,13 @@ wh_ostream_write (struct WOutputStream* const stream,
                   const uint8_t*              data,
                   uint_t                      dataSize);
 
+
 INLINE static struct WOutputStream*
 wh_ostream_wint8 (struct WOutputStream* const stream, const uint8_t value)
 {
   return wh_ostream_write (stream, &value, sizeof value);
 }
+
 
 INLINE static struct WOutputStream*
 wh_ostream_wint16 (struct WOutputStream* const stream, const uint16_t value)
@@ -73,17 +80,20 @@ wh_ostream_wint16 (struct WOutputStream* const stream, const uint16_t value)
   return wh_ostream_write (stream, (const uint8_t*)&value, sizeof value);
 }
 
+
 INLINE static struct WOutputStream*
 wh_ostream_wint32 (struct WOutputStream* const stream, const uint32_t value)
 {
   return wh_ostream_write (stream, (const uint8_t*)&value, sizeof value);
 }
 
+
 INLINE static struct WOutputStream*
 wh_ostream_wint64 (struct WOutputStream* stream, const uint64_t value)
 {
   return wh_ostream_write (stream, (const uint8_t*)&value, sizeof value);
 }
+
 
 #define wh_ostream_data(stream) ((stream)->data)
 #define wh_ostream_size(stream) ((stream)->dataSize)
@@ -93,3 +103,4 @@ wh_ostream_wint64 (struct WOutputStream* stream, const uint64_t value)
 #endif
 
 #endif /* WOUTSTREAM_H */
+

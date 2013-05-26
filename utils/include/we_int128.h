@@ -502,12 +502,14 @@ private:
   uint64_t  mLo;
 };
 
+
 template <typename T>
 WE_I128
 operator+ (const T op1, const WE_I128& op2)
 {
   return op2 + op1;
 }
+
 
 template <typename T>
 WE_I128
@@ -524,6 +526,7 @@ operator* (const T op1, const WE_I128& op2)
   return op2 * op1;
 }
 
+
 template <typename T>
 WE_I128
 operator/ (const T op1, const WE_I128& op2)
@@ -539,15 +542,18 @@ operator% (const T op1, const WE_I128& op2)
   return WE_I128 (op1) % op2;
 }
 
+
 static inline int64_t
 toInt64 (const WE_I128& value)
 {
   return value.Int64 ();
 }
 
+
 #else
 
 typedef int128_t WE_I128;
+
 
 static inline int64_t
 toInt64 (const WE_I128& value)

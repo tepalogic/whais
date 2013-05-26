@@ -31,8 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+
+
 namespace whisper {
 namespace wod {
+
+
+
 
 #define VER_MAJOR       0
 #define VER_MINOR       4
@@ -53,11 +58,13 @@ CmdLineParser::CmdLineParser (int argc, char ** argv)
   Parse ();
 }
 
+
 CmdLineParser::~CmdLineParser ()
 {
   if (mOutStream != &cout)
     delete mOutStream;
 }
+
 
 void
 CmdLineParser::Parse ()
@@ -109,6 +116,7 @@ CmdLineParser::Parse ()
   CheckArguments ();
 }
 
+
 void
 CmdLineParser::CheckArguments ()
 {
@@ -121,6 +129,7 @@ CmdLineParser::CheckArguments ()
     throw CmdLineException ("No given input file!", _EXTRA(0));
 }
 
+
 void
 CmdLineParser::DisplayUsage () const
 {
@@ -129,6 +138,27 @@ CmdLineParser::DisplayUsage () const
   cout << "Whisper Object Dumper ver. " << VER_MAJOR << '.' << VER_MINOR;
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
        << "Usage: wod input_file [-o output_file] [--help | -h]" << endl;
+}
+
+
+Exception*
+CmdLineException::Clone () const
+{
+  return new CmdLineException (*this);
+}
+
+
+EXCEPTION_TYPE
+CmdLineException::Type () const
+{
+  return DUMP_CMD_LINE_EXCEPTION;
+}
+
+
+const char*
+CmdLineException::Description () const
+{
+  return "Invalid command line.";
 }
 
 } //namespace wod

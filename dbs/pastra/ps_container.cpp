@@ -74,7 +74,7 @@ WFileContainerException::Clone () const
 }
 
 
-EXPCEPTION_TYPE
+EXCEPTION_TYPE
 WFileContainerException::Type () const
 {
   return FILE_CONTAINER_EXCEPTION;

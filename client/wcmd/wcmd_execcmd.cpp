@@ -37,14 +37,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_onlinecmds.h"
 #include "wcmd_optglbs.h"
 
+
 using namespace std;
 
 
-static const char     NULL_VALUE[]   = "";
-static const char     NULL_LABEL[]  = "(NULL)";
-
 typedef map<uint_t, vector<string> > FIELD_ENTRY;
 typedef FIELD_ENTRY::iterator        FIELD_ENTRY_IT;
+
+
+
+static const char     NULL_VALUE[]   = "";
+static const char     NULL_LABEL[]   = "(NULL)";
+
+
 
 struct FieldEntry
 {
@@ -68,12 +73,16 @@ struct FieldEntry
     return true;
   }
 
-  FIELD_ENTRY mValues;
-  uint16_t    mType;
+  FIELD_ENTRY   mValues;
+  uint16_t      mType;
 };
 
-typedef map<string, FieldEntry> FIELD_VALUE;
-typedef FIELD_VALUE::iterator   FIELD_VALUE_IT;
+
+
+typedef map<string, FieldEntry>      FIELD_VALUE;
+typedef FIELD_VALUE::iterator        FIELD_VALUE_IT;
+
+
 
 struct TableParameter
 {
@@ -94,7 +103,7 @@ struct TableParameter
 
     if (! mFields[field].SetValue (row, type, value))
       {
-        cout << "Invalid command format.";
+        cout << "Invalid command format. ";
         cout << "Field '" << field << "' has different types values.\n";
 
         return false;
@@ -107,12 +116,14 @@ struct TableParameter
   uint_t       mRowsCount;
 };
 
-uint_t
+
+
+static uint_t
 update_stack_value (const WH_CONNECTION         hnd,
-                    const unsigned int            type,
+                    const unsigned int          type,
                     const char* const           fieldName,
-                    const WHT_ROW_INDEX       row,
-                    const WHT_INDEX        arrayOff,
+                    const WHT_ROW_INDEX         row,
+                    const WHT_INDEX             arrayOff,
                     const char* const           value)
 {
   /* When the values was created on the stack,
@@ -126,12 +137,12 @@ update_stack_value (const WH_CONNECTION         hnd,
   if (type != WHC_TYPE_TEXT)
     {
       return WUpdateValue (hnd,
-                                type,
-                                fieldName,
-                                row,
-                                arrayOff,
-                                WIGNORE_OFF,
-                                value);
+                           type,
+                           fieldName,
+                           row,
+                           arrayOff,
+                           WIGNORE_OFF,
+                           value);
     }
 
   assert (arrayOff == WIGNORE_OFF);
@@ -156,83 +167,91 @@ update_stack_value (const WH_CONNECTION         hnd,
       assert (valueOff <= strlen (value));
 
       wcs = WUpdateValue (hnd,
-                               WHC_TYPE_TEXT,
-                               fieldName,
-                               row,
-                               WIGNORE_OFF,
-                               utf8TextOff++,
-                               tempBuffer);
+                          WHC_TYPE_TEXT,
+                          fieldName,
+                          row,
+                          WIGNORE_OFF,
+                          utf8TextOff++,
+                          tempBuffer);
     }
 
   return wcs;
 }
 
+
 static bool
-parse_value (const string& cmdLine,
-             size_t&       ioLineOff,
-             string&       oValue)
+parse_value (const string&    cmdLine,
+             size_t&          inoutLineOff,
+             string&          outValue)
 {
   const char* const line = cmdLine.c_str ();
 
-  assert (line[ioLineOff - 1] == '\'');
+  assert (line[inoutLineOff - 1] == '\'');
 
-  oValue.clear ();
-  while (ioLineOff < cmdLine.length ())
+  outValue.clear ();
+  while (inoutLineOff < cmdLine.length ())
     {
-      if (line[ioLineOff] == '\'')
+      if (line[inoutLineOff] == '\'')
         {
-          ioLineOff++;
+          inoutLineOff++;
           return true;
         }
 
-      if (line[ioLineOff] == '\\')
+      if (line[inoutLineOff] == '\\')
         {
-          if (++ioLineOff >= cmdLine.length ())
+          if (++inoutLineOff >= cmdLine.length ())
             return false;
 
-          switch (line[ioLineOff++])
+          switch (line[inoutLineOff++])
           {
           case 'f':
-            oValue.push_back ('\f');
+            outValue.push_back ('\f');
             break;
+
           case 'n':
-            oValue.push_back ('\n');
+            outValue.push_back ('\n');
             break;
+
           case 'r':
-            oValue.push_back ('\r');
+            outValue.push_back ('\r');
             break;
+
           case 't':
-            oValue.push_back ('\t');
+            outValue.push_back ('\t');
             break;
+
           case 'v':
-            oValue.push_back ('\v');
+            outValue.push_back ('\v');
             break;
+
           case '\\':
-            oValue.push_back ('\\');
+            outValue.push_back ('\\');
             break;
+
           case '\'':
-            oValue.push_back ('\'');
+            outValue.push_back ('\'');
             break;
+
           case 'u':
             {
               uint64_t charCode = 0;
-              while (line[ioLineOff] != '&')
+              while (line[inoutLineOff] != '&')
                 {
                   charCode *= 16;
-                  if (('0' <= line[ioLineOff])
-                      && (line[ioLineOff] <= '9'))
+                  if (('0' <= line[inoutLineOff])
+                      && (line[inoutLineOff] <= '9'))
                     {
-                      charCode += line[ioLineOff] - '0';
+                      charCode += line[inoutLineOff] - '0';
                     }
-                  else if (('a' <= line[ioLineOff])
-                           && (line[ioLineOff] <= 'f'))
+                  else if (('a' <= line[inoutLineOff])
+                           && (line[inoutLineOff] <= 'f'))
                     {
-                      charCode += line[ioLineOff] - 'a' + 10;
+                      charCode += line[inoutLineOff] - 'a' + 10;
                     }
-                  else if (('A' <= line[ioLineOff])
-                           && (line[ioLineOff] <= 'F'))
+                  else if (('A' <= line[inoutLineOff])
+                           && (line[inoutLineOff] <= 'F'))
                     {
-                      charCode += line[ioLineOff] - 'A' + 10;
+                      charCode += line[inoutLineOff] - 'A' + 10;
                     }
                   else
                     {
@@ -251,101 +270,104 @@ parse_value (const string& cmdLine,
 
                       return false;
                     }
-                  ++ioLineOff;
+                  ++inoutLineOff;
                 }
-              ++ioLineOff;
+              ++inoutLineOff;
 
               if (charCode == 0)
                 {
                   cout << "Invalid command format.";
-                  cout << "The oValue specified with the escape sequence ";
+                  cout << "The outValue specified with the escape sequence ";
                   cout << "'\\u' cannot be 0.\n";
 
                   return false;
                 }
 
               uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-              uint_t  utf8UnitsCount = wh_store_utf8_cp (charCode,
-                                                         utf8CodeUnits);
+
+              const uint_t utf8UnitsCount = wh_store_utf8_cp (charCode,
+                                                              utf8CodeUnits);
               assert (utf8UnitsCount > 0);
-              oValue.append (_RC (const char*, utf8CodeUnits),
-                             utf8UnitsCount);
+
+              outValue.append (_RC (const char*, utf8CodeUnits),
+                               utf8UnitsCount);
             }
             break;
 
           default:
             cout << "Invalid command format. Unknown escape sequence ";
-            cout << "'\\" << line[ioLineOff - 1] << "'.\n";
+            cout << "'\\" << line[inoutLineOff - 1] << "'.\n";
 
             return false;
           }
         }
       else
-        oValue.push_back (line[ioLineOff++]);
+        outValue.push_back (line[inoutLineOff++]);
     }
 
-  cout << "Invalid command format. Missing ' at the end of the oValue.\n";
+  cout << "Invalid command format. Missing ' at the end of the outValue.\n";
 
   return false;
 }
 
+
 static bool
 parse_type (const string&       cmdLine,
-            size_t&             ioLineOff,
-            uint_t&             oType)
+            size_t&             inoutLineOff,
+            uint_t&             outType)
 {
   const char* const line = cmdLine.c_str ();
 
-  switch (line[ioLineOff++])
+  switch (line[inoutLineOff++])
   {
   case      'B':
   case      'b':
-    oType = WHC_TYPE_BOOL;
+    outType = WHC_TYPE_BOOL;
     break;
 
   case      'C':
   case      'c':
-    oType = WHC_TYPE_CHAR;
+    outType = WHC_TYPE_CHAR;
     break;
 
   case      'D':
   case      'd':
-    oType = WHC_TYPE_DATE;
+    outType = WHC_TYPE_DATE;
     break;
 
   case      'H':
   case      'h':
-    oType = WHC_TYPE_DATETIME;
+    outType = WHC_TYPE_DATETIME;
     break;
 
   case      'M':
   case      'm':
-    oType = WHC_TYPE_HIRESTIME;
+    outType = WHC_TYPE_HIRESTIME;
     break;
 
   case      'I':
   case      'i':
-    oType = WHC_TYPE_INT64;
+    outType = WHC_TYPE_INT64;
     break;
 
   case      'U':
   case      'u':
-    oType = WHC_TYPE_UINT64;
+    outType = WHC_TYPE_UINT64;
     break;
 
   case      'R':
   case      'r':
-    oType = WHC_TYPE_RICHREAL;
+    outType = WHC_TYPE_RICHREAL;
     break;
 
   case      't':
   case      'T':
-    oType = WHC_TYPE_TEXT;
+    outType = WHC_TYPE_TEXT;
     break;
 
   default:
     cout << "Invalid command format. Unexpected parameter specifier '"
-         << line[ioLineOff - 1] <<"'.\n";
+         << line[inoutLineOff - 1] <<"'.\n";
 
     return false;
   }
@@ -353,20 +375,22 @@ parse_type (const string&       cmdLine,
   return true;
 }
 
+
 static bool
 handle_param_value (WH_CONNECTION           hnd,
-                    const string&             cmdLine,
-                    const uint_t              type,
+                    const string&           cmdLine,
+                    const uint_t            type,
                     const char* const       field,
-                    const WHT_ROW_INDEX   row,
-                    const WHT_INDEX    arrayOff,
-                    size_t&                   ioLineOff)
+                    const WHT_ROW_INDEX     row,
+                    const WHT_INDEX         arrayOff,
+                    size_t&                 inoutLineOff)
 {
-  uint_t   wcs = WCS_OK;
-
+  uint_t wcs = WCS_OK;
   string value;
-  if (! parse_value (cmdLine, ioLineOff, value))
+
+  if (! parse_value (cmdLine, inoutLineOff, value))
     return false;
+
   else if ((value.length () == 0) && (arrayOff != WIGNORE_OFF))
     {
       cout << "Invalid command format. "
@@ -375,12 +399,7 @@ handle_param_value (WH_CONNECTION           hnd,
       return false;
     }
 
-  wcs = update_stack_value (hnd,
-                            type,
-                            field,
-                            row,
-                            arrayOff,
-                            value.c_str ());
+  wcs = update_stack_value (hnd, type, field, row, arrayOff, value.c_str ());
   if (wcs != WCS_OK)
     goto proc_param_connector_error;
 
@@ -395,13 +414,14 @@ proc_param_connector_error:
   return false;
 }
 
+
 static bool
 handle_procedure_array_param (WH_CONNECTION           hnd,
-                              const string&             cmdLine,
-                              const uint_t              type,
+                              const string&           cmdLine,
+                              const uint_t            type,
                               const char* const       field,
-                              const WHT_ROW_INDEX   row,
-                              size_t&                   ioLineOff)
+                              const WHT_ROW_INDEX     row,
+                              size_t&                 inoutLineOff)
 {
   const char* const line = cmdLine.c_str ();
 
@@ -409,22 +429,24 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
   uint_t   wcs        = WCS_OK;
 
   assert (type != WHC_TYPE_TEXT);
-  assert (line[ioLineOff - 1] == '(');
+  assert (line[inoutLineOff - 1] == '(');
 
-  while (ioLineOff < cmdLine.length ())
+  while (inoutLineOff < cmdLine.length ())
     {
-      if (line[ioLineOff] == ')')
+      if (line[inoutLineOff] == ')')
         {
-          ++ioLineOff;
+          ++inoutLineOff;
+
           return true;
         }
 
-      if ((line[ioLineOff] == ' ') || (line[ioLineOff] == '\t'))
+      if ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t'))
         {
-          ++ioLineOff;
+          ++inoutLineOff;
+
           continue;
         }
-      else if (line[ioLineOff++] != '\'')
+      else if (line[inoutLineOff++] != '\'')
         {
           cout << "Invalid command format. ";
           cout << "The value of the array's element should begin with a '.\n";
@@ -438,7 +460,7 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
                                 field,
                                 row,
                                 arrayIndex++,
-                                ioLineOff))
+                                inoutLineOff))
         {
           return false;
         }
@@ -447,18 +469,20 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
   assert (wcs == WCS_OK);
 
   cout << "Invalid command format. Missing ')' to mark the end of array.\n";
+
   return false;
 }
 
+
 static bool
-handle_procedure_table_param (WH_CONNECTION           hnd,
-                              const string&             cmdLine,
-                              size_t&                   ioLineOff)
+handle_procedure_table_param (WH_CONNECTION       hnd,
+                              const string&       cmdLine,
+                              size_t&             inoutLineOff)
 {
-  const char* const line       = cmdLine.c_str ();
-  uint_t              wcs        = WCS_OK;
-  uint_t              row        = 0;
-  uint_t              type       = 0;
+  const char* const   line         = cmdLine.c_str ();
+  uint_t              wcs          = WCS_OK;
+  uint_t              row          = 0;
+  uint_t              type         = 0;
   string              field;
   string              value;
   TableParameter      table;
@@ -471,27 +495,29 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
   bool                endOfEntry   = false;
   bool                ignoreSpaces = true;
 
-  assert (line[ioLineOff - 1] == '[');
+  assert (line[inoutLineOff - 1] == '[');
 
-  while (ioLineOff < cmdLine.length ())
+  while (inoutLineOff < cmdLine.length ())
     {
       if (ignoreSpaces
-          && ((line[ioLineOff] == ' ') || (line[ioLineOff] == '\t')))
+          && ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t')))
         {
-          ioLineOff++;
+          inoutLineOff++;
+
           continue;
         }
 
       if (! rowStarted)
         {
-          if (line[ioLineOff] == ']')
+          if (line[inoutLineOff] == ']')
             {
               endOfEntry = true;
-              ++ioLineOff;
+
+              ++inoutLineOff;
 
               break;
             }
-          else if (line[ioLineOff++] != '(')
+          else if (line[inoutLineOff++] != '(')
             {
               cout << "Invalid command format. ";
               cout << "Missing '(' at the beginning of value.\n";
@@ -512,9 +538,10 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
         {
           ignoreSpaces = false;
 
-          if (line[ioLineOff] == '.')
+          if (line[inoutLineOff] == '.')
             {
-              ++ioLineOff;
+              ++inoutLineOff;
+
               emptyRow   = false;
               fieldParse = false;
               typeParse  = true;
@@ -527,9 +554,9 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
                   return false;
                 }
             }
-          else if (line[ioLineOff] == ')')
+          else if (line[inoutLineOff] == ')')
             {
-              ++ioLineOff;
+              ++inoutLineOff;
               ++row;
 
               fieldParse   = false;
@@ -546,8 +573,8 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
             }
           else
             {
-              field.append (line + ioLineOff, 1);
-              ioLineOff++;
+              field.append (line + inoutLineOff, 1);
+              inoutLineOff++;
             }
 
           continue;
@@ -557,8 +584,9 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
         {
           assert (emptyRow == false);
 
-          if ( ! parse_type (cmdLine, ioLineOff, type))
+          if ( ! parse_type (cmdLine, inoutLineOff, type))
             return false;
+
           else
             {
               typeParse    = false;
@@ -571,11 +599,13 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
       if (valueParse)
         {
           assert (ignoreSpaces);
-          if ((line[ioLineOff] == '(') || arrayValue)
+
+          if ((line[inoutLineOff] == '(') || arrayValue)
             {
-              if (line[ioLineOff] == '(')
+              if (line[inoutLineOff] == '(')
                 {
-                  ++ioLineOff;
+                  ++inoutLineOff;
+
                   type       |= WHC_TYPE_ARRAY_MASK;
                   arrayValue  = true;
 
@@ -587,9 +617,9 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
                   assert (type & WHC_TYPE_ARRAY_MASK);
                 }
 
-              if (line[ioLineOff] == ')')
+              if (line[inoutLineOff] == ')')
                 {
-                  ioLineOff++;
+                  inoutLineOff++;
 
                   //Put a simple place holder for this to notify
                   //his presence in case of an empty array
@@ -604,24 +634,25 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
 
                   continue ;
                 }
-              else if (line[ioLineOff++] != '\'')
+              else if (line[inoutLineOff++] != '\'')
                 {
                   cout << "Invalid command format. Unexpected character '";
-                  cout << line[ioLineOff] << "\'.\n";
+                  cout << line[inoutLineOff] << "\'.\n";
 
                   return false;
                 }
 
-              if ( ! parse_value (cmdLine, ioLineOff, value))
+              if ( ! parse_value (cmdLine, inoutLineOff, value))
                 return false;
 
               if ( ! table.SetValue (field, row, type, value))
                 return false;
             }
-          else if (line[ioLineOff] == '\'')
+          else if (line[inoutLineOff] == '\'')
             {
-              ++ioLineOff;
-              if ( ! parse_value (cmdLine, ioLineOff, value))
+              ++inoutLineOff;
+
+              if ( ! parse_value (cmdLine, inoutLineOff, value))
                 return false;
 
               if ( ! table.SetValue (field, row, type, value))
@@ -635,7 +666,7 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
           else
             {
               cout << "Invalid command format. Unexpected character '";
-              cout << line[ioLineOff] << "\'.\n";
+              cout << line[inoutLineOff] << "\'.\n";
 
               return false;
             }
@@ -670,6 +701,7 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
     goto proc_param_connector_error;
 
   assert (table.mRowsCount > 0);
+
   for (uint_t row = 0; row < table.mRowsCount; ++row)
     {
       for (FIELD_VALUE_IT it = table.mFields.begin ();
@@ -703,6 +735,7 @@ handle_procedure_table_param (WH_CONNECTION           hnd,
           else
             {
               assert (entry->second.size () == 1);
+
               wcs = update_stack_value (hnd,
                                         it->second.mType,
                                         it->first.c_str (),
@@ -727,81 +760,84 @@ proc_param_connector_error:
   return false;
 }
 
+
 static bool
-handle_procedure_parameters (WH_CONNECTION hnd,
+handle_procedure_parameters (WH_CONNECTION   hnd,
                              const string&   cmdLine,
-                             size_t&         ioLineOff)
+                             size_t&         inoutLineOff)
 {
-  const char* const line = cmdLine.c_str ();
+  const char* const   line = cmdLine.c_str ();
   uint_t              type = WHC_TYPE_NOTSET;
   uint_t              wcs  = WCS_OK;
 
-  while ((ioLineOff < cmdLine.length ())
+  while ((inoutLineOff < cmdLine.length ())
          && (wcs == WCS_OK))
     {
-      if ((line[ioLineOff] == ' ') || (line[ioLineOff] == '\t'))
+      if ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t'))
         {
-          ++ioLineOff;
+          ++inoutLineOff;
+
           continue;
         }
 
-      if (line[ioLineOff] == '[')
+      if (line[inoutLineOff] == '[')
         {
-          ++ioLineOff;
+          ++inoutLineOff;
 
-          if ( ! handle_procedure_table_param (hnd, cmdLine, ioLineOff))
+          if ( ! handle_procedure_table_param (hnd, cmdLine, inoutLineOff))
             return false;
         }
       else
         {
-          if (!parse_type (cmdLine, ioLineOff, type))
+          if (!parse_type (cmdLine, inoutLineOff, type))
             return false;
 
-          while ((ioLineOff < cmdLine.length ())
-                 && (line[ioLineOff] == ' ')
-                 && (line[ioLineOff] == '\t'))
+          while ((inoutLineOff < cmdLine.length ())
+                 && (line[inoutLineOff] == ' ')
+                 && (line[inoutLineOff] == '\t'))
             {
-              ++ioLineOff;
+              ++inoutLineOff;
+
               continue;
             }
 
-          if (ioLineOff >= cmdLine.length ())
+          if (inoutLineOff >= cmdLine.length ())
             {
               cout << "Invalid command format. No values was specified.\n";
               return false;
 
             }
-          else if (line[ioLineOff] == '(')
+          else if (line[inoutLineOff] == '(')
             {
               wcs = WPushValue (hnd, type | WHC_TYPE_ARRAY_MASK, 0, NULL);
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
 
-              ++ioLineOff;
+              ++inoutLineOff;
               if (! handle_procedure_array_param (hnd,
                                                   cmdLine,
                                                   type,
                                                   WIGNORE_FIELD,
                                                   WIGNORE_ROW,
-                                                  ioLineOff))
+                                                  inoutLineOff))
                 {
                   return false;
                 }
             }
-          else if (line[ioLineOff] == '\'')
+          else if (line[inoutLineOff] == '\'')
             {
               wcs = WPushValue (hnd, type, 0, NULL);
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
 
-              ++ioLineOff;
+              ++inoutLineOff;
               if (! handle_param_value (hnd,
                                         cmdLine,
                                         type,
                                         WIGNORE_FIELD,
                                         WIGNORE_ROW,
                                         WIGNORE_OFF,
-                                        ioLineOff))
+                                        inoutLineOff))
                 {
                   return false;
                 }
@@ -809,7 +845,7 @@ handle_procedure_parameters (WH_CONNECTION hnd,
           else
             {
               cout << "Invalid command format. Unexpected character '";
-              cout << line[ioLineOff] << "\'.\n";
+              cout << line[inoutLineOff] << "\'.\n";
 
               return false;
             }
@@ -829,11 +865,12 @@ proc_param_connector_error:
   return false;
 }
 
+
 static bool
 fetch_execution_simple_result (WH_CONNECTION         hnd,
-                               const uint_t            type,
-                               const char* const       field,
-                               const uint64_t          row)
+                               const uint_t          type,
+                               const char* const     field,
+                               const uint64_t        row)
 
 {
   uint_t         wcs = WCS_OK;
@@ -841,24 +878,21 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
 
   if (type != WHC_TYPE_TEXT)
     {
-      wcs = WValueEntry (hnd,
-                                 field,
-                                 row,
-                                 WIGNORE_OFF,
-                                 WIGNORE_OFF,
-                                 &retValue);
+      wcs = WValueEntry (hnd, field, row, WIGNORE_OFF, WIGNORE_OFF, &retValue);
       if (wcs != WCS_OK)
         goto fetch_result_fail;
 
       if (strcmp (retValue, NULL_VALUE) == 0)
         cout << NULL_LABEL;
+
       else
         cout << '\'' << retValue << '\'';
     }
   else
     {
       unsigned long long length  = 0;
-      uint64_t offset  = 0;
+      uint64_t           offset  = 0;
+
       wcs = WValueTextLength (hnd, field, row, WIGNORE_OFF, &length);
       if (wcs != WCS_OK)
         goto fetch_result_fail;
@@ -869,11 +903,11 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
           while (offset < length)
             {
               wcs = WValueEntry (hnd,
-                                        field,
-                                        row,
-                                        WIGNORE_OFF,
-                                        offset,
-                                        &retValue);
+                                 field,
+                                 row,
+                                 WIGNORE_OFF,
+                                 offset,
+                                 &retValue);
               if (wcs != WCS_OK)
                 goto fetch_result_fail;
 
@@ -890,6 +924,7 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
     }
 
   assert (wcs == WCS_OK);
+
   return true;
 
 fetch_result_fail:
@@ -905,15 +940,15 @@ fetch_result_fail:
 
 static bool
 fetch_execution_array_result (WH_CONNECTION        hnd,
-                              const uint_t           type,
-                              const char* const      field,
-                              const uint64_t         row)
+                              const uint_t         type,
+                              const char* const    field,
+                              const uint64_t       row)
 
 {
   assert ((type >= WHC_TYPE_BOOL) && (type < WHC_TYPE_TEXT));
 
-  const char*         retValue;
-  unsigned long long              count;
+  const char*           retValue;
+  unsigned long long    count;
   uint_t                wcs;
 
   if ((wcs = WValueArraySize (hnd, field, row, &count)) != WCS_OK)
@@ -946,11 +981,13 @@ fetch_result_fail:
 
 }
 
+
 static bool
 fetch_execution_field_result (WH_CONNECTION hnd, const uint_t type)
 {
   unsigned long long rowsCount = 0;
-  uint_t   wcs       = WCS_OK;
+
+  uint_t wcs = WCS_OK;
 
   if ((wcs = WValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
@@ -998,12 +1035,14 @@ fetch_result_fail:
   return false;
 }
 
+
 static bool
-fetch_execution_table_result (WH_CONNECTION hnd,
-                              vector<WField>& fields)
+fetch_execution_table_result (WH_CONNECTION       hnd,
+                              vector<WField>&     fields)
 {
   unsigned long long rowsCount = 0;
-  uint_t   wcs       = WCS_OK;
+
+  uint_t wcs = WCS_OK;
 
   if ((wcs = WValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
@@ -1015,6 +1054,7 @@ fetch_execution_table_result (WH_CONNECTION hnd,
           for (uint_t i = 0; i < fields.size (); ++i )
             {
               cout << row << " | " << fields[i].name << " | ";
+
               if (fields[i].type & WHC_TYPE_ARRAY_MASK)
                 {
                   if ( ! fetch_execution_array_result (
@@ -1057,6 +1097,7 @@ fetch_result_fail:
   return false;
 }
 
+
 static bool
 fetch_execution_result (WH_CONNECTION hnd)
 {
@@ -1068,9 +1109,9 @@ fetch_execution_result (WH_CONNECTION hnd)
 
   if (stackResut & WHC_TYPE_TABLE_MASK)
     {
-      vector<string>            fields;
-      vector<WField> fieldsDescriptors;
-      uint_t                    fieldsCount;
+      vector<string>   fields;
+      vector<WField>   fieldsDescriptors;
+      uint_t           fieldsCount;
 
       assert (stackResut == WHC_TYPE_TABLE_MASK);
 
@@ -1082,9 +1123,9 @@ fetch_execution_result (WH_CONNECTION hnd)
       cout << "TABLE OF (";
       for (uint_t i = 0; i < fieldsCount; ++i)
         {
-          WField     fd;
-          const char*         fieldName;
-          uint_t                fieldType;
+          WField        fd;
+          const char*   fieldName;
+          uint_t        fieldType;
 
           wcs = WFetchField (hnd, &fieldName, &fieldType);
           if (wcs != WCS_OK)
@@ -1099,6 +1140,7 @@ fetch_execution_result (WH_CONNECTION hnd)
 
           if (i > 0)
             cout << ", ";
+
           cout << fd.name << " AS ";
           cout << wcmd_decode_typeinfo (fd.type);
         }
@@ -1162,14 +1204,15 @@ fetch_result_fail:
   return false;
 }
 
+
 bool
 cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  const VERBOSE_LEVEL level       = GetVerbosityLevel ();
-  size_t              linePos     = 0;
-  string              token       = CmdLineNextToken (cmdLine, linePos);
-  WH_CONNECTION     conHdl      = NULL;
-  bool                result      = false;
+  const VERBOSE_LEVEL level    = GetVerbosityLevel ();
+  size_t              linePos  = 0;
+  string              token    = CmdLineNextToken (cmdLine, linePos);
+  WH_CONNECTION       conHdl   = NULL;
+  bool                result   = false;
 
   WTICKS paramTicks, execTicks, fetchTicks;
 
@@ -1188,7 +1231,6 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                            GetUserPassword ().c_str (),
                            GetUserId (),
                            &conHdl);
-
   if (cs != WCS_OK)
     {
       cout << "Failed to connect: " << wcmd_translate_status (cs) << endl;
@@ -1260,3 +1302,4 @@ cmd_exec_err:
 
   return result;
 }
+

@@ -42,6 +42,7 @@ public:
   {
     return mSourceFile;
   }
+
   std::ostream& OutStream () const
   {
     return *mOutStream;
@@ -49,7 +50,9 @@ public:
 
 private:
   void Parse ();
+
   void DisplayUsage () const;
+
   void CheckArguments ();
 
 private:
@@ -60,6 +63,8 @@ private:
   bool          mShowHelp;
 
 };
+
+
 
 class CmdLineException : public Exception
 {
@@ -72,21 +77,11 @@ public:
   {
   }
 
-  virtual ~CmdLineException ()
-  {
-  };
+  virtual Exception* Clone () const;
 
-  virtual Exception* Clone () const
-  {
-    return new CmdLineException (*this);
-  }
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual EXPCEPTION_TYPE Type () const { return DUMP_CMD_LINE_EXCEPTION; }
-
-  virtual const char* Description () const
-  {
-    return "Invalid command line.";
-  }
+  virtual const char* Description () const;
 };
 
 } //namespace wod

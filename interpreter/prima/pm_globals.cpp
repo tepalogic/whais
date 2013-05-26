@@ -85,10 +85,10 @@ GlobalsManager::FindGlobal (const uint8_t* const name,
     {
       const GlobalEntry& entry     = mGlobalsEntrys[iterator];
       const char* const  entryName = _RC (const char*,
-                                          &mIdentifiers [entry.mIdOffet]);
+                                          &mIdentifiers[entry.mIdOffet]);
 
       if ((strlen (entryName) == nameLength)
-          && memcmp (entryName, name, nameLength) == 0)
+          && (memcmp (entryName, name, nameLength) == 0))
         {
           return iterator;
         }
