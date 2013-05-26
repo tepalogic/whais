@@ -12,16 +12,30 @@ CXX:=g++
 LD:=g++
 AR:=ar
 
-ifeq ($(FLAVOR),debug)
-CC_FLAGS?=-Wall -Wno-format -g -c -ansi -ftrapv -fvisibility=hidden -fPIC -Wno-unknown-pragmas
-CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
+#Commn compile flags
+CC_FLAGS=-Wall -m64 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas
+
+ifeq ($(ASSERTS),no)
+DEFINES+=-DNDEBUG
 endif
 
-ifeq ($(FLAVOR),release)
-DEFINES+=-DNDEBUG
-CC_FLAGS?=-Wall -c -ansi -O3 -fvisibility=hidden -fPIC -Wno-unknown-pragmas
-CXX_FLAGS?=$(CC_FLAGS) -fno-rtti
+ifeq ($(OPTIMISE),speed)
+CC_FLAGS+= -Ofast
+else
+ifeq ($(OPTIMISE),size)
+CC_FLAGS+= -Os
 endif
+endif
+
+ifeq ($(DEBUGINFO),yes)
+CC_FLAGS+= -g
+endif
+
+ifeq ($(PROFILE),yes)
+CC_FLAGS+= -pg
+endif
+
+CXX_FLAGS=$(CC_FLAGS) -fno-rtti
 
 DEFINES+=ARCH_LINUX_GCC=1
 DEFINES+=INLINE=__inline__
@@ -55,7 +69,11 @@ arch_set_output_sharedlib=-o ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL
 arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
 #set the right  flags for the linker
-arch_linker_flags= -pthread
+arch_linker_flags= -m64 -pthread
+ifeq ($(PROFILE),yes)
+arch_linker_flags+= -pg
+endif
+
 arch_shl_linker_flags= -shared -Wl,-Bsymbolic,-soname,lib$(1).so$(2) $(arch_linker_flags)
 arch_archiver_flags=rcs
 

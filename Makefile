@@ -1,14 +1,24 @@
 
 ALL_UNITS:=utils custom compiler interpreter dbs server client
 
+ifeq ($(FLAVOR),release)
+OPTIMISE?=speed
+ASSERTS?=no
+DEBUGINFO?=no
+endif
+
 VERBOSE?=no
-FLAVOR ?=debug
+OPTIMISE?=none
+ASSERTS?=yes
+DEBUGINFO?=yes
+PROFILE?=no
 BUILD_TESTS?=no
+
 EXES:=
 LIBS:=
 
 ifeq ($(ARCH),)
-$(error "You must specify tour ARCH as linux_gcc_x86, linux_gcc_x86_64 or windows_vc_x86") 
+$(error "You must specify tour ARCH as linux_gcc_x86, linux_gcc_x86_64 or windows_vc_x86, etc.") 
 endif
 
 ifeq ($(VERBOSE),yes)
