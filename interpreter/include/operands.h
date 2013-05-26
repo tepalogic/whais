@@ -148,7 +148,7 @@ public:
 
   StackValue (const StackValue& source)
   {
-    IOperand& op = _CC (IOperand&, _RC (const IOperand&, source.mStorage));
+    IOperand& op = _CC (StackValue&, source).Operand ();
 
     op.NotifyCopy ();
 
@@ -163,7 +163,7 @@ public:
   StackValue&
   operator= (const StackValue& source)
   {
-    IOperand& op = _CC (IOperand&, _RC (const IOperand&, source.mStorage));
+    IOperand& op = _CC (StackValue&, source).Operand ();
 
     op.NotifyCopy ();
 

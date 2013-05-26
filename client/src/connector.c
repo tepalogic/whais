@@ -46,7 +46,7 @@ static const uint_t INVALID_OFF    = ~0;
 static uint_t
 max_data_size (const struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   assert ((hnd->cipher == FRAME_ENCTYPE_PLAIN)
           || (hnd->cipher == FRAME_ENCTYPE_3K));
@@ -75,7 +75,7 @@ max_data_size (const struct INTERNAL_HANDLER* const hnd)
 static uint_t
 data_size (const struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   const uint16_t frameSize = load_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
 
@@ -102,7 +102,7 @@ data_size (const struct INTERNAL_HANDLER* const hnd)
 static void
 set_data_size (struct INTERNAL_HANDLER* const hnd, const uint_t size)
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (hnd->cipher)
   {
@@ -127,7 +127,7 @@ set_data_size (struct INTERNAL_HANDLER* const hnd, const uint_t size)
 static uint8_t*
 data (struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (hnd->cipher)
   {
@@ -151,7 +151,7 @@ data (struct INTERNAL_HANDLER* const hnd)
 static uint8_t*
 raw_data (struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (hnd->cipher)
   {
@@ -2376,6 +2376,7 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
               const uint_t textOff = load_le_int64 (data_ + sizeof (uint64_t));
               rowOff += sizeof (uint64_t);
 
+              (void)textOff;
               assert (rowOff <= dataSize);
               assert (textOff < charsCount);
               assert (strlen ((const char*)data_ + rowOff) > 0);

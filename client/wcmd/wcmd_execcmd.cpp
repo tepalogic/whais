@@ -426,7 +426,6 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
   const char* const line = cmdLine.c_str ();
 
   uint64_t arrayIndex = 0;
-  uint_t   wcs        = WCS_OK;
 
   assert (type != WHC_TYPE_TEXT);
   assert (line[inoutLineOff - 1] == '(');
@@ -465,8 +464,6 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
           return false;
         }
     }
-
-  assert (wcs == WCS_OK);
 
   cout << "Invalid command format. Missing ')' to mark the end of array.\n";
 

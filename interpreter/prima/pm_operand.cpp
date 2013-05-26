@@ -2552,8 +2552,8 @@ CharTextElOperand::NotifyCopy ()
 
 
 
-GlobalOperand::GlobalOperand (GlobalValue& value) :
-    BaseOperand (),
+GlobalOperand::GlobalOperand (GlobalValue& value)
+  : BaseOperand (),
     mValue (value)
 {
 }

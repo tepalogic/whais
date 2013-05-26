@@ -626,6 +626,7 @@ VariableSizeStore::UpdateRecord (uint64_t         recordFirstEntry,
 
       const uint64_t chunkSize = entry->Write (offset, tempValid, tembuffer);
 
+      (void)chunkSize;
       assert (chunkSize == tempValid);
 
       sourceSize -= tempValid, sourceOffset += tempValid;
@@ -832,6 +833,7 @@ VariableSizeStore::RemoveRecord (uint64_t recordFirstEntry)
   const StoreEntry* entry      = _RC (const StoreEntry*,
                                       cachedItem.GetDataForRead());
 
+  (void)entry;
   assert (entry->IsDeleted () == false);
   assert (entry->IsFirstEntry ());
 

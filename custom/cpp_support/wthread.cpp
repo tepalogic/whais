@@ -46,6 +46,7 @@ Lock::~Lock ()
 {
   const uint_t result = wh_lock_destroy (&mLock);
 
+  (void)result;
   assert (result == WOP_OK);
 }
 
@@ -64,6 +65,7 @@ Lock::Release ()
 {
   const uint_t result = wh_lock_release (&mLock);
 
+  (void)result;
   assert (result == WOP_OK);
 }
 

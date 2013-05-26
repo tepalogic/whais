@@ -13,10 +13,10 @@ LD:=g++
 AR:=ar
 
 #Commn compile flags
-CC_FLAGS=-Wall -m64 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas
+CC_FLAGS=-Wall -m64 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -Wno-strict-aliasing
 
 ifeq ($(ASSERTS),no)
-DEFINES+=-DNDEBUG
+DEFINES+=NDEBUG
 endif
 
 ifeq ($(OPTIMISE),speed)

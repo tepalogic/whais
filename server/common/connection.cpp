@@ -212,7 +212,7 @@ ClientConnection::MaxSize () const
   assert ((mCipher == FRAME_ENCTYPE_PLAIN) || (mCipher == FRAME_ENCTYPE_3K));
   assert ((MIN_FRAME_SIZE<= mDataSize) && (mDataSize <= MAX_FRAME_SIZE));
 
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (mCipher)
   {
@@ -235,7 +235,7 @@ ClientConnection::MaxSize () const
 uint_t
 ClientConnection::DataSize () const
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (mCipher)
   {
@@ -262,7 +262,7 @@ ClientConnection::DataSize () const
 uint8_t*
 ClientConnection::Data ()
 {
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (mCipher)
   {
@@ -287,7 +287,7 @@ ClientConnection::DataSize (const uint16_t size)
 {
   assert (size <= MaxSize ());
 
-  uint_t metaDataSize;
+  uint_t metaDataSize = 0;
 
   switch (mCipher)
   {

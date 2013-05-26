@@ -3180,7 +3180,10 @@ public:
     return Operand ().CopyFieldOp (source);
   }
 
-  BaseOperand& Operand () { return *_RC (BaseOperand*, mStorage);  }
+  BaseOperand& Operand ()
+  {
+    return *_RC (BaseOperand*, _RC (void*, mStorage));
+  }
 
 private:
   Lock          mSync;

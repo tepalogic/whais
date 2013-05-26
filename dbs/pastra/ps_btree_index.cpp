@@ -368,6 +368,7 @@ BTree::FindBiggerOrEqual (const IBTreeKey& key,
     {
       const bool found = node->FindBiggerOrEqual (key, outKeyIndex);
 
+      (void)found;
       assert (found != false);
 
       if ( node->IsLeaf ())

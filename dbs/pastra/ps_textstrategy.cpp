@@ -255,6 +255,7 @@ GenericText::CharAt (const uint64_t index)
 
   const uint_t charSize = wh_load_utf8_cp (aUtf8Char, &chValue);
 
+  (void)charSize;
   assert ((chOffset + charSize) <= mBytesSize);
 
   return DChar (chValue);
