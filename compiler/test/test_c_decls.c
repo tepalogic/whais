@@ -76,7 +76,7 @@ check_type_spec_fill (const struct TypeSpec* ts,
         return TRUE;
     }
 
-  while (count < (ts->dataSize - 2))
+  while (count < ((uint_t)ts->dataSize - 2))
     {
       uint16_t temp = strlen ((char *) it) + 1;
       if (strcmp ((char *) it, fname) != 0)

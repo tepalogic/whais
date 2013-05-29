@@ -28,39 +28,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_thread.h"
 
 uint_t
-wh_lock_init (WH_LOCK* pSync)
+wh_lock_init (WH_LOCK* const pLock)
 {
-  InitializeCriticalSection (pSync);
+  InitializeCriticalSection (pLock);
 
   return WOP_OK;
 }
 
 uint_t
-wh_lock_destroy (WH_LOCK* pSync)
+wh_lock_destroy (WH_LOCK* const pLock)
 {
-  DeleteCriticalSection (pSync);
+  DeleteCriticalSection (pLock);
 
   return WOP_OK;
 }
 
 uint_t
-wh_lock_acquire (WH_LOCK* pSync)
+wh_lock_acquire (WH_LOCK* const pLock)
 {
-  EnterCriticalSection (pSync);
+  EnterCriticalSection (pLock);
 
   return WOP_OK;
 }
 
 uint_t
-wh_lock_release (WH_LOCK* pSync)
+wh_lock_release (WH_LOCK* const pLock)
 {
-  LeaveCriticalSection (pSync);
+  LeaveCriticalSection (pLock);
 
   return WOP_OK;
 }
 
 uint_t
-wh_thread_create (WH_THREAD* pThread, WH_THREAD_ROUTINE routine, void* args)
+wh_thread_create (WH_THREAD* const              pThread,
+                  const WH_THREAD_ROUTINE       routine,
+                  void* const                   args)
 {
   *pThread = CreateThread (NULL,
                            0,
@@ -95,7 +97,7 @@ wh_yield ()
 }
 
 void
-wh_sleep (uint_t millisecs)
+wh_sleep (const uint_t millisecs)
 {
   if (millisecs == 0)
     return;

@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 WH_FILE
-whf_open (const char* file, uint_t mode)
+whf_open (const char* const file, uint_t mode)
 {
   int         openMode = O_LARGEFILE;
   const int   accMode  = (S_IRUSR | S_IWUSR | S_IRGRP);
@@ -90,15 +90,19 @@ whf_seek (WH_FILE hnd, int64_t where, int whence)
     case WHC_SEEK_BEGIN:
       whence = SEEK_SET;
       break;
+
     case WHC_SEEK_END:
       whence = SEEK_END;
       break;
+
     case WHC_SEEK_CURR:
       whence = SEEK_CUR;
       break;
+
     default:
-      assert (0);
+      assert (FALSE);
     }
+
   return (lseek64 (hnd, where, whence) != POSIX_FAIL_RET);
 }
 
@@ -118,6 +122,7 @@ whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
         {
           /* the errno is already set for this */
           result = FALSE;
+
           break;
         }
       else if (count == 0)
@@ -126,6 +131,7 @@ whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
            * error in POSIX, but we do! */
           errno  = ENODATA;
           result = FALSE;
+
           break;
         }
       actualCount += count;
@@ -133,6 +139,7 @@ whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
 
   assert ((result == TRUE) || (actualCount < size));
   assert ((result == FALSE) || (size == actualCount));
+
   return result;
 }
 
@@ -159,12 +166,13 @@ whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
 
   assert ((result == TRUE) || (actual_count < size));
   assert ((result == FALSE) || (size == actual_count));
+
   return result;
 }
 
 
 bool_t
-whf_tell (WH_FILE hnd, uint64_t* outPosition)
+whf_tell (WH_FILE hnd, uint64_t* const outPosition)
 {
   *outPosition = lseek64 (hnd, 0, SEEK_CUR);
 
@@ -180,7 +188,7 @@ whf_sync (WH_FILE hnd)
 
 
 bool_t
-whf_tell_size (WH_FILE hnd, uint64_t* outSize)
+whf_tell_size (WH_FILE hnd, uint64_t* const outSize)
 {
   struct stat64 buf;
 
@@ -193,7 +201,7 @@ whf_tell_size (WH_FILE hnd, uint64_t* outSize)
 
 
 bool_t
-whf_set_size (WH_FILE hnd, uint64_t newSize)
+whf_set_size (WH_FILE hnd, const uint64_t newSize)
 {
   if (ftruncate (hnd, newSize) != 0)
     return FALSE;
@@ -238,7 +246,7 @@ whf_err_to_str (uint64_t errorCode, char* str, uint_t strSize)
 
 
 bool_t
-whf_remove (const char* file)
+whf_remove (const char* const file)
 {
   if (unlink (file) == 0)
     return TRUE;
@@ -262,7 +270,7 @@ whf_current_dir ()
 
 
 bool_t
-whf_is_absolute (const char* path)
+whf_is_absolute (const char* const path)
 {
   assert (path != NULL);
 

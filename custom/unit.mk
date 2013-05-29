@@ -27,11 +27,8 @@ endif
 ifeq ($(ARCH),linux_gcc_x86)
 SRC_FOLDER:=posix
 endif
-ifeq ($(ARCH),wine_vc)
-SRC_FOLDER:=windows
-endif
 
-ifeq ($(ARCH),windows_vc)
+ifeq ($(ARCH),windows_vc_x86)
 SRC_FOLDER:=windows
 endif
 

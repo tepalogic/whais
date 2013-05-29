@@ -54,7 +54,7 @@ public:
 
   virtual ITable& RetrievePersistentTable (const TABLE_INDEX index);
 
-  virtual ITable& RetrievePersistentTable (const char* name);
+  virtual ITable& RetrievePersistentTable (const char* const name);
 
   virtual void ReleaseTable (ITable&);
 

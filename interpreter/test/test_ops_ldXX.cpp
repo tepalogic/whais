@@ -163,7 +163,7 @@ test_op_ldi8 (Session& session)
   SessionStack stack;
 
   uint_t opSize = w_encode_opcode (W_LDI8, testCode);
-  testCode [opSize + 0] = 0xD8;
+  testCode [opSize + 0] = 0x58;
   w_encode_opcode (W_RET, testCode + opSize + 1);
 
   session.ExecuteProcedure (procName, stack);
@@ -173,7 +173,7 @@ test_op_ldi8 (Session& session)
 
   DInt8 value;
   stack[0].Operand ().GetValue (value);
-  if (value != DInt8 (0xD8))
+  if (value != DInt8 (0x58))
     return false;
 
   return true;
@@ -194,7 +194,7 @@ test_op_ldi16 (Session& session)
 
   uint_t opSize = w_encode_opcode (W_LDI16, testCode);
   testCode [opSize + 0] = 0xA1;
-  testCode [opSize + 1] = 0xB4;
+  testCode [opSize + 1] = 0x34;
   w_encode_opcode (W_RET, testCode + opSize + 2);
 
   session.ExecuteProcedure (procName, stack);
@@ -204,7 +204,7 @@ test_op_ldi16 (Session& session)
 
   DInt16 value;
   stack[0].Operand ().GetValue (value);
-  if (value != DInt16 (0xB4A1))
+  if (value != DInt16 (0x34A1))
     return false;
 
   return true;

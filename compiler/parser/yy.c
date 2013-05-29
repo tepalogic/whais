@@ -37,8 +37,11 @@
 #include <ctype.h>
 #include <assert.h>
 
+/* Include this first to avoidome type redefinitions
+ * when the Visual C++ compiler is used. */
+#include "whisper.tab.h" 
+
 #include "whisper.h"
-#include "whisper.tab.h"
 
 #include "utils/utf8.h"
 #include "compiler/wopcodes.h"
@@ -453,7 +456,7 @@ parse_real (const char*      buffer,
   const uint_t oldLen            = bufferLen;
   bool_t       foundDecimalPoint = FALSE;
   bool_t       negative          = FALSE;
-  uint64_t     precision         = 1;
+  int64_t      precision         = 1;
 
   assert (buffer != NULL);
   assert (bufferLen != 0);
@@ -484,7 +487,10 @@ parse_real (const char*      buffer,
             }
           else
             {
-              precision               *= 10;
+              precision *= 10;
+              if ((precision < 0) || (precision >= W_LDRR_PRECISSION))
+                break;
+
               outReal->fractionalPart *= 10;
               outReal->fractionalPart += digit;
             }

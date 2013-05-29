@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include "whisper.h"
+
 #include "compiler/wopcodes.h"
 
 #include "expression.h"
@@ -2855,7 +2856,7 @@ translate_tree_exp (struct ParserState* const   parser,
 
 
 YYSTYPE
-translate_exp (struct ParserState* parser, YYSTYPE exp)
+translate_exp (struct ParserState* const parser, YYSTYPE exp)
 {
   struct Statement* const     stmt   = parser->pCurrentStmt;
   struct WOutputStream* const instrs = stmt_query_instrs (stmt);
@@ -2875,7 +2876,7 @@ translate_exp (struct ParserState* parser, YYSTYPE exp)
 
 
 YYSTYPE
-translate_return_exp (struct ParserState* parser, YYSTYPE exp)
+translate_return_exp (struct ParserState* const parser, YYSTYPE exp)
 {
   struct Statement* const         stmt    = parser->pCurrentStmt;
   struct WOutputStream* const     instrs  = stmt_query_instrs (stmt);
@@ -2987,7 +2988,7 @@ translate_return_exp (struct ParserState* parser, YYSTYPE exp)
 
 
 bool_t
-translate_bool_exp (struct ParserState* parser, YYSTYPE exp)
+translate_bool_exp (struct ParserState* const parser, YYSTYPE exp)
 {
   struct ExpResultType expType;
 
@@ -3016,9 +3017,9 @@ translate_bool_exp (struct ParserState* parser, YYSTYPE exp)
 
 
 YYSTYPE
-create_arg_link (struct ParserState* parser,
-                 YYSTYPE             argument,
-                 YYSTYPE             next)
+create_arg_link (struct ParserState* const parser,
+                 YYSTYPE                   argument,
+                 YYSTYPE                   next)
 {
   struct SemValue* const result = alloc_sem_value (parser);
 

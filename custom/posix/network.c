@@ -188,10 +188,12 @@ whs_accept (const WH_SOCKET      sd,
             WH_SOCKET* const     outSocket)
 {
   const int clientSD = accept (sd, NULL, NULL);
+
   if (clientSD < 0)
     return errno;
 
   *outSocket = clientSD;
+
   return WOP_OK;
 }
 

@@ -81,7 +81,7 @@ wh_array_resize (struct WArray* const array, const uint_t count);
 
 
 void
-wh_array_clean (struct WArray* array);
+wh_array_clean (struct WArray* const array);
 
 #endif /* WARRAY_H */
 

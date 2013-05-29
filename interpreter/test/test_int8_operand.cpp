@@ -21,7 +21,7 @@ get_test_array ()
 {
   DArray array;
 
-  array.Add (DInt8 (0xFf));
+  array.Add (DInt8 (-1));
   array.Add (DInt8 (0));
   array.Add (DInt8 (-100));
   array.Add (DInt8 (10));

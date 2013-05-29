@@ -22,17 +22,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#define WIN32
-#define _WINDOWS
-#include <sdkddkver.h>
-#include <windows.h>
 #include <assert.h>
 
 #include "whisper.h"
 #include "whisper_fileio.h"
 
 WH_FILE
-whf_open (const char* pFileName, uint_t mode)
+whf_open (const char* const file, uint_t mode)
 {
   DWORD       dwDesiredAccess = 0;
   DWORD       dwCreation      = 0;
@@ -41,8 +37,10 @@ whf_open (const char* pFileName, uint_t mode)
 
   if (mode & WHC_FILECREATE_NEW)
     dwCreation |= CREATE_NEW;
+
   else if (mode & WHC_FILECREATE)
     dwCreation |= CREATE_ALWAYS;
+
   else
     dwCreation |= OPEN_EXISTING;
 
@@ -52,7 +50,7 @@ whf_open (const char* pFileName, uint_t mode)
   dwDesiredAccess |= (mode & WHC_FILEREAD) ? GENERIC_READ : 0;
   dwDesiredAccess |= (mode & WHC_FILEWRITE) ? GENERIC_WRITE : 0;
 
-  result = CreateFile (pFileName,
+  result = CreateFile (file,
                        dwDesiredAccess,
                        0,
                        NULL,
@@ -60,27 +58,29 @@ whf_open (const char* pFileName, uint_t mode)
                        dwFlagsAndAttr,
                        NULL);
   result = (result == INVALID_HANDLE_VALUE) ? (WH_FILE)-1 : result;
+
   return result;
 }
 
 WH_FILE
-whf_dup (WH_FILE f_hnd)
+whf_dup (WH_FILE hnd)
 {
   WH_FILE result = INVALID_HANDLE_VALUE;
 
   DuplicateHandle(GetCurrentProcess(),
-                  f_hnd,
+                  hnd,
                   GetCurrentProcess(),
                   &result,
                   0,
                   FALSE,
                   DUPLICATE_SAME_ACCESS);
+
   return (result == INVALID_HANDLE_VALUE) ? 0 : result;
 
 }
 
 bool_t
-whf_seek (WH_FILE f_hnd, int64_t where, int whence)
+whf_seek (WH_FILE hnd, int64_t where, int whence)
 {
   LARGE_INTEGER sliWhere;
 
@@ -91,36 +91,42 @@ whf_seek (WH_FILE f_hnd, int64_t where, int whence)
     case WHC_SEEK_BEGIN:
       whence = FILE_BEGIN;
       break;
+
     case WHC_SEEK_END:
       whence = FILE_END;
       break;
+
     case WHC_SEEK_CURR:
       whence = FILE_CURRENT;
       break;
+
     default:
-      assert (0);
+      assert (FALSE);
     }
 
-  if (!SetFilePointerEx (f_hnd, sliWhere, NULL, whence))
+  if ( ! SetFilePointerEx (hnd, sliWhere, NULL, whence))
     return FALSE;
 
   return TRUE;
 }
 
 bool_t
-whf_read (WH_FILE f_hnd, uint8_t* pBuffer, uint_t size)
+whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
 {
-  bool_t result = TRUE;
+  bool_t result       = TRUE;
   uint_t actual_count = 0;
 
   while (actual_count < size)
     {
       DWORD count;
-      if (!ReadFile (f_hnd, pBuffer + actual_count,
-                     size - actual_count, &count, NULL))
+      if ( ! ReadFile (hnd,
+                       dstBuffer + actual_count,
+                       size - actual_count,
+                       &count,
+                       NULL))
         {
-          /* the errno is already set for this */
           result = FALSE;
+
           break;
         }
       actual_count += count;
@@ -133,23 +139,23 @@ whf_read (WH_FILE f_hnd, uint8_t* pBuffer, uint_t size)
 }
 
 bool_t
-whf_write (WH_FILE f_hnd, const uint8_t* pBuffer, uint_t size)
+whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
 {
 
-  bool_t result     = TRUE;
+  bool_t result       = TRUE;
   uint_t actualCount = 0;
 
   while (actualCount < size)
     {
       DWORD count;
-      if (!WriteFile (f_hnd,
-                      pBuffer + actualCount,
-                      size - actualCount,
-                      &count,
-                      NULL))
+      if ( ! WriteFile (hnd,
+                        srcBuffer + actualCount,
+                        size - actualCount,
+                        &count,
+                        NULL))
         {
-          /* the errno is already set for this */
           result = FALSE;
+
           break;
         }
       actualCount += count;
@@ -162,46 +168,52 @@ whf_write (WH_FILE f_hnd, const uint8_t* pBuffer, uint_t size)
 }
 
 bool_t
-whf_tell (WH_FILE f_hnd, uint64_t* pOutSize)
+whf_tell (WH_FILE hnd, uint64_t* const outPosition)
 {
 
   const LARGE_INTEGER sTemp = { 0, };
 
-  if (!SetFilePointerEx (f_hnd,
+  if (!SetFilePointerEx (hnd,
                          sTemp,
-                         (LARGE_INTEGER*)pOutSize,
+                         (LARGE_INTEGER*)outPosition,
                          FILE_CURRENT))
-    return FALSE;
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
 
 bool_t
-whf_sync (WH_FILE f_hnd)
+whf_sync (WH_FILE hnd)
 {
-  const HANDLE handler = (HANDLE) f_hnd;
+  const HANDLE handler = (HANDLE) hnd;
+
   return FlushFileBuffers (handler);
 }
 
 bool_t
-whf_tell_size (WH_FILE f_hnd, uint64_t* pOutSize)
+whf_tell_size (WH_FILE hnd, uint64_t* const outSize)
 {
-  return GetFileSizeEx (f_hnd, (LARGE_INTEGER*) pOutSize);
+  return GetFileSizeEx (hnd, (LARGE_INTEGER*) outSize);
 }
 
 bool_t
-whf_set_size (WH_FILE f_hnd, uint64_t newSize)
+whf_set_size (WH_FILE hnd, const uint64_t newSize)
 {
-  if (whf_seek (f_hnd, newSize, WHC_SEEK_BEGIN)
-      && (SetEndOfFile (f_hnd) != 0))
-    return TRUE;
+  if (whf_seek (hnd, newSize, WHC_SEEK_BEGIN)
+      && (SetEndOfFile (hnd) != 0))
+    {
+      return TRUE;
+    }
+
   return FALSE;
 }
 
 bool_t
-whf_close (WH_FILE f_hnd)
+whf_close (WH_FILE hnd)
 {
-  return CloseHandle (f_hnd);
+  return CloseHandle (hnd);
 }
 
 uint32_t
@@ -218,13 +230,14 @@ whf_err_to_str (uint64_t error_code, char* str, uint_t strSize)
               NULL,
               (DWORD) error_code,
               MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-              str, strSize, NULL) != 0;
+              str, strSize, NULL
+                       ) != 0;
 }
 
 bool_t
-whf_remove (const char *pFileName)
+whf_remove (const char* const file)
 {
-  return DeleteFile (pFileName);
+  return DeleteFile (file);
 }
 
 const char*
@@ -240,8 +253,9 @@ whf_current_dir ()
 }
 
 bool_t
-whf_is_absolute (const char* pPath)
+whf_is_absolute (const char* const path)
 {
-  assert (pPath != NULL);
-  return (pPath[1] == ':');
+  assert (path != NULL);
+
+  return (path[1] == ':');
 }

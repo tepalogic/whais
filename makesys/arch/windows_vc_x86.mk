@@ -12,20 +12,32 @@ CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
 LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
 AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/lib.exe'
 
-ifeq ($(FLAVOR),debug)
-CC_FLAGS?=/LDd /W3 /TC /c  /Y- /arch:SSE2 /GF /ZI /RTC1 /nologo /wd4242 /wd4244 /wd4355
-CXX_FLAGS?=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc
+CC_FLAGS:=/LD /W3 /TC /c  /Y- /arch:SSE2 /nologo /wd4242 /wd4244 /wd4290 /wd4355 
+
+ifeq ($(ASSERTS),no)
+DEFINES+=NDEBUG=1
 endif
 
-ifeq ($(FLAVOR),release)
-DEFINES+=-DNDEBUG
-CC_FLAGS?=/LD /W3 /TC /c  /Y- /arch:SSE2 /GF /O2 /nologo /wd4242 /wd4244
-CXX_FLAGS?=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc
+ifeq ($(DEBUGINFO),yes)
+CC_FLAGS:=$(subst /LD,/LDd /Z7 /RTC1,$(CC_FLAGS))
 endif
+
+ifeq ($(OPTIMISE),speed)
+CC_FLAGS+= /O2
+CC_FLAGS:=$(subst /RTC1,,$(CC_FLAGS))
+else
+ifeq ($(OPTIMISE),size)
+CC_FLAGS+= /O1
+CC_FLAGS:=$(subst /RTC1,,$(CC_FLAGS))
+endif
+endif
+
+CXX_FLAGS?=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc
 
 DEFINES+=ARCH_WINDOWS_VC=2
 DEFINES+=INLINE=__inline
 DEFINES+=_CRT_SECURE_NO_WARNINGS
+DEFINES+=snprintf=_snprintf
 
 #translate input files
 arch_translate_path=$(subst /,\\,$(1))
@@ -56,10 +68,10 @@ arch_set_output_library=/OUT:$(call arch_translate_path,./bin/$(ARCH)/$(2)/$(ARC
 
 #set the right  flags for the linker
 
-arch_linker_flags=/link /nologo 
-ifeq ($(FLAVOR),debug)
+arch_linker_flags=/link /nologo
+ifeq ($(DEBUGINFO),yes)
 arch_linker_flags+=/DEBUG
-endif
+endif 
 arch_shl_linker_flags= $(arch_linker_flags) /DLL 
 arch_archiver_flags=/NOLOGO
 

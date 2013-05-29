@@ -114,7 +114,7 @@ wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 
 
 uint_t
-wh_store_utf8_cp (uint32_t codePoint, uint8_t* const dest)
+wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest)
 {
   if (codePoint < 0x80)
     {
@@ -175,7 +175,7 @@ wh_store_utf8_cp (uint32_t codePoint, uint8_t* const dest)
 
 
 uint_t
-wh_utf8_store_size (uint32_t codePoint)
+wh_utf8_store_size (const uint32_t codePoint)
 {
   if (codePoint < 0x80)
     return 1;

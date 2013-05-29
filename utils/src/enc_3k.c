@@ -32,11 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 static uint32_t
 exchange_1bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
-  assert (p1 < 32);
-  assert (p2 < 32);
-
   const uint32_t val1 = (value >> p1) & 1;
   const uint32_t val2 = (value >> p2) & 1;
+
+  assert (p1 < 32);
+  assert (p2 < 32);
 
   value &= ~((1 << p1) | (1 << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -47,11 +47,11 @@ exchange_1bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 static uint32_t
 exchange_2bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
-  assert ((p1 < 32) && ((p1 % 2) == 0));
-  assert ((p2 < 32) && ((p2 % 2) == 0));
-
   const uint32_t val1 = (value >> p1) & 0x03;
   const uint32_t val2 = (value >> p2) & 0x03;
+
+  assert ((p1 < 32) && ((p1 % 2) == 0));
+  assert ((p2 < 32) && ((p2 % 2) == 0));
 
   value &= ~((0x03 << p1) | (0x03 << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -62,11 +62,11 @@ exchange_2bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 static uint32_t
 exchange_4bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
-  assert ((p1 < 32) && ((p1 % 4) == 0));
-  assert ((p2 < 32) && ((p2 % 4) == 0));
-
   const uint32_t val1 = (value >> p1) & 0x0F;
   const uint32_t val2 = (value >> p2) & 0x0F;
+
+  assert ((p1 < 32) && ((p1 % 4) == 0));
+  assert ((p2 < 32) && ((p2 % 4) == 0));
 
   value &= ~((0x0F << p1) | (0x0F << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -77,11 +77,11 @@ exchange_4bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 static uint32_t
 exchange_8bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
-  assert ((p1 < 32) && ((p1 % 8) == 0));
-  assert ((p2 < 32) && ((p2 % 8) == 0));
-
   const uint32_t val1 = (value >> p1) & 0xFF;
   const uint32_t val2 = (value >> p2) & 0xFF;
+
+  assert ((p1 < 32) && ((p1 % 8) == 0));
+  assert ((p2 < 32) && ((p2 % 8) == 0));
 
   value &= ~((0xFF << p1) | (0xFF << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -92,11 +92,11 @@ exchange_8bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 static uint32_t
 exchange_16bit_pair (uint32_t value, const uint_t p1, const uint_t p2)
 {
-  assert ((p1 < 32) && ((p1 % 16) == 0));
-  assert ((p2 < 32) && ((p2 % 16) == 0));
-
   const uint32_t val1 = (value >> p1) & 0xFFFF;
   const uint32_t val2 = (value >> p2) & 0xFFFF;
+
+  assert ((p1 < 32) && ((p1 % 16) == 0));
+  assert ((p2 < 32) && ((p2 % 16) == 0));
 
   value &= ~((0xFFFF << p1) | (0xFFFF << p2));
   value |= (val1 << p2) | (val2 << p1);
@@ -113,10 +113,11 @@ wh_buff_3k_encode (const uint32_t           firstKing,
                    const uint_t             bufferSize)
 {
   uint_t pos, b;
+  uint_t keyIndex = firstKing % keyLen;
 
   assert (bufferSize % sizeof (uint32_t) == 0);
 
-  uint_t keyIndex = firstKing % keyLen;
+
   for (pos = 0; pos < bufferSize; pos += sizeof (uint32_t))
     {
       uint64_t message   = load_le_int32 (buffer + pos);
@@ -184,10 +185,12 @@ wh_buff_3k_decode (const uint32_t           firstKing,
                    uint8_t*                 buffer,
                    const uint_t             bufferSize)
 {
-  int pos, b;
+  uint_t pos, b;
+  uint_t keyIndex = firstKing % keyLen;
+
   assert (bufferSize % sizeof (uint32_t) == 0);
 
-  uint_t keyIndex = firstKing % keyLen;
+
   for (pos = 0; pos < bufferSize; pos += sizeof (uint32_t))
     {
       uint64_t message   = load_le_int32 (buffer + pos);
@@ -245,4 +248,3 @@ wh_buff_3k_decode (const uint32_t           firstKing,
       store_le_int32 (message, buffer + pos);
     }
 }
-

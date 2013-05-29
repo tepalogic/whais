@@ -145,7 +145,7 @@ wh_unit_procedures_count (WH_COMPILED_UNIT hnd);
 /* Get the description of a procedure from a compiled unit. */
 uint_t
 wh_unit_procedure (WH_COMPILED_UNIT              hnd,
-                   uint_t                        id,
+                   const uint_t                  id,
                    WCompilerProcedureDesc* const outDesription);
 
 /* Get a pointer to to the compiled binary type descriptors. */

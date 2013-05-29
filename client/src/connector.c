@@ -1168,12 +1168,15 @@ compute_push_space_need (const uint_t               type,
                          uint_t                     fieldsCount,
                          const struct WField* const fields)
 {
+  uint_t result = 0;
+
   if (type != WHC_TYPE_TABLE_MASK)
     {
+      const uint_t baseType = type & ~(WHC_TYPE_ARRAY_MASK);
+
       if (type & WHC_TYPE_FIELD_MASK)
         return 0;
 
-      const uint_t baseType = type & ~(WHC_TYPE_ARRAY_MASK);
       if ((baseType < WHC_TYPE_BOOL) || (baseType > WHC_TYPE_TEXT)
           || (fieldsCount > 0))
         {
@@ -1186,7 +1189,7 @@ compute_push_space_need (const uint_t               type,
   if ((fieldsCount == 0) || (fields == NULL))
     return 0;
 
-  uint_t result = 2 * sizeof (uint16_t) + 1;
+  result = 2 * sizeof (uint16_t) + 1;
   while (fieldsCount-- > 0)
     {
       const char* const fieldName = fields[fieldsCount].name;
@@ -1499,16 +1502,20 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
       const uint16_t prevType = load_le_int16 (++data_);
       if (prevType == WHC_TYPE_TEXT)
         {
-          data_ += sizeof (uint16_t);
+          uint64_t      prevOffset;
+          uint_t        prevRawlen;
+          int           prevLen;
 
-          const uint64_t prevOffset = load_le_int64 (data_);
+
+          data_ += sizeof (uint16_t);
+          prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const int prevLen = wh_utf8_strlen (data_);
+          prevLen = wh_utf8_strlen (data_);
 
           assert (prevLen >= 0);
 
-          const uint_t prevRawlen = strlen ((const char*)data_);
+          prevRawlen = strlen ((const char*)data_);
           data_ += prevRawlen;
           if ((prevOffset + prevLen) == textOff)
             {
@@ -1596,22 +1603,27 @@ stack_top_field_text_update (struct INTERNAL_HANDLER* const hnd,
       const uint16_t prevType = load_le_int16 (++data_);
       if (prevType == (WHC_TYPE_TEXT | WHC_TYPE_FIELD_MASK))
         {
+          const char* prevFieldName;
+          uint64_t    prevRow, prevOffset;
+          uint_t      prevRawlen;
+          int         prevLen;
+
           data_ += sizeof (uint16_t);
 
-          const char* const prevFieldName = (const char*)data_;
+          prevFieldName = (const char*)data_;
           data_ += strlen (prevFieldName) + 1;
 
-          const uint64_t prevRow = load_le_int64 (data_);
+          prevRow = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const uint64_t prevOffset = load_le_int64 (data_);
+          prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const int prevLen = wh_utf8_strlen (data_);
+          prevLen = wh_utf8_strlen (data_);
 
           assert (prevLen >= 0);
 
-          const uint_t prevRawlen = strlen ((const char*)data_);
+          prevRawlen = strlen ((const char*)data_);
           data_ += prevRawlen;
 
           if ((strcmp (prevFieldName, fieldName) == 0)
@@ -1670,6 +1682,9 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* const hnd,
                               const WHT_INDEX                arrayOff,
                               const char* const              value)
 {
+  uint_t   currSize;
+  uint8_t* data_;
+
   uint_t cs       = WCS_OK;
   uint_t countOff = sizeof (uint8_t) + sizeof (uint16_t);
 
@@ -1691,34 +1706,40 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* const hnd,
         return cs;
     }
 
-  uint8_t* data_ = data (hnd);
+  data_ = data (hnd);
   if (data_[hnd->cmdInternal[LAST_UPDATE_OFF]] == CMD_UPDATE_FUNC_CHTOP)
   {
+      uint16_t prevType;
       data_ += hnd->cmdInternal[LAST_UPDATE_OFF];
 
-      const uint16_t prevType = load_le_int16 (++data_);
+      prevType = load_le_int16 (++data_);
       if ((type | WHC_TYPE_ARRAY_MASK) == prevType)
         {
+          uint64_t prevOffset;
+          uint16_t prevCount;
+
           data_ += sizeof (uint16_t);
 
-          const uint16_t prevCount = load_le_int16 (data_);
+          prevCount = load_le_int16 (data_);
 
           assert (prevCount > 0);
 
           data_ += sizeof (uint16_t);
 
-          const uint64_t prevOffset = load_le_int64 (data_);
+          prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
           if ((prevCount < 0xFFFF) &&
               (prevOffset + prevCount) == arrayOff)
             {
+              uint_t newDataSize;
+
               data_ = data (hnd) +
                         hnd->cmdInternal[LAST_UPDATE_OFF] +
                         countOff;
               store_le_int16 (prevCount + 1, data_);
 
-              const uint_t newDataSize = data_size (hnd) + strlen (value) + 1;
+              newDataSize = data_size (hnd) + strlen (value) + 1;
 
               assert (newDataSize <= max_data_size (hnd));
 
@@ -1731,7 +1752,7 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* const hnd,
         }
   }
 
-  const uint_t currSize = data_size (hnd);
+  currSize = data_size (hnd);
 
   data_    = data (hnd) + currSize;
   *data_++ = CMD_UPDATE_FUNC_CHTOP;
@@ -1801,33 +1822,39 @@ stack_top_field_array_basic_update (struct INTERNAL_HANDLER* const hnd,
       const uint16_t prevType = load_le_int16 (++data_);
       if ((type | WHC_TYPE_ARRAY_MASK | WHC_TYPE_FIELD_MASK) == prevType)
         {
+          const char*    prevFielName;
+          uint64_t       prevRow, prevOffset;
+          uint16_t       prevCount;
+
           data_ += sizeof (uint16_t);
 
-          const char* prevFielName = (const char*)data_;
+          prevFielName = (const char*)data_;
           data_ += strlen (prevFielName) + 1;
 
-          const uint64_t prevRow = load_le_int64 (data_);
+          prevRow = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
-          const uint16_t prevCount = load_le_int16 (data_);
+          prevCount = load_le_int16 (data_);
 
           assert (prevCount > 0);
 
           data_ += sizeof (uint16_t);
 
-          const uint64_t prevOffset = load_le_int64 (data_);
+          prevOffset = load_le_int64 (data_);
           data_ += sizeof (uint64_t);
 
           if (((prevOffset + prevCount) == arrayOff)
               && (prevRow == row)
               && (strcmp (prevFielName, fieldName) == 0))
             {
+              uint_t newDataSize = data_size (hnd) + strlen (value) + 1;
+
               data_ = data (hnd) +
                         hnd->cmdInternal[LAST_UPDATE_OFF] +
                         countOff;
               store_le_int16 (prevCount + 1, data_);
 
-              const uint_t newDataSize = data_size (hnd) + strlen (value) + 1;
+              newDataSize = data_size (hnd) + strlen (value) + 1;
 
               assert (newDataSize <= max_data_size (hnd));
               assert (newDataSize > currSize);
@@ -2010,7 +2037,6 @@ WFlush (const WH_CONNECTION hnd)
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   uint32_t  cs  = WCS_OK;
-
   uint16_t  type;
 
   if (hnd_ == NULL)
@@ -2788,18 +2814,19 @@ WValueArraySize (const WH_CONNECTION  hnd,
   uint64_t      count = 0;
   uint16_t      type  = 0;
   const char*   value = NULL;
+  uint_t        cs;
 
   if (outCount == NULL)
     return WCS_INVALID_ARGS;
 
-  uint_t cs = get_stack_value (hnd,
-                               field,
-                               row,
-                               0,
-                               WIGNORE_OFF,
-                               &count,
-                               &type,
-                               &value);
+  cs = get_stack_value (hnd,
+                        field,
+                        row,
+                        0,
+                        WIGNORE_OFF,
+                        &count,
+                        &type,
+                        &value);
 
   if ((cs != WCS_OK) && (cs != WCS_INVALID_ARRAY_OFF))
     return cs;
@@ -2816,21 +2843,23 @@ WValueTextLength (const WH_CONNECTION           hnd,
                           const WHT_ROW_INDEX   arrayOff,
                           ullong_t* const       outCount)
 {
+  uint_t        cs;
   uint64_t      count = 0;
   uint16_t      type  = 0;
   const char*   value = NULL;
 
+
   if (outCount == NULL)
     return WCS_INVALID_ARGS;
 
-  uint_t cs = get_stack_value (hnd,
-                               field,
-                               row,
-                               arrayOff,
-                               0,
-                               &count,
-                               &type,
-                               &value);
+  cs = get_stack_value (hnd,
+                        field,
+                        row,
+                        arrayOff,
+                        0,
+                        &count,
+                        &type,
+                        &value);
 
   if ((cs != WCS_OK) && (cs != WCS_INVALID_TEXT_OFF))
     return cs;

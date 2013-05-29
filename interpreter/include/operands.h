@@ -224,7 +224,11 @@ public:
   StackValue& operator[] (const uint_t index);
 
 private:
+
+#pragma warning (disable: 4251)
   std::vector<StackValue> mStack;
+#pragma warning (default: 4251)
+
 };
 
 

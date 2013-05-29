@@ -21,14 +21,24 @@ using namespace whisper;
 
 struct TableFieldDesc
 {
-  const char* const field_name;
-  const uint16_t      field_type;
-  bool                desc_visited;
+#if 0
+  TableFieldDesc ()
+    : field_name (NULL),
+      field_type (0),
+      desc_visited (false)
+  {
+
+  }
+#endif
+
+  const char*   field_name;
+  uint16_t      field_type;
+  bool          desc_visited;
 };
 
 struct GlobalDescs
 {
-  const char*  name;
+  const char*    name;
   const uint16_t raw_type;
   uint16_t       fields_count;
   bool           desc_visited;

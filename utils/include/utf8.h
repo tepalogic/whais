@@ -61,7 +61,7 @@ wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint);
 
 /* Store a Unicode code point using the UTF-8 encoding. */
 uint_t
-wh_store_utf8_cp (uint32_t codePoint, uint8_t *dest);
+wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest);
 
 
 /* Get the reuquired code  unit to store this Unicode code point using
@@ -73,7 +73,7 @@ wh_utf8_store_size (const uint32_t codePoint);
 /*  Get the Unicode code points count from an UTF-8 encoded
  *  string (null terminated). */
 int
-wh_utf8_strlen (const uint8_t* const utf8Str);
+wh_utf8_strlen (const uint8_t* utf8Str);
 
 
 #ifdef __cplusplus

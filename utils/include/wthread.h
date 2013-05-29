@@ -148,6 +148,7 @@ private:
   bool                    mUnkExceptSignaled;
   bool                    mIgnoreExceptions;
   bool                    mEnded;
+  bool                    mStarted;
   bool                    mNeedsClean;
 };
 

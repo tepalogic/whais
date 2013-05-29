@@ -92,12 +92,11 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
   //Wait for the the previous thread to be cleared.
   WaitToEnd ();
 
-  mLock.Acquire ();
-
   assert (mEnded);
   assert (mNeedsClean == false);
 
-  mEnded       = false;
+  mEnded       = true;
+  mStarted     = false;
   mRoutine     = routine;
   mRoutineArgs = args;
 
@@ -106,8 +105,7 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
                                        this);
   if (res != WOP_OK)
     {
-      mEnded = true;
-      mLock.Release ();
+      assert (mEnded);
       throw ThreadException (NULL, _EXTRA (errno));
     }
 
@@ -130,6 +128,13 @@ Thread::~Thread ()
 void
 Thread::WaitToEnd (const bool throwPending)
 {
+  //Give a chance for the thread it owns to execute. Make sure it had
+  //acquired the lock (if it did not then spin), in case this method was
+  //called to soon.
+  while ( ! mStarted)
+    wh_yield ();
+
+  //Wait till the spawned thread releases the lock.
   LockRAII holder (mLock);
 
   assert (mEnded );
@@ -171,32 +176,36 @@ Thread::ThrowPendingException ()
 void
 Thread::ThreadWrapperRoutine (void* const args)
 {
-  Thread* const pThread = _RC(Thread*, args);
+  Thread* const th = _RC (Thread*, args);
+
+  th->mEnded = false;
+  th->mLock.Acquire ();
+  th->mStarted = true; //Signal the we grabbed the lock
 
   try
   {
-    pThread->mRoutine (pThread->mRoutineArgs);
+      th->mRoutine (th->mRoutineArgs);
   }
   catch (Exception &e)
   {
-    if (pThread->mIgnoreExceptions == false)
-      pThread->mException = e.Clone ();
+    if (th->mIgnoreExceptions == false)
+      th->mException = e.Clone ();
   }
   catch (Exception* pE)
   {
-    if (pThread->mIgnoreExceptions == false)
-      pThread->mException = pE;
+    if (th->mIgnoreExceptions == false)
+      th->mException = pE;
   }
   catch (...)
   {
-    if (pThread->mIgnoreExceptions == false)
-      pThread->mUnkExceptSignaled = true;
+    if (th->mIgnoreExceptions == false)
+      th->mUnkExceptSignaled = true;
   }
 
-  assert (pThread->mEnded == false);
+  assert (th->mEnded == false);
 
-  pThread->mEnded = true;
-  pThread->mLock.Release ();
+  th->mEnded = true;
+  th->mLock.Release ();
 }
 
 

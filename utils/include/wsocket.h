@@ -49,7 +49,6 @@ public:
 };
 
 
-
 class EXCEP_SHL Socket
 {
 public:
@@ -98,7 +97,7 @@ private:
           throw SocketException ("Network system could not be initialized.",
                                   _EXTRA (0));
         }
-    }
+    };
 
     ~SocketInitialiser ()
     {
@@ -109,7 +108,7 @@ private:
   // Use the following static member to initialise the socket framework.
   // Note: in a program that uses the Socket wrapper class, one must not
   // call 'whs_init ()' or 'whs_clean ()', as this is handled automatically.
-  static SocketInitialiser __initer;
+  static struct SocketInitialiser __initer;
 };
 
 

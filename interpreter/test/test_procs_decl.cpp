@@ -23,13 +23,13 @@ static const uint_t MAX_FIELDS     = 10;
 struct FieldDesc
 {
   const char*  field_name;
-  const uint16_t field_type;
-  bool           field_visited;
+  uint16_t     field_type;
+  bool         field_visited;
 };
 
 struct ParameterDesc
 {
-  const uint16_t      type;
+  uint16_t            type;
   bool                desc_visited;
   uint16_t            field_count;
   FieldDesc           fields[MAX_FIELDS];
@@ -37,7 +37,7 @@ struct ParameterDesc
 
 struct ProcDesc
 {
-  const char*  name;
+  const char*    name;
   const uint_t   param_count;
   bool           desc_visited;
   ParameterDesc  params[MAX_PROC_PARAM];

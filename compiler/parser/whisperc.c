@@ -150,9 +150,9 @@ wh_unit_procedures_count (WH_COMPILED_UNIT hnd)
 
 
 uint_t
-wh_unit_procedure (WH_COMPILED_UNIT        hnd,
-                   const uint_t            id,
-                   WCompilerProcedureDesc* outDescription)
+wh_unit_procedure (WH_COMPILED_UNIT              hnd,
+                   const uint_t                  id,
+                   WCompilerProcedureDesc* const outDescription)
 {
   const struct Statement* stmt  = (const struct Statement*)
                                   wh_unit_procedure_get (hnd, id);

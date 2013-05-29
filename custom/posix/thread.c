@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 uint_t
-wh_lock_init (WH_LOCK* pLock)
+wh_lock_init (WH_LOCK* const pLock)
 {
   uint_t result;
 
@@ -50,7 +50,7 @@ wh_lock_init (WH_LOCK* pLock)
 
 
 uint_t
-wh_lock_destroy (WH_LOCK* pLock)
+wh_lock_destroy (WH_LOCK* const pLock)
 {
   uint_t result;
 
@@ -66,7 +66,7 @@ wh_lock_destroy (WH_LOCK* pLock)
 
 
 uint_t
-wh_lock_acquire (WH_LOCK* pLock)
+wh_lock_acquire (WH_LOCK* const pLock)
 {
   uint_t result;
 
@@ -82,7 +82,7 @@ wh_lock_acquire (WH_LOCK* pLock)
 
 
 uint_t
-wh_lock_release (WH_LOCK* pLock)
+wh_lock_release (WH_LOCK* const pLock)
 {
   uint_t result;
 
@@ -98,9 +98,9 @@ wh_lock_release (WH_LOCK* pLock)
 
 
 uint_t
-wh_thread_create (WH_THREAD*       pThread,
-                 WH_THREAD_ROUTINE routine,
-                 void*             args)
+wh_thread_create (WH_THREAD*  const             pThread,
+                  const WH_THREAD_ROUTINE       routine,
+                  void* const                   args)
 {
   uint_t result;
 
@@ -130,7 +130,7 @@ wh_yield ()
 
 
 void
-wh_sleep (uint_t millisecs)
+wh_sleep (const uint_t millisecs)
 {
   usleep (millisecs * 1000);
 }

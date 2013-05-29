@@ -305,9 +305,10 @@ IBTreeNodeManager::RetrieveNode (const NODE_INDEX nodeId)
 
               delete it->second.mNode;
 
-              mNodesKeeper.erase (it);
+              mNodesKeeper.erase (it++);
             }
-          ++it;
+          else
+            ++it;
         }
     }
 

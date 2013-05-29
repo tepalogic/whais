@@ -313,6 +313,15 @@ main (int argc, char** argv)
     th[5].Run (test_array_with_hirestimes_r, NULL);
     th[6].Run (test_array_with_int8, NULL);
     th[7].Run (test_array_with_int8_r, NULL);
+
+    th[0].WaitToEnd (true);
+    th[1].WaitToEnd (true);
+    th[2].WaitToEnd (true);
+    th[3].WaitToEnd (true);
+    th[4].WaitToEnd (true);
+    th[5].WaitToEnd (true);
+    th[6].WaitToEnd (true);
+    th[7].WaitToEnd (true);
   }
 
   DBSShoutdown ();
