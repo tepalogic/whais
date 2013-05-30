@@ -35,7 +35,8 @@ ifeq ($(PROFILE),yes)
 CC_FLAGS+= -pg
 endif
 
-CXX_FLAGS=$(CC_FLAGS) -fno-rtti
+CXX_FLAGS:=$(CC_FLAGS) -fno-rtti
+CC_FLAGS+=$(EXT_CC_FLAGS)
 
 DEFINES+=ARCH_LINUX_GCC=1
 DEFINES+=INLINE=__inline__
@@ -69,7 +70,7 @@ arch_set_output_sharedlib=-o ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL
 arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
 #set the right  flags for the linker
-arch_linker_flags= -m64 -pthread
+arch_linker_flags:=$(EXT_LD_FLAGS) -m64 -pthread
 ifeq ($(PROFILE),yes)
 arch_linker_flags+= -pg
 endif

@@ -32,7 +32,8 @@ CC_FLAGS:=$(subst /RTC1,,$(CC_FLAGS))
 endif
 endif
 
-CXX_FLAGS?=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc
+CXX_FLAGS:=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc $(EXT_CXX_FLAGS)
+CC_FLAGS+=$(EXT_CC_FLAGS)
 
 DEFINES+=ARCH_WINDOWS_VC=2
 DEFINES+=INLINE=__inline

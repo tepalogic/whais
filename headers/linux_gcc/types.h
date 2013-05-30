@@ -84,5 +84,6 @@ typedef uint8_t       bool_t;
 #define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))
 
 #define INVALID_SOCKET  ((int)-1)
+#define INVALID_FILE    ((int)-1)
 
 #endif /* WHISPER_TYPES_H */

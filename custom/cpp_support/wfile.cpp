@@ -36,7 +36,7 @@ File::File (const char* name, uint_t mode)
   : mHandle (0)
 {
   mHandle = whf_open (name, mode);
-  if (mHandle == _RC (WH_FILE, -1))
+  if (mHandle == INVALID_FILE)
     throw FileException (name, _EXTRA (whf_last_error ()));
 }
 
@@ -44,7 +44,7 @@ File::File (const char* name, uint_t mode)
 File::File (const File &src) :
   mHandle (whf_dup (src.mHandle))
 {
-  if (mHandle == _RC (WH_FILE, -1))
+  if (mHandle == INVALID_FILE)
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
 
@@ -52,7 +52,7 @@ File::File (const File &src) :
 File::~File ()
 {
   /* Close it only if is not already closed */
-  if (mHandle != _RC (WH_FILE, -1))
+  if (mHandle != INVALID_FILE)
     whf_close (mHandle);
 }
 
@@ -122,12 +122,12 @@ File::SetSize (const uint64_t size)
 void
 File::Close ()
 {
-  assert (mHandle != _RC (WH_FILE, -1));
+  assert (mHandle != INVALID_FILE);
 
   if ( ! whf_close (mHandle))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 
-  mHandle = _RC (WH_FILE, -1);
+  mHandle = INVALID_FILE;
 }
 
 
@@ -140,7 +140,7 @@ File::operator= (const File &src)
   Close(); // Close the old handler
 
   mHandle = whf_dup (src.mHandle);
-  if (mHandle == _RC (WH_FILE, -1))
+  if (mHandle == INVALID_FILE)
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 
   return *this;

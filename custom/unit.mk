@@ -28,6 +28,14 @@ ifeq ($(ARCH),linux_gcc_x86)
 SRC_FOLDER:=posix
 endif
 
+ifeq ($(ARCH),linux_gcc_ppc)
+SRC_FOLDER:=posix
+endif 
+
+ifeq ($(ARCH),linux_gcc_ppc64)
+SRC_FOLDER:=posix
+endif 
+
 ifeq ($(ARCH),windows_vc_x86)
 SRC_FOLDER:=windows
 endif

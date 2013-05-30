@@ -69,7 +69,7 @@ whf_open (const char* const file, uint_t mode)
     }
 
   result = open (file, openMode, accMode);
-  return ((result < 0) ? -1 : result);
+  return ((result < 0) ? INVALID_FILE : result);
 }
 
 
@@ -78,7 +78,7 @@ whf_dup (WH_FILE hnd)
 {
   WH_FILE result = dup (hnd);
 
-  return (result < 0) ? 0 : result;
+  return (result < 0) ? INVALID_FILE: result;
 }
 
 
