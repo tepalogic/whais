@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wod_dump.h"
 #include "wod_cmdline.h"
 
+using namespace std;
 using namespace whisper;
 using namespace whisper::wod;
 
@@ -58,37 +59,42 @@ main (int argc, char **argv)
   }
   catch (FunctionalUnitException& e)
   {
-    std::cerr << e.Message () << std::endl;
+    cerr << e.Message () << endl;
     retCode = -1;
   }
   catch (FileException& e)
   {
-    std::cerr << "File IO error " << e.Extra ();
+    cerr << "File IO error " << e.Extra ();
+
     if (e.Message () != NULL)
-      std::cerr << ": " << e.Message () << std::endl;
+      cerr << ": " << e.Message () << endl;
+
     else
-      std::cerr << '.' << std::endl;
+      cerr << '.' << endl;
+
     retCode = -1;
   }
   catch (CmdLineException& e)
   {
-    std::cerr << e.Message () << std::endl;
-  } catch (Exception & e)
+    cerr << e.Message () << endl;
+  }
+  catch (Exception & e)
   {
-    std::cerr << "error : " << e.Message () << std::endl;
-    std::cerr << "file: " << e.File() << " : " << e.Line() << std::endl;
-    std::cerr << "Extra: " << e.Extra() << std::endl;
+    cerr << "error : " << e.Message () << endl;
+    cerr << "file: " << e.File() << " : " << e.Line() << endl;
+    cerr << "Extra: " << e.Extra() << endl;
 
     retCode = -1;
   }
-  catch (std::bad_alloc &)
+  catch (bad_alloc &)
   {
-    std::cerr << "Memory allocation failed!" << std::endl;
+    cerr << "Memory allocation failed!" << endl;
+
     retCode = -1;
   }
   catch (...)
   {
-    std::cerr << "Unknown exception thrown!" << std::endl;
+    cerr << "Unknown exception thrown!" << endl;
     retCode = -1;
   }
 

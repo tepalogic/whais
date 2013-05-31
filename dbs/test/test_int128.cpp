@@ -423,7 +423,7 @@ test_for_special_mul_cases ()
 
   for (i = 0; i < 64; ++i)
     {
-      WE_I128 val = 1 << i;
+      WE_I128 val = 1ll << i;
 
       if ((val * 1ll != 1ll * val)
           || (val * 1ll != val))

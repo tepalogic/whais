@@ -143,7 +143,7 @@ main ()
         }
     }
 
-  printf ("Testing '%=' operator usage ...");
+  printf ("Testing '%%=' operator usage ...");
   if (check_all_procs (&state))
     {
       printf ("PASSED\n");

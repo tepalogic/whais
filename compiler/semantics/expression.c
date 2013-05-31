@@ -26,6 +26,7 @@
 
 #include "whisper.h"
 
+#include "utils/le_converter.h"
 #include "compiler/wopcodes.h"
 
 #include "expression.h"
@@ -2075,21 +2076,21 @@ translate_leaf_exp (struct ParserState* const parser,
 
   if (exp->val_type == VAL_ID)
     {
+      const uint16_t value_16 = ~0;
+      const uint8_t  value_8  = ~0;
+
+      enum W_OPCODE op_code = W_NA;
+      uint32_t      value   = 0;
+
       struct DeclaredVar* var = stmt_find_declaration (stmt,
                                                        exp->val.u_id.name,
                                                        exp->val.u_id.length,
                                                        TRUE,
                                                        TRUE );
-      uint32_t value;
-      uint32_t value_32 = ~0;
-      uint16_t value_16 = ~0;
-      uint8_t  value_8  = ~0;
-
-      enum W_OPCODE op_code = W_NA;
-
       if (var == NULL)
         {
           char temp[128];
+
           wh_copy_first (temp,
                          exp->val.u_id.name,
                          sizeof temp,
@@ -2120,11 +2121,10 @@ translate_leaf_exp (struct ParserState* const parser,
 
       if (value <= value_8)
         {
-          value_8 = value;
           op_code = (stmt->type == STMT_GLOBAL) ? W_LDGB8 : W_LDLO8;
 
           if ((encode_opcode (instrs, op_code) == NULL)
-              || wh_ostream_wint8 (instrs, value_8) == NULL)
+              || (wh_ostream_wint8 (instrs, value & 0xFF) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
@@ -2133,11 +2133,10 @@ translate_leaf_exp (struct ParserState* const parser,
         }
       else if (value <= value_16)
         {
-          value_16 = value;
           op_code  = (stmt->type == STMT_GLOBAL) ? W_LDGB16 : W_LDLO16;
 
           if ((encode_opcode (instrs, op_code) == NULL)
-              || wh_ostream_wint16 (instrs, value_16) == NULL)
+              || (wh_ostream_wint16 (instrs, value & 0xFFFF) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
@@ -2146,11 +2145,10 @@ translate_leaf_exp (struct ParserState* const parser,
         }
       else
         {
-          value_32 = value;
           op_code  = (stmt->type == STMT_GLOBAL) ? W_LDGB32 : W_LDLO32;
 
           if ((encode_opcode (instrs, op_code) == NULL)
-              || wh_ostream_wint32 (instrs, value_32) == NULL)
+              || (wh_ostream_wint32 (instrs, value) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
               return sgResultUnk;
@@ -2167,10 +2165,8 @@ translate_leaf_exp (struct ParserState* const parser,
         {
           result.type = exp->val.u_int.isSigned ? T_INT8 : T_UINT8;
           if ((encode_opcode (instrs, W_LDI8) == NULL)
-              || (wh_ostream_wint8 (
-                             instrs,
-                             (uint8_t)exp->val.u_int.value & value_8
-                                  ) == NULL))
+              || (wh_ostream_wint8 (instrs,
+                                    exp->val.u_int.value & 0xFF) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
@@ -2181,10 +2177,8 @@ translate_leaf_exp (struct ParserState* const parser,
         {
           result.type = exp->val.u_int.isSigned ? T_INT16 : T_UINT16;
           if ((encode_opcode (instrs, W_LDI16) == NULL)
-              || (wh_ostream_wint16 (
-                              instrs,
-                              (uint16_t)exp->val.u_int.value & value_16
-                                    ) == NULL))
+              || (wh_ostream_wint16 (instrs,
+                                     exp->val.u_int.value & 0xFFFF) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
@@ -2196,10 +2190,8 @@ translate_leaf_exp (struct ParserState* const parser,
           result.type = exp->val.u_int.isSigned ? T_INT32 : T_UINT32;
 
           if ((encode_opcode (instrs, W_LDI32) == NULL)
-              || (wh_ostream_wint32 (
-                              instrs,
-                              (uint32_t)exp->val.u_int.value & value_32
-                                    ) == NULL))
+              || (wh_ostream_wint32 (instrs,
+                                    exp->val.u_int.value & 0xFFFFFFFF) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
@@ -2210,8 +2202,7 @@ translate_leaf_exp (struct ParserState* const parser,
         {
           result.type = exp->val.u_int.isSigned ? T_INT64 : T_UINT64;
           if ((encode_opcode (instrs, W_LDI64) == NULL)
-              || (wh_ostream_wint64 (instrs,
-                                     (uint64_t) exp->val.u_int.value) == NULL))
+              || (wh_ostream_wint64 (instrs, exp->val.u_int.value) == NULL))
             {
               log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
@@ -2286,8 +2277,7 @@ translate_leaf_exp (struct ParserState* const parser,
     {
       result.type = T_RICHREAL;
       if ((encode_opcode (instrs, W_LDRR) == NULL)
-          || (wh_ostream_wint64 (instrs,
-                                 exp->val.u_real.integerPart) == NULL)
+          || (wh_ostream_wint64 (instrs, exp->val.u_real.integerPart) == NULL)
           || (wh_ostream_wint64 (instrs,
                                  exp->val.u_real.fractionalPart) == NULL))
 
@@ -2318,8 +2308,8 @@ translate_leaf_exp (struct ParserState* const parser,
   else if (exp->val_type == VAL_C_BOOL)
     {
       const enum W_OPCODE opcode = (exp->val.u_bool.value == FALSE) ?
-                                     W_LDBF :
-                                     W_LDBT;
+                                    W_LDBF :
+                                    W_LDBT;
       if (encode_opcode (instrs, opcode) == NULL)
         {
           log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -2838,17 +2828,11 @@ translate_tree_exp (struct ParserState* const   parser,
 
   if (needsJmpAdjust && (GET_TYPE (opType2.type) == T_BOOL))
     {
-      /* lets correct some jumps offsets */
+      /* Lets correct some jumps offsets */
       int currentPos = wh_ostream_size (instrs) - jmpPosition;
 
-      const uint8_t* const pos   = (uint8_t*)&currentPos;
-      uint8_t* const       code  = wh_ostream_data (instrs);
-
-      /* Fix the jump offset! */
-      code[jmpDataPos + 0] = pos[0];
-      code[jmpDataPos + 1] = pos[1];
-      code[jmpDataPos + 2] = pos[2];
-      code[jmpDataPos + 3] = pos[3];
+      uint8_t* const code  = wh_ostream_data (instrs);
+      store_le_int32 (currentPos, code + jmpDataPos);
     }
 
   return opType2;

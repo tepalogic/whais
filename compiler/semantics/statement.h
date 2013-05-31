@@ -38,11 +38,13 @@ enum STATEMENT_TYPE
   STMT_PROC
 };
 
+
 struct StatementGlobalSymbol
 {
   char*   symbol;
   uint_t  index;
 };
+
 
 struct _GlobalStatmentSpec
 {
@@ -52,6 +54,7 @@ struct _GlobalStatmentSpec
                                       of procedures */
   uint32_t             procsCount;
 };
+
 
 struct _ProcStatementSpec
 {
@@ -68,6 +71,7 @@ struct _ProcStatementSpec
   uint16_t             syncTracker;  /* Keeps track of sync staments. */
 };
 
+
 struct Statement
 {
   struct Statement*   parent;      /* NULL for global statement */
@@ -82,17 +86,23 @@ struct Statement
   } spec;
 };
 
+
+
 bool_t
 init_glbl_stmt (struct Statement* stmt);
+
 
 void
 clear_glbl_stmt (struct Statement* stmt);
 
+
 bool_t
 init_proc_stmt (struct Statement* parent, struct Statement* outStmt);
 
+
 void
 clear_proc_stmt (struct Statement* stmt);
+
 
 struct DeclaredVar*
 stmt_find_declaration (struct Statement* stmt,
@@ -101,19 +111,24 @@ stmt_find_declaration (struct Statement* stmt,
                        const bool_t      recursive,
                        const bool_t      reffered);
 
+
 struct DeclaredVar*
 stmt_add_declaration (struct Statement* const   stmt,
                       struct DeclaredVar*       var,
                       const bool_t              procPram);
 
+
 const struct DeclaredVar*
 stmt_get_param (const struct Statement* const stmt, const uint_t param);
+
 
 uint_t
 stmt_get_param_count (const struct Statement* const stmt);
 
+
 uint32_t
 stmt_get_import_id (const struct Statement* const proc);
+
 
 /* some inline functions to access statement members */
 static INLINE struct WOutputStream*
@@ -123,12 +138,14 @@ stmt_query_instrs (struct Statement* const stmt)
   return &stmt->spec.proc.code;
 }
 
+
 static INLINE struct WArray*
 stmt_query_branch_stack (struct Statement* const stmt)
 {
   assert (stmt->type == STMT_PROC);
   return &stmt->spec.proc.branchStack;
 }
+
 
 static INLINE struct WArray*
 stmt_query_loop_stack (struct Statement* const stmt)
@@ -137,29 +154,40 @@ stmt_query_loop_stack (struct Statement* const stmt)
   return &stmt->spec.proc.loopStack;
 }
 
+
+
 /**************************Type specification section ***************/
+
+
 
 #define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
 #define TYPE_SPEC_ERROR         0xFFFFFFFD
 
+
+
 struct TypeSpec
 {
-  uint16_t type;
-  uint16_t dataSize;
+  uint8_t  type[2];
+  uint8_t  dataSize[2];
   uint8_t  data[2];     /* VLA - Keep this last. */
 };
 
+
+
 bool_t
 is_type_spec_valid (const struct TypeSpec* spec);
+
 
 bool_t
 compare_type_spec (const struct TypeSpec* const spec1,
                    const struct TypeSpec* const spec2);
 
+
 uint_t
 fill_type_spec (struct WOutputStream* const     typeStream,
                 const struct DeclaredVar* const var);
+
 
 int
 add_constant_text (struct Statement* const stmt,

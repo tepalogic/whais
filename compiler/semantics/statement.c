@@ -216,6 +216,7 @@ stmt_add_declaration (struct Statement* const   stmt,
 
   if (IS_TABLE_FIELD (var->type))
       var->varId = ~0; /* Set the id to a generic value! */
+
   else if (stmt->type == STMT_GLOBAL)
     {
       var->varId = 0; /* The real id will be assigned when is refered */
@@ -282,8 +283,8 @@ is_type_spec_valid (const struct TypeSpec* spec)
 {
   bool_t result = TRUE;
 
-  const uint16_t htype = load_le_int16 ((uint8_t*)&spec->type);
-  const uint16_t hsize = load_le_int16 ((uint8_t*)&spec->dataSize);
+  const uint16_t htype = load_le_int16 (spec->type);
+  const uint16_t hsize = load_le_int16 (spec->dataSize);
 
   if (((htype == T_UNKNOWN) || (htype > T_UNDETERMINED))
       && (IS_FIELD (htype) == FALSE)
@@ -341,7 +342,7 @@ is_type_spec_valid (const struct TypeSpec* spec)
 
           /* Don't check for zero here, because of strlen () */
           index += identifierLength + 1;
-          type   = ((uint16_t*)&(spec->data[index]))[0];
+          type   = load_le_int16 (&(spec->data[index]));
 
           /* Ignore an eventual array mask */
           if ( (GET_BASIC_TYPE (type) == T_UNKNOWN) ||
@@ -381,7 +382,7 @@ find_type_spec (const uint8_t*         typeBuff,
       if (compare_type_spec (it, spec) != FALSE)
         return position;
 
-      position += it->dataSize + 2 * sizeof (uint16_t);
+      position += load_le_int16 (it->dataSize) + 2 * sizeof (uint16_t);
     }
 
   return TYPE_SPEC_INVALID_POS;
@@ -390,11 +391,17 @@ find_type_spec (const uint8_t*         typeBuff,
 
 bool_t
 compare_type_spec (const struct TypeSpec* const spec1,
-               const struct TypeSpec* const spec2)
+                   const struct TypeSpec* const spec2)
 {
-  return (spec1->type == spec2->type)
-          && (spec1->dataSize == spec2->dataSize)
-          && (memcmp (&spec1->data[0], &spec2->data[0], spec1->dataSize) == 0);
+  const uint_t t1 = load_le_int16 (spec1->type);
+  const uint_t s1 = load_le_int16 (spec1->dataSize);
+
+  const uint_t t2 = load_le_int16 (spec2->type);
+  const uint_t s2 = load_le_int16 (spec2->dataSize);
+
+  return (t1 == t2 )
+         && (s1 == s2)
+         && (memcmp (spec1->data, spec2->data, s1) == 0);
 }
 
 
@@ -402,8 +409,7 @@ static uint_t
 type_spec_fill_table_field (struct WOutputStream* const typeStream,
                             const struct DeclaredVar*   fields)
 {
-  uint_t   result = 0;
-  uint16_t leType;
+  uint_t result = 0;
 
   while (fields && IS_TABLE_FIELD (fields->type))
     {
@@ -417,8 +423,7 @@ type_spec_fill_table_field (struct WOutputStream* const typeStream,
         }
 
       result += fields->labelLength + 1;
-      store_le_int16 (GET_TYPE (fields->type), (uint8_t*)&leType);
-      if (wh_ostream_wint16 (typeStream, leType) == NULL)
+      if (wh_ostream_wint16 (typeStream, GET_TYPE (fields->type)) == NULL)
         {
           result = TYPE_SPEC_ERROR;
           break;
@@ -435,17 +440,14 @@ static uint_t
 type_spec_fill_table (struct WOutputStream* const     typeStream,
                       const struct DeclaredVar* const var)
 {
-  uint_t   result  = 0;
-  uint_t   specOff = wh_ostream_size (typeStream);
-  uint16_t leType;
+  uint_t result  = 0;
+  uint_t specOff = wh_ostream_size (typeStream);
 
   assert (IS_TABLE (var->type));
 
-  store_le_int16 (var->type, (uint8_t*)&leType);
-
   /* output the type and a dummy length to fill
    * after fields are output */
-  if ((wh_ostream_wint16 (typeStream, leType) != NULL)
+  if ((wh_ostream_wint16 (typeStream, var->type) != NULL)
       && (wh_ostream_wint16 (typeStream, 0) != NULL))
     {
       result = type_spec_fill_table_field (typeStream, var->extra);
@@ -460,7 +462,7 @@ type_spec_fill_table (struct WOutputStream* const     typeStream,
       struct TypeSpec *ts = (struct TypeSpec*)
                             (wh_ostream_data (typeStream) + specOff);
       result += 2 * sizeof (uint8_t);
-      store_le_int16 (result, (uint8_t*)&ts->dataSize);
+      store_le_int16 (result, ts->dataSize);
     }
   else
     result = TYPE_SPEC_ERROR;
@@ -479,8 +481,8 @@ type_spec_fill_array (struct WOutputStream* const     typeStream,
 
   assert (IS_ARRAY (GET_TYPE (var->type)));
 
-  store_le_int16 (GET_TYPE (var->type), (uint8_t*)&spec.type);
-  store_le_int16 (2, (uint8_t*)&spec.dataSize);
+  store_le_int16 (GET_TYPE (var->type), spec.type);
+  store_le_int16 (2, spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
 
@@ -504,8 +506,8 @@ type_spec_fill_field (struct WOutputStream* const     typeStream,
 
   assert (IS_FIELD (GET_TYPE (var->type)));
 
-  store_le_int16 (GET_TYPE (var->type), (uint8_t*)&spec.type);
-  store_le_int16 (2, (uint8_t*)&spec.dataSize);
+  store_le_int16 (GET_TYPE (var->type), spec.type);
+  store_le_int16 (2, spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
 
@@ -533,8 +535,8 @@ type_spec_fill_basic (struct WOutputStream* const      typeStream,
   assert (var->type != T_UNKNOWN);
   assert (var->type <= T_TEXT);
 
-  store_le_int16 (GET_BASIC_TYPE (var->type), (uint8_t*)&spec.type);
-  store_le_int16 (2, (uint8_t*)&spec.dataSize);
+  store_le_int16 (GET_BASIC_TYPE (var->type), spec.type);
+  store_le_int16 (2, spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;
 

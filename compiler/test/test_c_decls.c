@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/le_converter.h"
+
 #include "../parser/parser.h"
 #include "../semantics/vardecl.h"
 
@@ -70,15 +72,16 @@ check_type_spec_fill (const struct TypeSpec* ts,
 
   if (fname == NULL)
     {
-      if (ts->dataSize != 2)
+      if (load_le_int16 (ts->dataSize) != 2)
         return FALSE;
       else
         return TRUE;
     }
 
-  while (count < ((uint_t)ts->dataSize - 2))
+  while (count < (load_le_int16 (ts->dataSize) - 2))
     {
       uint16_t temp = strlen ((char *) it) + 1;
+
       if (strcmp ((char *) it, fname) != 0)
         {
           it += temp;
@@ -88,8 +91,7 @@ check_type_spec_fill (const struct TypeSpec* ts,
         }
       else
         {
-          uint16_t *ts_type = (uint16_t *) (it + temp);
-          if (*ts_type == type)
+          if (load_le_int16 (it + temp) == type)
             {
               return TRUE;
             }

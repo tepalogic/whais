@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/le_converter.h"
+
 #include "../parser/parser.h"
 #include "../semantics/vardecl.h"
 
@@ -84,8 +86,11 @@ check_declared_var (struct Statement *stm,
     {
       struct TypeSpec *ts = (struct TypeSpec *)
         &(wh_ostream_data (os)[var->typeSpecOff]);
-      if ((ts->type != type) ||
-          (ts->dataSize != 2) || (ts->data[0] != TYPE_SPEC_END_MARK))
+
+      if ((load_le_int16 (ts->type) != type)
+          || (load_le_int16 (ts->dataSize) != 2)
+          || (ts->data[0] != TYPE_SPEC_END_MARK)
+          || (ts->data[1] != 0))
         {
           return FALSE;
         }

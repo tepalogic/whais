@@ -66,6 +66,7 @@ begin_if_stmt (struct ParserState* const parser,
     log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 }
 
+
 void
 begin_else_stmt (struct ParserState* const parser)
 {
@@ -75,7 +76,7 @@ begin_else_stmt (struct ParserState* const parser)
   struct WArray* const branchStack = stmt_query_branch_stack (stmt);
   uint_t               branchId    = wh_array_count (branchStack) - 1;
   struct Branch*       branchIt    = wh_array_get (branchStack, branchId);
-  int32_t              jumpOffest  = 0;
+  int32_t              jumpOffset  = 0;
 
   /* Last if or elseif statement needs to know where to exit */
   if ((encode_opcode (code, W_JMP) == NULL)
@@ -87,11 +88,11 @@ begin_else_stmt (struct ParserState* const parser)
     }
 
   branchIt->elsePos = wh_ostream_size (code) - sizeof (uint32_t) - 1;
-  jumpOffest        = wh_ostream_size (code) - branchIt->startPos;
-  memcpy (wh_ostream_data (code) + branchIt->startPos + 1,
-          &jumpOffest,
-          sizeof jumpOffest);
+  jumpOffset        = wh_ostream_size (code) - branchIt->startPos;
+
+  store_le_int32 (jumpOffset, wh_ostream_data (code) + branchIt->startPos + 1);
 }
+
 
 void
 begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
@@ -101,6 +102,7 @@ begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
   if ( ! state->abortError)
     begin_if_stmt (state, exp, BT_ELSEIF);
 }
+
 
 void
 finalize_if_stmt (struct ParserState* const parser)
@@ -124,10 +126,11 @@ finalize_if_stmt (struct ParserState* const parser)
           assert (branchIt->startPos > 0);
 
           jumpOffset -= branchIt->startPos;
+
           assert (jumpOffset > 0);
-          memcpy (wh_ostream_data (code) + branchIt->startPos + 1,
-                  &jumpOffset,
-                  sizeof jumpOffset);
+
+          store_le_int32 (jumpOffset,
+                          wh_ostream_data (code) + branchIt->startPos + 1);
         }
       else
         {
@@ -136,9 +139,8 @@ finalize_if_stmt (struct ParserState* const parser)
 
           assert (jumpOffset > 0);
 
-          memcpy (wh_ostream_data (code) + branchIt->elsePos + 1,
-                  &jumpOffset,
-                  sizeof jumpOffset);
+          store_le_int32 (jumpOffset,
+                          wh_ostream_data (code) + branchIt->elsePos + 1);
         }
 
     }
@@ -146,6 +148,7 @@ finalize_if_stmt (struct ParserState* const parser)
 
   wh_array_resize (branchStack, branchId);
 }
+
 
 void
 begin_while_stmt (struct ParserState* const parser, YYSTYPE exp)
@@ -182,6 +185,7 @@ begin_while_stmt (struct ParserState* const parser, YYSTYPE exp)
       return;
     }
 }
+
 
 void
 finalize_while_stmt (struct ParserState* const parser)
@@ -224,17 +228,18 @@ finalize_while_stmt (struct ParserState* const parser)
           assert (FALSE);
         }
       /* Make the jump corrections. */
-      memcpy (code + loopIt->endPos + 1, &offset, sizeof offset);
+      store_le_int32 (offset, code + loopIt->endPos + 1);
     }
   while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   assert (loopIt->type == LE_WHILE_BEGIN);
 
   offset = loopIt->startPos - endWhileLoopPos;
-  memcpy (code + endWhileLoopPos + 1, &offset, sizeof offset);
+  store_le_int32 (offset, code + endWhileLoopPos + 1);
 
   wh_array_resize (loopsStack, loopId);
 }
+
 
 void
 begin_until_stmt (struct ParserState* const parser)
@@ -252,6 +257,7 @@ begin_until_stmt (struct ParserState* const parser)
   if (wh_array_add (loopsStack, &loop) == NULL)
     log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 }
+
 
 void
 finalize_until_stmt (struct ParserState* const parser, YYSTYPE exp)
@@ -307,12 +313,13 @@ finalize_until_stmt (struct ParserState* const parser, YYSTYPE exp)
         default:
           assert (0);
         }
-      memcpy (code + loopIt->endPos + 1, &offset, sizeof offset);
+      store_le_int32 (offset, code + loopIt->endPos + 1);
     }
   while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   wh_array_resize (loopsStack, loopId);
 }
+
 
 void
 handle_break_stmt (struct ParserState* const parser)
@@ -347,6 +354,7 @@ handle_break_stmt (struct ParserState* const parser)
       log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
     }
 }
+
 
 void
 handle_continue_stmt (struct ParserState* const parser)
@@ -409,6 +417,7 @@ handle_continue_stmt (struct ParserState* const parser)
     }
 }
 
+
 void
 begin_sync_stmt (struct ParserState* const parser)
 {
@@ -439,6 +448,7 @@ begin_sync_stmt (struct ParserState* const parser)
 
   stmt->spec.proc.syncTracker++;
 }
+
 
 void
 finalize_sync_stmt (struct ParserState* const parser)

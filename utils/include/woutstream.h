@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+#include "utils/le_converter.h"
 /* A convenient way to build a buffer with user content. */
 
 /* The size of memory to allocate when the buffer needs to be extended. */
@@ -77,21 +78,30 @@ wh_ostream_wint8 (struct WOutputStream* const stream, const uint8_t value)
 INLINE static struct WOutputStream*
 wh_ostream_wint16 (struct WOutputStream* const stream, const uint16_t value)
 {
-  return wh_ostream_write (stream, (const uint8_t*)&value, sizeof value);
+  uint8_t temp[2];
+
+  store_le_int16 (value, temp);
+  return wh_ostream_write (stream, temp, sizeof temp);
 }
 
 
 INLINE static struct WOutputStream*
 wh_ostream_wint32 (struct WOutputStream* const stream, const uint32_t value)
 {
-  return wh_ostream_write (stream, (const uint8_t*)&value, sizeof value);
+  uint8_t temp[4];
+
+  store_le_int32 (value, temp);
+  return wh_ostream_write (stream, temp, sizeof temp);
 }
 
 
 INLINE static struct WOutputStream*
 wh_ostream_wint64 (struct WOutputStream* stream, const uint64_t value)
 {
-  return wh_ostream_write (stream, (const uint8_t*)&value, sizeof value);
+  uint8_t temp[8];
+
+  store_le_int64 (value, temp);
+  return wh_ostream_write (stream, temp, sizeof temp);
 }
 
 

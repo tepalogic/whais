@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/le_converter.h"
+
 #include "../parser/parser.h"
 #include "../semantics/vardecl.h"
 #include "../semantics/opcodes.h"
@@ -165,7 +167,7 @@ check_procedure (struct ParserState *state, char * proc_name)
         {
           return FALSE;
         }
-      else if (*(int32_t *) (code + 3) != 8)
+      else if (load_le_int32 (code + 3) != 8)
         {
           return FALSE;
         }
