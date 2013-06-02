@@ -25,10 +25,13 @@
 #ifndef PS_SERIALIZER_H_
 #define PS_SERIALIZER_H_
 
-#include "dbs_values.h"
+#include "dbs/dbs_values.h"
+#include "utils/le_converter.h"
 
 namespace whisper {
 namespace pastra {
+
+typedef uint32_t NODE_INDEX;
 
 class Serializer
 {
@@ -72,6 +75,47 @@ public:
   static int Size (const DBS_FIELD_TYPE type, const bool isArray);
 
   static int Alignment (const DBS_FIELD_TYPE, const bool isArray);
+
+
+  static ROW_INDEX LoadRow (const ROW_INDEX* const from)
+  {
+    if (sizeof (ROW_INDEX) == sizeof (uint64_t))
+      return load_le_int64 (_RC (const uint8_t*, from));
+
+    else if (sizeof (ROW_INDEX) == sizeof (uint32_t))
+      return load_le_int32 (_RC (const uint8_t*, from));
+
+    assert (false);
+    return 0;
+  }
+
+  static void StoreRow (const ROW_INDEX row, ROW_INDEX* const to)
+  {
+    if (sizeof (ROW_INDEX) == sizeof (uint64_t))
+      store_le_int64 (row, _RC (uint8_t*, to));
+
+    else if (sizeof (ROW_INDEX) == sizeof (uint32_t))
+      store_le_int32 (row, _RC (uint8_t*, to));
+
+    else
+      {
+        assert (false);
+      }
+  }
+
+  static NODE_INDEX LoadNode (const NODE_INDEX* const from)
+  {
+    assert (sizeof (NODE_INDEX) == sizeof (uint32_t));
+
+    return load_le_int32 (_RC (const uint8_t*, from));
+  }
+
+  static void StoreNode (const NODE_INDEX node, NODE_INDEX* const to)
+  {
+    assert (sizeof (NODE_INDEX) == sizeof (uint32_t));
+
+    store_le_int32 (node, _RC (uint8_t*, to));
+  }
 };
 
 } //namespace pastra

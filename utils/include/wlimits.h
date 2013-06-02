@@ -33,13 +33,13 @@ w_min_value ()
 template<> int8_t
 w_max_value ()
 {
-  return 127ll;
+  return 127LL;
 }
 
 template<> int8_t
 w_min_value ()
 {
-  return -128ll;
+  return -128LL;
 }
 
 
@@ -47,13 +47,13 @@ w_min_value ()
 template<> int16_t
 w_max_value ()
 {
-  return 32767ll;
+  return 32767LL;
 }
 
 template<> int16_t
 w_min_value ()
 {
-  return -32768ll;
+  return -32768LL;
 }
 
 
@@ -61,13 +61,13 @@ w_min_value ()
 template<> int32_t
 w_max_value ()
 {
-  return 2147483647ll;
+  return 2147483647LL;
 }
 
 template<> int32_t
 w_min_value ()
 {
-  return -2147483648ll;
+  return -2147483648LL;
 }
 
 
@@ -75,7 +75,7 @@ w_min_value ()
 template<> int64_t
 w_max_value ()
 {
-  return 9223372036854775807ll;
+  return 9223372036854775807LL;
 }
 
 template<> int64_t
@@ -95,7 +95,7 @@ w_min_value ()
 template<> uint8_t
 w_max_value ()
 {
-  return 255ull;
+  return 255ULL;
 }
 
 template<> uint8_t
@@ -109,7 +109,7 @@ w_min_value ()
 template<> uint16_t
 w_max_value ()
 {
-  return 6553ull;
+  return 65535ULL;
 }
 
 template<> uint16_t
@@ -123,7 +123,7 @@ w_min_value ()
 template<> uint32_t
 w_max_value ()
 {
-  return 4294967295ull;
+  return 4294967295ULL;
 }
 
 template<> uint32_t
@@ -137,7 +137,7 @@ w_min_value ()
 template<> uint64_t
 w_max_value ()
 {
-  return 18446744073709551615ull;
+  return 18446744073709551615ULL;
 }
 
 template<> uint64_t

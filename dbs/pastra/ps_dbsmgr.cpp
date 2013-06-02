@@ -157,7 +157,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
   if (maxFileSize != mGlbSettings.mMaxFileSize)
     throw DBSException (NULL, _EXTRA (DBSException::INAVLID_DATABASE));
 
-  uint16_t tablesCount = *_RC (uint16_t*, buffer + PS_DBS_NUM_TABLES_OFF);
+  uint16_t tablesCount = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
 
   buffer += PS_DBS_HEADER_SIZE;
 

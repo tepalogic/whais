@@ -25,7 +25,10 @@
 #ifndef PS_TEMPLATETABLE_H_
 #define PS_TEMPLATETABLE_H_
 
+#include <assert.h>
+
 #include "utils/wfile.h"
+#include "utils/le_converter.h"
 
 #include "dbs_table.h"
 #include "dbs_types.h"
@@ -43,15 +46,113 @@ namespace pastra {
 static const uint_t PS_TABLE_FIELD_TYPE_MASK = 0x00FF;
 static const uint_t PS_TABLE_ARRAY_MASK      = 0x0100;
 
-struct FieldDescriptor
+
+
+class FieldDescriptor
 {
-  uint32_t mNullBitIndex;
-  uint32_t mRowDataOff;
-  uint32_t mNameOffset;
-  uint32_t mTypeDesc        : 12;
-  uint32_t mAcquired        : 1;
-  uint32_t mIndexNodeSizeKB : 9;
-  uint32_t mIndexUnitsCount : 10;
+public:
+
+  FieldDescriptor ()
+  {
+    NullBitIndex (0);
+    RowDataOff (0);
+    NameOffset (0);
+    IndexNodeSizeKB (0);
+    IndexUnitsCount (0);
+    Type (0);
+    mAcquired = 0;
+  }
+
+  uint_t NullBitIndex () const
+  {
+    return load_le_int16 (mNullBitIndex);
+  }
+
+  void NullBitIndex (const uint_t index)
+  {
+    store_le_int16 (index, mNullBitIndex);
+  }
+
+  uint_t RowDataOff () const
+  {
+    return load_le_int32 (mRowDataOff);
+  }
+
+  void RowDataOff (const uint_t off)
+  {
+    store_le_int32 (off, mRowDataOff);
+  }
+
+  uint_t NameOffset () const
+  {
+    return load_le_int32 (mNameOffset);
+  }
+
+  void NameOffset (const uint_t off)
+  {
+    store_le_int32 (off, mNameOffset);
+  }
+
+  uint_t Type () const
+  {
+    return load_le_int16 (mType);
+  }
+
+  void Type (const uint_t type)
+  {
+    store_le_int16 (type, mType);
+  }
+
+  bool IsAcquired () const
+  {
+    return mAcquired != 0;
+  }
+
+  void Acquire ()
+  {
+    assert (mAcquired == 0);
+
+    mAcquired = 1;
+  }
+
+  void Release ()
+  {
+    assert (mAcquired > 0);
+
+    mAcquired = 0;
+  }
+
+  uint_t IndexNodeSizeKB () const
+  {
+    return mIndexNodeSizeKB;
+  }
+
+  void IndexNodeSizeKB (const uint_t kb)
+  {
+    assert (kb <= 255);
+
+    mIndexNodeSizeKB = kb;
+  }
+
+  uint_t IndexUnitsCount () const
+  {
+    return load_le_int16 (mIndexUnitsCount);
+  }
+
+  void IndexUnitsCount (const uint_t count)
+  {
+    store_le_int16 (count, mIndexUnitsCount);
+  }
+
+private:
+  //TODO: Make sure you check no fields count bigger than 65535
+  uint8_t  mNullBitIndex[2];
+  uint8_t  mRowDataOff[4];
+  uint8_t  mNameOffset[4];
+  uint8_t  mType[2];
+  uint8_t  mIndexUnitsCount[2];
+  uint8_t  mAcquired;
+  uint8_t  mIndexNodeSizeKB;
 };
 
 
@@ -440,17 +541,26 @@ protected:
   Lock                                  mIndexSync;
 };
 
+
+
+
 class TableRmKey : public IBTreeKey
 {
 public:
-  TableRmKey (const uint64_t row) : mRow (row)
+  TableRmKey (const ROW_INDEX row)
+    : mRow (row)
   {
   };
 
-  operator uint64_t () const { return mRow; }
+  operator ROW_INDEX () const
+  {
+    return mRow;
+  }
 
-  const uint64_t mRow;
+  const ROW_INDEX mRow;
 };
+
+
 
 class TableRmNode : public IBTreeNode
 {

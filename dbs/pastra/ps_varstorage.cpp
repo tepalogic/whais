@@ -37,14 +37,6 @@ namespace pastra {
 
 
 
-StoreEntry::StoreEntry ()
-  : mPrevEntry (0),
-    mNextEntry (0)
-{
-}
-
-
-
 uint_t
 StoreEntry::Read (uint_t offset, uint_t count, uint8_t* buffer) const
 {

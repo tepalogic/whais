@@ -148,16 +148,17 @@ public:
     return result;
   }
 
-  virtual NODE_INDEX NodeIdOfKey (const KEY_INDEX key) const
+  virtual NODE_INDEX NodeIdOfKey (const KEY_INDEX keyIndex) const
   {
-    assert (key < KeysCount ());
+    assert (keyIndex < KeysCount ());
     assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
     assert (IsLeaf () == false);
 
     const ROW_INDEX* const  rows       = _RC (const ROW_INDEX*, DataForRead ());
     const NODE_INDEX* const childNodes = _RC (const NODE_INDEX*,
                                               rows + KeysPerNode ());
-    return childNodes[key];
+
+    return Serializer::LoadNode (childNodes + keyIndex);
   }
 
   virtual void SetNodeOfKey (const KEY_INDEX  keyIndex,
@@ -170,7 +171,7 @@ public:
     ROW_INDEX* const  rows       = _RC (ROW_INDEX*, DataForWrite ());
     NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
 
-    childNodes[keyIndex] = childNode;
+    Serializer::StoreNode (childNode, childNodes + keyIndex);
   }
 
   virtual void AdjustKeyNode (const IBTreeNode&  childNode,
@@ -472,11 +473,10 @@ public:
 
   virtual void GetRows (KEY_INDEX fromPos,
                         KEY_INDEX toPos,
-                        DArray& output) const
+                        DArray&   output) const
   {
     assert (fromPos >= toPos);
     assert (fromPos < KeysCount ());
-    assert (output.Type() == T_UINT64);
 
     const ROW_INDEX* const rows = _RC (const ROW_INDEX*, DataForRead ());
 
@@ -485,7 +485,17 @@ public:
 
     while (fromPos >= toPos)
       {
-        output.Add (DUInt64 (rows[fromPos]));
+        if (sizeof (ROW_INDEX) == 8)
+          output.Add (DUInt64 (Serializer::LoadRow (rows + fromPos)));
+
+        else if (sizeof (ROW_INDEX) == 4)
+          output.Add (DUInt32 (Serializer::LoadRow (rows + fromPos)));
+
+        else
+          {
+            assert (false);
+          }
+
         if (fromPos == 0)
           break;
         fromPos--;
@@ -501,7 +511,10 @@ private:
     const ROW_INDEX *const rows = _RC (const ROW_INDEX*, DataForRead ());
 
     if (keyIndex >= KeysCount() - NullKeysCount ())
-      return T_BTreeKey<DBS_T> (DBS_T (), rows[keyIndex]);
+      {
+        return T_BTreeKey<DBS_T> (DBS_T (),
+                                  Serializer::LoadRow (rows + keyIndex));
+      }
 
     DBS_T value;
     if (IsLeaf())
@@ -522,7 +535,7 @@ private:
       }
 
 
-    return T_BTreeKey<DBS_T> (value, rows[keyIndex]);
+    return T_BTreeKey<DBS_T> (value, Serializer::LoadRow (rows + keyIndex));
   }
 
   void SetKey (const T_BTreeKey<DBS_T> &key, const KEY_INDEX keyIndex)
@@ -550,7 +563,8 @@ private:
             Serializer::Store (values + keyIndex * T_SIZE, key.mValuePart);
           }
       }
-    rows[keyIndex] = key.mRowPart;
+
+    Serializer::StoreRow (key.mRowPart, rows + keyIndex);
   }
 };
 

@@ -162,22 +162,23 @@ normalize_fields (vector<DBSFieldDescriptor>&   fields,
   FieldDescriptor* const fieldsDesc   = _RC (FieldDescriptor*, outFields);
   uint_t                 fieldNameOff = sizeof (fieldsDesc[0]) * fieldsCount;
 
+  memset (outFields, 0, sizeof (fieldsDesc[0]) * fieldsCount);
   sort (fields.begin (), fields.end (), compare_fields);
 
   *outRowsSize = (fieldsCount + 7) / 8;
 
   for (uint_t i = 0; i <fieldsCount; i++)
     {
-      fieldsDesc[i].mNullBitIndex    = i;
-      fieldsDesc[i].mRowDataOff      = *outRowsSize;
-      fieldsDesc[i].mNameOffset      = fieldNameOff;
-      fieldsDesc[i].mAcquired        = 0;
-      fieldsDesc[i].mIndexNodeSizeKB = 0;
-      fieldsDesc[i].mIndexUnitsCount = 0;
+      fieldsDesc[i].NullBitIndex (i);
+      fieldsDesc[i].RowDataOff (*outRowsSize);
+      fieldsDesc[i].NameOffset (fieldNameOff);
 
-      fieldsDesc[i].mTypeDesc = fields[i].type;
       if (fields[i].isArray)
-        fieldsDesc[i].mTypeDesc |= PS_TABLE_ARRAY_MASK;
+        fieldsDesc[i].Type (fields[i].type | PS_TABLE_ARRAY_MASK);
+
+      else
+        fieldsDesc[i].Type (fields[i].type);
+
 
       const uint_t nameLen = strlen (fields[i].name) + 1;
 
@@ -211,7 +212,7 @@ create_table_file (const uint64_t                  maxFileSize,
   auto_ptr<uint8_t>          fieldsDescs (new uint8_t[descriptorsSize]);
   uint_t                     rowSize;
 
-  normalize_fields (vect, &rowSize, fieldsDescs.get());
+  normalize_fields (vect, &rowSize, fieldsDescs.get ());
 
   File tableFile (filePrefix, WHC_FILECREATE_NEW | WHC_FILERDWR);
 
@@ -220,15 +221,15 @@ create_table_file (const uint64_t                  maxFileSize,
 
   memcpy (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
-  store_le_int32 (fieldsCount, header + PS_TABLE_FIELDS_COUNT_OFF);
+  store_le_int32 (fieldsCount,     header + PS_TABLE_FIELDS_COUNT_OFF);
   store_le_int32 (descriptorsSize, header + PS_TABLE_ELEMS_SIZE_OFF);
-  store_le_int64 (0, header + PS_TABLE_RECORDS_COUNT_OFF);
-  store_le_int64 (0, header + PS_TABLE_VARSTORAGE_SIZE_OFF);
-  store_le_int32 (rowSize, header + PS_TABLE_ROW_SIZE_OFF);
-  store_le_int32 (NIL_NODE, header + PS_TABLE_BT_ROOT_OFF);
-  store_le_int32 (NIL_NODE, header + PS_TABLE_BT_HEAD_OFF);
-  store_le_int64 (maxFileSize, header + PS_TABLE_MAX_FILE_SIZE_OFF);
-  store_le_int64 (~(uint64_t)0, header + PS_TABLE_MAINTABLE_SIZE_OFF);
+  store_le_int64 (0,               header + PS_TABLE_RECORDS_COUNT_OFF);
+  store_le_int64 (0,               header + PS_TABLE_VARSTORAGE_SIZE_OFF);
+  store_le_int32 (rowSize,         header + PS_TABLE_ROW_SIZE_OFF);
+  store_le_int32 (NIL_NODE,        header + PS_TABLE_BT_ROOT_OFF);
+  store_le_int32 (NIL_NODE,        header + PS_TABLE_BT_HEAD_OFF);
+  store_le_int64 (maxFileSize,     header + PS_TABLE_MAX_FILE_SIZE_OFF);
+  store_le_int64 (~(uint64_t)0,    header + PS_TABLE_MAINTABLE_SIZE_OFF);
 
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_HEAD_LEN);
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_ROOT_LEN);
@@ -346,7 +347,7 @@ PersistentTable::~PersistentTable ()
         unitsCount += mvIndexNodeMgrs[fieldIndex]->IndexRawSize();
         unitsCount /= mMaxFileSize;
 
-        field.mIndexUnitsCount = unitsCount;
+        field.IndexUnitsCount (unitsCount);
         delete mvIndexNodeMgrs [fieldIndex];
       }
   MakeHeaderPersistent ();
@@ -462,9 +463,9 @@ PersistentTable::InitIndexedFields ()
     {
       FieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
-      if (field.mIndexNodeSizeKB == 0)
+      if (field.IndexNodeSizeKB () == 0)
         {
-          assert (field.mIndexUnitsCount == 0);
+          assert (field.IndexUnitsCount () == 0);
 
           mvIndexNodeMgrs.push_back (NULL);
           continue;
@@ -474,19 +475,19 @@ PersistentTable::InitIndexedFields ()
 
       containerName += '_';
       containerName += _RC (const char*, mFieldsDescriptors.get ()) +
-                              field.mNameOffset;
+                              field.NameOffset ();
       containerName += "_bt";
 
       auto_ptr<IDataContainer> indexContainer (
                              new FileContainer (containerName.c_str (),
                                                 mMaxFileSize,
-                                                field.mIndexUnitsCount )
+                                                field.IndexUnitsCount () )
                                                );
       mvIndexNodeMgrs.push_back (
             new FieldIndexNodeManager (indexContainer,
-                                       field.mIndexNodeSizeKB * 1024,
+                                       field.IndexNodeSizeKB () * 1024,
                                        0x400000, //4MB
-                                       _SC (DBS_FIELD_TYPE, field.mTypeDesc),
+                                       _SC (DBS_FIELD_TYPE, field.Type ()),
                                        false)
                                 );
     }
@@ -503,16 +504,17 @@ PersistentTable::MakeHeaderPersistent ()
 
   memcpy (tableHdr, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
-  store_le_int32 (mFieldsCount, tableHdr + PS_TABLE_FIELDS_COUNT_OFF);
-  store_le_int32 (mDescriptorsSize, tableHdr + PS_TABLE_ELEMS_SIZE_OFF);
-  store_le_int64 (mRowsCount, tableHdr + PS_TABLE_RECORDS_COUNT_OFF);
+  store_le_int32 (mFieldsCount,        tableHdr + PS_TABLE_FIELDS_COUNT_OFF);
+  store_le_int32 (mDescriptorsSize,    tableHdr + PS_TABLE_ELEMS_SIZE_OFF);
+  store_le_int64 (mRowsCount,          tableHdr + PS_TABLE_RECORDS_COUNT_OFF);
+  store_le_int32 (mRowSize,            tableHdr + PS_TABLE_ROW_SIZE_OFF);
+  store_le_int32 (mRootNode,           tableHdr + PS_TABLE_BT_ROOT_OFF);
+  store_le_int32 (mUnallocatedHead,    tableHdr + PS_TABLE_BT_HEAD_OFF);
+  store_le_int64 (mMaxFileSize,        tableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
+  store_le_int64 (mTableData->Size (), tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
+
   store_le_int64 ((mVSData != NULL) ? mVSData->Size () : 0,
                   tableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF);
-  store_le_int32 (mRowSize, tableHdr + PS_TABLE_ROW_SIZE_OFF);
-  store_le_int32 (mRootNode, tableHdr + PS_TABLE_BT_ROOT_OFF);
-  store_le_int32 (mUnallocatedHead, tableHdr + PS_TABLE_BT_HEAD_OFF);
-  store_le_int64 (mMaxFileSize, tableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
-  store_le_int64 (mTableData->Size (), tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
 
   memset(tableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 

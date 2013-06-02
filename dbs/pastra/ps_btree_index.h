@@ -30,21 +30,29 @@
 
 #include "utils/wthread.h"
 
+#include "ps_serializer.h"
+
 
 namespace whisper {
 namespace pastra {
+
+
 
 class IBTreeKey
 {
   /* Empty class to be used for key access uniformization. */
 };
 
+
 class IBTreeNodeManager;
 
-typedef uint32_t NODE_INDEX;
-typedef uint_t   KEY_INDEX;
+
+typedef uint_t KEY_INDEX;
+
 
 static const NODE_INDEX NIL_NODE = ~0;
+
+
 
 class IBTreeNode
 {
@@ -70,28 +78,28 @@ public:
 
   NODE_INDEX NodeId () const
   {
-    return mHeader->mNodeId;
+    return Serializer::LoadNode (&mHeader->mNodeId);
   }
 
   NODE_INDEX Next () const
   {
-    return mHeader->mRight;
+    return Serializer::LoadNode (&mHeader->mRight);
   }
 
   void Next (const NODE_INDEX next)
   {
-    mHeader->mRight = next;
+    Serializer::StoreNode (next, &mHeader->mRight);
     MarkDirty ();
   }
 
   NODE_INDEX Prev () const
   {
-    return mHeader->mLeft;
+    return Serializer::LoadNode (&mHeader->mLeft);
   }
 
   void Prev (const NODE_INDEX prev)
   {
-    mHeader->mLeft = prev;
+    Serializer::StoreNode (prev, &mHeader->mLeft);
     MarkDirty ();
   }
 
@@ -141,23 +149,23 @@ public:
 
   uint16_t NullKeysCount () const
   {
-    return mHeader->mNullKeysCount;
+    return load_le_int16 (mHeader->mNullKeysCount);
   }
 
   void NullKeysCount (const uint_t count)
   {
-    mHeader->mNullKeysCount = count;
+    store_le_int16 (count, mHeader->mNullKeysCount);
     MarkDirty ();
   }
 
   uint_t KeysCount () const
   {
-    return mHeader->mKeysCount;
+    return load_le_int16 (mHeader->mKeysCount);
   }
 
   void KeysCount (const uint_t count)
   {
-    mHeader->mKeysCount = count;
+    store_le_int16 (count, mHeader->mKeysCount);
     MarkDirty ();
   }
 
@@ -211,18 +219,17 @@ public:
 protected:
   struct NodeHeader
   {
-    uint64_t  mLeft          : 32;
-    uint64_t  mRight         : 32;
-    uint64_t  mNodeId        : 32;
-    uint64_t  mKeysCount     : 16;
-    uint64_t  mNullKeysCount : 16;
-    uint64_t  mLeaf          : 1;
-    uint64_t  mDirty         : 1;
-    uint64_t  mRemoved       : 1;
-    uint64_t  _reserved      : 61; //To make sure this it's aligned well
-    uint64_t  _unused;
-  };
+    NODE_INDEX   mLeft;
+    NODE_INDEX   mRight;
+    NODE_INDEX   mNodeId;
+    uint8_t      mKeysCount[2];
+    uint8_t      mNullKeysCount[2];
 
+    uint8_t      mLeaf;
+    uint8_t      mDirty;
+    uint8_t      mRemoved;
+    uint8_t      _unused[13]; //Leave space to align at 128 bit boundary.
+  };
 
   IBTreeNodeManager&       mNodesMgr;
 

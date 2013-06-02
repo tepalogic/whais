@@ -200,21 +200,21 @@ test_for_fields (IDBSHandler& rDbs,
     {
       FieldDescriptor& descr = _SC(PrototypeTable&, table).GetFieldDescriptorInternal (fieldIndex);
 
-      if (descr.mNullBitIndex != fieldIndex)
+      if (descr.NullBitIndex () != fieldIndex)
         {
           result = false;
           break;
         }
 
-      nullPositions.push_back (descr.mNullBitIndex);
+      nullPositions.push_back (descr.NullBitIndex ());
 
       if (! result)
         break;
 
-      uint_t elem_start = descr.mRowDataOff;
+      uint_t elem_start = descr.RowDataOff ();
       uint_t elem_end = elem_start +
-          Serializer::Size (_SC (DBS_FIELD_TYPE, descr.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK),
-                            (descr.mTypeDesc & PS_TABLE_ARRAY_MASK) != 0);
+          Serializer::Size (_SC (DBS_FIELD_TYPE, descr.Type () & PS_TABLE_FIELD_TYPE_MASK),
+                            (descr.Type () & PS_TABLE_ARRAY_MASK) != 0);
 
       for (uint_t index = 0; index < storage.size (); ++index)
         {
@@ -223,7 +223,7 @@ test_for_fields (IDBSHandler& rDbs,
               || ((storage[index].mBegin >= elem_end) &&
                   (elem_end <= storage[index].mEnd))
               || (elem_start >= elem_end)
-              || (storage[index].mBegin <= descr.mNullBitIndex / 8))
+              || (storage[index].mBegin <= descr.NullBitIndex () / 8))
             {
               result = false;
               break;

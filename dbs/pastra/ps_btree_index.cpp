@@ -29,8 +29,12 @@
 
 using namespace std;
 
+
+
 namespace whisper {
 namespace pastra {
+
+
 
 IBTreeNode::IBTreeNode (IBTreeNodeManager&  nodesManager,
                         const NODE_INDEX    nodeId)
@@ -39,7 +43,7 @@ IBTreeNode::IBTreeNode (IBTreeNodeManager&  nodesManager,
 {
   assert (nodeId != NIL_NODE);
 
-  mHeader->mNodeId = nodeId;
+  Serializer::StoreNode (nodeId, &mHeader->mNodeId);
   NullKeysCount (0);
 }
 

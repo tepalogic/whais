@@ -138,10 +138,10 @@ PrototypeTable::DescribeField (const FIELD_INDEX field)
 
   DBSFieldDescriptor result;
 
-  result.isArray = (desc[field].mTypeDesc & PS_TABLE_ARRAY_MASK) != 0;
+  result.isArray = (desc[field].Type () & PS_TABLE_ARRAY_MASK) != 0;
   result.type    = _SC (DBS_FIELD_TYPE,
-                        desc[field].mTypeDesc & PS_TABLE_FIELD_TYPE_MASK);
-  result.name    = _RC (const char*, desc) + desc[field].mNameOffset;
+                        desc[field].Type () & PS_TABLE_FIELD_TYPE_MASK);
+  result.name    = _RC (const char*, desc) + desc[field].NameOffset ();
 
   return result;
 }
@@ -210,9 +210,9 @@ PrototypeTable::AddReusedRow ()
       assert (keyNode->IsLeaf() );
       assert (keyIndex < keyNode->KeysCount());
 
-      const uint64_t* const rows = _RC (const uint64_t*, node->DataForRead ());
-
-      result = rows[keyIndex];
+      const ROW_INDEX* const rows = _RC (const ROW_INDEX*,
+                                         node->DataForRead ());
+      result = Serializer::LoadRow (rows + keyIndex);
     }
   return result;
 }
@@ -233,8 +233,8 @@ PrototypeTable::MarkRowForReuse (const ROW_INDEX row)
       {
         const FieldDescriptor& field = GetFieldDescriptorInternal (fieldsCount);
 
-        const uint8_t bitOff  = field.mNullBitIndex % 8;
-        const uint_t  byteOff = field.mNullBitIndex / 8;
+        const uint8_t bitOff  = field.NullBitIndex () % 8;
+        const uint_t  byteOff = field.NullBitIndex () / 8;
 
         rowData[byteOff] |= (1 << bitOff);
       }
@@ -277,8 +277,8 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
 
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if ((desc.mTypeDesc == T_TEXT)
-      || (desc.mTypeDesc & PS_TABLE_ARRAY_MASK) != 0)
+  if ((desc.Type () == T_TEXT)
+      || (desc.Type () & PS_TABLE_ARRAY_MASK) != 0)
     {
       throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
@@ -291,7 +291,7 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
                                                        nodeSizeKB * 1024,
                                                        0x400000, //4MB
                                                        _SC (DBS_FIELD_TYPE,
-                                                            desc.mTypeDesc),
+                                                            desc.Type ()),
                                                        true)
                                           );
 
@@ -309,7 +309,7 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
 
   for (ROW_INDEX row = 0; row < mRowsCount; ++row)
     {
-      switch (desc.mTypeDesc)
+      switch (desc.Type ())
       {
       case T_BOOL:
         insert_row_field<DBool> (*this, fieldTree, row, field);
@@ -386,8 +386,8 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
         }
     }
 
-  desc.mIndexNodeSizeKB = nodeSizeKB;
-  desc.mIndexUnitsCount = 1;
+  desc.IndexNodeSizeKB (nodeSizeKB);
+  desc.IndexUnitsCount (1);
 
   MakeHeaderPersistent ();
 
@@ -405,11 +405,11 @@ PrototypeTable::RemoveIndex (const FIELD_INDEX field)
 
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  assert (desc.mIndexNodeSizeKB > 0);
-  assert (desc.mIndexUnitsCount > 0);
+  assert (desc.IndexNodeSizeKB () > 0);
+  assert (desc.IndexUnitsCount () > 0);
 
-  desc.mIndexNodeSizeKB = 0;
-  desc.mIndexUnitsCount = 0;
+  desc.IndexNodeSizeKB (0);
+  desc.IndexUnitsCount (0);
 
   MakeHeaderPersistent ();
 
@@ -621,7 +621,7 @@ PrototypeTable::CheckRowToDelete (const ROW_INDEX row)
       const FieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
       const uint8_t          bitsSet   = ~0;
 
-      if ( rowData[fieldDesc.mNullBitIndex / 8] != bitsSet)
+      if ( rowData[fieldDesc.NullBitIndex () / 8] != bitsSet)
         {
           allFieldsNull = false;
           break;
@@ -653,7 +653,7 @@ PrototypeTable::CheckRowToReuse (const ROW_INDEX row)
       const FieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
       const uint8_t          bitsSet   = ~0;
 
-      if ( rowData[fieldDesc.mNullBitIndex / 8] != bitsSet)
+      if ( rowData[fieldDesc.NullBitIndex () / 8] != bitsSet)
         {
           allFieldsNull = false;
           break;
@@ -677,9 +677,9 @@ PrototypeTable::AcquireFieldIndex (FieldDescriptor* const field)
     {
       LockRAII syncHolder (mIndexSync);
 
-      if (field->mAcquired == 0)
+      if (! field->IsAcquired ())
         {
-          field->mAcquired = 1;
+          field->Acquire ();
           break;
         }
 
@@ -694,9 +694,9 @@ PrototypeTable::ReleaseIndexField (FieldDescriptor* const field)
 {
   LockRAII syncHolder (mIndexSync);
 
-  assert (field->mAcquired == 1);
+  assert (field->IsAcquired ());
 
-  field->mAcquired = 0;
+  field->Release ();
 }
 
 
@@ -848,8 +848,8 @@ PrototypeTable::Set (const ROW_INDEX      row,
   else if (row > mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
-      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
+  if ((desc.Type () & PS_TABLE_ARRAY_MASK)
+      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
@@ -869,12 +869,10 @@ PrototypeTable::Set (const ROW_INDEX      row,
 
           if (&value.mStorage != &VSStore ())
             {
-              newFirstEntry = VSStore ().AddRecord (
-                                                        value.mStorage,
-                                                        value.mFirstEntry,
-                                                        0,
-                                                        newFieldValueSize
-                                                               );
+              newFirstEntry = VSStore ().AddRecord (value.mStorage,
+                                                    value.mFirstEntry,
+                                                    0,
+                                                    newFieldValueSize);
             }
           else
             {
@@ -927,15 +925,12 @@ PrototypeTable::Set (const ROW_INDEX      row,
   const uint8_t  bitsSet           = ~0;
   bool           fieldValueWasNull = false;
 
-  uint64_t* const fieldFirstEntry = _RC (uint64_t*,
-                                         rowData + desc.mRowDataOff + 0);
-  uint64_t* const fieldValueSize  = _RC (
-                              uint64_t*,
-                              rowData + desc.mRowDataOff + sizeof (uint64_t)
-                                         );
+  uint8_t* const fieldFirstEntry = rowData + desc.RowDataOff ();
+  uint8_t* const fieldValueSize  = rowData +
+                                     desc.RowDataOff () + sizeof (uint64_t);
 
-  const uint_t  byteOff = desc.mNullBitIndex / 8;
-  const uint8_t bitOff  = desc.mNullBitIndex % 8;
+  const uint_t  byteOff = desc.NullBitIndex () / 8;
+  const uint8_t bitOff  = desc.NullBitIndex () % 8;
 
   if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
@@ -968,20 +963,15 @@ PrototypeTable::Set (const ROW_INDEX      row,
       //Postpone the removal of the actual record entries
       //to allow other threads gain access to 'mSync' faster.
       RowFieldText oldEntryRAII (VSStore (),
-                                 *fieldFirstEntry,
-                                 *fieldValueSize);
+                                 load_le_int64 (fieldFirstEntry),
+                                 load_le_int64 (fieldValueSize));
       syncHolder.Release ();
 
-      VSStore ().DecrementRecordRef (*fieldFirstEntry);
-      *fieldFirstEntry = newFirstEntry;
-      *fieldValueSize  = newFieldValueSize;
+      VSStore ().DecrementRecordRef (load_le_int64 (fieldFirstEntry));
+    }
 
-    }
-  else
-    {
-      *fieldFirstEntry = newFirstEntry;
-      *fieldValueSize  = newFieldValueSize;
-    }
+  store_le_int64 (newFirstEntry,     fieldFirstEntry);
+  store_le_int64 (newFieldValueSize, fieldValueSize);
 }
 
 
@@ -998,9 +988,9 @@ PrototypeTable::Set (const ROW_INDEX        row,
   else if (row > mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if (((desc.mTypeDesc & PS_TABLE_ARRAY_MASK) == 0)
-      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
-           _SC (uint_t, value.Type())))
+  if (((desc.Type () & PS_TABLE_ARRAY_MASK) == 0)
+      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
+           _SC (uint_t, value.Type ())))
     {
       throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
@@ -1044,15 +1034,12 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
           store_le_int64 (value.Count(), elemsCount);
 
-          newFirstEntry = VSStore ().AddRecord (
-                                                        elemsCount,
-                                                        sizeof (elemsCount)
-                                                            );
+          newFirstEntry = VSStore ().AddRecord (elemsCount, sizeof elemsCount);
           VSStore ().UpdateRecord (newFirstEntry,
-                                               sizeof elemsCount,
-                                               value.mStorage,
-                                               0,
-                                               newFieldValueSize);
+                                   sizeof elemsCount,
+                                   value.mStorage,
+                                   0,
+                                   newFieldValueSize);
           newFieldValueSize += sizeof elemsCount;
         }
     }
@@ -1062,14 +1049,13 @@ PrototypeTable::Set (const ROW_INDEX        row,
   StoredItem     cachedItem = mRowCache.RetriveItem (row);
   uint8_t *const rowData    = cachedItem.GetDataForUpdate();
 
-  uint64_t *const fieldFirstEntry = _RC (uint64_t*,
-                                         rowData + desc.mRowDataOff + 0);
-  uint64_t *const fieldValueSize  = _RC (
-                            uint64_t*,
-                            rowData + desc.mRowDataOff + sizeof (uint64_t)
-                                        );
-  const uint_t  byteOff = desc.mNullBitIndex / 8;
-  const uint8_t bitOff  = desc.mNullBitIndex % 8;
+  uint8_t *const fieldFirstEntry = rowData + desc.RowDataOff ();
+  uint8_t *const fieldValueSize  = rowData +
+                                     desc.RowDataOff () + sizeof (uint64_t);
+
+
+  const uint_t  byteOff = desc.NullBitIndex () / 8;
+  const uint8_t bitOff  = desc.NullBitIndex () % 8;
 
   if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
@@ -1102,19 +1088,20 @@ PrototypeTable::Set (const ROW_INDEX        row,
       //Postpone the removal of the actual record entries
       //to allow other threads gain access to 'mSync' faster.
       RowFieldArray   oldEntryRAII (VSStore (),
-                                    *fieldFirstEntry,
+                                    load_le_int64 (fieldFirstEntry),
                                     value.Type ());
 
-      VSStore ().DecrementRecordRef (*fieldFirstEntry);
-      *fieldFirstEntry = newFirstEntry;
-      *fieldValueSize  = newFieldValueSize;
+      VSStore ().DecrementRecordRef (load_le_int64 (fieldFirstEntry));
+
+      store_le_int64 (newFirstEntry,     fieldFirstEntry);
+      store_le_int64 (newFieldValueSize, fieldValueSize);
 
       syncHolder.Release ();
     }
   else
     {
-      *fieldFirstEntry = newFirstEntry;
-      *fieldValueSize  = newFieldValueSize;
+      store_le_int64 (newFirstEntry,     fieldFirstEntry);
+      store_le_int64 (newFieldValueSize, fieldValueSize);
     }
 }
 
@@ -1277,16 +1264,16 @@ allocate_row_field_array (VariableSizeStore&        store,
 
 void
 PrototypeTable::Get (const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          DText&          outValue)
+                     const FIELD_INDEX field,
+                     DText&            outValue)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if (row >= mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
-      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
+  if ((desc.Type () & PS_TABLE_ARRAY_MASK)
+      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
@@ -1296,16 +1283,13 @@ PrototypeTable::Get (const ROW_INDEX   row,
   StoredItem           cachedItem = mRowCache.RetriveItem (row);
   const uint8_t* const rowData    = cachedItem.GetDataForRead();
 
-  const uint64_t& fieldFirstEntry = *_RC (
-                                      const uint64_t*,
-                                      rowData + desc.mRowDataOff + 0
-                                         );
-  const uint64_t& fieldValueSize  = *_RC (
-                              const uint64_t*,
-                              rowData + desc.mRowDataOff + sizeof (uint64_t)
-                                         );
-  const uint_t  byteOff = desc.mNullBitIndex / 8;
-  const uint8_t bitOff  = desc.mNullBitIndex % 8;
+  const uint64_t fieldFirstEntry = load_le_int64 (rowData + desc.RowDataOff ());
+  const uint64_t fieldValueSize  = load_le_int64 (
+                              rowData + desc.RowDataOff () + sizeof (uint64_t)
+                                                 );
+
+  const uint_t  byteOff = desc.NullBitIndex () / 8;
+  const uint8_t bitOff  = desc.NullBitIndex () % 8;
 
   outValue.~DText ();
   if (rowData[byteOff] & (1 << bitOff))
@@ -1313,16 +1297,10 @@ PrototypeTable::Get (const ROW_INDEX   row,
 
   else
     {
-      _placement_new (
-                       &outValue,
-                       DText (
-                           *allocate_row_field_text (
-                                                     VSStore (),
-                                                     fieldFirstEntry,
-                                                     fieldValueSize
-                                                     )
-                               )
-                      );
+      _placement_new (&outValue,
+                      DText (*allocate_row_field_text (VSStore (),
+                                                       fieldFirstEntry,
+                                                       fieldValueSize)));
     }
 }
 
@@ -1338,8 +1316,8 @@ PrototypeTable::Get (const ROW_INDEX        row,
   if (row >= mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if (((desc.mTypeDesc & PS_TABLE_ARRAY_MASK) == 0)
-      || (((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+  if (((desc.Type () & PS_TABLE_ARRAY_MASK) == 0)
+      || (((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
              _SC(uint_t, outValue.Type ()))
           && (outValue.Type () != T_UNDETERMINED)))
     {
@@ -1351,18 +1329,15 @@ PrototypeTable::Get (const ROW_INDEX        row,
   StoredItem           cachedItem = mRowCache.RetriveItem (row);
   const uint8_t *const rowData   = cachedItem.GetDataForRead();
 
-  const uint64_t& fieldFirstEntry = *_RC (
-                                          const uint64_t*,
-                                          rowData + desc.mRowDataOff + 0
-                                         );
+  const uint64_t fieldFirstEntry = load_le_int64 (rowData + desc.RowDataOff ());
 
-  const uint_t  byteOff = desc.mNullBitIndex / 8;
-  const uint8_t bitOff  = desc.mNullBitIndex % 8;
+  const uint_t  byteOff = desc.NullBitIndex () / 8;
+  const uint8_t bitOff  = desc.NullBitIndex () % 8;
 
   outValue.~DArray ();
   if (rowData[byteOff] & (1 << bitOff))
     {
-      switch (desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK)
+      switch (desc.Type () & PS_TABLE_FIELD_TYPE_MASK)
       {
       case T_BOOL:
         _placement_new (&outValue, DArray(_SC(DBool *, NULL)));
@@ -1434,7 +1409,7 @@ PrototypeTable::Get (const ROW_INDEX        row,
                                VSStore (),
                                fieldFirstEntry,
                               _SC (DBS_FIELD_TYPE,
-                                   desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK)
+                                   desc.Type () & PS_TABLE_FIELD_TYPE_MASK)
                                                             );
       _placement_new (&outValue, DArray (rowArray));
     }
@@ -1821,8 +1796,8 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
 
   const uint8_t      bitsSet  = ~0;
   FieldDescriptor&   desc     = GetFieldDescriptorInternal (field);
-  const uint_t       byteOff = desc.mNullBitIndex / 8;
-  const uint8_t      bitOff  = desc.mNullBitIndex % 8;
+  const uint_t       byteOff = desc.NullBitIndex () / 8;
+  const uint8_t      bitOff  = desc.NullBitIndex () % 8;
 
   LockRAII syncHolder (mSync);
 
@@ -1845,7 +1820,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
 
       rowData[byteOff] &= ~(1 << bitOff);
 
-      Serializer::Store (rowData + desc.mRowDataOff, value);
+      Serializer::Store (rowData + desc.RowDataOff (), value);
     }
 
   syncHolder.Release ();
@@ -1887,20 +1862,20 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
   if (row >= mRowsCount)
     throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
-      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+  if ((desc.Type () & PS_TABLE_ARRAY_MASK)
+      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
             _SC(uint_t,  outValue.DBSType ())))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
-  const uint_t  byteOff = desc.mNullBitIndex / 8;
-  const uint8_t bitOff  = desc.mNullBitIndex % 8;
+  const uint_t  byteOff = desc.NullBitIndex () / 8;
+  const uint8_t bitOff  = desc.NullBitIndex () % 8;
 
   LockRAII syncHolder (mSync);
 
   StoredItem           cachedItem = mRowCache.RetriveItem (row);
-  const uint8_t* const rowData   = cachedItem.GetDataForRead ();
+  const uint8_t* const rowData    = cachedItem.GetDataForRead ();
 
   if (rowData[byteOff] & (1 << bitOff))
     {
@@ -1908,7 +1883,7 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
       _placement_new (&outValue, T ());
     }
   else
-    Serializer::Load (rowData + desc.mRowDataOff, &outValue);
+    Serializer::Load (rowData + desc.RowDataOff (), &outValue);
 }
 
 
@@ -1923,8 +1898,8 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
 {
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
-  if ((desc.mTypeDesc & PS_TABLE_ARRAY_MASK)
-      || ((desc.mTypeDesc & PS_TABLE_FIELD_TYPE_MASK) !=
+  if ((desc.Type () & PS_TABLE_ARRAY_MASK)
+      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
             _SC(uint_t, min.DBSType ())))
     {
       throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
@@ -1934,7 +1909,7 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
 
   FieldIndexNodeManager* const nodeMgr = mvIndexNodeMgrs[field];
 
-  DArray                       result (_SC (DUInt64*, NULL));
+  DArray                       result;
   NODE_INDEX                   nodeId;
   KEY_INDEX                    keyIndex;
   const T_BTreeKey<T>          firstKey (min, fromRow);
@@ -2093,10 +2068,10 @@ TableRmNode::KeysPerNode () const
   uint_t result = mNodesMgr.NodeRawSize () - sizeof (NodeHeader);
 
   if (IsLeaf ())
-    result /= sizeof (uint64_t);
+    result /= sizeof (ROW_INDEX);
 
   else
-    result /= sizeof (uint64_t) + sizeof (NODE_INDEX);
+    result /= sizeof (ROW_INDEX) + sizeof (NODE_INDEX);
 
   return result;
 }
@@ -2108,9 +2083,9 @@ TableRmNode::GetParentKeyIndex (const IBTreeNode& parent) const
   assert (KeysCount() > 0);
 
   KEY_INDEX               result;
-  const NODE_INDEX* const keys = _RC ( const NODE_INDEX*, DataForRead ());
+  const ROW_INDEX* const  keys = _RC (const ROW_INDEX*, DataForRead ());
 
-  const TableRmKey key (keys[0]);
+  const TableRmKey key (Serializer::LoadRow (keys));
 
   parent.FindBiggerOrEqual (key, &result);
 
@@ -2128,10 +2103,10 @@ TableRmNode::NodeIdOfKey (const KEY_INDEX keyIndex) const
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
   assert (IsLeaf () == false);
 
-  const uint_t            firstKeyOff = KeysPerNode () * sizeof (uint64_t);
-  const NODE_INDEX* const keys        = _RC (const NODE_INDEX*,
-                                             DataForRead() + firstKeyOff);
-  return keys[keyIndex];
+  const uint_t            firstNodeOff = KeysPerNode () * sizeof (ROW_INDEX);
+  const NODE_INDEX* const nodes        = _RC (const NODE_INDEX*,
+                                              DataForRead() + firstNodeOff);
+  return Serializer::LoadNode (nodes + keyIndex);
 }
 
 
@@ -2142,12 +2117,12 @@ TableRmNode::AdjustKeyNode (const IBTreeNode&   childNode,
   assert (childNode.NodeId () == NodeIdOfKey (keyIndex));
   assert (IsLeaf() == false);
 
-  const TableRmNode&      child     = _SC (const TableRmNode&, childNode);
-  NODE_INDEX* const       keys      = _RC (NODE_INDEX*, DataForWrite ());
-  const NODE_INDEX* const childKeys = _RC (const NODE_INDEX*,
-                                           child.DataForRead ());
+  const TableRmNode&     child     = _SC (const TableRmNode&, childNode);
+  ROW_INDEX* const       keys      = _RC (ROW_INDEX*, DataForWrite ());
+  const ROW_INDEX* const childKeys = _RC (const ROW_INDEX*,
+                                          child.DataForRead ());
 
-  keys[keyIndex] = childKeys[0];
+  Serializer::StoreRow (Serializer::LoadRow (childKeys), keys + keyIndex);
 }
 
 
@@ -2159,10 +2134,10 @@ TableRmNode::SetNodeOfKey (const KEY_INDEX keyIndex, const NODE_INDEX childNode)
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
   assert (IsLeaf () == false);
 
-  const uint_t      keysOffset = KeysPerNode() * sizeof (uint64_t);
-  NODE_INDEX* const keys       = _RC (NODE_INDEX*,
-                                      DataForWrite () + keysOffset);
-  keys[keyIndex] = childNode;
+  const uint_t      nodesOff = KeysPerNode() * sizeof (ROW_INDEX);
+  NODE_INDEX* const nodes    = _RC (NODE_INDEX*, DataForWrite () + nodesOff);
+
+  Serializer::StoreNode (childNode, nodes + keyIndex);
 }
 
 
@@ -2184,14 +2159,14 @@ TableRmNode::InsertKey (const IBTreeKey& key)
 
       assert ((keyIndex == 0) || IsLess (key, keyIndex - 1));
 
-      uint64_t* const rows = _RC (uint64_t *, DataForWrite ());
+      ROW_INDEX* const rows = _RC (ROW_INDEX*, DataForWrite ());
 
       make_array_room (lastKey,
                        keyIndex,
-                       sizeof (uint64_t),
+                       sizeof (rows[0]),
                        _RC (uint8_t*, rows));
       KeysCount (KeysCount() + 1);
-      rows[keyIndex] = *(_SC(const TableRmKey*, &key));
+      Serializer::StoreRow ( *_SC (const TableRmKey*, &key), rows + keyIndex);
 
       if (IsLeaf () == false)
         {
@@ -2205,9 +2180,9 @@ TableRmNode::InsertKey (const IBTreeKey& key)
       return keyIndex;
     }
 
-  uint64_t* const rows = _RC (uint64_t *, DataForWrite ());
+  ROW_INDEX* const rows = _RC (ROW_INDEX*, DataForWrite ());
 
-  rows[0] = *( _SC(const TableRmKey *, &key));
+  Serializer::StoreRow ( *_SC (const TableRmKey*, &key), rows);
 
   KeysCount (1);
 
@@ -2222,19 +2197,18 @@ TableRmNode::RemoveKey (const KEY_INDEX keyIndex)
 
   assert (lastKey < (KeysPerNode() - 1));
 
-  uint64_t* const rows = _RC (uint64_t *, DataForWrite ());
+  NODE_INDEX* const rows = _RC (NODE_INDEX*, DataForWrite ());
   remove_array_elemes (lastKey,
                        keyIndex,
-                       sizeof (uint64_t),
+                       sizeof (rows[0]),
                        _RC (uint8_t*, rows));
 
   if (IsLeaf () == false)
     {
-      NODE_INDEX* const nodes = _RC (NODE_INDEX*,
-                                     rows + TableRmNode::KeysPerNode());
+      NODE_INDEX* const nodes = _RC (NODE_INDEX*, rows + KeysPerNode());
       remove_array_elemes (lastKey,
                            keyIndex,
-                           sizeof (NODE_INDEX),
+                           sizeof (nodes[0]),
                            _RC (uint8_t*, nodes));
     }
 
@@ -2247,12 +2221,12 @@ TableRmNode::Split ( const NODE_INDEX parentId)
 {
   assert (NeedsSpliting ());
 
-  const uint64_t* const rows     = _RC (const uint64_t *, DataForRead ());
-  const KEY_INDEX       splitKey = KeysCount() / 2;
+  const ROW_INDEX* const rows     = _RC (const ROW_INDEX*, DataForRead ());
+  const KEY_INDEX        splitKey = KeysCount() / 2;
 
   BTreeNodeRAII parentNode (mNodesMgr.RetrieveNode (parentId));
 
-  const TableRmKey key (rows[splitKey]);
+  const TableRmKey key (Serializer::LoadRow (rows + splitKey));
   const KEY_INDEX  insertionPos    = parentNode->InsertKey (key);
   const NODE_INDEX allocatedNodeId = mNodesMgr.AllocateNode (parentId,
                                                              insertionPos);
@@ -2262,10 +2236,14 @@ TableRmNode::Split ( const NODE_INDEX parentId)
   allocatedNode->Leaf (IsLeaf ());
   allocatedNode->MarkAsUsed();
 
-  uint64_t* const newRows = _RC (uint64_t*, allocatedNode->DataForWrite ());
+  ROW_INDEX* const newRows = _RC (ROW_INDEX*, allocatedNode->DataForWrite ());
 
   for (uint_t index = splitKey; index < KeysCount (); ++index)
-    newRows[index - splitKey] = rows[index];
+    {
+      const ROW_INDEX r = Serializer::LoadRow (rows + index);
+
+      Serializer::StoreRow (r, newRows + index - splitKey);
+    }
 
   if (IsLeaf () == false)
     {
@@ -2275,7 +2253,11 @@ TableRmNode::Split ( const NODE_INDEX parentId)
                                         newRows + KeysPerNode ());
 
       for (uint_t index = splitKey; index < KeysCount (); ++index)
-        newNodes[index - splitKey] = nodes[index];
+        {
+          const NODE_INDEX n = Serializer::LoadNode (nodes + index);
+
+          Serializer::StoreNode (n, newNodes + index - splitKey);
+        }
     }
 
   allocatedNode->KeysCount (KeysCount() - splitKey);
@@ -2297,7 +2279,7 @@ TableRmNode::Join (const bool toRight)
 {
   assert (NeedsJoining ());
 
-  uint64_t *const   rows  = _RC (uint64_t *,  DataForWrite ());
+  ROW_INDEX* const  rows  = _RC (ROW_INDEX*,  DataForWrite ());
   NODE_INDEX* const nodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
 
   if (toRight)
@@ -2307,10 +2289,14 @@ TableRmNode::Join (const bool toRight)
       BTreeNodeRAII next (mNodesMgr.RetrieveNode (Next ()));
 
       TableRmNode* const nextNode = _SC (TableRmNode*, &(*next));
-      uint64_t *const    destRows = _RC (uint64_t*, nextNode->DataForWrite ());
+      ROW_INDEX* const   destRows = _RC (ROW_INDEX*, nextNode->DataForWrite ());
 
       for (uint_t index = 0; index < KeysCount (); ++index)
-        destRows[index + nextNode->KeysCount ()] = rows[index];
+        {
+          const ROW_INDEX r = Serializer::LoadRow (rows + index);
+
+          Serializer::StoreRow (r, destRows + index + nextNode->KeysCount ());
+        }
 
       if (IsLeaf () == false)
         {
@@ -2318,7 +2304,14 @@ TableRmNode::Join (const bool toRight)
                                              destRows + KeysPerNode ());
 
           for (uint_t index = 0; index < KeysCount (); ++index)
-            destNodes[index + nextNode->KeysCount ()] = nodes[index];
+            {
+              const NODE_INDEX n = Serializer::LoadNode (nodes + index);
+
+              Serializer::StoreNode (
+                                n,
+                                destNodes + index + nextNode->KeysCount ()
+                                    );
+            }
         }
 
       nextNode->KeysCount (nextNode->KeysCount () + KeysCount ());
@@ -2337,10 +2330,14 @@ TableRmNode::Join (const bool toRight)
       BTreeNodeRAII prev (mNodesMgr.RetrieveNode (Prev ()));
 
       TableRmNode* const prevNode = _SC (TableRmNode*, &(*prev));
-      uint64_t *const    srcRows  = _RC (uint64_t*, prevNode->DataForWrite ());
+      ROW_INDEX *const   srcRows  = _RC (ROW_INDEX*, prevNode->DataForWrite ());
 
       for (uint_t index = 0; index < prevNode->KeysCount(); ++index)
-        rows[index + KeysCount ()] = srcRows[index];
+        {
+          const ROW_INDEX r = Serializer::LoadRow (srcRows + index);
+
+          Serializer::StoreRow (r, rows + index + KeysCount ());
+        }
 
       if (IsLeaf () == false)
         {
@@ -2348,7 +2345,11 @@ TableRmNode::Join (const bool toRight)
                                             srcRows + KeysPerNode ());
 
           for (uint_t index = 0; index < prevNode->KeysCount (); ++index)
-            nodes[index + KeysCount ()] = srcNodes[index];
+            {
+              const NODE_INDEX n = Serializer::LoadNode (srcNodes + index);
+
+              Serializer::StoreNode (n, nodes + index + KeysCount ());
+            }
         }
 
       KeysCount (KeysCount () + prevNode->KeysCount());
@@ -2365,33 +2366,33 @@ TableRmNode::Join (const bool toRight)
 bool
 TableRmNode::IsLess (const IBTreeKey& key, const KEY_INDEX keyIndex) const
 {
-  const uint64_t *const rows = _RC ( const uint64_t*, DataForRead ());
+  const ROW_INDEX* const rows = _RC ( const ROW_INDEX*, DataForRead ());
 
   const TableRmKey tKey (*_SC (const TableRmKey*, &key));
 
-  return tKey < rows[keyIndex];
+  return tKey < Serializer::LoadRow (rows + keyIndex);
 }
 
 
 bool
 TableRmNode::IsEqual (const IBTreeKey& key, const KEY_INDEX keyIndex) const
 {
-  const uint64_t *const rows = _RC ( const uint64_t*, DataForRead ());
+  const ROW_INDEX* const rows = _RC ( const ROW_INDEX*, DataForRead ());
 
   const TableRmKey tKey (*_SC (const TableRmKey*, &key));
 
-  return tKey == rows[keyIndex];
+  return tKey == Serializer::LoadRow (rows + keyIndex);
 }
 
 
 bool
 TableRmNode::IsBigger (const IBTreeKey& key, KEY_INDEX const keyIndex) const
 {
-  const uint64_t *const rows = _RC ( const uint64_t*, DataForRead ());
+  const ROW_INDEX* const rows = _RC ( const ROW_INDEX*, DataForRead ());
 
   const TableRmKey tKey (*_SC (const TableRmKey*, &key));
 
-  return tKey > rows[keyIndex];
+  return tKey > Serializer::LoadRow (rows + keyIndex);
 }
 
 

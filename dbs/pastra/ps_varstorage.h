@@ -28,6 +28,7 @@
 #include "whisper.h"
 
 #include "utils/wthread.h"
+#include "utils/le_converter.h"
 
 #include "ps_container.h"
 #include "ps_blockcache.h"
@@ -40,58 +41,65 @@ namespace pastra
 class StoreEntry
 {
 public:
-  static const uint64_t LAST_DELETED_ENTRY = 0x0FFFFFFFFFFFFFFF;
-  static const uint64_t LAST_CHAINED_ENTRY = 0x0FFFFFFFFFFFFFFF;
-  static const uint64_t ENTRY_DELETED_MASK = 0x8000000000000000;
-  static const uint64_t FIRST_RECORD_ENTRY = 0x4000000000000000;
+  static const uint64_t LAST_DELETED_ENTRY = 0x0FFFFFFFFFFFFFFFull;
+  static const uint64_t LAST_CHAINED_ENTRY = 0x0FFFFFFFFFFFFFFFull;
+  static const uint64_t ENTRY_DELETED_MASK = 0x8000000000000000ull;
+  static const uint64_t FIRST_RECORD_ENTRY = 0x4000000000000000ull;
 
   static const uint_t   ENTRY_SIZE = 48;
 
-  StoreEntry ();
-
-  ~StoreEntry () {} ;
-
   void MarkAsDeleted (const bool deleted)
   {
-    deleted ? (mNextEntry |= ENTRY_DELETED_MASK) :
-                (mNextEntry &= ~ENTRY_DELETED_MASK);
+    uint64_t entry = load_le_int64 (mNextEntry);
+
+    deleted ? (entry |= ENTRY_DELETED_MASK) : (entry &= ~ENTRY_DELETED_MASK);
+
+    store_le_int64 (entry, mNextEntry);
   }
 
   void MarkAsFirstEntry (const bool first)
   {
-    first ? (mNextEntry |= FIRST_RECORD_ENTRY) :
-              (mNextEntry &= ~FIRST_RECORD_ENTRY);
+    uint64_t entry = load_le_int64 (mNextEntry);
+
+    first ? (entry |= FIRST_RECORD_ENTRY) : (entry &= ~FIRST_RECORD_ENTRY);
+
+    store_le_int64 (entry, mNextEntry);
   }
 
   bool IsDeleted () const
   {
-    return (mNextEntry & ENTRY_DELETED_MASK) != 0;
+    return (load_le_int64 (mNextEntry) & ENTRY_DELETED_MASK) != 0;
   }
 
   bool IsFirstEntry () const
   {
-    return (mNextEntry & FIRST_RECORD_ENTRY) != 0;
+    return (load_le_int64 (mNextEntry) & FIRST_RECORD_ENTRY) != 0;
   }
 
   uint64_t PrevEntry () const
   {
-    return mPrevEntry;
+    return load_le_int64 (mPrevEntry);
   }
 
   void PrevEntry (const uint64_t content)
   {
-    mPrevEntry = content;
+    store_le_int64 (content, mPrevEntry);
   }
 
   uint64_t NextEntry () const
   {
-    return mNextEntry & ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
+    return load_le_int64 (mNextEntry) &
+             ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
   }
 
   void NextEntry (const uint64_t content)
   {
-    mNextEntry &= (ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
-    mNextEntry |= content;
+    uint64_t entry = load_le_int64 (mNextEntry);
+
+    entry &= (ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
+    entry |= content;
+
+    store_le_int64 (entry, mNextEntry);
   }
 
   uint_t Read (uint_t offset, uint_t count, uint8_t* buffer) const;
@@ -104,9 +112,9 @@ public:
   }
 
 private:
-  uint64_t    mPrevEntry;
-  uint64_t    mNextEntry;
-  uint8_t     mRawData[ENTRY_SIZE];
+  uint8_t  mPrevEntry[8];
+  uint8_t  mNextEntry[8];
+  uint8_t  mRawData[ENTRY_SIZE];
 };
 
 class VariableSizeStore : public IBlocksManager

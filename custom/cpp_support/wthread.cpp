@@ -81,6 +81,7 @@ Thread::Thread ()
     mUnkExceptSignaled (false),
     mIgnoreExceptions (false),
     mEnded (true),
+    mStarted (true),
     mNeedsClean (false)
 {
 }
@@ -106,6 +107,8 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
   if (res != WOP_OK)
     {
       assert (mEnded);
+
+      mStarted = true;
       throw ThreadException (NULL, _EXTRA (errno));
     }
 
