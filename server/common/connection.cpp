@@ -95,11 +95,11 @@ ClientConnection::ClientConnection (UserHandler&            client,
   mUserHandler.mDesc = NULL;
   const uint16_t authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
 
-  memset (&mData[0], 0, authFrameLen);
+  memset (mData, 0, mDataSize);
 
   assert (authFrameLen <= MIN_FRAME_SIZE);
 
-  store_le_int16 (authFrameLen, &mData[FRAME_SIZE_OFF]);
+  store_le_int16 (MIN_FRAME_SIZE, &mData[FRAME_SIZE_OFF]);
   mData[FRAME_TYPE_OFF]    = FRAME_TYPE_AUTH_CLNT;
   mData[FRAME_ENCTYPE_OFF] = FRAME_ENCTYPE_PLAIN;
   store_le_int32 (0, &mData[FRAME_ID_OFF]);
@@ -108,7 +108,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
   store_le_int16 (mDataSize, &mData[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]);
   mData[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = GetAdminSettings().mCipher;;
 
-  mUserHandler.mSocket.Write (mData, authFrameLen);
+  mUserHandler.mSocket.Write (mData, MIN_FRAME_SIZE);
   ReciveRawClientFrame ();
 
   mCipher = GetAdminSettings().mCipher;

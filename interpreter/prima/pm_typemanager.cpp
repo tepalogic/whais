@@ -637,6 +637,7 @@ compute_table_typeinfo (ITable& table)
       if (field.isArray)
         MARK_ARRAY (type);
 
+      store_le_int16 (type, _RC (uint8_t*, &type));
       data.insert (data.end (),
                    _RC (uint8_t*, &type),
                    _RC (uint8_t*, &type) + 2);
@@ -650,11 +651,13 @@ compute_table_typeinfo (ITable& table)
   uint16_t temp = 0;
   MARK_TABLE (temp);
 
+  store_le_int16 (temp, _RC (uint8_t*, &temp));
   result.insert (result.end (),
                  _RC (uint8_t*, &temp),
                  _RC (uint8_t*, &temp) + sizeof (temp));
 
   temp = data.size ();
+  store_le_int16 (temp, _RC (uint8_t*, &temp));
   result.insert (result.end (),
                  _RC (uint8_t*, &temp),
                  _RC (uint8_t*, &temp) + sizeof (temp));

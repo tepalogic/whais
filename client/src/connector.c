@@ -477,7 +477,6 @@ WConnect (const char* const    host,
           goto fail_ret;
         }
 
-      assert (frameSize == FRAME_HDR_SIZE + FRAME_AUTH_SIZE);
       assert (result->data[FRAME_ENCTYPE_OFF] == FRAME_ENCTYPE_PLAIN);
 
       result->cipher = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];

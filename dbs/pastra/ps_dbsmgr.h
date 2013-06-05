@@ -75,7 +75,7 @@ public:
 
   const std::string& WorkingDir () const
   {
-    return mGlbSettings.mWorkDir;
+    return mDbsLocationDir;
   }
 
   const std::string& TemporalDir () const
