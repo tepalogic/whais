@@ -39,7 +39,7 @@
 
 /* Include this first to avoidome type redefinitions
  * when the Visual C++ compiler is used. */
-#include "whisper.tab.h" 
+#include "whisper.tab.h"
 
 #include "whisper.h"
 
@@ -380,7 +380,7 @@ parse_multichar_operator (const char* op)
 
 static uint_t
 parse_integer (const char*      buffer,
-               uint_t            bufferLen,
+               uint_t           bufferLen,
                uint64_t* const  outValue,
                bool_t* const    outSigned)
 {

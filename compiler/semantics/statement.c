@@ -522,16 +522,16 @@ type_spec_fill_field (struct WOutputStream* const     typeStream,
 
 
 static uint_t
-type_spec_fill_basic (struct WOutputStream* const      typeStream,
+type_spec_fill_basic (struct WOutputStream* const     typeStream,
                       const struct DeclaredVar* const var)
 {
   uint_t result = 0;
 
   struct TypeSpec spec;
 
-  assert ((IS_ARRAY (var->varId) == FALSE)
-          && (IS_TABLE (var->varId) == FALSE)
-          && (IS_FIELD (var->varId) == FALSE));
+  assert ((IS_ARRAY (var->type) == FALSE)
+          && (IS_TABLE (var->type) == FALSE)
+          && (IS_FIELD (var->type) == FALSE));
   assert (var->type != T_UNKNOWN);
   assert (var->type <= T_TEXT);
 

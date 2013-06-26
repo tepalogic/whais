@@ -133,7 +133,6 @@ CmdLineParser::CheckArguments ()
     const uint_t  fileNameLen = strlen (mSourceFile);
     char* const   tempBuffer  = new char[fileNameLen + sizeof fileExt];
 
-    mOutputFile = tempBuffer;
     strcpy (tempBuffer, mSourceFile);
 
     if ((mSourceFile[fileNameLen - 1] == 'w') &&
@@ -143,6 +142,8 @@ CmdLineParser::CheckArguments ()
       }
     else
       strcat (tempBuffer, fileExt);
+
+    mOutputFile = tempBuffer;
   }
 }
 

@@ -256,11 +256,11 @@ main (int argc, char **argv)
   {
     std::cerr << e.Message () << std::endl;
   }
-  catch (Exception & e)
+  catch (Exception& e)
   {
-    std::cerr << "error : " << e.Message () << std::endl;
-    std::cerr << "file: " << e.File() << " : " << e.Line() << std::endl;
-    std::cerr << "Extra: " << e.Extra() << std::endl;
+    std::cerr << "error: " << e.Message () << std::endl;
+    std::cerr << "file:  " << e.File () << " : " << e.Line () << std::endl;
+    std::cerr << "extra: " << e.Extra () << std::endl;
 
     retCode = -1;
   }

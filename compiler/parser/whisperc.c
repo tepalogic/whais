@@ -100,7 +100,7 @@ get_var_from_stmt (const struct Statement* stmt, uint_t item)
     {
       struct DeclaredVar* var = wh_array_get (&stmt->decls, it);
 
-      if (IS_TABLE_FIELD (var->varId))
+      if (IS_TABLE_FIELD (var->type))
         continue;
 
       else if (RETRIVE_ID (var->varId) == item)

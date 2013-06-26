@@ -7,6 +7,7 @@
 %parse-param {struct ParserState *state}
 %lex-param {struct ParserState *state}
 %{
+#define YYMAXDEPTH (256 * 1024)
 #define YYSTYPE struct SemValue*
 
 struct SemValue;

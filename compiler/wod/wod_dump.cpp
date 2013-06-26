@@ -411,8 +411,8 @@ wod_dump_code (const uint8_t*       code,
       if (prefix != NULL)
         {
           output << prefix << "+";
-          output << setw (4) << setfill ('0') << currPos;
-          output << '\t';
+          output << setw (4) << setfill ('0') << right << currPos;
+          output << left << ' ';
         }
 
       char operand1[MAX_OP_STRING];
@@ -425,7 +425,8 @@ wod_dump_code (const uint8_t*       code,
                                              operand1,
                                              operand2);
 
-      output << wod_str_table[opcode] << '\t' << operand1;
+      output << setw (10) << setfill (' ') << wod_str_table[opcode];
+      output << setw (0) << operand1;
 
       if (operand2[0] != 0)
         output << ", " << operand2;

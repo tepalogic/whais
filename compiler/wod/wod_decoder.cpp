@@ -109,15 +109,27 @@ static uint_t
 wod_dec_w_ldc (const uint8_t* args, char* const op1, char* const op2)
 {
 
-  op1[0] = '\'';
-  op1[1] = args[0];
-  op1[2] = '\'';
-  op1[3] = op2[0] = 0;
+  /* If is printable ASCII, then print the character. */
+  if ((args[0] >= 0x20) && (args[0] <= 0x7E)
+       && (args[1] == 0)
+       && (args[2] == 0)
+       && (args[3] == 0))
+    {
+      op1[0] = '\'';
+      op1[1] = args[0];
+      op1[2] = '\'';
+      op1[3] = 0;
+    }
+  else
+    {
+      int8_str_conv (op1, args[3]);
+      int8_str_conv (op1 + 2, args[2]);
+      int8_str_conv (op1 + 4, args[1]);
+      int8_str_conv (op1 + 6, args[0]);
+      strcat (op1, "h");
+    }
 
-  //Does not support any extended character set yet!
-  assert (args[1] == 0);
-  assert (args[1] == args [2]);
-  assert (args[2] == args [3]);
+  op2[0] = 0;
 
   return 4;
 }
