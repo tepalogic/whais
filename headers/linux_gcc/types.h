@@ -44,32 +44,16 @@ typedef unsigned long      ulong_t;
 typedef long long          llong_t;
 typedef unsigned long long ullong_t;
 
-#ifndef int8_t
-typedef int8_t        int8_t;
-#endif
-
 #ifndef uint8_t
 typedef u_int8_t      uint8_t;
-#endif
-
-#ifndef int16_t
-typedef int16_t       int16_t;
 #endif
 
 #ifndef uint16_t
 typedef u_int16_t     uint16_t;
 #endif
 
-#ifndef int32_t
-typedef int32_t       int32_t;
-#endif
-
 #ifndef uint32_t
 typedef u_int32_t     uint32_t;
-#endif
-
-#ifndef int64_t
-typedef int64_t       int64_t;
 #endif
 
 #ifndef uint64_t

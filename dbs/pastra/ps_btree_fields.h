@@ -469,7 +469,12 @@ public:
     return theKey > GetKey (keyIndex);
   }
 
-  virtual const IBTreeKey& SentinelKey () const;
+  virtual const IBTreeKey& SentinelKey () const
+  {
+    static T_BTreeKey<DBS_T> _sentinel (DBS_T::Max (), ~0ull);
+
+    return _sentinel;
+  }
 
   virtual void GetRows (KEY_INDEX fromPos,
                         KEY_INDEX toPos,

@@ -22,8 +22,6 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include "utils/wlimits.h"
-
 #include "ps_btree_fields.h"
 
 using namespace std;
@@ -31,77 +29,6 @@ using namespace std;
 namespace whisper {
 namespace pastra {
 
-template<class DBS_T, class T, uint_t T_SIZE>
-const IBTreeKey&
-DBS_BTreeNode<DBS_T, T, T_SIZE>::SentinelKey() const
-{
-  static T_BTreeKey<DBS_T> _sentinel (DBS_T (w_max_value<T> ()), ~0ull);
-
-  return _sentinel;
-}
-
-//Specialization for DBool
-template<>
-const IBTreeKey&
-DBS_BTreeNode<DBool, bool, 1>::SentinelKey() const
-{
-  static BoolBTreeKey _sentinel (DBool (true), ~0ull);
-  return _sentinel;
-}
-
-//Specializations for DDate
-template<>
-const IBTreeKey&
-DBS_BTreeNode<DDate, void, 4>::SentinelKey() const
-{
-  static DateBTreeKey _sentinel (DDate (0x7FFF, 12, 31), ~0ull);
-  return _sentinel;
-}
-
-//Specialization for DateTime
-template<>
-const IBTreeKey&
-DBS_BTreeNode<DDateTime, void, 7>::SentinelKey() const
-{
-  static DateTimeBTreeKey _sentinel (
-      DDateTime (0x7FFF, 12, 31, 23, 59, 59), ~0ull);
-  return _sentinel;
-}
-
-//Specialization of DHiresTime
-template<>
-const IBTreeKey&
-DBS_BTreeNode<DHiresTime, void, 11>::SentinelKey() const
-{
-  static HiresTimeBTreeKey _sentinel (
-      DHiresTime (0x7FFF, 12, 31, 23, 59, 59, 999999999), ~0ull);
-  return _sentinel;
-}
-
-template<>
-const IBTreeKey&
-DBS_BTreeNode<DReal, REAL_T, 8>::SentinelKey() const
-{
-  static const int64_t intPart = 0xFFFFFFFFFFull >> 1;
-  static const int64_t fracPart = DBS_REAL_PREC - 1;
-
-  static RealBTreeKey _sentinel (
-      DReal (REAL_T (intPart, fracPart, DBS_REAL_PREC)), ~0ull);
-  return _sentinel;
-}
-
-template<>
-const IBTreeKey&
-DBS_BTreeNode<DRichReal, RICHREAL_T, 14>::SentinelKey() const
-{
-  static const int64_t intPart = ~0ull >> 1;
-  static const int64_t fracPart = DBS_RICHREAL_PREC - 1;
-
-  static RichRealBTreeKey _sentinel (
-      DRichReal (RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC)),
-      ~0ull);
-  return _sentinel;
-}
 
 FieldIndexNodeManager::FieldIndexNodeManager (
                     auto_ptr<IDataContainer>& container,

@@ -18,6 +18,10 @@ UNIT_EXES+=test_varstore
 test_varstore_SRC=test/test_varstore.cpp
 test_varstore_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 
+UNIT_EXES+=test_basic_values
+test_basic_values_SRC=test/test_basic_values.cpp
+test_basic_values_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
+
 UNIT_EXES+=test_dbsarray
 test_dbsarray_SRC=test/test_dbsarray.cpp
 test_dbsarray_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon

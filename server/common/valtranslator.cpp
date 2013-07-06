@@ -25,9 +25,9 @@
 #include <assert.h>
 #include <cstdio>
 #include <cstring>
+#include <limits.h>
 
 #include "utils/utf8.h"
-#include "utils/wlimits.h"
 #include "valtranslator.h"
 
 using namespace whisper;
@@ -402,8 +402,8 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((result == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (value < w_min_value<int8_t> ())
-      || (w_max_value<int8_t> () < value))
+      || (value < std::numeric_limits<int8_t>::min ())
+      || (std::numeric_limits<int8_t>::max () < value))
     {
       return 0;
     }
@@ -433,8 +433,8 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((result == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (value < w_min_value<int16_t> ())
-      || (w_max_value<int16_t> () < value))
+      || (value < std::numeric_limits<int16_t>::min ())
+      || (std::numeric_limits<int16_t>::max () < value))
     {
       return 0;
     }
@@ -463,8 +463,8 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((result == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (value < w_min_value<int32_t> ())
-      || (w_max_value<int32_t> () < value))
+      || (value < std::numeric_limits<int32_t>::min ())
+      || (std::numeric_limits<int32_t>::max () < value))
     {
       return 0;
     }
@@ -524,8 +524,8 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((result == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (value < w_min_value<uint8_t> ())
-      || (w_max_value<uint8_t> () < value))
+      || (value < std::numeric_limits<uint8_t>::min ())
+      || (std::numeric_limits<uint8_t>::max () < value))
     {
       return 0;
     }
@@ -554,8 +554,8 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((result == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (value < w_min_value<uint16_t> ())
-      || (w_max_value<uint16_t> () < value))
+      || (value < std::numeric_limits<uint16_t>::min ())
+      || (std::numeric_limits<uint16_t>::max () < value))
     {
       return 0;
     }
@@ -584,8 +584,8 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((result == 0)
       || (utf8Src[result++] != 0)
       || (result > srcSize)
-      || (value < w_min_value<uint32_t> ())
-      || (w_max_value<uint32_t> () < value))
+      || (value < std::numeric_limits<uint32_t>::min ())
+      || (std::numeric_limits<uint32_t>::max () < value))
     {
       return 0;
     }

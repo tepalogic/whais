@@ -39,6 +39,9 @@ using namespace pastra;
 
 static const uint_t MAX_VALUE_RAW_STORAGE = 0x20;
 
+static uint_t MNTH_DAYS[12] = { 31, 28, 31, 30, 31, 30,
+                                31, 31, 30, 31, 30, 31 };
+
 static bool
 is_leap_year (const int year)
 {
@@ -48,6 +51,7 @@ is_leap_year (const int year)
         {
           if ((year % 400) == 0)
             return true;
+
           else
             return false;
         }
@@ -63,23 +67,24 @@ static bool
 is_valid_date (const int year, const uint_t month, const uint_t day)
 {
   const uint_t  mnth          = month - 1;
-  static uint_t monthDays[12] = { 31, 28, 31, 30, 31, 30,
-                                  31, 31, 30, 31, 30, 31 };
+
   if (mnth > 11)
     return false;
 
   else if (day == 0)
     return false;
 
-  if ((mnth != 1) && (day > monthDays [mnth]))
+  if ((mnth != 1) && (day > MNTH_DAYS [mnth]))
     return false;
 
   else if (mnth == 1)
     {
-      if (is_leap_year (year) && (day > (monthDays[1] + 1)))
+      const bool leapYear = is_leap_year (year);
+
+      if (leapYear && (day > (MNTH_DAYS[1] + 1)))
         return false;
 
-      else if (day > monthDays[1])
+      else if (! leapYear && (day > MNTH_DAYS[1]))
         return false;
     }
 
@@ -140,6 +145,73 @@ DDate::DDate (const int32_t year, const uint8_t month, const uint8_t day)
 }
 
 
+DDate
+DDate::Min ()
+{
+  return DDate (-32768, 1, 1);
+}
+
+
+DDate
+DDate::Max ()
+{
+  return DDate (32767, 12, 31);
+}
+
+
+DDate
+DDate::Prev () const
+{
+  if (mIsNull || (*this == Min ()))
+    return DDate ();
+
+  uint16_t year = mYear;
+  uint8_t  mnth = mMonth;
+  uint8_t  day  = mDay;
+
+  if (--day == 0)
+    {
+      if (--mnth == 0)
+          --year, mnth = 12;
+
+      if ((mnth == 2) && is_leap_year (year))
+        day = MNTH_DAYS[mnth - 1] + 1;
+
+      else
+        day = MNTH_DAYS[mnth - 1];
+    }
+
+  return DDate (year, mnth, day);
+}
+
+
+DDate
+DDate::Next () const
+{
+  if (mIsNull || (*this == Max ()))
+    return DDate ();
+
+  uint16_t year = mYear;
+  uint8_t  mnth = mMonth;
+  uint8_t  day  = mDay;
+
+  uint8_t  mnthDays = MNTH_DAYS[mnth - 1];
+
+  if ((mnth == 2) && is_leap_year (year))
+    mnthDays++;
+
+  if (++day > mnthDays)
+    {
+      day = 1;
+
+      if (++mnth > 12)
+          ++year, mnth = 1;
+    }
+
+  return DDate (year, mnth, day);
+}
+
+
 
 DDateTime::DDateTime (const int32_t     year,
                       const uint8_t     month,
@@ -160,6 +232,103 @@ DDateTime::DDateTime (const int32_t     year,
     {
       throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
     }
+}
+
+
+DDateTime
+DDateTime::Min ()
+{
+  return DDateTime (-32768, 1, 1, 0, 0, 0);
+}
+
+
+DDateTime
+DDateTime::Max ()
+{
+  return DDateTime (32767, 12, 31, 23, 59, 59);
+}
+
+
+DDateTime
+DDateTime::Prev () const
+{
+  if (mIsNull || (*this == Min ()))
+    return DDateTime ();
+
+  uint16_t year  = mYear;
+  uint8_t  mnth  = mMonth;
+  uint8_t  day   = mDay;
+  uint8_t  hour  = mHour;
+  uint8_t  mins  = mMinutes;
+  uint8_t  secs  = mSeconds;
+
+  if (secs-- == 0)
+    {
+      secs = 59;
+      if (mins-- == 0)
+        {
+          mins = 59;
+          if (hour-- == 0)
+            {
+              hour = 23;
+              if (--day == 0)
+                {
+                  if (--mnth == 0)
+                      --year, mnth = 12;
+
+                  if ((mnth == 2) && is_leap_year (year))
+                    day = MNTH_DAYS[mnth - 1] + 1;
+
+                  else
+                    day = MNTH_DAYS[mnth - 1];
+                }
+            }
+        }
+    }
+
+  return DDateTime (year, mnth, day, hour, mins, secs);
+}
+
+
+DDateTime
+DDateTime::Next () const
+{
+  if (mIsNull || (*this == Max ()))
+    return DDateTime ();
+
+  uint16_t year  = mYear;
+  uint8_t  mnth  = mMonth;
+  uint8_t  day   = mDay;
+  uint8_t  hour  = mHour;
+  uint8_t  mins  = mMinutes;
+  uint8_t  secs  = mSeconds;
+
+  if (++secs > 59)
+    {
+      secs = 0;
+      if (++mins > 59)
+        {
+          mins = 0;
+          if (++hour > 23)
+            {
+              hour = 0;
+
+              uint8_t mnthDays = MNTH_DAYS[mnth - 1];
+              if ((mnth == 2) && is_leap_year (year))
+                mnthDays++;
+
+              if (++day > mnthDays)
+                {
+                  day = 1;
+
+                  if (++mnth > 12)
+                      ++year, mnth = 1;
+                }
+            }
+        }
+    }
+
+  return DDateTime (year, mnth, day, hour, mins, secs);
 }
 
 
@@ -191,6 +360,197 @@ DHiresTime::DHiresTime (const int32_t    year,
     {
       throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
     }
+}
+
+
+DHiresTime
+DHiresTime::Min ()
+{
+  return DHiresTime (-32768, 1, 1, 0, 0, 0, 0);
+}
+
+
+DHiresTime
+DHiresTime::Max ()
+{
+  return DHiresTime (32767, 12, 31, 23, 59, 59, 999999);
+}
+
+
+DHiresTime
+DHiresTime::Prev () const
+{
+  if (mIsNull || (*this == Min ()))
+    {
+      return DHiresTime ();
+    }
+
+  uint16_t year  = mYear;
+  uint8_t  mnth  = mMonth;
+  uint8_t  day   = mDay;
+  uint8_t  hour  = mHour;
+  uint8_t  mins  = mMinutes;
+  uint8_t  secs  = mSeconds;
+  uint32_t usecs = mMicrosec;
+
+  if (usecs-- == 0)
+    {
+      usecs = 999999;
+      if (secs-- == 0)
+        {
+          secs = 59;
+          if (mins-- == 0)
+            {
+              mins = 59;
+              if (hour-- == 0)
+                {
+                  hour = 23;
+                  if (--day == 0)
+                    {
+                      if (--mnth == 0)
+                          --year, mnth = 12;
+
+                      if ((mnth == 2) && is_leap_year (year))
+                        day = MNTH_DAYS[mnth - 1] + 1;
+
+                      else
+                        day = MNTH_DAYS[mnth - 1];
+                    }
+                }
+            }
+        }
+    }
+
+  return DHiresTime (year, mnth, day, hour, mins, secs, usecs);
+}
+
+
+DHiresTime
+DHiresTime::Next () const
+{
+  if (mIsNull || (*this == Max ()))
+    return DHiresTime ();
+
+  uint16_t year  = mYear;
+  uint8_t  mnth  = mMonth;
+  uint8_t  day   = mDay;
+  uint8_t  hour  = mHour;
+  uint8_t  mins  = mMinutes;
+  uint8_t  secs  = mSeconds;
+  uint32_t usecs = mMicrosec;
+
+  if (++usecs > 999999)
+    {
+      usecs = 0;
+      if (++secs > 59)
+        {
+          secs = 0;
+          if (++mins > 59)
+            {
+              mins = 0;
+              if (++hour > 23)
+                {
+                  hour = 0;
+
+                  uint8_t  mnthDays = MNTH_DAYS[mnth - 1];
+                  if ((mnth == 2) && is_leap_year (year))
+                    mnthDays++;
+
+                  if (++day > mnthDays)
+                    {
+                      day = 1;
+
+                      if (++mnth > 12)
+                          ++year, mnth = 1;
+                    }
+                }
+            }
+        }
+    }
+
+  return DHiresTime (year, mnth, day, hour, mins, secs, usecs);
+}
+
+
+
+DReal
+DReal::Min ()
+{
+  const int64_t intPart  = 0xFFFFFF8000000000ll;
+  const int64_t fracPart = -1 * (DBS_REAL_PREC - 1);
+
+  return DReal (DBS_REAL_T (intPart, fracPart, DBS_REAL_PREC));
+}
+
+
+DReal
+DReal::Max ()
+{
+  const int64_t intPart  = 0x0000007FFFFFFFFFll;
+  const int64_t fracPart = (DBS_REAL_PREC - 1);
+
+  return DReal (DBS_REAL_T (intPart, fracPart, DBS_REAL_PREC));
+}
+
+
+DReal
+DReal::Prev () const
+{
+  if (mIsNull || (*this == Min ()))
+    return DReal ();
+
+  return DReal (mValue - DBS_REAL_T (0, 1, DBS_REAL_PREC));
+}
+
+
+DReal
+DReal::Next () const
+{
+  if (mIsNull || (*this == Max ()))
+    return DReal ();
+
+  return DReal (mValue + DBS_REAL_T (0, 1, DBS_REAL_PREC));
+}
+
+
+
+DRichReal
+DRichReal::Min ()
+{
+  const int64_t intPart  = 0x8000000000000000ull;
+  const int64_t fracPart = -1 * (DBS_RICHREAL_PREC - 1);
+
+  return DRichReal (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
+}
+
+
+DRichReal
+DRichReal::Max ()
+{
+  const int64_t intPart  = 0x7FFFFFFFFFFFFFFFull;
+  const int64_t fracPart = (DBS_RICHREAL_PREC - 1);
+
+  return DRichReal (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
+}
+
+
+DRichReal
+DRichReal::Prev () const
+{
+  if (mIsNull || (*this == Min ()))
+    return DRichReal ();
+
+  return DRichReal (mValue - DBS_RICHREAL_T (0, 1, DBS_RICHREAL_PREC));
+}
+
+
+DRichReal
+DRichReal::Next () const
+{
+  if (mIsNull || (*this == Max ()))
+    return DRichReal ();
+
+  return DRichReal (mValue + DBS_RICHREAL_T (0, 1, DBS_RICHREAL_PREC));
 }
 
 

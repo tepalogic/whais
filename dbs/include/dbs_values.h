@@ -114,7 +114,23 @@ struct DBool
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBool Prev () const
+  {
+    if (mIsNull || (mValue == false))
+      return DBool ();
+
+    return DBool (false);
+  }
+
+  DBool Next () const
+  {
+    if (mIsNull || mValue)
+      return DBool ();
+
+    return DBool (true);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_BOOL;
   }
@@ -124,9 +140,21 @@ struct DBool
     return mIsNull;
   }
 
+  static DBool Min ()
+  {
+    return DBool (false);
+  }
+
+  static DBool Max ()
+  {
+    return DBool (true);
+  }
+
   const bool mValue;
   const bool mIsNull;
 };
+
+
 
 struct DChar
 {
@@ -198,7 +226,23 @@ struct DChar
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DChar Prev () const
+  {
+    if (mIsNull || (mValue == 0))
+      return DChar ();
+
+    return DChar (mValue - 1);
+  }
+
+  DChar Next () const
+  {
+    if (mIsNull || (mValue == 0xFFFFFFFF))
+        return DChar ();
+
+    return DChar (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_CHAR;
   }
@@ -208,9 +252,21 @@ struct DChar
     return mIsNull;
   }
 
+  static DChar Min ()
+  {
+    return DChar (0);
+  }
+
+  static DChar Max ()
+  {
+    return DChar (0xFFFFFFFF);
+  }
+
   const uint32_t mValue;
   const bool     mIsNull;
 };
+
+
 
 struct DBS_SHL DDate
 {
@@ -301,15 +357,23 @@ struct DBS_SHL DDate
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_DATE;
   }
+
+  DDate Prev () const;
+
+  DDate Next () const;
 
   bool IsNull () const
   {
     return mIsNull;
   }
+
+  static DDate Min ();
+
+  static DDate Max ();
 
   const int16_t mYear;
   const uint8_t mMonth;
@@ -330,12 +394,12 @@ struct DBS_SHL DDateTime
   {
   }
 
-  explicit DDateTime (const int32_t year,
-                      const uint8_t mounth,
-                      const uint8_t day,
-                      const uint8_t hour,
-                      const uint8_t minutes,
-                      const uint8_t seconds);
+  DDateTime (const int32_t year,
+             const uint8_t mounth,
+             const uint8_t day,
+             const uint8_t hour,
+             const uint8_t minutes,
+             const uint8_t seconds);
 
   DDateTime (const DDateTime& source)
     : mYear (source.mYear),
@@ -438,7 +502,11 @@ struct DBS_SHL DDateTime
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DDateTime Prev () const;
+
+  DDateTime Next () const;
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_DATETIME;
   }
@@ -447,6 +515,10 @@ struct DBS_SHL DDateTime
   {
     return mIsNull;
   }
+
+  static DDateTime Min ();
+
+  static DDateTime Max ();
 
   const int16_t mYear;
   const uint8_t mMonth;
@@ -472,13 +544,13 @@ struct DBS_SHL DHiresTime
   {
   }
 
-  explicit DHiresTime (const int32_t year,
-                       const uint8_t month,
-                       const uint8_t day,
-                       const uint8_t hour,
-                       const uint8_t minutes,
-                       const uint8_t seconds,
-                       const uint32_t microsec);
+  DHiresTime (const int32_t  year,
+              const uint8_t  month,
+              const uint8_t  day,
+              const uint8_t  hour,
+              const uint8_t  minutes,
+              const uint8_t  seconds,
+              const uint32_t microsec);
 
   DHiresTime (const DHiresTime& source)
     : mMicrosec (source.mMicrosec),
@@ -590,7 +662,11 @@ struct DBS_SHL DHiresTime
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DHiresTime Prev () const;
+
+  DHiresTime Next () const;
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_HIRESTIME;
   }
@@ -600,6 +676,10 @@ struct DBS_SHL DHiresTime
     return mIsNull;
   }
 
+  static DHiresTime Min ();
+
+  static DHiresTime Max ();
+
   const uint32_t mMicrosec;
   const int16_t  mYear;
   const uint8_t  mMonth;
@@ -608,7 +688,6 @@ struct DBS_SHL DHiresTime
   const uint8_t  mMinutes;
   const uint8_t  mSeconds;
   const bool     mIsNull;
-
 };
 
 struct DUInt8
@@ -681,7 +760,23 @@ struct DUInt8
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  DBSType() const
+  DUInt8 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DUInt8 ();
+
+    return DUInt8 (mValue - 1);
+  }
+
+  DUInt8 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DUInt8 ();
+
+    return DUInt8 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT8;
   }
@@ -689,6 +784,16 @@ struct DUInt8
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DUInt8 Min ()
+  {
+    return DUInt8 (0);
+  }
+
+  static DUInt8 Max ()
+  {
+    return DUInt8 (0xFF);
   }
 
   const uint8_t mValue;
@@ -765,7 +870,23 @@ struct DUInt16
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE  DBSType() const
+  DUInt16 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DUInt16 ();
+
+    return DUInt16 (mValue - 1);
+  }
+
+  DUInt16 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DUInt16 ();
+
+    return DUInt16 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT16;
   }
@@ -773,6 +894,16 @@ struct DUInt16
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DUInt16 Min ()
+  {
+    return DUInt16 (0);
+  }
+
+  static DUInt16 Max ()
+  {
+    return DUInt16 (0xFFFF);
   }
 
   const uint16_t mValue;
@@ -848,7 +979,23 @@ struct DUInt32
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DUInt32 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DUInt32 ();
+
+    return DUInt32 (mValue - 1);
+  }
+
+  DUInt32 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DUInt32 ();
+
+    return DUInt32 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT32;
   }
@@ -856,6 +1003,16 @@ struct DUInt32
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DUInt32 Min ()
+  {
+    return DUInt32 (0);
+  }
+
+  static DUInt32 Max ()
+  {
+    return DUInt32 (0xFFFFFFFFu);
   }
 
   const uint32_t mValue;
@@ -932,7 +1089,23 @@ struct DUInt64
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DUInt64 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DUInt64 ();
+
+    return DUInt64 (mValue - 1);
+  }
+
+  DUInt64 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DUInt64 ();
+
+    return DUInt64 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT64;
   }
@@ -940,6 +1113,16 @@ struct DUInt64
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DUInt64 Min ()
+  {
+    return DUInt64 (0);
+  }
+
+  static DUInt64 Max ()
+  {
+    return DUInt64 (0xFFFFFFFFFFFFFFFFull);
   }
 
   const uint64_t mValue;
@@ -1016,7 +1199,23 @@ struct DInt8
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DInt8 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DInt8 ();
+
+    return DInt8 (mValue - 1);
+  }
+
+  DInt8 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DInt8 ();
+
+    return DInt8 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT8;
   }
@@ -1024,6 +1223,16 @@ struct DInt8
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DInt8 Min ()
+  {
+    return DInt8 (-128);
+  }
+
+  static DInt8 Max ()
+  {
+    return DInt8 (127);
   }
 
   const int8_t mValue;
@@ -1100,7 +1309,23 @@ struct DInt16
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DInt16 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DInt16 ();
+
+    return DInt16 (mValue - 1);
+  }
+
+  DInt16 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DInt16 ();
+
+    return DInt16 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT16;
   }
@@ -1108,6 +1333,16 @@ struct DInt16
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DInt16 Min ()
+  {
+    return DInt16 (-32768);
+  }
+
+  static DInt16 Max ()
+  {
+    return DInt16 (32767);
   }
 
   const int16_t mValue;
@@ -1184,7 +1419,23 @@ struct DInt32
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DInt32 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DInt32 ();
+
+    return DInt32 (mValue - 1);
+  }
+
+  DInt32 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DInt32 ();
+
+    return DInt32 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT32;
   }
@@ -1192,6 +1443,16 @@ struct DInt32
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DInt32 Min ()
+  {
+    return DInt32 (-2147483648ll);
+  }
+
+  static DInt32 Max ()
+  {
+    return DInt32 (2147483647);
   }
 
   const int32_t mValue;
@@ -1267,7 +1528,23 @@ struct DInt64
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DInt64 Prev () const
+  {
+    if (mIsNull || (*this == Min ()))
+      return DInt64 ();
+
+    return DInt64 (mValue - 1);
+  }
+
+  DInt64 Next () const
+  {
+    if (mIsNull || (*this == Max ()))
+      return DInt64 ();
+
+    return DInt64 (mValue + 1);
+  }
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT64;
   }
@@ -1275,6 +1552,17 @@ struct DInt64
   bool IsNull () const
   {
     return mIsNull;
+  }
+
+  static DInt64 Min ()
+  {
+    //Avoid compiler warnings!
+    return DInt64 (-9223372036854775807ll - 1);
+  }
+
+  static DInt64 Max ()
+  {
+    return DInt64 (9223372036854775807ll);
   }
 
   const int64_t mValue;
@@ -1350,7 +1638,11 @@ struct DReal
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DReal Prev () const;
+
+  DReal Next () const;
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_REAL;
   }
@@ -1360,9 +1652,14 @@ struct DReal
     return mIsNull;
   }
 
+  static DReal Min ();
+
+  static DReal Max ();
+
   const REAL_T mValue;
   const bool   mIsNull;
 };
+
 
 struct DRichReal
 {
@@ -1432,7 +1729,11 @@ struct DRichReal
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DRichReal Prev () const;
+
+  DRichReal Next () const;
+
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_RICHREAL;
   }
@@ -1441,6 +1742,10 @@ struct DRichReal
   {
     return mIsNull;
   }
+
+  static DRichReal Min ();
+
+  static DRichReal Max ();
 
   const RICHREAL_T mValue;
   const bool       mIsNull;
@@ -1483,7 +1788,7 @@ public:
 
   void MakeMirror (DText& mirror) const;
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_TEXT;
   }
@@ -1496,6 +1801,7 @@ public:
 private:
   ITextStrategy*      mText;
 };
+
 
 class IArrayStrategy;
 class DBS_SHL DArray
