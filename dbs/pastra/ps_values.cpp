@@ -66,7 +66,7 @@ is_leap_year (const int year)
 static bool
 is_valid_date (const int year, const uint_t month, const uint_t day)
 {
-  const uint_t  mnth          = month - 1;
+  const uint_t mnth = month - 1;
 
   if (mnth > 11)
     return false;
@@ -122,7 +122,7 @@ is_valid_hiresdate (const int       year,
   if (is_valid_datetime (year, month, day, hour, min, sec) == false)
     return false;
 
-  else if (microsec > 999999999)
+  else if (microsec > 999999)
       return false;
 
   return true;

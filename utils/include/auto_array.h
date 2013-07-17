@@ -8,7 +8,10 @@
 #ifndef AUTO_ARRAY_H_
 #define AUTO_ARRAY_H_
 
+
 #include <stdexcept>
+
+
 
 template <class T>
 class auto_array

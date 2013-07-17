@@ -155,8 +155,7 @@ struct DBool
 };
 
 
-
-struct DChar
+struct DBS_SHL DChar
 {
   DChar ()
     : mValue (),
@@ -265,7 +264,6 @@ struct DChar
   const uint32_t mValue;
   const bool     mIsNull;
 };
-
 
 
 struct DBS_SHL DDate
@@ -380,6 +378,7 @@ struct DBS_SHL DDate
   const uint8_t mDay;
   const bool    mIsNull;
 };
+
 
 struct DBS_SHL DDateTime
 {
@@ -528,6 +527,7 @@ struct DBS_SHL DDateTime
   const uint8_t mSeconds;
   const bool    mIsNull;
 };
+
 
 struct DBS_SHL DHiresTime
 {
@@ -690,7 +690,8 @@ struct DBS_SHL DHiresTime
   const bool     mIsNull;
 };
 
-struct DUInt8
+
+struct DBS_SHL DUInt8
 {
   DUInt8 ()
     : mValue (),
@@ -800,7 +801,8 @@ struct DUInt8
   const bool    mIsNull;
 };
 
-struct DUInt16
+
+struct DBS_SHL DUInt16
 {
   DUInt16 ()
     : mValue (),
@@ -910,7 +912,8 @@ struct DUInt16
   const bool     mIsNull;
 };
 
-struct DUInt32
+
+struct DBS_SHL DUInt32
 {
   DUInt32 ()
     : mValue (),
@@ -1019,7 +1022,8 @@ struct DUInt32
   const bool     mIsNull;
 };
 
-struct DUInt64
+
+struct DBS_SHL DUInt64
 {
   DUInt64 ()
     : mValue (),
@@ -1129,7 +1133,8 @@ struct DUInt64
   const bool     mIsNull;
 };
 
-struct DInt8
+
+struct DBS_SHL DInt8
 {
   DInt8 ()
     : mValue (),
@@ -1239,7 +1244,8 @@ struct DInt8
   const bool   mIsNull;
 };
 
-struct DInt16
+
+struct DBS_SHL DInt16
 {
   DInt16 ()
     : mValue (),
@@ -1349,7 +1355,8 @@ struct DInt16
   bool          mIsNull;
 };
 
-struct DInt32
+
+struct DBS_SHL DInt32
 {
   DInt32 ()
     : mValue (),
@@ -1459,7 +1466,8 @@ struct DInt32
   const bool    mIsNull;
 };
 
-struct DInt64
+
+struct DBS_SHL DInt64
 {
   DInt64 ()
     : mValue (),
@@ -1569,7 +1577,8 @@ struct DInt64
   const bool    mIsNull;
 };
 
-struct DReal
+
+struct DBS_SHL DReal
 {
   DReal () :
     mValue (),
@@ -1661,7 +1670,7 @@ struct DReal
 };
 
 
-struct DRichReal
+struct DBS_SHL DRichReal
 {
   DRichReal ()
     : mValue (),
