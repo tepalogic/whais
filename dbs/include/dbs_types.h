@@ -31,6 +31,9 @@ typedef uint32_t         FIELD_INDEX;
 typedef uint32_t         TABLE_INDEX;
 typedef uint64_t         ROW_INDEX;
 
+/* Note: Make sure ROW_INDEX matched to the appropitae Dxx type. */
+#define DROW_INDEX       DUInt64
+
 enum DBS_FIELD_TYPE
 {
   T_UNKNOWN = 0,

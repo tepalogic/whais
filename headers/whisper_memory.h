@@ -136,6 +136,13 @@ _placement_new (void* place, T& value)
   new (place) T (value);
 }
 
+template <class T> static inline void
+_placement_new (void* place)
+{
+  new (place) T;
+}
+
+
 #ifdef ENABLE_MEMORY_TRACE
 
 #define new new(__FILE__, __LINE__)

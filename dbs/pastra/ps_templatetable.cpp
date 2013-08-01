@@ -1108,8 +1108,8 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
 void
 PrototypeTable::Get (const ROW_INDEX        row,
-                    const FIELD_INDEX       field,
-                    DChar&                  outValue)
+                     const FIELD_INDEX       field,
+                     DChar&                  outValue)
 {
   RetrieveEntry (row, field, outValue);
 }
@@ -1436,7 +1436,13 @@ PrototypeTable::MatchRows (const DBool&       min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1460,7 +1466,13 @@ PrototypeTable::MatchRows (const DChar&         min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1484,7 +1496,13 @@ PrototypeTable::MatchRows (const DDate&         min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1508,7 +1526,13 @@ PrototypeTable::MatchRows (const DDateTime&     min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1532,7 +1556,13 @@ PrototypeTable::MatchRows (const DHiresTime&     min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1556,7 +1586,13 @@ PrototypeTable::MatchRows (const DUInt8&        min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1580,7 +1616,13 @@ PrototypeTable::MatchRows (const DUInt16&       min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1604,7 +1646,13 @@ PrototypeTable::MatchRows (const DUInt32&       min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1628,7 +1676,13 @@ PrototypeTable::MatchRows (const DUInt64&       min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1652,7 +1706,13 @@ PrototypeTable::MatchRows (const DInt8&         min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1676,7 +1736,13 @@ PrototypeTable::MatchRows (const DInt16&        min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1700,7 +1766,13 @@ PrototypeTable::MatchRows (const DInt32&       min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1724,7 +1796,13 @@ PrototypeTable::MatchRows (const DInt64&       min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1748,7 +1826,13 @@ PrototypeTable::MatchRows (const DReal&        min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -1772,7 +1856,13 @@ PrototypeTable::MatchRows (const DRichReal&    min,
                                  field);
     }
 
-  return MatchRows (min, max, fromRow, toRow, ignoreFirst, maxCount, field);
+  return MatchRowsNoIndex (min,
+                           max,
+                           fromRow,
+                           toRow,
+                           ignoreFirst,
+                           maxCount,
+                           field);
 }
 
 
@@ -2017,22 +2107,22 @@ force_return:
 
 
 template <class T> DArray
-PrototypeTable::MatchRows (const T&          min,
-                           const T&          max,
-                           const ROW_INDEX   fromRow,
-                           ROW_INDEX         toRow,
-                           ROW_INDEX         ignoreFirst,
-                           ROW_INDEX         maxCount,
-                           const FIELD_INDEX field)
+PrototypeTable::MatchRowsNoIndex (const T&          min,
+                                  const T&          max,
+                                  const ROW_INDEX   fromRow,
+                                  ROW_INDEX         toRow,
+                                  ROW_INDEX         ignoreFirst,
+                                  ROW_INDEX         maxCount,
+                                  const FIELD_INDEX field)
 {
   toRow = MIN (toRow, ((mRowsCount > 0) ? mRowsCount - 1 : 0));
 
-  DArray result (_SC (DUInt64*, NULL));
+  DArray result;
   T      rowValue;
 
   for (ROW_INDEX row = fromRow; (row <= toRow) && (maxCount > 0); ++row)
     {
-      Get (field, row, rowValue);
+      Get (row, field, rowValue);
 
       if ((rowValue < min) || (max < rowValue))
         continue;
@@ -2045,7 +2135,7 @@ PrototypeTable::MatchRows (const T&          min,
 
       --maxCount;
 
-      result.Add (DUInt64 (row));
+      result.Add (DROW_INDEX (row));
     }
 
   return result;

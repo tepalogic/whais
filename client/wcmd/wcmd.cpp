@@ -164,24 +164,53 @@ ExecuteCommandLine (const string& cmdLine)
 static bool
 ExecuteCommandBatch (const string& line)
 {
-  size_t lastSemicolonPos = 0;
-  while (lastSemicolonPos < line.length ())
+  size_t lastPos    = 0;
+  size_t currentPos = 0;
+  char   commandSep = ';';
+  bool   result     = true;
+
+  while (result
+         && (currentPos < line.length ()))
     {
-      size_t nextSemicolonPos = line.find_first_of (';', lastSemicolonPos);
+      if (line.c_str ()[currentPos] != commandSep)
+        {
+          if ((commandSep == ';')
+              && ((line.c_str ()[currentPos] == '\'')
+                  || (line.c_str ()[currentPos] == '\"')))
+            {
+              commandSep = line.c_str ()[currentPos++];
+            }
+          else
+            ++currentPos;
 
-      if (nextSemicolonPos == line.npos)
-        nextSemicolonPos = line.length ();
+          continue;
+        }
+      else if ((commandSep == '\'') || (commandSep == '\"'))
+        {
+          ++currentPos;
+          commandSep = ';';
+          continue ;
+        }
 
-      string command = line.substr (lastSemicolonPos,
-                                    nextSemicolonPos - lastSemicolonPos);
+      const string command = line.substr (lastPos, currentPos - lastPos);
+      lastPos = ++currentPos;
 
-      if ( (command != "" ) && (! ExecuteCommandLine (command)))
-        break;
-
-      lastSemicolonPos = nextSemicolonPos + 1;
+      if (command.length () > 0)
+        result = ExecuteCommandLine (command);
     }
 
-  return true;
+  if (! result)
+    return false;
+
+  if (commandSep != ';')
+    return false;
+
+  const string command = line.substr (lastPos);
+
+  if (command.length () > 0)
+    result = ExecuteCommandLine (command);
+
+  return result;
 }
 
 
@@ -215,10 +244,8 @@ ExecuteInteractively ()
     {
       cout << "> ";
       if (getline (cin, line))
-        {
-          if (!ExecuteCommandBatch (line))
-            break;
-        }
+        ExecuteCommandBatch (line);
+
       else
         break;
     }
@@ -558,7 +585,8 @@ main (const int argc, char *argv[])
           }
 
         if (script != "")
-          ExecuteCommandBatch (script);
+          result = ExecuteCommandBatch (script) ? 0 : 1;
+
         else
           ExecuteInteractively ();
       }

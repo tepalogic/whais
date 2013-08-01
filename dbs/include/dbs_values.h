@@ -69,29 +69,26 @@ struct DBool
     return *this;
   }
 
-  bool operator< (const DBool& source) const
+  bool operator< (const DBool& second) const
   {
-    if (IsNull () && (source.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (source.IsNull () == false)
-      {
-        if ((mValue == false) && (source.mValue == true))
-          return true;
-      }
-
-    return false;
-  }
-
-  bool operator== (const DBool& source) const
-  {
-    if (mIsNull != source.mIsNull)
+    else if (second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    return (mValue == false) && (second.mValue == true);
+  }
+
+  bool operator== (const DBool& second) const
+  {
+    if (IsNull () != second.IsNull ())
+      return false;
+
+    else if (IsNull ())
       return true;
 
-    return (mValue == source.mValue);
+    return (mValue == second.mValue);
   }
 
   bool operator<= (const DBool& second) const
@@ -185,21 +182,21 @@ struct DBS_SHL DChar
 
   bool operator< (const DChar& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DChar& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -300,22 +297,22 @@ struct DBS_SHL DDate
 
   bool operator< (const DDate& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
+
+    else if (second.IsNull ())
+      return false;
+
+    if (mYear < second.mYear)
       return true;
 
-    if (second.IsNull () == false)
+    else if (mYear == second.mYear)
       {
-        if (mYear < second.mYear)
+        if (mMonth < second.mMonth)
           return true;
 
-        else if (mYear == second.mYear)
-          {
-            if (mMonth < second.mMonth)
-              return true;
-
-            else if (mMonth == second.mMonth)
-              return mDay < second.mDay;
-          }
+        else if (mMonth == second.mMonth)
+          return mDay < second.mDay;
       }
 
     return false;
@@ -323,16 +320,15 @@ struct DBS_SHL DDate
 
   bool operator== (const DDate& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mYear == second.mYear)
             && (mMonth == second.mMonth)
             && (mDay  == second.mDay);
-
   }
 
   bool operator<= (const DDate& second) const
@@ -426,37 +422,37 @@ struct DBS_SHL DDateTime
 
   bool operator< (const DDateTime& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
+
+    else if (second.IsNull ())
+      return false;
+
+    if (mYear < second.mYear)
       return true;
 
-    if (second.IsNull () == false)
+    else if (mYear == second.mYear)
       {
-        if (mYear < second.mYear)
+        if (mMonth < second.mMonth)
           return true;
 
-        else if (mYear == second.mYear)
+        else if (mMonth == second.mMonth)
           {
-            if (mMonth < second.mMonth)
+            if (mDay < second.mDay)
               return true;
 
-            else if (mMonth == second.mMonth)
+            else if (mDay == second.mDay)
               {
-                if (mDay < second.mDay)
+                if (mHour < second.mHour)
                   return true;
 
-                else if (mDay == second.mDay)
+                else if (mHour == second.mHour)
                   {
-                    if (mHour < second.mHour)
+                    if (mMinutes < second.mMinutes)
                       return true;
 
-                    else if (mHour == second.mHour)
-                      {
-                        if (mMinutes < second.mMinutes)
-                          return true;
-
-                        else if (mMinutes == second.mMinutes)
-                          return mSeconds < second.mSeconds;
-                      }
+                    else if (mMinutes == second.mMinutes)
+                      return mSeconds < second.mSeconds;
                   }
               }
           }
@@ -467,10 +463,10 @@ struct DBS_SHL DDateTime
 
   bool operator== (const DDateTime& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mYear == second.mYear)
@@ -580,42 +576,42 @@ struct DBS_SHL DHiresTime
 
   bool operator< (const DHiresTime& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
+
+    else if (second.IsNull ())
+      return false;
+
+    if (mYear < second.mYear)
       return true;
 
-    if (second.IsNull () == false)
+    else if (mYear == second.mYear)
       {
-        if (mYear < second.mYear)
+        if (mMonth < second.mMonth)
           return true;
 
-        else if (mYear == second.mYear)
+        else if (mMonth == second.mMonth)
           {
-            if (mMonth < second.mMonth)
+            if (mDay < second.mDay)
               return true;
 
-            else if (mMonth == second.mMonth)
+            else if (mDay == second.mDay)
               {
-                if (mDay < second.mDay)
+                if (mHour < second.mHour)
                   return true;
 
-                else if (mDay == second.mDay)
+                else if (mHour == second.mHour)
                   {
-                    if (mHour < second.mHour)
+                    if (mMinutes < second.mMinutes)
                       return true;
 
-                    else if (mHour == second.mHour)
+                    else if (mMinutes == second.mMinutes)
                       {
-                        if (mMinutes < second.mMinutes)
+                        if (mSeconds < second.mSeconds)
                           return true;
 
-                        else if (mMinutes == second.mMinutes)
-                          {
-                            if (mSeconds < second.mSeconds)
-                              return true;
-
-                            else if (mSeconds == second.mSeconds)
-                              return mMicrosec < second.mMicrosec;
-                          }
+                        else if (mSeconds == second.mSeconds)
+                          return mMicrosec < second.mMicrosec;
                       }
                   }
               }
@@ -627,10 +623,10 @@ struct DBS_SHL DHiresTime
 
   bool operator== (const DHiresTime& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mYear == second.mYear)
@@ -721,21 +717,21 @@ struct DBS_SHL DUInt8
 
   bool operator< (const DUInt8& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DUInt8& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -832,21 +828,21 @@ struct DBS_SHL DUInt16
 
   bool operator< (const DUInt16& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DUInt16& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -942,21 +938,21 @@ struct DBS_SHL DUInt32
 
   bool operator< (const DUInt32& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DUInt32& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1053,21 +1049,21 @@ struct DBS_SHL DUInt64
 
   bool operator< (const DUInt64& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DUInt64& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1164,21 +1160,21 @@ struct DBS_SHL DInt8
 
   bool operator< (const DInt8& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DInt8& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1275,21 +1271,21 @@ struct DBS_SHL DInt16
 
   bool operator< (const DInt16& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DInt16& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1386,21 +1382,21 @@ struct DBS_SHL DInt32
 
   bool operator< (const DInt32& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DInt32& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1496,21 +1492,21 @@ struct DBS_SHL DInt64
 
   bool operator< (const DInt64& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return mValue < second.mValue;
+    else if (second.IsNull ())
+      return false;
 
-    return false;
+    return mValue < second.mValue;
   }
 
   bool operator== (const DInt64& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1608,20 +1604,21 @@ struct DBS_SHL DReal
 
   bool operator< (const DReal& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return (mValue < second.mValue);
-    return false;
+    else if (second.IsNull ())
+      return false;
+
+    return mValue < second.mValue;
   }
 
   bool operator== (const DReal& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1699,20 +1696,21 @@ struct DBS_SHL DRichReal
 
   bool operator< (const DRichReal& second) const
   {
-    if (IsNull () && (second.IsNull () == false))
-      return true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    if (second.IsNull () == false)
-      return (mValue < second.mValue);
-    return false;
+    else if (second.IsNull ())
+      return false;
+
+    return mValue < second.mValue;
   }
 
   bool operator== (const DRichReal& second) const
   {
-    if (mIsNull != second.mIsNull)
+    if (IsNull () != second.IsNull ())
       return false;
 
-    if (mIsNull == true)
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);

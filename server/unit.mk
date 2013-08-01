@@ -7,7 +7,7 @@ UNIT_LIBS:=
 
 whisper_SRC=common/configuration.cpp common/loader.cpp common/server.cpp\
 			common/connection.cpp common/commands.cpp common/stack_cmds.cpp\
-			common/valtranslator.cpp common/server_main.cpp
+			common/server_main.cpp
 			
 whisper_DEF=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL
 whisper_LIB=utils/wslutils custom/wslcustom

@@ -25,18 +25,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include "whisper.h"
+#include "whisper_time.h"
 
+#include "utils/range.h"
+#include "utils/tokenizer.h"
 #include "dbs/dbs_mgr.h"
 
 #include "wcmd_tabcomds.h"
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_optglbs.h"
+#include "wcmd_valparser.h"
+
 
 using namespace std;
 using namespace whisper;
+
+static const string sArgsDelimiter(" \t");
+static const string sListDelimiter(",");
 
 static const char tableShowDesc[]    = "Describe database's tables.";
 static const char tableShowDescEXt[] =
@@ -95,6 +104,58 @@ static const char tableRmIndDescExt[] =
   "For the specified fields remove their indexes.\n"
   "Usage:\n"
   "  table_rmindex table_name field_name ...";
+
+static const char rowsDesc[]    = "Manipulate table rows.";
+static const char rowsDescExt[] =
+  "This command is used to manage the rows of a table. It can be used to\n"
+  "update, add, remove or retrieve tables rows content. It does so by means\n"
+  "of different subcommands:\n"
+  "  info     Used to retrieve general info about rows of a table.\n"
+  "  list     Used to display the content of a set of row (it also allow\n"
+  "           the selection of field subsed to list). The selection is made\n"
+  "           by using field and rows selection specifiers. Example:\n"
+  "\n"
+  "             rows TableName field1,field2 1,3,5,70-90,100-\n"
+  "\n"
+  "           List only field1 and field2 from rows 1,3,5, 70 to 90 included\n"
+  "           and 100 to rows count. While\n"
+  "\n"
+  "             rows TableName * 10,20- field1=n,100@200 field2=min@max\n"
+  "\n"
+  "           List all fields from rows 10 and 20 to rows count, and further\n"
+  "           only ones that have field1 set to null of from 100 to 200, and\n"
+  "           field2 is not null.\n"
+  "  add      Used to add a new table row. Example:\n"
+  "\n"
+  "             rows Table field1=\"Some text value\",field5='2001/2/3'\n"
+  "\n"
+  "           Add a new row to the table, set all fields by default to null,\n"
+  "           execpt field1 that's set to 'Some text value' and field5\n"
+  "           that's set to 3rd Feb 2001.\n"
+  " reuse     Reuse that the same thing has add but it trys not to increase\n"
+  "           the table first. It finds an available row (e.g one that has\n"
+  "           all fields set null)\n"
+  " remove    Remove the selector rows. By removing it's understood all of\n"
+  "           their field values will be set to null, such way the can be\n"
+  "           reused latter. Example:\n"
+  "\n"
+  "             rows Table remove * field1=n,field2=min,field3=max\n"
+  "\n"
+  "           Will remove all rows that have field1 is null, field2 is set\n"
+  "           to minimum and field3 is set to maximum.\n"
+  "Usage:\n"
+  "  rows Table info\n"
+  "  rows Table list [[field,...]|* [[rows_selector]|* [field_selector]]]\n"
+  "  rows Table add {field_values}\n"
+  "  rows Table reuse {field_values}\n"
+  "  rows Table remove [[rows_selector]|* [field_selector]]\n"
+  "Examples:\n"
+  "  rows Products info\n"
+  "  rows Products list * 1,2,40 qnty=5@max price=min@2.99,10.9,n\n"
+  "  rows Products list Supplier,Received * qnty=0 price=n\n"
+  "  rows Products reuse Suplier='Smart DBs',Recieved='2011/12/15',qnty=100\n"
+  "  rows Products remove * qnty=n,0\n";
+
 
 
 
@@ -607,6 +668,320 @@ invalid_args:
 }
 
 
+
+struct
+TableFieldParameter
+{
+  DBSFieldDescriptor mDesc;
+  FIELD_INDEX        mField;
+};
+
+
+
+static bool
+parse_list_table_fields (ITable&                      table,
+                         const string&                cmdLine,
+                         size_t&                      inoutLinePos,
+                         vector<TableFieldParameter>& outParams)
+{
+  const string fieldSpec = NextToken (cmdLine, inoutLinePos, sArgsDelimiter);
+
+  outParams.clear ();
+  if ((fieldSpec.length () == 0) || (fieldSpec == "*"))
+    {
+
+      for (FIELD_INDEX i = 0; i < table.FieldsCount (); ++i)
+        {
+          TableFieldParameter field;
+
+          field.mField = i;
+          field.mDesc  = table.DescribeField (i);
+
+          outParams.push_back (field);
+        }
+    }
+  else
+    {
+      size_t fieldSpecPos = 0;
+
+      while (fieldSpecPos < fieldSpec.length ())
+        {
+          const string fieldName = NextToken (fieldSpec,
+                                              fieldSpecPos,
+                                              sListDelimiter);
+          if (fieldName.length () == 0)
+            break;
+
+          TableFieldParameter field;
+
+          field.mField = table.RetrieveField (fieldName.c_str ());
+          field.mDesc  = table.DescribeField (field.mField);
+
+          outParams.push_back (field);
+        }
+    }
+
+    assert (outParams.size ()  > 0);
+
+    return true;
+}
+
+static void
+print_match_statistic (ostream&                os,
+                       ITable&                 table,
+                       const Range<ROW_INDEX>& rows,
+                       const WTICKS            startTicks,
+                       const WTICKS            endTicks)
+{
+  const WTICKS ticks = endTicks - startTicks;
+
+  const uint_t  secs  = ticks / 1000;
+  const uint_t  msecs = ticks % 1000;
+
+  if (GetVerbosityLevel () >= VL_INFO)
+    return;
+
+  ROW_INDEX matchedRows = 0;
+  for (size_t r = 0; r < rows.mIntervals.size (); ++r)
+    {
+      const Interval<ROW_INDEX> intv = rows.mIntervals[r];
+
+      matchedRows += intv.mTo - intv.mFrom + 1;
+    }
+
+  os << "Matched "<< matchedRows;
+  os << '(' << table.AllocatedRows () << ") rows in ";
+  os << secs << '.' << setw (3) << setfill ('0') << msecs;
+  os << setw (1) << setfill (' ') << "s.\n";
+}
+
+static bool
+cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+{
+  IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
+  size_t               linePos = 0;
+  string               token   = CmdLineNextToken (cmdLine, linePos);
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
+  ITable*              table   = NULL;
+
+  assert (token == "rows");
+
+  if (linePos >= cmdLine.length ())
+    goto invalid_args;
+
+  try
+  {
+    token = CmdLineNextToken (cmdLine, linePos);
+    table = &dbs.RetrievePersistentTable (token.c_str ());
+  }
+  catch (const Exception& e)
+  {
+    if (level >= VL_INFO)
+      cerr << "Failed to open table: " << token << endl;
+
+    printException (cerr, e);
+
+    return false;
+  }
+
+  try
+  {
+    token = CmdLineNextToken (cmdLine, linePos);
+    if ((token == "info") || (token.length () == 0))
+      {
+        cout << "Allocated rows    : " << table->AllocatedRows () << endl;
+        cout << "First reusable row: " << table->AddReusedRow ()  << endl;
+      }
+    else if (token == "list")
+      {
+        vector<TableFieldParameter> fields;
+        RowsSelection               rows;
+
+        if (! parse_list_table_fields (*table, cmdLine, linePos, fields))
+          return false;
+
+        assert (linePos <= cmdLine.length ());
+        if (! ParseRowsSelectionClause (&cerr,
+                                        *table,
+                                        cmdLine.c_str () + linePos,
+                                        rows))
+          {
+            return false;
+          }
+
+        const WTICKS matchBegin = wh_msec_ticks ();
+
+        MatchSelectedRows (*table, rows);
+
+        const WTICKS matchEnd = wh_msec_ticks ();
+
+        for (size_t r = 0; r < rows.mRows.mIntervals.size (); ++r)
+          {
+            const Interval<ROW_INDEX>& intv = rows.mRows.mIntervals[r];
+
+            for (ROW_INDEX row = intv.mFrom; row <= intv.mTo; ++row)
+              {
+                for (size_t f = 0; f < fields.size (); ++f)
+                  {
+                    cout << row << ':' << fields[f].mDesc.name << ':';
+                    PrintFieldValue (cout, *table, row, fields[f].mField);
+                    cout << endl;
+                  }
+                cout << endl;
+              }
+          }
+
+        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
+      }
+    else if (token == "update")
+      {
+        size_t                    temp;
+        vector<FieldValuesUpdate> fieldVals;
+        RowsSelection             rows;
+
+        if (! ParseFieldUpdateValues (&cerr,
+                                      *table,
+                                      cmdLine.c_str () + linePos,
+                                      &temp,
+                                      fieldVals))
+          {
+            return false;
+          }
+
+        linePos += temp;
+        assert (linePos <= cmdLine.length ());
+        if (! ParseRowsSelectionClause (&cerr,
+                                        *table,
+                                        cmdLine.c_str () + linePos,
+                                        rows))
+          {
+            return false;
+          }
+
+        const WTICKS matchBegin = wh_msec_ticks ();
+
+        MatchSelectedRows (*table, rows);
+
+        const WTICKS matchEnd = wh_msec_ticks ();
+
+        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
+
+        for (size_t r = 0; r < rows.mRows.mIntervals.size (); ++r)
+          {
+            const Interval<ROW_INDEX>& intv = rows.mRows.mIntervals[r];
+
+            for (ROW_INDEX row = intv.mFrom; row <= intv.mTo; ++row)
+              {
+                for (size_t f = 0; f < fieldVals.size (); ++f)
+                  {
+                    if (! UpdateTableRow (&cerr, *table, row, fieldVals))
+                      return false;
+                  }
+              }
+          }
+      }
+    else if (token == "add")
+      {
+        size_t                    temp;
+        vector<FieldValuesUpdate> fieldVals;
+
+        if (! ParseFieldUpdateValues (&cerr,
+                                      *table,
+                                      cmdLine.c_str () + linePos,
+                                      &temp,
+                                      fieldVals))
+          {
+            return false;
+          }
+
+        const ROW_INDEX row = table->AllocatedRows ();
+        if (! UpdateTableRow (&cerr, *table, row, fieldVals))
+          return false;
+
+        if (level >= VL_INFO)
+          cout << "Row added at index " << row << ".\n";
+      }
+    else if (token == "reuse")
+      {
+        size_t                    temp;
+        vector<FieldValuesUpdate> fieldVals;
+
+        if (! ParseFieldUpdateValues (&cerr,
+                                      *table,
+                                      cmdLine.c_str () + linePos,
+                                      &temp,
+                                      fieldVals))
+          {
+            return false;
+          }
+
+        const ROW_INDEX row = table->AddReusedRow ();
+        if (! UpdateTableRow (&cerr, *table, row, fieldVals))
+          return false;
+
+        if (level >= VL_INFO)
+          cout << "Row added at index " << row << ".\n";
+      }
+    else if (token == "remove")
+      {
+        RowsSelection select;
+
+        if ( ! ParseRowsSelectionClause (&cerr,
+                                         *table,
+                                         cmdLine.c_str () + linePos,
+                                         select))
+          {
+            return false;
+          }
+
+        MatchSelectedRows (*table, select);
+
+        const size_t rowIntervals = select.mRows.mIntervals.size ();
+        for (size_t rowI = 0; rowI < rowIntervals; ++rowI)
+          {
+            const Interval<ROW_INDEX>& r = select.mRows.mIntervals[rowI];
+
+            for (ROW_INDEX row = r.mFrom; row <= r.mTo; ++row)
+              table->MarkRowForReuse (row);
+          }
+      }
+    else
+      {
+        if (table)
+          dbs.ReleaseTable (*table);
+
+        cerr << "Unexpected token '" << token << "'.\n";
+
+        return false;
+      }
+  }
+  catch (const Exception& e)
+  {
+    if (level >= VL_INFO)
+      cerr << "Failed to open table: " << token << endl;
+
+    printException (cerr, e);
+
+    return false;
+  }
+
+  if (table)
+    dbs.ReleaseTable (*table);
+
+  return true;
+
+invalid_args:
+
+  if (table)
+    dbs.ReleaseTable (*table);
+
+  cerr << "Invalid commands arguments.\n";
+
+  return false;
+
+}
+
+
 void
 AddOfflineTableCommands ()
 {
@@ -651,6 +1026,14 @@ AddOfflineTableCommands ()
   entry.mDesc         = tableRmIndDesc;
   entry.mExtendedDesc = tableRmIndDescExt;
   entry.mCmd          = cmdTableRmIndex;
+
+  RegisterCommand (entry);
+
+  entry.mShowStatus   = true;
+  entry.mName         = "rows";
+  entry.mDesc         = rowsDesc;
+  entry.mExtendedDesc = rowsDescExt;
+  entry.mCmd          = cmdRowsMgm;
 
   RegisterCommand (entry);
 }

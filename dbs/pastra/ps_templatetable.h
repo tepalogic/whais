@@ -490,13 +490,13 @@ private:
                                                ROW_INDEX         maxCount,
                                                const FIELD_INDEX fieldIndex);
 
-  template<class T> DArray MatchRows (const T&          min,
-                                      const T&          max,
-                                      const ROW_INDEX   fromRow,
-                                      ROW_INDEX         toRow,
-                                      ROW_INDEX         ignoreFirst,
-                                      ROW_INDEX         maxCount,
-                                      const FIELD_INDEX filedIndex);
+  template<class T> DArray MatchRowsNoIndex (const T&          min,
+                                             const T&          max,
+                                             const ROW_INDEX   fromRow,
+                                             ROW_INDEX         toRow,
+                                             ROW_INDEX         ignoreFirst,
+                                             ROW_INDEX         maxCount,
+                                             const FIELD_INDEX filedIndex);
 
   void CheckRowToReuse (const ROW_INDEX row);
 

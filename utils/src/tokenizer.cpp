@@ -38,7 +38,10 @@ NextToken (const std::string&     text,
   inoutOff = text.find_first_not_of (delims, inoutOff);
 
   if (inoutOff == string::npos)
-    return string ();
+    {
+      inoutOff  = text.length ();
+      return string ();
+    }
 
   assert (inoutOff != string::npos);
   assert (inoutOff < text.length ());

@@ -388,10 +388,8 @@ Next<uint64_t> (const uint64_t& t)
 
 
 template<class T>
-class Range
+struct Range
 {
-public:
-
   void Join (const Interval<T>& v)
   {
     size_t bOffset = FindJoinInsertPlace (v.mFrom);
@@ -608,8 +606,6 @@ public:
   {
     mIntervals.resize (0);
   }
-
-protected:
 
   size_t FindJoinInsertPlace (const T& v)
   {

@@ -138,6 +138,7 @@ read_integer (const uint8_t*    from,
       if ((isSigned && ((result * 10 + (*from - '0')) > MAX_SIGNED_ABS))
           || ( ! isSigned && (result > (result * 10 + (*from - '0')))))
         {
+          *outCount = 0;
           return 0; // Overflow condition
         }
 
@@ -157,87 +158,140 @@ read_integer (const uint8_t*    from,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const  utf8Src,
                       const uint_t          srcSize,
                       DBool* const          outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DBool ();
-      return 1;
+      return 0;
     }
-  else if ( 2 * sizeof (uint8_t) > srcSize)
-    return 0;
-
   else
     {
-      *outValue = DBool (*utf8Src == '1');
-
-      if ((utf8Src[1] != 0)
-          || ((*utf8Src != '1') && (*utf8Src != '0')))
+      if ((*utf8Src != '1') && (*utf8Src != '0')
+          && (*utf8Src != 't') && (*utf8Src != 'f')
+          && (*utf8Src != 'T') && (*utf8Src != 'F'))
         {
-          return 0;
+          return -1;
         }
 
-      return 2;
+      *outValue = DBool ((*utf8Src == '1')
+                         || (*utf8Src == 't')
+                         || (*utf8Src == 'T'));
     }
 
-  return 0;
+  return 1;
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
+                      const bool           checkSpecial,
                       DChar* const         outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DChar ();
-      return 1;
+      return 0;
+    }
+
+  if ((*utf8Src == '\\') && checkSpecial)
+    {
+      if (srcSize == 1)
+        return false;
+
+      switch (utf8Src[1])
+        {
+        case 'a':
+          *outValue = DChar ('\a');
+          return 2;
+
+        case 'b':
+          *outValue = DChar ('\b');
+          return 2;
+
+        case 'f':
+          *outValue = DChar ('\f');
+          return 2;
+
+        case 'n':
+          *outValue = DChar ('\n');
+          return 2;
+
+        case 'r':
+          *outValue = DChar ('\r');
+          return 2;
+
+        case 't':
+          *outValue = DChar ('\t');
+          return 2;
+
+        case 'u':
+            {
+              uint_t temp        = 0;
+              const int64_t code = read_integer (utf8Src + 2, &temp, true);
+
+              if ((temp == 0) || (0xFFFFFFFF < code))
+                return -1;
+
+              *outValue  = DChar (code);
+              temp      += 2;
+
+              if (utf8Src[temp++] != '&')
+                return -1;
+
+              return temp;
+            }
+
+        default:
+          *outValue = DChar (utf8Src[1]);
+          return 2;
+        }
+
     }
 
   const uint_t result = wh_utf8_cu_count (*utf8Src);
   if ((result == 0) || (result + 1 > srcSize))
-    return 0;
+    return -1;
 
   else
     {
       uint32_t ch;
 
       if ((wh_load_utf8_cp (utf8Src, &ch) != result)
-          || (ch == 0)
-          || (utf8Src[result] != 0))
+          || (ch == 0))
         {
-          return 0;
+          return -1;
         }
 
       *outValue = DChar (ch);
     }
 
-  return result + 1;
+  return result;
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DDate* const         outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DDate ();
-      return 1;
+      return 0;
     }
 
   uint_t temp   = 0;
@@ -246,17 +300,17 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   const int64_t year = read_integer (utf8Src, &temp, true);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != '/') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t month = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != '/') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t day = read_integer (utf8Src + result, &temp, false);
   result += temp;
-  if ((temp == 0) || (utf8Src[result++] != 0) || (result > srcSize))
-    return 0;
+  if ((temp == 0) || (result > srcSize))
+    return -1;
 
   *outValue = DDate (year, month, day);
 
@@ -264,18 +318,18 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DDateTime* const     outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DDateTime ();
-      return 1;
+      return 0;
     }
 
   uint_t temp   = 0;
@@ -284,32 +338,32 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   const int64_t year = read_integer (utf8Src, &temp, true);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != '/') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t month = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != '/') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t day = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != ' ') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t hour = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != ':') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t min = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != ':') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t secs = read_integer (utf8Src + result, &temp, false);
   result += temp;
-  if ((temp == 0) || (utf8Src[result++] != 0) || (result > srcSize))
-    return 0;
+  if ((temp == 0) || (result > srcSize))
+    return -1;
 
   *outValue = DDateTime (year, month, day, hour, min, secs);
 
@@ -317,18 +371,18 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DHiresTime* const    outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DHiresTime ();
-      return 1;
+      return 0;
     }
 
   uint_t temp   = 0;
@@ -337,27 +391,27 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   const int64_t year = read_integer (utf8Src, &temp, true);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != '/') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t month = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != '/') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t day = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != ' ') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t hour = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != ':') || (result > srcSize))
-    return 0;
+    return -1;
 
   const uint64_t min = read_integer (utf8Src + result, &temp, false);
   result += temp;
   if ((temp == 0) || (utf8Src[result++] != ':') || (result > srcSize))
-    return 0;
+    return -1;
 
   int64_t secs, usecs, usecPrec;
   temp = read_real (utf8Src + result, &secs, &usecs, &usecPrec);
@@ -365,10 +419,9 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   if ((temp == 0)
       || (secs < 0)
       || (usecs < 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize))
     {
-      return 0;
+      return -1;
     }
 
   if (usecPrec > USECS_PRECISION)
@@ -383,29 +436,28 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DInt8* const         outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DInt8 ();
-      return 1;
+      return 0;
     }
 
   uint_t        result = 0;
   const int64_t value  = read_integer (utf8Src, &result, true);
   if ((result == 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize)
       || (value < std::numeric_limits<int8_t>::min ())
       || (std::numeric_limits<int8_t>::max () < value))
     {
-      return 0;
+      return -1;
     }
 
   *outValue = DInt8 (value);
@@ -414,59 +466,58 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DInt16* const        outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DInt16 ();
-      return 1;
+      return 0;
     }
 
   uint_t        result = 0;
   const int64_t value  = read_integer (utf8Src, &result, true);
   if ((result == 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize)
       || (value < std::numeric_limits<int16_t>::min ())
       || (std::numeric_limits<int16_t>::max () < value))
     {
-      return 0;
+      return -1;
     }
+
   *outValue = DInt16 (value);
 
   return result;
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DInt32* const        outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DInt32 ();
-      return 1;
+      return 0;
     }
 
   uint_t        result = 0;
   const int64_t value  = read_integer (utf8Src, &result, true);
   if ((result == 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize)
       || (value < std::numeric_limits<int32_t>::min ())
       || (std::numeric_limits<int32_t>::max () < value))
     {
-      return 0;
+      return -1;
     }
 
   *outValue = DInt32 (value);
@@ -475,29 +526,24 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DInt64* const        outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DInt64 ();
-      return 1;
+      return 0;
     }
 
   uint_t        result = 0;
   const int64_t value  = read_integer (utf8Src, &result, true);
-  if ((result == 0)
-      || (utf8Src[result++] != 0)
-      || (result > srcSize))
-
-    {
-      return 0;
-    }
+  if ((result == 0) || (result > srcSize))
+    return -1;
 
   *outValue = DInt64 (value);
 
@@ -505,18 +551,18 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DUInt8* const        outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DUInt8 ();
-      return 1;
+      return 0;
     }
 
   uint_t         result = 0;
@@ -527,7 +573,7 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
       || (value < std::numeric_limits<uint8_t>::min ())
       || (std::numeric_limits<uint8_t>::max () < value))
     {
-      return 0;
+      return -1;
     }
   *outValue = DUInt8 (value);
 
@@ -535,59 +581,58 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DUInt16* const       outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DUInt16 ();
-      return 1;
+      return 0;
     }
 
   uint_t         result = 0;
   const uint64_t value  = read_integer (utf8Src, &result, false);
   if ((result == 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize)
       || (value < std::numeric_limits<uint16_t>::min ())
       || (std::numeric_limits<uint16_t>::max () < value))
     {
-      return 0;
+      return -1;
     }
+
   *outValue = DUInt16 (value);
 
   return result;
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DUInt32* const       outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DUInt32 ();
-      return 1;
+      return 0;
     }
 
   uint_t         result = 0;
   const uint64_t value  = read_integer (utf8Src, &result, false);
   if ((result == 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize)
       || (value < std::numeric_limits<uint32_t>::min ())
       || (std::numeric_limits<uint32_t>::max () < value))
     {
-      return 0;
+      return -1;
     }
 
   *outValue = DUInt32 (value);
@@ -596,57 +641,50 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DUInt64* const       outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DUInt64 ();
-      return 1;
+      return 0;
     }
 
   uint_t         result = 0;
   const uint64_t value  = read_integer (utf8Src, &result, false);
-  if ((result == 0)
-      || (utf8Src[result++] != 0)
-      || (result > srcSize))
-    {
-      return 0;
-    }
+  if ((result == 0) || (result > srcSize))
+    return -1;
+
   *outValue = DUInt64 (value);
 
   return result;
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DReal* const         outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DReal ();
-      return 1;
+      return 0;
     }
 
   int64_t intPart, fracPart, precision;
   uint_t  result  = read_real (utf8Src, &intPart, &fracPart, &precision);
   assert ((precision == 1) || (precision % 10 == 0));
-  if ((result == 0)
-      || (utf8Src[result++] != 0)
-      || (result > srcSize))
-    {
-      return 0;
-    }
+  if ((result == 0) || (result > srcSize))
+      return -1;
 
   *outValue = DReal (DBS_REAL_T (intPart, fracPart, precision));
 
@@ -654,30 +692,26 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
 }
 
 
-uint_t
+int
 Utf8Translator::Read (const uint8_t* const utf8Src,
                       const uint_t         srcSize,
                       DRichReal* const     outValue)
 {
-  if (sizeof (*utf8Src) > srcSize)
-    return 0;
+  if (srcSize == 0)
+    return -1;
 
-  if (*utf8Src == 0)
+  else if (*utf8Src == 0)
     {
       *outValue = DRichReal ();
-      return 1;
+      return 0;
     }
 
   int64_t intPart, fracPart, precision;
   uint_t  result  = read_real (utf8Src, &intPart, &fracPart, &precision);
 
   assert ((precision == 1) || (precision % 10 == 0));
-  if ((result == 0)
-      || (utf8Src[result++] != 0)
-      || (result > srcSize))
-    {
-      return 0;
-    }
+  if ((result == 0) || (result > srcSize))
+    return -1;
 
   *outValue = DRichReal (DBS_RICHREAL_T (intPart, fracPart, precision));
 
@@ -716,6 +750,7 @@ Utf8Translator::Write (uint8_t* const      utf8Dest,
 uint_t
 Utf8Translator::Write (uint8_t* const      utf8Dest,
                        const uint_t        maxSize,
+                       const bool          checkSpecial,
                        const DChar&        value)
 {
   if (maxSize == 0)
@@ -729,12 +764,48 @@ Utf8Translator::Write (uint8_t* const      utf8Dest,
   else if (maxSize <= MAX_UTF8_CHAR_SIZE)
     return 0;
 
+  if (checkSpecial)
+    {
+      utf8Dest[0] = '\\';
+      utf8Dest[2] = 0;
+
+      switch (value.mValue)
+        {
+        case '\a':
+          utf8Dest[1] = 'a';
+          return 3;
+
+        case '\b':
+          utf8Dest[1] = 'b';
+          return 3;
+
+        case '\f':
+          utf8Dest[1] = 'f';
+          return 3;
+
+        case '\n':
+          utf8Dest[1] = 'n';
+          return 3;
+
+        case '\r':
+          utf8Dest[1] = 'r';
+          return 3;
+
+        case '\t':
+          utf8Dest[1] = 't';
+          return 3;
+
+        case '\\':
+          utf8Dest[1] = '\\';
+          return 3;
+        }
+    }
+
   uint_t result = wh_store_utf8_cp (value.mValue, utf8Dest);
   utf8Dest[result++] = 0;
 
   return result;
 }
-
 
 uint_t
 Utf8Translator::Write (uint8_t* const    utf8Dest,

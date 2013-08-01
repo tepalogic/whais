@@ -28,10 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/le_converter.h"
 #include "utils/auto_array.h"
 #include "utils/utf8.h"
+#include "utils/valtranslator.h"
 #include "server_protocol.h"
 
 #include "stack_cmds.h"
-#include "valtranslator.h"
 
 using namespace std;
 
@@ -338,14 +338,11 @@ push_frame_error:
 static uint_t
 read_value (StackValue&         dest,
             const uint32_t      type,
-            const bool          isArray,
             const uint8_t*      data,
             const uint16_t      dataSize,
             uint_t* const       inoutDataOff)
 {
-  const uint_t minSize = isArray ? 0 : 1;
-
-  uint_t result = 0;
+  int result = -1;
 
   switch (type)
   {
@@ -355,8 +352,10 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
+
     }
     break;
 
@@ -365,8 +364,10 @@ read_value (StackValue&         dest,
       DChar value;
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
+                                     false,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -377,7 +378,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -388,7 +390,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -399,7 +402,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -410,7 +414,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -421,7 +426,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -432,7 +438,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -443,7 +450,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -454,7 +462,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -465,7 +474,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -476,7 +486,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -487,7 +498,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -498,7 +510,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -509,7 +522,8 @@ read_value (StackValue&         dest,
       result = Utf8Translator::Read (data + *inoutDataOff,
                                      dataSize - *inoutDataOff,
                                      &value);
-      if (result > minSize)
+
+      if ((result >= 0) && (data[*inoutDataOff + result++] == 0))
         dest.Operand ().SetValue (value);
     }
     break;
@@ -519,9 +533,10 @@ read_value (StackValue&         dest,
                                _EXTRA (type));
   }
 
-  if (result > minSize)
+  if (result >= 0)
     {
       *inoutDataOff += result;
+
       return result;
     }
 
@@ -603,7 +618,6 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
 
                   const uint_t len = read_value (arrayValuevalue,
                                                  type,
-                                                 true,
                                                  data,
                                                  dataSize,
                                                  inoutDataOff);
@@ -661,7 +675,6 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
             {
               const uint_t elLen = read_value (rowValue,
                                                type,
-                                               false,
                                                data,
                                                dataSize,
                                                inoutDataOff);
@@ -702,7 +715,6 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
 
               const uint_t len = read_value (arrayValue,
                                              type,
-                                             true,
                                              data,
                                              dataSize,
                                              inoutDataOff);
@@ -759,7 +771,6 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
 
           const uint_t elLen = read_value (stackTop,
                                            type,
-                                           false,
                                            data,
                                            dataSize,
                                            inoutDataOff);
@@ -833,7 +844,7 @@ write_value (StackValue&      source,
 
       source.Operand ().GetValue (value);
 
-      result = Utf8Translator::Write (data, maxDataSize, value);
+      result = Utf8Translator::Write (data, maxDataSize, false, value);
     }
     break;
 

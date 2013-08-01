@@ -363,7 +363,7 @@ test_op_ldht (Session& session)
   testCode [opSize + 0]  = 0x04;
   testCode [opSize + 1]  = 0x03;
   testCode [opSize + 2]  = 0x02;
-  testCode [opSize + 3]  = 0x01;
+  testCode [opSize + 3]  = 0x00;
   testCode [opSize + 4]  = 0x23;
   testCode [opSize + 5]  = 0x10;
   testCode [opSize + 6]  = 0x0B;
@@ -381,7 +381,7 @@ test_op_ldht (Session& session)
   DHiresTime value;
   stack[0].Operand ().GetValue (value);
   if (value !=
-      DHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x01020304))
+      DHiresTime (0xD1F1, 0x06, 0x05, 0x0B, 0x10, 0x23, 0x20304))
     return false;
 
   return true;

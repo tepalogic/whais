@@ -32,8 +32,6 @@ extern "C" {
 #endif
 
 
-
-
 static const uint8_t UTF8_7BIT_MASK  = 0x00;
 static const uint8_t UTF8_11BIT_MASK = 0xC0;
 static const uint8_t UTF8_16BIT_MASK = 0xE0;
