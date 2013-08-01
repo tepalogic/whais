@@ -51,7 +51,7 @@ static const char MAX_VALUE[]  = "max";
 
 template<class T>
 bool parse_defined_values (const char*       src,
-                           uint_t*           outSrcSize,
+                           size_t*           outSrcSize,
                            T* const          outValue)
 {
   if (strncmp (src, NULL_VALUE, sizeof (NULL_VALUE) - 1) == 0)
@@ -85,7 +85,7 @@ bool
 ParseFieldValue (ostream* const  os,
                  const char*     src,
                  const bool      apostrophe,
-                 uint_t* const   outSrcSize,
+                 size_t* const   outSrcSize,
                  T* const        outValue)
 {
   uint_t offset = 0;
@@ -123,7 +123,7 @@ bool
 ParseFieldValue<DChar> (ostream* const  os,
                         const char*     src,
                         const bool      apostrophe,
-                        uint_t* const   outSrcSize,
+                        size_t* const   outSrcSize,
                         DChar* const    outValue)
 {
   (void)apostrophe;
@@ -170,7 +170,7 @@ bool ParseFieldSpecifier (ostream* const              os,
 {
   Range<T>& range = *_RC (Range<T>*, outFieldValues.mRange);
 
-  uint_t offset = 0;
+  size_t offset = 0;
   bool   result = false;
 
   while ((src[offset] != 0) && ! isspace (src[offset]))
