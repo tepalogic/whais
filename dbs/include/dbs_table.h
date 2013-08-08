@@ -217,120 +217,90 @@ public:
                             const DBool&      max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DChar&      min,
                             const DChar&      max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DDate&      min,
                             const DDate&      max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DDateTime&   min,
                             const DDateTime&   max,
                             const ROW_INDEX    fromRow,
                             const ROW_INDEX    toRow,
-                            const ROW_INDEX    ignoreFirst,
-                            const ROW_INDEX    maxCount,
                             const FIELD_INDEX  field) = 0;
 
   virtual DArray MatchRows (const DHiresTime&   min,
                             const DHiresTime&   max,
                             const ROW_INDEX     fromRow,
                             const ROW_INDEX     toRow,
-                            const ROW_INDEX     ignoreFirst,
-                            const ROW_INDEX     maxCount,
                             const FIELD_INDEX   field) = 0;
 
   virtual DArray MatchRows (const DUInt8&     min,
                             const DUInt8&     max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DUInt16&    min,
                             const DUInt16&    max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DUInt32&    min,
                             const DUInt32&    max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DUInt64&    min,
                             const DUInt64&    max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DInt8&      min,
                             const DInt8&      max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DInt16&     min,
                             const DInt16&     max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DInt32&     min,
                             const DInt32&     max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DInt64&     min,
                             const DInt64&     max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DReal&      min,
                             const DReal&      max,
                             const ROW_INDEX   fromRow,
                             const ROW_INDEX   toRow,
-                            const ROW_INDEX   ignoreFirst,
-                            const ROW_INDEX   maxCount,
                             const FIELD_INDEX field) = 0;
 
   virtual DArray MatchRows (const DRichReal&   min,
                             const DRichReal&   max,
                             const ROW_INDEX    fromRow,
                             const ROW_INDEX    toRow,
-                            const ROW_INDEX    ignoreFirst,
-                            const ROW_INDEX    maxCount,
                             const FIELD_INDEX  field) = 0;
 };
 

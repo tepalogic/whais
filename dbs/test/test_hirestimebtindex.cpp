@@ -31,8 +31,6 @@ const char tb_name[] = "t_test_tab";
 uint_t _rowsCount   = 5000000;
 uint_t _removedRows = _rowsCount / 10;
 
-static DHiresTime _max_date (0x7FFF, 12, 31, 23, 59, 59, 999999999);
-
 DHiresTime
 get_random_hires_time ()
 {
@@ -42,7 +40,7 @@ get_random_hires_time ()
   uint8_t hour  = wh_rnd () % 24;
   uint8_t mins  = wh_rnd () % 60;
   uint8_t secs  = wh_rnd () % 60;
-  uint32_t  mic = wh_rnd () % 1000000000;
+  uint32_t  mic = wh_rnd () % 1000000;
 
   return DHiresTime (year, month, day, hour, mins, secs, mic);
 }
@@ -83,12 +81,10 @@ fill_table_with_values (ITable& table,
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
   DArray values = table.MatchRows (DHiresTime (),
-                                           _max_date,
-                                           0,
-                                           ~0,
-                                           0,
-                                           ~0,
-                                           0);
+                                   DHiresTime::Max (),
+                                   0,
+                                   ~0,
+                                   0);
   if ((values.Count() != tableValues.Count ()) ||
       (values.Count () != rowCount))
     {
@@ -150,12 +146,10 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
     }
 
   DArray values = table.MatchRows (nullValue,
-                                           nullValue,
-                                           0,
-                                           ~0,
-                                           0,
-                                           ~0,
-                                           0);
+                                   nullValue,
+                                   0,
+                                   ~0,
+                                   0);
 
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
@@ -190,12 +184,10 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
 
   DHiresTime nullValue;
   DArray values  = table.MatchRows (nullValue,
-                                            nullValue,
-                                            0,
-                                            ~0,
-                                            0,
-                                            ~0,
-                                            0);
+                                    nullValue,
+                                    0,
+                                    ~0,
+                                    0);
   for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
       DUInt64 element;
@@ -212,12 +204,10 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
     }
 
   values  = table.MatchRows (nullValue,
-                                   _max_date,
-                                   0,
-                                   ~0,
-                                   _removedRows,
-                                   ~0,
-                                    0);
+                             DHiresTime::Max (),
+                             _removedRows,
+                             ~0,
+                              0);
 
   for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
@@ -275,12 +265,10 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
   table.CreateIndex (0, callback_index_create, &data);
 
   DArray values  = table.MatchRows (DHiresTime (),
-                                            _max_date,
-                                            0,
-                                            ~0,
-                                            0,
-                                            ~0,
-                                            0);
+                                    DHiresTime::Max (),
+                                    0,
+                                    ~0,
+                                    0);
 
   if (values.Count() != _rowsCount)
     result = false;

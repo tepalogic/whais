@@ -1687,8 +1687,6 @@ void match_field_value (ITable&                     table,
                                               vals.mTo,
                                               rows.mFrom,
                                               rows.mTo,
-                                              0,
-                                              ~(_SC(ROW_INDEX, 0)),
                                               values.mFieldId);
           add_rows_to_interval (rowsFound, fieldRows);
         }
@@ -1699,8 +1697,6 @@ void match_field_value (ITable&                     table,
                                               T (),
                                               rows.mFrom,
                                               rows.mTo,
-                                              0,
-                                              ~(_SC(ROW_INDEX, 0)),
                                               values.mFieldId);
           add_rows_to_interval (rowsFound, fieldRows);
         }

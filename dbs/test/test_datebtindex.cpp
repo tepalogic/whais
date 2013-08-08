@@ -80,12 +80,10 @@ fill_table_with_values (ITable& table,
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
   DArray values = table.MatchRows (DDate (),
-                                           _max_date,
-                                           0,
-                                           ~0,
-                                           0,
-                                           ~0,
-                                           0);
+                                   _max_date,
+                                   0,
+                                   ~0,
+                                   0);
   if ((values.Count() != tableValues.Count ()) ||
       (values.Count () != rowCount))
     {
@@ -147,12 +145,10 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
     }
 
   DArray values = table.MatchRows (nullValue,
-                                           nullValue,
-                                           0,
-                                           ~0,
-                                           0,
-                                           ~0,
-                                           0);
+                                   nullValue,
+                                   0,
+                                   ~0,
+                                   0);
 
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
@@ -187,12 +183,10 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
 
   DDate nullValue;
   DArray values  = table.MatchRows (nullValue,
-                                            nullValue,
-                                            0,
-                                            ~0,
-                                            0,
-                                            ~0,
-                                            0);
+                                    nullValue,
+                                    0,
+                                    ~0,
+                                    0);
   for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
       DUInt64 element;
@@ -209,12 +203,10 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
     }
 
   values  = table.MatchRows (nullValue,
-                                   _max_date,
-                                   0,
-                                   ~0,
-                                   _removedRows,
-                                   ~0,
-                                    0);
+                             _max_date,
+                             _removedRows,
+                             ~0,
+                              0);
 
   for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
@@ -272,12 +264,10 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
   table.CreateIndex (0, callback_index_create, &data);
 
   DArray values  = table.MatchRows (DDate (),
-                                            _max_date,
-                                            0,
-                                            ~0,
-                                            0,
-                                            ~0,
-                                            0);
+                                    _max_date,
+                                    0,
+                                    ~0,
+                                    0);
 
   if (values.Count() != _rowsCount)
     result = false;

@@ -1,3 +1,5 @@
 #!/bin/bash
 
-make "$1" ARCH=linux_gcc_x86 BUILD_TESTS=yes
+CORES_COUNT=`grep "processor.*:" /proc/cpuinfo | sort -u | wc -l`
+
+make -j $CORES_COUNT "$1" ARCH=linux_gcc_x86 BUILD_TESTS=yes

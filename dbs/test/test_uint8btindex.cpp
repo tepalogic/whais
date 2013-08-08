@@ -67,13 +67,7 @@ fill_table_with_values (ITable& table,
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DArray values = table.MatchRows (DUInt8 (),
-                                           DUInt8 (0xFF),
-                                           0,
-                                           ~0,
-                                           0,
-                                           ~0,
-                                           0);
+  DArray values = table.MatchRows (DUInt8 (), DUInt8 (0xFF), 0, ~0, 0);
   if ((values.Count() != tableValues.Count ()) ||
       (values.Count () != rowCount))
     {
@@ -134,13 +128,7 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
         }
     }
 
-  DArray values = table.MatchRows (nullValue,
-                                           nullValue,
-                                           0,
-                                           ~0,
-                                           0,
-                                           ~0,
-                                           0);
+  DArray values = table.MatchRows (nullValue, nullValue, 0, ~0, 0);
 
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
@@ -174,13 +162,7 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
   ITable& table = dbsHnd.RetrievePersistentTable (tb_name);
 
   DUInt8 nullValue;
-  DArray values  = table.MatchRows (nullValue,
-                                            nullValue,
-                                            0,
-                                            ~0,
-                                            0,
-                                            ~0,
-                                            0);
+  DArray values = table.MatchRows (nullValue, nullValue, 0, ~0, 0);
   for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
       DUInt64 element;
@@ -196,13 +178,7 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
         result = false;
     }
 
-  values  = table.MatchRows (nullValue,
-                                   DUInt8 (0xFF),
-                                   0,
-                                   ~0,
-                                   _removedRows,
-                                   ~0,
-                                    0);
+  values  = table.MatchRows (nullValue, DUInt8 (0xFF), _removedRows, ~0, 0);
 
   for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
@@ -259,13 +235,7 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
 
   table.CreateIndex (0, callback_index_create, &data);
 
-  DArray values  = table.MatchRows (DUInt8 (),
-                                            DUInt8 (0xFF),
-                                            0,
-                                            ~0,
-                                            0,
-                                            ~0,
-                                            0);
+  DArray values  = table.MatchRows (DUInt8 (), DUInt8 (0xFF), 0, ~0, 0);
 
   if (values.Count() != _rowsCount)
     result = false;

@@ -503,6 +503,7 @@ public:
 
         if (fromPos == 0)
           break;
+
         fromPos--;
       }
   }

@@ -10,5 +10,5 @@ rm "$@" 2>/dev/null
 
 
 #Do the actual tags 
-ctags -R --c++-kinds=+p --fields=+iaS --extra=+q -f "$1" . 
+ctags -R --links=no --c++-kinds=+p --fields=+iaS --extra=+q -f "$1" `pwd` 
 

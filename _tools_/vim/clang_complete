@@ -2,7 +2,7 @@
 -I/usr/include/c++/4.6/
 
 -I./
--Iheaders
+-Iheaders/
 
 -DARCH_LINUX_GCC=1 
 -DBUILD_TESTS=1 

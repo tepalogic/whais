@@ -23,15 +23,10 @@ set softtabstop=4
 set t_Co=256
 syntax on
 
-if has('gui_running')
-	colorscheme wombat
-else
-	colorscheme ir_black
-endif
+colorscheme koehler
 
 " highlight matching braces
 set showmatch
-set ignorecase
 set smartcase
 
 
@@ -55,7 +50,7 @@ map <S-Tab> :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
 
 set tags+=./tags,tags,~/tags
 " recreate tags file with F5
-map <F5> :!~/abin/ctags_for_vim tags<CR>
+map <F5> :!~/abin/ctags_for_vim ~/tags<CR>
 
 " The 'make_for_vim' is a helper script to allow the proper call of the
 " build/clean program.
@@ -101,7 +96,6 @@ function! CodingSetTextWidth()
   setlocal textwidth=80
   setlocal nowrap
   setlocal colorcolumn=80
-  let &colorcolumn=join(range(81,999),",")
 endfunction
 
 autocmd FileType c,cpp call GnuIndent() 
@@ -113,7 +107,7 @@ autocmd FileType c,cpp,java autocmd BufWritePre <buffer> :%s/\s\+$//e
 " g:clang_user_options set at vimprj section
 let g:clang_use_library=0
 let g:clang_user_path='/usr/bin/clang'
-let g:clang_complete_copen=1
+let g:clang_complete_copen=0
 let g:clang_complete_macros=1
 let g:clang_complete_patterns=1
 let g:clang_auto_select=1
@@ -130,7 +124,7 @@ let g:clang_snippets_engine='clang_complete'
 "
 " Complete options (disable preview scratch window, longest removed to aways
 " show menu)
-set completeopt=longest,menuone
+set completeopt=longest,menu
 
 " Limit popup menu height
 set pumheight=20
