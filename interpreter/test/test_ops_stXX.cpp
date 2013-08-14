@@ -96,7 +96,8 @@ test_op_stb (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DBool op;
@@ -139,7 +140,8 @@ test_op_stc (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DChar op;
@@ -182,7 +184,8 @@ test_op_std (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DDate op;
@@ -226,7 +229,8 @@ test_op_stdt (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DDateTime op;
@@ -269,7 +273,8 @@ test_op_stht (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DHiresTime op;
@@ -314,7 +319,8 @@ test_op_stXX (Session&       session,
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DBS_T op;
@@ -357,7 +363,8 @@ test_op_stt (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DText op;
@@ -400,7 +407,8 @@ test_op_stta (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   const DUInt32 firstVal (0x31);
@@ -457,7 +465,8 @@ test_op_stf (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   const DUInt32 firstVal (0x31);
@@ -518,7 +527,8 @@ test_op_sta (Session& session)
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   DArray op;

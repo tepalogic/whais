@@ -98,7 +98,8 @@ test_op_saddXX (Session& session,
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
 
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -145,7 +146,8 @@ test_op_ssubXX (Session& session,
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
 
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -191,8 +193,8 @@ test_op_smulXX (Session& session,
   std::cout << "Testing " << desc << " self multiplication...\n";
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
-
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -238,8 +240,8 @@ test_op_sdivXX (Session& session,
   std::cout << "Testing " << desc << " self division...\n";
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
-
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -286,7 +288,8 @@ test_op_smodXX (Session& session,
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
 
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -332,8 +335,8 @@ test_op_sandXX (Session& session,
   std::cout << "Testing " << desc << " self and...\n";
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
-
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -379,8 +382,8 @@ test_op_sxorXX (Session& session,
   std::cout << "Testing " << desc << " self xor...\n";
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
-
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -426,8 +429,8 @@ test_op_sorXX (Session& session,
   std::cout << "Testing " << desc << " self or...\n";
   const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, procName),
                                                  sizeof procName - 1);
-
-  uint8_t* testCode = _CC (uint8_t*, session.ProcCode (procId));
+  const Procedure& proc   = session.GetProcedure (procId);
+  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
   SessionStack stack;
 
   uint8_t opSize = 0;

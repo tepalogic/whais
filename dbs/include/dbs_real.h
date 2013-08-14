@@ -35,8 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace whisper {
 
-static const int64_t DBS_REAL_PREC      = 1000000ull;
-static const int64_t DBS_RICHREAL_PREC  = 100000000000000ull;
+static const int64_t DBS_REAL_PREC      = 1000000ull;         //6 decimals
+static const int64_t DBS_RICHREAL_PREC  = 100000000000000ull; //14 decimals
 
 template <typename TI, typename TF, const int64_t PRECISION>
 class DBSReal

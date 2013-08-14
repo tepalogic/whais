@@ -278,86 +278,6 @@ stmt_get_import_id (const struct Statement* const stmt)
 
 /*****************************Type specification section ***************/
 
-bool_t
-is_type_spec_valid (const struct TypeSpec* spec)
-{
-  bool_t result = TRUE;
-
-  const uint16_t htype = load_le_int16 (spec->type);
-  const uint16_t hsize = load_le_int16 (spec->dataSize);
-
-  if (((htype == T_UNKNOWN) || (htype > T_UNDETERMINED))
-      && (IS_FIELD (htype) == FALSE)
-      && (IS_ARRAY (htype) == FALSE)
-      && (IS_TABLE (htype) == FALSE))
-    {
-      result = FALSE;
-    }
-  else if ((spec->data[hsize - 2] != TYPE_SPEC_END_MARK)
-           || (spec->data[hsize - 1] != 0))
-    {
-      result = FALSE;
-    }
-  else if (IS_FIELD (htype))
-    {
-      const uint16_t fieldType = GET_FIELD_TYPE (htype);
-
-      if (hsize != 2)
-        result = FALSE;
-
-      else if (IS_ARRAY (fieldType))
-        {
-          if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (fieldType) > T_UNDETERMINED))
-            {
-              result = FALSE;
-            }
-        }
-      else
-        {
-          if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (fieldType) > T_UNDETERMINED))
-            {
-              result = FALSE;
-            }
-        }
-    }
-  else if (IS_ARRAY (htype))
-    {
-      if ((hsize != 2)
-          || (GET_BASIC_TYPE (htype) == T_UNKNOWN)
-          || (GET_BASIC_TYPE (htype) > T_UNDETERMINED) )
-        {
-          result = FALSE;
-        }
-    }
-  else if (IS_TABLE (htype))
-    {
-      uint_t index = 0;
-
-      while ((index < (uint_t) (hsize - 2)) && (result != FALSE))
-        {
-          uint16_t type;
-          uint_t   identifierLength = strlen ((char *) &spec->data[index]);
-
-          /* Don't check for zero here, because of strlen () */
-          index += identifierLength + 1;
-          type   = load_le_int16 (&(spec->data[index]));
-
-          /* Ignore an eventual array mask */
-          if ( (GET_BASIC_TYPE (type) == T_UNKNOWN) ||
-               (GET_BASIC_TYPE (type) > T_UNDETERMINED))
-            {
-              result = FALSE;
-              break;
-            }
-          index += 2;
-        }
-    }
-
-  return result;
-}
-
 
 static uint32_t
 find_type_spec (const uint8_t*         typeBuff,
@@ -386,22 +306,6 @@ find_type_spec (const uint8_t*         typeBuff,
     }
 
   return TYPE_SPEC_INVALID_POS;
-}
-
-
-bool_t
-compare_type_spec (const struct TypeSpec* const spec1,
-                   const struct TypeSpec* const spec2)
-{
-  const uint_t t1 = load_le_int16 (spec1->type);
-  const uint_t s1 = load_le_int16 (spec1->dataSize);
-
-  const uint_t t2 = load_le_int16 (spec2->type);
-  const uint_t s2 = load_le_int16 (spec2->dataSize);
-
-  return (t1 == t2 )
-         && (s1 == s2)
-         && (memcmp (spec1->data, spec2->data, s1) == 0);
 }
 
 

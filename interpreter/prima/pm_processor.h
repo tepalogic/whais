@@ -26,18 +26,17 @@
 #define PM_PROCESSOR_H_
 
 #include "pm_interpreter.h"
+#include "pm_procedures.h"
 
 namespace whisper {
 namespace prima {
 
-class Processor
+class ProcedureCall
 {
 public:
-  Processor (Session&           session,
-             SessionStack&      stack,
-             const uint32_t     procedureId);
-
-  void Run ();
+  ProcedureCall (Session&              session,
+                 SessionStack&         stack,
+                 const Procedure&      procedure);
 
   void AquireSync (const uint8_t sync);
 
@@ -55,7 +54,9 @@ public:
 
   const Unit& GetUnit () const
   {
-    return mProcUnit;
+    assert (mProcedure.mUnit != NULL);
+
+    return *mProcedure.mUnit;
   }
 
   const uint8_t* Code () const
@@ -63,37 +64,36 @@ public:
     return mCode;
   }
 
-  uint64_t CurrentOffset () const
+  uint32_t CodeSize () const
+  {
+    return mProcedure.mCodeSize;
+  }
+
+  uint32_t CurrentOffset () const
   {
     return mCodePos;
   }
 
-  uint64_t CodeSize () const
-  {
-    return mCodeSize;
-  }
-
   size_t LocalsCount () const
   {
-    return mLocalsCount;
+    return mProcedure.mLocalsCount;
   }
 
-  size_t StackBegin () const
+  uint32_t StackBegin () const
   {
     return mStackBegin;
   }
 
 private:
-  Session&          mSession;
-  SessionStack&     mStack;
-  const Unit&       mProcUnit;
-  const uint8_t*    mCode;
-  const uint64_t    mCodeSize;
-  uint64_t          mCodePos;
-  const uint_t      mLocalsCount;
-  const size_t      mStackBegin;
-  const uint32_t    mProcId;
-  uint16_t          mAquiredSync;
+  void Run ();
+
+  const Procedure&        mProcedure;
+  Session&                mSession;
+  SessionStack&           mStack;
+  const uint8_t*          mCode;
+  uint32_t                mStackBegin;
+  uint32_t                mCodePos;
+  uint16_t                mAquiredSync;
 
   static const uint16_t NO_INDEX = 0xFFFF;
 };

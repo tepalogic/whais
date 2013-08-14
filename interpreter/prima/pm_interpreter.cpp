@@ -24,10 +24,12 @@
 
 #include <string.h>
 #include <iostream>
+#include <sstream>
 #include <map>
 
 #include "utils/wthread.h"
 #include "dbs/dbs_mgr.h"
+#include "stdlib/interface.h"
 
 #include "pm_interpreter.h"
 #include "pm_processor.h"
@@ -88,8 +90,8 @@ GetInstance (const char* name, Logger* log)
     {
       IDBSHandler& hnd = DBSRetrieveDatabase (name);
       gmNameSpaces.insert (NameSpacePair (
-                          name,
-                          prima::NameSpaceHolder (new prima::NameSpace (hnd))
+                        name,
+                        prima::NameSpaceHolder (new prima::NameSpace (hnd))
                                          ));
     }
 
@@ -280,11 +282,9 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
                                               unit.ProceduresCount (),
                                               unit.RetrieveConstArea (),
                                               unit.ConstsAreaSize ());
-
-  TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
-
   try
   {
+    TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
     for (uint_t glbIt = 0; glbIt < unit.GlobalsCount(); ++glbIt)
       {
         const uint_t         typeOff  = unit.GlobalTypeOff (glbIt);
@@ -348,8 +348,8 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
                                   unit.RetriveProcCodeArea (procIt),
                                   unit.ProcCodeAreaSize (procIt),
                                   external,
-                                  unitMgr.GetUnit (unitIndex)
-                                                     );
+                                  &unitMgr.GetUnit (unitIndex)
+                                                    );
 
           unitMgr.SetProcedureIndex (unitIndex, procIt, procIndex);
       }
@@ -361,6 +361,122 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
   }
 }
 
+bool
+Session::LoadSharedLib (WH_SHLIB shl)
+{
+  assert (shl != INVALID_SHL);
+
+  WLIB_START_LIB_FUNC start = _RC (WLIB_START_LIB_FUNC,
+                                   wh_shl_symbol (shl, WSTDLIB_START_FUNC));
+  if (start == NULL)
+    {
+      ostringstream logEntry;
+
+      logEntry << "The shared library does not provide a '";
+      logEntry << WSTDLIB_START_FUNC << "' function.";
+      mLog.Log (LOG_WARNING, logEntry.str ());
+    }
+  else if ( ! start ())
+    {
+      mLog.Log (LOG_ERROR, "Failed to initialize the library.");
+      return false;
+    }
+
+  WLIB_END_LIB_FUNC end = _RC (WLIB_END_LIB_FUNC,
+                               wh_shl_symbol (shl, WSTDLIB_END_FUNC));
+  if (end == NULL)
+    {
+      ostringstream logEntry;
+
+      logEntry << "The shared library does not provide a '";
+      logEntry << WSTDLIB_END_FUNC << "' function.";
+      mLog.Log (LOG_WARNING, logEntry.str ());
+    }
+
+
+  WLIB_DESC_LIB_FUNC describe = _RC (WLIB_DESC_LIB_FUNC,
+                                     wh_shl_symbol (shl, WSTDLIB_DESC_FUNC));
+  if (describe == NULL)
+    {
+      ostringstream logEntry;
+
+      logEntry << "The shared library does not provide a '";
+      logEntry << WSTDLIB_DESC_FUNC << "' function.";
+
+      mLog.Log (LOG_ERROR, logEntry.str ());
+
+      if (end != NULL)
+        end ();
+
+      return false;
+    }
+
+  const WLIB_DESCRIPTION* const lib = describe ();
+  if (lib == NULL)
+    {
+      mLog.Log (LOG_ERROR, "The shared lib doesn't provide its content.");
+
+      if (end != NULL)
+        end ();
+
+      return false;
+
+    }
+
+  try
+    {
+      TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
+      for (uint_t procIt = 0; procIt < lib->procsCount; ++procIt)
+        {
+          const WLIB_PROC_DESCRIPTION& proc = lib->procsDescriptions[procIt];
+
+          vector<uint32_t>   typesOffset;
+          vector<StackValue> values;
+
+          for (uint_t local = 0; local < proc.localsCount; ++local)
+            {
+              const uint8_t* const localType = proc.localsTypes[local];
+
+              const uint_t tdSize = TypeManager::GetTypeLength (localType);
+              auto_ptr<uint8_t> td (new uint8_t [tdSize]);
+              memcpy (td.get (), localType, tdSize);
+
+              //For table type values, the type would be changed to reflect the
+              //order of the fields rearranged by the DBS layer.
+              StackValue     value   = typeMgr.CreateLocalValue (td.get ());
+              const uint32_t typeOff = typeMgr.AddType (td.get ());
+
+              typesOffset.push_back (typeOff);
+
+              //Keep a copy of stack values for locals to avoid construct them
+              //every time when the procedure is called.
+              values.push_back (value);
+            }
+
+          DefineProcedure (_RC (const uint8_t*, proc.name),
+                           strlen (proc.name),
+                           proc.localsCount,
+                           proc.localsCount - 1,
+                           0,
+                           values,
+                           &typesOffset[0],
+                           _RC (const uint8_t*, proc.code),
+                           0,
+                           false,
+                           NULL);
+        }
+    }
+  catch (...)
+    {
+      if (end != NULL)
+        end ();
+
+      throw ;
+    }
+
+  return true;
+}
+
 
 void
 Session::ExecuteProcedure (const char* const   procedure,
@@ -368,14 +484,9 @@ Session::ExecuteProcedure (const char* const   procedure,
 {
   const uint32_t procId = FindProcedure (_RC (const uint8_t*, procedure),
                                          strlen (procedure));
+  const Procedure& proc = GetProcedure (procId);
 
-  Processor proc (*this, stack, procId);
-
-  proc.Run ();
-
-  //TODO: 1. Check to see if you need some clean up work!
-  //      2. How will be handled the situation when a wrong number of parameters
-  //         or with different types will be supplied?
+  ProcedureCall (*this, stack, proc);
 }
 
 
@@ -716,16 +827,6 @@ Session::ArgsCount (const uint32_t procId)
 }
 
 
-uint32_t
-Session::LocalsCount (const uint32_t procId)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
-  return procMgr.LocalsCount (procId);
-}
-
-
 const uint8_t*
 Session::FindLocalTI (const uint32_t procId, const uint32_t local)
 {
@@ -736,79 +837,25 @@ Session::FindLocalTI (const uint32_t procId, const uint32_t local)
   return procMgr.LocalTypeDescription (procId, local);
 }
 
-
-Unit&
-Session::ProcUnit (const uint32_t procId)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                               mGlobalNames.Get ().GetProcedureManager () :
-                               mPrivateNames.Get ().GetProcedureManager ();
-  return procMgr.GetUnit (procId);
-}
-
-
-const uint8_t*
-Session::ProcCode (const uint32_t procId)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                               mGlobalNames.Get ().GetProcedureManager () :
-                               mPrivateNames.Get ().GetProcedureManager ();
-
-  return procMgr.Code (procId, NULL);
-}
-
-
-uint_t
-Session::ProcCodeSize (const uint32_t procId)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
-  uint_t codeSize;
-
-  procMgr.Code (procId, &codeSize);
-
-  return codeSize;
-}
-
-
-StackValue
-Session::ProcLocalValue (const uint32_t procId, const uint32_t local)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
-
-  return procMgr.LocalValue (procId, local);
-}
-
-
-void
-Session::AquireProcSync (const uint32_t procId, const uint32_t sync)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
-
-  procMgr.AquireSync (procId, sync);
-}
-
-
-void
-Session::ReleaseProcSync (const uint32_t procId, const uint32_t sync)
-{
-  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
-
-  procMgr.ReleaseSync (procId, sync);
-}
-
-
 IDBSHandler&
 Session::DBSHandler ()
 {
   return mPrivateNames.Get ().GetDBSHandler ();
+}
+
+
+const Procedure&
+Session::GetProcedure (const uint32_t procId)
+{
+  ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
+                                mGlobalNames.Get ().GetProcedureManager () :
+                                mPrivateNames.Get ().GetProcedureManager ();
+
+  const Procedure& procedure = procMgr.GetProcedure (procId);
+
+  assert (procedure.mProcMgr == &procMgr);
+
+  return procedure;
 }
 
 
@@ -938,7 +985,7 @@ Session::DefineProcedure (const uint8_t* const   name,
                           const uint8_t* const   code,
                           const uint32_t         codeSize,
                           const bool             external,
-                          Unit&                  unit)
+                          Unit* const            unit)
 {
   assert (argsCount < localsCount);
   assert (localsCount > 0);
@@ -976,7 +1023,9 @@ Session::DefineProcedure (const uint8_t* const   name,
         {
           string message = "Couldn't not find the definition "
                            "for external procedure '";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (),
+                          _RC (const char*, name),
+                          nameLength);
           message += "'.";
 
           mLog.Log (LOG_ERROR, message);

@@ -29,6 +29,8 @@
 
 #include "whisper.h"
 
+#include "stdlib/interface.h"
+
 #include "pm_operand.h"
 
 
@@ -40,21 +42,25 @@ namespace prima {
 
 class  NameSpace;
 struct Unit;
+class  ProcedureManager;
 
 
 
-struct ProcedureEntry
+struct Procedure
 {
-  uint32_t    mLocalsCount;
-  uint32_t    mArgsCount;
-  uint32_t    mSyncCount;
-  uint32_t    mSyncIndex;
-  uint32_t    mLocalsIndex;
-  uint32_t    mIdIndex;
-  uint32_t    mTypeOff;
-  uint32_t    mCodeIndex;
-  uint32_t    mCodeSize;
-  Unit*       mUnit;
+  uint32_t          mId;
+  uint32_t          mLocalsCount;
+  uint32_t          mArgsCount;
+  uint32_t          mSyncCount;
+  uint32_t          mSyncIndex;
+  uint32_t          mLocalsIndex;
+  uint32_t          mIdIndex;
+  uint32_t          mTypeOff;
+  uint32_t          mCodeIndex;
+  uint32_t          mCodeSize;
+  WLIB_PROCEDURE    mNativeCode;
+  Unit*             mUnit;
+  ProcedureManager* mProcMgr;
 };
 
 
@@ -88,16 +94,14 @@ public:
                          const uint32_t*          typesOffset,
                          const uint8_t*           code,
                          const uint32_t           codeSize,
-                         Unit&                    unit);
+                         Unit* const              unit);
 
   uint32_t GetProcedure (const uint8_t* const name,
                          const uint_t         nameLength) const;
 
+  const Procedure& GetProcedure (const uint32_t procId);
+
   const uint8_t* Name (const uint_t procId) const;
-
-  Unit& GetUnit (const uint_t procId) const;
-
-  uint32_t LocalsCount (const uint_t procId) const;
 
   uint32_t ArgsCount (const uint_t procId) const;
 
@@ -107,12 +111,12 @@ public:
   const uint8_t* LocalTypeDescription (const uint_t     procId,
                                        const uint32_t   local) const;
 
-  const uint8_t* Code (const uint_t procId, uint_t* const outCodeSize) const;
+  const uint8_t* Code (const Procedure&    proc,
+                       uint_t* const            outCodeSize) const;
 
-  void AquireSync (const uint_t procId, const uint32_t sync);
+  void AquireSync (const Procedure& proc, const uint32_t sync);
 
-  void ReleaseSync (const uint_t procId, const uint32_t sync);
-
+  void ReleaseSync (const Procedure& proc, const uint32_t sync);
 
   static bool IsValid (const uint32_t entry)
   {
@@ -138,7 +142,7 @@ private:
   static const uint32_t INVALID_ENTRY = 0xFFFFFFFF;
 
   NameSpace&                  mNameSpace;
-  std::vector<ProcedureEntry> mProcsEntrys;
+  std::vector<Procedure>      mProcsEntrys;
   std::vector<uint8_t>        mIdentifiers;
   std::vector<StackValue>     mLocalsValues;
   std::vector<uint32_t>       mLocalsTypes;

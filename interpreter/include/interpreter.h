@@ -80,6 +80,7 @@ public:
     SESSION_IN_USE,
 
     STACK_CORRUPTED,
+    NATIVE_CALL_FAILED,
 
     INVALID_UNIT_GLB_INDEX,
     INVALID_UNIT_PROC_INDEX,
@@ -107,6 +108,7 @@ public:
   virtual ~ISession ();
 
   virtual void LoadCompiledUnit (WIFunctionalUnit& unit) = 0;
+  virtual bool LoadSharedLib (WH_SHLIB shl) = 0;
 
   virtual void ExecuteProcedure (const char* const   name,
                                  SessionStack&       stack) = 0;
@@ -161,6 +163,11 @@ public:
   virtual uint_t ProcedurePameterFieldType (const char* const   name,
                                             const uint_t        param,
                                             const uint_t        field) = 0;
+  Logger& GetLogger ()
+  {
+    return mLog;
+  }
+
 protected:
   Logger& mLog;
 };

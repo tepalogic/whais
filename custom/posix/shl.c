@@ -22,32 +22,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include <dlfcn.h>
+
 #include "whisper.h"
 
-WTime
-wh_get_currtime ()
+WH_SHLIB
+wh_shl_load (const char* library)
 {
-  WTime      result;
-  SYSTEMTIME localTime;
-
-  GetLocalTime (&localTime);
-
-  result.year  = localTime.wYear;
-  result.month = localTime.wMonth - 1;
-  result.day   = localTime.wDay - 1;
-  result.hour  = localTime.wHour;
-  result.min   = localTime.wMinute;
-  result.sec   = localTime.wSecond;
-
-  return result;
-}
-
-WTICKS
-wh_msec_ticks ()
-{
-  return GetTickCount64 ();
+  return dlopen (library, RTLD_NOW | RTLD_GLOBAL);
 }
 
 
+void
+wh_shl_release (WH_SHLIB shl)
+{
+  dlclose  (shl);
+}
 
+
+void*
+wh_shl_symbol (WH_SHLIB shl, const char* symbol)
+{
+  return dlsym (shl, symbol);
+}
 

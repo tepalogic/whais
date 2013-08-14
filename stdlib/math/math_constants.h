@@ -1,5 +1,5 @@
 /******************************************************************************
- PASTRA - A light database one file system and more.
+ WSTDLIB - Standard mathemetically library for Whisper.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -21,20 +21,32 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+/******************************************************************************
+ Template file containing a skeleton to write a a natve Whisper library.
+ *****************************************************************************/
 
-#ifndef DBS_TYPES_H_
-#define DBS_TYPES_H_
+#ifndef MATH_CONSTANTS_H_
+#define MATH_CONSTANTS_H_
 
 #include "whisper.h"
 
-#include "utils/wtypes.h"
+#include "stdlib/interface.h"
 
-typedef uint32_t         FIELD_INDEX;
-typedef uint32_t         TABLE_INDEX;
-typedef uint64_t         ROW_INDEX;
+#ifndef MATH_SKIP_EXTERNS_DECLS
 
-/* Note: Make sure ROW_INDEX matched to the appropitae Dxx type. */
-#define DROW_INDEX       DUInt64
+extern const uint8_t* const gRichRealType;
+
+extern whisper::WLIB_PROC_DESCRIPTION     gProcPI;
+extern whisper::WLIB_PROC_DESCRIPTION     gProcEM;
+extern whisper::WLIB_PROC_DESCRIPTION     gProcGR;
+extern whisper::WLIB_PROC_DESCRIPTION     gProcSQRT2;
+extern whisper::WLIB_PROC_DESCRIPTION     gProcNE;
+
+#endif //MATH_SKIP_EXTERNS_DECLS
 
 
-#endif /* DBS_TYPES_H_ */
+whisper::WLIB_STATUS
+math_constants_init ();
+
+
+#endif //MATH_CONSTANTS_H_

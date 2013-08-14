@@ -654,9 +654,8 @@ ParseContextSection (Logger&          log,
              libEntry = token;
 
            if ( ! whf_is_absolute (libEntry.c_str ()))
-             {
-               libEntry = gMainSettings.mWorkDirectory + libEntry;
-             }
+             libEntry = gMainSettings.mWorkDirectory + libEntry;
+
            output.mObjectLibs.push_back (libEntry);
         }
        else if (token==gEntNativeLib)
@@ -695,9 +694,8 @@ ParseContextSection (Logger&          log,
              libEntry = token;
 
            if ( ! whf_is_absolute (libEntry.c_str ()))
-             {
-               libEntry = gMainSettings.mWorkDirectory + libEntry;
-             }
+             libEntry = gMainSettings.mWorkDirectory + libEntry;
+
            output.mNativeLibs.push_back (libEntry);
         }
        else if (token == gEntRootPasswrd)

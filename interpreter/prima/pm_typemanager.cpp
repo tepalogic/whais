@@ -43,11 +43,6 @@ namespace prima {
 
 
 
-static const uint8_t  TYPE_SPEC_END_MARK = ';';
-
-
-
-
 class TypeSpec
 {
 public:

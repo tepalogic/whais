@@ -29,37 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include <dbs/dbs_types.h>
-
-
-
-#define T_ARRAY_MASK           0x0100    /* Holds an array of values. */
-#define T_FIELD_MASK           0x0200    /* It's a 'field of' variable. */
-#define T_TABLE_MASK           0x0400    /* It's a table variable. */
-
-#define T_TABLE_FIELD          0x0800    /* Internal flag for table fields. */
-#define T_L_VALUE              0x1000    /* Internal flag for l-values. */
-
-#define IS_ARRAY(type)         ((((type) \
-                                 & (T_FIELD_MASK | T_ARRAY_MASK)) == \
-                                   T_ARRAY_MASK))
-#define IS_FIELD(type)         (((type) & T_FIELD_MASK) != 0)
-#define IS_TABLE(type)         (((type) & T_TABLE_MASK) != 0)
-
-#define IS_TABLE_FIELD(type)   (((type) & T_TABLE_FIELD) != 0)
-#define IS_L_VALUE(type)       (((type) & T_L_VALUE) != 0)
-
-#define MARK_ARRAY(type)       ((type) |= T_ARRAY_MASK)
-#define MARK_FIELD(type)       ((type) |= T_FIELD_MASK)
-#define MARK_TABLE(type)       ((type) |= T_TABLE_MASK)
-#define MARK_TABLE_FIELD(type) ((type) |= T_TABLE_FIELD)
-#define MARK_L_VALUE(type)     ((type) |= T_L_VALUE)
-
-#define GET_TYPE(type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
-#define GET_FIELD_TYPE(type)   ((type) \
-                                 & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
-#define GET_BASIC_TYPE(type)   ((type) & 0xFF)
-
+#include "dbs/dbs_types.h"
+#include "utils/wtypes.h"
 
 
 typedef const void*     WH_COMPILED_UNIT;

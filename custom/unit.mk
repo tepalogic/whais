@@ -45,6 +45,7 @@ wslcustom_SRC+=$(SRC_FOLDER)/thread.c
 wslcustom_SRC+=$(SRC_FOLDER)/time.c  
 wslcustom_SRC+=$(SRC_FOLDER)/network.c  
 wslcustom_SRC+=$(SRC_FOLDER)/memory.cpp
+wslcustom_SRC+=$(SRC_FOLDER)/shl.c
 
 ifeq ($(MEMORY_TRACE),yes)
 wslcustom_SRC+=test/mem_test.c

@@ -68,6 +68,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #define EXCEP_SHL
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+WH_SHLIB
+wh_shl_load (const char* library);
+
+void
+wh_shl_release (WH_SHLIB shl);
+
+void*
+wh_shl_symbol (WH_SHLIB shl, const char* symbol);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* WHISPER_SHL_H_ */
 

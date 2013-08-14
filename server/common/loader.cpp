@@ -64,6 +64,22 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
   else
     inoutDesc.mSession = &GetInstance (NULL, &log);
 
+  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin ();
+       it != inoutDesc.mNativeLibs.end ();
+       ++it)
+    {
+      logEntry << "... Loading dynamic native library '" << *it << "'.";
+      log.Log (LOG_INFO, logEntry.str ());
+      logEntry.str ("");
+
+      WH_SHLIB shl = wh_shl_load (it->c_str ());
+      if (shl == INVALID_SHL)
+        {
+          log.Log (LOG_WARNING, "Failed to load it in memory.");
+          continue;
+        }
+    }
+
   for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin ();
        it != inoutDesc.mObjectLibs.end ();
        ++it)

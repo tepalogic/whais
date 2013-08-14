@@ -57,7 +57,6 @@ whf_open (const char* const file, uint_t mode)
                        dwCreation,
                        dwFlagsAndAttr,
                        NULL);
-  result = (result == INVALID_HANDLE_VALUE) ? (WH_FILE)-1 : result;
 
   return result;
 }
@@ -75,7 +74,7 @@ whf_dup (WH_FILE hnd)
                   FALSE,
                   DUPLICATE_SAME_ACCESS);
 
-  return (result == INVALID_HANDLE_VALUE) ? 0 : result;
+  return result;
 
 }
 
@@ -259,3 +258,4 @@ whf_is_absolute (const char* const path)
 
   return (path[1] == ':');
 }
+

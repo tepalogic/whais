@@ -64,7 +64,8 @@ $(foreach src, $($(1)_SRC), $(eval $(call create_source_compile_rule,$(1),$(2),$
 EXES+=./bin/$(ARCH)/$(2)/$(1)$(ARCH_EXE_EXT)
 ./bin/$(ARCH)/$(2)/$(1)$(ARCH_EXE_EXT) : $($(1)_OBJ) $(call arch_dependecy_shlib,$(1)) $(call arch_dependecy_lib,$(1)) 
 	@echo Building executable $(ARCH)/$(1)  
-	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_linker_flags,$(1)) $$(call arch_add_lib_dirs,$(1))\
+	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_add_lib_dirs,$(1))\
+		$$(call arch_handle_import_libs,$(1)) $$(call arch_linker_flags,$(1))\
 		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_executable,$(2)/$(1))
 endef
 

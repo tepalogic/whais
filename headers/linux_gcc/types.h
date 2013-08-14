@@ -37,6 +37,7 @@ typedef int             WH_FILE;
 typedef pthread_mutex_t WH_LOCK;
 typedef pthread_t       WH_THREAD;
 typedef int             WH_SOCKET;
+typedef void*           WH_SHLIB;
 
 /* Simple type shortcuts */
 typedef unsigned int       uint_t;
@@ -64,10 +65,11 @@ typedef u_int64_t     uint64_t;
 typedef uint8_t       bool_t;
 #endif
 
-#define SHL_EXPORT_SYMBOL __attribute__((visibility("default")))
-#define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))
-
 #define INVALID_SOCKET  ((int)-1)
 #define INVALID_FILE    ((int)-1)
+#define INVALID_SHL     (NULL)
+
+#define SHL_EXPORT_SYMBOL __attribute__((visibility("default")))
+#define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))
 
 #endif /* WHISPER_TYPES_H */

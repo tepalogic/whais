@@ -158,6 +158,7 @@ public:
   virtual ~Session ();
 
   virtual void LoadCompiledUnit (WIFunctionalUnit& unit);
+  virtual bool LoadSharedLib (WH_SHLIB shl);
 
   virtual void ExecuteProcedure (const char* const   procedure,
                                  SessionStack&       stack);
@@ -224,23 +225,11 @@ public:
 
   uint32_t ArgsCount (const uint32_t procId);
 
-  uint32_t LocalsCount (const uint32_t procId);
-
   const uint8_t* FindLocalTI (const uint32_t procId, const uint32_t local);
 
-  Unit& ProcUnit (const uint32_t procId);
-
-  const uint8_t* ProcCode (const uint32_t procId);
-
-  uint_t ProcCodeSize (const uint32_t procId);
-
-  StackValue ProcLocalValue (const uint32_t procId, const uint32_t local);
-
-  void AquireProcSync (const uint32_t procId, const uint32_t sync);
-
-  void ReleaseProcSync (const uint32_t procId, const uint32_t sync);
-
   IDBSHandler& DBSHandler ();
+
+  const Procedure& GetProcedure (const uint32_t procId);
 
 private:
   void DefineTablesGlobalValues ();
@@ -261,7 +250,7 @@ private:
                             const uint8_t* const     code,
                             const uint32_t           codeSize,
                             const bool               external,
-                            Unit&                    unit);
+                            Unit* const              unit);
 
   NameSpaceHolder&    mGlobalNames;
   NameSpaceHolder&    mPrivateNames;

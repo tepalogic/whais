@@ -38,6 +38,7 @@ typedef HANDLE              WH_FILE;
 typedef CRITICAL_SECTION    WH_LOCK;
 typedef HANDLE              WH_THREAD;
 typedef SOCKET              WH_SOCKET;
+typedef HMODULE             WH_SHLIB;
 #endif
 
 /* Simple type shortcuts */
@@ -62,9 +63,11 @@ typedef unsigned __int64 uint64_t;
 typedef uint8_t       bool_t;
 #endif
 
+#define INVALID_SOCKET      INVALID_SOCKET
+#define INVALID_FILE        INVALID_HANDLE_VALUE
+#define INVALID_SHL         NULL
+
 #define SHL_EXPORT_SYMBOL __declspec(dllexport)
 #define SHL_IMPORT_SYMBOL __declspec(dllimport)
-
-/* #define INVALID_SOCKET  ((SOCKET)-1) */
 
 #endif /* WHISPER_TYPES_H */

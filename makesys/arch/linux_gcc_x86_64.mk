@@ -70,7 +70,7 @@ arch_set_output_sharedlib=-o ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL
 arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
 #set the right  flags for the linker
-arch_linker_flags:=$(EXT_LD_FLAGS) -m64 -pthread
+arch_linker_flags:=$(EXT_LD_FLAGS) -m64 -pthread -ldl
 ifeq ($(PROFILE),yes)
 arch_linker_flags+= -pg
 endif

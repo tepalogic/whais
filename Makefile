@@ -1,5 +1,5 @@
 
-ALL_UNITS:=utils custom compiler interpreter dbs server client
+ALL_UNITS:=utils custom compiler interpreter dbs server client stdlib
 
 ifeq ($(FLAVOR),release)
 OPTIMISE?=speed

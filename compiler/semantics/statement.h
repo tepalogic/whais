@@ -155,35 +155,6 @@ stmt_query_loop_stack (struct Statement* const stmt)
 }
 
 
-
-/**************************Type specification section ***************/
-
-
-
-#define TYPE_SPEC_END_MARK      ';'
-#define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
-#define TYPE_SPEC_ERROR         0xFFFFFFFD
-
-
-
-struct TypeSpec
-{
-  uint8_t  type[2];
-  uint8_t  dataSize[2];
-  uint8_t  data[2];     /* VLA - Keep this last. */
-};
-
-
-
-bool_t
-is_type_spec_valid (const struct TypeSpec* spec);
-
-
-bool_t
-compare_type_spec (const struct TypeSpec* const spec1,
-                   const struct TypeSpec* const spec2);
-
-
 uint_t
 fill_type_spec (struct WOutputStream* const     typeStream,
                 const struct DeclaredVar* const var);
