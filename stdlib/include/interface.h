@@ -26,7 +26,9 @@
 #define INTERFACE_H_
 
 #include "whisper.h"
+
 #include "interpreter/operands.h"
+#include "interpreter/interpreter.h"
 
 namespace whisper {
 
@@ -38,7 +40,7 @@ typedef int32_t             WLIB_STATUS;
 //behavior. Its paramters are on the top of the stack, a DBS handler is
 //provided for extra fucntionality too. It the responsability of the function
 //to clear the stack of its arguments and put the result on top of it.
-typedef WLIB_STATUS (*WLIB_PROCEDURE) (SessionStack&, IDBSHandler&);
+typedef WLIB_STATUS (*WLIB_PROCEDURE) (SessionStack&, ISession&);
 
 typedef const uint8_t* WLIB_PARAM_TYPE;
 
@@ -51,8 +53,8 @@ typedef struct {
 
 //Describes the content of the library.
 typedef struct {
-    uint32_t                      procsCount;
-    const WLIB_PROC_DESCRIPTION*  procsDescriptions;
+    uint32_t                       procsCount;
+    const WLIB_PROC_DESCRIPTION**  procsDescriptions;
 } WLIB_DESCRIPTION;
 
 

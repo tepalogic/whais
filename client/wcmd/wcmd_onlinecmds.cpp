@@ -117,6 +117,9 @@ wcmd_translate_status (const uint32_t cs)
   case WCS_TYPE_MISMATCH:
     return "The request cannot be completed due to unexpected value types.";
 
+  case WCS_PROC_NOTFOUND:
+    return "Procedure not found.";
+
   case WCS_GENERAL_ERR:
     return "Unexpected error condition.";
   }

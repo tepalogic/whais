@@ -3314,7 +3314,6 @@ WExecuteProcedure (const WH_CONNECTION     hnd,
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   uint_t   cs    = WCS_OK;
-  uint8_t* data_ = NULL;
   uint16_t type  = 0;
 
   if ((hnd_ == NULL)
@@ -3326,19 +3325,22 @@ WExecuteProcedure (const WH_CONNECTION     hnd,
     }
 
   set_data_size (hnd, strlen (procedure) + 1);
-  data_ = data (hnd);
-  strcpy ((char*)data_, procedure);
+  strcpy ((char*)data (hnd), procedure);
 
   if ((cs = send_command (hnd, CMD_EXEC_PROC)) != WCS_OK)
     goto execute_proc_err;
 
   if ((cs = recieve_answer (hnd, &type)) != WCS_OK)
     goto execute_proc_err;
+
   else if (type != CMD_EXEC_PROC_RSP)
     {
       cs = WCS_INVALID_FRAME;
       goto execute_proc_err;
     }
+
+  else
+    cs = load_le_int32 (data (hnd_));
 
 execute_proc_err:
   return cs;

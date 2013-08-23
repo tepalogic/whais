@@ -693,9 +693,6 @@ ParseContextSection (Logger&          log,
            else
              libEntry = token;
 
-           if ( ! whf_is_absolute (libEntry.c_str ()))
-             libEntry = gMainSettings.mWorkDirectory + libEntry;
-
            output.mNativeLibs.push_back (libEntry);
         }
        else if (token == gEntRootPasswrd)

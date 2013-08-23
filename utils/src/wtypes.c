@@ -33,7 +33,7 @@ wh_define_basic_type (const enum DBS_BASIC_TYPE   type,
                       struct TypeSpec* const      dest)
 {
   store_le_int16 (type, dest->type);
-  store_le_int16 (sizeof (*dest), dest->dataSize);
+  store_le_int16 (sizeof (dest->data), dest->dataSize);
 
   dest->data[0] = TYPE_SPEC_END_MARK;
   dest->data[1] = 0;

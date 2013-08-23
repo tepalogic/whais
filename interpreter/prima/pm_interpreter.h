@@ -252,8 +252,9 @@ private:
                             const bool               external,
                             Unit* const              unit);
 
-  NameSpaceHolder&    mGlobalNames;
-  NameSpaceHolder&    mPrivateNames;
+  NameSpaceHolder&            mGlobalNames;
+  NameSpaceHolder&            mPrivateNames;
+  std::vector<WH_SHLIB>       mNativeLibs;
 };
 
 

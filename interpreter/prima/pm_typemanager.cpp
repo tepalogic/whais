@@ -42,48 +42,40 @@ namespace whisper {
 namespace prima {
 
 
-
 class TypeSpec
 {
 public:
   TypeSpec (const uint8_t* const typeDesc)
-    : mType (load_le_int16 (typeDesc)),
-      mSize (load_le_int16 (typeDesc + sizeof (uint16_t))),
-      mData (typeDesc + 2 * sizeof (uint16_t))
+    : mData (typeDesc)
   {
   }
 
   uint16_t RawSize () const
   {
-    return mSize + 2 * sizeof (uint16_t);
+    return load_le_int16 (mData + sizeof (uint16_t)) + 2 * sizeof (uint16_t);
   }
 
   uint16_t DataSize () const
   {
-    return mSize;
+    return load_le_int16 (mData + sizeof (uint16_t));
   }
 
   bool operator== (const TypeSpec& second) const
-    {
-      if ((mType == second.mType ) && (mSize == second.mSize))
-        return (memcmp (mData, second.mData, mSize) == 0);
-
-      return false;
-    }
+  {
+    return memcmp (mData, second.mData, RawSize ()) == 0;
+  }
 
   uint16_t Type () const
   {
-    return mType;
+    return load_le_int16 (mData);
   }
 
   const uint8_t* Data () const
   {
-    return mData;
+    return mData + 2 * sizeof (uint16_t);
   }
 
 private:
-  const uint16_t       mType;
-  const uint16_t       mSize;
   const uint8_t* const mData;
 };
 
@@ -526,79 +518,7 @@ TypeManager::CreateLocalValue (uint8_t* inoutTypeDesc)
 bool
 TypeManager::IsTypeValid (const uint8_t* const typeDesc)
 {
-  bool result = true;
-
-  const TypeSpec spec (typeDesc);
-
-  if (((spec.Type () == T_UNKNOWN) || (spec.Type () > T_UNDETERMINED))
-      && (IS_ARRAY (spec.Type ()) == false)
-      && (IS_TABLE (spec.Type ()) == false)
-      && (IS_FIELD (spec.Type ()) == false))
-    {
-      result = false;
-    }
-  else if ((spec.Data()[spec.DataSize () - 2] != TYPE_SPEC_END_MARK)
-           || (spec.Data()[spec.DataSize () - 1] != 0))
-    {
-      result = false;
-    }
-  else if (IS_FIELD (spec.Type ()))
-    {
-      const uint16_t fieldType = GET_FIELD_TYPE (spec.Type ());
-
-      if (spec.DataSize () != 2)
-        result = false;
-
-      else if (IS_ARRAY (fieldType))
-        {
-          if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (fieldType) > T_UNDETERMINED))
-            {
-              result = false;
-            }
-        }
-      else
-        {
-          if (GET_BASIC_TYPE (fieldType) == T_UNKNOWN
-              || GET_BASIC_TYPE (fieldType) > T_UNDETERMINED)
-            {
-              result = false;
-            }
-        }
-    }
-  else if (IS_ARRAY (spec.Type ()))
-    {
-      if ((spec.DataSize () != 2)
-          || (GET_BASIC_TYPE (spec.Type ()) == T_UNKNOWN)
-          || (GET_BASIC_TYPE (spec.Type ()) > T_UNDETERMINED))
-        {
-          result = false;
-        }
-    }
-  else if (IS_TABLE (spec.Type ()))
-    {
-      uint_t index = 0;
-
-      while ((index < (uint_t) (spec.DataSize () - 2)) && (result != FALSE))
-        {
-          uint_t id_len = strlen (_RC (const char*, spec.Data ()) + index);
-
-          /* Don't check for zero here, because of strlen */
-          index += id_len + 1;
-
-          uint16_t type = load_le_int16 (spec.Data () + index);
-          /* clear an eventual array mask */
-          type = GET_BASIC_TYPE (type);
-          if ((type == T_UNKNOWN) || (type >= T_UNDETERMINED))
-            {
-              result = false;
-              break;
-            }
-          index += sizeof (uint16_t);
-        }
-    }
-
-  return result;
+  return is_type_spec_valid (_RC (const ::TypeSpec*, typeDesc));
 }
 
 

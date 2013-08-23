@@ -69,6 +69,12 @@ Exception::Message () const
   return mErrorMessage.c_str ();
 }
 
+void
+Exception::Message (const std::string& msg)
+{
+  mErrorMessage = msg;
+}
+
 
 const char*
 Exception::File () const

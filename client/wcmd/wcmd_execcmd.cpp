@@ -763,9 +763,10 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
                              const string&   cmdLine,
                              size_t&         inoutLineOff)
 {
-  const char* const   line = cmdLine.c_str ();
-  uint_t              type = WHC_TYPE_NOTSET;
-  uint_t              wcs  = WCS_OK;
+  const char* const   line       = cmdLine.c_str ();
+  uint_t              type       = WHC_TYPE_NOTSET;
+  uint_t              wcs        = WCS_OK;
+  bool                needsFlush = false;
 
   while ((inoutLineOff < cmdLine.length ())
          && (wcs == WCS_OK))
@@ -783,6 +784,8 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
 
           if ( ! handle_procedure_table_param (hnd, cmdLine, inoutLineOff))
             return false;
+
+          needsFlush = true;
         }
       else
         {
@@ -801,8 +804,8 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
           if (inoutLineOff >= cmdLine.length ())
             {
               cout << "Invalid command format. No values was specified.\n";
-              return false;
 
+              return false;
             }
           else if (line[inoutLineOff] == '(')
             {
@@ -820,6 +823,7 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
                 {
                   return false;
                 }
+              needsFlush = true;
             }
           else if (line[inoutLineOff] == '\'')
             {
@@ -838,6 +842,7 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
                 {
                   return false;
                 }
+              needsFlush = true;
             }
           else
             {
@@ -849,7 +854,9 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
         }
     }
 
-  wcs = WFlush (hnd);
+  if (needsFlush)
+    wcs = WFlush (hnd);
+
   if (wcs == WCS_OK)
     return true;
 

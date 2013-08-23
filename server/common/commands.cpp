@@ -22,6 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include <memory.h>
+#include <sstream>
 
 #include "utils/le_converter.h"
 
@@ -423,10 +424,29 @@ cmd_execute_procedure (ClientConnection& conn)
   const char*   procName = _RC (const char*, conn.Data ());
   ISession&     session  = *conn.Dbs ().mSession;
   SessionStack& stack    = conn.Stack ();
+  uint32_t      result   = WCS_GENERAL_ERR;
 
-  session.ExecuteProcedure (procName, stack);
+  try
+  {
+    session.ExecuteProcedure (procName, stack);
+    result = WCS_OK;
+  }
+  catch (InterException& e)
+  {
+    if (e.Extra () == InterException::INVALID_PROC_REQ)
+      {
+        result = WCS_PROC_NOTFOUND;
 
-  store_le_int32 (WCS_OK, conn.Data ());
+        std::ostringstream logEntry;
+
+        logEntry << "Failed to find procedure '" << procName << "'.";
+        session.GetLogger ().Log (LOG_ERROR, logEntry.str ().c_str ());
+      }
+    else
+      throw;
+  }
+
+  store_le_int32 (result, conn.Data ());
   conn.DataSize (sizeof (uint32_t));
 
   conn.SendCmdResponse (CMD_EXEC_PROC_RSP);

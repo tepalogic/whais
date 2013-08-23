@@ -29,7 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 WH_SHLIB
 wh_shl_load (const char* library)
 {
-  return dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+  const WH_SHLIB result = dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+
+  return result;
 }
 
 
@@ -43,6 +45,8 @@ wh_shl_release (WH_SHLIB shl)
 void*
 wh_shl_symbol (WH_SHLIB shl, const char* symbol)
 {
-  return dlsym (shl, symbol);
+  void* const result = dlsym (shl, symbol);
+
+  return result;
 }
 

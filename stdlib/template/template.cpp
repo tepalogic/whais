@@ -40,16 +40,16 @@ using namespace whisper;
 
 
 
-static const WLIB_PROC_DESCRIPTION sgRegisteredProcss[] = {
+static const WLIB_PROC_DESCRIPTION sgRegisteredProcs[] = {
     /* TODO: Add the procedures descriptors here. */
-                                                          };
+                                                         };
 
-static const WLIB_DESCRIPTION sgLibraryDescruption = {
-    sizeof (sgRegisteredProcss) / sizeof (sgRegisteredProcss[0]),
-    sgRegisteredProcss
+static const WLIB_DESCRIPTION sgLibraryDescription = {
+    sizeof (sgRegisteredProcs) / sizeof (sgRegisteredProcs[0]),
+    sgRegisteredProcs
                                                      };
 
-static int      sgReferencesCounter = 0;
+static int      sgRefsCount = 0;
 static Lock     sgShlLocker;
 static bool_t   sgInited;
 
@@ -64,9 +64,9 @@ wlib_start ()
 {
   LockRAII syncHolder (sgShlLocker);
 
-  assert (sgReferencesCounter >= 0);
+  assert (sgRefsCount >= 0);
 
-  if (sgReferencesCounter == 0)
+  if (sgRefsCount == 0)
     {
       WLIB_STATUS status = WOP_OK;
 
@@ -76,7 +76,7 @@ wlib_start ()
     }
 
   sgInited = true;
-  sgReferencesCounter++;
+  sgRefsCount++;
 
   return WOP_OK;
 }
@@ -87,9 +87,9 @@ wlib_end ()
 {
   LockRAII syncHolder (sgShlLocker);
 
-  assert ((! sgInited) || (sgReferencesCounter > 0));
+  assert ((! sgInited) || (sgRefsCount > 0));
 
-  if (sgInited && (--sgReferencesCounter == 0))
+  if (sgInited && (--sgRefsCount == 0))
     {
       sgInited = false;
       /* TODO: Add your library clean up code here. */
@@ -103,7 +103,7 @@ SHL_EXPORT_SYMBOL const WLIB_DESCRIPTION*
 wlib_describe ()
 {
   if (sgInited)
-    return &sgLibraryDescruption;
+    return &sgLibraryDescription;
 
   return NULL;
 }

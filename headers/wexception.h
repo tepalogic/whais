@@ -63,6 +63,7 @@ public:
 
   uint32_t      Extra () const;
   const char*   Message () const;
+  void          Message (const std::string& msg);
   const char*   File () const;
   uint32_t      Line () const;
 
@@ -75,7 +76,7 @@ public:
 private:
 
 #pragma warning( disable : 4251 )
-  const std::string mErrorMessage;
+  std::string       mErrorMessage;
 #pragma warning( default : 4251)
 
   const char*       mFile;

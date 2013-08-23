@@ -224,7 +224,7 @@ struct DBS_SHL DChar
 
   DChar Prev () const
   {
-    if (mIsNull || (mValue == 0))
+    if (mIsNull || (mValue == 1))
       return DChar ();
 
     return DChar (mValue - 1);
@@ -232,7 +232,7 @@ struct DBS_SHL DChar
 
   DChar Next () const
   {
-    if (mIsNull || (mValue == 0xFFFFFFFF))
+    if (mIsNull || (mValue == 0x7FFFFFFF))
         return DChar ();
 
     return DChar (mValue + 1);
@@ -250,12 +250,12 @@ struct DBS_SHL DChar
 
   static DChar Min ()
   {
-    return DChar (0);
+    return DChar (1);
   }
 
   static DChar Max ()
   {
-    return DChar (0xFFFFFFFF);
+    return DChar (0x7FFFFFFF);
   }
 
   const uint32_t mValue;

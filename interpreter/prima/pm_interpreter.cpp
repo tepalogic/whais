@@ -214,6 +214,13 @@ InterException::Description () const
       case TEXT_ARRAY_NOT_SUPP:
         return "The current implementation does not have support for "
                "text arrays.";
+
+      case STACK_CORRUPTED:
+        return "Execution stack has been corrupted.";
+
+      case NATIVE_CALL_FAILED:
+        return "A native procedure call reported failure!";
+
       default:
         assert (false);
 
@@ -271,6 +278,19 @@ Session::~Session ()
 {
   mGlobalNames.DecRefsCount ();
   mPrivateNames.DecRefsCount ();
+
+  for (vector<WH_SHLIB>::iterator it = mNativeLibs.begin ();
+       it != mNativeLibs.end ();
+       ++it)
+    {
+      WLIB_END_LIB_FUNC end = _RC (WLIB_END_LIB_FUNC,
+                                   wh_shl_symbol (*it, WSTDLIB_END_FUNC));
+
+      if (end != NULL)
+        end ();
+
+      wh_shl_release (*it);
+    }
 }
 
 
@@ -361,10 +381,24 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
   }
 }
 
+
 bool
 Session::LoadSharedLib (WH_SHLIB shl)
 {
   assert (shl != INVALID_SHL);
+
+
+  mNativeLibs.push_back (shl);
+
+
+  if (wh_shl_symbol (shl, WSTDLIB_END_FUNC) == NULL)
+    {
+      ostringstream logEntry;
+
+      logEntry << "The shared library does not provide a '";
+      logEntry << WSTDLIB_END_FUNC << "' function.";
+      mLog.Log (LOG_WARNING, logEntry.str ());
+    }
 
   WLIB_START_LIB_FUNC start = _RC (WLIB_START_LIB_FUNC,
                                    wh_shl_symbol (shl, WSTDLIB_START_FUNC));
@@ -376,23 +410,12 @@ Session::LoadSharedLib (WH_SHLIB shl)
       logEntry << WSTDLIB_START_FUNC << "' function.";
       mLog.Log (LOG_WARNING, logEntry.str ());
     }
-  else if ( ! start ())
+  else if (start () != WOP_OK)
     {
       mLog.Log (LOG_ERROR, "Failed to initialize the library.");
+
       return false;
     }
-
-  WLIB_END_LIB_FUNC end = _RC (WLIB_END_LIB_FUNC,
-                               wh_shl_symbol (shl, WSTDLIB_END_FUNC));
-  if (end == NULL)
-    {
-      ostringstream logEntry;
-
-      logEntry << "The shared library does not provide a '";
-      logEntry << WSTDLIB_END_FUNC << "' function.";
-      mLog.Log (LOG_WARNING, logEntry.str ());
-    }
-
 
   WLIB_DESC_LIB_FUNC describe = _RC (WLIB_DESC_LIB_FUNC,
                                      wh_shl_symbol (shl, WSTDLIB_DESC_FUNC));
@@ -405,9 +428,6 @@ Session::LoadSharedLib (WH_SHLIB shl)
 
       mLog.Log (LOG_ERROR, logEntry.str ());
 
-      if (end != NULL)
-        end ();
-
       return false;
     }
 
@@ -416,62 +436,64 @@ Session::LoadSharedLib (WH_SHLIB shl)
     {
       mLog.Log (LOG_ERROR, "The shared lib doesn't provide its content.");
 
-      if (end != NULL)
-        end ();
-
       return false;
 
     }
 
-  try
+  TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
+  for (uint_t procIt = 0; procIt < lib->procsCount; ++procIt)
     {
-      TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
-      for (uint_t procIt = 0; procIt < lib->procsCount; ++procIt)
+      if (lib->procsDescriptions[procIt] == NULL)
         {
-          const WLIB_PROC_DESCRIPTION& proc = lib->procsDescriptions[procIt];
+          assert (false);
 
-          vector<uint32_t>   typesOffset;
-          vector<StackValue> values;
+          mLog.Log (LOG_WARNING, "Found a NULL procedure description!");
 
-          for (uint_t local = 0; local < proc.localsCount; ++local)
-            {
-              const uint8_t* const localType = proc.localsTypes[local];
-
-              const uint_t tdSize = TypeManager::GetTypeLength (localType);
-              auto_ptr<uint8_t> td (new uint8_t [tdSize]);
-              memcpy (td.get (), localType, tdSize);
-
-              //For table type values, the type would be changed to reflect the
-              //order of the fields rearranged by the DBS layer.
-              StackValue     value   = typeMgr.CreateLocalValue (td.get ());
-              const uint32_t typeOff = typeMgr.AddType (td.get ());
-
-              typesOffset.push_back (typeOff);
-
-              //Keep a copy of stack values for locals to avoid construct them
-              //every time when the procedure is called.
-              values.push_back (value);
-            }
-
-          DefineProcedure (_RC (const uint8_t*, proc.name),
-                           strlen (proc.name),
-                           proc.localsCount,
-                           proc.localsCount - 1,
-                           0,
-                           values,
-                           &typesOffset[0],
-                           _RC (const uint8_t*, proc.code),
-                           0,
-                           false,
-                           NULL);
+          continue;
         }
-    }
-  catch (...)
-    {
-      if (end != NULL)
-        end ();
 
-      throw ;
+      const WLIB_PROC_DESCRIPTION& proc = *lib->procsDescriptions[procIt];
+
+      ostringstream logEntry;
+
+      logEntry << "Instaling native procedure '" << proc.name << "'...";
+
+      mLog.Log (LOG_INFO, logEntry.str ());
+
+      vector<uint32_t>   typesOffset;
+      vector<StackValue> values;
+
+      for (uint_t local = 0; local < proc.localsCount; ++local)
+        {
+          const uint8_t* const localType = proc.localsTypes[local];
+
+          const uint_t tdSize = TypeManager::GetTypeLength (localType);
+          auto_ptr<uint8_t> td (new uint8_t [tdSize]);
+          memcpy (td.get (), localType, tdSize);
+
+          //For table type values, the type would be changed to reflect the
+          //order of the fields rearranged by the DBS layer.
+          StackValue     value   = typeMgr.CreateLocalValue (td.get ());
+          const uint32_t typeOff = typeMgr.AddType (td.get ());
+
+          typesOffset.push_back (typeOff);
+
+          //Keep a copy of stack values for locals to avoid construct them
+          //every time when the procedure is called.
+          values.push_back (value);
+        }
+
+      DefineProcedure (_RC (const uint8_t*, proc.name),
+                       strlen (proc.name),
+                       proc.localsCount,
+                       proc.localsCount - 1,
+                       0,
+                       values,
+                       &typesOffset[0],
+                       _RC (const uint8_t*, proc.code),
+                       0,
+                       false,
+                       NULL);
     }
 
   return true;
@@ -484,6 +506,10 @@ Session::ExecuteProcedure (const char* const   procedure,
 {
   const uint32_t procId = FindProcedure (_RC (const uint8_t*, procedure),
                                          strlen (procedure));
+
+  if ( ! ProcedureManager::IsValid (procId))
+    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+
   const Procedure& proc = GetProcedure (procId);
 
   ProcedureCall (*this, stack, proc);
@@ -989,7 +1015,6 @@ Session::DefineProcedure (const uint8_t* const   name,
 {
   assert (argsCount < localsCount);
   assert (localsCount > 0);
-  assert (external || (codeSize > 0));
 
   TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
 

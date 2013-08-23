@@ -2,16 +2,16 @@ UNIT:=stdlib
 
 UNIT_EXES:=
 UNIT_LIBS:=
-UNIT_SHLS:=wnl_math
+UNIT_SHLS:=wnl_base
 
-wnl_math_INC:=
-wnl_math_SRC:=math/math.cpp math/math_constants.cpp
-wnl_math_LIB:=utils/wslutils custom/wslcustom
-wnl_math_DEF:=USE_DBS_SHL USE_INTERP_SHL
-wnl_math_SHL:=dbs/wpastra interpreter/wprima custom/wcommon
+wnl_base_INC:=
+wnl_base_SRC:=base/base.cpp base/base_types.cpp base/base_generics.cpp base/base_constants.cpp
+wnl_base_LIB:=utils/wslutils custom/wslcustom
+wnl_base_DEF:=USE_DBS_SHL USE_INTERP_SHL
+wnl_base_SHL:=dbs/wpastra interpreter/wprima custom/wcommon
 	   
-wnl_math_MAJ=.1
-wnl_math_MIN=.0
+wnl_base_MAJ=.1
+wnl_base_MIN=.0
 
 ifeq ($(BUILD_TESTS),yes)
 -include ./$(UNIT)/test/test.mk

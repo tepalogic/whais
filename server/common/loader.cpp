@@ -78,6 +78,8 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
           log.Log (LOG_WARNING, "Failed to load it in memory.");
           continue;
         }
+
+      inoutDesc.mSession->LoadSharedLib (shl);
     }
 
   for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin ();

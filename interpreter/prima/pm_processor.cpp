@@ -1520,8 +1520,7 @@ ProcedureCall::ProcedureCall (Session&                  session,
 {
   if (mProcedure.mNativeCode != NULL)
     {
-      const WLIB_STATUS status = procedure.mNativeCode (stack,
-                                                        session.DBSHandler ());
+      const WLIB_STATUS status = procedure.mNativeCode (stack, session);
       if (status != WOP_OK)
         {
           std::ostringstream log;
@@ -1535,10 +1534,13 @@ ProcedureCall::ProcedureCall (Session&                  session,
 
       if (stack.Size () != mStackBegin + 1)
         {
-          throw InterException (
-                _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId)),
-                _EXTRA (InterException::STACK_CORRUPTED)
-                               );
+          std::ostringstream log;
+          log << "Native procedure called '"
+              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
+              << "'.";
+
+          throw InterException (log.str ().c_str (),
+                                _EXTRA (InterException::STACK_CORRUPTED));
         }
 
       return ;
@@ -1568,10 +1570,33 @@ ProcedureCall::ProcedureCall (Session&                  session,
       //but not the result value too.
       if ((mProcedure.mLocalsCount - 1) > stack.Size ())
         {
+          std::ostringstream log;
+          log << "Stack corrupted before call to '"
+              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
+              << "'.";
+
           throw InterException (NULL,
                                 _EXTRA (InterException::STACK_CORRUPTED));
         }
-      Run ();
+
+      try
+      {
+        Run ();
+      }
+      catch (Exception& e)
+      {
+          std::ostringstream log;
+
+          if (e.Message () != NULL)
+            log << e.Message () << std::endl;
+
+          log << "Current procedure '"
+              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
+              << "'.";
+
+          e.Message (log.str ());
+          throw ;
+      }
     }
 
   assert (mAquiredSync == NO_INDEX);
