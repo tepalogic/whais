@@ -5,7 +5,8 @@ UNIT_LIBS:=
 UNIT_SHLS:=wnl_base
 
 wnl_base_INC:=
-wnl_base_SRC:=base/base.cpp base/base_types.cpp base/base_generics.cpp base/base_constants.cpp
+wnl_base_SRC:=base/base.cpp base/base_types.cpp base/base_generics.cpp base/base_constants.cpp\
+	          base/base_dates.cpp
 wnl_base_LIB:=utils/wslutils custom/wslcustom
 wnl_base_DEF:=USE_DBS_SHL USE_INTERP_SHL
 wnl_base_SHL:=dbs/wpastra interpreter/wprima custom/wcommon

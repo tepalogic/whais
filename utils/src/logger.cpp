@@ -57,8 +57,8 @@ FileLogger::FileLogger (const char* const file, const bool printStart)
       const WTime dayStart = wh_get_currtime ();
 
       mOutStream << "\n* Start of the day: " << (int)dayStart.year;
-      mOutStream << '-' << (int)dayStart.month + 1;
-      mOutStream << "-" << (int)dayStart.day + 1;
+      mOutStream << '-' << (int)dayStart.month;
+      mOutStream << "-" << (int)dayStart.day;
       mOutStream << ' ' << (int)dayStart.hour;
       mOutStream << ':' << (int)dayStart.min;
       mOutStream << ':' << (int)dayStart.sec << "\n\n";

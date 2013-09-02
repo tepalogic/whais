@@ -33,6 +33,7 @@ typedef struct
   uint8_t  hour;
   uint8_t  min;
   uint8_t  sec;
+  uint8_t  usec;
 }WTime;
 
 

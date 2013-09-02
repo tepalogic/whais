@@ -1,6 +1,6 @@
 /******************************************************************************
-WHISPER - An advanced database system
-Copyright (C) 2008  Iulian Popa
+UTILS - Common routines used trough WHISPER project
+Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -22,50 +22,50 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#ifndef DATE_H_
+#define DATE_H_
+
 #include "whisper.h"
 
-WTime
-wh_get_currtime ()
+
+
+#ifdef __cplusplus
+  #define  BOOL_R     bool
+  #define  FALSE_R    false
+  #define  TRUE_R     true
+#else
+  #define  BOOL_R     bool_t
+  #define  FALSE_R    FALSE
+  #define  TRUE_R     TRUE
+#endif
+
+
+#define MNTH_DAYS_A  { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+#define MNTH_YDAYS_A { 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}
+
+#define DAYS_PER_YEAR   365
+
+
+static BOOL_R
+is_leap_year (const int year)
 {
-  WTime      result;
-  FILETIME   fileTime;
-  SYSTEMTIME utcTime;
-  uint64_t   usec;
+  if ((year % 4) == 0)
+    {
+      if ((year % 100) == 0)
+        {
+          if ((year % 400) == 0)
+            return TRUE_R;
 
-  GetSystemTimeAsFileTime (&fileTime);
-  FileTimeToSystemTime (&fileTime, &utcTime);
-
-  /* Convert the FILETIME to a real 64 bit integer. */
-  usec = fileTime.dwHighDateTime;
-  usec <<= 32;
-  usec += fileTime.dwLowDateTime;
-
-  /* Get rid of the nanoseconds part. */
-  usec /= 10;
-
-  /* Keep only the microseconds. */
-  usec %= 1000000;
-
-  assert (usec / 1000 == utcTime.wMilliseconds);
-
-  result.year  = utcTime.wYear;
-  result.month = utcTime.wMonth;
-  result.day   = utcTime.wDay;
-  result.hour  = utcTime.wHour;
-  result.min   = utcTime.wMinute;
-  result.sec   = utcTime.wSecond;
-  result.usec  = usec;
-
-  return result;
+          else
+            return FALSE_R;
+        }
+      else
+        return TRUE_R;
+    }
+  else
+    return FALSE_R;
 }
 
+#undef BOOL_R
 
-WTICKS
-wh_msec_ticks ()
-{
-  return GetTickCount64 ();
-}
-
-
-
-
+#endif /* DATE_H_ */

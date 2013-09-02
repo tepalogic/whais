@@ -32,6 +32,7 @@
 #include "base_types.h"
 #include "base_generics.h"
 #include "base_constants.h"
+#include "base_dates.h"
 
 
 
@@ -40,108 +41,131 @@ using namespace whisper;
 
 
 static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
-          //Basic procedures returning constants
-                                                      &gProcPI,
-                                                      &gProcSQRT2,
-                                                      &gProcNE,
+        //Basic procedures returning constants
+                                                    &gProcPI,
+                                                    &gProcSQRT2,
+                                                    &gProcNE,
 
-                                                      &gProcMinB,
-                                                      &gProcMaxB,
+                                                    &gProcMinB,
+                                                    &gProcMaxB,
 
-                                                      &gProcMinC,
-                                                      &gProcMaxC,
+                                                    &gProcMinC,
+                                                    &gProcMaxC,
 
-                                                      &gProcMinD,
-                                                      &gProcMaxD,
+                                                    &gProcMinD,
+                                                    &gProcMaxD,
 
-                                                      &gProcMinDT,
-                                                      &gProcMaxDT,
+                                                    &gProcMinDT,
+                                                    &gProcMaxDT,
 
-                                                      &gProcMinHT,
-                                                      &gProcMaxHT,
+                                                    &gProcMinHT,
+                                                    &gProcMaxHT,
 
-                                                      &gProcMinI8,
-                                                      &gProcMaxI8,
+                                                    &gProcMinI8,
+                                                    &gProcMaxI8,
 
-                                                      &gProcMinI16,
-                                                      &gProcMaxI16,
+                                                    &gProcMinI16,
+                                                    &gProcMaxI16,
 
-                                                      &gProcMinI32,
-                                                      &gProcMaxI32,
+                                                    &gProcMinI32,
+                                                    &gProcMaxI32,
 
-                                                      &gProcMinI64,
-                                                      &gProcMaxI64,
+                                                    &gProcMinI64,
+                                                    &gProcMaxI64,
 
-                                                      &gProcMinU8,
-                                                      &gProcMaxU8,
+                                                    &gProcMinU8,
+                                                    &gProcMaxU8,
 
-                                                      &gProcMinU16,
-                                                      &gProcMaxU16,
+                                                    &gProcMinU16,
+                                                    &gProcMaxU16,
 
-                                                      &gProcMinU32,
-                                                      &gProcMaxU32,
+                                                    &gProcMinU32,
+                                                    &gProcMaxU32,
 
-                                                      &gProcMinU64,
-                                                      &gProcMaxU64,
+                                                    &gProcMinU64,
+                                                    &gProcMaxU64,
 
-                                                      &gProcMinR,
-                                                      &gProcMaxR,
+                                                    &gProcMinR,
+                                                    &gProcMaxR,
 
-                                                      &gProcMinRR,
-                                                      &gProcMaxRR,
-            //Base generics procedures
-                                                      &gProcPrevB,
-                                                      &gProcNextB,
+                                                    &gProcMinRR,
+                                                    &gProcMaxRR,
+          //Base generics procedures
+                                                    &gProcPrevB,
+                                                    &gProcNextB,
 
-                                                      &gProcPrevC,
-                                                      &gProcNextC,
+                                                    &gProcPrevC,
+                                                    &gProcNextC,
 
-                                                      &gProcPrevD,
-                                                      &gProcNextD,
+                                                    &gProcPrevD,
+                                                    &gProcNextD,
 
-                                                      &gProcPrevDT,
-                                                      &gProcNextDT,
+                                                    &gProcPrevDT,
+                                                    &gProcNextDT,
 
-                                                      &gProcPrevHT,
-                                                      &gProcNextHT,
+                                                    &gProcPrevHT,
+                                                    &gProcNextHT,
 
-                                                      &gProcPrevI8,
-                                                      &gProcNextI8,
+                                                    &gProcPrevI8,
+                                                    &gProcNextI8,
 
-                                                      &gProcPrevI16,
-                                                      &gProcNextI16,
+                                                    &gProcPrevI16,
+                                                    &gProcNextI16,
 
-                                                      &gProcPrevI32,
-                                                      &gProcNextI32,
+                                                    &gProcPrevI32,
+                                                    &gProcNextI32,
 
-                                                      &gProcPrevI64,
-                                                      &gProcNextI64,
+                                                    &gProcPrevI64,
+                                                    &gProcNextI64,
 
-                                                      &gProcPrevU8,
-                                                      &gProcNextU8,
+                                                    &gProcPrevU8,
+                                                    &gProcNextU8,
 
-                                                      &gProcPrevU16,
-                                                      &gProcNextU16,
+                                                    &gProcPrevU16,
+                                                    &gProcNextU16,
 
-                                                      &gProcPrevU32,
-                                                      &gProcNextU32,
+                                                    &gProcPrevU32,
+                                                    &gProcNextU32,
 
-                                                      &gProcPrevU64,
-                                                      &gProcNextU64,
+                                                    &gProcPrevU64,
+                                                    &gProcNextU64,
 
-                                                      &gProcPrevR,
-                                                      &gProcNextR,
+                                                    &gProcPrevR,
+                                                    &gProcNextR,
 
-                                                      &gProcPrevRR,
-                                                      &gProcNextRR,
+                                                    &gProcPrevRR,
+                                                    &gProcNextRR,
 
-                                                      &gProcSleep,
-                                                      &gProcLog,
+                                                    &gProcSleep,
+                                                    &gProcLog,
 
-                                                      &gProcCeil,
-                                                      &gProcRound,
-                                                      &gProcFloor,
-                                                      &gProcAbs
+                                                    &gProcCeil,
+                                                    &gProcRound,
+                                                    &gProcFloor,
+                                                    &gProcAbs,
+
+                        /* Date & time procedures. */
+
+                                                    &gProcTicks,
+                                                    &gProcNow,
+                                                    &gProcTimeYear,
+                                                    &gProcTimeMonth,
+                                                    &gProcTimeDay,
+                                                    &gProcTimeHours,
+                                                    &gProcTimeMinutess,
+                                                    &gProcTimeSeconds,
+                                                    &gProcTimeMicroseconds,
+                                                    &gProcDateDaysDiff,
+                                                    &gProcDateDaysDelta,
+                                                    &gProcDateSecondsDiff,
+                                                    &gProcDateSecondsDelta,
+                                                    &gProcDateMicrosecondsDiff,
+                                                    &gProcDateMicrosecondsDelta,
+                                                    &gProcNativeYear,
+                                                    &gProcDateWeek,
+                                                    &gProcLastDateOfWeek,
+                                                    &gProcDayOfWeek
+
                                                           };
 
 static const WLIB_DESCRIPTION sgLibraryDescription = {
@@ -172,7 +196,8 @@ wlib_start ()
 
       if (((status = base_types_init ()) != WOP_OK)
           || ((status = base_generics_init ()) != WOP_OK)
-          || ((status = base_constants_init ()) != WOP_OK))
+          || ((status = base_constants_init ()) != WOP_OK)
+          || ((status  = base_dates_init ()) != WOP_OK))
         {
           return status;
         }

@@ -28,6 +28,7 @@
 #include "dbs/dbs_values.h"
 #include "dbs/dbs_mgr.h"
 #include "utils/wrandom.h"
+#include "utils/date.h"
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
@@ -37,56 +38,29 @@ using namespace std;
 using namespace whisper;
 using namespace pastra;
 
-static const uint_t MAX_VALUE_RAW_STORAGE = 0x20;
-
-static uint_t MNTH_DAYS[12] = { 31, 28, 31, 30, 31, 30,
-                                31, 31, 30, 31, 30, 31 };
-
-static bool
-is_leap_year (const int year)
-{
-  if ((year % 4) == 0)
-    {
-      if ((year % 100) == 0)
-        {
-          if ((year % 400) == 0)
-            return true;
-
-          else
-            return false;
-        }
-      else
-        return true;
-    }
-  else
-    return false;
-}
+static const uint_t  MAX_VALUE_RAW_STORAGE = 0x20;
+static const uint8_t MNTH_DAYS[]           = MNTH_DAYS_A;
 
 
 static bool
 is_valid_date (const int year, const uint_t month, const uint_t day)
 {
-  const uint_t mnth = month - 1;
 
-  if (mnth > 11)
+  if (month > 12)
     return false;
 
   else if (day == 0)
     return false;
 
-  if ((mnth != 1) && (day > MNTH_DAYS [mnth]))
-    return false;
-
-  else if (mnth == 1)
+  if (month == 2)
     {
       const bool leapYear = is_leap_year (year);
 
-      if (leapYear && (day > (MNTH_DAYS[1] + 1)))
-        return false;
-
-      else if (! leapYear && (day > MNTH_DAYS[1]))
+      if (day > (leapYear ? MNTH_DAYS[1] + 1 : MNTH_DAYS[1]))
         return false;
     }
+  else if (day > MNTH_DAYS [month - 1])
+    return false;
 
   return true;
 }
