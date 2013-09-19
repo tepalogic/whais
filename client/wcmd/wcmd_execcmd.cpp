@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <cstring>
 
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 #include "client/whisper_connector.h"
 
 #include "wcmd_execcmd.h"

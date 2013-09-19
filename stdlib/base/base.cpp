@@ -33,6 +33,7 @@
 #include "base_generics.h"
 #include "base_constants.h"
 #include "base_dates.h"
+#include "base_text.h"
 
 
 

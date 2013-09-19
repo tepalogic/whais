@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/le_converter.h"
 #include "utils/auto_array.h"
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 #include "utils/valtranslator.h"
 #include "server_protocol.h"
 

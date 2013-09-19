@@ -43,7 +43,7 @@
 
 #include "whisper.h"
 
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 #include "compiler/wopcodes.h"
 
 #include "parser.h"

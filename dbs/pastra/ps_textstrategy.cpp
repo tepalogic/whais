@@ -25,7 +25,7 @@
 #include <assert.h>
 
 #include "utils/le_converter.h"
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs_exception.h"

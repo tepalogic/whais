@@ -164,6 +164,11 @@ struct DBS_SHL DChar
     : mValue (ch),
       mIsNull (false)
   {
+    if ((ch > UTF_LAST_CODEPOINT)
+        || ((UTF16_EXTRA_BYTE_MIN <= ch) && (ch <= UTF16_EXTRA_BYTE_MAX)))
+      {
+        throw DBSException (NULL, _EXTRA (DBSException::INVALID_UNICODE_CHAR));
+      }
   }
 
   DChar (const DChar& source)
@@ -227,13 +232,19 @@ struct DBS_SHL DChar
     if (mIsNull || (mValue == 1))
       return DChar ();
 
+    if (mValue == UTF16_EXTRA_BYTE_MAX + 1)
+      return DChar (UTF16_EXTRA_BYTE_MIN - 1);
+
     return DChar (mValue - 1);
   }
 
   DChar Next () const
   {
-    if (mIsNull || (mValue == 0x7FFFFFFF))
+    if (mIsNull || (mValue == UTF_LAST_CODEPOINT))
         return DChar ();
+
+    if (mValue == UTF16_EXTRA_BYTE_MIN - 1)
+      return DChar (UTF16_EXTRA_BYTE_MAX + 1);
 
     return DChar (mValue + 1);
   }
@@ -255,11 +266,17 @@ struct DBS_SHL DChar
 
   static DChar Max ()
   {
-    return DChar (0x7FFFFFFF);
+    return DChar (UTF_LAST_CODEPOINT);
   }
 
   const uint32_t mValue;
   const bool     mIsNull;
+
+private:
+  //Declare this here too to avoid inclusion of the UTF header file.
+  static const uint32_t UTF_LAST_CODEPOINT         = 0x100000;
+  static const uint16_t UTF16_EXTRA_BYTE_MIN       = 0xD800;
+  static const uint16_t UTF16_EXTRA_BYTE_MAX       = 0xDFFF;
 };
 
 

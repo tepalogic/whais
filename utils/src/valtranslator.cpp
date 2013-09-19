@@ -27,7 +27,7 @@
 #include <cstring>
 #include <limits.h>
 
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 #include "valtranslator.h"
 
 using namespace whisper;

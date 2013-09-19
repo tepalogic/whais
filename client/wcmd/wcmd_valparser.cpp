@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cctype>
 
 
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 #include "utils/range.h"
 #include "utils/valtranslator.h"
 #include "compiler/whisperc.h"

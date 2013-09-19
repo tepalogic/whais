@@ -62,6 +62,28 @@ uint8_t gGenericFieldType[sizeof (TypeSpec)];
 uint8_t gGenericTableType[sizeof (TypeSpec)];
 
 
+uint8_t gABoolType[sizeof (TypeSpec)];
+
+uint8_t gACharType[sizeof (TypeSpec)];
+
+uint8_t gADateType[sizeof (TypeSpec)];
+uint8_t gADateTimeType[sizeof (TypeSpec)];
+uint8_t gAHiresTimeType[sizeof (TypeSpec)];
+
+uint8_t gAUInt8Type[sizeof (TypeSpec)];
+uint8_t gAUInt16Type[sizeof (TypeSpec)];
+uint8_t gAUInt32Type[sizeof (TypeSpec)];
+uint8_t gAUInt64Type[sizeof (TypeSpec)];
+
+uint8_t gAInt8Type[sizeof (TypeSpec)];
+uint8_t gAInt16Type[sizeof (TypeSpec)];
+uint8_t gAInt32Type[sizeof (TypeSpec)];
+uint8_t gAInt64Type[sizeof (TypeSpec)];
+
+uint8_t gARealType[sizeof (TypeSpec)];
+uint8_t gARichRealType[sizeof (TypeSpec)];
+
+
 
 WLIB_STATUS
 base_types_init ()
@@ -98,6 +120,42 @@ base_types_init ()
       return WOP_UNKNOW;
     }
 
+  memcpy (gABoolType, gBoolType, sizeof gBoolType);
+  memcpy (gACharType, gCharType, sizeof gCharType);
+  memcpy (gADateType, gDateType, sizeof gDateType);
+  memcpy (gADateTimeType, gDateTimeType, sizeof gDateTimeType);
+  memcpy (gAHiresTimeType, gHiresTimeType, sizeof gHiresTimeType);
+  memcpy (gAInt8Type, gInt8Type, sizeof gInt8Type);
+  memcpy (gAInt16Type, gInt16Type, sizeof gInt16Type);
+  memcpy (gAInt32Type, gInt32Type, sizeof gInt32Type);
+  memcpy (gAInt64Type, gInt64Type, sizeof gInt64Type);
+  memcpy (gAUInt8Type, gUInt8Type, sizeof gUInt8Type);
+  memcpy (gAUInt16Type, gUInt16Type, sizeof gUInt16Type);
+  memcpy (gAUInt32Type, gUInt32Type, sizeof gUInt32Type);
+  memcpy (gAUInt64Type, gUInt64Type, sizeof gUInt64Type);
+  memcpy (gARealType, gRealType, sizeof gRealType);
+  memcpy (gARichRealType, gRichRealType, sizeof gRichRealType);
+
+  if ((wh_apply_array_modifier (_RC (TypeSpec*, gABoolType)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gACharType)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gADateType)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gADateTimeType)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAHiresTimeType)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAInt8Type)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAInt16Type)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAInt32Type)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAInt64Type)) <= 0)
+
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAUInt8Type)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAUInt16Type)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAUInt32Type)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gAUInt64Type)) <= 0)
+
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gARealType)) <= 0)
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gARichRealType)) <= 0))
+    {
+      return WOP_UNKNOW;
+    }
   return WOP_OK;
 }
 

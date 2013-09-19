@@ -162,6 +162,7 @@ op_func_ldht (ProcedureCall& call, int64_t& offset)
   const uint8_t* const data = call.Code () +
                                 call.CurrentOffset () +
                                 offset;
+
   const uint32_t usec  = load_le_int32 (data);
   const uint8_t  sec   = data[4];
   const uint8_t  min   = data[5];
