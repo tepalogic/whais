@@ -10,6 +10,8 @@
 #include <string.h>
 
 #include "utils/le_converter.h"
+#include "utils/wrandom.h"
+#include "utils/auto_array.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_exception.h"
@@ -117,6 +119,7 @@ test_nulliness()
       else if (textSingleton.CharAt(0).mValue != 0x10942)
         result = false;
     }
+#if 0
   if (result)
     {
       DText textSingleton;
@@ -133,6 +136,7 @@ test_nulliness()
       else if (textSingleton.CharAt(0).mValue != 0x3010942)
         result = false;
     }
+#endif
 
   if (result)
     {
@@ -151,17 +155,17 @@ test_nulliness()
       if (textVarRaw.IsNull() == false)
         return false;
 
-      textVarRaw.Append (DChar (0x71201200));
+      textVarRaw.Append (DChar (0x10FFFE));
 
       if (textVarRaw.IsNull() != false)
         result = false;
       else if (textVarRaw.Count() != 1)
         result = false;
-      else if (textVarRaw.RawSize () != 6)
+      else if (textVarRaw.RawSize () != 4)
         result = false;
       else if (textVarRaw.CharAt(0).mIsNull != false)
         result = false;
-      else if (textVarRaw.CharAt(0).mValue != 0x71201200)
+      else if (textVarRaw.CharAt(0).mValue != 0x10FFFE)
         result = false;
       else if (textVarRaw.CharAt(1).mIsNull == false)
         result = false;
@@ -347,12 +351,12 @@ test_character_insertion ()
                                       ))
                                    );
 
-              DChar test_char = DChar(0x211356);
+              DChar test_char = DChar(0x21135);
               originalText.CharAt (charsCount / 2, test_char);
 
               if (originalText.Count() != charsCount)
                 result = false;
-              else if (originalText.CharAt(charsCount / 2).mValue != 0x211356)
+              else if (originalText.CharAt(charsCount / 2).mValue != 0x21135)
                 result = false;
 
               storage.Flush ();
@@ -397,6 +401,427 @@ test_text_mirroring ()
 }
 
 
+static DText
+build_random_text (const int charsCount)
+{
+  DText result;
+
+  if (charsCount > 0)
+    result.Append (DChar ('A'));
+
+  for (int i = 1; i < charsCount; ++i)
+    {
+      uint32_t cp;
+
+      if (i % 2)
+        cp = wh_rnd () % 0x10FFFE + 1;
+
+      else
+        cp = wh_rnd () % 0x80 + 1;
+
+      if ((0xD800 <= cp) && (cp <= 0xDFFF))
+        {
+          --i;
+          continue ;
+        }
+
+      result.Append (DChar (cp));
+    }
+
+  return result;
+}
+
+
+static DText
+text_to_lower (const DText& src)
+{
+  DText result;
+
+  for (uint64_t i = 0; i < src.Count (); ++i)
+    result.Append (DChar (tolower (src.CharAt (i).mValue)));
+
+  return result;
+}
+
+
+static bool
+check_text_match (const DText&      src,
+                  const DText&      pattern,
+                  const uint64_t    matchIndex,
+                  const bool        ignoreCase)
+{
+  if (matchIndex + pattern.Count () > src.Count ())
+    return false;
+
+  for (uint64_t i = 0; i < pattern.Count (); ++i)
+    {
+      const uint32_t ch1 = src.CharAt (matchIndex + i).mValue;
+      const uint32_t ch2 = pattern.CharAt (i).mValue;
+
+      if (ignoreCase)
+        {
+          if (tolower (ch1) != tolower (ch2))
+            return false;
+        }
+      else if (ch1 != ch2)
+        return false;
+    }
+
+  return true;
+}
+
+
+
+static bool
+test_text_limit_matches (const uint_t  patternSize,
+                         const uint_t  textSize)
+{
+  const DText pattern      = build_random_text (patternSize);
+  const DText text         = build_random_text (textSize);
+  const DText lowerPattern = text_to_lower (pattern);
+  const DText lowerText    = text_to_lower (text);
+
+  assert (pattern != lowerPattern);
+  assert (text != lowerText);
+
+  DText temp;
+
+  if ((temp.FindSubstr (pattern).IsNull () == false)
+      || (temp.FindSubstr (pattern, DUInt64 (), DUInt64 (), DBool (true)) !=
+          DUInt64 ()))
+    {
+      return false;
+    }
+
+  temp.Append (pattern);
+
+  if ((temp.FindSubstr (DText ()).IsNull () == false)
+      || (temp.FindSubstr (pattern, DUInt64 (1)).IsNull () == false)
+      || (temp.FindSubstr (pattern,
+                           DUInt64 (0),
+                           DUInt64 (temp.Count () - 1)).IsNull () == false)
+      || (temp.FindSubstr (pattern) != DUInt64 (0))
+      || (temp.FindSubstrNext ().IsNull () == false)
+      || (temp.FindSubstr (pattern,
+                           DUInt64 (),
+                           DUInt64 (),
+                           DBool (true)) != DUInt64 (0))
+      || (temp.FindSubstr (lowerPattern,
+                           DUInt64 (),
+                           DUInt64 (),
+                           DBool (true)) != DUInt64 (0))
+      || (check_text_match (temp, pattern, 0, false) == false)
+      || (check_text_match (temp, lowerPattern, 0, true) == false))
+    {
+      return false;
+    }
+
+  temp = DText ();
+  temp.Append (DChar (wh_rnd () % 0xFF + 1));
+  temp.Append (pattern);
+
+  if ((temp.FindSubstr (pattern, DUInt64 (1)) != DUInt64 (1))
+      || (temp.FindSubstr (pattern,
+                           DUInt64 (0),
+                           DUInt64 (temp.Count () - 1)).IsNull () == false)
+      || (temp.FindSubstr (pattern) != DUInt64 (1))
+      || (temp.FindSubstrNext ().IsNull () == false)
+      || (temp.FindSubstr (pattern,
+                           DUInt64 (),
+                           DUInt64 (),
+                           DBool (true)) != DUInt64 (1))
+      || (temp.FindSubstr (lowerPattern,
+                           DUInt64 (),
+                           DUInt64 (),
+                           DBool (true)) != DUInt64 (1))
+      || (check_text_match (temp, pattern, 1, false) == false)
+      || (check_text_match (temp, lowerPattern, 1, true) == false))
+    {
+      return false;
+    }
+
+  temp = DText ();
+  temp.Append (text);
+  temp.Append (pattern);
+
+  if ((temp.FindSubstr (pattern) != DUInt64 (text.Count ()))
+      || (temp.FindSubstr (pattern,
+                           DUInt64 (0),
+                           DUInt64 (text.Count () + pattern.Count () - 1)).IsNull () == false)
+      || (temp.FindSubstr (pattern) != DUInt64 (text.Count ()))
+      || (temp.FindSubstrNext ().IsNull () == false)
+      || (temp.FindSubstr (pattern,
+                           DUInt64 (),
+                           DUInt64 (),
+                           DBool (true)) != DUInt64 (text.Count ()))
+      || (temp.FindSubstr (lowerPattern,
+                           DUInt64 (),
+                           DUInt64 (),
+                           DBool (true)) != DUInt64 (text.Count ())
+      || (check_text_match (temp, pattern, text.Count (), false) == false)
+      || (check_text_match (temp, lowerPattern, text.Count (), true) == false)))
+    {
+      return false;
+    }
+
+  return true;
+}
+
+
+static bool
+test_text_substrings_matches (const uint_t  patternSize,
+                              const uint_t  textSize)
+{
+  static const uint_t ITERATIONS = 64;
+
+  const DText pattern      = build_random_text (patternSize);
+  const DText lowerPattern = text_to_lower (pattern);
+
+  assert (pattern != lowerPattern);
+
+  auto_array<DUInt64> pattOffsets (ITERATIONS);
+  auto_array<DUInt64> pattOffsetsLowerCases (ITERATIONS);
+
+  DText temp;
+
+  for (uint_t i = 0; i < ITERATIONS; ++i)
+    {
+      pattOffsets[i] = DUInt64 (temp.Count ());
+      temp.Append (pattern);
+
+      if (textSize > 0)
+        temp.Append (build_random_text (wh_rnd () % textSize));
+    }
+
+  if ((temp.FindSubstr (pattern) != pattOffsets[0])
+      || (check_text_match (temp, pattern, pattOffsets[0].mValue, false) == false))
+    {
+      return false;
+    }
+  else
+    {
+      for (uint_t i = 1; i < pattOffsets.Size (); ++i)
+        {
+          if ((temp.FindSubstrNext () != pattOffsets[i])
+              || (check_text_match (temp, pattern, pattOffsets[i].mValue, false) == false))
+            {
+              return false;
+            }
+        }
+    }
+
+  if ((temp.FindSubstr (lowerPattern, DUInt64 (1), DUInt64 (), DBool (true)) != pattOffsets[1])
+      || (check_text_match (temp, lowerPattern, pattOffsets[1].mValue, true) == false))
+    {
+      return false;
+    }
+  else
+    {
+      for (uint_t i = 2; i < pattOffsets.Size (); ++i)
+        {
+          if ((temp.FindSubstrNext () != pattOffsets[i])
+              || (check_text_match (temp, lowerPattern, pattOffsets[i].mValue, true) == false))
+            {
+              return false;
+            }
+        }
+    }
+
+  temp = DText ();
+
+  for (uint_t i = 0; i < ITERATIONS; ++i)
+    {
+      pattOffsets[i] = DUInt64 (temp.Count ());
+      temp.Append (pattern);
+
+      if (textSize > 0)
+        temp.Append (build_random_text (wh_rnd () % textSize));
+
+      pattOffsetsLowerCases [i] = DUInt64 (temp.Count ());
+      temp.Append (lowerPattern);
+
+      if (textSize > 0)
+        temp.Append (build_random_text (wh_rnd () % textSize));
+    }
+
+  if ((temp.FindSubstr (pattern) != DUInt64 (pattOffsets[0]))
+      || (check_text_match (temp, pattern, pattOffsets[0].mValue, false) == false))
+    {
+      return false;
+    }
+  else
+    {
+      for (uint_t i = 1; i < pattOffsets.Size (); ++i)
+        {
+          if ((temp.FindSubstrNext () != pattOffsets[i])
+              || (check_text_match (temp, pattern, pattOffsets[i].mValue, false) == false))
+            {
+              return false;
+            }
+        }
+    }
+
+  if ((temp.FindSubstr (lowerPattern, DUInt64 (), DUInt64 (), DBool (true)) != pattOffsets [0])
+      || (check_text_match (temp, pattern, pattOffsets[0].mValue, false) == false))
+    {
+      return false;
+    }
+  else if ((temp.FindSubstrNext () != pattOffsetsLowerCases [0])
+           || (check_text_match (temp, lowerPattern, pattOffsetsLowerCases[0].mValue, false) == false))
+    {
+      return false;
+    }
+  else
+    {
+      for (uint_t i = 1; i < pattOffsets.Size (); ++i)
+        {
+          if ((temp.FindSubstrNext () != pattOffsets[i])
+              || (check_text_match (temp, pattern, pattOffsets[0].mValue, false) == false))
+            {
+              return false;
+            }
+
+          if ((temp.FindSubstrNext () != pattOffsetsLowerCases[i])
+              || (check_text_match (temp, lowerPattern, pattOffsetsLowerCases[i].mValue, false) == false))
+            {
+              return false;
+            }
+        }
+    }
+
+  return true;
+}
+
+
+
+static bool
+test_text_substrings_replace (const uint_t  patternSize,
+                              const uint_t  textSize)
+{
+  static const uint_t ITERATIONS = 64;
+
+  const DText pattern      = build_random_text (patternSize);
+  const DText lowerPattern = text_to_lower (pattern);
+
+  const DText newSubstr    = build_random_text (wh_rnd () % patternSize + 1);
+
+  assert (pattern != lowerPattern);
+
+  DText temp, temp2, temp3;
+
+  for (uint_t i = 0; i < ITERATIONS; ++i)
+    {
+      temp.Append (pattern);
+      temp2.Append (newSubstr);
+
+      if ((i == 0) || ((i == ITERATIONS - 1) && (textSize == 0)))
+        temp3.Append (pattern);
+
+      else
+        temp3.Append (newSubstr);
+
+      if (textSize > 0)
+        {
+          const DText t = (build_random_text (wh_rnd () % textSize + 1));
+
+          temp.Append (t);
+          temp2.Append (t);
+          temp3.Append (t);
+        }
+    }
+
+  if (temp.ReplaceSubstr (pattern, newSubstr) != temp2)
+    return false;
+
+  if (temp.ReplaceSubstr (pattern, newSubstr, DUInt64(1), DUInt64 (temp.Count () - 1)) != temp3)
+    return false;
+
+  temp = temp2 = temp3 = DText ();
+
+  for (uint_t i = 0; i < ITERATIONS; ++i)
+    {
+      temp.Append (pattern);
+      temp2.Append (newSubstr);
+
+      if (i == 0)
+        temp3.Append (pattern);
+
+      else
+        temp3.Append (newSubstr);
+
+      if (textSize > 0)
+        {
+          const DText t = (build_random_text (wh_rnd () % textSize));
+
+          temp.Append (t);
+          temp2.Append (t);
+          temp3.Append (t);
+        }
+
+      temp.Append (lowerPattern);
+      temp2.Append (newSubstr);
+      temp3.Append (newSubstr);
+
+      if (textSize > 0)
+        {
+          const DText t = (build_random_text (wh_rnd () % textSize));
+
+          temp.Append (t);
+          temp2.Append (t);
+          temp3.Append (t);
+        }
+    }
+
+ if (temp.ReplaceSubstr (pattern, newSubstr, DUInt64 (), DUInt64 (), DBool (true)) != temp2)
+    return false;
+
+  if (temp.ReplaceSubstr (pattern, newSubstr, DUInt64(1), DUInt64 (), DBool (true)) != temp3)
+    return false;
+
+
+  return true;
+}
+
+
+static bool
+test_text_substrings ()
+{
+  std::cout << "Testing for text pattern matching ... ";
+  bool result = true;
+
+  result = result && test_text_limit_matches (19, 256);
+  result = result && test_text_limit_matches (24, 4096);
+  result = result && test_text_limit_matches (323, 400);
+  result = result && test_text_limit_matches (543, 10231);
+
+  result = result && test_text_substrings_matches (17, 0);
+  result = result && test_text_substrings_matches (61, 3);
+  result = result && test_text_substrings_matches (15, 1024);
+  result = result && test_text_substrings_matches (271, 0);
+  result = result && test_text_substrings_matches (567, 1024);
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  return result;
+}
+
+static bool
+test_text_substrings_2 ()
+{
+  std::cout << "Testing for text pattern replace ... ";
+  bool result = true;
+
+  result = result && test_text_substrings_replace (15, 0);
+  result = result && test_text_substrings_replace (11, 3);
+  result = result && test_text_substrings_replace (23, 1024);
+  result = result && test_text_substrings_replace (1024, 0);
+  result = result && test_text_substrings_replace (512, 1024);
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+
+  return result;
+}
+
+
 int
 main ()
 {
@@ -408,6 +833,8 @@ main ()
   success = success && test_text_append ();
   success = success && test_character_insertion ();
   success = success && test_text_mirroring ();
+  success = success && test_text_substrings ();
+  success = success && test_text_substrings_2 ();
 
   DBSShoutdown ();
 

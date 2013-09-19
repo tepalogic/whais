@@ -96,8 +96,12 @@ public:
 protected:
 };
 
+
+
 namespace pastra
 {
+
+
 
 class GenericText : public ITextStrategy
 {
