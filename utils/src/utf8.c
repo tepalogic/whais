@@ -41,11 +41,13 @@ wh_utf8_cu_count (const uint8_t codeUnit)
   else if ((codeUnit & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
     return 4;
 
+#if 0
   else if ((codeUnit & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
     return 5;
 
   else if ((codeUnit & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
     return 6;
+#endif
 
   return 0; /* Signals en error. */
 }
@@ -85,6 +87,7 @@ wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 
       return 4;
     }
+#if 0
   else if ((utf8Str[0] & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
     {
       *outCodePoint |= utf8Str[0] & ~UTF8_26BIT_MASK;
@@ -106,6 +109,7 @@ wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 
       return 6;
     }
+#endif
 
   assert (FALSE);
 
@@ -146,6 +150,7 @@ wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest)
 
       return 4;
     }
+#if 0
   else if (codePoint < 0x4000000)
     {
       dest[0] = ((codePoint >> 24) & 0xFF) | UTF8_26BIT_MASK;
@@ -167,6 +172,7 @@ wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest)
 
       return 6;
     }
+#endif
 
   assert (FALSE);
 
@@ -188,12 +194,13 @@ wh_utf8_store_size (const uint32_t codePoint)
 
   else if (codePoint < 0x200000)
     return 4;
-
+#if 0
   else if (codePoint < 0x4000000)
     return 5;
 
   else if (codePoint < 0x80000000)
     return 6;
+#endif
 
   assert (FALSE);
 

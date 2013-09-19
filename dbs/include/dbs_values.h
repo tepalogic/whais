@@ -1787,11 +1787,34 @@ public:
 
   void RawRead (uint64_t offset, uint64_t count, uint8_t* dest) const;
 
+  uint64_t BytesUntilChar (const uint64_t chIndex) const;
+  uint64_t CharsUntilByte (const uint64_t offset) const;
+
   void Append (const DChar& ch);
   void Append (const DText& text);
 
   DChar CharAt (const uint64_t index) const;
   void  CharAt (const uint64_t index, const DChar& ch);
+
+  DUInt64 FindSubstr (const DText&      pattern,
+                      const DUInt64     from         = DUInt64 (),
+                      const DUInt64     to           = DUInt64 (),
+                      const DBool       ignoreCase   = DBool ());
+
+  DUInt64 FindSubstrNext () const;
+
+  DUInt64 FindSubstrRaw (const DText&      pattern,
+                         const DUInt64     from        = DUInt64 (),
+                         const DUInt64     to          = DUInt64 (),
+                         const DBool       ignoreCase  = DBool ());
+
+  DUInt64 FindSubstrNextRaw () const;
+
+  DText ReplaceSubstr (const DText&      substr,
+                       const DText&      newSubstr,
+                       const DUInt64     from        = DUInt64 (),
+                       const DUInt64     to          = DUInt64 (),
+                       const DBool       ignoreCase  = DBool ());
 
   void MakeMirror (DText& mirror) const;
 
@@ -1807,6 +1830,7 @@ public:
 
 private:
   ITextStrategy*      mText;
+  void*               mStringMatcher;
 };
 
 
@@ -1911,6 +1935,9 @@ private:
   IArrayStrategy       *mArray;
 };
 
+
+
 } //namespace whisper
 
 #endif /* DBS_VALUES_H_ */
+
