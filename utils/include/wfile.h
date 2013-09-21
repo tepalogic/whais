@@ -75,7 +75,9 @@ public:
 
 
 private:
-  WH_FILE   mHandle;
+  static const uint64_t UNKNOWN_SIZE = 0xFFFFFFFFFFFFFFFFull;
+  WH_FILE     mHandle;
+  uint64_t    mFileSize;
 };
 
 } //namespace whisper

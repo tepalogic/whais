@@ -33,16 +33,21 @@ namespace whisper {
 
 
 File::File (const char* name, uint_t mode)
-  : mHandle (0)
+  : mHandle (0),
+    mFileSize (UNKNOWN_SIZE)
 {
   mHandle = whf_open (name, mode);
+
   if (mHandle == INVALID_FILE)
     throw FileException (name, _EXTRA (whf_last_error ()));
+
+  GetSize ();
 }
 
 
 File::File (const File &src) :
-  mHandle (whf_dup (src.mHandle))
+  mHandle (whf_dup (src.mHandle)),
+  mFileSize (src.mFileSize)
 {
   if (mHandle == INVALID_FILE)
     throw FileException (NULL, _EXTRA (whf_last_error ()));
@@ -68,6 +73,14 @@ File::Read (uint8_t* pBuffer, uint_t size)
 void
 File::Write (const uint8_t* pBuffer, uint_t size)
 {
+  if (mFileSize != UNKNOWN_SIZE)
+    {
+      uint64_t currPos = Tell ();
+
+      if (mFileSize < currPos + size)
+        mFileSize = currPos + size;
+    }
+
   if ( ! whf_write (mHandle, pBuffer, size))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 }
@@ -102,12 +115,13 @@ File::Sync ()
 
 uint64_t File::GetSize () const
 {
-  uint64_t size;
+  if (mFileSize != UNKNOWN_SIZE)
+    return mFileSize;
 
-  if ( ! whf_tell_size (mHandle, &size))
+  if ( ! whf_tell_size (mHandle, &_CC (uint64_t&, mFileSize)))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
 
-  return size;
+  return mFileSize;
 }
 
 
@@ -116,6 +130,8 @@ File::SetSize (const uint64_t size)
 {
   if ( ! whf_set_size (mHandle, size))
     throw FileException (NULL, _EXTRA (whf_last_error ()));
+
+  mFileSize = UNKNOWN_SIZE;
 }
 
 
