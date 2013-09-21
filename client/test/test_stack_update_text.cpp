@@ -9,7 +9,7 @@
 #include <cstring>
 
 #include "utils/wrandom.h"
-#include "utils/utf8.h"
+#include "utils/wutf.h"
 #include "test_client_common.h"
 
 using namespace std;

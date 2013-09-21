@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-static const uint32_t UTF_LAST_CODEPOINT          = 0x100000;
+static const uint32_t UTF_LAST_CODEPOINT          = 0x10FFFF;
 
 static const uint8_t  UTF8_7BIT_MASK              = 0x00;
 static const uint8_t  UTF8_11BIT_MASK             = 0xC0;

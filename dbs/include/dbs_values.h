@@ -274,7 +274,7 @@ struct DBS_SHL DChar
 
 private:
   //Declare this here too to avoid inclusion of the UTF header file.
-  static const uint32_t UTF_LAST_CODEPOINT         = 0x100000;
+  static const uint32_t UTF_LAST_CODEPOINT         = 0x10FFFF;
   static const uint16_t UTF16_EXTRA_BYTE_MIN       = 0xD800;
   static const uint16_t UTF16_EXTRA_BYTE_MAX       = 0xDFFF;
 };
