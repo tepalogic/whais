@@ -29,27 +29,29 @@
 uint_t
 wh_utf8_cu_count (const uint8_t codeUnit)
 {
-  if ((codeUnit & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
+  if (codeUnit < 0x80)
     return 1;
 
-  else if ((codeUnit & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
+  else if (codeUnit < 0xC0)
+    return 0;
+
+  else if (codeUnit < 0xE0)
     return 2;
 
-  else if ((codeUnit & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
+  else if (codeUnit < 0xF0)
     return 3;
 
-  else if ((codeUnit & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
+  else if (codeUnit < 0xF8)
     return 4;
 
 #if 0
-  else if ((codeUnit & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
+  else if (codeUnit < 0xFC)
     return 5;
 
-  else if ((codeUnit & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
-    return 6;
+  return 6;
 #endif
 
-  return 0; /* Signals en error. */
+  return 0;
 }
 
 
@@ -68,64 +70,63 @@ wh_utf16_cu_count (const uint16_t codeUnit)
 uint_t
 wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 {
-  *outCodePoint = 0;
-  if ((utf8Str[0] & UTF8_EXTRA_BYTE_SIG) == UTF8_7BIT_MASK)
-    {
-      *outCodePoint |= utf8Str[0] & ~UTF8_7BIT_MASK;
+  const uint_t cpCount = wh_utf8_cu_count (utf8Str[0]);
 
-      return 1;
-    }
-  else if ((utf8Str[0] & UTF8_16BIT_MASK) == UTF8_11BIT_MASK)
+  *outCodePoint = 0;
+
+  switch (cpCount)
     {
+    case 1:
+
+      *outCodePoint |= utf8Str[0] & ~UTF8_7BIT_MASK;
+      break;
+
+    case 2:
+
       *outCodePoint |= utf8Str[0] & ~UTF8_11BIT_MASK;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
+      break;
 
-      return 2;
-    }
-  else if ((utf8Str[0] & UTF8_21BIT_MASK) == UTF8_16BIT_MASK)
-    {
+    case 3:
+
       *outCodePoint |= utf8Str[0] & ~UTF8_16BIT_MASK;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
+      break;
 
-      return 3;
-    }
-  else if ((utf8Str[0] & UTF8_26BIT_MASK) == UTF8_21BIT_MASK)
-    {
+    case 4:
+
       *outCodePoint |= utf8Str[0] & ~UTF8_21BIT_MASK;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[3] & ~UTF8_EXTRA_BYTE_SIG;
+      break;
 
-      return 4;
-    }
 #if 0
-  else if ((utf8Str[0] & UTF8_31BIT_MASK) == UTF8_26BIT_MASK)
-    {
+    case 5:
       *outCodePoint |= utf8Str[0] & ~UTF8_26BIT_MASK;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[3] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[4] & ~UTF8_EXTRA_BYTE_SIG;
+      break;
 
-      return 5;
-    }
-  else if ((utf8Str[0] & UTF8_37BIT_MASK) == UTF8_31BIT_MASK)
-    {
+    case 6:
       *outCodePoint |= utf8Str[0] & ~UTF8_31BIT_MASK;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[1] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[2] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[3] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[4] & ~UTF8_EXTRA_BYTE_SIG;
       *outCodePoint <<= 6; *outCodePoint |= utf8Str[5] & ~UTF8_EXTRA_BYTE_SIG;
-
-      return 6;
-    }
+      break;
 #endif
 
-  assert (FALSE);
+    default:
+      assert (FALSE);
+      return 0;
+    }
 
-  return 0;
+  return cpCount;
 }
 
 
@@ -190,6 +191,7 @@ wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest)
 
       return 4;
     }
+
 #if 0
   else if (codePoint < 0x4000000)
     {
@@ -258,6 +260,7 @@ wh_utf8_store_size (const uint32_t codePoint)
 
   else if (codePoint < 0x200000)
     return 4;
+
 #if 0
   else if (codePoint < 0x4000000)
     return 5;

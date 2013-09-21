@@ -45,7 +45,7 @@ get_random_hirestime ()
   uint8_t hour  = wh_rnd () % 24;
   uint8_t mins  = wh_rnd () % 60;
   uint8_t secs  = wh_rnd () % 60;
-  uint32_t  mic = wh_rnd () % 1000000000;
+  uint32_t  mic = wh_rnd () % 1000000;
 
   return DHiresTime (year, month, day, hour, mins, secs, mic);
 }

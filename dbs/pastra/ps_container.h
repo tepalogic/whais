@@ -100,7 +100,7 @@ private:
   void ExtendContainer ();
 
   const uint64_t       mMaxFileUnitSize;
-  std::vector< File >  mFilesHandles;
+  std::vector<File>    mFilesHandles;
   std::string          mFileNamePrefix;
   bool                 mToRemove;
 };
