@@ -77,6 +77,7 @@ WLIB_PROC_DESCRIPTION       gTextLike;
 WLIB_PROC_DESCRIPTION       gTextSubstr;
 
 
+#if 0
 static int
 compare_chars (const int   c1,
                const int   c2,
@@ -110,7 +111,7 @@ compare_chars (const DChar c1,
 
   return compare_chars (c1.mValue, c2.mValue, ignoreCase, alphabetically);
 }
-
+#endif
 
 template <IS_FUNC F>
 WLIB_STATUS
