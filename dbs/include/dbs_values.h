@@ -1829,6 +1829,9 @@ public:
                        const uint64_t  fromCh       = 0,
                        const uint64_t  toCh         = 0xFFFFFFFFFFFFFFFFull);
 
+  DText LowerCase () const;
+  DText UpperCase () const;
+
   void MakeMirror (DText& mirror) const;
 
   DBS_FIELD_TYPE DBSType () const
@@ -1841,6 +1844,7 @@ public:
     return *mText;
   }
 
+
 private:
   void AppendRaw (const DText&     text,
                   const uint64_t   fromOff,
@@ -1852,6 +1856,8 @@ private:
                           const uint64_t     toCh);
   DUInt64 FindNextUTF8 () const;
 
+
+  void AllCharsToCase (const bool lowerCase);
 
   ITextStrategy*      mText;
   void*               mStringMatcher;

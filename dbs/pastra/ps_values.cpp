@@ -998,6 +998,64 @@ DText::ReplaceSubstr (DText&             substr,
   return result;
 }
 
+
+DText
+DText::LowerCase () const
+{
+  DText result = *this;
+
+  result.AllCharsToCase (true);
+  return result;
+}
+
+
+DText
+DText::UpperCase () const
+{
+  DText result = *this;
+
+  result.AllCharsToCase (false);
+
+  return result;
+}
+
+
+void
+DText::MakeMirror (DText& inoutText) const
+{
+  if (mText->ReferenceCount() == 1)
+    mText->IncreaseShareCount ();
+
+  else
+    {
+      auto_ptr<ITextStrategy> newText (new TemporalText (NULL));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate (*mText, mText->BytesCount ());
+      mText->DecreaseReferenceCount ();
+
+      _CC (DText*, this)->mText = newText.release ();
+
+      assert (mText->ShareCount () == 0);
+      assert (mText->ReferenceCount () == 1);
+
+      mText->IncreaseShareCount ();
+    }
+
+  assert (mText->ReferenceCount () == 1);
+
+  if (this != &inoutText)
+    {
+      if (inoutText.mText->ShareCount () > 0)
+        inoutText.mText->DecreaseShareCount ();
+
+      else
+        inoutText.mText->DecreaseReferenceCount ();
+
+      inoutText.mText = mText;
+    }
+}
+
+
 DUInt64
 DText::FindInTextUTF8 (const DText&      text,
                        const bool        ignoreCase,
@@ -1046,37 +1104,17 @@ DText::FindNextUTF8 () const
 
 
 void
-DText::MakeMirror (DText& inoutText) const
+DText::AllCharsToCase (const bool lowerCase)
 {
-  if (mText->ReferenceCount() == 1)
-    mText->IncreaseShareCount ();
+  const uint64_t charsCount = Count ();
 
-  else
+  for (uint64_t i = 0; i < charsCount; ++i)
     {
-      auto_ptr<ITextStrategy> newText (new TemporalText (NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate (*mText, mText->BytesCount ());
-      mText->DecreaseReferenceCount ();
+      DChar ch = CharAt (i);
 
-      _CC (DText*, this)->mText = newText.release ();
+      ch = DChar (lowerCase ? tolower (ch.mValue) : toupper (ch.mValue));
 
-      assert (mText->ShareCount () == 0);
-      assert (mText->ReferenceCount () == 1);
-
-      mText->IncreaseShareCount ();
-    }
-
-  assert (mText->ReferenceCount () == 1);
-
-  if (this != &inoutText)
-    {
-      if (inoutText.mText->ShareCount () > 0)
-        inoutText.mText->DecreaseShareCount ();
-
-      else
-        inoutText.mText->DecreaseReferenceCount ();
-
-      inoutText.mText = mText;
+      CharAt (i, ch);
     }
 }
 
