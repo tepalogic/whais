@@ -77,41 +77,6 @@ WLIB_PROC_DESCRIPTION       gTextLike;
 WLIB_PROC_DESCRIPTION       gTextSubstr;
 
 
-static int
-compare_chars (const int   c1,
-               const int   c2,
-               const bool  ignoreCase,
-               const bool  alphabetically)
-{
-  const int lc1 = (alphabetically || ignoreCase) ? tolower (c1) : c1;
-  const int lc2 = (alphabetically || ignoreCase) ? tolower (c2) : c2;
-
-  if (alphabetically && (lc1 == lc2))
-    return c1 - c2;
-
-  return lc1 - lc2;
-}
-
-
-static int
-compare_chars (const DChar c1,
-               const DChar c2,
-               const bool  ignoreCase,
-               const bool  alphabetically)
-{
-  if (c1.IsNull () && c2.IsNull ())
-    return 0;
-
-  else if (c1.IsNull ())
-    return -1;
-
-  else if (c2.IsNull ())
-    return 1;
-
-  return compare_chars (c1.mValue, c2.mValue, ignoreCase, alphabetically);
-}
-
-
 template <IS_FUNC F>
 WLIB_STATUS
 is_func_XX (SessionStack& stack, ISession&)

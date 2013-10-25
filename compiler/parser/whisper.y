@@ -58,6 +58,7 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token TABLE
 %token TEXT
 %token THEN
+%token UNDEFINED
 %token UNTIL
 %token UNSIGNED
 %token WHILE
@@ -96,7 +97,6 @@ program: global_block_statement
 ;
 
 global_block_statement: /* empty */
-                      | return_stmt
                       | var_decl_stmt global_block_statement
                       | proc_decl_stmt global_block_statement
                       | extern_proc_decl_stmt global_block_statement
@@ -105,13 +105,6 @@ global_block_statement: /* empty */
                         var_decl_stmt
                             { state->externDecl = FALSE; }
                         global_block_statement
-;
-
-return_stmt: RETURN exp ';'
-                {
-                   $$ = translate_return_exp(state, $2); 
-                   CHK_SEM_ERROR;
-                }
 ;
 
 var_decl_stmt: LET id_list AS type_spec ';'
@@ -167,6 +160,8 @@ basic_type_spec: BOOL
                		{ $$ = create_type_spec(state, T_UINT32);  CHK_SEM_ERROR; }
                | UNSIGNED INT64
                		{ $$ = create_type_spec(state, T_UINT64);  CHK_SEM_ERROR; }
+               | UNDEFINED
+               		{ $$ = create_type_spec(state, T_UNDETERMINED);  CHK_SEM_ERROR; }
 ;
 
 array_type_spec: ARRAY array_of_clause
@@ -298,6 +293,12 @@ local_block_statement: /* empty */
                      | continue_stmt local_block_statement
 ;
 
+return_stmt: RETURN exp ';'
+                {
+                   $$ = translate_return_exp(state, $2); 
+                   CHK_SEM_ERROR;
+                }
+;
 
 procedure_parameter_decl: /* empty */
                             { $$ = NULL; }

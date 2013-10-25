@@ -53,11 +53,8 @@ struct MsgCodeEntry
 #define MSG_VAR_NFOUND          (MSG_VAR_DEFINED + 1)
 #define MSG_NOT_TABLE           (MSG_VAR_NFOUND + 1)
 #define MSG_SAME_FIELD          (MSG_NOT_TABLE + 1)
-#define MSG_FIELD_INV_ARRAY     (MSG_SAME_FIELD + 1)
-#define MSG_TABLE_INCOMPLETE    (MSG_FIELD_INV_ARRAY + 1)
-#define MSG_ARRAY_INCOMPLETE    (MSG_TABLE_INCOMPLETE + 1)
-#define MSG_FIELD_INCOMPLETE    (MSG_ARRAY_INCOMPLETE + 1)
-#define MSG_PROC_ADECL          (MSG_FIELD_INCOMPLETE + 1)
+#define MSG_FIELD_TYPE_INVALID  (MSG_SAME_FIELD + 1)
+#define MSG_PROC_ADECL          (MSG_FIELD_TYPE_INVALID + 1)
 #define MSG_COMPILER_ERR        (MSG_PROC_ADECL + 1)
 
 /* expression semantic related errors, base 500 */

@@ -74,6 +74,7 @@ enum W_OPCODE
   W_STTA,
   W_STF,
   W_STA,
+  W_STUD,
 
   W_INULL,
   W_NNULL,

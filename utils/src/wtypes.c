@@ -89,10 +89,13 @@ is_type_spec_valid (const struct TypeSpec* spec)
   const uint16_t htype = load_le_int16 (spec->type);
   const uint16_t hsize = load_le_int16 (spec->dataSize);
 
-  if (((htype == T_UNKNOWN) || (htype > T_UNDETERMINED))
-      && (IS_FIELD (htype) == FALSE)
-      && (IS_ARRAY (htype) == FALSE)
-      && (IS_TABLE (htype) == FALSE))
+  if (htype == T_UNKNOWN)
+    result = FALSE;
+
+  else if ((htype > T_UNDETERMINED)
+           && (IS_FIELD (htype) == FALSE)
+           && (IS_ARRAY (htype) == FALSE)
+           && (IS_TABLE (htype) == FALSE))
     {
       result = FALSE;
     }

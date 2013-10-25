@@ -37,19 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace whisper {
 namespace wod {
 
-void
-wod_dump_header (File& obj, std::ostream& output);
 
-void
-wod_dump_const_area (WIFunctionalUnit& unit, std::ostream& output);
+#define MAX_OP_STRING 128
 
-void
-wod_dump_globals_tables (WIFunctionalUnit& unit, std::ostream& output);
-
-void
-wod_dump_procs (WIFunctionalUnit&     unit,
-                std::ostream&         output,
-                bool_t                showCode);
 
 class DumpException : public Exception
 {
@@ -76,14 +66,36 @@ public:
   }
 };
 
+
 typedef uint_t (*FDECODE_OPCODE) (const uint8_t*      args,
                                   char* const         op1,
                                   char* const         op2);
 
+
 extern FDECODE_OPCODE wod_decode_table[];
 extern const char*    wod_str_table[];
 
-#define MAX_OP_STRING 128
+
+
+
+void
+wod_dump_header (File& obj, std::ostream& output);
+
+
+void
+wod_dump_const_area (WIFunctionalUnit& unit, std::ostream& output);
+
+
+void
+wod_dump_globals_tables (WIFunctionalUnit& unit, std::ostream& output);
+
+
+void
+wod_dump_procs (WIFunctionalUnit&     unit,
+                std::ostream&         output,
+                bool_t                showCode);
+
+
 
 } //namespace wod
 } //namespace whisper

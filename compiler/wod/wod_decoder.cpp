@@ -376,6 +376,7 @@ const FDECODE_OPCODE wod_dec_w_stui64 = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stta   = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_stf    = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sta    = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_stud   = wod_dec_w_ldnull;
 
 const FDECODE_OPCODE wod_dec_w_inull  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_nnull  = wod_dec_w_ldnull;
@@ -572,6 +573,7 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_stta,
   wod_dec_w_stf,
   wod_dec_w_sta,
+  wod_dec_w_stud,
 
   wod_dec_w_inull,
   wod_dec_w_nnull,
@@ -746,6 +748,7 @@ const char *wod_str_table[] = {
   "stta",
   "stf",
   "sta",
+  "stud",
 
   "inull",
   "nnull",
