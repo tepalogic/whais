@@ -38,6 +38,19 @@ namespace whisper {
 static const uint_t MAX_OP_QWORDS = 6;
 
 class StackValue;
+class INativeObject;
+
+
+
+class INTERP_SHL INativeObject
+{
+public:
+  virtual ~INativeObject ();
+
+  virtual void RegisterUser () = 0;
+  virtual void ReleaseUser () = 0;
+};
+
 
 class INTERP_SHL IOperand
 {
@@ -88,6 +101,7 @@ public:
   virtual void SetValue (const DText& value) = 0;
   virtual void SetValue (const DArray& value) = 0;
 
+
   virtual void SelfAdd (const DInt64& value) = 0;
   virtual void SelfAdd (const DRichReal& value) = 0;
   virtual void SelfAdd (const DChar& value) = 0;
@@ -125,11 +139,12 @@ public:
 
   virtual StackValue Duplicate () const = 0;
 
-protected:
+  virtual void           NativeObject (INativeObject* const value) = 0;
+  virtual INativeObject& NativeObject() = 0;
 
+protected:
   virtual void NotifyCopy () = 0;
 };
-
 
 
 class StackValue
@@ -214,7 +229,7 @@ public:
   void  Push (const DText& value);
   void  Push (const DArray& value);
   void  Push (IDBSHandler& dbs, ITable& table);
-
+  void  Push (INativeObject& object);
   void  Push (const StackValue& value);
 
   void  Pop (const uint_t count);

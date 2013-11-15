@@ -29,6 +29,7 @@
 #include "utils/le_converter.h"
 
 #include "pm_processor.h"
+#include "pm_operand_undefined.h"
 
 
 
@@ -406,6 +407,120 @@ op_func_stf (ProcedureCall& call, int64_t& offset)
   BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
 
   dest.CopyFieldOp (src.GetFieldOp());
+
+  stack.Pop (1);
+}
+
+
+template<typename T> static void
+transfer_undef_value (IOperand& dest, IOperand& src)
+{
+  T value;
+
+  src.GetValue (value);
+  dest.SetValue (value);
+}
+
+
+static void
+op_func_stud (ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack     = call.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+          stackSize);
+
+  BaseOperand& src   = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
+  BaseOperand& dest  = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
+
+  const uint_t srcType = src.GetType ();
+
+  if (srcType == T_UNDETERMINED)
+    {
+      if (src.IsNull ())
+        dest.CopyNativeObjectOperand (NativeObjectOperand ());
+
+      else
+        {
+          dest.CopyNativeObjectOperand (
+                              NativeObjectOperand (src.NativeObject ())
+                                       );
+        }
+    }
+  else if (IS_TABLE (srcType))
+    {
+      TableReference* const temp = src.IsNull () ?
+                                    NULL :
+                                    &src.GetTableReference ();
+
+      dest.CopyNativeObjectOperand (NativeObjectOperand (temp));
+    }
+  else if (IS_FIELD (srcType))
+    {
+      TableReference* const temp = src.IsNull () ?
+                                    NULL :
+                                    &src.GetTableReference ();
+
+      const uint_t      type        = src.GetType ();
+      const FIELD_INDEX fieldIndex  = src.GetField ();
+
+
+      dest.CopyNativeObjectOperand (NativeObjectOperand (temp,
+                                                         fieldIndex,
+                                                         type));
+    }
+  else if (IS_ARRAY (srcType))
+    transfer_undef_value<DArray> (dest, src);
+
+  else
+    {
+      switch (srcType)
+        {
+        case T_BOOL:
+          transfer_undef_value<DBool> (dest, src);
+          break;
+
+        case T_CHAR:
+          transfer_undef_value<DChar> (dest, src);
+          break;
+
+        case T_DATE:
+        case T_DATETIME:
+        case T_HIRESTIME:
+          transfer_undef_value<DHiresTime> (dest, src);
+          break;
+
+        case T_INT8:
+        case T_INT16:
+        case T_INT32:
+        case T_INT64:
+          transfer_undef_value<DInt64> (dest, src);
+          break;
+
+        case T_UINT8:
+        case T_UINT16:
+        case T_UINT32:
+        case T_UINT64:
+          transfer_undef_value<DUInt64> (dest, src);
+          break;
+
+        case T_REAL:
+        case T_RICHREAL:
+          transfer_undef_value<DRichReal> (dest, src);
+          break;
+
+        case T_TEXT:
+          transfer_undef_value<DText> (dest, src);
+          break;
+
+        default:
+          throw InterException (
+                          NULL,
+                          _EXTRA (InterException::INVALID_OP_CONVERSION)
+                                );
+        }
+    }
 
   stack.Pop (1);
 }
@@ -1090,7 +1205,6 @@ op_func_indta (ProcedureCall& call, int64_t& offset)
     throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_NULL));
 
   BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
-  TableOperand tableOp = op.GetTableOp ();
 
   const uint8_t* const  pData = call.Code () +
                                   call.CurrentOffset () +
@@ -1100,9 +1214,9 @@ op_func_indta (ProcedureCall& call, int64_t& offset)
 
   offset += sizeof (uint32_t);
 
-  FIELD_INDEX field = tableOp.GetTable ().RetrieveField (_RC (const char*,
-                                                              text));
-  FieldOperand fieldOp (tableOp, field);
+  FIELD_INDEX field = op.GetTable ().RetrieveField (_RC (const char*, text));
+
+  FieldOperand fieldOp (op.GetTableReference (), field);
   StackValue   result = fieldOp.GetValueAt (index.mValue);
 
   stack.Pop (2);
@@ -1120,7 +1234,6 @@ op_func_self (ProcedureCall& call, int64_t& offset)
           stackSize);
 
   BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
-  TableOperand tableOp = op.GetTableOp ();
 
   const uint8_t* const  data = call.Code () +
                                  call.CurrentOffset () +
@@ -1130,9 +1243,9 @@ op_func_self (ProcedureCall& call, int64_t& offset)
 
   offset += sizeof (uint32_t);
 
-  FIELD_INDEX field = tableOp.GetTable ().RetrieveField (_RC (const char*,
-                                                              text));
-  FieldOperand fieldOp (tableOp, field);
+  FIELD_INDEX field = op.GetTable ().RetrieveField (_RC (const char*, text));
+
+  FieldOperand fieldOp (op.GetTableReference (), field);
   StackValue   result (fieldOp);
 
   stack.Pop (1);
@@ -1375,6 +1488,7 @@ static OP_FUNC operations[] = {
                                 op_func_stta,
                                 op_func_stf,
                                 op_func_stXX<DArray>,
+                                op_func_stud,
 
                                 op_func_inull,
                                 op_func_nnull,
@@ -1383,7 +1497,6 @@ static OP_FUNC operations[] = {
                                 op_func_ret,
 
                                 op_func_addXX<DInt64>,
-                                op_func_addXX<DReal>,
                                 op_func_addXX<DRichReal>,
                                 op_func_addt,
 
@@ -1391,7 +1504,6 @@ static OP_FUNC operations[] = {
                                 op_func_andXX<DBool>,
 
                                 op_func_divXX<DInt64>,
-                                op_func_divXX<DReal>,
                                 op_func_divXX<DRichReal>,
 
                                 op_func_eqXX<DInt64>,
@@ -1400,7 +1512,6 @@ static OP_FUNC operations[] = {
                                 op_func_eqXX<DDate>,
                                 op_func_eqXX<DDateTime>,
                                 op_func_eqXX<DHiresTime>,
-                                op_func_eqXX<DReal>,
                                 op_func_eqXX<DRichReal>,
                                 op_func_eqXX<DText>,
 
@@ -1409,7 +1520,6 @@ static OP_FUNC operations[] = {
                                 op_func_geXX<DDate>,
                                 op_func_geXX<DDateTime>,
                                 op_func_geXX<DHiresTime>,
-                                op_func_geXX<DReal>,
                                 op_func_geXX<DRichReal>,
 
                                 op_func_gtXX<DInt64>,
@@ -1417,7 +1527,6 @@ static OP_FUNC operations[] = {
                                 op_func_gtXX<DDate>,
                                 op_func_gtXX<DDateTime>,
                                 op_func_gtXX<DHiresTime>,
-                                op_func_gtXX<DReal>,
                                 op_func_gtXX<DRichReal>,
 
                                 op_func_leXX<DInt64>,
@@ -1425,7 +1534,6 @@ static OP_FUNC operations[] = {
                                 op_func_leXX<DDate>,
                                 op_func_leXX<DDateTime>,
                                 op_func_leXX<DHiresTime>,
-                                op_func_leXX<DReal>,
                                 op_func_leXX<DRichReal>,
 
                                 op_func_ltXX<DInt64>,
@@ -1433,13 +1541,11 @@ static OP_FUNC operations[] = {
                                 op_func_ltXX<DDate>,
                                 op_func_ltXX<DDateTime>,
                                 op_func_ltXX<DHiresTime>,
-                                op_func_ltXX<DReal>,
                                 op_func_ltXX<DRichReal>,
 
                                 op_func_mod,
 
                                 op_func_mulXX<DInt64>,
-                                op_func_mulXX<DReal>,
                                 op_func_mulXX<DRichReal>,
 
                                 op_func_neXX<DInt64>,
@@ -1448,7 +1554,6 @@ static OP_FUNC operations[] = {
                                 op_func_neXX<DDate>,
                                 op_func_neXX<DDateTime>,
                                 op_func_neXX<DHiresTime>,
-                                op_func_neXX<DReal>,
                                 op_func_neXX<DRichReal>,
                                 op_func_neXX<DText>,
 
@@ -1459,7 +1564,6 @@ static OP_FUNC operations[] = {
                                 op_func_orXX<DBool>,
 
                                 op_func_subXX<DInt64>,
-                                op_func_subXX<DReal>,
                                 op_func_subXX<DRichReal>,
 
                                 op_func_xorXX<DInt64>,

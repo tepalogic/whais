@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "pm_operand.h"
+#include "pm_operand_undefined.h"
 
 #include "pm_typemanager.h"
 
@@ -38,7 +39,6 @@ IOperand::~IOperand ()
 
 
 namespace prima {
-
 
 
 bool
@@ -462,11 +462,38 @@ BaseOperand::CopyFieldOp (const FieldOperand& fieldOp)
 
 
 void
+BaseOperand::CopyNativeObjectOperand (const NativeObjectOperand& source)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+void
+BaseOperand::NativeObject (INativeObject* const)
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+INativeObject&
+BaseOperand::NativeObject ()
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+void
 BaseOperand::NotifyCopy ()
 {
   //Do nothing by default!
 }
 
+
+TableReference&
+BaseOperand::GetTableReference ()
+{
+  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+}
 
 
 template <typename T>
@@ -2966,6 +2993,27 @@ GlobalOperand::Duplicate () const
 
 
 void
+GlobalOperand::NativeObject (INativeObject* const value)
+{
+  mValue.NativeObject (value);
+}
+
+
+INativeObject&
+GlobalOperand::NativeObject ()
+{
+  return mValue.NativeObject ();
+}
+
+
+TableReference&
+GlobalOperand::GetTableReference ()
+{
+  return mValue.GetTableReference ();
+}
+
+
+void
 GlobalOperand::NotifyCopy ()
 {
   mValue.NotifyCopy ();
@@ -2997,6 +3045,13 @@ void
 GlobalOperand::CopyFieldOp (const FieldOperand& fieldOp)
 {
   mValue.CopyFieldOp (fieldOp);
+}
+
+
+void
+GlobalOperand::CopyNativeObjectOperand (const NativeObjectOperand& source)
+{
+  mValue.CopyNativeObjectOperand (source);
 }
 
 
@@ -3408,6 +3463,27 @@ LocalOperand::GetValueAt (const uint64_t index)
 }
 
 
+void
+LocalOperand::NativeObject (INativeObject* const value)
+{
+  mStack[mIndex].Operand ().NativeObject (value);
+}
+
+
+INativeObject&
+LocalOperand::NativeObject ()
+{
+  return mStack[mIndex].Operand ().NativeObject ();
+}
+
+
+TableReference&
+LocalOperand::GetTableReference ()
+{
+  return _SC (BaseOperand&, mStack[mIndex].Operand ()).GetTableReference ();
+}
+
+
 StackValue
 LocalOperand::Duplicate () const
 {
@@ -3444,6 +3520,14 @@ LocalOperand::CopyFieldOp (const FieldOperand& fieldOp)
 {
   BaseOperand& op = _SC (BaseOperand&, mStack[mIndex].Operand ());
   op.CopyFieldOp (fieldOp);
+}
+
+
+void
+LocalOperand::CopyNativeObjectOperand (const NativeObjectOperand& source)
+{
+  BaseOperand& op = _SC (BaseOperand&, mStack[mIndex].Operand ());
+  op.CopyNativeObjectOperand (source);
 }
 
 
@@ -3676,10 +3760,23 @@ SessionStack::Push (IDBSHandler& dbsHnd, ITable& table)
 
 
 void
+SessionStack::Push (INativeObject& object)
+{
+  NativeObjectOperand stackOp (object);
+
+  StackValue stackValue (stackOp);
+
+  Push (stackValue);
+}
+
+void
 SessionStack::Push (const StackValue& value)
 {
   mStack.push_back (value);
 }
+
+
+
 
 
 void

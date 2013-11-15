@@ -61,7 +61,7 @@ TableOperand::GetType ()
 StackValue
 TableOperand::GetFieldAt (const FIELD_INDEX field)
 {
-  return StackValue (FieldOperand (*this, field));
+  return StackValue (FieldOperand (GetTableReference (), field));
 }
 
 
@@ -100,10 +100,20 @@ TableOperand::CopyTableOp (const TableOperand& source)
 }
 
 
+TableReference&
+TableOperand::GetTableReference ()
+{
+  assert (IsNull () == false);
+  assert (mTableRef != NULL);
 
-FieldOperand::FieldOperand (TableOperand& tableOp, const FIELD_INDEX field)
+  return *mTableRef;
+}
+
+
+
+FieldOperand::FieldOperand (TableReference& tableRef, const FIELD_INDEX field)
   : BaseOperand (),
-    mTableRef (&tableOp.GetTableRef ()),
+    mTableRef (&tableRef),
     mField (field)
 {
   mTableRef->IncrementRefCount ();
@@ -162,7 +172,6 @@ FieldOperand::operator= (const FieldOperand& source)
       if (mTableRef)
         mTableRef->IncrementRefCount ();
     }
-
   return *this;
 }
 
@@ -295,6 +304,15 @@ FieldOperand::CopyFieldOp (const FieldOperand& source)
   *this = source;
 }
 
+
+TableReference&
+FieldOperand::GetTableReference ()
+{
+  assert (mTableRef != NULL);
+  assert (IsNull () == false);
+
+  return *mTableRef;
+}
 
 
 BaseFieldElOperand::~BaseFieldElOperand ()

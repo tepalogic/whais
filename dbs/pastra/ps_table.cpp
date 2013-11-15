@@ -609,14 +609,17 @@ TemporalTable::TemporalTable (DbsHandler&                     dbs,
 {
 
   //Check the arguments
-  if ((fields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
-    throw(DBSException(NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED)));
+  if ((fields == NULL)
+      || (fieldsCount == 0)
+      || (fieldsCount > 0xFFFFu))
+    {
+      throw(DBSException(NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED)));
+    }
 
   //Compute the table header descriptor size
   const uint32_t descriptorsSize = sizeof(FieldDescriptor) * fieldsCount +
                                      get_fields_names_len(fields, fieldsCount);
 
-  //Optimally rearrange the fields for minimum row size
   validate_field_descriptors(fields, fieldsCount);
 
   vector<DBSFieldDescriptor> vect (fields + 0, fields + fieldsCount);

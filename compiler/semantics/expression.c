@@ -569,10 +569,6 @@ translate_add_exp (struct ParserState* const         parser,
 
       break;
 
-    case W_ADDR:
-      result.type = T_REAL;
-      break;
-
     case W_ADDRR:
       result.type = T_RICHREAL;
       break;
@@ -644,10 +640,6 @@ translate_sub_exp (struct ParserState* const         parser,
 
       break;
 
-    case W_SUBR:
-      result.type = T_REAL;
-      break;
-
     case W_SUBRR:
       result.type = T_RICHREAL;
       break;
@@ -714,10 +706,6 @@ translate_mul_exp (struct ParserState* const         parser,
 
       break;
 
-    case W_MULR:
-      result.type = T_REAL;
-      break;
-
     case W_MULRR:
       result.type = T_RICHREAL;
       break;
@@ -780,10 +768,6 @@ translate_div_exp (struct ParserState* const         parser,
         result.type = T_UINT64;
       else
         result.type = T_INT64;
-      break;
-
-    case W_DIVR:
-      result.type = T_REAL;
       break;
 
     case W_DIVRR:
@@ -880,9 +864,8 @@ translate_less_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_LT) || (opcode == W_LTR) || (opcode == W_LTRR) ||
-          (opcode == W_LTC) || (opcode == W_LTD) || (opcode == W_LTDT) ||
-          (opcode == W_LTHT) || (opcode == W_LTR) || (opcode == W_LTRR));
+  assert ((opcode == W_LT) || (opcode == W_LTRR) || (opcode == W_LTC)
+          || (opcode == W_LTD) || (opcode == W_LTDT) || (opcode == W_LTHT));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -926,9 +909,8 @@ translate_exp_less_equal (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_LE) || (opcode == W_LER) || (opcode == W_LERR) ||
-          (opcode == W_LEC) || (opcode == W_LED) || (opcode == W_LEDT) ||
-          (opcode == W_LEHT) || (opcode == W_LER) || (opcode == W_LERR));
+  assert ((opcode == W_LE) || (opcode == W_LEC) || (opcode == W_LED)
+          || (opcode == W_LEDT) || (opcode == W_LEHT) || (opcode == W_LERR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -972,9 +954,8 @@ translate_grater_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_GT) || (opcode == W_GTR) || (opcode == W_GTRR) ||
-          (opcode == W_GTC) || (opcode == W_GTD) || (opcode == W_GTDT) ||
-          (opcode == W_GTHT) || (opcode == W_GTR) || (opcode == W_GTRR));
+  assert ((opcode == W_GT) || (opcode == W_GTC) || (opcode == W_GTD)
+          || (opcode == W_GTDT) || (opcode == W_GTHT) || (opcode == W_GTRR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1019,9 +1000,8 @@ translate_exp_grater_equal (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_GE) || (opcode == W_GER) || (opcode == W_GERR) ||
-          (opcode == W_GEC) || (opcode == W_GED) || (opcode == W_GEDT) ||
-          (opcode == W_GEHT) || (opcode == W_GER) || (opcode == W_GERR));
+  assert ((opcode == W_GE) || (opcode == W_GEC) || (opcode == W_GED)
+          || (opcode == W_GEDT) || (opcode == W_GEHT) || (opcode == W_GERR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1066,10 +1046,9 @@ translate_equals_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_EQ) || (opcode == W_EQR) || (opcode == W_EQRR) ||
-          (opcode == W_EQC) || (opcode == W_EQD) || (opcode == W_EQDT) ||
-          (opcode == W_EQHT) || (opcode == W_EQR) || (opcode == W_EQRR) ||
-          (opcode == W_EQB) || (opcode == W_EQT));
+  assert ((opcode == W_EQ) || (opcode == W_EQC) || (opcode == W_EQD)
+          || (opcode == W_EQDT) || (opcode == W_EQHT) || (opcode == W_EQRR)
+          || (opcode == W_EQB) || (opcode == W_EQT));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1114,10 +1093,9 @@ translate_exp_not_equals (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_NE) || (opcode == W_NER) || (opcode == W_NERR) ||
-          (opcode == W_NEC) || (opcode == W_NED) || (opcode == W_NEDT) ||
-          (opcode == W_NEHT) || (opcode == W_NER) || (opcode == W_NERR) ||
-          (opcode == W_NEB) || (opcode == W_NET));
+  assert ((opcode == W_NE) || (opcode == W_NERR) || (opcode == W_NEC)
+          || (opcode == W_NED) || (opcode == W_NEDT) ||(opcode == W_NEHT)
+          || (opcode == W_NEB) || (opcode == W_NET));
 
   result.type  = T_BOOL;
   result.extra = NULL;

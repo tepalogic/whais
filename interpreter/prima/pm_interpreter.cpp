@@ -176,6 +176,9 @@ InterException::Description () const
       case INVALID_OP_REQ:
         return "Invalid operand request.";
 
+      case INVALID_NATIVE_OP_REQ:
+        return "Incompatible dereferencing of a undefined value.";
+
       case INVALID_GLOBAL_REQ:
         return "Invalid global value request.";
 

@@ -82,7 +82,7 @@ private:
       mDbsHnd.ReleaseTable (mTable);
   }
 
-  IDBSHandler&    mDbsHnd;
+  IDBSHandler&     mDbsHnd;
   ITable&          mTable;
   uint64_t         mRefCount;
 };
