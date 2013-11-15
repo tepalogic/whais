@@ -110,6 +110,28 @@ TableOperand::GetTableReference ()
 }
 
 
+FieldOperand::FieldOperand (TableOperand& tableOp, const FIELD_INDEX field)
+  : BaseOperand (),
+    mTableRef (&tableOp.GetTableReference ()),
+    mField (field)
+{
+  mTableRef->IncrementRefCount ();
+
+  ITable&                  table     = mTableRef->GetTable ();
+  const DBSFieldDescriptor fieldDesc = table.DescribeField (field);
+
+  mFieldType = fieldDesc.type;
+
+  assert ((mFieldType > T_UNKNOWN) && (mFieldType < T_UNDETERMINED));
+
+  if (fieldDesc.isArray)
+    {
+      assert (mFieldType != T_TEXT);
+
+      MARK_ARRAY (mFieldType);
+    }
+}
+
 
 FieldOperand::FieldOperand (TableReference& tableRef, const FIELD_INDEX field)
   : BaseOperand (),

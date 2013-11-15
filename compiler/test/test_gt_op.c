@@ -195,7 +195,7 @@ check_op_symmetry ()
   for (i = T_END_OF_TYPES - 1, j = 0; (i >= 0) && (j < T_END_OF_TYPES);
        i--, j++)
     {
-      if (grater_op[i][j] != grater_op[j][i])
+      if (greater_op[i][j] != greater_op[j][i])
         {
           return FALSE;
         }
@@ -242,8 +242,6 @@ check_procedure (struct ParserState *state, char * proc_name)
       op_expect = W_GT;
       break;
     case T_REAL:
-      op_expect = W_GTR;
-      break;
     case T_RICHREAL:
       op_expect = W_GTRR;
       break;

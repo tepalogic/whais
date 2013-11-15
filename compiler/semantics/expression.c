@@ -521,19 +521,18 @@ translate_add_exp (struct ParserState* const         parser,
   struct Statement* const     stmt    = parser->pCurrentStmt;
   struct WOutputStream* const instrs  = stmt_query_instrs (stmt);
   enum W_OPCODE               opcode  = W_NA;
+  const uint_t                ftype   = GET_TYPE (opType1->type);
+  const uint_t                stype   = GET_TYPE (opType2->type);
   struct ExpResultType        result;
 
-  if ((GET_TYPE (opType1->type) < T_END_OF_TYPES) &&
-      (GET_TYPE (opType2->type) < T_END_OF_TYPES))
-    {
-      opcode = add_op[GET_TYPE (opType1->type)][GET_TYPE (opType2->type)];
-    }
+  if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
+    opcode = add_op[GET_TYPE (opType1->type)][GET_TYPE (opType2->type)];
 
-  if ((opcode == W_NA)
-      && (GET_TYPE (opType2->type) == T_UNDETERMINED))
-    {
-      opcode = add_op[GET_TYPE (opType1->type)][GET_TYPE(opType1->type)];
-    }
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = add_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (ftype == T_UNDETERMINED))
+    opcode = add_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -606,6 +605,9 @@ translate_sub_exp (struct ParserState* const         parser,
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = sub_op[ftype][ftype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = sub_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -671,6 +673,9 @@ translate_mul_exp (struct ParserState* const         parser,
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = mul_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = mul_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -739,6 +744,9 @@ translate_div_exp (struct ParserState* const         parser,
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = div_op[ftype][ftype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = div_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -802,6 +810,9 @@ translate_mod_exp (struct ParserState* const         parser,
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = mod_op[ftype][ftype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = mod_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -845,6 +856,9 @@ translate_less_exp (struct ParserState* const         parser,
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = less_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = less_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -891,6 +905,9 @@ translate_exp_less_equal (struct ParserState* const         parser,
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = less_eq_op[ftype][ftype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = less_eq_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -919,7 +936,7 @@ translate_exp_less_equal (struct ParserState* const         parser,
 }
 
 static struct ExpResultType
-translate_grater_exp (struct ParserState* const         parser,
+translate_greater_exp (struct ParserState* const         parser,
                       const struct ExpResultType* const opType1,
                       const struct ExpResultType* const opType2)
 {
@@ -931,10 +948,13 @@ translate_grater_exp (struct ParserState* const         parser,
   struct ExpResultType        result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
-    opcode = grater_op[ftype][stype];
+    opcode = greater_op[ftype][stype];
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
-    opcode = grater_op[ftype][ftype];
+    opcode = greater_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = greater_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -965,9 +985,9 @@ translate_grater_exp (struct ParserState* const         parser,
 
 
 static struct ExpResultType
-translate_exp_grater_equal (struct ParserState* const         parser,
-                            const struct ExpResultType* const opType1,
-                            const struct ExpResultType* const opType2)
+translate_exp_greater_equal (struct ParserState* const         parser,
+                             const struct ExpResultType* const opType1,
+                             const struct ExpResultType* const opType2)
 {
   struct Statement* const     stmt    = parser->pCurrentStmt;
   struct WOutputStream* const instrs  = stmt_query_instrs (stmt);
@@ -977,10 +997,13 @@ translate_exp_grater_equal (struct ParserState* const         parser,
   struct ExpResultType        result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
-    opcode = grater_eq_op[ftype][stype];
+    opcode = greater_eq_op[ftype][stype];
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
-    opcode = grater_eq_op[ftype][ftype];
+    opcode = greater_eq_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = greater_eq_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -1027,6 +1050,9 @@ translate_equals_exp (struct ParserState* const         parser,
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = equals_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = equals_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -1075,6 +1101,9 @@ translate_exp_not_equals (struct ParserState* const         parser,
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = not_equals_op[ftype][ftype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = not_equals_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -1121,6 +1150,9 @@ translate_or_exp (struct ParserState* const         parser,
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = or_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = or_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -1179,6 +1211,9 @@ translate_and_exp (struct ParserState* const         parser,
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = and_op[ftype][ftype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = and_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -1231,6 +1266,9 @@ translate_xor_exp (struct ParserState* const         parser,
 
   if ((opcode == W_NA) && (stype == T_UNDETERMINED))
     opcode = xor_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = xor_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -1455,18 +1493,16 @@ translate_sadd_exp (struct ParserState* const         parser,
 
   if (is_integer (ftype))
     {
-      if (is_integer(stype) || (stype == T_UNDETERMINED))
+      if (is_integer(stype))
         opcode = W_SADD;
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer (stype)
-          || (stype == T_UNDETERMINED)
-          || (stype == T_REAL)
-          || (stype == T_RICHREAL))
-        {
-          opcode = W_SADDRR;
-        }
+      if (is_integer (stype))
+        opcode = W_SADD;
+
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SADDRR;
     }
   else if (ftype == T_TEXT)
     {
@@ -1523,18 +1559,16 @@ translate_ssub_exp (struct ParserState* const         parser,
 
   if (is_integer (ftype))
     {
-      if (is_integer(stype) || (stype == T_UNDETERMINED))
+      if (is_integer(stype))
         opcode = W_SSUB;
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer (stype)
-          || (stype == T_UNDETERMINED)
-          || (stype == T_REAL)
-          || (stype == T_RICHREAL))
-        {
-          opcode = W_SSUBRR;
-        }
+      if (is_integer (stype))
+        opcode = W_SSUB;
+
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SSUBRR;
     }
 
   if (opcode == W_NA)
@@ -1563,7 +1597,6 @@ translate_ssub_exp (struct ParserState* const         parser,
   return result;
 }
 
-
 static struct ExpResultType
 translate_smul_exp (struct ParserState* const         parser,
                     const struct ExpResultType* const opType1,
@@ -1584,18 +1617,16 @@ translate_smul_exp (struct ParserState* const         parser,
 
   if (is_integer (ftype))
     {
-      if (is_integer(stype) || (stype == T_UNDETERMINED))
+      if (is_integer(stype))
         opcode = W_SMUL;
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer (stype)
-          || (stype == T_UNDETERMINED)
-          || (stype == T_REAL)
-          || (stype == T_RICHREAL))
-      {
+      if (is_integer (stype))
+        opcode = W_SMUL;
+
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
         opcode = W_SMULRR;
-      }
     }
 
   if (opcode == W_NA)
@@ -1644,18 +1675,16 @@ translate_sdiv_exp (struct ParserState* const         parser,
 
   if (is_integer (ftype))
     {
-      if (is_integer(stype) || (stype == T_UNDETERMINED))
+      if (is_integer(stype))
         opcode = W_SDIV;
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer (stype)
-          || (stype == T_UNDETERMINED)
-          || (stype == T_REAL)
-          || (stype == T_RICHREAL))
-        {
-          opcode = W_SDIVRR;
-        }
+      if (is_integer (stype))
+        opcode = W_SDIV;
+
+      else if ((stype == T_REAL) || (stype == T_RICHREAL))
+        opcode = W_SDIVRR;
     }
 
   if (opcode == W_NA)
@@ -1702,7 +1731,7 @@ translate_smod_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  if (is_integer (ftype) && (is_integer(stype) || (stype == T_UNDETERMINED)))
+  if (is_integer (ftype) && is_integer(stype))
     opcode = W_SMOD;
 
   if (opcode == W_NA)
@@ -1750,14 +1779,11 @@ translate_sand_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  if (is_integer (ftype) && (is_integer(stype) || (stype == T_UNDETERMINED)))
+  if (is_integer (ftype) && is_integer(stype))
     opcode = W_SAND;
 
-  else if ((ftype == T_BOOL)
-           && ((stype == T_BOOL) || (stype == T_UNDETERMINED)))
-    {
-      opcode = W_SANDB;
-    }
+  else if ((ftype == T_BOOL) && (stype == T_BOOL))
+    opcode = W_SANDB;
 
   if (opcode == W_NA)
     {
@@ -1804,14 +1830,11 @@ translate_sxor_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  if (is_integer (ftype) && (is_integer(stype) || (stype == T_UNDETERMINED)))
+  if (is_integer (ftype) && is_integer(stype))
     opcode = W_SXOR;
 
-  else if ((ftype == T_BOOL)
-           && ((stype == T_BOOL) || (stype == T_UNDETERMINED)))
-    {
-      opcode = W_SXORB;
-    }
+  else if ((ftype == T_BOOL) && (stype == T_BOOL))
+    opcode = W_SXORB;
 
   if (opcode == W_NA)
     {
@@ -1857,14 +1880,11 @@ translate_sor_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  if (is_integer (ftype) && (is_integer(stype) || (stype == T_UNDETERMINED)))
+  if (is_integer (ftype) && is_integer(stype))
     opcode = W_SOR;
 
-  else if ((ftype == T_BOOL)
-           && ((stype == T_BOOL) || (stype == T_UNDETERMINED)))
-    {
-      opcode = W_SORB;
-    }
+  else if ((ftype == T_BOOL) && (stype == T_BOOL))
+    opcode = W_SORB;
 
   if (opcode == W_NA)
     {
@@ -2019,11 +2039,11 @@ translate_opcode_exp (struct ParserState* const   parser,
       break;
 
     case OP_GT:
-      result = translate_grater_exp (parser, opType1, opType2);
+      result = translate_greater_exp (parser, opType1, opType2);
       break;
 
     case OP_GE:
-      result = translate_exp_grater_equal (parser, opType1, opType2);
+      result = translate_exp_greater_equal (parser, opType1, opType2);
       break;
 
     case OP_EQ:

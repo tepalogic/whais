@@ -242,8 +242,6 @@ check_procedure (struct ParserState *state, char * proc_name)
       op_expect = W_LE;
       break;
     case T_REAL:
-      op_expect = W_LER;
-      break;
     case T_RICHREAL:
       op_expect = W_LERR;
       break;

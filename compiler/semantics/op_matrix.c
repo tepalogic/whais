@@ -179,7 +179,7 @@ const enum W_OPCODE less_eq_op[T_END_OF_TYPES][T_END_OF_TYPES] =
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA}
 };
 
-const enum W_OPCODE grater_op[T_END_OF_TYPES][T_END_OF_TYPES] =
+const enum W_OPCODE greater_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 {
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA},
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA},
@@ -201,7 +201,7 @@ const enum W_OPCODE grater_op[T_END_OF_TYPES][T_END_OF_TYPES] =
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA}
 };
 
-const enum W_OPCODE grater_eq_op[T_END_OF_TYPES][T_END_OF_TYPES] =
+const enum W_OPCODE greater_eq_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 {
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA},
   {W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA, W_NA},

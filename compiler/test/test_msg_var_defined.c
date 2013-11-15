@@ -84,27 +84,6 @@ char test_prog_4[] = ""
   "v3 = v1 + v2;\n "
   "LET v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
-char test_prog_5[] = ""
-  "PROCEDURE ProcId1 () RETURN INT32 \n"
-  "DO \n"
-  "LET v3 as TABLE;\n "
-  "RETURN 10; \n"
-  "ENDPROC \n" " \n";
-
-char test_prog_6[] = ""
-  "PROCEDURE ProcId1 () RETURN INT32 \n"
-  "DO \n"
-  "LET v3 AS ARRAY;\n "
-  "RETURN 10; \n"
-  "ENDPROC \n" " \n";
-
-char test_prog_7[] = ""
-  "PROCEDURE ProcId1 () RETURN INT32 \n"
-  "DO \n"
-  "LET v3 AS FIELD;\n "
-  "RETURN 10; \n"
-  "ENDPROC \n" " \n";
-
 
 
 bool_t
@@ -159,18 +138,6 @@ main ()
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
                                                      MSG_VAR_DEFINED,
-                                                     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
-                                                     MSG_TABLE_INCOMPLETE,
-                                                     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
-                                                     MSG_ARRAY_INCOMPLETE,
-                                                     MSG_ERROR_EVENT);
-  test_result =
-    (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
-                                                     MSG_FIELD_INCOMPLETE,
                                                      MSG_ERROR_EVENT);
 
   if (test_result == FALSE)

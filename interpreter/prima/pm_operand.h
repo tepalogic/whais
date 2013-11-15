@@ -1606,6 +1606,7 @@ public:
     assert (GET_BASIC_TYPE (fieldType) > T_UNKNOWN);
   }
 
+  FieldOperand (TableOperand& tableOp, const FIELD_INDEX field);
   FieldOperand (TableReference& tableRef, const FIELD_INDEX field);
   FieldOperand (const FieldOperand& source);
   virtual ~FieldOperand ();
