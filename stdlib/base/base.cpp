@@ -165,9 +165,34 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcNativeYear,
                                                     &gProcDateWeek,
                                                     &gProcLastDateOfWeek,
-                                                    &gProcDayOfWeek
+                                                    &gProcDayOfWeek,
+                         /* Text procedures */
+                                                    &gIsUpper,
+                                                    &gIsLower,
+                                                    &gIsDigit,
+                                                    &gIsAlpha,
+                                                    &gIsSpace,
+                                                    &gIsPunct,
+                                                    &gIsPrint,
+                                                    &gUnicodeCP,
+                                                    &gUpperChar,
+                                                    &gLowerChar,
+                                                    &gUpperText,
+                                                    &gLowerText,
+                                                    &gTextToUtf8,
+                                                    &gTextFromUtf8,
+                                                    &gTextToUtf16,
+                                                    &gTextFromUtf16,
+                                                    &gTextToCharArray,
+                                                    &gTextFromCharArray,
+                                                    &gTextCharsCount,
+                                                    &gTextHash,
+                                                    &gCharFind,
+                                                    &gTextFind,
+                                                    &gTextCompare
 
                                                           };
+
 
 static const WLIB_DESCRIPTION sgLibraryDescription = {
     sizeof (sgRegisteredProcs) / sizeof (sgRegisteredProcs[0]),
@@ -198,7 +223,8 @@ wlib_start ()
       if (((status = base_types_init ()) != WOP_OK)
           || ((status = base_generics_init ()) != WOP_OK)
           || ((status = base_constants_init ()) != WOP_OK)
-          || ((status  = base_dates_init ()) != WOP_OK))
+          || ((status = base_dates_init ()) != WOP_OK)
+          || ((status = base_text_init ()) != WOP_OK))
         {
           return status;
         }

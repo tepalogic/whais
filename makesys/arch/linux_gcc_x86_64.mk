@@ -13,7 +13,7 @@ LD:=g++
 AR:=ar
 
 #Commn compile flags
-CC_FLAGS=-Wall -m64 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format -Wno-format-security -Wno-strict-aliasing
+CC_FLAGS:=-Wall -m64 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -fno-omit-frame-pointer -Wno-strict-aliasing -Wno-format
 
 ifeq ($(ASSERTS),no)
 DEFINES+=NDEBUG
@@ -28,14 +28,14 @@ endif
 endif
 
 ifeq ($(DEBUGINFO),yes)
-CC_FLAGS+= -g
+CC_FLAGS+= -ggdb3
 endif
 
 ifeq ($(PROFILE),yes)
 CC_FLAGS+= -pg
 endif
 
-CXX_FLAGS:=$(CC_FLAGS) -fno-rtti
+CXX_FLAGS:=$(CC_FLAGS) -fno-rtti $(EXT_CXX_FLAGS)
 CC_FLAGS+=$(EXT_CC_FLAGS)
 
 DEFINES+=ARCH_LINUX_GCC=1

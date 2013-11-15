@@ -1804,8 +1804,8 @@ public:
 
   void RawRead (uint64_t offset, uint64_t count, uint8_t* dest) const;
 
-  uint64_t BytesUntilChar (const uint64_t chIndex) const;
-  uint64_t CharsUntilByte (const uint64_t offset) const;
+  uint64_t OffsetOfChar (const uint64_t chIndex) const;
+  uint64_t CharsUntilOffset (const uint64_t offset) const;
 
   void Append (const DChar& ch);
   void Append (const DText& text);
@@ -1813,25 +1813,24 @@ public:
   DChar CharAt (const uint64_t index) const;
   void  CharAt (const uint64_t index, const DChar& ch);
 
-  DUInt64 FindSubstr (const DText&      pattern,
-                      const DUInt64     from         = DUInt64 (),
-                      const DUInt64     to           = DUInt64 (),
-                      const DBool       ignoreCase   = DBool ());
+  DUInt64 FindInText (const DText&     text,
+                      const bool       ignoreCase    = false,
+                      const uint64_t   fromCh        = 0,
+                      const uint64_t   toCh          = 0xFFFFFFFFFFFFFFFFull);
 
-  DUInt64 FindSubstrNext () const;
+  DUInt64 FindSubstring (DText&        substring,
+                        const bool     ignoreCase    = false,
+                        const uint64_t fromCh        = 0,
+                        const uint64_t toCh          = 0xFFFFFFFFFFFFFFFFull);
 
-  DUInt64 FindSubstrRaw (const DText&      pattern,
-                         const DUInt64     from        = DUInt64 (),
-                         const DUInt64     to          = DUInt64 (),
-                         const DBool       ignoreCase  = DBool ());
+  DText ReplaceSubstr (DText&          substring,
+                       const DText&    newSubString,
+                       const bool      ignoreCase   = false,
+                       const uint64_t  fromCh       = 0,
+                       const uint64_t  toCh         = 0xFFFFFFFFFFFFFFFFull);
 
-  DUInt64 FindSubstrNextRaw () const;
-
-  DText ReplaceSubstr (const DText&      substr,
-                       const DText&      newSubstr,
-                       const DUInt64     from        = DUInt64 (),
-                       const DUInt64     to          = DUInt64 (),
-                       const DBool       ignoreCase  = DBool ());
+  DText LowerCase () const;
+  DText UpperCase () const;
 
   void MakeMirror (DText& mirror) const;
 
@@ -1845,7 +1844,21 @@ public:
     return *mText;
   }
 
+
 private:
+  void AppendRaw (const DText&     text,
+                  const uint64_t   fromOff,
+                  const uint64_t   toOff);
+
+  DUInt64 FindInTextUTF8 (const DText&       text,
+                          const bool         ignoreCase,
+                          const uint64_t     fromCh,
+                          const uint64_t     toCh);
+  DUInt64 FindNextUTF8 () const;
+
+
+  void AllCharsToCase (const bool lowerCase);
+
   ITextStrategy*      mText;
   void*               mStringMatcher;
 };

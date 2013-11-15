@@ -23,7 +23,7 @@ get_test_array ()
 
   array.Add (DChar ('A'));
   array.Add (DChar ('B'));
-  array.Add (DChar (0x234151));
+  array.Add (DChar (0x104151));
 
   return array;
 }

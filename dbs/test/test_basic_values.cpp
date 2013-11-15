@@ -77,8 +77,8 @@ main ()
                                           DBool (false));
   success = success & test_bounds_values (DChar (1),
                                           DChar (2),
-                                          DChar (0x7FFFFFFF),
-                                          DChar (0x7FFFFFFE));
+                                          DChar (0x10FFFF),
+                                          DChar (0x10FFFE));
   success = success & test_bounds_values (DDate (-32768, 1, 1),
                                           DDate (-32768, 1, 2),
                                           DDate (32767, 12, 31),
