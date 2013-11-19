@@ -66,6 +66,10 @@ UNIT_EXES+=test_char_operand
 test_char_operand_SRC=test/test_char_operand.cpp
 test_char_operand_LIB=dbs/wslpastra  custom/wslcommon interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom
 
+UNIT_EXES+=test_nativeobj_operand
+test_nativeobj_operand_SRC=test/test_nativeobj_operand.cpp
+test_nativeobj_operand_LIB=dbs/wslpastra  custom/wslcommon interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom
+
 UNIT_EXES+=test_ops_ldXX
 test_ops_ldXX_SRC=test/test_ops_ldXX.cpp
 test_ops_ldXX_LIB=dbs/wslpastra  custom/wslcommon interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom

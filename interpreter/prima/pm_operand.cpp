@@ -2272,7 +2272,7 @@ void
 RealOperand::GetValue (DRichReal& outValue) const
 {
   _CC (bool&,       outValue.mIsNull) = mValue.mIsNull;
-  _CC (RICHREAL_T&, outValue.mValue)  = _SC (RICHREAL_T, mValue.mValue);
+  _CC (RICHREAL_T&, outValue.mValue)  = mValue.mValue;
 }
 
 
@@ -2366,7 +2366,7 @@ void
 RichRealOperand::GetValue (DReal& outValue) const
 {
   _CC (bool&,   outValue.mIsNull) = mValue.mIsNull;
-  _CC (REAL_T&, outValue.mValue)  = _SC (REAL_T, mValue.mValue);
+  _CC (REAL_T&, outValue.mValue)  = mValue.mValue;
 }
 
 

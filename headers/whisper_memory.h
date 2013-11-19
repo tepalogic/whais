@@ -169,7 +169,6 @@ public:
         a /= b; //If you are to crash make it loud.
       }
 
-
     if ((--smInitCount & 0x7FFFFFFF) == 0)
       PrintMemoryStatistics ();
   }

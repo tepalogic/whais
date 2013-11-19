@@ -103,7 +103,6 @@ TableOperand::CopyTableOp (const TableOperand& source)
 TableReference&
 TableOperand::GetTableReference ()
 {
-  assert (IsNull () == false);
   assert (mTableRef != NULL);
 
   return *mTableRef;
@@ -190,6 +189,7 @@ FieldOperand::operator= (const FieldOperand& source)
 
       mField     = source.mField;
       mTableRef  = source.mTableRef;
+      mFieldType = source.mFieldType;
 
       if (mTableRef)
         mTableRef->IncrementRefCount ();
@@ -201,7 +201,7 @@ FieldOperand::operator= (const FieldOperand& source)
 bool
 FieldOperand::IsNull () const
 {
-  return (mTableRef == NULL);
+  return mTableRef == NULL;
 }
 
 

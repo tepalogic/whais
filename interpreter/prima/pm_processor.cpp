@@ -450,11 +450,9 @@ op_func_stud (ProcedureCall& call, int64_t& offset)
     }
   else if (IS_TABLE (srcType))
     {
-      TableReference* const temp = src.IsNull () ?
-                                    NULL :
-                                    &src.GetTableReference ();
-
-      dest.CopyNativeObjectOperand (NativeObjectOperand (temp));
+      dest.CopyNativeObjectOperand (
+                            NativeObjectOperand (src.GetTableReference ())
+                                   );
     }
   else if (IS_FIELD (srcType))
     {
@@ -466,9 +464,9 @@ op_func_stud (ProcedureCall& call, int64_t& offset)
       const FIELD_INDEX fieldIndex  = src.GetField ();
 
 
-      dest.CopyNativeObjectOperand (NativeObjectOperand (temp,
-                                                         fieldIndex,
-                                                         type));
+      dest.CopyNativeObjectOperand (
+                        NativeObjectOperand (temp, fieldIndex, type)
+                                   );
     }
   else if (IS_ARRAY (srcType))
     transfer_undef_value<DArray> (dest, src);

@@ -64,7 +64,8 @@ public:
                        const uint8_t   secs         = 0,
                        const uint32_t  microsec     = 0);
 
-  explicit NativeObjectOperand (TableReference* const tableRef);
+  explicit NativeObjectOperand (TableReference& tableRef);
+
   explicit NativeObjectOperand (TableReference* const tableRef,
                                 const uint_t          fieldIndex,
                                 const uint_t          type);
@@ -111,42 +112,15 @@ public:
   virtual void SetValue (const DText& value);
   virtual void SetValue (const DArray& value);
 
-  virtual void SelfAdd (const DInt64& value);
-  virtual void SelfAdd (const DRichReal& value);
-  virtual void SelfAdd (const DChar& value);
-  virtual void SelfAdd (const DText& value);
-
-  virtual void SelfSub (const DInt64& value);
-  virtual void SelfSub (const DRichReal& value);
-
-  virtual void SelfMul (const DInt64& value);
-  virtual void SelfMul (const DRichReal& value);
-
-  virtual void SelfDiv (const DInt64& value);
-  virtual void SelfDiv (const DRichReal& value);
-
-  virtual void SelfMod (const DInt64& value);
-
-  virtual void SelfAnd (const DInt64& value);
-  virtual void SelfAnd (const DBool& value);
-
-  virtual void SelfXor (const DInt64& value);
-  virtual void SelfXor (const DBool& value);
-
-  virtual void SelfOr (const DInt64& value);
-  virtual void SelfOr (const DBool& value);
-
   virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
 
   virtual ITable& GetTable ();
 
-  virtual StackValue GetFieldAt (const FIELD_INDEX field);
-
-  virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
 
   virtual void           NativeObject (INativeObject* const value);
   virtual INativeObject& NativeObject();
@@ -157,28 +131,42 @@ public:
 
 private:
   struct RealValue
-    {
-      int64_t   mIntPart;
-      int64_t   mFracPart;
-    };
+  {
+    int64_t   mIntPart  : 64;
+    int64_t   mFracPart : 63;
+    int64_t   mNull     : 1;
+  };
 
   struct FieldValue
-    {
-      TableReference*   mTableRef;
-      uint64_t          mFieldIndex;
-    };
+  {
+    TableReference*   mTableRef;
+    FIELD_INDEX       mFieldIndex;
+    bool              mNull;
+  };
 
   struct TimeValue
-    {
-      uint32_t  mMicrosec;
-      int16_t   mYear;
-      uint8_t   mMonth;
-      uint8_t   mDay;
-      uint8_t   mHours;
-      uint8_t   mMins;
-      uint8_t   mSecs;
-    };
+  {
+    uint32_t  mMicrosec;
+    int16_t   mYear;
+    uint8_t   mMonth;
+    uint8_t   mDay;
+    uint8_t   mHours;
+    uint8_t   mMins;
+    uint8_t   mSecs;
+    bool      mNull;
+  };
 
+  struct IntValue
+  {
+    int64_t   mValue;
+    bool      mNull;
+  };
+
+  struct UIntValue
+  {
+    uint64_t   mValue;
+    bool       mNull;
+  };
 
 
   void Initialise ();
@@ -186,20 +174,21 @@ private:
 
 
 
+  uint16_t               mType;
   union
     {
-      uint64_t          mUIntValue;
-      int64_t           mIntValue;
-      INativeObject*    mNativeValue;
-      TableReference*   mTableValue;
-      FieldValue        mFieldValue;
-      RealValue         mRealValue;
-      TimeValue         mTimeValue;
-      uint8_t           mArrayValue[sizeof (DArray)];
-      uint8_t           mTextValue[sizeof (DText)];
+      UIntValue          mUIntValue;
+      IntValue           mIntValue;
+
+      INativeObject*     mNativeValue;
+      TableReference*    mTableValue;
+      FieldValue         mFieldValue;
+      RealValue          mRealValue;
+      TimeValue          mTimeValue;
+
+      uint8_t            mArrayValue[sizeof (DArray)];
+      uint8_t            mTextValue[sizeof (DText)];
     };
-  uint16_t      mType;
-  bool          mNull;
 };
 
 

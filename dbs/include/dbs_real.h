@@ -343,7 +343,7 @@ private:
   TF    mFracPart;
 };
 
-typedef DBSReal<int64_t, int32_t, DBS_REAL_PREC>      DBS_REAL_T;
+typedef DBSReal<int64_t, int64_t, DBS_REAL_PREC>      DBS_REAL_T;
 typedef DBSReal<int64_t, int64_t, DBS_RICHREAL_PREC>  DBS_RICHREAL_T;
 
 template<typename T>
