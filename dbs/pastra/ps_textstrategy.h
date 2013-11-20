@@ -30,6 +30,7 @@
 #include "ps_container.h"
 #include "ps_varstorage.h"
 
+
 namespace whisper {
 
 namespace pastra {
@@ -60,6 +61,10 @@ public:
 
   virtual uint64_t CharsCount () = 0;
 
+  virtual uint64_t CharsUntilOffset (const uint64_t offset) = 0;
+
+  virtual uint64_t OffsetOfChar (const uint64_t index) = 0;
+
   virtual uint64_t BytesCount () const = 0;
 
   virtual void Duplicate (ITextStrategy&  source,
@@ -69,7 +74,9 @@ public:
 
   virtual void    Append (const uint32_t ch) = 0;
 
-  virtual void    Append (ITextStrategy& text) = 0;
+  virtual void    Append (ITextStrategy& text,
+                          const uint64_t fromOff,
+                          const uint64_t toOff) = 0;
 
   virtual void    Truncate (uint64_t newCharCount) = 0;
 
@@ -123,16 +130,22 @@ public:
 
   virtual uint64_t CharsCount ();
 
+  virtual uint64_t CharsUntilOffset (const uint64_t offset);
+
+  virtual uint64_t OffsetOfChar (const uint64_t index);
+
   virtual uint64_t BytesCount () const;
 
   virtual void Duplicate (ITextStrategy&  source,
-                          const uint64_t  maxCharsCount);
+                          const uint64_t  bytesCount);
 
   virtual DChar   CharAt (const uint64_t index);
 
   virtual void    Append (const uint32_t ch);
 
-  virtual void    Append (ITextStrategy& text);
+  virtual void    Append (ITextStrategy& text,
+                          const uint64_t fromOff,
+                          const uint64_t toOff);
 
   virtual void    Truncate (uint64_t newCharCount);
 
@@ -147,20 +160,27 @@ public:
   virtual RowFieldText& GetRow ();
 
 protected:
+  static const uint64_t INVALID_CACHE_VALUE     = ~0ull;
+  static const uint_t   GENERIC_CACHE_BUFF_SIZE = 512;
+
+
   virtual ~GenericText ();
 
   virtual void ClearMyself () = 0;
 
-  uint64_t mBytesSize;
-  uint64_t mCachedCharCount;
-  uint64_t mCachedCharIndex;
-  uint64_t mCachedCharIndexOffset;
-  uint_t   mReferenceCount;
-  uint_t   mShareCount;
+  uint64_t    mBytesSize;
+  uint64_t    mCachedCharCount;
+  uint64_t    mCachedCharIndex;
+  uint64_t    mCachedCharIndexOffset;
+  uint64_t    mCacheStartOff;
+  uint_t      mCacheValid;
+  uint_t      mReferenceCount;
+  uint_t      mShareCount;
+  uint8_t     mCacheBuffer[GENERIC_CACHE_BUFF_SIZE];
 
 
-  static const uint64_t INVALID_CACHE_VALUE = ~0ull;
 };
+
 
 class NullText : public GenericText
 {
@@ -199,6 +219,7 @@ protected:
 
 };
 
+
 class TemporalText : public GenericText
 {
   friend class PrototypeTable;
@@ -228,6 +249,7 @@ protected:
 
   TemporalContainer mStorage;
 };
+
 
 class RowFieldText : public GenericText
 {
@@ -276,6 +298,7 @@ private:
   RowFieldText (const RowFieldText&);
   RowFieldText operator= (const RowFieldText&);
 };
+
 
 } //namespace pastra
 } //namespace whisper

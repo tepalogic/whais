@@ -134,9 +134,9 @@ test_op_ldc (Session& session)
   SessionStack stack;
 
   uint_t opSize = w_encode_opcode (W_LDC, testCode);
-  testCode [opSize + 3] = 0x53;
-  testCode [opSize + 2] = 0x52;
-  testCode [opSize + 1] = 0x51;
+  testCode [opSize + 3] = 0x00;
+  testCode [opSize + 2] = 0x02;
+  testCode [opSize + 1] = 0x61;
   testCode [opSize + 0] = 0x50;
   w_encode_opcode (W_RET, testCode + opSize + 4);
 
@@ -147,7 +147,7 @@ test_op_ldc (Session& session)
 
   DChar value;
   stack[0].Operand ().GetValue (value);
-  if (value != DChar (0x53525150))
+  if (value != DChar (0x26150))
     return false;
 
   return true;

@@ -109,7 +109,25 @@ wh_utf16_strlen (const uint16_t* utf16Str);
 
 
 #ifdef __cplusplus
-}
+} //extern "C"
+
+class UTF8_CU_COUNTER
+{
+public:
+  static uint8_t COUNTS[256];
+
+  static uint8_t Count (const uint8_t cu)
+  {
+    return UTF8_CU_COUNTER::COUNTS [cu];
+  }
+
+  UTF8_CU_COUNTER ()
+    {
+      for (uint_t i = 0; i < sizeof (COUNTS); ++i)
+        COUNTS[i] = wh_utf8_cu_count (i);
+    }
+};
+
 #endif
 
 #endif /* WUTF_H_ */

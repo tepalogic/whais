@@ -13,7 +13,7 @@ LD:=g++
 AR:=ar
 
 #Commn compile flags
-CC_FLAGS:=-Wall -m32 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -Wno-strict-aliasing
+CC_FLAGS:=-Wall -m32 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -fno-omit-frame-pointer -Wno-strict-aliasing 
 
 ifeq ($(ASSERTS),no)
 DEFINES+=NDEBUG
@@ -28,7 +28,7 @@ endif
 endif
 
 ifeq ($(DEBUGINFO),yes)
-CC_FLAGS+= -g
+CC_FLAGS+= -ggdb3
 endif
 
 ifeq ($(PROFILE),yes)

@@ -29,6 +29,30 @@
 
 #include "stdlib/interface.h"
 
+extern whisper::WLIB_PROC_DESCRIPTION       gIsUpper;
+extern whisper::WLIB_PROC_DESCRIPTION       gIsLower;
+extern whisper::WLIB_PROC_DESCRIPTION       gIsDigit;
+extern whisper::WLIB_PROC_DESCRIPTION       gIsAlpha;
+extern whisper::WLIB_PROC_DESCRIPTION       gIsSpace;
+extern whisper::WLIB_PROC_DESCRIPTION       gIsPunct;
+extern whisper::WLIB_PROC_DESCRIPTION       gIsPrint;
+extern whisper::WLIB_PROC_DESCRIPTION       gUnicodeCP;
+extern whisper::WLIB_PROC_DESCRIPTION       gUpperChar;
+extern whisper::WLIB_PROC_DESCRIPTION       gLowerChar;
+extern whisper::WLIB_PROC_DESCRIPTION       gUpperText;
+extern whisper::WLIB_PROC_DESCRIPTION       gLowerText;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextToUtf8;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextFromUtf8;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextToUtf16;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextFromUtf16;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextToCharArray;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextFromCharArray;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextCharsCount;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextHash;
+extern whisper::WLIB_PROC_DESCRIPTION       gCharFind;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextFind;
+extern whisper::WLIB_PROC_DESCRIPTION       gTextCompare;
+
 whisper::WLIB_STATUS
 base_text_init ();
 
