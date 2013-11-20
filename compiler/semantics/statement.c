@@ -437,7 +437,7 @@ type_spec_fill_basic (struct WOutputStream* const     typeStream,
           && (IS_TABLE (var->type) == FALSE)
           && (IS_FIELD (var->type) == FALSE));
   assert (var->type != T_UNKNOWN);
-  assert (var->type <= T_TEXT);
+  assert (var->type <= T_UNDETERMINED);
 
   store_le_int16 (GET_BASIC_TYPE (var->type), spec.type);
   store_le_int16 (2, spec.dataSize);

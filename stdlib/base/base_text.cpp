@@ -77,7 +77,6 @@ WLIB_PROC_DESCRIPTION       gTextCompare;
 
 
 
-
 static int
 compare_chars (const int   c1,
                const int   c2,
@@ -492,7 +491,7 @@ find_char_offset (SessionStack& stack, ISession&)
 
   const bool     igCase  = (ignoreCase == DBool (true));
   const uint64_t fromOff = from.IsNull () ? 0 : from.mValue;
-  const uint64_t endOff  = min ((to.IsNull () ? ~0ull : to.mValue),
+  const uint64_t endOff  = MIN ((to.IsNull () ? ~0ull : to.mValue),
                                 text.Count ());
   const uint32_t c       = igCase ? tolower (ch.mValue) : ch.mValue;
 
@@ -534,7 +533,7 @@ find_substring_offset (SessionStack& stack, ISession&)
 
   const bool     igCase  = (ignoreCase == DBool (true));
   const uint64_t fromOff = from.IsNull () ? 0 : from.mValue;
-  const uint64_t endOff  = min ((to.IsNull () ? ~0ull : to.mValue),
+  const uint64_t endOff  = MIN ((to.IsNull () ? ~0ull : to.mValue),
                                 text.Count ());
 
   stack.Push (substring.FindInText (text, igCase, fromOff, endOff));

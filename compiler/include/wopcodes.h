@@ -53,6 +53,7 @@ enum W_OPCODE
   W_LDGB8,
   W_LDGB16,
   W_LDGB32,
+
   W_CTS,
 
   W_STB,
@@ -74,6 +75,7 @@ enum W_OPCODE
   W_STTA,
   W_STF,
   W_STA,
+  W_STUD,
 
   W_INULL,
   W_NNULL,
@@ -82,7 +84,6 @@ enum W_OPCODE
   W_RET,
 
   W_ADD,
-  W_ADDR,
   W_ADDRR,
   W_ADDT,
 
@@ -90,7 +91,6 @@ enum W_OPCODE
   W_ANDB,
 
   W_DIV,
-  W_DIVR,
   W_DIVRR,
 
   W_EQ,
@@ -99,7 +99,6 @@ enum W_OPCODE
   W_EQD,
   W_EQDT,
   W_EQHT,
-  W_EQR,
   W_EQRR,
   W_EQT,
 
@@ -108,7 +107,6 @@ enum W_OPCODE
   W_GED,
   W_GEDT,
   W_GEHT,
-  W_GER,
   W_GERR,
 
   W_GT,
@@ -116,7 +114,6 @@ enum W_OPCODE
   W_GTD,
   W_GTDT,
   W_GTHT,
-  W_GTR,
   W_GTRR,
 
   W_LE,
@@ -124,7 +121,6 @@ enum W_OPCODE
   W_LED,
   W_LEDT,
   W_LEHT,
-  W_LER,
   W_LERR,
 
   W_LT,
@@ -132,13 +128,11 @@ enum W_OPCODE
   W_LTD,
   W_LTDT,
   W_LTHT,
-  W_LTR,
   W_LTRR,
 
   W_MOD,
 
   W_MUL,
-  W_MULR,
   W_MULRR,
 
   W_NE,
@@ -147,7 +141,6 @@ enum W_OPCODE
   W_NED,
   W_NEDT,
   W_NEHT,
-  W_NER,
   W_NERR,
   W_NET,
 
@@ -158,7 +151,6 @@ enum W_OPCODE
   W_ORB,
 
   W_SUB,
-  W_SUBR,
   W_SUBRR,
 
   W_XOR,

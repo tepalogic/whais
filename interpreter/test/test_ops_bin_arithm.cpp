@@ -405,17 +405,17 @@ main ()
                                         DInt16 ());
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_ADDR,
+                                        W_ADDRR,
                                         DReal (10.00),
                                         DReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "real with first null",
-                                        W_ADDR,
+                                        W_ADDRR,
                                         DReal (),
                                         DReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "real with second null",
-                                        W_ADDR,
+                                        W_ADDRR,
                                         DReal (10.00),
                                         DReal ());
 
@@ -431,7 +431,7 @@ main ()
                                         DRichReal (20.00));
     success = success && test_op_addXX (_SC (Session&, commonSession),
                                         "richreal with second null",
-                                        W_ADDR,
+                                        W_ADDRR,
                                         DRichReal (10.00),
                                         DRichReal ());
 
@@ -457,17 +457,17 @@ main ()
                                         DInt16 ());
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_SUBR,
+                                        W_SUBRR,
                                         DReal (10.00),
                                         DReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "real with first null",
-                                        W_SUBR,
+                                        W_SUBRR,
                                         DReal (),
                                         DReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "real with second null",
-                                        W_SUBR,
+                                        W_SUBRR,
                                         DReal (10.00),
                                         DReal ());
 
@@ -483,7 +483,7 @@ main ()
                                         DRichReal (20.00));
     success = success && test_op_subXX (_SC (Session&, commonSession),
                                         "richreal with second null",
-                                        W_SUBR,
+                                        W_SUBRR,
                                         DRichReal (10.00),
                                         DRichReal ());
 
@@ -508,17 +508,17 @@ main ()
                                         DInt16 ());
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_MULR,
+                                        W_MULRR,
                                         DReal (10.00),
                                         DReal (20.00));
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "real with first null",
-                                        W_MULR,
+                                        W_MULRR,
                                         DReal (),
                                         DReal (20.00));
     success = success && test_op_mulXX (_SC (Session&, commonSession),
                                         "real with second null",
-                                        W_MULR,
+                                        W_MULRR,
                                         DReal (10.00),
                                         DReal ());
 
@@ -560,17 +560,17 @@ main ()
 
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_DIVR,
+                                        W_DIVRR,
                                         DReal (10.00),
                                         DReal (20.00));
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "real with first null",
-                                        W_DIVR,
+                                        W_DIVRR,
                                         DReal (),
                                         DReal (20.00));
     success = success && test_op_divXX (_SC (Session&, commonSession),
                                         "real with second null",
-                                        W_DIVR,
+                                        W_DIVRR,
                                         DReal (10.00),
                                         DReal ());
 

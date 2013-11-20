@@ -200,7 +200,7 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
 
       type = GET_FIELD_TYPE (type);
       if (type != T_UNDETERMINED)
-        output << " OF ";
+        output << " OF UNDEFINED ";
 
       else
         return;
@@ -212,7 +212,7 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
       type = GET_BASIC_TYPE (type);
 
       if (type != T_UNDETERMINED)
-        output << " OF ";
+        output << " OF UNDEFINED";
 
       else
         return;
@@ -287,10 +287,15 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
       output << "UNSIGNED INT64";
       break;
 
+    case T_UNDETERMINED:
+      output << "UNDEFINED";
+      break;
+
     default:
       assert (false);
     }
 }
+
 
 static void
 wod_dump_table_type_inf (const uint8_t* typeDesc, ostream& output)
@@ -330,6 +335,7 @@ wod_dump_table_type_inf (const uint8_t* typeDesc, ostream& output)
 
 }
 
+
 static void
 wod_dump_type_info (const uint8_t* typeDesc, ostream& output)
 {
@@ -349,6 +355,7 @@ wod_dump_type_info (const uint8_t* typeDesc, ostream& output)
   else
     return wod_dump_table_type_inf (typeDesc, output);
 }
+
 
 void
 wod_dump_globals_tables (WIFunctionalUnit& obj, ostream& output)
@@ -398,6 +405,7 @@ wod_dump_globals_tables (WIFunctionalUnit& obj, ostream& output)
   output << endl;
 }
 
+
 static void
 wod_dump_code (const uint8_t*       code,
                const uint_t         codeSize,
@@ -438,6 +446,7 @@ wod_dump_code (const uint8_t*       code,
 
   assert (currPos == codeSize);
 }
+
 
 void
 wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)

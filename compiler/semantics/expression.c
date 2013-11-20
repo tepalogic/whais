@@ -264,7 +264,7 @@ array_to_text (uint_t type)
   else if (type == T_UINT64)
     return "ARRAY OF UNSIGNED INT64";
 
-  return "ARRAY";
+  return "ARRAY OF UNDEFINED";
 }
 
 
@@ -379,7 +379,7 @@ field_to_text (uint_t type)
         return "FIELD OF ARRAY OF UNSIGNED INT64";
     }
 
-  return "FIELD";
+  return "FIELD OF UNDEFINED";
 }
 
 
@@ -436,6 +436,9 @@ type_to_text (uint_t type)
   else if (type == T_UINT64)
     return "UNSIGNED INT64";
 
+  else if (type == T_UNDETERMINED)
+    return "UNDEFINED";
+
   else if (IS_FIELD (type))
     return field_to_text (type);
 
@@ -446,6 +449,7 @@ type_to_text (uint_t type)
     return "TABLE";
 
   assert (FALSE);
+
   return NULL;
 }
 
@@ -517,13 +521,18 @@ translate_add_exp (struct ParserState* const         parser,
   struct Statement* const     stmt    = parser->pCurrentStmt;
   struct WOutputStream* const instrs  = stmt_query_instrs (stmt);
   enum W_OPCODE               opcode  = W_NA;
+  const uint_t                ftype   = GET_TYPE (opType1->type);
+  const uint_t                stype   = GET_TYPE (opType2->type);
   struct ExpResultType        result;
 
-  if ((GET_TYPE (opType1->type) < T_END_OF_TYPES) &&
-      (GET_TYPE (opType2->type) < T_END_OF_TYPES))
-    {
-      opcode = add_op[GET_TYPE (opType1->type)][GET_TYPE (opType2->type)];
-    }
+  if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
+    opcode = add_op[GET_TYPE (opType1->type)][GET_TYPE (opType2->type)];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = add_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (ftype == T_UNDETERMINED))
+    opcode = add_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -557,10 +566,6 @@ translate_add_exp (struct ParserState* const         parser,
       else
         result.type = T_INT64;
 
-      break;
-
-    case W_ADDR:
-      result.type = T_REAL;
       break;
 
     case W_ADDRR:
@@ -597,6 +602,12 @@ translate_sub_exp (struct ParserState* const         parser,
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = sub_op[ftype][stype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = sub_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = sub_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -631,10 +642,6 @@ translate_sub_exp (struct ParserState* const         parser,
 
       break;
 
-    case W_SUBR:
-      result.type = T_REAL;
-      break;
-
     case W_SUBRR:
       result.type = T_RICHREAL;
       break;
@@ -663,6 +670,12 @@ translate_mul_exp (struct ParserState* const         parser,
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = mul_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = mul_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = mul_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -698,10 +711,6 @@ translate_mul_exp (struct ParserState* const         parser,
 
       break;
 
-    case W_MULR:
-      result.type = T_REAL;
-      break;
-
     case W_MULRR:
       result.type = T_RICHREAL;
       break;
@@ -731,6 +740,12 @@ translate_div_exp (struct ParserState* const         parser,
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = div_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = div_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = div_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -763,10 +778,6 @@ translate_div_exp (struct ParserState* const         parser,
         result.type = T_INT64;
       break;
 
-    case W_DIVR:
-      result.type = T_REAL;
-      break;
-
     case W_DIVRR:
       result.type = T_RICHREAL;
       break;
@@ -795,6 +806,12 @@ translate_mod_exp (struct ParserState* const         parser,
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = mod_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = mod_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = mod_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -837,6 +854,12 @@ translate_less_exp (struct ParserState* const         parser,
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = less_op[ftype][stype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = less_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = less_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -855,9 +878,8 @@ translate_less_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_LT) || (opcode == W_LTR) || (opcode == W_LTRR) ||
-          (opcode == W_LTC) || (opcode == W_LTD) || (opcode == W_LTDT) ||
-          (opcode == W_LTHT) || (opcode == W_LTR) || (opcode == W_LTRR));
+  assert ((opcode == W_LT) || (opcode == W_LTRR) || (opcode == W_LTC)
+          || (opcode == W_LTD) || (opcode == W_LTDT) || (opcode == W_LTHT));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -880,6 +902,12 @@ translate_exp_less_equal (struct ParserState* const         parser,
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = less_eq_op[ftype][stype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = less_eq_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = less_eq_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -898,9 +926,8 @@ translate_exp_less_equal (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_LE) || (opcode == W_LER) || (opcode == W_LERR) ||
-          (opcode == W_LEC) || (opcode == W_LED) || (opcode == W_LEDT) ||
-          (opcode == W_LEHT) || (opcode == W_LER) || (opcode == W_LERR));
+  assert ((opcode == W_LE) || (opcode == W_LEC) || (opcode == W_LED)
+          || (opcode == W_LEDT) || (opcode == W_LEHT) || (opcode == W_LERR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -909,7 +936,7 @@ translate_exp_less_equal (struct ParserState* const         parser,
 }
 
 static struct ExpResultType
-translate_grater_exp (struct ParserState* const         parser,
+translate_greater_exp (struct ParserState* const         parser,
                       const struct ExpResultType* const opType1,
                       const struct ExpResultType* const opType2)
 {
@@ -921,7 +948,13 @@ translate_grater_exp (struct ParserState* const         parser,
   struct ExpResultType        result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
-    opcode = grater_op[ftype][stype];
+    opcode = greater_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = greater_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = greater_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -941,9 +974,8 @@ translate_grater_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_GT) || (opcode == W_GTR) || (opcode == W_GTRR) ||
-          (opcode == W_GTC) || (opcode == W_GTD) || (opcode == W_GTDT) ||
-          (opcode == W_GTHT) || (opcode == W_GTR) || (opcode == W_GTRR));
+  assert ((opcode == W_GT) || (opcode == W_GTC) || (opcode == W_GTD)
+          || (opcode == W_GTDT) || (opcode == W_GTHT) || (opcode == W_GTRR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -953,9 +985,9 @@ translate_grater_exp (struct ParserState* const         parser,
 
 
 static struct ExpResultType
-translate_exp_grater_equal (struct ParserState* const         parser,
-                            const struct ExpResultType* const opType1,
-                            const struct ExpResultType* const opType2)
+translate_exp_greater_equal (struct ParserState* const         parser,
+                             const struct ExpResultType* const opType1,
+                             const struct ExpResultType* const opType2)
 {
   struct Statement* const     stmt    = parser->pCurrentStmt;
   struct WOutputStream* const instrs  = stmt_query_instrs (stmt);
@@ -965,7 +997,13 @@ translate_exp_grater_equal (struct ParserState* const         parser,
   struct ExpResultType        result;
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
-    opcode = grater_eq_op[ftype][stype];
+    opcode = greater_eq_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = greater_eq_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = greater_eq_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -985,9 +1023,8 @@ translate_exp_grater_equal (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_GE) || (opcode == W_GER) || (opcode == W_GERR) ||
-          (opcode == W_GEC) || (opcode == W_GED) || (opcode == W_GEDT) ||
-          (opcode == W_GEHT) || (opcode == W_GER) || (opcode == W_GERR));
+  assert ((opcode == W_GE) || (opcode == W_GEC) || (opcode == W_GED)
+          || (opcode == W_GEDT) || (opcode == W_GEHT) || (opcode == W_GERR));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1011,6 +1048,12 @@ translate_equals_exp (struct ParserState* const         parser,
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = equals_op[ftype][stype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = equals_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = equals_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -1029,10 +1072,9 @@ translate_equals_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_EQ) || (opcode == W_EQR) || (opcode == W_EQRR) ||
-          (opcode == W_EQC) || (opcode == W_EQD) || (opcode == W_EQDT) ||
-          (opcode == W_EQHT) || (opcode == W_EQR) || (opcode == W_EQRR) ||
-          (opcode == W_EQB) || (opcode == W_EQT));
+  assert ((opcode == W_EQ) || (opcode == W_EQC) || (opcode == W_EQD)
+          || (opcode == W_EQDT) || (opcode == W_EQHT) || (opcode == W_EQRR)
+          || (opcode == W_EQB) || (opcode == W_EQT));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1056,6 +1098,12 @@ translate_exp_not_equals (struct ParserState* const         parser,
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = not_equals_op[ftype][stype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = not_equals_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = not_equals_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -1074,10 +1122,9 @@ translate_exp_not_equals (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_NE) || (opcode == W_NER) || (opcode == W_NERR) ||
-          (opcode == W_NEC) || (opcode == W_NED) || (opcode == W_NEDT) ||
-          (opcode == W_NEHT) || (opcode == W_NER) || (opcode == W_NERR) ||
-          (opcode == W_NEB) || (opcode == W_NET));
+  assert ((opcode == W_NE) || (opcode == W_NERR) || (opcode == W_NEC)
+          || (opcode == W_NED) || (opcode == W_NEDT) ||(opcode == W_NEHT)
+          || (opcode == W_NEB) || (opcode == W_NET));
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1100,6 +1147,12 @@ translate_or_exp (struct ParserState* const         parser,
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = or_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = or_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = or_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -1155,6 +1208,12 @@ translate_and_exp (struct ParserState* const         parser,
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = and_op[ftype][stype];
 
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = and_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = and_op[stype][stype];
+
   if (opcode == W_NA)
     {
       log_message (parser,
@@ -1204,6 +1263,12 @@ translate_xor_exp (struct ParserState* const         parser,
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = xor_op[ftype][stype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = xor_op[ftype][ftype];
+
+  if ((opcode == W_NA) && (stype == T_UNDETERMINED))
+    opcode = xor_op[stype][stype];
 
   if (opcode == W_NA)
     {
@@ -1341,7 +1406,9 @@ translate_store_exp (struct ParserState* const         parser,
         {
           if ((GET_FIELD_TYPE (ftype) == T_UNDETERMINED) ||
               (GET_FIELD_TYPE (ftype) == GET_FIELD_TYPE (stype)))
-            opcode = W_STF;
+            {
+              opcode = W_STF;
+            }
         }
       else if (IS_ARRAY (ftype) && IS_ARRAY (stype))
         {
@@ -1354,6 +1421,8 @@ translate_store_exp (struct ParserState* const         parser,
           if ((temp_ftype == T_UNDETERMINED) || (temp_ftype == temp_stype))
             opcode = W_STA;
         }
+      else if (ftype == T_UNDETERMINED)
+        opcode = W_STUD; /* store an alias of the second object */
     }
   else
     {
@@ -1369,6 +1438,14 @@ translate_store_exp (struct ParserState* const         parser,
 
       else if (IS_FIELD (ftype))
         opcode = W_STF;
+
+      else
+        {
+          /* Store an alias of a undefined object object! */
+          assert (ftype == T_UNDETERMINED);
+
+          opcode = W_STUD;
+        }
     }
 
   if (opcode == W_NA)
@@ -1519,7 +1596,6 @@ translate_ssub_exp (struct ParserState* const         parser,
 
   return result;
 }
-
 
 static struct ExpResultType
 translate_smul_exp (struct ParserState* const         parser,
@@ -1862,7 +1938,7 @@ translate_index_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  if (is_integer (stype) == FALSE)
+  if ((is_integer (stype) == FALSE) && (stype != T_UNDETERMINED))
     {
       log_message (parser,
                    parser->bufferPos,
@@ -1963,11 +2039,11 @@ translate_opcode_exp (struct ParserState* const   parser,
       break;
 
     case OP_GT:
-      result = translate_grater_exp (parser, opType1, opType2);
+      result = translate_greater_exp (parser, opType1, opType2);
       break;
 
     case OP_GE:
-      result = translate_exp_grater_equal (parser, opType1, opType2);
+      result = translate_exp_greater_equal (parser, opType1, opType2);
       break;
 
     case OP_EQ:
@@ -2882,14 +2958,15 @@ translate_return_exp (struct ParserState* const parser, YYSTYPE exp)
 
   free_sem_value (exp);
 
-  /* convert the declared return type to an expression result type */
+  /* Convert the declared return type to an expression result type. */
   retType.type  = GET_TYPE (pRetVar->type);
   retType.extra = pRetVar->extra;
 
-  if (expType.type != T_UNDETERMINED)
+  /* Verify the type of the returned expression if the procedure's return type
+     is defined and the returned type is not a NULL value. */
+  if ((retType.type != T_UNDETERMINED)
+      && (expType.type != T_UNDETERMINED))
     {
-      /* The expression was not evaluated to NULL. */
-
       if ((IS_TABLE (retType.type) != IS_TABLE (expType.type))
           || (IS_FIELD (retType.type) != IS_FIELD (expType.type))
           || (IS_ARRAY (retType.type) != IS_ARRAY (expType.type)))

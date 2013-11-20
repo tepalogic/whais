@@ -13,7 +13,7 @@ LD:=g++
 AR:=ar
 
 #Commn compile flags
-CC_FLAGS:=-Wall -m32 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -fno-omit-frame-pointer -Wno-strict-aliasing 
+CC_FLAGS:=-Wall -m64 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -fno-omit-frame-pointer -Wno-strict-aliasing -Wno-format
 
 ifeq ($(ASSERTS),no)
 DEFINES+=NDEBUG

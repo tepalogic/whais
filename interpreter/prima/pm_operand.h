@@ -127,9 +127,9 @@ number_convert (const T_SRC& from, T_DEST& to)
 
 
 
-
 class TableOperand;
 class FieldOperand;
+class NativeObjectOperand;
 
 
 
@@ -216,7 +216,14 @@ public:
 
   virtual void CopyFieldOp (const FieldOperand& source);
 
+  virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
+
+  virtual void           NativeObject (INativeObject* const value);
+  virtual INativeObject& NativeObject();
+
   virtual void NotifyCopy ();
+
+  virtual TableReference& GetTableReference ();
 };
 
 
@@ -1553,12 +1560,12 @@ public:
 
   virtual ~TableOperand ();
 
-  const TableOperand& operator= (const TableOperand& pSource)
+  const TableOperand& operator= (const TableOperand& source)
   {
-    if (this != &pSource)
+    if (this != &source)
       {
         mTableRef->DecrementRefCount ();
-        mTableRef = pSource.mTableRef;
+        mTableRef = source.mTableRef;
         mTableRef->IncrementRefCount ();
       }
     return *this;
@@ -1572,13 +1579,6 @@ public:
 
   virtual ITable& GetTable ();
 
-  TableReference& GetTableRef () const
-  {
-    assert (mTableRef != NULL);
-
-    return *mTableRef;
-  }
-
   virtual StackValue Duplicate () const;
 
   virtual void NotifyCopy ();
@@ -1586,6 +1586,8 @@ public:
   virtual TableOperand GetTableOp ();
 
   virtual void CopyTableOp (const TableOperand& source);
+
+  virtual TableReference& GetTableReference ();
 
 private:
   TableReference* mTableRef;
@@ -1605,6 +1607,7 @@ public:
   }
 
   FieldOperand (TableOperand& tableOp, const FIELD_INDEX field);
+  FieldOperand (TableReference& tableRef, const FIELD_INDEX field);
   FieldOperand (const FieldOperand& source);
   virtual ~FieldOperand ();
 
@@ -1626,6 +1629,8 @@ public:
   virtual FieldOperand GetFieldOp ();
 
   virtual void CopyFieldOp (const FieldOperand& source);
+
+  virtual TableReference& GetTableReference ();
 
 private:
   TableReference*   mTableRef;
@@ -3180,6 +3185,34 @@ public:
     return Operand ().CopyFieldOp (source);
   }
 
+  void CopyNativeObjectOperand (const NativeObjectOperand& source)
+  {
+    LockRAII dummy(mSync);
+
+    return Operand ().CopyNativeObjectOperand (source);
+  }
+
+  void NativeObject (INativeObject* const value)
+  {
+    LockRAII dummy(mSync);
+
+    Operand ().NativeObject (value);
+  }
+
+  INativeObject& NativeObject ()
+  {
+    LockRAII dummy(mSync);
+
+    return Operand ().NativeObject ();
+  }
+
+  TableReference& GetTableReference ()
+  {
+    LockRAII dummy(mSync);
+
+    return Operand ().GetTableReference ();
+  }
+
   BaseOperand& Operand ()
   {
     return *_RC (BaseOperand*, _RC (void*, mStorage));
@@ -3282,6 +3315,13 @@ public:
 
   virtual void CopyFieldOp (const FieldOperand& source);
 
+  virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
+
+  virtual void           NativeObject (INativeObject* const value);
+  virtual INativeObject& NativeObject();
+
+  virtual TableReference& GetTableReference ();
+
 private:
   GlobalValue&    mValue;
 };
@@ -3374,6 +3414,13 @@ public:
   virtual FieldOperand GetFieldOp ();
 
   virtual void CopyFieldOp (const FieldOperand& source);
+
+  virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
+
+  virtual void           NativeObject (INativeObject* const value);
+  virtual INativeObject& NativeObject();
+
+  virtual TableReference& GetTableReference ();
 
 private:
   const uint64_t      mIndex;

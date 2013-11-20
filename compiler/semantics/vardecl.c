@@ -91,8 +91,8 @@ add_declaration (struct ParserState* const paser,
                  const bool_t              unique)
 {
   struct DeclaredVar*     result = NULL;
-  struct DeclaredVar*     decl  = NULL;
-  struct SemId* const     id    = &(var->val.u_id);
+  struct DeclaredVar*     decl   = NULL;
+  struct SemId* const     id     = &(var->val.u_id);
   struct Statement* const stmt   = paser->pCurrentStmt;
 
   assert (var->val_type == VAL_ID);
@@ -142,60 +142,14 @@ add_declaration (struct ParserState* const paser,
           struct DeclaredVar* it = result->extra;
 
           if (it == NULL)
-            {
-              if ( ! parameter)
-                {
-                  char text[128];
-                  wh_copy_first (text, var.label, sizeof text, var.labelLength);
+            result->extra = result;
 
-                  log_message (paser,
-                               paser->bufferPos,
-                               MSG_TABLE_INCOMPLETE,
-                               text);
-                  paser->abortError = TRUE;
-                }
-              result->extra = result;
-            }
           else
             {
               while (it->extra && IS_TABLE_FIELD (it->extra->type))
                 it = it->extra;
 
               it->extra = result;
-            }
-        }
-      else if (IS_ARRAY (var.type) && (! parameter))
-        {
-          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
-            {
-              char text[128];
-              wh_copy_first (text, var.label, sizeof text, var.labelLength);
-
-              log_message (paser,
-                           paser->bufferPos,
-                           MSG_ARRAY_INCOMPLETE,
-                           text);
-              paser->abortError = TRUE;
-            }
-        }
-      else if (IS_FIELD (var.type) && (! parameter))
-        {
-          if ((GET_BASIC_TYPE (var.type) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (var.type) >= T_UNDETERMINED))
-            {
-              char text[128];
-
-              assert (IS_ARRAY (var.type) == FALSE);
-
-              wh_copy_first (text, var.label, sizeof text, var.labelLength);
-
-              log_message (paser,
-                           paser->bufferPos,
-                           MSG_FIELD_INCOMPLETE,
-                           text);
-
-              paser->abortError = TRUE;
             }
         }
     }
@@ -296,9 +250,20 @@ add_field_declaration (struct ParserState*       paser,
           paser->abortError = TRUE;
           return NULL;
         }
-
       it = it->extra;
     }
+
+  if (GET_BASIC_TYPE (type->val.u_tspec.type) == T_UNDETERMINED)
+    {
+      char tname[128];
+
+      wh_copy_first (tname, id->name, sizeof tname, id->length);
+
+      log_message (paser, paser->bufferPos, MSG_FIELD_TYPE_INVALID, tname);
+
+      return NULL;
+    }
+
   result = add_declaration (paser, var, type, FALSE, FALSE);
 
   result->extra = NULL, it = extra;

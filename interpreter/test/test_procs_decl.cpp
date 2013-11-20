@@ -174,7 +174,7 @@ my_postman (WH_MESSENGER_CTXT data,
 }
 
 bool
-load_unit (ISession&           session,
+load_unit (ISession&            session,
            const uint8_t* const unitCode,
            const uint_t         unitCodeSize)
 {

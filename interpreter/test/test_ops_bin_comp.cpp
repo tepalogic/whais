@@ -433,13 +433,13 @@ main ()
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "real (same values)",
-                                        W_EQR,
+                                        W_EQRR,
                                         DReal (),
                                         DReal ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "real (different values)",
-                                        W_EQR,
+                                        W_EQRR,
                                         DReal (-1.0 ),
                                         DReal ( 1.0));
 
@@ -544,13 +544,13 @@ main ()
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "real (same values)",
-                                        W_NER,
+                                        W_NERR,
                                         DReal (),
                                         DReal ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "real (different values)",
-                                        W_NER,
+                                        W_NERR,
                                         DReal (-1.0 ),
                                         DReal ( 1.0));
 
@@ -612,7 +612,7 @@ main ()
 
     success = success && test_op_ltXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_LTR,
+                                        W_LTRR,
                                         DReal (-1.0 ),
                                         DReal ( 1.0));
 
@@ -657,7 +657,7 @@ main ()
 
     success = success && test_op_leXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_LER,
+                                        W_LERR,
                                         DReal (-1.0 ),
                                         DReal ( 1.0));
 
@@ -702,7 +702,7 @@ main ()
 
     success = success && test_op_gtXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_GTR,
+                                        W_GTRR,
                                         DReal (-1.0 ),
                                         DReal ( 1.0));
 
@@ -747,7 +747,7 @@ main ()
 
     success = success && test_op_geXX (_SC (Session&, commonSession),
                                         "real",
-                                        W_GER,
+                                        W_GERR,
                                         DReal (-1.0 ),
                                         DReal ( 1.0));
 

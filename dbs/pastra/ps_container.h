@@ -143,8 +143,8 @@ private:
   const uint_t                         mCacheSize;
   bool                                 mDirtyCache;
 
-  static uint64_t                      smTemporalsCount;
-  static Lock smSync;
+  static uint64_t  smTemporalsCount;
+  static Lock      smSync;
 };
 
 

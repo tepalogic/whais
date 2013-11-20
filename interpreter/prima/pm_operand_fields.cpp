@@ -61,7 +61,7 @@ TableOperand::GetType ()
 StackValue
 TableOperand::GetFieldAt (const FIELD_INDEX field)
 {
-  return StackValue (FieldOperand (*this, field));
+  return StackValue (FieldOperand (GetTableReference (), field));
 }
 
 
@@ -100,10 +100,41 @@ TableOperand::CopyTableOp (const TableOperand& source)
 }
 
 
+TableReference&
+TableOperand::GetTableReference ()
+{
+  assert (mTableRef != NULL);
+
+  return *mTableRef;
+}
+
 
 FieldOperand::FieldOperand (TableOperand& tableOp, const FIELD_INDEX field)
   : BaseOperand (),
-    mTableRef (&tableOp.GetTableRef ()),
+    mTableRef (&tableOp.GetTableReference ()),
+    mField (field)
+{
+  mTableRef->IncrementRefCount ();
+
+  ITable&                  table     = mTableRef->GetTable ();
+  const DBSFieldDescriptor fieldDesc = table.DescribeField (field);
+
+  mFieldType = fieldDesc.type;
+
+  assert ((mFieldType > T_UNKNOWN) && (mFieldType < T_UNDETERMINED));
+
+  if (fieldDesc.isArray)
+    {
+      assert (mFieldType != T_TEXT);
+
+      MARK_ARRAY (mFieldType);
+    }
+}
+
+
+FieldOperand::FieldOperand (TableReference& tableRef, const FIELD_INDEX field)
+  : BaseOperand (),
+    mTableRef (&tableRef),
     mField (field)
 {
   mTableRef->IncrementRefCount ();
@@ -158,11 +189,11 @@ FieldOperand::operator= (const FieldOperand& source)
 
       mField     = source.mField;
       mTableRef  = source.mTableRef;
+      mFieldType = source.mFieldType;
 
       if (mTableRef)
         mTableRef->IncrementRefCount ();
     }
-
   return *this;
 }
 
@@ -170,7 +201,7 @@ FieldOperand::operator= (const FieldOperand& source)
 bool
 FieldOperand::IsNull () const
 {
-  return (mTableRef == NULL);
+  return mTableRef == NULL;
 }
 
 
@@ -295,6 +326,15 @@ FieldOperand::CopyFieldOp (const FieldOperand& source)
   *this = source;
 }
 
+
+TableReference&
+FieldOperand::GetTableReference ()
+{
+  assert (mTableRef != NULL);
+  assert (IsNull () == false);
+
+  return *mTableRef;
+}
 
 
 BaseFieldElOperand::~BaseFieldElOperand ()

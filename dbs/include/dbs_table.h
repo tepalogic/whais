@@ -47,17 +47,17 @@ public:
   ITable ();
   virtual ~ITable ();
 
-  virtual bool               IsTemporal () const = 0;
+  virtual bool IsTemporal () const = 0;
 
-  virtual ITable&            Spawn () const = 0;
+  virtual ITable& Spawn () const = 0;
 
-  virtual FIELD_INDEX        FieldsCount () = 0;
+  virtual FIELD_INDEX FieldsCount () = 0;
 
-  virtual FIELD_INDEX        RetrieveField (const char* fieldName) = 0;
+  virtual FIELD_INDEX RetrieveField (const char* fieldName) = 0;
 
   virtual DBSFieldDescriptor DescribeField (const FIELD_INDEX field) = 0;
 
-  virtual ROW_INDEX          AllocatedRows () = 0;
+  virtual ROW_INDEX AllocatedRows () = 0;
 
   virtual ROW_INDEX AddRow () = 0;
 
@@ -140,7 +140,6 @@ public:
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
                     const DArray&     value) = 0;
-
 
 
   virtual void Get (const ROW_INDEX   row,
