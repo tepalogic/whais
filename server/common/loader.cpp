@@ -75,7 +75,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
       WH_SHLIB shl = wh_shl_load (it->c_str ());
       if (shl == INVALID_SHL)
         {
-          log.Log (LOG_WARNING, "Failed to load it in memory.");
+          log.Log (LOG_WARNING, "Failed to load the dynamic library.");
           continue;
         }
 

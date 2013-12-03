@@ -50,7 +50,7 @@ wh_apply_array_modifier (struct TypeSpec* const ioBuffer)
   if ( (is_type_spec_valid (ioBuffer) == FALSE)
       || (GET_BASIC_TYPE (type) == T_TEXT)
       || (GET_BASIC_TYPE (type) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE (type) >= T_UNDETERMINED))
+      || (GET_BASIC_TYPE (type) > T_UNDETERMINED))
     {
       return -1;
     }
@@ -69,7 +69,7 @@ wh_apply_field_modifier (struct TypeSpec* const ioBuffer)
 
   if ( (is_type_spec_valid (ioBuffer) == FALSE)
       || (GET_BASIC_TYPE (type) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE (type) >= T_UNDETERMINED))
+      || (GET_BASIC_TYPE (type) > T_UNDETERMINED))
     {
       return -1;
     }

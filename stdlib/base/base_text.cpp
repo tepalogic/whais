@@ -22,9 +22,6 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef BASE_TEXT_H_
-#define BASE_TEXT_H_
-
 #include <cctype>
 #include <algorithm>
 
@@ -754,6 +751,4 @@ base_text_init ()
 
   return WOP_OK;
 }
-
-#endif //BASE_TEXT_H_
 

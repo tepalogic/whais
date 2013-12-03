@@ -33,6 +33,7 @@
 #include "pm_typemanager.h"
 #include "pm_interpreter.h"
 #include "pm_general_table.h"
+#include "pm_operand_undefined.h"
 
 using namespace std;
 
@@ -378,7 +379,7 @@ TypeManager::CreateLocalValue (uint8_t* inoutTypeDesc)
 
   const TypeSpec spec (inoutTypeDesc);
 
-  if ((spec.Type () > T_UNKNOWN) && (spec.Type () < T_UNDETERMINED))
+  if ((spec.Type () > T_UNKNOWN) && (spec.Type () <= T_UNDETERMINED))
     {
       switch (spec.Type ())
       {
@@ -429,6 +430,9 @@ TypeManager::CreateLocalValue (uint8_t* inoutTypeDesc)
 
       case T_UINT64:
         return StackValue (UInt64Operand (DUInt64 ()));
+
+      case T_UNDETERMINED:
+        return StackValue (NativeObjectOperand ());
 
       default:
         assert (false);

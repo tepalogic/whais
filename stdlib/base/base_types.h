@@ -52,6 +52,8 @@ extern const uint8_t gRichRealType[sizeof (TypeSpec)];
 
 extern const uint8_t gTextType[sizeof (TypeSpec)];
 
+extern const uint8_t gUndefinedType[sizeof (TypeSpec)];
+
 extern const uint8_t gGenericArrayType[sizeof (TypeSpec)];
 extern const uint8_t gGenericFieldType[sizeof (TypeSpec)];
 extern const uint8_t gGenericTableType[sizeof (TypeSpec)];

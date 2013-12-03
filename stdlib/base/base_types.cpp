@@ -57,6 +57,8 @@ uint8_t gRichRealType[sizeof (TypeSpec)];
 
 uint8_t gTextType[sizeof (TypeSpec)];
 
+uint8_t gUndefinedType[sizeof (TypeSpec)];
+
 uint8_t gGenericArrayType[sizeof (TypeSpec)];
 uint8_t gGenericFieldType[sizeof (TypeSpec)];
 uint8_t gGenericTableType[sizeof (TypeSpec)];
@@ -109,7 +111,8 @@ base_types_init ()
       || (wh_define_basic_type (T_RICHREAL,
                                 _RC (TypeSpec*, gRichRealType)) <= 0)
       || (wh_define_basic_type (T_TEXT, _RC (TypeSpec*, gTextType)) <= 0)
-
+      || (wh_define_basic_type (T_UNDETERMINED,
+                                _RC (TypeSpec*, gUndefinedType)) <= 0)
       || (wh_define_basic_type (T_UNDETERMINED,
                                 _RC (TypeSpec*, gGenericArrayType)) <= 0)
       || (wh_define_basic_type (T_UNDETERMINED,
@@ -152,10 +155,13 @@ base_types_init ()
       || (wh_apply_array_modifier (_RC (TypeSpec*, gAUInt64Type)) <= 0)
 
       || (wh_apply_array_modifier (_RC (TypeSpec*, gARealType)) <= 0)
-      || (wh_apply_array_modifier (_RC (TypeSpec*, gARichRealType)) <= 0))
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gARichRealType)) <= 0)
+
+      || (wh_apply_array_modifier (_RC (TypeSpec*, gGenericArrayType)) <= 0))
     {
       return WOP_UNKNOW;
     }
+
   return WOP_OK;
 }
 

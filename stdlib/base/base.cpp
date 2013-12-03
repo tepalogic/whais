@@ -34,6 +34,7 @@
 #include "base_constants.h"
 #include "base_dates.h"
 #include "base_text.h"
+#include "base_arrays.h"
 
 
 
@@ -189,7 +190,21 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gTextHash,
                                                     &gCharFind,
                                                     &gTextFind,
-                                                    &gTextCompare
+                                                    &gTextCompare,
+                          /* Array procedures */
+                                                    &gProcArrayCount,
+                                                    &gProcArraySort,
+                                                    &gProcArrayBinSearch,
+                                                    &gProcArraySearch,
+                                                    &gProcArrayMin,
+                                                    &gProcArrayMax,
+                                                    &gProcArrayAverage,
+                                                    &gProcArrayIntersect,
+                                                    &gProcArrayUnion,
+                                                    &gProcArrayDiff,
+                                                    &gProcArrayPushBack,
+                                                    &gProcArrayTruncate,
+                                                    &gProcArrayHash
 
                                                           };
 
@@ -224,7 +239,8 @@ wlib_start ()
           || ((status = base_generics_init ()) != WOP_OK)
           || ((status = base_constants_init ()) != WOP_OK)
           || ((status = base_dates_init ()) != WOP_OK)
-          || ((status = base_text_init ()) != WOP_OK))
+          || ((status = base_text_init ()) != WOP_OK)
+          || ((status = base_arrays_init ()) != WOP_OK))
         {
           return status;
         }

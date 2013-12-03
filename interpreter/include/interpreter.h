@@ -42,7 +42,7 @@ namespace whisper
 
 
 
-class InterException : public Exception
+class INTERP_SHL InterException : public Exception
 {
 public:
   explicit InterException (const char* const message,
@@ -65,6 +65,7 @@ public:
     INVALID_OP_REQ,
     INVALID_NATIVE_OP_REQ,
     NATIVE_NULL_DEREFERENCE,
+    INVALID_PARAMETER_TYPE,
     INVALID_GLOBAL_REQ,
     INVALID_TYPE_DESC,
     DUPLICATE_DEFINITION,

@@ -98,6 +98,9 @@ decode_basic_type (const uint16_t type)
   case T_TEXT:
     return "TEXT";
 
+  case T_UNDETERMINED:
+    return "UNDEFINED";
+
   default:
     assert (false);
   }

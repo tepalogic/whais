@@ -1705,6 +1705,9 @@ set_array_element (const T&          value,
 {
   if (index == (*inoutStrategy)->Count ())
     {
+      if (value.IsNull ())
+        return;
+
       add_array_element (value, inoutStrategy);
       return ;
     }
@@ -1713,9 +1716,9 @@ set_array_element (const T&          value,
 
   prepare_array_strategy (inoutStrategy);
   static const uint_t storageSize = get_aligned_elem_size (
-                                                    (*inoutStrategy)->Type()
+                                                    (*inoutStrategy)->Type ()
                                                           );
-  if (value.IsNull())
+  if (value.IsNull ())
       (*inoutStrategy)->CollapseRaw (index * storageSize, storageSize);
 
   else
@@ -1723,7 +1726,9 @@ set_array_element (const T&          value,
       uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
       Serializer::Store (rawElement, value);
-      (*inoutStrategy)->WriteRaw (storageSize * index, storageSize, rawElement);
+      (*inoutStrategy)->WriteRaw (storageSize * index,
+                                  storageSize,
+                                  rawElement);
     }
 }
 
@@ -2105,66 +2110,71 @@ quick_sort (int64_t           from,
 void
 DArray::Sort (bool reverse)
 {
+  const int64_t arrayCount = Count ();
+
+  if (arrayCount == 0)
+    return ;
+
   switch (Type ())
   {
   case T_BOOL:
-    quick_sort<DBool> (0, Count () - 1, reverse, *this);
+    quick_sort<DBool> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_CHAR:
-    quick_sort<DChar> (0, Count () - 1, reverse, *this);
+    quick_sort<DChar> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_DATE:
-    quick_sort<DDate> (0, Count () - 1, reverse, *this);
+    quick_sort<DDate> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_DATETIME:
-    quick_sort<DDateTime> (0, Count () - 1, reverse, *this);
+    quick_sort<DDateTime> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_HIRESTIME:
-    quick_sort<DHiresTime> (0, Count () - 1, reverse, *this);
+    quick_sort<DHiresTime> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_UINT8:
-    quick_sort<DUInt8> (0, Count () - 1, reverse, *this);
+    quick_sort<DUInt8> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_UINT16:
-    quick_sort<DUInt16> (0, Count () - 1, reverse, *this);
+    quick_sort<DUInt16> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_UINT32:
-    quick_sort<DUInt32> (0, Count () - 1, reverse, *this);
+    quick_sort<DUInt32> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_UINT64:
-    quick_sort<DUInt64> (0, Count () - 1, reverse, *this);
+    quick_sort<DUInt64> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_REAL:
-    quick_sort<DReal> (0, Count () - 1, reverse, *this);
+    quick_sort<DReal> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_RICHREAL:
-    quick_sort<DRichReal> (0, Count () - 1, reverse, *this);
+    quick_sort<DRichReal> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_INT8:
-    quick_sort<DInt8> (0, Count () - 1, reverse, *this);
+    quick_sort<DInt8> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_INT16:
-    quick_sort<DInt16> (0, Count () - 1, reverse, *this);
+    quick_sort<DInt16> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_INT32:
-    quick_sort<DInt32> (0, Count () - 1, reverse, *this);
+    quick_sort<DInt32> (0, arrayCount - 1, reverse, *this);
     break;
 
   case T_INT64:
-    quick_sort<DInt64> (0, Count () - 1, reverse, *this);
+    quick_sort<DInt64> (0, arrayCount - 1, reverse, *this);
     break;
 
   default:
