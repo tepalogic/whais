@@ -32,7 +32,11 @@
 #include "ps_arraystrategy.h"
 #include "ps_serializer.h"
 
+
+
 using namespace std;
+
+
 
 namespace whisper {
 
@@ -408,6 +412,7 @@ TemporalArray::CollapseRaw (const uint64_t offset, const uint64_t count)
 }
 
 
+
 RowFieldArray::RowFieldArray (VariableSizeStore&    storage,
                               const uint64_t        firstRecordEntry,
                               const DBS_FIELD_TYPE  type)
@@ -568,6 +573,7 @@ RowFieldArray::EnableTemporalStorage ()
   mStorage.DecrementRecordRef (mFirstRecordEntry);
   mStorage.ReleaseReference();
 }
+
 
 } //namespace pastra
 } //namespace whisper

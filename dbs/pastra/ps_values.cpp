@@ -1847,8 +1847,7 @@ DArray::Remove (const uint64_t index)
 }
 
 
-template<class DBS_T>
-int64_t
+template<class DBS_T> int64_t
 partition (int64_t            from,
            int64_t            to,
            DArray&            inoutArray,
@@ -1857,33 +1856,34 @@ partition (int64_t            from,
   assert (from < to);
   assert (to < _SC (int64_t, inoutArray.Count ()));
 
-  const int64_t pivotIndex = (from + to) / 2;
-  DBS_T         leftEl;
-  DBS_T         pivot;
-  DBS_T         rightEl;
-  DBS_T         temp;
+  const  int64_t originalFrom = from;
 
-  inoutArray.Get (pivotIndex, pivot);
-  inoutArray.Get (from, leftEl);
+  DBS_T leftEl, rightEl, pivot, temp;
 
-  *outAlreadySorted = false;
-  if (leftEl <= pivot)
+  *outAlreadySorted = true;
+  while (from <= to)
     {
       temp = leftEl;
-      while (from < to)
+      inoutArray.Get (from, leftEl);
+
+      if (leftEl < temp)
         {
-          inoutArray.Get (from + 1, leftEl);
-          if ((leftEl <= pivot) && (temp <= leftEl))
-            {
-              ++from;
-              temp = leftEl;
-            }
-          else
-            break;
+          *outAlreadySorted = false;
+
+          break;
         }
-      if (from == to)
-        *outAlreadySorted = true;
+      else
+        ++from;
     }
+
+  if (*outAlreadySorted)
+    {
+      assert (from == to + 1);
+      return 0;
+    }
+
+  from = originalFrom;
+  inoutArray.Get ((from + to) / 2, pivot);
 
   while (from < to)
     {
@@ -1943,8 +1943,7 @@ partition (int64_t            from,
 }
 
 
-template<class DBS_T>
-int64_t
+template<class DBS_T> int64_t
 partition_reverse (int64_t            from,
                    int64_t            to,
                    DArray&            inoutArray,
@@ -1953,34 +1952,35 @@ partition_reverse (int64_t            from,
   assert (from < to);
   assert (to < _SC (int64_t, inoutArray.Count()));
 
-  const int64_t pivotIndex = (from + to) / 2;
-  DBS_T         leftEl;
-  DBS_T         pivot;
-  DBS_T         rightEl;
-  DBS_T         temp;
+  const  int64_t originalFrom = from;
 
-  inoutArray.Get (pivotIndex, pivot);
-  inoutArray.Get (from, leftEl);
+  DBS_T  leftEl = DBS_T::Max ();
+  DBS_T  rightEl, pivot, temp;
 
-  *outAlreadySorted = false;
-  if (leftEl >= pivot)
+  *outAlreadySorted = true;
+  while (from <= to)
     {
       temp = leftEl;
-      while (from < to)
-        {
-          inoutArray.Get (from + 1, leftEl);
-          if ((leftEl >= pivot) && (temp >= leftEl))
-            {
-              ++from;
-              temp = leftEl;
-            }
-          else
-            break;
-        }
+      inoutArray.Get (from, leftEl);
 
-      if (from == to)
-        *outAlreadySorted = true;
+      if (temp < leftEl)
+        {
+          *outAlreadySorted = false;
+
+          break;
+        }
+      else
+        ++from;
     }
+
+  if (*outAlreadySorted)
+    {
+      assert (from == to + 1);
+      return 0;
+    }
+
+  from = originalFrom;
+  inoutArray.Get ((from + to) / 2, pivot);
 
   while (from < to)
     {

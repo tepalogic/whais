@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "dbs/dbs_mgr.h"
+#include "utils/wrandom.h"
 
 #include "custom/include/test/test_fmw.h"
 #include "../pastra/ps_container.h"
@@ -96,8 +97,9 @@ colapse_container (uint_t max_file_size, const uint_t container_size)
 static bool
 check_temp_container (uint_t uTestContainerSize)
 {
-  const uint_t storeSize = 761;
-  const uint_t uStepSize = 100;
+  const uint_t storeSize = wh_rnd () % 761 + 761;
+  const uint_t uStepSize = wh_rnd () % 100 + 1;
+
   TemporalContainer container (storeSize);
 
   uint8_t marker = 0;
@@ -186,6 +188,12 @@ main ()
     success = false;
 
   if (!check_temp_container (678109))
+    success = false;
+
+  if (!check_temp_container (3412))
+    success = false;
+
+  if (!check_temp_container (23400))
     success = false;
 
   DBSShoutdown ();
