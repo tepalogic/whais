@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sstream>
 
+#include "utils/wthread.h"
 #include "server/server_protocol.h"
 
 #include "server.h"
@@ -32,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 using namespace std;
+using namespace whisper;
 
 
 class Listener
@@ -105,7 +107,7 @@ static FileLogger*                 sMainLog;
 static bool                        sAcceptUsersConnections;
 static bool                        sServerStopped;
 static auto_array<Listener>*       sListeners;
-
+static Lock                        sClosingLock;
 
 
 void
@@ -390,6 +392,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].mListenThread.WaitToEnd (false);
 
+  LockRAII holder(sClosingLock);
   sListeners = NULL;
 
   log.Log (LOG_DEBUG, "Server stopped!");
@@ -399,6 +402,8 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
 void
 StopServer ()
 {
+  LockRAII holder(sClosingLock);
+
   if ((sListeners == NULL)  || (sMainLog == NULL))
     return; //Ignore! The server probably did not even start.
 

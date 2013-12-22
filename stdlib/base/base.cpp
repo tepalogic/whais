@@ -35,6 +35,8 @@
 #include "base_dates.h"
 #include "base_text.h"
 #include "base_arrays.h"
+#include "base_fields.h"
+#include "base_tables.h"
 
 
 
@@ -204,8 +206,26 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcArrayDiff,
                                                     &gProcArrayPushBack,
                                                     &gProcArrayTruncate,
-                                                    &gProcArrayHash
-
+                                                    &gProcArrayHash,
+                          /* Field procedures */
+                                                    &gProcFieldTable,
+                                                    &gProcIsFielsIndexed,
+                                                    &gProcFieldName,
+                                                    &gProcFieldIndex,
+                                                    &gProcFindValueRange,
+                                                    &gProcFieldMinimum,
+                                                    &gProcFieldMaximum,
+                                                    &gProcFieldAverage,
+                          /* Table procedures */
+                                                    &gProcTableIsPersistent,
+                                                    &gProcTableFieldsCount,
+                                                    &gProcTableFieldByIndex,
+                                                    &gProcTableFieldByName,
+                                                    &gProcTableRowsCount,
+                                                    &gProcTableAddRow,
+                                                    &gProcTableFindRemovedRow,
+                                                    &gProcTableRemoveRow,
+                                                    &gProcTableExchangeRows
                                                           };
 
 
@@ -240,7 +260,9 @@ wlib_start ()
           || ((status = base_constants_init ()) != WOP_OK)
           || ((status = base_dates_init ()) != WOP_OK)
           || ((status = base_text_init ()) != WOP_OK)
-          || ((status = base_arrays_init ()) != WOP_OK))
+          || ((status = base_arrays_init ()) != WOP_OK)
+          || ((status = base_fields_init ()) != WOP_OK)
+          || ((status = base_tables_init ()) != WOP_OK))
         {
           return status;
         }

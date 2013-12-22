@@ -949,7 +949,8 @@ fetch_execution_array_result (WH_CONNECTION        hnd,
                               const uint64_t       row)
 
 {
-  assert ((type >= WHC_TYPE_BOOL) && (type < WHC_TYPE_TEXT));
+  assert (((type >= WHC_TYPE_BOOL) && (type < WHC_TYPE_TEXT))
+          || (type == T_UNDETERMINED));
 
   const char*           retValue;
   unsigned long long    count;
@@ -960,6 +961,8 @@ fetch_execution_array_result (WH_CONNECTION        hnd,
 
   if (count > 0)
     {
+      assert (type != T_UNDETERMINED);
+
       for (uint64_t i = 0; i < count; ++i)
         {
           wcs = WValueEntry (hnd, field, row, i, WIGNORE_OFF, &retValue);

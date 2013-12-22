@@ -420,6 +420,13 @@ BaseOperand::GetTable ()
 
 
 StackValue
+BaseOperand::GetTableValue ()
+{
+  return StackValue (TableOperand (GetTableReference ()));
+}
+
+
+StackValue
 BaseOperand::GetFieldAt (const FIELD_INDEX field)
 {
   throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));

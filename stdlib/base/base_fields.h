@@ -22,30 +22,25 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef BASE_ARRAYS_H_
-#define BASE_ARRAYS_H_
+#ifndef BASE_FIELDS_H_
+#define BASE_FIELDS_H_
+
 
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayCount;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArraySort;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayBinSearch;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArraySearch;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayMin;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayMax;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayAverage;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayIntersect;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayUnion;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayDiff;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayPushBack;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayHash;
-
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldTable;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcIsFielsIndexed;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldName;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldIndex;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFindValueRange;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldAverage;
 
 
 whisper::WLIB_STATUS
-base_arrays_init ();
+base_fields_init ();
 
-#endif /* BASE_ARRAYS_H_ */
+#endif /* BASE_FIELDS_H_ */
 

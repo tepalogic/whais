@@ -81,6 +81,25 @@ wh_apply_field_modifier (struct TypeSpec* const ioBuffer)
 }
 
 
+int
+wh_apply_table_modifier (struct TypeSpec* const ioBuffer)
+{
+  uint16_t type = load_le_int16 (ioBuffer->type);
+
+  if (type != 0)
+    return -1;
+
+  MARK_TABLE (type);
+  store_le_int16 (type, ioBuffer->type);
+
+  if ( ! is_type_spec_valid (ioBuffer))
+    return -1;
+
+
+  return sizeof (*ioBuffer);
+}
+
+
 bool_t
 is_type_spec_valid (const struct TypeSpec* spec)
 {
@@ -140,6 +159,9 @@ is_type_spec_valid (const struct TypeSpec* spec)
   else if (IS_TABLE (htype))
     {
       uint_t index = 0;
+
+      if (GET_BASIC_TYPE (htype) != 0)
+        result = FALSE;
 
       while ((index < (uint_t) (hsize - 2)) && (result != FALSE))
         {

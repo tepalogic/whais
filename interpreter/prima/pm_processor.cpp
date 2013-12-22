@@ -565,12 +565,13 @@ op_func_call (ProcedureCall& call, int64_t& offset)
                                 call.CurrentOffset () +
                                 offset;
 
-  const uint32_t procId = load_le_int32 (data);
+  const uint32_t procIndex = load_le_int32 (data);
 
   offset += sizeof (uint32_t);
 
-  Session&      session = call.GetSession ();
-  SessionStack& stack   = call.GetStack ();
+  Session&       session = call.GetSession ();
+  SessionStack&  stack   = call.GetStack ();
+  const uint32_t procId  = call.GetUnit ().GetProcedureId (procIndex);
 
   ProcedureCall (session, stack, session.GetProcedure (procId));
 }

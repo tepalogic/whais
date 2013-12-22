@@ -1106,6 +1106,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
 }
 
 
+
 void
 PrototypeTable::Get (const ROW_INDEX        row,
                      const FIELD_INDEX       field,
@@ -1412,6 +1413,160 @@ PrototypeTable::Get (const ROW_INDEX        row,
                                    desc.Type () & PS_TABLE_FIELD_TYPE_MASK)
                                                             );
       _placement_new (&outValue, DArray (rowArray));
+    }
+}
+
+
+template<typename T>
+void table_exchange_rows (ITable&             table,
+                          const FIELD_INDEX   field,
+                          const ROW_INDEX     row1,
+                          const ROW_INDEX     row2)
+{
+  T row1Value, row2Value;
+
+  assert (row1 < table.AllocatedRows ());
+  assert (row2 < table.AllocatedRows ());
+
+  table.Get (row1, field, row1Value);
+  table.Get (row2, field, row2Value);
+
+  if (row1Value == row2Value)
+    return ;
+
+  table.Set (row1, field, row2Value);
+  table.Set (row2, field, row1Value);
+}
+
+
+template<>
+void table_exchange_rows<DArray> (ITable&             table,
+                                 const FIELD_INDEX   field,
+                                 const ROW_INDEX     row1,
+                                 const ROW_INDEX     row2)
+{
+  DArray row1Value, row2Value;
+
+  assert (row1 < table.AllocatedRows ());
+  assert (row2 < table.AllocatedRows ());
+
+  table.Get (row1, field, row1Value);
+  table.Get (row2, field, row2Value);
+
+  table.Set (row1, field, row2Value);
+  table.Set (row2, field, row1Value);
+}
+
+
+template<>
+void table_exchange_rows<DText> (ITable&             table,
+                                 const FIELD_INDEX   field,
+                                 const ROW_INDEX     row1,
+                                 const ROW_INDEX     row2)
+{
+  DText row1Value, row2Value;
+
+  assert (row1 < table.AllocatedRows ());
+  assert (row2 < table.AllocatedRows ());
+
+  table.Get (row1, field, row1Value);
+  table.Get (row2, field, row2Value);
+
+  table.Set (row1, field, row2Value);
+  table.Set (row2, field, row1Value);
+}
+
+
+void
+PrototypeTable::ExchangeRows (const ROW_INDEX    row1,
+                              const ROW_INDEX    row2)
+{
+  const ROW_INDEX     allocatedRows = AllocatedRows ();
+  const FIELD_INDEX   fieldsCount   = FieldsCount ();
+
+  if ((allocatedRows <= row1) || (allocatedRows <= row2))
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+
+  for (FIELD_INDEX field = 0; field < fieldsCount; ++field)
+    {
+      const DBSFieldDescriptor fieldDesc = DescribeField (field);
+
+      if (fieldDesc.isArray)
+        table_exchange_rows<DArray> (*this, field, row1, row2);
+
+      else
+        {
+          switch (fieldDesc.type)
+            {
+            case T_BOOL:
+              table_exchange_rows<DBool> (*this, field, row1, row2);
+              break;
+
+            case T_CHAR:
+              table_exchange_rows<DChar> (*this, field, row1, row2);
+              break;
+
+            case T_DATE:
+              table_exchange_rows<DDate> (*this, field, row1, row2);
+              break;
+
+            case T_DATETIME:
+              table_exchange_rows<DDateTime> (*this, field, row1, row2);
+              break;
+
+            case T_HIRESTIME:
+              table_exchange_rows<DHiresTime> (*this, field, row1, row2);
+              break;
+
+            case T_INT8:
+              table_exchange_rows<DInt8> (*this, field, row1, row2);
+              break;
+
+            case T_INT16:
+              table_exchange_rows<DInt16> (*this, field, row1, row2);
+              break;
+
+            case T_INT32:
+              table_exchange_rows<DInt32> (*this, field, row1, row2);
+              break;
+
+            case T_INT64:
+              table_exchange_rows<DInt64> (*this, field, row1, row2);
+              break;
+
+            case T_UINT8:
+              table_exchange_rows<DUInt8> (*this, field, row1, row2);
+              break;
+
+            case T_UINT16:
+              table_exchange_rows<DUInt16> (*this, field, row1, row2);
+              break;
+
+            case T_UINT32:
+              table_exchange_rows<DUInt32> (*this, field, row1, row2);
+              break;
+
+            case T_UINT64:
+              table_exchange_rows<DUInt64> (*this, field, row1, row2);
+              break;
+
+            case T_REAL:
+              table_exchange_rows<DReal> (*this, field, row1, row2);
+              break;
+
+            case T_RICHREAL:
+              table_exchange_rows<DRichReal> (*this, field, row1, row2);
+              break;
+
+            case T_TEXT:
+              table_exchange_rows<DText> (*this, field, row1, row2);
+              break;
+
+            default:
+              throw DBSException (NULL,
+                                  _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+            }
+        }
     }
 }
 

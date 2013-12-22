@@ -133,6 +133,8 @@ public:
 
   virtual ITable& GetTable () = 0;
 
+  virtual StackValue GetTableValue () = 0;
+
   virtual StackValue GetFieldAt (const FIELD_INDEX field) = 0;
 
   virtual StackValue GetValueAt (const uint64_t index) = 0;

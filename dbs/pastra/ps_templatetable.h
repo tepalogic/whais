@@ -273,8 +273,6 @@ public:
                     const FIELD_INDEX         field,
                     const DArray&             value);
 
-
-
   virtual void Get (const ROW_INDEX           row,
                     const FIELD_INDEX         field,
                     DBool&                    outValue);
@@ -343,6 +341,8 @@ public:
                     const FIELD_INDEX         field,
                     DArray&                   outValue);
 
+  virtual void ExchangeRows (const ROW_INDEX    row1,
+                             const ROW_INDEX    row2);
 
   virtual DArray MatchRows (const DBool&          min,
                             const DBool&          max,

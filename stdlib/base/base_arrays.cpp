@@ -24,8 +24,6 @@
 
 #include <cassert>
 
-#include "whisper.h"
-
 #include "utils/we_int128.h"
 #include "utils/whash.h"
 
@@ -771,14 +769,14 @@ compute_real_array_average_value (const DArray& array)
     {
       array.Get (offset, currentValue);
 
-      const RICHREAL_T  temp = currentValue.mValue;
+      const RICHREAL_T temp = currentValue.mValue;
 
       integerSum    += temp.Integer ();
       fractionalSum += temp.Fractional ();
-
-      integerSum    += fractionalSum / DBS_RICHREAL_PREC;
-      fractionalSum %= DBS_RICHREAL_PREC;
     }
+
+  integerSum    += fractionalSum / DBS_RICHREAL_PREC;
+  fractionalSum %= DBS_RICHREAL_PREC;
 
   RICHREAL_T result = _SC (RICHREAL_T, integerSum) / arrayCount;
   result += RICHREAL_T (0, toInt64 (fractionalSum), DBS_RICHREAL_PREC)

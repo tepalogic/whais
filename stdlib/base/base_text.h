@@ -25,9 +25,10 @@
 #ifndef BASE_TEXT_H_
 #define BASE_TEXT_H_
 
-#include "whisper.h"
 
 #include "stdlib/interface.h"
+
+
 
 extern whisper::WLIB_PROC_DESCRIPTION       gIsUpper;
 extern whisper::WLIB_PROC_DESCRIPTION       gIsLower;
@@ -52,6 +53,7 @@ extern whisper::WLIB_PROC_DESCRIPTION       gTextHash;
 extern whisper::WLIB_PROC_DESCRIPTION       gCharFind;
 extern whisper::WLIB_PROC_DESCRIPTION       gTextFind;
 extern whisper::WLIB_PROC_DESCRIPTION       gTextCompare;
+
 
 whisper::WLIB_STATUS
 base_text_init ();

@@ -825,17 +825,17 @@ Session::FindGlobalTI (const uint32_t glbId)
 
 
 uint32_t
-Session::FindProcedure (const uint8_t* pName, const uint_t nameLength)
+Session::FindProcedure (const uint8_t* name, const uint_t nameLength)
 {
   ProcedureManager* procMgr = &mPrivateNames.Get ().GetProcedureManager ();
-  uint32_t          result  = procMgr->GetProcedure (pName, nameLength);
+  uint32_t          result  = procMgr->GetProcedure (name, nameLength);
 
   assert (ProcedureManager::IsGlobalEntry (result) == false);
 
   if ( ! ProcedureManager::IsValid (result))
     {
       procMgr = &mGlobalNames.Get ().GetProcedureManager ();
-      result  = procMgr->GetProcedure (pName, nameLength);
+      result  = procMgr->GetProcedure (name, nameLength);
 
       assert (ProcedureManager::IsGlobalEntry (result) == false);
 
@@ -1024,15 +1024,15 @@ Session::DefineProcedure (const uint8_t* const   name,
   for (uint_t localIt = 0; localIt < localsCount; ++ localIt)
     {
       const uint8_t* const typeDesc = typeMgr.TypeDescription (
-                                                        typesOffset[localIt
-                                                              ]);
+                                                        typesOffset[localIt]
+                                                              );
 
       if (TypeManager::IsTypeValid (typeDesc) == false)
         {
           string message = "Could not define the procedure ";
 
           message += "'";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' do to invalid type description of local value.";
 
           mLog.Log (LOG_ERROR, message);
@@ -1071,13 +1071,15 @@ Session::DefineProcedure (const uint8_t* const   name,
           if (memcmp (typeDesc,
                       FindLocalTI (procIndex, localIt),
                       TypeManager::GetTypeLength (typeDesc) ) != 0)
-            argsMatch = false;
+            {
+              argsMatch = false;
+            }
         }
 
       if (argsMatch == false)
         {
           string message = "External declaration of procedure '";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' has a different signature than its definition.";
 
           mLog.Log (LOG_ERROR, message);
@@ -1092,7 +1094,7 @@ Session::DefineProcedure (const uint8_t* const   name,
   else if (ProcedureManager::IsValid (procIndex))
     {
       string message = "Duplicate definition of procedure '";
-      message.insert (message.size(), _RC (const char*, name), nameLength);
+      message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "'.";
 
       mLog.Log (LOG_ERROR, message);

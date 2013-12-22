@@ -2448,12 +2448,12 @@ get_array_el_off (struct INTERNAL_HANDLER* const hnd,
   fromPos += sizeof (uint64_t);
 
   assert (fromPos <= dataSize);
-  assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
 
   *pArraySize = elCount;
   if ((elCount == 0) || (*pArraySize <= arrayOff))
     return INVALID_OFF;
 
+  assert ((WHC_TYPE_BOOL <= type) && (type <= WHC_TYPE_TEXT));
   assert (fromPos < dataSize);
 
   currOff = load_le_int64 (data_ + fromPos);

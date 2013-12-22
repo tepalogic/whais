@@ -2412,12 +2412,12 @@ translate_call_exp (struct ParserState* const   parser,
                     struct Statement* const     stmt,
                     struct SemExpression* const exp)
 {
-  struct WOutputStream* const instrs  = stmt_query_instrs (stmt);
-  const struct Statement*    proc     = NULL;
-  const struct DeclaredVar*  procVar  = NULL;
-  struct SemValue*           expArg   = NULL;
-  uint_t                     argCount = 0;
-  struct ExpResultType       result;
+  struct WOutputStream* const instrs   = stmt_query_instrs (stmt);
+  const struct Statement*     proc     = NULL;
+  const struct DeclaredVar*   procVar  = NULL;
+  struct SemValue*            expArg   = NULL;
+  uint_t                      argCount = 0;
+  struct ExpResultType        result;
 
   char temp[128];
 
@@ -2493,11 +2493,14 @@ translate_call_exp (struct ParserState* const   parser,
       else
         free_sem_value (param);
 
-      if (result.type != T_UNDETERMINED)
+      if (GET_TYPE (result.type) != T_UNDETERMINED)
         {
           if (IS_FIELD (result.type))
             {
-              const bool_t isArgArray = IS_ARRAY (GET_FIELD_TYPE (argType.type));
+              const bool_t isArgArray = IS_ARRAY (
+                                            GET_FIELD_TYPE (argType.type)
+                                                 );
+
               const bool_t isArgUndet = isArgArray ?
                                           FALSE :
                                           (GET_BASIC_TYPE (argType.type) ==

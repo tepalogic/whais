@@ -73,13 +73,11 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
       logEntry.str ("");
 
       WH_SHLIB shl = wh_shl_load (it->c_str ());
-      if (shl == INVALID_SHL)
+      if ((shl == INVALID_SHL)
+          || ! inoutDesc.mSession->LoadSharedLib (shl))
         {
           log.Log (LOG_WARNING, "Failed to load the dynamic library.");
-          continue;
         }
-
-      inoutDesc.mSession->LoadSharedLib (shl);
     }
 
   for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin ();

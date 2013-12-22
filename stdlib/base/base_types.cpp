@@ -117,7 +117,7 @@ base_types_init ()
                                 _RC (TypeSpec*, gGenericArrayType)) <= 0)
       || (wh_define_basic_type (T_UNDETERMINED,
                                 _RC (TypeSpec*, gGenericFieldType)) <= 0)
-      || (wh_define_basic_type (T_UNDETERMINED,
+      || (wh_define_basic_type (T_UNKNOWN,
                                 _RC (TypeSpec*, gGenericTableType)) <= 0))
     {
       return WOP_UNKNOW;
@@ -161,6 +161,13 @@ base_types_init ()
     {
       return WOP_UNKNOW;
     }
+
+  if (wh_apply_field_modifier (_RC (TypeSpec*, gGenericFieldType)) <= 0)
+    return WOP_UNKNOW;
+
+  if (wh_apply_table_modifier (_RC (TypeSpec*, gGenericTableType)) <= 0)
+    return WOP_UNKNOW;
+
 
   return WOP_OK;
 }

@@ -119,6 +119,8 @@ wh_apply_array_modifier (struct TypeSpec* const ioBuffer);
 int
 wh_apply_field_modifier (struct TypeSpec* const ioBuffer);
 
+int
+wh_apply_table_modifier (struct TypeSpec* const ioBuffer);
 
 bool_t
 is_type_spec_valid (const struct TypeSpec* spec);

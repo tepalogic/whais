@@ -204,6 +204,8 @@ public:
 
   virtual ITable& GetTable ();
 
+  virtual StackValue GetTableValue ();
+
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
 
   virtual StackValue GetValueAt (const uint64_t index);
@@ -1554,6 +1556,13 @@ public:
   TableOperand (const TableOperand& source)
     : BaseOperand (),
       mTableRef (source.mTableRef)
+  {
+    mTableRef->IncrementRefCount ();
+  }
+
+  TableOperand (TableReference& tableRef)
+    : BaseOperand (),
+      mTableRef (&tableRef)
   {
     mTableRef->IncrementRefCount ();
   }

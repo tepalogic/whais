@@ -430,6 +430,14 @@ GeneralTable::Get (const ROW_INDEX   row,
 }
 
 
+void
+GeneralTable::ExchangeRows (const ROW_INDEX    row1,
+                            const ROW_INDEX    row2)
+{
+  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+}
+
+
 DArray
 GeneralTable::MatchRows (const DBool&      min,
                          const DBool&      max,

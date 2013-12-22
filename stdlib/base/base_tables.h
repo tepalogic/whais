@@ -22,30 +22,23 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef BASE_ARRAYS_H_
-#define BASE_ARRAYS_H_
+#ifndef BASE_TABLES_H_
+#define BASE_TABLES_H_
 
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayCount;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArraySort;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayBinSearch;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArraySearch;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayMin;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayMax;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayAverage;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayIntersect;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayUnion;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayDiff;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayPushBack;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayHash;
-
-
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableIsPersistent;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFieldsCount;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFieldByIndex;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFieldByName;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableRowsCount;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableAddRow;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
 
 whisper::WLIB_STATUS
-base_arrays_init ();
+base_tables_init ();
 
-#endif /* BASE_ARRAYS_H_ */
-
+#endif /* BASE_TABLES_H_ */

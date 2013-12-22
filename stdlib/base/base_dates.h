@@ -25,9 +25,9 @@
 #ifndef BASE_DATES_H_
 #define BASE_DATES_H_
 
-#include "whisper.h"
 
 #include "stdlib/interface.h"
+
 
 extern whisper::WLIB_PROC_DESCRIPTION       gProcTicks;
 extern whisper::WLIB_PROC_DESCRIPTION       gProcNow;

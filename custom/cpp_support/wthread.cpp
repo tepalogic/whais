@@ -140,7 +140,7 @@ Thread::WaitToEnd (const bool throwPending)
   //Wait till the spawned thread releases the lock.
   LockRAII holder (mLock);
 
-  assert (mEnded );
+  assert (mEnded);
 
   if (mNeedsClean)
     wh_thread_free (mThread);
