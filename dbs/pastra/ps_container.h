@@ -137,11 +137,16 @@ private:
   void  FillCache (uint64_t position);
 
   std::auto_ptr<TemporalFileContainer> mFileContainer;
-  std::auto_ptr<uint8_t>               mCache;
-  uint64_t                             mCacheStartPos;
-  uint64_t                             mCacheEndPos;
+  std::auto_ptr<uint8_t>               mCache_1;
+  std::auto_ptr<uint8_t>               mCache_2;
+  uint64_t                             mCacheStartPos_1;
+  uint64_t                             mCacheEndPos_1;
+  uint64_t                             mCacheStartPos_2;
+  uint64_t                             mCacheEndPos_2;
   const uint_t                         mCacheSize;
-  bool                                 mDirtyCache;
+  bool                                 mDirtyCache_1;
+  bool                                 mDirtyCache_2;
+  bool                                 mCache1LastUsed;
 
   static uint64_t  smTemporalsCount;
   static Lock      smSync;
