@@ -568,7 +568,6 @@ Utf8Translator::Read (const uint8_t* const utf8Src,
   uint_t         result = 0;
   const uint64_t value  = read_integer (utf8Src, &result, false);
   if ((result == 0)
-      || (utf8Src[result++] != 0)
       || (result > srcSize)
       || (value < std::numeric_limits<uint8_t>::min ())
       || (std::numeric_limits<uint8_t>::max () < value))

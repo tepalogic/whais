@@ -104,7 +104,7 @@ struct TableParameter
     if (! mFields[field].SetValue (row, type, value))
       {
         cout << "Invalid command format. ";
-        cout << "Field '" << field << "' has different types values.\n";
+        cout << "Field '" << field << "' has different types of values.\n";
 
         return false;
       }
@@ -347,17 +347,74 @@ parse_type (const string&       cmdLine,
 
   case      'I':
   case      'i':
-    outType = WHC_TYPE_INT64;
+    if (strncmp (line + inoutLineOff, "8", 1) == 0)
+      {
+        inoutLineOff += 1;
+        outType = WHC_TYPE_INT8;
+      }
+    else if (strncmp (line + inoutLineOff, "16", 2) == 0)
+      {
+        inoutLineOff += 2;
+        outType = WHC_TYPE_INT16;
+      }
+    else if (strncmp (line + inoutLineOff, "32", 2) == 0)
+      {
+        inoutLineOff += 2;
+        outType = WHC_TYPE_INT32;
+      }
+    else if (strncmp (line + inoutLineOff, "64", 2) == 0)
+      {
+        inoutLineOff += 2;
+        outType = WHC_TYPE_INT64;
+      }
+    else
+      {
+        cout << "Invalid command format. Unexpected parameter specifier '"
+             << line[inoutLineOff - 1] <<"'.\n";
+        return false;
+      }
     break;
 
   case      'U':
   case      'u':
-    outType = WHC_TYPE_UINT64;
+    if (strncmp (line + inoutLineOff, "8", 1) == 0)
+      {
+        inoutLineOff += 1;
+        outType = WHC_TYPE_UINT8;
+      }
+    else if (strncmp (line + inoutLineOff, "16", 2) == 0)
+      {
+        inoutLineOff += 2;
+        outType = WHC_TYPE_UINT16;
+      }
+    else if (strncmp (line + inoutLineOff, "32", 2) == 0)
+      {
+        inoutLineOff += 2;
+        outType = WHC_TYPE_UINT32;
+      }
+    else if (strncmp (line + inoutLineOff, "64", 2) == 0)
+      {
+        inoutLineOff += 2;
+        outType = WHC_TYPE_UINT64;
+      }
+    else
+      {
+        cout << "Invalid command format. Unexpected parameter specifier '"
+             << line[inoutLineOff - 1] <<"'.\n";
+        return false;
+      }
     break;
 
   case      'R':
   case      'r':
-    outType = WHC_TYPE_RICHREAL;
+    if ((line[inoutLineOff] == 'r') || (line[inoutLineOff] == 'R'))
+      {
+        inoutLineOff += 1;
+        outType       = WHC_TYPE_RICHREAL;
+      }
+    else
+      outType = WHC_TYPE_REAL;
+
     break;
 
   case      't':
@@ -789,7 +846,7 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
         }
       else
         {
-          if (!parse_type (cmdLine, inoutLineOff, type))
+          if (! parse_type (cmdLine, inoutLineOff, type))
             return false;
 
           while ((inoutLineOff < cmdLine.length ())

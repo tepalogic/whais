@@ -80,8 +80,7 @@ bool parse_defined_values (const char*       src,
 }
 
 
-template <typename T>
-bool
+template<typename T> bool
 ParseFieldValue (ostream* const  os,
                  const char*     src,
                  const bool      apostrophe,
@@ -118,8 +117,7 @@ ParseFieldValue (ostream* const  os,
   return true;
 }
 
-template <>
-bool
+template<> bool
 ParseFieldValue<DChar> (ostream* const  os,
                         const char*     src,
                         const bool      apostrophe,
@@ -161,12 +159,12 @@ ParseFieldValue<DChar> (ostream* const  os,
   return true;
 }
 
-template <typename T>
-bool ParseFieldSpecifier (ostream* const              os,
-                          const char*                 src,
-                          size_t* const               outSrcSize,
-                          const bool                  apostrophe,
-                          FieldValuesSelection&       outFieldValues)
+template<typename T> bool
+ParseFieldSpecifier (ostream* const              os,
+                     const char*                 src,
+                     size_t* const               outSrcSize,
+                     const bool                  apostrophe,
+                     FieldValuesSelection&       outFieldValues)
 {
   Range<T>& range = *_RC (Range<T>*, outFieldValues.mRange);
 
@@ -329,7 +327,6 @@ allocate_value_range (const uint_t fieldType)
 static void
 free_value_range (const uint_t fieldType, void* const range)
 {
-
   switch (fieldType)
     {
     case T_BOOL:

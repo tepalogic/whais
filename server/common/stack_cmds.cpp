@@ -183,6 +183,8 @@ cmd_push_stack (ClientConnection& conn, uint_t* const inoutDataOff)
 
             case WHC_TYPE_TEXT:
               assert (false);
+              break;
+
             default:
               throw ConnectionException (
                     "Server internal error:\n"
@@ -319,7 +321,7 @@ cmd_push_stack (ClientConnection& conn, uint_t* const inoutDataOff)
         }
 
       IDBSHandler& dbs   = *conn.Dbs().mDbs;
-      ITable&   table = dbs.CreateTempTable (fieldsCount, fields_);
+      ITable&      table = dbs.CreateTempTable (fieldsCount, fields_);
 
       stack.Push (dbs, table);
     }
