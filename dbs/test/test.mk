@@ -34,6 +34,10 @@ UNIT_EXES+=l_test_arraysort
 l_test_arraysort_SRC=test/test_arraysort.cpp
 l_test_arraysort_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 
+UNIT_EXES+=l_test_tablesort
+l_test_tablesort_SRC=test/test_tablesort.cpp
+l_test_tablesort_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
+
 UNIT_EXES+=l_test_tablermrows
 l_test_tablermrows_SRC=test/test_tablermrows.cpp
 l_test_tablermrows_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon

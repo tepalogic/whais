@@ -213,6 +213,11 @@ public:
   virtual void ExchangeRows (const ROW_INDEX    row1,
                              const ROW_INDEX    row2) = 0;
 
+  virtual void Sort (const FIELD_INDEX  field,
+                     const ROW_INDEX    from,
+                     const ROW_INDEX    to,
+                     const bool         reverse) = 0;
+
   virtual DArray MatchRows (const DBool&      min,
                             const DBool&      max,
                             const ROW_INDEX   fromRow,

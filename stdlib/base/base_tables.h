@@ -37,6 +37,7 @@ extern whisper::WLIB_PROC_DESCRIPTION       gProcTableAddRow;
 extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
 extern whisper::WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
 extern whisper::WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
+extern whisper::WLIB_PROC_DESCRIPTION       gProcTableSort;
 
 whisper::WLIB_STATUS
 base_tables_init ();

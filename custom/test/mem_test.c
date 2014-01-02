@@ -9,7 +9,7 @@
 /* GLOBAL variables for testing */
 static size_t test_mem_used;
 static size_t test_mem_peak;
-static size_t test_max_mem;
+static size_t test_max_mem  = 40 * 1024 * 1024;
 
 #define CONTROL_BYTE    0xAC    /* all correct */
 
@@ -190,8 +190,6 @@ void*
 custom_mem_alloc (size_t size)
 {
   W_ALLOCATED_MEMORY *result = NULL;
-
-  test_set_mem_max (40*1024*1024);
 
   size += sizeof (W_ALLOCATED_MEMORY);
   size++;                       /* control byte */

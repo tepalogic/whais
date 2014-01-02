@@ -216,6 +216,7 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcFieldMinimum,
                                                     &gProcFieldMaximum,
                                                     &gProcFieldAverage,
+                                                    &gProcFieldSortTable,
                           /* Table procedures */
                                                     &gProcTableIsPersistent,
                                                     &gProcTableFieldsCount,
@@ -225,7 +226,8 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcTableAddRow,
                                                     &gProcTableFindRemovedRow,
                                                     &gProcTableRemoveRow,
-                                                    &gProcTableExchangeRows
+                                                    &gProcTableExchangeRows,
+                                                    &gProcTableSort
                                                           };
 
 

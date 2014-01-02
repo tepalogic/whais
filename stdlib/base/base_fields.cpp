@@ -44,6 +44,7 @@ WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
 WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
 WLIB_PROC_DESCRIPTION         gProcFieldAverage;
 
+WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
 static WLIB_STATUS
 proc_field_table (SessionStack& stack, ISession&)
@@ -712,6 +713,34 @@ compute_field_average (SessionStack& stack, ISession&)
 }
 
 
+static WLIB_STATUS
+field_sort_table (SessionStack& stack, ISession&)
+{
+  DBool  result;
+  DBool  reverseSort;
+
+  IOperand& opField = stack[stack.Size () - 2].Operand ();
+  stack[stack.Size () - 1].Operand ().GetValue (reverseSort);
+
+
+  if ( ! opField.IsNull ())
+    {
+      const FIELD_INDEX field = opField.GetField ();
+      ITable&           table = opField.GetTable ();
+
+      table.Sort (field,
+                  0,
+                  table.AllocatedRows () - 1,
+                  reverseSort.IsNull () ? false : reverseSort.mValue);
+      result = DBool (true);
+    }
+
+  stack.Pop (1);
+
+  return WOP_OK;
+}
+
+
 WLIB_STATUS
 base_fields_init ()
 {
@@ -796,6 +825,18 @@ base_fields_init ()
   gProcFieldAverage.localsCount = 2;
   gProcFieldAverage.localsTypes = fieldAverageLocals;
   gProcFieldAverage.code        = compute_field_average;
+
+
+  static const uint8_t* fieldSortTableLocals[] = {
+                                                   gGenericTableType,
+                                                   gGenericFieldType,
+                                                   gBoolType
+                                                 };
+
+  gProcFieldSortTable.name        = "field_sort_table";
+  gProcFieldSortTable.localsCount = 3;
+  gProcFieldSortTable.localsTypes = fieldSortTableLocals;
+  gProcFieldSortTable.code        = field_sort_table;
 
   return WOP_OK;
 }

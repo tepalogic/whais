@@ -1563,10 +1563,273 @@ PrototypeTable::ExchangeRows (const ROW_INDEX    row1,
               break;
 
             default:
-              throw DBSException (NULL,
-                                  _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+              throw DBSException (
+                              NULL,
+                              _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
+                                 );
             }
         }
+    }
+}
+
+
+static bool
+operator< (const DText& text1, const DText& text2)
+{
+  const uint64_t text1Count = text1.Count ();
+  const uint64_t text2Count = text2.Count ();
+
+  uint64_t i, j;
+
+  for (i = 0, j = 0;
+       ((i < text1Count) && (j < text2Count));
+       ++i, ++j)
+    {
+      const DChar c1 = text1.CharAt (i);
+      const DChar c2 = text2.CharAt (j);
+
+      if (c1 < c2)
+        return true;
+
+      else if (c1 > c2)
+        return false;
+    }
+
+  if (i < j)
+    return true;
+
+  return false;
+}
+
+//Keep this here! Other way g++ compiler fails to notice the operator<'s
+//definition.
+#include "utils/wsort.h"
+
+template<typename TF> class
+SortTableContainer
+{
+public:
+  SortTableContainer (ITable& table, const FIELD_INDEX field)
+    : mTable (table),
+      mField (field)
+  {
+  }
+
+  const TF operator[] (const int64_t position) const
+  {
+    TF value;
+    mTable.Get (position, mField, value);
+
+    return value;
+  }
+
+  void Exchange (const int64_t pos1, const int64_t pos2)
+  {
+    mTable.ExchangeRows (pos1, pos2);
+  }
+
+  uint64_t Count () const
+  {
+    return mTable.AllocatedRows ();
+  }
+
+  void Pivot (const uint64_t from, const uint64_t to)
+  {
+    mTable.Get ((from + to) / 2, mField, mPivot);
+  }
+
+  const TF& Pivot () const
+  {
+    return mPivot;
+  }
+
+private:
+  ITable&             mTable;
+  const FIELD_INDEX   mField;
+  TF                  mPivot;
+};
+
+
+void
+PrototypeTable::Sort (const FIELD_INDEX     field,
+                      const ROW_INDEX       fromRow,
+                      const ROW_INDEX       toRow,
+                      const bool            reverse)
+{
+  const DBSFieldDescriptor fd = DescribeField (field);
+
+  if (fd.isArray)
+    throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+
+  else if (fromRow > toRow)
+    throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
+
+  else if (toRow >= AllocatedRows ())
+    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+
+  switch (fd.type)
+    {
+      case T_BOOL:
+          {
+            SortTableContainer<DBool> temp (*this, field);
+            quick_sort<DBool, SortTableContainer<DBool> > (fromRow,
+                                                           toRow,
+                                                           reverse,
+                                                           temp);
+          }
+        break;
+
+      case T_CHAR:
+         {
+            SortTableContainer<DChar> temp (*this, field);
+            quick_sort<DChar, SortTableContainer<DChar> > (fromRow,
+                                                           toRow,
+                                                           reverse,
+                                                           temp);
+          }
+        break;
+
+      case T_DATE:
+         {
+            SortTableContainer<DDate> temp (*this, field);
+            quick_sort<DDate, SortTableContainer<DDate> > (fromRow,
+                                                           toRow,
+                                                           reverse,
+                                                           temp);
+          }
+        break;
+
+      case T_DATETIME:
+         {
+            SortTableContainer<DDateTime> temp (*this, field);
+            quick_sort<DDateTime, SortTableContainer<DDateTime> > (fromRow,
+                                                                   toRow,
+                                                                   reverse,
+                                                                   temp);
+          }
+        break;
+
+      case T_HIRESTIME:
+         {
+            SortTableContainer<DHiresTime> temp (*this, field);
+            quick_sort<DHiresTime, SortTableContainer<DHiresTime> > (fromRow,
+                                                                     toRow,
+                                                                     reverse,
+                                                                     temp);
+          }
+        break;
+
+      case T_UINT8:
+         {
+            SortTableContainer<DUInt8> temp (*this, field);
+            quick_sort<DUInt8, SortTableContainer<DUInt8> > (fromRow,
+                                                             toRow,
+                                                             reverse,
+                                                             temp);
+          }
+        break;
+
+      case T_UINT16:
+         {
+            SortTableContainer<DUInt16> temp (*this, field);
+            quick_sort<DUInt16, SortTableContainer<DUInt16> > (fromRow,
+                                                               toRow,
+                                                               reverse,
+                                                               temp);
+          }
+        break;
+
+      case T_UINT32:
+         {
+            SortTableContainer<DUInt32> temp (*this, field);
+            quick_sort<DUInt32, SortTableContainer<DUInt32> > (fromRow,
+                                                               toRow,
+                                                               reverse,
+                                                               temp);
+          }
+        break;
+
+      case T_UINT64:
+         {
+            SortTableContainer<DUInt64> temp (*this, field);
+            quick_sort<DUInt64, SortTableContainer<DUInt64> > (fromRow,
+                                                               toRow,
+                                                               reverse,
+                                                               temp);
+          }
+        break;
+
+      case T_REAL:
+         {
+            SortTableContainer<DReal> temp (*this, field);
+            quick_sort<DReal, SortTableContainer<DReal> > (fromRow,
+                                                           toRow,
+                                                           reverse,
+                                                           temp);
+          }
+        break;
+
+      case T_RICHREAL:
+         {
+            SortTableContainer<DRichReal> temp (*this, field);
+            quick_sort<DRichReal, SortTableContainer<DRichReal> > (fromRow,
+                                                                   toRow,
+                                                                   reverse,
+                                                                   temp);
+          }
+        break;
+
+      case T_INT8:
+         {
+            SortTableContainer<DInt8> temp (*this, field);
+            quick_sort<DInt8, SortTableContainer<DInt8> > (fromRow,
+                                                           toRow,
+                                                           reverse,
+                                                           temp);
+          }
+        break;
+
+      case T_INT16:
+         {
+            SortTableContainer<DInt16> temp (*this, field);
+            quick_sort<DInt16, SortTableContainer<DInt16> > (fromRow,
+                                                             toRow,
+                                                             reverse,
+                                                             temp);
+          }
+        break;
+
+      case T_INT32:
+         {
+            SortTableContainer<DInt32> temp (*this, field);
+            quick_sort<DInt32, SortTableContainer<DInt32> > (fromRow,
+                                                             toRow,
+                                                             reverse,
+                                                             temp);
+          }
+        break;
+
+      case T_INT64:
+         {
+            SortTableContainer<DInt64> temp (*this, field);
+            quick_sort<DInt64, SortTableContainer<DInt64> > (fromRow,
+                                                             toRow,
+                                                             reverse,
+                                                             temp);
+          }
+        break;
+      case T_TEXT:
+         {
+            SortTableContainer<DText> temp (*this, field);
+            quick_sort<DText, SortTableContainer<DText> > (fromRow,
+                                                           toRow,
+                                                           reverse,
+                                                           temp);
+          }
+        break;
+
+    default:
+      throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
     }
 }
 

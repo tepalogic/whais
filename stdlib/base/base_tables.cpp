@@ -23,7 +23,10 @@
  *****************************************************************************/
 
 #include <cassert>
+#include <vector>
 
+
+#include "utils/wsort.h"
 
 #include "base_tables.h"
 #include "base_types.h"
@@ -34,6 +37,7 @@
 
 
 using namespace whisper;
+using namespace std;
 
 
 WLIB_PROC_DESCRIPTION       gProcTableIsPersistent;
@@ -45,6 +49,464 @@ WLIB_PROC_DESCRIPTION       gProcTableAddRow;
 WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
 WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
 WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
+WLIB_PROC_DESCRIPTION       gProcTableSort;
+
+static bool
+operator< (const DText& text1, const DText& text2)
+{
+  const uint64_t text1Count = text1.Count ();
+  const uint64_t text2Count = text2.Count ();
+
+  uint64_t i, j;
+
+  for (i = 0, j = 0;
+       ((i < text1Count) && (j < text2Count));
+       ++i, ++j)
+    {
+      const DChar c1 = text1.CharAt (i);
+      const DChar c2 = text2.CharAt (j);
+
+      if (c1 < c2)
+        return true;
+
+      else if (c1 > c2)
+        return false;
+    }
+
+  if (i < j)
+    return true;
+
+  return false;
+}
+
+
+class TableSortContainer
+{
+
+public:
+
+  typedef int
+  (TableSortContainer::*field_comparator) (const ROW_INDEX    row1,
+                                           const ROW_INDEX    row2,
+                                           const FIELD_INDEX  row3) const;
+  class Value
+    {
+      friend class TableSortContainer;
+
+    public:
+      Value ()
+        : mContainer (NULL),
+          mRow (0)
+        {
+        }
+
+      Value (const TableSortContainer& container,
+             const ROW_INDEX           row)
+        : mContainer (&container),
+          mRow (row)
+        {
+        }
+
+      bool operator< (const Value& val) const
+        {
+          if ((mContainer == NULL) && (val.mContainer != NULL))
+            return true;
+
+          else if (val.mContainer == NULL)
+            return false;
+
+          assert (val.mContainer == mContainer);
+
+          for (FIELD_INDEX i = 0; i < mContainer->mFields.size (); ++i)
+            {
+              const field_comparator compare = mContainer->mComparators[i];
+
+              const int r = (mContainer->*compare) (mRow,
+                                                    val.mRow,
+                                                    mContainer->mFields[i]);
+              if (r < 0)
+                return true;
+
+              else if (r > 0)
+                return false;
+            }
+
+          return false;
+        }
+
+      bool operator== (const Value& val) const
+        {
+          if ((mContainer == NULL) && (val.mContainer == NULL))
+              return true;
+
+          else if (mContainer != val.mContainer)
+            return false;
+
+          for (FIELD_INDEX i = 0; i < mContainer->mFields.size (); ++i)
+            {
+              const field_comparator compare = mContainer->mComparators[i];
+
+              if ((mContainer->*compare) (mRow,
+                                          val.mRow,
+                                          mContainer->mFields[i]) != 0)
+                return false;
+            }
+
+          return true;
+        }
+
+      Value& operator= (const Value& src)
+        {
+          _CC (const TableSortContainer*&, mContainer) = src.mContainer;
+          _CC (ROW_INDEX&, mRow) = src.mRow;
+
+          return *this;
+        }
+
+    private:
+      const TableSortContainer* const mContainer;
+      const ROW_INDEX                 mRow;
+    };
+
+
+  TableSortContainer (ITable&       table,
+                      const DArray& fields,
+                      const DArray& fieldsSortOrder)
+    : mTable (table)
+    {
+      uint64_t fieldsCount = fields.Count ();
+
+      assert (fieldsCount > 0);
+      assert (fieldsCount == fieldsSortOrder.Count ());
+
+      extract_fields_ids (fields);
+
+      for (FIELD_INDEX field = 0; field < mFields.size (); ++field)
+        {
+          const DBSFieldDescriptor fd = mTable.DescribeField (mFields[field]);
+
+          if (fd.isArray)
+            {
+              throw InterException (
+                          "Could not sort after an array field.",
+                          _EXTRA (InterException::INVALID_PARAMETER_TYPE)
+                                   );
+            }
+
+          DBool sortOrder;
+          fieldsSortOrder.Get (field, sortOrder);
+
+          switch (fd.type)
+            {
+            case T_BOOL:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DBool>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DBool>)
+                                     );
+              break;
+
+            case T_CHAR:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DChar>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DChar>)
+                                     );
+              break;
+
+            case T_DATE:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDate>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DDate>)
+                                     );
+              break;
+
+            case T_DATETIME:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDateTime>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DDateTime>)
+                                     );
+              break;
+
+            case T_HIRESTIME:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DHiresTime>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DHiresTime>)
+                                     );
+              break;
+
+            case T_INT8:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt8>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DInt8>)
+                                     );
+              break;
+
+            case T_INT16:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt16>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DInt16>)
+                                     );
+              break;
+
+
+            case T_INT32:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt32>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DInt32>)
+                                     );
+              break;
+
+            case T_INT64:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt64>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DInt64>)
+                                     );
+              break;
+
+            case T_REAL:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DReal>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DReal>)
+                                     );
+              break;
+
+            case T_RICHREAL:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DRichReal>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DRichReal>)
+                                     );
+              break;
+
+            case T_UINT8:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt8>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt8>)
+                                     );
+              break;
+
+            case T_UINT16:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt16>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt16>)
+                                     );
+              break;
+
+
+            case T_UINT32:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt32>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt32>)
+                                     );
+              break;
+
+            case T_UINT64:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt64>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt64>)
+                                     );
+              break;
+
+            case T_TEXT:
+              mComparators.push_back (
+                            sortOrder.mValue ?
+                              _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DText>) :
+                              _SC (field_comparator, &TableSortContainer::compare_field_values<DText>)
+                                     );
+              break;
+
+            default:
+              throw InterException (NULL,
+                                    _EXTRA (InterException::INTERNAL_ERROR));
+            }
+        }
+    }
+
+  const Value operator[] (const int64_t position) const
+    {
+      return Value (*this, position);
+    }
+
+  void Exchange (const int64_t pos1, const int64_t pos2)
+    {
+      mTable.ExchangeRows (pos1, pos2);
+
+      if (mPivot.mRow == _SC (ROW_INDEX, pos1))
+        mPivot = Value (*this, pos2);
+
+      else if (mPivot.mRow == _SC (ROW_INDEX, pos2))
+        mPivot = Value (*this, pos1);
+    }
+
+  uint64_t Count () const
+    {
+      return mTable.AllocatedRows ();
+    }
+
+  void Pivot (const uint64_t from, const uint64_t to)
+    {
+      mPivot = Value (*this, (from + to) / 2);
+    }
+
+  const Value& Pivot () const
+    {
+      return mPivot;
+    }
+
+private:
+  friend class TableSortContainer::Value;
+
+  template<typename T> int
+  compare_field_values (const ROW_INDEX     row1,
+                        const ROW_INDEX     row2,
+                        const FIELD_INDEX   field) const
+  {
+    T v1, v2;
+
+    mTable.Get (row1, field, v1);
+    mTable.Get (row2, field, v2);
+
+    if (v1 == v2)
+      return 0;
+
+    else if  (v1 < v2)
+      return -1;
+
+    return 1;
+  }
+
+  template<typename T> int
+  compare_field_values_reverse (const ROW_INDEX     row1,
+                                const ROW_INDEX     row2,
+                                const FIELD_INDEX   field) const
+  {
+    T v1, v2;
+
+    mTable.Get (row1, field, v1);
+    mTable.Get (row2, field, v2);
+
+    if (v1 == v2)
+      return 0;
+
+    else if  (v2 < v1)
+      return -1;
+
+    return 1;
+  }
+
+
+  void extract_fields_ids (const DArray& fields)
+  {
+    const DBS_FIELD_TYPE arrayType   = fields.Type ();
+    const uint64_t       fieldsCount = fields.Count ();
+
+    assert (fieldsCount != 0);
+
+    for (uint64_t field = 0; field < fieldsCount; ++field)
+      {
+        switch (arrayType)
+          {
+          case T_INT8:
+              {
+                DInt8 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_INT16:
+              {
+                DInt16 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_INT32:
+              {
+                DInt32 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_INT64:
+              {
+                DInt64 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_UINT8:
+              {
+                DUInt8 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_UINT16:
+              {
+                DUInt16 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_UINT32:
+              {
+                DUInt32 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          case T_UINT64:
+              {
+                DUInt64 temp;
+                fields.Get (field, temp);
+
+                mFields.push_back (temp.mValue);
+              }
+            break;
+
+          default:
+            throw InterException (
+                        "The fields list should be an array of integers.",
+                        _EXTRA (InterException::INVALID_PARAMETER_TYPE)
+                                 );
+          }
+      }
+  }
+
+
+  ITable&                       mTable;
+  vector<uint16_t>              mFields;
+  vector<field_comparator>      mComparators;
+  uint16_t                      mFieldsCount;
+  Value                         mPivot;
+};
 
 
 static WLIB_STATUS
@@ -256,6 +718,44 @@ table_exchange_rows (SessionStack& stack, ISession&)
 
 }
 
+
+static WLIB_STATUS
+proc_table_sort (SessionStack& stack, ISession&)
+{
+  DArray fields, sortOrder;
+
+  IOperand& opTable = stack[stack.Size () - 3].Operand ();
+  stack[stack.Size () - 2].Operand ().GetValue (fields);
+  stack[stack.Size () - 1].Operand ().GetValue (sortOrder);
+
+  if (opTable.IsNull () || fields.IsNull ())
+    {
+      stack.Pop (2);
+      return WOP_OK;
+    }
+  else if ( ! sortOrder.IsNull ()
+           && (fields.Count () != sortOrder.Count ()))
+    {
+      throw InterException (
+            "The array parameters should have the same number of elements.",
+            _EXTRA (InterException::INVALID_PARAMETER_VALUE)
+                           );
+    }
+
+  ITable& table = opTable.GetTable ();
+  TableSortContainer container (table, fields, sortOrder);
+
+  quick_sort<TableSortContainer::Value, TableSortContainer> (
+                                                   0,
+                                                   table.AllocatedRows () - 1,
+                                                   false,
+                                                   container
+                                                             );
+  stack.Pop (2);
+  return WOP_OK;
+}
+
+
 WLIB_STATUS
 base_tables_init ()
 {
@@ -333,6 +833,19 @@ base_tables_init ()
   gProcTableExchangeRows.localsCount = 4;
   gProcTableExchangeRows.localsTypes = tableExchangeRows;
   gProcTableExchangeRows.code        = table_exchange_rows;
+
+  static const uint8_t* tableSortLocals[] = {
+                                              gBoolType,
+                                              gGenericTableType,
+                                              gGenericArrayType,
+                                              gGenericTableType
+                                            };
+
+  gProcTableSort.name        = "table_sort";
+  gProcTableSort.localsCount = 4;
+  gProcTableSort.localsTypes = tableSortLocals;
+  gProcTableSort.code        = proc_table_sort;
+
 
   return WOP_OK;
 }

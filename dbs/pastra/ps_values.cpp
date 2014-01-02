@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
-#include <vector>
+//#include <vector>
 #include <algorithm>
 
 #include "dbs/dbs_values.h"
@@ -31,6 +31,7 @@
 #include "utils/wrandom.h"
 #include "utils/date.h"
 #include "utils/wutf.h"
+#include "utils/wsort.h"
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
@@ -1852,264 +1853,59 @@ DArray::Remove (const uint64_t index)
 }
 
 
-template<class DBS_T> int64_t
-partition (int64_t            from,
-           int64_t            to,
-           DArray&            inoutArray,
-           bool* const        outAlreadySorted)
+template<typename TE>
+class ArrayContainer
 {
-  assert (from < to);
-  assert (to < _SC (int64_t, inoutArray.Count ()));
-
-  const  int64_t originalFrom = from;
-
-  DBS_T leftEl, rightEl, pivot, temp;
-
-  *outAlreadySorted = true;
-  while (from <= to)
+public:
+  ArrayContainer (DArray& array)
+    : mArray (array)
     {
-      temp = leftEl;
-      inoutArray.Get (from, leftEl);
-
-      if (leftEl < temp)
-        {
-          *outAlreadySorted = false;
-
-          break;
-        }
-      else
-        ++from;
     }
 
-  if (*outAlreadySorted)
+  const TE operator[] (const int64_t position) const
     {
-      assert (from == to + 1);
-      return 0;
+      TE value;
+      mArray.Get (position, value);
+
+      return value;
     }
 
-  from = originalFrom;
-  inoutArray.Get ((from + to) / 2, pivot);
-
-  while (from < to)
+  void Exchange (const int64_t pos1, const int64_t pos2)
     {
-      while (from <= to)
-        {
-          inoutArray.Get (from, leftEl);
-          if (leftEl < pivot)
-            ++from;
+      TE val1, val2;
 
-          else
-            break;
-        }
+      mArray.Get (pos1, val1);
+      mArray.Get (pos2, val2);
 
-      if (leftEl == pivot)
-        {
-          while (from < to)
-            {
-              inoutArray.Get (from + 1, temp);
-              if (temp == pivot)
-                ++from;
-
-              else
-                break;
-            }
-        }
-
-      assert ((from < to) || (leftEl == pivot));
-
-      while (from <= to)
-        {
-          inoutArray.Get (to, rightEl);
-          if (pivot < rightEl)
-            --to;
-
-          else
-            break;
-        }
-
-      assert ((from < to) || (rightEl == pivot));
-
-      if (from < to)
-        {
-          if (leftEl == rightEl)
-            {
-              assert (leftEl == pivot);
-              ++from;
-            }
-          else
-            {
-              inoutArray.Set (to, leftEl);
-              inoutArray.Set (from, rightEl);
-            }
-        }
+      mArray.Set (pos2, val1);
+      mArray.Set (pos1, val2);
     }
 
-  return from;
-}
-
-
-template<class DBS_T> int64_t
-partition_reverse (int64_t            from,
-                   int64_t            to,
-                   DArray&            inoutArray,
-                   bool* const        outAlreadySorted)
-{
-  assert (from < to);
-  assert (to < _SC (int64_t, inoutArray.Count()));
-
-  const  int64_t originalFrom = from;
-
-  DBS_T  leftEl = DBS_T::Max ();
-  DBS_T  rightEl, pivot, temp;
-
-  *outAlreadySorted = true;
-  while (from <= to)
+  uint64_t Count () const
     {
-      temp = leftEl;
-      inoutArray.Get (from, leftEl);
-
-      if (temp < leftEl)
-        {
-          *outAlreadySorted = false;
-
-          break;
-        }
-      else
-        ++from;
+      return mArray. Count ();
     }
 
-  if (*outAlreadySorted)
-    {
-      assert (from == to + 1);
-      return 0;
-    }
-
-  from = originalFrom;
-  inoutArray.Get ((from + to) / 2, pivot);
-
-  while (from < to)
-    {
-      while (from <= to)
-        {
-          inoutArray.Get (from, leftEl);
-          if (pivot < leftEl)
-            ++from;
-
-          else
-            break;
-        }
-
-      if (leftEl == pivot)
-        {
-          while (from < to)
-            {
-              inoutArray.Get (from + 1, temp);
-              if (temp == pivot)
-                ++from;
-
-              else
-                break;
-            }
-        }
-
-      assert ((from < to) || (leftEl == pivot));
-
-      while (from <= to)
-        {
-          inoutArray.Get (to, rightEl);
-          if (rightEl < pivot)
-            --to;
-
-          else
-            break;
-        }
-
-      assert ((from < to) || (rightEl == pivot));
-
-      if (from < to)
-        {
-          if (leftEl == rightEl)
-            {
-              assert (leftEl == pivot);
-              ++from;
-            }
-          else
-            {
-              inoutArray.Set (to, leftEl);
-              inoutArray.Set (from, rightEl);
-            }
-        }
-    }
-
-  return from;
-}
-
-struct _partition_t
-{
-  _partition_t (uint64_t from, uint64_t to)
-    : mFrom (from),
-      mTo (to)
+  void Pivot (const int64_t from, const int64_t to)
   {
+    mArray.Get ((from + to) / 2, mPivot);
   }
-  int64_t mFrom;
-  int64_t mTo;
+
+  const TE& Pivot () const
+  {
+    return mPivot;
+  }
+
+private:
+  DArray&     mArray;
+  TE          mPivot;
 };
-
-template<class DBS_T>
-void
-quick_sort (int64_t           from,
-            int64_t           to,
-            const bool        reverse,
-            DArray&           inoutArray)
-{
-  assert (from <= to);
-
-  vector<_partition_t> partStack;
-
-  partStack.push_back ( _partition_t (from, to));
-
-  do
-    {
-      _partition_t current = partStack[partStack.size () - 1];
-      partStack.pop_back();
-
-      if (current.mFrom >= current.mTo)
-        continue;
-
-      int64_t pivot;
-      bool    alreadySorted;
-
-      if (reverse)
-        {
-          pivot = partition_reverse<DBS_T> (current.mFrom,
-                                            current.mTo,
-                                            inoutArray,
-                                            &alreadySorted);
-        }
-      else
-        {
-          pivot = partition<DBS_T> (current.mFrom,
-                                    current.mTo,
-                                    inoutArray,
-                                    &alreadySorted);
-        }
-
-      if (alreadySorted == false)
-        {
-          if ((pivot + 1) < current.mTo)
-            partStack.push_back (_partition_t (pivot + 1, current.mTo));
-
-          if (current.mFrom < (pivot - 1))
-            partStack.push_back (_partition_t (current.mFrom, pivot - 1));
-        }
-    }
-  while (partStack.size () > 0);
-}
 
 
 void
 DArray::Sort (bool reverse)
 {
+
   const int64_t arrayCount = Count ();
 
   if (arrayCount == 0)
@@ -2118,63 +1914,153 @@ DArray::Sort (bool reverse)
   switch (Type ())
   {
   case T_BOOL:
-    quick_sort<DBool> (0, arrayCount - 1, reverse, *this);
+      {
+        ArrayContainer<DBool> temp (*this);
+        quick_sort<DBool, ArrayContainer<DBool> > (0,
+                                                   arrayCount - 1,
+                                                   reverse,
+                                                   temp);
+      }
     break;
 
   case T_CHAR:
-    quick_sort<DChar> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DChar> temp (*this);
+        quick_sort<DChar, ArrayContainer<DChar> > (0,
+                                                   arrayCount - 1,
+                                                   reverse,
+                                                   temp);
+      }
     break;
 
   case T_DATE:
-    quick_sort<DDate> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DDate> temp (*this);
+        quick_sort<DDate, ArrayContainer<DDate> > (0,
+                                                   arrayCount - 1,
+                                                   reverse,
+                                                   temp);
+      }
     break;
 
   case T_DATETIME:
-    quick_sort<DDateTime> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DDateTime> temp (*this);
+        quick_sort<DDateTime, ArrayContainer<DDateTime> > (0,
+                                                           arrayCount - 1,
+                                                           reverse,
+                                                           temp);
+      }
     break;
 
   case T_HIRESTIME:
-    quick_sort<DHiresTime> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DHiresTime> temp (*this);
+        quick_sort<DHiresTime, ArrayContainer<DHiresTime> > (0,
+                                                             arrayCount - 1,
+                                                             reverse,
+                                                             temp);
+      }
     break;
 
   case T_UINT8:
-    quick_sort<DUInt8> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DUInt8> temp (*this);
+        quick_sort<DUInt8, ArrayContainer<DUInt8> > (0,
+                                                     arrayCount - 1,
+                                                     reverse,
+                                                     temp);
+      }
     break;
 
   case T_UINT16:
-    quick_sort<DUInt16> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DUInt16> temp (*this);
+        quick_sort<DUInt16, ArrayContainer<DUInt16> > (0,
+                                                       arrayCount - 1,
+                                                       reverse,
+                                                       temp);
+      }
     break;
 
   case T_UINT32:
-    quick_sort<DUInt32> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DUInt32> temp (*this);
+        quick_sort<DUInt32, ArrayContainer<DUInt32> > (0,
+                                                       arrayCount - 1,
+                                                       reverse,
+                                                       temp);
+      }
     break;
 
   case T_UINT64:
-    quick_sort<DUInt64> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DUInt64> temp (*this);
+        quick_sort<DUInt64, ArrayContainer<DUInt64> > (0,
+                                                       arrayCount - 1,
+                                                       reverse,
+                                                       temp);
+      }
     break;
 
   case T_REAL:
-    quick_sort<DReal> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DReal> temp (*this);
+        quick_sort<DReal, ArrayContainer<DReal> > (0,
+                                                   arrayCount - 1,
+                                                   reverse,
+                                                   temp);
+      }
     break;
 
   case T_RICHREAL:
-    quick_sort<DRichReal> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DRichReal> temp (*this);
+        quick_sort<DRichReal, ArrayContainer<DRichReal> > (0,
+                                                           arrayCount - 1,
+                                                           reverse,
+                                                           temp);
+      }
     break;
 
   case T_INT8:
-    quick_sort<DInt8> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DInt8> temp (*this);
+        quick_sort<DInt8, ArrayContainer<DInt8> > (0,
+                                                   arrayCount - 1,
+                                                   reverse,
+                                                   temp);
+      }
     break;
 
   case T_INT16:
-    quick_sort<DInt16> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DInt16> temp (*this);
+        quick_sort<DInt16, ArrayContainer<DInt16> > (0,
+                                                     arrayCount - 1,
+                                                     reverse,
+                                                     temp);
+      }
     break;
 
   case T_INT32:
-    quick_sort<DInt32> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DInt32> temp (*this);
+        quick_sort<DInt32, ArrayContainer<DInt32> > (0,
+                                                     arrayCount - 1,
+                                                     reverse,
+                                                     temp);
+      }
     break;
 
   case T_INT64:
-    quick_sort<DInt64> (0, arrayCount - 1, reverse, *this);
+     {
+        ArrayContainer<DInt64> temp (*this);
+        quick_sort<DInt64, ArrayContainer<DInt64> > (0,
+                                                     arrayCount - 1,
+                                                     reverse,
+                                                     temp);
+      }
     break;
 
   default:

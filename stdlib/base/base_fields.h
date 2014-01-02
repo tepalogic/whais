@@ -37,6 +37,7 @@ extern whisper::WLIB_PROC_DESCRIPTION         gProcFindValueRange;
 extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
 extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
 extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldAverage;
+extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
 
 whisper::WLIB_STATUS

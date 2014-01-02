@@ -20,6 +20,16 @@ EXTERN PROCEDURE field_match_rows (t    AS FIELD,
 								   from AS UNSIGNED INT64,
 								   to   AS UNSIGNED INT64) RETURN ARRAY OF UNSIGNED INT64;
 
+EXTERN PROCEDURE field_sort_table (t as FIELD, reverse AS BOOL) RETURN TABLE;
+
+PROCEDURE test_field_sort (t AS TABLE, f AS UNSIGNED INT64, reverse AS BOOL)
+RETURN TABLE
+DO
+	field_sort_table (table_field_by_id (t, f), reverse);
+
+	RETURN t;
+ENDPROC
+
 
 PROCEDURE test_field_mimim (t AS TABLE, f AS UNSIGNED INT64)
 RETURN UNDEFINED
