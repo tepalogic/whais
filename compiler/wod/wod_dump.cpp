@@ -200,7 +200,7 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
 
       type = GET_FIELD_TYPE (type);
       if (type != T_UNDETERMINED)
-        output << " OF UNDEFINED ";
+        output << " OF ";
 
       else
         return;
@@ -209,10 +209,10 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
   if (IS_ARRAY (type))
     {
       output << "ARRAY";
-      type = GET_BASIC_TYPE (type);
 
+      type = GET_BASIC_TYPE (type);
       if (type != T_UNDETERMINED)
-        output << " OF UNDEFINED";
+        output << " OF ";
 
       else
         return;
@@ -455,7 +455,15 @@ wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)
 
   for (uint_t proc = 0; proc < procsCount; ++proc)
     {
-      output << "PROCEDURE " << obj.RetriveProcName (proc) << endl
+      const bool externalProc = obj.ProcCodeAreaSize (proc) == 0;
+      output << '[' << proc << "] ";
+      if (externalProc)
+          output << "EXTERN PROCEDURE ";
+
+      else
+          output << "PROCEDURE ";
+
+      output << obj.RetriveProcName (proc) << endl
              << setw (HEADER_SEPARATOR_LENGTH) << setfill ('*') << '*'
              << setw (0) << endl;
 
@@ -477,12 +485,15 @@ wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)
           output << endl;
         }
 
-      output << endl << "Code:" << endl;
+      if (! externalProc)
+        {
+          output << endl << "Code:" << endl;
 
-      wod_dump_code (obj.RetriveProcCodeArea (proc),
-                     obj.ProcCodeAreaSize (proc),
-                     output,
-                     obj.RetriveProcName (proc));
+          wod_dump_code (obj.RetriveProcCodeArea (proc),
+                         obj.ProcCodeAreaSize (proc),
+                         output,
+                         obj.RetriveProcName (proc));
+        }
 
       output << endl << endl;
     }
