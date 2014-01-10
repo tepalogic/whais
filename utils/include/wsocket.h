@@ -60,11 +60,11 @@ public:
           const uint16_t      port);
 
   //Server sockets constructors
-  Socket (const char* const    interface,
+  Socket (const char* const    address,
           const char* const    service,
           const uint_t         backLog);
 
-  Socket (const char* const    interface,
+  Socket (const char* const    address,
           const uint16_t       port,
           const uint_t         backLog);
 
@@ -108,7 +108,7 @@ private:
   // Use the following static member to initialise the socket framework.
   // Note: in a program that uses the Socket wrapper class, one must not
   // call 'whs_init ()' or 'whs_clean ()', as this is handled automatically.
-  static struct SocketInitialiser __initer;
+  static SocketInitialiser __initer;
 };
 
 

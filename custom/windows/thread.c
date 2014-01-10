@@ -27,50 +27,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 #include "whisper_thread.h"
 
+
 uint_t
-wh_lock_init (WH_LOCK* const pLock)
+wh_lock_init (WH_LOCK* const lock)
 {
-  InitializeCriticalSection (pLock);
+  InitializeCriticalSection (lock);
 
   return WOP_OK;
 }
 
+
 uint_t
-wh_lock_destroy (WH_LOCK* const pLock)
+wh_lock_destroy (WH_LOCK* const lock)
 {
-  DeleteCriticalSection (pLock);
+  DeleteCriticalSection (lock);
 
   return WOP_OK;
 }
 
+
 uint_t
-wh_lock_acquire (WH_LOCK* const pLock)
+wh_lock_acquire (WH_LOCK* const lock)
 {
-  EnterCriticalSection (pLock);
+  EnterCriticalSection (lock);
 
   return WOP_OK;
 }
 
+
 uint_t
-wh_lock_release (WH_LOCK* const pLock)
+wh_lock_release (WH_LOCK* const lock)
 {
-  LeaveCriticalSection (pLock);
+  LeaveCriticalSection (lock);
 
   return WOP_OK;
 }
 
+
 uint_t
-wh_thread_create (WH_THREAD* const              pThread,
+wh_thread_create (WH_THREAD* const              outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void* const                   args)
 {
-  *pThread = CreateThread (NULL,
+  *outThread = CreateThread (NULL,
                            0,
                            (LPTHREAD_START_ROUTINE)routine,
                            args,
                            0,
                            NULL);
-  if (*pThread == NULL)
+  if (*outThread == NULL)
     {
       const uint_t result = GetLastError ();
 
@@ -79,6 +84,7 @@ wh_thread_create (WH_THREAD* const              pThread,
 
   return WOP_OK;
 }
+
 
 uint_t
 wh_thread_free (WH_THREAD thread)
@@ -90,11 +96,13 @@ wh_thread_free (WH_THREAD thread)
   return WOP_OK;
 }
 
+
 void
 wh_yield ()
 {
   Sleep (0);
 }
+
 
 void
 wh_sleep (const uint_t millisecs)

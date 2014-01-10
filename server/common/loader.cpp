@@ -76,7 +76,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
       if ((shl == INVALID_SHL)
           || ! inoutDesc.mSession->LoadSharedLib (shl))
         {
-          log.Log (LOG_WARNING, "Failed to load the dynamic library.");
+          log.Log (LOG_ERROR, "Failed to load the dynamic library.");
         }
     }
 

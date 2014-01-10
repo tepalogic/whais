@@ -64,16 +64,13 @@ Socket::Socket (const char* const   serverHost,
 }
 
 
-Socket::Socket (const char* const     interface,
+Socket::Socket (const char* const     localAdress,
                 const char* const     service,
                 const uint_t          backLog)
   : mSocket (INVALID_SOCKET),
     mOwned (false)
 {
-  const uint32_t e = whs_create_server (interface,
-                                        service,
-                                        backLog,
-                                        &mSocket);
+  uint32_t e = whs_create_server (localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
     throw SocketException (NULL, _EXTRA (e));
 
@@ -81,18 +78,17 @@ Socket::Socket (const char* const     interface,
 }
 
 
-Socket::Socket (const char* const   interface,
+Socket::Socket (const char* const   localAdress,
                 const uint16_t      port,
                 const uint_t        backLog)
   : mSocket (INVALID_SOCKET),
     mOwned (false)
 {
-  uint32_t e;
   char   service[16];
 
   sprintf (service, "%u", port);
 
-  e = whs_create_server (interface, service, backLog, &mSocket);
+  uint32_t e = whs_create_server (localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
     throw SocketException (NULL, _EXTRA (e));
 

@@ -33,21 +33,21 @@ extern "C"
 typedef void (*WH_THREAD_ROUTINE) (void*);
 
 uint_t
-wh_lock_init (WH_LOCK* pLock);
+wh_lock_init (WH_LOCK* const lock);
 
 uint_t
-wh_lock_destroy (WH_LOCK* pLock);
+wh_lock_destroy (WH_LOCK* const lock);
 
 uint_t
-wh_lock_acquire (WH_LOCK* pLock);
+wh_lock_acquire (WH_LOCK* const lock);
 
 uint_t
-wh_lock_release (WH_LOCK* pLock);
+wh_lock_release (WH_LOCK* const lock);
 
 uint_t
-wh_thread_create (WH_THREAD*        pThread,
-                  WH_THREAD_ROUTINE routine,
-                  void*             args);
+wh_thread_create (WH_THREAD*                    outThread,
+                  const WH_THREAD_ROUTINE       routine,
+                  void*                         args);
 
 uint_t
 wh_thread_free (WH_THREAD thread);
@@ -56,7 +56,7 @@ void
 wh_yield ();
 
 void
-wh_sleep (uint_t millisecs);
+wh_sleep (const uint_t millisecs);
 
 #ifdef __cplusplus
 }

@@ -1679,7 +1679,10 @@ struct DBS_SHL DReal
 
   static DReal Max ();
 
+#pragma warning (disable: 4251)
   const REAL_T mValue;
+#pragma warning (default: 4251)
+
   const bool   mIsNull;
 };
 
@@ -1771,7 +1774,10 @@ struct DBS_SHL DRichReal
 
   static DRichReal Max ();
 
+#pragma warning (disable: 4251)
   const RICHREAL_T mValue;
+#pragma warning (default: 4251)
+
   const bool       mIsNull;
 };
 

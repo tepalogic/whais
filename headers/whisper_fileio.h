@@ -45,7 +45,7 @@ extern "C"
 #endif
 
 WH_FILE
-whf_open (const char* file, uint_t mode);
+whf_open (const char* const file, uint_t mode);
 
 WH_FILE
 whf_dup (WH_FILE hnd);
@@ -60,16 +60,16 @@ bool_t
 whf_seek (WH_FILE hnd, int64_t where, int whence);
 
 bool_t
-whf_tell (WH_FILE hnd, uint64_t* outPosition);
+whf_tell (WH_FILE hnd, uint64_t* const outPosition);
 
 bool_t
 whf_sync (WH_FILE hnd);
 
 bool_t
-whf_tell_size (WH_FILE hnd, uint64_t* outSize);
+whf_tell_size (WH_FILE hnd, uint64_t* const outSize);
 
 bool_t
-whf_set_size (WH_FILE, uint64_t newSize);
+whf_set_size (WH_FILE, const uint64_t newSize);
 
 bool_t
 whf_close (WH_FILE hnd);
@@ -81,7 +81,7 @@ bool_t
 whf_err_to_str (uint64_t errorCode, char* str, uint_t strSize);
 
 bool_t
-whf_remove (const char* file);
+whf_remove (const char* const file);
 
 const char*
 whf_dir_delim ();
@@ -90,7 +90,7 @@ const char*
 whf_current_dir ();
 
 bool_t
-whf_is_absolute (const char* path);
+whf_is_absolute (const char* const path);
 
 #ifdef __cplusplus
 } /* extern 'C' */

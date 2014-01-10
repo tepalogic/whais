@@ -33,7 +33,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if ! (defined(YYTOKENTYPE) || defined (YYBISON))
 /* Avoid some type name redefinition */
-#include "windows.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOGDICAPMASKS
+#define NOVIRTUALKEYCODES
+#define NOWINSTYLES
+#define NOMENUS
+#define NOICONS
+#define NOKEYSTATES
+#define NOSYSCOMMANDS
+#define NORASTEROPS
+#define NOSHOWWINDOW
+#define OEMRESOURCE
+#define NOCLIPBOARD
+#define NOCOLOR
+#define NOCTLMGR
+#define NODRAWTEXT
+#define NOGDI
+#define NOMB
+#define NOMEMMGR
+#define NOMETAFILE
+#define NOSCROLL
+#define NOSOUND
+#define NOTEXTMETRIC
+#define NOWH
+#define NOWINOFFSETS
+#define NOCOMM
+#define NOKANJI
+#define NOHELP
+#define NODEFERWINDOWPOS
+#define NOMCX
+
+
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
 typedef HANDLE              WH_FILE;
 typedef CRITICAL_SECTION    WH_LOCK;
 typedef HANDLE              WH_THREAD;
@@ -63,7 +98,6 @@ typedef unsigned __int64 uint64_t;
 typedef uint8_t       bool_t;
 #endif
 
-#define INVALID_SOCKET      INVALID_SOCKET
 #define INVALID_FILE        INVALID_HANDLE_VALUE
 #define INVALID_SHL         NULL
 

@@ -232,14 +232,15 @@ wh_store_utf16_cp (const uint32_t codePoint, uint16_t* const dest)
       return 1;
 
     case 2:
-      assert (codePoint >= UTF16_EXTRA_CODE_UNIT_MARK);
+      {
+        const uint32_t cp = codePoint - UTF16_EXTRA_CODE_UNIT_MARK;
+        assert (codePoint >= UTF16_EXTRA_CODE_UNIT_MARK);
 
-      const uint32_t cp = codePoint - UTF16_EXTRA_CODE_UNIT_MARK;
+        dest[0] = UTF16_EXTRA_BYTE_MIN + (cp >> 10);
+        dest[1] = cp & UTF16_EXTRA_10BIT_MASK;
 
-      dest[0] = UTF16_EXTRA_BYTE_MIN + (cp >> 10);
-      dest[1] = cp & UTF16_EXTRA_10BIT_MASK;
-
-      return 2;
+        return 2;
+      }
     }
 
   assert (FALSE);

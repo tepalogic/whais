@@ -28,7 +28,7 @@
 #include "whisper.h"
 
 #include "stdlib/interface.h"
-#include "utils/wtypes.h"
+#include "utils/w_types.h"
 #include "utils/wutf.h"
 #include "interpreter/interpreter.h"
 

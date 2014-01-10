@@ -84,4 +84,3 @@ void
 wh_array_clean (struct WArray* const array);
 
 #endif /* WARRAY_H */
-

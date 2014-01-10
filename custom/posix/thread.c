@@ -34,12 +34,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 
 uint_t
-wh_lock_init (WH_LOCK* const pLock)
+wh_lock_init (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_init (pLock, NULL);
+    result = pthread_mutex_init (lock, NULL);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -50,12 +50,12 @@ wh_lock_init (WH_LOCK* const pLock)
 
 
 uint_t
-wh_lock_destroy (WH_LOCK* const pLock)
+wh_lock_destroy (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_destroy (pLock);
+    result = pthread_mutex_destroy (lock);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -66,12 +66,12 @@ wh_lock_destroy (WH_LOCK* const pLock)
 
 
 uint_t
-wh_lock_acquire (WH_LOCK* const pLock)
+wh_lock_acquire (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_lock (pLock);
+    result = pthread_mutex_lock (lock);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -82,12 +82,12 @@ wh_lock_acquire (WH_LOCK* const pLock)
 
 
 uint_t
-wh_lock_release (WH_LOCK* const pLock)
+wh_lock_release (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_unlock (pLock);
+    result = pthread_mutex_unlock (lock);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
@@ -98,18 +98,18 @@ wh_lock_release (WH_LOCK* const pLock)
 
 
 uint_t
-wh_thread_create (WH_THREAD*  const             pThread,
+wh_thread_create (WH_THREAD*  const             outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void* const                   args)
 {
   uint_t result;
 
   do
-    result = pthread_create (pThread, NULL, (void* (*)(void*))routine, args);
+    result = pthread_create (outThread, NULL, (void* (*)(void*))routine, args);
   while (result == (uint_t)EAGAIN);
 
   if (result == 0)
-    result = pthread_detach (*pThread);
+    result = pthread_detach (*outThread);
 
   return result;
 }

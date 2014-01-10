@@ -9,7 +9,7 @@ ARCH_LIB_PREFIX:=sl
 ARCH_LIB_EXT:=.lib
 CC:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
 CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
-LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
+LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/link.exe'
 AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/lib.exe'
 
 CC_FLAGS:=/LD /W3 /TC /c  /Y- /arch:SSE2 /nologo /wd4242 /wd4244 /wd4290 /wd4355 
@@ -69,7 +69,7 @@ arch_set_output_library=/OUT:$(call arch_translate_path,./bin/$(ARCH)/$(2)/$(ARC
 
 #set the right  flags for the linker
 
-arch_linker_flags=/link /nologo
+arch_linker_flags=/NOLOGO /FORCE:MULTIPLE
 ifeq ($(DEBUGINFO),yes)
 arch_linker_flags+=/DEBUG
 endif 

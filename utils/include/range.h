@@ -8,11 +8,16 @@
 #ifndef RANGE_H_
 #define RANGE_H_
 
-#include <assert.h>
-#include <vector>
+#include <cassert>
 #include <limits>
+#include <vector>
 
 #include "whisper.h"
+
+#ifdef ARCH_WINDOWS_VC
+  #undef min
+  #undef max
+#endif
 
 namespace whisper {
 
@@ -83,24 +88,21 @@ struct Interval
 };
 
 
-template<>
-int8_t
+template<> int8_t
 Minimum<int8_t> ()
 {
   return std::numeric_limits<int8_t>::min ();
 }
 
 
-template<>
-int8_t
+template<> int8_t
 Maximum<int8_t> ()
 {
   return std::numeric_limits<int8_t>::max ();
 }
 
 
-template<>
-int8_t
+template<> int8_t
 Prev<int8_t> (const int8_t& t)
 {
   if (t == Minimum<int8_t> ())
@@ -110,8 +112,7 @@ Prev<int8_t> (const int8_t& t)
 }
 
 
-template<>
-int8_t
+template<> int8_t
 Next<int8_t> (const int8_t& t)
 {
   if (t == Maximum<int8_t> ())
@@ -121,24 +122,21 @@ Next<int8_t> (const int8_t& t)
 }
 
 
-template<>
-int16_t
+template<> int16_t
 Minimum<int16_t> ()
 {
   return std::numeric_limits<int16_t>::min ();
 }
 
 
-template<>
-int16_t
+template<> int16_t
 Maximum<int16_t> ()
 {
   return std::numeric_limits<int16_t>::max ();
 }
 
 
-template<>
-int16_t
+template<> int16_t
 Prev<int16_t> (const int16_t& t)
 {
   if (t == Minimum<int16_t> ())
@@ -148,8 +146,7 @@ Prev<int16_t> (const int16_t& t)
 }
 
 
-template<>
-int16_t
+template<> int16_t
 Next<int16_t> (const int16_t& t)
 {
   if (t == Maximum<int16_t> ())
@@ -159,23 +156,21 @@ Next<int16_t> (const int16_t& t)
 }
 
 
-template<>
-int32_t
+template<> int32_t
 Minimum<int32_t> ()
 {
   return std::numeric_limits<int32_t>::min ();
 }
 
-template<>
-int32_t
+
+template<> int32_t
 Maximum<int32_t> ()
 {
   return std::numeric_limits<int32_t>::max ();
 }
 
 
-template<>
-int32_t
+template<> int32_t
 Prev<int32_t> (const int32_t& t)
 {
   if (t == Minimum<int32_t> ())
@@ -185,8 +180,7 @@ Prev<int32_t> (const int32_t& t)
 }
 
 
-template<>
-int32_t
+template<> int32_t
 Next<int32_t> (const int32_t& t)
 {
   if (t == Maximum<int32_t> ())
@@ -196,24 +190,21 @@ Next<int32_t> (const int32_t& t)
 }
 
 
-template<>
-int64_t
+template<> int64_t
 Minimum<int64_t> ()
 {
   return std::numeric_limits<int64_t>::min ();
 }
 
 
-template<>
-int64_t
+template<> int64_t
 Maximum<int64_t> ()
 {
   return std::numeric_limits<int64_t>::max ();
 }
 
 
-template<>
-int64_t
+template<> int64_t
 Prev<int64_t> (const int64_t& t)
 {
   if (t == Minimum<int64_t> ())
@@ -223,8 +214,7 @@ Prev<int64_t> (const int64_t& t)
 }
 
 
-template<>
-int64_t
+template<> int64_t
 Next<int64_t> (const int64_t& t)
 {
   if (t == Maximum<int64_t> ())
@@ -234,24 +224,21 @@ Next<int64_t> (const int64_t& t)
 }
 
 
-template<>
-uint8_t
+template<> uint8_t
 Minimum<uint8_t> ()
 {
   return std::numeric_limits<uint8_t>::min ();
 }
 
 
-template<>
-uint8_t
+template<> uint8_t
 Maximum<uint8_t> ()
 {
   return std::numeric_limits<uint8_t>::max ();
 }
 
 
-template<>
-uint8_t
+template<> uint8_t
 Prev<uint8_t> (const uint8_t& t)
 {
   if (t == Minimum<uint8_t> ())
@@ -261,8 +248,7 @@ Prev<uint8_t> (const uint8_t& t)
 }
 
 
-template<>
-uint8_t
+template<> uint8_t
 Next<uint8_t> (const uint8_t& t)
 {
   if (t == Maximum<uint8_t> ())
@@ -272,24 +258,21 @@ Next<uint8_t> (const uint8_t& t)
 }
 
 
-template<>
-uint16_t
+template<> uint16_t
 Minimum<uint16_t> ()
 {
   return std::numeric_limits<uint16_t>::min ();
 }
 
 
-template<>
-uint16_t
+template<> uint16_t
 Maximum<uint16_t> ()
 {
   return std::numeric_limits<uint16_t>::max ();
 }
 
 
-template<>
-uint16_t
+template<> uint16_t
 Prev<uint16_t> (const uint16_t& t)
 {
   if (t == Minimum<uint16_t> ())
@@ -299,8 +282,7 @@ Prev<uint16_t> (const uint16_t& t)
 }
 
 
-template<>
-uint16_t
+template<> uint16_t
 Next<uint16_t> (const uint16_t& t)
 {
   if (t == Maximum<uint16_t> ())
@@ -310,24 +292,21 @@ Next<uint16_t> (const uint16_t& t)
 }
 
 
-template<>
-uint32_t
+template<> uint32_t
 Minimum<uint32_t> ()
 {
   return std::numeric_limits<uint32_t>::min ();
 }
 
 
-template<>
-uint32_t
+template<> uint32_t
 Maximum<uint32_t> ()
 {
   return std::numeric_limits<uint32_t>::max ();
 }
 
 
-template<>
-uint32_t
+template<> uint32_t
 Prev<uint32_t> (const uint32_t& t)
 {
   if (t == Minimum<uint32_t> ())
@@ -337,8 +316,7 @@ Prev<uint32_t> (const uint32_t& t)
 }
 
 
-template<>
-uint32_t
+template<> uint32_t
 Next<uint32_t> (const uint32_t& t)
 {
   if (t == Maximum<uint32_t> ())
@@ -349,23 +327,21 @@ Next<uint32_t> (const uint32_t& t)
 
 
 
-template<>
-uint64_t
+template<> uint64_t
 Minimum<uint64_t> ()
 {
   return std::numeric_limits<uint64_t>::min ();
 }
 
-template<>
-uint64_t
+
+template<> uint64_t
 Maximum<uint64_t> ()
 {
   return std::numeric_limits<uint64_t>::max ();
 }
 
 
-template<>
-uint64_t
+template<> uint64_t
 Prev<uint64_t> (const uint64_t& t)
 {
   if (t == Minimum<uint64_t> ())
@@ -375,8 +351,7 @@ Prev<uint64_t> (const uint64_t& t)
 }
 
 
-template<>
-uint64_t
+template<> uint64_t
 Next<uint64_t> (const uint64_t& t)
 {
   if (t == Maximum<uint64_t> ())

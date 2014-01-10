@@ -22,30 +22,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include <dlfcn.h>
-
 #include "whisper.h"
 
 WH_SHLIB
 wh_shl_load (const char* const library)
 {
-  const WH_SHLIB result = dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+  HMODULE hnd = LoadLibrary (library);
 
-  return result;
+  return hnd;
 }
 
 
 void
 wh_shl_release (WH_SHLIB shl)
 {
-  dlclose  (shl);
+  FreeLibrary (shl);
 }
 
 
 void*
 wh_shl_symbol (WH_SHLIB shl, const char* const symbol)
 {
-  void* const result = dlsym (shl, symbol);
+  void* const result = (void*)GetProcAddress (shl, symbol);
 
   return result;
 }

@@ -68,24 +68,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #define EXCEP_SHL
 #endif
 
+
+#if ! (defined(YYTOKENTYPE) || defined (YYBISON))
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+
 WH_SHLIB
-wh_shl_load (const char* library);
+wh_shl_load (const char* const library);
 
 void
 wh_shl_release (WH_SHLIB shl);
 
 void*
-wh_shl_symbol (WH_SHLIB shl, const char* symbol);
+wh_shl_symbol (WH_SHLIB shl, const char* const symbol);
 
 
 #ifdef __cplusplus
 }
 #endif
+#endif /* ! (defined(YYTOKENTYPE) || defined (YYBISON)) */
 
 #endif /* WHISPER_SHL_H_ */
 

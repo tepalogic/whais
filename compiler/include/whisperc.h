@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 
 #include "dbs/dbs_types.h"
-#include "utils/wtypes.h"
+#include "utils/w_types.h"
 
 
 typedef const void*     WH_COMPILED_UNIT;

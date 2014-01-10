@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#define WIN32_LEAN_AND_MEAN
+#include "whisper.h"
 
 #include <assert.h>
 #include <windows.h>
@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Need to link with Ws2_32.lib
 #pragma comment(lib, "ws2_32.lib")
 
-#include "whisper.h"
+
 
 bool_t
 whs_init ()
