@@ -12,6 +12,7 @@
 #include "utils/le_converter.h"
 #include "utils/wrandom.h"
 #include "utils/auto_array.h"
+#include "utils/wunicode.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_exception.h"
@@ -438,7 +439,7 @@ text_to_lower (const DText& src)
   DText result;
 
   for (uint64_t i = 0; i < src.Count (); ++i)
-    result.Append (DChar (tolower (src.CharAt (i).mValue)));
+    result.Append (DChar (wh_to_lowercase (src.CharAt (i).mValue)));
 
   return result;
 }
@@ -460,7 +461,7 @@ check_text_match (const DText&      src,
 
       if (ignoreCase)
         {
-          if (tolower (ch1) != tolower (ch2))
+          if (wh_to_lowercase (ch1) != wh_to_lowercase (ch2))
             return false;
         }
       else if (ch1 != ch2)

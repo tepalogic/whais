@@ -162,7 +162,7 @@ struct DBS_SHL DChar
 
   explicit DChar (const uint32_t ch)
     : mValue (ch),
-      mIsNull (false)
+      mIsNull ((ch != 0) ? false : true)
   {
     if ((ch > UTF_LAST_CODEPOINT)
         || ((UTF16_EXTRA_BYTE_MIN <= ch) && (ch <= UTF16_EXTRA_BYTE_MAX)))
@@ -185,16 +185,7 @@ struct DBS_SHL DChar
     return *this;
   }
 
-  bool operator< (const DChar& second) const
-  {
-    if (IsNull ())
-      return second.IsNull () ?  false : true;
-
-    else if (second.IsNull ())
-      return false;
-
-    return mValue < second.mValue;
-  }
+  bool operator< (const DChar& second) const;
 
   bool operator== (const DChar& second) const
   {
@@ -227,27 +218,9 @@ struct DBS_SHL DChar
     return (*this < second) == false;
   }
 
-  DChar Prev () const
-  {
-    if (mIsNull || (mValue == 1))
-      return DChar ();
+  DChar Prev () const;
 
-    if (mValue == UTF16_EXTRA_BYTE_MAX + 1)
-      return DChar (UTF16_EXTRA_BYTE_MIN - 1);
-
-    return DChar (mValue - 1);
-  }
-
-  DChar Next () const
-  {
-    if (mIsNull || (mValue == UTF_LAST_CODEPOINT))
-        return DChar ();
-
-    if (mValue == UTF16_EXTRA_BYTE_MIN - 1)
-      return DChar (UTF16_EXTRA_BYTE_MAX + 1);
-
-    return DChar (mValue + 1);
-  }
+  DChar Next () const;
 
   DBS_FIELD_TYPE DBSType () const
   {
@@ -274,9 +247,9 @@ struct DBS_SHL DChar
 
 private:
   //Declare this here too to avoid inclusion of the UTF header file.
-  static const uint32_t UTF_LAST_CODEPOINT         = 0x10FFFF;
-  static const uint16_t UTF16_EXTRA_BYTE_MIN       = 0xD800;
-  static const uint16_t UTF16_EXTRA_BYTE_MAX       = 0xDFFF;
+  static const uint_t UTF_LAST_CODEPOINT         = 0x10FFFF;
+  static const uint_t UTF16_EXTRA_BYTE_MIN       = 0xD800;
+  static const uint_t UTF16_EXTRA_BYTE_MAX       = 0xDFFF;
 };
 
 

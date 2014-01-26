@@ -95,3 +95,6 @@ UNIT_EXES+=test_range
 test_range_SRC=test/test_range.cpp
 test_range_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 
+UNIT_EXES+=test_unicodechars
+test_unicodechars_SRC=test/test_unicodechars.cpp
+test_unicodechars_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon

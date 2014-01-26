@@ -32,6 +32,7 @@
 #include "utils/date.h"
 #include "utils/wutf.h"
 #include "utils/wsort.h"
+#include "utils/wunicode.h"
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
@@ -173,6 +174,38 @@ is_valid_hiresdate (const int       year,
   return true;
 }
 
+
+bool
+DChar::operator< (const DChar& second) const
+{
+  if (IsNull ())
+    return second.IsNull () ?  false : true;
+
+  else if (second.IsNull ())
+    return false;
+
+  return wh_cmp_alphabetically (mValue, second.mValue) < 0;
+}
+
+
+DChar
+DChar::Prev () const
+{
+  if (mIsNull || (mValue == 1))
+    return DChar ();
+
+  return DChar (wh_prev_char (mValue));
+}
+
+
+DChar
+DChar::Next () const
+{
+  if (mIsNull || (mValue == UTF_LAST_CODEPOINT))
+      return DChar ();
+
+  return DChar (wh_next_char(mValue));
+}
 
 
 
@@ -1113,7 +1146,10 @@ DText::AllCharsToCase (const bool lowerCase)
     {
       DChar ch = CharAt (i);
 
-      ch = DChar (lowerCase ? tolower (ch.mValue) : toupper (ch.mValue));
+      ch = DChar (lowerCase ?
+                    wh_to_lowercase (ch.mValue) :
+                    wh_to_uppercase (ch.mValue)
+                 );
 
       CharAt (i, ch);
     }
@@ -2192,7 +2228,7 @@ StringMatcher::FindMatch (const DText&       text,
           uint32_t codePoint;
 
           wh_load_utf8_cp (mPatternRaw + chOffset, &codePoint);
-          chOffset += wh_store_utf8_cp (tolower (codePoint),
+          chOffset += wh_store_utf8_cp (wh_to_lowercase (codePoint),
                                         mPatternRaw + chOffset);
         }
       assert (chOffset == mPatternSize);
@@ -2315,7 +2351,7 @@ compare_text_buffers (const uint8_t* buffer1,
 
           if (ignoreCase)
             {
-              if (tolower (ch1) != tolower (ch2))
+              if (wh_to_lowercase (ch1) != wh_to_lowercase (ch2))
                 return false;
             }
           else if (ch1 != ch2)
@@ -2453,7 +2489,8 @@ StringMatcher::FillTextCache ()
                                                     &codePoint);
           if (chOffset + codeUnits <= mCacheValid)
             {
-              wh_store_utf8_cp (tolower (codePoint), mTextRawCache + chOffset);
+              wh_store_utf8_cp (wh_to_lowercase (codePoint),
+                                mTextRawCache + chOffset);
               chOffset += codeUnits;
             }
           else

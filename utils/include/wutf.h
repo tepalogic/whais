@@ -31,24 +31,24 @@
 extern "C" {
 #endif
 
-static const uint32_t UTF_LAST_CODEPOINT          = 0x10FFFF;
+static const uint_t UTF_LAST_CODEPOINT          = 0x10FFFF;
 
-static const uint8_t  UTF8_7BIT_MASK              = 0x00;
-static const uint8_t  UTF8_11BIT_MASK             = 0xC0;
-static const uint8_t  UTF8_16BIT_MASK             = 0xE0;
-static const uint8_t  UTF8_21BIT_MASK             = 0xF0;
-static const uint8_t  UTF8_26BIT_MASK             = 0xF8;
-static const uint8_t  UTF8_31BIT_MASK             = 0xFC;
-static const uint8_t  UTF8_37BIT_MASK             = 0xFE;
+static const uint_t  UTF8_7BIT_MASK              = 0x00;
+static const uint_t  UTF8_11BIT_MASK             = 0xC0;
+static const uint_t  UTF8_16BIT_MASK             = 0xE0;
+static const uint_t  UTF8_21BIT_MASK             = 0xF0;
+static const uint_t  UTF8_26BIT_MASK             = 0xF8;
+static const uint_t  UTF8_31BIT_MASK             = 0xFC;
+static const uint_t  UTF8_37BIT_MASK             = 0xFE;
 
-static const uint8_t  UTF8_EXTRA_BYTE_SIG         = 0x80;
-static const uint8_t  UTF8_EXTRA_BYTE_MASK        = 0xC0;
-static const uint8_t  UTF8_MAX_BYTES_COUNT        = 0x08;
+static const uint_t  UTF8_EXTRA_BYTE_SIG         = 0x80;
+static const uint_t  UTF8_EXTRA_BYTE_MASK        = 0xC0;
+static const uint_t  UTF8_MAX_BYTES_COUNT        = 0x08;
 
-static const uint16_t UTF16_EXTRA_BYTE_MIN        = 0xD800;
-static const uint16_t UTF16_EXTRA_BYTE_MAX        = 0xDFFF;
-static const uint16_t UTF16_EXTRA_10BIT_MASK      = 0x03FF;
-static const uint32_t UTF16_EXTRA_CODE_UNIT_MARK  = 0x10000;
+static const uint_t UTF16_EXTRA_BYTE_MIN        = 0xD800;
+static const uint_t UTF16_EXTRA_BYTE_MAX        = 0xDFFF;
+static const uint_t UTF16_EXTRA_10BIT_MASK      = 0x03FF;
+static const uint_t UTF16_EXTRA_CODE_UNIT_MARK  = 0x10000;
 
 
 /* Get the code units count of an UTF-8 encoded char using the

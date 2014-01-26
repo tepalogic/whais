@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 #include "utils/tokenizer.h"
+#include "utils/wunicode.h"
 
 #include "server_protocol.h"
 #include "configuration.h"
@@ -242,7 +243,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       else if (token == gEntEncryption)
         {
           token = NextToken (line, pos, delimiters);
-          std::transform(token.begin(), token.end(), token.begin(), ::tolower);
+          std::transform(token.begin(),
+                         token.end(),
+                         token.begin(),
+                         wh_to_lowercase);
 
           if (token == CIPHER_PLAIN)
             gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;

@@ -27,9 +27,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+bool_t
+wh_is_lowercase (const uint32_t codePoint);
+
+
+bool_t
+wh_is_uppercase (const uint32_t codePoint);
+
 
 uint32_t
 wh_to_lowercase (const uint32_t codePoint);
@@ -41,6 +52,14 @@ wh_to_uppercase (const uint32_t codePoint);
 int
 wh_cmp_alphabetically (const uint32_t cp1, const uint32_t cp2);
 
+uint32_t
+wh_prev_char (const uint32_t codePoint);
+
+uint32_t
+wh_next_char (const uint32_t codePoint);
+
+uint32_t
+wh_to_base_letter (const uint32_t codePoint);
 
 #ifdef __cplusplus
 } /* exntern "C" */

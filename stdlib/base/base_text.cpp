@@ -29,6 +29,7 @@
 
 #include "utils/wutf.h"
 #include "utils/whash.h"
+#include "utils/wunicode.h"
 
 #include "base_types.h"
 
@@ -80,8 +81,8 @@ compare_chars (const int   c1,
                const bool  ignoreCase,
                const bool  alphabetically)
 {
-  const int lc1 = (alphabetically || ignoreCase) ? tolower (c1) : c1;
-  const int lc2 = (alphabetically || ignoreCase) ? tolower (c2) : c2;
+  const int lc1 = (alphabetically || ignoreCase) ? wh_to_lowercase (c1) : c1;
+  const int lc2 = (alphabetically || ignoreCase) ? wh_to_lowercase (c2) : c2;
 
   if (alphabetically && (lc1 == lc2))
     return c1 - c2;
@@ -161,7 +162,7 @@ get_char_upper (SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  stack.Push (DChar (toupper (ch.mValue)));
+  stack.Push (DChar (wh_to_uppercase (ch.mValue)));
   return WOP_OK;
 }
 
@@ -180,7 +181,7 @@ get_char_lower (SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  stack.Push (DChar (tolower (ch.mValue)));
+  stack.Push (DChar (wh_to_lowercase (ch.mValue)));
   return WOP_OK;
 }
 
@@ -490,13 +491,13 @@ find_char_offset (SessionStack& stack, ISession&)
   const uint64_t fromOff = from.IsNull () ? 0 : from.mValue;
   const uint64_t endOff  = MIN ((to.IsNull () ? ~0ull : to.mValue),
                                 text.Count ());
-  const uint32_t c       = igCase ? tolower (ch.mValue) : ch.mValue;
+  const uint32_t c       = igCase ? wh_to_lowercase (ch.mValue) : ch.mValue;
 
   for (uint64_t i = fromOff; i < endOff; ++i)
     {
       const DChar ch = text.CharAt (i);
 
-      if (c == (igCase ? tolower (ch.mValue) : ch.mValue))
+      if (c == (igCase ? wh_to_lowercase (ch.mValue) : ch.mValue))
         {
           stack.Push (DUInt64 (i));
           return WOP_OK;
