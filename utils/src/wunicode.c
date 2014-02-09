@@ -375,12 +375,23 @@ to_uppercase_cyrillic (const uint32_t codePoint)
   if ((0x0450 <= codePoint) && (codePoint <= 0x45F))
     return codePoint - 0x0450 + 0x0400;
 
+  if ((0x0482 <= codePoint) && (codePoint <= 0x0489))
+    return codePoint;
+
   if ((codePoint & 1) != 0)
     {
-      if ((0x0460 <= codePoint) && (codePoint <= 0x0481))
+      if ((0x0460 <= codePoint) && (codePoint < 0x04C0))
         return codePoint - 1;
 
-      if ((0x048A <= codePoint) && (codePoint <= 0x0527))
+      if (codePoint == 0x04CF)
+        return 0x04C0;
+
+      if ((0x04D0 <= codePoint) && (codePoint <= 0x0527))
+        return codePoint - 1;
+    }
+  else
+    {
+      if ((0x04C2 <= codePoint) && (codePoint < 0x04CF))
         return codePoint - 1;
     }
 
@@ -399,12 +410,24 @@ to_lowercase_cyrillic (const uint32_t codePoint)
   if ((0x0400 <= codePoint) && (codePoint <= 0x040F))
     return codePoint - 0x0400 + 0x0450;
 
+  if ((0x0482 <= codePoint) && (codePoint <= 0x0489))
+    return codePoint;
+
   if ((codePoint & 1) == 0)
     {
-      if ((0x0460 <= codePoint) && (codePoint <= 0x0481))
+      if ((0x0460 <= codePoint) && (codePoint < 0x04C0))
         return codePoint + 1;
 
-      if ((0x048A <= codePoint) && (codePoint <= 0x0527))
+      if (codePoint == 0x04C0)
+        return 0x04CF;
+
+      if ((0x04D0 <= codePoint) && (codePoint <= 0x0527))
+        return codePoint + 1;
+
+    }
+  else
+    {
+      if ((0x04C1 <= codePoint) && (codePoint < 0x04CF))
         return codePoint + 1;
     }
 
@@ -431,7 +454,7 @@ to_lowercase_armenian (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_base_letter_latin1_supp (const uint32_t codePoint)
+to_canonical_latin1_supp (const uint32_t codePoint)
 {
   assert ((0x0080 <= codePoint) && (codePoint <= 0x00FF));
 
@@ -488,7 +511,7 @@ to_base_letter_latin1_supp (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_base_letter_latinA_ext (const uint32_t codePoint)
+to_canonical_latinA_ext (const uint32_t codePoint)
 {
   assert ((0x0100 <= codePoint) && (codePoint <= 0x17F));
 
@@ -630,7 +653,7 @@ to_base_letter_latinA_ext (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_base_letter_latinB_ext (const uint32_t codePoint)
+to_canonical_latinB_ext (const uint32_t codePoint)
 {
   assert ((0x0180 <= codePoint) && (codePoint <= 0x024F));
 
@@ -957,23 +980,416 @@ to_base_letter_latinB_ext (const uint32_t codePoint)
 }
 
 
-uint32_t
-wh_to_base_letter (const uint32_t codePoint)
+static uint32_t
+to_canonical_greek_coptic(const u_int32_t codePoint)
 {
-  if (codePoint < 0x0250)
+  switch (codePoint)
+    {
+    case 0x0386:
+      return 0x0391;
+
+    case 0x0388:
+      return 0x0395;
+
+    case 0x0389:
+      return 0x0397;
+
+    case 0x038A:
+      return 0x0399;
+
+    case 0x038C:
+      return 0x039F;
+
+    case 0x038E:
+      return 0x03A5;
+
+    case 0x038F:
+      return 0x03A9;
+
+    case 0x0390:
+      return 0x03B9;
+
+    case 0x03AA:
+      return 0x0399;
+
+    case 0x03AB:
+      return 0x03A5;
+
+    case 0x03AC:
+      return 0x03B1;
+
+    case 0x03AD:
+      return 0x03B5;
+
+    case 0x03AE:
+      return 0x03B7;
+
+    case 0x03AF:
+      return 0x03B9;
+
+    case 0x03B0:
+      return 0x03C5;
+
+    case 0x03CA:
+      return 0x03B9;
+
+    case 0x03CB:
+      return 0x03C5;
+
+    case 0x03CC:
+      return 0x03BF;
+
+    case 0x03CD:
+      return 0x03C5;
+
+    case 0x03CE:
+      return 0x03C9;
+
+    case 0x03D2:
+      return 0x03A5;
+
+    case 0x03D3:
+      return 0x03A5;
+
+    case 0x03D4:
+      return 0x03A5;
+    }
+
+  return codePoint;
+}
+
+
+static uint32_t
+to_canonical_cyrillic (const u_int32_t codePoint)
+{
+  switch (codePoint)
+  {
+  case 0x0400:
+    return 0x0415;
+
+  case 0x040D:
+    return 0x0418;
+
+  case 0x0419:
+    return 0x0418;
+
+  case 0x0439:
+    return 0x0438;
+
+  case 0x0450:
+    return 0x0435;
+
+  case 0x045D:
+    return 0x0438;
+
+  case 0x0476:
+    return 0x0474;
+
+  case 0x0477:
+    return 0x0475;
+
+  case 0x047C:
+    return 0x0460;
+
+  case 0x047D:
+    return 0x0461;
+
+  case 0x048A:
+    return 0x0418;
+
+  case 0x048B:
+    return 0x0438;
+
+  case 0x048E:
+    return 0x0420;
+
+  case 0x048F:
+    return 0x0440;
+
+  case 0x0490:
+    return 0x0413;
+
+  case 0x0491:
+    return 0x0433;
+
+  case 0x0492:
+    return 0x0413;
+
+  case 0x0493:
+    return 0x0433;
+
+  case 0x0494:
+    return 0x0413;
+
+  case 0x0495:
+    return 0x0433;
+
+  case 0x0496:
+    return 0x0416;
+
+  case 0x0497:
+    return 0x0436;
+
+  case 0x0498:
+    return 0x0417;
+
+  case 0x0499:
+    return 0x0437;
+
+  case 0x049A:
+    return 0x041A;
+
+  case 0x049B:
+    return 0x043A;
+
+  case 0x049C:
+    return 0x041A;
+
+  case 0x049D:
+    return 0x043A;
+
+  case 0x049E:
+    return 0x041A;
+
+  case 0x049F:
+    return 0x043A;
+
+  case 0x04A2:
+    return 0x041D;
+
+  case 0x04A3:
+    return 0x043D;
+
+  case 0x04A6:
+    return 0x041F;
+
+  case 0x04A7:
+    return 0x043F;
+
+  case 0x04AA:
+    return 0x0421;
+
+  case 0x04AB:
+    return 0x0441;
+
+  case 0x04AC:
+    return 0x0422;
+
+  case 0x04AD:
+    return 0x0442;
+
+  case 0x04B0:
+    return 0x0423;
+
+  case 0x04B1:
+    return 0x0443;
+
+  case 0x04B2:
+    return 0x0425;
+
+  case 0x04B3:
+    return 0x0445;
+
+  case 0x04B6:
+    return 0x0427;
+
+  case 0x04B7:
+    return 0x0447;
+
+  case 0x04B8:
+    return 0x0427;
+
+  case 0x04B9:
+    return 0x0447;
+
+  case 0x04BE:
+    return 0x04BC;
+
+  case 0x04BF:
+    return 0x04BD;
+
+  case 0x04C1:
+    return 0x0416;
+
+  case 0x04C2:
+    return 0x0436;
+
+  case 0x04C3:
+    return 0x041A;
+
+  case 0x04C4:
+    return 0x043A;
+
+  case 0x04C5:
+    return 0x041B;
+
+  case 0x04C6:
+    return 0x043B;
+
+  case 0x04C7:
+    return 0x041D;
+
+  case 0x04C8:
+    return 0x043D;
+
+  case 0x04C9:
+    return 0x041D;
+
+  case 0x04CA:
+    return 0x043D;
+
+  case 0x04CD:
+    return 0x041C;
+
+  case 0x04CE:
+    return 0x043C;
+
+  case 0x04D0:
+    return 0x0410;
+
+  case 0x04D1:
+    return 0x0430;
+
+  case 0x04D2:
+    return 0x0410;
+
+  case 0x04D3:
+    return 0x0430;
+
+  case 0x04D6:
+    return 0x0415;
+
+  case 0x04D7:
+    return 0x0435;
+
+  case 0x04DA:
+    return 0x0429;
+
+  case 0x04DB:
+    return 0x0449;
+
+  case 0x04DC:
+    return 0x0416;
+
+  case 0x04DD:
+    return 0x0436;
+
+  case 0x04DE:
+    return 0x0417;
+
+  case 0x04DF:
+    return 0x0437;
+
+  case 0x04E2:
+    return 0x0418;
+
+  case 0x04E3:
+    return 0x0438;
+
+  case 0x04E4:
+    return 0x0418;
+
+  case 0x04E5:
+    return 0x0438;
+
+  case 0x04E6:
+    return 0x041E;
+
+  case 0x04E7:
+    return 0x043E;
+
+  case 0x04EA:
+    return 0x041E;
+
+  case 0x04EB:
+    return 0x043E;
+
+  case 0x04EC:
+    return 0x042D;
+
+  case 0x04ED:
+    return 0x044D;
+
+  case 0x04EE:
+    return 0x0423;
+
+  case 0x04EF:
+    return 0x0443;
+
+  case 0x04F0:
+    return 0x0423;
+
+  case 0x04F1:
+    return 0x0443;
+
+  case 0x04F2:
+    return 0x0423;
+
+  case 0x04F3:
+    return 0x0443;
+
+  case 0x04F4:
+    return 0x0427;
+
+  case 0x04F5:
+    return 0x0447;
+
+  case 0x04F6:
+    return 0x0413;
+
+  case 0x04F7:
+    return 0x0433;
+
+  case 0x04F8:
+    return 0x042B;
+
+  case 0x04F9:
+    return 0x044B;
+
+  case 0x04FA:
+    return 0x0413;
+
+  case 0x04FB:
+    return 0x0433;
+
+  case 0x04FC:
+    return 0x0425;
+
+  case 0x04FD:
+    return 0x0445;
+
+  case 0x04FE:
+    return 0x0425;
+
+  case 0x04FF:
+    return 0x0445;
+  }
+  return codePoint;
+}
+
+
+uint32_t
+wh_to_canonical (const uint32_t codePoint)
+{
+  if (codePoint < 0x0374)
     {
       if (codePoint < 0x0080)
         return codePoint;
 
       else if (codePoint < 0x0100)
-        return to_base_letter_latin1_supp (codePoint);
+        return to_canonical_latin1_supp (codePoint);
 
       else if (codePoint < 0x0180)
-        return to_base_letter_latinA_ext (codePoint);
+        return to_canonical_latinA_ext (codePoint);
 
-      else
-        return to_base_letter_latinB_ext (codePoint);
+      else if (codePoint < 0x0250)
+        return to_canonical_latinB_ext (codePoint);
     }
+  else if ((0x0374 <= codePoint) && (codePoint < 0x0400))
+    return to_canonical_greek_coptic (codePoint);
+
+  else if (codePoint < 0x528)
+    return to_canonical_cyrillic (codePoint);
 
   return codePoint;
 }
@@ -1062,8 +1478,8 @@ wh_to_uppercase (const uint32_t codePoint)
 int
 wh_cmp_alphabetically (const uint32_t cp1, const uint32_t cp2)
 {
-  const int32_t bcp1 = wh_to_base_letter (cp1);
-  const int32_t bcp2 = wh_to_base_letter (cp2);
+  const int bcp1 = wh_to_canonical (cp1);
+  const int bcp2 = wh_to_canonical (cp2);
 
   if (bcp1 == bcp2)
     return (int)cp1 - (int)cp2;

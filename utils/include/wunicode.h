@@ -59,7 +59,7 @@ uint32_t
 wh_next_char (const uint32_t codePoint);
 
 uint32_t
-wh_to_base_letter (const uint32_t codePoint);
+wh_to_canonical (const uint32_t codePoint);
 
 #ifdef __cplusplus
 } /* exntern "C" */

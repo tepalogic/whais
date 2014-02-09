@@ -28,8 +28,7 @@ test_character (const uint32_t codePoint,
   if (codePointLowercase == codePointUppercase)
     {
       if ((codePoint != codePointLowercase)
-          || (codePoint != codePointCannonical)
-          || (codePoint != wh_to_base_letter (codePoint))
+          || (wh_to_canonical (codePoint) != codePointCannonical)
           || (wh_to_lowercase (codePoint) != codePointLowercase)
           || (wh_to_uppercase (codePoint) != codePointUppercase))
         {
@@ -41,7 +40,7 @@ test_character (const uint32_t codePoint,
     {
       if (! wh_is_uppercase (codePoint)
           || wh_is_lowercase (codePoint)
-          || (wh_to_base_letter (codePoint) != codePointCannonical)
+          || (wh_to_canonical (codePoint) != codePointCannonical)
           || (wh_to_lowercase (codePoint) != codePointLowercase)
           || (wh_to_uppercase (codePoint) != codePointUppercase))
         {
@@ -52,7 +51,7 @@ test_character (const uint32_t codePoint,
     {
       if (wh_is_uppercase (codePoint)
           || ! wh_is_lowercase (codePoint)
-          || (wh_to_base_letter (codePoint) != codePointCannonical)
+          || (wh_to_canonical (codePoint) != codePointCannonical)
           || (wh_to_lowercase (codePoint) != codePointLowercase)
           || (wh_to_uppercase (codePoint) != codePointUppercase))
         {
@@ -930,31 +929,34 @@ test_greek_char_set ()
   for (uint32_t i = 0x374; (i < 0x386) && result; ++i)
     result &= test_character (i, i, i, i);
 
-  result &= test_character (0x386, 0x386, 0x3AC, 0x386);
-  result &= test_character (0x3AC, 0x386, 0x3AC, 0x3AC);
+  result &= test_character (0x386, 0x386, 0x3AC, 0x391);
+  result &= test_character (0x3AC, 0x386, 0x3AC, 0x3B1);
 
   result &= test_character (0x387, 0x387, 0x387, 0x387);
 
-  for (uint32_t i = 0x388; (i < 0x38B) && result; ++i)
-    {
-      result &= test_character (i, i, i + 0x25, i);
-      result &= test_character (i + 0x25, i, i + 0x25, i + 0x25);
-    }
+  result &= test_character (0x388, 0x388, 0x3AD, 0x395);
+  result &= test_character (0x3AD, 0x388, 0x3AD, 0x3B5);
+
+  result &= test_character (0x389, 0x389, 0x3AE, 0x397);
+  result &= test_character (0x3AE, 0x389, 0x3AE, 0x3B7);
+
+  result &= test_character (0x38A, 0x38A, 0x3AF, 0x399);
+  result &= test_character (0x3AF, 0x38A, 0x3AF, 0x3B9);
 
   result &= test_character (0x38B, 0x38B, 0x38B, 0x38B);
 
-  result &= test_character (0x38C, 0x38C, 0x3CC, 0x38C);
-  result &= test_character (0x3CC, 0x38C, 0x3CC, 0x3CC);
+  result &= test_character (0x38C, 0x38C, 0x3CC, 0x39F);
+  result &= test_character (0x3CC, 0x38C, 0x3CC, 0x3BF);
 
   result &= test_character (0x38D, 0x38D, 0x38D, 0x38D);
 
-  result &= test_character (0x38E, 0x38E, 0x3CD, 0x38E);
-  result &= test_character (0x3CD, 0x38E, 0x3CD, 0x3CD);
+  result &= test_character (0x38E, 0x38E, 0x3CD, 0x3A5);
+  result &= test_character (0x3CD, 0x38E, 0x3CD, 0x3C5);
 
-  result &= test_character (0x38F, 0x38F, 0x3CE, 0x38F);
-  result &= test_character (0x3CE, 0x38F, 0x3CE, 0x3CE);
+  result &= test_character (0x38F, 0x38F, 0x3CE, 0x3A9);
+  result &= test_character (0x3CE, 0x38F, 0x3CE, 0x3C9);
 
-  result &= test_character (0x390, 0x390, 0x390, 0x390);
+  result &= test_character (0x390, 0x390, 0x390, 0x3B9);
 
   for (uint32_t i = 0x391; (i < 0x3A2) && result; ++i)
     {
@@ -965,16 +967,30 @@ test_greek_char_set ()
   result &= test_character (0x3A2, 0x3A2, 0x3A2, 0x3A2);
   result &= test_character (0x3C2, 0x3C2, 0x3C2, 0x3C2);
 
-  for (uint32_t i = 0x3A3; (i < 0x3AC) && result; ++i)
+  for (uint32_t i = 0x3A3; (i < 0x3AA) && result; ++i)
     {
       result &= test_character (i, i, i + 0x20, i);
       result &= test_character (i + 0x20, i, i + 0x20, i + 0x20);
     }
 
-  result &= test_character (0x3B0, 0x3B0, 0x3B0, 0x3B0);
+  result &= test_character (0x3AA, 0x3AA, 0x3CA, 0x399);
+  result &= test_character (0x3CA, 0x3AA, 0x3CA, 0x3B9);
+
+  result &= test_character (0x3AB, 0x3AB, 0x3CB, 0x3A5);
+  result &= test_character (0x3CB, 0x3AB, 0x3CB, 0x3C5);
+
+  result &= test_character (0x3B0, 0x3B0, 0x3B0, 0x3C5);
   result &= test_character (0x3CF, 0x3CF, 0x3CF, 0x3CF);
 
-  for (uint32_t i = 0x3D0; (i < 0x3E2) && result; ++i)
+
+  result &= test_character (0x3D0, 0x3D0, 0x3D0, 0x3D0);
+  result &= test_character (0x3D1, 0x3D1, 0x3D1, 0x3D1);
+
+  result &= test_character (0x3D2, 0x3D2, 0x3D2, 0x3A5);
+  result &= test_character (0x3D3, 0x3D3, 0x3D3, 0x3A5);
+  result &= test_character (0x3D4, 0x3D4, 0x3D4, 0x3A5);
+
+  for (uint32_t i = 0x3D5; (i < 0x3E2) && result; ++i)
     result &= test_character (i, i, i, i);
 
   for (uint32_t i = 0x3E2; (i < 0x3F0) && result; i += 2)
@@ -1003,22 +1019,56 @@ test_cyrillic_char_set ()
 
   std::cout << "Testing Cyrillic character set...";
 
-  for (uint32_t i = 0x400; (i < 0x410) && result; ++i)
+  result &= test_character (0x0400, 0x400, 0x0450, 0x0415);
+  result &= test_character (0x0450, 0x400, 0x0450, 0x0435);
+
+  for (uint32_t i = 0x401; (i < 0x40D) && result; ++i)
     {
       result &= test_character (i, i, i + 0x50, i);
       result &= test_character (i + 0x50, i, i + 0x50, i + 0x50);
     }
 
+  result &= test_character (0x040D, 0x40D, 0x045D, 0x0418);
+  result &= test_character (0x045D, 0x40D, 0x045D, 0x0438);
+
+  result &= test_character (0x040E, 0x040E, 0x045E, 0x040E);
+  result &= test_character (0x045E, 0x040E, 0x045E, 0x045E);
+
+  result &= test_character (0x040F, 0x040F, 0x045F, 0x040F);
+  result &= test_character (0x045F, 0x040F, 0x045F, 0x045F);
+
   for (uint32_t i = 0x410; (i < 0x430) && result; ++i)
     {
-      result &= test_character (i, i, i + 0x20, i);
-      result &= test_character (i + 0x20, i, i + 0x20, i + 0x20);
+      if (i == 0x0419)
+        {
+          result &= test_character (i, i, i + 0x20, 0x0418);
+          result &= test_character (i + 0x20, i, i + 0x20, 0x0438);
+        }
+      else
+        {
+          result &= test_character (i, i, i + 0x20, i);
+          result &= test_character (i + 0x20, i, i + 0x20, i + 0x20);
+        }
     }
 
   for (uint32_t i = 0x460; (i < 0x481) && result; i += 2)
     {
-      result &= test_character (i, i, i + 1, i);
-      result &= test_character (i + 1, i, i + 1, i + 1);
+      if (i == 0x0476)
+        {
+          result &= test_character (i, i, i + 1, 0x0474);
+          result &= test_character (i + 1, i, i + 1, 0x0475);
+
+        }
+      else if (i == 0x047C)
+        {
+          result &= test_character (i, i, i + 1, 0x0460);
+          result &= test_character (i + 1, i, i + 1, 0x0461);
+        }
+      else
+        {
+          result &= test_character (i, i, i + 1, i);
+          result &= test_character (i + 1, i, i + 1, i + 1);
+        }
     }
 
   for (uint32_t i = 0x482; (i < 0x48A) && result; ++i)
@@ -1026,8 +1076,247 @@ test_cyrillic_char_set ()
 
   for (uint32_t i = 0x48A; (i < 0x4FF) && result; i += 2)
     {
-      result &= test_character (i, i, i + 1, i);
-      result &= test_character (i + 1, i, i + 1, i + 1);
+      if (i == 0x04C0)
+        {
+          result &= test_character(0x04C0, 0x04C0, 0x04CF, 0x04C0);
+          result &= test_character(0x04CF, 0x04C0, 0x04CF, 0x04CF);
+          i -= 1;
+          continue;
+        }
+
+
+      switch (i)
+        {
+      case 0x048A:
+        result &= test_character(i, i, i + 1, 0x0418);
+        result &= test_character(i + 1, i, i + 1, 0x0418 + 0x0020);
+        break;
+
+      case 0x048E:
+        result &= test_character(i, i, i + 1, 0x0420);
+        result &= test_character(i + 1, i, i + 1, 0x0420 + 0x0020);
+        break;
+
+      case 0x0490:
+        result &= test_character(i, i, i + 1, 0x0413);
+        result &= test_character(i + 1, i, i + 1, 0x0413 + 0x0020);
+        break;
+
+      case 0x0492:
+        result &= test_character(i, i, i + 1, 0x0413);
+        result &= test_character(i + 1, i, i + 1, 0x0413 + 0x0020);
+        break;
+
+      case 0x0494:
+        result &= test_character(i, i, i + 1, 0x0413);
+        result &= test_character(i + 1, i, i + 1, 0x0413 + 0x0020);
+        break;
+
+      case 0x0496:
+        result &= test_character(i, i, i + 1, 0x0416);
+        result &= test_character(i + 1, i, i + 1, 0x0416 + 0x0020);
+        break;
+
+      case 0x0498:
+        result &= test_character(i, i, i + 1, 0x0417);
+        result &= test_character(i + 1, i, i + 1, 0x0417 + 0x0020);
+        break;
+
+      case 0x049A:
+        result &= test_character(i, i, i + 1, 0x041A);
+        result &= test_character(i + 1, i, i + 1, 0x041A + 0x0020);
+        break;
+
+      case 0x049C:
+        result &= test_character(i, i, i + 1, 0x041A);
+        result &= test_character(i + 1, i, i + 1, 0x041A + 0x0020);
+        break;
+
+      case 0x049E:
+        result &= test_character(i, i, i + 1, 0x041A);
+        result &= test_character(i + 1, i, i + 1, 0x041A + 0x0020);
+        break;
+
+      case 0x04A2:
+        result &= test_character(i, i, i + 1, 0x041D);
+        result &= test_character(i + 1, i, i + 1, 0x041D + 0x0020);
+        break;
+
+      case 0x04A6:
+        result &= test_character(i, i, i + 1, 0x041F);
+        result &= test_character(i + 1, i, i + 1, 0x041F + 0x0020);
+        break;
+
+      case 0x04AA:
+        result &= test_character(i, i, i + 1, 0x0421);
+        result &= test_character(i + 1, i, i + 1, 0x0421 + 0x0020);
+        break;
+
+      case 0x04AC:
+        result &= test_character(i, i, i + 1, 0x0422);
+        result &= test_character(i + 1, i, i + 1, 0x0422 + 0x0020);
+        break;
+
+      case 0x04B0:
+        result &= test_character(i, i, i + 1, 0x0423);
+        result &= test_character(i + 1, i, i + 1, 0x0423 + 0x0020);
+        break;
+
+      case 0x04B2:
+        result &= test_character(i, i, i + 1, 0x0425);
+        result &= test_character(i + 1, i, i + 1, 0x0425 + 0x0020);
+        break;
+
+      case 0x04B6:
+        result &= test_character(i, i, i + 1, 0x0427);
+        result &= test_character(i + 1, i, i + 1, 0x0427 + 0x0020);
+        break;
+
+      case 0x04B8:
+        result &= test_character(i, i, i + 1, 0x0427);
+        result &= test_character(i + 1, i, i + 1, 0x0427 + 0x0020);
+        break;
+
+      case 0x04BE:
+        result &= test_character(i, i, i + 1, 0x04BC);
+        result &= test_character(i + 1, i, i + 1, 0x04BD);
+        break;
+
+      case 0x04C1:
+        result &= test_character(i, i, i + 1, 0x0416);
+        result &= test_character(i + 1, i, i + 1, 0x0436);
+        break;
+
+      case 0x04C3:
+        result &= test_character(i, i, i + 1, 0x041A);
+        result &= test_character(i + 1, i, i + 1, 0x043A);
+        break;
+
+      case 0x04C5:
+        result &= test_character(i, i, i + 1, 0x041B);
+        result &= test_character(i + 1, i, i + 1, 0x043B);
+        break;
+
+      case 0x04C7:
+        result &= test_character(i, i, i + 1, 0x041D);
+        result &= test_character(i + 1, i, i + 1, 0x043D);
+        break;
+
+      case 0x04C9:
+        result &= test_character(i, i, i + 1, 0x041D);
+        result &= test_character(i + 1, i, i + 1, 0x043D);
+        break;
+
+      case 0x04CD:
+        result &= test_character(i, i, i + 1, 0x041C);
+        result &= test_character(i + 1, i, i + 1, 0x043C);
+        i += 1;
+        break;
+
+      case 0x04D0:
+        result &= test_character(i, i, i + 1, 0x0410);
+        result &= test_character(i + 1, i, i + 1, 0x0410 + 0x0020);
+        break;
+
+      case 0x04D2:
+        result &= test_character(i, i, i + 1, 0x0410);
+        result &= test_character(i + 1, i, i + 1, 0x0410 + 0x0020);
+        break;
+
+      case 0x04D6:
+        result &= test_character(i, i, i + 1, 0x0415);
+        result &= test_character(i + 1, i, i + 1, 0x0415 + 0x0020);
+        break;
+
+      case 0x04DA:
+        result &= test_character(i, i, i + 1, 0x0429);
+        result &= test_character(i + 1, i, i + 1, 0x0429 + 0x0020);
+        break;
+
+      case 0x04DC:
+        result &= test_character(i, i, i + 1, 0x0416);
+        result &= test_character(i + 1, i, i + 1, 0x0416 + 0x0020);
+        break;
+
+      case 0x04DE:
+        result &= test_character(i, i, i + 1, 0x0417);
+        result &= test_character(i + 1, i, i + 1, 0x0417 + 0x0020);
+        break;
+
+      case 0x04E2:
+        result &= test_character(i, i, i + 1, 0x0418);
+        result &= test_character(i + 1, i, i + 1, 0x0418 + 0x0020);
+        break;
+
+      case 0x04E4:
+        result &= test_character(i, i, i + 1, 0x0418);
+        result &= test_character(i + 1, i, i + 1, 0x0418 + 0x0020);
+        break;
+
+      case 0x04E6:
+        result &= test_character(i, i, i + 1, 0x041E);
+        result &= test_character(i + 1, i, i + 1, 0x041E + 0x0020);
+        break;
+
+      case 0x04EA:
+        result &= test_character(i, i, i + 1, 0x041E);
+        result &= test_character(i + 1, i, i + 1, 0x041E + 0x0020);
+        break;
+
+      case 0x04EC:
+        result &= test_character(i, i, i + 1, 0x042D);
+        result &= test_character(i + 1, i, i + 1, 0x042D + 0x0020);
+        break;
+
+      case 0x04EE:
+        result &= test_character(i, i, i + 1, 0x0423);
+        result &= test_character(i + 1, i, i + 1, 0x0423 + 0x0020);
+        break;
+
+      case 0x04F0:
+        result &= test_character(i, i, i + 1, 0x0423);
+        result &= test_character(i + 1, i, i + 1, 0x0423 + 0x0020);
+        break;
+
+      case 0x04F2:
+        result &= test_character(i, i, i + 1, 0x0423);
+        result &= test_character(i + 1, i, i + 1, 0x0423 + 0x0020);
+        break;
+
+      case 0x04F4:
+        result &= test_character(i, i, i + 1, 0x0427);
+        result &= test_character(i + 1, i, i + 1, 0x0427 + 0x0020);
+        break;
+
+      case 0x04F6:
+        result &= test_character(i, i, i + 1, 0x0413);
+        result &= test_character(i + 1, i, i + 1, 0x0413 + 0x0020);
+        break;
+
+      case 0x04F8:
+        result &= test_character(i, i, i + 1, 0x042B);
+        result &= test_character(i + 1, i, i + 1, 0x042B + 0x0020);
+        break;
+
+      case 0x04FA:
+        result &= test_character(i, i, i + 1, 0x0413);
+        result &= test_character(i + 1, i, i + 1, 0x0413 + 0x0020);
+        break;
+
+      case 0x04FC:
+        result &= test_character(i, i, i + 1, 0x0425);
+        result &= test_character(i + 1, i, i + 1, 0x0425 + 0x0020);
+        break;
+
+      case 0x04FE:
+        result &= test_character(i, i, i + 1, 0x0425);
+        result &= test_character(i + 1, i, i + 1, 0x0425 + 0x0020);
+        break;
+
+      default:
+        result &= test_character(i, i, i + 1, i);
+        result &= test_character(i + 1, i, i + 1, i + 1);
+        }
     }
 
   for (uint32_t i = 0x500; (i < 0x527) && result; i += 2)
@@ -1150,8 +1439,8 @@ main (int argc, char** argv)
   success = success & test_unicode_rest ();
   success = success & test_unicode_evaluation ();
 
-
   DBSShoutdown ();
+
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;
