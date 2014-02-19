@@ -37,8 +37,9 @@ namespace whisper
 Lock::Lock ()
 {
   const uint_t result = wh_lock_init (&mLock);
+
   if (result != WOP_OK)
-    throw LockException (NULL, _EXTRA (result));
+    throw LockException (_EXTRA (result), "Failed to initialize a lock.");
 }
 
 
@@ -56,7 +57,7 @@ Lock::Acquire ()
 {
   const uint_t result = wh_lock_acquire (&mLock);
   if (result != WOP_OK)
-    throw LockException (NULL, _EXTRA (result));
+    throw LockException (_EXTRA (result), "Failed to acquire a lock.");
 }
 
 
@@ -109,7 +110,7 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
       assert (mEnded);
 
       mStarted = true;
-      throw ThreadException (NULL, _EXTRA (errno));
+      throw ThreadException (_EXTRA (errno), "Failed to create a thread.");
     }
 
   mNeedsClean = true;
@@ -163,7 +164,7 @@ Thread::ThrowPendingException ()
   if (mUnkExceptSignaled)
     {
       DiscardException ();
-      throw ThreadException (NULL, _EXTRA (WOP_UNKNOW));
+      throw ThreadException (_EXTRA (WOP_UNKNOW));
     }
 
   if (mException != NULL)

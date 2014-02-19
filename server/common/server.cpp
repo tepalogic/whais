@@ -133,8 +133,9 @@ client_handler_routine (void* args)
 
           if ((cmdType & 1) != 0)
             {
-              throw ConnectionException ("Invalid command received.",
-                                         _EXTRA (cmdType));
+              throw ConnectionException (_EXTRA (cmdType),
+                                         "Invalid command requested.");
+
             }
 
           if (cmdType >= USER_CMD_BASE)
@@ -143,8 +144,8 @@ client_handler_routine (void* args)
               cmdType /= 2;
               if (cmdType >= USER_CMDS_COUNT)
                 {
-                  throw ConnectionException ("Invalid user command received.",
-                                             _EXTRA (cmdType));
+                  throw ConnectionException (_EXTRA (cmdType),
+                                             "Invalid user command received.");
                 }
               cmds = gpUserCommands;
             }
@@ -153,14 +154,16 @@ client_handler_routine (void* args)
               cmdType /= 2;
               if (cmdType >= ADMIN_CMDS_COUNT)
                 {
-                  throw ConnectionException ("Invalid admin command received.",
-                                             _EXTRA (cmdType));
+                  throw ConnectionException (
+                                  _EXTRA (cmdType),
+                                  "Invalid administrator command received."
+                                            );
                 }
               else if (! connection.IsAdmin ())
                 {
-                  throw ConnectionException ("Regular user requested to "
-                                               "execute admin command.",
-                                             _EXTRA (cmdType));
+                  throw ConnectionException (_EXTRA (cmdType),
+                                             "Regular user wants to execute "
+                                               "an administrator command.");
                 }
               cmds = gpAdminCommands;
             }
@@ -177,7 +180,7 @@ client_handler_routine (void* args)
       logEntry << "Unable to deal with error condition.\n";
       logEntry << "Description:\n\t" << e.Description () << endl;
 
-      if (e.Message ())
+      if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Extra () << " (";
@@ -203,7 +206,7 @@ client_handler_routine (void* args)
       if (e.Description ())
         logEntry << "Description:\n\t" << e.Description () << endl;
 
-      if (e.Message ())
+      if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Extra () << " (";
@@ -302,7 +305,7 @@ listener_routine (void* args)
 
                 logEntry << "Description:\n\t" << e.Description () << endl;
 
-                if (e.Message ())
+                if ( ! e.Message ().empty ())
                   logEntry << "Message:\n\t" << e.Message () << endl;
 
                 logEntry <<"Extra: " << e.Extra () << " (";
@@ -323,7 +326,7 @@ listener_routine (void* args)
       logEntry << "Unable to deal with this error condition at this point.\n";
       logEntry << "Description:\n\t" << e.Description () << endl;
 
-      if (e.Message ())
+      if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Extra () << " (";

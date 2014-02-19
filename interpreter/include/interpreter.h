@@ -45,12 +45,21 @@ namespace whisper
 class INTERP_SHL InterException : public Exception
 {
 public:
-  explicit InterException (const char* const message,
-                           const char* const file,
-                           const uint32_t    line,
-                           const uint32_t    extra)
-    : Exception (message, file, line, extra)
+  explicit InterException (const uint32_t  code,
+                           const char*     file,
+                           uint32_t        line,
+                           const char*     fmtMsg = NULL,
+                           ...)
+    : Exception (code, file, line)
   {
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
   }
 
   virtual Exception* Clone () const;

@@ -40,7 +40,12 @@ Socket::Socket (const char* const   serverHost,
 {
   const uint32_t e = whs_create_client (serverHost, service, &mSocket);
   if (e != WOP_OK)
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Could not connect to '%s:%s'.",
+                             serverHost,
+                             service);
+    }
 
   mOwned = true;
 }
@@ -58,7 +63,12 @@ Socket::Socket (const char* const   serverHost,
 
   e = whs_create_client (serverHost, service, &mSocket);
   if (e != WOP_OK)
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Could not connect to '%s:%u'.",
+                             serverHost,
+                             _SC (uint_t, port));
+    }
 
   mOwned = true;
 }
@@ -72,7 +82,12 @@ Socket::Socket (const char* const     localAdress,
 {
   uint32_t e = whs_create_server (localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Could not start listen at '%s:%s'.",
+                             localAdress,
+                             service);
+    }
 
   mOwned = true;
 }
@@ -90,7 +105,12 @@ Socket::Socket (const char* const   localAdress,
 
   uint32_t e = whs_create_server (localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Could not connect to '%s:%u'.",
+                             localAdress,
+                             _SC (uint_t, port));
+    }
 
   mOwned = true;
 }
@@ -145,7 +165,11 @@ Socket::Accept ()
   const uint32_t e      = whs_accept (mSocket, &client);
 
   if (e != WOP_OK )
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Socket (%d) failed to accept connection.",
+                             mSocket);
+    }
 
   assert (client != INVALID_SOCKET);
 
@@ -160,7 +184,11 @@ Socket::Read (uint8_t* const buffer, const uint_t maxCount)
   const uint32_t e      = whs_read (mSocket, buffer, &result);
 
   if (e != WOP_OK)
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Failed to read from socket (%d).",
+                             mSocket);
+    }
 
   return result;
 }
@@ -172,7 +200,12 @@ Socket::Write (const uint8_t* const buffer, const uint_t count)
   const uint32_t e = whs_write (mSocket, buffer, count);
 
   if (e != WOP_OK)
-    throw SocketException (NULL, _EXTRA (e));
+    {
+      throw SocketException (_EXTRA (e),
+                             "Failed to write on socket (%d).",
+                             mSocket);
+    }
+
 }
 
 

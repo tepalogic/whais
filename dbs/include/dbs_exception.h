@@ -35,12 +35,21 @@ namespace whisper
 class DBS_SHL DBSException : public Exception
 {
 public:
-  DBSException (const char*     message,
+  DBSException (const uint32_t  code,
                 const char*     file,
                 uint32_t        line,
-                uint32_t        extra)
-    : Exception (message, file, line, extra)
+                const char*     fmtMsg = NULL,
+                ...)
+    : Exception (code, file, line)
   {
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
   }
 
   virtual ~DBSException ()

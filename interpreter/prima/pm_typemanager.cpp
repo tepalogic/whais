@@ -329,8 +329,9 @@ TypeManager::CreateGlobalValue (uint8_t*    inoutTypeDesc,
         return GlobalValue (ArrayOperand ( DArray ((DRichReal*) NULL)));
 
       case T_TEXT:
-        throw InterException (NULL,
-                              _EXTRA (InterException::TEXT_ARRAY_NOT_SUPP));
+        throw InterException (_EXTRA (InterException::TEXT_ARRAY_NOT_SUPP),
+                              "This implementation does not support variables "
+                                "with array of text type.");
 
       case T_UNDETERMINED:
         //Just a default
@@ -488,8 +489,9 @@ TypeManager::CreateLocalValue (uint8_t* inoutTypeDesc)
         return StackValue (ArrayOperand ( DArray ((DRichReal*) NULL)));
 
       case T_TEXT:
-        throw InterException (NULL,
-                              _EXTRA (InterException::TEXT_ARRAY_NOT_SUPP));
+        throw InterException (_EXTRA (InterException::TEXT_ARRAY_NOT_SUPP),
+                              "This implementation does not support variables "
+                                "with array of text type.");
 
       case T_UNDETERMINED:
         //Just a default

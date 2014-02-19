@@ -39,7 +39,11 @@ File::File (const char* name, uint_t mode)
   mHandle = whf_open (name, mode);
 
   if (mHandle == INVALID_FILE)
-    throw FileException (name, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Could not open file '%s'.",
+                           name);
+    }
 
   GetSize ();
 }
@@ -50,7 +54,11 @@ File::File (const File &src) :
   mFileSize (src.mFileSize)
 {
   if (mHandle == INVALID_FILE)
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to duplicate file (%d) handle.",
+                           mHandle);
+    }
 }
 
 
@@ -66,7 +74,11 @@ void
 File::Read (uint8_t* pBuffer, uint_t size)
 {
   if ( ! whf_read (mHandle, pBuffer, size))
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to read file (%d) content.",
+                           mHandle);
+    }
 }
 
 
@@ -82,7 +94,11 @@ File::Write (const uint8_t* pBuffer, uint_t size)
     }
 
   if ( ! whf_write (mHandle, pBuffer, size))
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to update file (%d).",
+                           mHandle);
+    }
 }
 
 
@@ -90,7 +106,11 @@ void
 File::Seek (const int64_t where, const int whence)
 {
   if ( ! whf_seek (mHandle, where, whence))
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to seek in file (%d).",
+                           mHandle);
+    }
 }
 
 
@@ -99,7 +119,11 @@ uint64_t File::Tell ()
   uint64_t position;
 
   if ( ! whf_tell (mHandle, &position))
-    throw FileException (NULL, _EXTRA(whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to to get file (%d) current position.",
+                           mHandle);
+    }
 
   return position;
 }
@@ -109,7 +133,11 @@ void
 File::Sync ()
 {
   if ( ! whf_sync (mHandle))
-    throw FileException (NULL,_EXTRA(whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to flush file (%d) content.",
+                           mHandle);
+    }
 }
 
 
@@ -119,7 +147,11 @@ uint64_t File::GetSize () const
     return mFileSize;
 
   if ( ! whf_tell_size (mHandle, &_CC (uint64_t&, mFileSize)))
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to get file (%d) size.",
+                           mHandle);
+    }
 
   return mFileSize;
 }
@@ -129,7 +161,11 @@ void
 File::SetSize (const uint64_t size)
 {
   if ( ! whf_set_size (mHandle, size))
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to update file (%d) size.",
+                           mHandle);
+    }
 
   mFileSize = UNKNOWN_SIZE;
 }
@@ -141,7 +177,11 @@ File::Close ()
   assert (mHandle != INVALID_FILE);
 
   if ( ! whf_close (mHandle))
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to close file (%d).",
+                           mHandle);
+    }
 
   mHandle = INVALID_FILE;
 }
@@ -157,7 +197,11 @@ File::operator= (const File &src)
 
   mHandle = whf_dup (src.mHandle);
   if (mHandle == INVALID_FILE)
-    throw FileException (NULL, _EXTRA (whf_last_error ()));
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Failed to duplicate file (%d) handle.",
+                           src.mHandle);
+    }
 
   return *this;
 }

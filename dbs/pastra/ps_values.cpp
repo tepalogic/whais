@@ -218,7 +218,7 @@ DDate::DDate (const int32_t year, const uint8_t month, const uint8_t day)
   if ((mIsNull == false)
       && ! is_valid_date (year, month, day))
     {
-      throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATE));
+      throw DBSException (_EXTRA (DBSException::INVALID_DATE));
     }
 }
 
@@ -308,7 +308,7 @@ DDateTime::DDateTime (const int32_t     year,
   if ((mIsNull == false)
        && ! is_valid_datetime (year, month, day, hour, minutes, seconds))
     {
-      throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
+      throw DBSException (_EXTRA (DBSException::INVALID_DATETIME));
     }
 }
 
@@ -436,7 +436,7 @@ DHiresTime::DHiresTime (const int32_t    year,
                                seconds,
                                microsec))
     {
-      throw DBSException (NULL, _EXTRA (DBSException::INVALID_DATETIME));
+      throw DBSException (_EXTRA (DBSException::INVALID_DATETIME));
     }
 }
 
@@ -945,7 +945,7 @@ DText::CharAt (const uint64_t index, const DChar& ch)
       return ;
     }
   else if (charsCount < index)
-    throw DBSException (NULL, _EXTRA (DBSException::STRING_INDEX_TOO_BIG));
+    throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
 
   if (ch.IsNull ())
     mText->Truncate (index);
@@ -1171,7 +1171,7 @@ wh_array_init (const T* const       array,
     }
 
   if (array == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
+    throw DBSException (_EXTRA (DBSException::INVALID_PARAMETERS));
 
   auto_ptr<TemporalArray> autoP (new TemporalArray (array[0].DBSType ()));
   *outStrategy = autoP.get ();
@@ -1377,7 +1377,7 @@ DArray::operator= (const DArray& source)
   if ((Type () != T_UNDETERMINED)
       && source.Type () != Type ())
     {
-      throw DBSException (NULL, _EXTRA (DBSException::INVALID_ARRAY_TYPE));
+      throw DBSException (_EXTRA (DBSException::INVALID_ARRAY_TYPE));
     }
 
   IArrayStrategy* const oldArray = mArray;
@@ -1469,7 +1469,7 @@ add_array_element (const T& element, IArrayStrategy** inoutStrategy)
   if ((*inoutStrategy)->Type () != element.DBSType ())
     {
       if ((*inoutStrategy)->Type () != T_UNDETERMINED)
-        throw DBSException (NULL, _EXTRA (DBSException::INVALID_ARRAY_TYPE));
+        throw DBSException (_EXTRA (DBSException::INVALID_ARRAY_TYPE));
 
       assert ((*inoutStrategy) ==
                 &NullArray::GetSingletoneInstace (T_UNDETERMINED));
@@ -1479,7 +1479,7 @@ add_array_element (const T& element, IArrayStrategy** inoutStrategy)
       return add_array_element (element, inoutStrategy);
     }
   else if (element.IsNull ())
-    throw DBSException (NULL, _EXTRA (DBSException::NULL_ARRAY_ELEMENT));
+    throw DBSException (_EXTRA (DBSException::NULL_ARRAY_ELEMENT));
 
   static const uint_t storageSize = get_aligned_elem_size (
                                                     element.DBSType ()
@@ -1612,10 +1612,10 @@ get_array_element (IArrayStrategy&        strategy,
                    T&                     outElement)
 {
   if (strategy.Count() <= index)
-    throw DBSException (NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
+    throw DBSException (_EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
 
   else if (strategy.Type() != outElement.DBSType ())
-    throw DBSException (NULL, _EXTRA(DBSException::INVALID_ARRAY_TYPE));
+    throw DBSException (_EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
   static const uint_t storageSize = get_aligned_elem_size (
                                                     outElement.DBSType ()
@@ -1749,7 +1749,7 @@ set_array_element (const T&          value,
       return ;
     }
   else if (index > (*inoutStrategy)->Count())
-    throw DBSException(NULL, _EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
+    throw DBSException(_EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (inoutStrategy);
   static const uint_t storageSize = get_aligned_elem_size (
@@ -1879,7 +1879,7 @@ void
 DArray::Remove (const uint64_t index)
 {
   if (index >= mArray->Count ())
-    throw DBSException(NULL, _EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
+    throw DBSException(_EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (&mArray);
 

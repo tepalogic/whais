@@ -44,14 +44,24 @@ append_int_to_str (std::string& dest, uint64_t number);
 class DataContainerException : public Exception
 {
 public:
-  DataContainerException (const char*   message,
-                          const char*   file,
-                          uint32_t      line,
-                          uint32_t      extra)
-    : Exception (message, file, line, extra)
+  DataContainerException (const uint32_t      code,
+                          const char*         file,
+                          const uint32_t      line,
+                          const char* const   fmtMsg,
+                          ...)
+    : Exception (code, file, line)
   {
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
   }
 };
+
 
 
 
@@ -158,12 +168,21 @@ class WFileContainerException : public DataContainerException
 {
 public:
   explicit
-  WFileContainerException (const char*   message,
-                           const char*   file,
-                           uint32_t      line,
-                           uint32_t      extra)
-    : DataContainerException (message, file, line, extra)
+  WFileContainerException (const uint32_t       code,
+                           const char*          file,
+                           uint32_t             line,
+                           const char*          fmtMsg,
+                           ...)
+    : DataContainerException (code, file, line, NULL)
   {
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
   }
 
   virtual Exception* Clone () const;

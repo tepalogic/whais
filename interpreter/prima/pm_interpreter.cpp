@@ -58,7 +58,7 @@ InitInterpreter (const char* adminDbsDir)
   LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () != 0)
-    throw InterException (NULL, _EXTRA (InterException::ALREADY_INITED));
+    throw InterException (_EXTRA (InterException::ALREADY_INITED));
 
   static IDBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName, adminDbsDir);
 
@@ -77,13 +77,17 @@ GetInstance (const char* name, Logger* log)
   LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
-    throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
+    throw InterException (_EXTRA (InterException::NOT_INITED));
 
   if (name == NULL)
     name = gDBSName;
 
   else if (strcmp (name, gDBSName) == 0)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_SESSION));
+    {
+      throw InterException (_EXTRA (InterException::INVALID_SESSION),
+                            "Cannot find the instance of session '%s'.",
+                            name);
+    }
 
   map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.find (name);
   if (it == gmNameSpaces.end ())
@@ -115,7 +119,7 @@ ReleaseInstance (ISession& instance)
   LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
-    throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
+    throw InterException (_EXTRA (InterException::NOT_INITED));
 
   prima::Session* const inst = _SC (prima::Session*, &instance);
 
@@ -129,7 +133,7 @@ CleanInterpreter (const bool forced)
   LockRAII syncHolder (gSync);
 
   if (gmNameSpaces.size () == 0)
-    throw InterException (NULL, _EXTRA (InterException::NOT_INITED));
+    throw InterException (_EXTRA (InterException::NOT_INITED));
 
   //TODO: remember to clean the sessions to when the mechanism will
   //be employed
@@ -142,7 +146,7 @@ CleanInterpreter (const bool forced)
         space.ForceRelease ();
 
       else if (space.RefsCount() != 0)
-        throw InterException (NULL, _EXTRA (InterException::SESSION_IN_USE));
+        throw InterException (_EXTRA (InterException::SESSION_IN_USE));
 
       ++it;
     }
@@ -511,7 +515,11 @@ Session::ExecuteProcedure (const char* const   procedure,
                                          strlen (procedure));
 
   if ( ! ProcedureManager::IsValid (procId))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+    {
+      throw InterException (_EXTRA (InterException::INVALID_PROC_REQ),
+                            "Cannot find procedure '%s' to execute.",
+                            procedure);
+    }
 
   const Procedure& proc = GetProcedure (procId);
 
@@ -671,7 +679,7 @@ uint_t
 Session::ProcedurePameterRawType (const uint_t id, const uint_t param)
 {
   if (param >= ProcedureParametersCount (id))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
   ProcedureManager& mgr = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
@@ -694,7 +702,7 @@ uint_t
 Session::ProcedurePameterFieldsCount (const uint_t id, const uint_t param)
 {
   if (param >= ProcedureParametersCount (id))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
   ProcedureManager& mgr = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
@@ -723,7 +731,7 @@ Session::ProcedurePameterFieldName (const uint_t id,
                                     const uint_t field)
 {
   if (param >= ProcedureParametersCount (id))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
   ProcedureManager& mgr   = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
@@ -751,7 +759,7 @@ Session::ProcedurePameterFieldType (const uint_t id,
                                     const uint_t field)
 {
   if (param >= ProcedureParametersCount (id))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
   ProcedureManager& mgr   = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
@@ -938,7 +946,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
 
       mLog.Log (LOG_ERROR, message);
 
-      throw InterException (NULL, _EXTRA (InterException::INVALID_TYPE_DESC));
+      throw InterException (_EXTRA (InterException::INVALID_TYPE_DESC));
     }
 
 
@@ -961,7 +969,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
+          throw InterException (_EXTRA (InterException::EXTERNAL_FIRST));
         }
 
       const uint32_t  typeOff = typeMgr.AddType (tdBuff.get ());
@@ -983,8 +991,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException (NULL,
-                                _EXTRA (InterException::EXTERNAL_MISMATCH));
+          throw InterException (_EXTRA (InterException::EXTERNAL_MISMATCH));
         }
     }
   else
@@ -995,8 +1002,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
 
       mLog.Log (LOG_ERROR, message);
 
-      throw InterException (NULL,
-                            _EXTRA (InterException::DUPLICATE_DEFINITION));
+      throw InterException (_EXTRA (InterException::DUPLICATE_DEFINITION));
     }
 
   return glbEntry;
@@ -1037,8 +1043,7 @@ Session::DefineProcedure (const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException (NULL,
-                                _EXTRA (InterException::INVALID_TYPE_DESC));
+          throw InterException (_EXTRA (InterException::INVALID_TYPE_DESC));
         }
     }
 
@@ -1058,7 +1063,7 @@ Session::DefineProcedure (const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException (NULL, _EXTRA (InterException::EXTERNAL_FIRST));
+          throw InterException (_EXTRA (InterException::EXTERNAL_FIRST));
         }
 
       bool argsMatch = (argsCount == ArgsCount (procIndex));
@@ -1084,8 +1089,7 @@ Session::DefineProcedure (const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException (NULL,
-                                _EXTRA (InterException::EXTERNAL_MISMATCH));
+          throw InterException (_EXTRA (InterException::EXTERNAL_MISMATCH));
 
         }
 
@@ -1099,8 +1103,7 @@ Session::DefineProcedure (const uint8_t* const   name,
 
       mLog.Log (LOG_ERROR, message);
 
-      throw InterException (NULL,
-                            _EXTRA (InterException::DUPLICATE_DEFINITION));
+      throw InterException (_EXTRA (InterException::DUPLICATE_DEFINITION));
     }
 
   return procMgr.AddProcedure (name,

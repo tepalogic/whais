@@ -96,7 +96,10 @@ struct DbsManager
         || (mDBSSettings.mVLStoreCacheBlkCount == 0)
         || (mDBSSettings.mVLValueCacheSize == 0))
       {
-        throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
+        throw DBSException (
+            _EXTRA (DBSException::INVALID_PARAMETERS),
+            "Cannot create a database manager with the specified parameters."
+                           );
       }
 
     if (mDBSSettings.mWorkDir[mDBSSettings.mWorkDir.length () - 1] !=
@@ -141,7 +144,11 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
   inputFile.Read (buffer, inputFile.GetSize ());
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
-    throw DBSException (NULL, _EXTRA (DBSException::INAVLID_DATABASE));
+    {
+      throw DBSException (_EXTRA (DBSException::INAVLID_DATABASE),
+                          "File '%s' does not contains a valid signature.",
+                          fileName.c_str ());
+    }
 
   const uint16_t versionMaj = load_le_int16 (buffer + PS_DBS_VER_MAJ_OFF);
   const uint16_t versionMin = load_le_int16 (buffer + PS_DBS_VER_MIN_OFF);
@@ -149,13 +156,26 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
   if ((versionMaj > PS_DBS_VER_MAJ)
       || ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
     {
-      throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+      throw DBSException (_EXTRA (DBSException::OPER_NOT_SUPPORTED),
+                          "Cannot open a database with version %d.%d. "
+                            "Maximum supported by this implementation is "
+                            "%d.%d",
+                          versionMaj,
+                          versionMin,
+                          PS_DBS_VER_MAJ,
+                          PS_DBS_VER_MIN);
     }
 
   const uint64_t maxFileSize = load_le_int64 (buffer + PS_DBS_MAX_FILE_OFF);
 
   if (maxFileSize != mGlbSettings.mMaxFileSize)
-    throw DBSException (NULL, _EXTRA (DBSException::INAVLID_DATABASE));
+    {
+      throw DBSException (_EXTRA (DBSException::INAVLID_DATABASE),
+                          "Database uses a different maximum file size "
+                             "than what is parameterized (%lu vs %lu).",
+                          _SC (long, maxFileSize),
+                          _SC (long, mGlbSettings.mMaxFileSize));
+    }
 
   uint16_t tablesCount = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
 
@@ -204,7 +224,12 @@ DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
   LockRAII syncHolder (mSync);
 
   if (iterator >= mTables.size ())
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+                          "Cannot retrieve table by index %u (count %u).",
+                          index,
+                          mTables.size ());
+    }
 
   TABLES::iterator it = mTables.begin ();
 
@@ -231,7 +256,11 @@ DbsHandler::RetrievePersistentTable (const char* const name)
   TABLES::iterator it = mTables.find (name);
 
   if (it == mTables.end ())
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+                          "Cannot retrieve table '%s'.",
+                          name);
+    }
 
   if (it->second == NULL)
     it->second = new PersistentTable (*this, it->first);
@@ -248,13 +277,22 @@ DbsHandler::AddTable (const char* const   name,
   LockRAII syncHolder (mSync);
 
   if ((name == NULL) || (inoutFields == NULL) || (fieldsCount == 0))
-    throw DBSException (NULL, _EXTRA(DBSException::INVALID_PARAMETERS));
+    {
+      throw DBSException (_EXTRA(DBSException::INVALID_PARAMETERS),
+                          "Cannot create persistent table '%s' with %u fields.",
+                          (name == NULL) ? "(no name)" : name,
+                          (inoutFields == NULL) ? 0 : fieldsCount);
+    }
 
   const string     tableName (name);
   TABLES::iterator it = mTables.find (tableName);
 
   if (it != mTables.end ())
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_EXISTS));
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_EXISTS),
+                          "Cannot create table '%s'. It already exists.",
+                          name);
+    }
 
   mTables.insert (pair<string, PersistentTable*> (
                                         tableName,
@@ -310,7 +348,12 @@ DbsHandler::TableName (const TABLE_INDEX index)
   LockRAII syncHolder (mSync);
 
   if (iterator >= mTables.size ())
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+                          "Cannot retrieve table by index %u (count %u).",
+                          index,
+                          mTables.size ());
+    }
 
   TABLES::iterator it = mTables.begin ();
 
@@ -336,7 +379,11 @@ DbsHandler::DeleteTable (const char* const name)
   TABLES::iterator it = mTables.find (name);
 
   if (it == mTables.end ())
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_NOT_FOUND));
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+                          "Cannot delete table '%s'. It was not fund.",
+                          name);
+    }
 
   if (it->second == NULL)
     it->second = new PersistentTable (*this, it->first);
@@ -431,7 +478,10 @@ DBS_SHL void
 DBSInit (const DBSSettings& settings)
 {
   if (dbsMgrs_.get () != NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::ALREADY_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::ALREADY_INITED),
+                          "DBS framework was already initialized.");
+    }
 
   dbsMgrs_.reset (new DbsManager (settings));
 }
@@ -441,7 +491,10 @@ DBS_SHL void
 DBSShoutdown ()
 {
   if (dbsMgrs_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::NOT_INITED),
+                          "DBS framework is not initialized.");
+    }
 
   //~DbsManager() will be called automatically!
   dbsMgrs_.reset (NULL);
@@ -452,7 +505,10 @@ DBS_SHL const DBSSettings&
 DBSGetSeettings ()
 {
   if (dbsMgrs_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::NOT_INITED),
+                          "DBS framework is not initialized.");
+    }
 
   return dbsMgrs_->mDBSSettings;
 }
@@ -463,7 +519,10 @@ DBSCreateDatabase (const char* const name,
                    const char*       path)
 {
   if (dbsMgrs_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::NOT_INITED),
+                          "DBS framework is not initialized.");
+    }
 
   if (path == NULL)
     path = dbsMgrs_->mDBSSettings.mWorkDir.c_str ();
@@ -495,7 +554,10 @@ DBS_SHL  IDBSHandler&
 DBSRetrieveDatabase (const char* const name, const char* path)
 {
   if (dbsMgrs_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::NOT_INITED),
+                          "DBS framework is not initialized.");
+    }
 
   LockRAII syncHolder (dbsMgrs_->mSync);
 
@@ -530,7 +592,10 @@ DBS_SHL void
 DBSReleaseDatabase (IDBSHandler& hnd)
 {
   if (dbsMgrs_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::NOT_INITED),
+                          "DBS framework is not initialized.");
+    }
 
   LockRAII syncHolder (dbsMgrs_->mSync);
 
@@ -559,7 +624,10 @@ DBS_SHL  void
 DBSRemoveDatabase (const char* const name, const char* path)
 {
   if (dbsMgrs_.get () == NULL)
-    throw DBSException (NULL, _EXTRA (DBSException::NOT_INITED));
+    {
+      throw DBSException (_EXTRA (DBSException::NOT_INITED),
+                          "DBS framework is not initialized.");
+    }
 
   //Acquire the DBS's manager lock!
   LockRAII syncHolder (dbsMgrs_->mSync);
@@ -586,7 +654,11 @@ DBSRemoveDatabase (const char* const name, const char* path)
     }
 
   if (it->second.mRefCount != 0)
-    throw DBSException (NULL, _EXTRA (DBSException::DATABASE_IN_USE));
+    {
+      throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
+                          "Cannot remove database '%s' because is still in use.",
+                          name);
+    }
 
   it->second.mDbs.RemoveFromStorage ();
   dbses.erase (it);

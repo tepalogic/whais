@@ -105,7 +105,9 @@ validate_field_name (const char* name)
               || ((name[0] >= '0') && (name[0] <= '9'))
               || (name[0] >= '_')))
         {
-          throw DBSException(NULL, _EXTRA (DBSException::FIELD_NAME_INVALID));
+          throw DBSException(_EXTRA (DBSException::FIELD_NAME_INVALID),
+                             "Cannot use '%s' as a field name.",
+                             name);
         }
       ++name;
     }
@@ -127,16 +129,28 @@ validate_field_descriptors (const DBSFieldDescriptor* const fields,
         {
           if (strcmp(fields[i].name, fields[j].name) == 0)
             {
-              throw DBSException (fields[i].name,
-                                  _EXTRA (DBSException::FIELD_NAME_DUPLICATED));
+              throw DBSException (_EXTRA (DBSException::FIELD_NAME_DUPLICATED),
+                                  "Table field name '%s' is duplicated.",
+                                  fields[i].name);
             }
         }
 
       if ((fields[i].type == T_UNKNOWN) || (fields[i].type >= T_END_OF_TYPES))
-        throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+        {
+          throw DBSException(_EXTRA (DBSException::FIELD_TYPE_INVALID),
+                             "Table field '%s' has invalid type '%X'.",
+                             fields[i].name,
+                             fields[i].type);
+        }
+
 
       if (fields[i].isArray && (fields[i].type == T_TEXT))
-        throw DBSException(NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+        {
+          throw DBSException(_EXTRA (DBSException::FIELD_TYPE_INVALID),
+                             "This implemenation does not supprot array of "
+                               "text type for field '%s'.",
+                             fields[i].name);
+        }
     }
 }
 
@@ -200,7 +214,13 @@ create_table_file (const uint64_t                  maxFileSize,
 {
   //Check the arguments
   if ((fields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
-    throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+    {
+      throw DBSException (
+          _EXTRA (DBSException::OPER_NOT_SUPPORTED),
+          "Could not create a persistent table with %d fields count.",
+          (fields == NULL ) ? 0 : fieldsCount
+                         );
+    }
 
   //Compute the table header descriptor size
   const uint32_t descriptorsSize = sizeof (FieldDescriptor) * fieldsCount +
@@ -277,7 +297,15 @@ PersistentTable::PersistentTable (DbsHandler&       dbs,
   InitFromFile ();
 
   if (mMaxFileSize != dbs.MaxFileSize ())
-    throw DBSException (NULL, _EXTRA (DBSException::TABLE_INCONSITENCY));
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_INCONSITENCY),
+                          "Persistent table '%s' is set to use a different "
+                            "maximum file size than what is parameterized "
+                            "(%lu vs. %lu).",
+                          name.c_str (),
+                          _SC (long, mMaxFileSize),
+                          _SC (long, dbs.MaxFileSize ()));
+    }
 
   assert (mTableData.get () != NULL);
 
@@ -384,7 +412,12 @@ PersistentTable::InitFromFile ()
   mainTableFile.Read (tableHdr, PS_HEADER_SIZE);
 
   if (memcmp (tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
-    throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
+    {
+      throw DBSException (
+          _EXTRA (DBSException::TABLE_INVALID),
+          "Persistent table file '%s' has an invalid signature.",
+          mFileNamePrefix.c_str ());
+    }
 
   mFieldsCount     = load_le_int32 (tableHdr + PS_TABLE_FIELDS_COUNT_OFF);
   mDescriptorsSize = load_le_int32 (tableHdr + PS_TABLE_ELEMS_SIZE_OFF);
@@ -400,7 +433,10 @@ PersistentTable::InitFromFile ()
       (mDescriptorsSize < (sizeof(FieldDescriptor) * mFieldsCount)) ||
       (mainTableSize < PS_HEADER_SIZE))
     {
-      throw DBSException(NULL, _EXTRA (DBSException::TABLE_INVALID));
+      throw DBSException (
+          _EXTRA (DBSException::TABLE_INVALID),
+          "Persistent table file '%s' has an invalid signature.",
+          mFileNamePrefix.c_str ());
     }
 
   //Cache the field descriptors in memory
@@ -420,7 +456,7 @@ PersistentTable::InitFromFile ()
 void
 PersistentTable::InitVariableStorages ()
 {
-  // Loading the rows regular should be done upfront.
+  // Loading the rows regular should be done up front.
   mRowsData.reset (
               new FileContainer (
                 (mFileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str(),
@@ -613,7 +649,11 @@ TemporalTable::TemporalTable (DbsHandler&                     dbs,
       || (fieldsCount == 0)
       || (fieldsCount > 0xFFFFu))
     {
-      throw(DBSException(NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED)));
+      throw DBSException (
+          _EXTRA (DBSException::OPER_NOT_SUPPORTED),
+          "Could not create a temporal table with %d fields count.",
+          (fields == NULL ) ? 0 : fieldsCount
+                         );
     }
 
   //Compute the table header descriptor size

@@ -54,11 +54,13 @@ CmdLineParser::CmdLineParser (int argc, char** argv)
   Parse ();
 }
 
+
 CmdLineParser::~CmdLineParser ()
 {
   if (mOutputFileOwn)
     delete [] mOutputFile;
 }
+
 
 void
 CmdLineParser::Parse ()
@@ -66,7 +68,12 @@ CmdLineParser::Parse ()
   int index = 1;
 
   if (index >= mArgCount)
-    throw CmdLineException ("No arguments! Use --help first!", _EXTRA (0));
+    {
+      throw CmdLineException (
+                  _EXTRA (0),
+                  "No arguments provided. Use '--help' for information."
+                             );
+    }
 
   while (index < mArgCount)
     {
@@ -78,19 +85,20 @@ CmdLineParser::Parse ()
         }
       else if (isStrEqual (mArgs[index], "-o"))
         {
-          if ((void *) mOutputFile != NULL)
+          if (mOutputFile != NULL)
             {
-              throw CmdLineException ("Parameter '-o' is given twice",
-                                      _EXTRA (0));
+              throw CmdLineException (
+                                  _EXTRA (0),
+                                  "Parameter '-o' is given multiple times."
+                                      );
             }
 
           if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
             {
-              throw CmdLineException (
-                         "Missing file name argument for for parameter '-o'.",
-                         _EXTRA (0)
-                                        );
+              throw CmdLineException (_EXTRA (0),
+                                      "Missing parameter for argument '-o'.");
             }
+
           else
             mOutputFile = mArgs[index++];
 
@@ -100,16 +108,20 @@ CmdLineParser::Parse ()
         {
           if (mSourceFile != NULL)
             {
-              throw CmdLineException ("The object file was already specified!",
-                                       _EXTRA (0));
+              throw CmdLineException (
+                              _EXTRA (0),
+                              "An input  file was already specified ('%s').",
+                              mSourceFile
+                                     );
             }
 
           mSourceFile = mArgs[index++];
         }
       else
         {
-          throw CmdLineException ("Unknown arguments! Use --help first!",
-                                  _EXTRA (0));
+          throw CmdLineException (_EXTRA (0),
+                                  "Cannot handle argument '%s.'",
+                                  mArgs[index]);
         }
     }
 
@@ -125,7 +137,7 @@ CmdLineParser::CheckArguments ()
       exit (0);
     }
   else if (mSourceFile == NULL)
-    throw CmdLineException ("No given input file!", _EXTRA(0));
+    throw CmdLineException (_EXTRA(0), "The input file was not specified.");
 
   else if (mOutputFile == NULL)
   {

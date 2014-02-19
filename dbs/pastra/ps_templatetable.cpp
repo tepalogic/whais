@@ -123,7 +123,9 @@ PrototypeTable::RetrieveField (const char* name)
       fieldName += strlen (fieldName) + 1;
     }
 
-  throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+  throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+                     "Cannot find table field '%s'.",
+                     name);
 }
 
 
@@ -131,7 +133,12 @@ DBSFieldDescriptor
 PrototypeTable::DescribeField (const FIELD_INDEX field)
 {
   if (field >= mFieldsCount)
-    throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+    {
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+                         "Table field index is invalid %u (count %u).",
+                         field,
+                         mFieldsCount);
+    }
 
   const FieldDescriptor* const desc = _RC(const FieldDescriptor*,
                                           mFieldsDescriptors.get ());
@@ -270,17 +277,19 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
                              CreateIndexCallbackContext* const cbContext)
 {
   if (PrototypeTable::IsIndexed (field))
-    throw DBSException (NULL, _EXTRA (DBSException::FIELD_INDEXED));
+    throw DBSException (_EXTRA (DBSException::FIELD_INDEXED));
 
   if ((cbFunc == NULL) && (cbContext != NULL))
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
+    throw DBSException (_EXTRA (DBSException::INVALID_PARAMETERS));
 
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.Type () == T_TEXT)
       || (desc.Type () & PS_TABLE_ARRAY_MASK) != 0)
     {
-      throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID),
+                          "This implementation does not support indexing text "
+                            "or array fields.");
     }
 
   const uint_t nodeSizeKB  = 16; //16KB
@@ -401,7 +410,7 @@ void
 PrototypeTable::RemoveIndex (const FIELD_INDEX field)
 {
   if (PrototypeTable::IsIndexed (field) == false)
-    throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_INDEXED));
+    throw DBSException (_EXTRA (DBSException::FIELD_NOT_INDEXED));
 
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
@@ -424,7 +433,12 @@ bool
 PrototypeTable::IsIndexed (const FIELD_INDEX field) const
 {
   if (field >= mFieldsCount)
-    throw DBSException (NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+    {
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+                         "Table field index is invalid %u (%u),",
+                         field,
+                         mFieldsCount);
+    }
 
   assert (mvIndexNodeMgrs.size () == mFieldsCount);
 
@@ -446,7 +460,12 @@ PrototypeTable::GetFieldDescriptorInternal(const FIELD_INDEX field) const
                                     mFieldsDescriptors.get ());
 
   if (field >= mFieldsCount)
-    throw DBSException(NULL, _EXTRA (DBSException::FIELD_NOT_FOUND));
+    {
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+                         "Cannot get table field %u (of %u) description.",
+                          field,
+                          mFieldsCount);
+    }
 
   return desc[field];
 }
@@ -846,12 +865,12 @@ PrototypeTable::Set (const ROW_INDEX      row,
     AddRow ();
 
   else if (row > mRowsCount)
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ((desc.Type () & PS_TABLE_ARRAY_MASK)
       || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
     {
-      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
   uint64_t newFirstEntry     = ~0ull;
@@ -889,8 +908,10 @@ PrototypeTable::Set (const ROW_INDEX      row,
 
           if (value.mBytesSize >= RowFieldText::MAX_BYTES_COUNT)
             {
-              throw DBSException (NULL,
-                                  _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+              throw DBSException (_EXTRA (DBSException::OPER_NOT_SUPPORTED),
+                                  "This implementation does not support text"
+                                   " fields with more than %lu characters.",
+                                  _SC (long, RowFieldText::MAX_BYTES_COUNT));
             }
 
           newFieldValueSize = value.mBytesSize +
@@ -986,13 +1007,13 @@ PrototypeTable::Set (const ROW_INDEX        row,
     AddRow ();
 
   else if (row > mRowsCount)
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if (((desc.Type () & PS_TABLE_ARRAY_MASK) == 0)
       || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
            _SC (uint_t, value.Type ())))
     {
-      throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
 
   uint64_t      newFirstEntry     = ~0;
@@ -1271,12 +1292,12 @@ PrototypeTable::Get (const ROW_INDEX   row,
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if (row >= mRowsCount)
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ((desc.Type () & PS_TABLE_ARRAY_MASK)
       || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
     {
-      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
   LockRAII syncHolder (mSync);
@@ -1315,14 +1336,14 @@ PrototypeTable::Get (const ROW_INDEX        row,
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if (row >= mRowsCount)
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if (((desc.Type () & PS_TABLE_ARRAY_MASK) == 0)
       || (((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
              _SC(uint_t, outValue.Type ()))
           && (outValue.Type () != T_UNDETERMINED)))
     {
-      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
   LockRAII syncHolder (mSync);
@@ -1485,7 +1506,7 @@ PrototypeTable::ExchangeRows (const ROW_INDEX    row1,
   const FIELD_INDEX   fieldsCount   = FieldsCount ();
 
   if ((allocatedRows <= row1) || (allocatedRows <= row2))
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   for (FIELD_INDEX field = 0; field < fieldsCount; ++field)
     {
@@ -1563,10 +1584,7 @@ PrototypeTable::ExchangeRows (const ROW_INDEX    row1,
               break;
 
             default:
-              throw DBSException (
-                              NULL,
-                              _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
-                                 );
+              throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
             }
         }
     }
@@ -1659,13 +1677,16 @@ PrototypeTable::Sort (const FIELD_INDEX     field,
   const DBSFieldDescriptor fd = DescribeField (field);
 
   if (fd.isArray)
-    throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+    {
+      throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID),
+                          "This implementation does not sort array fields.");
+    }
 
   else if (fromRow > toRow)
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_PARAMETERS));
+    throw DBSException (_EXTRA (DBSException::INVALID_PARAMETERS));
 
   else if (toRow >= AllocatedRows ())
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   switch (fd.type)
     {
@@ -1829,7 +1850,7 @@ PrototypeTable::Sort (const FIELD_INDEX     field,
         break;
 
     default:
-      throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+      throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
     }
 }
 
@@ -2128,13 +2149,13 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if (row >= mRowsCount)
-    throw DBSException (NULL, _EXTRA (DBSException::ROW_NOT_ALLOCATED));
+    throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
   if ((desc.Type () & PS_TABLE_ARRAY_MASK)
       || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
             _SC(uint_t,  outValue.DBSType ())))
     {
-      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
   const uint_t  byteOff = desc.NullBitIndex () / 8;
@@ -2168,7 +2189,7 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
       || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
             _SC(uint_t, min.DBSType ())))
     {
-      throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
   toRow = MIN (toRow, ((mRowsCount > 0) ? mRowsCount - 1 : 0));

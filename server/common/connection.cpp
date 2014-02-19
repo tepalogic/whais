@@ -43,12 +43,21 @@ static const uint32_t FRAME_SERVER_VERS  = 0x00000001;
 
 
 
-ConnectionException::ConnectionException (const char*   message,
-                                          const char*   file,
-                                          uint32_t      line,
-                                          uint32_t      extra)
-  : Exception (message, file, line, extra)
+ConnectionException::ConnectionException (const uint32_t  code,
+                                          const char*     file,
+                                          uint32_t        line,
+                                          const char*     fmtMsg,
+                                          ...)
+  : Exception (code, file, line)
 {
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
 }
 
 
@@ -120,25 +129,25 @@ ClientConnection::ClientConnection (UserHandler&            client,
       || (mData[FRAME_TYPE_OFF] != FRAME_TYPE_AUTH_CLNT_RSP)
       || (mData[FRAME_ENCTYPE_OFF] != FRAME_ENCTYPE_PLAIN))
     {
-      throw ConnectionException ("Unexpected authentication frame received.",
-                                 _EXTRA (0));
+      throw ConnectionException (_EXTRA (0),
+                                 "Unexpected authentication frame received.");
     }
 
   if (mCipher != mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_ENC_OFF])
     {
-      throw ConnectionException ("The cipher not echoed back by client.",
-                                 _EXTRA (0));
+      throw ConnectionException (_EXTRA (0),
+                                 "The cipher was not echoed back by client.");
     }
 
-  const string dbsName = _RC (const char*,
-                              &mData[FRAME_HDR_SIZE +
-                                FRAME_AUTH_RSP_FIXED_SIZE]);
+  const char* dbsName = _RC (const char*,
+                             &mData[FRAME_HDR_SIZE +
+                                    FRAME_AUTH_RSP_FIXED_SIZE]);
 
   for (vector<DBSDescriptors>::iterator it = databases.begin ();
       it != databases.end ();
       ++it)
     {
-      if (it->mDbsName == dbsName)
+      if (strcmp (it->mDbsName.c_str (), dbsName) == 0)
         {
           mUserHandler.mDesc = &it[0];
           break;
@@ -146,7 +155,11 @@ ClientConnection::ClientConnection (UserHandler&            client,
     }
 
   if (mUserHandler.mDesc == NULL)
-    throw ConnectionException ("Failed to retrieve database.", _EXTRA (0));
+    {
+      throw ConnectionException (_EXTRA (0),
+                                 "Failed to retrieve database '%s'.",
+                                 dbsName);
+    }
 
   mUserHandler.mRoot =
         (mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0) ? true : false;
@@ -157,14 +170,15 @@ ClientConnection::ClientConnection (UserHandler&            client,
                                  mData +
                                    FRAME_HDR_SIZE +
                                    FRAME_AUTH_RSP_FIXED_SIZE +
-                                   dbsName.size () + 1);
+                                   strlen (dbsName) + 1);
       if (mUserHandler.mRoot)
         {
           if (mUserHandler.mDesc->mRootPass != passwd)
             {
               throw ConnectionException (
-                                "Failed to authenticate database root user.",
-                                _EXTRA (0)
+                        _EXTRA (0),
+                        "Failed to authenticate database ('%s') root user.",
+                        dbsName
                                         );
 
             }
@@ -176,8 +190,9 @@ ClientConnection::ClientConnection (UserHandler&            client,
           if (mUserHandler.mDesc->mUserPasswd != passwd)
             {
               throw ConnectionException (
-                                    "Failed to authenticate database user.",
-                                    _EXTRA (0)
+                            _EXTRA (0),
+                            "Failed to authenticate database ('%s') user.",
+                            dbsName
                                         );
             }
           else
@@ -333,7 +348,7 @@ ClientConnection::ReciveRawClientFrame ()
                    mUserHandler.mSocket.Read (&mData[frameRead],
                                              FRAME_HDR_SIZE - frameRead);
       if (chunkSize == 0)
-        throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
+        throw ConnectionException (_EXTRA (0), "Connection reset by peer.");
 
       frameRead += chunkSize;
     }
@@ -346,14 +361,15 @@ ClientConnection::ReciveRawClientFrame ()
     break;
 
   case FRAME_TYPE_TIMEOUT:
-    throw ConnectionException ("Client peer has signaled a timeout condition.",
-                               _EXTRA (0));
+    throw ConnectionException (_EXTRA (0),
+                               "Client peer has signaled a timeout condition.");
     break;
 
   default:
     assert (false);
 
-    throw ConnectionException ("Unexpected frame type received.", _EXTRA (0));
+    throw ConnectionException (_EXTRA (0),
+                               "Unexpected frame type received.");
   }
 
   mFrameSize = load_le_int16 (mData + FRAME_SIZE_OFF);
@@ -361,7 +377,8 @@ ClientConnection::ReciveRawClientFrame ()
   if ((mFrameSize < frameRead)
       || (mFrameSize > mDataSize))
     {
-      throw ConnectionException ("Invalid frame received.", _EXTRA (0));
+      throw ConnectionException (_EXTRA (0),
+                                 "Invalid frame received.");
     }
 
   while (frameRead < mFrameSize)
@@ -370,7 +387,8 @@ ClientConnection::ReciveRawClientFrame ()
                    mUserHandler.mSocket.Read (&mData[frameRead],
                                               mFrameSize - frameRead);
       if (chunkSize == 0)
-        throw ConnectionException ("Connection reset by peer.", _EXTRA (0));
+        throw ConnectionException (_EXTRA (0),
+                                   "Connection reset by peer.");
 
       frameRead += chunkSize;
     }
@@ -380,13 +398,14 @@ ClientConnection::ReciveRawClientFrame ()
   const uint32_t frameId = load_le_int32 (mData + FRAME_ID_OFF);
   if (frameId != mWaitingFrameId)
     {
-      throw ConnectionException ("Connection with peer is out of sync",
-                                 _EXTRA (0));
+      throw ConnectionException (_EXTRA (0),
+                                 "Connection with peer is out of sync");
+
     }
 
   const uint32_t encType = mData[FRAME_ENCTYPE_OFF];
   if (encType != mCipher)
-    throw ConnectionException ("Peer has used a wrong cipher.", _EXTRA (0));
+    throw ConnectionException (_EXTRA (0), "Peer has used a wrong cipher.");
 
   if (encType == FRAME_ENCTYPE_3K)
     {
@@ -489,8 +508,8 @@ ClientConnection::ReadCommand ()
                                             );
   if (servCookie != mServerCookie)
     {
-      throw ConnectionException ("Peer context cannot be recognized.",
-                                 _EXTRA (0));
+      throw ConnectionException (_EXTRA (0),
+                                 "Peer context cannot be recognized.");
     }
 
   uint16_t        chkSum   = 0;
@@ -499,7 +518,8 @@ ClientConnection::ReadCommand ()
     chkSum += Data ()[i];
 
   if (chkSum != load_le_int16 (RawCmdData () + PLAIN_CRC_OFF))
-    throw ConnectionException ("Frame with invalid CRC received.", _EXTRA (0));
+    throw ConnectionException (_EXTRA (0),
+                               "Frame with invalid CRC received.");
 
   mClientCookie    = load_le_int32 (RawCmdData () + PLAIN_CLNT_COOKIE_OFF);
   mLastReceivedCmd = load_le_int16 (RawCmdData () + PLAIN_TYPE_OFF);

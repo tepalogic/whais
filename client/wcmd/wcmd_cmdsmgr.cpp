@@ -278,7 +278,7 @@ printException (ostream& outputStream, const Exception& e)
       outputStream << "Unknown exception throwed.\n";
     }
 
-  if ((level >= VL_ERROR) && (e.Message() != NULL))
+  if ((level >= VL_ERROR) && ( ! e.Message().empty ()))
     outputStream << e.Message () << endl;
 
   if (level >= VL_DEBUG)

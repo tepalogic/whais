@@ -160,7 +160,7 @@ IArrayStrategy::IsRowValue () const
 pastra::TemporalArray&
 IArrayStrategy::GetTemporal ()
 {
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
   return *_RC(pastra::TemporalArray*, this);
 }
@@ -169,7 +169,7 @@ IArrayStrategy::GetTemporal ()
 pastra::RowFieldArray&
 IArrayStrategy::GetRow()
 {
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
   return *_RC(pastra::RowFieldArray*, this);
 }
@@ -218,7 +218,7 @@ void
 NullArray::IncrementShareCount ()
 {
   //Someone does not know what is doing!
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -226,7 +226,7 @@ void
 NullArray::DecrementShareCount ()
 {
   //Someone does not know what is doing!
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -236,7 +236,7 @@ NullArray::ReadRaw (const uint64_t      offset,
                     uint8_t* const      buffer)
 {
   //Someone does not know what is doing!
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -246,7 +246,7 @@ NullArray::WriteRaw (const uint64_t           offset,
                      const uint8_t* const     buffer)
 {
   //Someone does not know what is doing!
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -254,7 +254,7 @@ void
 NullArray::CollapseRaw (const uint64_t offset, const uint64_t count)
 {
   //Someone does not know what is doing!
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -336,13 +336,13 @@ NullArray::GetSingletoneInstace (const DBS_FIELD_TYPE type)
     return _int64Instance;
 
   case T_TEXT:
-    throw DBSException (NULL, _EXTRA (DBSException::INVALID_ARRAY_TYPE));
+    throw DBSException (_EXTRA (DBSException::INVALID_ARRAY_TYPE));
 
   default:
 
     assert (false);
 
-    throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
   }
 }
 

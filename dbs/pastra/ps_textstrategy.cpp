@@ -69,7 +69,7 @@ get_utf8_string_length (const uint8_t* utf8Str, uint64_t maxBytesCount)
         }
 
       if ( ! validChar)
-        throw DBSException (NULL, _EXTRA(DBSException::INVALID_UTF8_STRING));
+        throw DBSException (_EXTRA(DBSException::INVALID_UTF8_STRING));
 
       result += charSize, maxBytesCount -= charSize, utf8Str += charSize;
     }
@@ -592,14 +592,14 @@ GenericText::IsRowValue() const
 TemporalText&
 GenericText::GetTemporal()
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 RowFieldText&
 GenericText::GetRow ()
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -646,14 +646,14 @@ NullText::ShareCount () const
 void
 NullText::IncreaseShareCount ()
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 void
 NullText::DecreaseShareCount ()
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -662,7 +662,7 @@ NullText::ReadUtf8 (const uint64_t offset,
                     const uint64_t count,
                     uint8_t* const buffer)
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -671,14 +671,14 @@ NullText::WriteUtf8 (const uint64_t       offset,
                      const uint64_t       count,
                      const uint8_t* const buffer)
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 void
 NullText::TruncateUtf8 (const uint64_t newSize)
 {
-  throw DBSException (NULL, _EXTRA(DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -808,7 +808,12 @@ RowFieldText::WriteUtf8 (const uint64_t       offset,
                          const uint8_t* const buffer)
 {
   if ((offset + count) > MAX_BYTES_COUNT)
-    throw DBSException (NULL, _EXTRA (DBSException::OPER_NOT_SUPPORTED));
+    {
+      throw DBSException (_EXTRA (DBSException::OPER_NOT_SUPPORTED),
+                          "This implementation does not support text fields"
+                            " with more than %lu characters.",
+                          _SC (long, MAX_BYTES_COUNT));
+    }
 
   if (mTempText != NULL)
     {

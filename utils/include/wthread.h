@@ -85,10 +85,11 @@ private:
 class EXCEP_SHL LockException : public Exception
 {
 public:
-  LockException (const char*   message,
-                 const char*   file,
-                 uint32_t      line,
-                 uint32_t      extra);
+  LockException (const uint32_t    code,
+                 const char*       file,
+                 uint32_t          line,
+                 const char*       fmtMsg = NULL,
+                 ...);
 
   virtual Exception* Clone () const;
 
@@ -157,10 +158,11 @@ private:
 class EXCEP_SHL ThreadException : public Exception
 {
 public:
-  ThreadException (const char*   message,
-                   const char*   file,
-                   uint32_t      line,
-                   uint32_t      extra);
+  ThreadException (const uint32_t    code,
+                   const char*       file,
+                   uint32_t          line,
+                   const char*       fmtMsg = NULL,
+                   ...);
 
 
   virtual Exception* Clone () const;

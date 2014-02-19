@@ -149,8 +149,14 @@ FileContainer::FileContainer (const char*       baseName,
           && ((unit != (unitsCount - 1)) || (file.GetSize () > maxFileSize)))
         {
           throw WFileContainerException (
-                         "Inconsistent container!",
-                         _EXTRA (WFileContainerException::CONTAINTER_INVALID)
+                         _EXTRA (WFileContainerException::CONTAINTER_INVALID),
+                         "Inconsistent container "
+                           "(base name: '%s', unit %d (of %d), fs: %d (max %d)!",
+                         mFileNamePrefix.c_str (),
+                         unit,
+                         unitsCount,
+                         file.GetSize (),
+                         maxFileSize
                                         );
         }
     }
@@ -174,8 +180,13 @@ FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
   if (unitIndex > unitsCount)
     {
       throw WFileContainerException (
-                   NULL,
-                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
+                   "Could not access file container offset %d, "
+                     "unit %d (%d * %lu)!",
+                   to,
+                   unitIndex,
+                   unitsCount,
+                   _SC (long, mMaxFileUnitSize)
                                     );
     }
   else if (unitIndex == unitsCount)
@@ -183,8 +194,12 @@ FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
       if (unitPosition != 0)
         {
           throw WFileContainerException (
-                   NULL,
-                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+           _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
+           "Could not access file container offset %d, unit %d (of %d * %lu).",
+           to,
+           unitIndex,
+           unitsCount,
+           _SC (long, mMaxFileUnitSize)
                                         );
         }
       else
@@ -203,8 +218,10 @@ FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
   if (file.GetSize () < unitPosition)
     {
       throw WFileContainerException (
-                   NULL,
-                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
+                   "Unit position %lu (%lu).",
+                   _SC (long, unitPosition),
+                   _SC (long, file.GetSize ())
                                     );
     }
 
@@ -227,8 +244,14 @@ FileContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
   if ((unitIndex > unitsCount) || (from + size > Size ()))
     {
       throw WFileContainerException (
-                     NULL,
-                     _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                     _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
+                     "Failed to read %lu bytes from %lu ( of %lu), "
+                       "unit %d ( of %d).",
+                     _SC (long, size),
+                     _SC (long, from),
+                     _SC (long, Size ()),
+                     unitIndex,
+                     unitsCount
                                     );
     }
 
@@ -259,8 +282,11 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
   if ((to < from) || (containerSize < to))
     {
       throw WFileContainerException (
-                         NULL,
-                         _EXTRA (WFileContainerException::INVALID_PARAMETERS)
+                         _EXTRA (WFileContainerException::INVALID_PARAMETERS),
+                         "Failed to collapse from %lu to %lu (of %lu).",
+                         _SC (long, from),
+                         _SC (long, to),
+                         _SC (long, containerSize)
                                     );
     }
   else if (intervalSize == 0)
@@ -304,8 +330,9 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
       if ( ! whf_remove (baseName.c_str ()))
         {
           throw WFileContainerException (
-                           NULL,
-                           _EXTRA (WFileContainerException::FILE_OS_IO_ERROR)
+                           _EXTRA (WFileContainerException::FILE_OS_IO_ERROR),
+                           "Failed to remove file '%s'.",
+                           baseName.c_str ()
                                         );
         }
       mFilesHandles.pop_back ();
@@ -382,8 +409,11 @@ TemporalContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
   if (to > Size ())
     {
       throw WFileContainerException (
-                   NULL,
-                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
+                   "Failed to write %lu bytes at %lu (of %lu).",
+                   _SC (long, size),
+                   _SC (long, to),
+                   _SC (long, Size ())
                                     );
     }
 
@@ -436,8 +466,11 @@ TemporalContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
   if (from + size > Size ())
     {
       throw WFileContainerException (
-                   NULL,
-                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION)
+                   _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
+                   "Failed to read %lu bytes from %lu (of %lu).",
+                   _SC (long, size),
+                   _SC (long, from),
+                   _SC (long, Size ())
                                     );
     }
 
@@ -473,13 +506,16 @@ TemporalContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
 void
 TemporalContainer::Colapse (uint64_t from, uint64_t to)
 {
-  const uint64_t currSize = Size ();
+  const uint64_t containerSize = Size ();
 
-  if ((to < from) || (currSize < to))
+  if ((to < from) || (containerSize < to))
     {
       throw WFileContainerException (
-                         NULL,
-                         _EXTRA (WFileContainerException::INVALID_PARAMETERS)
+                 _EXTRA (WFileContainerException::INVALID_PARAMETERS),
+                 "Failed to collapse temporal container from %lu to %lu (%lu).",
+                 _SC (long, from),
+                 _SC (long, to),
+                 _SC (long, containerSize)
                                     );
     }
 
@@ -489,7 +525,7 @@ TemporalContainer::Colapse (uint64_t from, uint64_t to)
       assert (mCacheEndPos_1   == mCacheSize);
       assert (mCacheStartPos_2 == mCacheSize);
       assert (mCacheEndPos_2   <= 2 * mCacheSize);
-      assert (currSize         == mCacheEndPos_2);
+      assert (containerSize    == mCacheEndPos_2);
 
       assert (mDirtyCache_1);
       assert (mDirtyCache_2 || (mCacheStartPos_2 == mCacheEndPos_2));
@@ -497,12 +533,12 @@ TemporalContainer::Colapse (uint64_t from, uint64_t to)
       uint8_t   stepBuffer[128];
       uint64_t  tempFrom = from, tempTo = to;
 
-      while (tempTo < currSize)
+      while (tempTo < containerSize)
         {
           uint_t stepSize = sizeof (stepBuffer);
 
-          if (tempTo + stepSize > currSize)
-            stepSize = currSize - tempTo;
+          if (tempTo + stepSize > containerSize)
+            stepSize = containerSize - tempTo;
 
           Read (tempTo, stepSize, stepBuffer);
           Write (tempFrom, stepSize, stepBuffer);
@@ -546,7 +582,7 @@ TemporalContainer::Colapse (uint64_t from, uint64_t to)
     }
   else
     {
-      assert (currSize == mCacheEndPos_1);
+      assert (containerSize == mCacheEndPos_1);
 
       uint8_t* const cache_     = mCache_1.get();
       const uint_t   remainSize = mCacheEndPos_1 - to;
@@ -607,6 +643,7 @@ TemporalContainer::Colapse (uint64_t from, uint64_t to)
       from -= from % mCacheSize;
       if (from == 0)
         from = mCacheSize;
+
       mCacheStartPos_2 = from;
       mCacheEndPos_2   = MIN (mFileContainer->Size (), from + mCacheSize);
 

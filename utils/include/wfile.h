@@ -33,10 +33,11 @@ namespace whisper
 class EXCEP_SHL FileException : public Exception
 {
 public:
-  FileException (const char*   message,
-                 const char*   file,
-                 uint32_t      line,
-                 uint32_t      extra);
+  FileException (const uint32_t    code,
+                 const char*       file,
+                 uint32_t          line,
+                 const char*       fmtMsg,
+                 ...);
 
   virtual Exception* Clone () const;
 

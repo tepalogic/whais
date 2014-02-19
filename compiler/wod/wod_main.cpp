@@ -66,7 +66,7 @@ main (int argc, char **argv)
   {
     cerr << "File IO error " << e.Extra ();
 
-    if (e.Message () != NULL)
+    if ( ! e.Message ().empty ())
       cerr << ": " << e.Message () << endl;
 
     else

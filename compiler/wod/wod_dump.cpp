@@ -52,7 +52,7 @@ wod_dump_header (File& obj, ostream& output)
   obj.Read (woheader, sizeof woheader);
 
   if ((woheader[0] != 'W') || (woheader[1] != 'O'))
-    throw FunctionalUnitException ("Not an whisper object file!", _EXTRA(0));
+    throw FunctionalUnitException (_EXTRA(0), "Not a whisper object file!");
 
   output << setbase (16);
   output.flags (ios::hex | ios::uppercase);
@@ -346,7 +346,7 @@ wod_dump_type_info (const uint8_t* typeDesc, ostream& output)
       (typeDesc[descSize + sizeof (uint16_t)] != ';') ||
       (typeDesc[descSize + sizeof (uint16_t) + 1] != 0x0))
     {
-      throw DumpException ("Object file is corrupt!", _EXTRA (0));
+      throw DumpException (_EXTRA (0), "Object file is corrupt!");
     }
 
   if (IS_TABLE (type) == FALSE)

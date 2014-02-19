@@ -93,7 +93,7 @@ int8_str_conv (char* const dest, const uint8_t value)
 static uint_t
 wod_dec_w_na (const uint8_t* args, char* const op1, char* const op2)
 {
-  throw DumpException ("Not a valid opcode encountered!", _EXTRA(0));
+  throw DumpException (_EXTRA(0), "Not a valid opcode encountered!");
   return 0;
 }
 

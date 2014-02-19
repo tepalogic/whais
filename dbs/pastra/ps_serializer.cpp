@@ -504,7 +504,7 @@ Serializer::Size (const DBS_FIELD_TYPE type, const bool isArray)
 
   default:
     assert (0);
-    throw DBSException (NULL, _EXTRA(DBSException::FIELD_TYPE_INVALID));
+    throw DBSException (_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
   }
 }
 
@@ -559,7 +559,7 @@ Serializer::Alignment (const DBS_FIELD_TYPE type, bool isArray)
   default:
     assert (false);
 
-    throw DBSException (NULL, _EXTRA (DBSException::FIELD_TYPE_INVALID));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
   }
 }
 

@@ -297,7 +297,7 @@ VariableSizeStore::GetRecord (uint64_t  recordFirstEntry,
       LockRAII sync (mSync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
-        throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+        throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
       StoredItem cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
 
@@ -319,10 +319,7 @@ VariableSizeStore::GetRecord (uint64_t  recordFirstEntry,
       LockRAII sync (mSync);
 
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
-        {
-          throw DBSException (NULL,
-                              _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
-        }
+        throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
       StoredItem cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
 
@@ -358,12 +355,8 @@ VariableSizeStore::UpdateRecord (uint64_t       recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
-            {
-              throw DBSException (
-                              NULL,
-                              _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
-                                 );
-            }
+            throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
           else
             break;
         }
@@ -429,12 +422,8 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
-            {
-              throw DBSException (
-                            NULL,
-                            _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
-                                  );
-            }
+            throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
           else
             break;
         }
@@ -463,12 +452,8 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (sourceOffset != 0)
-            {
-              throw DBSException (
-                            NULL,
-                            _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
-                                 );
-            }
+            throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
           else
             break;
         }
@@ -492,7 +477,7 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
   while (sourceSize > 0)
     {
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
-        throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+        throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
       LockRAII sync (mSync);
 
@@ -569,12 +554,8 @@ VariableSizeStore::UpdateRecord (uint64_t         recordFirstEntry,
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         {
           if (offset != 0)
-            {
-              throw DBSException (
-                            NULL,
-                            _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
-                                 );
-            }
+            throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+
           else
             break;
         }

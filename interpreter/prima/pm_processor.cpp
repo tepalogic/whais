@@ -513,10 +513,7 @@ op_func_stud (ProcedureCall& call, int64_t& offset)
           break;
 
         default:
-          throw InterException (
-                          NULL,
-                          _EXTRA (InterException::INVALID_OP_CONVERSION)
-                                );
+          throw InterException (_EXTRA (InterException::INVALID_OP_CONVERSION));
         }
     }
 
@@ -703,7 +700,7 @@ op_func_divXX (ProcedureCall& call, int64_t& offset)
   stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   if (secondOp == DBS_T (0))
-    throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
+    throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
 
   DBS_T result;
   if (firstOp.IsNull ())
@@ -846,7 +843,7 @@ op_func_mod (ProcedureCall& call, int64_t& offset)
   stack[stackSize - 1].Operand ().GetValue (secondOp);
 
   if (secondOp == DInt64 (0))
-    throw InterException (NULL, _EXTRA (InterException::DIVIDE_BY_ZERO));
+    throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
 
   DInt64 result;
   if (firstOp.IsNull ())
@@ -1179,7 +1176,7 @@ op_func_ind (ProcedureCall& call, int64_t& offset)
   stack[stackSize - 1].Operand ().GetValue (index);
 
   if (index.IsNull ())
-    throw InterException (NULL, _EXTRA (EXCEPTION_CODE));
+    throw InterException (_EXTRA (EXCEPTION_CODE));
 
   StackValue result = stack[stackSize - 2].Operand ().GetValueAt (index.mValue);
 
@@ -1201,7 +1198,7 @@ op_func_indta (ProcedureCall& call, int64_t& offset)
   stack[stackSize - 1].Operand ().GetValue (index);
 
   if (index.IsNull ())
-    throw InterException (NULL, _EXTRA (InterException::ROW_INDEX_NULL));
+    throw InterException (_EXTRA (InterException::ROW_INDEX_NULL));
 
   BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
 
@@ -1632,8 +1629,8 @@ ProcedureCall::ProcedureCall (Session&                  session,
               << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
               << "' returned error code " << status << '.';
 
-          throw InterException (log.str ().c_str (),
-                                _EXTRA (InterException::NATIVE_CALL_FAILED));
+          throw InterException (_EXTRA (InterException::NATIVE_CALL_FAILED),
+                                log.str ().c_str ());
         }
 
       if (stack.Size () != mStackBegin + 1)
@@ -1643,8 +1640,8 @@ ProcedureCall::ProcedureCall (Session&                  session,
               << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
               << "'.";
 
-          throw InterException (log.str ().c_str (),
-                                _EXTRA (InterException::STACK_CORRUPTED));
+          throw InterException (_EXTRA (InterException::STACK_CORRUPTED),
+                                log.str ().c_str ());
         }
 
       return ;
@@ -1679,8 +1676,8 @@ ProcedureCall::ProcedureCall (Session&                  session,
               << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
               << "'.";
 
-          throw InterException (NULL,
-                                _EXTRA (InterException::STACK_CORRUPTED));
+          throw InterException (_EXTRA (InterException::STACK_CORRUPTED),
+                                log.str ().c_str ());
         }
 
       try
@@ -1691,14 +1688,15 @@ ProcedureCall::ProcedureCall (Session&                  session,
       {
           std::ostringstream log;
 
-          if (e.Message () != NULL)
+          if ( ! e.Message ().empty ())
             log << e.Message () << std::endl;
 
           log << "Current procedure '"
               << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
               << "'.";
 
-          e.Message (log.str ());
+          std::va_list dummy;
+          e.Message (log.str ().c_str (), dummy);
           throw ;
       }
     }
@@ -1758,7 +1756,7 @@ void
 ProcedureCall::AquireSync (const uint8_t sync)
 {
   if (mAquiredSync != NO_INDEX)
-    throw InterException (NULL, _EXTRA (InterException::NEESTED_SYNC_REQ));
+    throw InterException (_EXTRA (InterException::NEESTED_SYNC_REQ));
 
   mProcedure.mProcMgr->AquireSync (mProcedure, sync);
   mAquiredSync = sync;
@@ -1769,7 +1767,7 @@ void
 ProcedureCall::ReleaseSync (const uint8_t sync)
 {
   if (mAquiredSync != sync)
-    throw InterException (NULL, _EXTRA (InterException::SYNC_NOT_AQUIRED));
+    throw InterException (_EXTRA (InterException::SYNC_NOT_AQUIRED));
 
   mProcedure.mProcMgr->ReleaseSync (mProcedure, sync);
   mAquiredSync = NO_INDEX;

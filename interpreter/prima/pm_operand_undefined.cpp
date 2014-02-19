@@ -390,7 +390,7 @@ NativeObjectOperand::IsNull () const
         }
     }
 
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -398,10 +398,7 @@ void
 NativeObjectOperand::GetValue (DBool& outValue) const
 {
   if (mType != T_BOOL)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DBool ();
@@ -415,10 +412,7 @@ void
 NativeObjectOperand::GetValue (DChar& outValue) const
 {
   if (mType != T_CHAR)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DChar ();
@@ -432,10 +426,7 @@ void
 NativeObjectOperand::GetValue (DDate& outValue) const
 {
   if (mType != T_HIRESTIME)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DDate ();
@@ -449,10 +440,7 @@ void
 NativeObjectOperand::GetValue (DDateTime& outValue) const
 {
   if (mType != T_HIRESTIME)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DDateTime ();
@@ -473,10 +461,7 @@ void
 NativeObjectOperand::GetValue (DHiresTime& outValue) const
 {
   if (mType != T_HIRESTIME)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DHiresTime ();
@@ -498,10 +483,7 @@ void
 NativeObjectOperand::GetValue (DInt8& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DInt8 ();
@@ -515,10 +497,7 @@ void
 NativeObjectOperand::GetValue (DInt16& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DInt16 ();
@@ -532,10 +511,7 @@ void
 NativeObjectOperand::GetValue (DInt32& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DInt32 ();
@@ -549,10 +525,7 @@ void
 NativeObjectOperand::GetValue (DInt64& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DInt64 ();
@@ -566,10 +539,7 @@ void
 NativeObjectOperand::GetValue (DUInt8& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DUInt8 ();
@@ -583,10 +553,7 @@ void
 NativeObjectOperand::GetValue (DUInt16& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DUInt16 ();
@@ -600,10 +567,7 @@ void
 NativeObjectOperand::GetValue (DUInt32& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DUInt32 ();
@@ -617,10 +581,7 @@ void
 NativeObjectOperand::GetValue (DUInt64& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DUInt64 ();
@@ -634,10 +595,7 @@ void
 NativeObjectOperand::GetValue (DReal& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64) && (mType != T_RICHREAL))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DReal ();
@@ -657,10 +615,7 @@ void
 NativeObjectOperand::GetValue (DRichReal& outValue) const
 {
   if ((mType != T_INT64) && (mType != T_UINT64) && (mType != T_RICHREAL))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   if (IsNull ())
     outValue = DRichReal ();
@@ -680,10 +635,7 @@ void
 NativeObjectOperand::GetValue (DText& outValue) const
 {
   if (mType != T_TEXT)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   outValue = *_RC (const DText*, mTextValue);
 }
@@ -693,10 +645,7 @@ void
 NativeObjectOperand::GetValue (DArray& outValue) const
 {
   if ( ! IS_ARRAY (mType))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   outValue = *_RC (const DArray*, mArrayValue);
 }
@@ -887,7 +836,7 @@ NativeObjectOperand::GetField ()
   if ( IS_FIELD (mType))
     return mFieldValue.mFieldIndex;
 
-  throw InterException (NULL, _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 }
 
 
@@ -900,17 +849,12 @@ NativeObjectOperand::GetTable ()
   else if (IS_FIELD (mType))
     {
       if (IsNull ())
-        {
-          throw InterException (
-                            NULL,
-                            _EXTRA (InterException::NATIVE_NULL_DEREFERENCE)
-                                );
-        }
+        throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
       return mFieldValue.mTableRef->GetTable ();
     }
 
-  throw InterException (NULL, _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 }
 
 
@@ -941,15 +885,10 @@ INativeObject&
 NativeObjectOperand::NativeObject ()
 {
   if (mType != T_UNDETERMINED)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
+
   else if (IsNull ())
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
-    }
+    throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
   assert (mNativeValue != NULL);
 
@@ -975,15 +914,10 @@ TableReference&
 NativeObjectOperand::GetTableReference ()
 {
   if (! (IS_TABLE (mType) || IS_FIELD (mType)))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_NATIVE_OP_REQ));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
+
   else if (IS_FIELD (mType) && IsNull ())
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
-    }
+      throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
   if (IS_TABLE (mType))
     return *mTableValue;

@@ -188,8 +188,8 @@ public:
           if (fd.isArray)
             {
               throw InterException (
-                          "Could not sort after an array field.",
-                          _EXTRA (InterException::INVALID_PARAMETER_TYPE)
+                          _EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                          "Cannot sort a table using an array field."
                                    );
             }
 
@@ -329,8 +329,7 @@ public:
               break;
 
             default:
-              throw InterException (NULL,
-                                    _EXTRA (InterException::INTERNAL_ERROR));
+              throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
             }
         }
     }
@@ -493,8 +492,8 @@ private:
 
           default:
             throw InterException (
-                        "The fields list should be an array of integers.",
-                        _EXTRA (InterException::INVALID_PARAMETER_TYPE)
+                        _EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                        "The fields list should be an array of integers."
                                  );
           }
       }
@@ -541,7 +540,7 @@ proc_table_fields_count (SessionStack& stack, ISession&)
   ITable* const table = &op.GetTable ();
 
   if (table == NULL)
-    throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+    throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 
   DUInt64 result (table->FieldsCount ());
 
@@ -562,8 +561,10 @@ proc_table_field_by_id (SessionStack& stack, ISession&)
 
   if (fieldId.IsNull ())
     {
-      throw InterException ("A non null field index need to be specified.",
-                            _EXTRA (InterException::INVALID_PARAMETER_VALUE));
+      throw InterException (
+                  _EXTRA (InterException::INVALID_PARAMETER_VALUE),
+                  "A non null index is required for retrieving a table field."
+                           );
     }
   StackValue result = op.GetFieldAt (fieldId.mValue);
 
@@ -587,14 +588,19 @@ proc_table_field_name (SessionStack& stack, ISession&)
   stack[stack.Size () - 1].Operand ().GetValue (field);
   if (field.IsNull ())
     {
-      throw InterException ("Name of the field could not be a null text.",
-                            _EXTRA (InterException::INVALID_PARAMETER_VALUE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_VALUE),
+                            "A non null name is required to retrieve a field.");
     }
   else if (field.RawSize () >= sizeof fieldName)
-    throw InterException (NULL, _EXTRA (InterException::FIELD_NAME_TOO_LONG));
-
+    {
+      throw InterException (
+                _EXTRA (InterException::FIELD_NAME_TOO_LONG),
+                "This function support fields names up to %d caharacters.",
+                MAX_FIELD_NAME_LENGTH
+                            );
+    }
   else if (table == NULL)
-    throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+    throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 
   field.RawRead (0, field.RawSize (), fieldName);
   fieldName[field.RawSize ()] = 0;
@@ -737,8 +743,9 @@ proc_table_sort (SessionStack& stack, ISession&)
            && (fields.Count () != sortOrder.Count ()))
     {
       throw InterException (
-            "The array parameters should have the same number of elements.",
-            _EXTRA (InterException::INVALID_PARAMETER_VALUE)
+            _EXTRA (InterException::INVALID_PARAMETER_VALUE),
+            "The field list and sort order arrays should have the same "
+              "count of elements."
                            );
     }
 

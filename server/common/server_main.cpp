@@ -264,7 +264,7 @@ main (int argc, char** argv)
     if (e.Description ())
       logEntry << "Description:\n\t" << e.Description () << endl;
 
-    if (e.Message ())
+    if ( ! e.Message ().empty ())
       logEntry << "Message:\n\t" << e.Message () << endl;
 
     logEntry <<"Extra: " << e.Extra () << " (";

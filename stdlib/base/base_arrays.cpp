@@ -316,7 +316,7 @@ binary_array_search_proc (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+      throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
     }
 
   stack.Pop (3);
@@ -521,7 +521,7 @@ unsorted_array_search_proc (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+      throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
     }
 
   stack.Pop (2);
@@ -721,7 +721,7 @@ search_minmax (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+      throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
     }
 
 
@@ -845,8 +845,10 @@ compute_array_average (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException ("Invalid array type to compute its average.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (
+          _EXTRA (InterException::INVALID_PARAMETER_TYPE),
+          "You need a numeric array type to compute the average."
+                           );
     }
 
   stack.Push (result);
@@ -903,8 +905,8 @@ proc_interesect_arrays (SessionStack& stack, ISession&)
 
   if (array1.Type () != array2.Type ())
     {
-      throw InterException ("Arrays must have same type for intersection.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Intersection requires array of the same type.");
     }
 
   if (array1.IsNull ())
@@ -979,8 +981,8 @@ proc_interesect_arrays (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException ("Unexpected array type.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Unexpected array type.");
     }
 
   stack.Push (result);
@@ -1048,8 +1050,8 @@ proc_diff_arrays (SessionStack& stack, ISession&)
 
   if (array1.Type () != array2.Type ())
     {
-      throw InterException ("Arrays must have same type for differentiation.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Differentiation requires arrays of the same type.");
     }
 
   if (array1.IsNull ())
@@ -1124,8 +1126,8 @@ proc_diff_arrays (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException ("Unexpected array type.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Unexpected array type.");
     }
 
   stack.Push (result);
@@ -1165,8 +1167,8 @@ proc_union_arrays (SessionStack& stack, ISession&)
 
   if (array1.Type () != array2.Type ())
     {
-      throw InterException ("Arrays must have same type for union.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Union requires arrays of the same type.");
     }
 
   if (array1.IsNull ())
@@ -1241,8 +1243,8 @@ proc_union_arrays (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException ("Unexpected array type.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Unexpected array type.");
     }
 
   stack.Push (result);
@@ -1262,8 +1264,7 @@ proc_array_pushback (SessionStack& stack, ISession&)
   if (IS_TABLE (opValue.GetType ())
       || IS_ARRAY (opValue.GetType ()))
     {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE));
     }
 
   opArray.GetValue (array);
@@ -1412,8 +1413,7 @@ proc_array_pushback (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE));
     }
 
   opArray.SetValue (array);
@@ -1559,8 +1559,8 @@ proc_hash_array (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException ("Unexpected array type.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Unexpected array type.");
     }
 
   stack.Push (result);

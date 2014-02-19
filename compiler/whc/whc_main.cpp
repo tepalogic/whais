@@ -240,7 +240,7 @@ main (int argc, char **argv)
   {
     std::cerr << "File IO error: " << e.Extra ();
 
-    if (e.Message () != NULL)
+    if ( ! e.Message ().empty())
       std::cerr << ": " << e.Message () << std::endl;
 
     else

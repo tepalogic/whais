@@ -71,7 +71,12 @@ CmdLineParser::Parse ()
 {
   int index = 1;
   if (index >= mArgCount)
-    throw CmdLineException ("No arguments! Use --help first!", _EXTRA(0));
+    {
+      throw CmdLineException (
+                  _EXTRA(0),
+                  "No arguments provided. Use '--help' for information."
+                             );
+    }
 
   while (index < mArgCount)
     {
@@ -85,15 +90,16 @@ CmdLineParser::Parse ()
         {
           if (mOutStream != &cout)
             {
-              throw CmdLineException ("Parameter '-o' is given twice",
-                                      _EXTRA (0));
+              throw CmdLineException (
+                  _EXTRA (0),
+                  "The output file '-o' is specified multiple times."
+                                     );
             }
 
           if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
             {
-              throw CmdLineException (
-                                "Missing file name argument for parameter -o",
-                                _EXTRA(0));
+              throw CmdLineException (_EXTRA (0),
+                                      "Missing parameter for argument '-o'.");
             }
           else
             mOutStream = new ofstream (mArgs[index++]);
@@ -102,15 +108,16 @@ CmdLineParser::Parse ()
         {
           if ((void *) mSourceFile != NULL)
             {
-              throw CmdLineException ("The source file was already specified!",
-                                      _EXTRA(0));
+              throw CmdLineException (_EXTRA (0),
+                                      "The input file was already specified.");
             }
           mSourceFile = mArgs[index++];
         }
       else
         {
-          throw CmdLineException ("Unknown arguments! Use --help first!",
-                                  _EXTRA(0));
+          throw CmdLineException (_EXTRA(0),
+                                  "Cannot handle argument '%s' Try '--help'!",
+                                  mArgs[index]);
         }
     }
   CheckArguments ();
@@ -126,7 +133,7 @@ CmdLineParser::CheckArguments ()
       exit (0);
     }
   else if (mSourceFile == NULL)
-    throw CmdLineException ("No given input file!", _EXTRA(0));
+    throw CmdLineException (_EXTRA (0), "The input file was not specified.");
 }
 
 

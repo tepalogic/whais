@@ -121,7 +121,7 @@ ArrayOperand::GetValueAt (const uint64_t index)
     assert (false);
   }
 
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 

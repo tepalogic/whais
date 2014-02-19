@@ -116,7 +116,7 @@ ProcedureManager::GetProcedure (const uint32_t procId)
   assert (procedure < mProcsEntrys.size ());
 
   if (procedure >= mProcsEntrys.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_PROC_REQ));
 
   return mProcsEntrys[procedure];
 }
@@ -126,7 +126,7 @@ const uint8_t*
 ProcedureManager::Name (const uint_t procId) const
 {
   if (procId >= mProcsEntrys.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_PROC_REQ));
 
   return &mIdentifiers[mProcsEntrys[procId].mIdIndex];
 }
@@ -137,7 +137,7 @@ ProcedureManager::ArgsCount (const uint_t procId) const
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
   if (procedure >= mProcsEntrys.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_PROC_REQ));
 
   return mProcsEntrys[procedure].mArgsCount;
 }
@@ -150,12 +150,12 @@ ProcedureManager::LocalValue (const uint_t   procId,
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
   if (procedure >= mProcsEntrys.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_PROC_REQ));
 
   const Procedure& entry = mProcsEntrys[procedure];
 
   if (local >= entry.mLocalsCount)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
   return mLocalsValues[entry.mLocalsIndex + local];
 }
@@ -170,14 +170,14 @@ ProcedureManager::LocalTypeDescription (const uint_t   procId,
   assert (procedure < mProcsEntrys.size ());
 
   if (procedure >= mProcsEntrys.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_PROC_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_PROC_REQ));
 
   const Procedure& entry = mProcsEntrys[procedure];
 
   assert (local < entry.mLocalsCount);
 
   if (local >= entry.mLocalsCount)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_LOCAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
   const TypeManager& typeMgr = mNameSpace.GetTypeManager ();
 
@@ -205,7 +205,7 @@ ProcedureManager::AquireSync (const Procedure& proc, const uint32_t sync)
   assert (sync < proc.mSyncCount);
 
   if (sync >= proc.mSyncCount)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_SYNC_REQ));
 
   do
     {
@@ -234,7 +234,7 @@ ProcedureManager::ReleaseSync (const Procedure& proc, const uint32_t sync)
   assert (sync < proc.mSyncCount);
 
   if (sync >= proc.mSyncCount)
-    throw InterException (NULL, _EXTRA (InterException::INVALID_SYNC_REQ));
+    throw InterException ( _EXTRA (InterException::INVALID_SYNC_REQ));
 
   assert (mSyncStmts[proc.mSyncIndex + sync] == true);
 

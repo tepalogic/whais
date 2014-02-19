@@ -44,378 +44,378 @@ namespace prima {
 bool
 BaseOperand::IsNull () const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DBool& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DChar& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DDate& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DDateTime& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DHiresTime& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DInt8& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DInt16& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DInt32& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DInt64& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DReal& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DRichReal& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DUInt8& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DUInt16& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DUInt32& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DText& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DArray& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::GetValue (DUInt64& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DBool& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DChar& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DDate& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DDateTime& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DHiresTime& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DInt8& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DInt16& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DInt32& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DReal& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DRichReal& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DUInt8& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DUInt16& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DUInt32& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DUInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DText& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SetValue (const DArray& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfAdd (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfAdd (const DRichReal& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfAdd (const DChar& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfAdd (const DText& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfSub (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfSub (const DRichReal& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfMul (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfMul (const DRichReal& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfDiv (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfDiv (const DRichReal& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfMod (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfAnd (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfAnd (const DBool& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfXor (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfXor (const DBool& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfOr (const DInt64& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::SelfOr (const DBool& value)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 FIELD_INDEX
 BaseOperand::GetField ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 ITable&
 BaseOperand::GetTable ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
@@ -429,63 +429,63 @@ BaseOperand::GetTableValue ()
 StackValue
 BaseOperand::GetFieldAt (const FIELD_INDEX field)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 StackValue
 BaseOperand::GetValueAt (const uint64_t index)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 TableOperand
 BaseOperand::GetTableOp ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::CopyTableOp (const TableOperand& tableOp)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 FieldOperand
 BaseOperand::GetFieldOp ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::CopyFieldOp (const FieldOperand& fieldOp)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::CopyNativeObjectOperand (const NativeObjectOperand& source)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 void
 BaseOperand::NativeObject (INativeObject* const)
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 INativeObject&
 BaseOperand::NativeObject ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
@@ -499,7 +499,7 @@ BaseOperand::NotifyCopy ()
 TableReference&
 BaseOperand::GetTableReference ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
@@ -547,7 +547,7 @@ NullOperand::GetValue (DDate& outValue) const
 void
 NullOperand::GetValue (DDateTime& outValue) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INVALID_OP_REQ));
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
@@ -3790,7 +3790,7 @@ void
 SessionStack::Pop (const uint_t count)
 {
   if (count > mStack.size ())
-    throw DBSException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
+    throw DBSException (_EXTRA (InterException::STACK_CORRUPTED));
 
   uint_t topIndex = mStack.size () - 1;
 
@@ -3810,7 +3810,7 @@ StackValue&
 SessionStack::operator[] (const uint_t index)
 {
   if (index > mStack.size ())
-    throw DBSException (NULL, _EXTRA (InterException::STACK_CORRUPTED));
+    throw DBSException (_EXTRA (InterException::STACK_CORRUPTED));
 
   return mStack[index];
 }

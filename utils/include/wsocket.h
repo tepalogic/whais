@@ -36,10 +36,11 @@ namespace whisper {
 class EXCEP_SHL SocketException : public Exception
 {
 public:
-  SocketException (const char*    message,
+  SocketException (const uint32_t code,
                    const char*    file,
                    uint32_t       line,
-                   uint32_t       extra);
+                   const char*    fmMsg = NULL,
+                   ...);
 
   virtual Exception* Clone () const;
 
@@ -94,8 +95,10 @@ private:
     {
       if ( ! whs_init ())
         {
-          throw SocketException ("Network system could not be initialized.",
-                                  _EXTRA (0));
+          throw SocketException (
+                          _EXTRA (0),
+                          "The network subsystem could not be initialized."
+                                );
         }
     };
 

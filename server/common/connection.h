@@ -69,10 +69,11 @@ struct UserHandler
 class ConnectionException : public Exception
 {
 public:
-  ConnectionException (const char*   message,
-                       const char*   file,
-                       uint32_t      line,
-                       uint32_t      extra);
+  ConnectionException (const uint32_t  code,
+                       const char*     file,
+                       uint32_t        line,
+                       const char*     fmtMsg = NULL,
+                       ...);
 
   virtual Exception* Clone () const;
 

@@ -70,8 +70,8 @@ cmd_pop_stack (ClientConnection& conn, uint_t* const inoutDataOff)
   if ((*inoutDataOff + sizeof (uint32_t)) > conn.DataSize ())
     {
       throw ConnectionException (
-                    "Got frame with invalid content for stack pop operation.",
-                    _EXTRA (0)
+                    _EXTRA (0),
+                    "Got frame with invalid content for stack pop operation."
                                 );
     }
 
@@ -187,9 +187,9 @@ cmd_push_stack (ClientConnection& conn, uint_t* const inoutDataOff)
 
             default:
               throw ConnectionException (
+                    _EXTRA (type),
                     "Server internal error:\n"
-                    "Invalid type encountered, though it passed type checks!",
-                    _EXTRA (type)
+                    "Invalid type encountered, though it passed type checks!"
                                         );
           }
           return WCS_OK;
@@ -263,9 +263,9 @@ cmd_push_stack (ClientConnection& conn, uint_t* const inoutDataOff)
 
         default:
           throw ConnectionException (
+                    _EXTRA (type),
                     "Server internal error:\n"
-                    "Invalid type encountered, though it passed type checks!",
-                    _EXTRA (type)
+                    "Invalid type encountered, though it passed type checks!"
                                     );
       }
     }
@@ -330,8 +330,8 @@ cmd_push_stack (ClientConnection& conn, uint_t* const inoutDataOff)
 
 push_frame_error:
   throw ConnectionException (
-                    "Frame with invalid content for stack push operation.",
-                    _EXTRA (0)
+                    _EXTRA (0),
+                    "Frame with invalid content for stack push operation."
                             );
   return WCS_GENERAL_ERR; //Not executed anyway!
 }
@@ -531,8 +531,9 @@ read_value (StackValue&         dest,
     break;
 
   default:
-    throw ConnectionException ("Client frame contains invalid update type.",
-                               _EXTRA (type));
+    throw ConnectionException (_EXTRA (type),
+                               "Client frame contains invalid update type.");
+
   }
 
   if (result >= 0)
@@ -813,8 +814,8 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
 update_frame_error:
 
     throw ConnectionException (
-                    "Frame with invalid content for stack update operation.",
-                    _EXTRA (0)
+                    _EXTRA (0),
+                    "Frame with invalid content for stack update operation."
                               );
     return WCS_GENERAL_ERR; //Not executed anyway!
 }

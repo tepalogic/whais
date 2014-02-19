@@ -160,14 +160,17 @@ struct DBS_SHL DChar
   {
   }
 
-  explicit DChar (const uint32_t ch)
-    : mValue (ch),
-      mIsNull ((ch != 0) ? false : true)
+  explicit DChar (const uint32_t codePoint)
+    : mValue (codePoint),
+      mIsNull ((codePoint != 0) ? false : true)
   {
-    if ((ch > UTF_LAST_CODEPOINT)
-        || ((UTF16_EXTRA_BYTE_MIN <= ch) && (ch <= UTF16_EXTRA_BYTE_MAX)))
+    if ((codePoint > UTF_LAST_CODEPOINT)
+        || ((UTF16_EXTRA_BYTE_MIN <= codePoint)
+            && (codePoint <= UTF16_EXTRA_BYTE_MAX)))
       {
-        throw DBSException (NULL, _EXTRA (DBSException::INVALID_UNICODE_CHAR));
+        throw DBSException (_EXTRA (DBSException::INVALID_UNICODE_CHAR),
+                            "Code point U+%04X is not Unicode valid.",
+                            codePoint);
       }
   }
 

@@ -44,12 +44,21 @@ namespace wod {
 class DumpException : public Exception
 {
 public:
-  DumpException (const char*      message,
-                 const char*      file,
-                 uint32_t         line,
-                 uint32_t         extra)
-    : Exception (message, file, line, extra)
+  DumpException (const uint32_t  code,
+                 const char*     file,
+                 uint32_t        line,
+                 const char*     fmtMsg = NULL,
+                 ...)
+    : Exception (code, file, line)
   {
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
   }
 
   virtual ~DumpException ()

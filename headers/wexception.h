@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WEXCEPTION_H_
 
 #include <string>
+#include <cstdarg>
 
 namespace whisper
 {
@@ -53,19 +54,18 @@ enum EXCEPTION_TYPE
 class EXCEP_SHL Exception
 {
 public:
-  Exception (const char*   message,
+  Exception (uint32_t      code,
              const char*   file,
-             uint32_t      line,
-             uint32_t      extra);
+             uint32_t      line);
   Exception (const Exception& source);
 
   virtual ~Exception ();
 
-  uint32_t      Extra () const;
-  const char*   Message () const;
-  void          Message (const std::string& msg);
-  const char*   File () const;
-  uint32_t      Line () const;
+  uint32_t            Extra () const;
+  const std::string&  Message () const;
+  void                Message (const char* msg, std::va_list vl);
+  const char*         File () const;
+  uint32_t            Line () const;
 
   virtual Exception* Clone () const = 0;
 
@@ -86,8 +86,9 @@ private:
 
 } //namespace whisper
 
+
 // Macro used to expand the CMD line
-#define _EXTRA(x)  __FILE__, __LINE__, (x)
+#define _EXTRA(x)  (x), __FILE__, __LINE__
 
 #endif /* WEXCEPTION_H_ */
 

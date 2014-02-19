@@ -104,7 +104,7 @@ const uint8_t*
 GlobalsManager::Name (const uint_t index) const
 {
   if (index >= mStorage.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   const GlobalEntry& entry = mGlobalsEntrys[index];
 
@@ -119,7 +119,7 @@ GlobalsManager::Value (const uint32_t glbId)
   assert (mGlobalsEntrys.size () == mStorage.size ());
 
   if ((IsValid (glbId) == false) || (index >= mStorage.size ()))
-    throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   return mStorage[index];
 }
@@ -134,7 +134,7 @@ GlobalsManager::TypeDescription (const uint32_t glbId)
   assert (index < mGlobalsEntrys.size ());
 
   if (index >= mGlobalsEntrys.size ())
-    throw InterException (NULL, _EXTRA (InterException::INVALID_GLOBAL_REQ));
+    throw InterException (_EXTRA (InterException::INVALID_GLOBAL_REQ));
 
   TypeManager&   typeMgr = mNames.GetTypeManager ();
   const uint8_t* pType   = typeMgr.TypeDescription (

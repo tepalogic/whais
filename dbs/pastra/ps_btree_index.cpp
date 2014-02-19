@@ -126,7 +126,7 @@ IBTreeNode::GetChildNode (const IBTreeKey& key) const
   if ( ! FindBiggerOrEqual (key, &outKey)
       || ! IsEqual (key, outKey))
     {
-      throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+      throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
     }
 
   return NodeIdOfKey (outKey);
@@ -136,7 +136,7 @@ IBTreeNode::GetChildNode (const IBTreeKey& key) const
 void
 IBTreeNode::SetData (const KEY_INDEX, const uint8_t* )
 {
-  throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -450,7 +450,7 @@ BTree::RecursiveInsertNodeKey (const NODE_INDEX  parentId,
           assert (0);
         }
       else if (node->IsEqual (key, *outKeyIndex))
-        throw DBSException (NULL, _EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+        throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
       *outKeyIndex += 1;
 

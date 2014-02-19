@@ -43,10 +43,7 @@ void
 Unit::SetGlobalId (const uint32_t index, const uint32_t id)
 {
   if (index >= mGlbsCount)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
 
   _RC (uint32_t*, mUnitData)[index] = id;
 }
@@ -56,10 +53,7 @@ void
 Unit::SetProcedureId (const uint32_t index, const uint32_t id)
 {
   if (index >= mProcsCount)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
 
   _RC (uint32_t*, mUnitData)[mGlbsCount + index] = id;
 }
@@ -69,10 +63,7 @@ uint32_t
 Unit::GetGlobalId (const uint32_t index) const
 {
   if (index >= mGlbsCount)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_UNIT_GLB_INDEX));
 
   return _RC (const uint32_t*, mUnitData)[index];
 }
@@ -82,10 +73,7 @@ uint32_t
 Unit::GetProcedureId (const uint32_t index) const
 {
   if (index >= mProcsCount)
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
-    }
+    throw InterException (_EXTRA (InterException::INVALID_UNIT_PROC_INDEX));
 
   return _RC (const uint32_t*, mUnitData)[mGlbsCount + index];
 }
@@ -95,8 +83,7 @@ const uint8_t*
 Unit::GetConstData (const uint32_t offset) const
 {
   if (offset >= mConstSize)
-    throw InterException (NULL,
-                          _EXTRA (InterException::INVALID_UNIT_DATA_OFF));
+    throw InterException (_EXTRA (InterException::INVALID_UNIT_DATA_OFF));
 
   const uint8_t* data = mUnitData;
 

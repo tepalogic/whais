@@ -22,22 +22,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include <cstdio>
+
 #include "whisper.h"
 #include "utils/wfile.h"
 #include "utils/wthread.h"
 #include "utils/wsocket.h"
 
 
+
 namespace whisper {
 
-Exception::Exception (const char*     message,
+Exception::Exception (uint32_t        code,
                       const char*     file,
-                      uint32_t        line,
-                      uint32_t        extra)
-  : mErrorMessage ((message == NULL) ? "" : message),
+                      uint32_t        line)
+  : mErrorMessage (),
     mFile (file),
     mLine (line),
-    mExtra (extra)
+    mExtra (code)
 {
 }
 
@@ -63,16 +65,30 @@ Exception::Extra () const
 }
 
 
-const char*
+const std::string&
 Exception::Message () const
 {
-  return mErrorMessage.c_str ();
+  return mErrorMessage;
 }
 
+
 void
-Exception::Message (const std::string& msg)
+Exception::Message (const char* fmtMsg, std::va_list vl)
 {
-  mErrorMessage = msg;
+  int msgSize = 256;
+
+  while (true) //Loop until the message is stored completely
+    {
+      mErrorMessage.reserve (msgSize);
+      if (std::vsnprintf (_CC (char*, mErrorMessage.c_str ()),
+                          msgSize,
+                          fmtMsg, vl) < msgSize)
+        {
+          break;
+        }
+
+      msgSize *= 2;
+    }
 }
 
 
@@ -92,12 +108,21 @@ Exception::Line () const
 
 
 
-FileException::FileException (const char*   message,
-                              const char*   file,
-                              uint32_t      line,
-                              uint32_t      extra)
-  : Exception (message, file, line, extra)
+FileException::FileException (const uint32_t    code,
+                              const char*       file,
+                              uint32_t          line,
+                              const char*       fmtMsg,
+                              ...)
+  : Exception (code, file, line)
 {
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
 }
 
 
@@ -123,12 +148,21 @@ FileException::Description () const
 
 
 
-LockException::LockException (const char*   message,
-                              const char*   file,
-                              uint32_t      line,
-                              uint32_t      extra)
-  : Exception (message, file, line, extra)
+LockException::LockException (const uint32_t    code,
+                              const char*       file,
+                              uint32_t          line,
+                              const char*       fmtMsg,
+                              ...)
+  : Exception (code, file, line)
 {
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
 }
 
 
@@ -154,12 +188,21 @@ LockException::Description () const
 
 
 
-ThreadException::ThreadException (const char*   message,
-                                  const char*   file,
-                                  uint32_t      line,
-                                  uint32_t      extra)
-  : Exception (message, file, line, extra)
+ThreadException::ThreadException (const uint32_t    code,
+                                  const char*       file,
+                                  uint32_t          line,
+                                  const char*       fmtMsg,
+                                  ... )
+  : Exception (code, file, line)
 {
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
 }
 
 
@@ -186,12 +229,21 @@ ThreadException::Description () const
 
 
 
-SocketException::SocketException (const char*   message,
-                                  const char*   file,
-                                  uint32_t      line,
-                                  uint32_t      extra)
-  : Exception (message, file, line, extra)
+SocketException::SocketException (const uint32_t        code,
+                                  const char*           file,
+                                  uint32_t              line,
+                                  const char*           fmtMsg,
+                                  ...)
+  : Exception (code, file, line)
 {
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
 }
 
 

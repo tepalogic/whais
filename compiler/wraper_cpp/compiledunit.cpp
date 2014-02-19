@@ -29,7 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../whc/wo_format.h"
 
+
 namespace whisper {
+
 
 /////////////******CompiledBufferUnit********//////////////////////////////
 
@@ -44,7 +46,7 @@ CompiledBufferUnit::CompiledBufferUnit (const uint8_t*     buffer,
                                messenger,
                                messengerContext);
   if (mHandler == NULL)
-    throw FunctionalUnitException ("Failed to compile the buffer.", _EXTRA(0));
+    throw FunctionalUnitException (_EXTRA (0), "Buffer could not be compiled.");
 }
 
 
@@ -119,8 +121,9 @@ CompiledBufferUnit::GlobalNameLength (const uint_t id)
   if ( ! wh_unit_global (mHandler, id, &globalDesc))
     {
       throw FunctionalUnitException (
-                             "Could not get the global variable descriptor.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve global value (index: '%u') description.",
+              id
                                     );
     }
 
@@ -136,8 +139,9 @@ CompiledBufferUnit::RetriveGlobalName (const uint_t id)
   if ( ! wh_unit_global (mHandler, id, &globalDesc))
     {
       throw FunctionalUnitException (
-                             "Could not get the global variable descriptor.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve global value (index: '%u') description.",
+              id
                                     );
     }
 
@@ -153,8 +157,9 @@ CompiledBufferUnit::GlobalTypeOff (const uint_t id)
   if ( ! wh_unit_global (mHandler, id, &globalDesc))
     {
       throw FunctionalUnitException (
-                             "Could not get the global variable descriptor.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve global value (index: '%u') description.",
+              id
                                     );
     }
 
@@ -177,8 +182,9 @@ CompiledBufferUnit::IsGlobalExternal (const uint_t id)
   if ( ! wh_unit_global (mHandler, id, &globalDesc))
     {
       throw FunctionalUnitException (
-                             "Could not get the global variable descriptor.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve global value (index: '%u') description.",
+              id
                                     );
     }
 
@@ -194,8 +200,9 @@ CompiledBufferUnit::ProcSyncStatementsCount (const uint_t id)
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
       throw FunctionalUnitException (
-                             "Could not get procedure description.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
                                     );
     }
 
@@ -211,8 +218,9 @@ CompiledBufferUnit::ProcCodeAreaSize (const uint_t id)
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
       throw FunctionalUnitException (
-                             "Could not get procedure description.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
                                     );
     }
 
@@ -228,8 +236,9 @@ CompiledBufferUnit::RetriveProcCodeArea (const uint_t id)
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
       throw FunctionalUnitException (
-                             "Could not get procedure description.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
                                     );
     }
 
@@ -245,8 +254,9 @@ CompiledBufferUnit::ProcLocalsCount (const uint_t id)
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
       throw FunctionalUnitException (
-                             "Could not get procedure description.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
                                     );
     }
 
@@ -262,8 +272,9 @@ CompiledBufferUnit::ProcParametersCount (const uint_t id)
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
       throw FunctionalUnitException (
-                           "Could not get procedure description.",
-                           _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
                                     );
     }
 
@@ -279,8 +290,9 @@ CompiledBufferUnit::GetProcReturnTypeOff (const uint_t id)
   if (hProc == NULL)
     {
       throw FunctionalUnitException (
-                           "Could not create the  procedure handle.",
-                           _EXTRA(0)
+              _EXTRA (0),
+              "Could not obtain procedure (index: '%u') handle.",
+              id
                                     );
     }
 
@@ -305,8 +317,9 @@ CompiledBufferUnit::GetProcNameSize (const uint_t id)
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
       throw FunctionalUnitException (
-                             "Could not get the procedure's description.",
-                             _EXTRA(0)
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
                                     );
     }
 
@@ -321,8 +334,11 @@ CompiledBufferUnit::RetriveProcName (const uint_t id)
 
   if ( ! wh_unit_procedure (mHandler, id, &desc))
     {
-      throw FunctionalUnitException ("Could not get procedure's description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              id
+                                    );
     }
 
   return desc.name;
@@ -340,16 +356,22 @@ CompiledBufferUnit::GetProcLocalTypeOff (uint_t procId, uint_t localId)
 
   if ( ! wh_unit_procedure (mHandler, procId, &procDesc))
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (
+              _EXTRA (0),
+              "Could not retrieve procedure (index: '%u') description.",
+              procId
+                                    );
     }
 
   WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get (mHandler, procId);
 
   if (hProc == NULL)
     {
-      throw FunctionalUnitException ("Could not create the  procedure handle.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (
+              _EXTRA (0),
+              "Could not obtain procedure (index: '%u') handle.",
+              procId
+                                    );
     }
 
   localType = wh_procedure_local_type (mHandler, hProc, localId);
@@ -358,8 +380,13 @@ CompiledBufferUnit::GetProcLocalTypeOff (uint_t procId, uint_t localId)
 
   if (localType == NULL)
     {
-      throw FunctionalUnitException ("Could not get local variable type.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (
+          _EXTRA (0),
+          "Cannot obtain the procedure's local value description "
+            "(procedure index: %u, local index: %u).",
+          procId,
+          localId
+                                    );
     }
 
   const uint8_t* localDesc;
@@ -419,7 +446,13 @@ CompiledFileUnit::ProcessHeader ()
   mFile.Read (t_buffer, sizeof t_buffer);
 
   if ((t_buffer[0] != 'W') || (t_buffer[1] != 'O'))
-    throw FunctionalUnitException ("Not a whisper object file!", _EXTRA(0));
+    {
+      throw FunctionalUnitException (
+                  _EXTRA(0),
+                  "File signature does not match a whisper compiled object."
+                                    );
+    }
+
 
   mGlobalsCount = load_le_int32 (t_buffer + WHC_GLOBS_COUNT_OFF);
   mProcsCount   = load_le_int32 (t_buffer + WHC_PROCS_COUNT_OFF);
@@ -517,8 +550,10 @@ CompiledFileUnit::GlobalNameLength (const uint_t id)
   if (id >= mGlobalsCount)
     {
       throw FunctionalUnitException (
-                             "Could not get the global variable descriptor.",
-                             _EXTRA(0)
+                              _EXTRA (0),
+                              "Global value index out of range (%d of %d).",
+                              id,
+                              mGlobalsCount
                                     );
     }
 
@@ -536,10 +571,14 @@ CompiledFileUnit::RetriveGlobalName (const uint_t id)
 {
   if (id >= mGlobalsCount)
     {
-      throw FunctionalUnitException (
-                             "Could not get the global variable descriptor.",
-                             _EXTRA(0)
-                                    );
+      {
+        throw FunctionalUnitException (
+                                _EXTRA (0),
+                                "Global value index out of range (%d of %d).",
+                                id,
+                                mGlobalsCount
+                                      );
+      }
     }
 
   const uint8_t* const global = mGlobals.get () + (WHC_GLOBAL_ENTRY_SIZE * id);
@@ -556,8 +595,10 @@ CompiledFileUnit::GlobalTypeOff (const uint_t id)
   if (id >= mGlobalsCount)
     {
       throw FunctionalUnitException (
-                           "Could not get the global variable descriptor.",
-                           _EXTRA(0)
+                              _EXTRA (0),
+                              "Global value index out of range (%d of %d).",
+                              id,
+                              mGlobalsCount
                                     );
     }
 
@@ -577,8 +618,10 @@ CompiledFileUnit::IsGlobalExternal (const uint_t id)
   if (id >= mGlobalsCount)
     {
       throw FunctionalUnitException (
-                         "Could not get the global variable descriptor.",
-                         _EXTRA(0)
+                              _EXTRA (0),
+                              "Global value index out of range (%d of %d).",
+                              id,
+                              mGlobalsCount
                                     );
     }
 
@@ -599,8 +642,10 @@ CompiledFileUnit::ProcSyncStatementsCount (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure's description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   LoadProcInMemory (id);
@@ -614,11 +659,12 @@ CompiledFileUnit::ProcSyncStatementsCount (const uint_t id)
 uint_t
 CompiledFileUnit::ProcCodeAreaSize (const uint_t id)
 {
-  if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
-    }
+  {
+    throw FunctionalUnitException (_EXTRA (0),
+                                   "Procedure index out of range (%d of %d).",
+                                   id,
+                                   mProcsCount);
+  }
 
   return load_le_int32 (mProcs.get () +
                           (id * WHC_PROC_ENTRY_SIZE) +
@@ -630,8 +676,10 @@ CompiledFileUnit::RetriveProcCodeArea (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   const uint_t nlocals = ProcLocalsCount (id);
@@ -648,8 +696,10 @@ CompiledFileUnit::ProcLocalsCount (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   return load_le_int16 (mProcs.get () +
@@ -662,8 +712,10 @@ CompiledFileUnit::ProcParametersCount (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   return load_le_int16 (mProcs.get () +
@@ -676,8 +728,10 @@ CompiledFileUnit::GetProcReturnTypeOff (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   uint_t type = load_le_int32 (mProcs.get () +
@@ -695,8 +749,10 @@ CompiledFileUnit::GetProcNameSize (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA (0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   const uint_t offset = load_le_int32 (mProcs.get () +
@@ -712,8 +768,10 @@ CompiledFileUnit::RetriveProcName (const uint_t id)
 {
   if (id >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA (0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
     }
 
   const uint_t temp32 = load_le_int32 (mProcs.get () +
@@ -732,8 +790,13 @@ CompiledFileUnit::GetProcLocalTypeOff (uint_t procId, uint_t localId)
 
   if (localId >= ProcLocalsCount (procId))
     {
-      throw FunctionalUnitException ("Could not get local variable type.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (
+          _EXTRA (0),
+          "Procedure (%d) local index out of range ( %d of %d).",
+          procId,
+          localId,
+          ProcLocalsCount (procId),
+          mProcsCount);
     }
 
   LoadProcInMemory (procId);
@@ -752,8 +815,10 @@ CompiledFileUnit::IsProcExternal (uint_t procId)
 {
   if (procId >= mProcsCount)
     {
-      throw FunctionalUnitException ("Could not get procedure description.",
-                                     _EXTRA(0));
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     procId,
+                                     mProcsCount);
     }
 
   return (load_le_int32 (mProcs.get () +

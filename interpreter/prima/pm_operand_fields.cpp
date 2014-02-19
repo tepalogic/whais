@@ -180,8 +180,7 @@ FieldOperand::operator= (const FieldOperand& source)
       if ((mFieldType != T_UNDETERMINED)
           && (mFieldType != source.mFieldType))
         {
-          throw InterException (NULL,
-                                _EXTRA (InterException::FIELD_TYPE_MISMATCH));
+          throw InterException (_EXTRA (InterException::FIELD_TYPE_MISMATCH));
         }
 
       if (mTableRef != NULL)
@@ -235,10 +234,7 @@ FieldOperand::GetValueAt (const uint64_t index)
 {
 
   if ((mFieldType == T_UNKNOWN) || (mTableRef == NULL))
-    {
-      throw InterException (NULL,
-                            _EXTRA (InterException::FIELD_TYPE_MISMATCH));
-    }
+    throw InterException (_EXTRA (InterException::FIELD_TYPE_MISMATCH));
 
   if (IS_ARRAY (mFieldType))
     return StackValue (ArrayFieldElOperand (mTableRef, index, mField));
@@ -294,7 +290,7 @@ FieldOperand::GetValueAt (const uint64_t index)
     return StackValue (TextFieldElOperand (mTableRef, index, mField));
   }
 
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -3244,7 +3240,7 @@ ArrayFieldElOperand::GetValueAt (const uint64_t index)
     assert (false);
   }
 
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 

@@ -48,7 +48,7 @@ GeneralTable::IsTemporal () const
 ITable&
 GeneralTable::Spawn () const
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -62,42 +62,42 @@ GeneralTable::FieldsCount ()
 FIELD_INDEX
 GeneralTable::RetrieveField (const char*)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 DBSFieldDescriptor
 GeneralTable::DescribeField (const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 ROW_INDEX
 GeneralTable::AllocatedRows ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 ROW_INDEX
 GeneralTable::AddRow ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 ROW_INDEX
 GeneralTable::AddReusedRow ()
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::MarkRowForReuse (const ROW_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -106,21 +106,21 @@ GeneralTable::CreateIndex (const FIELD_INDEX,
                            CREATE_INDEX_CALLBACK_FUNC* const,
                            CreateIndexCallbackContext* const)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::RemoveIndex (const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 bool
 GeneralTable::IsIndexed (const FIELD_INDEX) const
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -128,245 +128,245 @@ GeneralTable::IsIndexed (const FIELD_INDEX) const
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DChar&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DBool&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DDate&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DDateTime&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DHiresTime&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DInt8&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DInt16&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DInt32&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DInt64&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DReal&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DRichReal&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DUInt8&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DUInt16&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DUInt32&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DUInt64&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DText&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Set (const ROW_INDEX, const FIELD_INDEX, const DArray&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DChar&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DBool&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DDate&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DDateTime&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DHiresTime&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DInt8&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DInt16&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DInt32&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DInt64&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DReal&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DRichReal&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DUInt8&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DUInt16&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DUInt32&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DUInt64&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DText&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::Get (const ROW_INDEX, const FIELD_INDEX, DArray&)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
 void
 GeneralTable::ExchangeRows (const ROW_INDEX, const ROW_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -376,7 +376,7 @@ GeneralTable::Sort (const FIELD_INDEX,
                     const ROW_INDEX,
                     const bool)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -387,7 +387,7 @@ GeneralTable::MatchRows (const DBool&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -398,7 +398,7 @@ GeneralTable::MatchRows (const DChar&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -409,7 +409,7 @@ GeneralTable::MatchRows (const DDate&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -420,7 +420,7 @@ GeneralTable::MatchRows (const DDateTime&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -431,7 +431,7 @@ GeneralTable::MatchRows (const DHiresTime&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -442,7 +442,7 @@ GeneralTable::MatchRows (const DUInt8&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -453,7 +453,7 @@ GeneralTable::MatchRows (const DUInt16&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -464,7 +464,7 @@ GeneralTable::MatchRows (const DUInt32&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -475,7 +475,7 @@ GeneralTable::MatchRows (const DUInt64&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -486,7 +486,7 @@ GeneralTable::MatchRows (const DInt8&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -497,7 +497,7 @@ GeneralTable::MatchRows (const DInt16&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -508,7 +508,7 @@ GeneralTable::MatchRows (const DInt32&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -519,7 +519,7 @@ GeneralTable::MatchRows (const DInt64&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -530,7 +530,7 @@ GeneralTable::MatchRows (const DReal&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 
@@ -541,7 +541,7 @@ GeneralTable::MatchRows (const DRichReal&,
                          const ROW_INDEX,
                          const FIELD_INDEX)
 {
-  throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }
 
 

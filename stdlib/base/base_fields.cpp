@@ -167,10 +167,11 @@ proc_field_find_range (SessionStack& stack, ISession&)
       || (GET_BASIC_TYPE (fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE (fieldType) >= T_TEXT))
     {
-      throw InterException ("Matching field values is available only for "
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Matching field values is available only for "
                               "basic types (e.g. reals, integers, dates, etc. "
-                              "and not for arrays or text.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+                              "and not for arrays or text.");
+
     }
 
   IOperand&    opFrom       = stack[stack.Size () - 4].Operand ();
@@ -345,7 +346,7 @@ proc_field_find_range (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+      throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
     }
 
   stack.Pop (5);
@@ -422,10 +423,10 @@ field_search_minmax (SessionStack& stack, ISession&)
       || (GET_BASIC_TYPE (fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE (fieldType) >= T_TEXT))
     {
-      throw InterException ("Searching for min and max values is available "
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Searching for min and max values is available "
                               "only for basic types (e.g. reals, integers, "
-                              "dates, etc. and not for arrays or text.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+                              "dates, etc. and not for arrays or text.");
     }
 
   ITable&           table = opField.GetTable ();
@@ -554,7 +555,7 @@ field_search_minmax (SessionStack& stack, ISession&)
     break;
 
   default:
-    throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+    throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
   }
 
   stack.Pop (1);
@@ -650,10 +651,10 @@ compute_field_average (SessionStack& stack, ISession&)
       || (GET_BASIC_TYPE (fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE (fieldType) >= T_TEXT))
     {
-      throw InterException ("Computing field average value is available "
+      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_TYPE),
+                            "Computing field average value is available "
                               "only for basic types (e.g. reals, integers, "
-                              "dates, etc. and not for arrays or text.",
-                            _EXTRA (InterException::INVALID_PARAMETER_TYPE));
+                              "dates, etc. and not for arrays or text.");
     }
 
   ITable&           table = opField.GetTable ();
@@ -703,7 +704,7 @@ compute_field_average (SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException (NULL, _EXTRA (InterException::INTERNAL_ERROR));
+      throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
     }
 
   stack.Pop (1);
