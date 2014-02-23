@@ -77,7 +77,7 @@ BlockCache::Init (IBlocksManager&  blocksMgr,
   mManager = &blocksMgr;
 
   if ((itemSize == 0) || (maxCachedBlocks == 0))
-    throw DBSException (_EXTRA (DBSException::INVALID_PARAMETERS));
+    throw DBSException (_EXTRA (DBSException::BAD_PARAMETERS));
 
   /* Expect a clean initialization. */
   if ((mItemSize | mBlockSize | mMaxCachedBlocks) != 0)

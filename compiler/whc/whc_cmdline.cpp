@@ -174,17 +174,37 @@ CmdLineParser::DisplayUsage () const
 
 
 
+CmdLineException::CmdLineException (const uint32_t      code,
+                                    const char*         file,
+                                    const uint32_t      line,
+                                    const char*         fmtMsg,
+                                    ... )
+  : Exception (code, file, line)
+{
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
+}
+
+
 Exception*
 CmdLineException::Clone () const
 {
   return new CmdLineException (*this);
 }
 
+
 EXCEPTION_TYPE
 CmdLineException::Type () const
 {
   return COMPILER_CMD_LINE_EXCEPTION;
 }
+
 
 const char*
 CmdLineException::Description () const

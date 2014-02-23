@@ -97,7 +97,7 @@ struct DbsManager
         || (mDBSSettings.mVLValueCacheSize == 0))
       {
         throw DBSException (
-            _EXTRA (DBSException::INVALID_PARAMETERS),
+            _EXTRA (DBSException::BAD_PARAMETERS),
             "Cannot create a database manager with the specified parameters."
                            );
       }
@@ -225,7 +225,7 @@ DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
 
   if (iterator >= mTables.size ())
     {
-      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table by index %u (count %u).",
                           index,
                           mTables.size ());
@@ -257,7 +257,7 @@ DbsHandler::RetrievePersistentTable (const char* const name)
 
   if (it == mTables.end ())
     {
-      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table '%s'.",
                           name);
     }
@@ -349,7 +349,7 @@ DbsHandler::TableName (const TABLE_INDEX index)
 
   if (iterator >= mTables.size ())
     {
-      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table by index %u (count %u).",
                           index,
                           mTables.size ());
@@ -380,7 +380,7 @@ DbsHandler::DeleteTable (const char* const name)
 
   if (it == mTables.end ())
     {
-      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FOUND),
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot delete table '%s'. It was not fund.",
                           name);
     }

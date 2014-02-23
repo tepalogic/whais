@@ -30,8 +30,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef COMPILEDUNIT_H_
 #define COMPILEDUNIT_H_
 
+
+
 namespace whisper
 {
+
+
 
 class COMPILER_SHL WIFunctionalUnit
 {
@@ -69,6 +73,8 @@ public:
   virtual bool_t         IsProcExternal (uint_t procId) = 0;
 };
 
+
+
 class COMPILER_SHL FunctionalUnitException : public Exception
 {
 public:
@@ -76,34 +82,13 @@ public:
                            const char*        file,
                            const uint32_t     line,
                            const char*        fmtMsg = NULL,
-                           ...)
-    : Exception (code, file, line)
-  {
-      if (fmtMsg != NULL)
-        {
-          va_list vl;
+                           ...);
 
-          va_start (vl, fmtMsg);
-          this->Message (fmtMsg, vl);
-          va_end (vl);
-        }
-  }
+  virtual Exception* Clone () const;
 
-  virtual ~FunctionalUnitException ()
-  {
-  };
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual Exception* Clone () const
-  {
-    return new FunctionalUnitException (*this);
-  }
-
-  virtual EXCEPTION_TYPE Type () const { return FUNCTIONAL_UNIT_EXCEPTION; }
-
-  virtual const char* Description () const
-  {
-    return "Functional unit operation request faailed!";
-  }
+  virtual const char* Description () const;
 };
 
 
@@ -211,7 +196,11 @@ private:
 #pragma warning (default: 4251)
 };
 
+
+
 } //namespace whisper
+
+
 
 #endif /* COMPILEDUNIT_H_ */
 

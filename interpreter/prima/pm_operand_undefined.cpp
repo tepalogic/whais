@@ -917,7 +917,7 @@ NativeObjectOperand::GetTableReference ()
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
   else if (IS_FIELD (mType) && IsNull ())
-      throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
+    throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
   if (IS_TABLE (mType))
     return *mTableValue;

@@ -73,18 +73,7 @@ public:
                     const char*     file,
                     uint32_t        line,
                     const char*     fmtMsg = NULL,
-                    ...)
-    : Exception (code, file, line)
-  {
-    if (fmtMsg != NULL)
-      {
-        va_list vl;
-
-        va_start (vl, fmtMsg);
-        this->Message (fmtMsg, vl);
-        va_end (vl);
-      }
-  }
+                    ...);
 
   virtual Exception* Clone () const;
 

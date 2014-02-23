@@ -595,8 +595,8 @@ proc_table_field_name (SessionStack& stack, ISession&)
     {
       throw InterException (
                 _EXTRA (InterException::FIELD_NAME_TOO_LONG),
-                "This function support fields names up to %d caharacters.",
-                MAX_FIELD_NAME_LENGTH
+                "This implementation support fields names up to %d characters.",
+                sizeof fieldName
                             );
     }
   else if (table == NULL)

@@ -43,7 +43,7 @@ static const UTF8_CU_COUNTER _cuCache;
 
 
 
-/* Return the numbers of characters encoded bu this string. The string is
+/* Return the numbers of characters encoded by this string. The string is
    either null terminated or 'maxBytesCount' bounded. */
 static uint64_t
 get_utf8_string_length (const uint8_t* utf8Str, uint64_t maxBytesCount)

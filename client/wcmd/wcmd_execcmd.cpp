@@ -450,8 +450,9 @@ handle_param_value (WH_CONNECTION           hnd,
 
   else if ((value.length () == 0) && (arrayOff != WIGNORE_OFF))
     {
-      cout << "Invalid command format. "
-           << "Empty '' (null) is not a valid element for an array value.\n";
+      cout << "Invalid command format."
+              " A null value (e.g. '') is not a valid element"
+              " for an array value.\n";
 
       return false;
     }

@@ -1171,7 +1171,7 @@ wh_array_init (const T* const       array,
     }
 
   if (array == NULL)
-    throw DBSException (_EXTRA (DBSException::INVALID_PARAMETERS));
+    throw DBSException (_EXTRA (DBSException::BAD_PARAMETERS));
 
   auto_ptr<TemporalArray> autoP (new TemporalArray (array[0].DBSType ()));
   *outStrategy = autoP.get ();

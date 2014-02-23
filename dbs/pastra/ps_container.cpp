@@ -67,6 +67,43 @@ append_int_to_str (uint64_t number, string& inoutStr)
 
 
 
+DataContainerException::DataContainerException (const uint32_t      code,
+                                                const char*         file,
+                                                const uint32_t      line,
+                                                const char* const   fmtMsg,
+                                                ...)
+  : Exception (code, file, line)
+{
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
+}
+
+
+
+WFileContainerException::WFileContainerException (const uint32_t       code,
+                                                  const char*          file,
+                                                  uint32_t             line,
+                                                  const char*          fmtMsg,
+                                                  ...)
+  : DataContainerException (code, file, line, NULL)
+{
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
+}
+
+
 Exception*
 WFileContainerException::Clone () const
 {
@@ -87,23 +124,20 @@ WFileContainerException::Description () const
   switch (Extra ())
     {
     case INVALID_PARAMETERS:
-      return "Invalid parameters.";
+      return "Container operation failed due to invalid parameters.";
 
     case CONTAINTER_INVALID:
-      return "Container inconsistency detected.";
+      return "File container inconsistency detected.";
 
     case INVALID_ACCESS_POSITION:
-      return "Container accessed outside bounds.";
+      return "File container accessed outside bounds.";
 
     case FILE_OS_IO_ERROR:
-      return "Container internal file IO error.";
-
-    default:
-      assert (false);
-
-      return "Unknown container exception";
+      return "File container request failed due to internal file IO error.";
     }
-  return NULL;
+
+  assert (false);
+  return "Unknown file container exception.";
 }
 
 

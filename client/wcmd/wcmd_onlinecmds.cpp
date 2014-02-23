@@ -48,7 +48,7 @@ wcmd_translate_status (const uint32_t cs)
   if (cs > WCS_OS_ERR_BASE)
     {
       /* This is safe, coz this function is not supposed to be executed
-       * in a multi thread environment. a*/
+       * in a multithread environment. a*/
       static char statusStr [64];
       sprintf (statusStr, "OS internal error: %u.", cs - WCS_OS_ERR_BASE);
 
@@ -76,31 +76,32 @@ wcmd_translate_status (const uint32_t cs)
     return "No suitable protocol to communicate with the server.";
 
   case WCS_ENCTYPE_NOTSUPP:
-    return "Could not agree on supported encryption type.";
+    return "Could not agree on a supported encryption type.";
 
   case WCS_UNEXPECTED_FRAME:
     return "Unexpected communication frame received.";
 
   case WCS_INVALID_FRAME:
-    return "An frame with invalid content received.";
+    return "A communication frame with invalid content received.";
 
   case WCS_COMM_OUT_OF_SYNC:
-    return "Communication is out of sync.";
+    return "Communication with peer is out of sync.";
 
   case WCS_LARGE_ARGS:
     return "Size of the request arguments is big.";
 
   case WCS_LARGE_RESPONSE:
-    return "Size of the request response is too big.";
+    return "Size of the request's response is too big.";
 
   case WCS_CONNECTION_TIMEOUT:
-    return "Connection has timeout.";
+    return "Peer is taking to long time to respond.";
 
   case WCS_SERVER_BUSY:
-    return "Server is busy.";
+    return "The server rejected our connection request because is too busy.";
 
   case WCS_INCOMPLETE_CMD:
-    return "Previous command has not been completed.";
+    return "The requested command could not be handled."
+           " The previous one should be completed first.";
 
   case WCS_INVALID_ARRAY_OFF:
     return "An invalid array index was used.";
@@ -115,13 +116,14 @@ wcmd_translate_status (const uint32_t cs)
     return "An invalid table field was used.";
 
   case WCS_TYPE_MISMATCH:
-    return "The request cannot be completed due to unexpected value types.";
+    return "The request command cannot be completed"
+           " due to an unexpected type of a value.";
 
   case WCS_PROC_NOTFOUND:
     return "Procedure not found.";
 
   case WCS_GENERAL_ERR:
-    return "Unexpected error condition.";
+    return "Unexpected internal error.";
   }
 
   assert (false);

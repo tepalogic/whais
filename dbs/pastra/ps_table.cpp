@@ -129,7 +129,7 @@ validate_field_descriptors (const DBSFieldDescriptor* const fields,
         {
           if (strcmp(fields[i].name, fields[j].name) == 0)
             {
-              throw DBSException (_EXTRA (DBSException::FIELD_NAME_DUPLICATED),
+              throw DBSException (_EXTRA (DBSException::FIELD_NAME_INVALID),
                                   "Table field name '%s' is duplicated.",
                                   fields[i].name);
             }
@@ -147,7 +147,7 @@ validate_field_descriptors (const DBSFieldDescriptor* const fields,
       if (fields[i].isArray && (fields[i].type == T_TEXT))
         {
           throw DBSException(_EXTRA (DBSException::FIELD_TYPE_INVALID),
-                             "This implemenation does not supprot array of "
+                             "This implementation does not support array of "
                                "text type for field '%s'.",
                              fields[i].name);
         }

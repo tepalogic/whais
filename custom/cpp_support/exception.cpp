@@ -92,6 +92,22 @@ Exception::Message (const char* fmtMsg, std::va_list vl)
 }
 
 
+void
+Exception::Message (const char* fmtMsg, ... )
+{
+  if (fmtMsg != NULL)
+    {
+      va_list vl;
+
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
+    }
+  else
+    mErrorMessage.clear ();
+}
+
+
 const char*
 Exception::File () const
 {
@@ -183,7 +199,7 @@ LockException::Type () const
 const char*
 LockException::Description () const
 {
-  return "Thread synchronize error.";
+  return "Thread synchronization error.";
 }
 
 

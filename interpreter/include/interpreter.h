@@ -49,19 +49,7 @@ public:
                            const char*     file,
                            uint32_t        line,
                            const char*     fmtMsg = NULL,
-                           ...)
-    : Exception (code, file, line)
-  {
-    if (fmtMsg != NULL)
-      {
-        va_list vl;
-
-        va_start (vl, fmtMsg);
-        this->Message (fmtMsg, vl);
-        va_end (vl);
-      }
-  }
-
+                           ...);
   virtual Exception* Clone () const;
 
   virtual EXCEPTION_TYPE Type () const;
@@ -70,7 +58,6 @@ public:
 
   enum
   {
-    INVALID_OP_CONVERSION,
     INVALID_OP_REQ,
     INVALID_NATIVE_OP_REQ,
     NATIVE_NULL_DEREFERENCE,
@@ -83,21 +70,16 @@ public:
     EXTERNAL_MISMATCH,
     INVALID_PROC_REQ,
     INVALID_LOCAL_REQ,
+
     INVALID_SYNC_REQ,
     NEESTED_SYNC_REQ,
     SYNC_NOT_AQUIRED,
 
-    ALREADY_INITED,
-    NOT_INITED,
     INVALID_SESSION,
     SESSION_IN_USE,
 
     STACK_CORRUPTED,
     NATIVE_CALL_FAILED,
-
-    INVALID_UNIT_GLB_INDEX,
-    INVALID_UNIT_PROC_INDEX,
-    INVALID_UNIT_DATA_OFF,
 
     TEXT_INDEX_NULL,
     ARRAY_INDEX_NULL,
@@ -109,6 +91,13 @@ public:
 
     DIVIDE_BY_ZERO,
 
+    //The exception codes below this line cause an application stop.
+    __CRITICAL_EXCEPTIONS,
+    ALREADY_INITED,
+    NOT_INITED,
+    INVALID_UNIT_GLB_INDEX,
+    INVALID_UNIT_PROC_INDEX,
+    INVALID_UNIT_DATA_OFF,
     INTERNAL_ERROR
   };
 };

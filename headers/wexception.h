@@ -62,9 +62,13 @@ public:
   virtual ~Exception ();
 
   uint32_t            Extra () const;
+
   const std::string&  Message () const;
   void                Message (const char* msg, std::va_list vl);
+  void                Message (const char* msg, ...);
+
   const char*         File () const;
+
   uint32_t            Line () const;
 
   virtual Exception* Clone () const = 0;

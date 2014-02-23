@@ -335,7 +335,7 @@ cmd_read_stack (ClientConnection& conn)
   {
       const uint_t extra = e.Extra ();
 
-      if (extra == DBSException::FIELD_NOT_FOUND)
+      if (extra == DBSException::FIELD_NOT_FUND)
         status = WCS_INVALID_FIELD;
 
       else if (extra == DBSException::ARRAY_INDEX_TOO_BIG)

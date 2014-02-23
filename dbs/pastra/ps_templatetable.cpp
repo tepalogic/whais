@@ -123,7 +123,7 @@ PrototypeTable::RetrieveField (const char* name)
       fieldName += strlen (fieldName) + 1;
     }
 
-  throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+  throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
                      "Cannot find table field '%s'.",
                      name);
 }
@@ -134,7 +134,7 @@ PrototypeTable::DescribeField (const FIELD_INDEX field)
 {
   if (field >= mFieldsCount)
     {
-      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
                          "Table field index is invalid %u (count %u).",
                          field,
                          mFieldsCount);
@@ -434,7 +434,7 @@ PrototypeTable::IsIndexed (const FIELD_INDEX field) const
 {
   if (field >= mFieldsCount)
     {
-      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
                          "Table field index is invalid %u (%u),",
                          field,
                          mFieldsCount);
@@ -461,7 +461,7 @@ PrototypeTable::GetFieldDescriptorInternal(const FIELD_INDEX field) const
 
   if (field >= mFieldsCount)
     {
-      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
                          "Cannot get table field %u (of %u) description.",
                           field,
                           mFieldsCount);

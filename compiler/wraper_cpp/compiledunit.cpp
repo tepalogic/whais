@@ -828,6 +828,48 @@ CompiledFileUnit::IsProcExternal (uint_t procId)
 }
 
 
+
+
+FunctionalUnitException::FunctionalUnitException (const uint32_t     code,
+                                                  const char*        file,
+                                                  const uint32_t     line,
+                                                  const char*        fmtMsg,
+                                                  ...)
+  : Exception (code, file, line)
+{
+    if (fmtMsg != NULL)
+      {
+        va_list vl;
+
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
+      }
+}
+
+
+Exception*
+FunctionalUnitException::Clone () const
+{
+  return new FunctionalUnitException (*this);
+}
+
+
+EXCEPTION_TYPE
+FunctionalUnitException::Type () const
+{
+  return FUNCTIONAL_UNIT_EXCEPTION;
+}
+
+
+const char*
+FunctionalUnitException::Description () const
+{
+  return "A request to a functional unit has failed!";
+}
+
+
+
 } //namespace whisper;
 
 #if defined (ENABLE_MEMORY_TRACE) && defined (USE_COMPILER_SHL)

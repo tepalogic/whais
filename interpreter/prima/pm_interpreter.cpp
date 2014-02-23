@@ -155,87 +155,6 @@ CleanInterpreter (const bool forced)
 
 
 
-Exception*
-InterException::Clone () const
-{
-  return new InterException (*this);
-}
-
-
-EXCEPTION_TYPE
-InterException::Type () const
-{
-  return INTERPRETER_EXCEPTION;
-}
-
-
-const char*
-InterException::Description () const
-{
-  switch (Extra ())
-    {
-      case INVALID_OP_CONVERSION:
-        return "Invalid operand conversion.";
-
-      case INVALID_OP_REQ:
-        return "Invalid operand request.";
-
-      case INVALID_NATIVE_OP_REQ:
-        return "Incompatible dereferencing of a undefined value.";
-
-      case INVALID_GLOBAL_REQ:
-        return "Invalid global value request.";
-
-      case INVALID_TYPE_DESC:
-        return "Invalid type description.";
-
-      case DUPLICATE_DEFINITION:
-        return "Definition two global symbols with the same name.";
-
-      case EXTERNAL_FIRST:
-        return "An external declaration of a symbol encountered before "
-               "it's definition.";
-
-      case EXTERNAL_MISMATCH:
-        return "Declaration of an external symbol is different from "
-               "its definition.";
-
-      case INVALID_PROC_REQ:
-        return "Invalid procedure request.";
-
-      case INVALID_LOCAL_REQ:
-        return "Invalid local value request.";
-
-      case ALREADY_INITED:
-        return "Already initialized.";
-
-      case NOT_INITED:
-        return "Not initialized.";
-
-      case INVALID_SESSION:
-        return "Invalid session.";
-
-      case SESSION_IN_USE:
-        return "Session in use.";
-
-      case TEXT_ARRAY_NOT_SUPP:
-        return "The current implementation does not have support for "
-               "text arrays.";
-
-      case STACK_CORRUPTED:
-        return "Execution stack has been corrupted.";
-
-      case NATIVE_CALL_FAILED:
-        return "A native procedure call reported failure!";
-
-      default:
-        assert (false);
-
-    }
-
-  return "Unknown interpreter exception.";
-}
-
 
 
 ISession::ISession (Logger& log)
@@ -263,9 +182,6 @@ NameSpace::NameSpace (IDBSHandler& dbsHandler)
     mUnitsManager ()
 {
 }
-
-
-
 
 Session::Session (Logger&           log,
                   NameSpaceHolder&  globalNames,

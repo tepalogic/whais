@@ -125,7 +125,7 @@ test_for_invalid_fields (IDBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.Extra () == DBSException::FIELD_NAME_DUPLICATED)
+    if (e.Extra () == DBSException::FIELD_NAME_INVALID)
       result = true;
     else
       result = false;

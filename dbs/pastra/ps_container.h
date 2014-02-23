@@ -48,20 +48,36 @@ public:
                           const char*         file,
                           const uint32_t      line,
                           const char* const   fmtMsg,
-                          ...)
-    : Exception (code, file, line)
-  {
-    if (fmtMsg != NULL)
-      {
-        va_list vl;
-
-        va_start (vl, fmtMsg);
-        this->Message (fmtMsg, vl);
-        va_end (vl);
-      }
-  }
+                          ...);
 };
 
+
+
+
+class WFileContainerException : public DataContainerException
+{
+public:
+  explicit
+  WFileContainerException (const uint32_t       code,
+                           const char*          file,
+                           uint32_t             line,
+                           const char*          fmtMsg = NULL,
+                           ...);
+
+  virtual Exception* Clone () const;
+
+  virtual EXCEPTION_TYPE Type () const;
+
+  virtual const char* Description () const;
+
+  enum
+  {
+    INVALID_PARAMETERS = 1,
+    CONTAINTER_INVALID,
+    INVALID_ACCESS_POSITION,
+    FILE_OS_IO_ERROR
+  };
+};
 
 
 
@@ -163,42 +179,6 @@ private:
 };
 
 
-
-class WFileContainerException : public DataContainerException
-{
-public:
-  explicit
-  WFileContainerException (const uint32_t       code,
-                           const char*          file,
-                           uint32_t             line,
-                           const char*          fmtMsg,
-                           ...)
-    : DataContainerException (code, file, line, NULL)
-  {
-    if (fmtMsg != NULL)
-      {
-        va_list vl;
-
-        va_start (vl, fmtMsg);
-        this->Message (fmtMsg, vl);
-        va_end (vl);
-      }
-  }
-
-  virtual Exception* Clone () const;
-
-  virtual EXCEPTION_TYPE Type () const;
-
-  virtual const char*   Description () const;
-
-  enum
-  {
-    INVALID_PARAMETERS = 1,
-    CONTAINTER_INVALID,
-    INVALID_ACCESS_POSITION,
-    FILE_OS_IO_ERROR
-  };
-};
 
 } //namespace pastra
 } //namespace whisper

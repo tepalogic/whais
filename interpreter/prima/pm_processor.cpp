@@ -513,7 +513,7 @@ op_func_stud (ProcedureCall& call, int64_t& offset)
           break;
 
         default:
-          throw InterException (_EXTRA (InterException::INVALID_OP_CONVERSION));
+          throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
         }
     }
 
@@ -1695,8 +1695,7 @@ ProcedureCall::ProcedureCall (Session&                  session,
               << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
               << "'.";
 
-          std::va_list dummy;
-          e.Message (log.str ().c_str (), dummy);
+          e.Message (log.str ().c_str ());
           throw ;
       }
     }

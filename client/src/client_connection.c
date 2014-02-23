@@ -86,12 +86,13 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
     }
   case FRAME_TYPE_SERV_BUSY:
     return WCS_SERVER_BUSY;
+
   case FRAME_TYPE_TIMEOUT:
     return WCS_CONNECTION_TIMEOUT;
+
   case FRAME_TYPE_COMM_NOSYNC:
     return WCS_COMM_OUT_OF_SYNC;
-  default:
-    return WCS_UNEXPECTED_FRAME;
+
   }
 
   return WCS_UNEXPECTED_FRAME;
@@ -103,6 +104,7 @@ write_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                  const  uint_t                  frameSize)
 {
   uint_t result = whs_write (pHnd->socket, pHnd->data, frameSize);
+
   if (result != WOP_OK)
     result = WENC_OS_ERROR (result);
 
