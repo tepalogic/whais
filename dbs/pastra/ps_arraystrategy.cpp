@@ -251,7 +251,7 @@ NullArray::WriteRaw (const uint64_t           offset,
 
 
 void
-NullArray::CollapseRaw (const uint64_t offset, const uint64_t count)
+NullArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 {
   //Someone does not know what is doing!
   throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
@@ -400,7 +400,7 @@ TemporalArray::GetTemporal ()
 
 
 void
-TemporalArray::CollapseRaw (const uint64_t offset, const uint64_t count)
+TemporalArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 {
   assert ((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
   assert (mElementRawSize > 0);
@@ -539,17 +539,17 @@ RowFieldArray::RawSize () const
 
 
 void
-RowFieldArray::CollapseRaw (const uint64_t offset, const uint64_t count)
+RowFieldArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 {
   if (mTempArray)
     {
-      mTempArray->CollapseRaw (offset, count);
+      mTempArray->ColapseRaw (offset, count);
       return;
     }
   else
     EnableTemporalStorage ();
 
-  mTempArray->CollapseRaw (offset, count);
+  mTempArray->ColapseRaw (offset, count);
 
   assert (mElementRawSize > 0);
   assert ((mTempArray->RawSize () % mElementRawSize) == 0);

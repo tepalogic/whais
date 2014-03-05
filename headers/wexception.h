@@ -61,7 +61,7 @@ public:
 
   virtual ~Exception ();
 
-  uint32_t            Extra () const;
+  uint32_t            Code () const;
 
   const std::string&  Message () const;
   void                Message (const char* msg, std::va_list vl);
@@ -83,9 +83,9 @@ private:
   std::string       mErrorMessage;
 #pragma warning( default : 4251)
 
-  const char*       mFile;
-  uint32_t          mLine;
-  uint32_t          mExtra;
+  const char* const     mFile;
+  const uint32_t        mLine;
+  const uint32_t        mCode;
 };
 
 } //namespace whisper

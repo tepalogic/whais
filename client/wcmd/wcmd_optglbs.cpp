@@ -69,7 +69,7 @@ SetRemoteHostName (const char* const host)
 const string&
 GetConnectionPort ()
 {
-  if (IsDatabaseRemote () && (sConnectPort.size () == 0))
+  if (IsOnlineDatabase () && (sConnectPort.size () == 0))
     sConnectPort = DEFAULT_PORT;
 
   return sConnectPort;
@@ -86,7 +86,7 @@ SetConnectionPort (const char* const port)
 uint_t
 GetUserId ()
 {
-  if ((sUserId < 0 ) && IsDatabaseRemote ())
+  if ((sUserId < 0 ) && IsOnlineDatabase ())
     sUserId = DEFUALT_USER;
 
   return sUserId;
@@ -228,7 +228,7 @@ GetDBSHandler ()
 
 
 bool
-IsDatabaseRemote ()
+IsOnlineDatabase ()
 {
   if (GetRemoteHostName ().size () > 0)
     return true;

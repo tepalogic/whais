@@ -1756,7 +1756,7 @@ set_array_element (const T&          value,
                                                     (*inoutStrategy)->Type ()
                                                           );
   if (value.IsNull ())
-      (*inoutStrategy)->CollapseRaw (index * storageSize, storageSize);
+      (*inoutStrategy)->ColapseRaw (index * storageSize, storageSize);
 
   else
     {
@@ -1885,7 +1885,7 @@ DArray::Remove (const uint64_t index)
 
   const uint_t storageSize = get_aligned_elem_size (mArray->Type());
 
-  mArray->CollapseRaw (index * storageSize, storageSize);
+  mArray->ColapseRaw (index * storageSize, storageSize);
 }
 
 

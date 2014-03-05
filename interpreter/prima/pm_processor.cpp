@@ -1624,13 +1624,11 @@ ProcedureCall::ProcedureCall (Session&                  session,
       const WLIB_STATUS status = procedure.mNativeCode (stack, session);
       if (status != WOP_OK)
         {
-          std::ostringstream log;
-          log << "Native procedure call '"
-              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
-              << "' returned error code " << status << '.';
-
           throw InterException (_EXTRA (InterException::NATIVE_CALL_FAILED),
-                                log.str ().c_str ());
+                                "Native procedure '%s' execution returned"
+                                " unexpected error code '%d'.",
+                                mProcedure.mProcMgr->Name (mProcedure.mId),
+                                status);
         }
 
       if (stack.Size () != mStackBegin + 1)
@@ -1641,7 +1639,9 @@ ProcedureCall::ProcedureCall (Session&                  session,
               << "'.";
 
           throw InterException (_EXTRA (InterException::STACK_CORRUPTED),
-                                log.str ().c_str ());
+                                "Stack corruption detected after native"
+                                " procedure '%s' execution.",
+                                mProcedure.mProcMgr->Name (mProcedure.mId));
         }
 
       return ;
@@ -1656,10 +1656,6 @@ ProcedureCall::ProcedureCall (Session&                  session,
           const StackValue* localValue =
             &(mProcedure.mProcMgr->LocalValue) (mProcedure.mId, local);
 
-          //Note: 1. This works only if the local values are stored in
-          //         consecutive memory locations.
-          //      2. The procedure manager's 'functional encapsulation' is
-          //         breaked on purpose for faster procedures calls.
           while (local < mProcedure.mLocalsCount)
             {
               stack.Push (*localValue);
@@ -1671,13 +1667,10 @@ ProcedureCall::ProcedureCall (Session&                  session,
       //but not the result value too.
       if ((mProcedure.mLocalsCount - 1) > stack.Size ())
         {
-          std::ostringstream log;
-          log << "Stack corrupted before call to '"
-              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
-              << "'.";
-
           throw InterException (_EXTRA (InterException::STACK_CORRUPTED),
-                                log.str ().c_str ());
+                                "Stack corruption detected after procedure"
+                                " '%s' execution.",
+                                mProcedure.mProcMgr->Name (mProcedure.mId));
         }
 
       try
@@ -1686,16 +1679,19 @@ ProcedureCall::ProcedureCall (Session&                  session,
       }
       catch (Exception& e)
       {
-          std::ostringstream log;
+          const std::string message = e.Message ();
 
-          if ( ! e.Message ().empty ())
-            log << e.Message () << std::endl;
-
-          log << "Current procedure '"
-              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
-              << "'.";
-
-          e.Message (log.str ().c_str ());
+          if ( ! message.empty ())
+            {
+              e.Message ("%s\n\tCalled from '%s'.",
+                         message.c_str (),
+                         mProcedure.mProcMgr->Name (mProcedure.mId));
+            }
+          else
+            {
+              e.Message ("Current procedure '%s'.",
+                         mProcedure.mProcMgr->Name (mProcedure.mId));
+            }
           throw ;
       }
     }

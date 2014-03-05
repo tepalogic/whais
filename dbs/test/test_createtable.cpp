@@ -42,7 +42,7 @@ test_for_no_args (IDBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.Extra() == DBSException::INVALID_PARAMETERS)
+    if (e.Code() == DBSException::INVALID_PARAMETERS)
       result = true;
   }
 
@@ -59,7 +59,7 @@ test_for_no_args (IDBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.Extra() == DBSException::INVALID_PARAMETERS)
+    if (e.Code() == DBSException::INVALID_PARAMETERS)
       result = true;
     else
       result = false;
@@ -87,7 +87,7 @@ test_for_invalid_fields (IDBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.Extra () == DBSException::FIELD_TYPE_INVALID)
+    if (e.Code () == DBSException::FIELD_TYPE_INVALID)
       result = true;
   }
 
@@ -102,7 +102,7 @@ test_for_invalid_fields (IDBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.Extra () == DBSException::FIELD_NAME_INVALID)
+    if (e.Code () == DBSException::FIELD_NAME_INVALID)
       result = true;
     else
       result = false;
@@ -125,7 +125,7 @@ test_for_invalid_fields (IDBSHandler& rDbs)
   }
   catch (DBSException& e)
   {
-    if (e.Extra () == DBSException::FIELD_NAME_INVALID)
+    if (e.Code () == DBSException::FIELD_NAME_INVALID)
       result = true;
     else
       result = false;

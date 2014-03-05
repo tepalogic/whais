@@ -40,7 +40,7 @@ test_self_add (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -63,7 +63,7 @@ test_self_sub (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -86,7 +86,7 @@ test_self_mul (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -109,7 +109,7 @@ test_self_div (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -132,7 +132,7 @@ test_self_mod (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -155,7 +155,7 @@ test_self_and (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -178,7 +178,7 @@ test_self_xor (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -201,7 +201,7 @@ test_self_or (IOperand& op)
   }
   catch (InterException& e)
   {
-      assert (e.Extra () == InterException::INVALID_OP_REQ);
+      assert (e.Code () == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch (...)
@@ -225,7 +225,7 @@ test_operand_for_exceptions (IOperand& op)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::INVALID_OP_REQ)
+      if (e.Code () == InterException::INVALID_OP_REQ)
         result = true;
   }
   catch (...)
@@ -308,7 +308,7 @@ test_op_invalid_conv (IOperand& op)
   }
   catch (InterException& e)
   {
-      if (e.Extra() != InterException::INVALID_OP_REQ)
+      if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch (...)
@@ -323,7 +323,7 @@ test_op_invalid_conv (IOperand& op)
   }
   catch (InterException& e)
   {
-      if (e.Extra() != InterException::INVALID_OP_REQ)
+      if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch (...)
@@ -338,7 +338,7 @@ test_op_invalid_conv (IOperand& op)
   }
   catch (InterException& e)
   {
-      if (e.Extra() != InterException::INVALID_OP_REQ)
+      if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch (...)

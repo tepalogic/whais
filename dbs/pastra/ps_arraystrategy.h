@@ -72,7 +72,7 @@ public:
                          const uint64_t         size,
                          const uint8_t* const   buffer) = 0;
 
-  virtual void CollapseRaw (const uint64_t offset, const uint64_t count) = 0;
+  virtual void ColapseRaw (const uint64_t offset, const uint64_t count) = 0;
 
   virtual uint64_t RawSize () const = 0 ;
 
@@ -131,7 +131,7 @@ public:
                          const uint64_t           size,
                          const uint8_t* const     buffer);
 
-  virtual void CollapseRaw (const uint64_t offset, const uint64_t count);
+  virtual void ColapseRaw (const uint64_t offset, const uint64_t count);
 
   virtual uint64_t RawSize () const;
 };
@@ -155,7 +155,7 @@ public:
                          const uint64_t       size,
                          const uint8_t* const buffer);
 
-  virtual void CollapseRaw (const uint64_t offset, const uint64_t count);
+  virtual void ColapseRaw (const uint64_t offset, const uint64_t count);
 
   virtual uint64_t RawSize () const;
 
@@ -182,7 +182,7 @@ public:
                          const uint64_t       size,
                          const uint8_t* const buffer);
 
-  virtual void CollapseRaw (const uint64_t offset, const uint64_t count);
+  virtual void ColapseRaw (const uint64_t offset, const uint64_t count);
 
   virtual uint64_t RawSize () const;
 

@@ -238,7 +238,7 @@ main (int argc, char **argv)
   }
   catch (FileException & e)
   {
-    std::cerr << "File IO error: " << e.Extra ();
+    std::cerr << "File IO error: " << e.Code ();
 
     if ( ! e.Message ().empty())
       std::cerr << ": " << e.Message () << std::endl;
@@ -260,7 +260,7 @@ main (int argc, char **argv)
   {
     std::cerr << "error: " << e.Message () << std::endl;
     std::cerr << "file:  " << e.File () << " : " << e.Line () << std::endl;
-    std::cerr << "extra: " << e.Extra () << std::endl;
+    std::cerr << "extra: " << e.Code () << std::endl;
 
     retCode = -1;
   }

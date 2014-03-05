@@ -63,7 +63,7 @@ InterException::Type () const
 const char*
 InterException::Description () const
 {
-  switch (Extra ())
+  switch (Code ())
     {
   case INVALID_OP_REQ:
     return "An operation was requested that was not support by a stack operand.";

@@ -121,7 +121,7 @@ WFileContainerException::Type () const
 const char*
 WFileContainerException::Description () const
 {
-  switch (Extra ())
+  switch (Code ())
     {
     case INVALID_PARAMETERS:
       return "Container operation failed due to invalid parameters.";

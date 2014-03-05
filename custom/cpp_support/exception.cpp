@@ -39,7 +39,7 @@ Exception::Exception (uint32_t        code,
   : mErrorMessage (),
     mFile (file),
     mLine (line),
-    mExtra (code)
+    mCode (code)
 {
 }
 
@@ -48,7 +48,7 @@ Exception::Exception (const Exception& source)
   : mErrorMessage (source.mErrorMessage),
     mFile (source.mFile),
     mLine (source.mLine),
-    mExtra (source.mExtra)
+    mCode (source.mCode)
 {
 }
 
@@ -59,9 +59,9 @@ Exception::~Exception ()
 
 
 uint32_t
-Exception::Extra () const
+Exception::Code () const
 {
-  return mExtra;
+  return mCode;
 }
 
 

@@ -251,7 +251,7 @@ check_global_def_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::EXTERNAL_FIRST)
+      if (e.Code () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found global with out defintion OK" << std::endl;
           result = true;
@@ -283,7 +283,7 @@ check_global_doubledef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::DUPLICATE_DEFINITION)
+      if (e.Code () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -315,7 +315,7 @@ check_global_diffdef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::EXTERNAL_MISMATCH)
+      if (e.Code () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -348,7 +348,7 @@ check_proc_def_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::EXTERNAL_FIRST)
+      if (e.Code () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found procedure with out defintion OK" << std::endl;
           result = true;
@@ -380,7 +380,7 @@ check_proc_doubledef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::DUPLICATE_DEFINITION)
+      if (e.Code () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -412,7 +412,7 @@ check_proc_diffdef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Extra () == InterException::EXTERNAL_MISMATCH)
+      if (e.Code () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;

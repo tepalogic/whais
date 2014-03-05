@@ -70,7 +70,7 @@ const char*
 DBSException::Description () const
 {
 
-  switch (Extra ())
+  switch (Code ())
   {
   case OPER_NOT_SUPPORTED:
     return "A requested operation is not supported.";

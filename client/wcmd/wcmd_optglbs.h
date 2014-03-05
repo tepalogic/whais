@@ -115,7 +115,7 @@ GetDBSHandler ();
 
 
 bool
-IsDatabaseRemote ();
+IsOnlineDatabase ();
 
 
 #endif //WCMD_OPTGLBS_H_

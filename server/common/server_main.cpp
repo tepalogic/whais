@@ -267,7 +267,7 @@ main (int argc, char** argv)
     if ( ! e.Message ().empty ())
       logEntry << "Message:\n\t" << e.Message () << endl;
 
-    logEntry <<"Extra: " << e.Extra () << " (";
+    logEntry <<"Extra: " << e.Code () << " (";
     logEntry << e.File () << ':' << e.Line() << ").\n";
 
     glbLog->Log (LOG_CRITICAL, logEntry.str ());

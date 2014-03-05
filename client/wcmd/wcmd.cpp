@@ -256,7 +256,7 @@ static void
 InitDBS ()
 {
 
-  if (IsDatabaseRemote ())
+  if (IsOnlineDatabase ())
     {
       if (GetVerbosityLevel () >= VL_DEBUG)
         {
@@ -294,7 +294,7 @@ InitDBS ()
 static void
 StopDBS ()
 {
-  if (IsDatabaseRemote ())
+  if (IsOnlineDatabase ())
     return;
 
   DBSShoutdown ();
@@ -366,7 +366,7 @@ main (const int argc, char *argv[])
 
   if (! whs_init ())
     {
-      cerr << "Couldn't not init the network socket framework\n";
+      cerr << "Couldn't not initialize the network socket framework.\n";
       return ENOTSOCK;
     }
 
@@ -525,6 +525,7 @@ main (const int argc, char *argv[])
                (strcmp (argv[currentArg], "--file_size" ) == 0))
         {
           ++currentArg;
+
           if ((currentArg == argc) ||
               ( ! SetMaximumFileSize (argv[currentArg++])))
             {
@@ -548,11 +549,11 @@ main (const int argc, char *argv[])
   catch (const Exception& e)
   {
     printException (cout, e);
-    return e.Extra ();
+    return e.Code ();
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknown exception was thrown.\n";
+    cout << "Fatal error ... An unknown exception was encountered.\n";
     return 0xFF;
   }
 
@@ -567,7 +568,7 @@ main (const int argc, char *argv[])
                       GetWorkingDirectory ());
           }
 
-        if (IsDatabaseRemote ())
+        if (IsOnlineDatabase ())
           {
             if (GetUserPassword ().size () == 0)
               {
@@ -597,7 +598,7 @@ main (const int argc, char *argv[])
   {
     printException (cout, e);
 
-    result = e.Extra ();
+    result = e.Code ();
   }
   catch (...)
   {
@@ -612,7 +613,7 @@ main (const int argc, char *argv[])
   catch (const Exception& e)
   {
     printException (cout, e);
-    result = (result != 0) ? result : e.Extra ();
+    result = (result != 0) ? result : e.Code ();
   }
   catch (...)
   {

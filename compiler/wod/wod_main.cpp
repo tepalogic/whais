@@ -64,7 +64,7 @@ main (int argc, char **argv)
   }
   catch (FileException& e)
   {
-    cerr << "File IO error " << e.Extra ();
+    cerr << "File IO error " << e.Code ();
 
     if ( ! e.Message ().empty ())
       cerr << ": " << e.Message () << endl;
@@ -82,7 +82,7 @@ main (int argc, char **argv)
   {
     cerr << "error : " << e.Message () << endl;
     cerr << "file: " << e.File() << " : " << e.Line() << endl;
-    cerr << "Extra: " << e.Extra() << endl;
+    cerr << "Extra: " << e.Code() << endl;
 
     retCode = -1;
   }

@@ -333,7 +333,7 @@ cmd_read_stack (ClientConnection& conn)
     }
   catch (DBSException& e)
   {
-      const uint_t extra = e.Extra ();
+      const uint_t extra = e.Code ();
 
       if (extra == DBSException::FIELD_NOT_FUND)
         status = WCS_INVALID_FIELD;
@@ -433,7 +433,7 @@ cmd_execute_procedure (ClientConnection& conn)
   }
   catch (InterException& e)
   {
-    if (e.Extra () == InterException::INVALID_PROC_REQ)
+    if (e.Code () == InterException::INVALID_PROC_REQ)
       {
         result = WCS_PROC_NOTFOUND;
 

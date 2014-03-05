@@ -183,7 +183,7 @@ client_handler_routine (void* args)
       if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
-      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
@@ -209,7 +209,7 @@ client_handler_routine (void* args)
       if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
-      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
@@ -308,7 +308,7 @@ listener_routine (void* args)
                 if ( ! e.Message ().empty ())
                   logEntry << "Message:\n\t" << e.Message () << endl;
 
-                logEntry <<"Extra: " << e.Extra () << " (";
+                logEntry <<"Extra: " << e.Code () << " (";
                 logEntry << e.File () << ':' << e.Line() << ").\n";
 
                 sMainLog->Log (LOG_ERROR, logEntry.str ());
@@ -329,7 +329,7 @@ listener_routine (void* args)
       if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
-      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());

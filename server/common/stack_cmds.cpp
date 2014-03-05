@@ -785,14 +785,14 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
   }
   catch (InterException& e)
   {
-      if (e.Extra() == InterException::INVALID_OP_REQ)
+      if (e.Code() == InterException::INVALID_OP_REQ)
         return WCS_TYPE_MISMATCH;
 
       throw;
   }
   catch (DBSException& e)
   {
-      const uint_t extra = e.Extra ();
+      const uint_t extra = e.Code ();
 
       if (extra == DBSException::FIELD_NOT_FUND)
         return WCS_INVALID_FIELD;

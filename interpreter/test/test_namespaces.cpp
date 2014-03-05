@@ -318,7 +318,7 @@ test_fault (ISession& session,
   }
   catch (InterException& e)
   {
-      if (e.Extra () == expectedCode)
+      if (e.Code () == expectedCode)
         {
           std::cout << "Got the expected exception code OK" << std::endl;
           result = true;

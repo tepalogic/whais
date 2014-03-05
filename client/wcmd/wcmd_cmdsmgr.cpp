@@ -141,11 +141,11 @@ wcmd_decode_typeinfo (unsigned int type)
 map<string, CmdEntry> sCommands;
 static const char descHelp[]    = "Display help on available commands.";
 static const char descExtHelp[] = "Display the list of available commands "
-                                     "or extended help.\n"
+                                     "or an extended help about a command.\n"
                                      "Usage:\n"
                                      "  help [command]\n"
                                      "Example:\n"
-                                     "  help list";
+                                     "  help table";
 
 static bool
 cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
@@ -175,19 +175,20 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
       return true;
     }
 
-  //For every token in command line print the extended help.
-  while (currPosition < cmdLine.length ())
+  token = CmdLineNextToken (cmdLine, currPosition);
+  if ( ! CmdLineNextToken (cmdLine, currPosition).empty ())
     {
-      token = CmdLineNextToken (cmdLine, currPosition);
-
-      const CmdEntry *entry = FindCmdEntry (token.c_str ());
-      if (entry == NULL)
-        {
-          cout << "Command not found: " << token << endl;
-          return false;
-        }
-      cout << entry->mExtendedDesc << endl;
+      cout << "Invalid command parameters.\n";
+      return false;
     }
+  const CmdEntry *const entry = FindCmdEntry (token.c_str ());
+  if (entry == NULL)
+    {
+      cout << "Unknown command '" << token << "'.\n";
+      return false;
+    }
+
+  cout << entry->mExtendedDesc << endl;
 
   return true;
 }
@@ -267,7 +268,7 @@ printException (ostream& outputStream, const Exception& e)
         {
           char errorDesc[MAX_DECODED_STRING];
 
-          whf_err_to_str (e.Extra (), errorDesc, sizeof errorDesc);
+          whf_err_to_str (e.Code (), errorDesc, sizeof errorDesc);
           outputStream << errorDesc << endl;
         }
     }

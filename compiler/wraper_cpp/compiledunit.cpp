@@ -659,12 +659,13 @@ CompiledFileUnit::ProcSyncStatementsCount (const uint_t id)
 uint_t
 CompiledFileUnit::ProcCodeAreaSize (const uint_t id)
 {
-  {
-    throw FunctionalUnitException (_EXTRA (0),
-                                   "Procedure index out of range (%d of %d).",
-                                   id,
-                                   mProcsCount);
-  }
+  if (id >= mProcsCount)
+    {
+      throw FunctionalUnitException (_EXTRA (0),
+                                     "Procedure index out of range (%d of %d).",
+                                     id,
+                                     mProcsCount);
+    }
 
   return load_le_int32 (mProcs.get () +
                           (id * WHC_PROC_ENTRY_SIZE) +
