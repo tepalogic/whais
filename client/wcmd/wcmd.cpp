@@ -38,6 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 using namespace whisper;
 
+
+
 static const char usageDescription[] =
 "\n"
 "Usage: wcmd --create db_name [OPTIONS]\n"
@@ -63,16 +65,15 @@ static const char usageDescription[] =
 "\n"
 "    -H,  --host hostname   The host name for remote database access.\n"
 "    -P,  --port portnum    The port number where the to connect.\n"
-"    -U,  --user userId     The user id for connection. 0 to connect as\n"
-"                           admin. Anything else to connect as regular user.\n"
+"    -A,  --admin           Connect to a remote database as administrator.\n"
 "    -p,  --pass password   The password used to authenticate.\n"
 "\n"
 "    -d, --dir directory    Sets the working directory.\n"
 "    -o, --dbdir directory  Sets the directory where the DB content resides.\n"
-"    -m, --file_size size   Specify the maximum file size. Not all file\n"
-"                           support the same maximum file systems, and this\n"
-"                           is used to specify the respective limit. It also\n"
-"                           the following size modifiers:\n"
+"    -m, --file_size size   Specify the maximum file size. This is used to\n"
+"                           cope with the maximum file size supported by the\n"
+"                           file system hosting the database files. It also\n"
+"                           support the size modifiers:\n"
 "                            k,K : for Kilobytes.\n"
 "                            m,M : for Megabytes.\n"
 "                            g,G : for Gigabytes.\n"
@@ -99,8 +100,8 @@ static const char usageDescription[] =
 "\n";
 
 
-static const char descExit[]    = "Terminate execution.";
-static const char descExtExit[] = "Terminate execution.\n"
+static const char descExit[]    = "Exit this program.";
+static const char descExtExit[] = "Exit this program.\n"
                                     "Usage:\n"
                                     "  quit";
 static bool sFinishInteraction = false;
@@ -115,9 +116,13 @@ PrintHelpUsage ()
 
 
 static void
-PrintWrongUsage ()
+PrintWrongUsage (const char* const arg)
 {
-  cout << " wcmd: invalid arguments. Use --help!" << endl;
+  if (arg != NULL)
+    cerr << "Cannot handle argument '" << arg << "' correctly. Use --help!\n";
+
+  else
+    cerr << "Invalid arguments. Use --help!\n";
 }
 
 
@@ -258,15 +263,20 @@ InitDBS ()
 
   if (IsOnlineDatabase ())
     {
+      if (GetVerbosityLevel () >= VL_INFO)
+        {
+          cout << "Connecting to a remote database as ";
+          cout << (GetUserId () == 0 ? "administrator" : "default user")
+               << ".\n";
+        }
+
       if (GetVerbosityLevel () >= VL_DEBUG)
         {
-          cout << "Connecting to remote database as  ";
-          cout << ((GetUserId () == 0) ? "admin" : "regular user") << ":\n";
-          cout << " remote host: " << GetRemoteHostName () << endl;
-          cout << " port:" << GetConnectionPort () << endl;
-          cout << " database: " << GetWorkingDB () << endl;
-          cout << " user id: " << GetUserId () << endl;
-          cout << " password: " << GetUserPassword () << endl;
+          cout << " remote host:     " << GetRemoteHostName () << endl;
+          cout << " port:            " << GetConnectionPort () << endl;
+          cout << " database:        " << GetWorkingDB () << endl;
+          cout << " user id:         " << GetUserId () << endl;
+          cout << " password:        " << GetUserPassword () << endl;
         }
     }
   else
@@ -285,9 +295,6 @@ InitDBS ()
       settings.mWorkDir = settings.mTempDir = workDir;
       DBSInit (settings);
     }
-
-  if (GetVerbosityLevel () >= VL_DEBUG)
-    cout << "done." << endl;
 }
 
 
@@ -305,7 +312,40 @@ StopDBS ()
 
 
 static void
-CreateDB (const string& dbDirectory)
+OpenDB ()
+{
+  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
+  const string&       workDB = GetWorkingDB ();
+
+  if (level >= VL_DEBUG)
+    cout << "Opening database: " << workDB << " ... ";
+
+  IDBSHandler& dbsHnd = DBSRetrieveDatabase (workDB.c_str ());
+  SetDbsHandler (dbsHnd);
+
+  if (level >= VL_DEBUG)
+    cout << "done." << endl;
+}
+
+
+static void
+RemoveDB ()
+{
+  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
+  const string&       workDB = GetWorkingDB ();
+
+  if (level >= VL_DEBUG)
+    cout << "Removing database: " << workDB << " ... ";
+
+  DBSRemoveDatabase (workDB.c_str ());
+
+  if (level >= VL_DEBUG)
+    cout << "done." << endl;
+}
+
+
+static void
+CreateDB ()
 {
   const VERBOSE_LEVEL level  = GetVerbosityLevel ();
   const string&       workDB = GetWorkingDB ();
@@ -320,59 +360,28 @@ CreateDB (const string& dbDirectory)
 }
 
 
-static void
-OpenDB ()
-{
-  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
-  const string&       workDB = GetWorkingDB ();
-
-  if (level >= VL_INFO)
-    cout << "Opening database: " << workDB << " ... ";
-
-  IDBSHandler& dbsHnd = DBSRetrieveDatabase (workDB.c_str ());
-  SetDbsHandler (dbsHnd);
-
-  if (level >= VL_INFO)
-    cout << "done." << endl;
-}
-
-
-static void
-RemoveDB ()
-{
-  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
-  const string&       workDB = GetWorkingDB ();
-
-  if (level >= VL_INFO)
-    cout << "Removing database: " << workDB << " ... ";
-
-  DBSRemoveDatabase (workDB.c_str ());
-
-  if (level >= VL_INFO)
-    cout << "done." << endl;
-}
-
-
 int
 main (const int argc, char *argv[])
 {
-  int           result     = 0;
-  int           currentArg = 1;
-  bool          createDB   = false;
-  bool          removeDB   = false;
+  int           result          = 0;
+  int           currentArg      = 1;
+  bool          createDB        = false;
+  bool          removeDB        = false;
+  bool          useDB           = false;
   string        script;
-  string        dbDirectory;
 
 
   if (! whs_init ())
     {
       cerr << "Couldn't not initialize the network socket framework.\n";
+
       return ENOTSOCK;
     }
 
   if (argc == currentArg)
     {
-      PrintWrongUsage ();
+      PrintWrongUsage (NULL);
+
       return EINVAL;
     }
 
@@ -390,9 +399,9 @@ main (const int argc, char *argv[])
                (strcmp (argv[currentArg], "--create" ) == 0))
         {
           ++currentArg;
-          if ((currentArg == argc) || (GetWorkingDB ().length () != 0))
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
@@ -403,9 +412,9 @@ main (const int argc, char *argv[])
                (strcmp (argv[currentArg], "--remove" ) == 0))
         {
           ++currentArg;
-          if ((currentArg == argc) || (GetWorkingDB ().length () != 0))
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
@@ -416,21 +425,22 @@ main (const int argc, char *argv[])
                (strcmp (argv[currentArg], "--use" ) == 0))
         {
           ++currentArg;
-          if ((currentArg == argc) || (GetWorkingDB ().length () != 0))
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
           SetWorkingDB (argv[currentArg++]);
+          useDB = true;
         }
       else if ((strcmp (argv[currentArg], "-H") == 0) ||
                (strcmp (argv[currentArg], "--host" ) == 0))
         {
           ++currentArg;
-          if (currentArg == argc)
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
@@ -440,25 +450,19 @@ main (const int argc, char *argv[])
                (strcmp (argv[currentArg], "--port" ) == 0))
         {
           ++currentArg;
-          if (currentArg == argc)
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
           SetConnectionPort (argv[currentArg++]);
         }
-      else if ((strcmp (argv[currentArg], "-U") == 0) ||
-               (strcmp (argv[currentArg], "--user" ) == 0))
+      else if ((strcmp (argv[currentArg], "-A") == 0) ||
+               (strcmp (argv[currentArg], "--admin" ) == 0))
         {
           ++currentArg;
-          if (currentArg == argc)
-            {
-              PrintWrongUsage ();
-
-              return EINVAL;
-            }
-          SetUserId (atoi (argv[currentArg++]));
+          SetUserId (0);
         }
       else if ((strcmp (argv[currentArg], "-p") == 0) ||
                (strcmp (argv[currentArg], "--pass" ) == 0))
@@ -466,7 +470,7 @@ main (const int argc, char *argv[])
           ++currentArg;
           if (currentArg == argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
@@ -476,38 +480,34 @@ main (const int argc, char *argv[])
                (strcmp (argv[currentArg], "--dir" ) == 0))
         {
           ++currentArg;
-          if (currentArg == argc)
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
+
           SetWorkingDirectory (argv[currentArg++]);
-        }
-      else if ((strcmp (argv[currentArg], "-o") == 0) ||
-               (strcmp (argv[currentArg], "--dbdir" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg == argc)
-            {
-              PrintWrongUsage ();
-
-              return EINVAL;
-            }
-
-          dbDirectory = argv[currentArg++];
         }
       else if ((strcmp (argv[currentArg], "-v") == 0) ||
                (strcmp (argv[currentArg], "--verbose" ) == 0))
         {
           ++currentArg;
-          if (currentArg == argc)
+          if (currentArg >= argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
+              return EINVAL;
+            }
+
+          const int verbosityLevel = atoi (argv[currentArg++]);
+          if (verbosityLevel > 5)
+            {
+              cerr << "The value of the verbosity level is invalid.\n";
 
               return EINVAL;
             }
-          SetVerbosityLevel (atoi (argv[currentArg++]));
+
+          SetVerbosityLevel (verbosityLevel);
         }
       else if ((strcmp (argv[currentArg], "-s") == 0) ||
                (strcmp (argv[currentArg], "--command" ) == 0))
@@ -515,7 +515,7 @@ main (const int argc, char *argv[])
           ++currentArg;
           if (currentArg == argc)
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
@@ -527,16 +527,18 @@ main (const int argc, char *argv[])
           ++currentArg;
 
           if ((currentArg == argc) ||
-              ( ! SetMaximumFileSize (argv[currentArg++])))
+              ( ! SetMaximumFileSize (argv[currentArg])))
             {
-              PrintWrongUsage ();
+              PrintWrongUsage (argv[currentArg - 1]);
 
               return EINVAL;
             }
+          else
+            ++currentArg;
         }
       else
         {
-          PrintWrongUsage ();
+          cerr << "Unknown parameter '" << argv[currentArg] << "'.\n";
 
           return EINVAL;
         }
@@ -549,31 +551,75 @@ main (const int argc, char *argv[])
   catch (const Exception& e)
   {
     printException (cout, e);
+
     return e.Code ();
   }
   catch (...)
   {
-    cout << "Fatal error ... An unknown exception was encountered.\n";
+    cerr << "Fatal error ... An unknown exception was encountered.\n";
+
     return 0xFF;
   }
 
   try
   {
+    if (! (useDB || createDB || removeDB))
+      {
+        cerr << "A database needs to be selected.\n";
+
+        return EINVAL;
+      }
+
+    if (useDB)
+      {
+        if (removeDB)
+          {
+            cerr << "Could not use and remove a database in the same time.\n";
+
+            return EINVAL;
+          }
+        else if (createDB)
+          {
+            cerr << "Could not use and create a database in the same time.\n";
+
+            return EINVAL;
+          }
+      }
+    else if (removeDB && createDB)
+      {
+        cerr << "Could not remove and create a database in the same time.\n";
+
+        return EINVAL;
+      }
+
+   if (IsOnlineDatabase())
+      {
+        if (removeDB || createDB)
+          {
+            cerr << "Cannot remove nor create a database on a remote host.\n";
+            return EINVAL;
+          }
+
+        assert (useDB);
+      }
+
     if (removeDB == false)
       {
         if (createDB)
-          {
-            CreateDB ((dbDirectory.length () != 0) ?
-                      dbDirectory :
-                      GetWorkingDirectory ());
-          }
+          CreateDB ();
 
         if (IsOnlineDatabase ())
           {
             if (GetUserPassword ().size () == 0)
               {
                 string password;
-                cout << "Password [" << GetUserId () << "]: ";
+
+                if (GetUserId () == 0)
+                  cout << "Password[administrator]: ";
+
+                else
+                  cout << "Password: ";
+
                 getline (cin, password);
                 SetUserPassword (password.c_str ());
               }
@@ -590,19 +636,21 @@ main (const int argc, char *argv[])
 
         else
           ExecuteInteractively ();
+
+        DBSReleaseDatabase (GetDBSHandler ());
       }
     else
       RemoveDB ();
   }
   catch (const Exception& e)
   {
-    printException (cout, e);
+    printException (cerr, e);
 
     result = e.Code ();
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknown exception was thrown.\n";
+    cerr << "Fatal error ... Unknown exception was thrown.\n";
     result = 0xFF;
   }
 
@@ -617,7 +665,7 @@ main (const int argc, char *argv[])
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknown exception was thrown.\n";
+    cerr << "Fatal error ... Unknown exception was thrown.\n";
     result = (result != 0)  ? result : 0xFF;
   }
 

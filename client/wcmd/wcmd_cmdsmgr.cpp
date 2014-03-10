@@ -188,6 +188,7 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
       return false;
     }
 
+  cout << "Command '"<< entry->mName << "' help:\n\n";
   cout << entry->mExtendedDesc << endl;
 
   return true;
@@ -254,23 +255,20 @@ printException (ostream& outputStream, const Exception& e)
   if (e.Type () == DBS_EXCEPTION)
     {
       if (level >= VL_DEBUG)
-        outputStream << "Exception throwed from DBS framework.\n";
+        outputStream << "DBS framework exception.\n";
 
-      if (level >= VL_ERROR)
+      if ( e.Message ().empty ())
         outputStream << e.Description () <<endl;
     }
   else if (e.Type () == FILE_EXCEPTION)
     {
       if (level >= VL_DEBUG)
-        outputStream << "Filesystem IO exception throwed.\n";
+        outputStream << "File system IO exception.\n";
 
-      if (level >= VL_ERROR)
-        {
-          char errorDesc[MAX_DECODED_STRING];
+      char errorDesc[MAX_DECODED_STRING];
 
-          whf_err_to_str (e.Code (), errorDesc, sizeof errorDesc);
-          outputStream << errorDesc << endl;
-        }
+      whf_err_to_str (e.Code (), errorDesc, sizeof errorDesc);
+      outputStream << errorDesc << endl;
     }
   else
     {
@@ -279,7 +277,7 @@ printException (ostream& outputStream, const Exception& e)
       outputStream << "Unknown exception throwed.\n";
     }
 
-  if ((level >= VL_ERROR) && ( ! e.Message().empty ()))
+  if ( ! e.Message ().empty ())
     outputStream << e.Message () << endl;
 
   if (level >= VL_DEBUG)

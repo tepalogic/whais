@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wfile.h"
 #include "utils/wthread.h"
 #include "utils/wsocket.h"
+#include "utils/auto_array.h"
 
 
 
@@ -76,19 +77,18 @@ void
 Exception::Message (const char* fmtMsg, std::va_list vl)
 {
   int msgSize = 256;
+  auto_array<char> errorMessage;
 
   while (true) //Loop until the message is stored completely
     {
-      mErrorMessage.reserve (msgSize);
-      if (std::vsnprintf (_CC (char*, mErrorMessage.c_str ()),
-                          msgSize,
-                          fmtMsg, vl) < msgSize)
-        {
-          break;
-        }
+      errorMessage.Reset (msgSize);
+
+      if (std::vsnprintf (errorMessage.Get (), msgSize, fmtMsg, vl) < msgSize)
+        break;
 
       msgSize *= 2;
     }
+  mErrorMessage = errorMessage.Get ();
 }
 
 

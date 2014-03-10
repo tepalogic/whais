@@ -23,16 +23,19 @@ public:
   {
   }
 
+
   auto_array (const unsigned int size)
     : mpT (new T [size]),
       mSize (size)
   {
   }
 
+
   ~auto_array ()
   {
     delete [] mpT;
   }
+
 
   T& operator[] (const unsigned int i)
   {
@@ -43,6 +46,7 @@ public:
     return mpT[i];
   }
 
+
   const T& operator[] (const unsigned int i) const
   {
 
@@ -52,10 +56,24 @@ public:
     return mpT[i];
   }
 
+
   unsigned int Size () const
   {
     return mSize;
   }
+
+
+  const T* Get () const
+  {
+    return mpT;
+  }
+
+
+  T* Get ()
+  {
+    return mpT;
+  }
+
 
   T* Size (const unsigned int newSize)
   {
@@ -88,6 +106,7 @@ public:
 
     return mpT;
   }
+
 
   T* Reset (const unsigned int newSize)
   {

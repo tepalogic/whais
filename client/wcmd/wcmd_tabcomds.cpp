@@ -47,24 +47,23 @@ using namespace whisper;
 static const string sArgsDelimiter(" \t");
 static const string sListDelimiter(",");
 
-static const char tableShowDesc[]    = "Describe database's tables.";
-static const char tableShowDescEXt[] =
-  "Show table information. If no table name is provided it prints the list of\n"
-  "tables from the current database.\n"
-  "If a table name is provided, it prints the table's fields information.\n"
+static const char tableShowDesc[]    = "Describe the tables from the database.";
+static const char tableShowDescExt[] =
+  "Print information about a table of the database. If a table name is not\n"
+  "provided it lists the tables from database.\n"
   "Usage:\n"
   "  table [table_name] ... ";
 
-static const char tableRmDesc[]      = "Remove tables from the database.";
+static const char tableRmDesc[]      = "Remove some tables from the database.";
 static const char tableRmDescExt[ ]  =
   "Remove the specified tables from the database.\n"
   "Usage:\n"
-  "  table_remove table_name ... ";
+  "  table_remove table_name [second_table_name ...] ";
 
-static const char tableAddDesc[]     = "Add table to the database.";
+static const char tableAddDesc[]     = "Add a table to the database.";
 static const char tableAddDescExt[]  =
-  "Add a table to database with by specifying table name,\n"
-  "fields names and fields types.\n"
+  "Add a table to the database with the specified table name, field names\n"
+  "and fields types.\n"
   "Type specifiers:\n"
   "\tbasic_type:\n"
   "\t\tBOOL\n"
@@ -89,27 +88,29 @@ static const char tableAddDescExt[]  =
   "\t\tfield_name [basic_type]\n"
   "\t\tfield_name [aggregate_types]\n"
   "Usage:\n"
-  "  table_add table_name [field_specifier] ...\n"
+  "  table_add table_name field_specifier [second_field_specifier] ...\n"
   "Example:\n"
   "  table_add SomeTableName fieldName DATE otherFieldname ARRAY INT8";
 
-static const char tableAddIndDesc[]    = "Create table field index.";
+static const char tableAddIndDesc[]    = "Index the specified field tables.";
 static const char tableAddIndDescExt[] =
-  "For the specified fields creates indexes.\n"
+  "Index the values of the specified table fields for faster searching.\n"
+  "Currently it does not support to index array nor text field types.\n"
   "Usage:\n"
-  "  table_index table_name field_name ...";
+  "  table_index table_name field_name [second_field_name ...]";
 
-static const char tableRmIndDesc[]    = "Remove table field index.";
+static const char tableRmIndDesc[]    = "Remove the index associated with some"
+                                        " table fields.";
 static const char tableRmIndDescExt[] =
-  "For the specified fields remove their indexes.\n"
+  "Remove the associated index of the specified table fields.\n"
   "Usage:\n"
-  "  table_rmindex table_name field_name ...";
+  "  table_rmindex table_name field_name [second_field_name ...]";
 
 static const char rowsDesc[]    = "Manipulate table rows.";
 static const char rowsDescExt[] =
   "This command is used to manage the rows of a table. It can be used to\n"
   "update, add, remove or retrieve tables rows content. It does so by means\n"
-  "of different subcommands:\n"
+  "of different sub commands:\n"
   "  info     Used to retrieve general info about rows of a table.\n"
   "  list     Used to display the content of a set of row (it also allow\n"
   "           the selection of field subset to list). The selection is made\n"
@@ -992,7 +993,7 @@ AddOfflineTableCommands ()
   entry.mShowStatus   = false;
   entry.mName         = "table";
   entry.mDesc         = tableShowDesc;
-  entry.mExtendedDesc = tableShowDescEXt;
+  entry.mExtendedDesc = tableShowDescExt;
   entry.mCmd          = cmdTablePrint;
 
   RegisterCommand (entry);

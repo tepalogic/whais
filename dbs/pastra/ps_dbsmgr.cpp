@@ -40,12 +40,12 @@ using namespace std;
 namespace whisper {
 namespace pastra {
 
-static const char DBS_FILE_EXT[]       = ".pd";
+static const char DBS_FILE_EXT[]       = ".db";
 static const char DBS_FILE_SIGNATURE[] = { 0x50, 0x41, 0x53, 0x54,
                                            0x52, 0x41, 0x20, 0x44 };
 
-static const uint16_t PS_DBS_VER_MAJ          = 0;
-static const uint16_t PS_DBS_VER_MIN          = 10;
+static const uint16_t PS_DBS_VER_MAJ          = 1;
+static const uint16_t PS_DBS_VER_MIN          = 0;
 
 static const uint_t PS_DBS_SIGNATURE_OFF      = 0;
 static const uint_t PS_DBS_SIGNATURE_LEN      = 8;
@@ -57,8 +57,12 @@ static const uint_t PS_DBS_NUM_TABLES_OFF     = 14;
 static const uint_t PS_DBS_NUM_TABLES_LEN     = 2;
 static const uint_t PS_DBS_MAX_FILE_OFF       = 16;
 static const uint_t PS_DBS_MAX_FILE_LEN       = 8;
+static const uint_t PS_DBS_FLAGS_OFF          = 24;
+static const uint_t PS_DBS_FLAGS_LEN          = 8;
 
-static const uint_t PS_DBS_HEADER_SIZE        = 24;
+static const uint_t PS_DBS_HEADER_SIZE        = 32;
+
+static const uint64_t PS_FLAG_NOT_CLOSED      = 1;
 
 
 
@@ -135,13 +139,14 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     mTables ()
 {
   string fileName = mDbsLocationDir + mName + DBS_FILE_EXT;
-  File   inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
+  File   inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
 
-  auto_ptr<uint8_t> fileContent (new uint8_t[inputFile.GetSize ()]);
+  const uint_t      fileSize = inputFile.GetSize ();
+  auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t*          buffer = fileContent.get ();
 
   inputFile.Seek (0, WHC_SEEK_BEGIN);
-  inputFile.Read (buffer, inputFile.GetSize ());
+  inputFile.Read (buffer, fileSize);
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
     {
@@ -149,6 +154,17 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
                           "File '%s' does not contains a valid signature.",
                           fileName.c_str ());
     }
+
+  uint64_t headerFlags = load_le_int64 (buffer + PS_DBS_FLAGS_OFF);
+  if (headerFlags & PS_FLAG_NOT_CLOSED)
+    {
+      throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
+                          "Cannot open database '%s'. Either it is already in"
+                           " use or it was not properly closed last time.",
+                          name.c_str ());
+    }
+  headerFlags |= PS_FLAG_NOT_CLOSED;
+  store_le_int64 (headerFlags, buffer + PS_DBS_FLAGS_OFF);
 
   const uint16_t versionMaj = load_le_int16 (buffer + PS_DBS_VER_MAJ_OFF);
   const uint16_t versionMin = load_le_int16 (buffer + PS_DBS_VER_MIN_OFF);
@@ -176,6 +192,10 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
                           _SC (long, maxFileSize),
                           _SC (long, mGlbSettings.mMaxFileSize));
     }
+
+  //Before we continue set the 'in use' flag.
+  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Write (buffer, fileSize);
 
   uint16_t tablesCount = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
 
@@ -430,6 +450,7 @@ DbsHandler::SyncToFile ()
   store_le_int16 (PS_DBS_VER_MIN, header + PS_DBS_VER_MIN_OFF);
   store_le_int16 (mTables.size (), header + PS_DBS_NUM_TABLES_OFF);
   store_le_int64 (MaxFileSize (), header + PS_DBS_MAX_FILE_OFF);
+  store_le_int64 (PS_FLAG_NOT_CLOSED, header + PS_DBS_FLAGS_OFF);
 
   const string fileName (mDbsLocationDir + mName + DBS_FILE_EXT);
   File outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
@@ -443,6 +464,7 @@ DbsHandler::SyncToFile ()
                      it->first.length () + 1);
     }
 }
+
 
 void
 DbsHandler::RemoveFromStorage ()
@@ -536,6 +558,7 @@ DBSCreateDatabase (const char* const name,
   auto_ptr<uint8_t> header(new uint8_t[PS_DBS_HEADER_SIZE]);
   uint8_t* const    buffer = header.get ();
 
+  memset (buffer, 0, PS_DBS_HEADER_SIZE);
   memcpy (buffer + PS_DBS_SIGNATURE_OFF,
           DBS_FILE_SIGNATURE,
           PS_DBS_SIGNATURE_LEN);
@@ -610,9 +633,28 @@ DBSReleaseDatabase (IDBSHandler& hnd)
 
           if (--it->second.mRefCount == 0)
             {
+              const string fileName (it->second.mDbs.WorkingDir () +
+                                     it->first +
+                                     DBS_FILE_EXT);
+
               it->second.mDbs.Discard ();
 
               dbses.erase (it);
+
+              uint8_t header[PS_DBS_HEADER_SIZE];
+
+              File dbFile (fileName.c_str (),
+                           WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+
+              dbFile.Seek (0, WHC_SEEK_BEGIN);
+              dbFile.Read (header, sizeof header);
+
+              uint64_t flags = load_le_int64 (header + PS_DBS_FLAGS_OFF);
+              flags &= ~PS_FLAG_NOT_CLOSED;
+              store_le_int64 (flags, header + PS_DBS_FLAGS_OFF);
+
+              dbFile.Seek (0, WHC_SEEK_BEGIN);
+              dbFile.Write (header, sizeof header);
             }
           break;
         }
@@ -655,9 +697,11 @@ DBSRemoveDatabase (const char* const name, const char* path)
 
   if (it->second.mRefCount != 0)
     {
-      throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
-                          "Cannot remove database '%s' because is still in use.",
-                          name);
+      throw DBSException (
+                    _EXTRA (DBSException::DATABASE_IN_USE),
+                    "Cannot remove database '%s' because is still in use.",
+                    name
+                         );
     }
 
   it->second.mDbs.RemoveFromStorage ();
@@ -665,6 +709,8 @@ DBSRemoveDatabase (const char* const name, const char* path)
 }
 
 } //namespace whisper
+
+
 
 #if  defined (ENABLE_MEMORY_TRACE) && defined (USE_DBS_SHL)
 uint32_t WMemoryTracker::smInitCount = 0;

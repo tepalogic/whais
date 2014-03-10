@@ -37,7 +37,7 @@ using namespace whisper;
 
 static const uint64_t   MINIMUM_FILE_SIZE = 0x100000;    //1 MB
 static const char       DEFAULT_PORT[]    = "1761";
-static const uint_t     DEFUALT_USER      = 1;
+static const uint_t     DEFAULT_USER      = 1;
 
 
 static string        sWorkingDirectory (whf_current_dir ());
@@ -48,7 +48,7 @@ static IDBSHandler*  sDBSHnd          = NULL;
 static string        sRemoteHost;
 static string        sConnectPort;
 static string        sPassword;
-static int           sUserId          = -1;
+static uint_t        sUserId          = DEFAULT_USER;
 
 
 
@@ -86,9 +86,6 @@ SetConnectionPort (const char* const port)
 uint_t
 GetUserId ()
 {
-  if ((sUserId < 0 ) && IsOnlineDatabase ())
-    sUserId = DEFUALT_USER;
-
   return sUserId;
 }
 
@@ -96,7 +93,7 @@ GetUserId ()
 void
 SetUserId (const uint_t userId)
 {
-  sUserId = (userId > 0) ? 1 : 0;
+  sUserId = userId;
 }
 
 
@@ -196,10 +193,8 @@ SetMaximumFileSize (string size)
 
   sMaxFileSize = atoi (size.c_str ()) * multiplier;
 
-  if (sMaxFileSize == 0)
+  if (sMaxFileSize < MINIMUM_FILE_SIZE)
     return false;
-
-  sMaxFileSize = MAX (sMaxFileSize, MINIMUM_FILE_SIZE);
 
   return true;
 }
