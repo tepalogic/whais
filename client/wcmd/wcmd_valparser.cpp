@@ -164,6 +164,7 @@ ParseFieldSpecifier (ostream* const              os,
                      const char*                 src,
                      size_t* const               outSrcSize,
                      const bool                  apostrophe,
+                     const string&               fieldName,
                      FieldValuesSelection&       outFieldValues)
 {
   Range<T>& range = *_RC (Range<T>*, outFieldValues.mRange);
@@ -244,7 +245,7 @@ ParseFieldSpecifier (ostream* const              os,
 ParseFieldSpecifier_msg_err:
 
   if (os != NULL)
-    *os << "Invalid field specifier.\n";
+    *os << "Invalid selector values for field '" << fieldName <<"'.\n";
 
   return false;
 }
@@ -446,7 +447,7 @@ parse_rows_selection (ostream* const     os,
     {
       bool fromEntered = false;
 
-      from = 0, to = table.AllocatedRows ()  - 1;
+      from = 0, to = table.AllocatedRows ();
       while (isdigit (str[offset]))
         {
           const ROW_INDEX temp = from;
@@ -547,10 +548,18 @@ parse_field_values_selection (ostream* const              os,
   if (fd.isArray)
     {
       if (os != NULL)
-        *os << "Array fields are not supported in value selections.\n";
+        *os << "Array type fields are not supported in value selections.\n";
 
       return false;
     }
+  else if (fd.type == T_TEXT)
+    {
+      if (os != NULL)
+        *os << "Text type fields are not supported in value selections.\n";
+
+      return false;
+    }
+
   outRowsRange->mFieldType = fd.type;
   outRowsRange->mRange     = allocate_value_range (fd.type);
 
@@ -575,6 +584,7 @@ parse_field_values_selection (ostream* const              os,
                                         str + offset,
                                         &temp,
                                         false,
+                                        field,
                                         *outRowsRange))
         {
           return false;
@@ -586,6 +596,7 @@ parse_field_values_selection (ostream* const              os,
                                         str + offset,
                                         &temp,
                                         true,
+                                        field,
                                         *outRowsRange))
         {
           return false;
@@ -597,6 +608,7 @@ parse_field_values_selection (ostream* const              os,
                                         str + offset,
                                         &temp,
                                         true,
+                                        field,
                                         *outRowsRange))
         {
           return false;
@@ -608,6 +620,7 @@ parse_field_values_selection (ostream* const              os,
                                             str + offset,
                                             &temp,
                                             true,
+                                            field,
                                             *outRowsRange))
         {
           return false;
@@ -619,6 +632,7 @@ parse_field_values_selection (ostream* const              os,
                                              str + offset,
                                              &temp,
                                              true,
+                                             field,
                                              *outRowsRange))
         {
           return false;
@@ -630,6 +644,7 @@ parse_field_values_selection (ostream* const              os,
                                         str + offset,
                                         &temp,
                                         false,
+                                        field,
                                         *outRowsRange))
         {
           return false;
@@ -641,6 +656,7 @@ parse_field_values_selection (ostream* const              os,
                                          str + offset,
                                          &temp,
                                          false,
+                                         field,
                                          *outRowsRange))
         {
           return false;
@@ -652,6 +668,7 @@ parse_field_values_selection (ostream* const              os,
                                          str + offset,
                                          &temp,
                                          false,
+                                         field,
                                          *outRowsRange))
         {
           return false;
@@ -663,6 +680,7 @@ parse_field_values_selection (ostream* const              os,
                                          str + offset,
                                          &temp,
                                          false,
+                                         field,
                                          *outRowsRange))
         {
           return false;
@@ -674,6 +692,7 @@ parse_field_values_selection (ostream* const              os,
                                          str + offset,
                                          &temp,
                                          false,
+                                         field,
                                          *outRowsRange))
         {
           return false;
@@ -685,6 +704,7 @@ parse_field_values_selection (ostream* const              os,
                                           str + offset,
                                           &temp,
                                           false,
+                                          field,
                                           *outRowsRange))
         {
           return false;
@@ -696,6 +716,7 @@ parse_field_values_selection (ostream* const              os,
                                           str + offset,
                                           &temp,
                                           false,
+                                          field,
                                           *outRowsRange))
         {
           return false;
@@ -707,6 +728,7 @@ parse_field_values_selection (ostream* const              os,
                                           str + offset,
                                           &temp,
                                           false,
+                                          field,
                                           *outRowsRange))
         {
           return false;
@@ -718,6 +740,7 @@ parse_field_values_selection (ostream* const              os,
                                         str + offset,
                                         &temp,
                                         false,
+                                        field,
                                         *outRowsRange))
         {
           return false;
@@ -729,6 +752,7 @@ parse_field_values_selection (ostream* const              os,
                                             str + offset,
                                             &temp,
                                             false,
+                                            field,
                                             *outRowsRange))
         {
           return false;

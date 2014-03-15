@@ -61,9 +61,11 @@ public:
 
   virtual ROW_INDEX AddRow () = 0;
 
-  virtual ROW_INDEX AddReusedRow () = 0;
+  virtual ROW_INDEX GetReusableRow (const bool forceAdd) = 0;
 
-  virtual void  MarkRowForReuse (const ROW_INDEX row) = 0;
+  virtual ROW_INDEX ReusableRowsCount () = 0;
+
+  virtual void MarkRowForReuse (const ROW_INDEX row) = 0;
 
   virtual void CreateIndex (const FIELD_INDEX                  field,
                             CREATE_INDEX_CALLBACK_FUNC* const  cbFunc,

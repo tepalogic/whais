@@ -347,7 +347,7 @@ test_op_table_index (Session& session)
   LocalOperand localOp(stack, 0);
 
   ITable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
-  tempTable.AddReusedRow ();
+  tempTable.GetReusableRow (true);
   tempTable.Set (0, 0, value);
 
   stack.Push (session.DBSHandler (), tempTable);
@@ -387,7 +387,7 @@ test_op_field_index (Session& session)
   LocalOperand localOp(stack, 0);
 
   ITable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
-  tempTable.AddReusedRow ();
+  tempTable.GetReusableRow (true);
   tempTable.Set (0, 0, value);
 
   stack.Push (session.DBSHandler (), tempTable);

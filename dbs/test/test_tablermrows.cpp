@@ -71,7 +71,7 @@ remove_first_rows (ITable& table)
           table.Set (rowIndex, 0, fieldValue);
         }
 
-      if (table.AddReusedRow() != rowIndex)
+      if (table.GetReusableRow (true) != rowIndex)
         {
           result = false;
           break;
@@ -97,12 +97,12 @@ restore_first_rows (ITable& table)
       DUInt32 fieldValue (rowIndex);
       table.Set (rowIndex, 0, fieldValue);
 
-      if ((rowIndex < count) && (table.AddReusedRow() != (rowIndex + 1)))
+      if ((rowIndex < count) && (table.GetReusableRow(true) != (rowIndex + 1)))
         {
           result = false;
           break;
         }
-      else if ((rowIndex == count) && (table.AddReusedRow() != gElemsCount ))
+      else if ((rowIndex == count) && (table.GetReusableRow(true) != gElemsCount ))
         {
           result = false;
           break;
@@ -130,7 +130,7 @@ test_for_radius_rows (ITable& table)
       table.Set ((gElemsCount / 2) - rowIndex, 0, fieldValue);
       table.Set ((gElemsCount / 2) + count - rowIndex, 0, fieldValue);
 
-      if (table.AddReusedRow() != ((gElemsCount / 2) - rowIndex))
+      if (table.GetReusableRow(true) != ((gElemsCount / 2) - rowIndex))
         {
           result = false;
           break;
@@ -147,7 +147,7 @@ test_for_radius_rows (ITable& table)
           rowIndex <= (gElemsCount / 2) + count;
           ++rowIndex)
         {
-          if (table.AddReusedRow() != rowIndex)
+          if (table.GetReusableRow(true) != rowIndex)
             {
               result = false;
               break;

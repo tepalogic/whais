@@ -33,8 +33,11 @@ typedef uint32_t         FIELD_INDEX;
 typedef uint32_t         TABLE_INDEX;
 typedef uint64_t         ROW_INDEX;
 
-/* Note: Make sure ROW_INDEX matched to the appropitae Dxx type. */
+/* Note: Make sure ROW_INDEX size matched to the appropriate Dxx type. */
 #define DROW_INDEX       DUInt64
+
+
+static const ROW_INDEX ROW_INVALID_VALUE = ~((ROW_INDEX)0);
 
 
 #endif /* DBS_TYPES_H_ */

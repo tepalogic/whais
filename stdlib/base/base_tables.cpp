@@ -662,7 +662,7 @@ proc_table_reusable_row (SessionStack& stack, ISession&)
 
   ITable& table = op.GetTable ();
 
-  DUInt64 result (table.AddReusedRow ());
+  DUInt64 result (table.GetReusableRow (true));
 
   stack.Pop (1);
   stack.Push (result);

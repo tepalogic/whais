@@ -460,7 +460,7 @@ test_array_tableread_value (IDBSHandler& dbsHnd,
   fd[1].name = "simple_type";
 
   ITable& testTable = dbsHnd.CreateTempTable (2, fd);
-  const ROW_INDEX row = testTable.AddReusedRow ();
+  const ROW_INDEX row = testTable.GetReusableRow (true);
   {
     TableOperand tableOp (dbsHnd, testTable);
     FieldOperand fieldArrayOp (tableOp, testTable.RetrieveField ("array_type"));
@@ -560,7 +560,7 @@ test_tabletext_char (IDBSHandler& dbsHnd)
   fd[0].name = "text_type";
 
   ITable& testTable = dbsHnd.CreateTempTable (1, fd);
-  const ROW_INDEX row = testTable.AddReusedRow ();
+  const ROW_INDEX row = testTable.GetReusableRow (true);
   {
     assert (row == 0);
     TableOperand tableOp (dbsHnd, testTable);

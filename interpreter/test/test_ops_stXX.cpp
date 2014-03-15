@@ -419,8 +419,8 @@ test_op_stta (Session& session)
   ITable& firstTable = session.DBSHandler ().CreateTempTable (1, &fd);
   ITable& secondTable = session.DBSHandler ().CreateTempTable (1, &fd);
 
-  secondTable.Set (secondTable.AddReusedRow (), 0, firstVal);
-  secondTable.Set (secondTable.AddReusedRow (), 0, secondVal);
+  secondTable.Set (secondTable.GetReusableRow (true), 0, firstVal);
+  secondTable.Set (secondTable.GetReusableRow (true), 0, secondVal);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode (W_LDLO8, testCode);

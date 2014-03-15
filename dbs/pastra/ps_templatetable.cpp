@@ -197,17 +197,19 @@ PrototypeTable::AddRow ()
 
 
 ROW_INDEX
-PrototypeTable::AddReusedRow ()
+PrototypeTable::GetReusableRow (const bool forceAdd)
 {
-  uint64_t     result = 0;
+  uint64_t     result = ROW_INVALID_VALUE;
   NODE_INDEX   node;
   KEY_INDEX    keyIndex;
   TableRmKey   key (0);
   BTree        removedRows (*this);
 
   if (removedRows.FindBiggerOrEqual(key, &node, &keyIndex) == false)
-    result = PrototypeTable::AddRow ();
-
+    {
+      if (forceAdd)
+        return PrototypeTable::AddRow ();
+    }
   else
     {
       BTreeNodeRAII keyNode (RetrieveNode (node));
@@ -221,7 +223,38 @@ PrototypeTable::AddReusedRow ()
                                          node->DataForRead ());
       result = Serializer::LoadRow (rows + keyIndex);
     }
+
   return result;
+}
+
+
+ROW_INDEX
+PrototypeTable::ReusableRowsCount ()
+{
+  uint64_t     result = 0;
+  NODE_INDEX   nodeId;
+  KEY_INDEX    keyIndex;
+  TableRmKey   key (0);
+  BTree        removedRows (*this);
+
+  if (removedRows.FindBiggerOrEqual(key, &nodeId, &keyIndex) == false)
+    return 0;
+
+  else
+    do
+      {
+        BTreeNodeRAII keyNode (RetrieveNode (nodeId));
+
+        TableRmNode* const  node = _SC (TableRmNode*, &(*keyNode));
+
+        result += node->KeysCount ();
+        nodeId  = node->Next ();
+      }
+    while (nodeId != NIL_NODE);
+
+  assert (result >= 2);
+
+  return result - 1; //Don't count the sentinel of the last node.
 }
 
 

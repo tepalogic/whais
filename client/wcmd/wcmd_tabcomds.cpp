@@ -111,34 +111,36 @@ static const char rowsDescExt[] =
   "This command is used to manage the rows of a table. It can be used to\n"
   "update, add, remove or retrieve tables rows content. It does so by means\n"
   "of different sub commands:\n"
-  "  info     Used to retrieve general info about rows of a table.\n"
-  "  list     Used to display the content of a set of row (it also allow\n"
-  "           the selection of field subset to list). The selection is made\n"
-  "           by using field and rows selection specifiers. Example:\n"
+  "  info    Used to retrieve general info about rows of a table.\n"
+  "  list    Used to display the content of a set of row (it also allow\n"
+  "          the selection of field subset to list). The selection is made\n"
+  "          by using field and rows selection specifiers. Example:\n"
   "\n"
-  "             rows TableName field1,field2 1,3,5,70-90,100-\n"
+  "            rows TableName field1,field2 1,3,5,70-90,100-\n"
   "\n"
-  "           List only field1 and field2 from rows 1,3,5, 70 to 90 included\n"
-  "           and 100 to rows count. While\n"
+  "          List only field1 and field2 from rows 1,3,5, 70 to 90 included\n"
+  "          and 100 to rows count. While\n"
   "\n"
-  "             rows TableName * 10,20- field1=n,100@200 field2=min@max\n"
+  "            rows TableName * 10,20- field1=n,100@200 field2=min@max\n"
   "\n"
-  "           List all fields from rows 10 and 20 to rows count, and further\n"
-  "           only ones that have field1 set to null of from 100 to 200, and\n"
-  "           field2 is not null.\n"
-  "  add      Used to add a new table row. Example:\n"
+  "          List all fields from rows 10 and 20 to rows count, and further\n"
+  "          only ones that have field1 set to null of from 100 to 200, and\n"
+  "          field2 is not null.\n"
+  "  add     Used to add a new table row. Example:\n"
   "\n"
   "             rows Table field1=\"Some text value\",field5='2001/2/3'\n"
   "\n"
-  "           Add a new row to the table, set all fields by default to null,\n"
-  "           except field1 that's set to 'Some text value' and field5\n"
-  "           that's set to 3rd Feb 2001.\n"
-  " reuse     Reuse that the same thing has add but it tries not to increase\n"
-  "           the table first. It finds an available row (e.g one that has\n"
-  "           all fields set null)\n"
-  " remove    Remove the selector rows. By removing it's understood all of\n"
-  "           their field values will be set to null, such way the can be\n"
-  "           reused latter. Example:\n"
+  "          Add a new row to the table, set all fields by default to null,\n"
+  "          except field1 that's set to 'Some text value' and field5\n"
+  "          that's set to 3rd Feb 2001.\n"
+  "  reuse   Reuse does the same thing as 'add' but it tries not to increase\n"
+  "          the table. First it searches for an available row (e.g one that\n"
+  "          has all fields set to null).\n"
+  "  update  Updates a selected set of table rows. Example:\n"
+  "             rows Table update * qnty=100,price=0.99 productId=190\n"
+  "  remove  Remove a select set of rows from a table. By removing it's\n"
+  "          understood that all of fields values of the corresponding rows\n"
+  "          will be set to null such way the can be reused latter. Example:\n"
   "\n"
   "             rows Table remove * field1=n,field2=min,field3=max\n"
   "\n"
@@ -149,13 +151,15 @@ static const char rowsDescExt[] =
   "  rows Table list [[field,...]|* [[rows_selector]|* [field_selector]]]\n"
   "  rows Table add {field_values}\n"
   "  rows Table reuse {field_values}\n"
+  "  rows Table update {field_values} [[rows_selector]|* [field_selector]]\n"
   "  rows Table remove [[rows_selector]|* [field_selector]]\n"
   "Examples:\n"
   "  rows Products info\n"
-  "  rows Products list * 1,2,40 qnty=5@max price=min@2.99,10.9,n\n"
-  "  rows Products list Supplier,Received * qnty=0 price=n\n"
-  "  rows Products reuse Suplier='Smart DBs',Recieved='2011/12/15',qnty=100\n"
-  "  rows Products remove * qnty=n,0\n";
+  "  rows Products list * 1,2,40 qnty=5@max price=min@2.99,10.9,null\n"
+  "  rows Products list Supplier,Received * qnty=0 price=null\n"
+  "  rows Products reuse Supplier='Smart DBs',Recieved='2011/12/15',qnty=100\n"
+  "  rows Products update price=10.99 * price=0.99,productId=891\n"
+  "  rows Products remove * qnty=null,0\n";
 
 
 
@@ -336,7 +340,10 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         desc.type = T_TEXT;
 
       else
-        goto invalid_args;
+        {
+          cerr << "Token '" << token << "' is not a valid type.\n";
+          return false;
+        }
 
       fields.push_back (desc);
 
@@ -356,20 +363,15 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   }
   catch (const Exception& e)
   {
-    if (level >= VL_ERROR)
-      cout << "Failed to add table: " << tableName << endl;
+    printException (cerr, e);
 
-    printException (cout, e);
-
-    result =  false;
+    result = false;
   }
 
   return result;
 
 invalid_args:
-
-  if (level >= VL_ERROR)
-    cout << "Invalid commands arguments.\n";
+  cerr << "Invalid command arguments.\n";
 
   return false;
 }
@@ -382,7 +384,7 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel ();
-  bool                 result  = true;
+  bool                 result  = false;
 
   assert (token == "table_remove");
 
@@ -390,7 +392,7 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     goto invalid_args;
 
   if (level > VL_INFO)
-    cout << "Removing tables\n";
+    cout << "Removing table(s):\n";
 
   do
     {
@@ -400,18 +402,13 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         dbs.DeleteTable (token.c_str ());
 
         if (level >= VL_INFO)
-          cout << "  ... " << token << endl;
+          cout << " ... " << token << endl;
+
+        result = true;
       }
       catch (const Exception& e)
       {
-        if (level >= VL_ERROR)
-          cout << "Failed to remove table: " << token << endl;
-
-        printException (cout, e);
-
-        result =  false;
-
-        break;
+        printException (cerr, e);
       }
     }
   while (linePos < cmdLine.length ());
@@ -420,7 +417,7 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
 invalid_args:
   if (level >= VL_ERROR)
-    cout << "Invalid commands arguments.\n";
+    cerr << "Invalid commands arguments.\n";
 
   return false;
 }
@@ -475,7 +472,7 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   }
   catch (const Exception& e)
   {
-    printException (cout, e);
+    printException (cerr, e);
 
     result = false;
   }
@@ -526,9 +523,9 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   catch (const Exception& e)
   {
     if (level >= VL_INFO)
-      cout << "Failed to open table: " << token << endl;
+      cerr << "Failed to open table '" << token << "'.\n";
 
-    printException (cout, e);
+    printException (cerr, e);
 
     return false;
   }
@@ -562,9 +559,9 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       catch (const Exception& e)
       {
         if (level >= VL_INFO)
-          cout << "Failed to create index for field: " << token << endl;
+          cerr << "Failed to create index for field '" << token << "'.\n";
 
-        printException (cout, e);
+        printException (cerr, e);
 
         result = false;
         break;
@@ -582,7 +579,7 @@ invalid_args:
     dbs.ReleaseTable (*table);
 
   if (level >= VL_ERROR)
-    cout << "Invalid commands arguments.\n";
+    cerr << "Invalid commands arguments.\n";
 
   return false;
 }
@@ -611,7 +608,7 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   catch (const Exception& e)
   {
     if (level >= VL_INFO)
-      cout << "Failed to open table: " << token << endl;
+      cerr << "Failed to open table '" << token << "'.\n";
 
     printException (cout, e);
 
@@ -632,20 +629,20 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         if (table->IsIndexed (field))
           {
             if (level >= VL_INFO)
-              cout << "Removing index for " << token << ".\n";
+              cout << "Removing index for '" << token << "'.\n";
 
             table->RemoveIndex (field);
           }
         else
           if (level > VL_INFO)
-            cout << "Ignoring field " << token << ".\n";
+            cout << "Ignoring field '" << token << "'.\n";
       }
       catch (const Exception& e)
       {
         if (level >= VL_INFO)
-          cout << "Failed to renove index for field: " << token << endl;
+          cerr << "Failed to remove index for field '" << token << "'.\n";
 
-        printException (cout, e);
+        printException (cerr, e);
 
         result = false;
         break;
@@ -663,7 +660,7 @@ invalid_args:
     dbs.ReleaseTable (*table);
 
   if (level >= VL_ERROR)
-    cout << "Invalid commands arguments.\n";
+    cerr << "Invalid commands arguments.\n";
 
   return false;
 }
@@ -790,8 +787,17 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     token = CmdLineNextToken (cmdLine, linePos);
     if ((token == "info") || (token.length () == 0))
       {
-        cout << "Allocated rows    : " << table->AllocatedRows () << endl;
-        cout << "First reusable row: " << table->AddReusedRow ()  << endl;
+        const ROW_INDEX firstReusableRow  = table->GetReusableRow (false);
+        const ROW_INDEX reusableRowsCount = table->ReusableRowsCount ();
+        const ROW_INDEX rowsCount         = table->AllocatedRows ();
+
+        cout << "Allocated rows    : " << rowsCount << endl;
+        cout << "Reusable rows     : " << reusableRowsCount << endl;
+        cout << "First reusable row: "
+             << ((firstReusableRow == ROW_INVALID_VALUE) ?
+                   rowsCount :
+                   firstReusableRow)
+            << endl;
       }
     else if (token == "list")
       {
@@ -916,7 +922,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             return false;
           }
 
-        const ROW_INDEX row = table->AddReusedRow ();
+        const ROW_INDEX row = table->GetReusableRow (true);
         if (! UpdateTableRow (&cerr, *table, row, fieldVals))
           return false;
 

@@ -496,6 +496,7 @@ main (const int argc, char *argv[])
           if (currentArg >= argc)
             {
               PrintWrongUsage (argv[currentArg - 1]);
+
               return EINVAL;
             }
 

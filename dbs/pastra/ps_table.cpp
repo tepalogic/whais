@@ -613,6 +613,7 @@ IDataContainer&
 PersistentTable::RowsContainer ()
 {
   assert (mRowsData.get () != NULL);
+
   return *mRowsData.get ();
 }
 
@@ -621,6 +622,7 @@ IDataContainer&
 PersistentTable::TableContainer ()
 {
   assert (mTableData.get () != NULL);
+
   return *mTableData.get ();
 }
 

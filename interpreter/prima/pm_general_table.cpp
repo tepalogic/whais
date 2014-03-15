@@ -88,7 +88,14 @@ GeneralTable::AddRow ()
 
 
 ROW_INDEX
-GeneralTable::AddReusedRow ()
+GeneralTable::GetReusableRow (const bool forceAdd)
+{
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+}
+
+
+ROW_INDEX
+GeneralTable::ReusableRowsCount ()
 {
   throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
 }

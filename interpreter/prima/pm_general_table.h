@@ -53,7 +53,9 @@ public:
 
   virtual ROW_INDEX AddRow ();
 
-  virtual ROW_INDEX AddReusedRow ();
+  virtual ROW_INDEX GetReusableRow (const bool forceAdd);
+
+  virtual ROW_INDEX ReusableRowsCount ();
 
   virtual void MarkRowForReuse (const ROW_INDEX row);
 
