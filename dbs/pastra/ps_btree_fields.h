@@ -49,26 +49,21 @@ public:
   {
   }
 
-  bool operator< (const T_BTreeKey& key) const
+  int CompareWith (const T_BTreeKey& key) const
   {
     if (mValuePart < key.mValuePart)
-      return true;
+      return -1;
 
     else if (mValuePart == key.mValuePart)
-      return mRowPart < key.mRowPart;
+      {
+        if (mRowPart < key.mRowPart)
+          return -1;
 
-    return false;
-  }
+        else if (mRowPart == key.mRowPart)
+          return 0;
+      }
 
-  bool operator== (const T_BTreeKey& key) const
-  {
-    return (mRowPart == key.mRowPart)
-           && (mValuePart == key.mValuePart);
-  }
-
-  bool operator> (const T_BTreeKey& key) const
-  {
-    return ! ((*this < key) || (*this == key));
+    return 1;
   }
 
   const ROW_INDEX mRowPart;
@@ -123,7 +118,7 @@ public:
   {
     assert (sizeof (NodeHeader) % 16 == 0);
 
-    uint_t result = mNodesMgr.NodeRawSize () - sizeof (NodeHeader);
+    uint_t result = mRawNodeSize - sizeof (NodeHeader);
 
     if (IsLeaf())
       result /= sizeof (ROW_INDEX) + T_SIZE;
@@ -142,7 +137,7 @@ public:
 
     parent.FindBiggerOrEqual (GetKey (0), &result);
 
-    assert (parent.IsEqual (GetKey (0), result));
+    assert (parent.CompareKey (GetKey (0), result) == 0);
     assert (NodeId () == parent.NodeIdOfKey (result));
 
     return result;
@@ -155,8 +150,10 @@ public:
     assert (IsLeaf () == false);
 
     const ROW_INDEX* const  rows       = _RC (const ROW_INDEX*, DataForRead ());
-    const NODE_INDEX* const childNodes = _RC (const NODE_INDEX*,
-                                              rows + KeysPerNode ());
+    const NODE_INDEX* const childNodes = _RC (
+                                      const NODE_INDEX*,
+                                      rows + DBS_BTreeNode::KeysPerNode ()
+                                             );
 
     return Serializer::LoadNode (childNodes + keyIndex);
   }
@@ -169,7 +166,8 @@ public:
     assert (IsLeaf () == false);
 
     ROW_INDEX* const  rows       = _RC (ROW_INDEX*, DataForWrite ());
-    NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
+    NODE_INDEX* const childNodes = _RC (NODE_INDEX*,
+                                        rows + DBS_BTreeNode::KeysPerNode ());
 
     Serializer::StoreNode (childNode, childNodes + keyIndex);
   }
@@ -224,9 +222,15 @@ public:
 
     if (IsLeaf () == false)
       {
-        NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
+        NODE_INDEX* const childNodes = _RC (
+                                       NODE_INDEX*,
+                                       rows + DBS_BTreeNode::KeysPerNode ()
+                                           );
 
-        uint8_t* const values = _RC (uint8_t*, childNodes + KeysPerNode ());
+        uint8_t* const values = _RC (
+                                uint8_t*,
+                                childNodes + DBS_BTreeNode::KeysPerNode ()
+                                    );
 
         make_array_room (lastKey,
                          keyIndex,
@@ -242,7 +246,8 @@ public:
       }
     else
       {
-        uint8_t* const values = _RC (uint8_t*, rows + KeysPerNode ());
+        uint8_t* const values = _RC (uint8_t*,
+                                     rows + DBS_BTreeNode::KeysPerNode ());
 
         make_array_room (lastKey,
                          keyIndex,
@@ -271,9 +276,15 @@ public:
 
     if (IsLeaf () == false)
       {
-        NODE_INDEX* const childNodes = _RC (NODE_INDEX*, rows + KeysPerNode ());
+        NODE_INDEX* const childNodes = _RC (
+                                       NODE_INDEX*,
+                                       rows + DBS_BTreeNode::KeysPerNode ()
+                                           );
 
-        uint8_t* const values = _RC (uint8_t*, childNodes + KeysPerNode ());
+        uint8_t* const values = _RC (
+                                uint8_t*,
+                                childNodes + DBS_BTreeNode::KeysPerNode ()
+                                    );
 
         remove_array_elemes (lastKey,
                              keyIndex,
@@ -289,7 +300,8 @@ public:
       }
     else
       {
-         uint8_t* const values = _RC (uint8_t*, rows + KeysPerNode ());
+         uint8_t* const values = _RC (uint8_t*,
+                                      rows + DBS_BTreeNode::KeysPerNode ());
 
          remove_array_elemes (lastKey,
                               keyIndex,
@@ -403,7 +415,8 @@ public:
           }
 
         assert (nextNode->NullKeysCount () <= nextNode->KeysCount ());
-        assert (nextNode->KeysCount () <= nextNode->KeysPerNode());
+        assert (nextNode->KeysCount () <=
+                nextNode->DBS_BTreeNode::KeysPerNode());
       }
     else
       {
@@ -438,40 +451,23 @@ public:
           }
 
         assert (NullKeysCount () <= KeysCount() );
-        assert (KeysCount () <= KeysPerNode());
+        assert (KeysCount () <= DBS_BTreeNode::KeysPerNode ());
       }
   }
 
-  virtual bool IsLess (const IBTreeKey& key, const KEY_INDEX keyIndex) const
+  virtual int CompareKey (const IBTreeKey&      key,
+                          const KEY_INDEX       nodeKeyIndex) const
   {
-    assert (keyIndex  < KeysCount ());
+    assert (nodeKeyIndex  < KeysCount ());
 
     const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
 
-    return theKey < GetKey (keyIndex);
-  }
-
-  virtual bool IsEqual (const IBTreeKey& key, const KEY_INDEX keyIndex) const
-  {
-    assert (keyIndex  < KeysCount ());
-
-    const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
-
-    return theKey == GetKey (keyIndex);
-  }
-
-  virtual bool IsBigger (const IBTreeKey& key, const KEY_INDEX keyIndex) const
-  {
-    assert (keyIndex  < KeysCount ());
-
-    const T_BTreeKey<DBS_T> &theKey = _SC (const T_BTreeKey<DBS_T>&, key);
-
-    return theKey > GetKey (keyIndex);
+    return theKey.CompareWith (GetKey (nodeKeyIndex));
   }
 
   virtual const IBTreeKey& SentinelKey () const
   {
-    static T_BTreeKey<DBS_T> _sentinel (DBS_T::Max (), ~0ull);
+    static T_BTreeKey<DBS_T> _sentinel (DBS_T::Max (), ~_SC (ROW_INDEX, 0));
 
     return _sentinel;
   }
@@ -485,7 +481,7 @@ public:
 
     const ROW_INDEX* const rows = _RC (const ROW_INDEX*, DataForRead ());
 
-    if ((toPos == 0) && IsEqual (SentinelKey (), toPos))
+    if ((toPos == 0) && (CompareKey (SentinelKey (), toPos) == 0))
       ++toPos;
 
     while (fromPos >= toPos)
@@ -525,17 +521,23 @@ private:
     DBS_T value;
     if (IsLeaf())
       {
-        const uint8_t* const values = _RC (const uint8_t*,
-                                           rows + KeysPerNode ());
+        const uint8_t* const values = _RC (
+                                      const uint8_t*,
+                                      rows + DBS_BTreeNode::KeysPerNode ()
+                                          );
         Serializer::Load (values + keyIndex * T_SIZE, &value);
       }
     else
       {
-        const NODE_INDEX* const childNodes = _RC (const NODE_INDEX*,
-                                                  rows + KeysPerNode ());
+        const NODE_INDEX* const childNodes = _RC (
+                                         const NODE_INDEX*,
+                                         rows + DBS_BTreeNode::KeysPerNode ()
+                                                 );
 
-        const uint8_t* const values = _RC (const uint8_t*,
-                                           childNodes + KeysPerNode ());
+        const uint8_t* const values = _RC (
+                                   const uint8_t*,
+                                   childNodes + DBS_BTreeNode::KeysPerNode ()
+                                          );
 
         Serializer::Load (values + keyIndex * T_SIZE, &value);
       }
@@ -555,16 +557,22 @@ private:
       {
         if (IsLeaf ())
           {
-            uint8_t* const values = _RC (uint8_t*, rows + KeysPerNode ());
+            uint8_t* const values = _RC (uint8_t*,
+                                         rows + DBS_BTreeNode::KeysPerNode ());
 
             Serializer::Store (values + keyIndex * T_SIZE, key.mValuePart);
           }
         else
           {
-            NODE_INDEX* const childNodes = _RC (NODE_INDEX*,
-                                                rows + KeysPerNode ());
+            NODE_INDEX* const childNodes = _RC (
+                                           NODE_INDEX*,
+                                           rows + DBS_BTreeNode::KeysPerNode ()
+                                               );
 
-            uint8_t* const values = _RC (uint8_t*, childNodes + KeysPerNode ());
+            uint8_t* const values = _RC (
+                                    uint8_t*,
+                                    childNodes + DBS_BTreeNode::KeysPerNode ()
+                                        );
 
             Serializer::Store (values + keyIndex * T_SIZE, key.mValuePart);
           }
@@ -572,6 +580,7 @@ private:
 
     Serializer::StoreRow (key.mRowPart, rows + keyIndex);
   }
+
 };
 
 

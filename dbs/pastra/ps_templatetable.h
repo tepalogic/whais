@@ -530,6 +530,7 @@ public:
     return mRow;
   }
 
+private:
   const ROW_INDEX mRow;
 };
 
@@ -561,11 +562,8 @@ public:
 
   virtual void Join (const bool toRight);
 
-  virtual bool IsLess (const IBTreeKey& key, const KEY_INDEX keyIndex) const;
-
-  virtual bool IsEqual (const IBTreeKey& key, const KEY_INDEX keyIndex) const;
-
-  virtual bool IsBigger (const IBTreeKey& key, const KEY_INDEX keyIndex) const;
+  virtual int CompareKey (const IBTreeKey&      key,
+                          const KEY_INDEX       nodeKeyIndex) const;
 
   virtual const IBTreeKey& SentinelKey () const;
 

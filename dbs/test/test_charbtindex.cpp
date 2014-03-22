@@ -43,12 +43,12 @@ fill_table_with_values (ITable& table,
   DChar  prev;
 
   table.CreateIndex (0, NULL, NULL);
-  std::cout << "Filling table with values ... " << std::endl;
+  std::cout << "Filling table with " << rowCount << " rows.\n";
 
   wh_rnd_set_seed (seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DChar value (wh_rnd () & 0xFFFFFFFF);
+      DChar value (wh_rnd () % 0xD000 + 1);
       if (table.AddRow () != index)
         {
           result = false;
@@ -67,7 +67,7 @@ fill_table_with_values (ITable& table,
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
   DArray values = table.MatchRows (DChar (),
-                                   DChar (0xFFFFFFFF),
+                                   DChar::Max (),
                                    0,
                                    ~0,
                                    0);
@@ -79,8 +79,8 @@ fill_table_with_values (ITable& table,
 
   for (uint_t checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
     {
-      DChar  rowValue;
-      DUInt64 rowIndex;
+      DChar       rowValue;
+      DROW_INDEX  rowIndex;
 
       values.Get (checkIndex, rowIndex);
       assert (rowIndex.IsNull() == false);
@@ -139,7 +139,7 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
-      DUInt64 element;
+      DROW_INDEX element;
       values.Get (index, element);
 
       if (element.IsNull() || (element.mValue != index))
@@ -176,7 +176,7 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
                                     0);
   for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
-      DUInt64 element;
+      DROW_INDEX element;
       values.Get (index, element);
 
       if (element.IsNull() || (element.mValue != index))
@@ -190,14 +190,14 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
     }
 
   values  = table.MatchRows (nullValue,
-                             DChar (0xFFFFFFFF),
+                             DChar::Max (),
                              _removedRows,
                              ~0,
                               0);
 
   for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
-      DUInt64 element;
+      DROW_INDEX element;
       values.Get (index - _removedRows, element);
 
       DChar rowValue;
@@ -251,7 +251,7 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
   table.CreateIndex (0, callback_index_create, &data);
 
   DArray values  = table.MatchRows (DChar (),
-                                    DChar (0xFFFFFFFF),
+                                    DChar::Max (),
                                     0,
                                     ~0,
                                     0);

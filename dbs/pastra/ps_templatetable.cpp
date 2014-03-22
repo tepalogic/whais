@@ -199,7 +199,7 @@ PrototypeTable::AddRow ()
 ROW_INDEX
 PrototypeTable::GetReusableRow (const bool forceAdd)
 {
-  uint64_t     result = ROW_INVALID_VALUE;
+  uint64_t     result = INVALID_ROW_INDEX;
   NODE_INDEX   node;
   KEY_INDEX    keyIndex;
   TableRmKey   key (0);
@@ -2262,7 +2262,7 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
             {
               lastNode = true;
 
-              if (node->IsLess (lastKey, toKey))
+              if (node->CompareKey (lastKey, toKey) < 0)
                 toKey++;
             }
           else
@@ -2361,7 +2361,7 @@ TableRmNode::GetParentKeyIndex (const IBTreeNode& parent) const
 
   parent.FindBiggerOrEqual (key, &result);
 
-  assert (parent.IsEqual (key, result));
+  assert (parent.CompareKey (key, result) == 0);
   assert (NodeId () == parent.NodeIdOfKey (result));
 
   return result;
@@ -2375,9 +2375,10 @@ TableRmNode::NodeIdOfKey (const KEY_INDEX keyIndex) const
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
   assert (IsLeaf () == false);
 
-  const uint_t            firstNodeOff = KeysPerNode () * sizeof (ROW_INDEX);
-  const NODE_INDEX* const nodes        = _RC (const NODE_INDEX*,
-                                              DataForRead() + firstNodeOff);
+  const uint_t firstNodeOff = TableRmNode::KeysPerNode () * sizeof (ROW_INDEX);
+
+  const NODE_INDEX* const nodes = _RC (const NODE_INDEX*,
+                                       DataForRead () + firstNodeOff);
   return Serializer::LoadNode (nodes + keyIndex);
 }
 
@@ -2399,15 +2400,17 @@ TableRmNode::AdjustKeyNode (const IBTreeNode&   childNode,
 
 
 void
-TableRmNode::SetNodeOfKey (const KEY_INDEX keyIndex, const NODE_INDEX childNode)
+TableRmNode::SetNodeOfKey (const KEY_INDEX      keyIndex,
+                           const NODE_INDEX     childNode)
 {
 
   assert (keyIndex < KeysCount ());
   assert (sizeof (NodeHeader) % sizeof (uint64_t) == 0);
   assert (IsLeaf () == false);
 
-  const uint_t      nodesOff = KeysPerNode() * sizeof (ROW_INDEX);
-  NODE_INDEX* const nodes    = _RC (NODE_INDEX*, DataForWrite () + nodesOff);
+  const uint_t nodesOff = TableRmNode::KeysPerNode () * sizeof (ROW_INDEX);
+
+  NODE_INDEX* const nodes = _RC (NODE_INDEX*, DataForWrite () + nodesOff);
 
   Serializer::StoreNode (childNode, nodes + keyIndex);
 }
@@ -2429,7 +2432,7 @@ TableRmNode::InsertKey (const IBTreeKey& key)
       else
         keyIndex++;
 
-      assert ((keyIndex == 0) || IsLess (key, keyIndex - 1));
+      assert ((keyIndex == 0) || (CompareKey (key, keyIndex - 1) < 0));
 
       ROW_INDEX* const rows = _RC (ROW_INDEX*, DataForWrite ());
 
@@ -2635,43 +2638,30 @@ TableRmNode::Join (const bool toRight)
 }
 
 
-bool
-TableRmNode::IsLess (const IBTreeKey& key, const KEY_INDEX keyIndex) const
+int
+TableRmNode::CompareKey (const IBTreeKey&       key,
+                         const KEY_INDEX        keyIndex) const
 {
   const ROW_INDEX* const rows = _RC ( const ROW_INDEX*, DataForRead ());
 
   const TableRmKey tKey (*_SC (const TableRmKey*, &key));
 
-  return tKey < Serializer::LoadRow (rows + keyIndex);
-}
+  const int64_t row = Serializer::LoadRow (rows + keyIndex);
 
+  if (tKey < row)
+    return -1;
 
-bool
-TableRmNode::IsEqual (const IBTreeKey& key, const KEY_INDEX keyIndex) const
-{
-  const ROW_INDEX* const rows = _RC ( const ROW_INDEX*, DataForRead ());
+  else if (tKey == row)
+    return 0;
 
-  const TableRmKey tKey (*_SC (const TableRmKey*, &key));
-
-  return tKey == Serializer::LoadRow (rows + keyIndex);
-}
-
-
-bool
-TableRmNode::IsBigger (const IBTreeKey& key, KEY_INDEX const keyIndex) const
-{
-  const ROW_INDEX* const rows = _RC ( const ROW_INDEX*, DataForRead ());
-
-  const TableRmKey tKey (*_SC (const TableRmKey*, &key));
-
-  return tKey > Serializer::LoadRow (rows + keyIndex);
+  return 1;
 }
 
 
 const IBTreeKey&
 TableRmNode::SentinelKey () const
 {
-  static TableRmKey _key (~0);
+  static TableRmKey _key (~_SC (ROW_INDEX, 0));
 
   return _key;
 }

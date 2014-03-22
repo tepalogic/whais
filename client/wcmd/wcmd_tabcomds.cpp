@@ -794,7 +794,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         cout << "Allocated rows    : " << rowsCount << endl;
         cout << "Reusable rows     : " << reusableRowsCount << endl;
         cout << "First reusable row: "
-             << ((firstReusableRow == ROW_INVALID_VALUE) ?
+             << ((firstReusableRow == INVALID_ROW_INDEX) ?
                    rowsCount :
                    firstReusableRow)
             << endl;

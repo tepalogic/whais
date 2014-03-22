@@ -200,14 +200,8 @@ public:
 
   virtual void Join (const bool toRight) = 0;
 
-  virtual bool IsLess (const IBTreeKey&   key,
-                       const KEY_INDEX    keyIndex) const = 0;
-
-  virtual bool IsEqual (const IBTreeKey&  key,
-                        const KEY_INDEX   keyIndex) const = 0;
-
-  virtual bool IsBigger (const IBTreeKey& key,
-                         const KEY_INDEX  keyIndex) const = 0;
+  virtual int CompareKey (const IBTreeKey&   key,
+                          const KEY_INDEX    nodeKeyIndex) const = 0;
 
   virtual const IBTreeKey& SentinelKey () const = 0;
 
@@ -232,6 +226,7 @@ protected:
   };
 
   IBTreeNodeManager&       mNodesMgr;
+  const uint_t             mRawNodeSize;
 
 private:
   std::auto_ptr<NodeHeader> mHeader;

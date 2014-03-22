@@ -806,13 +806,13 @@ TemporalContainer::FillCache (uint64_t position)
 
       if (position >= mFileContainer->Size ())
         {
-          assert (mDirtyCache_1);
-          assert (position == mCacheEndPos_1);
-
-          mFileContainer->Write (mCacheStartPos_1,
-                                 mCacheEndPos_1 - mCacheStartPos_1,
-                                 mCache_1.get ());
-          mDirtyCache_1 = false;
+          if (mDirtyCache_1)
+            {
+              mFileContainer->Write (mCacheStartPos_1,
+                                     mCacheEndPos_1 - mCacheStartPos_1,
+                                     mCache_1.get ());
+              mDirtyCache_1 = false;
+            }
         }
 
       const uint_t toRead = MIN (mCacheSize,
@@ -836,13 +836,13 @@ TemporalContainer::FillCache (uint64_t position)
 
       if (position >= mFileContainer->Size ())
         {
-          assert (mDirtyCache_2);
-          assert (position == mCacheEndPos_2);
-
-          mFileContainer->Write (mCacheStartPos_2,
-                                 mCacheEndPos_2 - mCacheStartPos_2,
-                                 mCache_2.get ());
-          mDirtyCache_2 = false;
+          if (mDirtyCache_2)
+            {
+              mFileContainer->Write (mCacheStartPos_2,
+                                     mCacheEndPos_2 - mCacheStartPos_2,
+                                     mCache_2.get ());
+              mDirtyCache_2 = false;
+            }
         }
 
       const uint_t toRead = MIN (mCacheSize,

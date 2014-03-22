@@ -39,6 +39,7 @@ namespace pastra {
 IBTreeNode::IBTreeNode (IBTreeNodeManager&  nodesManager,
                         const NODE_INDEX    nodeId)
   : mNodesMgr (nodesManager),
+    mRawNodeSize (nodesManager.NodeRawSize ()),
     mHeader (_RC (NodeHeader*, new uint8_t [mNodesMgr.NodeRawSize ()]))
 {
   assert (nodeId != NIL_NODE);
@@ -65,29 +66,29 @@ IBTreeNode::FindBiggerOrEqual (const IBTreeKey&   key,
 
   assert (bottomKey < KeysPerNode());
 
-  if (IsBigger (key, topKey))
+  if (CompareKey (key, topKey) > 0)
     return false;
 
   while (bottomKey > topKey + 1)
     {
       const KEY_INDEX median = (bottomKey + topKey) / 2;
 
-      if (IsLess (key, median))
+      if (CompareKey (key, median) < 0)
         topKey = median;
 
       else
         bottomKey = median;
     }
 
-  if (IsEqual (key, bottomKey))
+  const int compare = CompareKey (key, bottomKey);
+  if (compare == 0)
     *outIndex = bottomKey;
 
-  else if (IsBigger (key, bottomKey))
+  else if (compare > 0)
     *outIndex = topKey;
 
   else
     *outIndex = bottomKey;
-
 
   return true;
 }
@@ -124,7 +125,7 @@ IBTreeNode::GetChildNode (const IBTreeKey& key) const
   KEY_INDEX outKey;
 
   if ( ! FindBiggerOrEqual (key, &outKey)
-      || ! IsEqual (key, outKey))
+      ||  (CompareKey (key, outKey) != 0))
     {
       throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
     }
@@ -149,7 +150,7 @@ IBTreeNode::RemoveKey (const IBTreeKey& key)
     {
       assert (false);
     }
-  else if (IsEqual (key, keyIndex) == false )
+  else if (CompareKey (key, keyIndex) == 0)
     {
       assert (false);
     }
@@ -198,7 +199,7 @@ IBTreeNodeManager::Split (NODE_INDEX parentId, const NODE_INDEX nodeId)
   if (parentId == NIL_NODE )
     {
       assert (nodeId == RootNodeId ());
-      assert (node->IsEqual (node->SentinelKey(), 0));
+      assert (node->CompareKey (node->SentinelKey(), 0) == 0);
 
       parentId = AllocateNode (NIL_NODE, 0);
 
@@ -384,8 +385,11 @@ BTree::FindBiggerOrEqual (const IBTreeKey& key,
     }
   while (true);
 
-  if ((*outKeyIndex == 0) && node->IsEqual (node->SentinelKey (), 0))
-    return false;
+  if ((*outKeyIndex == 0)
+      && (node->CompareKey (node->SentinelKey (), 0) == 0))
+    {
+      return false;
+    }
 
   return true;
 }
@@ -449,7 +453,7 @@ BTree::RecursiveInsertNodeKey (const NODE_INDEX  parentId,
           //The sentinel shall be here!
           assert (0);
         }
-      else if (node->IsEqual (key, *outKeyIndex))
+      else if (node->CompareKey (key, *outKeyIndex) == 0)
         throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 
       *outKeyIndex += 1;
@@ -495,7 +499,7 @@ BTree::RecursiveDeleteNodeKey (IBTreeNode& node, const IBTreeKey& key)
 
   if (node.IsLeaf ())
     {
-      if (node.IsEqual (key, keyIndex))
+      if (node.CompareKey (key, keyIndex) == 0)
         node.RemoveKey (keyIndex);
 
       else
@@ -514,11 +518,11 @@ BTree::RecursiveDeleteNodeKey (IBTreeNode& node, const IBTreeKey& key)
         }
       else if (RecursiveDeleteNodeKey (*childNode, key))
         {
-          assert (node.IsEqual (key, keyIndex));
+          assert (node.CompareKey (key, keyIndex) == 0);
 
           node.AdjustKeyNode (*childNode, keyIndex);
         }
-      else if (node.IsEqual (key, keyIndex))
+      else if (node.CompareKey (key, keyIndex) == 0)
         {
           assert (false);
 

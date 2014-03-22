@@ -42,7 +42,7 @@ fill_table_with_values (ITable& table,
   DUInt64 prev;
 
   table.CreateIndex (0, NULL, NULL);
-  std::cout << "Filling table with values ... " << std::endl;
+  std::cout << "Filling table with " << rowCount << " rows.\n";
 
   wh_rnd_set_seed (seed);
   for (uint_t index = 0; index < rowCount; ++index)
@@ -79,8 +79,8 @@ fill_table_with_values (ITable& table,
 
   for (uint_t checkIndex = 0; (checkIndex < rowCount) && result; ++checkIndex)
     {
-      DUInt64  rowValue;
-      DUInt64 rowIndex;
+      DUInt64    rowValue;
+      DROW_INDEX rowIndex;
 
       values.Get (checkIndex, rowIndex);
       assert (rowIndex.IsNull() == false);
@@ -139,7 +139,7 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
-      DUInt64 element;
+      DROW_INDEX element;
       values.Get (index, element);
 
       if (element.IsNull() || (element.mValue != index))
@@ -176,7 +176,7 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
                                     0);
   for (uint64_t index = 0; (index < _removedRows) && result; ++index)
     {
-      DUInt64 element;
+      DROW_INDEX element;
       values.Get (index, element);
 
       if (element.IsNull() || (element.mValue != index))
@@ -197,7 +197,7 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
 
   for (uint64_t index = _removedRows; (index < _rowsCount) && result; ++index)
     {
-      DUInt64 element;
+      DROW_INDEX element;
       values.Get (index - _removedRows, element);
 
       DUInt64 rowValue;
