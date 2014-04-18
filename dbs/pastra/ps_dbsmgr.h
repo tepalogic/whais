@@ -88,6 +88,10 @@ public:
     return mGlbSettings.mMaxFileSize;
   }
 
+  bool HasUnreleasedTables ();
+
+  void RegisterTableSpawn ();
+
 private:
   typedef std::map<std::string, PersistentTable*> TABLES;
 
@@ -98,6 +102,7 @@ private:
   const std::string       mDbsLocationDir;
   const std::string       mName;
   TABLES                  mTables;
+  int                     mCreatedTemporalTables;
 };
 
 } //namespace pastra

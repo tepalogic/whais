@@ -441,14 +441,24 @@ public:
                             const ROW_INDEX       toRow,
                             const FIELD_INDEX     field);
 
+  virtual void LockTable ();
 
+  virtual void UnlockTable ();
 
   //Followings declarations shouldn't be public,
   //but kept here to ease the testing procedures.
   uint_t RowSize () const;
+
   FieldDescriptor& GetFieldDescriptorInternal (
-                                         const FIELD_INDEX fieldIndex
+                           const FIELD_INDEX fieldIndex
                                               ) const;
+
+  virtual void Flush ();
+
+  DbsHandler& GetDBSHandler ()
+  {
+    return mDbs;
+  }
 
 private:
   template<class T> void StoreEntry (const ROW_INDEX,
@@ -470,7 +480,6 @@ private:
                                              const ROW_INDEX   fromRow,
                                              ROW_INDEX         toRow,
                                              const FIELD_INDEX filedIndex);
-
   void CheckRowToReuse (const ROW_INDEX row);
 
   void CheckRowToDelete (const ROW_INDEX row);
@@ -479,7 +488,6 @@ private:
 
   void ReleaseIndexField (FieldDescriptor* const field);
 
-
   virtual uint_t MaxCachedNodes ();
 
   virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId);
@@ -487,7 +495,6 @@ private:
   virtual void SaveNode (IBTreeNode* const node);
 
 protected:
-  virtual void Flush ();
 
   virtual void MakeHeaderPersistent () = 0;
 
@@ -498,6 +505,15 @@ protected:
   virtual IDataContainer& TableContainer () = 0;
 
   virtual VariableSizeStore& VSStore () = 0;
+
+  virtual void FlushEpilog () = 0;
+
+  void MarkRowModification ();
+
+  void MarkIndexModification ();
+
+  void FlushInternal ();
+
 
   //Data members
   DbsHandler&                           mDbs;
@@ -510,10 +526,12 @@ protected:
   std::auto_ptr<uint8_t>                mFieldsDescriptors;
   std::vector<FieldIndexNodeManager*>   mvIndexNodeMgrs;
   BlockCache                            mRowCache;
-  Lock                                  mSync;
-  Lock                                  mIndexSync;
+  Lock                                  mRowsSync;
+  Lock                                  mIndexesSync;
+  bool                                  mRowModified;
+  bool                                  mIndexModified;
+  bool                                  mLockInProgress;
 };
-
 
 
 

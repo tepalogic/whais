@@ -397,6 +397,14 @@ FileContainer::MarkForRemoval()
 
 
 void
+FileContainer::Flush ()
+{
+  for (size_t i = 0; i < mFilesHandles.size (); ++i)
+    mFilesHandles[i].Sync ();
+}
+
+
+void
 FileContainer::ExtendContainer ()
 {
   uint_t count    = mFilesHandles.size ();
@@ -695,6 +703,14 @@ void
 TemporalContainer::MarkForRemoval ()
 {
   return ; //This will be deleted automatically. Nothing to do here!
+}
+
+
+void
+TemporalContainer::Flush ()
+{
+  if (mFileContainer.get () != NULL)
+    mFileContainer->Flush ();
 }
 
 

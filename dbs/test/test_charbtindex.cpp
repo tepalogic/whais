@@ -305,7 +305,9 @@ main (int argc, char **argv)
   }
 
   IDBSHandler& handler = DBSRetrieveDatabase (db_name);
-  handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
+  handler.AddTable ("t_test_tab",
+                    sizeof field_desc / sizeof (field_desc[0]),
+                    field_desc);
 
   {
     DArray tableValues (_SC (DChar*, NULL));
@@ -317,8 +319,8 @@ main (int argc, char **argv)
       handler.ReleaseTable (table);
       success = success && test_table_index_survival (handler, tableValues);
     }
-      success = success && test_index_creation (handler, tableValues);
 
+    success = success && test_index_creation (handler, tableValues);
   }
   DBSReleaseDatabase (handler);
   DBSRemoveDatabase (db_name);

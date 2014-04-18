@@ -37,9 +37,6 @@ namespace pastra  {
 class IBlocksManager
 {
 public:
-  IBlocksManager ()
-  {
-  }
 
   virtual ~IBlocksManager();
 
@@ -171,7 +168,6 @@ class BlockCache
 public:
   BlockCache ();
   ~BlockCache ();
-
 
   void Init (IBlocksManager&      blocksMgr,
              const uint_t         itemSize,

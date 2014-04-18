@@ -38,6 +38,8 @@ namespace whisper
 namespace pastra
 {
 
+
+
 class StoreEntry
 {
 public:
@@ -116,6 +118,8 @@ private:
   uint8_t  mNextEntry[8];
   uint8_t  mRawData[ENTRY_SIZE];
 };
+
+
 
 class VariableSizeStore : public IBlocksManager
 {
@@ -206,6 +210,8 @@ private:
   uint64_t                      mRefsCount;
   Lock                          mSync;
 };
+
+
 
 } //namespace pastra
 } //namespace whisper

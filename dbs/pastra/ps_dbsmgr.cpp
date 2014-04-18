@@ -136,7 +136,8 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     mSync (),
     mDbsLocationDir (locationDir),
     mName (name),
-    mTables ()
+    mTables (),
+    mCreatedTemporalTables (0)
 {
   string fileName = mDbsLocationDir + mName + DBS_FILE_EXT;
   File   inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
@@ -218,8 +219,10 @@ DbsHandler::DbsHandler (const DbsHandler& source)
     mSync (),
     mDbsLocationDir (source.mDbsLocationDir),
     mName (source.mName),
-    mTables (source.mTables)
+    mTables (source.mTables),
+    mCreatedTemporalTables (source.mCreatedTemporalTables)
 {
+  assert (mCreatedTemporalTables == 0);
 }
 
 
@@ -263,6 +266,14 @@ DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
   if (it->second == NULL)
     it->second = new PersistentTable (*this, it->first);
 
+  else
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_IN_USE),
+                          "Table with index %u needs to be released before it"
+                          " can be retrieved again.",
+                          index);
+    }
+
   return *it->second;
 
 }
@@ -284,6 +295,14 @@ DbsHandler::RetrievePersistentTable (const char* const name)
 
   if (it->second == NULL)
     it->second = new PersistentTable (*this, it->first);
+
+  else
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_IN_USE),
+                          "Table '%s' needs to be released before it can be"
+                          " retrieved again.",
+                          name);
+    }
 
   return *it->second;
 }
@@ -316,36 +335,48 @@ DbsHandler::AddTable (const char* const   name,
 
   mTables.insert (pair<string, PersistentTable*> (
                                         tableName,
-                                        _RC (PersistentTable*, NULL))
-                                                  );
-  it = mTables.find (tableName);
-  try
-    {
-      it->second = new PersistentTable (*this,
-                                        it->first,
-                                        inoutFields,
-                                        fieldsCount);
-    }
-  catch (...)
-    {
-      mTables.erase (it);
-      throw;
-    }
+                                        new PersistentTable (*this,
+                                                             tableName,
+                                                             inoutFields,
+                                                             fieldsCount)
+                                                 ));
   SyncToFile ();
+
+  //Make sure we can retrieve the table later.
+  it = mTables.find (tableName);
+
+  assert (it != mTables.end ());
+
+  delete it->second;
+  it->second = NULL;
 }
 
 
 void
 DbsHandler::ReleaseTable (ITable& hndTable)
 {
+  assert (mCreatedTemporalTables >= 0);
 
-  if (hndTable.IsTemporal ())
+  if (& _SC (PrototypeTable&, hndTable).GetDBSHandler () != this)
     {
-      delete &_SC (TemporalTable&, hndTable);
-      return;
+      throw DBSException (_EXTRA (DBSException::TABLE_INVALID),
+                          "Cannot release a table that was created on a"
+                          " different database.");
     }
 
   LockRAII syncHolder (mSync);
+
+  if (hndTable.IsTemporal ())
+    {
+      assert (mCreatedTemporalTables > 0);
+
+      --mCreatedTemporalTables;
+
+      delete &_SC (TemporalTable&, hndTable);
+
+      return;
+    }
+
 
   for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
@@ -384,9 +415,6 @@ DbsHandler::TableName (const TABLE_INDEX index)
       ++it;
     }
 
-  if (it->second == NULL)
-    it->second = new PersistentTable (*this, it->first);
-
   return it->first.c_str ();
 }
 
@@ -401,7 +429,7 @@ DbsHandler::DeleteTable (const char* const name)
   if (it == mTables.end ())
     {
       throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
-                          "Cannot delete table '%s'. It was not fund.",
+                          "Cannot delete table '%s'. It was not found.",
                           name);
     }
 
@@ -422,7 +450,13 @@ ITable&
 DbsHandler::CreateTempTable (const FIELD_INDEX   fieldsCount,
                              DBSFieldDescriptor* inoutFields)
 {
-  return *(new TemporalTable (*this, inoutFields, fieldsCount));
+  ITable* const result = new TemporalTable (*this, inoutFields, fieldsCount);
+
+  LockRAII syncHolder (mSync);
+
+  ++mCreatedTemporalTables;
+
+  return *result;
 }
 
 
@@ -463,6 +497,28 @@ DbsHandler::SyncToFile ()
       outFile.Write (_RC (const uint8_t*, it->first.c_str ()),
                      it->first.length () + 1);
     }
+}
+
+
+bool
+DbsHandler::HasUnreleasedTables ()
+{
+  for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
+    {
+      if (it->second != NULL)
+        return true;
+    }
+
+  return mCreatedTemporalTables > 0;
+}
+
+
+void
+DbsHandler::RegisterTableSpawn ()
+{
+  LockRAII syncHolder (mSync);
+
+  ++mCreatedTemporalTables;
 }
 
 
@@ -573,7 +629,7 @@ DBSCreateDatabase (const char* const name,
 }
 
 
-DBS_SHL  IDBSHandler&
+DBS_SHL IDBSHandler&
 DBSRetrieveDatabase (const char* const name, const char* path)
 {
   if (dbsMgrs_.get () == NULL)
@@ -604,6 +660,14 @@ DBSRetrieveDatabase (const char* const name, const char* path)
 
       assert (it != dbses.end ());
     }
+  else
+    {
+      throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
+                          "Database '%s' is already opened.",
+                          name);
+    }
+
+  assert (it->second.mRefCount == 0);
 
   it->second.mRefCount++;
 
@@ -627,9 +691,16 @@ DBSReleaseDatabase (IDBSHandler& hnd)
 
   for (it = dbses.begin (); it != dbses.end (); ++it)
     {
-      if (_SC (IDBSHandler *, &it->second.mDbs) == &hnd)
+      if (_SC (IDBSHandler*, &it->second.mDbs) == &hnd)
         {
-          assert (it->second.mRefCount > 0);
+          if (it->second.mDbs.HasUnreleasedTables ())
+            {
+              throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
+                                  "Could not release a database handler with"
+                                  " associated persistent tables unreleased.");
+            }
+
+          assert (it->second.mRefCount == 1);
 
           if (--it->second.mRefCount == 0)
             {

@@ -87,6 +87,9 @@ DBSException::Description () const
   case DATABASE_IN_USE:
     return "A requested operation on a database failed because is still in use.";
 
+  case DATABASE_EXISTS:
+    return "A database with the same name already exists.";
+
   case TABLE_INCONSITENCY:
     return "Tried to use a database table using unsupported parameters.";
 
@@ -149,6 +152,12 @@ DBSException::Description () const
 
   case ROW_NOT_ALLOCATED:
     return "Tried to access a table row that was not allocated.";
+
+  case TABLE_ALREADY_LOCKED:
+    return "Tried to lock a table content, but it was already locked.";
+
+  case TABLE_NOT_LOCKED:
+    return "Tried to unlock a table though it was not locked  locked.";
 
   case BAD_PARAMETERS:
     return "Program execution could not continue due to invalid parameters.";

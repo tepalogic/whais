@@ -110,7 +110,7 @@ bool
 IBTreeNode::NeedsSpliting () const
 {
   /* Do not allow one node to have more than 2/3 of it's capacity filed.
-     It needs to safely allow joining of one of it's neigbors. */
+     It needs to safely allow joining of one of it's neighbors. */
 
   if (KeysCount () >= (2 * KeysPerNode () / 3 - 1))
     return true;
@@ -432,11 +432,11 @@ BTree::RemoveKey (const IBTreeKey& key)
 
 
 bool
-BTree::RecursiveInsertNodeKey (const NODE_INDEX  parentId,
-                               const NODE_INDEX  nodeId,
-                               const IBTreeKey&  key,
-                               NODE_INDEX*       outNode,
-                               KEY_INDEX*        outKeyIndex)
+BTree::RecursiveInsertNodeKey (const NODE_INDEX         parentId,
+                               const NODE_INDEX         nodeId,
+                               const IBTreeKey&         key,
+                               NODE_INDEX*              outNode,
+                               KEY_INDEX*               outKeyIndex)
 {
   BTreeNodeRAII node (mNodesManager.RetrieveNode (nodeId));
 

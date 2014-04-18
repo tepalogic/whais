@@ -47,6 +47,7 @@ public:
     NOT_INITED,
     INAVLID_DATABASE,
     DATABASE_IN_USE,
+    DATABASE_EXISTS,
     TABLE_INCONSITENCY,
     TABLE_NOT_FUND,
     TABLE_EXISTS,
@@ -68,6 +69,8 @@ public:
     INVALID_DATETIME,
     INVALID_HIRESTIME,
     ROW_NOT_ALLOCATED,
+    TABLE_ALREADY_LOCKED,
+    TABLE_NOT_LOCKED,
 
     //The exception codes below this line cause an application stop.
     __CRITICAL_EXCEPTIONS,

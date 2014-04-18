@@ -11,6 +11,12 @@
 
 #include "dbs/dbs_values.h"
 
+
+#include "../pastra/ps_table.h"
+#include "../pastra/ps_serializer.h"
+
+
+
 using namespace whisper;
 
 

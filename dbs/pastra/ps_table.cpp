@@ -74,10 +74,15 @@ static const uint_t PS_TABLE_BT_HEAD_OFF           = 52;
 static const uint_t PS_TABLE_BT_HEAD_LEN           = 4;
 static const uint_t PS_TABLE_ROW_SIZE_OFF          = 56;
 static const uint_t PS_TABLE_ROW_SIZE_LEN          = 4;
+static const uint_t PS_TABLE_FLAGS_OFF             = 60;
+static const uint_t PS_TABLE_FLAGS_LEN             = 4;
 
-static const uint_t PS_RESEVED_FOR_FUTURE_OFF = 60;
+static const uint_t PS_RESEVED_FOR_FUTURE_OFF = 64;
 static const uint_t PS_RESEVED_FOR_FUTURE_LEN = PS_HEADER_SIZE -
                                                   PS_RESEVED_FOR_FUTURE_OFF;
+
+static const uint32_t PS_TABLE_ROW_MODIFIED_MASK        = 1;
+static const uint32_t PS_TABLE_IDX_MODIFIED_MASK        = 2;
 
 static uint_t
 get_fields_names_len (const DBSFieldDescriptor* fields, uint_t count)
@@ -237,7 +242,7 @@ create_table_file (const uint64_t                  maxFileSize,
   File tableFile (filePrefix, WHC_FILECREATE_NEW | WHC_FILERDWR);
 
   auto_ptr<uint8_t> tableHeader(new uint8_t[PS_HEADER_SIZE]);
-  uint8_t* const    header = tableHeader.get();
+  uint8_t* const    header = tableHeader.get ();
 
   memcpy (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
@@ -250,6 +255,7 @@ create_table_file (const uint64_t                  maxFileSize,
   store_le_int32 (NIL_NODE,        header + PS_TABLE_BT_HEAD_OFF);
   store_le_int64 (maxFileSize,     header + PS_TABLE_MAX_FILE_SIZE_OFF);
   store_le_int64 (~(uint64_t)0,    header + PS_TABLE_MAINTABLE_SIZE_OFF);
+  store_le_int32 (0,               header + PS_TABLE_FLAGS_OFF);
 
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_HEAD_LEN);
   assert (sizeof (NODE_INDEX) == PS_TABLE_BT_ROOT_LEN);
@@ -294,7 +300,7 @@ PersistentTable::PersistentTable (DbsHandler&       dbs,
     mVSData (NULL),
     mRemoved (false)
 {
-  InitFromFile ();
+  InitFromFile (name);
 
   if (mMaxFileSize != dbs.MaxFileSize ())
     {
@@ -342,7 +348,7 @@ PersistentTable::PersistentTable (DbsHandler&                     dbs,
                      mFileNamePrefix.c_str (),
                      fields,
                      fieldsCount);
-  InitFromFile ();
+  InitFromFile (name);
 
   assert (mTableData.get () != NULL);
 
@@ -395,12 +401,16 @@ PersistentTable::IsTemporal () const
 ITable&
 PersistentTable::Spawn () const
 {
-  return *(new TemporalTable (*this));
+  ITable* const result = new TemporalTable (*this);
+
+  mDbs.RegisterTableSpawn ();
+
+  return *result;
 }
 
 
 void
-PersistentTable::InitFromFile ()
+PersistentTable::InitFromFile (const string& tableName)
 {
   uint64_t   mainTableSize = 0;
   uint8_t    tableHdr[PS_HEADER_SIZE];
@@ -437,6 +447,15 @@ PersistentTable::InitFromFile ()
           _EXTRA (DBSException::TABLE_INVALID),
           "Persistent table file '%s' has an invalid signature.",
           mFileNamePrefix.c_str ());
+    }
+  else if (load_le_int32 (tableHdr + PS_TABLE_FLAGS_OFF)
+           & (PS_TABLE_IDX_MODIFIED_MASK | PS_TABLE_ROW_MODIFIED_MASK))
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_IN_USE),
+                          "Cannot open table '%s' as is already in use or"
+                          " was not closed properly last time.",
+                          tableName.c_str ());
+
     }
 
   //Cache the field descriptors in memory
@@ -536,6 +555,15 @@ PersistentTable::MakeHeaderPersistent ()
   if (mRemoved)
     return ; //We were removed. We were removed.
 
+  uint32_t flags = 0;
+
+
+  if (mRowModified)
+    flags |= PS_TABLE_ROW_MODIFIED_MASK;
+
+  if (mIndexModified)
+    flags |= PS_TABLE_IDX_MODIFIED_MASK;
+
   uint8_t tableHdr[PS_HEADER_SIZE];
 
   memcpy (tableHdr, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
@@ -548,11 +576,12 @@ PersistentTable::MakeHeaderPersistent ()
   store_le_int32 (mUnallocatedHead,    tableHdr + PS_TABLE_BT_HEAD_OFF);
   store_le_int64 (mMaxFileSize,        tableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
   store_le_int64 (mTableData->Size (), tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
+  store_le_int32 (flags,               tableHdr + PS_TABLE_FLAGS_OFF);
 
   store_le_int64 ((mVSData != NULL) ? mVSData->Size () : 0,
                   tableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  memset(tableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
+  memset (tableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
   mTableData->Write (0, sizeof tableHdr, tableHdr);
   mTableData->Write (sizeof tableHdr,
@@ -575,6 +604,7 @@ PersistentTable::RemoveFromDatabase ()
       if (mvIndexNodeMgrs[i]  != NULL)
         mvIndexNodeMgrs[i]->MarkForRemoval ();
     }
+
   mTableData->MarkForRemoval ();
   mRemoved = true;
 }
@@ -600,12 +630,16 @@ PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 
 
 void
-PersistentTable::Flush ()
+PersistentTable::FlushEpilog ()
 {
   if (mVSData != NULL)
     mVSData->Flush ();
 
-  PrototypeTable::Flush ();
+  if (mRowsData.get () != NULL)
+    mRowsData->Flush ();
+
+  if (mTableData.get () != NULL)
+    mTableData->Flush ();
 }
 
 
@@ -733,17 +767,19 @@ TemporalTable::IsTemporal () const
 ITable&
 TemporalTable::Spawn () const
 {
-  return *(new TemporalTable (*this));
+  ITable* const result = new TemporalTable (*this);
+
+  mDbs.RegisterTableSpawn ();
+
+  return *result;
 }
 
 
 void
-TemporalTable::Flush ()
+TemporalTable::FlushEpilog ()
 {
   if (mVSData != NULL)
     mVSData->Flush ();
-
-  PrototypeTable::Flush ();
 }
 
 

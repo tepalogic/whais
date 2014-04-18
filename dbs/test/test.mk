@@ -98,3 +98,8 @@ test_range_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 UNIT_EXES+=test_unicodechars
 test_unicodechars_SRC=test/test_unicodechars.cpp
 test_unicodechars_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
+
+UNIT_EXES+=test_dbs_recovery
+test_dbs_recovery_SRC=test/test_dbs_recovery.cpp
+test_dbs_recovery_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
+

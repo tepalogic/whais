@@ -552,6 +552,25 @@ GeneralTable::MatchRows (const DRichReal&,
 }
 
 
+void
+GeneralTable::Flush ()
+{
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+}
+
+
+void
+GeneralTable::LockTable ()
+{
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+}
+
+void
+GeneralTable::UnlockTable ()
+{
+  throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+}
+
 GeneralTable&
 GeneralTable::Instance ()
 {

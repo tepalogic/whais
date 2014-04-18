@@ -30,7 +30,11 @@
 #include "dbs_types.h"
 #include "dbs_table.h"
 
+
+
 namespace whisper {
+
+
 
 static const uint64_t DEFAULT_MAX_FILE_SIZE           = 2147483648ul; //2GB
 static const uint32_t DEFAULT_TABLE_CACHE_BLK_SIZE    = 16384u;       //16KB
@@ -39,10 +43,11 @@ static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_SIZE  = 16384u;       //16KB
 static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_COUNT = 1024u;
 static const uint32_t DEFAULT_VLVALUE_CACHE_SIZE      = 512u;
 
+
+
 class DBS_SHL IDBSHandler
 {
 public:
-  IDBSHandler () {}
   virtual ~IDBSHandler () {}
 
   virtual TABLE_INDEX PersistentTablesCount () = 0;
@@ -89,18 +94,24 @@ struct DBSSettings
   uint32_t      mVLValueCacheSize;
 };
 
+
+
 DBS_SHL void
 DBSInit (const DBSSettings& setup);
+
 
 DBS_SHL void
 DBSShoutdown ();
 
+
 DBS_SHL const DBSSettings&
 DBSGetSeettings ();
+
 
 DBS_SHL void
 DBSCreateDatabase (const char* const name,
                    const char*       path = NULL);
+
 
 DBS_SHL IDBSHandler&
 DBSRetrieveDatabase (const char* const name,
@@ -109,9 +120,11 @@ DBSRetrieveDatabase (const char* const name,
 DBS_SHL void
 DBSReleaseDatabase (IDBSHandler& hnd);
 
+
 DBS_SHL void
 DBSRemoveDatabase (const char* const name,
                    const char*       path = NULL);
+
 
 } //namespace whisper
 

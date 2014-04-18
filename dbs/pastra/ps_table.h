@@ -50,9 +50,9 @@ public:
 
   virtual ITable& Spawn () const;
 
-protected:
-  virtual void Flush ();
+  virtual void FlushEpilog ();
 
+protected:
   virtual void MakeHeaderPersistent ();
 
   virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
@@ -74,7 +74,7 @@ protected:
   bool                         mRemoved;
 
 private:
-  void InitFromFile ();
+  void InitFromFile (const std::string& tableName);
 
   void InitIndexedFields ();
 
@@ -97,8 +97,9 @@ public:
 
   virtual ITable& Spawn () const;
 
+  virtual void FlushEpilog ();
+
 protected:
-  virtual void Flush ();
 
   virtual void MakeHeaderPersistent ();
 

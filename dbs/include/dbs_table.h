@@ -44,7 +44,6 @@ typedef void CREATE_INDEX_CALLBACK_FUNC (CreateIndexCallbackContext* cbContext);
 class DBS_SHL ITable
 {
 public:
-  ITable ();
   virtual ~ITable ();
 
   virtual bool IsTemporal () const = 0;
@@ -309,6 +308,12 @@ public:
                             const ROW_INDEX    fromRow,
                             const ROW_INDEX    toRow,
                             const FIELD_INDEX  field) = 0;
+
+  virtual void Flush () = 0;
+
+  virtual void LockTable () = 0;
+
+  virtual void UnlockTable () = 0;
 };
 
 } //namespace whisper

@@ -55,7 +55,7 @@ BlockCache::~BlockCache ()
   map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin ();
   while (it != mCachedBlocks.end ())
     {
-      assert (it->second.IsInUse() == false);
+      assert (it->second.IsInUse () == false);
       assert (it->second.IsDirty () == false);
 
       delete [] it->second.Data ();

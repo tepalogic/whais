@@ -302,6 +302,12 @@ public:
                             const ROW_INDEX       toRow,
                             const FIELD_INDEX     field);
 
+  virtual void Flush ();
+
+  virtual void LockTable ();
+
+  virtual void UnlockTable ();
+
   static GeneralTable& Instance ();
 };
 

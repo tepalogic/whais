@@ -84,9 +84,6 @@ public:
 class IDataContainer
 {
 public:
-  IDataContainer ()
-  {
-  }
 
   virtual ~IDataContainer ();
 
@@ -99,6 +96,8 @@ public:
   virtual uint64_t Size () const = 0;
 
   virtual void MarkForRemoval () = 0;
+
+  virtual void Flush () = 0;
 };
 
 
@@ -121,6 +120,8 @@ public:
   virtual uint64_t Size () const;
 
   virtual void MarkForRemoval ();
+
+  virtual void Flush ();
 
 private:
   void ExtendContainer ();
@@ -158,6 +159,8 @@ public:
   virtual uint64_t Size () const;
 
   virtual void MarkForRemoval ();
+
+  virtual void Flush ();
 
 private:
   void  FillCache (uint64_t position);
