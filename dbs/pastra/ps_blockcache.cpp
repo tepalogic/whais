@@ -89,6 +89,11 @@ BlockCache::Init (IBlocksManager&  blocksMgr,
 
   if (mBlockSize < mItemSize)
     mBlockSize = mItemSize;
+
+  else if (mBlockSize % mItemSize != 0)
+    mBlockSize -= mBlockSize % mItemSize;
+
+  assert (mBlockSize > 0);
 }
 
 void

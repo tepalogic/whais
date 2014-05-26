@@ -12,7 +12,7 @@ wslconnector_SHL:=
 
 wcmd_SRC:=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
 		 wcmd/wcmd_tabcomds.cpp wcmd/wcmd_onlinecmds.cpp wcmd/wcmd_execcmd.cpp\
-		 wcmd/wcmd_valparser.cpp
+		 wcmd/wcmd_valparser.cpp wcmd/wcmd_dbcheck.cpp
 		 
 wcmd_DEF:=USE_DBS_SHL
 wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcustom 

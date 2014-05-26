@@ -254,6 +254,7 @@ protected:
 class RowFieldText : public GenericText
 {
   friend class PrototypeTable;
+  friend class VariableSizeStore;
 
 public:
   RowFieldText (VariableSizeStore& storage,

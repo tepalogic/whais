@@ -250,7 +250,7 @@ whf_remove (const char* const file)
 {
   if (unlink (file) == 0)
     return TRUE;
-  /* else */
+
   return FALSE;
 }
 

@@ -233,11 +233,13 @@ whf_err_to_str (uint64_t error_code, char* str, uint_t strSize)
                        ) != 0;
 }
 
+
 bool_t
 whf_remove (const char* const file)
 {
   return DeleteFile (file);
 }
+
 
 const char*
 whf_dir_delim ()

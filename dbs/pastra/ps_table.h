@@ -33,15 +33,24 @@ namespace pastra {
 
 
 
+bool
+prototype_fix_table (DbsHandler&                  dbs,
+                     const std::string&           name,
+                     FIX_ERROR_CALLBACK           fixCallback);
+
+
 class PersistentTable : public PrototypeTable
 {
 public:
   PersistentTable (DbsHandler& dbs, const std::string& name);
+
   PersistentTable (DbsHandler&                     dbs,
                    const std::string&              name,
                    const DBSFieldDescriptor* const fields,
                    const uint_t                    fieldsCount);
+
   PersistentTable (const PrototypeTable& prototype);
+
   virtual ~PersistentTable ();
 
   void RemoveFromDatabase ();
@@ -63,7 +72,6 @@ protected:
 
   virtual VariableSizeStore& VSStore ();
 
-
   const DBSSettings&           mDbsSettings;
   uint64_t                     mMaxFileSize;
   uint64_t                     mVSDataSize;
@@ -79,6 +87,16 @@ private:
   void InitIndexedFields ();
 
   void InitVariableStorages();
+
+  void CheckTableValues (FIX_ERROR_CALLBACK fixCallback);
+
+public:
+  static bool ValidateTable (IDBSHandler&               dbs,
+                             const std::string&         name);
+
+  static bool RepairTable (DbsHandler&                  dbs,
+                           const std::string&           name,
+                           FIX_ERROR_CALLBACK           fixCallback);
 };
 
 

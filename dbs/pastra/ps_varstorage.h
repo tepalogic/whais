@@ -190,6 +190,17 @@ public:
                               uint_t         itemsCount,
                               uint8_t*       to);
 
+  void PrepareToCheckStorage ();
+
+  bool CheckArrayEntry (const uint64_t   recordFirstEntry,
+                        const uint64_t   recordSize,
+                        const uint_t     itemSize);
+
+  bool CheckTextEntry (const uint64_t   recordFirstEntry,
+                       const uint64_t   recordSize);
+
+  void ConcludeStorageCheck ();
+
 private:
   void FinishInit ();
 
@@ -209,6 +220,8 @@ private:
   uint64_t                      mEntriesCount;
   uint64_t                      mRefsCount;
   Lock                          mSync;
+
+  std::vector<bool>             mUsedEntries;
 };
 
 

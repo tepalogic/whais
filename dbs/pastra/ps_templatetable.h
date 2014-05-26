@@ -440,7 +440,6 @@ public:
                             const ROW_INDEX       fromRow,
                             const ROW_INDEX       toRow,
                             const FIELD_INDEX     field);
-
   virtual void LockTable ();
 
   virtual void UnlockTable ();

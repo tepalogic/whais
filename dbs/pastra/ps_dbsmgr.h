@@ -47,7 +47,9 @@ public:
   DbsHandler (const DBSSettings&    settings,
               const std::string&    directory,
               const std::string&    name);
+
   DbsHandler (const DbsHandler&     source);
+
   virtual ~DbsHandler ();
 
   virtual TABLE_INDEX PersistentTablesCount ();

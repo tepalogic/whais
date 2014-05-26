@@ -95,6 +95,17 @@ struct DBSSettings
 };
 
 
+enum FIX_ERROR_CALLBACK_TYPE {
+  INFORMATION                   = 1,
+  FIX_QUESTION,
+  VALIDATE_QUESTION,
+  OPTIMISE_QUESTION,
+  CRITICAL
+};
+
+typedef bool (*FIX_ERROR_CALLBACK) (const FIX_ERROR_CALLBACK_TYPE type,
+                                    const char* const             format,
+                                    ... );
 
 DBS_SHL void
 DBSInit (const DBSSettings& setup);
@@ -113,6 +124,15 @@ DBSCreateDatabase (const char* const name,
                    const char*       path = NULL);
 
 
+DBS_SHL bool
+DBSValidateDatabase (const char* const name,
+                     const char* const path = NULL);
+
+DBS_SHL bool
+DBSRepairDatabase (const char* const            name,
+                   const char* const            path        = NULL,
+                   FIX_ERROR_CALLBACK           fixCallback = NULL);
+
 DBS_SHL IDBSHandler&
 DBSRetrieveDatabase (const char* const name,
                      const char*       path = NULL);
@@ -122,8 +142,8 @@ DBSReleaseDatabase (IDBSHandler& hnd);
 
 
 DBS_SHL void
-DBSRemoveDatabase (const char* const name,
-                   const char*       path = NULL);
+DBSRemoveDatabase (const char* const     name,
+                   const char* const     path = NULL);
 
 
 } //namespace whisper

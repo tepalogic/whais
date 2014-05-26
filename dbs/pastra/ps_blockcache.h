@@ -191,7 +191,9 @@ private:
   std::map<uint64_t, class BlockEntry> mCachedBlocks;
 };
 
+
 } //namespace pastra
 } //namespace whisper
+
 
 #endif /* PS_BLOCKCACHE_H_ */

@@ -74,6 +74,7 @@ public:
 
     //The exception codes below this line cause an application stop.
     __CRITICAL_EXCEPTIONS,
+    TABLE_RECOVER_FAILED,
     BAD_PARAMETERS,
     GENERAL_CONTROL_ERROR
   };

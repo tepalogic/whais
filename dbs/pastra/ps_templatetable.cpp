@@ -822,6 +822,7 @@ IBTreeNode*
 PrototypeTable::LoadNode (const NODE_INDEX nodeId)
 {
   auto_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
+  memset (node->RawData (), 0xFF, NodeRawSize ());
 
   assert (TableContainer ().Size () % NodeRawSize () == 0);
 
@@ -914,12 +915,12 @@ PrototypeTable::CheckRowToDelete (const ROW_INDEX row)
 
   if (allFieldsNull)
     {
-      NODE_INDEX   dumyNode;
+      NODE_INDEX   dummyNode;
       KEY_INDEX    dummyKey;
       BTree        removedNodes (*this);
       TableRmKey   key (row);
 
-      removedNodes.InsertKey (key, &dumyNode, &dummyKey);
+      removedNodes.InsertKey (key, &dummyNode, &dummyKey);
     }
 }
 
@@ -1321,7 +1322,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
           uint8_t elemsCount[RowFieldArray::METADATA_SIZE];
 
-          store_le_int64 (value.Count(), elemsCount);
+          store_le_int64 (value.Count (), elemsCount);
 
           newFirstEntry = VSStore ().AddRecord (elemsCount, sizeof elemsCount);
           VSStore ().UpdateRecord (newFirstEntry,
@@ -2425,7 +2426,7 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
       || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
             _SC(uint_t,  outValue.DBSType ())))
     {
-      throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
+      throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
 
   const uint_t  byteOff = desc.NullBitIndex () / 8;

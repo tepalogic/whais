@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_tabcomds.h"
 #include "wcmd_onlinecmds.h"
+#include "wcmd_dbcheck.h"
 
 using namespace std;
 using namespace whisper;
@@ -63,10 +64,10 @@ static const char usageDescription[] =
 "    -r, --remove db_name   Remove the database named 'db_name'.\n"
 "    -u, --use db_name      Select 'db_name' as the target database.\n"
 "\n"
-"    -H,  --host hostname   The host name for remote database access.\n"
-"    -P,  --port portnum    The port number where the to connect.\n"
-"    -A,  --admin           Connect to a remote database as administrator.\n"
-"    -p,  --pass password   The password used to authenticate.\n"
+"    -H, --host hostname    The host name for remote database access.\n"
+"    -P, --port portnum     The port number where the to connect.\n"
+"    -A, --admin            Connect to a remote database as administrator.\n"
+"    -p, --pass password    The password used to authenticate.\n"
 "\n"
 "    -d, --dir directory    Sets the working directory.\n"
 "    -o, --dbdir directory  Sets the directory where the DB content resides.\n"
@@ -79,6 +80,8 @@ static const char usageDescription[] =
 "                            g,G : for Gigabytes.\n"
 "                           Default value for this is 2G (e.g. 2 Gigabytes),\n"
 "                           and the minimum is 1M (e.g. one Megabyte).\n"
+"    -f, --autofix          Accept to fix any issues by default in case the\n"
+"                           requested database was corrupted.\n"
 "    -v, --verbose level    Set the verbosity level. Level values:\n"
 "                            0: No out put.\n"
 "                            1: Print the status of the executed command.\n"
@@ -360,14 +363,43 @@ CreateDB ()
 }
 
 
+static bool
+repair_database (const bool forceRepair)
+{
+  if (forceRepair)
+    return true;
+
+  while (true)
+    {
+      char c;
+
+      cout << "Fix database for errors (y/N)?";
+      cin >> c;
+
+      if ((c == 'y') || (c == 'Y'))
+        return true;
+
+      else if ((c == 'n') || (c == 'N'))
+        return false;
+
+      cout << "Please choose 'y' or 'n'!\n";
+    }
+
+  assert (false);
+  return false;
+}
+
+
 int
 main (const int argc, char *argv[])
 {
-  int           result          = 0;
-  int           currentArg      = 1;
-  bool          createDB        = false;
-  bool          removeDB        = false;
-  bool          useDB           = false;
+  int           result              = 0;
+  int           currentArg          = 1;
+  bool          createDB            = false;
+  bool          removeDB            = false;
+  bool          useDB               = false;
+  bool          autoFix             = false;
+  bool          checkDbForErrors    = false;
   string        script;
 
 
@@ -537,6 +569,11 @@ main (const int argc, char *argv[])
           else
             ++currentArg;
         }
+      else if ((strcmp (argv[currentArg], "-f") == 0) ||
+               (strcmp (argv[currentArg], "--autofix" ) == 0))
+        {
+          autoFix = true;
+        }
       else
         {
           cerr << "Unknown parameter '" << argv[currentArg] << "'.\n";
@@ -645,9 +682,19 @@ main (const int argc, char *argv[])
   }
   catch (const Exception& e)
   {
-    printException (cerr, e);
+    if ((e.Type () == DBS_EXCEPTION)
+        && (e.Code () == DBSException::DATABASE_IN_USE))
+      {
+        cout << "The selected database was not closed porperly last time it ";
+        cout << "was used.";
+        checkDbForErrors = repair_database (autoFix);
+      }
+    else
+      {
+        printException (cerr, e);
 
-    result = e.Code ();
+        result = e.Code ();
+      }
   }
   catch (...)
   {
@@ -671,6 +718,11 @@ main (const int argc, char *argv[])
   }
 
   whs_clean ();
+
+  if (checkDbForErrors)
+    {
+      result = check_database_for_errors (autoFix);
+    }
 
   return result;
 }

@@ -405,6 +405,40 @@ FileContainer::Flush ()
 
 
 void
+FileContainer::Fix (const char* const           baseFile,
+                    const uint64_t              maxFileSize,
+                    const uint64_t              newContainerSize)
+{
+  uint64_t size                 = 0;
+  uint_t   fileCount            = 0;
+
+  while (true)
+    {
+      string fileName = baseFile;
+
+      if (fileCount != 0)
+        append_int_to_str (fileCount, fileName);
+
+      if (size >= newContainerSize)
+        {
+          //Remove all trailing container files until you found a missing one
+          if (! whf_remove (fileName.c_str ()))
+            break;
+        }
+      else
+        {
+          File unitFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
+
+          if (newContainerSize - size >= maxFileSize)
+            unitFile.SetSize (maxFileSize);
+
+          else
+            unitFile.SetSize (newContainerSize - size);
+        }
+    }
+}
+
+void
 FileContainer::ExtendContainer ()
 {
   uint_t count    = mFilesHandles.size ();

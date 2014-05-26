@@ -63,6 +63,7 @@ static const uint_t PS_DBS_FLAGS_LEN          = 8;
 static const uint_t PS_DBS_HEADER_SIZE        = 32;
 
 static const uint64_t PS_FLAG_NOT_CLOSED      = 1;
+static const uint64_t PS_FLAG_TO_REPAIR       = 2;
 
 
 
@@ -157,7 +158,8 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     }
 
   uint64_t headerFlags = load_le_int64 (buffer + PS_DBS_FLAGS_OFF);
-  if (headerFlags & PS_FLAG_NOT_CLOSED)
+  if ((headerFlags & PS_FLAG_NOT_CLOSED)
+      && ! (headerFlags & PS_FLAG_TO_REPAIR))
     {
       throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
                           "Cannot open database '%s'. Either it is already in"
@@ -377,7 +379,6 @@ DbsHandler::ReleaseTable (ITable& hndTable)
       return;
     }
 
-
   for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
       if (&hndTable == _SC (ITable*, it->second))
@@ -476,6 +477,8 @@ DbsHandler::Discard ()
 void
 DbsHandler::SyncToFile ()
 {
+  const uint8_t zero = 0;
+
   uint8_t header[PS_DBS_HEADER_SIZE];
 
   memcpy (header, DBS_FILE_SIGNATURE, PS_DBS_SIGNATURE_LEN);
@@ -497,6 +500,8 @@ DbsHandler::SyncToFile ()
       outFile.Write (_RC (const uint8_t*, it->first.c_str ()),
                      it->first.length () + 1);
     }
+
+  outFile.Write (&zero, 1);
 }
 
 
@@ -629,6 +634,154 @@ DBSCreateDatabase (const char* const name,
 }
 
 
+DBS_SHL bool
+DBSValidateDatabase (const char* const name,
+                     const char* const path)
+{
+
+  const string fileName = string (path) + name + DBS_FILE_EXT;
+  File         inputFile (fileName.c_str (),
+                          WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+
+  const uint_t      fileSize = inputFile.GetSize ();
+  auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
+  uint8_t* const    buffer = fileContent.get ();
+
+  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Read (buffer, fileSize);
+
+  if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
+    return false;
+
+  uint64_t headerFlags = load_le_int64 (buffer + PS_DBS_FLAGS_OFF);
+  if (headerFlags & PS_FLAG_NOT_CLOSED)
+    return false;
+
+  const uint16_t versionMaj = load_le_int16 (buffer + PS_DBS_VER_MAJ_OFF);
+  const uint16_t versionMin = load_le_int16 (buffer + PS_DBS_VER_MIN_OFF);
+
+  if ((versionMaj > PS_DBS_VER_MAJ)
+      || ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
+    {
+      return false;
+    }
+
+  return true;
+}
+
+
+DBS_SHL bool
+DBSRepairDatabase (const char* const            name,
+                   const char* const            path,
+                   FIX_ERROR_CALLBACK           fixCallback)
+{
+  const string fileName = string (name) + name + DBS_FILE_EXT;
+  File         inputFile (fileName.c_str (),
+                          WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+
+  const uint_t      fileSize = inputFile.GetSize ();
+  auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
+  uint8_t* const    buffer = fileContent.get ();
+
+  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Read (buffer, fileSize);
+
+  if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
+    {
+      if (fixCallback)
+        fixCallback (CRITICAL, "Cannot find a valid database signature!");
+
+      return false;
+    }
+
+  const uint16_t versionMaj = load_le_int16 (buffer + PS_DBS_VER_MAJ_OFF);
+  const uint16_t versionMin = load_le_int16 (buffer + PS_DBS_VER_MIN_OFF);
+
+  if ((versionMaj > PS_DBS_VER_MAJ)
+      || ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
+    {
+      if (fixCallback)
+        {
+          fixCallback (CRITICAL,
+                    "Database '%s' format version (%u,%u) is not supported."
+                    " Cannot fix!",
+                    name);
+        }
+      return false;
+    }
+
+  uint64_t headerFlags = load_le_int64 (buffer + PS_DBS_FLAGS_OFF);
+  if ((headerFlags & PS_FLAG_TO_REPAIR)
+      || (headerFlags & PS_FLAG_NOT_CLOSED))
+    {
+      bool fixError = false;
+      if (fixCallback)
+        {
+          fixError = fixCallback (FIX_QUESTION,
+                               "Database '%s' was not closed properly.",
+                               name);
+        }
+      if ( ! fixError)
+        return false;
+    }
+
+  //Before we continue set the 'in use' flag.
+  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Write (buffer, fileSize);
+
+  uint16_t       tablesCount  = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
+  uint16_t       actualCount  = 0;
+  IDBSHandler&   dbs          = DBSRetrieveDatabase (name, path);
+  const char* tableName       = _RC (const char*, buffer + PS_DBS_HEADER_SIZE);
+
+  while (*tableName != 0)
+    {
+      --tablesCount, ++actualCount;
+
+      if (! PersistentTable::ValidateTable (dbs, tableName))
+        {
+          try
+          {
+              if (! PersistentTable::RepairTable (_SC (DbsHandler&, dbs),
+                                                  tableName,
+                                                  fixCallback))
+                {
+                  return false;
+                }
+          }
+          catch (...)
+          {
+              DBSReleaseDatabase (dbs);
+              return false;
+          }
+        }
+      tableName += strlen (tableName) + 1;
+    }
+
+  if (tablesCount > 0)
+    {
+      bool fixError = false;
+      if (fixCallback)
+        {
+          fixError = fixCallback (FIX_QUESTION,
+                                  "The database tables count is higher than"
+                                  " expected. Should I truncated this?");
+        }
+      if ( ! fixError)
+        return false;
+
+      else
+        store_le_int16 (actualCount, buffer + PS_DBS_NUM_TABLES_OFF);
+    }
+
+  headerFlags &= ~(PS_FLAG_NOT_CLOSED | PS_FLAG_TO_REPAIR);
+  store_le_int64 (headerFlags, buffer + PS_DBS_FLAGS_OFF);
+
+  DBSReleaseDatabase (dbs);
+  return true;
+}
+
+
 DBS_SHL IDBSHandler&
 DBSRetrieveDatabase (const char* const name, const char* path)
 {
@@ -721,7 +874,7 @@ DBSReleaseDatabase (IDBSHandler& hnd)
               dbFile.Read (header, sizeof header);
 
               uint64_t flags = load_le_int64 (header + PS_DBS_FLAGS_OFF);
-              flags &= ~PS_FLAG_NOT_CLOSED;
+              flags &= ~(PS_FLAG_NOT_CLOSED | PS_FLAG_TO_REPAIR);
               store_le_int64 (flags, header + PS_DBS_FLAGS_OFF);
 
               dbFile.Seek (0, WHC_SEEK_BEGIN);
@@ -778,6 +931,9 @@ DBSRemoveDatabase (const char* const name, const char* path)
   it->second.mDbs.RemoveFromStorage ();
   dbses.erase (it);
 }
+
+
+
 
 } //namespace whisper
 

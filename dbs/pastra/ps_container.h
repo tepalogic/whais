@@ -123,6 +123,9 @@ public:
 
   virtual void Flush ();
 
+  static void Fix (const char* const       baseFile,
+                   const uint64_t          maxFileSize,
+                   const uint64_t          newContainerSize);
 private:
   void ExtendContainer ();
 

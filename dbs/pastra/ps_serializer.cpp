@@ -35,6 +35,7 @@ using namespace std;
 namespace whisper {
 namespace pastra {
 
+
 static const int PS_BOOL_SIZE                = 1;
 static const int PS_CHAR_SIZE                = 4;
 static const int PS_DATE_SIZE                = 4;
@@ -61,6 +62,8 @@ static const int PS_INT32_ALIGN              = 4;
 static const int PS_INT64_ALIGN              = 8;
 static const int PS_TEXT_ALIGN               = 8;
 static const int PS_ARRAY_ALIGN              = 8;
+
+
 
 inline static void
 new_bool (bool value, DBool* outBool)
@@ -508,6 +511,7 @@ Serializer::Size (const DBS_FIELD_TYPE type, const bool isArray)
   }
 }
 
+
 int
 Serializer::Alignment (const DBS_FIELD_TYPE type, bool isArray)
 {
@@ -562,6 +566,7 @@ Serializer::Alignment (const DBS_FIELD_TYPE type, bool isArray)
     throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
   }
 }
+
 
 } //namespace pastra
 } //namespace whisper
