@@ -636,8 +636,10 @@ DBSCreateDatabase (const char* const name,
 
 DBS_SHL bool
 DBSValidateDatabase (const char* const name,
-                     const char* const path)
+                     const char*       path)
 {
+  if (path == NULL)
+    path = dbsMgrs_->mDBSSettings.mWorkDir.c_str ();
 
   const string fileName = string (path) + name + DBS_FILE_EXT;
   File         inputFile (fileName.c_str (),
@@ -672,10 +674,13 @@ DBSValidateDatabase (const char* const name,
 
 DBS_SHL bool
 DBSRepairDatabase (const char* const            name,
-                   const char* const            path,
+                   const char*                  path,
                    FIX_ERROR_CALLBACK           fixCallback)
 {
-  const string fileName = string (name) + name + DBS_FILE_EXT;
+  if (path == NULL)
+    path = dbsMgrs_->mDBSSettings.mWorkDir.c_str ();
+
+  const string fileName = string (path) + name + DBS_FILE_EXT;
   File         inputFile (fileName.c_str (),
                           WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
 
@@ -718,21 +723,24 @@ DBSRepairDatabase (const char* const            name,
       if (fixCallback)
         {
           fixError = fixCallback (FIX_QUESTION,
-                               "Database '%s' was not closed properly.",
-                               name);
+                                  "Database '%s' was not closed properly.",
+                                  name);
         }
+
       if ( ! fixError)
         return false;
     }
 
   //Before we continue set the 'in use' flag.
+  store_le_int64 (headerFlags | PS_FLAG_TO_REPAIR, buffer + PS_DBS_FLAGS_OFF);
   inputFile.Seek (0, WHC_SEEK_BEGIN);
   inputFile.Write (buffer, fileSize);
+  inputFile.Close ();
 
   uint16_t       tablesCount  = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
   uint16_t       actualCount  = 0;
   IDBSHandler&   dbs          = DBSRetrieveDatabase (name, path);
-  const char* tableName       = _RC (const char*, buffer + PS_DBS_HEADER_SIZE);
+  const char*    tableName    = _RC (const char*, buffer + PS_DBS_HEADER_SIZE);
 
   while (*tableName != 0)
     {
@@ -773,9 +781,6 @@ DBSRepairDatabase (const char* const            name,
       else
         store_le_int16 (actualCount, buffer + PS_DBS_NUM_TABLES_OFF);
     }
-
-  headerFlags &= ~(PS_FLAG_NOT_CLOSED | PS_FLAG_TO_REPAIR);
-  store_le_int64 (headerFlags, buffer + PS_DBS_FLAGS_OFF);
 
   DBSReleaseDatabase (dbs);
   return true;

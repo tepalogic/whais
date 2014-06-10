@@ -25,7 +25,7 @@ const char tb_name[] = "t_test_tab";
 static const uint_t array_values = 5;
 
 static char text1[] = "This is a text!";
-static char text2[] = "This is should be bigger. It mus have more chars then the first one";
+static char text2[] = "This is should be bigger. It must have more chars then the first one";
 static char text3[] = "FirstName LastName";
 static char text4[] = "Total domination of the world is the goal, but why?\n"
                         "Some one will say because one can, but this is not the case.\b"
@@ -463,6 +463,7 @@ test_fixed_values_table (IDBSHandler& rDbs)
   return result;
 }
 
+
 template <class T> bool
 check_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
 {
@@ -490,6 +491,7 @@ check_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
   return true;
 }
 
+
 template <class T> bool
 fill_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
 {
@@ -506,6 +508,7 @@ fill_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
     }
   return check_value_array (source, array, seed);
 }
+
 
 template <class T> uint_t
 add_vectors_values_to_table (ITable& table, std::vector<T> &testVect)

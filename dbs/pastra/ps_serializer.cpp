@@ -243,9 +243,19 @@ Serializer::Store (uint8_t* const dst, const DReal& value)
   int64_t temp;
 
   store_le_int64 (value.mValue.Integer (), _RC (uint8_t*, &temp));
+
+  const uint64_t i = temp & 0xFFFFFF8000000000;
+  if ((i != 0) && (i != 0xFFFFFF8000000000))
+    throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
+
   memcpy (dst, &temp, integerSize);
 
   store_le_int64 (value.mValue.Fractional (), _RC (uint8_t*, &temp));
+
+  const uint64_t f = temp & 0xFFFFFFFFFF800000;
+  if ((f != 0) && (f != 0xFFFFFFFFFF800000))
+    throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
+
   memcpy (dst + integerSize, &temp, fractionalSize);
 }
 
@@ -263,6 +273,11 @@ Serializer::Store (uint8_t* const dst, const DRichReal& value)
   int64_t temp;
 
   store_le_int64 (value.mValue.Fractional (), _RC (uint8_t*, &temp));
+
+  const uint64_t f = temp & 0xFFFF800000000000;
+  if ((f != 0) && (f != 0xFFFF800000000000))
+    throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
+
   memcpy (dst + integerSize, &temp, fractionalSize);
 }
 

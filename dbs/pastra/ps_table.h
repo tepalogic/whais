@@ -109,6 +109,7 @@ public:
                  const DBSFieldDescriptor* const fields,
                  const FIELD_INDEX               fieldsCount);
   TemporalTable (const PrototypeTable& protoype);
+
   virtual ~TemporalTable ();
 
   virtual bool IsTemporal () const;

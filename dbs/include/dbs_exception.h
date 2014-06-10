@@ -55,7 +55,7 @@ public:
     TABLE_INVALID,
     FIELD_NAME_INVALID,
     FIELD_TYPE_INVALID,
-    FIELD_NOT_FUND,
+    FIELD_NOT_FOUND,
     FIELD_NOT_INDEXED,
     FIELD_INDEXED,
     INVALID_PARAMETERS,
@@ -71,6 +71,7 @@ public:
     ROW_NOT_ALLOCATED,
     TABLE_ALREADY_LOCKED,
     TABLE_NOT_LOCKED,
+    NUMERIC_FAULT,
 
     //The exception codes below this line cause an application stop.
     __CRITICAL_EXCEPTIONS,

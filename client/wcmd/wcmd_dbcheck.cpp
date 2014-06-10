@@ -31,7 +31,7 @@ using namespace std;
 int
 check_database_for_errors (const bool autoFixErrors)
 {
-  cout << "Beginning to check db for errors\n";
+  cout << "Beginning to check the database for errors\n";
 
   return 0;
 }

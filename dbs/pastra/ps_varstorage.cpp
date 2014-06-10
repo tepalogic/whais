@@ -111,7 +111,7 @@ void VariableSizeStore::Init (const char*     tempDir,
   mEntriesContainer.reset (new TemporalContainer ());
   mEntriesCount = 0;
 
-  FinishInit ();
+  FinishInit (true);
 }
 
 
@@ -130,7 +130,7 @@ VariableSizeStore::Init (const char*        baseName,
 
   mEntriesCount = mEntriesContainer->Size () / sizeof (StoreEntry);
 
-  FinishInit ();
+  FinishInit (false);
 }
 
 
@@ -159,7 +159,7 @@ is_entry_valid (const StoreEntry&    entry,
                 const bool           firstEntry,
                 const bool           lastEntry)
 {
-  if (firstEntry && ! entry.IsFirstEntry())
+  if (firstEntry && ! entry.IsFirstEntry ())
     return false;
 
   else if ( ! firstEntry && entry.IsFirstEntry ())
@@ -168,7 +168,9 @@ is_entry_valid (const StoreEntry&    entry,
   else if (lastEntry && (entry.NextEntry () != StoreEntry::LAST_CHAINED_ENTRY))
     return false;
 
-  return (entry.PrevEntry () == prevEntry);
+  return firstEntry ?
+          (entry.PrevEntry () == StoreEntry::FIRST_PREV_ENTRY) :
+          (entry.PrevEntry () == prevEntry);
 }
 
 
@@ -193,13 +195,16 @@ VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
                                   sizeof vsEntry,
                                   _RC (uint8_t*, &vsEntry));
 
+  if (vsEntry.IsDeleted ())
+    return false;
+
   uint8_t temp[sizeof (uint64_t)];
   vsEntry.Read (0, sizeof temp, temp);
 
   const uint64_t itemsCount = load_le_int64 (temp);
   if ((itemsCount == 0)
-      || ((recordSize - sizeof (uint64_t) % itemSize) != 0)
-      || ((recordSize - sizeof (uint64_t) / itemSize) != itemsCount))
+      || ((recordSize - sizeof (uint64_t)) % itemSize != 0)
+      || ((recordSize - sizeof (uint64_t)) / itemSize != itemsCount))
     {
       return false;
     }
@@ -215,7 +220,7 @@ VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
       if ( ! is_entry_valid (vsEntry,
                              prevEntry,
                              currentEntry == recordFirstEntry,
-                             lastEntry));
+                             lastEntry))
         {
           return false;
         }
@@ -354,7 +359,7 @@ VariableSizeStore::ConcludeStorageCheck ()
 
   const uint64_t containerSize = mEntriesCount * sizeof (StoreEntry);
 
-  if (containerSize >= mEntriesContainer->Size ())
+  if (containerSize <= mEntriesContainer->Size ())
     mEntriesContainer->Colapse (containerSize, mEntriesContainer->Size ());
 
   else
@@ -413,11 +418,11 @@ VariableSizeStore::ConcludeStorageCheck ()
   while (blkSize < sizeof (StoreEntry))
     blkSize *= 2;
 
-  mEntriesCache.Init (*this, sizeof (StoreEntry), blkSize, blkCount);
+  mEntriesCache.Init (*this, sizeof (StoreEntry), blkSize, blkCount, false);
 }
 
 void
-VariableSizeStore::FinishInit ()
+VariableSizeStore::FinishInit (const bool nonPersitentData)
 {
   if (mEntriesCount == 0)
     {
@@ -442,7 +447,11 @@ VariableSizeStore::FinishInit ()
   while (blkSize < sizeof (StoreEntry))
     blkSize *= 2;
 
-  mEntriesCache.Init (*this, sizeof (StoreEntry), blkSize, blkCount);
+  mEntriesCache.Init (*this,
+                      sizeof (StoreEntry),
+                      blkSize,
+                      blkCount,
+                      nonPersitentData);
 
   StoredItem              cachedItem = mEntriesCache.RetriveItem (0);
   const StoreEntry* const entry      = _RC (const StoreEntry*,
@@ -493,7 +502,7 @@ VariableSizeStore::AddRecord (const uint8_t*    buffer,
     entry->MarkAsFirstEntry (true);
 
     entry->NextEntry (StoreEntry::LAST_CHAINED_ENTRY);
-    entry->PrevEntry (1);
+    entry->PrevEntry (StoreEntry::FIRST_PREV_ENTRY);
   }
 
   if ((resultEntry != 0) && (size > 0))
@@ -529,7 +538,7 @@ VariableSizeStore::AddRecord (VariableSizeStore& sourceStore,
     entry->MarkAsFirstEntry (true);
 
     entry->NextEntry (StoreEntry::LAST_CHAINED_ENTRY);
-    entry->PrevEntry (1);
+    entry->PrevEntry (StoreEntry::FIRST_PREV_ENTRY);
   }
 
   if ((resultEntry != 0) && (sourceSize > 0))
@@ -567,7 +576,7 @@ VariableSizeStore::AddRecord (IDataContainer& sourceContainer,
     entry->MarkAsFirstEntry (true);
 
     entry->NextEntry (StoreEntry::LAST_CHAINED_ENTRY);
-    entry->PrevEntry (1);
+    entry->PrevEntry (StoreEntry::FIRST_PREV_ENTRY);
   }
 
   if ((resultEntry != 0) && (sourceSize > 0))

@@ -794,7 +794,7 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
   {
       const uint_t extra = e.Code ();
 
-      if (extra == DBSException::FIELD_NOT_FUND)
+      if (extra == DBSException::FIELD_NOT_FOUND)
         return WCS_INVALID_FIELD;
 
       else if (extra == DBSException::ARRAY_INDEX_TOO_BIG)

@@ -47,8 +47,9 @@ public:
   static const uint64_t LAST_CHAINED_ENTRY = 0x0FFFFFFFFFFFFFFFull;
   static const uint64_t ENTRY_DELETED_MASK = 0x8000000000000000ull;
   static const uint64_t FIRST_RECORD_ENTRY = 0x4000000000000000ull;
+  static const uint64_t FIRST_PREV_ENTRY   = 0xAAAAAAAAAAAAAAAAull;
 
-  static const uint_t   ENTRY_SIZE = 48;
+  static const uint_t     ENTRY_SIZE              = 48;
 
   void MarkAsDeleted (const bool deleted)
   {
@@ -202,7 +203,7 @@ public:
   void ConcludeStorageCheck ();
 
 private:
-  void FinishInit ();
+  void FinishInit (const bool nonPersitentData);
 
   uint64_t AllocateEntry (const uint64_t prevEntryId);
 

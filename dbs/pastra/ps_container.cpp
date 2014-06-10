@@ -419,6 +419,8 @@ FileContainer::Fix (const char* const           baseFile,
       if (fileCount != 0)
         append_int_to_str (fileCount, fileName);
 
+      fileCount++;
+
       if (size >= newContainerSize)
         {
           //Remove all trailing container files until you found a missing one
@@ -430,10 +432,15 @@ FileContainer::Fix (const char* const           baseFile,
           File unitFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
 
           if (newContainerSize - size >= maxFileSize)
-            unitFile.SetSize (maxFileSize);
-
+            {
+              unitFile.SetSize (maxFileSize);
+              size += maxFileSize;
+            }
           else
-            unitFile.SetSize (newContainerSize - size);
+            {
+              unitFile.SetSize (newContainerSize - size);
+              size = newContainerSize;
+            }
         }
     }
 }

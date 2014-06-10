@@ -172,7 +172,8 @@ public:
   void Init (IBlocksManager&      blocksMgr,
              const uint_t         itemSize,
              const uint_t         blockSize,
-             const uint_t         maxCachedBlocks);
+             const uint_t         maxCachedBlocks,
+             const bool           nonPersitentData);
 
   void Flush ();
 
@@ -187,6 +188,7 @@ private:
   uint_t           mItemSize;
   uint_t           mBlockSize;
   uint_t           mMaxCachedBlocks;
+  bool             mSkipFlush;
 
   std::map<uint64_t, class BlockEntry> mCachedBlocks;
 };

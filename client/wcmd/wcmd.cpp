@@ -685,7 +685,7 @@ main (const int argc, char *argv[])
     if ((e.Type () == DBS_EXCEPTION)
         && (e.Code () == DBSException::DATABASE_IN_USE))
       {
-        cout << "The selected database was not closed porperly last time it ";
+        cout << "The selected database was not closed properly last time it ";
         cout << "was used.";
         checkDbForErrors = repair_database (autoFix);
       }

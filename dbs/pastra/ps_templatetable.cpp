@@ -59,7 +59,6 @@ PrototypeTable::PrototypeTable (DbsHandler& dbs)
     mRowsSync (),
     mIndexesSync (),
     mRowModified (false),
-    mIndexModified (false),
     mLockInProgress (false)
 {
 }
@@ -78,7 +77,6 @@ PrototypeTable::PrototypeTable (const PrototypeTable& prototype)
     mRowsSync (),
     mIndexesSync (),
     mRowModified (false),
-    mIndexModified (false),
     mLockInProgress (false)
 {
   //TODO: Should be possible for the two prototypes to share the same memory
@@ -153,7 +151,7 @@ PrototypeTable::RetrieveField (const char* name)
       fieldName += strlen (fieldName) + 1;
     }
 
-  throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
+  throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
                      "Cannot find table field '%s'.",
                      name);
 }
@@ -164,7 +162,7 @@ PrototypeTable::DescribeField (const FIELD_INDEX field)
 {
   if (field >= mFieldsCount)
     {
-      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
                          "Table field index is invalid %u (count %u).",
                          field,
                          mFieldsCount);
@@ -218,7 +216,6 @@ PrototypeTable::AddRow ()
   LockRAII syncHolder (mRowsSync);
 
   MarkRowModification ();
-  MarkIndexModification ();
 
   mRowCache.FlushItem (mRowsCount - 1);
 
@@ -542,8 +539,6 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
                             "or array fields.");
     }
 
-  MarkIndexModification ();
-
   const uint_t nodeSizeKB  = 16; //16KB
 
   auto_ptr<IDataContainer> indexContainer (CreateIndexContainer (field));
@@ -556,18 +551,7 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
                                                        true)
                                           );
 
-  BTreeNodeRAII rootNode (nodeMgr->RetrieveNode (
-                                     nodeMgr->AllocateNode (NIL_NODE, 0))
-                                                );
-  rootNode->Next (NIL_NODE);
-  rootNode->Prev (NIL_NODE);
-  rootNode->KeysCount (0);
-  rootNode->Leaf (true);
-  rootNode->InsertKey (rootNode->SentinelKey ());
-
-  nodeMgr->RootNodeId (rootNode->NodeId());
   BTree fieldTree (*nodeMgr.get ());
-
   for (ROW_INDEX row = 0; row < mRowsCount; ++row)
     {
       switch (desc.Type ())
@@ -664,8 +648,6 @@ PrototypeTable::RemoveIndex (const FIELD_INDEX field)
   if (PrototypeTable::IsIndexed (field) == false)
     throw DBSException (_EXTRA (DBSException::FIELD_NOT_INDEXED));
 
-  MarkIndexModification ();
-
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   assert (desc.IndexNodeSizeKB () > 0);
@@ -688,7 +670,7 @@ PrototypeTable::IsIndexed (const FIELD_INDEX field) const
 {
   if (field >= mFieldsCount)
     {
-      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
                          "Table field index is invalid %u (%u),",
                          field,
                          mFieldsCount);
@@ -715,7 +697,7 @@ PrototypeTable::GetFieldDescriptorInternal(const FIELD_INDEX field) const
 
   if (field >= mFieldsCount)
     {
-      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FUND),
+      throw DBSException(_EXTRA (DBSException::FIELD_NOT_FOUND),
                          "Cannot get table field %u (of %u) description.",
                           field,
                           mFieldsCount);
@@ -822,7 +804,6 @@ IBTreeNode*
 PrototypeTable::LoadNode (const NODE_INDEX nodeId)
 {
   auto_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
-  memset (node->RawData (), 0xFF, NodeRawSize ());
 
   assert (TableContainer ().Size () % NodeRawSize () == 0);
 
@@ -940,7 +921,7 @@ PrototypeTable::CheckRowToReuse (const ROW_INDEX row)
       const FieldDescriptor& fieldDesc = GetFieldDescriptorInternal (index);
       const uint8_t          bitsSet   = ~0;
 
-      if ( rowData[fieldDesc.NullBitIndex () / 8] != bitsSet)
+      if (rowData[fieldDesc.NullBitIndex () / 8] != bitsSet)
         {
           allFieldsNull = false;
           break;
@@ -1134,8 +1115,8 @@ PrototypeTable::Set (const ROW_INDEX      row,
   else if (row > mRowsCount)
     throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.Type () & PS_TABLE_ARRAY_MASK)
-      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
+  if (IS_ARRAY (desc.Type ())
+      || (GET_BASIC_TYPE (desc.Type ()) != T_TEXT))
     {
       throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
@@ -1276,9 +1257,9 @@ PrototypeTable::Set (const ROW_INDEX        row,
   else if (row > mRowsCount)
     throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if (((desc.Type () & PS_TABLE_ARRAY_MASK) == 0)
-      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
-           _SC (uint_t, value.Type ())))
+  if ( ! IS_ARRAY (desc.Type ())
+      || ((GET_BASIC_TYPE (desc.Type ()) != value.Type ())
+          && ! value.IsNull ()))
     {
       throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
@@ -1312,7 +1293,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
                                                       value.mFirstRecordEntry,
                                                       0,
                                                       newFieldValueSize
-                                                                   );
+                                                       );
             }
         }
       else
@@ -1562,8 +1543,8 @@ PrototypeTable::Get (const ROW_INDEX   row,
   if (row >= mRowsCount)
     throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if ((desc.Type () & PS_TABLE_ARRAY_MASK)
-      || ((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) != _SC(uint_t, T_TEXT)))
+  if (IS_ARRAY (desc.Type ())
+      || (GET_BASIC_TYPE (desc.Type ()) != T_TEXT))
     {
       throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
@@ -1606,10 +1587,9 @@ PrototypeTable::Get (const ROW_INDEX        row,
   if (row >= mRowsCount)
     throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
 
-  if (((desc.Type () & PS_TABLE_ARRAY_MASK) == 0)
-      || (((desc.Type () & PS_TABLE_FIELD_TYPE_MASK) !=
-             _SC(uint_t, outValue.Type ()))
-          && (outValue.Type () != T_UNDETERMINED)))
+  if ( ! IS_ARRAY (desc.Type ())
+      || ((GET_BASIC_TYPE (desc.Type ()) != outValue.Type ())
+          && ! outValue.IsNull ()))
     {
       throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
@@ -2361,7 +2341,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
   LockRAII syncHolder (mRowsSync);
 
   StoredItem     cachedItem = mRowCache.RetriveItem (row);
-  uint8_t *const rowData   = cachedItem.GetDataForUpdate();
+  uint8_t *const rowData    = cachedItem.GetDataForUpdate();
 
   if (value.IsNull ())
     {
@@ -2387,8 +2367,6 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
     {
       NODE_INDEX        dummyNode;
       KEY_INDEX         dummyKey;
-
-      MarkIndexModification ();
 
       AcquireFieldIndex (&desc);
       syncHolder.Release ();
@@ -2574,17 +2552,6 @@ PrototypeTable::MarkRowModification ()
 
 
 void
-PrototypeTable::MarkIndexModification ()
-{
-  if ( ! mIndexModified)
-    {
-      mIndexModified = true;
-      MakeHeaderPersistent ();
-    }
-}
-
-
-void
 PrototypeTable::FlushInternal ()
 {
   mRowCache.Flush ();
@@ -2606,7 +2573,6 @@ PrototypeTable::FlushInternal ()
   FlushEpilog ();
 
   mRowModified   = false;
-  mIndexModified = false;
 
   MakeHeaderPersistent ();
 }

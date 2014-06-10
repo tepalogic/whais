@@ -509,10 +509,7 @@ protected:
 
   void MarkRowModification ();
 
-  void MarkIndexModification ();
-
   void FlushInternal ();
-
 
   //Data members
   DbsHandler&                           mDbs;
@@ -528,7 +525,6 @@ protected:
   Lock                                  mRowsSync;
   Lock                                  mIndexesSync;
   bool                                  mRowModified;
-  bool                                  mIndexModified;
   bool                                  mLockInProgress;
 };
 

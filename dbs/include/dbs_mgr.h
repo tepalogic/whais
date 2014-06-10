@@ -126,11 +126,11 @@ DBSCreateDatabase (const char* const name,
 
 DBS_SHL bool
 DBSValidateDatabase (const char* const name,
-                     const char* const path = NULL);
+                     const char*       path = NULL);
 
 DBS_SHL bool
 DBSRepairDatabase (const char* const            name,
-                   const char* const            path        = NULL,
+                   const char*                  path        = NULL,
                    FIX_ERROR_CALLBACK           fixCallback = NULL);
 
 DBS_SHL IDBSHandler&

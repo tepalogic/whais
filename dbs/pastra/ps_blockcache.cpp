@@ -56,7 +56,7 @@ BlockCache::~BlockCache ()
   while (it != mCachedBlocks.end ())
     {
       assert (it->second.IsInUse () == false);
-      assert (it->second.IsDirty () == false);
+      assert (mSkipFlush || it->second.IsDirty () == false);
 
       delete [] it->second.Data ();
       ++it;
@@ -68,7 +68,8 @@ void
 BlockCache::Init (IBlocksManager&  blocksMgr,
                   const uint_t     itemSize,
                   const uint_t     blockSize,
-                  const uint_t     maxCachedBlocks)
+                  const uint_t     maxCachedBlocks,
+                  const bool       nonPersitentData)
 {
   assert (itemSize > 0);
   assert (blockSize > 0);
@@ -86,6 +87,7 @@ BlockCache::Init (IBlocksManager&  blocksMgr,
   mItemSize         = itemSize;
   mMaxCachedBlocks  = maxCachedBlocks;
   mBlockSize        = blockSize;
+  mSkipFlush        = nonPersitentData;
 
   if (mBlockSize < mItemSize)
     mBlockSize = mItemSize;
@@ -100,6 +102,9 @@ void
 BlockCache::Flush ()
 {
   assert (mItemSize != 0);
+
+  if (mSkipFlush)
+    return;
 
   map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin ();
   while (it != mCachedBlocks.end ())

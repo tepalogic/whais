@@ -59,6 +59,7 @@ class IBTreeNode
 public:
   IBTreeNode (IBTreeNodeManager&   nodesManager,
               const NODE_INDEX     nodeId);
+
   virtual ~IBTreeNode ();
 
   bool IsLeaf () const

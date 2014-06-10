@@ -103,3 +103,6 @@ UNIT_EXES+=test_dbs_recovery
 test_dbs_recovery_SRC=test/test_dbs_recovery.cpp
 test_dbs_recovery_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 
+UNIT_EXES+=test_autofix
+test_autofix_SRC=test/test_autofix.cpp
+test_autofix_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon

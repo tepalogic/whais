@@ -111,7 +111,7 @@ DBSException::Description () const
   case FIELD_TYPE_INVALID:
     return "Tried to create a table using an invalid or unsupported field type.";
 
-  case FIELD_NOT_FUND:
+  case FIELD_NOT_FOUND:
     return "Tried to select an inexistent table field.";
 
   case FIELD_NOT_INDEXED:
@@ -156,8 +156,14 @@ DBSException::Description () const
   case TABLE_ALREADY_LOCKED:
     return "Tried to lock a table content, but it was already locked.";
 
+  case NUMERIC_FAULT:
+    return "A numeric fault was encountered.";
+
   case TABLE_NOT_LOCKED:
     return "Tried to unlock a table though it was not locked  locked.";
+
+  case TABLE_RECOVER_FAILED:
+    return "Failed to recover a database table.";
 
   case BAD_PARAMETERS:
     return "Program execution could not continue due to invalid parameters.";
