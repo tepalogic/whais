@@ -25,6 +25,8 @@
 #ifndef PS_SERIALIZER_H_
 #define PS_SERIALIZER_H_
 
+#include <cstring>
+
 #include "dbs/dbs_values.h"
 #include "utils/le_converter.h"
 
@@ -74,9 +76,6 @@ public:
 
   static int Size (const DBS_FIELD_TYPE type, const bool isArray);
 
-  static int Alignment (const DBS_FIELD_TYPE, const bool isArray);
-
-
   static ROW_INDEX LoadRow (const ROW_INDEX* const from)
   {
     if (sizeof (ROW_INDEX) == sizeof (uint64_t))
@@ -116,7 +115,19 @@ public:
 
     store_le_int32 (node, _RC (uint8_t*, to));
   }
+
+  template<typename T> static bool
+  ValidateBuffer (const uint8_t* const buffer)
+  {
+    return true;
+  }
+
 };
+
+
+
+
+
 
 } //namespace pastra
 } //namespace whisper

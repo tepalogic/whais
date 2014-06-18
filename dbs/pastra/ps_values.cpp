@@ -1176,15 +1176,9 @@ wh_array_init (const T* const       array,
   auto_ptr<TemporalArray> autoP (new TemporalArray (array[0].DBSType ()));
   *outStrategy = autoP.get ();
 
-  uint64_t currentOffset  = 0;
-  uint_t   valueIncrement = 0;
-
-  while (valueIncrement <
-           _SC(uint_t,  Serializer::Size (array[0].DBSType (), false)))
-    {
-      valueIncrement += Serializer::Alignment (array[0].DBSType (), false);
-    }
-
+  uint64_t       currentOffset  = 0;
+  const uint_t   valueSize      = Serializer::Size (array[0].DBSType (),
+                                                    false);
   for (uint64_t index = 0; index < count; ++index)
     {
       if (array[index].IsNull ())
@@ -1192,11 +1186,11 @@ wh_array_init (const T* const       array,
 
       uint8_t rawStorage [MAX_VALUE_RAW_STORAGE];
 
-      assert (valueIncrement <= (sizeof rawStorage));
+      assert (valueSize <= (sizeof rawStorage));
 
       Serializer::Store (rawStorage, array[index]);
-      (*outStrategy)->WriteRaw(currentOffset, valueIncrement, rawStorage);
-      currentOffset += valueIncrement;
+      (*outStrategy)->WriteRaw(currentOffset, valueSize, rawStorage);
+      currentOffset += valueSize;
     }
 
   (*outStrategy)->IncrementReferenceCount();
@@ -1427,18 +1421,6 @@ DArray::Type () const
 }
 
 
-static int
-get_aligned_elem_size (DBS_FIELD_TYPE type)
-{
-  int result = 0;
-
-  while (result < Serializer::Size(type, false))
-    result += Serializer::Alignment (type, false);
-
-  return result;
-}
-
-
 static void
 prepare_array_strategy (IArrayStrategy** inoutStrategy)
 {
@@ -1481,9 +1463,8 @@ add_array_element (const T& element, IArrayStrategy** inoutStrategy)
   else if (element.IsNull ())
     throw DBSException (_EXTRA (DBSException::NULL_ARRAY_ELEMENT));
 
-  static const uint_t storageSize = get_aligned_elem_size (
-                                                    element.DBSType ()
-                                                          );
+  static const uint_t storageSize = Serializer::Size (element.DBSType (),
+                                                      false);
   prepare_array_strategy (inoutStrategy);
 
   uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
@@ -1617,9 +1598,8 @@ get_array_element (IArrayStrategy&        strategy,
   else if (strategy.Type() != outElement.DBSType ())
     throw DBSException (_EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
-  static const uint_t storageSize = get_aligned_elem_size (
-                                                    outElement.DBSType ()
-                                                          );
+  static const uint_t storageSize = Serializer::Size (outElement.DBSType (),
+                                                      false);
   uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
   assert (sizeof rawElement >= storageSize);
@@ -1734,8 +1714,7 @@ DArray::Get (const uint64_t index, DInt64& outValue) const
 }
 
 
-template<class T>
-inline void
+template<class T> inline void
 set_array_element (const T&          value,
                    const uint64_t    index,
                    IArrayStrategy**  inoutStrategy)
@@ -1752,9 +1731,9 @@ set_array_element (const T&          value,
     throw DBSException(_EXTRA (DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy (inoutStrategy);
-  static const uint_t storageSize = get_aligned_elem_size (
-                                                    (*inoutStrategy)->Type ()
-                                                          );
+
+  static const uint_t storageSize = Serializer::Size ((*inoutStrategy)->Type (),
+                                                      false);
   if (value.IsNull ())
       (*inoutStrategy)->ColapseRaw (index * storageSize, storageSize);
 
@@ -1763,9 +1742,7 @@ set_array_element (const T&          value,
       uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
       Serializer::Store (rawElement, value);
-      (*inoutStrategy)->WriteRaw (storageSize * index,
-                                  storageSize,
-                                  rawElement);
+      (*inoutStrategy)->WriteRaw (storageSize * index, storageSize, rawElement);
     }
 }
 
@@ -1883,7 +1860,7 @@ DArray::Remove (const uint64_t index)
 
   prepare_array_strategy (&mArray);
 
-  const uint_t storageSize = get_aligned_elem_size (mArray->Type());
+  const uint_t storageSize = Serializer::Size (mArray->Type (), false);
 
   mArray->ColapseRaw (index * storageSize, storageSize);
 }

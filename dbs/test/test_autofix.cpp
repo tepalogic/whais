@@ -137,7 +137,8 @@ check_indexed_field (ITable&            table,
                      DArray&            reffArray,
                      vector<bool>&      reffNullsArray,
                      const FIELD_INDEX  field,
-                     const ROW_INDEX    rowsCount)
+                     const ROW_INDEX    rowsCount,
+                     const bool         broken)
 {
   bool indexed = table.IsIndexed (field);
 
@@ -201,7 +202,20 @@ check_indexed_field (ITable&            table,
   for (ROW_INDEX i = 0; i < rowsCount; ++i)
     {
       if ( ! visitedRows[i])
-        return false;
+        {
+          bool notFound = true;
+          for (uint_t j = 0; broken && (j < matchedRows.Count ()) && notFound; ++j)
+            {
+              DROW_INDEX row;
+
+              matchedRows.Get (j, row);
+              if (row.mValue == i)
+                notFound = false;
+            }
+
+          if (notFound)
+            return false;
+        }
     }
 
   return true;
@@ -233,7 +247,7 @@ add_bool_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_bool_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_bool_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'bool'.\n";
   if (bool_rows.Count () != rowsCount)
@@ -251,7 +265,7 @@ verify_bool_rows (ITable& table, const ROW_INDEX rowsCount)
       if (bool_rows_n[field])
         return (arrayValue == DBool (true)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -259,7 +273,8 @@ verify_bool_rows (ITable& table, const ROW_INDEX rowsCount)
                                      bool_rows,
                                      bool_rows_n,
                                      field,
-                                     rowsCount);
+                                     rowsCount,
+                                     broken);
 }
 
 
@@ -294,7 +309,7 @@ add_char_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_char_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_char_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Testing field 'char'.\n";
 
@@ -313,7 +328,7 @@ verify_char_rows (ITable& table, const ROW_INDEX rowsCount)
       if (char_rows_n[field])
         return (arrayValue == DChar ('Z')) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -321,7 +336,8 @@ verify_char_rows (ITable& table, const ROW_INDEX rowsCount)
                                      char_rows,
                                      char_rows_n,
                                      field,
-                                     rowsCount);
+                                     rowsCount,
+                                     broken);
 }
 
 
@@ -354,7 +370,7 @@ add_date_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_date_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_date_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'date'.\n";
   if (date_rows.Count () != rowsCount)
@@ -372,7 +388,7 @@ verify_date_rows (ITable& table, const ROW_INDEX rowsCount)
       if (date_rows_n[field])
         return (arrayValue == DDate (1, 1, 1)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -380,7 +396,8 @@ verify_date_rows (ITable& table, const ROW_INDEX rowsCount)
                                      date_rows,
                                      date_rows_n,
                                      field,
-                                     rowsCount);
+                                     rowsCount,
+                                     broken);
 }
 
 
@@ -416,7 +433,9 @@ add_datetime_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_datetime_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_datetime_rows (ITable&           table,
+                      const ROW_INDEX   rowsCount,
+                      const bool        broken)
 {
   cout << "Test field 'datetime'.\n";
   if (datetime_rows.Count () != rowsCount)
@@ -437,7 +456,7 @@ verify_datetime_rows (ITable& table, const ROW_INDEX rowsCount)
                   && rowValue.IsNull ();
         }
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -445,7 +464,8 @@ verify_datetime_rows (ITable& table, const ROW_INDEX rowsCount)
                                          datetime_rows,
                                          datetime_rows_n,
                                          field,
-                                         rowsCount);
+                                         rowsCount,
+                                         broken);
 }
 
 
@@ -482,7 +502,9 @@ add_hirestime_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_hirestime_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_hirestime_rows (ITable& table,
+                      const ROW_INDEX rowsCount,
+                      const bool broken)
 {
   cout << "Test field 'hirestime'.\n";
   if (hirestime_rows.Count () != rowsCount)
@@ -503,7 +525,7 @@ verify_hirestime_rows (ITable& table, const ROW_INDEX rowsCount)
                     rowValue.IsNull ();
         }
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -511,7 +533,8 @@ verify_hirestime_rows (ITable& table, const ROW_INDEX rowsCount)
                                           hirestime_rows,
                                           hirestime_rows_n,
                                           field,
-                                          rowsCount);
+                                          rowsCount,
+                                          broken);
 }
 
 
@@ -542,7 +565,7 @@ add_int8_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_int8_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_int8_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'int8'.\n";
   if (int8_rows.Count () != rowsCount)
@@ -560,7 +583,7 @@ verify_int8_rows (ITable& table, const ROW_INDEX rowsCount)
       if (int8_rows_n[field])
         return (arrayValue == DInt8 (12)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -568,7 +591,8 @@ verify_int8_rows (ITable& table, const ROW_INDEX rowsCount)
                                      int8_rows,
                                      int8_rows_n,
                                      field,
-                                     rowsCount);
+                                     rowsCount,
+                                     broken);
 }
 
 
@@ -599,7 +623,7 @@ add_int16_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_int16_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_int16_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'int16'.\n";
   if (int16_rows.Count () != rowsCount)
@@ -617,7 +641,7 @@ verify_int16_rows (ITable& table, const ROW_INDEX rowsCount)
       if (int16_rows_n[field])
         return (arrayValue == DInt16 (-13)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -625,7 +649,8 @@ verify_int16_rows (ITable& table, const ROW_INDEX rowsCount)
                                       int16_rows,
                                       int16_rows_n,
                                       field,
-                                      rowsCount);
+                                      rowsCount,
+                                      broken);
 }
 
 
@@ -656,7 +681,7 @@ add_int32_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_int32_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_int32_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'int32'.\n";
   if (int32_rows.Count () != rowsCount)
@@ -682,7 +707,8 @@ verify_int32_rows (ITable& table, const ROW_INDEX rowsCount)
                                       int32_rows,
                                       int32_rows_n,
                                       field,
-                                      rowsCount);
+                                      rowsCount,
+                                      broken);
 }
 
 
@@ -713,7 +739,7 @@ add_int64_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_int64_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_int64_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'int64'.\n";
   if (int64_rows.Count () != rowsCount)
@@ -731,7 +757,7 @@ verify_int64_rows (ITable& table, const ROW_INDEX rowsCount)
       if (int64_rows_n[field])
         return (arrayValue == DInt64 (-15)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -739,7 +765,8 @@ verify_int64_rows (ITable& table, const ROW_INDEX rowsCount)
                                       int64_rows,
                                       int64_rows_n,
                                       field,
-                                      rowsCount);
+                                      rowsCount,
+                                      broken);
 }
 
 
@@ -770,7 +797,7 @@ add_u_int8_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_u_int8_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_u_int8_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'uint8'.\n";
   if (u_int8_rows.Count () != rowsCount)
@@ -788,7 +815,7 @@ verify_u_int8_rows (ITable& table, const ROW_INDEX rowsCount)
       if (u_int8_rows_n[field])
         return (arrayValue == DUInt8 (12)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -796,7 +823,8 @@ verify_u_int8_rows (ITable& table, const ROW_INDEX rowsCount)
                                       u_int8_rows,
                                       u_int8_rows_n,
                                       field,
-                                      rowsCount);
+                                      rowsCount,
+                                      broken);
 }
 
 
@@ -827,7 +855,7 @@ add_u_int16_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_u_int16_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_u_int16_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'uint16'.\n";
   if (u_int16_rows.Count () != rowsCount)
@@ -845,7 +873,7 @@ verify_u_int16_rows (ITable& table, const ROW_INDEX rowsCount)
       if (u_int16_rows_n[field])
         return (arrayValue == DUInt16 (13)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -853,7 +881,8 @@ verify_u_int16_rows (ITable& table, const ROW_INDEX rowsCount)
                                        u_int16_rows,
                                        u_int16_rows_n,
                                        field,
-                                       rowsCount);
+                                       rowsCount,
+                                       broken);
 }
 
 
@@ -884,7 +913,7 @@ add_u_int32_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_u_int32_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_u_int32_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'uint32'.\n";
   if (u_int32_rows.Count () != rowsCount)
@@ -910,7 +939,8 @@ verify_u_int32_rows (ITable& table, const ROW_INDEX rowsCount)
                                        u_int32_rows,
                                        u_int32_rows_n,
                                        field,
-                                       rowsCount);
+                                       rowsCount,
+                                       broken);
 }
 
 
@@ -941,7 +971,7 @@ add_u_int64_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_u_int64_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_u_int64_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'uint64'.\n";
   if (u_int64_rows.Count () != rowsCount)
@@ -959,7 +989,7 @@ verify_u_int64_rows (ITable& table, const ROW_INDEX rowsCount)
       if (u_int64_rows_n[field])
         return (arrayValue == DUInt64 (15)) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -967,7 +997,8 @@ verify_u_int64_rows (ITable& table, const ROW_INDEX rowsCount)
                                        u_int64_rows,
                                        u_int64_rows_n,
                                        field,
-                                       rowsCount);
+                                       rowsCount,
+                                       broken);
 }
 
 
@@ -1001,7 +1032,7 @@ add_real_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_real_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_real_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'real'.\n";
   if (u_int64_rows.Count () != rowsCount)
@@ -1019,7 +1050,7 @@ verify_real_rows (ITable& table, const ROW_INDEX rowsCount)
       if (real_rows_n[field])
         return (arrayValue == DReal::Min ()) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -1027,7 +1058,8 @@ verify_real_rows (ITable& table, const ROW_INDEX rowsCount)
                                      real_rows,
                                      real_rows_n,
                                      field,
-                                     rowsCount);
+                                     rowsCount,
+                                     broken );
 }
 
 
@@ -1060,7 +1092,7 @@ add_richreal_row (ITable& table, const ROW_INDEX row)
 
 
 static bool
-verify_richreal_rows (ITable& table, const ROW_INDEX rowsCount)
+verify_richreal_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
   cout << "Test field 'richreal'.\n";
   if (u_int64_rows.Count () != rowsCount)
@@ -1078,7 +1110,7 @@ verify_richreal_rows (ITable& table, const ROW_INDEX rowsCount)
       if (richreal_rows_n[field])
         return (arrayValue == DRichReal::Max ()) && rowValue.IsNull ();
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
+      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
           return false;
     }
 
@@ -1086,7 +1118,8 @@ verify_richreal_rows (ITable& table, const ROW_INDEX rowsCount)
                                          richreal_rows,
                                          richreal_rows_n,
                                          field,
-                                         rowsCount);
+                                         rowsCount,
+                                         broken);
 }
 
 
@@ -1109,7 +1142,8 @@ add_text_row (ITable&         table,
 
 static bool
 verify_text_rows (ITable& table,
-                  const ROW_INDEX rowsCount)
+                  const ROW_INDEX rowsCount,
+                  const bool broken)
 {
 
   cout << "Test field 'text'.\n";
@@ -1126,7 +1160,7 @@ verify_text_rows (ITable& table,
             return false;
         }
       else if  ((fieldValue != DText (text[row % 4]))
-                && ( ! fieldValue.IsNull ()))
+                && ( broken && ! fieldValue.IsNull ()))
         {
           return false;
         }
@@ -1169,7 +1203,8 @@ verify_array_rows (ITable& table,
                    const ROW_INDEX rowsCount,
                    const char* const fieldName,
                    const DArray& refArray,
-                   const vector<uint8_t>& arraysSizes)
+                   const vector<uint8_t>& arraysSizes,
+                   const bool broken)
 {
   cout << "Test field '" << fieldName << "'.\n";
 
@@ -1182,8 +1217,10 @@ verify_array_rows (ITable& table,
 
       if (temp.Count () != arraysSizes[row])
         {
-          if (temp.IsNull ())
+          if (broken && temp.IsNull ())
             continue ;
+
+          return false;
         }
 
       for (uint_t i = 0; i < arraysSizes[row]; ++i)
@@ -1357,18 +1394,29 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 }
 
 
-bool
-repair_data_base ()
+static bool
+repair_data_base (const bool broken)
 {
-  if (DBSValidateDatabase (db_name))
-    return false; //The database should be broken
+  const bool valid = DBSValidateDatabase (db_name);
+
+  if (broken)
+    {
+      if (valid)
+        return false;
+    }
+  else
+    {
+      if ( ! valid)
+        return false;
+    }
 
   return DBSRepairDatabase (db_name, NULL, repair_callback);
 }
 
 
-bool
-check_repaired_database (const ROW_INDEX rowsCount)
+static bool
+check_repaired_database (const ROW_INDEX rowsCount,
+                         const bool      broken)
 {
   cout << "Checking the repair ... \n";
 
@@ -1377,50 +1425,51 @@ check_repaired_database (const ROW_INDEX rowsCount)
 
   bool result = true;
 
-  result = result && verify_bool_rows (table, rowsCount);
-  result = result && verify_char_rows (table, rowsCount);
-  result = result && verify_date_rows (table, rowsCount);
-  result = result && verify_datetime_rows (table, rowsCount);
-  result = result && verify_hirestime_rows (table, rowsCount);
-  result = result && verify_int8_rows (table, rowsCount);
-  result = result && verify_int16_rows (table, rowsCount);
-  result = result && verify_int32_rows (table, rowsCount);
-  result = result && verify_int64_rows (table, rowsCount);
+  result = result && verify_bool_rows (table, rowsCount, broken);
+  result = result && verify_char_rows (table, rowsCount, broken);
+  result = result && verify_date_rows (table, rowsCount, broken);
+  result = result && verify_datetime_rows (table, rowsCount, broken);
+  result = result && verify_hirestime_rows (table, rowsCount, broken);
+  result = result && verify_int8_rows (table, rowsCount, broken);
+  result = result && verify_int16_rows (table, rowsCount, broken);
+  result = result && verify_int32_rows (table, rowsCount, broken);
+  result = result && verify_int64_rows (table, rowsCount, broken);
 
-  result = result && verify_u_int8_rows (table, rowsCount);
-  result = result && verify_u_int16_rows (table, rowsCount);
-  result = result && verify_u_int32_rows (table, rowsCount);
-  result = result && verify_u_int64_rows (table, rowsCount);
+  result = result && verify_u_int8_rows (table, rowsCount, broken);
+  result = result && verify_u_int16_rows (table, rowsCount, broken);
+  result = result && verify_u_int32_rows (table, rowsCount, broken);
+  result = result && verify_u_int64_rows (table, rowsCount, broken);
 
-  result = result && verify_real_rows (table, rowsCount);
-  result = result && verify_richreal_rows (table, rowsCount);
-
-
-  result = result && verify_array_rows<DBool> (table, rowsCount, "array_bool", bool_rows, a_bool_rows_n);
-  result = result && verify_array_rows<DChar> (table, rowsCount, "array_char", char_rows, a_char_rows_n);
-  result = result && verify_array_rows<DDate> (table, rowsCount, "array_date", date_rows, a_date_rows_n);
-  result = result && verify_array_rows<DDateTime> (table, rowsCount, "array_datetime", datetime_rows, a_datetime_rows_n);
-  result = result && verify_array_rows<DHiresTime> (table, rowsCount, "array_hirestime", hirestime_rows, a_hirestime_rows_n);
-  result = result && verify_array_rows<DInt8> (table, rowsCount, "array_int8", int8_rows, a_int8_rows_n);
-  result = result && verify_array_rows<DInt16> (table, rowsCount, "array_int16", int16_rows, a_int16_rows_n);
-  result = result && verify_array_rows<DInt32> (table, rowsCount, "array_int32", int32_rows, a_int32_rows_n);
-  result = result && verify_array_rows<DInt64> (table, rowsCount, "array_int64", int64_rows, a_int64_rows_n);
-
-  result = result && verify_array_rows<DUInt8> (table, rowsCount, "array_uint8", u_int8_rows, a_u_int8_rows_n);
-  result = result && verify_array_rows<DUInt16> (table, rowsCount, "array_uint16", u_int16_rows, a_u_int16_rows_n);
-  result = result && verify_array_rows<DUInt32> (table, rowsCount, "array_uint32", u_int32_rows, a_u_int32_rows_n);
-  result = result && verify_array_rows<DUInt64> (table, rowsCount, "array_uint64", u_int64_rows, a_u_int64_rows_n);
+  result = result && verify_real_rows (table, rowsCount, broken);
+  result = result && verify_richreal_rows (table, rowsCount, broken);
 
 
-  result = result && verify_array_rows<DReal> (table, rowsCount, "array_real", real_rows, a_real_rows_n);
-  result = result && verify_array_rows<DRichReal> (table, rowsCount, "array_richreal", richreal_rows, a_richreal_rows_n);
+  result = result && verify_array_rows<DBool> (table, rowsCount, "array_bool", bool_rows, a_bool_rows_n, broken);
+  result = result && verify_array_rows<DChar> (table, rowsCount, "array_char", char_rows, a_char_rows_n, broken);
+  result = result && verify_array_rows<DDate> (table, rowsCount, "array_date", date_rows, a_date_rows_n, broken);
+  result = result && verify_array_rows<DDateTime> (table, rowsCount, "array_datetime", datetime_rows, a_datetime_rows_n, broken);
+  result = result && verify_array_rows<DHiresTime> (table, rowsCount, "array_hirestime", hirestime_rows, a_hirestime_rows_n, broken);
+  result = result && verify_array_rows<DInt8> (table, rowsCount, "array_int8", int8_rows, a_int8_rows_n, broken);
+  result = result && verify_array_rows<DInt16> (table, rowsCount, "array_int16", int16_rows, a_int16_rows_n, broken);
+  result = result && verify_array_rows<DInt32> (table, rowsCount, "array_int32", int32_rows, a_int32_rows_n, broken);
+  result = result && verify_array_rows<DInt64> (table, rowsCount, "array_int64", int64_rows, a_int64_rows_n, broken);
 
-  result = result && verify_text_rows (table, rowsCount);
+  result = result && verify_array_rows<DUInt8> (table, rowsCount, "array_uint8", u_int8_rows, a_u_int8_rows_n, broken);
+  result = result && verify_array_rows<DUInt16> (table, rowsCount, "array_uint16", u_int16_rows, a_u_int16_rows_n, broken);
+  result = result && verify_array_rows<DUInt32> (table, rowsCount, "array_uint32", u_int32_rows, a_u_int32_rows_n, broken);
+  result = result && verify_array_rows<DUInt64> (table, rowsCount, "array_uint64", u_int64_rows, a_u_int64_rows_n, broken);
+
+  result = result && verify_array_rows<DReal> (table, rowsCount, "array_real", real_rows, a_real_rows_n, broken);
+  result = result && verify_array_rows<DRichReal> (table, rowsCount, "array_richreal", richreal_rows, a_richreal_rows_n, broken);
+
+  result = result && verify_text_rows (table, rowsCount, broken);
 
   handler.ReleaseTable (table);
 
   DBSReleaseDatabase (handler);
-  DBSRemoveDatabase (db_name);
+
+  if (broken)
+    DBSRemoveDatabase (db_name);
 
   cout << (result ? "OK" : "FAIL") << endl;
 
@@ -1434,9 +1483,11 @@ test_data_base (const ROW_INDEX rowsCount)
   bool result = true;
 
   result = result && build_data_base (rowsCount);
+  result = result && repair_data_base (false);
+  result = result && check_repaired_database (rowsCount, false);
   result = result && break_data_base ();
-  result = result && repair_data_base ();
-  result = result && check_repaired_database (rowsCount);
+  result = result && repair_data_base (true);
+  result = result && check_repaired_database (rowsCount, true);
 
   return result;
 }

@@ -51,19 +51,6 @@ static const int PS_ARRAY_SIZE               = 16;
 static const int PS_REAL_SIZE                = 8;
 static const int PS_RICHREAL_SIZE            = 14;
 
-static const int PS_BOOL_ALIGN               = 1;
-static const int PS_CHAR_ALIGN               = 4;
-static const int PS_DATE_ALIGN               = 2;
-static const int PS_DATETIME_ALIGN           = 2;
-static const int PS_HIRESDATE_ALIGN          = 4;
-static const int PS_INT8_ALIGN               = 1;
-static const int PS_INT16_ALIGN              = 2;
-static const int PS_INT32_ALIGN              = 4;
-static const int PS_INT64_ALIGN              = 8;
-static const int PS_TEXT_ALIGN               = 8;
-static const int PS_ARRAY_ALIGN              = 8;
-
-
 
 inline static void
 new_bool (bool value, DBool* outBool)
@@ -132,8 +119,7 @@ new_hirestime (int32_t           year,
 }
 
 
-template<class T_OBJ, class T_VAL>
-static void
+template<class T_OBJ, class T_VAL> static void
 new_integer (T_VAL value, T_OBJ* const outValue)
 {
   _placement_new (outValue, T_OBJ (value));
@@ -144,7 +130,8 @@ void
 Serializer::Store (uint8_t* const dst, const DBool& value)
 {
   assert (! value.IsNull ());
-  dst[0] = (value.mValue == false) ? 0 : 1;
+
+  dst[0] = value.mValue ? 1 : 0;
 }
 
 
@@ -152,6 +139,7 @@ void
 Serializer::Store (uint8_t* const dst, const DChar& value)
 {
   assert (! value.IsNull ());
+
   store_le_int32 (value.mValue, dst);
 }
 
@@ -240,19 +228,19 @@ Serializer::Store (uint8_t* const dst, const DReal& value)
   const uint_t integerSize    = 5;
   const uint_t fractionalSize = 3;
 
-  int64_t temp;
+  uint8_t temp[sizeof (uint64_t)];
 
-  store_le_int64 (value.mValue.Integer (), _RC (uint8_t*, &temp));
+  store_le_int64 (value.mValue.Integer (), temp);
 
-  const uint64_t i = temp & 0xFFFFFF8000000000;
+  const uint64_t i = value.mValue.Integer () & 0xFFFFFF8000000000;
   if ((i != 0) && (i != 0xFFFFFF8000000000))
     throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
 
   memcpy (dst, &temp, integerSize);
 
-  store_le_int64 (value.mValue.Fractional (), _RC (uint8_t*, &temp));
+  store_le_int64 (value.mValue.Fractional (), temp);
 
-  const uint64_t f = temp & 0xFFFFFFFFFF800000;
+  const uint64_t f = value.mValue.Fractional () & 0xFFFFFFFFFF800000;
   if ((f != 0) && (f != 0xFFFFFFFFFF800000))
     throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
 
@@ -270,11 +258,11 @@ Serializer::Store (uint8_t* const dst, const DRichReal& value)
 
   store_le_int64 (value.mValue.Integer (), dst);
 
-  int64_t temp;
+  uint8_t temp[sizeof (uint64_t)];
 
-  store_le_int64 (value.mValue.Fractional (), _RC (uint8_t*, &temp));
+  store_le_int64 (value.mValue.Fractional (), temp);
 
-  const uint64_t f = temp & 0xFFFF800000000000;
+  const uint64_t f = value.mValue.Fractional () & 0xFFFF800000000000;
   if ((f != 0) && (f != 0xFFFF800000000000))
     throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
 
@@ -335,9 +323,9 @@ void
 Serializer::Load (const uint8_t* const src, DDate* const outValue)
 {
 
-  int16_t year  = load_le_int16 (src);
-  uint8_t month = src[2];
-  uint8_t day   = src[3];
+  const int16_t year  = load_le_int16 (src);
+  const uint8_t month = src[2];
+  const uint8_t day   = src[3];
 
   new_date (year, month, day, outValue);
 }
@@ -346,12 +334,12 @@ Serializer::Load (const uint8_t* const src, DDate* const outValue)
 void
 Serializer::Load (const uint8_t* const src, DDateTime* const outValue)
 {
-  int16_t year    = load_le_int16 (src);
-  uint8_t month   = src[2];
-  uint8_t day     = src[3];
-  uint8_t hours   = src[4];
-  uint8_t mins    = src[5];
-  uint8_t secs    = src[6];
+  const int16_t year    = load_le_int16 (src);
+  const uint8_t month   = src[2];
+  const uint8_t day     = src[3];
+  const uint8_t hours   = src[4];
+  const uint8_t mins    = src[5];
+  const uint8_t secs    = src[6];
 
   new_datetime (year, month, day, hours, mins, secs, outValue);
 }
@@ -360,13 +348,13 @@ Serializer::Load (const uint8_t* const src, DDateTime* const outValue)
 void
 Serializer::Load (const uint8_t* const src, DHiresTime* const outValue)
 {
-  int32_t usecs    = load_le_int32 (src);
-  int16_t year     = load_le_int16 (src + sizeof (uint32_t));
-  uint8_t month    = src[6];
-  uint8_t day      = src[7];
-  uint8_t hours    = src[8];
-  uint8_t mins     = src[9];
-  uint8_t secs     = src[10];
+  const int32_t usecs    = load_le_int32 (src);
+  const int16_t year     = load_le_int16 (src + sizeof (uint32_t));
+  const uint8_t month    = src[6];
+  const uint8_t day      = src[7];
+  const uint8_t hours    = src[8];
+  const uint8_t mins     = src[9];
+  const uint8_t secs     = src[10];
 
   new_hirestime (year, month, day, hours, mins, secs, usecs, outValue);
 }
@@ -527,60 +515,156 @@ Serializer::Size (const DBS_FIELD_TYPE type, const bool isArray)
 }
 
 
-int
-Serializer::Alignment (const DBS_FIELD_TYPE type, bool isArray)
+template<> bool
+Serializer::ValidateBuffer<DBool> (const uint8_t* const buffer)
 {
-  if (isArray)
-    return PS_ARRAY_ALIGN;
-
-  switch (type)
-  {
-  case T_BOOL:
-    return PS_BOOL_ALIGN;
-
-  case T_CHAR:
-    return PS_CHAR_ALIGN;
-
-  case T_DATE:
-    return PS_DATE_ALIGN;
-
-  case T_DATETIME:
-    return PS_DATETIME_ALIGN;
-
-  case T_HIRESTIME:
-    return PS_HIRESDATE_ALIGN;
-
-  case T_REAL:
-    return 1;
-
-  case T_RICHREAL:
-    return 1;
-
-  case T_UINT8:
-  case T_INT8:
-    return PS_INT8_ALIGN;
-
-  case T_UINT16:
-  case T_INT16:
-      return PS_INT16_ALIGN;
-
-  case T_UINT32:
-  case T_INT32:
-      return PS_INT32_ALIGN;
-
-  case T_UINT64:
-  case T_INT64:
-      return PS_INT64_ALIGN;
-
-  case T_TEXT:
-    return PS_TEXT_ALIGN;
-
-  default:
-    assert (false);
-
-    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
-  }
+  return (buffer[0] == 0) || (buffer[0] == 1);
 }
+
+
+template<> bool
+Serializer::ValidateBuffer<DChar> (const uint8_t* const buffer)
+{
+  try
+  {
+      DChar (load_le_int32 (buffer));
+  }
+  catch (...)
+  {
+      return false;
+  }
+
+  return true;
+}
+
+
+template<> bool
+Serializer::ValidateBuffer<DDate> (const uint8_t* const buffer)
+{
+  try
+  {
+      const int16_t year  = load_le_int16 (buffer);
+      const uint8_t month = buffer[2];
+      const uint8_t day   = buffer[3];
+
+      DDate (year, month, day);
+  }
+  catch (...)
+  {
+      return false;
+  }
+  return true;
+}
+
+
+template<> bool
+Serializer::ValidateBuffer<DDateTime> (const uint8_t* const buffer)
+{
+  try
+  {
+      const int16_t year    = load_le_int16 (buffer);
+      const uint8_t month   = buffer[2];
+      const uint8_t day     = buffer[3];
+      const uint8_t hours   = buffer[4];
+      const uint8_t mins    = buffer[5];
+      const uint8_t secs    = buffer[6];
+
+      DDateTime (year, month, day, hours, mins, secs);
+  }
+  catch (...)
+  {
+      return false;
+  }
+  return true;
+}
+
+
+template<> bool
+Serializer::ValidateBuffer<DHiresTime> (const uint8_t* const buffer)
+{
+  try
+  {
+      const int32_t usecs    = load_le_int32 (buffer);
+      const int16_t year     = load_le_int16 (buffer + sizeof (uint32_t));
+      const uint8_t month    = buffer[6];
+      const uint8_t day      = buffer[7];
+      const uint8_t hours    = buffer[8];
+      const uint8_t mins     = buffer[9];
+      const uint8_t secs     = buffer[10];
+
+      DHiresTime (year, month, day, hours, mins, secs, usecs);
+  }
+  catch (...)
+  {
+      return false;
+  }
+  return true;
+}
+
+
+template<> bool
+Serializer::ValidateBuffer<DReal> (const uint8_t* const buffer)
+{
+  const uint_t integerSize    = 5;
+  const uint_t fractionalSize = 3;
+
+  int64_t temp = 0;
+  memcpy (&temp, buffer, integerSize);
+
+  int64_t integer = load_le_int64 (_RC (const uint8_t*, &temp));
+
+  if (integer & 0x8000000000)
+    integer |= ~_SC (int64_t, 0xFFFFFFFFFF);
+
+  temp = 0;
+  memcpy (&temp, buffer + integerSize, fractionalSize);
+
+  int64_t fractional = load_le_int64 (_RC (const uint8_t*, &temp));
+
+  if (fractional & 0x800000)
+    fractional |= ~_SC (int64_t, 0xFFFFFF);
+
+  if ((integer < 0) && (fractional > 0))
+    return false;
+
+  else if ((integer > 0) && (fractional < 0))
+    return false;
+
+  assert ((fractional < 0) || (fractional < DBS_REAL_PREC));
+  assert ((fractional > 0) || (fractional > -DBS_REAL_PREC));
+
+  return true;
+}
+
+
+template<> bool
+Serializer::ValidateBuffer<DRichReal> (const uint8_t* const buffer)
+{
+  const uint_t integerSize    = 8;
+  const uint_t fractionalSize = 6;
+
+  int64_t integer = load_le_int64 (buffer);
+
+  int64_t temp = 0;
+  memcpy (&temp, buffer + integerSize, fractionalSize);
+
+  int64_t fractional = load_le_int64 (_RC (const uint8_t*, &temp));
+
+  if (fractional & 0x800000000000)
+    fractional |= ~_SC (int64_t, 0xFFFFFFFFFFFF);
+
+  if ((integer < 0) && (fractional > 0))
+    return false;
+
+  else if ((integer > 0) && (fractional < 0))
+    return false;
+
+  assert ((fractional < 0) || (fractional < DBS_RICHREAL_PREC));
+  assert ((fractional > 0) || (fractional > -DBS_RICHREAL_PREC));
+
+  return true;
+}
+
 
 
 } //namespace pastra

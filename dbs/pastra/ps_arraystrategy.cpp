@@ -53,10 +53,7 @@ IArrayStrategy::IArrayStrategy (const DBS_FIELD_TYPE elemsType)
   {
     assert ((elemsType >= T_BOOL) && (elemsType < T_TEXT));
 
-    mElementRawSize = pastra::Serializer::Alignment (mElementsType, false);
-
-    while (mElementRawSize < pastra::Serializer::Size (mElementsType, false))
-      mElementRawSize += pastra::Serializer::Alignment (mElementsType, false);
+    mElementRawSize = pastra::Serializer::Size (mElementsType, false);
   }
 }
 

@@ -193,9 +193,9 @@ public:
 
   void PrepareToCheckStorage ();
 
-  bool CheckArrayEntry (const uint64_t   recordFirstEntry,
-                        const uint64_t   recordSize,
-                        const uint_t     itemSize);
+  bool CheckArrayEntry (const uint64_t          recordFirstEntry,
+                        const uint64_t          recordSize,
+                        const DBS_FIELD_TYPE    itemSize);
 
   bool CheckTextEntry (const uint64_t   recordFirstEntry,
                        const uint64_t   recordSize);

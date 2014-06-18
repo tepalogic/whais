@@ -31,6 +31,7 @@
 #include "dbs_exception.h"
 #include "ps_varstorage.h"
 #include "ps_textstrategy.h"
+#include "ps_serializer.h"
 
 using namespace std;
 
@@ -39,11 +40,15 @@ namespace pastra {
 
 
 
+typedef bool (*VALUE_VALIDATOR) (const uint8_t* const);
+
+
+
+
 uint_t
 StoreEntry::Read (uint_t offset, uint_t count, uint8_t* buffer) const
 {
-
-  assert (IsDeleted() == false);
+  assert (IsDeleted () == false);
 
   if (count + offset > Size () )
     count = Size () - offset;
@@ -174,13 +179,103 @@ is_entry_valid (const StoreEntry&    entry,
 }
 
 
+static VALUE_VALIDATOR
+select_validator (const DBS_FIELD_TYPE itemType)
+{
+  switch (itemType)
+  {
+  case T_BOOL:
+    return Serializer::ValidateBuffer<DBool>;
+
+  case T_CHAR:
+    return Serializer::ValidateBuffer<DChar>;
+
+  case T_DATE:
+    return Serializer::ValidateBuffer<DDate>;
+
+  case T_DATETIME:
+    return Serializer::ValidateBuffer<DDateTime>;
+
+  case T_HIRESTIME:
+    return Serializer::ValidateBuffer<DHiresTime>;
+
+  case T_INT8:
+    return Serializer::ValidateBuffer<DInt8>;
+
+  case T_INT16:
+    return Serializer::ValidateBuffer<DInt16>;
+
+  case T_INT32:
+    return Serializer::ValidateBuffer<DInt32>;
+
+  case T_INT64:
+    return Serializer::ValidateBuffer<DInt64>;
+
+ case T_UINT8:
+    return Serializer::ValidateBuffer<DUInt8>;
+
+  case T_UINT16:
+    return Serializer::ValidateBuffer<DUInt16>;
+
+  case T_UINT32:
+    return Serializer::ValidateBuffer<DUInt32>;
+
+  case T_UINT64:
+    return Serializer::ValidateBuffer<DUInt64>;
+
+  case T_REAL:
+    return Serializer::ValidateBuffer<DReal>;
+
+  case T_RICHREAL:
+    return Serializer::ValidateBuffer<DRichReal>;
+
+  default:
+    assert (false);
+  }
+
+  return NULL;
+}
+
+
+static uint_t
+retrieve_entry_value (const StoreEntry&         entry,
+                      uint8_t* const            buffer,
+                      const uint_t              valueSize,
+                      const uint_t              entryOffset,
+                      const uint_t              bytesRead)
+
+{
+
+  assert (valueSize > 0);
+  assert (bytesRead < valueSize);
+  assert (entryOffset < StoreEntry::ENTRY_SIZE);
+
+  if ((entryOffset + valueSize - bytesRead) <= StoreEntry::ENTRY_SIZE)
+    {
+      return entry.Read (entryOffset,
+                         valueSize - bytesRead,
+                         buffer + bytesRead);
+    }
+
+  assert (bytesRead == 0);
+  assert (StoreEntry::ENTRY_SIZE - entryOffset < valueSize);
+
+  return entry.Read (entryOffset,
+                     StoreEntry::ENTRY_SIZE - entryOffset,
+                     buffer);
+}
+
+
 bool
-VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
-                                    const uint64_t   recordSize,
-                                    const uint_t     itemSize)
+VariableSizeStore::CheckArrayEntry (const uint64_t         recordFirstEntry,
+                                    const uint64_t         recordSize,
+                                    const DBS_FIELD_TYPE   itemType)
 {
   if (recordSize <= sizeof (uint64_t))
     return false;
+
+  const uint_t            itemSize  = Serializer::Size (itemType, false);
+  const VALUE_VALIDATOR   validator = select_validator (itemType);
 
   uint64_t              currentEntry = recordFirstEntry;
   uint64_t              prevEntry    = 0;
@@ -194,7 +289,6 @@ VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
   mEntriesContainer.get ()->Read (currentEntry * sizeof vsEntry,
                                   sizeof vsEntry,
                                   _RC (uint8_t*, &vsEntry));
-
   if (vsEntry.IsDeleted ())
     return false;
 
@@ -209,13 +303,15 @@ VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
       return false;
     }
 
-  uint64_t   itemsChecked  = 0;
   uint64_t   actualSize    = sizeof (uint64_t);
+  uint64_t   itemsChecked  = 0;
+  uint_t     itemBytesRead = 0;
+  uint8_t    itemBuffer[64];
   while (itemsChecked < itemsCount)
     {
-      const bool lastEntry = (StoreEntry::ENTRY_SIZE -
-                             (actualSize % StoreEntry::ENTRY_SIZE)) <=
-                                (recordSize - actualSize);
+      const bool lastEntry = (recordSize - actualSize) <=
+                               (StoreEntry::ENTRY_SIZE -
+                                   StoreEntry::ENTRY_SIZE % actualSize);
 
       if ( ! is_entry_valid (vsEntry,
                              prevEntry,
@@ -225,8 +321,24 @@ VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
           return false;
         }
 
-      if (((actualSize % StoreEntry::ENTRY_SIZE) + itemSize) >
-            StoreEntry::ENTRY_SIZE)
+      itemBytesRead += retrieve_entry_value (
+                                        vsEntry,
+                                        itemBuffer,
+                                        itemSize,
+                                        actualSize % StoreEntry::ENTRY_SIZE,
+                                        itemBytesRead
+                                            );
+      if (itemBytesRead == itemSize)
+        {
+          ++itemsChecked;
+          itemBytesRead = 0;
+
+          if ( ! validator (itemBuffer))
+            return false;
+        }
+
+      actualSize += itemSize;
+      if ((actualSize % StoreEntry::ENTRY_SIZE) == 0)
         {
           prevEntry     = currentEntry;
           currentEntry  = vsEntry.NextEntry ();
@@ -243,9 +355,6 @@ VariableSizeStore::CheckArrayEntry (const uint64_t   recordFirstEntry,
                                           sizeof vsEntry,
                                           _RC (uint8_t*, &vsEntry));
         }
-
-      actualSize += itemSize;
-      ++itemsChecked;
     }
 
   for (size_t i = 0; i < entriesUsed.size (); ++i)
@@ -274,6 +383,8 @@ VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
   mEntriesContainer.get ()->Read (currentEntry * sizeof vsEntry,
                                   sizeof vsEntry,
                                   _RC (uint8_t*, &vsEntry));
+  if (vsEntry.IsDeleted ())
+    return false;
 
   uint8_t temp[StoreEntry::ENTRY_SIZE];
   vsEntry.Read (0, RowFieldText::CACHE_META_DATA_SIZE, temp);
