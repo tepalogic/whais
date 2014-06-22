@@ -28,7 +28,7 @@
 #include <assert.h>
 
 #include "utils/wfile.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "dbs_table.h"
 #include "dbs_types.h"

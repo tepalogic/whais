@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 /* A convenient way to build a buffer with user content. */
 
 /* The size of memory to allocate when the buffer needs to be extended. */

@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_types.h"
 #include "dbs/dbs_exception.h"
@@ -137,8 +137,8 @@ IArrayStrategy::Clone (IArrayStrategy& strategy)
                                       mElementRawSize;
       const uint64_t toClone = MIN (cloneBuffSize, cloneSize);
 
-      strategy.ReadRaw (currentPosition, toClone, cloneBuff);
-      WriteRaw (currentPosition, toClone, cloneBuff);
+      strategy.RawRead (currentPosition, toClone, cloneBuff);
+      RawWrite (currentPosition, toClone, cloneBuff);
 
       cloneSize -= toClone, currentPosition += toClone;
     }
@@ -228,7 +228,7 @@ NullArray::DecrementShareCount ()
 
 
 void
-NullArray::ReadRaw (const uint64_t      offset,
+NullArray::RawRead (const uint64_t      offset,
                     const uint64_t      size,
                     uint8_t* const      buffer)
 {
@@ -238,7 +238,7 @@ NullArray::ReadRaw (const uint64_t      offset,
 
 
 void
-NullArray::WriteRaw (const uint64_t           offset,
+NullArray::RawWrite (const uint64_t           offset,
                      const uint64_t           size,
                      const uint8_t* const     buffer)
 {
@@ -359,7 +359,7 @@ TemporalArray::~TemporalArray ()
 
 
 void
-TemporalArray::ReadRaw (const uint64_t    offset,
+TemporalArray::RawRead (const uint64_t    offset,
                         const uint64_t    size,
                         uint8_t* const    buffer)
 {
@@ -368,7 +368,7 @@ TemporalArray::ReadRaw (const uint64_t    offset,
 
 
 void
-TemporalArray::WriteRaw (const uint64_t       offset,
+TemporalArray::RawWrite (const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer)
 {
@@ -472,13 +472,13 @@ RowFieldArray::GetTemporal ()
 
 
 void
-RowFieldArray::ReadRaw (const uint64_t    offset,
+RowFieldArray::RawRead (const uint64_t    offset,
                         const uint64_t    size,
                         uint8_t* const    buffer)
 {
 
   if (mTempArray)
-    mTempArray->ReadRaw (offset, size, buffer);
+    mTempArray->RawRead (offset, size, buffer);
 
   else
     {
@@ -491,13 +491,13 @@ RowFieldArray::ReadRaw (const uint64_t    offset,
 
 
 void
-RowFieldArray::WriteRaw (const uint64_t       offset,
+RowFieldArray::RawWrite (const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer)
 {
   if (mTempArray)
     {
-      mTempArray->WriteRaw (offset, size, buffer);
+      mTempArray->RawWrite (offset, size, buffer);
       mElementsCount = RawSize () / mElementRawSize;
     }
   else

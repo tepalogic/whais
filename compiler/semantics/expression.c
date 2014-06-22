@@ -26,7 +26,7 @@
 
 #include "whisper.h"
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "compiler/wopcodes.h"
 
 #include "expression.h"

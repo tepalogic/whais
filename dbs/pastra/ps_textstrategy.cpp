@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "utils/wutf.h"
 
 #include "dbs/dbs_mgr.h"
@@ -949,14 +949,14 @@ RowFieldText::ClearMyself ()
 
 
 TemporalText::TemporalText (const uint8_t* const utf8Str,
-                            const uint64_t       bytesCount)
+                            const uint64_t       unitsCount)
   : GenericText (0),
     mStorage ()
 {
   if (utf8Str == NULL)
     return;
 
-  mBytesSize = get_utf8_string_length (utf8Str, bytesCount);
+  mBytesSize = get_utf8_string_length (utf8Str, unitsCount);
   mStorage.Write (0, mBytesSize, utf8Str);
 }
 

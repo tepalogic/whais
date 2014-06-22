@@ -225,7 +225,7 @@ class TemporalText : public GenericText
   friend class PrototypeTable;
 public:
   TemporalText (const uint8_t* const utf8Str,
-                const uint64_t       bytesCount = ~0);
+                const uint64_t       unitsCount = ~0);
 
   //Implementations of ITextStrategy
   virtual void ReadUtf8 (const uint64_t offset,

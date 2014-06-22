@@ -653,14 +653,14 @@ DText::DText (const char* text)
 }
 
 
-DText::DText (const uint8_t *utf8Src)
+DText::DText (const uint8_t *utf8Src, uint_t unitsCount)
   : mText (& NullText::GetSingletoneInstace()),
     mStringMatcher (NULL)
 
 {
-  if ((utf8Src != NULL) && (utf8Src[0] != 0))
+  if ((utf8Src != NULL) && (utf8Src[0] != 0) && (unitsCount > 0))
     {
-      auto_ptr<ITextStrategy> strategy (new TemporalText (utf8Src));
+      auto_ptr<ITextStrategy> strategy (new TemporalText (utf8Src, unitsCount));
       strategy.get ()->IncreaseReferenceCount ();
 
       mText = strategy.release ();
@@ -1189,7 +1189,7 @@ wh_array_init (const T* const       array,
       assert (valueSize <= (sizeof rawStorage));
 
       Serializer::Store (rawStorage, array[index]);
-      (*outStrategy)->WriteRaw(currentOffset, valueSize, rawStorage);
+      (*outStrategy)->RawWrite(currentOffset, valueSize, rawStorage);
       currentOffset += valueSize;
     }
 
@@ -1472,7 +1472,7 @@ add_array_element (const T& element, IArrayStrategy** inoutStrategy)
   assert (storageSize <= sizeof rawElement);
 
   Serializer::Store (rawElement, element);
-  (*inoutStrategy)->WriteRaw ((*inoutStrategy)->RawSize (),
+  (*inoutStrategy)->RawWrite ((*inoutStrategy)->RawSize (),
                               storageSize,
                               rawElement);
 
@@ -1604,7 +1604,7 @@ get_array_element (IArrayStrategy&        strategy,
 
   assert (sizeof rawElement >= storageSize);
 
-  strategy.ReadRaw (index * storageSize, storageSize, rawElement);
+  strategy.RawRead (index * storageSize, storageSize, rawElement);
   Serializer::Load (rawElement, &outElement);
 }
 
@@ -1742,7 +1742,7 @@ set_array_element (const T&          value,
       uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
       Serializer::Store (rawElement, value);
-      (*inoutStrategy)->WriteRaw (storageSize * index, storageSize, rawElement);
+      (*inoutStrategy)->RawWrite (storageSize * index, storageSize, rawElement);
     }
 }
 

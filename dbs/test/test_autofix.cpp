@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <iostream>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <vector>
 
@@ -131,6 +132,24 @@ static const uint_t FIXED_DESC_FIELDS_COUNT = 15;
 static const uint_t VAR_DESC_FIELDS_COUNT   = 16;
 static const uint_t TOTAL_DESC_FIELDS_COUNT = 31;
 
+static const uint_t TABLE_BREAK_MARKER      = 0xAB;
+
+
+template<typename T> bool
+verify_int_marker (const T& value)
+{
+  for (uint_t i = 0; i < sizeof value; ++i)
+    {
+      if ((_RC (const uint8_t*, &value)[i] == TABLE_BREAK_MARKER)
+          || (_RC (const uint8_t*, &value)[i] == 0xFF))
+        {
+          return true;
+        }
+    }
+
+  return false;
+}
+
 
 template<typename T> bool
 check_indexed_field (ITable&            table,
@@ -170,7 +189,16 @@ check_indexed_field (ITable&            table,
         return false;
 
       else if (current != arrayValue)
-        return false;
+        {
+          if ( ! broken)
+            return false;
+
+          else if (! verify_int_marker (current))
+            return false;
+        }
+
+      if (broken)
+        reffNullsArray[row.mValue] = false;
     }
 
   matchedRows = table.MatchRows (T(), T(), 0, rowsCount, field);
@@ -204,7 +232,9 @@ check_indexed_field (ITable&            table,
       if ( ! visitedRows[i])
         {
           bool notFound = true;
-          for (uint_t j = 0; broken && (j < matchedRows.Count ()) && notFound; ++j)
+          for (uint_t j = 0;
+               broken && (j < matchedRows.Count ()) && notFound;
+               ++j)
             {
               DROW_INDEX row;
 
@@ -262,11 +292,26 @@ verify_bool_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       bool_rows.Get (row, arrayValue);
 
-      if (bool_rows_n[field])
-        return (arrayValue == DBool (true)) && rowValue.IsNull ();
+      if (bool_rows_n[row])
+        {
+           if (arrayValue != DBool (false))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DBool> (table,
@@ -311,7 +356,7 @@ add_char_row (ITable& table, const ROW_INDEX row)
 static bool
 verify_char_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
 {
-  cout << "Testing field 'char'.\n";
+  cout << "Test field 'char'.\n";
 
   if (char_rows.Count () != rowsCount)
     return false;
@@ -325,11 +370,26 @@ verify_char_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       char_rows.Get (row, arrayValue);
 
-      if (char_rows_n[field])
-        return (arrayValue == DChar ('Z')) && rowValue.IsNull ();
+      if (char_rows_n[row])
+        {
+           if (arrayValue != DChar ('Z'))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DChar> (table,
@@ -385,11 +445,25 @@ verify_date_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       date_rows.Get (row, arrayValue);
 
-      if (date_rows_n[field])
-        return (arrayValue == DDate (1, 1, 1)) && rowValue.IsNull ();
+      if (date_rows_n[row])
+        {
+           if (arrayValue != DDate (1, 1, 1))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mYear))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DDate> (table,
@@ -450,14 +524,25 @@ verify_datetime_rows (ITable&           table,
       table.Get (row, field, rowValue);
       datetime_rows.Get (row, arrayValue);
 
-      if (datetime_rows_n[field])
+      if (datetime_rows_n[row])
         {
-          return (arrayValue == DDateTime (1, 1, 1, 0, 1, 2))
-                  && rowValue.IsNull ();
-        }
+           if (arrayValue != DDateTime (1, 1, 1, 0, 1, 2))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mYear))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DDateTime> (table,
@@ -519,14 +604,25 @@ verify_hirestime_rows (ITable& table,
       table.Get (row, field, rowValue);
       hirestime_rows.Get (row, arrayValue);
 
-      if (hirestime_rows_n[field])
+      if (hirestime_rows_n[row])
         {
-          return (arrayValue == DHiresTime (1, 1, 1, 0, 1, 2, 10)) &&
-                    rowValue.IsNull ();
-        }
+           if (arrayValue != DHiresTime (1, 1, 1, 0, 1, 2, 10))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mYear))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DHiresTime> (table,
@@ -580,11 +676,25 @@ verify_int8_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       int8_rows.Get (row, arrayValue);
 
-      if (int8_rows_n[field])
-        return (arrayValue == DInt8 (12)) && rowValue.IsNull ();
+      if (int8_rows_n[row])
+        {
+           if (arrayValue != DInt8 (12))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DInt8> (table,
@@ -638,11 +748,25 @@ verify_int16_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       int16_rows.Get (row, arrayValue);
 
-      if (int16_rows_n[field])
-        return (arrayValue == DInt16 (-13)) && rowValue.IsNull ();
+      if (int16_rows_n[row])
+        {
+           if (arrayValue != DInt16 (-13))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DInt16> (table,
@@ -696,11 +820,25 @@ verify_int32_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       int32_rows.Get (row, arrayValue);
 
-      if (int32_rows_n[field])
-        return (arrayValue == DInt32 (14)) && rowValue.IsNull ();
+      if (int32_rows_n[row])
+        {
+           if (arrayValue != DInt32 (14))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DInt32> (table,
@@ -754,11 +892,25 @@ verify_int64_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       int64_rows.Get (row, arrayValue);
 
-      if (int64_rows_n[field])
-        return (arrayValue == DInt64 (-15)) && rowValue.IsNull ();
+      if (int64_rows_n[row])
+        {
+           if (arrayValue != DInt64 (-15))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DInt64> (table,
@@ -812,11 +964,25 @@ verify_u_int8_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       u_int8_rows.Get (row, arrayValue);
 
-      if (u_int8_rows_n[field])
-        return (arrayValue == DUInt8 (12)) && rowValue.IsNull ();
+      if (u_int8_rows_n[row])
+        {
+           if (arrayValue != DUInt8 (12))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DUInt8> (table,
@@ -870,11 +1036,25 @@ verify_u_int16_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken
       table.Get (row, field, rowValue);
       u_int16_rows.Get (row, arrayValue);
 
-      if (u_int16_rows_n[field])
-        return (arrayValue == DUInt16 (13)) && rowValue.IsNull ();
+      if (u_int16_rows_n[row])
+        {
+           if (arrayValue != DUInt16 (13))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DUInt16> (table,
@@ -928,11 +1108,25 @@ verify_u_int32_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken
       table.Get (row, field, rowValue);
       u_int32_rows.Get (row, arrayValue);
 
-      if (u_int32_rows_n[field])
-        return (arrayValue == DUInt32 (14)) && rowValue.IsNull ();
+      if (u_int32_rows_n[row])
+        {
+           if (arrayValue != DUInt32 (14))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DUInt32> (table,
@@ -986,11 +1180,25 @@ verify_u_int64_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken
       table.Get (row, field, rowValue);
       u_int64_rows.Get (row, arrayValue);
 
-      if (u_int64_rows_n[field])
-        return (arrayValue == DUInt64 (15)) && rowValue.IsNull ();
+      if (u_int64_rows_n[row])
+        {
+           if (arrayValue != DUInt64 (15))
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue))
+                return false;
+            }
+        }
     }
 
   return check_indexed_field<DUInt64> (table,
@@ -1047,11 +1255,28 @@ verify_real_rows (ITable& table, const ROW_INDEX rowsCount, const bool broken)
       table.Get (row, field, rowValue);
       real_rows.Get (row, arrayValue);
 
-      if (real_rows_n[field])
-        return (arrayValue == DReal::Min ()) && rowValue.IsNull ();
+      if (real_rows_n[row])
+        {
+           if (arrayValue != DReal::Min ())
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue.Integer ())
+                  || ! verify_int_marker (rowValue.mValue.Fractional()))
+                {
+                  return false;
+                }
+            }
+        }
     }
 
   return check_indexed_field<DReal> (table,
@@ -1107,11 +1332,28 @@ verify_richreal_rows (ITable& table, const ROW_INDEX rowsCount, const bool broke
       table.Get (row, field, rowValue);
       richreal_rows.Get (row, arrayValue);
 
-      if (richreal_rows_n[field])
-        return (arrayValue == DRichReal::Max ()) && rowValue.IsNull ();
+      if (richreal_rows_n[row])
+        {
+           if (arrayValue != DRichReal::Max ())
+             return false;
 
-      if ((rowValue != arrayValue) &&  ( broken && ! rowValue.IsNull ()))
-          return false;
+           if ( ! broken && ! rowValue.IsNull ())
+             return false;
+        }
+      else if (rowValue != arrayValue)
+        {
+          if (! broken)
+            return false;
+
+          if ( ! rowValue.IsNull ())
+            {
+              if ( ! verify_int_marker (rowValue.mValue.Integer ())
+                  || ! verify_int_marker (rowValue.mValue.Fractional()))
+                {
+                  return false;
+                }
+            }
+        }
     }
 
   return check_indexed_field<DRichReal> (table,
@@ -1365,8 +1607,11 @@ break_data_base ()
   File vsTable ((string (tb_name_1) + "_v").c_str (),
                 WHC_FILEOPEN_EXISTING | WHC_FILEWRITE);
 
+  File fsTable ((string (tb_name_1) + "_f").c_str (),
+                WHC_FILEOPEN_EXISTING | WHC_FILEWRITE);
+
   uint8_t vsCorruption[64];
-  memset (vsCorruption, 0xAB, sizeof vsCorruption);
+  memset (vsCorruption, TABLE_BREAK_MARKER, sizeof vsCorruption);
 
   const uint_t last = wh_rnd () % 20;
   for (uint_t i = 0, index = 0; i < last; ++i)
@@ -1376,11 +1621,17 @@ break_data_base ()
       vsTable.Seek (index * sizeof vsCorruption, WHC_SEEK_BEGIN);
       vsTable.Write (vsCorruption, sizeof vsCorruption);
 
+      fsTable.Seek (index * sizeof vsCorruption, WHC_SEEK_BEGIN);
+      fsTable.Write (vsCorruption, sizeof vsCorruption);
+
       index = wh_rnd () % (vsTable.GetSize () / sizeof vsCorruption);
     }
 
   vsTable.Seek (sizeof vsCorruption, WHC_SEEK_END);
   vsTable.Write (vsCorruption, sizeof vsCorruption);
+
+  fsTable.Seek (sizeof vsCorruption, WHC_SEEK_END);
+  fsTable.Write (vsCorruption, sizeof vsCorruption);
 
   return true;
 }
@@ -1390,6 +1641,14 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
                  const char* const             format,
                  ... )
 {
+  va_list vl;
+
+  va_start (vl, format);
+  vprintf (format, vl);
+  va_end (vl);
+
+  printf ("\n");
+
   return true;
 }
 

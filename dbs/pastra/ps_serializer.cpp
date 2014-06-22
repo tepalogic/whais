@@ -26,7 +26,7 @@
 
 #include "dbs/dbs_exception.h"
 #include "dbs/dbs_values.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "ps_serializer.h"
 
@@ -624,14 +624,16 @@ Serializer::ValidateBuffer<DReal> (const uint8_t* const buffer)
   if (fractional & 0x800000)
     fractional |= ~_SC (int64_t, 0xFFFFFF);
 
-  if ((integer < 0) && (fractional > 0))
-    return false;
-
-  else if ((integer > 0) && (fractional < 0))
-    return false;
-
-  assert ((fractional < 0) || (fractional < DBS_REAL_PREC));
-  assert ((fractional > 0) || (fractional > -DBS_REAL_PREC));
+  if ((integer < 0)
+      && ((fractional <= -DBS_REAL_PREC) || (0 < fractional)))
+    {
+      return false;
+    }
+  else if ((integer > 0)
+           && ((fractional < 0) || (DBS_REAL_PREC <= fractional)))
+    {
+      return false;
+    }
 
   return true;
 }
@@ -653,17 +655,82 @@ Serializer::ValidateBuffer<DRichReal> (const uint8_t* const buffer)
   if (fractional & 0x800000000000)
     fractional |= ~_SC (int64_t, 0xFFFFFFFFFFFF);
 
-  if ((integer < 0) && (fractional > 0))
-    return false;
-
-  else if ((integer > 0) && (fractional < 0))
-    return false;
+  if ((integer < 0)
+      && ((fractional <= -DBS_RICHREAL_PREC) || (0 < fractional)))
+    {
+      return false;
+    }
+  else if ((integer > 0)
+           && ((fractional < 0) || (DBS_RICHREAL_PREC <= fractional)))
+    {
+      return false;
+    }
 
   assert ((fractional < 0) || (fractional < DBS_RICHREAL_PREC));
   assert ((fractional > 0) || (fractional > -DBS_RICHREAL_PREC));
 
   return true;
 }
+
+
+
+Serializer::VALUE_VALIDATOR
+Serializer::SelectValidator (const DBS_FIELD_TYPE itemType)
+{
+  switch (itemType)
+  {
+  case T_BOOL:
+    return Serializer::ValidateBuffer<DBool>;
+
+  case T_CHAR:
+    return Serializer::ValidateBuffer<DChar>;
+
+  case T_DATE:
+    return Serializer::ValidateBuffer<DDate>;
+
+  case T_DATETIME:
+    return Serializer::ValidateBuffer<DDateTime>;
+
+  case T_HIRESTIME:
+    return Serializer::ValidateBuffer<DHiresTime>;
+
+  case T_INT8:
+    return Serializer::ValidateBuffer<DInt8>;
+
+  case T_INT16:
+    return Serializer::ValidateBuffer<DInt16>;
+
+  case T_INT32:
+    return Serializer::ValidateBuffer<DInt32>;
+
+  case T_INT64:
+    return Serializer::ValidateBuffer<DInt64>;
+
+ case T_UINT8:
+    return Serializer::ValidateBuffer<DUInt8>;
+
+  case T_UINT16:
+    return Serializer::ValidateBuffer<DUInt16>;
+
+  case T_UINT32:
+    return Serializer::ValidateBuffer<DUInt32>;
+
+  case T_UINT64:
+    return Serializer::ValidateBuffer<DUInt64>;
+
+  case T_REAL:
+    return Serializer::ValidateBuffer<DReal>;
+
+  case T_RICHREAL:
+    return Serializer::ValidateBuffer<DRichReal>;
+
+  default:
+    assert (false);
+  }
+
+  return NULL;
+}
+
 
 
 

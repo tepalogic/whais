@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "ps_templatetable.h"
 
@@ -1121,13 +1121,15 @@ PrototypeTable::Set (const ROW_INDEX      row,
       throw DBSException (_EXTRA(DBSException::FIELD_TYPE_INVALID));
     }
 
+  assert (Serializer::Size (T_TEXT, false) == 2 * sizeof (uint64_t));
 
-  uint64_t newFirstEntry     = ~0ull;
-  uint64_t newFieldValueSize = 0;
+  uint64_t    newFirstEntry      = ~0ull;
+  uint64_t    newFieldValueSize  = 0;
+  const bool  skipVariableStore  = value.RawSize () < (2 * sizeof (uint64_t));
 
   MarkRowModification ();
 
-  if (value.IsNull() == false)
+  if ((value.IsNull() == false) && ! skipVariableStore)
     {
       ITextStrategy& text = value;
       if (text.IsRowValue ())
@@ -1153,7 +1155,7 @@ PrototypeTable::Set (const ROW_INDEX      row,
         }
       else
         {
-          TemporalText& value = text.GetTemporal();
+          TemporalText& value = text.GetTemporal ();
 
           assert (value.mBytesSize > 0);
 
@@ -1195,8 +1197,9 @@ PrototypeTable::Set (const ROW_INDEX      row,
   bool           fieldValueWasNull = false;
 
   uint8_t* const fieldFirstEntry = rowData + desc.RowDataOff ();
-  uint8_t* const fieldValueSize  = rowData +
-                                     desc.RowDataOff () + sizeof (uint64_t);
+  uint8_t* const fieldValueSize  = rowData              +
+                                     desc.RowDataOff () +
+                                     sizeof (uint64_t);
 
   const uint_t  byteOff = desc.NullBitIndex () / 8;
   const uint8_t bitOff  = desc.NullBitIndex () % 8;
@@ -1207,7 +1210,7 @@ PrototypeTable::Set (const ROW_INDEX      row,
   if (fieldValueWasNull && value.IsNull ())
     return ;
 
-  else if ( (fieldValueWasNull == false) && value.IsNull())
+  else if ( (fieldValueWasNull == false) && value.IsNull ())
     {
       rowData[byteOff] |= (1 << bitOff);
 
@@ -1216,7 +1219,7 @@ PrototypeTable::Set (const ROW_INDEX      row,
 
       return;
     }
-  else if (value.IsNull() == false)
+  else if (value.IsNull () == false)
     {
       if (rowData[byteOff] == bitsSet)
         {
@@ -1227,7 +1230,8 @@ PrototypeTable::Set (const ROW_INDEX      row,
       rowData[byteOff] &= ~(1 << bitOff);
     }
 
-  if (fieldValueWasNull == false)
+  if ((fieldValueWasNull == false)
+      && ((load_le_int64 (fieldValueSize) & 0x8000000000000000ull) == 0))
     {
       //Postpone the removal of the actual record entries
       //to allow other threads gain access to 'mSync' faster.
@@ -1239,8 +1243,22 @@ PrototypeTable::Set (const ROW_INDEX      row,
       VSStore ().DecrementRecordRef (load_le_int64 (fieldFirstEntry));
     }
 
-  store_le_int64 (newFirstEntry,     fieldFirstEntry);
-  store_le_int64 (newFieldValueSize, fieldValueSize);
+  if (skipVariableStore)
+    {
+      assert (value.RawSize () < _SC (uint_t,
+                                      Serializer::Size (T_TEXT, false)));
+      assert (_SC (ITextStrategy&, value).IsRowValue () == false);
+
+      fieldValueSize[sizeof (uint64_t) - 1]  = value.RawSize ();
+      fieldValueSize[sizeof (uint64_t) - 1] |= 0x80;
+
+      value.RawRead (0, value.RawSize (), rowData + desc.RowDataOff ());
+    }
+  else
+    {
+      store_le_int64 (newFieldValueSize, fieldValueSize);
+      store_le_int64 (newFirstEntry,     fieldFirstEntry);
+    }
 }
 
 
@@ -1268,15 +1286,16 @@ PrototypeTable::Set (const ROW_INDEX        row,
   uint64_t      newFieldValueSize = 0;
   const uint8_t bitsSet           = ~0;
   bool          fieldValueWasNull = false;
-
+  const bool    skipVariableStore = _SC (IArrayStrategy&, value).RawSize () <
+                                      (2 * sizeof (uint64_t));
   MarkRowModification ();
 
-  if (value.IsNull() == false)
+  if ((value.IsNull () == false) && ! skipVariableStore)
     {
       IArrayStrategy& array = value;
-      if (array.IsRowValue())
+      if (array.IsRowValue ())
         {
-          RowFieldArray& value = array.GetRow();
+          RowFieldArray& value = array.GetRow ();
 
           if (&value.mStorage == &VSStore ())
             {
@@ -1299,7 +1318,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
       else
         {
           TemporalArray& value = array.GetTemporal ();
-          newFieldValueSize    = value.RawSize();
+          newFieldValueSize    = value.RawSize ();
 
           uint8_t elemsCount[RowFieldArray::METADATA_SIZE];
 
@@ -1321,8 +1340,9 @@ PrototypeTable::Set (const ROW_INDEX        row,
   uint8_t *const rowData    = cachedItem.GetDataForUpdate();
 
   uint8_t *const fieldFirstEntry = rowData + desc.RowDataOff ();
-  uint8_t *const fieldValueSize  = rowData +
-                                     desc.RowDataOff () + sizeof (uint64_t);
+  uint8_t *const fieldValueSize  = rowData              +
+                                     desc.RowDataOff () +
+                                     sizeof (uint64_t);
 
   const uint_t  byteOff = desc.NullBitIndex () / 8;
   const uint8_t bitOff  = desc.NullBitIndex () % 8;
@@ -1333,7 +1353,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
   if (fieldValueWasNull && value.IsNull ())
     return ;
 
-  else if ( (fieldValueWasNull == false) && value.IsNull())
+  else if ( (fieldValueWasNull == false) && value.IsNull ())
     {
       rowData[byteOff] |= (1 << bitOff);
 
@@ -1342,7 +1362,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
       return ;
     }
-  else if (value.IsNull() == false)
+  else if (value.IsNull () == false)
     {
       if (rowData[byteOff] == bitsSet)
         {
@@ -1353,7 +1373,8 @@ PrototypeTable::Set (const ROW_INDEX        row,
       rowData[byteOff] &= ~(1 << bitOff);
     }
 
-  if (fieldValueWasNull == false)
+  if ((fieldValueWasNull == false)
+      && ((load_le_int64 (fieldValueSize) & 0x8000000000000000ull) == 0))
     {
       //Postpone the removal of the actual record entries
       //to allow other threads gain access to 'mSync' faster.
@@ -1363,15 +1384,25 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
       VSStore ().DecrementRecordRef (load_le_int64 (fieldFirstEntry));
 
-      store_le_int64 (newFirstEntry,     fieldFirstEntry);
-      store_le_int64 (newFieldValueSize, fieldValueSize);
+    }
 
-      syncHolder.Release ();
+  if (skipVariableStore)
+    {
+      IArrayStrategy& array = value;
+
+      assert (array.RawSize () < _SC (uint_t,
+                                      Serializer::Size (T_HIRESTIME, true)));
+      assert (array.IsRowValue () == false);
+
+      fieldValueSize[sizeof (uint64_t) - 1]  = array.RawSize ();
+      fieldValueSize[sizeof (uint64_t) - 1] |= 0x80;
+
+      array.RawRead (0, array.RawSize (), rowData + desc.RowDataOff ());
     }
   else
     {
-      store_le_int64 (newFirstEntry,     fieldFirstEntry);
       store_le_int64 (newFieldValueSize, fieldValueSize);
+      store_le_int64 (newFirstEntry,     fieldFirstEntry);
     }
 }
 
@@ -1554,10 +1585,9 @@ PrototypeTable::Get (const ROW_INDEX   row,
   StoredItem           cachedItem = mRowCache.RetriveItem (row);
   const uint8_t* const rowData    = cachedItem.GetDataForRead();
 
-  const uint64_t fieldFirstEntry = load_le_int64 (rowData + desc.RowDataOff ());
-  const uint64_t fieldValueSize  = load_le_int64 (
-                              rowData + desc.RowDataOff () + sizeof (uint64_t)
-                                                 );
+  const uint64_t fieldValueSize  = load_le_int64 (rowData              +
+                                                    desc.RowDataOff () +
+                                                    sizeof (uint64_t));
 
   const uint_t  byteOff = desc.NullBitIndex () / 8;
   const uint8_t bitOff  = desc.NullBitIndex () % 8;
@@ -1566,8 +1596,20 @@ PrototypeTable::Get (const ROW_INDEX   row,
   if (rowData[byteOff] & (1 << bitOff))
     _placement_new (&outValue, DText ());
 
+  else if ((fieldValueSize & 0x8000000000000000ull) != 0)
+    {
+      assert (((fieldValueSize >> 56) & 0x7F) > 0);
+      assert (((fieldValueSize >> 56) & 0x7F) <
+                Serializer::Size (T_TEXT, false));
+
+      _placement_new (&outValue,
+                      DText (rowData + desc.RowDataOff (),
+                             (fieldValueSize >> 56) & 0x7F));
+    }
   else
     {
+      const uint64_t fieldFirstEntry = load_le_int64 (rowData +
+                                                        desc.RowDataOff ());
       _placement_new (&outValue,
                       DText (*allocate_row_field_text (VSStore (),
                                                        fieldFirstEntry,
@@ -1581,7 +1623,6 @@ PrototypeTable::Get (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
                      DArray&                outValue)
 {
-
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if (row >= mRowsCount)
@@ -1599,7 +1640,9 @@ PrototypeTable::Get (const ROW_INDEX        row,
   StoredItem           cachedItem = mRowCache.RetriveItem (row);
   const uint8_t *const rowData    = cachedItem.GetDataForRead();
 
-  const uint64_t fieldFirstEntry = load_le_int64 (rowData + desc.RowDataOff ());
+  const uint64_t fieldValueSize = load_le_int64 (rowData              +
+                                                   desc.RowDataOff () +
+                                                   sizeof (uint64_t));
 
   const uint_t  byteOff = desc.NullBitIndex () / 8;
   const uint8_t bitOff  = desc.NullBitIndex () % 8;
@@ -1607,7 +1650,7 @@ PrototypeTable::Get (const ROW_INDEX        row,
   outValue.~DArray ();
   if (rowData[byteOff] & (1 << bitOff))
     {
-      switch (desc.Type () & PS_TABLE_FIELD_TYPE_MASK)
+      switch (GET_BASIC_TYPE (desc.Type ()))
       {
       case T_BOOL:
         _placement_new (&outValue, DArray(_SC(DBool *, NULL)));
@@ -1673,8 +1716,134 @@ PrototypeTable::Get (const ROW_INDEX        row,
         assert (false);
       }
     }
+  else if ((fieldValueSize & 0x8000000000000000ull) != 0)
+    {
+
+      switch (GET_BASIC_TYPE (desc.Type ()))
+      {
+      case T_BOOL:
+        {
+          DBool dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_CHAR:
+        {
+          DChar dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_DATE:
+        {
+          DDate dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_DATETIME:
+        {
+          DDateTime dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_HIRESTIME:
+        {
+          DHiresTime dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_UINT8:
+        {
+          DUInt8 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_UINT16:
+        {
+          DUInt16 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_UINT32:
+        {
+          DUInt32 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_UINT64:
+        {
+          DUInt64 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_REAL:
+        {
+          DReal dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_RICHREAL:
+        {
+          DRichReal dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_INT8:
+        {
+          DInt8 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_INT16:
+        {
+          DInt16 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_INT32:
+        {
+          DInt32 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      case T_INT64:
+        {
+          DInt64 dummy;
+          _placement_new (&outValue, DArray (&dummy, 1));
+        }
+        break;
+
+      default:
+        assert (false);
+      }
+
+      assert (((fieldValueSize >> 56) & 0x7F) > 0);
+      assert (((fieldValueSize >> 56) & 0x7F) <
+               Serializer::Size (T_BOOL, true));
+
+      IArrayStrategy& array = outValue;
+      array.RawWrite (0,
+                      (fieldValueSize >> 56) & 0x7F,
+                      rowData + desc.RowDataOff ());
+    }
   else
     {
+      const uint64_t fieldFirstEntry = load_le_int64 (rowData +
+                                                        desc.RowDataOff ());
+
       IArrayStrategy& rowArray = *allocate_row_field_array (
                                VSStore (),
                                fieldFirstEntry,

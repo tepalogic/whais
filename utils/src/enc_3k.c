@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 
 #include "enc_3k.h"
-#include "le_converter.h"
+#include "endianness.h"
 
 static uint32_t
 exchange_1bit_pair (uint32_t value, const uint_t p1, const uint_t p2)

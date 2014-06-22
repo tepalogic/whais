@@ -28,7 +28,7 @@
 #include <cstring>
 
 #include "dbs/dbs_values.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 namespace whisper {
 namespace pastra {
@@ -121,6 +121,10 @@ public:
   {
     return true;
   }
+
+  typedef bool (*VALUE_VALIDATOR) (const uint8_t* const);
+
+  static VALUE_VALIDATOR SelectValidator (const DBS_FIELD_TYPE type);
 
 };
 

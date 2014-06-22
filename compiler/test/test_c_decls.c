@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "../parser/parser.h"
 #include "../semantics/vardecl.h"

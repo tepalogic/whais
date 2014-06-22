@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string.h>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "utils/wrandom.h"
 #include "utils/auto_array.h"
 #include "utils/wunicode.h"

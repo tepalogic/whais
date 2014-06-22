@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "compiler/wopcodes.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "pm_processor.h"
 #include "pm_operand_undefined.h"

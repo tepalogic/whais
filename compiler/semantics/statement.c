@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "vardecl.h"
 #include "brlo_stmts.h"

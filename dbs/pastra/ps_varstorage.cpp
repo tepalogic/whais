@@ -43,8 +43,6 @@ namespace pastra {
 typedef bool (*VALUE_VALIDATOR) (const uint8_t* const);
 
 
-
-
 uint_t
 StoreEntry::Read (uint_t offset, uint_t count, uint8_t* buffer) const
 {
@@ -179,62 +177,6 @@ is_entry_valid (const StoreEntry&    entry,
 }
 
 
-static VALUE_VALIDATOR
-select_validator (const DBS_FIELD_TYPE itemType)
-{
-  switch (itemType)
-  {
-  case T_BOOL:
-    return Serializer::ValidateBuffer<DBool>;
-
-  case T_CHAR:
-    return Serializer::ValidateBuffer<DChar>;
-
-  case T_DATE:
-    return Serializer::ValidateBuffer<DDate>;
-
-  case T_DATETIME:
-    return Serializer::ValidateBuffer<DDateTime>;
-
-  case T_HIRESTIME:
-    return Serializer::ValidateBuffer<DHiresTime>;
-
-  case T_INT8:
-    return Serializer::ValidateBuffer<DInt8>;
-
-  case T_INT16:
-    return Serializer::ValidateBuffer<DInt16>;
-
-  case T_INT32:
-    return Serializer::ValidateBuffer<DInt32>;
-
-  case T_INT64:
-    return Serializer::ValidateBuffer<DInt64>;
-
- case T_UINT8:
-    return Serializer::ValidateBuffer<DUInt8>;
-
-  case T_UINT16:
-    return Serializer::ValidateBuffer<DUInt16>;
-
-  case T_UINT32:
-    return Serializer::ValidateBuffer<DUInt32>;
-
-  case T_UINT64:
-    return Serializer::ValidateBuffer<DUInt64>;
-
-  case T_REAL:
-    return Serializer::ValidateBuffer<DReal>;
-
-  case T_RICHREAL:
-    return Serializer::ValidateBuffer<DRichReal>;
-
-  default:
-    assert (false);
-  }
-
-  return NULL;
-}
 
 
 static uint_t
@@ -271,18 +213,20 @@ VariableSizeStore::CheckArrayEntry (const uint64_t         recordFirstEntry,
                                     const uint64_t         recordSize,
                                     const DBS_FIELD_TYPE   itemType)
 {
-  if (recordSize <= sizeof (uint64_t))
+  if (_SC (int64_t, recordSize) <= Serializer::Size (itemType, true) - 1)
     return false;
 
-  const uint_t            itemSize  = Serializer::Size (itemType, false);
-  const VALUE_VALIDATOR   validator = select_validator (itemType);
+  const uint_t itemSize  = Serializer::Size (itemType, false);
+
+  const Serializer::VALUE_VALIDATOR validator =
+      Serializer::SelectValidator (itemType);
 
   uint64_t              currentEntry = recordFirstEntry;
   uint64_t              prevEntry    = 0;
   StoreEntry            vsEntry;
   vector<uint64_t>      entriesUsed;
 
-  if (mUsedEntries[currentEntry])
+  if ((recordFirstEntry >= mUsedEntries.size ()) || mUsedEntries[currentEntry])
     return false;
 
   entriesUsed.push_back (currentEntry);
@@ -368,7 +312,7 @@ bool
 VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
                                    const uint64_t   recordSize)
 {
-  if (recordSize == RowFieldText::CACHE_META_DATA_SIZE)
+  if (_SC (int64_t, recordSize) <= Serializer::Size (T_TEXT, false) - 1)
     return false;
 
   uint64_t              currentEntry = recordFirstEntry;
@@ -376,7 +320,7 @@ VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
   StoreEntry            vsEntry;
   vector<uint64_t>      entriesUsed;
 
-  if (mUsedEntries[currentEntry])
+  if ((recordFirstEntry >= mUsedEntries.size ()) || mUsedEntries[currentEntry])
     return false;
 
   entriesUsed.push_back (currentEntry);

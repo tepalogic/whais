@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whisper.h"
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "utils/wrandom.h"
 #include "utils/enc_3k.h"
 #include "server/server_protocol.h"

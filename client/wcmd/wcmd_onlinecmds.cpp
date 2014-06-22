@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper.h"
 
 #include "utils/auto_array.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "client/whisper_connector.h"
 
 #include "wcmd_onlinecmds.h"

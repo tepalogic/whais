@@ -30,7 +30,7 @@
 #include "dbs/dbs_exception.h"
 #include "utils/wfile.h"
 #include "utils/wthread.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "ps_dbsmgr.h"
 #include "ps_table.h"
@@ -693,8 +693,7 @@ DBSRepairDatabase (const char* const            name,
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
     {
-      if (fixCallback)
-        fixCallback (CRITICAL, "Cannot find a valid database signature!");
+      fixCallback (CRITICAL, "Cannot find a valid database signature!");
 
       return false;
     }
@@ -705,13 +704,10 @@ DBSRepairDatabase (const char* const            name,
   if ((versionMaj > PS_DBS_VER_MAJ)
       || ((versionMaj == PS_DBS_VER_MAJ) && (versionMin > PS_DBS_VER_MIN)))
     {
-      if (fixCallback)
-        {
-          fixCallback (CRITICAL,
-                    "Database '%s' format version (%u,%u) is not supported."
-                    " Cannot fix!",
-                    name);
-        }
+      fixCallback (CRITICAL,
+                   "Database '%s' format version (%u,%u) is not supported."
+                   " Cannot fix!",
+                   name);
       return false;
     }
 
@@ -719,13 +715,9 @@ DBSRepairDatabase (const char* const            name,
   if ((headerFlags & PS_FLAG_TO_REPAIR)
       || (headerFlags & PS_FLAG_NOT_CLOSED))
     {
-      bool fixError = false;
-      if (fixCallback)
-        {
-          fixError = fixCallback (FIX_QUESTION,
-                                  "Database '%s' was not closed properly.",
-                                  name);
-        }
+      bool fixError = fixCallback (FIX_QUESTION,
+                                   "Database '%s' was not closed properly.",
+                                   name);
 
       if ( ! fixError)
         return false;
@@ -768,13 +760,9 @@ DBSRepairDatabase (const char* const            name,
 
   if (tablesCount > 0)
     {
-      bool fixError = false;
-      if (fixCallback)
-        {
-          fixError = fixCallback (FIX_QUESTION,
-                                  "The database tables count is higher than"
-                                  " expected. Should I truncated this?");
-        }
+      bool fixError = fixCallback (FIX_QUESTION,
+                                   "The database tables count is higher than"
+                                   " expected. Should I truncated this?");
       if ( ! fixError)
         return false;
 

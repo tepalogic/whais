@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "compiler/compiledunit.h"
 #include "utils/wfile.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "../whc/wo_format.h"
 #include "wod_dump.h"

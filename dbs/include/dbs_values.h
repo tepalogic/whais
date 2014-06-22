@@ -1763,7 +1763,7 @@ class DBS_SHL DText
 {
 public:
   explicit DText (const char* text = NULL);
-  explicit DText (const uint8_t* utf8Src);
+  explicit DText (const uint8_t* utf8Src, const uint_t unitsCount = ~0x0);
   explicit DText (ITextStrategy& text);
 
   DText (const DText& source);

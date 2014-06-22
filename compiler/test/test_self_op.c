@@ -7,7 +7,7 @@
 #include "../semantics/opcodes.h"
 #include "../semantics/procdecl.h"
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "custom/include/test/test_fmw.h"
 

@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef LE_CONVERTER_H_
-#define LE_CONVERTER_H_
+#ifndef ENDIANNESS_H_
+#define ENDIANNESS_H_
 
 #include "whisper.h"
 
@@ -80,65 +80,34 @@ load_le_int64 (const uint8_t* from)
 static INLINE void
 store_le_int16 (const uint16_t value, uint8_t* const to)
 {
-  const uint8_t* from = (const uint8_t*)&value;
-  const uint16_t le_machine = 0x1;
-
-    if (*((uint8_t*)&le_machine))
-      {
-        uint_t i;
-        for (i = 0; i < sizeof (value); ++i)
-          to[i] = from[i];
-      }
-    else
-      {
-        uint_t i;
-        for (i = 0; i < sizeof (value); ++i)
-          to[i] = from[sizeof (value) - (i + 1)];
-      }
+  to[0] = value        & 0xFF;
+  to[1] = (value >> 8) & 0xFF;
 }
 
 
 static INLINE void
 store_le_int32 (const uint32_t value, uint8_t* const to)
 {
-  const uint8_t* from = (const uint8_t*)&value;
-  const uint16_t le_machine = 0x1;
-
-    if (*((uint8_t*)&le_machine))
-      {
-        uint_t i;
-        for (i = 0; i < sizeof (value); ++i)
-          to[i] = from[i];
-      }
-    else
-      {
-        uint_t i;
-        for (i = 0; i < sizeof (value); ++i)
-          to[i] = from[sizeof (value) - (i + 1)];
-      }
+  to[0] = value         & 0xFF;
+  to[1] = (value >>  8) & 0xFF;
+  to[2] = (value >> 16) & 0xFF;
+  to[3] = (value >> 24) & 0xFF;
 }
 
 
 static INLINE void
 store_le_int64 (const uint64_t value, uint8_t* const to)
 {
-  const uint8_t* from = (const uint8_t*)&value;
-  const uint16_t le_machine = 0x1;
-
-    if (*((uint8_t*)&le_machine))
-      {
-        uint_t i;
-        for (i = 0; i < sizeof (value); ++i)
-          to[i] = from[i];
-      }
-    else
-      {
-        uint_t i;
-        for (i = 0; i < sizeof (value); ++i)
-          to[i] = from[sizeof (value) - (i + 1)];
-      }
+  to[0] = value         & 0xFF;
+  to[1] = (value >>  8) & 0xFF;
+  to[2] = (value >> 16) & 0xFF;
+  to[3] = (value >> 24) & 0xFF;
+  to[4] = (value >> 32) & 0xFF;
+  to[5] = (value >> 40) & 0xFF;
+  to[6] = (value >> 48) & 0xFF;
+  to[7] = (value >> 56) & 0xFF;
 }
 
 
-#endif /* LE_CONVERTER_H_ */
+#endif /* ENDIANNESS_H_ */
 

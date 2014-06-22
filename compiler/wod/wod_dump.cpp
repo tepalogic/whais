@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iomanip>
 #include <string.h>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 #include "compiler/whisperc.h"
 
 #include "../whc/wo_format.h"

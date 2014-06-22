@@ -64,11 +64,11 @@ public:
 
   virtual void DecrementShareCount ();
 
-  virtual void ReadRaw (const uint64_t    offset,
+  virtual void RawRead (const uint64_t    offset,
                         const uint64_t    size,
                         uint8_t* const    buffer) = 0;
 
-  virtual void WriteRaw (const uint64_t         offset,
+  virtual void RawWrite (const uint64_t         offset,
                          const uint64_t         size,
                          const uint8_t* const   buffer) = 0;
 
@@ -123,11 +123,11 @@ public:
 
   virtual void DecrementShareCount ();
 
-  virtual void ReadRaw (const uint64_t      offset,
+  virtual void RawRead (const uint64_t      offset,
                         const uint64_t      size,
                         uint8_t* const      buffer);
 
-  virtual void WriteRaw (const uint64_t           offset,
+  virtual void RawWrite (const uint64_t           offset,
                          const uint64_t           size,
                          const uint8_t* const     buffer);
 
@@ -147,11 +147,11 @@ public:
   virtual ~TemporalArray ();
 
   //Implements of IArrayStrategy
-  virtual void ReadRaw (const uint64_t    offset,
+  virtual void RawRead (const uint64_t    offset,
                         const uint64_t    size,
                         uint8_t* const    buffer);
 
-  virtual void WriteRaw (const uint64_t       offset,
+  virtual void RawWrite (const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer);
 
@@ -174,11 +174,11 @@ public:
                  const DBS_FIELD_TYPE     type);
   ~RowFieldArray ();
 
-  virtual void ReadRaw (const uint64_t      offset,
+  virtual void RawRead (const uint64_t      offset,
                         const uint64_t      size,
                         uint8_t* const      buffer);
 
-  virtual void WriteRaw (const uint64_t       offset,
+  virtual void RawWrite (const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer);
 

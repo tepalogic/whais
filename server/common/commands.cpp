@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <memory.h>
 #include <sstream>
 
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "commands.h"
 #include "stack_cmds.h"

@@ -28,7 +28,7 @@
 #include "whisper.h"
 
 #include "utils/wthread.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "ps_container.h"
 #include "ps_blockcache.h"

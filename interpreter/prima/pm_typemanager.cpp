@@ -28,7 +28,7 @@
 
 #include "dbs/dbs_types.h"
 #include "compiler/whisperc.h"
-#include "utils/le_converter.h"
+#include "utils/endianness.h"
 
 #include "pm_typemanager.h"
 #include "pm_interpreter.h"
