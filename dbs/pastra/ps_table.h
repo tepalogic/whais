@@ -91,12 +91,13 @@ private:
   void CheckTableValues (FIX_ERROR_CALLBACK fixCallback);
 
 public:
-  static bool ValidateTable (IDBSHandler&               dbs,
+  static bool ValidateTable (const std::string&         path,
                              const std::string&         name);
 
-  static bool RepairTable (DbsHandler&                  dbs,
-                           const std::string&           name,
-                           FIX_ERROR_CALLBACK           fixCallback);
+  static bool RepairTable (DbsHandler&                 dbs,
+                           const std::string&          name,
+                           const std::string&          path,
+                           FIX_ERROR_CALLBACK          fixCallback);
 };
 
 

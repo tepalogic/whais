@@ -66,68 +66,7 @@ static const uint64_t PS_FLAG_NOT_CLOSED      = 1;
 static const uint64_t PS_FLAG_TO_REPAIR       = 2;
 
 
-
-struct DbsElement
-{
-  DbsElement (const DbsHandler& dbs)
-    : mRefCount (0),
-      mDbs (dbs)
-  {
-  }
-
-  uint64_t   mRefCount;
-  DbsHandler mDbs;
-};
-
-
-
-typedef map<string, DbsElement> DATABASES_MAP;
-
-
-
-
-struct DbsManager
-{
-  DbsManager (const DBSSettings& settings)
-    : mSync (),
-      mDBSSettings (settings),
-      mDatabases ()
-  {
-    if ((mDBSSettings.mWorkDir.length () == 0)
-        || (mDBSSettings.mTempDir.length () == 0)
-        || (mDBSSettings.mTableCacheBlkSize == 0)
-        || (mDBSSettings.mTableCacheBlkCount == 0)
-        || (mDBSSettings.mVLStoreCacheBlkSize == 0)
-        || (mDBSSettings.mVLStoreCacheBlkCount == 0)
-        || (mDBSSettings.mVLValueCacheSize == 0))
-      {
-        throw DBSException (
-            _EXTRA (DBSException::BAD_PARAMETERS),
-            "Cannot create a database manager with the specified parameters."
-                           );
-      }
-
-    if (mDBSSettings.mWorkDir[mDBSSettings.mWorkDir.length () - 1] !=
-          whf_dir_delim ()[0])
-      {
-        mDBSSettings.mWorkDir += whf_dir_delim ();
-      }
-
-    if (mDBSSettings.mTempDir[mDBSSettings.mTempDir.length () - 1] !=
-          whf_dir_delim ()[0])
-      {
-        mDBSSettings.mTempDir += whf_dir_delim ();
-      }
-  }
-
-  Lock            mSync;
-  DBSSettings     mDBSSettings;
-  DATABASES_MAP   mDatabases;
-};
-
-
 static auto_ptr<DbsManager> dbsMgrs_;
-
 
 DbsHandler::DbsHandler (const DBSSettings&    settings,
                         const std::string&    locationDir,
@@ -166,6 +105,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
                            " use or it was not properly closed last time.",
                           name.c_str ());
     }
+  headerFlags &= ~PS_FLAG_TO_REPAIR;
   headerFlags |= PS_FLAG_NOT_CLOSED;
   store_le_int64 (headerFlags, buffer + PS_DBS_FLAGS_OFF);
 
@@ -668,6 +608,22 @@ DBSValidateDatabase (const char* const name,
       return false;
     }
 
+  uint16_t       actualCount  = 0;
+  const uint16_t tablesCount  = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
+  const char*    tableName    = _RC (const char*, buffer + PS_DBS_HEADER_SIZE);
+  while (*tableName != 0)
+   {
+      ++actualCount;
+
+      if ( ! PersistentTable::ValidateTable (path, name))
+        return false;
+
+      tableName += strlen (tableName) + 1;
+    }
+
+  if (tablesCount != actualCount)
+    return false;
+
   return true;
 }
 
@@ -693,7 +649,7 @@ DBSRepairDatabase (const char* const            name,
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
     {
-      fixCallback (CRITICAL, "Cannot find a valid database signature!");
+      fixCallback (CRITICAL, "Cannot find the signature of the database file!");
 
       return false;
     }
@@ -706,7 +662,7 @@ DBSRepairDatabase (const char* const            name,
     {
       fixCallback (CRITICAL,
                    "Database '%s' format version (%u,%u) is not supported."
-                   " Cannot fix!",
+                   " Cannot continue to check!",
                    name);
       return false;
     }
@@ -715,12 +671,9 @@ DBSRepairDatabase (const char* const            name,
   if ((headerFlags & PS_FLAG_TO_REPAIR)
       || (headerFlags & PS_FLAG_NOT_CLOSED))
     {
-      bool fixError = fixCallback (FIX_QUESTION,
-                                   "Database '%s' was not closed properly.",
-                                   name);
-
-      if ( ! fixError)
-        return false;
+      fixCallback (INFORMATION,
+                   "Database '%s' was not closed properly.",
+                   name);
     }
 
   //Before we continue set the 'in use' flag.
@@ -729,40 +682,45 @@ DBSRepairDatabase (const char* const            name,
   inputFile.Write (buffer, fileSize);
   inputFile.Close ();
 
+  IDBSHandler&   dbs          = DBSRetrieveDatabase (name, path);
   uint16_t       tablesCount  = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
   uint16_t       actualCount  = 0;
-  IDBSHandler&   dbs          = DBSRetrieveDatabase (name, path);
   const char*    tableName    = _RC (const char*, buffer + PS_DBS_HEADER_SIZE);
+  while ((*tableName != 0)
+         && ((_RC (const uint8_t*, tableName) - buffer) < fileSize))
 
-  while (*tableName != 0)
     {
       --tablesCount, ++actualCount;
 
-      if (! PersistentTable::ValidateTable (dbs, tableName))
-        {
-          try
-          {
-              if (! PersistentTable::RepairTable (_SC (DbsHandler&, dbs),
-                                                  tableName,
-                                                  fixCallback))
-                {
-                  return false;
-                }
-          }
-          catch (...)
-          {
-              DBSReleaseDatabase (dbs);
+      fixCallback (INFORMATION,
+                   "Checking database table '%s' ...",
+                   tableName);
+      try
+      {
+          if (! PersistentTable::RepairTable (_SC (DbsHandler&, dbs),
+                                              tableName,
+                                              path,
+                                              fixCallback))
+            {
               return false;
-          }
-        }
+            }
+      }
+      catch (...)
+      {
+          DBSReleaseDatabase (dbs);
+          return false;
+      }
+
       tableName += strlen (tableName) + 1;
     }
+  DBSReleaseDatabase (dbs);
 
   if (tablesCount > 0)
     {
       bool fixError = fixCallback (FIX_QUESTION,
-                                   "The database tables count is higher than"
-                                   " expected. Should I truncated this?");
+                                   "The database's tables count is not correct."
+                                   " It should be set to '%u'.",
+                                   actualCount);
       if ( ! fixError)
         return false;
 
@@ -770,7 +728,6 @@ DBSRepairDatabase (const char* const            name,
         store_le_int16 (actualCount, buffer + PS_DBS_NUM_TABLES_OFF);
     }
 
-  DBSReleaseDatabase (dbs);
   return true;
 }
 
@@ -786,8 +743,8 @@ DBSRetrieveDatabase (const char* const name, const char* path)
 
   LockRAII syncHolder (dbsMgrs_->mSync);
 
-  DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
-  DATABASES_MAP::iterator it    = dbses.find (name);
+  DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
+  DbsManager::DATABASES_MAP::iterator it    = dbses.find (name);
 
   if (it == dbses.end ())
     {
@@ -832,8 +789,8 @@ DBSReleaseDatabase (IDBSHandler& hnd)
 
   LockRAII syncHolder (dbsMgrs_->mSync);
 
-  DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
-  DATABASES_MAP::iterator it;
+  DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
+  DbsManager::DATABASES_MAP::iterator it;
 
   for (it = dbses.begin (); it != dbses.end (); ++it)
     {
@@ -891,8 +848,8 @@ DBSRemoveDatabase (const char* const name, const char* path)
   //Acquire the DBS's manager lock!
   LockRAII syncHolder (dbsMgrs_->mSync);
 
-  DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
-  DATABASES_MAP::iterator it    = dbses.find (name);
+  DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
+  DbsManager::DATABASES_MAP::iterator it    = dbses.find (name);
 
   if (it == dbses.end ())
     {

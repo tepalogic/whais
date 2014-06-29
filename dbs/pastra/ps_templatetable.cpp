@@ -1216,8 +1216,6 @@ PrototypeTable::Set (const ROW_INDEX      row,
 
       if (rowData[byteOff] == bitsSet)
         CheckRowToDelete (row);
-
-      return;
     }
   else if (value.IsNull () == false)
     {
@@ -1241,6 +1239,8 @@ PrototypeTable::Set (const ROW_INDEX      row,
       syncHolder.Release ();
 
       VSStore ().DecrementRecordRef (load_le_int64 (fieldFirstEntry));
+
+      return ;
     }
 
   if (skipVariableStore)
@@ -1359,8 +1359,6 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
       if (rowData[byteOff] == bitsSet)
         CheckRowToDelete (row);
-
-      return ;
     }
   else if (value.IsNull () == false)
     {
@@ -1384,6 +1382,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
 
       VSStore ().DecrementRecordRef (load_le_int64 (fieldFirstEntry));
 
+      return ;
     }
 
   if (skipVariableStore)

@@ -26,8 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WCMD_DBCHECK_H_
 
 
+bool
+repair_database_erros ();
+
+
 int
-check_database_for_errors (const bool autoFixErrors);
+check_database_for_errors (const bool allAnswersYes, const bool userRequest);
 
 
 #endif /* WCMD_DBCHECK_H_ */

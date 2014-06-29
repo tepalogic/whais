@@ -1216,7 +1216,7 @@ ParseFieldUpdateValues (ostream* const              os,
                   DDate value;
                   if (! ParseFieldValue<DDate> (os,
                                                 str + offset,
-                                                false,
+                                                true,
                                                 &offset,
                                                 &value))
                     {
@@ -1234,7 +1234,7 @@ ParseFieldUpdateValues (ostream* const              os,
                   DDateTime value;
                   if (! ParseFieldValue<DDateTime> (os,
                                                     str + offset,
-                                                    false,
+                                                    true,
                                                     &offset,
                                                     &value))
                     {
@@ -1252,7 +1252,7 @@ ParseFieldUpdateValues (ostream* const              os,
                   DHiresTime value;
                   if (! ParseFieldValue<DHiresTime> (os,
                                                      str + offset,
-                                                     false,
+                                                     true,
                                                      &offset,
                                                      &value))
                     {

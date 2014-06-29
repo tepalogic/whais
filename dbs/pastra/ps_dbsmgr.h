@@ -38,7 +38,8 @@ namespace pastra {
 
 //Forward declarations
 class PersistentTable;
-
+class DbsHandler;
+class DbsManager;
 
 
 class DbsHandler : public IDBSHandler
@@ -94,7 +95,13 @@ public:
 
   void RegisterTableSpawn ();
 
+  const DBSSettings& Settings () const
+  {
+    return mGlbSettings;
+  }
+
 private:
+
   typedef std::map<std::string, PersistentTable*> TABLES;
 
   void SyncToFile ();
@@ -105,7 +112,67 @@ private:
   const std::string       mName;
   TABLES                  mTables;
   int                     mCreatedTemporalTables;
+
+
 };
+
+
+
+struct DbsElement
+{
+  DbsElement (const DbsHandler& dbs)
+    : mRefCount (0),
+      mDbs (dbs)
+  {
+  }
+
+  uint64_t   mRefCount;
+  DbsHandler mDbs;
+};
+
+
+
+struct DbsManager
+{
+  typedef std::map<std::string, DbsElement> DATABASES_MAP;
+
+  DbsManager (const DBSSettings& settings)
+    : mSync (),
+      mDBSSettings (settings),
+      mDatabases ()
+  {
+    if ((mDBSSettings.mWorkDir.length () == 0)
+        || (mDBSSettings.mTempDir.length () == 0)
+        || (mDBSSettings.mTableCacheBlkSize == 0)
+        || (mDBSSettings.mTableCacheBlkCount == 0)
+        || (mDBSSettings.mVLStoreCacheBlkSize == 0)
+        || (mDBSSettings.mVLStoreCacheBlkCount == 0)
+        || (mDBSSettings.mVLValueCacheSize == 0))
+      {
+        throw DBSException (
+            _EXTRA (DBSException::BAD_PARAMETERS),
+            "Cannot create a database manager with the specified parameters."
+                           );
+      }
+
+    if (mDBSSettings.mWorkDir[mDBSSettings.mWorkDir.length () - 1] !=
+          whf_dir_delim ()[0])
+      {
+        mDBSSettings.mWorkDir += whf_dir_delim ();
+      }
+
+    if (mDBSSettings.mTempDir[mDBSSettings.mTempDir.length () - 1] !=
+          whf_dir_delim ()[0])
+      {
+        mDBSSettings.mTempDir += whf_dir_delim ();
+      }
+  }
+
+  Lock            mSync;
+  DBSSettings     mDBSSettings;
+  DATABASES_MAP   mDatabases;
+};
+
 
 } //namespace pastra
 } //namespace whisper

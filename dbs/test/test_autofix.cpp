@@ -1765,8 +1765,6 @@ main (int argc, char** argv)
 
   success = success && test_data_base  (_rowsCount);
 
-
-
   DBSShoutdown ();
 
   if (!success)

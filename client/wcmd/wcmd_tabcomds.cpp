@@ -774,6 +774,8 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   }
   catch (const Exception& e)
   {
+    assert (table == NULL);
+
     if (level >= VL_INFO)
       cerr << "Failed to open table: " << token << endl;
 
@@ -805,7 +807,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         RowsSelection               rows;
 
         if (! parse_list_table_fields (*table, cmdLine, linePos, fields))
-          return false;
+          goto invalid_args;
 
         assert (linePos <= cmdLine.length ());
         if (! ParseRowsSelectionClause (&cerr,
@@ -813,7 +815,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                         cmdLine.c_str () + linePos,
                                         rows))
           {
-            return false;
+            goto invalid_args;
           }
 
         const WTICKS matchBegin = wh_msec_ticks ();
@@ -852,7 +854,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                       &temp,
                                       fieldVals))
           {
-            return false;
+            goto invalid_args;
           }
 
         linePos += temp;
@@ -862,7 +864,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                         cmdLine.c_str () + linePos,
                                         rows))
           {
-            return false;
+            goto invalid_args;
           }
 
         const WTICKS matchBegin = wh_msec_ticks ();
@@ -882,7 +884,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 for (size_t f = 0; f < fieldVals.size (); ++f)
                   {
                     if (! UpdateTableRow (&cerr, *table, row, fieldVals))
-                      return false;
+                      goto invalid_args;
                   }
               }
           }
@@ -898,7 +900,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                       &temp,
                                       fieldVals))
           {
-            return false;
+            goto invalid_args;
           }
 
         const ROW_INDEX row = table->AllocatedRows ();
@@ -919,7 +921,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                       &temp,
                                       fieldVals))
           {
-            return false;
+            goto invalid_args;
           }
 
         const ROW_INDEX row = table->GetReusableRow (true);
@@ -938,7 +940,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                          cmdLine.c_str () + linePos,
                                          select))
           {
-            return false;
+            goto invalid_args;
           }
 
         MatchSelectedRows (*table, select);
@@ -968,6 +970,9 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       cerr << "Failed to open table: " << token << endl;
 
     printException (cerr, e);
+
+    if (table)
+      dbs.ReleaseTable (*table);
 
     return false;
   }

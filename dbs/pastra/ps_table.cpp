@@ -416,16 +416,20 @@ repair_table_fields (FieldDescriptor* const           fields,
 {
   static const uint_t NOT_FIXED = 0;
 
+  const char* const descriptorBase = _RC (const char*, fields);
+
   uint_t rowSize = (fieldsCount + 7) / 8;
 
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
+      const char* const fieldName = descriptorBase + fields[i].NameOffset ();
+
       if (fields[i].NullBitIndex () != i)
         {
           bool toFix = fixCallback (FIX_QUESTION,
-                                    "Detecting invalid null bit index for field"
-                                    " '%u'. Should I fix?",
-                                    i);
+                                    "Detecting invalid null bit index for"
+                                    " field '%s'.",
+                                    fieldName);
           if (toFix)
             fields[i].NullBitIndex (i);
 
@@ -436,14 +440,22 @@ repair_table_fields (FieldDescriptor* const           fields,
       if (fields[i].RowDataOff () != rowSize)
         {
           bool toFix = fixCallback (FIX_QUESTION,
-                                    "Detected invalid field '%u' data offset. "
-                                    "Should I fix?",
-                                    i);
+                                    "Detected invalid data offset for field"
+                                    " '%s'. It should be set at %u.",
+                                    fieldName,
+                                    rowSize);
           if (toFix)
             fields[i].RowDataOff (rowSize);
 
           else
             return NOT_FIXED;
+        }
+      else
+        {
+          fixCallback (INFORMATION,
+                       "Field '%s' data offset set at '%u'.",
+                       fieldName,
+                       rowSize);
         }
 
       rowSize += Serializer::Size (_SC (DBS_FIELD_TYPE,
@@ -486,8 +498,8 @@ repair_table_header (const string&             name,
   if (memcmp (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE) != 0)
     {
       fixCallback (CRITICAL,
-                   "The table '%s' cannot be repaired. Its header file is"
-                   " does not have the right signature.",
+                   "The table '%s' cannot be repaired. Cannot find the table"
+                   " file's signature.",
                    name.c_str ());
       return false;
     }
@@ -508,18 +520,19 @@ repair_table_header (const string&             name,
       || (fieldsCount * sizeof (FieldDescriptor) >= descSize))
     {
       fixCallback (CRITICAL,
-                   "The table '%s' cannot be repaired. Its field"
-                   " descriptor is too damaged.",
+                   "The table '%s' cannot be repaired. The field"
+                   " descriptors are too damaged.",
                    name.c_str ());
       return false;
     }
+
   auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
   uint8_t* const     descriptors = fieldsDescs.get ();
 
   if (tableFile.GetSize () < PS_HEADER_SIZE + descSize)
     {
       fixCallback (CRITICAL,
-                   "The table '%s' cannot be repaired. Its header file is"
+                   "The table '%s' cannot be repaired. The header file is"
                    " too damaged.",
                    name.c_str ());
       return false;
@@ -534,8 +547,10 @@ repair_table_header (const string&             name,
       if (fds[i].NameOffset () != nameOffset)
         {
           bool toFix = fixCallback (FIX_QUESTION,
-                           "The table field '%u' is damaged. Should I fix it?",
-                           i);
+                                    "The table field '%u' is damaged. Its name"
+                                    " should be '%s'.",
+                                    i,
+                                    descriptors + nameOffset);
           if (toFix)
             {
               fds[i].NameOffset (nameOffset);
@@ -548,7 +563,8 @@ repair_table_header (const string&             name,
                 }
               else
                 {
-                  fixCallback (CRITICAL, "Cannot restore field name");
+                  fixCallback (CRITICAL,
+                               "The restored field name is not valid.");
 
                   return false;
                 }
@@ -577,8 +593,8 @@ repair_table_header (const string&             name,
   if (nameOffset != descSize)
     {
       fixCallback (CRITICAL,
-                   "The table '%s' cannot be repaired. Its field"
-                   " descriptor is too damaged.",
+                   "The table '%s' cannot be repaired. The field"
+                   " descriptors are too damaged.",
                    name.c_str ());
       return false;
     }
@@ -591,7 +607,7 @@ repair_table_header (const string&             name,
     {
       bool toFix = fixCallback (FIX_QUESTION,
                                 "The table '%s' row size is set at %u"
-                                " bytes instead of %u. Should I fix it?",
+                                " bytes instead of %u.",
                                 name.c_str (),
                                 load_le_int32 (header + PS_TABLE_ROW_SIZE_OFF),
                                 rowSize);
@@ -601,6 +617,13 @@ repair_table_header (const string&             name,
 
       else
         return false;
+    }
+  else
+    {
+      fixCallback (INFORMATION,
+                   "The row size of table '%s' is %u bytes long.",
+                   name.c_str (),
+                   rowSize);
     }
 
   //Remove the information about recyclable row.
@@ -632,12 +655,20 @@ repair_table_header (const string&             name,
 
 class RepairTableNodeManager : public TemporalTable
 {
+  /* This class is declared to reuse as much as possible the code used to build
+   *  the index of a table removed rows. Nothing else! */
+
 public:
   RepairTableNodeManager (DbsHandler& dbs, IDataContainer& container)
     : TemporalTable (dbs, &RepairTableNodeManager::field, 1),
       mContainer (container),
       mCurrentRoot (NIL_NODE)
   {
+  }
+
+  ~RepairTableNodeManager ()
+  {
+    FlushInternal ();
   }
 
   virtual uint64_t NodeRawSize () const
@@ -676,7 +707,7 @@ public:
         rootNode->Leaf (true);
         rootNode->InsertKey (rootNode->SentinelKey ());
 
-        RootNodeId (rootNode->NodeId());
+        RootNodeId (rootNode->NodeId ());
       }
 
     return mCurrentRoot;
@@ -1116,18 +1147,19 @@ VariableSizeStore&
 PersistentTable::VSStore ()
 {
   assert (mVSData != NULL);
+
   return *mVSData;
 }
 
 
 bool
-PersistentTable::ValidateTable (IDBSHandler&               dbs,
+PersistentTable::ValidateTable (const std::string&         path,
                                 const std::string&         name)
 {
   uint8_t tableHdr[PS_HEADER_SIZE];
   bool    toFix = false;
 
-  const string tableFileName = _SC (DbsHandler&, dbs).WorkingDir () + name;
+  const string tableFileName = path + name;
 
   File tableFile (tableFileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
 
@@ -1215,14 +1247,23 @@ check_text_buffer (const uint8_t* const utf8buffer, const uint_t bufferSize)
   uint_t verified = 0;
   while (verified < bufferSize)
     {
-      uint32_t cp;
+      try
+      {
+        const uint_t unitsCount = wh_utf8_cu_count (utf8buffer[verified]);
 
-      const int unitsCount = wh_load_utf8_cp (utf8buffer + verified, &cp);
+        if (unitsCount == 0)
+          return false;
 
-      if (unitsCount == 0)
-        return false;
+        uint32_t cp;
+        wh_load_utf8_cp (utf8buffer + verified, &cp);
+        DChar chk_cp_valid(cp);
 
-      verified += unitsCount;
+        verified += unitsCount;
+      }
+      catch (...)
+      {
+          return false;
+      }
     }
 
   return verified == bufferSize;
@@ -1230,15 +1271,18 @@ check_text_buffer (const uint8_t* const utf8buffer, const uint_t bufferSize)
 
 
 bool
-PersistentTable::RepairTable (DbsHandler&                  dbs,
-                              const std::string&           name,
-                              FIX_ERROR_CALLBACK           fixCallback)
+PersistentTable::RepairTable (DbsHandler&                 dbs,
+                              const std::string&          name,
+                              const std::string&          path,
+                              FIX_ERROR_CALLBACK          fixCallback)
 {
-  const string fileNamePrefix = dbs.WorkingDir () + name;
+  const DBSSettings& settings = dbs.Settings ();
+
+  const string fileNamePrefix = path + name;
 
   if ( ! repair_table_header (name,
                               fileNamePrefix,
-                              dbs.MaxFileSize(),
+                              settings.mMaxFileSize,
                               fixCallback))
     {
       return false;
@@ -1247,7 +1291,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
   File tableFile (fileNamePrefix.c_str(),
                    WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
 
-  assert (tableFile.GetSize ()  >= TableRmNode::RAW_NODE_SIZE);
+  assert (tableFile.GetSize () >= TableRmNode::RAW_NODE_SIZE);
 
   auto_ptr<uint8_t> tableHeader(new uint8_t[PS_HEADER_SIZE]);
 
@@ -1263,14 +1307,14 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
   const uint_t descSize    = load_le_int32 (tableHeader.get () +
                                             PS_TABLE_ELEMS_SIZE_OFF);
 
-  uint32_t rowsCount = load_le_int32 (tableHeader.get () +
-                                      PS_TABLE_ROWS_COUNT_OFF);
-
   const uint32_t rowSize = load_le_int32 (tableHeader.get () +
                                           PS_TABLE_ROW_SIZE_OFF);
 
-  uint64_t    vsDataSize = load_le_int64 (tableHeader.get () +
-                                          PS_TABLE_VARSTORAGE_SIZE_OFF);
+  uint32_t rowsCount = load_le_int32 (tableHeader.get () +
+                                      PS_TABLE_ROWS_COUNT_OFF);
+
+  uint64_t vsDataSize = load_le_int64 (tableHeader.get () +
+                                       PS_TABLE_VARSTORAGE_SIZE_OFF);
 
   auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
 
@@ -1303,11 +1347,11 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
       containerName += _RC (const char*, fds) + fds[i].NameOffset ();
       containerName += "_bt";
 
-      FileContainer::Fix (containerName.c_str (), dbs.MaxFileSize (), 0);
+      FileContainer::Fix (containerName.c_str (), settings.mMaxFileSize, 0);
 
       auto_ptr<IDataContainer> indexContainer (
                              new FileContainer (containerName.c_str (),
-                                                dbs.MaxFileSize (),
+                                                settings.mMaxFileSize,
                                                 0 )
                                               );
       indexNodeMgrs.push_back (
@@ -1319,11 +1363,11 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                                 );
     }
 
-  FileContainer tableData (fileNamePrefix.c_str(), dbs.MaxFileSize (), 1);
+  FileContainer tableData (fileNamePrefix.c_str(), settings.mMaxFileSize, 1);
   FileContainer rowsData ((fileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str(),
-                          dbs.MaxFileSize (),
-                          ((rowSize * rowsCount) + dbs.MaxFileSize () - 1) /
-                            dbs.MaxFileSize ());
+                          settings.mMaxFileSize,
+                          ((rowSize * rowsCount) + settings.mMaxFileSize - 1) /
+                          settings.mMaxFileSize);
 
   RepairTableNodeManager tableNodeMgr(dbs, tableData);
 
@@ -1332,7 +1376,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
       const bool toFix = fixCallback (
                               FIX_QUESTION,
                               "The table's row data does not match table "
-                                "header descriptions. Should I fix it?"
+                                "header descriptions."
                                      );
       if (! toFix )
         return false;
@@ -1342,14 +1386,24 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
       fixCallback (INFORMATION,
                    "Set the table rows count at '%u'.",
                    rowsCount);
+
+      rowsData.Colapse (rowsCount * rowSize, rowsData.Size ());
     }
+  else
+    {
+      fixCallback (INFORMATION,
+                   "Table '%s' has %u row(s) allocated.",
+                   name.c_str (),
+                   rowsCount);
+    }
+
 
   auto_ptr<VariableSizeStore> vsData (new VariableSizeStore);
   if (vsDataSize > 0)
     {
       vsData->Init ((fileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str(),
                     vsDataSize,
-                    dbs.MaxFileSize ());
+                    settings.mMaxFileSize);
       vsData->PrepareToCheckStorage ();
     }
 
@@ -1388,7 +1442,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                                              ))
 
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1405,7 +1459,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                                           GET_BASIC_TYPE (fds[field].Type ()))
                                                  ))
                 {
-                  fixCallback (INFORMATION,
+                  fixCallback (FIX_INFO,
                                "Detected invalid value of field '%s' at row"
                                " %u. Set to NULL.",
                                fieldsDescs.get () + fds[field].NameOffset (),
@@ -1425,7 +1479,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! check_text_buffer (fieldData,
                                             (fieldSize >> 56) & 0x7F))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1437,7 +1491,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                 }
               else if ( ! vsData->CheckTextEntry (fieldEntry, fieldSize))
                 {
-                  fixCallback (INFORMATION,
+                  fixCallback (FIX_INFO,
                                "Detected invalid value of field '%s' at row"
                                " %u. Set to NULL.",
                                fieldsDescs.get () + fds[field].NameOffset (),
@@ -1456,7 +1510,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DBool> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1483,7 +1537,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DChar> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1510,7 +1564,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DDate> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1537,7 +1591,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DDateTime> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1564,7 +1618,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DHiresTime> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1591,7 +1645,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt8> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1618,7 +1672,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt16> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1645,7 +1699,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt32> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1672,7 +1726,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt64> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1699,7 +1753,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DReal> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1726,7 +1780,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DRichReal> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () + fds[field].NameOffset (),
@@ -1752,7 +1806,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt8> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1779,7 +1833,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt16> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1806,7 +1860,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt32> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1833,7 +1887,7 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt64> (fieldData))
                     {
-                      fixCallback (INFORMATION,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1903,8 +1957,8 @@ PersistentTable::RepairTable (DbsHandler&                  dbs,
       assert (fds[field].IndexUnitsCount () == 0);
 
       uint64_t unitsCount = indexNodeMgrs[field]->IndexRawSize ();
-      unitsCount += dbs.MaxFileSize () - 1;
-      unitsCount /= dbs.MaxFileSize ();
+      unitsCount += settings.mMaxFileSize - 1;
+      unitsCount /= settings.mMaxFileSize;
 
       fds[field].IndexUnitsCount (unitsCount);
       delete indexNodeMgrs[field];

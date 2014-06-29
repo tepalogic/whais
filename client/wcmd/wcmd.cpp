@@ -80,8 +80,9 @@ static const char usageDescription[] =
 "                            g,G : for Gigabytes.\n"
 "                           Default value for this is 2G (e.g. 2 Gigabytes),\n"
 "                           and the minimum is 1M (e.g. one Megabyte).\n"
-"    -f, --autofix          Accept to fix any issues by default in case the\n"
-"                           requested database was corrupted.\n"
+"    -t, --check            Check the database integrity.\n"
+"    -f, --auto_yes         Auto answer with 'yes' to all questions related\n"
+"                           to database validation.\n"
 "    -v, --verbose level    Set the verbosity level. Level values:\n"
 "                            0: No out put.\n"
 "                            1: Print the status of the executed command.\n"
@@ -363,33 +364,6 @@ CreateDB ()
 }
 
 
-static bool
-repair_database (const bool forceRepair)
-{
-  if (forceRepair)
-    return true;
-
-  while (true)
-    {
-      char c;
-
-      cout << "Fix database for errors (y/N)?";
-      cin >> c;
-
-      if ((c == 'y') || (c == 'Y'))
-        return true;
-
-      else if ((c == 'n') || (c == 'N'))
-        return false;
-
-      cout << "Please choose 'y' or 'n'!\n";
-    }
-
-  assert (false);
-  return false;
-}
-
-
 int
 main (const int argc, char *argv[])
 {
@@ -398,7 +372,7 @@ main (const int argc, char *argv[])
   bool          createDB            = false;
   bool          removeDB            = false;
   bool          useDB               = false;
-  bool          autoFix             = false;
+  bool          autoYes             = false;
   bool          checkDbForErrors    = false;
   string        script;
 
@@ -569,15 +543,73 @@ main (const int argc, char *argv[])
           else
             ++currentArg;
         }
-      else if ((strcmp (argv[currentArg], "-f") == 0) ||
-               (strcmp (argv[currentArg], "--autofix" ) == 0))
+      else if ((strcmp (argv[currentArg], "-f") == 0)
+               || (strcmp (argv[currentArg], "--auto_yes" ) == 0))
         {
-          autoFix = true;
+          ++currentArg;
+
+          autoYes = true;
+        }
+      else if ((strcmp (argv[currentArg], "-t") == 0)
+               || (strcmp (argv[currentArg], "--check") == 0))
+        {
+          ++currentArg;
+
+          checkDbForErrors = true;
         }
       else
         {
           cerr << "Unknown parameter '" << argv[currentArg] << "'.\n";
 
+          return EINVAL;
+        }
+    }
+
+  if (! (useDB || createDB || removeDB))
+    {
+      cerr << "A database needs to be selected.\n";
+
+      return ECANCELED;
+    }
+
+  if (useDB)
+    {
+      if (removeDB)
+        {
+          cerr << "Could not use and remove a database in the same time.\n";
+
+          return EINVAL;
+        }
+      else if (createDB)
+        {
+          cerr << "Could not use and create a database in the same time.\n";
+
+          return EINVAL;
+        }
+    }
+  else if (removeDB && createDB)
+    {
+      cerr << "Could not remove and create a database in the same time.\n";
+
+      return EINVAL;
+    }
+
+  if (IsOnlineDatabase ())
+    {
+      if (removeDB || createDB)
+        {
+          cerr << "Cannot remove nor create a database on a remote host.\n";
+          return EINVAL;
+        }
+
+      assert (useDB);
+    }
+
+  if (checkDbForErrors)
+    {
+      if ( ! useDB || IsOnlineDatabase ())
+        {
+          cerr << "Only an existent local database may be validated.\n";
           return EINVAL;
         }
     }
@@ -596,98 +628,80 @@ main (const int argc, char *argv[])
   {
     cerr << "Fatal error ... An unknown exception was encountered.\n";
 
-    return 0xFF;
+    return EINVAL;
   }
 
   try
   {
-    if (! (useDB || createDB || removeDB))
-      {
-        cerr << "A database needs to be selected.\n";
+      if (checkDbForErrors)
+        {
+          assert (useDB && ! IsOnlineDatabase ());
 
-        return EINVAL;
-      }
+          checkDbForErrors = false;
 
-    if (useDB)
-      {
-        if (removeDB)
-          {
-            cerr << "Could not use and remove a database in the same time.\n";
+          cout << "Checking database ...\n";
+          result = check_database_for_errors (autoYes, true);
 
-            return EINVAL;
-          }
-        else if (createDB)
-          {
-            cerr << "Could not use and create a database in the same time.\n";
+          if (result < 0)
+            {
+              cerr << "The selected database is not in a valid state."
+                      " Aborting!\n";
+            }
+          else
+            {
+              cout << "The database validation went well. Please restart the "
+                      "program with out '-t' or '--validate'.\n";
+            }
+            result = EAGAIN;
+        }
 
-            return EINVAL;
-          }
-      }
-    else if (removeDB && createDB)
-      {
-        cerr << "Could not remove and create a database in the same time.\n";
+      if ((result == 0) &&  ! removeDB)
+        {
+          if (createDB)
+            CreateDB ();
 
-        return EINVAL;
-      }
+          if (IsOnlineDatabase ())
+            {
+              if (GetUserPassword ().size () == 0)
+                {
+                  string password;
 
-   if (IsOnlineDatabase())
-      {
-        if (removeDB || createDB)
-          {
-            cerr << "Cannot remove nor create a database on a remote host.\n";
-            return EINVAL;
-          }
+                  if (GetUserId () == 0)
+                    cout << "Password[administrator]: ";
 
-        assert (useDB);
-      }
+                  else
+                    cout << "Password: ";
 
-    if (removeDB == false)
-      {
-        if (createDB)
-          CreateDB ();
+                  getline (cin, password);
+                  SetUserPassword (password.c_str ());
+                }
+              AddOnlineTableCommands ();
+            }
+          else
+            {
+              OpenDB ();
+              AddOfflineTableCommands ();
+            }
 
-        if (IsOnlineDatabase ())
-          {
-            if (GetUserPassword ().size () == 0)
-              {
-                string password;
+          if (script != "")
+            result = ExecuteCommandBatch (script) ? 0 : 1;
 
-                if (GetUserId () == 0)
-                  cout << "Password[administrator]: ";
+          else
+            ExecuteInteractively ();
 
-                else
-                  cout << "Password: ";
-
-                getline (cin, password);
-                SetUserPassword (password.c_str ());
-              }
-            AddOnlineTableCommands ();
-          }
-        else
-          {
-            OpenDB ();
-            AddOfflineTableCommands ();
-          }
-
-        if (script != "")
-          result = ExecuteCommandBatch (script) ? 0 : 1;
-
-        else
-          ExecuteInteractively ();
-
-        DBSReleaseDatabase (GetDBSHandler ());
-      }
-    else
-      RemoveDB ();
+          DBSReleaseDatabase (GetDBSHandler ());
+        }
+      else if (result == 0)
+        RemoveDB ();
   }
   catch (const Exception& e)
   {
     if ((e.Type () == DBS_EXCEPTION)
         && (e.Code () == DBSException::DATABASE_IN_USE))
       {
-        cout << "The selected database was not closed properly last time it ";
-        cout << "was used.";
-        checkDbForErrors = repair_database (autoFix);
+        cerr << "The selected database was not closed properly last time it ";
+        cerr << "was used.\n";
+        checkDbForErrors = repair_database_erros ();
       }
     else
       {
@@ -704,7 +718,21 @@ main (const int argc, char *argv[])
 
   try
   {
-    StopDBS ();
+      if (checkDbForErrors)
+        {
+          if (check_database_for_errors (autoYes, false) < 0)
+            {
+              cout << "Failed to validate the database.\n";
+              result = EINVAL;
+            }
+          else
+            {
+              cout << "The database has been successfully repaired. "
+                      "You need to restart the program to use it.\n";
+              result = EAGAIN;
+            }
+        }
+      StopDBS ();
   }
   catch (const Exception& e)
   {
@@ -718,11 +746,6 @@ main (const int argc, char *argv[])
   }
 
   whs_clean ();
-
-  if (checkDbForErrors)
-    {
-      result = check_database_for_errors (autoFix);
-    }
 
   return result;
 }
