@@ -36,10 +36,29 @@ static const char text1[] = "This is a text!";
 static const char text2[] = "This is should be bigger. It must have more chars then the first one.";
 static const char text3[] = "FirstName LastName";
 static const char text4[] = "Total domination of the world is the goal, but why?\n"
-                             "Someone will say because one can, but this is not the case.\b"
-                             "I have no idea what I wrote here! But is nice if I will dominate the world some day.\n";
+                             "Someone will say because one can, but this is not the case.\n"
+                             "I have no idea what I wrote here! But it will be nice if I will dominate the world some day.\n";
 
-const char* text[] = {text1, text2, text3, text4 };
+static const char text5[]  = "B";
+static const char text6[]  = "BT";
+static const char text7[]  = "\0xC8\0x9B345678901234";
+static const char text8[]  = "\0xE8\0x9E\0x99456\0xF0\0x90\0x83\0x8412345";
+static const char text9[]  = "\0xF0\0x90\0x83\0x84567890\0xC8\0x9B3456";
+static const char text10[] = "\0xC8\0x9B34567890123\0xF0\0x90\0x83\0x84";
+static const char text11[] = "1234567\0xE8\0x9E\0x9912345678901234567890\0xC8\0x9B"
+                             "\0xC8\0x9B34567890123\0xC8\0x9B678901234567890123456789012345\0xE8\0x9E\0x99"
+                             "\0xE8\0x9E\0x994567890\0xF0\0x90\0x83\0x84567890123456789012345678901234567\0xE8"
+                             "\0x9E\0x9934567890123456789012345678901234567890123456\0xE8\0x9E"
+                             "\0x9923456789012345678\0xE8\0x9E\0x9923456789012345678901234\0xF0\0x90\0x83\0x84"
+                             "\0xF0\0x90\0x83\0x84567890123456789012\0xF0\0x90\0x83\0x84789012345678901234567\0xF0"
+                             "\0x90\0x83\0x844567890123456789012345678901234567890123456\0xF0\0x90"
+                             "\0x83\0x84345678901234567890123456789\0xE8\0x9E\0x993456789012345\0xF0\0x90\0x83"
+                             "\0x8423456789012345678901234567\0xC8\0x9B0123456789012345678";
+
+
+
+
+const char* text[] = {text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11 };
 
 struct DBSFieldDescriptor field_descs[] = {
     {"bool", T_BOOL, false},
@@ -1376,7 +1395,7 @@ add_text_row (ITable&         table,
     table.Set (row, field, DText ());
 
   else
-    table.Set (row, field, DText (text [row % 4]));
+    table.Set (row, field, DText (text [row % 11]));
 
   return true;
 }
@@ -1401,7 +1420,7 @@ verify_text_rows (ITable& table,
           if ( ! fieldValue.IsNull ())
             return false;
         }
-      else if  ((fieldValue != DText (text[row % 4]))
+      else if  ((fieldValue != DText (text[row % 11]))
                 && ( broken && ! fieldValue.IsNull ()))
         {
           return false;
@@ -1473,7 +1492,13 @@ verify_array_rows (ITable& table,
           refArray.Get (i, refValue);
 
           if (tabValue != refValue)
-            return false;
+            {
+              if ( ! broken)
+                return false;
+
+              else if (! verify_int_marker (tabValue))
+                return false;
+            }
         }
     }
 
@@ -1658,16 +1683,8 @@ repair_data_base (const bool broken)
 {
   const bool valid = DBSValidateDatabase (db_name);
 
-  if (broken)
-    {
-      if (valid)
-        return false;
-    }
-  else
-    {
-      if ( ! valid)
-        return false;
-    }
+  if (broken && valid)
+    return false;
 
   return DBSRepairDatabase (db_name, NULL, repair_callback);
 }

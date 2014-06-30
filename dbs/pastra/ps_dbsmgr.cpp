@@ -615,7 +615,7 @@ DBSValidateDatabase (const char* const name,
    {
       ++actualCount;
 
-      if ( ! PersistentTable::ValidateTable (path, name))
+      if ( ! PersistentTable::ValidateTable (path, tableName))
         return false;
 
       tableName += strlen (tableName) + 1;

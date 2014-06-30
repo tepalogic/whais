@@ -49,7 +49,7 @@ public:
   static const uint64_t FIRST_RECORD_ENTRY = 0x4000000000000000ull;
   static const uint64_t FIRST_PREV_ENTRY   = 0x0000000000000001ull;
 
-  static const uint_t     ENTRY_SIZE              = 48;
+  static const uint_t  ENTRY_SIZE          = 48;
 
   void MarkAsDeleted (const bool deleted)
   {
