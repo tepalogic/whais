@@ -30,7 +30,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../whc/wo_format.h"
 
 
+
 namespace whisper {
+
+
+
+WIFunctionalUnit::~WIFunctionalUnit ()
+{
+}
 
 
 /////////////******CompiledBufferUnit********//////////////////////////////
@@ -406,6 +413,7 @@ CompiledBufferUnit::IsProcExternal (uint_t procId)
 
 
 /////////////******CompiledFileUnit********//////////////////////////////
+
 
 CompiledFileUnit::CompiledFileUnit (const char* file)
   : mFile (file, WHC_FILEREAD),

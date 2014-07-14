@@ -278,3 +278,12 @@ whf_is_absolute (const char* const path)
 }
 
 
+bool_t
+whf_file_eixsts (const char* const file)
+{
+  struct stat statBuffer;
+
+  return stat (file, &statBuffer) == 0;
+}
+
+

@@ -24,18 +24,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 #include <string>
 #include <iostream>
 #include <assert.h>
 
 #include "compiler/whisperc.h"
-
 #include "whc_cmdline.h"
+
+
 
 using namespace std;
 
+
+
 namespace whisper {
 namespace whc {
+
+
 
 static inline bool
 isStrEqual (const char* str1, const char* str2)
@@ -43,13 +49,20 @@ isStrEqual (const char* str1, const char* str2)
   return strcmp (str1, str2) == 0;
 }
 
+
+
+
 CmdLineParser::CmdLineParser (int argc, char** argv)
   : mArgCount (argc),
     mArgs (argv),
     mSourceFile (NULL),
     mOutputFile (NULL),
     mShowHelp (false),
-    mOutputFileOwn (true)
+    mOutputFileOwn (true),
+    mPreprocessOnly (false),
+    mBuildDependencies (false),
+    mInclusionPaths (),
+    mReplacementTags ()
 {
   Parse ();
 }
@@ -83,6 +96,56 @@ CmdLineParser::Parse ()
           mShowHelp = true;
           ++index;
         }
+      else if (isStrEqual (mArgs[index], "-P"))
+        {
+          mPreprocessOnly = true;
+          ++index;
+        }
+      else if (isStrEqual (mArgs[index], "-I"))
+        {
+          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
+            {
+              throw CmdLineException (_EXTRA (0),
+                                      "Missing value for parameter '-I'.");
+            }
+          AddInclusionPaths (mArgs[index++]);
+        }
+      else if (isStrEqual (mArgs[index], "-D"))
+        {
+          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
+            {
+              throw CmdLineException (_EXTRA (0),
+                                      "Missing values for parameter '-D'.");
+            }
+          else if (mArgs[index][0] == '=')
+            {
+              throw CmdLineException (_EXTRA (0),
+                                      "Missing tag value for parameter '-D'.");
+            }
+
+          const string param (mArgs[index]);
+          const size_t separatorPos = param.find ('=');
+
+          if (separatorPos == string::npos)
+            {
+              mReplacementTags.push_back (
+                  ReplacementTag (param.substr (0, separatorPos),
+                                  string ())
+                                         );
+            }
+          else
+            {
+              mReplacementTags.push_back (
+                  ReplacementTag (param.substr (0, separatorPos),
+                                  param.substr (separatorPos + 1))
+                                         );
+            }
+        }
+      else if (isStrEqual (mArgs[index], "--make_deps"))
+        {
+          mBuildDependencies = true;
+          ++index;
+        }
       else if (isStrEqual (mArgs[index], "-o"))
         {
           if (mOutputFile != NULL)
@@ -96,7 +159,7 @@ CmdLineParser::Parse ()
           if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
             {
               throw CmdLineException (_EXTRA (0),
-                                      "Missing parameter for argument '-o'.");
+                                      "Missing value for parameter '-o'.");
             }
 
           else
@@ -128,6 +191,57 @@ CmdLineParser::Parse ()
   CheckArguments ();
 }
 
+
+static string&
+normalize_path (string& path)
+{
+  const char* const dirDelim = whf_dir_delim();
+
+  for (uint_t i = 0; i < path.size (); ++i)
+    {
+      if ((path[i] == '/') || (path[i] =='\\'))
+        path[i] = dirDelim[0];
+    }
+
+  if (path[path.size () - 1] != dirDelim[0])
+    path.append (dirDelim);
+
+  return path;
+}
+
+
+void
+CmdLineParser::AddInclusionPaths (const char* const paths)
+{
+  assert (paths != NULL);
+
+  const char* currentPath = paths;
+  const char* nextPath    = currentPath;
+
+  while (nextPath && (*nextPath != 0))
+    {
+      nextPath = strpbrk (currentPath, ":;");
+      if (nextPath == NULL)
+        {
+          string path (currentPath);
+
+          mInclusionPaths.push_back (normalize_path (path));
+        }
+      else
+        {
+          const uint_t pathSize = nextPath - currentPath;
+          if (pathSize > 0)
+            {
+              string path (currentPath, pathSize);
+
+              mInclusionPaths.push_back (normalize_path (path));
+            }
+          currentPath = ++nextPath;
+        }
+    }
+}
+
+
 void
 CmdLineParser::CheckArguments ()
 {
@@ -157,7 +271,55 @@ CmdLineParser::CheckArguments ()
 
     mOutputFile = tempBuffer;
   }
+
+  const char* const defaults_inc = getenv ("WHAIS_INC");
+  if (defaults_inc != NULL)
+    AddInclusionPaths (defaults_inc);
+
+  char  temp[64];
+  const WTime t  = wh_get_currtime ();
+
+  snprintf (temp, sizeof temp, "%d", t.year);
+  mReplacementTags.push_back (ReplacementTag ("YEAR", temp));
+
+  snprintf (temp, sizeof temp, "%u", t.month);
+  mReplacementTags.push_back (ReplacementTag ("MONTH", temp));
+
+  snprintf (temp, sizeof temp, "%u", t.day);
+  mReplacementTags.push_back (ReplacementTag ("DAY", temp));
+
+  snprintf (temp, sizeof temp, "%u", t.hour);
+  mReplacementTags.push_back (ReplacementTag ("HOUR", temp));
+
+  snprintf (temp, sizeof temp, "%u", t.min);
+  mReplacementTags.push_back (ReplacementTag ("MIN", temp));
+
+  snprintf (temp, sizeof temp, "%s", t.sec);
+  mReplacementTags.push_back (ReplacementTag ("SEC", temp));
+
+  snprintf (temp, sizeof temp, "%s", t.usec);
+  mReplacementTags.push_back (ReplacementTag ("USEC", temp));
+
+  snprintf (temp,
+            sizeof temp,
+            "%d/%u/%u %u:%u:%u.%u",
+            t.year,
+            t.month,
+            t.day,
+            t.hour,
+            t.min,
+            t.sec,
+            t.usec);
+
+  mReplacementTags.push_back (ReplacementTag ("TIME_STAMP", temp));
+
+  for (size_t i = 0; i < mReplacementTags.size (); ++i)
+    {
+      mReplacementTags[i].mTagName.insert (0, "%");
+      mReplacementTags[i].mTagName.push_back ('%');
+    }
 }
+
 
 void
 CmdLineParser::DisplayUsage () const
@@ -171,7 +333,6 @@ CmdLineParser::DisplayUsage () const
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
        << "Usage: whisperc  input_file [-o output_file] [--help | -h]" << endl;
 }
-
 
 
 CmdLineException::CmdLineException (const uint32_t      code,

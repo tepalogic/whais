@@ -92,6 +92,9 @@ whf_current_dir ();
 bool_t
 whf_is_absolute (const char* const path);
 
+bool_t
+whf_file_eixsts (const char* const file);
+
 #ifdef __cplusplus
 } /* extern 'C' */
 #endif

@@ -25,7 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __WHC_CMDLINE_H
 #define __WHC_CMDLINE_H
 
+
+#include <vector>
+#include <string>
+
 #include "whisper.h"
+
+
+#include "whc_preprocess.h"
 
 
 
@@ -50,12 +57,35 @@ public:
     return mOutputFile;
   }
 
+
+  const bool JustPreprocess () const
+  {
+    return mPreprocessOnly;
+  }
+
+  const bool BuildDependencies () const
+  {
+    return mBuildDependencies;
+  }
+
+  const std::vector<std::string>& InclusionPaths () const
+  {
+    return mInclusionPaths;
+  }
+
+  const std::vector<ReplacementTag>& ReplacementTags () const
+  {
+    return mReplacementTags;
+  }
+
 private:
   void Parse ();
 
   void DisplayUsage () const;
 
   void CheckArguments ();
+
+  void AddInclusionPaths (const char* const paths);
 
 private:
   int         mArgCount;
@@ -64,7 +94,13 @@ private:
   const char* mOutputFile;
   bool        mShowHelp;
   bool        mOutputFileOwn;
+  bool        mPreprocessOnly;
+  bool        mBuildDependencies;
+
+  std::vector<std::string>            mInclusionPaths;
+  std::vector<ReplacementTag>         mReplacementTags;
 };
+
 
 class CmdLineException : public Exception
 {

@@ -23,10 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include <cstdio>
-#include <assert.h>
+#include <cassert>
+#include <vector>
 
 #include "msglog.h"
 
+
+using namespace std;
 
 
 
@@ -37,13 +40,28 @@ static const char *MSG_PREFIX[] = {
 
 
 static uint_t
-get_line_from_buffer (const char* buffer, uint_t bufferOff)
+get_line_from_buffer (const vector<SourceCodeMark>& codeMark,
+                      const char*                   buffer,
+                      uint_t                        bufferOff,
+                      int* const                    mark)
 {
-  uint_t count  = 0;
-  int    result = 1;
+  *mark = -1;
 
   if (bufferOff == WHC_IGNORE_BUFFER_POS)
     return -1;
+
+  for (uint_t i = 0;
+      (i < codeMark.size ()) && (bufferOff <= codeMark[i].mBufferOffset);
+      ++i)
+    {
+      *mark = i;
+    }
+
+  if (*mark < 0)
+    return -1;
+
+  uint_t count  = codeMark[*mark].mBufferOffset;
+  int    result = codeMark[*mark].mBufferLine;
 
   while (count < bufferOff)
     {
@@ -65,6 +83,7 @@ get_line_from_buffer (const char* buffer, uint_t bufferOff)
         }
       ++count;
     }
+
   return result;
 }
 
@@ -77,12 +96,66 @@ whc_messenger (WH_MESSENGER_CTXT    data,
                const char*          msgFormat,
                va_list              args)
 {
-  const char* buffer    = (const char*)data;
-  int         buffLine = get_line_from_buffer (buffer, buffOff);
+  const WHC_MESSAGE_CTX&        ctx       = *_RC(const WHC_MESSAGE_CTX*, data);
+  const char* const             buffer    = ctx.mCode;
+  const vector<SourceCodeMark>& codeMarks = ctx.mCodeMarks;
+
+  int mark     = 0;
+  int buffLine = get_line_from_buffer (codeMarks, buffer, buffOff, &mark);
 
   fprintf (stderr, MSG_PREFIX[msgType]);
-  fprintf (stderr, "%d : line %d: ", msgId, buffLine);
-  vfprintf (stderr, msgFormat, args);
+  if (buffLine > 0)
+    {
+      assert (codeMarks.size () > 0);
+
+          assert (codeMarks[mark].mLevel == 0);
+
+          fprintf (stderr,
+                   "%s:line %d: %d: ",
+                   codeMarks[mark].mBufferSource.c_str (),
+                   buffLine,
+                   msgId);
+          vfprintf (stderr, msgFormat, args);
+
+          while (codeMarks[mark].mLevel > 0)
+            {
+              const uint_t prevLevel = codeMarks[mark].mLevel - 1;
+
+              while (codeMarks[mark].mLevel > prevLevel)
+                {
+                  assert (mark > 0);
+                  --mark;
+                }
+
+              assert (codeMarks[mark].mLevel == prevLevel);
+
+              fprintf (stderr,
+                      "\n\tFile is included from '%s' at line %d%c",
+                      codeMarks[mark].mBufferSource.c_str (),
+                      codeMarks[mark].mBufferLine,
+                      prevLevel == 0 ? '.' : ';');
+            }
+
+      fprintf (stderr, "%d : line %d: ", msgId, buffLine);
+    }
+  else
+    {
+      fprintf (stderr, "%d : ", msgId);
+      vfprintf (stderr, msgFormat, args);
+    }
+
   fprintf (stderr, "\n");
+}
+
+
+void
+whc_messenger (WH_MESSENGER_CTXT data,
+               uint_t            buffOff,
+               uint_t            msgId,
+               uint_t            msgType,
+               const char*       msgFormat,
+               ...)
+{
+
 }
 

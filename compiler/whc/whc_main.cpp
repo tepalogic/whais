@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include <iostream>
+#include <sstream>
 #include <assert.h>
 
 #include "whisper.h"
@@ -32,9 +33,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wfile.h"
 #include "utils/endianness.h"
 #include "utils/woutstream.h"
+#include "utils/auto_array.h"
 
 #include "msglog.h"
 #include "whc_cmdline.h"
+#include "whc_preprocess.h"
 #include "wo_format.h"
 
 
@@ -137,53 +140,43 @@ process_procedures_table (WIFunctionalUnit&   unit,
 }
 
 
-int
-main (int argc, char **argv)
+static void
+create_object_file (const char* const                  outFile,
+                    const string&                      sourceCode,
+                    const vector<SourceCodeMark>&      codeMarks)
 {
-  uint_t             buffSize = 0;
-  int                retCode  = 0;
-  uint_t             langVerMaj;
-  uint_t             langVerMin;
-  auto_ptr<uint8_t>  buffer (NULL);
-  WOutputStream      symbolsStream;
-  WOutputStream      glbsTableStream;
-  WOutputStream      procsTableStream;
+  uint_t        langVerMaj;
+  uint_t        langVerMin;
+
+  WOutputStream symbolsStream;
+  WOutputStream glbsTableStream;
+  WOutputStream procsTableStream;
 
   wh_compiler_language_ver (&langVerMaj, &langVerMin);
+
   wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &symbolsStream);
   wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &glbsTableStream);
   wh_ostream_init (OUTSTREAM_INCREMENT_SIZE, &procsTableStream);
 
   try
   {
-    CmdLineParser args (argc, argv);
+    WHC_MESSAGE_CTX ctx (codeMarks, sourceCode.c_str ());
 
-    File inputFile (args.SourceFile (), WHC_FILEREAD);
-    buffSize = inputFile.GetSize ();
-
-    buffer.reset (new uint8_t[_SC (unsigned int, buffSize + 1)]);
-    buffer.get ()[buffSize] = 0;  //Ensures the null terminator.
-
-    inputFile.Seek (0, WHC_SEEK_CURR);
-    inputFile.Read (buffer.get (), _SC (unsigned int, buffSize));
-    assert (inputFile.Tell () == buffSize);
-    inputFile.Close ();
-
-    CompiledBufferUnit unit (buffer.get (),
-                             buffSize,
+    CompiledBufferUnit unit (_RC (const uint8_t*, sourceCode.c_str ()),
+                             sourceCode.size (),
                              whc_messenger,
-                             buffer.get ());
+                             &ctx);
 
-    File outputFile (args.OutputFile (), WHC_FILEWRITE | WHC_FILECREATE);
+    File outputObject (outFile, WHC_FILEWRITE | WHC_FILECREATE);
 
-    outputFile.SetSize (0);
-    outputFile.Seek (0, WHC_SEEK_BEGIN);
+    outputObject.SetSize (0);
+    outputObject.Seek (0, WHC_SEEK_BEGIN);
 
     //reserve space for header file
-    outputFile.Write (wh_header, sizeof wh_header);
+    outputObject.Write (wh_header, sizeof wh_header);
 
     process_procedures_table (unit,
-                              outputFile,
+                              outputObject,
                               &symbolsStream,
                               &procsTableStream);
     fill_globals_table (unit, &symbolsStream, &glbsTableStream);
@@ -199,29 +192,29 @@ main (int argc, char **argv)
 
     assert ((wh_ostream_size (&procsTableStream) % WHC_PROC_ENTRY_SIZE) == 0);
 
-    store_le_int32 (outputFile.Tell (), wh_header + WHC_TYPEINFO_START_OFF);
+    store_le_int32 (outputObject.Tell (), wh_header + WHC_TYPEINFO_START_OFF);
     store_le_int32 (unit.TypeAreaSize (),
                     wh_header + WHC_TYPEINFO_SIZE_OFF);
 
-    outputFile.Write (unit.RetriveTypeArea (),
+    outputObject.Write (unit.RetriveTypeArea (),
                       unit.TypeAreaSize ());
 
-    store_le_int32 (outputFile.Tell (), wh_header + WHC_SYMTABLE_START_OFF);
+    store_le_int32 (outputObject.Tell (), wh_header + WHC_SYMTABLE_START_OFF);
     store_le_int32 (wh_ostream_size (&symbolsStream),
                     wh_header + WHC_SYMTABLE_SIZE_OFF);
 
-    outputFile.Write (wh_ostream_data (&symbolsStream),
+    outputObject.Write (wh_ostream_data (&symbolsStream),
                       wh_ostream_size (&symbolsStream));
 
-    store_le_int32 (outputFile.Tell (), wh_header + WHC_CONSTAREA_START_OFF);
+    store_le_int32 (outputObject.Tell (), wh_header + WHC_CONSTAREA_START_OFF);
     store_le_int32 (unit.ConstsAreaSize (),
                     wh_header + WHC_CONSTAREA_SIZE_OFF);
 
-    outputFile.Write (unit.RetrieveConstArea (),
+    outputObject.Write (unit.RetrieveConstArea (),
                       unit.ConstsAreaSize ());
-    outputFile.Write (wh_ostream_data (&glbsTableStream),
+    outputObject.Write (wh_ostream_data (&glbsTableStream),
                       wh_ostream_size (&glbsTableStream));
-    outputFile.Write (wh_ostream_data (&procsTableStream),
+    outputObject.Write (wh_ostream_data (&procsTableStream),
                       wh_ostream_size (&procsTableStream));
 
     wh_header[WHC_SIGNATURE_OFF]     = WH_SIGNATURE[0];
@@ -231,9 +224,79 @@ main (int argc, char **argv)
     wh_header[WHC_LANGVER_MAJ_OFF]   = langVerMaj;
     wh_header[WHC_LANGVER_MIN_OFF]   = langVerMin;
 
-    outputFile.Seek (0, WHC_SEEK_BEGIN);
-    outputFile.Write (wh_header, sizeof wh_header);
-    outputFile.Sync ();
+    outputObject.Seek (0, WHC_SEEK_BEGIN);
+    outputObject.Write (wh_header, sizeof wh_header);
+    outputObject.Sync ();
+  }
+  catch (...)
+  {
+      wh_ostream_clean (&symbolsStream);
+      wh_ostream_clean (&glbsTableStream);
+      wh_ostream_clean (&procsTableStream);
+
+      throw ;
+  }
+
+  wh_ostream_clean (&symbolsStream);
+  wh_ostream_clean (&glbsTableStream);
+  wh_ostream_clean (&procsTableStream);
+}
+
+
+int
+main (int argc, char **argv)
+{
+  int                        retCode  = 0;
+
+  ostringstream              buffer;
+  vector<SourceCodeMark>     codeMarks;
+  vector<string>             usedFiles;
+
+  try
+  {
+    CmdLineParser args (argc, argv);
+
+    if (! preprocess_source (args.SourceFile (),
+                             args.InclusionPaths (),
+                             args.ReplacementTags (),
+                             buffer,
+                             codeMarks,
+                             usedFiles))
+
+      {
+        //In case of an error encountered during the processing stage its
+        //corresponding message was already displayed.
+        //Just return the error code here.
+        return -1;
+      }
+
+    if (args.JustPreprocess ())
+      {
+        cout << endl << buffer << endl;
+
+        return 0;
+      }
+    else if (args.BuildDependencies ())
+      {
+        assert (usedFiles.size () > 0);
+
+        cout << args.OutputFile () << " : ";
+        for (size_t i = 0; i < usedFiles.size (); ++i)
+          {
+            cout << usedFiles[i];
+            if (i < usedFiles.size () - 1)
+              cout << " \\\n ";
+
+            else
+              cout << endl;
+          }
+
+        return 0;
+      }
+
+    create_object_file (args.OutputFile (),
+                        buffer.str (),
+                        codeMarks);
 
   }
   catch (FileException & e)
@@ -276,10 +339,6 @@ main (int argc, char **argv)
 
     retCode = -1;
   }
-
-  wh_ostream_clean (&symbolsStream);
-  wh_ostream_clean (&glbsTableStream);
-  wh_ostream_clean (&procsTableStream);
 
   return retCode;
 }

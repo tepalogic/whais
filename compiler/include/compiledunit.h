@@ -40,13 +40,7 @@ namespace whisper
 class COMPILER_SHL WIFunctionalUnit
 {
 public:
-  WIFunctionalUnit ()
-  {
-  }
-
-  virtual ~WIFunctionalUnit ()
-  {
-  };
+  virtual ~WIFunctionalUnit ();
 
   virtual uint_t         TypeAreaSize () = 0;
   virtual const uint8_t* RetriveTypeArea () = 0;
@@ -92,7 +86,6 @@ public:
 };
 
 
-
 class COMPILER_SHL CompiledBufferUnit : public WIFunctionalUnit
 {
 public:
@@ -122,8 +115,7 @@ public:
   virtual uint_t         GetProcReturnTypeOff (const uint_t id);
   virtual uint_t         GetProcNameSize (const uint_t id);
   virtual const char*    RetriveProcName (const uint_t id);
-  virtual uint_t         GetProcLocalTypeOff (uint_t procId,
-                                              uint_t localId);
+  virtual uint_t         GetProcLocalTypeOff (uint_t procId, uint_t localId);
   virtual bool_t         IsProcExternal (uint_t procId);
 
 private:
@@ -163,8 +155,7 @@ public:
   virtual uint_t         GetProcReturnTypeOff (const uint_t id);
   virtual uint_t         GetProcNameSize (const uint_t id);
   virtual const char*    RetriveProcName (const uint_t id);
-  virtual uint_t         GetProcLocalTypeOff (uint_t procId,
-                                              uint_t localId);
+  virtual uint_t         GetProcLocalTypeOff (uint_t procId, uint_t localId);
   virtual bool_t         IsProcExternal (uint_t procId);
 
 private:

@@ -9,7 +9,9 @@ endif
 UNIT_SHLS:=wcompiler
 
 
-whc_SRC=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp
+whc_SRC=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp \
+		whc/whc_preprocess.cpp
+
 whc_DEF=USE_COMPILER_SHL
 whc_LIB=utils/wslutils custom/wslcustom
 whc_SHL=compiler/wcompiler custom/wcommon

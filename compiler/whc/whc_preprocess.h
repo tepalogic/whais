@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+WHISPERC - A compiler for whisper programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,51 +22,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef DATE_H_
-#define DATE_H_
+#ifndef __WHC_PREPROCESS_H
+#define __WHC_PREPROCESS_H
+
+#include <vector>
+#include <string>
 
 #include "whisper.h"
 
+#include "utils/auto_array.h"
 
-
-#ifdef __cplusplus
-  #define  BOOL_R     bool
-  #define  FALSE_R    false
-  #define  TRUE_R     true
-#else
-  #define  BOOL_R     bool_t
-  #define  FALSE_R    FALSE
-  #define  TRUE_R     TRUE
-#endif
-
-
-#define MNTH_DAYS_A  { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
-#define MNTH_YDAYS_A { 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334}
-
-#define DAYS_PER_YEAR   365
+#include "msglog.h"
 
 
 
-static BOOL_R
-is_leap_year (const int year)
+struct ReplacementTag
 {
-  if ((year % 4) == 0)
-    {
-      if ((year % 100) == 0)
-        {
-          if ((year % 400) == 0)
-            return TRUE_R;
+  ReplacementTag (const std::string& tagName, const std::string& tagValue)
+    : mTagName (tagName),
+      mTagValue (tagValue)
+  {
+  }
 
-          else
-            return FALSE_R;
-        }
-      else
-        return TRUE_R;
-    }
-  else
-    return FALSE_R;
-}
+  std::string mTagName;
+  std::string mTagValue;
+};
 
-#undef BOOL_R
 
-#endif /* DATE_H_ */
+bool
+preprocess_source (const std::string&                  sourceFile,
+                   const std::vector<std::string>&     inclusionPaths,
+                   const std::vector<ReplacementTag>&  tagPairs,
+                   std::ostringstream&                 sourceCode,
+                   std::vector<SourceCodeMark>&        codeMarks,
+                   std::vector<std::string>&           usedFiles);
+
+
+#endif /* __WHC_PREPROCESS_H */

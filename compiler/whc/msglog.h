@@ -22,7 +22,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include <stdarg.h>
+#include <cstdarg>
+#include <vector>
+#include <string>
+
 
 #include "whisper.h"
 
@@ -31,6 +34,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef MSGLOG_H_
 #define MSGLOG_H_
 
+
+
+struct SourceCodeMark
+{
+  SourceCodeMark (uint32_t      bufferOffset,
+                  uint32_t      bufferLine,
+                  std::string   bufferSource,
+                  uint_t        inclusionLevel)
+    : mBufferOffset (bufferOffset),
+      mBufferLine (bufferLine),
+      mLevel (inclusionLevel),
+      mBufferSource (bufferSource)
+  {
+  }
+
+  uint32_t      mBufferOffset;
+  uint32_t      mBufferLine;
+  uint_t        mLevel;
+  std::string   mBufferSource;
+};
+
+
+struct WHC_MESSAGE_CTX
+{
+  WHC_MESSAGE_CTX (const std::vector<SourceCodeMark>& codeMarks,
+                   const char* const                  sourceCode)
+    : mCodeMarks (codeMarks),
+      mCode (sourceCode)
+  {
+  }
+
+  const std::vector<SourceCodeMark>&   mCodeMarks;
+  const char* const                    mCode;
+};
+
+
+
 void
 whc_messenger (WH_MESSENGER_CTXT data,
                uint_t            buffOff,
@@ -38,6 +78,14 @@ whc_messenger (WH_MESSENGER_CTXT data,
                uint_t            msgType,
                const char*       msgFormat,
                va_list           args);
+
+void
+whc_messenger (WH_MESSENGER_CTXT data,
+               uint_t            buffOff,
+               uint_t            msgId,
+               uint_t            msgType,
+               const char*       msgFormat,
+               ...);
 
 #endif /* MSGLOG_H_ */
 
