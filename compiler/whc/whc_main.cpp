@@ -272,7 +272,7 @@ main (int argc, char **argv)
 
     if (args.JustPreprocess ())
       {
-        cout << endl << buffer << endl;
+        cout << endl << buffer.str () << endl;
 
         return 0;
       }
@@ -288,7 +288,7 @@ main (int argc, char **argv)
               cout << " \\\n ";
 
             else
-              cout << endl;
+              cout << endl << endl;
           }
 
         return 0;

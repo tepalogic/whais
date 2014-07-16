@@ -44,27 +44,33 @@ static const int TOKEN_NFOUND         =  1;
 static const int TOKEN_NO_NEWLINE     = -1;
 
 static const uint_t errPreprocessorBase      = 50;
-static const uint_t errNoIncludeId           = errPreprocessorBase          + 1;
-static const uint_t errMultipleIncludes      = errNoIncludeId               + 1;
-static const uint_t errTagLineOffset         = errMultipleIncludes          + 1;
-static const uint_t errTagMissingValue       = errTagLineOffset             + 1;
-static const uint_t errTagMultipleGuard      = errTagMissingValue           + 1;
+static const uint_t errNoIncludeId           = errPreprocessorBase        + 1;
+static const uint_t errMultipleIncludes      = errNoIncludeId             + 1;
+static const uint_t errTagLineOffset         = errMultipleIncludes        + 1;
+static const uint_t errTagMissingValue       = errTagLineOffset           + 1;
+static const uint_t errTagMultipleGuard      = errTagMissingValue         + 1;
+static const uint_t errTooNestedInclude      = errTagMultipleGuard        + 1;
 
-static const char tagInclude[]      = "#!include";
-static const char tagIncludeGuard[] = "#!include_guard";
+static const char tagInclude[]      = "#@include";
+static const char tagIncludeGuard[] = "#@guard";
+
+static const uint_t MAX_INCLUDED_LEVELS = 256;
+
 
 
 void
-print_err_preprocess (vector<uint8_t>&          source,
-                      vector<SourceCodeMark>&   codeMarks)
+print_err_include_to_deep (vector<SourceCodeMark>&   codeMarks,
+                           const string&             source)
 {
   WHC_MESSAGE_CTX ctxt (codeMarks, _RC (const char*, &source[0]));
 
   whc_messenger (&ctxt,
-                 -1,
-                 errNoIncludeId,
+                 source.size () - 1,
+                 errTooNestedInclude,
                  0,
-                 "Unexpected preprocessor error encountered.");
+                 "Reached the maximum level of nested includes."
+                 " This implementation supports a maximum of '%u' levels.",
+                 MAX_INCLUDED_LEVELS);
 }
 
 void
@@ -84,13 +90,13 @@ print_err_no_include (vector<SourceCodeMark>&   codeMarks,
 
   if (inclusionPaths.size () > 0)
     {
-      cerr << "I looked for header in:\n";
+      cerr << "\tI looked for it in:\n";
 
       for (uint_t i = 0; i < inclusionPaths.size (); ++i)
-        cerr << '\t' << inclusionPaths[i].c_str () << endl;
+        cerr << "\t\t"  << inclusionPaths[i].c_str () << endl;
     }
   else
-    cerr << "There were no paths to setup for inclusion.\n";
+    cerr << "\tThere were no directories setup to search for it.\n";
 
 }
 
@@ -109,13 +115,14 @@ print_err_multiple_include (vector<SourceCodeMark>&   codeMarks,
                  source.size () - 1,
                  errMultipleIncludes,
                  0,
-                 "There is more than one candidates for the inclusion of '%s'.",
+                 "There is more than one candidate for the inclusion of '%s'.",
                  includedFile.c_str ());
 
-  cerr << "I found the following candidates:\n";
+  cerr << "\tI found the following candidates:\n";
   for (uint_t i = 0; i < foundFiles.size (); ++i)
-    cerr << '\t' << foundFiles[i].c_str () << endl;
+    cerr << "\t\t" << foundFiles[i].c_str () << endl;
 }
+
 
 void
 print_err_tag_no_line_start (vector<SourceCodeMark>&   codeMarks,
@@ -132,6 +139,7 @@ print_err_tag_no_line_start (vector<SourceCodeMark>&   codeMarks,
                  tag.c_str ());
 }
 
+
 void
 print_err_tag_no_value (vector<SourceCodeMark>&   codeMarks,
                         const string&             source,
@@ -141,11 +149,12 @@ print_err_tag_no_value (vector<SourceCodeMark>&   codeMarks,
 
   whc_messenger (&ctxt,
                  source.size () - 1,
-                 errTagLineOffset,
+                 errTagMissingValue,
                  0,
                  "The tag '%s' has no value.",
                  tag.c_str ());
 }
+
 
 void
 print_err_multiple_guard_entries (vector<SourceCodeMark>&   codeMarks,
@@ -156,7 +165,7 @@ print_err_multiple_guard_entries (vector<SourceCodeMark>&   codeMarks,
 
   whc_messenger (&ctxt,
                  source.size (),
-                 errTagLineOffset,
+                 errTagMultipleGuard,
                  0,
                  "Tag '%s' defined multiple times inside included file '%s'.",
                  tagIncludeGuard,
@@ -187,7 +196,10 @@ get_tag_value (const string& line, const uint tagLength)
 
   while (from < line.size ())
     {
-      if ( ! isspace (line[from]))
+      if (line[from] == '\n' || line[from]=='\r')
+        return string ();
+
+      else if ( ! isspace (line[from]))
         break;
 
       ++from;
@@ -199,11 +211,9 @@ get_tag_value (const string& line, const uint tagLength)
   uint_t size = 0;
   while (from + size < line.size ())
     {
-      if (line[from + size] == '#')
-        {
-          --size;
-          break;
-        }
+      if ((line[from + size] == '#') || isspace (line[from + size]))
+        break;
+
       ++size;
     }
   return line.substr (from, size);
@@ -218,24 +228,29 @@ process_line (const string&                     file,
 {
   for (uint_t i = 0; i < tagPairs.size (); ++i)
     {
-      line.replace (line.find (tagPairs[i].mTagName),
-                    tagPairs[i].mTagName.size (),
-                    tagPairs[i].mTagValue);
+      const size_t offset = line.find (tagPairs[i].mTagName);
+
+      if (offset != string::npos)
+        {
+          line.replace (offset,
+                        tagPairs[i].mTagName.size (),
+                        tagPairs[i].mTagValue);
+        }
     }
 
   static const string fileTag ("%FILE%");
+  const size_t fileOffset = line.find (fileTag);
+  if (fileOffset != string::npos)
+    line.replace (fileOffset, fileTag.size (), file);
+
   static const string lineTag ("%LINE%");
-
-  line.replace (line.find (fileTag), fileTag.size (), file);
-
-  if (line.find (lineTag) != string::npos)
+  const size_t lineOffset = line.find (lineTag);
+  if (lineOffset != string::npos)
     {
-      //Only spawn a line string if it has to.
-
       char temp[8];
       snprintf (temp, sizeof temp, "%u", lineIndex);
 
-      line.replace (line.find (fileTag), fileTag.size (), temp);
+      line.replace (lineOffset, lineTag.size (), temp);
     }
 }
 
@@ -276,17 +291,20 @@ preprocess_include_directives (const string&                    file,
                                vector<string>&                  usedFiles)
 
 {
-  if (levelSize >= 255)
-    return false;
+  if (levelSize >= MAX_INCLUDED_LEVELS)
+    {
+      print_err_include_to_deep (codeMarks, sourceCode.str ());
+      return false;
+    }
 
   add_file_to_deps (file, usedFiles);
 
   uint_t lineIndex    = 1;
 
   codeMarks.push_back (SourceCodeMark (sourceCode.tellp (),
-                                      lineIndex,
-                                      file,
-                                      levelSize));
+                                       lineIndex,
+                                       file,
+                                       levelSize));
   while ( ! includedSource.eof ())
     {
       string line;
@@ -327,12 +345,16 @@ preprocess_include_directives (const string&                    file,
             }
 
           File includedFile (foundFiles[0].c_str (), WHC_FILEREAD);
-          vector<uint8_t> includeContent (includedFile.GetSize ());
+          string includeContent;
 
-          includedFile.Read (&includeContent[0], includeContent.size ());
+          includeContent.resize (includedFile.GetSize (), ' ');
 
-          const char* const guard = strstr (_RC (const char*,
-                                                 &includeContent[0]),
+          includedFile.Read (_CC (uint8_t*,
+                                  _RC (const uint8_t*,
+                                       includeContent.c_str ())),
+                             includeContent.size ());
+
+          const char* const guard = strstr (includeContent.c_str (),
                                             tagIncludeGuard);
 
           string guardValue;
@@ -365,7 +387,7 @@ preprocess_include_directives (const string&                    file,
           if (ignoreInclusion)
             {
               line = string ("#Ignoring include of '") +
-                     foundFiles[0] + "' due to guard '" + guard + "'.";
+                     foundFiles[0] + "' due to guard '" + guardValue + "'.";
 
               sourceCode << line << endl;
 
@@ -373,16 +395,19 @@ preprocess_include_directives (const string&                    file,
             }
           else
             {
-              line = string ("#Including'") +
+              codeMarks.push_back (SourceCodeMark (sourceCode.tellp (),
+                                                   lineIndex,
+                                                   file,
+                                                   levelSize));
+              line = string ("#Including '") +
                      foundFiles[0] + "' with guard '" + guardValue + "'.";
 
               sourceCode << line << endl;
 
-              ++lineIndex;
-
               if (guardValue.size () > 0)
                 includedGuards.push_back (guardValue);
 
+              istringstream includedSource (includeContent);
               if (! preprocess_include_directives (foundFiles[0],
                                                    inclusionPaths,
                                                    includedGuards,
@@ -396,6 +421,13 @@ preprocess_include_directives (const string&                    file,
                   return false;
                 }
 
+              line = string ("#Finished including '") +
+                     foundFiles[0] + "' with guard '" + guardValue + "'.";
+
+              sourceCode << line << endl;
+
+              ++lineIndex;
+
               codeMarks.push_back (SourceCodeMark (sourceCode.tellp (),
                                                   lineIndex,
                                                   file,
@@ -404,6 +436,8 @@ preprocess_include_directives (const string&                    file,
         }
       else if (strstr (line.c_str (), tagInclude) != NULL)
         {
+          sourceCode << line; //Added to properly compute the line number.
+
           print_err_tag_no_line_start (codeMarks,
                                        sourceCode.str (),
                                        tagInclude);
@@ -439,7 +473,26 @@ preprocess_source (const string&                  sourceFile,
   source.Read (_CC (uint8_t*,
                     _RC (const uint8_t*, fileContent.c_str ())), fileSize);
 
+
   vector<string> includedGuards;
+  const char* const guard = strstr (fileContent.c_str (), tagIncludeGuard);
+  if (guard != NULL)
+    {
+      if (strstr (guard + strlen (tagIncludeGuard),
+                  tagIncludeGuard) != NULL)
+        {
+          print_err_multiple_guard_entries (codeMarks,
+                                            sourceCode.str (),
+                                            sourceFile);
+          return 0;
+        }
+
+      const string guardValue = get_tag_value (guard, strlen (tagIncludeGuard));
+      if (guardValue.size () > 0)
+        includedGuards.push_back (guardValue);
+
+    }
+
   istringstream includedSource (fileContent);
 
   return preprocess_include_directives (sourceFile,

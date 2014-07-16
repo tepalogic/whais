@@ -140,6 +140,7 @@ CmdLineParser::Parse ()
                                   param.substr (separatorPos + 1))
                                          );
             }
+          ++index;
         }
       else if (isStrEqual (mArgs[index], "--make_deps"))
         {
@@ -282,27 +283,27 @@ CmdLineParser::CheckArguments ()
   snprintf (temp, sizeof temp, "%d", t.year);
   mReplacementTags.push_back (ReplacementTag ("YEAR", temp));
 
-  snprintf (temp, sizeof temp, "%u", t.month);
+  snprintf (temp, sizeof temp, "%02u", t.month);
   mReplacementTags.push_back (ReplacementTag ("MONTH", temp));
 
-  snprintf (temp, sizeof temp, "%u", t.day);
+  snprintf (temp, sizeof temp, "%02u", t.day);
   mReplacementTags.push_back (ReplacementTag ("DAY", temp));
 
-  snprintf (temp, sizeof temp, "%u", t.hour);
+  snprintf (temp, sizeof temp, "%02u", t.hour);
   mReplacementTags.push_back (ReplacementTag ("HOUR", temp));
 
-  snprintf (temp, sizeof temp, "%u", t.min);
+  snprintf (temp, sizeof temp, "%02u", t.min);
   mReplacementTags.push_back (ReplacementTag ("MIN", temp));
 
-  snprintf (temp, sizeof temp, "%s", t.sec);
+  snprintf (temp, sizeof temp, "%02u", t.sec);
   mReplacementTags.push_back (ReplacementTag ("SEC", temp));
 
-  snprintf (temp, sizeof temp, "%s", t.usec);
+  snprintf (temp, sizeof temp, "%05u", t.usec);
   mReplacementTags.push_back (ReplacementTag ("USEC", temp));
 
   snprintf (temp,
             sizeof temp,
-            "%d/%u/%u %u:%u:%u.%u",
+            "%d/%02u/%02u %02u:%02u:%02u.%05u",
             t.year,
             t.month,
             t.day,
@@ -329,9 +330,14 @@ CmdLineParser::DisplayUsage () const
   unsigned int ver_maj, ver_min;
   wh_compiler_libver (&ver_maj, &ver_min);
 
-  cout << "Whisper Compiler ver. " << ver_maj << '.' << ver_min;
+  cout << "Whisper Compiler v" << ver_maj << '.';
+
+  cout.width (2); cout.fill ('0');
+  cout << ver_min;
+  cout.width (0);
+
   cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
-       << "Usage: whisperc  input_file [-o output_file] [--help | -h]" << endl;
+       << "Usage: whc input_file [-o output_file] [--help | -h]" << endl;
 }
 
 

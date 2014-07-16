@@ -298,8 +298,8 @@ void
 wh_compiler_libver (uint_t* const     outMajor,
                     uint_t* const     outMinor)
 {
-  *outMajor = 0;
-  *outMinor = 1;
+  *outMajor = 1;
+  *outMinor = 0;
 }
 
 
