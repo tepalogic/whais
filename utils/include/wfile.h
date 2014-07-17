@@ -68,9 +68,9 @@ public:
 
   void     Sync ();
 
-  uint64_t GetSize () const;
+  uint64_t Size () const;
 
-  void     SetSize (const uint64_t size);
+  void     Size (const uint64_t size);
 
   void     Close ();
 

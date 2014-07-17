@@ -47,25 +47,25 @@ whf_open (const char* const file, uint_t mode)
   const int   accMode  = (S_IRUSR | S_IWUSR | S_IRGRP);
   WH_FILE     result   = -1;
 
-  if (mode & WHC_FILECREATE_NEW)
+  if (mode & WH_FILECREATE_NEW)
     openMode |= O_CREAT | O_EXCL;
 
-  else if (mode & WHC_FILECREATE)
+  else if (mode & WH_FILECREATE)
     openMode |= O_CREAT;
 
   else
     openMode |= 0; /* WHC_FILEOPEN_EXISTING */
 
-  openMode |= (mode & WHC_FILEDIRECT) ? O_DIRECT : 0;
-  openMode |= (mode & WHC_FILESYNC) ? O_SYNC : 0;
+  openMode |= (mode & WH_FILEDIRECT) ? O_DIRECT : 0;
+  openMode |= (mode & WH_FILESYNC) ? O_SYNC : 0;
 
-  if ((mode & WHC_FILERDWR) == WHC_FILERDWR)
+  if ((mode & WH_FILERDWR) == WH_FILERDWR)
     openMode |= O_RDWR;
 
   else
     {
-      openMode |= (mode & WHC_FILEREAD) ? O_RDONLY : 0;
-      openMode |= (mode & WHC_FILEWRITE) ? O_WRONLY : 0;
+      openMode |= (mode & WH_FILEREAD) ? O_RDONLY : 0;
+      openMode |= (mode & WH_FILEWRITE) ? O_WRONLY : 0;
     }
 
   result = open (file, openMode, accMode);
@@ -87,15 +87,15 @@ whf_seek (WH_FILE hnd, int64_t where, int whence)
 {
   switch (whence)
     {
-    case WHC_SEEK_BEGIN:
+    case WH_SEEK_BEGIN:
       whence = SEEK_SET;
       break;
 
-    case WHC_SEEK_END:
+    case WH_SEEK_END:
       whence = SEEK_END;
       break;
 
-    case WHC_SEEK_CURR:
+    case WH_SEEK_CURR:
       whence = SEEK_CUR;
       break;
 
@@ -279,7 +279,7 @@ whf_is_absolute (const char* const path)
 
 
 bool_t
-whf_file_eixsts (const char* const file)
+whf_file_exists (const char* const file)
 {
   struct stat statBuffer;
 

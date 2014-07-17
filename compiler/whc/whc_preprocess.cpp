@@ -273,7 +273,7 @@ search_for_header_file (const vector<string>&    inclusionPaths,
     {
       const string file (inclusionPaths[i] + fileName);
 
-      if (whf_file_eixsts (file.c_str ()))
+      if (whf_file_exists (file.c_str ()))
         foundFiles.push_back (file);
     }
 }
@@ -344,10 +344,10 @@ preprocess_include_directives (const string&                    file,
               return false;
             }
 
-          File includedFile (foundFiles[0].c_str (), WHC_FILEREAD);
+          File includedFile (foundFiles[0].c_str (), WH_FILEREAD);
           string includeContent;
 
-          includeContent.resize (includedFile.GetSize (), ' ');
+          includeContent.resize (includedFile.Size (), ' ');
 
           includedFile.Read (_CC (uint8_t*,
                                   _RC (const uint8_t*,
@@ -465,8 +465,8 @@ preprocess_source (const string&                  sourceFile,
 {
   usedFiles.resize (0);
 
-  File source (sourceFile.c_str (), WHC_FILEREAD);
-  const uint_t fileSize = source.GetSize ();
+  File source (sourceFile.c_str (), WH_FILEREAD);
+  const uint_t fileSize = source.Size ();
 
   string fileContent;
   fileContent.resize (fileSize, ' ');

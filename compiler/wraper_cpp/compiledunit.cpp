@@ -416,7 +416,7 @@ CompiledBufferUnit::IsProcExternal (uint_t procId)
 
 
 CompiledFileUnit::CompiledFileUnit (const char* file)
-  : mFile (file, WHC_FILEREAD),
+  : mFile (file, WH_FILEREAD),
     mGlobalsCount (0),
     mProcsCount (0),
     mTypeAreaSize (0),
@@ -450,7 +450,7 @@ CompiledFileUnit::ProcessHeader ()
   uint8_t  t_buffer[WHC_TABLE_SIZE];
   uint32_t temp32;
 
-  mFile.Seek (0, WHC_SEEK_BEGIN);
+  mFile.Seek (0, WH_SEEK_BEGIN);
   mFile.Read (t_buffer, sizeof t_buffer);
 
   if ((t_buffer[0] != 'W') || (t_buffer[1] != 'O'))
@@ -469,21 +469,21 @@ CompiledFileUnit::ProcessHeader ()
   mTypeAreaSize = load_le_int32 (t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
   mTypeInfo.reset (new uint8_t[mTypeAreaSize]);
-  mFile.Seek (temp32, WHC_SEEK_BEGIN);
+  mFile.Seek (temp32, WH_SEEK_BEGIN);
   mFile.Read (mTypeInfo.get (), mTypeAreaSize);
 
   temp32       = load_le_int32 (t_buffer + WHC_SYMTABLE_START_OFF);
   mSymbolsSize = load_le_int32 (t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
   mSymbols.reset (new uint8_t[mSymbolsSize]);
-  mFile.Seek (temp32, WHC_SEEK_BEGIN);
+  mFile.Seek (temp32, WH_SEEK_BEGIN);
   mFile.Read (mSymbols.get (), mSymbolsSize);
 
   temp32         = load_le_int32 (t_buffer + WHC_CONSTAREA_START_OFF);
   mConstAreaSize = load_le_int32 (t_buffer + WHC_CONSTAREA_SIZE_OFF);
 
   mConstArea.reset (new uint8_t[mConstAreaSize]);
-  mFile.Seek (temp32, WHC_SEEK_BEGIN);
+  mFile.Seek (temp32, WH_SEEK_BEGIN);
   mFile.Read (mConstArea.get (), mConstAreaSize);
 
   temp32 = (mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE) +
@@ -492,7 +492,7 @@ CompiledFileUnit::ProcessHeader ()
   mGlobals.reset (new uint8_t[mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE]);
   mProcs.reset (new uint8_t[mProcsCount * WHC_PROC_ENTRY_SIZE]);
 
-  mFile.Seek ((-1 * _SC (int64_t, temp32)), WHC_SEEK_END);
+  mFile.Seek ((-1 * _SC (int64_t, temp32)), WH_SEEK_END);
   mFile.Read (mGlobals.get (), mGlobalsCount * WHC_GLOBS_COUNT_OFF);
   mFile.Read (mProcs.get (), mProcsCount * WHC_PROC_ENTRY_SIZE);
 }
@@ -514,7 +514,7 @@ CompiledFileUnit::LoadProcInMemory (const uint_t id)
                               WHC_PROC_BODY_SYNCS_ENTRY_SYZE + codeSize;
 
   mProcData.get ()[id] = new uint8_t[bodySize];
-  mFile.Seek (bodyPos, WHC_SEEK_BEGIN);
+  mFile.Seek (bodyPos, WH_SEEK_BEGIN);
   mFile.Read (mProcData.get ()[id], bodySize);
 }
 

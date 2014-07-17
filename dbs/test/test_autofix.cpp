@@ -1611,29 +1611,29 @@ break_data_base ()
   const char   noTableName[]  = "This_is_love";
 
   File dataBaseFile ((string (db_name) + ".db").c_str (),
-                     WHC_FILEOPEN_EXISTING | WHC_FILEWRITE);
+                     WH_FILEOPEN_EXISTING | WH_FILEWRITE);
 
-  dataBaseFile.Seek (24, WHC_SEEK_BEGIN);   //data base flags
+  dataBaseFile.Seek (24, WH_SEEK_BEGIN);   //data base flags
   dataBaseFile.Write (&mask, sizeof mask);
 
-  dataBaseFile.Seek (1, WHC_SEEK_END);
+  dataBaseFile.Seek (1, WH_SEEK_END);
   dataBaseFile.Write (_RC (const uint8_t*, noTableName), sizeof noTableName);
 
   //Break the database's table
 
-  File tableFile (tb_name_1, WHC_FILEOPEN_EXISTING | WHC_FILEWRITE);
+  File tableFile (tb_name_1, WH_FILEOPEN_EXISTING | WH_FILEWRITE);
 
-  tableFile.Seek (60, WHC_SEEK_BEGIN);  //table flags
+  tableFile.Seek (60, WH_SEEK_BEGIN);  //table flags
   tableFile.Write (&mask, sizeof mask);
 
-  tableFile.Seek (56, WHC_SEEK_BEGIN); //table row size
+  tableFile.Seek (56, WH_SEEK_BEGIN); //table row size
   tableFile.Write (&mask, sizeof mask);
 
   File vsTable ((string (tb_name_1) + "_v").c_str (),
-                WHC_FILEOPEN_EXISTING | WHC_FILEWRITE);
+                WH_FILEOPEN_EXISTING | WH_FILEWRITE);
 
   File fsTable ((string (tb_name_1) + "_f").c_str (),
-                WHC_FILEOPEN_EXISTING | WHC_FILEWRITE);
+                WH_FILEOPEN_EXISTING | WH_FILEWRITE);
 
   uint8_t vsCorruption[64];
   memset (vsCorruption, TABLE_BREAK_MARKER, sizeof vsCorruption);
@@ -1643,19 +1643,19 @@ break_data_base ()
     {
       cout << "Breaking # " << i << " index " << index << endl;
 
-      vsTable.Seek (index * sizeof vsCorruption, WHC_SEEK_BEGIN);
+      vsTable.Seek (index * sizeof vsCorruption, WH_SEEK_BEGIN);
       vsTable.Write (vsCorruption, sizeof vsCorruption);
 
-      fsTable.Seek (index * sizeof vsCorruption, WHC_SEEK_BEGIN);
+      fsTable.Seek (index * sizeof vsCorruption, WH_SEEK_BEGIN);
       fsTable.Write (vsCorruption, sizeof vsCorruption);
 
-      index = wh_rnd () % (vsTable.GetSize () / sizeof vsCorruption);
+      index = wh_rnd () % (vsTable.Size () / sizeof vsCorruption);
     }
 
-  vsTable.Seek (sizeof vsCorruption, WHC_SEEK_END);
+  vsTable.Seek (sizeof vsCorruption, WH_SEEK_END);
   vsTable.Write (vsCorruption, sizeof vsCorruption);
 
-  fsTable.Seek (sizeof vsCorruption, WHC_SEEK_END);
+  fsTable.Seek (sizeof vsCorruption, WH_SEEK_END);
   fsTable.Write (vsCorruption, sizeof vsCorruption);
 
   return true;

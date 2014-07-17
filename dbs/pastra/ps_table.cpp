@@ -367,7 +367,7 @@ create_table_file (const uint64_t                  maxFileSize,
 
   normalize_fields (vect, &rowSize, fieldsDescs.get ());
 
-  File tableFile (filePrefix, WHC_FILECREATE_NEW | WHC_FILERDWR);
+  File tableFile (filePrefix, WH_FILECREATE_NEW | WH_FILERDWR);
 
   auto_ptr<uint8_t> tableHeader(new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    header = tableHeader.get ();
@@ -400,11 +400,11 @@ create_table_file (const uint64_t                  maxFileSize,
   minFileSize /= TableRmNode::RAW_NODE_SIZE;
   minFileSize *= TableRmNode::RAW_NODE_SIZE;
 
-  tableFile.SetSize (minFileSize);
+  tableFile.Size (minFileSize);
 
-  store_le_int64 (tableFile.GetSize (), header + PS_TABLE_MAINTABLE_SIZE_OFF);
+  store_le_int64 (tableFile.Size (), header + PS_TABLE_MAINTABLE_SIZE_OFF);
 
-  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Write (header, PS_HEADER_SIZE);
 }
 
@@ -475,9 +475,9 @@ repair_table_header (const string&             name,
 
 {
   File tableFile (fileNamePrefix.c_str(),
-                  WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+                  WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint64_t tableFileSize = tableFile.GetSize();
+  const uint64_t tableFileSize = tableFile.Size();
 
   if (tableFileSize < PS_HEADER_SIZE)
     {
@@ -492,7 +492,7 @@ repair_table_header (const string&             name,
   auto_ptr<uint8_t> tableHeader(new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    header = tableHeader.get ();
 
-  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Read (header, PS_HEADER_SIZE);
 
   if (memcmp (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE) != 0)
@@ -529,7 +529,7 @@ repair_table_header (const string&             name,
   auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
   uint8_t* const     descriptors = fieldsDescs.get ();
 
-  if (tableFile.GetSize () < PS_HEADER_SIZE + descSize)
+  if (tableFile.Size () < PS_HEADER_SIZE + descSize)
     {
       fixCallback (CRITICAL,
                    "The table '%s' cannot be repaired. The header file is"
@@ -638,11 +638,11 @@ repair_table_header (const string&             name,
 
   store_le_int64 (vsSize, header + PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Write (header, PS_HEADER_SIZE);
   tableFile.Write (descriptors, descSize);
 
-  tableFile.SetSize (fileSize);
+  tableFile.Size (fileSize);
   tableFile.Close ();
 
   FileContainer::Fix (fileNamePrefix.c_str (), maxFileSize, fileSize);
@@ -902,9 +902,9 @@ PersistentTable::InitFromFile (const string& tableName)
   uint8_t    tableHdr[PS_HEADER_SIZE];
 
   File mainTableFile (mFileNamePrefix.c_str(),
-                      WHC_FILEOPEN_EXISTING | WHC_FILEREAD);
+                      WH_FILEOPEN_EXISTING | WH_FILEREAD);
 
-  mainTableFile.Seek (0, WHC_SEEK_BEGIN);
+  mainTableFile.Seek (0, WH_SEEK_BEGIN);
   mainTableFile.Read (tableHdr, PS_HEADER_SIZE);
 
   if (memcmp (tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
@@ -1161,9 +1161,9 @@ PersistentTable::ValidateTable (const std::string&         path,
 
   const string tableFileName = path + name;
 
-  File tableFile (tableFileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+  File tableFile (tableFileName.c_str (), WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Read (tableHdr, PS_HEADER_SIZE);
 
   const uint32_t fieldsCount = load_le_int32 (tableHdr +
@@ -1189,7 +1189,7 @@ PersistentTable::ValidateTable (const std::string&         path,
       store_le_int32 (tableFlags, tableHdr + PS_TABLE_FLAGS_OFF);
     }
 
-  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Write (tableHdr, sizeof tableHdr);
 
   return (toFix == false);
@@ -1289,13 +1289,13 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
     }
 
   File tableFile (fileNamePrefix.c_str(),
-                   WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+                   WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  assert (tableFile.GetSize () >= TableRmNode::RAW_NODE_SIZE);
+  assert (tableFile.Size () >= TableRmNode::RAW_NODE_SIZE);
 
   auto_ptr<uint8_t> tableHeader(new uint8_t[PS_HEADER_SIZE]);
 
-  tableFile.Seek (0, WHC_SEEK_BEGIN);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Read (tableHeader.get (), PS_HEADER_SIZE);
 
   assert (memcmp (tableHeader.get (),
@@ -1318,7 +1318,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
 
   auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
 
-  assert (tableFile.GetSize () >= PS_HEADER_SIZE + descSize);
+  assert (tableFile.Size () >= PS_HEADER_SIZE + descSize);
 
   tableFile.Read (fieldsDescs.get (), descSize);
   tableFile.Close ();

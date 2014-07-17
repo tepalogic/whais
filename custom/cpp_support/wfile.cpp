@@ -45,7 +45,7 @@ File::File (const char* name, uint_t mode)
                            name);
     }
 
-  GetSize ();
+  Size ();
 }
 
 
@@ -141,7 +141,7 @@ File::Sync ()
 }
 
 
-uint64_t File::GetSize () const
+uint64_t File::Size () const
 {
   if (mFileSize != UNKNOWN_SIZE)
     return mFileSize;
@@ -158,7 +158,7 @@ uint64_t File::GetSize () const
 
 
 void
-File::SetSize (const uint64_t size)
+File::Size (const uint64_t size)
 {
   if ( ! whf_set_size (mHandle, size))
     {

@@ -25,19 +25,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHISPER_FILEIO_H_
 #define WHISPER_FILEIO_H_
 
-#define WHC_FILECREATE          0x00000001
-#define WHC_FILECREATE_NEW      0x00000002
-#define WHC_FILEOPEN_EXISTING   0x00000004
-#define WHC_FILEDIRECT          0x00000008
-#define WHC_FILESYNC            0x00000010
+#define WH_FILECREATE          0x00000001
+#define WH_FILECREATE_NEW      0x00000002
+#define WH_FILEOPEN_EXISTING   0x00000004
+#define WH_FILEDIRECT          0x00000008
+#define WH_FILESYNC            0x00000010
 
-#define WHC_FILEREAD            0x00000100
-#define WHC_FILEWRITE           0x00000200
-#define WHC_FILERDWR            (WHC_FILEREAD | WHC_FILEWRITE)
+#define WH_FILEREAD            0x00000100
+#define WH_FILEWRITE           0x00000200
+#define WH_FILERDWR            (WH_FILEREAD | WH_FILEWRITE)
 
-#define WHC_SEEK_BEGIN          0x00000001
-#define WHC_SEEK_CURR           0x00000002
-#define WHC_SEEK_END            0x00000004
+#define WH_SEEK_BEGIN          0x00000001
+#define WH_SEEK_CURR           0x00000002
+#define WH_SEEK_END            0x00000004
 
 #ifdef __cplusplus
 extern "C"
@@ -93,7 +93,7 @@ bool_t
 whf_is_absolute (const char* const path);
 
 bool_t
-whf_file_eixsts (const char* const file);
+whf_file_exists (const char* const file);
 
 #ifdef __cplusplus
 } /* extern 'C' */

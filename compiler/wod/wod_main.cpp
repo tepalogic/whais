@@ -46,7 +46,7 @@ main (int argc, char **argv)
     CmdLineParser cmdLine (argc, argv);
 
     {
-      File inFileObj (cmdLine.SourceFile (), WHC_FILEREAD);
+      File inFileObj (cmdLine.SourceFile (), WH_FILEREAD);
       wod_dump_header (inFileObj, cmdLine.OutStream ());
     }
 

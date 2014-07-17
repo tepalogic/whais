@@ -48,7 +48,7 @@ wod_dump_header (File& obj, ostream& output)
 {
   uint8_t woheader[WHC_TABLE_SIZE];
 
-  obj.Seek (0, WHC_SEEK_BEGIN);
+  obj.Seek (0, WH_SEEK_BEGIN);
   obj.Read (woheader, sizeof woheader);
 
   if ((woheader[0] != 'W') || (woheader[1] != 'O'))

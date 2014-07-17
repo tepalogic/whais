@@ -80,13 +80,13 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     mCreatedTemporalTables (0)
 {
   string fileName = mDbsLocationDir + mName + DBS_FILE_EXT;
-  File   inputFile (fileName.c_str (), WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+  File   inputFile (fileName.c_str (), WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint_t      fileSize = inputFile.GetSize ();
+  const uint_t      fileSize = inputFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t*          buffer = fileContent.get ();
 
-  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Seek (0, WH_SEEK_BEGIN);
   inputFile.Read (buffer, fileSize);
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
@@ -137,7 +137,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     }
 
   //Before we continue set the 'in use' flag.
-  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Seek (0, WH_SEEK_BEGIN);
   inputFile.Write (buffer, fileSize);
 
   uint16_t tablesCount = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
@@ -430,9 +430,9 @@ DbsHandler::SyncToFile ()
   store_le_int64 (PS_FLAG_NOT_CLOSED, header + PS_DBS_FLAGS_OFF);
 
   const string fileName (mDbsLocationDir + mName + DBS_FILE_EXT);
-  File outFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
+  File outFile (fileName.c_str (), WH_FILECREATE | WH_FILEWRITE);
 
-  outFile.SetSize (0);
+  outFile.Size (0);
   outFile.Write (header, sizeof header);
 
   for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
@@ -554,7 +554,7 @@ DBSCreateDatabase (const char* const name,
   fileName += name;
   fileName += DBS_FILE_EXT;
 
-  File dbsFile (fileName.c_str (), WHC_FILECREATE_NEW | WHC_FILEWRITE);
+  File dbsFile (fileName.c_str (), WH_FILECREATE_NEW | WH_FILEWRITE);
 
   auto_ptr<uint8_t> header(new uint8_t[PS_DBS_HEADER_SIZE]);
   uint8_t* const    buffer = header.get ();
@@ -583,13 +583,13 @@ DBSValidateDatabase (const char* const name,
 
   const string fileName = string (path) + name + DBS_FILE_EXT;
   File         inputFile (fileName.c_str (),
-                          WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+                          WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint_t      fileSize = inputFile.GetSize ();
+  const uint_t      fileSize = inputFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t* const    buffer = fileContent.get ();
 
-  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Seek (0, WH_SEEK_BEGIN);
   inputFile.Read (buffer, fileSize);
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
@@ -638,13 +638,13 @@ DBSRepairDatabase (const char* const            name,
 
   const string fileName = string (path) + name + DBS_FILE_EXT;
   File         inputFile (fileName.c_str (),
-                          WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+                          WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint_t      fileSize = inputFile.GetSize ();
+  const uint_t      fileSize = inputFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t* const    buffer = fileContent.get ();
 
-  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Seek (0, WH_SEEK_BEGIN);
   inputFile.Read (buffer, fileSize);
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
@@ -678,7 +678,7 @@ DBSRepairDatabase (const char* const            name,
 
   //Before we continue set the 'in use' flag.
   store_le_int64 (headerFlags | PS_FLAG_TO_REPAIR, buffer + PS_DBS_FLAGS_OFF);
-  inputFile.Seek (0, WHC_SEEK_BEGIN);
+  inputFile.Seek (0, WH_SEEK_BEGIN);
   inputFile.Write (buffer, fileSize);
   inputFile.Close ();
 
@@ -818,16 +818,16 @@ DBSReleaseDatabase (IDBSHandler& hnd)
               uint8_t header[PS_DBS_HEADER_SIZE];
 
               File dbFile (fileName.c_str (),
-                           WHC_FILEOPEN_EXISTING | WHC_FILERDWR);
+                           WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-              dbFile.Seek (0, WHC_SEEK_BEGIN);
+              dbFile.Seek (0, WH_SEEK_BEGIN);
               dbFile.Read (header, sizeof header);
 
               uint64_t flags = load_le_int64 (header + PS_DBS_FLAGS_OFF);
               flags &= ~(PS_FLAG_NOT_CLOSED | PS_FLAG_TO_REPAIR);
               store_le_int64 (flags, header + PS_DBS_FLAGS_OFF);
 
-              dbFile.Seek (0, WHC_SEEK_BEGIN);
+              dbFile.Seek (0, WH_SEEK_BEGIN);
               dbFile.Write (header, sizeof header);
             }
           break;

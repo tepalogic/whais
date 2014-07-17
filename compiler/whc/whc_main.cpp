@@ -167,10 +167,10 @@ create_object_file (const char* const                  outFile,
                              whc_messenger,
                              &ctx);
 
-    File outputObject (outFile, WHC_FILEWRITE | WHC_FILECREATE);
+    File outputObject (outFile, WH_FILEWRITE | WH_FILECREATE);
 
-    outputObject.SetSize (0);
-    outputObject.Seek (0, WHC_SEEK_BEGIN);
+    outputObject.Size (0);
+    outputObject.Seek (0, WH_SEEK_BEGIN);
 
     //reserve space for header file
     outputObject.Write (wh_header, sizeof wh_header);
@@ -224,7 +224,7 @@ create_object_file (const char* const                  outFile,
     wh_header[WHC_LANGVER_MAJ_OFF]   = langVerMaj;
     wh_header[WHC_LANGVER_MIN_OFF]   = langVerMin;
 
-    outputObject.Seek (0, WHC_SEEK_BEGIN);
+    outputObject.Seek (0, WH_SEEK_BEGIN);
     outputObject.Write (wh_header, sizeof wh_header);
     outputObject.Sync ();
   }

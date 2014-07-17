@@ -158,8 +158,8 @@ FileContainer::FileContainer (const char*       baseName,
 {
   uint_t openMode;
 
-  openMode  = (unitsCount > 0) ? WHC_FILEOPEN_EXISTING : WHC_FILECREATE_NEW;
-  openMode |= WHC_FILERDWR;
+  openMode  = (unitsCount > 0) ? WH_FILEOPEN_EXISTING : WH_FILECREATE_NEW;
+  openMode |= WH_FILERDWR;
 
   for (uint_t unit = 0; unit < unitsCount; ++unit)
     {
@@ -179,8 +179,8 @@ FileContainer::FileContainer (const char*       baseName,
     {
       File& file = mFilesHandles[unit];
 
-      if ((file.GetSize () != maxFileSize)
-          && ((unit != (unitsCount - 1)) || (file.GetSize () > maxFileSize)))
+      if ((file.Size () != maxFileSize)
+          && ((unit != (unitsCount - 1)) || (file.Size () > maxFileSize)))
         {
           throw WFileContainerException (
                          _EXTRA (WFileContainerException::CONTAINTER_INVALID),
@@ -189,7 +189,7 @@ FileContainer::FileContainer (const char*       baseName,
                          mFileNamePrefix.c_str (),
                          unit,
                          unitsCount,
-                         file.GetSize (),
+                         file.Size (),
                          maxFileSize
                                         );
         }
@@ -249,17 +249,17 @@ FileContainer::Write (uint64_t to, uint64_t size, const uint8_t* buffer)
 
   File& file = mFilesHandles[unitIndex];
 
-  if (file.GetSize () < unitPosition)
+  if (file.Size () < unitPosition)
     {
       throw WFileContainerException (
                    _EXTRA (WFileContainerException::INVALID_ACCESS_POSITION),
                    "Unit position %lu (%lu).",
                    _SC (long, unitPosition),
-                   _SC (long, file.GetSize ())
+                   _SC (long, file.Size ())
                                     );
     }
 
-  file.Seek (unitPosition, WHC_SEEK_BEGIN);
+  file.Seek (unitPosition, WH_SEEK_BEGIN);
   file.Write (buffer, actualSize);
 
   //Write the rest
@@ -293,10 +293,10 @@ FileContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
 
   uint64_t actualSize = size;
 
-  if (actualSize + unitPosition > file.GetSize ())
-    actualSize = file.GetSize () - unitPosition;
+  if (actualSize + unitPosition > file.Size ())
+    actualSize = file.Size () - unitPosition;
 
-  file.Seek (unitPosition, WHC_SEEK_BEGIN);
+  file.Seek (unitPosition, WH_SEEK_BEGIN);
   file.Read (buffer, actualSize);
 
   //Read the rest
@@ -350,7 +350,7 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
     --lastUnit;
 
   else
-    mFilesHandles[lastUnit].SetSize (lastUnitSize);
+    mFilesHandles[lastUnit].Size (lastUnitSize);
 
   for (int unit = mFilesHandles.size () - 1; unit > lastUnit; --unit)
     {
@@ -383,7 +383,7 @@ FileContainer::Size () const
   const File&  lastUnitFile = mFilesHandles[mFilesHandles.size () - 1];
   uint64_t     result       = (mFilesHandles.size () - 1) * mMaxFileUnitSize;
 
-  result += lastUnitFile.GetSize ();
+  result += lastUnitFile.Size ();
 
   return result;
 }
@@ -429,16 +429,16 @@ FileContainer::Fix (const char* const           baseFile,
         }
       else
         {
-          File unitFile (fileName.c_str (), WHC_FILECREATE | WHC_FILEWRITE);
+          File unitFile (fileName.c_str (), WH_FILECREATE | WH_FILEWRITE);
 
           if (newContainerSize - size >= maxFileSize)
             {
-              unitFile.SetSize (maxFileSize);
+              unitFile.Size (maxFileSize);
               size += maxFileSize;
             }
           else
             {
-              unitFile.SetSize (newContainerSize - size);
+              unitFile.Size (newContainerSize - size);
               size = newContainerSize;
             }
         }
@@ -454,7 +454,7 @@ FileContainer::ExtendContainer ()
   if (count != 0)
     append_int_to_str (count, baseName);
 
-  File unitFile (baseName.c_str (), WHC_FILECREATE_NEW | WHC_FILERDWR);
+  File unitFile (baseName.c_str (), WH_FILECREATE_NEW | WH_FILERDWR);
   mFilesHandles.push_back (unitFile);
 }
 
