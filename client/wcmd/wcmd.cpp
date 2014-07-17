@@ -41,8 +41,12 @@ using namespace whisper;
 
 
 
+#define VER_MAJOR       1
+#define VER_MINOR       0
+
+
+
 static const char usageDescription[] =
-"\n"
 "Usage: wcmd --create db_name [OPTIONS]\n"
 "   or: wcmd --remove db_name [OPTIONS]\n"
 "   or: wcmd --use db_name [OPTIONS]\n"
@@ -100,8 +104,7 @@ static const char usageDescription[] =
 "    wcmd --create some_database -m 4G\n"
 " or:\n"
 "    wcmd --use some_database -d /database/path -s 'list tables'\n"
-"    wcmd -u remote_database -H localhost -P 1761 -U 0 -p 'Some password'\n"
-"\n";
+"    wcmd -u remote_database -H localhost -P 1761 -U 0 -p 'Some password'\n";
 
 
 static const char descExit[]    = "Exit this program.";
@@ -115,6 +118,15 @@ static bool sFinishInteraction = false;
 static void
 PrintHelpUsage ()
 {
+  cout << "Whais Commander v" << VER_MAJOR << '.';
+
+  cout.width (2); cout.fill ('0');
+  cout << VER_MINOR;
+  cout.width (0);
+
+  cout <<
+    " by Iulian POPA (popaiulian@gmail.com)\n";
+
   cout << usageDescription;
 }
 

@@ -221,7 +221,7 @@ CmdLineParser::AddInclusionPaths (const char* const paths)
 
   while (nextPath && (*nextPath != 0))
     {
-      nextPath = strpbrk (currentPath, ":;");
+      nextPath = strpbrk (currentPath, ";");
       if (nextPath == NULL)
         {
           string path (currentPath);
@@ -330,14 +330,25 @@ CmdLineParser::DisplayUsage () const
   unsigned int ver_maj, ver_min;
   wh_compiler_libver (&ver_maj, &ver_min);
 
-  cout << "Whisper Compiler v" << ver_maj << '.';
+  cout << "Whais Compiler v" << ver_maj << '.';
 
   cout.width (2); cout.fill ('0');
   cout << ver_min;
   cout.width (0);
 
-  cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
-       << "Usage: whc input_file [-o output_file] [--help | -h]" << endl;
+  cout <<
+    " by Iulian POPA (popaiulian@gmail.com)\n"
+    "Usage: whc [options] input_file\n"
+    "Options:\n"
+    "-D 'tag=text'   Define a replace tag (e.g -D 'user_name=The Coder).\n"
+    "-h, --help      Display this help.\n"
+    "-I 'dir1;di2'   Add a list of directories paths to the list of\n"
+    "                directories used to search for included files.\n"
+    "                (e.g -I '/usr/local/whais/inc;C:\\whais\\inc').\n"
+    "--make_deps     Generate the dependencies list of this file (in a 'make'\n"
+    "                recognized way) on the standard output.\n"
+    "-o file         Use 'file' as the compilation output file.\n"
+    "-P              Preprocess only. Display the result on standard output.\n";
 }
 
 

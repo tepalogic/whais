@@ -39,8 +39,8 @@ namespace wod {
 
 
 
-#define VER_MAJOR       0
-#define VER_MINOR       4
+#define VER_MAJOR       1
+#define VER_MINOR       0
 
 static inline bool
 isStrEqual (const char* str1, const char* str2)
@@ -142,9 +142,19 @@ CmdLineParser::DisplayUsage () const
 {
   using namespace std;
 
-  cout << "Whisper Object Dumper ver. " << VER_MAJOR << '.' << VER_MINOR;
-  cout << " by Iulian POPA (popaiulian@gmail.com)" << endl
-       << "Usage: wod input_file [-o output_file] [--help | -h]" << endl;
+
+  cout << "Whais Object Dumper v" << VER_MAJOR << '.';
+
+  cout.width (2); cout.fill ('0');
+  cout << VER_MINOR;
+  cout.width (0);
+
+  cout <<
+    " by Iulian POPA (popaiulian@gmail.com)\n"
+    "Usage: wod [options] input_file\n"
+    "Options:\n"
+    "-h, --help      Display this help.\n"
+    "-o file         Use 'file' as the output file.\n";
 }
 
 

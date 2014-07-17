@@ -262,7 +262,6 @@ main (int argc, char **argv)
                              buffer,
                              codeMarks,
                              usedFiles))
-
       {
         //In case of an error encountered during the processing stage its
         //corresponding message was already displayed.
@@ -297,7 +296,6 @@ main (int argc, char **argv)
     create_object_file (args.OutputFile (),
                         buffer.str (),
                         codeMarks);
-
   }
   catch (FileException & e)
   {
