@@ -70,11 +70,11 @@ public:
   }
 
 private:
-  IDBSHandler&     mDbsHandler;
-  TypeManager      mTypeManager;
-  GlobalsManager   mGlbsManager;
-  ProcedureManager mProcsManager;
-  UnitsManager     mUnitsManager;
+  IDBSHandler&                  mDbsHandler;
+  TypeManager                   mTypeManager;
+  GlobalsManager                mGlbsManager;
+  ProcedureManager              mProcsManager;
+  UnitsManager                  mUnitsManager;
 };
 
 

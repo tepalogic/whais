@@ -84,6 +84,7 @@ public:
 
         mUsersPool[index].mEndConnetion = true;
         mUsersPool[index].mSocket.Close ();
+        mUsersPool[index].mThread.WaitToEnd (false);
       }
   }
 
@@ -177,8 +178,8 @@ client_handler_routine (void* args)
 
       ostringstream logEntry;
 
-      logEntry << "Unable to deal with error condition.\n";
-      logEntry << "Description:\n\t" << e.Description () << endl;
+      logEntry << "Client session socket error!\n"
+                  "Description:\n\t" << e.Description () << endl;
 
       if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
@@ -186,9 +187,7 @@ client_handler_routine (void* args)
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line() << ").\n";
 
-      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
-
-      StopServer ();
+      sMainLog->Log (LOG_ERROR, logEntry.str ());
   }
   catch (ConnectionException& e)
   {
@@ -202,7 +201,8 @@ client_handler_routine (void* args)
   {
       ostringstream logEntry;
 
-      logEntry << "Unable to deal with error condition.\n";
+      logEntry << "Client session exception: Unable to deal "
+                  "with error condition.\n";
       if (e.Description ())
         logEntry << "Description:\n\t" << e.Description () << endl;
 
@@ -386,8 +386,8 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
       assert (listener->mListenThread.IsEnded ());
 
       listener->mInterface = (server.mListens[index].mInterface.size () == 0) ?
-                               NULL :
-                               server.mListens[index].mInterface.c_str ();
+                              NULL :
+                              server.mListens[index].mInterface.c_str ();
       listener->mPort = server.mListens[index].mService.c_str ();
       listener->mListenThread.Run (listener_routine, listener);
     }
@@ -395,7 +395,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].mListenThread.WaitToEnd (false);
 
-  LockRAII holder(sClosingLock);
+  LockRAII holder (sClosingLock);
   sListeners = NULL;
 
   log.Log (LOG_DEBUG, "Server stopped!");

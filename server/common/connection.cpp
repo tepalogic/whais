@@ -94,7 +94,8 @@ ClientConnection::ClientConnection (UserHandler&            client,
     mVersion (1),
     mCipher (FRAME_ENCTYPE_PLAIN),
     mDataSize (GetAdminSettings ().mMaxFrameSize),
-    mData (new uint8_t[mDataSize])
+    mDataHolder (new uint8_t[mDataSize]),
+    mData (mDataHolder.get ())
 {
   assert ((mDataSize >= MIN_FRAME_SIZE) && (mDataSize <= MAX_FRAME_SIZE));
 
@@ -177,10 +178,9 @@ ClientConnection::ClientConnection (UserHandler&            client,
             {
               throw ConnectionException (
                         _EXTRA (0),
-                        "Failed to authenticate database ('%s') root user.",
+                        "Failed to authenticate database '%s' root user.",
                         dbsName
                                         );
-
             }
           else
             mKey = mUserHandler.mDesc->mRootPass;
@@ -191,7 +191,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
             {
               throw ConnectionException (
                             _EXTRA (0),
-                            "Failed to authenticate database ('%s') user.",
+                            "Failed to authenticate database '%s' user.",
                             dbsName
                                         );
             }
@@ -212,12 +212,6 @@ ClientConnection::ClientConnection (UserHandler&            client,
       assert (false);
     }
 
-}
-
-
-ClientConnection::~ClientConnection ()
-{
-  delete [] mData;
 }
 
 

@@ -84,7 +84,7 @@ static const char usageDescription[] =
 "                            g,G : for Gigabytes.\n"
 "                           Default value for this is 2G (e.g. 2 Gigabytes),\n"
 "                           and the minimum is 1M (e.g. one Megabyte).\n"
-"    -t, --check            Check the database integrity.\n"
+"    -t, --validate         Check the database integrity.\n"
 "    -f, --auto_yes         Auto answer with 'yes' to all questions related\n"
 "                           to database validation.\n"
 "    -v, --verbose level    Set the verbosity level. Level values:\n"
@@ -563,7 +563,7 @@ main (const int argc, char *argv[])
           autoYes = true;
         }
       else if ((strcmp (argv[currentArg], "-t") == 0)
-               || (strcmp (argv[currentArg], "--check") == 0))
+               || (strcmp (argv[currentArg], "--validate") == 0))
         {
           ++currentArg;
 
@@ -701,7 +701,8 @@ main (const int argc, char *argv[])
           else
             ExecuteInteractively ();
 
-          DBSReleaseDatabase (GetDBSHandler ());
+          if (! IsOnlineDatabase ())
+            DBSReleaseDatabase (GetDBSHandler ());
         }
       else if (result == 0)
         RemoveDB ();

@@ -43,6 +43,7 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
                                         &chunkSize);
       if (status != WOP_OK)
         return WENC_OS_ERROR (status);
+
       else if (chunkSize == 0)
         return WCS_DROPPED;
 
@@ -71,10 +72,11 @@ read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
           uint_t chunkSize = expected - frameSize;
 
           const uint32_t status = whs_read (pHnd->socket,
-                                                  &pHnd->data[frameSize],
-                                                  &chunkSize);
+                                            &pHnd->data[frameSize],
+                                            &chunkSize);
           if (status != WOP_OK)
             return WENC_OS_ERROR (status);
+
           else if (chunkSize == 0)
             return WCS_DROPPED;
 

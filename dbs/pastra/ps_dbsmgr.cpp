@@ -763,14 +763,6 @@ DBSRetrieveDatabase (const char* const name, const char* path)
 
       assert (it != dbses.end ());
     }
-  else
-    {
-      throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
-                          "Database '%s' is already opened.",
-                          name);
-    }
-
-  assert (it->second.mRefCount == 0);
 
   it->second.mRefCount++;
 
@@ -803,13 +795,11 @@ DBSReleaseDatabase (IDBSHandler& hnd)
                                   " associated persistent tables unreleased.");
             }
 
-          assert (it->second.mRefCount == 1);
-
           if (--it->second.mRefCount == 0)
             {
               const string fileName (it->second.mDbs.WorkingDir () +
-                                     it->first +
-                                     DBS_FILE_EXT);
+                                       it->first                   +
+                                       DBS_FILE_EXT);
 
               it->second.mDbs.Discard ();
 

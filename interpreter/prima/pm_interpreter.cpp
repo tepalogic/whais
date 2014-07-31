@@ -97,9 +97,8 @@ GetInstance (const char* name, Logger* log)
                         name,
                         prima::NameSpaceHolder (new prima::NameSpace (hnd))
                                          ));
+      it = gmNameSpaces.find (name);
     }
-
-  it = gmNameSpaces.find (name);
 
   assert (it != gmNameSpaces.end ());
 
@@ -108,7 +107,8 @@ GetInstance (const char* name, Logger* log)
   //      2. Throw an execution exception when pLog is null at this point
   return *(new prima::Session (
                         *log,
-                        gmNameSpaces.find (gDBSName)->second, it->second)
+                        gmNameSpaces.find (gDBSName)->second,
+                        it->second)
                               );
 }
 
@@ -135,8 +135,8 @@ CleanInterpreter (const bool forced)
   if (gmNameSpaces.size () == 0)
     throw InterException (_EXTRA (InterException::NOT_INITED));
 
-  //TODO: remember to clean the sessions to when the mechanism will
-  //be employed
+  //TODO: Remember to clean the sessions to when the mechanism will
+  //      be employed
   map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.begin ();
   while (it != gmNameSpaces.end ())
     {
@@ -182,6 +182,9 @@ NameSpace::NameSpace (IDBSHandler& dbsHandler)
     mUnitsManager ()
 {
 }
+
+
+
 
 Session::Session (Logger&           log,
                   NameSpaceHolder&  globalNames,

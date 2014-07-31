@@ -69,7 +69,9 @@ SetRemoteHostName (const char* const host)
 const string&
 GetConnectionPort ()
 {
-  if (IsOnlineDatabase () && (sConnectPort.size () == 0))
+  assert (IsOnlineDatabase ());
+
+  if (sConnectPort.size () == 0)
     sConnectPort = DEFAULT_PORT;
 
   return sConnectPort;
@@ -86,6 +88,8 @@ SetConnectionPort (const char* const port)
 uint_t
 GetUserId ()
 {
+  assert (IsOnlineDatabase ());
+
   return sUserId;
 }
 
@@ -100,6 +104,8 @@ SetUserId (const uint_t userId)
 const string&
 GetUserPassword ()
 {
+  assert (IsOnlineDatabase ());
+
   return sPassword;
 }
 
@@ -114,6 +120,8 @@ SetUserPassword (const char* const password)
 const string&
 GetWorkingDirectory ()
 {
+  assert (! IsOnlineDatabase ());
+
   return sWorkingDirectory;
 }
 
@@ -202,6 +210,8 @@ SetMaximumFileSize (string size)
 uint64_t
 GetMaximumFileSize ()
 {
+  assert (! IsOnlineDatabase ());
+
   return sMaxFileSize;
 }
 
@@ -209,6 +219,8 @@ GetMaximumFileSize ()
 void
 SetDbsHandler (IDBSHandler& dbs)
 {
+  assert (! IsOnlineDatabase ());
+
   sDBSHnd = &dbs;
 }
 
@@ -217,6 +229,7 @@ IDBSHandler&
 GetDBSHandler ()
 {
   assert (sDBSHnd != NULL);
+  assert (! IsOnlineDatabase ());
 
   return *sDBSHnd;
 }

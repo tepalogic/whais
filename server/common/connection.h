@@ -47,6 +47,7 @@ struct UserHandler
     : mDesc (NULL),
       mThread (),
       mSocket (INVALID_SOCKET),
+      mRoot (false),
       mEndConnetion (true)
   {
     mThread.IgnoreExceptions (true);
@@ -89,7 +90,6 @@ class ClientConnection
 public:
   ClientConnection (UserHandler&                 client,
                     std::vector<DBSDescriptors>& databases);
-  ~ClientConnection ();
 
   uint_t MaxSize () const;
 
@@ -126,18 +126,19 @@ private:
 
   void SendRawClientFrame (const uint8_t type);
 
-  UserHandler&        mUserHandler;
-  SessionStack        mStack;
-  uint32_t            mWaitingFrameId;
-  uint32_t            mClientCookie;
-  uint32_t            mServerCookie;
-  uint16_t            mLastReceivedCmd;
-  uint16_t            mFrameSize;
-  uint8_t             mVersion;
-  uint8_t             mCipher;
-  uint_t              mDataSize;
-  uint8_t*            mData;
-  std::string         mKey;
+  UserHandler&                      mUserHandler;
+  SessionStack                      mStack;
+  uint32_t                          mWaitingFrameId;
+  uint32_t                          mClientCookie;
+  uint32_t                          mServerCookie;
+  uint16_t                          mLastReceivedCmd;
+  uint16_t                          mFrameSize;
+  uint8_t                           mVersion;
+  uint8_t                           mCipher;
+  uint_t                            mDataSize;
+  std::auto_ptr<uint8_t>            mDataHolder;
+  uint8_t* const                    mData;
+  std::string                       mKey;
 
 
   ClientConnection (const ClientConnection&);

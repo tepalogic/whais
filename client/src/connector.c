@@ -235,7 +235,7 @@ send_raw_frame (struct INTERNAL_HANDLER* const hnd,
   return WCS_OK;
 }
 
-/* Waith for a communication frame from server and do connection specfic
+/* Wait for a communication frame from server and do connection specific
  * processing before gets forwarded to upper layers.
  */
 static uint_t
@@ -443,7 +443,7 @@ WConnect (const char* const    host,
   memcpy (result->encriptionKey, password, passwordLen);
 
   result->data       = tempBuffer;
-  result->dataSize   = sizeof (tempBuffer);
+  result->dataSize   = sizeof tempBuffer;
   result->userId     = userId;
   result->socket     = INVALID_SOCKET;
   result->encKeySize = passwordLen;
@@ -456,7 +456,7 @@ WConnect (const char* const    host,
     }
 
   /* The server is the one who starts the communication. The first frame
-   * is an authenticate request and its size is fixed at minimum. */
+   * is an authenticate request and its size is fixed at maximum size. */
   if ((status = read_raw_frame (result, &frameSize)) != WCS_OK)
     goto fail_ret;
 
@@ -511,9 +511,9 @@ WConnect (const char* const    host,
   {
     /* Prepare the authentication response, according to the server's
      * published settings. */
-    const uint_t frameSize = FRAME_HDR_SIZE +
-                               FRAME_AUTH_RSP_FIXED_SIZE +
-                               strlen (database) + 1 +
+    const uint_t frameSize = FRAME_HDR_SIZE               +
+                               FRAME_AUTH_RSP_FIXED_SIZE  +
+                               strlen (database) + 1      +
                                passwordLen + 1;
     char* const pAuthData =
         (char*)&result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE];
@@ -596,6 +596,7 @@ WPingServer (const WH_CONNECTION hnd)
 
   if (hnd == NULL)
     return WCS_INVALID_ARGS;
+
   else if (hnd_->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
@@ -1363,8 +1364,8 @@ stack_top_basic_update (struct INTERNAL_HANDLER* const hnd,
                         const uint_t                   type,
                         const char* const              value)
 {
-  const uint_t spaceNeed = sizeof (uint8_t) +
-                             sizeof (uint16_t) +
+  const uint_t spaceNeed = sizeof (uint8_t)     +
+                             sizeof (uint16_t)  +
                              strlen (value) + 1;
   uint_t cs = WCS_OK;
 
@@ -1733,7 +1734,7 @@ stack_top_array_basic_update (struct INTERNAL_HANDLER* const hnd,
             {
               uint_t newDataSize;
 
-              data_ = data (hnd) +
+              data_ = data (hnd)                          +
                         hnd->cmdInternal[LAST_UPDATE_OFF] +
                         countOff;
               store_le_int16 (prevCount + 1, data_);
@@ -2332,14 +2333,14 @@ get_row_offset (struct INTERNAL_HANDLER* const hnd,
       while ((currentRow < row)
              && (rowOff < dataSize))
         {
-          const uint_t arrayCount = load_le_int64 (data_ + rowOff);
+          const uint64_t arrayCount = load_le_int64 (data_ + rowOff);
           rowOff += sizeof (uint64_t);
 
           assert (rowOff <= dataSize);
 
           if (arrayCount > 0)
             {
-              uint_t arrayOff = load_le_int64 (data_ + rowOff);
+              uint64_t arrayOff = load_le_int64 (data_ + rowOff);
               rowOff += sizeof (uint64_t);
 
               while ((arrayOff < arrayCount)
@@ -2588,11 +2589,8 @@ WValueRowsCount (const WH_CONNECTION        hnd,
   assert (load_le_int32 (data_) == WCS_OK);
 
   if (type & WHC_TYPE_TABLE_MASK)
-    {
-      *outCount = load_le_int64 (data_ +
-                                   sizeof (uint32_t) +
-                                   sizeof (uint16_t));
-    }
+    *outCount = load_le_int64 (data_ + sizeof (uint32_t) + sizeof (uint16_t));
+
   else if (type & WHC_TYPE_FIELD_MASK)
     {
       uint_t offset = sizeof (uint32_t) + sizeof (uint16_t);
@@ -2915,6 +2913,7 @@ describe_proc_parameter (struct INTERNAL_HANDLER* const hnd,
   set_data_size (hnd, nameLen + sizeof (uint32_t));
   data_ = data (hnd);
   store_le_int16 (param, data_);
+  store_le_int16 (0, data_ + sizeof (uint16_t)); /* reserved */
   strcpy ((char*)data_ + 2 * sizeof (uint16_t), procedure);
 
   if ((cs = send_command (hnd, CMD_DESC_PROC_PARAM)) != WCS_OK)
@@ -3033,7 +3032,6 @@ get_paratmeter_offset (struct INTERNAL_HANDLER* const       hnd,
           uint_t field;
 
           const uint16_t fieldsCount = load_le_int16 (data_ + *outOff);
-
           *outOff += sizeof (uint16_t);
 
           for (field = 0;

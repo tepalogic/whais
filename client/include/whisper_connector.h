@@ -136,7 +136,7 @@ WPingServer (const WH_CONNECTION hnd);
 
 /* Get the list of the global values.
  *
- * Used to initialise the fetching of the global values defined by the context
+ * Used to initialize the fetching of the global values defined by the context
  * of the specified database. The caller has to be connected as root (e.g. the
  * used user id should be set to 0) for this to proceed.
  */

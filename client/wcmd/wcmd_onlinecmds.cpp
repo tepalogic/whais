@@ -207,7 +207,12 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       unsigned int rawType = 0;
 
       token = CmdLineNextToken (globals, linePos);
-      cs    = WGlobalType (conHdl, token.c_str (), &rawType);
+
+      if (token.size () == 0)
+        break;
+
+      else
+        cs = WGlobalType (conHdl, token.c_str (), &rawType);
 
       if (cs != WCS_OK)
         {
@@ -234,7 +239,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             cout << "TABLE";
 
           else
-            cout << "TABLE OF ";
+            cout << "TABLE OF (";
 
           for (uint_t field = 0; field < fieldsCount; field++)
             {
@@ -247,9 +252,9 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               if (field > 0)
                 cout << ", ";
 
-              cout << wcmd_decode_typeinfo (rawType);
+              cout << fieldName << " AS " << wcmd_decode_typeinfo (rawType);
             }
-          cout << endl;
+          cout << ")\n";
         }
       else if (rawType & WHC_TYPE_FIELD_MASK)
         {
@@ -318,7 +323,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       if (level >= VL_DEBUG)
         {
           if (cs == WCS_OK)
-            cout << "Got " << procsCount << " globals.\n";
+            cout << "Got " << procsCount << " procedures.\n";
 
           else
             cout << "Listing procedures has failed\n";
@@ -351,6 +356,9 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       uint_t procsParameter;
 
       token = CmdLineNextToken (procedures, linePos);
+      if (token.size () == 0)
+        break;
+
       cs    = WProcParamsCount (conHdl, token.c_str (), &procsParameter);
 
       if (cs != WCS_OK)
@@ -408,7 +416,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   continue;
                 }
 
-              cout << "TABLE OF [";
+              cout << "TABLE OF (";
 
               for (uint_t field = 0; field < fieldsCount; field++)
                 {
@@ -426,10 +434,9 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   if (field > 0)
                     cout << ", ";
 
-                  cout << fieldName << " AS ";
-                  cout << wcmd_decode_typeinfo (paramType);
+                  cout << fieldName << " AS " << wcmd_decode_typeinfo (paramType);
                 }
-              cout << ']';
+              cout << ')';
             }
           else if (paramType & WHC_TYPE_FIELD_MASK)
             {

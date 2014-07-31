@@ -499,7 +499,7 @@ cmd_list_globals (ClientConnection& conn)
 
   assert (conn.DataSize () > 3 * sizeof (uint32_t));
 
-  if (firstHint >= glbsCount)
+  if ((firstHint >= glbsCount) && (glbsCount > 0))
     {
       result = WCS_INVALID_ARGS;
 
@@ -532,7 +532,7 @@ cmd_list_globals (ClientConnection& conn)
 
   assert (result == WCS_OK);
   assert (dataOffset <= conn.DataSize ());
-  assert (oneAtLeast);
+  assert ((glbsCount == 0) || oneAtLeast);
 
   conn.DataSize (dataOffset);
   conn.SendCmdResponse (CMD_LIST_GLOBALS_RSP);
@@ -582,7 +582,7 @@ cmd_list_procedures (ClientConnection& conn)
 
   assert (conn.DataSize () > 3 * sizeof (uint32_t));
 
-  if (firstHint >= procsCount)
+  if ((firstHint >= procsCount) && (procsCount > 0))
     {
       result = WCS_INVALID_ARGS;
       goto cmd_list_procedures_err;
@@ -614,7 +614,7 @@ cmd_list_procedures (ClientConnection& conn)
 
   assert (result == WCS_OK);
   assert (dataOffset <= conn.DataSize ());
-  assert (oneAtLeast);
+  assert ((procsCount == 0) || oneAtLeast);
 
   conn.DataSize (dataOffset);
   conn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);
@@ -700,6 +700,7 @@ cmd_procedure_param_desc (ClientConnection& conn)
 
   try
     {
+      uint16_t lastValidOffset = offset;
       do
         {
           const uint_t paramType = session.ProcedurePameterRawType (procName,
@@ -724,7 +725,8 @@ cmd_procedure_param_desc (ClientConnection& conn)
               store_le_int16 (fieldsCount, data_ + offset);
               offset += sizeof (uint16_t);
 
-              for (uint_t field = 0; field < fieldsCount; field++)
+              uint_t field = 0;
+              for (; field < fieldsCount; field++)
                 {
                   const char* fieldName = _RC (
                                 const char*,
@@ -747,6 +749,12 @@ cmd_procedure_param_desc (ClientConnection& conn)
                   store_le_int16 (fieldType, data_ + offset);
                   offset += sizeof (uint16_t);
                 }
+
+              if (field < fieldsCount)
+                {
+                  offset = lastValidOffset;
+                  break;
+                }
             }
           else
             {
@@ -758,16 +766,18 @@ cmd_procedure_param_desc (ClientConnection& conn)
             }
 
           ++hint;
-          oneAtLeast = true;
+          oneAtLeast      = true;
+          lastValidOffset = offset;
         }
       while (hint < paramsCount);
 
       if (! oneAtLeast)
         {
           result = WCS_LARGE_ARGS;
-
           goto cmd_procedure_param_desc_err;
         }
+
+      offset = lastValidOffset;
     }
   catch (InterException&)
     {

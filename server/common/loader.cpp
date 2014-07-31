@@ -51,7 +51,6 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
 
   inoutDesc.mDbs = &DBSRetrieveDatabase (inoutDesc.mDbsName.c_str (),
                                          inoutDesc.mDbsDirectory.c_str ());
-
   std::auto_ptr<Logger> dbsLogger (
                          new FileLogger (inoutDesc.mDbsLogFile.c_str (), true)
                                   );

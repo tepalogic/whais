@@ -25,11 +25,15 @@ static bool sInterpreterInited = false;
 
 static vector<DBSDescriptors> databases;
 
+
+
 static void
 clean_frameworks (FileLogger& log)
 {
-  if (sInterpreterInited  && sDbsInited)
+  if (sInterpreterInited)
     {
+      assert (sDbsInited);
+
       vector<DBSDescriptors>::reverse_iterator dbsIterator;
 
       for (dbsIterator = databases.rbegin ();
@@ -37,8 +41,31 @@ clean_frameworks (FileLogger& log)
            ++dbsIterator)
         {
           if (dbsIterator->mSession != NULL)
+            {
               ReleaseInstance (*(dbsIterator->mSession));
+              dbsIterator->mSession = NULL;
+            }
 
+          ostringstream logEntry;
+          logEntry << "Closing session '";
+          logEntry << dbsIterator->mDbsName << "'.\n";
+          log.Log (LOG_INFO, logEntry.str ());
+        }
+    }
+
+  if (sInterpreterInited)
+    CleanInterpreter ();
+
+  if (sInterpreterInited)
+    {
+      assert (sDbsInited);
+
+      vector<DBSDescriptors>::reverse_iterator dbsIterator;
+
+      for (dbsIterator = databases.rbegin ();
+           dbsIterator != databases.rend ();
+           ++dbsIterator)
+        {
           if (dbsIterator->mDbs != NULL)
             DBSReleaseDatabase (*(dbsIterator->mDbs));
 
@@ -49,14 +76,11 @@ clean_frameworks (FileLogger& log)
             }
 
           ostringstream logEntry;
-          logEntry << "Cleaned resourses for database '";
+          logEntry << "Cleaned resources of database '";
           logEntry << dbsIterator->mDbsName << "'.\n";
           log.Log (LOG_INFO, logEntry.str ());
         }
     }
-
-  if (sInterpreterInited)
-    CleanInterpreter ();
 
   if (sDbsInited)
     DBSShoutdown ();
@@ -69,7 +93,7 @@ clean_frameworks (FileLogger& log)
 static void
 sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 {
-  if (sig != SIGINT)
+  if ((sig != SIGINT) && (sig != SIGTERM))
     return ; //Ignore this!
 
   StopServer ();
@@ -86,6 +110,9 @@ set_signals ()
   action.sa_sigaction = &sigterm_hdl;
 
  if (sigaction (SIGINT, &action, NULL) < 0)
+   return false;
+
+ if (sigaction (SIGTERM, &action, NULL) < 0)
    return false;
 
  return true;

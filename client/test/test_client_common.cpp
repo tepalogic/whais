@@ -19,7 +19,7 @@ extern const char* DefaultUserPassword ();
 static const char DEFAULT_HOST_SEREVR[]   = "localhost";
 static const char DEFAULT_PORT_SERVER[]   = "1761";
 
-static const int ROOT_ID                = 0;
+static const int ROOT_ID                  = 0;
 
 static const char ARG_ROOT[]              = "--root";
 static const char ARG_HOST_NAME[]         = "-h";
