@@ -41,7 +41,7 @@ print_usage (const char* cmd)
 bool
 tc_settup_connection (int              argc,
                       const char**     argv,
-                      WH_CONNECTION* pHnd)
+                      WH_CONNECTION*   pHnd)
 {
   const char*   hostname      = DEFAULT_HOST_SEREVR;
   const char*   port          = DEFAULT_PORT_SERVER;
@@ -88,7 +88,13 @@ tc_settup_connection (int              argc,
   cout << "Password: " << password << endl;
   cout << "Connecting ... ";
 
-  status = WConnect (hostname, port, database, password, userid, pHnd);
+  status = WConnect (hostname,
+                     port,
+                     database,
+                     password,
+                     userid,
+                     DEFAULT_FRAME_SIZE,
+                     pHnd);
   if (status != WCS_OK)
     {
       cout << "FAIL (0x" << hex << status << dec << ")\n";

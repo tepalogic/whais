@@ -416,7 +416,9 @@ WConnect (const char* const    host,
           const char* const    database,
           const char* const    password,
           const uint_t         userId,
+          const uint16_t       maxFrameSize,
           WH_CONNECTION* const pHnd)
+
 {
   struct INTERNAL_HANDLER* result      = NULL;
   const uint_t             passwordLen = strlen (password);
@@ -432,7 +434,9 @@ WConnect (const char* const    host,
       || (pHnd == NULL)
       || (strlen (host) == 0)
       || (strlen (port) == 0)
-      || (strlen (database) == 0))
+      || (strlen (database) == 0)
+      || (maxFrameSize < MIN_FRAME_SIZE))
+
     {
       status = WCS_INVALID_ARGS;
       goto fail_ret;
@@ -486,8 +490,8 @@ WConnect (const char* const    host,
           status = WCS_ENCTYPE_NOTSUPP;
           goto fail_ret;
         }
-      result->version = load_le_int32 (result->data +
-                                         FRAME_HDR_SIZE +
+      result->version = load_le_int32 (result->data 		+
+                                         FRAME_HDR_SIZE 	+
                                          FRAME_AUTH_VER_OFF);
       if ((result->version & CLIENT_VERSION) == 0)
         {
@@ -498,23 +502,31 @@ WConnect (const char* const    host,
         result->version = CLIENT_VERSION;
 
       /* Make sure we are able to handle server's published max frames size */
-      serverFrameSize = load_le_int16 (result->data +
-                                         FRAME_HDR_SIZE +
+      serverFrameSize = load_le_int16 (result->data 		+
+                                         FRAME_HDR_SIZE 	+
                                          FRAME_AUTH_SIZE_OFF);
       assert (MIN_FRAME_SIZE <= serverFrameSize);
       assert (serverFrameSize <= MAX_FRAME_SIZE);
 
+      if (maxFrameSize < serverFrameSize)
+	serverFrameSize = maxFrameSize;
+
       result->data     = mem_alloc (serverFrameSize);
       result->dataSize = serverFrameSize;
+
+      store_le_int16 (result->dataSize,
+                      result->data 		+
+			  FRAME_HDR_SIZE 	+
+			  FRAME_AUTH_RSP_SIZE_OFF);
   }
 
   {
     /* Prepare the authentication response, according to the server's
      * published settings. */
-    const uint_t frameSize = FRAME_HDR_SIZE +
-                               FRAME_AUTH_RSP_FIXED_SIZE +
-                               strlen (database) + 1 +
-                               passwordLen + 1;
+    const uint_t frameSize = FRAME_HDR_SIZE 			+
+			       FRAME_AUTH_RSP_FIXED_SIZE 	+
+			       strlen (database) + 1 		+
+			       passwordLen + 1;
     char* const pAuthData =
         (char*)&result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE];
 

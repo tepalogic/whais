@@ -89,7 +89,7 @@ protected:
   uint_t                mShareCount;
   uint_t                mReferenceCount;
   const DBS_FIELD_TYPE  mElementsType;
-  int                   mElementRawSize;
+  uint_t                mElementRawSize;
 
 private:
   IArrayStrategy (const IArrayStrategy&);

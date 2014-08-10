@@ -177,18 +177,15 @@ client_handler_routine (void* args)
 
       ostringstream logEntry;
 
-      logEntry << "Unable to deal with error condition.\n";
-      logEntry << "Description:\n\t" << e.Description () << endl;
+      logEntry << e.Description () << endl;
 
       if ( ! e.Message ().empty ())
         logEntry << "Message:\n\t" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Extra () << " (";
-      logEntry << e.File () << ':' << e.Line() << ").\n";
+      logEntry << e.File () << ':' << e.Line() << ").";
 
-      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
-
-      StopServer ();
+      sMainLog->Log (LOG_ERROR, logEntry.str ());
   }
   catch (ConnectionException& e)
   {
@@ -210,7 +207,7 @@ client_handler_routine (void* args)
         logEntry << "Message:\n\t" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Extra () << " (";
-      logEntry << e.File () << ':' << e.Line() << ").\n";
+      logEntry << e.File () << ':' << e.Line() << ").";
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
@@ -309,7 +306,7 @@ listener_routine (void* args)
                   logEntry << "Message:\n\t" << e.Message () << endl;
 
                 logEntry <<"Extra: " << e.Extra () << " (";
-                logEntry << e.File () << ':' << e.Line() << ").\n";
+                logEntry << e.File () << ':' << e.Line() << ").";
 
                 sMainLog->Log (LOG_ERROR, logEntry.str ());
               }
@@ -330,7 +327,7 @@ listener_routine (void* args)
         logEntry << "Message:\n\t" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Extra () << " (";
-      logEntry << e.File () << ':' << e.Line() << ").\n";
+      logEntry << e.File () << ':' << e.Line() << ").";
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 

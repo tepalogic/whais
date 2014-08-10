@@ -158,6 +158,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                           GetWorkingDB ().c_str (),
                           GetUserPassword ().c_str (),
                           GetUserId (),
+                          DEFAULT_FRAME_SIZE,
                           &conHdl);
   if (cs != WCS_OK)
     {
@@ -298,6 +299,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                           GetWorkingDB ().c_str (),
                           GetUserPassword ().c_str (),
                           GetUserId (),
+                          DEFAULT_FRAME_SIZE,
                           &conHdl);
 
   assert (token == "procedure");
@@ -482,6 +484,7 @@ cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                    GetWorkingDB ().c_str (),
                                    GetUserPassword ().c_str (),
                                    GetUserId (),
+                                   DEFAULT_FRAME_SIZE,
                                    &conHdl);
   if (cs != WCS_OK)
     goto cmd_ping_exit;

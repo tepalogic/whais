@@ -5,6 +5,8 @@
 #include <math.h>
 
 #define YYSTYPE struct SemValue*
+struct ParserState;
+
 #include "../parser/whisper.tab.h"
 #include "../parser/parser.h"
 #include "../parser/strstore.h"

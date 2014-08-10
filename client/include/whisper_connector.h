@@ -97,6 +97,11 @@ static const uint_t WCS_OS_ERR_BASE        = 0x1000;
 #define WIGNORE_OFF          (~0ull)
 #define WPOP_ALL             (~0)
 
+
+#define MIN_FRAME_SIZE                  512
+#define MAX_FRAME_SIZE                  65535
+#define DEFAULT_FRAME_SIZE              MAX_FRAME_SIZE
+
 /* Describes the field of a table. */
 struct WField
 {
@@ -117,6 +122,7 @@ WConnect (const char* const      host,
           const char* const      database,
           const char* const      password,
           const uint_t           userid,
+          const uint16_t         maxFrameSize,
           WH_CONNECTION* const   outHnd);
 
 /* Close a connection.

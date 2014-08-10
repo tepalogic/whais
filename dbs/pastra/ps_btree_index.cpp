@@ -143,7 +143,7 @@ IBTreeNode::SetData (const KEY_INDEX, const uint8_t* )
 void
 IBTreeNode::RemoveKey (const IBTreeKey& key)
 {
-  KEY_INDEX keyIndex;
+  KEY_INDEX keyIndex = 0;
 
   if (FindBiggerOrEqual (key, &keyIndex) == false)
     {

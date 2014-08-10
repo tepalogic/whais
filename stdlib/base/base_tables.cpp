@@ -174,10 +174,8 @@ public:
                       const DArray& fieldsSortOrder)
     : mTable (table)
     {
-      uint64_t fieldsCount = fields.Count ();
-
-      assert (fieldsCount > 0);
-      assert (fieldsCount == fieldsSortOrder.Count ());
+      assert (fields.Count () > 0);
+      assert (fields.Count () == fieldsSortOrder.Count ());
 
       extract_fields_ids (fields);
 

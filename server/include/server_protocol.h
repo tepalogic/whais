@@ -27,10 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "client/whisper_connector.h"
 
-#define MIN_FRAME_SIZE                  512
-#define MAX_FRAME_SIZE                  65535
-#define DEFAULT_FRAME_SIZE              4096
-
 
 #define FRAME_SIZE_OFF                  0x00
 #define FRAME_TYPE_OFF                  0x02
@@ -93,7 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FRAME_AUTH_RSP_VER_OFF              0x00
 #define FRAME_AUTH_RSP_USR_OFF              0x04
 #define FRAME_AUTH_RSP_ENC_OFF              0x05
-#define FRAME_AUTH_RSP_SPARE_OFF            0x06
+#define FRAME_AUTH_RSP_SIZE_OFF             0x06
 #define FRAME_AUTH_RSP_FIXED_SIZE           0x08
 
 #define ADMIN_CMD_BASE                      0x0000
