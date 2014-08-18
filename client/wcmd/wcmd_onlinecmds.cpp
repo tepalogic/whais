@@ -171,7 +171,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   if (linePos >= cmdLine.length ())
     {
-      cs = WListGlobals (conHdl, &glbsCount);
+      cs = WStartGlobalsList (conHdl, &glbsCount);
       if (level >= VL_DEBUG)
         {
           if (cs == WCS_OK)
@@ -185,7 +185,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               && (glbsCount-- > 0))
         {
           const char* glbName = NULL;
-          cs = WListGlobalsFetch (conHdl, &glbName);
+          cs = WFetchGlobal (conHdl, &glbName);
 
           assert (glbName != NULL);
 
@@ -208,7 +208,11 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       unsigned int rawType = 0;
 
       token = CmdLineNextToken (globals, linePos);
-      cs    = WGlobalType (conHdl, token.c_str (), &rawType);
+
+      if (token.length () == 0)
+	break;
+
+      cs = WDescribeGlobal (conHdl, token.c_str (), &rawType);
 
       if (cs != WCS_OK)
         {
@@ -227,30 +231,32 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
           uint_t fieldsCount;
 
-          cs = WFieldsCount (conHdl, &fieldsCount);
+          cs = WValueFieldsCount (conHdl, &fieldsCount);
           if (cs != WCS_OK)
             break;
 
           if (fieldsCount == 0)
-            cout << "TABLE";
+            {
+              cout << "TABLE\n";
+              continue;
+            }
 
-          else
-            cout << "TABLE OF ";
-
+          cout << "TABLE OF (";
           for (uint_t field = 0; field < fieldsCount; field++)
             {
               const char* fieldName;
 
-              cs = WFetchField (conHdl, &fieldName, &rawType);
+              cs = WValueFetchField (conHdl, &fieldName, &rawType);
               if (cs != WCS_OK)
                 break;
 
               if (field > 0)
                 cout << ", ";
 
-              cout << wcmd_decode_typeinfo (rawType);
+              cout << fieldName << " AS " << wcmd_decode_typeinfo (rawType);
             }
-          cout << endl;
+
+          cout << ")\n";
         }
       else if (rawType & WHC_TYPE_FIELD_MASK)
         {
@@ -350,10 +356,14 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   do
     {
-      uint_t procsParameter;
+      uint_t procsParametersCount;
 
       token = CmdLineNextToken (procedures, linePos);
-      cs    = WProcParamsCount (conHdl, token.c_str (), &procsParameter);
+
+      if (token.length () == 0)
+	break;
+
+      cs = WProcParamsCount (conHdl, token.c_str (), &procsParametersCount);
 
       if (cs != WCS_OK)
         {
@@ -367,11 +377,12 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       cout << token << " (";
 
-      uint_t param = 1; //Start with the first procdure parameter
+      //Start from the first parameter and let the return type at then end
+      //after the enclosing ')'.
+      uint_t param = 1;
       do
         {
-          param %= procsParameter;
-
+          param %= procsParametersCount;
           if (param == 0)
             cout << ") ";
 
@@ -410,15 +421,14 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   continue;
                 }
 
-              cout << "TABLE OF [";
-
+              cout << "TABLE OF (";
               for (uint_t field = 0; field < fieldsCount; field++)
                 {
                   const char* fieldName;
 
                   cs = WProcParamField (conHdl,
                                         token.c_str (),
-                                        0,
+                                        param,
                                         field,
                                         &fieldName,
                                         &paramType);
@@ -431,7 +441,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   cout << fieldName << " AS ";
                   cout << wcmd_decode_typeinfo (paramType);
                 }
-              cout << ']';
+              cout << ')';
             }
           else if (paramType & WHC_TYPE_FIELD_MASK)
             {

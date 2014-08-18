@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern "C" {
 #endif
 
-/* Custom types defined to ease the usage of the Whisper's connector API. */
+/* Custom types defined to ease the usage of the Whais' connector API. */
 typedef void*     WH_CONNECTION;
 typedef ullong_t  WHT_ROW_INDEX;
 typedef ullong_t  WHT_INDEX;
@@ -97,7 +97,7 @@ static const uint_t WCS_OS_ERR_BASE        = 0x1000;
 #define WIGNORE_OFF          (~0ull)
 #define WPOP_ALL             (~0)
 
-
+/* The interval of valid maximum communication frame sizes. */
 #define MIN_FRAME_SIZE                  512
 #define MAX_FRAME_SIZE                  65535
 #define DEFAULT_FRAME_SIZE              MAX_FRAME_SIZE
@@ -113,8 +113,26 @@ struct WField
 /* Connects to a remote sever.
  *
  * Called prior any other connector's API, it's used to setup the connection to
- * a remote Whisper server. The port is an UTF-8 string so one might use
- * service names too.
+ * a remote Whais server. In case of success this function should return a
+ * handle to identify this connection.
+ *
+ * @host                Specify the host name of the Whais server.
+ * @port                Specify the port where to connect. This is an UTF-8
+ *                      string so service names could be used too.
+ * @database            Specify the name of the database to use.
+ * @password            Specify to user password.
+ * @userId              Set to 0 if this is an administrator user, anything
+ *                      else for a regular user.
+ * @maxFrameSize        Hint about the allowed communication maximum frame size.
+ *                      It should be set to DEFAULT_FRAME_SIZE, or to any value
+ *                      between MIN_FRAME_SIZE and MAX_FRAME_SIZE.
+ * @outHnd              in case of a successful connection, this will hold the
+ *                      connection handle to be used with the rest of the
+ *                      function.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ * @return              WCS_OK in case of success, anything else other way.
  */
 uint_t
 WConnect (const char* const      host,
@@ -128,6 +146,8 @@ WConnect (const char* const      host,
 /* Close a connection.
  *
  * Instructs the remote server to discard and data related to this connection.
+ *
+ * @hnd                 The connection handle.
  */
 void
 WClose (WH_CONNECTION hnd);
@@ -136,27 +156,60 @@ WClose (WH_CONNECTION hnd);
  *
  * This has several usages from keeping the connection alive or test the
  * connection healthiness.
+ *
+ * @hnd                 The connection handle.
  */
 uint_t
 WPingServer (const WH_CONNECTION hnd);
 
 /* Get the list of the global values.
  *
- * Used to initialise the fetching of the global values defined by the context
+ * Used to initialize the fetching of the global values defined by the context
  * of the specified database. The caller has to be connected as root (e.g. the
  * used user id should be set to 0) for this to proceed.
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @outCount            In case of success, this holds the number of global
+ *                      values defined on the connected database. Use NULL for
+ *                      it if the value is not needed.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
  */
 uint_t
-WListGlobals (const WH_CONNECTION hnd, uint_t* const outCount);
+WStartGlobalsList (const WH_CONNECTION hnd, uint_t* const outCount);
 
-/* Fetch the name of the next global value. */
+/* Fetch the name of the next global value.
+ *
+ * This is used to retrieve the next global variable name defined in the
+ * connected database. This function should be called after WStartGlobalsList
+ * was used initialize the global list.
+ * To retrieve all the global names one should call repeatedly WFetchGlobal
+ * for every global name after the initial call to WStartGlobalsList.
+ *
+ * @hnd                 The connection handle.
+ * @outName             In case of success this will hold a pointer to the name
+ *                      of the next global variable. The name global is a null
+ *                      terminated UTF-8 encoded string. If there are no
+ *                      global values left this will be set to NULL.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: The caller does not have the ownership of the memory pointed to
+ *       by outName. It should make a copy of its content prior calling any
+ *       other API using the same connection handle.
+ */
 uint_t
-WListGlobalsFetch (const WH_CONNECTION hnd,
-                   const char** const  outpName);
+WFetchGlobal (const WH_CONNECTION hnd,
+              const char** const  outpName);
 
 /* Get the list of the procedures.
  *
- * Initialise the fetching of the procedure defined by the context of the
+ * Initialize the fetching of the procedure defined by the context of the
  * specified database. The caller has to be connected as root for this to
  * proceed.
  */
@@ -211,13 +264,27 @@ WProcParamField (const WH_CONNECTION   hnd,
 
 /* Get the type of a global value.
  *
- * Retrieve the raw type of a global values. In case of a composite type
- * further actions will be required to get the full descriptions.
+ * Retrieve the type of a global value. In case the global types is a table
+ * WFetchField needs to be called repeatedly to retrieve the tables's fields'
+ * names and types
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @name                The global name. It should be a null terminated, UTF-8
+ *                      encoded string.
+ *
+ * @outType             In case of success it will hold the global variable's
+ *                      type.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
  */
 uint_t
-WGlobalType (const WH_CONNECTION    hnd,
-             const char* const      name,
-             uint_t* const          outRawType);
+WDescribeGlobal (const WH_CONNECTION    hnd,
+                 const char* const      name,
+                 uint_t* const          outType);
 
 /* Get the type of the stack top.
  *
@@ -226,27 +293,51 @@ WGlobalType (const WH_CONNECTION    hnd,
  * type description.
  */
 uint_t
-WStackValueType (const WH_CONNECTION   hnd,
-                 uint_t* const         outRawType);
+WDescribeStackTop (const WH_CONNECTION   hnd,
+                   uint_t* const         outRawType);
 
-/* Get the fields count of the stack value.
+/* Get the list of fields of a table value.
  *
- * In case the global or stack value's raw type points to a composite type
- * (e.g. a table), this would be used to get the fields count.
+ * This function should be called only after a call to WDescribeGlobal or
+ * WDescribeStackTop ().
+ * In case the value's type turns out to be a table, this function will be
+ * called to retrieve the count of table fields.
+  *
+ * @hnd                 The connection handle.
+ * @outCount            In case of success, this will hold the number of fields.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
  */
 uint_t
-WFieldsCount (const WH_CONNECTION  hnd,
-              uint_t* const        outCount);
+WValueFieldsCount (const WH_CONNECTION  hnd,
+                   uint_t* const        outCount);
 
 /* Fetch the field type of the stack top value.
  *
- * Use repeatedly to get value field name and type. A prior call to
- * 'WStackValueType () or WGlobalType ()' is needed prior calling this.
+ * This function should be called only after a call to WDescribeGlobal or
+ * WDescribeStackTop ().
+ * In case the value's type turns out to be a table, this function will be
+ * called repeatedly to retrieve the tables fields names and types.
+ *
+ * @hnd                 The connection handle.
+ * @outFieldName        In case of success this will hold a pointer to the name
+ *                      of the next table's field. The field name is a null
+ *                      terminated UTF-8 encoded string. If there are no
+ *                      fields left than this will be se to NULL.
+ * @outFieldType        In case of success, this will hold the field type.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: The caller does not have the ownership of the memory pointed to
+ *       by outFieldName. It should make a copy of its content prior calling a
+ *       any other API using the same connection handle.
  */
 uint_t
-WFetchField (const WH_CONNECTION  hnd,
-             const char**         outpFieldName,
-             uint_t* const        outFieldType);
+WValueFetchField (const WH_CONNECTION  hnd,
+                  const char**         outFieldName,
+                  uint_t* const        outFieldType);
 
 
 /* Add a value on the stack top.

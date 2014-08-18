@@ -695,9 +695,9 @@ check_table_description (WH_CONNECTION hnd)
   const char* fieldName = NULL;
   uint_t        fieldType = 0;
 
-  if ((WStackValueType (hnd, &type) != WCS_OK)
+  if ((WDescribeStackTop (hnd, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK)
-      || (WFieldsCount (hnd, &fcount) != WCS_OK)
+      || (WValueFieldsCount (hnd, &fcount) != WCS_OK)
       || (fcount != _fieldsCount))
     {
       return false;
@@ -706,14 +706,14 @@ check_table_description (WH_CONNECTION hnd)
   for (uint_t i = 0; i < _fieldsCount; ++i)
     {
 
-      if (WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
       if (strcmp (fieldName, get_table_field_name( fieldType)) != 0)
         return false;
     }
 
-  if ((WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+  if ((WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
       || (fieldName != NULL)
       || (fieldType != WHC_TYPE_NOTSET))
     {

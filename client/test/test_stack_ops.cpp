@@ -113,9 +113,9 @@ match_table_fields_match (WH_CONNECTION               hnd,
   uint_t fieldsCount;
   uint_t topType;
 
-  if ((WStackValueType (hnd, &topType) != WCS_OK)
+  if ((WDescribeStackTop (hnd, &topType) != WCS_OK)
       || (topType != WHC_TYPE_TABLE_MASK)
-      || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
+      || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
       || (fieldsSize != fieldsCount))
     {
       return false;
@@ -126,7 +126,7 @@ match_table_fields_match (WH_CONNECTION               hnd,
       const char* fieldName;
       uint_t        fieldType;
 
-      if (WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
       const uint_t index = get_field_entry_index (fieldName,
@@ -186,9 +186,9 @@ test_stack_bulk_update (WH_CONNECTION hnd)
       uint_t    type;
       uint_t    fieldsCount;
 
-      if ((WStackValueType (hnd, &type) != WCS_OK)
+      if ((WDescribeStackTop (hnd, &type) != WCS_OK)
            || (type != simpleTypes[i])
-           || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
+           || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
            || (fieldsCount != 0)
            || (WPopValues (hnd, 1) != WCS_OK)
            || (WFlush (hnd) != WCS_OK))
@@ -235,9 +235,9 @@ test_stack_step_update (WH_CONNECTION hnd)
         {
           goto test_stack_step_update_err;
         }
-      else if ((WStackValueType (hnd, &type) != WCS_OK)
+      else if ((WDescribeStackTop (hnd, &type) != WCS_OK)
                || (type != simpleTypes[i])
-               || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
+               || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
                || (fieldsCount != 0))
         {
           goto test_stack_step_update_err;
@@ -283,9 +283,9 @@ test_for_errors (WH_CONNECTION hnd)
     {
       goto test_for_errors_fail;
     }
-  else if ((WStackValueType (NULL, NULL) != WCS_INVALID_ARGS)
-            || (WStackValueType (NULL, &type) != WCS_INVALID_ARGS)
-            || (WStackValueType (hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WDescribeStackTop (NULL, NULL) != WCS_INVALID_ARGS)
+            || (WDescribeStackTop (NULL, &type) != WCS_INVALID_ARGS)
+            || (WDescribeStackTop (hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }

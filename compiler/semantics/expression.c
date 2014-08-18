@@ -273,9 +273,10 @@ field_to_text (uint_t type)
 {
   assert (IS_FIELD (type));
 
-  type = GET_BASIC_TYPE (type);
+  type = GET_FIELD_TYPE (type);
 
-  assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
+  assert ((GET_BASIC_TYPE (type) > T_UNKNOWN)
+          && (GET_BASIC_TYPE (type) <= T_UNDETERMINED));
 
   if (type == T_BOOL)
     return "FIELD OF BOOL";
@@ -328,7 +329,7 @@ field_to_text (uint_t type)
   else if (IS_ARRAY (type))
     {
       type = GET_BASIC_TYPE (type);
-      assert (type > T_UNKNOWN || type < T_UNDETERMINED);
+      assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
 
       if (type == T_BOOL)
         return "FIELD OF ARRAY OF BOOL";
@@ -377,6 +378,9 @@ field_to_text (uint_t type)
 
       else if (type == T_UINT64)
         return "FIELD OF ARRAY OF UNSIGNED INT64";
+
+      else if (type == T_UNDETERMINED)
+	return "FIELD OF ARRAY OF UNDEFINED";
     }
 
   return "FIELD OF UNDEFINED";
@@ -1956,8 +1960,16 @@ translate_index_exp (struct ParserState* const         parser,
       result.type = GET_FIELD_TYPE (ftype);
 
       assert (IS_ARRAY (result.type)
-              || ((result.type < T_UNDETERMINED)
-                  && (result.type > T_UNKNOWN)));
+              || ((T_UNKNOWN < result.type)
+                  && (result.type <= T_UNDETERMINED)));
+
+      if (result.type == T_UNDETERMINED)
+        {
+          log_message (parser, parser->bufferPos, MSG_INDEX_UNF);
+          parser->abortError = TRUE;
+
+          return sgResultUnk;
+        }
     }
   else if (IS_ARRAY (ftype))
     {
@@ -2521,8 +2533,8 @@ translate_call_exp (struct ParserState* const   parser,
                                               sizeof temp,
                                               proc->spec.proc.nameLength),
                                argCount,
-                               type_to_text (argType.type),
-                               type_to_text (result.type));
+                               type_to_text (result.type),
+                               type_to_text (argType.type));
 
                   parser->abortError = TRUE;
                   return sgResultUnk;
@@ -2551,8 +2563,8 @@ translate_call_exp (struct ParserState* const   parser,
                                                   sizeof temp,
                                                   proc->spec.proc.nameLength),
                                    argCount,
-                                   type_to_text (argType.type),
-                                   type_to_text (result.type));
+                                   type_to_text (result.type),
+                                   type_to_text (argType.type));
 
                       return sgResultUnk;
                     }
@@ -2567,8 +2579,8 @@ translate_call_exp (struct ParserState* const   parser,
                                               sizeof temp,
                                               proc->spec.proc.nameLength),
                                argCount,
-                               type_to_text (argType.type),
-                               type_to_text (result.type));
+                               type_to_text (result.type),
+                               type_to_text (argType.type));
 
                   return sgResultUnk;
                 }
@@ -2987,12 +2999,17 @@ translate_return_exp (struct ParserState* const parser, YYSTYPE exp)
               && (GET_FIELD_TYPE (retType.type) !=
                    GET_FIELD_TYPE (expType.type)))
             {
-              log_message (parser,
-                           parser->bufferPos,
-                           MSG_PROC_RET_NA_EXT,
-                           type_to_text (GET_TYPE (retType.type)),
-                           type_to_text (GET_TYPE (expType.type)));
-              parser->abortError = TRUE;
+              if ( ! (IS_ARRAY ( GET_FIELD_TYPE (retType.type))
+        	     && (GET_BASIC_TYPE (retType.type) == T_UNDETERMINED)
+        	     && (IS_ARRAY (GET_FIELD_TYPE (expType.type)))))
+        	{
+                      log_message (parser,
+                                   parser->bufferPos,
+                                   MSG_PROC_RET_NA_EXT,
+                                   type_to_text (GET_TYPE (retType.type)),
+                                   type_to_text (GET_TYPE (expType.type)));
+                      parser->abortError = TRUE;
+        	}
             }
         }
       else if ( IS_TABLE (retType.type) == FALSE)

@@ -101,7 +101,7 @@ test_simple_text (WH_CONNECTION hnd)
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
       || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
-      || (WStackValueType (hnd, &rawType) != WCS_OK)
+      || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;
@@ -137,7 +137,7 @@ test_simple_text (WH_CONNECTION hnd)
                                  WIGNORE_OFF,
                                  &count) != WCS_OK)
       || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
-      || (WStackValueType (hnd, &rawType) != WCS_OK)
+      || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;

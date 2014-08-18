@@ -1,10 +1,9 @@
 
-.PHONY: all prepare_env generate_files exes clean
+.PHONY: all prepare_env generate_files executables clean
 
 all: generate_files
 
 prepare_env:
-	@echo -n "Preparing environment..."
 	$(ECHO)if [ ! -d ./bin ]; then mkdir ./bin ; fi;
 	$(ECHO)if [ ! -d ./bin/$(ARCH) ]; then mkdir ./bin/$(ARCH) ; fi;
 	$(ECHO)if [ ! -d ./tmp ]; then mkdir ./tmp ; fi;
@@ -16,16 +15,11 @@ prepare_env:
 			if [ ! -d ./tmp/$(ARCH)/$$unit/shls ]; then mkdir ./tmp/$(ARCH)/$$unit/shls ; fi;\
 			if [ ! -d ./tmp/$(ARCH)/$$unit/libs ]; then mkdir ./tmp/$(ARCH)/$$unit/libs ; fi;\
 		done ;
-	@echo "Done"
 		
-generate_files: prepare_env
-	@echo -n "Generating parser source code..."
-	$(ECHO)bison -d compiler/parser/whisper.y -o compiler/parser/whisper.tab.c
-	@echo "Done generating"
-	@echo "Start the actual build ... "
-	$(MAKE) -otarget exes 
+generate_files: prepare_env ./compiler/parser/whisper.tab.c
+	$(ECHO)$(MAKE) --no-print-directory -otarget executables 
 		
-exes:  $(EXES) $(SHLS) $(LIBS)
+executables:  $(EXES) $(SHLS) $(LIBS)
 
 clean:
 	rm -rf ./tmp

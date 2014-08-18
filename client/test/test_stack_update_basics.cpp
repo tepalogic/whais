@@ -1173,7 +1173,7 @@ test_step_update (WH_CONNECTION hnd)
           goto test_step_update_err;
         }
 
-      if ((WStackValueType (hnd, &type) != WCS_OK)
+      if ((WDescribeStackTop (hnd, &type) != WCS_OK)
           || (type != _values[i].type))
         {
           goto test_step_update_err;
@@ -1203,7 +1203,7 @@ test_step_update (WH_CONNECTION hnd)
           goto test_step_update_err;
         }
 
-      if ((WStackValueType (hnd, &type) != WCS_OK)
+      if ((WDescribeStackTop (hnd, &type) != WCS_OK)
           || (type != _values[i].type))
         {
           goto test_step_update_err;
@@ -1265,7 +1265,7 @@ test_bulk_update (WH_CONNECTION hnd)
       uint_t        type;
       const char* value;
 
-      if ((WStackValueType (hnd, &type) != WCS_OK)
+      if ((WDescribeStackTop (hnd, &type) != WCS_OK)
           || (type != _values[i].type))
         {
           goto test_bulk_update_err;

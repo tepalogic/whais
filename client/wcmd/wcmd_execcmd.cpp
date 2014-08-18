@@ -1169,7 +1169,7 @@ fetch_execution_result (WH_CONNECTION hnd)
   uint_t stackResut = WHC_TYPE_NOTSET;
   uint_t wcs        = WCS_OK;
 
-  if ((wcs = WStackValueType (hnd, &stackResut)) != WCS_OK)
+  if ((wcs = WDescribeStackTop (hnd, &stackResut)) != WCS_OK)
     goto fetch_result_fail;
 
   if (stackResut & WHC_TYPE_TABLE_MASK)
@@ -1180,7 +1180,7 @@ fetch_execution_result (WH_CONNECTION hnd)
 
       assert (stackResut == WHC_TYPE_TABLE_MASK);
 
-      if ((wcs = WFieldsCount (hnd, &fieldsCount)) != WCS_OK)
+      if ((wcs = WValueFieldsCount (hnd, &fieldsCount)) != WCS_OK)
         goto fetch_result_fail;
 
       assert (fieldsCount > 0);
@@ -1192,7 +1192,7 @@ fetch_execution_result (WH_CONNECTION hnd)
           const char*   fieldName;
           uint_t        fieldType;
 
-          wcs = WFetchField (hnd, &fieldName, &fieldType);
+          wcs = WValueFetchField (hnd, &fieldName, &fieldType);
           if (wcs != WCS_OK)
             goto fetch_result_fail;
 

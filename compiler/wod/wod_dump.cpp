@@ -372,7 +372,7 @@ wod_dump_globals_tables (WIFunctionalUnit& obj, ostream& output)
   const int globalsCount = obj.GlobalsCount ();
   if (globalsCount == 0)
     {
-      output << "No globals entries." << endl;
+      output << "No globals entries.\n\n";
       return;
     }
 
@@ -451,7 +451,18 @@ wod_dump_code (const uint8_t*       code,
 void
 wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)
 {
+
+  output << endl << endl << setw (HEADER_SEPARATOR_LENGTH) << setfill ('*')
+    << '*' << setw (0) << "\nPROCEDURES DESCRIPTIONS\n"
+    << setw (HEADER_SEPARATOR_LENGTH) << setfill ('*') << '*' << setw (0)
+    << endl << endl;
+
   const uint_t procsCount = obj.ProceduresCount ();
+  if (procsCount == 0)
+    {
+      output << "No procedures entries.\n\n";
+      return;
+    }
 
   for (uint_t proc = 0; proc < procsCount; ++proc)
     {

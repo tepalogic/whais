@@ -28,20 +28,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "server/server_protocol.h"
 
 #define CLIENT_VERSION                    1
-#define INT32_INTERNALS_COUNT             4
+#define INT32_INTERNALS_COUNT             8
 
-static const uint_t LIST_GLBSCOUNT      = 0;
-static const uint_t LIST_GLBINDEX       = 1;
-static const uint_t LIST_GLBOFF         = 2;
+static const uint_t LIST_GLBS_COUNT     = 0;
+static const uint_t LIST_GLB_INDEX      = 1;
+static const uint_t LIST_GLB_OFF        = 2;
+static const uint_t LIST_GLB_FRAME_ID   = 3;
 
-static const uint_t LIST_PROCSCOUNT     = 0;
-static const uint_t LIST_PROCSINDEX     = 1;
-static const uint_t LIST_PROCOFF        = 2;
+static const uint_t LIST_PROCS_COUNT    = 0;
+static const uint_t LIST_PROC_INDEX     = 1;
+static const uint_t LIST_PROC_OFF       = 2;
+static const uint_t LIST_PROC_FRAME_ID  = 3;
 
 static const uint_t DESC_RAWTYPE        = 0;
 static const uint_t DESC_FIELD_COUNT    = 1;
 static const uint_t DESC_FIELD_HINT     = 2;
 static const uint_t DESC_FIELD_OFFSET   = 3;
+static const uint_t DESC_FIELD_FRAME_ID = 4;
 
 static const uint_t LAST_UPDATE_OFF     = 0;
 

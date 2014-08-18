@@ -84,7 +84,14 @@ cmd_value_desc (ClientConnection& conn)
               const FIELD_INDEX fieldsCount =
                                     session.GlobalValueFieldsCount (glbName);
 
-              if (fieldHint >= fieldsCount)
+              store_le_int16 (fieldsCount, data_ + dataOffset);
+              dataOffset += sizeof (uint16_t);
+
+              store_le_int16 (fieldHint, data_ + dataOffset);
+              dataOffset += sizeof (uint16_t);
+
+
+              if ((fieldsCount > 0) && (fieldHint >= fieldsCount))
                 {
                   result = WCS_INVALID_ARGS;
 
@@ -97,14 +104,8 @@ cmd_value_desc (ClientConnection& conn)
                   goto cmd_glb_desc_err;
                 }
 
-              store_le_int16 (fieldsCount, data_ + dataOffset);
-              dataOffset += sizeof (uint16_t);
-
-              store_le_int16 (fieldHint, data_ + dataOffset);
-              dataOffset += sizeof (uint16_t);
-
               bool oneAtLeast = false;
-              do
+              while (fieldHint < fieldsCount)
                 {
                   const char* fieldName =
                           session.GlobalValueFieldName (glbName, fieldHint);
@@ -128,9 +129,8 @@ cmd_value_desc (ClientConnection& conn)
                   ++fieldHint;
                   oneAtLeast = true;
                 }
-              while (fieldHint < fieldsCount);
 
-              if (! oneAtLeast)
+              if ((fieldsCount > 0) && ! oneAtLeast)
                 {
                   result = WCS_LARGE_ARGS;
 
@@ -167,6 +167,14 @@ cmd_value_desc (ClientConnection& conn)
               ITable&           table       = op.GetTable ();
               const FIELD_INDEX fieldsCount = table.FieldsCount ();
 
+              assert (fieldsCount > 0);
+
+              store_le_int16 (fieldsCount, data_ + dataOffset);
+              dataOffset += sizeof (uint16_t);
+
+              store_le_int16 (fieldHint, data_ + dataOffset);
+              dataOffset += sizeof (uint16_t);
+
               if (fieldHint >= fieldsCount)
                 {
                   result = WCS_INVALID_ARGS;
@@ -179,14 +187,9 @@ cmd_value_desc (ClientConnection& conn)
 
                   goto cmd_glb_desc_err;
                 }
-              store_le_int16 (fieldsCount, data_ + dataOffset);
-              dataOffset += sizeof (uint16_t);
-
-              store_le_int16 (fieldHint, data_ + dataOffset);
-              dataOffset += sizeof (uint16_t);
 
               bool oneAtLeast = false;
-              do
+              while (fieldHint < fieldsCount)
                 {
                   const DBSFieldDescriptor fd = table.DescribeField (fieldHint);
 
@@ -211,7 +214,6 @@ cmd_value_desc (ClientConnection& conn)
                   ++fieldHint;
                   oneAtLeast = true;
                 }
-              while (fieldHint < fieldsCount);
 
               if (! oneAtLeast)
                 {
@@ -499,7 +501,7 @@ cmd_list_globals (ClientConnection& conn)
 
   assert (conn.DataSize () > 3 * sizeof (uint32_t));
 
-  if (firstHint >= glbsCount)
+  if ((glbsCount > 0) && (firstHint >= glbsCount))
     {
       result = WCS_INVALID_ARGS;
 
@@ -532,7 +534,7 @@ cmd_list_globals (ClientConnection& conn)
 
   assert (result == WCS_OK);
   assert (dataOffset <= conn.DataSize ());
-  assert (oneAtLeast);
+  assert ((glbsCount == 0) || oneAtLeast);
 
   conn.DataSize (dataOffset);
   conn.SendCmdResponse (CMD_LIST_GLOBALS_RSP);
@@ -582,7 +584,7 @@ cmd_list_procedures (ClientConnection& conn)
 
   assert (conn.DataSize () > 3 * sizeof (uint32_t));
 
-  if (firstHint >= procsCount)
+  if ((procsCount > 0) && firstHint >= procsCount)
     {
       result = WCS_INVALID_ARGS;
       goto cmd_list_procedures_err;
@@ -614,7 +616,7 @@ cmd_list_procedures (ClientConnection& conn)
 
   assert (result == WCS_OK);
   assert (dataOffset <= conn.DataSize ());
-  assert (oneAtLeast);
+  assert ((procsCount == 0) ^ oneAtLeast);
 
   conn.DataSize (dataOffset);
   conn.SendCmdResponse (CMD_LIST_PROCEDURE_RSP);

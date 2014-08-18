@@ -41,6 +41,14 @@ static const char WANONIM_FIELD[] = "";
 
 static const uint_t INVALID_OFF    = ~0;
 
+
+static uint32_t
+frame_id (const struct INTERNAL_HANDLER* const hnd)
+{
+  return load_le_int32 (&hnd->data[FRAME_ID_OFF]);
+}
+
+
 /* Calculate how much data can fit in one communication frame. It depends on
  * advertised size, type of encryption, etc. */
 static uint_t
@@ -663,11 +671,12 @@ list_globals (struct INTERNAL_HANDLER* const hnd,
   *outCount   = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_GLBINDEX] = load_le_int32 (data_ + dataOffset);
+  hnd->cmdInternal[LIST_GLB_INDEX] = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_GLBOFF]    = dataOffset;
-  hnd->cmdInternal[LIST_GLBSCOUNT] = *outCount;
+  hnd->cmdInternal[LIST_GLB_OFF]      = dataOffset;
+  hnd->cmdInternal[LIST_GLBS_COUNT]   = *outCount;
+  hnd->cmdInternal[LIST_GLB_FRAME_ID] = frame_id (hnd);
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -681,9 +690,10 @@ list_globals_err:
   return cs;
 }
 
+
 uint_t
-WListGlobals (const WH_CONNECTION hnd,
-              uint_t* const       outCount)
+WStartGlobalsList (const WH_CONNECTION hnd,
+                   uint_t* const       outCount)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
@@ -696,11 +706,21 @@ WListGlobals (const WH_CONNECTION hnd,
   else if (hnd_->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
-  return list_globals (hnd_, 0, outCount);
+  uint_t proxyCount = 0;
+  const uint_t result = list_globals (hnd_, 0, &proxyCount);
+
+  if ((result == WCS_OK)
+      && (outCount != NULL))
+    {
+      *outCount = proxyCount;
+    }
+
+  return result;
 }
 
+
 uint_t
-WListGlobalsFetch (const WH_CONNECTION hnd,
+WFetchGlobal (const WH_CONNECTION hnd,
                    const char** const  outpName)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
@@ -716,12 +736,15 @@ WListGlobalsFetch (const WH_CONNECTION hnd,
     {
       return WCS_INVALID_ARGS;
     }
+  else if (frame_id (hnd) != hnd_->cmdInternal[LIST_GLB_FRAME_ID])
+    return WCS_COMM_OUT_OF_SYNC;
+
   else if ((cs = load_le_int32 (data (hnd_))) != WCS_OK)
     goto list_global_fetch_err;
 
-  glbsCount  = hnd_->cmdInternal[LIST_GLBSCOUNT];
-  glbIndex   = hnd_->cmdInternal[LIST_GLBINDEX];
-  dataOffset = hnd_->cmdInternal[LIST_GLBOFF];
+  glbsCount  = hnd_->cmdInternal[LIST_GLBS_COUNT];
+  glbIndex   = hnd_->cmdInternal[LIST_GLB_INDEX];
+  dataOffset = hnd_->cmdInternal[LIST_GLB_OFF];
 
   if (glbIndex >= glbsCount)
     {
@@ -741,20 +764,18 @@ WListGlobalsFetch (const WH_CONNECTION hnd,
 
       dataOffset = 3 * sizeof (uint32_t);
 
-      assert (glbsCount  == hnd_->cmdInternal[LIST_GLBSCOUNT]);
-      assert (glbIndex   == hnd_->cmdInternal[LIST_GLBINDEX]);
-      assert (dataOffset == hnd_->cmdInternal[LIST_GLBOFF]);
+      assert (glbsCount  == hnd_->cmdInternal[LIST_GLBS_COUNT]);
+      assert (glbIndex   == hnd_->cmdInternal[LIST_GLB_INDEX]);
+      assert (dataOffset == hnd_->cmdInternal[LIST_GLB_OFF]);
     }
-
 
   *outpName   = (char*)data (hnd_) + dataOffset;
   dataOffset += strlen (*outpName) + 1;
 
   assert (dataOffset <= data_size (hnd_));
 
-  hnd_->cmdInternal[LIST_GLBSCOUNT] = glbsCount;
-  hnd_->cmdInternal[LIST_GLBINDEX]  = glbIndex + 1;
-  hnd_->cmdInternal[LIST_GLBOFF]    = dataOffset;
+  hnd_->cmdInternal[LIST_GLB_INDEX]  = glbIndex + 1;
+  hnd_->cmdInternal[LIST_GLB_OFF]    = dataOffset;
 
   assert (cs == WCS_OK);
 
@@ -767,6 +788,7 @@ list_global_fetch_err:
   hnd_->lastCmdRespReceived = CMD_INVALID_RSP;
   return cs;
 }
+
 
 static uint_t
 list_procedures (struct INTERNAL_HANDLER* const hnd,
@@ -808,11 +830,11 @@ list_procedures (struct INTERNAL_HANDLER* const hnd,
   *outCount   = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_PROCSINDEX] = load_le_int32 (data_ + dataOffset);
+  hnd->cmdInternal[LIST_PROC_INDEX] = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_PROCOFF]    = dataOffset;
-  hnd->cmdInternal[LIST_PROCSCOUNT] = *outCount;
+  hnd->cmdInternal[LIST_PROC_OFF]    = dataOffset;
+  hnd->cmdInternal[LIST_PROCS_COUNT] = *outCount;
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -825,6 +847,7 @@ list_procedures_err:
   hnd->lastCmdRespReceived = CMD_INVALID_RSP;
   return cs;
 }
+
 
 uint_t
 WListProcedures (const WH_CONNECTION hnd, uint_t* const outpCount)
@@ -866,9 +889,9 @@ WListProceduresFetch (const WH_CONNECTION  hnd,
     goto list_procedure_fetch_err;
 
 
-  procsCount = hnd_->cmdInternal[LIST_PROCSCOUNT];
-  dataOffset = hnd_->cmdInternal[LIST_PROCOFF];
-  procIndex  = hnd_->cmdInternal[LIST_PROCSINDEX];
+  procsCount = hnd_->cmdInternal[LIST_PROCS_COUNT];
+  dataOffset = hnd_->cmdInternal[LIST_PROC_OFF];
+  procIndex  = hnd_->cmdInternal[LIST_PROC_INDEX];
 
   if (procIndex >= procsCount)
     {
@@ -888,9 +911,9 @@ WListProceduresFetch (const WH_CONNECTION  hnd,
 
       dataOffset = 3 * sizeof (uint32_t);
 
-      assert (procsCount == hnd_->cmdInternal[LIST_PROCSCOUNT]);
-      assert (dataOffset == hnd_->cmdInternal[LIST_PROCOFF]);
-      assert (procIndex  == hnd_->cmdInternal[LIST_PROCSINDEX]);
+      assert (procsCount == hnd_->cmdInternal[LIST_PROCS_COUNT]);
+      assert (dataOffset == hnd_->cmdInternal[LIST_PROC_OFF]);
+      assert (procIndex  == hnd_->cmdInternal[LIST_PROC_INDEX]);
     }
 
   *outpName   = (char*)data (hnd_) + dataOffset;
@@ -898,9 +921,9 @@ WListProceduresFetch (const WH_CONNECTION  hnd,
 
   assert (dataOffset <= data_size (hnd_));
 
-  hnd_->cmdInternal[LIST_PROCSCOUNT] = procsCount;
-  hnd_->cmdInternal[LIST_PROCOFF]    = dataOffset;
-  hnd_->cmdInternal[LIST_PROCSINDEX] = procIndex + 1;
+  hnd_->cmdInternal[LIST_PROCS_COUNT] = procsCount;
+  hnd_->cmdInternal[LIST_PROC_OFF]    = dataOffset;
+  hnd_->cmdInternal[LIST_PROC_INDEX] = procIndex + 1;
 
   assert (cs == WCS_OK);
 
@@ -939,11 +962,11 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   set_data_size (hnd, max_data_size (hnd));
   data_ = data (hnd);
 
-  store_le_int16 (fieldHint, data_);
+  store_le_int16 (fieldHint, data_ + offset);
   offset += sizeof (uint16_t);
 
   /* These 16 bits are reserved */
-  store_le_int16 (0, data_);
+  store_le_int16 (0, data_ + offset);
   offset += sizeof (uint16_t);
 
   if (globalName == NULL)
@@ -988,7 +1011,8 @@ describe_value (struct INTERNAL_HANDLER* const  hnd,
   hnd->cmdInternal[DESC_FIELD_HINT] = load_le_int16 (data_ + offset);
   offset += sizeof (uint16_t);
 
-  hnd->cmdInternal[DESC_FIELD_OFFSET] = offset;
+  hnd->cmdInternal[DESC_FIELD_OFFSET]   = offset;
+  hnd->cmdInternal[DESC_FIELD_FRAME_ID] = frame_id (hnd);
 
   hnd->lastCmdRespReceived = CMD_GLOBAL_DESC_RSP;
 
@@ -1005,16 +1029,16 @@ describe_value_err:
 }
 
 uint_t
-WGlobalType (const WH_CONNECTION    hnd,
-             const char* const      name,
-             uint_t* const          outRawType)
+WDescribeGlobal (const WH_CONNECTION    hnd,
+                 const char* const      name,
+                 uint_t* const          outType)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
   if ((hnd == NULL)
       || (name == NULL)
       || (strlen (name) == 0)
-      || (outRawType == NULL))
+      || (outType == NULL))
     {
       return WCS_INVALID_ARGS;
     }
@@ -1022,12 +1046,13 @@ WGlobalType (const WH_CONNECTION    hnd,
   else if (hnd_->userId != 0)
     return WCS_OP_NOTPERMITED;
 
-  return describe_value (hnd_, name, 0, outRawType);
+  return describe_value (hnd_, name, 0, outType);
 }
 
+
 uint_t
-WFieldsCount (const WH_CONNECTION  hnd,
-              uint_t* const        outCount)
+WValueFieldsCount (const WH_CONNECTION  hnd,
+                   uint_t* const        outCount)
 {
   struct INTERNAL_HANDLER* const hnd_   = (struct INTERNAL_HANDLER*)hnd;
   uint_t                         cs     = WCS_OK;
@@ -1039,6 +1064,9 @@ WFieldsCount (const WH_CONNECTION  hnd,
 
   else if (hnd_->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP)
     return WCS_INCOMPLETE_CMD;
+
+  else if (frame_id (hnd) != hnd_->cmdInternal[DESC_FIELD_FRAME_ID])
+    return WCS_COMM_OUT_OF_SYNC;
 
   data_ = data (hnd);
   if ((cs = load_le_int32 (data_)) != WCS_OK)
@@ -1065,10 +1093,11 @@ describe_value_field_cnt_err:
   return cs;
 }
 
+
 uint_t
-WFetchField (const WH_CONNECTION    hnd,
-             const char**           outpFieldName,
-             uint_t* const          outFieldType)
+WValueFetchField (const WH_CONNECTION    hnd,
+                  const char**           outFieldName,
+                  uint_t* const          outFieldType)
 {
   struct INTERNAL_HANDLER* const hnd_   = (struct INTERNAL_HANDLER*)hnd;
 
@@ -1078,11 +1107,14 @@ WFetchField (const WH_CONNECTION    hnd,
   uint_t    fieldHint, fieldCount;
   uint16_t  type;
 
-  if ((hnd_ == NULL) || (outpFieldName == NULL) || (outFieldType == NULL))
+  if ((hnd_ == NULL) || (outFieldName == NULL) || (outFieldType == NULL))
     return WCS_INVALID_ARGS;
 
   else if (hnd_->lastCmdRespReceived != CMD_GLOBAL_DESC_RSP)
     return WCS_INCOMPLETE_CMD;
+
+  else if (frame_id (hnd) != hnd_->cmdInternal[DESC_FIELD_FRAME_ID])
+    return WCS_COMM_OUT_OF_SYNC;
 
   data_ = data (hnd_);
   if ((cs = load_le_int32 (data_)) != WCS_OK)
@@ -1101,32 +1133,25 @@ describe_value_fetch_field_again:
   assert (fieldCount <= 0xFFFF);
   assert (offset > 0);
 
-  if (fieldHint > fieldCount)
-    return WCS_INVALID_ARGS;
-
-  else if (fieldHint == fieldCount)
+  if (fieldHint >= fieldCount)
     {
-      *outFieldType  = WHC_TYPE_NOTSET;
-      *outpFieldName = NULL;
-
-      hnd_->cmdInternal[DESC_FIELD_HINT] = ++fieldHint;
+      *outFieldName = NULL;
 
       return WCS_OK;
     }
   else if (offset < data_size (hnd_))
     {
-      *outpFieldName  = (char*)data (hnd_) + offset;
-      offset         += strlen (*outpFieldName) + 1;
+      *outFieldName  = (char*)data (hnd_) + offset;
+      offset         += strlen (*outFieldName) + 1;
 
       *outFieldType  = load_le_int16 (data(hnd_) + offset);
       offset        += sizeof (uint16_t);
 
       ++fieldHint;
 
-      assert (offset <= 0xFFFF);
+      assert (offset <= data_size (hnd));
       assert (fieldHint <= 0xFFFF);
 
-      hnd_->cmdInternal[DESC_FIELD_COUNT]  = fieldCount;
       hnd_->cmdInternal[DESC_FIELD_HINT]   = fieldHint;
       hnd_->cmdInternal[DESC_FIELD_OFFSET] = offset;
     }
@@ -1162,7 +1187,7 @@ describe_value_fetch_field_err:
 
 
 uint_t
-WStackValueType (const WH_CONNECTION hnd,
+WDescribeStackTop (const WH_CONNECTION hnd,
                  uint_t* const       outRawType)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
