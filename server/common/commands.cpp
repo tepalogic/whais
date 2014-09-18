@@ -654,6 +654,7 @@ cmd_procedure_param_desc (ClientConnection& conn)
                                          data_ + 2 * sizeof (uint16_t));
   const uint_t        procNameLen = strlen (procName) + 1;
   uint16_t            offset      = 0;
+  uint64_t            lastOffset  = 0;
   bool                oneAtLeast  = false;
   uint_t              paramsCount = 0;
 
@@ -703,7 +704,7 @@ cmd_procedure_param_desc (ClientConnection& conn)
   try
     {
       do
-        {
+       {
           const uint_t paramType = session.ProcedurePameterRawType (procName,
                                                                     hint);
           if (IS_TABLE (paramType))
@@ -726,7 +727,8 @@ cmd_procedure_param_desc (ClientConnection& conn)
               store_le_int16 (fieldsCount, data_ + offset);
               offset += sizeof (uint16_t);
 
-              for (uint_t field = 0; field < fieldsCount; field++)
+              uint_t field = 0;
+              for (; field < fieldsCount; field++)
                 {
                   const char* fieldName = _RC (
                                 const char*,
@@ -749,6 +751,9 @@ cmd_procedure_param_desc (ClientConnection& conn)
                   store_le_int16 (fieldType, data_ + offset);
                   offset += sizeof (uint16_t);
                 }
+
+              if (field != fieldsCount)
+                break;
             }
           else
             {
@@ -761,6 +766,7 @@ cmd_procedure_param_desc (ClientConnection& conn)
 
           ++hint;
           oneAtLeast = true;
+          lastOffset = offset;
         }
       while (hint < paramsCount);
 
@@ -786,7 +792,7 @@ cmd_procedure_param_desc (ClientConnection& conn)
 
   assert (result == WCS_OK);
 
-  conn.DataSize (offset);
+  conn.DataSize (lastOffset);
   conn.SendCmdResponse (CMD_DESC_PROC_PARAM_RSP);
 
   return;

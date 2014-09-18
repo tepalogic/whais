@@ -94,6 +94,7 @@ tc_settup_connection (int              argc,
   cout << "Database: " << database << endl;
   cout << "User: " << userid << endl;
   cout << "Password: " << password << endl;
+  cout << "Frame size: " << frameSize << endl;
   cout << "Connecting ... ";
 
   status = WConnect (host, port, database, password, userid, frameSize, pHnd);

@@ -891,32 +891,17 @@ Utf8Translator::Write (uint8_t* const      utf8Dest,
   if ((result < 0) || (_SC (uint_t, result) >= maxSize))
     return 0;
 
-  uint64_t usecPrec = USECS_PRECISION / 10;
-  uint32_t usec_t   = value.mMicrosec;
-
-  while ((usec_t > 0 ) && (usecPrec > usec_t))
-    {
-      utf8Dest[result++] = '0';
-      usecPrec /= 10;
-
-      if (_SC (uint_t, result) >= maxSize)
-        return 0;
-    }
-
-  while ((usec_t > 0) && ((usec_t % 10) == 0))
-    usec_t /= 10;
-
-  const int64_t res_t = result;
+  const int64_t usecsRes = result;
 
   result = snprintf (_RC (char*, utf8Dest + result),
                      maxSize - result,
-                     "%u",
-                     usec_t);
+                     "%06u",
+                     value.mMicrosec);
 
-  if ((result < 0) || (result + res_t >= maxSize))
+  if ((result < 0) || (result + usecsRes >= maxSize))
     return 0;
 
-  return result + res_t + 1;
+  return result + usecsRes + 1;
 }
 
 

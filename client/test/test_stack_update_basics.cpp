@@ -1246,12 +1246,12 @@ test_bulk_update (WH_CONNECTION hnd)
     {
       if ((WPushValue (hnd, _values[i].type, 0, NULL) != WCS_OK)
           || (WUpdateValue (hnd,
-                                 _values[i].type,
-                                 WIGNORE_FIELD,
-                                 WIGNORE_ROW,
-                                 WIGNORE_OFF,
-                                 WIGNORE_OFF,
-                                 _values[i].value) != WCS_OK))
+                            _values[i].type,
+                            WIGNORE_FIELD,
+                            WIGNORE_ROW,
+                            WIGNORE_OFF,
+                            WIGNORE_OFF,
+                            _values[i].value) != WCS_OK))
         {
           goto test_bulk_update_err;
         }
@@ -1291,7 +1291,6 @@ test_bulk_update_err:
   cout << "FAIL\n";
   return false;
 }
-
 
 
 static bool

@@ -692,8 +692,7 @@ list_globals_err:
 
 
 uint_t
-WStartGlobalsList (const WH_CONNECTION hnd,
-                   uint_t* const       outCount)
+WStartGlobalsList (const WH_CONNECTION hnd, uint_t* const outCount)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
@@ -709,11 +708,8 @@ WStartGlobalsList (const WH_CONNECTION hnd,
   uint_t proxyCount = 0;
   const uint_t result = list_globals (hnd_, 0, &proxyCount);
 
-  if ((result == WCS_OK)
-      && (outCount != NULL))
-    {
-      *outCount = proxyCount;
-    }
+  if ((result == WCS_OK) && (outCount != NULL))
+    *outCount = proxyCount;
 
   return result;
 }
@@ -833,8 +829,9 @@ list_procedures (struct INTERNAL_HANDLER* const hnd,
   hnd->cmdInternal[LIST_PROC_INDEX] = load_le_int32 (data_ + dataOffset);
   dataOffset += sizeof (uint32_t);
 
-  hnd->cmdInternal[LIST_PROC_OFF]    = dataOffset;
-  hnd->cmdInternal[LIST_PROCS_COUNT] = *outCount;
+  hnd->cmdInternal[LIST_PROC_OFF]      = dataOffset;
+  hnd->cmdInternal[LIST_PROCS_COUNT]   = *outCount;
+  hnd->cmdInternal[LIST_PROC_FRAME_ID] = frame_id (hnd);
 
   assert (hnd->lastCmdRespReceived == type);
 
@@ -850,11 +847,11 @@ list_procedures_err:
 
 
 uint_t
-WListProcedures (const WH_CONNECTION hnd, uint_t* const outpCount)
+WStartProceduresList (const WH_CONNECTION hnd, uint_t* const outCount)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  if ((hnd == NULL) || (outpCount == NULL))
+  if (hnd == NULL)
     return WCS_INVALID_ARGS;
 
   else if (hnd_->userId != 0)
@@ -863,13 +860,19 @@ WListProcedures (const WH_CONNECTION hnd, uint_t* const outpCount)
   else if (hnd_->buildingCmd != CMD_INVALID)
     return WCS_INCOMPLETE_CMD;
 
-  return list_procedures (hnd_, 0, outpCount);
+  uint_t proxyCount = 0;
+  const uint_t result = list_procedures (hnd_, 0, &proxyCount);
+
+  if ((result == WCS_OK) && (outCount != NULL))
+    *outCount = proxyCount;
+
+  return result;
 }
 
 
 uint_t
-WListProceduresFetch (const WH_CONNECTION  hnd,
-                      const char** const   outpName)
+WFetchProcedure (const WH_CONNECTION  hnd,
+                 const char** const   outpName)
 {
   struct INTERNAL_HANDLER* hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
@@ -884,6 +887,8 @@ WListProceduresFetch (const WH_CONNECTION  hnd,
     {
       return WCS_INVALID_ARGS;
     }
+  else if (frame_id (hnd) != hnd_->cmdInternal[LIST_PROC_FRAME_ID])
+    return WCS_COMM_OUT_OF_SYNC;
 
   else if ((cs = load_le_int32 (data (hnd_))) != WCS_OK)
     goto list_procedure_fetch_err;
@@ -3094,7 +3099,7 @@ get_paratmeter_offset (struct INTERNAL_HANDLER* const       hnd,
 uint_t
 WProcParamType (const WH_CONNECTION     hnd,
                 const char* const       procedure,
-                const uint_t            param,
+                const uint_t            parameter,
                 uint_t* const           outRawType)
 {
   struct INTERNAL_HANDLER* const hnd_    = (struct INTERNAL_HANDLER*)hnd;
@@ -3120,12 +3125,12 @@ WProcParamType (const WH_CONNECTION     hnd,
       if (strcmp (procedure, (const char*)data_ + sizeof (uint32_t)) != 0)
         {
           tryAgain = FALSE;
-          cs = describe_proc_parameter (hnd, procedure, param);
+          cs = describe_proc_parameter (hnd, procedure, parameter);
           if (cs != WCS_OK)
             return cs;
         }
     }
-  else if ((cs = describe_proc_parameter (hnd, procedure, param)) != WCS_OK)
+  else if ((cs = describe_proc_parameter (hnd, procedure, parameter)) != WCS_OK)
     {
       tryAgain = FALSE;
       return cs;
@@ -3138,7 +3143,7 @@ proc_parameter_try_again:
   assert (cs == WCS_OK);
   assert (load_le_int32 (data_) == WCS_OK);
 
-  if ((cs = get_paratmeter_offset (hnd_, param, &offset)) != WCS_OK)
+  if ((cs = get_paratmeter_offset (hnd_, parameter, &offset)) != WCS_OK)
     goto proc_parameter_err;
 
   assert (offset <= data_size (hnd_) - sizeof (uint16_t));
@@ -3158,7 +3163,7 @@ proc_parameter_err:
        * this with the right hints. */
       tryAgain = FALSE;
 
-      cs = describe_proc_parameter (hnd, procedure, param);
+      cs = describe_proc_parameter (hnd, procedure, parameter);
       if (cs == WCS_OK)
         goto proc_parameter_try_again;
     }

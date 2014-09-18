@@ -165,19 +165,19 @@ WPingServer (const WH_CONNECTION hnd);
 /* Get the list of the global values.
  *
  * Used to initialize the fetching of the global values defined by the context
- * of the specified database. The caller has to be connected as root (e.g. the
- * used user id should be set to 0) for this to proceed.
+ * of the specified database.
  *
  * This function will fail if it's not called with a connection handler that
  * was successfully authenticated with the the administrator account.
  *
  * @hnd                 The connection handle.
- * @outCount            In case of success, this holds the number of global
- *                      values defined on the connected database. Use NULL for
- *                      it if the value is not needed.
+ * @outCount            In case of success, this will hold the number of global
+ *                      values defined be the context of the connected database.
+ *                      It should be set to NULL for if this value is not
+ *                      needed.
  *
- * @return              WCS_OK in case of success, other way it will return
- *                      the error's case corresponding code.
+ * @return              WCS_OK in case of success, other way it will return the
+ *                      error's case corresponding code.
  */
 uint_t
 WStartGlobalsList (const WH_CONNECTION hnd, uint_t* const outCount);
@@ -187,62 +187,142 @@ WStartGlobalsList (const WH_CONNECTION hnd, uint_t* const outCount);
  * This is used to retrieve the next global variable name defined in the
  * connected database. This function should be called after WStartGlobalsList
  * was used initialize the global list.
- * To retrieve all the global names one should call repeatedly WFetchGlobal
- * for every global name after the initial call to WStartGlobalsList.
+ * To retrieve all global values names one should call repeatedly WFetchGlobal.
  *
  * @hnd                 The connection handle.
- * @outName             In case of success this will hold a pointer to the name
- *                      of the next global variable. The name global is a null
+ * @outpName            In case of success this will hold a pointer to the name
+ *                      of the next global variable. The name is a null
  *                      terminated UTF-8 encoded string. If there are no
- *                      global values left this will be set to NULL.
+ *                      global values left it will be set to NULL.
  *
  * @return              WCS_OK in case of success, other way it will return
  *                      the error's case corresponding code.
  *
  * NOTE: The caller does not have the ownership of the memory pointed to
- *       by outName. It should make a copy of its content prior calling any
+ *       by outpName. It should make a copy of its content prior calling any
  *       other API using the same connection handle.
  */
 uint_t
-WFetchGlobal (const WH_CONNECTION hnd,
-              const char** const  outpName);
+WFetchGlobal (const WH_CONNECTION hnd, const char** const  outpName);
 
 /* Get the list of the procedures.
  *
  * Initialize the fetching of the procedure defined by the context of the
- * specified database. The caller has to be connected as root for this to
- * proceed.
+ * specified database.
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @outCount            In case of success, this will hold the number of
+ *                      procedures defined by the context of the connected
+ *                      database. It should be set to NULL if this value is not
+ *                      needed.
+ *
+ * @return              WCS_OK in case of success, other way it will return the
+ *                      error's case corresponding code.
  */
 uint_t
-WListProcedures (const WH_CONNECTION hnd, uint_t* const outCount);
+WStartProceduresList (const WH_CONNECTION hnd, uint_t* const outCount);
 
-/* Fetch the name of the next procedure. */
+/* Fetch the name of the next procedure.
+ *
+ * This is used to retrieve the next procedure name defined on the context of
+ * the connected database. This function should be called after
+ * WStartProceduresList was used initialize the procedures names list.
+ * To retrieve all procedures names one should call repeatedly WFetchProcedure.
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @outpName            In case of success this will hold a pointer to the name
+ *                      of the next procedure. The name is a null terminated
+ *                      UTF-8 encoded string. If there are no procedures left
+ *                      it will be set to NULL.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: The caller does not have the ownership of the memory pointed to
+ *       by outpName. It should make a copy of its content prior calling any
+ *       other API using the same connection handle.
+ */
 uint_t
-WListProceduresFetch (const WH_CONNECTION   hnd,
-                      const char** const    outpName);
+WFetchProcedure (const WH_CONNECTION hnd, const char** const outpName);
 
-/* Get the parameters count of a procedure. */
+/* Get the parameters count of a procedure.
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @name                Name of the procedure.
+ * @outCount            In case of success will hold the number of procedure
+ *                      parameter.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: 1. The output parameter count should be always greater than 1. This is
+ *          because the parameter at index 0 represents the return type of the
+ *          procedure and all Whais procedure have a return type defined.
+ *       2. If the return code is WCS_LARGE_RESPONSE or WCS_LARGE_ARGS than
+ *          the communication maximum frame size should be increased.
+ */
 uint_t
 WProcParamsCount (const WH_CONNECTION hnd,
                   const char* const   name,
                   uint_t* const       outCount);
 
-/* Get procedures' parameter type.
+/* Get type information about a procedure parameter.
  *
- * Retrieves the raw type of a procedures' parameters. In case it is a
- * composite type (e.g. table), other APIs have to be called too to get the
- * full description.
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @procedure           Name of the procedure,
+ * @parameter           The parameter index to retrieve information for. By
+ *                      convention, the parameter at index 0 describes the
+ *                      return type of a Whais procedure and continues with 1
+ *                      for the first argument if it exists, 2 for the next,
+ *                      and so on ...
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: If the return code is WCS_LARGE_RESPONSE or WCS_LARGE_ARGS than the
+ *       communication maximum frame size should be increased.
  */
 uint_t
 WProcParamType (const WH_CONNECTION   hnd,
                 const char* const     procedure,
-                const uint_t          param,
+                const uint_t          parameter,
                 uint_t* const         outRawType);
 
-/* Get the fields count of a table parameter.
+/* Get the fields count of a table procedure parameter.
  *
- * For a procedure parameter describe as a table, this is used to get the
- * number of fields, to get the full description of it.
+ * If a parameter procedure is described as being a table then this function
+ * might be used to retrieve the count of table's fields.
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @procedure           Name of the procedure,
+ * @parameter           The parameter index to retrieve information for. By
+ *                      convention, the parameter at index 0 describes the
+ *                      return type of a Whais procedure and continues with 1
+ *                      for the first argument if it exists, 2 for the next,
+ *                      and so on ...
+ * @outCount            In case of success it will hold the fields count.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: If the return code is WCS_LARGE_RESPONSE or WCS_LARGE_ARGS than the
+ *       communication maximum frame size should be increased.
+ *
  */
 uint_t
 WProcParamFieldCount (const WH_CONNECTION   hnd,
@@ -250,9 +330,35 @@ WProcParamFieldCount (const WH_CONNECTION   hnd,
                       const uint_t          param,
                       uint_t* const         outCount);
 
-/* Describe a field of a procedure parameter.
+/* Describes a field of a procedure parameter.
  *
- * Retrieves the name and type of a procedure parameter field.
+ * If a parameter procedure is described as being a table then this function
+ * might be used to retrieve details about the table's fields.
+ *
+ * This function will fail if it's not called with a connection handler that
+ * was successfully authenticated with the the administrator account.
+ *
+ * @hnd                 The connection handle.
+ * @procedure           Name of the procedure,
+ * @parameter           The parameter index to retrieve information for. By
+ *                      convention, the parameter at index 0 describes the
+ *                      return type of a Whais procedure and continues with 1
+ *                      for the first argument if it exists, 2 for the next,
+ *                      and so on ...
+ * @field               The field index to retrieve  information for.
+ * @outpFieldName       In case of success it will hold a pointer the field
+ *                      name. The name is a null terminated UTF-8 encoded
+ *                      string.
+ * @outFieldType        In case of success it will hold the field type.
+ *
+ * @return              WCS_OK in case of success, other way it will return
+ *                      the error's case corresponding code.
+ *
+ * NOTE: 1. If the return code is WCS_LARGE_RESPONSE or WCS_LARGE_ARGS than the
+ *          communication maximum frame size should be increased.
+ *       2. The caller does not have the ownership of the memory pointed to
+ *          by outpFieldName. It should make a copy of its content prior
+ *          calling any other API using the same connection handle.
  */
 uint_t
 WProcParamField (const WH_CONNECTION   hnd,
@@ -324,7 +430,7 @@ WValueFieldsCount (const WH_CONNECTION  hnd,
  * @outFieldName        In case of success this will hold a pointer to the name
  *                      of the next table's field. The field name is a null
  *                      terminated UTF-8 encoded string. If there are no
- *                      fields left than this will be se to NULL.
+ *                      fields left than this will be set to NULL.
  * @outFieldType        In case of success, this will hold the field type.
  *
  * @return              WCS_OK in case of success, other way it will return

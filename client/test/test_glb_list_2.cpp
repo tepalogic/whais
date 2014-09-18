@@ -1,10 +1,3 @@
-/*
- * test_glb_list_2.cpp
- *
- *  Created on: Aug 16, 2014
- *      Author: ipopa
- */
-
 #include <iostream>
 #include <cstring>
 
@@ -98,12 +91,6 @@ check_type (const WH_CONNECTION          hnd,
         }
       else
         {
-          if (offset != glbType.find (fieldName))
-            {
-              cout << "Found two fields sharing the same type";
-              return false;
-            }
-
           for (temp = 0; temp < offsets.size (); temp++)
             {
               if (offset == offsets[temp])
@@ -160,7 +147,7 @@ test_global_variables (WH_CONNECTION hnd, vector<string> glbNames, vector<string
             break;
         }
 
-      if (index > glbNames.size ())
+      if (index >= glbNames.size ())
         {
           cout << "Found global '" << name << "' that we don't know it.\n";
           return false;
@@ -181,7 +168,7 @@ test_global_variables (WH_CONNECTION hnd, vector<string> glbNames, vector<string
     {
       if (WFetchGlobal (hnd, &name) != WCS_OK)
         {
-          cout << "Error encountered durring global fetch end condition.\n";
+          cout << "Error encountered during global fetch end condition.\n";
           return false;
         }
       else if (name != NULL)
@@ -191,7 +178,7 @@ test_global_variables (WH_CONNECTION hnd, vector<string> glbNames, vector<string
         }
     }
 
-  cout << "Fetched " << i << " globals.\n";
+  cout << "Fetched " << i << " global(s).\n";
   if (i != glbsCount)
     {
       cout << "Those globals were less than " << glbsCount << ".\n";

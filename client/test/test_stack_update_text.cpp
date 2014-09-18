@@ -54,12 +54,12 @@ insert_a_string (WH_CONNECTION        hnd,
         break;
 
       if ((WUpdateValue (hnd,
-                              WHC_TYPE_TEXT,
-                              fieldName,
-                              row,
-                              WIGNORE_OFF,
-                              wh_utf8_strlen (_RC (uint8_t*, result)),
-                              temp) != WCS_OK)
+                         WHC_TYPE_TEXT,
+                         fieldName,
+                         row,
+                         WIGNORE_OFF,
+                         wh_utf8_strlen (_RC (uint8_t*, result)),
+                         temp) != WCS_OK)
           || (bulk && (WFlush (hnd) != WCS_OK)))
         {
           return NULL;
@@ -96,10 +96,10 @@ test_simple_text (WH_CONNECTION hnd)
 
   ref = insert_a_string (hnd, WIGNORE_FIELD, WIGNORE_OFF, false);
   if ((WValueTextLength (hnd,
-                                 WIGNORE_FIELD,
-                                 WIGNORE_ROW,
-                                 WIGNORE_OFF,
-                                 &count) != WCS_OK)
+                         WIGNORE_FIELD,
+                         WIGNORE_ROW,
+                         WIGNORE_OFF,
+                         &count) != WCS_OK)
       || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
       || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
@@ -111,11 +111,11 @@ test_simple_text (WH_CONNECTION hnd)
   while (strlen (aValue) < strlen (ref + aSimpleOffset))
     {
       if (WValueEntry (hnd,
-                               WIGNORE_FIELD,
-                               WIGNORE_ROW,
-                               WIGNORE_OFF,
-                               wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
-                               &value) != WCS_OK)
+                       WIGNORE_FIELD,
+                       WIGNORE_ROW,
+                       WIGNORE_OFF,
+                       wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                       &value) != WCS_OK)
         {
           goto test_simple_text_fail;
         }
@@ -132,10 +132,10 @@ test_simple_text (WH_CONNECTION hnd)
 
   ref = insert_a_string (hnd, WIGNORE_FIELD, WIGNORE_OFF, true);
   if ((WValueTextLength (hnd,
-                                 WIGNORE_FIELD,
-                                 WIGNORE_ROW,
-                                 WIGNORE_OFF,
-                                 &count) != WCS_OK)
+                         WIGNORE_FIELD,
+                         WIGNORE_ROW,
+                         WIGNORE_OFF,
+                         &count) != WCS_OK)
       || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
       || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
@@ -148,11 +148,11 @@ test_simple_text (WH_CONNECTION hnd)
   while (strlen (aValue) < strlen (ref + aSimpleOffset))
     {
       if (WValueEntry (hnd,
-                               WIGNORE_FIELD,
-                               WIGNORE_ROW,
-                               WIGNORE_OFF,
-                               wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
-                               &value) != WCS_OK)
+                       WIGNORE_FIELD,
+                       WIGNORE_ROW,
+                       WIGNORE_OFF,
+                       wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                       &value) != WCS_OK)
         {
           goto test_simple_text_fail;
         }
@@ -230,11 +230,11 @@ test_table_text (WH_CONNECTION hnd)
       while (strlen (aValue) < strlen (ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
           if (WValueEntry (hnd,
-                                   "WHC_TYPE_TEXT_2",
-                                   row,
-                                   WIGNORE_OFF,
-                                   wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
-                                   &value) != WCS_OK)
+                           "WHC_TYPE_TEXT_2",
+                           row,
+                           WIGNORE_OFF,
+                           wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                           &value) != WCS_OK)
             {
               goto test_table_text_fail;
             }

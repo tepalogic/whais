@@ -576,8 +576,8 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
           const uint_t      fieldLen  = strlen (fieldName) + 1;
 
           *inoutDataOff += fieldLen;
-          if ((fieldLen <= 1) ||
-              ((*inoutDataOff + sizeof (uint64_t)) > dataSize))
+          if ((fieldLen <= 1)
+              || ((*inoutDataOff + sizeof (uint64_t)) > dataSize))
             {
               goto update_frame_error;
             }

@@ -322,7 +322,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   if (linePos >= cmdLine.length ())
     {
-      cs = WListProcedures (conHdl, &procsCount);
+      cs = WStartProceduresList (conHdl, &procsCount);
       if (level >= VL_DEBUG)
         {
           if (cs == WCS_OK)
@@ -336,7 +336,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               && (procsCount-- > 0))
         {
           const char* procName = NULL;
-          cs = WListProceduresFetch (conHdl, &procName);
+          cs = WFetchProcedure (conHdl, &procName);
 
           assert (procName != NULL);
 
