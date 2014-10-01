@@ -47,7 +47,7 @@ typedef FIELD_ENTRY::iterator        FIELD_ENTRY_IT;
 
 
 static const char     NULL_VALUE[]   = "";
-static const char     NULL_LABEL[]   = "(NULL)";
+static const char     NULL_LABEL[]   = "(null)";
 
 
 
@@ -103,8 +103,8 @@ struct TableParameter
 
     if (! mFields[field].SetValue (row, type, value))
       {
-        cout << "Invalid command format. ";
-        cout << "Field '" << field << "' has different types of values.\n";
+        cerr << "Invalid command format. ";
+        cerr << "Field '" << field << "' has different types of values.\n";
 
         return false;
       }
@@ -255,18 +255,18 @@ parse_value (const string&    cmdLine,
                     }
                   else
                     {
-                      cout << "Invalid command format. ";
-                      cout << "Missing '&' to specify the end of the '\\u' ";
-                      cout << "character escape sequence.\n";
+                      cerr << "Invalid command format. ";
+                      cerr << "Missing '&' to specify the end of the '\\u' ";
+                      cerr << "character escape sequence.\n";
 
                       return false;
                     }
 
                   if (charCode > 0xFFFFFFFF)
                     {
-                      cout << "Invalid command format.";
-                      cout << "The value specified with the escape sequence ";
-                      cout << "'\\u' is not a valid Unicode point.\n";
+                      cerr << "Invalid command format.";
+                      cerr << "The value specified with the escape sequence ";
+                      cerr << "'\\u' is not a valid Unicode point.\n";
 
                       return false;
                     }
@@ -276,9 +276,9 @@ parse_value (const string&    cmdLine,
 
               if (charCode == 0)
                 {
-                  cout << "Invalid command format.";
-                  cout << "The outValue specified with the escape sequence ";
-                  cout << "'\\u' cannot be 0.\n";
+                  cerr << "Invalid command format.";
+                  cerr << "The outValue specified with the escape sequence ";
+                  cerr << "'\\u' cannot be 0.\n";
 
                   return false;
                 }
@@ -295,8 +295,8 @@ parse_value (const string&    cmdLine,
             break;
 
           default:
-            cout << "Invalid command format. Unknown escape sequence ";
-            cout << "'\\" << line[inoutLineOff - 1] << "'.\n";
+            cerr << "Invalid command format. Unknown escape sequence ";
+            cerr << "'\\" << line[inoutLineOff - 1] << "'.\n";
 
             return false;
           }
@@ -305,7 +305,7 @@ parse_value (const string&    cmdLine,
         outValue.push_back (line[inoutLineOff++]);
     }
 
-  cout << "Invalid command format. Missing ' at the end of the outValue.\n";
+  cerr << "Invalid command format. Missing ' at the end of the outValue.\n";
 
   return false;
 }
@@ -369,7 +369,7 @@ parse_type (const string&       cmdLine,
       }
     else
       {
-        cout << "Invalid command format. Unexpected parameter specifier '"
+        cerr << "Invalid command format. Unexpected parameter specifier '"
              << line[inoutLineOff - 1] <<"'.\n";
         return false;
       }
@@ -399,7 +399,7 @@ parse_type (const string&       cmdLine,
       }
     else
       {
-        cout << "Invalid command format. Unexpected parameter specifier '"
+        cerr << "Invalid command format. Unexpected parameter specifier '"
              << line[inoutLineOff - 1] <<"'.\n";
         return false;
       }
@@ -423,7 +423,7 @@ parse_type (const string&       cmdLine,
     break;
 
   default:
-    cout << "Invalid command format. Unexpected parameter specifier '"
+    cerr << "Invalid command format. Unexpected parameter specifier '"
          << line[inoutLineOff - 1] <<"'.\n";
 
     return false;
@@ -446,13 +446,23 @@ handle_param_value (WH_CONNECTION           hnd,
   string value;
 
   if (! parse_value (cmdLine, inoutLineOff, value))
-    return false;
-
+    {
+      if (arrayOff != WIGNORE_OFF)
+        {
+          cerr << "Invalid command format. "
+                  "An array values was not specified properly.\n";
+        }
+      else
+        {
+          cerr << "Invalid command format. "
+                  "A value was not specified properly.\n";
+        }
+      return false;
+    }
   else if ((value.length () == 0) && (arrayOff != WIGNORE_OFF))
     {
-      cout << "Invalid command format."
-              " A null value (e.g. '') is not a valid element"
-              " for an array value.\n";
+      cerr << "Invalid command format. "
+              "An array value cannot hold a null value (e.g. '').\n";
 
       return false;
     }
@@ -466,8 +476,8 @@ handle_param_value (WH_CONNECTION           hnd,
 proc_param_connector_error:
   assert (wcs != WCS_OK);
 
-  cout << "Failed to send procedure parameters:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to send procedure parameters:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -486,11 +496,11 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
   uint64_t arrayIndex = 0;
 
   assert (type != WHC_TYPE_TEXT);
-  assert (line[inoutLineOff - 1] == '(');
+  assert (line[inoutLineOff - 1] == '{');
 
   while (inoutLineOff < cmdLine.length ())
     {
-      if (line[inoutLineOff] == ')')
+      if (line[inoutLineOff] == '}')
         {
           ++inoutLineOff;
 
@@ -505,8 +515,8 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
         }
       else if (line[inoutLineOff++] != '\'')
         {
-          cout << "Invalid command format. ";
-          cout << "The value of the array's element should begin with a '.\n";
+          cerr << "Invalid command format. "
+                   "An array element should begin with a '.\n";
 
           return false;
         }
@@ -523,7 +533,7 @@ handle_procedure_array_param (WH_CONNECTION           hnd,
         }
     }
 
-  cout << "Invalid command format. Missing ')' to mark the end of array.\n";
+  cerr << "Invalid command format. Missing '}' to mark the end of array.\n";
 
   return false;
 }
@@ -546,11 +556,10 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
   bool                typeParse    = false;
   bool                valueParse   = false;
   bool                arrayValue   = false;
-  bool                emptyRow     = true;
   bool                endOfEntry   = false;
   bool                ignoreSpaces = true;
 
-  assert (line[inoutLineOff - 1] == '[');
+  assert (line[inoutLineOff - 1] == '(');
 
   while (inoutLineOff < cmdLine.length ())
     {
@@ -564,7 +573,7 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
 
       if (! rowStarted)
         {
-          if (line[inoutLineOff] == ']')
+          if (line[inoutLineOff] == ')')
             {
               endOfEntry = true;
 
@@ -572,17 +581,15 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
 
               break;
             }
-          else if (line[inoutLineOff++] != '(')
+          else if (line[inoutLineOff++] != '[')
             {
-              cout << "Invalid command format. ";
-              cout << "Missing '(' at the beginning of value.\n";
+              cerr << "Invalid command format. Needs a '[' to begin a row.\n";
 
               return false;
             }
 
           rowStarted = true;
           fieldParse = true;
-          emptyRow   = true;
 
           field.clear ();
 
@@ -597,19 +604,18 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
             {
               ++inoutLineOff;
 
-              emptyRow   = false;
               fieldParse = false;
               typeParse  = true;
 
               if (field.length () == 0)
                 {
-                  cout << "Invalid command format. ";
-                  cout << "A non empty field has to be provided.\n";
+                  cerr << "Invalid command format. "
+                          "A non empty field has to be provided.\n";
 
                   return false;
                 }
             }
-          else if (line[inoutLineOff] == ')')
+          else if (line[inoutLineOff] == ']')
             {
               ++inoutLineOff;
               ++row;
@@ -617,14 +623,6 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
               fieldParse   = false;
               rowStarted   = false;
               ignoreSpaces = true;
-
-              if (emptyRow)
-                {
-                  cout << "Invalid command format. ";
-                  cout << "A table value cannot have an empty row.\n";
-
-                  return false;
-                }
             }
           else
             {
@@ -637,8 +635,6 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
 
       if (typeParse)
         {
-          assert (emptyRow == false);
-
           if ( ! parse_type (cmdLine, inoutLineOff, type))
             return false;
 
@@ -655,9 +651,9 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
         {
           assert (ignoreSpaces);
 
-          if ((line[inoutLineOff] == '(') || arrayValue)
+          if ((line[inoutLineOff] == '{') || arrayValue)
             {
-              if (line[inoutLineOff] == '(')
+              if (line[inoutLineOff] == '{')
                 {
                   ++inoutLineOff;
 
@@ -672,7 +668,7 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
                   assert (type & WHC_TYPE_ARRAY_MASK);
                 }
 
-              if (line[inoutLineOff] == ')')
+              if (line[inoutLineOff] == '}')
                 {
                   inoutLineOff++;
 
@@ -691,8 +687,9 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
                 }
               else if (line[inoutLineOff++] != '\'')
                 {
-                  cout << "Invalid command format. Unexpected character '";
-                  cout << line[inoutLineOff] << "\'.\n";
+                  cerr << "Invalid table parameter format. "
+                            "Unexpected character '"
+                       << line[inoutLineOff] << "\'.\n";
 
                   return false;
                 }
@@ -720,8 +717,8 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
             }
           else
             {
-              cout << "Invalid command format. Unexpected character '";
-              cout << line[inoutLineOff] << "\'.\n";
+              cerr << "Invalid table parameter format. Unexpected character '"
+                   << line[inoutLineOff] << "\'.\n";
 
               return false;
             }
@@ -730,8 +727,14 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
 
   if (! endOfEntry)
     {
-      cout << "Invalid command format. Table value entry is not complete.\n";
+      cerr << "Invalid command format. "
+              "Table parameter value is not complete.\n";
 
+      return false;
+    }
+  else if (table.mRowsCount <= 0)
+    {
+      cerr << "Invalid table parameter. Table is not defined correctly.\n";
       return false;
     }
 
@@ -756,6 +759,10 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
     goto proc_param_connector_error;
 
   assert (table.mRowsCount > 0);
+
+  wcs = WAddTableRows (hnd, table.mRowsCount);
+  if (wcs != WCS_OK)
+    goto proc_param_connector_error;
 
   for (uint_t row = 0; row < table.mRowsCount; ++row)
     {
@@ -809,8 +816,8 @@ handle_procedure_table_param (WH_CONNECTION       hnd,
 proc_param_connector_error:
   assert (wcs != WCS_OK);
 
-  cout << "Failed to send procedure parameters:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to send procedure parameters:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -836,7 +843,7 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
           continue;
         }
 
-      if (line[inoutLineOff] == '[')
+      if (line[inoutLineOff] == '(')
         {
           ++inoutLineOff;
 
@@ -861,11 +868,11 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
 
           if (inoutLineOff >= cmdLine.length ())
             {
-              cout << "Invalid command format. No values was specified.\n";
+              cerr << "Invalid command format. No values was specified.\n";
 
               return false;
             }
-          else if (line[inoutLineOff] == '(')
+          else if (line[inoutLineOff] == '{')
             {
               wcs = WPushValue (hnd, type | WHC_TYPE_ARRAY_MASK, 0, NULL);
               if (wcs != WCS_OK)
@@ -904,8 +911,8 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
             }
           else
             {
-              cout << "Invalid command format. Unexpected character '";
-              cout << line[inoutLineOff] << "\'.\n";
+              cerr << "Invalid command format. Unexpected character '";
+              cerr << line[inoutLineOff] << "\'.\n";
 
               return false;
             }
@@ -921,8 +928,8 @@ handle_procedure_parameters (WH_CONNECTION   hnd,
 proc_param_connector_error:
   assert (wcs != WCS_OK);
 
-  cout << "Failed to send procedure parameters:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to send procedure parameters:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -993,8 +1000,8 @@ fetch_result_fail:
 
   assert (wcs != WCS_OK);
 
-  cout << "Failed to fetch result:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to fetch result:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -1039,8 +1046,8 @@ fetch_result_fail:
 
   assert (wcs != WCS_OK);
 
-  cout << "Failed to fetch array result:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to fetch array result:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 
@@ -1086,7 +1093,7 @@ fetch_execution_field_result (WH_CONNECTION hnd, const uint_t type)
         }
     }
   else
-    cout << NULL_LABEL << endl;
+    cout << endl;
 
   return true;
 
@@ -1094,8 +1101,8 @@ fetch_result_fail:
 
   assert (wcs != WCS_OK);
 
-  cout << "Failed to fetch field results:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to fetch field results:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -1109,6 +1116,13 @@ fetch_execution_table_result (WH_CONNECTION       hnd,
 
   uint_t wcs = WCS_OK;
 
+  uint_t largestFieldName = 0;
+  for (size_t i = 0; i < fields.size (); ++i)
+    {
+      if (strlen (fields[i].name) > largestFieldName)
+        largestFieldName = strlen(fields[i].name);
+    }
+
   if ((wcs = WValueRowsCount (hnd, &rowsCount)) != WCS_OK)
     goto fetch_result_fail;
 
@@ -1118,7 +1132,14 @@ fetch_execution_table_result (WH_CONNECTION       hnd,
         {
           for (uint_t i = 0; i < fields.size (); ++i )
             {
-              cout << row << " | " << fields[i].name << " | ";
+              cout.width (3);
+              cout << std::right << row;
+              cout.width (0);
+              cout << '|';
+              cout.width (largestFieldName);
+              cout << std::left << fields[i].name << std::right;
+              cout.width (0);
+              cout << " : ";
 
               if (fields[i].type & WHC_TYPE_ARRAY_MASK)
                 {
@@ -1156,8 +1177,8 @@ fetch_result_fail:
 
   assert (wcs != WCS_OK);
 
-  cout << "Failed to fetch table result:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to fetch table result:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -1263,8 +1284,8 @@ fetch_result_fail:
 
   assert (wcs != WCS_OK);
 
-  cout << "Failed to send procedure parameters:\n";
-  cout << wcmd_translate_status (wcs) << endl;
+  cerr << "Failed to send procedure parameters:\n";
+  cerr << wcmd_translate_status (wcs) << endl;
 
   return false;
 }
@@ -1286,7 +1307,7 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   const string procName = CmdLineNextToken (cmdLine, linePos);
   if (procName.length () == 0)
     {
-      cout << "Invalid command format. The procedure name is missing.\n";
+      cerr << "Invalid command format. The procedure name is missing.\n";
       return false;
     }
 
@@ -1299,7 +1320,7 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                            &conHdl);
   if (cs != WCS_OK)
     {
-      cout << "Failed to connect: " << wcmd_translate_status (cs) << endl;
+      cerr << "Failed to connect: " << wcmd_translate_status (cs) << endl;
       return false;
     }
 
@@ -1307,7 +1328,7 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   if (! handle_procedure_parameters (conHdl, cmdLine, linePos))
     {
       if (level >= VL_DEBUG)
-        cout << "Failed to parse procedure parameters.\n";
+        cerr << "Failed to parse procedure parameters.\n";
 
       goto cmd_exec_err;
     }
@@ -1317,9 +1338,9 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   if ((cs = WExecuteProcedure (conHdl, procName.c_str ())) != WCS_OK)
     {
       if (level >= VL_DEBUG)
-        cout << "Failed to execute remote procedure '" << procName << "': ";
+        cerr << "Failed to execute remote procedure '" << procName << "': ";
 
-      cout << wcmd_translate_status (cs) << endl;
+      cerr << wcmd_translate_status (cs) << endl;
       goto cmd_exec_err;
     }
   execTicks = wh_msec_ticks () - execTicks;
@@ -1329,8 +1350,8 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     {
       if (level >= VL_DEBUG)
         {
-          cout << "\nFailed to fetch the execution result for '";
-          cout << procName << "'.\n";
+          cerr << "\nFailed to fetch the execution result for '";
+          cerr << procName << "'.\n";
         }
 
         goto cmd_exec_err;
@@ -1355,7 +1376,7 @@ cmdExec (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       WTICKS totalTicks = paramTicks + fetchTicks + execTicks;
 
       cout << "---\n";
-      cout << "Total time          : " << totalTicks / 1000 << '.';
+      cout << "Total time           : " << totalTicks / 1000 << '.';
       cout.width (3); cout.fill ('0');
       cout << right << totalTicks % 1000<< "s.\n";
     }

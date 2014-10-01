@@ -1193,7 +1193,7 @@ describe_value_fetch_field_err:
 
 uint_t
 WDescribeStackTop (const WH_CONNECTION hnd,
-                 uint_t* const       outRawType)
+                   uint_t* const       outRawType)
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
@@ -1352,7 +1352,7 @@ WPopValues (const WH_CONNECTION hnd,
 {
   struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
 
-  static const uint_t  spaceReq  = sizeof (uint32_t) + 1;
+  static const uint_t spaceReq  = 1 + sizeof (uint32_t);
 
   if ((hnd_ == NULL) || (count == 0))
     return WCS_INVALID_ARGS;
@@ -1509,9 +1509,9 @@ stack_top_text_update (struct INTERNAL_HANDLER* hnd,
                        const WHT_INDEX          textOff,
                        const char* const        value)
 {
-  const uint_t fixedSize = sizeof (uint8_t) +
-                             sizeof (uint16_t) +
-                             sizeof (uint64_t);
+  const uint_t fixedSize = sizeof (uint8_t)
+                              + sizeof (uint16_t)
+                              + sizeof (uint64_t);
   const uint_t cmdSize   = fixedSize + strlen (value) + 1;
 
   uint8_t* data_;
@@ -2071,6 +2071,65 @@ WUpdateValue (const WH_CONNECTION    hnd,
 
   return cs;
 }
+
+
+uint_t
+WAddTableRows (const WH_CONNECTION    hnd,
+               const int32_t          rowsCount)
+{
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+  static const uint_t spaceReq  = 1 + sizeof (uint32_t);
+
+  if ((hnd_ == NULL) || (rowsCount < 0))
+    return WCS_INVALID_ARGS;
+
+  else if (rowsCount == 0)
+    return WCS_OK;
+
+  else if ((hnd_->buildingCmd != CMD_UPDATE_STACK)
+           && (hnd_->buildingCmd != CMD_INVALID))
+    {
+      return WCS_INCOMPLETE_CMD;
+    }
+
+  if (hnd_->buildingCmd == CMD_INVALID)
+    set_data_size (hnd_, 0);
+
+  /* Try to cache this operation if it's enough space in frame, other way
+   * flush what's there. */
+  if (max_data_size (hnd_) - spaceReq  <  data_size (hnd_))
+    {
+      uint_t cs;
+
+      assert (hnd_->buildingCmd == CMD_UPDATE_STACK);
+      assert (data_size (hnd_) > 0);
+
+      if ((cs = WFlush (hnd_)) != WCS_OK)
+        return cs;
+
+      assert (hnd_->buildingCmd == CMD_INVALID);
+    }
+
+  {
+    uint8_t* const data_    = data (hnd_);
+    const uint_t   dataSize = data_size (hnd_);
+
+    assert ((dataSize == 0) || (hnd_->buildingCmd == CMD_UPDATE_STACK));
+    assert ((dataSize > 0) || (hnd_->buildingCmd == CMD_INVALID));
+
+    data_[dataSize] = CMD_UPDATE_FUNC_TBL_ROWS;
+    store_le_int32 (rowsCount, data_ + dataSize + 1);
+
+    set_data_size (hnd_, dataSize + spaceReq);
+  }
+
+  memset (hnd_->cmdInternal, 0, sizeof (hnd_->cmdInternal));
+  hnd_->buildingCmd = CMD_UPDATE_STACK;
+
+  return WCS_OK;
+}
+
 
 uint_t
 WFlush (const WH_CONNECTION hnd)

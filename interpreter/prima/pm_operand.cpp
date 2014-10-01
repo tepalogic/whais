@@ -3790,7 +3790,7 @@ void
 SessionStack::Pop (const uint_t count)
 {
   if (count > mStack.size ())
-    throw DBSException (_EXTRA (InterException::STACK_CORRUPTED));
+    throw InterException (_EXTRA (InterException::STACK_CORRUPTED));
 
   uint_t topIndex = mStack.size () - 1;
 
@@ -3810,7 +3810,7 @@ StackValue&
 SessionStack::operator[] (const uint_t index)
 {
   if (index > mStack.size ())
-    throw DBSException (_EXTRA (InterException::STACK_CORRUPTED));
+    throw InterException (_EXTRA (InterException::STACK_CORRUPTED));
 
   return mStack[index];
 }

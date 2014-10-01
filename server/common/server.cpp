@@ -195,7 +195,7 @@ client_handler_routine (void* args)
       else
         sMainLog->Log (LOG_ERROR, e.Message ());
   }
-  catch (Exception& e)
+  catch (FileException& e)
   {
       ostringstream logEntry;
 
@@ -212,6 +212,22 @@ client_handler_routine (void* args)
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
       StopServer ();
+  }
+  catch (Exception& e)
+  {
+      ostringstream logEntry;
+
+      logEntry << "Error condition encountered: \n";
+      if (e.Description ())
+        logEntry << "Description:\n\t" << e.Description () << endl;
+
+      if ( ! e.Message ().empty ())
+        logEntry << "Message:\n\t" << e.Message () << endl;
+
+      logEntry <<"Extra: " << e.Extra () << " (";
+      logEntry << e.File () << ':' << e.Line() << ").";
+
+      client->mDesc->mLogger->Log (LOG_ERROR, logEntry.str ());
   }
   catch (std::bad_alloc&)
   {

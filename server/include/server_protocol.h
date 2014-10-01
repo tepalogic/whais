@@ -208,9 +208,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_UPDATE_STACK        (CMD_READ_STACK_RSP + 1)
 #define CMD_UPDATE_STACK_RSP    (CMD_UPDATE_STACK + 1)
 
-#define CMD_UPDATE_FUNC_POP     1
-#define CMD_UPDATE_FUNC_PUSH    2
-#define CMD_UPDATE_FUNC_CHTOP   3
+#define CMD_UPDATE_FUNC_POP             1
+#define CMD_UPDATE_FUNC_PUSH            2
+#define CMD_UPDATE_FUNC_CHTOP           3
+#define CMD_UPDATE_FUNC_TBL_ROWS        4
 
 /*
  * CmdUpdate

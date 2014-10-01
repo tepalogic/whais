@@ -812,12 +812,11 @@ cmd_update_stack_top (ClientConnection& conn, uint_t* const inoutDataOff)
   return WCS_OK;
 
 update_frame_error:
-
-    throw ConnectionException (
+  throw ConnectionException (
                     _EXTRA (0),
                     "Frame with invalid content for stack update operation."
-                              );
-    return WCS_GENERAL_ERR; //Not executed anyway!
+                             );
+  return WCS_GENERAL_ERR; //Not executed anyway!
 }
 
 
@@ -944,7 +943,6 @@ cmd_read_basic_stack_top (ClientConnection& conn,
   uint8_t* const data        = conn.Data ();
   const uint_t   maxDataSize = conn.MaxSize ();
 
-  assert (*inoutDataOffset <= maxDataSize);
   assert (conn.Stack ().Size () > 0);
   assert ((value.Operand ().GetType() >= T_BOOL)
           && (value.Operand ().GetType () < T_TEXT));
@@ -973,8 +971,6 @@ cmd_read_array_stack_top (ClientConnection& conn,
   uint8_t* const data        = conn.Data ();
   const uint_t   maxDataSize = conn.MaxSize ();
   uint64_t       maxCount    = 0;
-
-  assert (*inoutDataOffset < maxDataSize);
 
   {
     DArray temp;
@@ -1020,6 +1016,8 @@ cmd_read_array_stack_top (ClientConnection& conn,
       *inoutDataOffset += writeSize;
     }
 
+  assert (*inoutDataOffset <= maxDataSize);
+
   return WCS_OK;
 }
 
@@ -1033,7 +1031,6 @@ cmd_read_text_stack_top (ClientConnection& conn,
   const uint_t   maxDataSize = conn.MaxSize ();
   uint64_t       maxCount    = 0;
 
-  assert (*inoutDataOffset < maxDataSize);
   assert (conn.Stack ().Size () > 0);
   assert (value.Operand ().GetType() == T_TEXT);
 
@@ -1085,7 +1082,7 @@ cmd_read_text_stack_top (ClientConnection& conn,
       assert (data[*inoutDataOffset] == 0);
     }
 
-  assert (*inoutDataOffset < maxDataSize);
+  assert (*inoutDataOffset <= maxDataSize);
   assert (data[*inoutDataOffset] == 0);
 
   *inoutDataOffset += 1; //Make sure we count the null terminator too!
@@ -1203,12 +1200,15 @@ cmd_read_field_stack_top (ClientConnection& conn,
   if (hintRow >= rowsCount)
     hintRow = 0;
 
+  store_le_int64 (hintRow, data + *inoutDataOffset);
+  *inoutDataOffset += sizeof (uint64_t);
+
   uint_t status = WCS_GENERAL_ERR;
   for (uint64_t row = hintRow; row < rowsCount; ++row)
     {
       const uint16_t  prevOffset = *inoutDataOffset;
 
-      StackValue  el = topValue.Operand ().GetFieldAt (row);
+      StackValue  el = topValue.Operand ().GetValueAt (row);
 
       if (fieldDesc.isArray)
         {
@@ -1342,5 +1342,54 @@ cmd_read_table_stack_top (ClientConnection& conn,
     }
 
   return WCS_OK;
+}
+
+
+uint_t
+cmd_update_stack_table_add_rows (ClientConnection& conn,
+                                 uint_t* const inoutDataOff)
+{
+  assert_cmds_values ();
+
+  const uint8_t* const data     = conn.Data ();
+  const uint_t         dataSize = conn.DataSize ();
+  SessionStack&        stack    = conn.Stack ();
+
+  if (stack.Size () == 0)
+    return WCS_INVALID_ARGS;
+
+  StackValue& stackTop = stack[stack.Size () - 1];
+
+  if ((*inoutDataOff + sizeof (uint32_t)) > dataSize)
+    goto update_frame_error;
+
+  try
+  {
+      const int32_t rowsCount = load_le_int32 (data + *inoutDataOff);
+      *inoutDataOff += sizeof (uint32_t);
+
+      if (rowsCount < 0)
+        return WCS_INVALID_ARGS;
+
+      ITable& table = stackTop.Operand ().GetTable ();
+      for (int r = 0; r < rowsCount; ++r)
+        table.AddRow ();
+  }
+  catch (InterException& e)
+  {
+      if (e.Extra () == InterException::INVALID_OP_REQ)
+        return WCS_TYPE_MISMATCH;
+
+      throw;
+  }
+
+  return WCS_OK;
+
+update_frame_error:
+  throw ConnectionException (
+                      _EXTRA (0),
+                      "Frame with invalid content for stack update operation."
+                            );
+  return WCS_GENERAL_ERR; //Not executed anyway!
 }
 

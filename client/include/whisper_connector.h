@@ -491,6 +491,14 @@ WUpdateValue (const WH_CONNECTION     hnd,
               const WHT_INDEX         textOff,
               const char* const       value);
 
+/* Add rows to a stack's top table value.
+ *
+ *
+ */
+uint_t
+WAddTableRows (const WH_CONNECTION    hnd,
+               const int32_t          rowsCount);
+
 /* Flush all stack commits.
  *
  * To maximise network bandwidth, all stack update operations (push, pop and

@@ -72,5 +72,9 @@ cmd_read_table_stack_top (ClientConnection& conn,
                           uint64_t          hintTextOff,
                           uint_t* const     pDataOffset);
 
+uint_t
+cmd_update_stack_table_add_rows (ClientConnection& conn,
+                                 uint_t* const inoutDataOff);
+
 #endif /* STACK_CMDS_H */
 

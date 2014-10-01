@@ -443,6 +443,7 @@ ClientConnection::ReciveRawClientFrame ()
       const uint32_t secondKing = load_le_int32 (&mData.front () 	    +
                                                    FRAME_HDR_SIZE      	    +
                                                    ENC_3K_SECOND_KING_OFF);
+
       wh_buff_3k_decode (
                       firstKing,
                       secondKing,
@@ -466,7 +467,6 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
 {
   assert ((mFrameSize >= FRAME_HDR_SIZE) && (mFrameSize <= mDataSize));
 
-
   if (mCipher == FRAME_ENCTYPE_3K)
     {
       const uint16_t plainSize = mFrameSize;
@@ -475,16 +475,14 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
         mData[mFrameSize++] = wh_rnd () & 0xFF;
 
       const uint32_t firstKing  = wh_rnd () & 0xFFFFFFFF;
-      store_le_int32 (firstKing,
-                      &mData.front ()		+
-			FRAME_HDR_SIZE 		+
-			ENC_3K_FIRST_KING_OFF);
+      store_le_int32 (firstKing, &mData.front ()
+                                 + FRAME_HDR_SIZE
+                                 + ENC_3K_FIRST_KING_OFF);
 
       const uint32_t secondKing = wh_rnd () & 0xFFFFFFFF;
-      store_le_int32 (secondKing,
-                      &mData.front () 		  +
-			FRAME_HDR_SIZE 		  +
-			ENC_3K_SECOND_KING_OFF);
+      store_le_int32 (secondKing, &mData.front ()
+                                  + FRAME_HDR_SIZE
+                                  + ENC_3K_SECOND_KING_OFF);
 
       uint8_t prev = 0;
       for (uint_t i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)

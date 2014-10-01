@@ -398,6 +398,10 @@ cmd_update_stack (ClientConnection& conn)
           status = cmd_update_stack_top (conn, &dataOff);
           break;
 
+      case CMD_UPDATE_FUNC_TBL_ROWS:
+          status = cmd_update_stack_table_add_rows (conn, &dataOff);
+          break;
+
       default:
         throw ConnectionException (
                                _EXTRA (subcmd),

@@ -58,6 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whisper_fileio.h"
 #include "whisper_thread.h"
 #include "whisper_net.h"
+#include "whisper_console.h"
 #endif
 
 /* General operation status codes */

@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include <assert.h>
 
 #include "dbs/dbs_mgr.h"
@@ -144,11 +145,11 @@ ExecuteCommandLine (const string& cmdLine)
 
   size_t          pos     = 0;
   const string    command = CmdLineNextToken (normalizeCmd, pos);
-  const CmdEntry* cmd  = FindCmdEntry (command.c_str ());
+  const CmdEntry* cmd     = FindCmdEntry (command.c_str ());
 
   if (cmd == NULL)
     {
-      cout << "Invalid command '" << command << "'." <<  endl;
+      cerr << "Invalid command '" << command << "'." <<  endl;
       return false;
     }
 
@@ -162,37 +163,52 @@ ExecuteCommandLine (const string& cmdLine)
 
 
 static bool
-ExecuteCommandBatch (const string& line)
+ExecuteCommandStmt (const string& cmdStmt)
 {
   size_t lastPos    = 0;
   size_t currentPos = 0;
   char   commandSep = ';';
   bool   result     = true;
+  bool   armedSlash = false;
 
   while (result
-         && (currentPos < line.length ()))
+         && (currentPos < cmdStmt.length ()))
     {
-      if (line.c_str ()[currentPos] != commandSep)
+      if (cmdStmt.c_str ()[currentPos] != commandSep)
         {
           if ((commandSep == ';')
-              && ((line.c_str ()[currentPos] == '\'')
-                  || (line.c_str ()[currentPos] == '\"')))
+              && (cmdStmt.c_str ()[currentPos] == '\''))
             {
-              commandSep = line.c_str ()[currentPos++];
+              commandSep = cmdStmt.c_str ()[currentPos++];
             }
           else
-            ++currentPos;
+            {
+              if ((commandSep == '\'')
+                  && (cmdStmt.c_str ()[currentPos] == '\\'))
+                {
+                  armedSlash = ! armedSlash;
+                }
+              else
+                armedSlash = false;
+
+              ++currentPos;
+            }
 
           continue;
         }
-      else if ((commandSep == '\'') || (commandSep == '\"'))
+      else if (commandSep == '\'')
         {
+          assert (currentPos > 0);
+
+          if ( ! armedSlash)
+            commandSep = ';';
+
+          armedSlash = false;
           ++currentPos;
-          commandSep = ';';
           continue ;
         }
 
-      const string command = line.substr (lastPos, currentPos - lastPos);
+      const string command = cmdStmt.substr (lastPos, currentPos - lastPos);
       lastPos = ++currentPos;
 
       if (command.length () > 0)
@@ -203,9 +219,12 @@ ExecuteCommandBatch (const string& line)
     return false;
 
   if (commandSep != ';')
-    return false;
+    {
+      cerr << "Invalid command line format is unexpected.\n";
+      return false;
+    }
 
-  const string command = line.substr (lastPos);
+  const string command = cmdStmt.substr (lastPos);
 
   if (command.length () > 0)
     result = ExecuteCommandLine (command);
@@ -225,8 +244,8 @@ cmdExit (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 }
 
 
-void
-ExecuteInteractively ()
+static int
+ExecuteInteractively (istream& is)
 {
   CmdEntry entry;
 
@@ -239,16 +258,51 @@ ExecuteInteractively ()
 
   RegisterCommand (entry);
 
-  string line;
+  string commandStmt;
   while (! sFinishInteraction)
     {
-      cout << "> ";
-      if (getline (cin, line))
-        ExecuteCommandBatch (line);
+      if ((commandStmt.length () == 0) && (&is == &cin))
+        {
+          cout << "> ";
+        }
 
+      string line;
+      if (getline (is, line))
+        {
+          if (line.length () <= 0)
+            continue;
+
+          commandStmt.append (line);
+          if (&is == &cin)
+            {
+              if (line[line.length () - 1] == '\\')
+                commandStmt.resize (commandStmt.length () - 1);
+
+              else
+                {
+                  ExecuteCommandStmt (commandStmt);
+                  commandStmt.resize (0);
+                }
+            }
+          else if (line[line.length () - 1] == ';')
+            {
+              line.resize (line.length () - 1);
+              if ( ! ExecuteCommandStmt (commandStmt))
+                sFinishInteraction = true;
+
+              commandStmt.resize (0);
+            }
+        }
+      else if ((&is != &cin) && (commandStmt.length () > 0))
+        {
+          cerr << "Error! A script statement does not end with ';'.\n";
+          return 1;
+        }
       else
         break;
     }
+
+  return 0;
 }
 
 
@@ -360,8 +414,9 @@ main (const int argc, char *argv[])
   int           currentArg = 1;
   bool          createDB   = false;
   bool          removeDB   = false;
-  string        script;
+  const char*   scriptFile = NULL;
   string        dbDirectory;
+
 
 
   if (! whs_init ())
@@ -519,7 +574,7 @@ main (const int argc, char *argv[])
 
               return EINVAL;
             }
-          script = argv [currentArg++];
+          scriptFile = argv [currentArg++];
         }
       else if ((strcmp (argv[currentArg], "-m") == 0) ||
                (strcmp (argv[currentArg], "--file_size" ) == 0))
@@ -547,12 +602,12 @@ main (const int argc, char *argv[])
   }
   catch (const Exception& e)
   {
-    printException (cout, e);
+    printException (cerr, e);
     return e.Extra ();
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknown exception was thrown.\n";
+    cerr << "Fatal error ... Unknown exception was thrown.\n";
     return 0xFF;
   }
 
@@ -572,9 +627,17 @@ main (const int argc, char *argv[])
             if (GetUserPassword ().size () == 0)
               {
                 string password;
-                cout << "Password [" << GetUserId () << "]: ";
+
+                cout << "Password"
+                     << ( (GetUserId () == 0) ? " (root): " : ": ");
+
+                wh_disable_echo ();
                 getline (cin, password);
+                wh_enable_echo ();
+                cout << endl;
+
                 SetUserPassword (password.c_str ());
+
               }
             AddOnlineTableCommands ();
           }
@@ -584,24 +647,26 @@ main (const int argc, char *argv[])
             AddOfflineTableCommands ();
           }
 
-        if (script != "")
-          result = ExecuteCommandBatch (script) ? 0 : 1;
-
+        if (scriptFile != NULL)
+          {
+            ifstream script (scriptFile);
+            result = ExecuteInteractively (script);
+          }
         else
-          ExecuteInteractively ();
+          result = ExecuteInteractively (cin);
       }
     else
       RemoveDB ();
   }
   catch (const Exception& e)
   {
-    printException (cout, e);
+    printException (cerr, e);
 
     result = e.Extra ();
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknown exception was thrown.\n";
+    cerr << "Fatal error ... Unknown exception was thrown.\n";
     result = 0xFF;
   }
 
@@ -611,12 +676,12 @@ main (const int argc, char *argv[])
   }
   catch (const Exception& e)
   {
-    printException (cout, e);
+    printException (cerr, e);
     result = (result != 0) ? result : e.Extra ();
   }
   catch (...)
   {
-    cout << "Fatal error ... Unknown exception was thrown.\n";
+    cerr << "Fatal error ... Unknown exception was thrown.\n";
     result = (result != 0)  ? result : 0xFF;
   }
 
