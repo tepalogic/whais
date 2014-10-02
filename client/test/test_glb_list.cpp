@@ -129,7 +129,7 @@ test_global_values_list (WH_CONNECTION hnd)
 
   cout << "Testing the global values listing ... ";
 
-  if ((WListGlobals (hnd, &globalsCount) != WCS_OK)
+  if ((WStartGlobalsList (hnd, &globalsCount) != WCS_OK)
       || (globalsCount != glbsCount))
     {
       goto test_global_values_list_error;
@@ -137,7 +137,7 @@ test_global_values_list (WH_CONNECTION hnd)
 
   do
     {
-      if (WListGlobalsFetch (hnd, &recvGlbName) != WCS_OK)
+      if (WFetchGlobal (hnd, &recvGlbName) != WCS_OK)
         goto test_global_values_list_error;
       else if ((recvGlbName != NULL)
                && ! test_global_name_match (recvGlbName))
@@ -171,23 +171,23 @@ test_for_errors (WH_CONNECTION hnd)
   const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
-  if ((WListGlobals(NULL, &glbsCount) != WCS_INVALID_ARGS)
-      || (WListGlobals (hnd, NULL) != WCS_INVALID_ARGS)
-      || (WListGlobals (NULL, NULL) != WCS_INVALID_ARGS))
+  if ((WStartGlobalsList(NULL, &glbsCount) != WCS_INVALID_ARGS)
+      || (WStartGlobalsList (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WStartGlobalsList (NULL, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WListGlobalsFetch (hnd, &nameFetched) != WCS_INVALID_ARGS)
+  else if (WFetchGlobal (hnd, &nameFetched) != WCS_INVALID_ARGS)
     goto test_for_errors_fail;
-  else if (WListGlobals (hnd, &glbsCount) != WCS_OK)
+  else if (WStartGlobalsList (hnd, &glbsCount) != WCS_OK)
     goto test_for_errors_fail;
-  else if ((WListGlobalsFetch (NULL, NULL) != WCS_INVALID_ARGS)
-            || (WListGlobalsFetch (NULL, &nameFetched) != WCS_INVALID_ARGS)
-            || (WListGlobalsFetch (hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WFetchGlobal (NULL, NULL) != WCS_INVALID_ARGS)
+            || (WFetchGlobal (NULL, &nameFetched) != WCS_INVALID_ARGS)
+            || (WFetchGlobal (hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WListGlobalsFetch (hnd, &nameFetched) != WCS_OK)
+  else if (WFetchGlobal (hnd, &nameFetched) != WCS_OK)
     goto test_for_errors_fail;
 
   cout << "OK\n";

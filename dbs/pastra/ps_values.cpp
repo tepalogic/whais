@@ -44,7 +44,7 @@ using namespace whisper;
 using namespace pastra;
 
 static const uint_t  MAX_VALUE_RAW_STORAGE = 0x20;
-static const uint8_t MNTH_DAYS[]           = MNTH_DAYS_A;
+static const uint_t  MNTH_DAYS[]           = MNTH_DAYS_A;
 
 static const UTF8_CU_COUNTER _cuCache;
 
@@ -2290,7 +2290,7 @@ StringMatcher::NextMatchRaw ()
 uint_t
 StringMatcher::ComparingWindowShift (uint_t position) const
 {
-  assert ((mPatternSize - 1) <= position);
+  assert (_SC (uint_t, (mPatternSize - 1)) <= position);
   assert (position < mCacheValid);
 
   for (int i = mPatternSize - 1; i >= 0; --i, --position)

@@ -134,7 +134,7 @@ test_procedures_list (WH_CONNECTION hnd)
 
   cout << "Testing the procedures listing ... ";
 
-  if ((WListProcedures (hnd, &globalsCount) != WCS_OK)
+  if ((WStartProceduresList (hnd, &globalsCount) != WCS_OK)
       || (globalsCount != procsCount))
     {
       goto test_procedures_list_error;
@@ -142,7 +142,7 @@ test_procedures_list (WH_CONNECTION hnd)
 
   do
     {
-      if (WListProceduresFetch (hnd, &recvGlbName) != WCS_OK)
+      if (WFetchProcedure (hnd, &recvGlbName) != WCS_OK)
         goto test_procedures_list_error;
       else if ((recvGlbName != NULL)
                && ! test_proc_name_match (recvGlbName))
@@ -176,23 +176,23 @@ test_for_errors (WH_CONNECTION hnd)
   const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
-  if ((WListProcedures(NULL, &procsCount) != WCS_INVALID_ARGS)
-      || (WListProcedures (hnd, NULL) != WCS_INVALID_ARGS)
-      || (WListProcedures (NULL, NULL) != WCS_INVALID_ARGS))
+  if ((WStartProceduresList(NULL, &procsCount) != WCS_INVALID_ARGS)
+      || (WStartProceduresList (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WStartProceduresList (NULL, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WListProceduresFetch (hnd, &nameFetched) != WCS_INVALID_ARGS)
+  else if (WFetchProcedure (hnd, &nameFetched) != WCS_INVALID_ARGS)
     goto test_for_errors_fail;
-  else if (WListProcedures (hnd, &procsCount) != WCS_OK)
+  else if (WStartProceduresList (hnd, &procsCount) != WCS_OK)
     goto test_for_errors_fail;
-  else if ((WListProceduresFetch (NULL, NULL) != WCS_INVALID_ARGS)
-            || (WListProceduresFetch (NULL, &nameFetched) != WCS_INVALID_ARGS)
-            || (WListProceduresFetch (hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WFetchProcedure (NULL, NULL) != WCS_INVALID_ARGS)
+            || (WFetchProcedure (NULL, &nameFetched) != WCS_INVALID_ARGS)
+            || (WFetchProcedure (hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WListProceduresFetch (hnd, &nameFetched) != WCS_OK)
+  else if (WFetchProcedure (hnd, &nameFetched) != WCS_OK)
     goto test_for_errors_fail;
 
   cout << "OK\n";

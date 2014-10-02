@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONNECTION_H_
 
 #include <string>
+#include <memory>
 
 #include "whisper.h"
 
@@ -126,19 +127,18 @@ private:
 
   void SendRawClientFrame (const uint8_t type);
 
-  UserHandler&                      mUserHandler;
-  SessionStack                      mStack;
-  uint32_t                          mWaitingFrameId;
-  uint32_t                          mClientCookie;
-  uint32_t                          mServerCookie;
-  uint16_t                          mLastReceivedCmd;
-  uint16_t                          mFrameSize;
-  uint8_t                           mVersion;
-  uint8_t                           mCipher;
-  uint_t                            mDataSize;
-  std::auto_ptr<uint8_t>            mDataHolder;
-  uint8_t* const                    mData;
-  std::string                       mKey;
+  UserHandler&              mUserHandler;
+  SessionStack              mStack;
+  uint32_t                  mWaitingFrameId;
+  uint32_t                  mClientCookie;
+  uint32_t                  mServerCookie;
+  uint16_t                  mLastReceivedCmd;
+  uint16_t                  mFrameSize;
+  uint8_t                   mVersion;
+  uint8_t                   mCipher;
+  uint_t                    mDataSize;
+  std::vector<uint8_t>		mData;
+  std::string         		mKey;
 
 
   ClientConnection (const ClientConnection&);

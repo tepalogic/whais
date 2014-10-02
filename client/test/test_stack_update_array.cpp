@@ -297,9 +297,9 @@ fill_array_entries_step (WH_CONNECTION hnd)
   for (uint_t i = 0; i < _valuesCount; i++)
     {
       if ((WPushValue (hnd,
-                            _values[i].type | WHC_TYPE_ARRAY_MASK,
-                            0,
-                            NULL) != WCS_OK)
+                       _values[i].type | WHC_TYPE_ARRAY_MASK,
+                       0,
+                       NULL) != WCS_OK)
           || (WFlush (hnd) != WCS_OK))
         {
           return false;
@@ -308,12 +308,12 @@ fill_array_entries_step (WH_CONNECTION hnd)
       for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
           if ((WUpdateValue (hnd,
-                                  _values[i].type,
-                                  WIGNORE_FIELD,
-                                  WIGNORE_ROW,
-                                  j,
-                                  WIGNORE_OFF,
-                                  _values[i].values[j]) != WCS_OK)
+                             _values[i].type,
+                             WIGNORE_FIELD,
+                             WIGNORE_ROW,
+                             j,
+                             WIGNORE_OFF,
+                             _values[i].values[j]) != WCS_OK)
               || (WFlush (hnd) != WCS_OK))
             {
               return false;
@@ -340,12 +340,12 @@ fill_array_entries_bulk (WH_CONNECTION hnd)
       for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
           if (WUpdateValue (hnd,
-                                 _values[i].type,
-                                 WIGNORE_FIELD,
-                                 WIGNORE_ROW,
-                                 j,
-                                 WIGNORE_OFF,
-                                 _values[i].values[j]) != WCS_OK)
+                            _values[i].type,
+                            WIGNORE_FIELD,
+                            WIGNORE_ROW,
+                            j,
+                            WIGNORE_OFF,
+                            _values[i].values[j]) != WCS_OK)
             {
               return false;
             }
@@ -366,9 +366,9 @@ check_array_entry (WH_CONNECTION hnd, const int index)
   unsigned long long int  count;
 
   if ((WValueArraySize (hnd,
-                                    WIGNORE_FIELD,
-                                    WIGNORE_ROW,
-                                    &count) != WCS_OK)
+                        WIGNORE_FIELD,
+                        WIGNORE_ROW,
+                        &count) != WCS_OK)
       || (count != pEntry->elementsCount))
     {
       return false;
@@ -377,11 +377,11 @@ check_array_entry (WH_CONNECTION hnd, const int index)
   for (uint_t i = 0; i < pEntry->elementsCount; ++i)
     {
       if ((WValueEntry (hnd,
-                               WIGNORE_FIELD,
-                               WIGNORE_ROW,
-                               i,
-                               WIGNORE_OFF,
-                               &value) != WCS_OK)
+                        WIGNORE_FIELD,
+                        WIGNORE_ROW,
+                        i,
+                        WIGNORE_OFF,
+                        &value) != WCS_OK)
           || (strcmp (value, pEntry->values[i]) != 0))
         {
           return false;
@@ -389,17 +389,17 @@ check_array_entry (WH_CONNECTION hnd, const int index)
     }
 
   if ((WValueEntry (hnd,
-                            WIGNORE_FIELD,
-                            WIGNORE_ROW,
-                            pEntry->elementsCount,
-                            WIGNORE_OFF,
-                            &value) != WCS_INVALID_ARRAY_OFF)
+                    WIGNORE_FIELD,
+                    WIGNORE_ROW,
+                    pEntry->elementsCount,
+                    WIGNORE_OFF,
+                    &value) != WCS_INVALID_ARRAY_OFF)
       || (WValueEntry (hnd,
-                               WIGNORE_FIELD,
-                               WIGNORE_ROW,
-                               pEntry->elementsCount,
-                               WIGNORE_OFF,
-                               NULL) != WCS_INVALID_ARGS))
+                       WIGNORE_FIELD,
+                       WIGNORE_ROW,
+                       pEntry->elementsCount,
+                       WIGNORE_OFF,
+                       NULL) != WCS_INVALID_ARGS))
     {
       return false;
     }
@@ -492,10 +492,13 @@ test_for_errors (WH_CONNECTION hnd)
     {
       goto test_for_errors_fail;
     }
+
   cout << "OK\n";
+
   return true;
 
 test_for_errors_fail :
+
   cout << "FAIL\n";
   return false;
 }

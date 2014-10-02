@@ -51,6 +51,13 @@ public:
 
   static const uint_t  ENTRY_SIZE          = 48;
 
+  StoreEntry ()
+  {
+    memset (mPrevEntry, 0xFF, sizeof mPrevEntry);
+    memset (mNextEntry, 0xFF, sizeof mPrevEntry);
+    memset (mRawData,   0xFF, sizeof mRawData);
+  }
+
   void MarkAsDeleted (const bool deleted)
   {
     uint64_t entry = load_le_int64 (mNextEntry);

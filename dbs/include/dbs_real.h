@@ -43,6 +43,8 @@ class DBSReal
 {
 public:
   DBSReal ()
+    : mIntPart (0),
+      mFracPart (0)
   {
   }
 

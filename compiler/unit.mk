@@ -36,8 +36,8 @@ wcompiler_SHL=custom/wcommon
 wslcompiler_SRC=$(wcompiler_SRC)
 wslcompiler_INC=$(wcompiler_INC)
 
-./$(UNIT)/parser/whisper.tab.c ./$(UNIT)/parser/whisper.tab.h : ./$(UNIT)/parser/whisper.y
-	bison -d $? -o $@
+./compiler/parser/whisper.tab.c ./compiler/parser/whisper.tab.h : ./compiler/parser/whisper.y
+	$(ECHO)if [ ! -f $@ ] ; then bison -d $? -o $@ ; fi
 
 
 ifeq ($(BUILD_TESTS),yes)

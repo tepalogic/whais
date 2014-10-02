@@ -1861,8 +1861,7 @@ print_basic_value (ostream&      os,
     os << '\'';
 }
 
-template<>
-void
+template<> void
 print_basic_value<DChar> (ostream&        os,
                           const DChar&    value,
                           const bool      apostrophe)

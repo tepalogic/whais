@@ -1,10 +1,18 @@
 UNIT_EXES+=c_test_glb_list
 c_test_glb_list_SRC=test/test_glb_list.cpp
-c_test_glb_list_LIB=client/wslconnector custom/wslcustom utils/wslutils 
+c_test_glb_list_LIB=client/wslconnector custom/wslcustom utils/wslutils
+
+UNIT_EXES+=c_test_glb_list_2
+c_test_glb_list_2_SRC=test/test_glb_list_2.cpp
+c_test_glb_list_2_LIB=client/wslconnector custom/wslcustom utils/wslutils 
 
 UNIT_EXES+=c_test_proc_list
 c_test_proc_list_SRC=test/test_proc_list.cpp
 c_test_proc_list_LIB=client/wslconnector custom/wslcustom utils/wslutils 
+
+UNIT_EXES+=c_test_proc_list_2
+c_test_proc_list_2_SRC=test/test_proc_list_2.cpp
+c_test_proc_list_2_LIB=client/wslconnector custom/wslcustom utils/wslutils 
 
 UNIT_EXES+=c_test_proc_args
 c_test_proc_args_SRC=test/test_proc_args.cpp

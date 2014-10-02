@@ -43,6 +43,7 @@ endif
 wslcustom_SRC+=$(SRC_FOLDER)/fileio.c
 wslcustom_SRC+=$(SRC_FOLDER)/thread.c  
 wslcustom_SRC+=$(SRC_FOLDER)/time.c  
+wslcustom_SRC+=$(SRC_FOLDER)/console.c  
 wslcustom_SRC+=$(SRC_FOLDER)/network.c  
 wslcustom_SRC+=$(SRC_FOLDER)/memory.cpp
 wslcustom_SRC+=$(SRC_FOLDER)/shl.c

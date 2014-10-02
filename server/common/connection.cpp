@@ -94,8 +94,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
     mVersion (1),
     mCipher (FRAME_ENCTYPE_PLAIN),
     mDataSize (GetAdminSettings ().mMaxFrameSize),
-    mDataHolder (new uint8_t[mDataSize]),
-    mData (mDataHolder.get ())
+    mData (mDataSize, 0)
 {
   assert ((mDataSize >= MIN_FRAME_SIZE) && (mDataSize <= MAX_FRAME_SIZE));
 
@@ -104,8 +103,6 @@ ClientConnection::ClientConnection (UserHandler&            client,
 
   mUserHandler.mDesc = NULL;
   const uint16_t authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
-
-  memset (mData, 0, mDataSize);
 
   assert (authFrameLen <= MIN_FRAME_SIZE);
 
@@ -118,7 +115,7 @@ ClientConnection::ClientConnection (UserHandler&            client,
   store_le_int16 (mDataSize, &mData[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]);
   mData[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = GetAdminSettings().mCipher;;
 
-  mUserHandler.mSocket.Write (mData, MIN_FRAME_SIZE);
+  mUserHandler.mSocket.Write (&mData.front (), MIN_FRAME_SIZE);
   ReciveRawClientFrame ();
 
   mCipher = GetAdminSettings().mCipher;
@@ -138,6 +135,35 @@ ClientConnection::ClientConnection (UserHandler&            client,
     {
       throw ConnectionException (_EXTRA (0),
                                  "The cipher was not echoed back by client.");
+    }
+
+  if (load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_SIZE_OFF]) <
+      mDataSize)
+    {
+      mDataSize = load_le_int16 (&mData[FRAME_HDR_SIZE 	+
+					  FRAME_AUTH_RSP_SIZE_OFF]);
+      if (mDataSize < MIN_FRAME_SIZE)
+	{
+	  throw ConnectionException (
+              _EXTRA (0),
+              "Cannot use the client's specified frame size of %u bytes.",
+              mDataSize
+				     );
+	}
+
+      if (mCipher == FRAME_ENCTYPE_3K)
+	mDataSize -= mDataSize % sizeof (uint32_t);
+    }
+  else if (mDataSize <
+	   load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_SIZE_OFF]))
+    {
+      throw ConnectionException (
+            _EXTRA (0),
+            "Client requested a frame size of %u bytes. The server's "
+              "maximum frame size is set at %u bytes.",
+            load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]),
+            mDataSize
+				);
     }
 
   const char* dbsName = _RC (const char*,
@@ -168,9 +194,9 @@ ClientConnection::ClientConnection (UserHandler&            client,
   if (mCipher == FRAME_ENCTYPE_PLAIN)
     {
       const string passwd = _RC (const char*,
-                                 mData +
-                                   FRAME_HDR_SIZE +
-                                   FRAME_AUTH_RSP_FIXED_SIZE +
+                                 &mData.front ()		 +
+                                   FRAME_HDR_SIZE 		 +
+                                   FRAME_AUTH_RSP_FIXED_SIZE   	 +
                                    strlen (dbsName) + 1);
       if (mUserHandler.mRoot)
         {
@@ -287,7 +313,7 @@ ClientConnection::Data ()
     assert (false);
   }
 
-  return mData + metaDataSize;
+  return &mData.front () + metaDataSize;
 }
 
 
@@ -322,10 +348,10 @@ uint8_t*
 ClientConnection::RawCmdData ()
 {
   if (mCipher == FRAME_ENCTYPE_PLAIN)
-    return mData + FRAME_HDR_SIZE;
+    return &mData.front () + FRAME_HDR_SIZE;
 
   else if (mCipher == FRAME_ENCTYPE_3K)
-    return mData + FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
+    return &mData.front () + FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
 
   return NULL;
 }
@@ -366,7 +392,7 @@ ClientConnection::ReciveRawClientFrame ()
                                "Unexpected frame type received.");
   }
 
-  mFrameSize = load_le_int16 (mData + FRAME_SIZE_OFF);
+  mFrameSize = load_le_int16 (&mData.front () + FRAME_SIZE_OFF);
 
   if ((mFrameSize < frameRead)
       || (mFrameSize > mDataSize))
@@ -389,7 +415,7 @@ ClientConnection::ReciveRawClientFrame ()
 
   assert (frameRead == mFrameSize);
 
-  const uint32_t frameId = load_le_int32 (mData + FRAME_ID_OFF);
+  const uint32_t frameId = load_le_int32 (&mData.front () + FRAME_ID_OFF);
   if (frameId != mWaitingFrameId)
     {
       throw ConnectionException (_EXTRA (0),
@@ -410,26 +436,27 @@ ClientConnection::ReciveRawClientFrame ()
           prev = mData[FRAME_HDR_SIZE + i];
         }
 
-      const uint32_t firstKing = load_le_int32 (mData +
-                                                  FRAME_HDR_SIZE +
+      const uint32_t firstKing = load_le_int32 (&mData.front () 	    +
+                                                  FRAME_HDR_SIZE 	    +
                                                   ENC_3K_FIRST_KING_OFF);
-      const uint32_t secondKing = load_le_int32 (mData +
-                                                   FRAME_HDR_SIZE +
+      const uint32_t secondKing = load_le_int32 (&mData.front () 	    +
+                                                   FRAME_HDR_SIZE      	    +
                                                    ENC_3K_SECOND_KING_OFF);
+
       wh_buff_3k_decode (
                       firstKing,
                       secondKing,
                       _RC (const uint8_t*, mKey.c_str ()),
                       mKey.length (),
-                      mData + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
+                      &mData.front () + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
                       mFrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
                          );
 
-      const uint16_t plainSize = load_le_int16 (mData +
-                                                  FRAME_HDR_SIZE +
+      const uint16_t plainSize = load_le_int16 (&mData.front () 	  +
+                                                  FRAME_HDR_SIZE 	  +
                                                   ENC_3K_PLAIN_SIZE_OFF);
       mFrameSize = plainSize;
-      store_le_int16 (plainSize, mData + FRAME_SIZE_OFF);
+      store_le_int16 (plainSize, &mData.front () + FRAME_SIZE_OFF);
     }
 }
 
@@ -439,7 +466,6 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
 {
   assert ((mFrameSize >= FRAME_HDR_SIZE) && (mFrameSize <= mDataSize));
 
-
   if (mCipher == FRAME_ENCTYPE_3K)
     {
       const uint16_t plainSize = mFrameSize;
@@ -448,12 +474,14 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
         mData[mFrameSize++] = wh_rnd () & 0xFF;
 
       const uint32_t firstKing  = wh_rnd () & 0xFFFFFFFF;
-      store_le_int32 (firstKing,
-                      mData + FRAME_HDR_SIZE + ENC_3K_FIRST_KING_OFF);
+      store_le_int32 (firstKing, &mData.front ()
+                                 + FRAME_HDR_SIZE
+                                 + ENC_3K_FIRST_KING_OFF);
 
       const uint32_t secondKing = wh_rnd () & 0xFFFFFFFF;
-      store_le_int32 (secondKing,
-                      mData + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
+      store_le_int32 (secondKing, &mData.front ()
+                                  + FRAME_HDR_SIZE
+                                  + ENC_3K_SECOND_KING_OFF);
 
       uint8_t prev = 0;
       for (uint_t i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
@@ -465,27 +493,27 @@ ClientConnection::SendRawClientFrame (const uint8_t type)
         }
 
       store_le_int16 (plainSize,
-                      mData + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
+                      &mData.front () + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
       store_le_int16 (wh_rnd () & 0xFFFF,
-                      mData + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
+                      &mData.front () + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
 
       wh_buff_3k_encode (
                       firstKing,
                       secondKing,
                       _RC (const uint8_t*, mKey.c_str ()),
                       mKey.length (),
-                      mData + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
+                      &mData.front () + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
                       mFrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
                          );
     }
 
-  store_le_int16 (mFrameSize, mData + FRAME_SIZE_OFF);
-  store_le_int32 (++mWaitingFrameId, mData + FRAME_ID_OFF);
+  store_le_int16 (mFrameSize, &mData.front () + FRAME_SIZE_OFF);
+  store_le_int32 (++mWaitingFrameId, &mData.front () + FRAME_ID_OFF);
 
   mData[FRAME_TYPE_OFF]    = type;
   mData[FRAME_ENCTYPE_OFF] = mCipher;
 
-  mUserHandler.mSocket.Write (mData, mFrameSize);
+  mUserHandler.mSocket.Write (&mData.front (), mFrameSize);
 
   mFrameSize    = 0;  //This frame content is not valid anymore.
   mClientCookie = ~0; //Make sure the client cookie is reread.

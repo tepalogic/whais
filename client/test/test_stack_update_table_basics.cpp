@@ -458,9 +458,9 @@ check_table_description (WH_CONNECTION hnd)
   const char* fieldName = NULL;
   uint_t        fieldType = 0;
 
-  if ((WStackValueType (hnd, &type) != WCS_OK)
+  if ((WDescribeStackTop (hnd, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK)
-      || (WFieldsCount (hnd, &fcount) != WCS_OK)
+      || (WValueFieldsCount (hnd, &fcount) != WCS_OK)
       || (fcount != _fieldsCount))
     {
       return false;
@@ -469,14 +469,14 @@ check_table_description (WH_CONNECTION hnd)
   for (uint_t i = 0; i < _fieldsCount; ++i)
     {
 
-      if (WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
       if (strcmp (fieldName, get_table_field_name( fieldType)) != 0)
         return false;
     }
 
-  if ((WFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+  if ((WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
       || (fieldName != NULL)
       || (fieldType != WHC_TYPE_NOTSET))
     {
@@ -499,52 +499,52 @@ check_table_value (WH_CONNECTION      hnd,
   if (extraCheck)
     {
       if (WValueEntry (hnd,
-                               "some_field_name",
-                               row,
-                               WIGNORE_OFF,
-                               WIGNORE_OFF,
-                               &tabVal) != WCS_INVALID_FIELD)
+                       "some_field_name",
+                       row,
+                       WIGNORE_OFF,
+                       WIGNORE_OFF,
+                       &tabVal) != WCS_INVALID_FIELD)
       {
         return false;
       }
 
       if (WValueEntry (hnd,
-                               fieldName,
-                               98012, //Some big row number
-                               WIGNORE_OFF,
-                               WIGNORE_OFF,
-                               &tabVal) != WCS_INVALID_ROW)
+                       fieldName,
+                       98012, //Some big row number
+                       WIGNORE_OFF,
+                       WIGNORE_OFF,
+                       &tabVal) != WCS_INVALID_ROW)
       {
         return false;
       }
 
       if (WValueEntry (hnd,
-                               fieldName,
-                               row,
-                               0,
-                               WIGNORE_OFF,
-                               &tabVal) != WCS_TYPE_MISMATCH)
+                       fieldName,
+                       row,
+                       0,
+                       WIGNORE_OFF,
+                       &tabVal) != WCS_TYPE_MISMATCH)
         {
           return false;
         }
 
       if (WValueEntry (hnd,
-                               fieldName,
-                               row,
-                               WIGNORE_OFF,
-                               0,
-                               &tabVal) != WCS_TYPE_MISMATCH)
+                       fieldName,
+                       row,
+                       WIGNORE_OFF,
+                       0,
+                       &tabVal) != WCS_TYPE_MISMATCH)
         {
           return false;
         }
     }
 
   if (WValueEntry (hnd,
-                           fieldName,
-                           row,
-                           WIGNORE_OFF,
-                           WIGNORE_OFF,
-                           &tabVal) != WCS_OK)
+                   fieldName,
+                   row,
+                   WIGNORE_OFF,
+                   WIGNORE_OFF,
+                   &tabVal) != WCS_OK)
     {
       return false;
     }
@@ -569,12 +569,12 @@ fill_table_with_values (WH_CONNECTION hnd,
   for (uint_t i = 0; i < _valuesCount; ++i)
     {
       if (WUpdateValue (hnd,
-                             _values[i].type,
-                             get_table_field_name (_values[i].type),
-                             i / _fieldsCount,
-                             WIGNORE_OFF,
-                             WIGNORE_OFF,
-                             _values[i].value) != WCS_OK)
+                        _values[i].type,
+                        get_table_field_name (_values[i].type),
+                        i / _fieldsCount,
+                        WIGNORE_OFF,
+                        WIGNORE_OFF,
+                        _values[i].value) != WCS_OK)
         {
           goto fill_table_fail;
         }

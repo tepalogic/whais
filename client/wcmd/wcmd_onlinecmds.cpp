@@ -158,6 +158,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                           GetWorkingDB ().c_str (),
                           GetUserPassword ().c_str (),
                           GetUserId (),
+                          DEFAULT_FRAME_SIZE,
                           &conHdl);
   if (cs != WCS_OK)
     {
@@ -170,7 +171,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   if (linePos >= cmdLine.length ())
     {
-      cs = WListGlobals (conHdl, &glbsCount);
+      cs = WStartGlobalsList (conHdl, &glbsCount);
       if (level >= VL_DEBUG)
         {
           if (cs == WCS_OK)
@@ -184,7 +185,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               && (glbsCount-- > 0))
         {
           const char* glbName = NULL;
-          cs = WListGlobalsFetch (conHdl, &glbName);
+          cs = WFetchGlobal (conHdl, &glbName);
 
           assert (glbName != NULL);
 
@@ -208,11 +209,10 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       token = CmdLineNextToken (globals, linePos);
 
-      if (token.size () == 0)
-        break;
+      if (token.length () == 0)
+	    break;
 
-      else
-        cs = WGlobalType (conHdl, token.c_str (), &rawType);
+      cs = WDescribeGlobal (conHdl, token.c_str (), &rawType);
 
       if (cs != WCS_OK)
         {
@@ -231,21 +231,22 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
           uint_t fieldsCount;
 
-          cs = WFieldsCount (conHdl, &fieldsCount);
+          cs = WValueFieldsCount (conHdl, &fieldsCount);
           if (cs != WCS_OK)
             break;
 
           if (fieldsCount == 0)
-            cout << "TABLE";
+            {
+              cout << "TABLE\n";
+              continue;
+            }
 
-          else
-            cout << "TABLE OF (";
-
+          cout << "TABLE OF (";
           for (uint_t field = 0; field < fieldsCount; field++)
             {
               const char* fieldName;
 
-              cs = WFetchField (conHdl, &fieldName, &rawType);
+              cs = WValueFetchField (conHdl, &fieldName, &rawType);
               if (cs != WCS_OK)
                 break;
 
@@ -303,6 +304,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                           GetWorkingDB ().c_str (),
                           GetUserPassword ().c_str (),
                           GetUserId (),
+                          DEFAULT_FRAME_SIZE,
                           &conHdl);
 
   assert (token == "procedure");
@@ -319,7 +321,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   if (linePos >= cmdLine.length ())
     {
-      cs = WListProcedures (conHdl, &procsCount);
+      cs = WStartProceduresList (conHdl, &procsCount);
       if (level >= VL_DEBUG)
         {
           if (cs == WCS_OK)
@@ -333,7 +335,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               && (procsCount-- > 0))
         {
           const char* procName = NULL;
-          cs = WListProceduresFetch (conHdl, &procName);
+          cs = WFetchProcedure (conHdl, &procName);
 
           assert (procName != NULL);
 
@@ -353,13 +355,13 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   do
     {
-      uint_t procsParameter;
+      uint_t procsParametersCount;
 
       token = CmdLineNextToken (procedures, linePos);
       if (token.size () == 0)
         break;
 
-      cs    = WProcParamsCount (conHdl, token.c_str (), &procsParameter);
+      cs = WProcParamsCount (conHdl, token.c_str (), &procsParametersCount);
 
       if (cs != WCS_OK)
         {
@@ -373,11 +375,12 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       cout << token << " (";
 
-      uint_t param = 1; //Start with the first procdure parameter
+      //Start from the first parameter and let the return type at then end
+      //after the enclosing ')'.
+      uint_t param = 1;
       do
         {
-          param %= procsParameter;
-
+          param %= procsParametersCount;
           if (param == 0)
             cout << ") ";
 
@@ -417,14 +420,13 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 }
 
               cout << "TABLE OF (";
-
               for (uint_t field = 0; field < fieldsCount; field++)
                 {
                   const char* fieldName;
 
                   cs = WProcParamField (conHdl,
                                         token.c_str (),
-                                        0,
+                                        param,
                                         field,
                                         &fieldName,
                                         &paramType);
@@ -489,6 +491,7 @@ cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                    GetWorkingDB ().c_str (),
                                    GetUserPassword ().c_str (),
                                    GetUserId (),
+                                   DEFAULT_FRAME_SIZE,
                                    &conHdl);
   if (cs != WCS_OK)
     goto cmd_ping_exit;

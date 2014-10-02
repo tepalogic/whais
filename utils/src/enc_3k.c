@@ -112,8 +112,9 @@ wh_buff_3k_encode (const uint32_t           firstKing,
                    uint8_t*                 buffer,
                    const uint_t             bufferSize)
 {
-  uint_t pos, b;
+  uint_t pos;
   uint_t keyIndex = firstKing % keyLen;
+  int    b;
 
   assert (bufferSize % sizeof (uint32_t) == 0);
 
@@ -127,20 +128,16 @@ wh_buff_3k_encode (const uint32_t           firstKing,
       message ^= secondKing;
 
       thirdKing = key[keyIndex++]; thirdKing <<= 8;
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       thirdKing |= key[keyIndex++];
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       for (b = 0; b < 16; ++b)
         {
@@ -185,8 +182,9 @@ wh_buff_3k_decode (const uint32_t           firstKing,
                    uint8_t*                 buffer,
                    const uint_t             bufferSize)
 {
-  uint_t pos, b;
+  uint_t pos;
   uint_t keyIndex = firstKing % keyLen;
+  int    b;
 
   assert (bufferSize % sizeof (uint32_t) == 0);
 
@@ -197,20 +195,16 @@ wh_buff_3k_decode (const uint32_t           firstKing,
       uint32_t thirdKing = 0;
 
       thirdKing = key[keyIndex++]; thirdKing <<= 8;
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       thirdKing |= key[keyIndex++];
-      if (keyIndex == keyLen)
-        keyIndex = 0;
+      keyIndex %= keyLen;
 
       if (thirdKing & (1 << 31))
         message = exchange_8bit_pair (message, 8, 16);

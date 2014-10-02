@@ -144,7 +144,7 @@ IBTreeNode::SetData (const KEY_INDEX, const uint8_t* )
 void
 IBTreeNode::RemoveKey (const IBTreeKey& key)
 {
-  KEY_INDEX keyIndex;
+  KEY_INDEX keyIndex = 0;
 
   if (FindBiggerOrEqual (key, &keyIndex) == false)
     {
@@ -490,7 +490,7 @@ BTree::RecursiveInsertNodeKey (const NODE_INDEX         parentId,
 bool
 BTree::RecursiveDeleteNodeKey (IBTreeNode& node, const IBTreeKey& key)
 {
-  KEY_INDEX keyIndex;
+  KEY_INDEX keyIndex = ~0;
 
   if (node.FindBiggerOrEqual (key, &keyIndex) == false)
     {

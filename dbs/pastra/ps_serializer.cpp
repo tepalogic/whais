@@ -460,7 +460,7 @@ Serializer::Load (const uint8_t* src, DUInt64* const outValue)
 }
 
 
-int
+uint_t
 Serializer::Size (const DBS_FIELD_TYPE type, const bool isArray)
 {
   if (isArray)

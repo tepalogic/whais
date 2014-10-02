@@ -44,7 +44,6 @@ static const uint_t MAX_DECODED_STRING = 256;
 
 
 
-
 static const char*
 decode_basic_type (const uint16_t type)
 {
@@ -139,6 +138,7 @@ wcmd_decode_typeinfo (unsigned int type)
 
 
 map<string, CmdEntry> sCommands;
+
 static const char descHelp[]    = "Display help on available commands.";
 static const char descExtHelp[] = "Display the list of available commands "
                                      "or an extended help about a command.\n"
@@ -195,6 +195,34 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
 }
 
 
+static const char descEcho[]    = "Prints a text.";
+static const char descExtEcho[] = "Used mainly with scripts to print a text "
+                                     "provided by the user.\n"
+                                     "Usage:\n"
+                                     "  echo [user text] ... \n"
+                                     "Example:\n"
+                                     "  echo First stage completed.";
+
+static bool
+cmdEcho (const string& cmdLine, ENTRY_CMD_CONTEXT)
+{
+  size_t currPosition = 0;
+  string token        = CmdLineNextToken (cmdLine, currPosition);
+
+  assert (token == "echo");
+
+  while (currPosition < cmdLine.length ()
+         && isspace (cmdLine.at (currPosition)))
+    {
+      ++currPosition;
+    }
+
+  cout << cmdLine.substr (currPosition) << endl;
+
+  return true;
+}
+
+
 void
 InitCmdManager ()
 {
@@ -204,6 +232,16 @@ InitCmdManager ()
   entry.mDesc         = descHelp;
   entry.mExtendedDesc = descExtHelp;
   entry.mCmd          = cmdHelp;
+  entry.mContext      = NULL;
+  entry.mShowStatus   = false;
+
+  RegisterCommand (entry);
+
+
+  entry.mName         = "echo";
+  entry.mDesc         = descEcho;
+  entry.mExtendedDesc = descExtEcho;
+  entry.mCmd          = cmdEcho;
   entry.mContext      = NULL;
   entry.mShowStatus   = false;
 

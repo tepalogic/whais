@@ -74,7 +74,7 @@ public:
   static void Load (const uint8_t* const src, DUInt32* const outValue);
   static void Load (const uint8_t* const src, DUInt64* const outValue);
 
-  static int Size (const DBS_FIELD_TYPE type, const bool isArray);
+  static uint_t Size (const DBS_FIELD_TYPE type, const bool isArray);
 
   static ROW_INDEX LoadRow (const ROW_INDEX* const from)
   {

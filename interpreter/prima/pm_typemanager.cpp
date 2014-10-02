@@ -334,9 +334,6 @@ TypeManager::CreateGlobalValue (uint8_t*    inoutTypeDesc,
                                 "with array of text type.");
 
       case T_UNDETERMINED:
-        //Just a default
-        assert (false);
-
         return GlobalValue (ArrayOperand ( DArray ()));
 
       default:

@@ -675,8 +675,8 @@ CompiledFileUnit::ProcCodeAreaSize (const uint_t id)
                                      mProcsCount);
     }
 
-  return load_le_int32 (mProcs.get () +
-                          (id * WHC_PROC_ENTRY_SIZE) +
+  return load_le_int32 (mProcs.get () 			+
+                          (id * WHC_PROC_ENTRY_SIZE) 	+
                           WHC_PROC_ENTRY_CODE_SIZE);
 }
 
@@ -885,4 +885,3 @@ FunctionalUnitException::Description () const
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "COMPILER";
 #endif
-

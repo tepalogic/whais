@@ -156,12 +156,12 @@ test_global_value_description (WH_CONNECTION hnd)
       strcpy (buffer, no_fileds_types[i].name);
       strcat (buffer, suffix);
 
-      if ((WGlobalType (hnd, buffer, &type) != WCS_OK)
+      if ((WDescribeGlobal (hnd, buffer, &type) != WCS_OK)
           || (type != no_fileds_types[i].type))
         {
           goto test_global_value_description_err;
         }
-      else if ((WFieldsCount (hnd, &fieldsCount) != WCS_OK)
+      else if ((WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
           || (fieldsCount != no_fileds_types[i].fieldsCount))
         {
           goto test_global_value_description_err;
@@ -210,9 +210,9 @@ test_complete_field_global (WH_CONNECTION hnd)
 
   cout << "Testing the complete field ... ";
 
-  if ((WGlobalType (hnd, complete_field_table, &type) != WCS_OK)
+  if ((WDescribeGlobal (hnd, complete_field_table, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK)
-      || (WFieldsCount (hnd, &fieldsCount) != WCS_OK)
+      || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
       || (fieldsCount != sizeof (tableFields) / sizeof (tableFields[0])))
     {
       goto test_complete_field_global_err;
@@ -220,17 +220,17 @@ test_complete_field_global (WH_CONNECTION hnd)
 
   while (fieldsCount-- > 0)
     {
-      if ((WFetchField (hnd, &fieldName, &type) != WCS_OK)
+      if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
           || ! test_field_match (fieldName, type))
         {
           goto test_complete_field_global_err;
         }
     }
 
-  if ((WFetchField (hnd, &fieldName, &type) != WCS_OK)
+  if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
       || (fieldName != NULL)
       || (type != WHC_TYPE_NOTSET)
-      || (WFetchField (hnd, &fieldName, &type) == WCS_OK))
+      || (WValueFetchField (hnd, &fieldName, &type) == WCS_OK))
     {
       goto test_complete_field_global_err; //Should not allow an extra fetch!
     }
@@ -257,22 +257,22 @@ test_one_field_global (WH_CONNECTION hnd)
 
   cout << "Testing the one field ... ";
 
-  if ((WGlobalType (hnd, one_field_table, &type) != WCS_OK)
+  if ((WDescribeGlobal (hnd, one_field_table, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK))
     {
       goto test_one_field_global_err;
     }
-  else if ((WFetchField (hnd, &fieldName, &type) != WCS_OK)
+  else if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
             || (type != WHC_TYPE_BOOL)
             || (strcmp (fieldName, "field1") != 0))
     {
       goto test_one_field_global_err;
     }
 
-  if ((WFetchField (hnd, &fieldName, &type) != WCS_OK)
+  if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
       || (fieldName != NULL)
       || (type != WHC_TYPE_NOTSET)
-      || (WFetchField (hnd, &fieldName, &type) == WCS_OK))
+      || (WValueFetchField (hnd, &fieldName, &type) == WCS_OK))
     {
       goto test_one_field_global_err; //Should not allow an extra fetch!
     }
@@ -294,29 +294,29 @@ test_for_errors (WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WFetchField (hnd, &nameFetched, &type) != WCS_INCOMPLETE_CMD)
-      || (WFieldsCount (hnd, &fieldsCount) != WCS_INCOMPLETE_CMD))
+  if ((WValueFetchField (hnd, &nameFetched, &type) != WCS_INCOMPLETE_CMD)
+      || (WValueFieldsCount (hnd, &fieldsCount) != WCS_INCOMPLETE_CMD))
     {
       goto test_for_errors_fail;
     }
-  else if ((WGlobalType (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WGlobalType (hnd, one_field_table, NULL) != WCS_INVALID_ARGS)
-           || (WGlobalType (hnd, NULL, &type) != WCS_INVALID_ARGS))
+  else if ((WDescribeGlobal (NULL, NULL, NULL) != WCS_INVALID_ARGS)
+           || (WDescribeGlobal (hnd, one_field_table, NULL) != WCS_INVALID_ARGS)
+           || (WDescribeGlobal (hnd, NULL, &type) != WCS_INVALID_ARGS))
 
     {
       goto test_for_errors_fail;
     }
-  else if ((WGlobalType (hnd, one_field_table, &type) != WCS_OK)
+  else if ((WDescribeGlobal (hnd, one_field_table, &type) != WCS_OK)
 
-           || (WFieldsCount (NULL, NULL) != WCS_INVALID_ARGS)
-           || (WFieldsCount (hnd, NULL) != WCS_INVALID_ARGS)
-           || (WFetchField (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WFetchField (NULL, &nameFetched, &type) != WCS_INVALID_ARGS)
-           || (WFetchField (hnd, NULL, &type) != WCS_INVALID_ARGS)
-           || (WFetchField (hnd, &nameFetched, NULL) != WCS_INVALID_ARGS)
+           || (WValueFieldsCount (NULL, NULL) != WCS_INVALID_ARGS)
+           || (WValueFieldsCount (hnd, NULL) != WCS_INVALID_ARGS)
+           || (WValueFetchField (NULL, NULL, NULL) != WCS_INVALID_ARGS)
+           || (WValueFetchField (NULL, &nameFetched, &type) != WCS_INVALID_ARGS)
+           || (WValueFetchField (hnd, NULL, &type) != WCS_INVALID_ARGS)
+           || (WValueFetchField (hnd, &nameFetched, NULL) != WCS_INVALID_ARGS)
 
-           || (WFetchField (hnd, &nameFetched, &type) != WCS_OK)
-           || (WFieldsCount (hnd, &fieldsCount) != WCS_OK))
+           || (WValueFetchField (hnd, &nameFetched, &type) != WCS_OK)
+           || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK))
     {
       goto test_for_errors_fail;
     }

@@ -1,7 +1,7 @@
 
-.PHONY: all prepare_env libs exes clean 
+.PHONY: all prepare_env generate_files executables clean
 
-all: prepare_env exes $(EXES) $(SHLS) $(LIBS)
+all: generate_files
 
 prepare_env:
 	$(ECHO)if [ ! -d ./bin ]; then mkdir ./bin ; fi;
@@ -15,6 +15,11 @@ prepare_env:
 			if [ ! -d ./tmp/$(ARCH)/$$unit/shls ]; then mkdir ./tmp/$(ARCH)/$$unit/shls ; fi;\
 			if [ ! -d ./tmp/$(ARCH)/$$unit/libs ]; then mkdir ./tmp/$(ARCH)/$$unit/libs ; fi;\
 		done ;
+		
+generate_files: prepare_env ./compiler/parser/whisper.tab.c
+	$(ECHO)$(MAKE) --no-print-directory -otarget executables 
+		
+executables:  $(EXES) $(SHLS) $(LIBS)
 
 clean:
 	rm -rf ./tmp
@@ -23,4 +28,5 @@ clean:
 	rm -rf vc90.idb vc90.pdb vc100.idb vc100.pdb
 	rm -rf _CL_*
 
-
+%.c : generate_files
+%.cpp : generate_files

@@ -37,8 +37,9 @@
 #include <ctype.h>
 #include <assert.h>
 
-/* Include this first to avoidome type redefinitions
+/* Include this first to avoid type redefinitions
  * when the Visual C++ compiler is used. */
+struct ParserState;
 #include "whisper.tab.h"
 
 #include "whisper.h"
@@ -667,7 +668,7 @@ parse_time_value (const char*      buffer,
   uint_t   result    = 0;
   bool_t   dummy;
 
-  /* initialise the structure with default valid values */
+  /* Initialize the structure with default valid values */
   memset (outTime, 0, sizeof (outTime[0]));
   outTime->month = outTime->day = 1;
 

@@ -27,7 +27,7 @@
 
 #include "whisper.h"
 
-#include "utils/w_types.h"
+#include "utils/wtypes.h"
 
 typedef uint16_t         FIELD_INDEX;
 typedef uint16_t         TABLE_INDEX;
