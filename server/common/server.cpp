@@ -36,6 +36,17 @@ using namespace std;
 using namespace whisper;
 
 
+static const uint_t SOCKET_BACK_LOG       = 10;
+static const uint_t SLEEP_TICK_RESOLUTION = 10;
+static const uint_t REQ_TICK_RESOLUTION   = 100;
+
+static vector<DBSDescriptors>*     sDbsDescriptors;
+static FileLogger*                 sMainLog;
+static bool                        sAcceptUsersConnections;
+static bool                        sServerStopped;
+static Lock                        sClosingLock;
+
+
 class Listener
 {
 public:
@@ -95,17 +106,30 @@ public:
         if ((mUsersPool[c].mEndConnetion) || (mUsersPool[c].mLastReqTick == 0))
           continue;
 
-        if ((wh_msec_ticks () - mUsersPool[c].mLastReqTick) <
-              mUsersPool[c].mDesc->mWaitReqTmo)
+        if (mUsersPool[c].mDesc == NULL)
+          {
+            if ((wh_msec_ticks () - mUsersPool[c].mLastReqTick) <
+                GetAdminSettings ().mAuthTMO)
+              {
+                continue ;
+              }
+
+            mUsersPool[c].mSocket.Close ();
+            sMainLog->Log (LOG_WARNING,
+                           "Terminated authentication as it took too long...");
+            continue ;
+          }
+        else if ((wh_msec_ticks () - mUsersPool[c].mLastReqTick) <
+                 mUsersPool[c].mDesc->mWaitReqTmo)
           {
             continue;
           }
 
+        mUsersPool[c].mSocket.Close ();
         mUsersPool[c].mDesc->mLogger->Log (
                     LOG_WARNING,
-                    "Terminating connection due to a long wait for a request..."
-                                              );
-        mUsersPool[c].mSocket.Close ();
+                    "Terminated connection due to a long wait for a request..."
+                                           );
       }
   }
 
@@ -118,20 +142,11 @@ public:
 private:
   Listener (const Listener& );
   Listener& operator= (const Listener&);
+
+  static const uint_t MAX_AUTH_TMO_MS = 200;
 };
 
-
-
-static const uint_t SOCKET_BACK_LOG       = 10;
-static const uint_t SLEEP_TICK_RESOLUTION = 10;
-static const uint_t REQ_TICK_RESOLUTION   = 1000;
-
-static vector<DBSDescriptors>*     sDbsDescriptors;
-static FileLogger*                 sMainLog;
-static bool                        sAcceptUsersConnections;
-static bool                        sServerStopped;
 static auto_array<Listener>*       sListeners;
-static Lock                        sClosingLock;
 
 
 void
@@ -144,15 +159,16 @@ client_handler_routine (void* args)
 
   try
   {
+      client->mLastReqTick = wh_msec_ticks (); //Start authentication timer.
       ClientConnection connection (*client, *sDbsDescriptors);
 
       while (true)
         {
           const COMMAND_HANDLER* cmds;
 
-          client->mLastReqTick = wh_msec_ticks (); //Start timing!
+          client->mLastReqTick = wh_msec_ticks (); //Start request timer!
           uint16_t cmdType = connection.ReadCommand ();
-          client->mLastReqTick = 0;                //Stop timing!
+          client->mLastReqTick = 0;                //Stop request timer!
 
           if (cmdType == CMD_CLOSE_CONN)
             break;
@@ -342,7 +358,7 @@ ticks_routine ()
             (*sListeners)[i].ReqTmoCloseTick ();
           }
 
-        if (reqCheckElapsedTics >= SLEEP_TICK_RESOLUTION)
+        if (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
           reqCheckElapsedTics = 0;
     }
   while (true);

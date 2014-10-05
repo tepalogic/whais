@@ -56,6 +56,7 @@ struct ServerSettings
       mVLBlockSize (UNSET_VALUE),
       mVLBlockCount (UNSET_VALUE),
       mTempValuesCache (UNSET_VALUE),
+      mAuthTMO (UNSET_VALUE),
       mSyncWakeup (UNSET_VALUE),
       mSyncInterval (UNSET_VALUE),
       mWaitReqTmo (UNSET_VALUE),
@@ -75,6 +76,7 @@ struct ServerSettings
   uint_t                   mVLBlockSize;
   uint_t                   mVLBlockCount;
   uint_t                   mTempValuesCache;
+  int                      mAuthTMO;
   int                      mSyncWakeup;
   int                      mSyncInterval;
   int                      mWaitReqTmo;

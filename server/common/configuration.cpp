@@ -59,6 +59,7 @@ static const uint_t DEFAULT_TEMP_CACHE              = 512;
 static const uint_t DEFAULT_WAIT_TMO_MS             = 60 * 1000;
 static const uint_t DEFAULT_SYNC_INTERVAL_MS        = 0;
 static const uint_t DEFAULT_SYNC_WAKEUP_MS          = 1000;
+static const uint_t DEFAULT_AUTH_TMO_MS             = 1000;
 
 static const string gEntPort ("listen");
 static const string gEntMaxConnections ("max_connections");
@@ -69,7 +70,7 @@ static const string gEntTableBlkCount ("table_block_cache_count");
 static const string gEntVlBlkSize ("vl_values_block_size");
 static const string gEntVlBlkCount ("vl_values_block_count");
 static const string gEntTempCache ("temporals_cache");
-static const string gEntConnectionTMO("connection_tmo_ms");
+static const string gEntAuthTMO("auth_tmo_ms");
 static const string gEntRequestTMO("request_tmo_ms");
 static const string gEntSyncInterval ("sync_interval_ms");
 static const string gEntSyncWakeup ("syncer_wakeup_ms");
@@ -327,6 +328,26 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
               cerr << "Configuration error at line ";
               cerr << inoutConfigLine << ".\n";
 
+              return false;
+            }
+        }
+      else if (token == gEntAuthTMO)
+        {
+          token = NextToken (line, pos, delimiters);
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+            {
+              cerr << "Configuration error at line "
+                   << inoutConfigLine << ".\n";
+
+              return false;
+            }
+
+          gMainSettings.mAuthTMO = atoi (token.c_str ());
+          if (gMainSettings.mAuthTMO <= 0)
+            {
+              cerr << "At line " << inoutConfigLine << "the connection timeout"
+                      "parameter should be an integer value bigger than 0 "
+                      "(currently set to " << gMainSettings.mAuthTMO << " ).\n";
               return false;
             }
         }
@@ -1073,8 +1094,7 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mTempValuesCache = DEFAULT_TEMP_CACHE;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
-                   "The temporal values cache is set by default value.");
+          log.Log (LOG_DEBUG, "The temporal values cache is set by default");
         }
     }
   if (gMainSettings.mTempValuesCache < MIN_TEMP_CACHE)
@@ -1085,6 +1105,22 @@ PrepareConfigurationSection (Logger& log)
     }
   logStream << "The temporal values cache set at ";
   logStream << gMainSettings.mTempValuesCache << " bytes.";
+  log.Log (LOG_INFO, logStream.str ());
+  logStream.str (CLEAR_LOG_STREAM);
+
+  //Authentication timeout
+  if (gMainSettings.mAuthTMO == UNSET_VALUE)
+    {
+      gMainSettings.mAuthTMO = DEFAULT_AUTH_TMO_MS;
+      if (gMainSettings.mShowDebugLog)
+        {
+          log.Log (LOG_DEBUG,
+                   "The authentication timeout value is set by default.");
+        }
+    }
+
+  logStream << "The authentication timeout value is set at ";
+  logStream << gMainSettings.mAuthTMO << " milliseconds.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
