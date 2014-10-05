@@ -38,6 +38,8 @@ using namespace std;
 using namespace whisper;
 
 
+static const char CLEAR_LOG_STREAM[] = "";
+
 
 bool
 LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
@@ -47,13 +49,24 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
 
   logEntry << "Loading database: " << inoutDesc.mDbsName;
   log.Log (LOG_INFO, logEntry.str ());
-  logEntry.str ("");
+  logEntry.str (CLEAR_LOG_STREAM);
 
   inoutDesc.mDbs = &DBSRetrieveDatabase (inoutDesc.mDbsName.c_str (),
                                          inoutDesc.mDbsDirectory.c_str ());
   std::auto_ptr<Logger> dbsLogger (
                          new FileLogger (inoutDesc.mDbsLogFile.c_str (), true)
                                   );
+  logEntry << "Sync interval is set at " << inoutDesc.mSyncInterval
+           << " milliseconds";
+  dbsLogger->Log (LOG_INFO, logEntry.str ());
+  log.Log (LOG_INFO, logEntry.str ());
+  logEntry.str (CLEAR_LOG_STREAM);
+
+  logEntry << "Request timeout interval is set at " << inoutDesc.mWaitReqTmo
+           << " milliseconds.";
+  dbsLogger->Log (LOG_INFO, logEntry.str ());
+  log.Log (LOG_INFO, logEntry.str ());
+  logEntry.str (CLEAR_LOG_STREAM);
 
   if (inoutDesc.mDbsName != GlobalContextDatabase ())
     {
@@ -68,8 +81,9 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
        ++it)
     {
       logEntry << "... Loading dynamic native library '" << *it << "'.";
+      dbsLogger->Log (LOG_INFO, logEntry.str ());
       log.Log (LOG_INFO, logEntry.str ());
-      logEntry.str ("");
+      logEntry.str (CLEAR_LOG_STREAM);
 
       WH_SHLIB shl = wh_shl_load (it->c_str ());
       if ((shl == INVALID_SHL)
@@ -84,8 +98,9 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
        ++it)
     {
       logEntry << "... Loading compiled object unit '" << *it << "'.";
+      dbsLogger->Log (LOG_INFO, logEntry.str ());
       log.Log (LOG_INFO, logEntry.str ());
-      logEntry.str ("");
+      logEntry.str (CLEAR_LOG_STREAM);
 
       CompiledFileUnit unit (it->c_str ());
       inoutDesc.mSession->LoadCompiledUnit (unit);

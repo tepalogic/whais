@@ -42,7 +42,7 @@ static const char DEFAULT_LISTEN_PORT[]             = "1761";
 static const char CLEAR_LOG_STREAM[]                = "";
 
 static const char CIPHER_PLAIN[]                    = "plain";
-static const char CIPHER_3K[]                       = "3k";
+static const char CIPHER_3K[]                       = "3K";
 
 static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE      = 1024;
 static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT     = 128;
@@ -56,7 +56,9 @@ static const uint_t DEFAULT_TABLE_CACHE_BLOCK_COUNT = 1024;
 static const uint_t DEFAULT_VL_BLOCK_SIZE           = 1024;
 static const uint_t DEFAULT_VL_BLOCK_COUNT          = 4098;
 static const uint_t DEFAULT_TEMP_CACHE              = 512;
-
+static const uint_t DEFAULT_WAIT_TMO_MS             = 60 * 1000;
+static const uint_t DEFAULT_SYNC_INTERVAL_MS        = 0;
+static const uint_t DEFAULT_SYNC_WAKEUP_MS          = 1000;
 
 static const string gEntPort ("listen");
 static const string gEntMaxConnections ("max_connections");
@@ -67,6 +69,10 @@ static const string gEntTableBlkCount ("table_block_cache_count");
 static const string gEntVlBlkSize ("vl_values_block_size");
 static const string gEntVlBlkCount ("vl_values_block_count");
 static const string gEntTempCache ("temporals_cache");
+static const string gEntConnectionTMO("connection_tmo_ms");
+static const string gEntRequestTMO("request_tmo_ms");
+static const string gEntSyncInterval ("sync_interval_ms");
+static const string gEntSyncWakeup ("syncer_wakeup_ms");
 static const string gEntLogFile ("log_file");
 static const string gEntDBSName ("name");
 static const string gEntWorkDir ("directory");
@@ -111,7 +117,6 @@ const string&
 GlobalContextDatabase ()
 {
   static const string dbsName ("administrator");
-
   return dbsName;
 }
 
@@ -165,14 +170,11 @@ FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine)
       assert (config.good());
 
       string line;
-
       getline (config, line);
-
       ++inoutConfigLine;
 
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
-
       if ((token.length () > 0) && (token.at (0) == COMMENT_CHAR))
         continue;
 
@@ -189,7 +191,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 {
   static const string delimiters(" \t=");
 
-  while ( !  config.eof ())
+  while ( ! config.eof ())
     {
       const streampos lastPos = config.tellg ();
 
@@ -328,6 +330,69 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
               return false;
             }
         }
+      else if (token == gEntRequestTMO)
+        {
+          token = NextToken (line, pos, delimiters);
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+            {
+              cerr << "Configuration error at line "
+                   << inoutConfigLine << ".\n";
+
+              return false;
+            }
+
+          gMainSettings.mWaitReqTmo = atoi (token.c_str ());
+          if (gMainSettings.mWaitReqTmo <= 0)
+            {
+              cerr << "At line " << inoutConfigLine << "the request waiting "
+                      "timeout parameter should be an integer value bigger "
+                      "than 0 (currently set to "
+                   << gMainSettings.mWaitReqTmo << " ).\n";
+              return false;
+            }
+        }
+      else if (token == gEntSyncInterval)
+        {
+          token = NextToken (line, pos, delimiters);
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+            {
+              cerr << "Configuration error at line "
+                   << inoutConfigLine << ".\n";
+
+              return false;
+            }
+
+          gMainSettings.mSyncInterval = atoi (token.c_str ());
+          if (gMainSettings.mSyncInterval < -1)
+            {
+              cerr << "At line " << inoutConfigLine << "the data sync interval "
+                      "timeout parameter should be a positive integer value "
+                      "(currently set to "
+                   << gMainSettings.mSyncInterval << " ).\n";
+              return false;
+            }
+        }
+      else if (token == gEntSyncWakeup)
+       {
+         token = NextToken (line, pos, delimiters);
+         if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+          {
+            cerr << "Configuration error at line "
+                 << inoutConfigLine << ".\n";
+
+            return false;
+          }
+
+         gMainSettings.mSyncWakeup = atoi (token.c_str ());
+         if (gMainSettings.mSyncWakeup <= 0)
+          {
+            cerr << "At line " << inoutConfigLine << "the data sync interval "
+                    "timeout parameter should be an integer value bigger "
+                    "than 0 (currently set to "
+                 << gMainSettings.mSyncWakeup << " ).\n";
+            return false;
+          }
+       }
       else if (token == gEntLogFile)
         {
           token = NextToken (line, pos, delimiters);
@@ -349,9 +414,9 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
                                      token.at (0),
                                      gMainSettings.mLogFile) == false)
                 {
-                  cerr << "Unmatched "<< token.at (0);
-                  cerr << " in configuration file at line ";
-                  cerr << inoutConfigLine << ".\n";
+                  cerr << "Unmatched "<< token.at (0)
+                       << " in configuration file at line "
+                       << inoutConfigLine << ".\n";
 
                   return false;
                 }
@@ -448,7 +513,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           else
             {
-              cerr << "Unkown to assign '" << token << "\' to 'show_debug' ";
+              cerr << "Cannot assign '" << token << "\' to 'show_debug' ";
               cerr << "at line " << inoutConfigLine << ". ";
               cerr << "Valid value are only 'true' or 'false'.\n";
 
@@ -548,10 +613,52 @@ ParseContextSection (Logger&          log,
 
                   return false;
                 }
-
             }
           else
             output.mDbsName = token;
+        }
+       else if (token == gEntRequestTMO)
+        {
+          token = NextToken (line, pos, delimiters);
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+           {
+             cerr << "Configuration error at line "
+                  << inoutConfigLine << ".\n";
+
+             return false;
+           }
+
+          output.mWaitReqTmo = atoi (token.c_str ());
+          if (output.mWaitReqTmo <= 0)
+           {
+             cerr << "At line " << inoutConfigLine << "the request waiting "
+                     "timeout parameter should be an integer value bigger "
+                     "than 0 (currently set to "
+                  << gMainSettings.mWaitReqTmo << " ).\n";
+             return false;
+           }
+        }
+       else if (token == gEntSyncInterval)
+        {
+          token = NextToken (line, pos, delimiters);
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
+           {
+             cerr << "Configuration error at line "
+                  << inoutConfigLine << ".\n";
+
+             return false;
+           }
+
+
+          output.mSyncInterval = atoi (token.c_str ());
+          if (output.mSyncInterval < -1)
+           {
+             cerr << "At line " << inoutConfigLine << "the data sync interval "
+                     "timeout parameter should be a positive integer value "
+                     "(currently set to "
+                  << gMainSettings.mSyncInterval << " ).\n";
+             return false;
+           }
         }
        else if (token == gEntWorkDir)
         {
@@ -617,7 +724,6 @@ ParseContextSection (Logger&          log,
 
                   return false;
                 }
-
             }
           else
             output.mDbsLogFile = token;
@@ -652,7 +758,6 @@ ParseContextSection (Logger&          log,
 
                    return false;
                  }
-
              }
            else
              libEntry = token;
@@ -812,13 +917,13 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mListens.push_back (defaultEnt);
     }
 
-  if (gMainSettings.mMaxConnections == 0)
+  if (gMainSettings.mMaxConnections == UNSET_VALUE)
     {
       if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG,
-                     "The number of maximum simultaneous connections per "
-                     "interface set to default.");
+                   "The number of maximum simultaneous connections per "
+		     "interface set by default.");
         }
       gMainSettings.mMaxConnections = DEFAULT_MAX_CONNS;
     }
@@ -828,11 +933,11 @@ PrepareConfigurationSection (Logger& log)
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.mCipher == 0)
+  if (gMainSettings.mCipher == UNSET_VALUE)
     {
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG, "The communication cipher is set to default.");
+          log.Log (LOG_DEBUG, "The communication cipher is set by default.");
         }
       gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;
     }
@@ -856,12 +961,12 @@ PrepareConfigurationSection (Logger& log)
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.mMaxFrameSize == 0)
+  if (gMainSettings.mMaxFrameSize == UNSET_VALUE)
     {
       if (gMainSettings.mShowDebugLog)
         {
           log.Log (LOG_DEBUG,
-                   "The maximum communication frame size set to default.");
+                   "The maximum communication frame size set by default.");
         }
       gMainSettings.mMaxFrameSize = DEFAULT_FRAME_SIZE;
     }
@@ -881,14 +986,11 @@ PrepareConfigurationSection (Logger& log)
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.mTableCacheBlockSize == 0)
+  if (gMainSettings.mTableCacheBlockSize == UNSET_VALUE)
     {
       gMainSettings.mTableCacheBlockSize = DEFAULT_TABLE_CACHE_BLOCK_SIZE;
       if (gMainSettings.mShowDebugLog)
-        {
-          log.Log (LOG_DEBUG,
-                   "The table cache block size is set to default value.");
-        }
+        log.Log (LOG_DEBUG, "The table cache block size is set by default.");
     }
 
   if (gMainSettings.mTableCacheBlockSize < MIN_TABLE_CACHE_BLOCK_SIZE)
@@ -902,14 +1004,11 @@ PrepareConfigurationSection (Logger& log)
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.mTableCacheBlockCount == 0)
+  if (gMainSettings.mTableCacheBlockCount == UNSET_VALUE)
     {
       gMainSettings.mTableCacheBlockCount = DEFAULT_TABLE_CACHE_BLOCK_COUNT;
       if (gMainSettings.mShowDebugLog)
-        {
-          log.Log (LOG_DEBUG,
-                   "The table cache block count is set to default values.");
-        }
+        log.Log (LOG_DEBUG, "The table cache block count is set by default.");
     }
   if (gMainSettings.mTableCacheBlockCount < MIN_TABLE_CACHE_BLOCK_COUNT)
     {
@@ -924,43 +1023,34 @@ PrepareConfigurationSection (Logger& log)
   logStream.str (CLEAR_LOG_STREAM);
 
   //VLS
-  if (gMainSettings.mVLBlockSize == 0)
+  if (gMainSettings.mVLBlockSize == UNSET_VALUE)
     {
       gMainSettings.mVLBlockSize = DEFAULT_VL_BLOCK_SIZE;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (
-                   LOG_DEBUG,
-                     "The table VL store cache block size is set "
-                     "to default value."
-                  );
+          log.Log (LOG_DEBUG,
+                   "The table VL store cache block size is set by default.");
         }
     }
 
   if (gMainSettings.mVLBlockSize < MIN_VL_BLOCK_SIZE)
     {
       gMainSettings.mVLBlockSize = MIN_VL_BLOCK_SIZE;
-      log.Log (
-               LOG_INFO,
-                 "The table cache block size was "
-                 " set to less than minimum. "
-              );
+      log.Log (LOG_INFO,
+               "The table cache block size was set to less than minimum. ");
     }
   logStream << "Table VL store cache block size set at ";
   logStream << gMainSettings.mVLBlockSize << " bytes.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
-  if (gMainSettings.mVLBlockCount == 0)
+  if (gMainSettings.mVLBlockCount == UNSET_VALUE)
     {
       gMainSettings.mVLBlockCount = DEFAULT_VL_BLOCK_COUNT;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (
-                   LOG_DEBUG,
-                     "The table VL store cache block count is set "
-                     "to default value."
-                   );
+          log.Log (LOG_DEBUG,
+                   "The table VL store cache block count is set by default.");
         }
     }
 
@@ -968,10 +1058,9 @@ PrepareConfigurationSection (Logger& log)
     {
       gMainSettings.mVLBlockCount = MIN_VL_BLOCK_COUNT;
       log.Log (
-               LOG_INFO,
-                 "The table VL store he block count was set "
-                 "to less than minimum."
-               );
+          LOG_INFO,
+          "The table VL store he block count was set to less than minimum."
+              );
     }
   logStream << "Table VL store cache block count set at ";
   logStream << gMainSettings.mVLBlockCount << '.';
@@ -979,29 +1068,58 @@ PrepareConfigurationSection (Logger& log)
   logStream.str (CLEAR_LOG_STREAM);
 
   //Temporal values
-  if (gMainSettings.mTempValuesCache == 0)
+  if (gMainSettings.mTempValuesCache == UNSET_VALUE)
     {
       gMainSettings.mTempValuesCache = DEFAULT_TEMP_CACHE;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (
-                   LOG_DEBUG,
-                     "The temporal values cache is set "
-                     "to default value."
-                   );
+          log.Log (LOG_DEBUG,
+                   "The temporal values cache is set by default value.");
         }
     }
   if (gMainSettings.mTempValuesCache < MIN_TEMP_CACHE)
     {
       gMainSettings.mTempValuesCache = MIN_TEMP_CACHE;
-      log.Log (
-               LOG_INFO,
-                 "The temporal values cache was set "
-                 "to less than minimum."
-               );
+      log.Log (LOG_INFO,
+               "The temporal values cache was set to less than minimum.");
     }
   logStream << "The temporal values cache set at ";
   logStream << gMainSettings.mTempValuesCache << " bytes.";
+  log.Log (LOG_INFO, logStream.str ());
+  logStream.str (CLEAR_LOG_STREAM);
+
+  //Syncer wake up
+  if (gMainSettings.mSyncWakeup == UNSET_VALUE)
+    {
+      gMainSettings.mSyncWakeup = DEFAULT_SYNC_WAKEUP_MS;
+      if (gMainSettings.mShowDebugLog)
+        {
+          log.Log (LOG_DEBUG,
+                   "The data syncer wake up interval is set by default value.");
+        }
+    }
+
+  logStream << "The data syncer wake up interval is set at ";
+  logStream << gMainSettings.mSyncWakeup << " milliseconds.";
+  log.Log (LOG_INFO, logStream.str ());
+  logStream.str (CLEAR_LOG_STREAM);
+
+  //Sync data valid interval
+  logStream << "The default data flush interval interval is set at ";
+  logStream << gMainSettings.mSyncInterval << " milliseconds.";
+  log.Log (LOG_INFO, logStream.str ());
+  logStream.str (CLEAR_LOG_STREAM);
+
+  //Request wait timeout
+  if (gMainSettings.mWaitReqTmo == UNSET_VALUE)
+    {
+      gMainSettings.mWaitReqTmo = DEFAULT_WAIT_TMO_MS;
+      if (gMainSettings.mShowDebugLog)
+        log.Log (LOG_DEBUG, "The request waiting timeout is set by default.");
+    }
+
+  logStream << "The request waiting timeout is set at ";
+  logStream << gMainSettings.mWaitReqTmo << " milliseconds.";
   log.Log (LOG_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 

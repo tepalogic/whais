@@ -61,12 +61,15 @@ public:
                          DBSFieldDescriptor* inoutFields) = 0;
   virtual void DeleteTable (const char* const name) = 0;
 
+  virtual void SyncTableContent (const TABLE_INDEX index) = 0;
+
   virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields) = 0;
 
   virtual void ReleaseTable (ITable&) = 0;
 
   virtual const char* TableName (const TABLE_INDEX index) = 0;
+
 };
 
 struct DBSSettings

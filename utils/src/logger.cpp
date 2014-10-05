@@ -39,18 +39,22 @@ Logger::~Logger ()
 }
 
 
-
 FileLogger::FileLogger (const char* const file, const bool printStart)
   : Logger (),
     mStartTick (wh_msec_ticks ()),
     mSync (),
-    mOutStream (file, ios::app | ios::out)
+    mOutStream (),
+    mLogFile (file),
+    mTodayTime (wh_get_currtime())
 {
   if (! mOutStream.good ())
     {
       throw ios_base::failure ("The file associated with the output stream "
                                "could not be opened");
     }
+
+  mLogFile.append (".wlog.yyyymmdd");
+  SwitchFile ();
 
   if (printStart)
     {
@@ -68,11 +72,9 @@ FileLogger::FileLogger (const char* const file, const bool printStart)
 void
 FileLogger::Log (const LOG_TYPE type, const char* str)
 {
-
   LockRAII holder (mSync);
 
-  const WTICKS ticks    = wh_msec_ticks ();
-  const int    markSize = PrintTimeMark (type, ticks);
+  const int markSize = PrintTimeMark (type);
 
   /* Print white spaces where the time mark should have been for
      for string messages that have more than one line, to keep
@@ -103,51 +105,59 @@ FileLogger::Log (const LOG_TYPE type, const string& str)
 
 
 uint_t
-FileLogger::PrintTimeMark (LOG_TYPE type, WTICKS ticks)
+FileLogger::PrintTimeMark (LOG_TYPE type)
 {
   static char logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
 
   if (type > LOG_DEBUG)
     type = LOG_UNKNOW;
 
-  ticks -= mStartTick;
+  const WTime ctime = wh_get_currtime ();
 
-  const uint_t days = ticks / (1000 * 3600 * 24);
-  ticks %= (1000 * 3600 * 24);
-
-  const uint_t hours = ticks / (1000 * 3600);
-  ticks %= (1000 * 3600);
-
-  const uint_t mins = ticks / (1000 * 60);
-  ticks %= (1000 * 60);
-
-  const uint_t secs = ticks / 1000;
-  ticks %= 1000;
+  if ((ctime.day != mTodayTime.day)
+      || (ctime.month != mTodayTime.month)
+      || (ctime.year != mTodayTime.year))
+    {
+      mTodayTime = ctime;
+      SwitchFile ();
+    }
 
   const char       fill  = mOutStream.fill ();
   const streamsize width = mOutStream.width ();
 
-  mOutStream << logIds [type];
-  mOutStream.width (4);
+  mOutStream << '(' << logIds [type] << ')';
   mOutStream.fill ('0');
-  mOutStream << days << 'd';
   mOutStream.width (2);
-  mOutStream << hours << 'h';
+  mOutStream << (uint_t) ctime.hour << ':';
   mOutStream.width (2);
-  mOutStream << mins << 'm';
+  mOutStream << (uint_t) ctime.min << ':';
   mOutStream.width (2);
-  mOutStream << secs << 's';
-  mOutStream.width (3);
-  mOutStream << ticks << ": ";
-  mOutStream.width (0);
-  mOutStream.fill (0);
+  mOutStream << (uint_t) ctime.sec << '.';
+  mOutStream.width (6);
+  mOutStream << (uint_t) ctime.usec << ": ";
 
   mOutStream.fill (fill);
   mOutStream.width (width);
 
-  return 20; //The length of the time mark!
+  return 1 + 2 + 1 + 2 + 1 + 2 + 1 + 6 + 2;
 }
 
+
+void
+FileLogger::SwitchFile ()
+{
+  if (mOutStream.is_open ())
+    mOutStream.close ();
+
+  snprintf (_CC (char*, mLogFile.c_str () + mLogFile.size () - 14),
+            15,
+            ".wlog.%04u%02u%02u",
+            mTodayTime.year,
+            mTodayTime.month,
+            mTodayTime.day);
+
+  mOutStream.open (mLogFile.c_str (), ios::app | ios::out);
+}
 
 
 void

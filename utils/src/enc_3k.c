@@ -109,7 +109,7 @@ wh_buff_3k_encode (const uint32_t           firstKing,
                    const uint32_t           secondKing,
                    const uint8_t* const     key,
                    const uint_t             keyLen,
-                   uint8_t*                 buffer,
+                   uint8_t* const           buffer,
                    const uint_t             bufferSize)
 {
   uint_t pos;
@@ -179,7 +179,7 @@ wh_buff_3k_decode (const uint32_t           firstKing,
                    const uint32_t           secondKing,
                    const uint8_t* const     key,
                    const uint_t             keyLen,
-                   uint8_t*                 buffer,
+                   uint8_t* const           buffer,
                    const uint_t             bufferSize)
 {
   uint_t pos;

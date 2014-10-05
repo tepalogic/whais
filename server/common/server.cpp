@@ -88,6 +88,27 @@ public:
       }
   }
 
+  void ReqTmoCloseTick ()
+  {
+    for (uint_t c = 0; c < mUsersPool.Size (); ++c)
+      {
+        if ((mUsersPool[c].mEndConnetion) || (mUsersPool[c].mLastReqTick == 0))
+          continue;
+
+        if ((wh_msec_ticks () - mUsersPool[c].mLastReqTick) <
+              mUsersPool[c].mDesc->mWaitReqTmo)
+          {
+            continue;
+          }
+
+        mUsersPool[c].mDesc->mLogger->Log (
+                    LOG_WARNING,
+                    "Terminating connection due to a long wait for a request..."
+                                              );
+        mUsersPool[c].mSocket.Close ();
+      }
+  }
+
   const char*             mInterface;
   const char*             mPort;
   Thread                  mListenThread;
@@ -101,7 +122,9 @@ private:
 
 
 
-static const uint_t SOCKET_BACK_LOG = 10;
+static const uint_t SOCKET_BACK_LOG       = 10;
+static const uint_t SLEEP_TICK_RESOLUTION = 10;
+static const uint_t REQ_TICK_RESOLUTION   = 1000;
 
 static vector<DBSDescriptors>*     sDbsDescriptors;
 static FileLogger*                 sMainLog;
@@ -116,8 +139,8 @@ client_handler_routine (void* args)
 {
   UserHandler* const client = _RC (UserHandler*, args);
 
-  assert (client != NULL);
   assert (sDbsDescriptors != NULL);
+  assert (client->mLastReqTick == 0);
 
   try
   {
@@ -127,7 +150,9 @@ client_handler_routine (void* args)
         {
           const COMMAND_HANDLER* cmds;
 
+          client->mLastReqTick = wh_msec_ticks (); //Start timing!
           uint16_t cmdType = connection.ReadCommand ();
+          client->mLastReqTick = 0;                //Stop timing!
 
           if (cmdType == CMD_CLOSE_CONN)
             break;
@@ -136,9 +161,7 @@ client_handler_routine (void* args)
             {
               throw ConnectionException (_EXTRA (cmdType),
                                          "Invalid command requested.");
-
             }
-
           if (cmdType >= USER_CMD_BASE)
             {
               cmdType -= USER_CMD_BASE;
@@ -162,13 +185,13 @@ client_handler_routine (void* args)
                 }
               else if (! connection.IsAdmin ())
                 {
-                  throw ConnectionException (_EXTRA (cmdType),
-                                             "Regular user wants to execute "
-                                               "an administrator command.");
+                  throw ConnectionException (
+                      _EXTRA (cmdType),
+                      "Regular user wants to execute an administrator command."
+                                            );
                 }
               cmds = gpAdminCommands;
             }
-
           cmds[cmdType] (connection);
         }
   }
@@ -254,9 +277,76 @@ client_handler_routine (void* args)
   }
 
   client->mSocket.Close ();
+
+  client->mLastReqTick  = 0;
   client->mEndConnetion = true;
 }
 
+
+static void
+ticks_routine ()
+{
+  const uint_t syncWakeup = GetAdminSettings ().mSyncWakeup;
+
+  uint_t syncElapsedTicks = 0, reqCheckElapsedTics = 0;
+  do
+    {
+      if (sServerStopped)
+        return ;
+
+      wh_sleep (SLEEP_TICK_RESOLUTION);
+      syncElapsedTicks    += SLEEP_TICK_RESOLUTION;
+      reqCheckElapsedTics += SLEEP_TICK_RESOLUTION;
+      if ((syncElapsedTicks < syncWakeup)
+          && (reqCheckElapsedTics < REQ_TICK_RESOLUTION))
+        {
+          continue;
+        }
+
+      for (size_t i = 0;
+           (syncElapsedTicks >= syncWakeup) && (i < sDbsDescriptors->size ());
+           ++i)
+        {
+          if (sServerStopped)
+            return ;
+
+          const uint64_t dbsLstFlush = (*sDbsDescriptors)[i].mLastFlushTick;
+          const int      dbsSyncTmo  = (*sDbsDescriptors)[i].mSyncInterval;
+
+          if (_SC (int64_t, wh_msec_ticks () - dbsLstFlush) < dbsSyncTmo)
+            continue;
+
+          IDBSHandler&      hnd         = *((*sDbsDescriptors)[i].mDbs);
+          const TABLE_INDEX tablesCount = hnd.PersistentTablesCount ();
+          for (TABLE_INDEX t = 0; t < tablesCount; ++t)
+            {
+              if (sServerStopped)
+                return ;
+
+              hnd.SyncTableContent (t);
+            }
+          (*sDbsDescriptors)[i].mLastFlushTick = wh_msec_ticks ();
+        }
+
+        if (syncElapsedTicks >= syncWakeup)
+          syncElapsedTicks = 0;
+
+        if (sServerStopped)
+          return ;
+
+        for (uint_t i = 0;
+            (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
+                && (i < sListeners->Size ());
+            ++i)
+          {
+            (*sListeners)[i].ReqTmoCloseTick ();
+          }
+
+        if (reqCheckElapsedTics >= SLEEP_TICK_RESOLUTION)
+          reqCheckElapsedTics = 0;
+    }
+  while (true);
+}
 
 void
 listener_routine (void* args)
@@ -298,6 +388,7 @@ listener_routine (void* args)
 
           if (hnd != NULL)
             {
+              hnd->mLastReqTick  = 0;
               hnd->mSocket       = client;
               hnd->mEndConnetion = false;
 
@@ -400,12 +491,15 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
 
       assert (listener->mListenThread.IsEnded ());
 
-      listener->mInterface = (server.mListens[index].mInterface.size () == 0) ?
-                              NULL :
-                              server.mListens[index].mInterface.c_str ();
+      listener->mInterface = (server.mListens[index].mInterface.size () == 0)
+                              ? NULL
+                              : server.mListens[index].mInterface.c_str ();
       listener->mPort = server.mListens[index].mService.c_str ();
       listener->mListenThread.Run (listener_routine, listener);
     }
+
+  ticks_routine ();
+  log.Log (LOG_DEBUG, "Ticks routine has stopped.");
 
   for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].mListenThread.WaitToEnd (false);

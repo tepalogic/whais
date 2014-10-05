@@ -166,15 +166,13 @@ main (int argc, char** argv)
 
   if (! whs_init ())
     {
-      cerr << "Couldn't not init the network socket framework\n";
-
+      cerr << "Could not initialize the network socket framework\n";
       return ENOTSOCK;
     }
 
   try
   {
       uint_t sectionLine = 0;
-
       if (SeekAtConfigurationSection (*config, sectionLine) == false)
         {
           cerr << "Cannot find the CONFIG section in configuration file!\n";
@@ -210,7 +208,12 @@ main (int argc, char** argv)
     config->seekg (0);
     while (FindNextContextSection (*config, configLine))
       {
-        DBSDescriptors  dbs (configLine);
+        DBSDescriptors dbs (configLine);
+
+        //Inherit some global settings from the server configuration area in
+        //case are not set in the context configuration section.
+        dbs.mWaitReqTmo   = GetAdminSettings().mWaitReqTmo;
+        dbs.mSyncInterval = GetAdminSettings().mSyncInterval;
 
         if ( ! ParseContextSection (*glbLog, *config, configLine, dbs))
           return -1;

@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server_protocol.h"
 
-
+#define UNSET_VALUE		(0)
 
 struct ListenEntry
 {
@@ -49,18 +49,21 @@ struct ListenEntry
 struct ServerSettings
 {
   ServerSettings ()
-    : mMaxConnections (0),
-      mMaxFrameSize (0),
-      mTableCacheBlockSize (0),
-      mTableCacheBlockCount (0),
-      mVLBlockSize (0),
-      mVLBlockCount (0),
-      mTempValuesCache (0),
+    : mMaxConnections (UNSET_VALUE),
+      mMaxFrameSize (UNSET_VALUE),
+      mTableCacheBlockSize (UNSET_VALUE),
+      mTableCacheBlockCount (UNSET_VALUE),
+      mVLBlockSize (UNSET_VALUE),
+      mVLBlockCount (UNSET_VALUE),
+      mTempValuesCache (UNSET_VALUE),
+      mSyncWakeup (UNSET_VALUE),
+      mSyncInterval (UNSET_VALUE),
+      mWaitReqTmo (UNSET_VALUE),
       mWorkDirectory (),
       mTempDirectory (),
       mLogFile (),
       mListens (),
-      mCipher (0),
+      mCipher (UNSET_VALUE),
       mShowDebugLog (false)
   {
   }
@@ -72,6 +75,9 @@ struct ServerSettings
   uint_t                   mVLBlockSize;
   uint_t                   mVLBlockCount;
   uint_t                   mTempValuesCache;
+  int                      mSyncWakeup;
+  int                      mSyncInterval;
+  int                      mWaitReqTmo;
   std::string              mWorkDirectory;
   std::string              mTempDirectory;
   std::string              mLogFile;
@@ -88,17 +94,22 @@ struct DBSDescriptors
 {
   DBSDescriptors (const uint_t configLine)
     : mConfigLine (configLine),
+      mSyncInterval (UNSET_VALUE),
+      mWaitReqTmo (UNSET_VALUE),
       mDbsName (),
       mDbsDirectory (),
       mObjectLibs (),
       mNativeLibs (),
       mDbs (NULL),
       mSession (NULL),
-      mLogger (NULL)
+      mLogger (NULL),
+      mLastFlushTick (0)
   {
   }
 
   uint_t                           mConfigLine;
+  int                              mSyncInterval;
+  int                              mWaitReqTmo;
   std::string                      mDbsName;
   std::string                      mDbsDirectory;
   std::string                      mDbsLogFile;
@@ -109,6 +120,7 @@ struct DBSDescriptors
   whisper::IDBSHandler*            mDbs;
   whisper::ISession*               mSession;
   whisper::Logger*                 mLogger;
+  uint64_t			   mLastFlushTick;
 };
 
 const std::string&

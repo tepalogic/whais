@@ -140,22 +140,22 @@ ClientConnection::ClientConnection (UserHandler&            client,
   if (load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_SIZE_OFF]) <
       mDataSize)
     {
-      mDataSize = load_le_int16 (&mData[FRAME_HDR_SIZE 	+
-					  FRAME_AUTH_RSP_SIZE_OFF]);
+      mDataSize = load_le_int16 (&mData[FRAME_HDR_SIZE
+                                          + FRAME_AUTH_RSP_SIZE_OFF]);
       if (mDataSize < MIN_FRAME_SIZE)
-	{
-	  throw ConnectionException (
+        {
+          throw ConnectionException (
               _EXTRA (0),
               "Cannot use the client's specified frame size of %u bytes.",
               mDataSize
-				     );
-	}
+                                    );
+        }
 
       if (mCipher == FRAME_ENCTYPE_3K)
-	mDataSize -= mDataSize % sizeof (uint32_t);
+        mDataSize -= mDataSize % sizeof (uint32_t);
     }
   else if (mDataSize <
-	   load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_SIZE_OFF]))
+            load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_SIZE_OFF]))
     {
       throw ConnectionException (
             _EXTRA (0),
@@ -163,13 +163,12 @@ ClientConnection::ClientConnection (UserHandler&            client,
               "maximum frame size is set at %u bytes.",
             load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]),
             mDataSize
-				);
+                                );
     }
 
-  const char* dbsName = _RC (const char*,
-                             &mData[FRAME_HDR_SIZE +
-                                    FRAME_AUTH_RSP_FIXED_SIZE]);
-
+  const char* const dbsName = _RC (const char*,
+                                   &mData[FRAME_HDR_SIZE
+                                            + FRAME_AUTH_RSP_FIXED_SIZE]);
   for (vector<DBSDescriptors>::iterator it = databases.begin ();
       it != databases.end ();
       ++it)
@@ -188,16 +187,17 @@ ClientConnection::ClientConnection (UserHandler&            client,
                                  dbsName);
     }
 
-  mUserHandler.mRoot =
-        (mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0) ? true : false;
+  mUserHandler.mRoot = (mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0)
+                          ? true
+                          : false;
 
   if (mCipher == FRAME_ENCTYPE_PLAIN)
     {
       const string passwd = _RC (const char*,
-                                 &mData.front ()		 +
-                                   FRAME_HDR_SIZE 		 +
-                                   FRAME_AUTH_RSP_FIXED_SIZE   	 +
-                                   strlen (dbsName) + 1);
+                                 &mData.front ()
+                                    + FRAME_HDR_SIZE
+                                    + FRAME_AUTH_RSP_FIXED_SIZE
+                                    + strlen (dbsName) + 1);
       if (mUserHandler.mRoot)
         {
           if (mUserHandler.mDesc->mRootPass != passwd)

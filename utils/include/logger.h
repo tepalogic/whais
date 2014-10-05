@@ -70,11 +70,14 @@ private:
   FileLogger (const Logger&);
   FileLogger& operator= (const Logger&);
 
-  uint_t PrintTimeMark (LOG_TYPE type, WTICKS ticks);
+  uint_t PrintTimeMark (LOG_TYPE type);
+  void   SwitchFile ();
 
   WTICKS        mStartTick;
   Lock          mSync;
   std::ofstream mOutStream;
+  std::string   mLogFile;
+  WTime         mTodayTime;
 };
 
 

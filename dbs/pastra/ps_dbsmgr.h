@@ -67,6 +67,8 @@ public:
 
   virtual void DeleteTable (const char* const name);
 
+  virtual void SyncTableContent (const TABLE_INDEX index);
+
   virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields);
 

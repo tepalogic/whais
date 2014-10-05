@@ -387,6 +387,35 @@ DbsHandler::DeleteTable (const char* const name)
 }
 
 
+void
+DbsHandler::SyncTableContent (const TABLE_INDEX index)
+{
+  TABLE_INDEX iterator = index;
+
+  LockRAII syncHolder (mSync);
+
+  if (iterator >= mTables.size ())
+    {
+      throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
+                          "Cannot retrieve table by index %u (count %u).",
+                          index,
+                          mTables.size ());
+    }
+
+  TABLES::iterator it = mTables.begin ();
+
+  while (iterator-- > 0)
+    {
+      assert (it != mTables.end ());
+
+      ++it;
+    }
+
+  if (it->second != NULL)
+    it->second->Flush ();
+}
+
+
 ITable&
 DbsHandler::CreateTempTable (const FIELD_INDEX   fieldsCount,
                              DBSFieldDescriptor* inoutFields)

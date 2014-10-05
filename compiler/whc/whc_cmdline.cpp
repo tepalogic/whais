@@ -298,12 +298,12 @@ CmdLineParser::CheckArguments ()
   snprintf (temp, sizeof temp, "%02u", t.sec);
   mReplacementTags.push_back (ReplacementTag ("SEC", temp));
 
-  snprintf (temp, sizeof temp, "%05u", t.usec);
+  snprintf (temp, sizeof temp, "%06u", t.usec);
   mReplacementTags.push_back (ReplacementTag ("USEC", temp));
 
   snprintf (temp,
             sizeof temp,
-            "%d/%02u/%02u %02u:%02u:%02u.%05u",
+            "%d/%02u/%02u %02u:%02u:%02u.%06u",
             t.year,
             t.month,
             t.day,
