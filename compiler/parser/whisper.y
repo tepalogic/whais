@@ -34,16 +34,14 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token DATETIME
 %token DO
 %token ELSE
-%token ELSEIF
 %token END
 %token ENDPROC
 %token ENDSYNC
 %token EXTERN
 %token FIELD
-%token FOREACH
+%token FOR
 %token HIRESTIME
 %token IF
-%token IN
 %token INT8
 %token INT16
 %token INT32
@@ -280,17 +278,21 @@ extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER
                                 $$ = NULL;
                             }
 ;
+
 local_block_statement: /* empty */
-                     | return_stmt local_block_statement
                      | var_decl_stmt local_block_statement
-                     | exp_stmt local_block_statement
-                     | if_stmt local_block_statement
-                     | while_stmt local_block_statement
+                     | one_statement local_block_statement
                      | until_stmt local_block_statement
-                     | foreach_stmt local_block_statement
                      | syncronize_stmt local_block_statement
-                     | break_stmt local_block_statement
-                     | continue_stmt local_block_statement
+;
+
+one_statement: return_stmt
+             | exp_stmt 
+             | if_stmt 
+             | while_stmt 
+             | for_stmt 
+             | break_stmt 
+             | continue_stmt 
 ;
 
 return_stmt: RETURN exp ';'
@@ -574,25 +576,45 @@ if_stmt : IF exp THEN
                 begin_if_stmt(state, $2, BT_IF);
                 CHK_SEM_ERROR;
               }
-          local_block_statement else_if_clause 
+          local_block_statement end_of_if_statement 
+
+        | IF exp 
+              {
+                begin_if_stmt(state, $2, BT_IF);
+                CHK_SEM_ERROR;
+              }
+          one_statement possible_no_else_if_clause
 ;
 
-else_if_clause: END
+possible_no_else_if_clause: /* empty */
+							   {
+								   finalize_if_stmt(state);
+							   }
+		   			      | else_if_clause
+;
+
+end_of_if_statement: END
+					  {
+						   finalize_if_stmt (state);
+					  }
+				   | else_if_clause
+;
+
+else_if_clause: ELSE
                   {
-                        finalize_if_stmt(state);
-                  }           
-              | ELSEIF exp 
-                   {
-                        begin_elseif_stmt(state, $2);
+                        begin_else_stmt(state);
                         CHK_SEM_ERROR;
-                   }           
-              THEN  local_block_statement else_if_clause 
+                  }
+                THEN local_block_statement END
+                  {
+                       finalize_if_stmt(state);
+                  }
               | ELSE
                   {
                         begin_else_stmt(state);
                         CHK_SEM_ERROR;
                   }
-              local_block_statement END
+                 one_statement
                   {
                        finalize_if_stmt(state);
                   }   
@@ -603,7 +625,17 @@ while_stmt : WHILE exp
                     begin_while_stmt(state, $2);
                     CHK_SEM_ERROR;
                }
-           DO local_block_statement END
+             DO local_block_statement END
+               {
+                    finalize_while_stmt(state);
+                    CHK_SEM_ERROR;
+               }
+           | WHILE exp
+               {
+                    begin_while_stmt(state, $2);
+                    CHK_SEM_ERROR;
+               }
+             one_statement
                {
                     finalize_while_stmt(state);
                     CHK_SEM_ERROR;
@@ -615,14 +647,17 @@ until_stmt: DO
                     begin_until_stmt(state);
                     CHK_SEM_ERROR;
               }
-          local_block_statement UNTIL exp ';'
+           local_block_statement UNTIL exp ';'
               {
                     finalize_until_stmt(state, $5);
                     CHK_SEM_ERROR;
               }
 ;
 
-foreach_stmt: FOREACH IDENTIFIER IN '{' parameters_list '}'  DO local_block_statement END
+for_stmt: FOR '(' IDENTIFIER ':' exp ')' one_statement
+        | FOR '(' IDENTIFIER ':' exp ')' DO local_block_statement END
+        | FOR '(' exp ';' exp ';' exp ')' one_statement
+        | FOR '(' exp ';' exp ';' exp ')' DO local_block_statement END
 ; 
 
 break_stmt: BREAK ';'

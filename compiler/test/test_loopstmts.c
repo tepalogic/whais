@@ -51,29 +51,79 @@ check_used_vals (struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-  "PROCEDURE proc1() RETURN BOOL "
-  "DO "
-  "LET a,b,c AS BOOL; "
-  "a  = TRUE; "
-  "WHILE (a) DO "
-  "IF (b) THEN "
-  "BREAK; "
-  "ELSEIF (c) THEN "
-  "CONTINUE; "
-  "END "
-  "END "
-  "RETURN b; "
-  "ENDPROC "
-  " "
-  "PROCEDURE proc2() RETURN BOOL "
-  "DO "
-  "LET a,b,c AS BOOL; "
-  "a  = TRUE; "
-  "DO "
-  "IF (b) THEN "
-  "CONTINUE; "
-  "ELSEIF (c) THEN "
-  "BREAK; " "END " "UNTIL (a); " "RETURN         c; " "ENDPROC " "";
+    "  PROCEDURE proc1() RETURN BOOL"
+    "  DO"
+    "       LET a,b,c AS BOOL;"
+    " "
+    "       a  = TRUE; "
+    "       WHILE (a) DO "
+    "               IF (b) THEN "
+    "                       BREAK;"
+    "               ELSE IF (c) THEN "
+    "                       CONTINUE; "
+    "               END "
+    "       END "
+    "       RETURN b; "
+    " ENDPROC "
+    ""
+    "  PROCEDURE proc1_b() RETURN BOOL"
+    "  DO"
+    "       LET a,b,c AS BOOL;"
+    " "
+    "       a  = TRUE; "
+    "       WHILE (a) DO "
+    "               IF (b)"
+    "                       BREAK;"
+    "               ELSE IF (c) "
+    "                       CONTINUE; "
+    "       END "
+    "       RETURN b; "
+    " ENDPROC "
+    "   "
+    ""
+    " PROCEDURE proc1_c() RETURN BOOL"
+    " DO"
+    "       LET a,b,c AS BOOL;"
+    " "
+    "       a  = TRUE; "
+    "       WHILE (a)"
+    "               IF (b)"
+    "                       BREAK;"
+    "               ELSE IF (c) "
+    "                       CONTINUE; "
+    "       RETURN b; "
+    " ENDPROC "
+    " "
+    " "
+    "  PROCEDURE proc2() RETURN BOOL"
+    "  DO"
+    "   LET a,b,c AS BOOL;"
+    "   a  = TRUE;"
+    "   DO"
+    "          IF (b) THEN "
+    "              CONTINUE;"
+    "          ELSE IF (c) THEN "
+    "              BREAK; "
+    "          END "
+    "   UNTIL (a);"
+    "   RETURN c;"
+    "  ENDPROC "
+    ""
+    ""
+    "  PROCEDURE proc2_b() RETURN BOOL"
+    "  DO"
+    "   LET a,b,c AS BOOL;"
+    "   a  = TRUE;"
+    "   DO"
+    "          IF (b) "
+    "              CONTINUE;"
+    "          ELSE IF (c)"
+    "              BREAK; "
+    "   UNTIL (a);"
+    "   RETURN c;"
+    "  ENDPROC "
+    "";
+
 
 static int32_t
 get_int32 (uint8_t * buffer)
@@ -213,8 +263,11 @@ static bool_t
 check_all_procs (struct ParserState *state)
 {
 
-  return check_procedure_1 (state, "proc1") &&
-    check_procedure_2 (state, "proc2");
+  return check_procedure_1 (state, "proc1")
+         && check_procedure_1 (state, "proc1_b")
+         && check_procedure_1 (state, "proc1_c")
+         && check_procedure_2 (state, "proc2")
+         && check_procedure_2 (state, "proc2_b");
 }
 
 int
