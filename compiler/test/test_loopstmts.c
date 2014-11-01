@@ -65,9 +65,9 @@ char proc_decl_buffer[] =
     "       END "
     "       RETURN b; "
     " ENDPROC "
-    ""
-    "  PROCEDURE proc1_b() RETURN BOOL"
-    "  DO"
+    " "
+    " PROCEDURE proc1_b() RETURN BOOL"
+    " DO"
     "       LET a,b,c AS BOOL;"
     " "
     "       a  = TRUE; "
@@ -79,8 +79,8 @@ char proc_decl_buffer[] =
     "       END "
     "       RETURN b; "
     " ENDPROC "
-    "   "
-    ""
+    " "
+    " "
     " PROCEDURE proc1_c() RETURN BOOL"
     " DO"
     "       LET a,b,c AS BOOL;"
@@ -108,8 +108,8 @@ char proc_decl_buffer[] =
     "   UNTIL (a);"
     "   RETURN c;"
     "  ENDPROC "
-    ""
-    ""
+    " "
+    " "
     "  PROCEDURE proc2_b() RETURN BOOL"
     "  DO"
     "   LET a,b,c AS BOOL;"
@@ -122,7 +122,39 @@ char proc_decl_buffer[] =
     "   UNTIL (a);"
     "   RETURN c;"
     "  ENDPROC "
-    "";
+    " "
+    " "
+    "PROCEDURE proc3 () RETURN TABLE "
+    "DO "
+    "       LET a,b as UNSIGNED INT8;"
+    "       LET c,d AS BOOL;"
+    " "
+    "       FOR (a = 0; c; b = b + 2)"
+    "       DO"
+    "               IF (d)"
+    "                       CONTINUE;"
+    "               ELSE "
+    "                       BREAK;"
+    "       END"
+    "       RETURN NULL; "
+    "ENDPROC"
+    " "
+    "PROCEDURE proc3_b () RETURN TABLE "
+    "DO "
+    "       LET a,b as UNSIGNED INT8;"
+    "       LET c,d AS BOOL;"
+    " "
+    "       FOR (a = 0; c; b = b + 2)"
+    "       DO"
+    "               IF (d) THEN"
+    "                       CONTINUE;"
+    "               ELSE THEN "
+    "                       BREAK;"
+    "               END"
+    "       END"
+    "       RETURN NULL; "
+    "ENDPROC"
+    " ";
 
 
 static int32_t
@@ -260,14 +292,73 @@ check_procedure_2 (struct ParserState *state, char * proc_name)
 }
 
 static bool_t
+check_procedure_3 (struct ParserState *state, char * proc_name)
+{
+  struct Statement *stmt =
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs (stmt));
+  int shift = 0;
+  int cond_exp_pos = 6;
+  int step_exp_pos = 18;
+  int for_end_pos  = 0;
+
+  if (decode_opcode (code + cond_exp_pos - 1) != W_CTS)
+    return FALSE;
+  else if (decode_opcode (code + cond_exp_pos + 2) != W_JFC)
+    return FALSE;
+  else
+    {
+      for_end_pos = get_int32 (code + cond_exp_pos + 3)
+                    + cond_exp_pos + 2;
+      if (decode_opcode (code + for_end_pos - 5) != W_JMP)
+        return FALSE;
+      else
+        {
+          const int jmp_back = get_int32 (code + for_end_pos - 4)
+                               + for_end_pos - 5;
+          if (jmp_back != step_exp_pos)
+            return FALSE;
+        }
+    }
+
+  if (decode_opcode (code + cond_exp_pos + 2 + 5) != W_JMP)
+    return FALSE;
+  else
+    {
+      /* Check if the jump is exactly after the step expression */
+      if (get_int32 (code + cond_exp_pos + 2 + 5 + 1) != 19)
+        return FALSE;
+    }
+
+  /* check the break statement */
+  shift = 49;
+  if (decode_opcode (code + shift) != W_JMP)
+    return FALSE;
+  shift += get_int32 (code + shift + 1);
+  if (shift != for_end_pos)
+    return FALSE;
+
+  /* check the continue statement */
+  shift = 39;
+  if (decode_opcode (code + shift) != W_JMP)
+    return FALSE;
+  shift += get_int32 (code + shift + 1);
+  if (shift != step_exp_pos)
+    return FALSE;
+
+  return TRUE;
+}
+
+static bool_t
 check_all_procs (struct ParserState *state)
 {
-
   return check_procedure_1 (state, "proc1")
          && check_procedure_1 (state, "proc1_b")
          && check_procedure_1 (state, "proc1_c")
          && check_procedure_2 (state, "proc2")
-         && check_procedure_2 (state, "proc2_b");
+         && check_procedure_2 (state, "proc2_b")
+         && check_procedure_3 (state, "proc3")
+         && check_procedure_3 (state, "proc3_b");
 }
 
 int

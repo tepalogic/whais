@@ -70,6 +70,7 @@ enum LOOP_ELEMENT_TYPE
   LE_WHILE_BEGIN,
   LE_UNTIL_BEGIN,
   LE_FOREACH_BEGIN,
+  LE_FOR_BEGIN,
   LE_BREAK,
   LE_CONTINUE
 };
@@ -80,6 +81,16 @@ struct Loop
   uint32_t               startPos;
   int32_t                endPos;
 };
+
+
+void
+begin_for_stmt (struct ParserState* const parser,
+                YYSTYPE                   exp1,
+                YYSTYPE                   exp2,
+                YYSTYPE                   exp3);
+
+void
+finalize_for_stmt (struct ParserState* const parser);
 
 void
 begin_while_stmt (struct ParserState* const parser, YYSTYPE exp);
@@ -98,7 +109,6 @@ handle_break_stmt (struct ParserState* const parser);
 
 void
 handle_continue_stmt (struct ParserState* const parser);
-
 
 void
 begin_sync_stmt (struct ParserState* const parser);

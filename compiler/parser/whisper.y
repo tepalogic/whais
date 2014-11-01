@@ -656,8 +656,22 @@ until_stmt: DO
 
 for_stmt: FOR '(' IDENTIFIER ':' exp ')' one_statement
         | FOR '(' IDENTIFIER ':' exp ')' DO local_block_statement END
-        | FOR '(' exp ';' exp ';' exp ')' one_statement
-        | FOR '(' exp ';' exp ';' exp ')' DO local_block_statement END
+        | FOR '(' exp ';' exp ';' exp ')' 
+          {
+            begin_for_stmt (state, $3, $5, $7);
+          }
+          one_statement
+          {
+            finalize_for_stmt (state);
+          }
+        | FOR '(' exp ';' exp ';' exp ')'
+          {
+            begin_for_stmt (state, $3, $5, $7);
+          } 
+          DO local_block_statement END
+          {
+            finalize_for_stmt(state);
+          }
 ; 
 
 break_stmt: BREAK ';'

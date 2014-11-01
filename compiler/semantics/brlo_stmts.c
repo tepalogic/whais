@@ -151,6 +151,126 @@ finalize_if_stmt (struct ParserState* const parser)
 
 
 void
+begin_for_stmt (struct ParserState* const parser,
+                YYSTYPE                   exp1,
+                YYSTYPE                   exp2,
+                YYSTYPE                   exp3)
+{
+  translate_exp (parser, exp1);
+  if (parser->abortError)
+    return ;
+
+  struct Statement* const     stmt = parser->pCurrentStmt;
+  struct WOutputStream* const code = stmt_query_instrs (stmt);
+
+  struct Loop loop;
+  loop.type = LE_FOR_BEGIN;
+
+  const int32_t boolExpMark = wh_ostream_size (code);
+  if ( ! translate_bool_exp (parser, exp2))
+    {
+      assert (parser->abortError == TRUE);
+
+      return;
+    }
+
+  loop.endPos = wh_ostream_size (code);
+  if ((encode_opcode (code, W_JFC) == NULL)
+      || (wh_ostream_wint32 (code, 0) == NULL))
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+      return;
+    }
+
+  const int32_t stepExpMark = wh_ostream_size (code);
+  if ((encode_opcode (code, W_JMP) == NULL)
+      || (wh_ostream_wint32 (code, 0) == NULL))
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+      return;
+    }
+
+  loop.startPos = wh_ostream_size (code);
+  translate_exp (parser, exp3);
+  if (parser->abortError)
+    return ;
+
+  const int32_t offset = wh_ostream_size (code);
+  if ((encode_opcode (code, W_JMP) == NULL)
+      || (wh_ostream_wint32 (code, boolExpMark - offset) == NULL))
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+      return;
+    }
+
+  store_le_int32 (wh_ostream_size (code) - stepExpMark,
+                  wh_ostream_data (code) + stepExpMark + 1);
+
+  struct WArray* const loopsStack = stmt_query_loop_stack (stmt);
+  if (wh_array_add (loopsStack, &loop) == NULL)
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+      return;
+    }
+}
+
+void
+finalize_for_stmt (struct ParserState* const parser)
+{
+  struct Statement* const     stmt    = parser->pCurrentStmt;
+  struct WOutputStream* const stream  = stmt_query_instrs (stmt);
+  uint8_t* const              code    = wh_ostream_data (stream);
+
+  struct WArray* const loopsStack = stmt_query_loop_stack (stmt);
+  uint_t               loopId     = wh_array_count (loopsStack);
+  const struct Loop*   loopIt     = NULL;
+
+  int32_t  endForLoopPos = wh_ostream_size (stream);
+  int32_t  endForStmtPos = 0;
+  int32_t  offset        = 0;
+
+  if ((encode_opcode (stream, W_JMP) == NULL)
+      || (wh_ostream_wint32 (stream, 0) == NULL))
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+      return;
+    }
+
+  endForStmtPos = wh_ostream_size (stream);
+  do
+    {
+      loopIt = wh_array_get (loopsStack, --loopId);
+      switch (loopIt->type)
+        {
+        case LE_BREAK:
+        case LE_FOR_BEGIN:
+          offset = endForStmtPos - loopIt->endPos;
+          break;
+
+        default:
+          /* Continue statements should be already handled in case
+           * of FOR statements */
+          assert (FALSE);
+        }
+      /* Make the jump corrections. */
+      store_le_int32 (offset, code + loopIt->endPos + 1);
+    }
+  while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
+
+  assert (loopIt->type == LE_FOR_BEGIN);
+
+  offset = loopIt->startPos - endForLoopPos;
+  store_le_int32 (offset, code + endForLoopPos + 1);
+
+  wh_array_resize (loopsStack, loopId);
+}
+
+void
 begin_while_stmt (struct ParserState* const parser, YYSTYPE exp)
 {
   struct Statement* const     stmt = parser->pCurrentStmt;
@@ -185,7 +305,6 @@ begin_while_stmt (struct ParserState* const parser, YYSTYPE exp)
       return;
     }
 }
-
 
 void
 finalize_while_stmt (struct ParserState* const parser)
@@ -402,6 +521,7 @@ handle_continue_stmt (struct ParserState* const parser)
       break;
 
     case LE_WHILE_BEGIN:
+    case LE_FOR_BEGIN:
       if ((encode_opcode (code, W_JMP) == NULL) ||
           (wh_ostream_wint32 (code, loopIt->startPos - loop.endPos) == NULL))
         {
@@ -413,7 +533,7 @@ handle_continue_stmt (struct ParserState* const parser)
       break;
 
     default:
-      assert (0);
+      assert (FALSE);
     }
 }
 
