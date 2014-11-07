@@ -35,26 +35,6 @@ test_dbs_creation ()
 
   bool result = false;
 
-  try
-  {
-      IDBSHandler& hnd = DBSRetrieveDatabase (testDbName_1, NULL);
-
-      cout << "Should not be possible to open a database already opened.";
-
-      DBSReleaseDatabase (hnd);
-  }
-  catch (DBSException& e)
-  {
-      if (e.Code () != DBSException::DATABASE_IN_USE)
-        {
-          cout << "Unexpected exception code received.";
-          result &= false;
-        }
-      else
-
-      result = true;
-  }
-
   DBSCreateDatabase (testDbName_2, NULL);
   try
   {
@@ -62,11 +42,11 @@ test_dbs_creation ()
 
       cout << "Should not be possible to create a database with same name.";
 
-      result &= false;
+      result = false;
   }
   catch (FileException& e)
   {
-      result &= true;
+      result = true;
   }
 
   DBSRemoveDatabase (testDbName_2, NULL);

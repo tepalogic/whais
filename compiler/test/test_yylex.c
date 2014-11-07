@@ -17,13 +17,13 @@ const char tokens[] =
   " ArRaY   aS #comment\n  BOOL \t brEak CHARACTER  Continue DATE DATETIME   DO"
   " elSE  \t \n \n  END ENDPROC \n ENDsync\t ExTerN false fielD FOR HIrESTIME   IF "
   " InT8\n\n\t\tINT16 \n  \t\t\tINT32 INT64 LET OF NULL real RETURN"
-  "\t\t \nRICHREAL      PROCEDURE \nSynC\n\tTABLE \n TEXT THEN tRUE "
+  "\t\t \nRICHREAL      PROCEDURE \nSynC\n\tTABLE \n TEXT tRUE "
   " undefined UNTIL  \n###bau#bau\n#bau\n#hello\n\n#bau again\n   UNSIGNED  wHIle";
 const int tokens_values[] =
   { ARRAY, AS, BOOL, BREAK, CHARACTER, CONTINUE, DATE, DATETIME, DO,
     ELSE, END, ENDPROC, ENDSYNC, EXTERN, W_FALSE, FIELD, FOR, HIRESTIME,
     IF, INT8, INT16, INT32, INT64, LET, OF, WHISPER_NULL, REAL, RETURN, RICHREAL,
-    PROCEDURE, SYNC, TABLE, TEXT, THEN, W_TRUE, UNDEFINED, UNTIL, UNSIGNED, WHILE
+    PROCEDURE, SYNC, TABLE, TEXT, W_TRUE, UNDEFINED, UNTIL, UNSIGNED, WHILE
   };
 
 static int

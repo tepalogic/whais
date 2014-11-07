@@ -55,7 +55,6 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token SYNC
 %token TABLE
 %token TEXT
-%token THEN
 %token UNDEFINED
 %token UNTIL
 %token UNSIGNED
@@ -571,7 +570,7 @@ not_empty_paramter_list: exp
                             }
 ;
 
-if_stmt : IF exp THEN 
+if_stmt : IF exp DO 
               {
                 begin_if_stmt(state, $2, BT_IF);
                 CHK_SEM_ERROR;
@@ -605,7 +604,7 @@ else_if_clause: ELSE
                         begin_else_stmt(state);
                         CHK_SEM_ERROR;
                   }
-                THEN local_block_statement END
+                DO local_block_statement END
                   {
                        finalize_if_stmt(state);
                   }

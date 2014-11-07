@@ -301,7 +301,6 @@ static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"SYNC", SYNC},
                                         {"TABLE", TABLE},
                                         {"TEXT", TEXT},
-                                        {"THEN", THEN},
                                         {"TRUE", W_TRUE},
                                         {"UNDEFINED", UNDEFINED},
                                         {"UNTIL", UNTIL},
