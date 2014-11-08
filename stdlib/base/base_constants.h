@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -29,43 +29,43 @@
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION     gProcPI;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcSQRT2;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcNE;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinB;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinC;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinD;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinDT;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinHT;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinI8;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinI16;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinI32;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinI64;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinU8;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinU16;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinU32;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinU64;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinR;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMinRR;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxB;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxC;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxD;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxDT;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxHT;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxI8;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxI16;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxI32;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxI64;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxU8;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxU16;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxU32;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxU64;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxR;
-extern whisper::WLIB_PROC_DESCRIPTION     gProcMaxRR;
+extern whais::WLIB_PROC_DESCRIPTION     gProcPI;
+extern whais::WLIB_PROC_DESCRIPTION     gProcSQRT2;
+extern whais::WLIB_PROC_DESCRIPTION     gProcNE;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinB;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinC;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinD;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinDT;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinHT;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinI8;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinI16;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinI32;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinI64;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinU8;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinU16;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinU32;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinU64;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinR;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMinRR;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxB;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxC;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxD;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxDT;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxHT;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxI8;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxI16;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxI32;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxI64;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxU8;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxU16;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxU32;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxU64;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxR;
+extern whais::WLIB_PROC_DESCRIPTION     gProcMaxRR;
 
 
-whisper::WLIB_STATUS
-base_constants_init ();
+whais::WLIB_STATUS
+base_constants_init( );
 
 #endif //BASE_CONSTANTS_H_
 

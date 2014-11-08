@@ -34,7 +34,7 @@
 
 
 
-namespace whisper {
+namespace whais {
 namespace prima {
 
 
@@ -42,29 +42,29 @@ namespace prima {
 class NameSpace
 {
 public:
-  NameSpace (IDBSHandler& dbsHandler);
+  NameSpace( IDBSHandler& dbsHandler);
 
-  IDBSHandler& GetDBSHandler ()
+  IDBSHandler& GetDBSHandler( )
   {
     return mDbsHandler;
   }
 
-  TypeManager& GetTypeManager ()
+  TypeManager& GetTypeManager( )
   {
     return mTypeManager;
   }
 
-  GlobalsManager& GetGlobalsManager ()
+  GlobalsManager& GetGlobalsManager( )
   {
     return mGlbsManager;
   }
 
-  ProcedureManager& GetProcedureManager ()
+  ProcedureManager& GetProcedureManager( )
   {
     return mProcsManager;
   }
 
-  UnitsManager& GetUnitsManager ()
+  UnitsManager& GetUnitsManager( )
   {
     return mUnitsManager;
   }
@@ -82,59 +82,59 @@ private:
 class NameSpaceHolder
 {
 public:
-  explicit NameSpaceHolder (NameSpace* space = NULL)
-    : mSpace (space),
-      mRefsCount (0)
+  explicit NameSpaceHolder( NameSpace* space = NULL)
+    : mSpace( space),
+      mRefsCount( 0)
   {
-    assert (mSpace != NULL);
+    assert( mSpace != NULL);
   }
 
-  NameSpaceHolder (const NameSpaceHolder& source)
-    : mSpace (source.mSpace),
-      mRefsCount (source.mRefsCount)
+  NameSpaceHolder( const NameSpaceHolder& source)
+    : mSpace( source.mSpace),
+      mRefsCount( source.mRefsCount)
   {
     _CC (NameSpace*&, source.mSpace)      = NULL;
     _CC (uint64_t&,   source.mRefsCount)  = 0;
   }
 
-  ~NameSpaceHolder ()
+  ~NameSpaceHolder( )
   {
-    assert (mRefsCount == 0);
+    assert( mRefsCount == 0);
 
     if (mSpace != NULL)
       {
-        IDBSHandler& dbsHandler = mSpace->GetDBSHandler ();
+        IDBSHandler& dbsHandler = mSpace->GetDBSHandler( );
 
         delete mSpace;
 
-        DBSReleaseDatabase (dbsHandler);
+        DBSReleaseDatabase( dbsHandler);
       }
   }
 
   NameSpace& Get ()
   {
-    assert (mRefsCount > 0);
+    assert( mRefsCount > 0);
     return *mSpace;
   }
 
-  uint64_t RefsCount ()
+  uint64_t RefsCount( )
   {
     return mRefsCount;
   }
 
-  void IncRefsCount ()
+  void IncRefsCount( )
   {
     ++mRefsCount;
   }
 
-  void DecRefsCount ()
+  void DecRefsCount( )
   {
-    assert (mRefsCount > 0);
+    assert( mRefsCount > 0);
 
     --mRefsCount;
   }
 
-  void ForceRelease ()
+  void ForceRelease( )
   {
     mRefsCount = 0;
   }
@@ -151,96 +151,96 @@ private:
 class Session : public ISession
 {
 public:
-  Session (Logger&           log,
+  Session( Logger&           log,
           NameSpaceHolder&   globalNames,
           NameSpaceHolder&   privateNames);
 
-  virtual ~Session ();
+  virtual ~Session( );
 
-  virtual void LoadCompiledUnit (WIFunctionalUnit& unit);
-  virtual bool LoadSharedLib (WH_SHLIB shl);
+  virtual void LoadCompiledUnit( WIFunctionalUnit& unit);
+  virtual bool LoadSharedLib( WH_SHLIB shl);
 
-  virtual void ExecuteProcedure (const char* const   procedure,
+  virtual void ExecuteProcedure( const char* const   procedure,
                                  SessionStack&       stack);
 
-  virtual uint_t GlobalValuesCount () const;
+  virtual uint_t GlobalValuesCount( ) const;
 
-  virtual uint_t ProceduresCount () const;
+  virtual uint_t ProceduresCount( ) const;
 
-  virtual const char* GlobalValueName (const uint_t index) const;
+  virtual const char* GlobalValueName( const uint_t index) const;
 
-  virtual const char* ProcedureName (const uint_t index) const;
+  virtual const char* ProcedureName( const uint_t index) const;
 
-  virtual uint_t GlobalValueRawType (const uint32_t index);
-  virtual uint_t GlobalValueRawType (const char* const name);
+  virtual uint_t GlobalValueRawType( const uint32_t index);
+  virtual uint_t GlobalValueRawType( const char* const name);
 
-  virtual uint_t GlobalValueFieldsCount (const uint32_t index);
-  virtual uint_t GlobalValueFieldsCount (const char* const name);
+  virtual uint_t GlobalValueFieldsCount( const uint32_t index);
+  virtual uint_t GlobalValueFieldsCount( const char* const name);
 
-  virtual const char* GlobalValueFieldName (const uint32_t index,
+  virtual const char* GlobalValueFieldName( const uint32_t index,
                                             const uint32_t field);
-  virtual const char* GlobalValueFieldName (const char* const   name,
+  virtual const char* GlobalValueFieldName( const char* const   name,
                                             const uint32_t      field);
 
-  virtual uint_t GlobalValueFieldType (const uint32_t index,
+  virtual uint_t GlobalValueFieldType( const uint32_t index,
                                        const uint32_t field);
-  virtual uint_t GlobalValueFieldType (const char* const   name,
+  virtual uint_t GlobalValueFieldType( const char* const   name,
                                        const uint32_t      field);
 
-  virtual uint_t ProcedureParametersCount (const uint_t id) const;
-  virtual uint_t ProcedureParametersCount (const char* const name) const;
+  virtual uint_t ProcedureParametersCount( const uint_t id) const;
+  virtual uint_t ProcedureParametersCount( const char* const name) const;
 
-  virtual uint_t ProcedurePameterRawType (const uint_t id,
+  virtual uint_t ProcedurePameterRawType( const uint_t id,
                                           const uint_t param);
-  virtual uint_t ProcedurePameterRawType (const char* const   name,
+  virtual uint_t ProcedurePameterRawType( const char* const   name,
                                           const uint_t        param);
 
-  virtual uint_t ProcedurePameterFieldsCount (const uint_t id,
+  virtual uint_t ProcedurePameterFieldsCount( const uint_t id,
                                               const uint_t param);
-  virtual uint_t ProcedurePameterFieldsCount (const char* const   name,
+  virtual uint_t ProcedurePameterFieldsCount( const char* const   name,
                                               const uint_t        param);
 
-  virtual const char* ProcedurePameterFieldName (const uint_t id,
+  virtual const char* ProcedurePameterFieldName( const uint_t id,
                                                  const uint_t param,
                                                  const uint_t field);
-  virtual const char* ProcedurePameterFieldName (const char* const   name,
+  virtual const char* ProcedurePameterFieldName( const char* const   name,
                                                  const uint_t        param,
                                                  const uint_t        field);
 
-  virtual uint_t ProcedurePameterFieldType (const uint_t id,
+  virtual uint_t ProcedurePameterFieldType( const uint_t id,
                                             const uint_t param,
                                             const uint_t field);
-  virtual uint_t ProcedurePameterFieldType (const char* const   name,
+  virtual uint_t ProcedurePameterFieldType( const char* const   name,
                                             const uint_t        param,
                                             const uint_t        field);
 
 
-  uint32_t FindGlobal (const uint8_t* name, const uint_t nameLength);
+  uint32_t FindGlobal( const uint8_t* name, const uint_t nameLength);
 
-  StackValue GetGlobalValue (const uint32_t globalId);
+  StackValue GetGlobalValue( const uint32_t globalId);
 
-  const uint8_t* FindGlobalTI (const uint32_t globalId);
+  const uint8_t* FindGlobalTI( const uint32_t globalId);
 
-  uint32_t FindProcedure (const uint8_t* name, const uint_t nameLength);
+  uint32_t FindProcedure( const uint8_t* name, const uint_t nameLength);
 
-  uint32_t ArgsCount (const uint32_t procId);
+  uint32_t ArgsCount( const uint32_t procId);
 
-  const uint8_t* FindLocalTI (const uint32_t procId, const uint32_t local);
+  const uint8_t* FindLocalTI( const uint32_t procId, const uint32_t local);
 
-  IDBSHandler& DBSHandler ();
+  IDBSHandler& DBSHandler( );
 
-  const Procedure& GetProcedure (const uint32_t procId);
+  const Procedure& GetProcedure( const uint32_t procId);
 
 private:
-  void DefineTablesGlobalValues ();
+  void DefineTablesGlobalValues( );
 
-  uint32_t DefineGlobalValue (const uint8_t* const   name,
+  uint32_t DefineGlobalValue( const uint8_t* const   name,
                               const uint_t           nameLength,
                               const uint8_t* const   typeDesc,
                               const bool             external,
                               ITable* const          persitentTable);
 
-  uint32_t DefineProcedure (const uint8_t* const     name,
+  uint32_t DefineProcedure( const uint8_t* const     name,
                             const uint_t             nameLength,
                             const uint32_t           localsCount,
                             const uint32_t           argsCount,
@@ -259,7 +259,7 @@ private:
 
 
 } //namespace prima
-} //namespace whisper
+} //namespace whais
 
 #endif /* PM_INTERPRETER_H_ */
 

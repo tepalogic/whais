@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_TYPES_H
-#define WHISPER_TYPES_H
+#ifndef WHAIS_TYPES_H
+#define WHAIS_TYPES_H
 
 #ifndef ARCH_WINDOWS_VC
 #error "Do not compile this file with other compilator than MS Visual C/C++"
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "sys/types.h"
 
-#if ! (defined(YYTOKENTYPE) || defined (YYBISON))
+#if ! (defined( YYTOKENTYPE) || defined( YYBISON))
 /* Avoid some type name redefinition */
 
 #define WIN32_LEAN_AND_MEAN
@@ -101,7 +101,7 @@ typedef uint8_t       bool_t;
 #define INVALID_FILE        INVALID_HANDLE_VALUE
 #define INVALID_SHL         NULL
 
-#define SHL_EXPORT_SYMBOL __declspec(dllexport)
-#define SHL_IMPORT_SYMBOL __declspec(dllimport)
+#define SHL_EXPORT_SYMBOL __declspec( dllexport)
+#define SHL_IMPORT_SYMBOL __declspec( dllimport)
 
-#endif /* WHISPER_TYPES_H */
+#endif /* WHAIS_TYPES_H */

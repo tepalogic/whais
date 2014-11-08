@@ -1,5 +1,5 @@
 /******************************************************************************
- WHISPERC - A compiler for whisper programs
+ WHAISC - A compiler for whais programs
  Copyright (C) 2009  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -29,19 +29,19 @@
 #ifndef STRSTORE_H
 #define STRSTORE_H
 
-#include "whisper.h"
+#include "whais.h"
 
 /* A handler for a string store */
 typedef void* StringStoreHnd;
 
 StringStoreHnd
-create_string_store ();
+create_string_store( );
 
 void
-release_string_store (StringStoreHnd* pStore);
+release_string_store( StringStoreHnd* pStore);
 
 char*
-alloc_str (StringStoreHnd store, uint_t length);
+alloc_str( StringStoreHnd store, uint_t length);
 
 #endif /* STRSTORE_H */
 

@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -50,10 +50,10 @@ extern const enum W_OPCODE and_op[T_END_OF_TYPES][T_END_OF_TYPES];
 extern const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES];
 
 struct WOutputStream*
-encode_opcode (struct WOutputStream *stream, const enum W_OPCODE opcode);
+encode_opcode( struct WOutputStream *stream, const enum W_OPCODE opcode);
 
 enum W_OPCODE
-decode_opcode (const uint8_t* instrs);
+decode_opcode( const uint8_t* instrs);
 
 #endif /* OPCODES_H_ */
 

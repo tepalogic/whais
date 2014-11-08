@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,14 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WCMD_ONLINECMDS_H_
 #define WCMD_ONLINECMDS_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 void
-AddOnlineTableCommands ();
+AddOnlineTableCommands( );
 
 
 const char*
-wcmd_translate_status (const uint32_t cs);
+wcmd_translate_status( const uint32_t cs);
 
 #endif /* WCMD_ONLINECMDS_H_ */
 

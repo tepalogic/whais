@@ -19,7 +19,7 @@
 
 #include "../pastra/ps_table.h"
 
-using namespace whisper;
+using namespace whais;
 using namespace pastra;
 
 struct DBSFieldDescriptor field_desc[] = {
@@ -32,21 +32,21 @@ const char tb_name[] = "t_test_tab";
 static uint_t _rowsCount   = 5000000;
 uint_t _removedRows = _rowsCount / 10;
 
-static DDate _max_date (0x7FFF, 12, 31);
+static DDate _max_date( 0x7FFF, 12, 31);
 
 DDate
-get_random_date ()
+get_random_date( )
 {
-  int16_t year  = wh_rnd () & 0xFFFF;
-  uint8_t month = wh_rnd () % 12 + 1;
-  uint8_t day   = wh_rnd () % 27 + 1;
+  int16_t year  = wh_rnd( ) & 0xFFFF;
+  uint8_t month = wh_rnd( ) % 12 + 1;
+  uint8_t day   = wh_rnd( ) % 27 + 1;
 
-  return DDate (year, month, day);
+  return DDate( year, month, day);
 }
 
 
 bool
-fill_table_with_values (ITable& table,
+fill_table_with_values( ITable& table,
                         const uint32_t rowCount,
                         uint64_t seed,
                         DArray& tableValues)
@@ -54,14 +54,14 @@ fill_table_with_values (ITable& table,
   bool     result = true;
   DDate prev;
 
-  table.CreateIndex (0, NULL, NULL);
+  table.CreateIndex( 0, NULL, NULL);
   std::cout << "Filling table with " << rowCount << " rows.\n";
 
-  wh_rnd_set_seed (seed);
+  wh_rnd_set_seed( seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DDate value = get_random_date ();
-      if (table.AddRow () != index)
+      DDate value = get_random_date( );
+      if (table.AddRow( ) != index)
         {
           result = false;
           break;
@@ -70,7 +70,7 @@ fill_table_with_values (ITable& table,
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush ();
+          std::cout.flush( );
         }
 
       table.Set (index, 0, value);
@@ -79,13 +79,13 @@ fill_table_with_values (ITable& table,
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DArray values = table.MatchRows (DDate (),
+  DArray values = table.MatchRows( DDate( ),
                                    _max_date,
                                    0,
                                    ~0,
                                    0);
-  if ((values.Count() != tableValues.Count ()) ||
-      (values.Count () != rowCount))
+  if ((values.Count( ) != tableValues.Count( )) ||
+      (values.Count( ) != rowCount))
     {
       result = false;
     }
@@ -96,13 +96,13 @@ fill_table_with_values (ITable& table,
       DROW_INDEX rowIndex;
 
       values.Get (checkIndex, rowIndex);
-      assert (rowIndex.IsNull() == false);
+      assert( rowIndex.IsNull( ) == false);
 
       table.Get (rowIndex.mValue, 0, rowValue);
 
       DDate generated;
       tableValues.Get (rowIndex.mValue, generated);
-      assert (generated.IsNull() == false);
+      assert( generated.IsNull( ) == false);
 
       if (((rowValue == generated) == false) ||
           (rowValue < prev))
@@ -116,7 +116,7 @@ fill_table_with_values (ITable& table,
       if (((checkIndex * 100) % rowCount) == 0)
         {
           std::cout << (checkIndex * 100) / rowCount << "%\r";
-          std::cout.flush ();
+          std::cout.flush( );
         }
     }
 
@@ -126,7 +126,7 @@ fill_table_with_values (ITable& table,
 }
 
 bool
-fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
+fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
@@ -140,11 +140,11 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush ();
+          std::cout.flush( );
         }
     }
 
-  DArray values = table.MatchRows (nullValue,
+  DArray values = table.MatchRows( nullValue,
                                    nullValue,
                                    0,
                                    ~0,
@@ -155,17 +155,17 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull() || (element.mValue != index))
+      if (element.IsNull( ) || (element.mValue != index))
         result = false;
 
       DDate rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull() == false)
+      if (rowValue.IsNull( ) == false)
         result = false;
     }
 
-  if (values.Count() != rowCount)
+  if (values.Count( ) != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -174,15 +174,15 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 }
 
 bool
-test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
+test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
 {
   bool result = true;
   std::cout << "Test index survival ... ";
 
-  ITable& table = dbsHnd.RetrievePersistentTable (tb_name);
+  ITable& table = dbsHnd.RetrievePersistentTable( tb_name);
 
   DDate nullValue;
-  DArray values  = table.MatchRows (nullValue,
+  DArray values  = table.MatchRows( nullValue,
                                     nullValue,
                                     0,
                                     ~0,
@@ -192,17 +192,17 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull() || (element.mValue != index))
+      if (element.IsNull( ) || (element.mValue != index))
         result = false;
 
       DDate rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull() == false)
+      if (rowValue.IsNull( ) == false)
         result = false;
     }
 
-  values  = table.MatchRows (nullValue,
+  values  = table.MatchRows( nullValue,
                              _max_date,
                              _removedRows,
                              ~0,
@@ -216,7 +216,7 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
       DDate rowValue;
       table.Get (element.mValue, 0, rowValue);
 
-      if (rowValue.IsNull() == true)
+      if (rowValue.IsNull( ) == true)
         result = false;
 
       DDate generatedValue;
@@ -225,32 +225,32 @@ test_table_index_survival (IDBSHandler& dbsHnd, DArray& tableValues)
         result = false;
     }
 
-  dbsHnd.ReleaseTable (table);
+  dbsHnd.ReleaseTable( table);
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
   return result;
 }
 
 void
-callback_index_create (CreateIndexCallbackContext* const pData)
+callback_index_create( CreateIndexCallbackContext* const pData)
 {
   if (((pData->mRowIndex * 100) % pData->mRowsCount) == 0)
     {
       std::cout << (pData->mRowIndex * 100) / pData->mRowsCount << "%\r";
-      std::cout.flush ();
+      std::cout.flush( );
     }
 }
 
 bool
-test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
+test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
 {
   CreateIndexCallbackContext data;
   bool result = true;
   std::cout << "Test index creation ... " << std::endl;
 
-  ITable& table = dbsHnd.RetrievePersistentTable (tb_name);
+  ITable& table = dbsHnd.RetrievePersistentTable( tb_name);
 
-  table.RemoveIndex (0);
+  table.RemoveIndex( 0);
 
   for (uint64_t index = 0; index < _removedRows; ++index)
     {
@@ -261,15 +261,15 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
     }
 
 
-  table.CreateIndex (0, callback_index_create, &data);
+  table.CreateIndex( 0, callback_index_create, &data);
 
-  DArray values  = table.MatchRows (DDate (),
+  DArray values  = table.MatchRows( DDate( ),
                                     _max_date,
                                     0,
                                     ~0,
                                     0);
 
-  if (values.Count() != _rowsCount)
+  if (values.Count( ) != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -281,7 +281,7 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
       DDate rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull() == true)
+      if (rowValue.IsNull( ) == true)
         result = false;
 
       DDate generatedValue;
@@ -292,50 +292,50 @@ test_index_creation (IDBSHandler& dbsHnd, DArray& tableValues)
       if (((index * 100) % _rowsCount) == 0)
         {
           std::cout << (index * 100) / _rowsCount << "%\r";
-          std::cout.flush ();
+          std::cout.flush( );
         }
     }
 
-  dbsHnd.ReleaseTable (table);
+  dbsHnd.ReleaseTable( table);
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
   return result;
 }
 
 int
-main (int argc, char **argv)
+main( int argc, char **argv)
 {
   if (argc > 1)
     {
-      _rowsCount = atol (argv[1]);
+      _rowsCount = atol( argv[1]);
     }
   _removedRows = _rowsCount / 10;
 
   bool success = true;
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
+    DBSInit( DBSSettings( ));
+    DBSCreateDatabase( db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
-  handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
+  IDBSHandler& handler = DBSRetrieveDatabase( db_name);
+  handler.AddTable( "t_test_tab", sizeof field_desc / sizeof( field_desc[0]), field_desc);
 
   {
-    DArray tableValues (_SC (DDate*, NULL));
+    DArray tableValues( _SC (DDate*, NULL));
     {
-      ITable& table = handler.RetrievePersistentTable (tb_name);
+      ITable& table = handler.RetrievePersistentTable( tb_name);
 
-      success = success && fill_table_with_values (table, _rowsCount, 0, tableValues);
-      success = success && fill_table_with_first_nulls (table, _removedRows);
-      handler.ReleaseTable (table);
-      success = success && test_table_index_survival (handler, tableValues);
+      success = success && fill_table_with_values( table, _rowsCount, 0, tableValues);
+      success = success && fill_table_with_first_nulls( table, _removedRows);
+      handler.ReleaseTable( table);
+      success = success && test_table_index_survival( handler, tableValues);
     }
-      success = success && test_index_creation (handler, tableValues);
+      success = success && test_index_creation( handler, tableValues);
 
   }
-  DBSReleaseDatabase (handler);
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSReleaseDatabase( handler);
+  DBSRemoveDatabase( db_name);
+  DBSShoutdown( );
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;

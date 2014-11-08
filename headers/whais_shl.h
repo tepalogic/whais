@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_SHL_H_
-#define WHISPER_SHL_H_
+#ifndef WHAIS_SHL_H_
+#define WHAIS_SHL_H_
 
 #ifdef USE_COMPILER_SHL
   #ifdef COMPILER_EXPORTING
@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 
-#if ! (defined(YYTOKENTYPE) || defined (YYBISON))
+#if ! (defined( YYTOKENTYPE) || defined( YYBISON))
 #ifdef __cplusplus
 extern "C"
 {
@@ -77,19 +77,19 @@ extern "C"
 
 
 WH_SHLIB
-wh_shl_load (const char* const library);
+wh_shl_load( const char* const library);
 
 void
-wh_shl_release (WH_SHLIB shl);
+wh_shl_release( WH_SHLIB shl);
 
 void*
-wh_shl_symbol (WH_SHLIB shl, const char* const symbol);
+wh_shl_symbol( WH_SHLIB shl, const char* const symbol);
 
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ! (defined(YYTOKENTYPE) || defined (YYBISON)) */
+#endif /* ! (defined( YYTOKENTYPE) || defined( YYBISON)) */
 
-#endif /* WHISPER_SHL_H_ */
+#endif /* WHAIS_SHL_H_ */
 

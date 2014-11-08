@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,12 +22,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPERC_H
-#define WHISPERC_H
+#ifndef WHAISC_H
+#define WHAISC_H
 
 #include <stdarg.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "dbs/dbs_types.h"
 #include "utils/wtypes.h"
@@ -38,17 +38,15 @@ typedef const void*     WH_COMPILED_UNIT_PROC;
 typedef const void*     WH_MESSENGER_CTXT;
 
 
-typedef void  (*WH_MESSENGER) (WH_MESSENGER_CTXT    context,
-                               uint_t               buffPos,
-                               uint_t               msgId,
-                               uint_t               msgType,
-                               const char*          message,
+typedef void (*WH_MESSENGER)( WH_MESSENGER_CTXT    context,
+                              uint_t               buffPos,
+                              uint_t               msgId,
+                              uint_t               msgType,
+                              const char*          message,
                                va_list              args);
 
 
-
-#define WHC_IGNORE_BUFFER_POS        (uint_t)(-1)
-
+#define WHC_IGNORE_BUFFER_POS     ((uint_t)(-1))
 
 
 typedef struct
@@ -87,83 +85,83 @@ extern "C"
 {
 #endif
 
-/* Load a buffer containing a WHISPER program. The supplied messenger is used
-   to report compiler related information (e.g. errors, warnings, etc.). */
+/* Load a buffer containing a WHAIS program. The supplied messenger is used
+   to report compiler related information( e.g. errors, warnings, etc.). */
 WH_COMPILED_UNIT
-wh_compiler_load (const char*          sourceCode,
+wh_compiler_load( const char*          sourceCode,
                   unsigned             sourceSize,
                   WH_MESSENGER         messenger,
                   WH_MESSENGER_CTXT    messengerContext);
 
 /* Free the resources associated with a compiled unit. */
 void
-wh_compiler_discard (WH_COMPILED_UNIT hnd);
+wh_compiler_discard( WH_COMPILED_UNIT hnd);
 
 /* Get the globals count declared in a compiled unit. */
 uint_t
-wh_unit_globals_count (WH_COMPILED_UNIT hnd);
+wh_unit_globals_count( WH_COMPILED_UNIT hnd);
 
 /* Get the description of global variable from a compiled unit. */
 uint_t
-wh_unit_global (WH_COMPILED_UNIT            hnd,
+wh_unit_global( WH_COMPILED_UNIT            hnd,
                 const uint_t                id,
                 WCompilerGlobalDesc* const  outDesription);
 
 /* Get the procedures count declared in a compiled unit. */
 uint_t
-wh_unit_procedures_count (WH_COMPILED_UNIT hnd);
+wh_unit_procedures_count( WH_COMPILED_UNIT hnd);
 
 /* Get the description of a procedure from a compiled unit. */
 uint_t
-wh_unit_procedure (WH_COMPILED_UNIT              hnd,
+wh_unit_procedure( WH_COMPILED_UNIT              hnd,
                    const uint_t                  id,
                    WCompilerProcedureDesc* const outDesription);
 
 /* Get a pointer to to the compiled binary type descriptors. */
 uint_t
-wh_unit_type_descriptors (WH_COMPILED_UNIT      hnd,
+wh_unit_type_descriptors( WH_COMPILED_UNIT      hnd,
                          const uint8_t**        ppTypePool);
 
 /* Get a pinter to the compiled binary constants area. */
 uint_t
-wh_unit_constants (WH_COMPILED_UNIT           hnd,
+wh_unit_constants( WH_COMPILED_UNIT           hnd,
                    const uint8_t**            ppConstPool);
 
 /* Get a procedure handler to get detailed information about
    it's components. */
 WH_COMPILED_UNIT_PROC
-wh_unit_procedure_get (WH_COMPILED_UNIT hnd, const uint_t id);
+wh_unit_procedure_get( WH_COMPILED_UNIT hnd, const uint_t id);
 
 /* Release the resources associated a procedure handler. */
 void
-wh_unit_procedure_release (WH_COMPILED_UNIT            hnd,
+wh_unit_procedure_release( WH_COMPILED_UNIT            hnd,
                            WH_COMPILED_UNIT_PROC       proc);
 
 /* Get the compiled binary type representation of the procedure's
    return type. */
 const uint8_t*
-wh_procedure_return_type (WH_COMPILED_UNIT           hnd,
+wh_procedure_return_type( WH_COMPILED_UNIT           hnd,
                           WH_COMPILED_UNIT_PROC      proc);
 
 /* Get the compiled binary type representation of a procedure's
    local variable */
 const uint8_t*
-wh_procedure_local_type (WH_COMPILED_UNIT           hnd,
+wh_procedure_local_type( WH_COMPILED_UNIT           hnd,
                          WH_COMPILED_UNIT_PROC      proc,
                          const uint_t               id);
 
 COMPILER_SHL void
-wh_compiler_libver (uint_t* const   outMajor,
+wh_compiler_libver( uint_t* const   outMajor,
                     uint_t* const   outMinor);
 
 /* Get the version of the language specification this library uses. */
 COMPILER_SHL void
-wh_compiler_language_ver (uint_t* const   outMajor,
+wh_compiler_language_ver( uint_t* const   outMajor,
                           uint_t* const   outMinor);
 
 #ifdef __cplusplus
 }       /* extern "C" */
 #endif
 
-#endif  /* WHISPERC_H */
+#endif  /* WHAISC_H */
 

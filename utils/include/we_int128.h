@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WE_INT128_H_
 #define WE_INT128_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 #ifndef int128_t
 
@@ -58,7 +58,7 @@ public:
   WE_I128
   operator- () const
   {
-    WE_I128 result (*this);
+    WE_I128 result( *this);
 
     result.mHi  = ~result.mHi;
     result.mLo  = ~result.mLo;
@@ -73,7 +73,7 @@ public:
   WE_I128
   operator+ (const WE_I128& op) const
     {
-      WE_I128 result (*this);
+      WE_I128 result( *this);
 
       result.mHi += op.mHi;
       result.mLo += op.mLo;
@@ -87,7 +87,7 @@ public:
   WE_I128
   operator- (const WE_I128& op) const
     {
-      WE_I128 result (*this);
+      WE_I128 result( *this);
 
       if (op.mLo > result.mLo)
         result.mHi--;
@@ -101,7 +101,7 @@ public:
   WE_I128
   operator* (const WE_I128& op) const
     {
-      WE_I128 tthis (*this);
+      WE_I128 tthis( *this);
       WE_I128 top (op);
       bool    tneg = false;
       bool    oneg = false;
@@ -121,7 +121,7 @@ public:
       if ((top.mHi == 0) && (top.mLo <= 0xFFFFFFFF))
         tthis = tthis.multiply32 (top.mLo);
       else
-        tthis = tthis.multiply (top);
+        tthis = tthis.multiply( top);
 
       if (tneg ^ oneg)
         return -tthis;
@@ -134,7 +134,7 @@ public:
     {
       WE_I128 quotient, reminder;
 
-      WE_I128 tthis (*this);
+      WE_I128 tthis( *this);
       WE_I128 top (op);
       bool    tneg = false;
       bool    oneg = false;
@@ -159,7 +159,7 @@ public:
           tthis.devide64 (top.mLo, quotient, reminder);
         }
       else
-        tthis.devide (top, quotient, reminder);
+        tthis.devide( top, quotient, reminder);
 
       if (tneg ^ oneg)
         quotient = -quotient;
@@ -172,7 +172,7 @@ public:
     {
       WE_I128 quotient, reminder;
 
-      WE_I128 tthis (*this);
+      WE_I128 tthis( *this);
       WE_I128 top (op);
       bool    tneg = false;
 
@@ -193,7 +193,7 @@ public:
           tthis.devide64 (top.mLo, quotient, reminder);
         }
       else
-        tthis.devide (top, quotient, reminder);
+        tthis.devide( top, quotient, reminder);
 
       if (tneg)
         reminder = -reminder;
@@ -226,7 +226,7 @@ public:
   bool
   operator== (const WE_I128& op) const
   {
-    return (mHi == op.mHi) && (mLo == op.mLo);
+    return( mHi == op.mHi) && (mLo == op.mLo);
   }
 
   bool
@@ -244,14 +244,14 @@ public:
     if ((_SC (int64_t, mHi) > 0) && (_SC (int64_t, op.mHi) <= 0))
       return false;
 
-    return ((mHi < op.mHi)
+    return( (mHi < op.mHi)
             || ((mHi == op.mHi) && ((mLo < op.mLo))));
   }
 
   bool
   operator<=  (const WE_I128& op) const
   {
-    return (*this == op) || (*this < op);
+    return( *this == op) || (*this < op);
   }
 
   bool
@@ -346,7 +346,7 @@ private:
   }
 
   const WE_I128&
-  lshift ()
+  lshift( )
   {
     mHi <<= 1;
     mHi  |= (mLo >> 63) & 1;
@@ -356,7 +356,7 @@ private:
   }
 
   const WE_I128&
-  rshift ()
+  rshift( )
   {
     const uint64_t one = 1;
 
@@ -390,7 +390,7 @@ private:
   }
 
   WE_I128
-  multiply (const WE_I128& op) const
+  multiply( const WE_I128& op) const
   {
     const uint32_t tw0 = mLo & 0xFFFFFFFF;
     const uint32_t tw1 = (mLo >> 32) & 0xFFFFFFFF;
@@ -457,7 +457,7 @@ private:
     if (sr == op)
       ++sq, sr = 0;
 
-    while (reminder.mHi > 0)
+    while( reminder.mHi > 0)
       {
         WE_I128 temp;
 
@@ -479,16 +479,16 @@ private:
   }
 
   void
-  devide (const WE_I128& op, WE_I128& quotient, WE_I128& reminder) const
+  devide( const WE_I128& op, WE_I128& quotient, WE_I128& reminder) const
   {
     quotient = *this;
     reminder = 0;
 
     for (uint_t i = 0; i < 128; ++i)
       {
-        reminder.lshift ();
+        reminder.lshift( );
         reminder.mLo |= (quotient.mHi >> 63) & 1;
-        quotient.lshift ();
+        quotient.lshift( );
 
         if (reminder >= op)
           {

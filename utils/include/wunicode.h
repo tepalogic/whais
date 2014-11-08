@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WUNICODE_H_
 #define WUNICODE_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 
 
@@ -35,31 +35,31 @@ extern "C" {
 
 
 bool_t
-wh_is_lowercase (const uint32_t codePoint);
+wh_is_lowercase( const uint32_t codePoint);
 
 
 bool_t
-wh_is_uppercase (const uint32_t codePoint);
+wh_is_uppercase( const uint32_t codePoint);
 
 
 uint32_t
-wh_to_lowercase (const uint32_t codePoint);
+wh_to_lowercase( const uint32_t codePoint);
 
 
 uint32_t
-wh_to_uppercase (const uint32_t codePoint);
+wh_to_uppercase( const uint32_t codePoint);
 
 int
-wh_cmp_alphabetically (const uint32_t cp1, const uint32_t cp2);
+wh_cmp_alphabetically( const uint32_t cp1, const uint32_t cp2);
 
 uint32_t
-wh_prev_char (const uint32_t codePoint);
+wh_prev_char( const uint32_t codePoint);
 
 uint32_t
-wh_next_char (const uint32_t codePoint);
+wh_next_char( const uint32_t codePoint);
 
 uint32_t
-wh_to_canonical (const uint32_t codePoint);
+wh_to_canonical( const uint32_t codePoint);
 
 #ifdef __cplusplus
 } /* exntern "C" */

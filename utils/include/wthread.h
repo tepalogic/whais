@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,21 +27,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 
-#include "whisper.h"
+#include "whais.h"
 
-namespace whisper {
+namespace whais {
 
 class EXCEP_SHL Lock
 {
 public:
-  Lock();
-  ~Lock();
+  Lock( );
+  ~Lock( );
 
-  void Acquire ();
-  void Release ();
+  void Acquire( );
+  void Release( );
 
 private:
-  Lock (const Lock&);
+  Lock( const Lock&);
   Lock& operator= (const Lock&);
 
   WH_LOCK mLock;
@@ -51,29 +51,29 @@ private:
 class LockRAII
 {
 public:
-  explicit LockRAII (Lock &lock) :
-    mLock (lock),
-    mIsAcquireed (true)
+  explicit LockRAII( Lock &lock) :
+    mLock( lock),
+    mIsAcquireed( true)
   {
-    mLock.Acquire ();
+    mLock.Acquire( );
   }
 
-  ~LockRAII ()
+  ~LockRAII( )
   {
     if (mIsAcquireed)
-      mLock.Release ();
+      mLock.Release( );
   }
 
-  void Acquire ()
+  void Acquire( )
   {
-    mLock.Acquire ();
+    mLock.Acquire( );
     mIsAcquireed = true;
   }
 
-  void Release ()
+  void Release( )
   {
     mIsAcquireed = false;
-    mLock.Release ();
+    mLock.Release( );
   }
 
 private:
@@ -85,17 +85,17 @@ private:
 class EXCEP_SHL LockException : public Exception
 {
 public:
-  LockException (const uint32_t    code,
+  LockException( const uint32_t    code,
                  const char*       file,
                  uint32_t          line,
                  const char*       fmtMsg = NULL,
                  ...);
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone( ) const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type( ) const;
 
-  virtual const char* Description () const;
+  virtual const char* Description( ) const;
 };
 
 
@@ -103,21 +103,21 @@ public:
 class EXCEP_SHL Thread
 {
 public:
-  Thread ();
-  ~Thread ();
+  Thread( );
+  ~Thread( );
 
   void Run (WH_THREAD_ROUTINE routine, void* const args);
 
-  void WaitToEnd (const bool throwPending = true);
+  void WaitToEnd( const bool throwPending = true);
 
-  void ThrowPendingException ();
+  void ThrowPendingException( );
 
-  void IgnoreExceptions (bool ignore)
+  void IgnoreExceptions( bool ignore)
   {
     mIgnoreExceptions = ignore;
   }
 
-  void DiscardException ()
+  void DiscardException( )
   {
     mUnkExceptSignaled = false;
 
@@ -125,20 +125,20 @@ public:
     mException = NULL;
   }
 
-  bool IsEnded () const
+  bool IsEnded( ) const
   {
     return mEnded;
   }
 
-  bool HasExceptionPending ()
+  bool HasExceptionPending( )
   {
-    return (mUnkExceptSignaled || (mException != NULL));
+    return( mUnkExceptSignaled || (mException != NULL));
   }
 
 private:
-  static void ThreadWrapperRoutine (void* const);
+  static void ThreadWrapperRoutine( void* const);
 
-  Thread (const Thread&);
+  Thread( const Thread&);
   Thread& operator= (const Thread&);
 
   WH_THREAD_ROUTINE       mRoutine;
@@ -158,22 +158,22 @@ private:
 class EXCEP_SHL ThreadException : public Exception
 {
 public:
-  ThreadException (const uint32_t    code,
+  ThreadException( const uint32_t    code,
                    const char*       file,
                    uint32_t          line,
                    const char*       fmtMsg = NULL,
                    ...);
 
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone( ) const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type( ) const;
 
-  virtual const char* Description () const;
+  virtual const char* Description( ) const;
 };
 
 
-} //namespace whisper
+} //namespace whais
 
 #endif /* WTHREAD_H_ */
 

@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,16 +22,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#ifndef WHAIS_CONSOLE_H_
+#define WHAIS_CONSOLE_H_
 
-#ifndef WHISPER_TYPES_H_
-#define WHISPER_TYPES_H_
-
-#ifdef ARCH_LINUX_GCC
-#include "linux_gcc/types.h"
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
-#ifdef ARCH_WINDOWS_VC
-#include "windows_vc/types.h"
+bool_t
+wh_disable_echo( );
+
+bool_t
+wh_enable_echo( );
+
+#ifdef __cplusplus
+}
 #endif
 
-#endif /* WHISPER_TYPES_H_ */
+#endif /* WHAIS_CONSOLE_H_ */
+

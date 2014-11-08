@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WOUTSTREAM_H
 #define WOUTSTREAM_H
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "utils/endianness.h"
 /* A convenient way to build a buffer with user content. */
@@ -52,18 +52,18 @@ extern "C"
 
 /* Initialise the buffer builder. */
 struct WOutputStream*
-wh_ostream_init (const uint_t                increment,
+wh_ostream_init( const uint_t                increment,
                  struct WOutputStream* const outStream);
 
 
 /* Clean the resources associated with this buffer. */
 void
-wh_ostream_clean (struct WOutputStream* const stream);
+wh_ostream_clean( struct WOutputStream* const stream);
 
 
 /* Send a chink of data to the stream. */
 struct WOutputStream*
-wh_ostream_write (struct WOutputStream* const stream,
+wh_ostream_write( struct WOutputStream* const stream,
                   const uint8_t*              data,
                   uint_t                      dataSize);
 
@@ -71,7 +71,7 @@ wh_ostream_write (struct WOutputStream* const stream,
 INLINE static struct WOutputStream*
 wh_ostream_wint8 (struct WOutputStream* const stream, const uint8_t value)
 {
-  return wh_ostream_write (stream, &value, sizeof value);
+  return wh_ostream_write( stream, &value, sizeof value);
 }
 
 
@@ -81,7 +81,7 @@ wh_ostream_wint16 (struct WOutputStream* const stream, const uint16_t value)
   uint8_t temp[2];
 
   store_le_int16 (value, temp);
-  return wh_ostream_write (stream, temp, sizeof temp);
+  return wh_ostream_write( stream, temp, sizeof temp);
 }
 
 
@@ -91,7 +91,7 @@ wh_ostream_wint32 (struct WOutputStream* const stream, const uint32_t value)
   uint8_t temp[4];
 
   store_le_int32 (value, temp);
-  return wh_ostream_write (stream, temp, sizeof temp);
+  return wh_ostream_write( stream, temp, sizeof temp);
 }
 
 
@@ -101,12 +101,12 @@ wh_ostream_wint64 (struct WOutputStream* stream, const uint64_t value)
   uint8_t temp[8];
 
   store_le_int64 (value, temp);
-  return wh_ostream_write (stream, temp, sizeof temp);
+  return wh_ostream_write( stream, temp, sizeof temp);
 }
 
 
-#define wh_ostream_data(stream) ((stream)->data)
-#define wh_ostream_size(stream) ((stream)->dataSize)
+#define wh_ostream_data( stream) ((stream)->data)
+#define wh_ostream_size( stream) ((stream)->dataSize)
 
 #ifdef __cplusplus
 }                                /* extern "C" */

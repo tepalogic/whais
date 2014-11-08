@@ -24,135 +24,135 @@
 #ifndef VALTRANSLATOR_H_
 #define VALTRANSLATOR_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "dbs/dbs_values.h"
 
 class Utf8Translator
 {
 public:
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DBool* const      outValue);
+                   whais::DBool* const      outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
                    const bool                 checkSpecial,
-                   whisper::DChar* const      outValue);
+                   whais::DChar* const      outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DDate* const      outValue);
+                   whais::DDate* const      outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DDateTime* const  outValue);
+                   whais::DDateTime* const  outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DHiresTime* const outValue);
+                   whais::DHiresTime* const outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DInt8* const      outValue);
+                   whais::DInt8* const      outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DInt16* const     outValue);
+                   whais::DInt16* const     outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DInt32* const     outValue);
+                   whais::DInt32* const     outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DInt64* const     outValue);
+                   whais::DInt64* const     outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DReal* const      outValue);
+                   whais::DReal* const      outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DRichReal* const  outValue);
+                   whais::DRichReal* const  outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DUInt8* const     outValue);
+                   whais::DUInt8* const     outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DUInt16* const    outValue);
+                   whais::DUInt16* const    outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DUInt32* const    outValue);
+                   whais::DUInt32* const    outValue);
 
-  static int Read (const uint8_t* const       utf8Src,
+  static int Read( const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whisper::DUInt64* const    outValue);
+                   whais::DUInt64* const    outValue);
 
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DBool&      value);
+                       const whais::DBool&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
                        const bool                 checkSpecial,
-                       const whisper::DChar&      value);
+                       const whais::DChar&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DDate&      value);
+                       const whais::DDate&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DDateTime&  value);
+                       const whais::DDateTime&  value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DHiresTime& value);
+                       const whais::DHiresTime& value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DInt8&      value);
+                       const whais::DInt8&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DInt16&     value);
+                       const whais::DInt16&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DInt32&     value);
+                       const whais::DInt32&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DInt64&     value);
+                       const whais::DInt64&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DReal&      value);
+                       const whais::DReal&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DRichReal&  value);
+                       const whais::DRichReal&  value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DUInt8&     value);
+                       const whais::DUInt8&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DUInt16&    value);
+                       const whais::DUInt16&    value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DUInt32&    value);
+                       const whais::DUInt32&    value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
+  static uint_t Write( uint8_t* const             utf8Dest,
                        const uint_t               maxSize,
-                       const whisper::DUInt64&    value);
+                       const whais::DUInt64&    value);
 };
 
 #endif /* VALTRANSLATOR_H_ */

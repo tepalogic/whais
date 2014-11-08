@@ -1,5 +1,5 @@
 /******************************************************************************
- WHISPERC - A compiler for whisper programs
+ WHAISC - A compiler for whais programs
  Copyright (C) 2009  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@
  * strstore.c - Implements a string storage used to hold the parsed text.
  */
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "strstore.h"
 
@@ -40,10 +40,10 @@ struct StoreLink
 };
 
 static struct StoreLink*
-alloc_link (const uint_t size)
+alloc_link( const uint_t size)
 {
-  struct StoreLink* const link = mem_alloc (sizeof (struct StoreLink) +
-                                            size * sizeof (char));
+  struct StoreLink* const link = mem_alloc( sizeof( struct StoreLink) +
+                                            size * sizeof( char));
   if (link != NULL)
     {
       link->next      = NULL;
@@ -55,21 +55,21 @@ alloc_link (const uint_t size)
 }
 
 StringStoreHnd
-create_string_store ()
+create_string_store( )
 {
-  return (StringStoreHnd) alloc_link (DEFAULT_STR_SIZE);
+  return( StringStoreHnd) alloc_link( DEFAULT_STR_SIZE);
 }
 
 
 void
-release_string_store (StringStoreHnd* handle)
+release_string_store( StringStoreHnd* handle)
 {
   struct StoreLink* link = (struct StoreLink*) handle;
-  while (link != NULL)
+  while( link != NULL)
     {
       struct StoreLink* const temp = link->next;
 
-      mem_free (link);
+      mem_free( link);
       link = temp;
     }
 
@@ -77,12 +77,12 @@ release_string_store (StringStoreHnd* handle)
 
 
 char*
-alloc_str (StringStoreHnd handle, uint_t length)
+alloc_str( StringStoreHnd handle, uint_t length)
 {
   struct StoreLink* link   = (struct StoreLink*) handle;
   char*             result = NULL;
 
-  while ((link->unused < length) && (link->next != NULL))
+  while( (link->unused < length) && (link->next != NULL))
     link = link->next;
 
   if (link->unused > length)
@@ -92,7 +92,7 @@ alloc_str (StringStoreHnd handle, uint_t length)
     }
   else
     {
-      link->next = alloc_link (MAX (length,  DEFAULT_STR_SIZE));
+      link->next = alloc_link( MAX (length,  DEFAULT_STR_SIZE));
       link       = link->next;
 
       if (link == NULL)

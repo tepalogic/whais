@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WCMD_TABCMDS_H_
 
 void
-AddOfflineTableCommands ();
+AddOfflineTableCommands( );
 
 #endif //WCMD_TABCMDS_H_
 

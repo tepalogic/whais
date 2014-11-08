@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -21,8 +21,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#ifndef WHISPER_TYPES_H
-#define WHISPER_TYPES_H
+#ifndef WHAIS_TYPES_H
+#define WHAIS_TYPES_H
 
 #ifndef ARCH_LINUX_GCC
 #error "Do not compile this file with a compilator other than Linux's gcc/g++!"
@@ -67,9 +67,9 @@ typedef uint8_t       bool_t;
 
 #define INVALID_SOCKET  ((int)-1)
 #define INVALID_FILE    ((int)-1)
-#define INVALID_SHL     (NULL)
+#define INVALID_SHL     NULL
 
-#define SHL_EXPORT_SYMBOL __attribute__((visibility("default")))
-#define SHL_IMPORT_SYMBOL __attribute__((visibility("default")))
+#define SHL_EXPORT_SYMBOL __attribute__( (visibility( "default")))
+#define SHL_IMPORT_SYMBOL __attribute__( (visibility( "default")))
 
-#endif /* WHISPER_TYPES_H */
+#endif /* WHAIS_TYPES_H */

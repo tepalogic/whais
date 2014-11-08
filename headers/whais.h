@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_H
-#define WHISPER_H
+#ifndef WHAIS_H
+#define WHAIS_H
 
 #include <stddef.h>
 
@@ -36,12 +36,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "windows_vc/types.h"
 #endif
 
-/* This section contains whisper specific data */
+/* This section contains whais specific data */
 
 
 /* This section will contain some general data */
-#include "general/whisper_macros.h"
-#include "whisper_shl.h"
+#include "general/whais_macros.h"
+#include "whais_shl.h"
 
 #ifdef __cplusplus
 #define _DC(type, value)     (dynamic_cast<type> (value))
@@ -51,19 +51,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wexception.h"
 #endif
 
-#include "whisper_memory.h"
-#include "whisper_time.h"
-#if ! (defined(YYTOKENTYPE) || defined (YYBISON))
-/* Avoid some type name redefinition (for Windows) */
-#include "whisper_fileio.h"
-#include "whisper_thread.h"
-#include "whisper_net.h"
-#include "whisper_console.h"
+#include "whais_memory.h"
+#include "whais_time.h"
+#if ! (defined( YYTOKENTYPE) || defined( YYBISON))
+/* Avoid some type name redefinition( for Windows) */
+#include "whais_fileio.h"
+#include "whais_thread.h"
+#include "whais_net.h"
+#include "whais_console.h"
 #endif
 
 /* General operation status codes */
 #define WOP_OK           0
-#define WOP_UNKNOW      (~0)
+#define WOP_UNKNOW       (~0)
 
-#endif /* WHISPER_H */
+#endif /* WHAIS_H */
 

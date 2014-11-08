@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,23 +22,44 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_CONSOLE_H_
-#define WHISPER_CONSOLE_H_
+#ifndef WHAIS_THREAD_H_
+#define WHAIS_THREAD_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-bool_t
-wh_disable_echo ();
+typedef void( *WH_THREAD_ROUTINE) (void*);
 
-bool_t
-wh_enable_echo ();
+uint_t
+wh_lock_init( WH_LOCK* const lock);
+
+uint_t
+wh_lock_destroy( WH_LOCK* const lock);
+
+uint_t
+wh_lock_acquire( WH_LOCK* const lock);
+
+uint_t
+wh_lock_release( WH_LOCK* const lock);
+
+uint_t
+wh_thread_create( WH_THREAD*                    outThread,
+                  const WH_THREAD_ROUTINE       routine,
+                  void*                         args);
+
+uint_t
+wh_thread_free( WH_THREAD thread);
+
+void
+wh_yield( );
+
+void
+wh_sleep( const uint_t millisecs);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* WHISPER_CONSOLE_H_ */
-
+#endif /* WHAIS_THREAD_H_ */

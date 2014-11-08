@@ -1,5 +1,5 @@
 /******************************************************************************
- WHISPERC - A compiler for whisper programs
+ WHAISC - A compiler for whais programs
  Copyright (C) 2009  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@
 #ifndef WO_FORMAT_H_
 #define WO_FORMAT_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 const uint8_t WH_SIGNATURE[] = { 'W', 'O' };
 
@@ -61,8 +61,8 @@ const uint_t WHC_PROC_ENTRY_NPARMS_OFF = 14;
 const uint_t WHC_PROC_ENTRY_CODE_SIZE  = 16;
 const uint_t WHC_PROC_ENTRY_SIZE       = 20;
 
-const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof (uint32_t);
-const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof (uint8_t);
+const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof( uint32_t);
+const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof( uint8_t);
 
 #endif /* WO_FORMAT_H_ */
 

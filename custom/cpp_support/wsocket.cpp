@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -29,19 +29,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-namespace whisper {
+namespace whais {
 
 
 
-Socket::Socket (const char* const   serverHost,
+Socket::Socket( const char* const   serverHost,
                 const char* const   service)
-  : mSocket (INVALID_SOCKET),
-    mOwned (false)
+  : mSocket( INVALID_SOCKET),
+    mOwned( false)
 {
-  const uint32_t e = whs_create_client (serverHost, service, &mSocket);
+  const uint32_t e = whs_create_client( serverHost, service, &mSocket);
   if (e != WOP_OK)
     {
-      throw SocketException (_EXTRA (e),
+      throw SocketException( _EXTRA( e),
                              "Could not connect to '%s:%s'.",
                              serverHost,
                              service);
@@ -51,20 +51,20 @@ Socket::Socket (const char* const   serverHost,
 }
 
 
-Socket::Socket (const char* const   serverHost,
+Socket::Socket( const char* const   serverHost,
                 const uint16_t      port)
-  : mSocket (INVALID_SOCKET),
-    mOwned (false)
+  : mSocket( INVALID_SOCKET),
+    mOwned( false)
 {
   uint32_t e;
   char     service[16];
 
-  sprintf (service, "%u", port);
+  sprintf( service, "%u", port);
 
-  e = whs_create_client (serverHost, service, &mSocket);
+  e = whs_create_client( serverHost, service, &mSocket);
   if (e != WOP_OK)
     {
-      throw SocketException (_EXTRA (e),
+      throw SocketException( _EXTRA( e),
                              "Could not connect to '%s:%u'.",
                              serverHost,
                              _SC (uint_t, port));
@@ -74,16 +74,16 @@ Socket::Socket (const char* const   serverHost,
 }
 
 
-Socket::Socket (const char* const     localAdress,
+Socket::Socket( const char* const     localAdress,
                 const char* const     service,
                 const uint_t          backLog)
-  : mSocket (INVALID_SOCKET),
-    mOwned (false)
+  : mSocket( INVALID_SOCKET),
+    mOwned( false)
 {
-  uint32_t e = whs_create_server (localAdress, service, backLog, &mSocket);
+  uint32_t e = whs_create_server( localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
     {
-      throw SocketException (_EXTRA (e),
+      throw SocketException( _EXTRA( e),
                              "Could not start listen at '%s:%s'.",
                              localAdress,
                              service);
@@ -93,20 +93,20 @@ Socket::Socket (const char* const     localAdress,
 }
 
 
-Socket::Socket (const char* const   localAdress,
+Socket::Socket( const char* const   localAdress,
                 const uint16_t      port,
                 const uint_t        backLog)
-  : mSocket (INVALID_SOCKET),
-    mOwned (false)
+  : mSocket( INVALID_SOCKET),
+    mOwned( false)
 {
   char   service[16];
 
-  sprintf (service, "%u", port);
+  sprintf( service, "%u", port);
 
-  uint32_t e = whs_create_server (localAdress, service, backLog, &mSocket);
+  uint32_t e = whs_create_server( localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
     {
-      throw SocketException (_EXTRA (e),
+      throw SocketException( _EXTRA( e),
                              "Could not connect to '%s:%u'.",
                              localAdress,
                              _SC (uint_t, port));
@@ -116,27 +116,27 @@ Socket::Socket (const char* const   localAdress,
 }
 
 
-Socket::Socket (const WH_SOCKET sd)
-  : mSocket (sd),
-    mOwned ((sd != INVALID_SOCKET) ? true : false)
+Socket::Socket( const WH_SOCKET sd)
+  : mSocket( sd),
+    mOwned( (sd != INVALID_SOCKET) ? true : false)
 {
 }
 
 
-Socket::Socket (const Socket& src)
-  : mSocket (src.mSocket),
-    mOwned (src.mOwned)
+Socket::Socket( const Socket& src)
+  : mSocket( src.mSocket),
+    mOwned( src.mOwned)
 {
   _CC (bool&, src.mOwned) = false;
 }
 
 
-Socket::~Socket ()
+Socket::~Socket( )
 {
   if (mOwned)
     {
-      assert (mSocket != INVALID_SOCKET);
-      whs_close (mSocket);
+      assert( mSocket != INVALID_SOCKET);
+      whs_close( mSocket);
     }
 }
 
@@ -147,7 +147,7 @@ Socket::operator= (const Socket& src)
   if (this != &src)
     {
       if (mOwned)
-        whs_close (mSocket);
+        whs_close( mSocket);
 
       mSocket = src.mSocket;
       mOwned  = src.mOwned;
@@ -159,34 +159,34 @@ Socket::operator= (const Socket& src)
 
 
 Socket
-Socket::Accept ()
+Socket::Accept( )
 {
   WH_SOCKET      client = INVALID_SOCKET;
-  const uint32_t e      = whs_accept (mSocket, &client);
+  const uint32_t e      = whs_accept( mSocket, &client);
 
   if (e != WOP_OK )
     {
-      throw SocketException (_EXTRA (e),
-                             "Socket (%d) failed to accept connection.",
+      throw SocketException( _EXTRA( e),
+                             "Socket( %d) failed to accept connection.",
                              mSocket);
     }
 
-  assert (client != INVALID_SOCKET);
+  assert( client != INVALID_SOCKET);
 
-  return Socket (client);
+  return Socket( client);
 }
 
 
 uint_t
-Socket::Read (uint8_t* const buffer, const uint_t maxCount)
+Socket::Read( uint8_t* const buffer, const uint_t maxCount)
 {
   uint_t         result = maxCount;
-  const uint32_t e      = whs_read (mSocket, buffer, &result);
+  const uint32_t e      = whs_read( mSocket, buffer, &result);
 
   if (e != WOP_OK)
     {
-      throw SocketException (_EXTRA (e),
-                             "Failed to read from socket (%d).",
+      throw SocketException( _EXTRA( e),
+                             "Failed to read from socket( %d).",
                              mSocket);
     }
 
@@ -195,14 +195,14 @@ Socket::Read (uint8_t* const buffer, const uint_t maxCount)
 
 
 void
-Socket::Write (const uint8_t* const buffer, const uint_t count)
+Socket::Write( const uint8_t* const buffer, const uint_t count)
 {
-  const uint32_t e = whs_write (mSocket, buffer, count);
+  const uint32_t e = whs_write( mSocket, buffer, count);
 
   if (e != WOP_OK)
     {
-      throw SocketException (_EXTRA (e),
-                             "Failed to write on socket (%d).",
+      throw SocketException( _EXTRA( e),
+                             "Failed to write on socket( %d).",
                              mSocket);
     }
 
@@ -210,18 +210,18 @@ Socket::Write (const uint8_t* const buffer, const uint_t count)
 
 
 void
-Socket::Close ()
+Socket::Close( )
 {
   if (! mOwned)
     return;
 
-  assert (mSocket != INVALID_SOCKET);
+  assert( mSocket != INVALID_SOCKET);
 
-  whs_close (mSocket);
+  whs_close( mSocket);
 
   mSocket = INVALID_SOCKET;
   mOwned  = false;
 }
 
-} //namespace whisper
+} //namespace whais
 

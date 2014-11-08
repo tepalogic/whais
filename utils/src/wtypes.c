@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -29,79 +29,79 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 int
-wh_define_basic_type (const enum DBS_BASIC_TYPE   type,
+wh_define_basic_type( const enum DBS_BASIC_TYPE   type,
                       struct TypeSpec* const      dest)
 {
   store_le_int16 (type, dest->type);
-  store_le_int16 (sizeof (dest->data), dest->dataSize);
+  store_le_int16 (sizeof( dest->data), dest->dataSize);
 
   dest->data[0] = TYPE_SPEC_END_MARK;
   dest->data[1] = 0;
 
-  return sizeof (*dest);
+  return sizeof( *dest);
 }
 
 
 int
-wh_apply_array_modifier (struct TypeSpec* const ioBuffer)
+wh_apply_array_modifier( struct TypeSpec* const ioBuffer)
 {
   uint16_t type = load_le_int16 (ioBuffer->type);
 
-  if ( (is_type_spec_valid (ioBuffer) == FALSE)
-      || (GET_BASIC_TYPE (type) == T_TEXT)
-      || (GET_BASIC_TYPE (type) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE (type) > T_UNDETERMINED))
+  if ( (is_type_spec_valid( ioBuffer) == FALSE)
+      || (GET_BASIC_TYPE( type) == T_TEXT)
+      || (GET_BASIC_TYPE( type) <= T_UNKNOWN)
+      || (GET_BASIC_TYPE( type) > T_UNDETERMINED))
     {
       return -1;
     }
 
-  MARK_ARRAY (type);
+  MARK_ARRAY( type);
   store_le_int16 (type, ioBuffer->type);
 
-  return sizeof (*ioBuffer);
+  return sizeof( *ioBuffer);
 }
 
 
 int
-wh_apply_field_modifier (struct TypeSpec* const ioBuffer)
+wh_apply_field_modifier( struct TypeSpec* const ioBuffer)
 {
   uint16_t type = load_le_int16 (ioBuffer->type);
 
-  if ( (is_type_spec_valid (ioBuffer) == FALSE)
-      || (GET_BASIC_TYPE (type) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE (type) > T_UNDETERMINED))
+  if ( (is_type_spec_valid( ioBuffer) == FALSE)
+      || (GET_BASIC_TYPE( type) <= T_UNKNOWN)
+      || (GET_BASIC_TYPE( type) > T_UNDETERMINED))
     {
       return -1;
     }
 
-  MARK_FIELD (type);
+  MARK_FIELD( type);
   store_le_int16 (type, ioBuffer->type);
 
-  return sizeof (*ioBuffer);
+  return sizeof( *ioBuffer);
 }
 
 
 int
-wh_apply_table_modifier (struct TypeSpec* const ioBuffer)
+wh_apply_table_modifier( struct TypeSpec* const ioBuffer)
 {
   uint16_t type = load_le_int16 (ioBuffer->type);
 
   if (type != 0)
     return -1;
 
-  MARK_TABLE (type);
+  MARK_TABLE( type);
   store_le_int16 (type, ioBuffer->type);
 
-  if ( ! is_type_spec_valid (ioBuffer))
+  if ( ! is_type_spec_valid( ioBuffer))
     return -1;
 
 
-  return sizeof (*ioBuffer);
+  return sizeof( *ioBuffer);
 }
 
 
 bool_t
-is_type_spec_valid (const struct TypeSpec* spec)
+is_type_spec_valid( const struct TypeSpec* spec)
 {
   bool_t result = TRUE;
 
@@ -112,9 +112,9 @@ is_type_spec_valid (const struct TypeSpec* spec)
     result = FALSE;
 
   else if ((htype > T_UNDETERMINED)
-           && (IS_FIELD (htype) == FALSE)
-           && (IS_ARRAY (htype) == FALSE)
-           && (IS_TABLE (htype) == FALSE))
+           && (IS_FIELD( htype) == FALSE)
+           && (IS_ARRAY( htype) == FALSE)
+           && (IS_TABLE( htype) == FALSE))
     {
       result = FALSE;
     }
@@ -123,58 +123,58 @@ is_type_spec_valid (const struct TypeSpec* spec)
     {
       result = FALSE;
     }
-  else if (IS_FIELD (htype))
+  else if (IS_FIELD( htype))
     {
-      const uint16_t fieldType = GET_FIELD_TYPE (htype);
+      const uint16_t fieldType = GET_FIELD_TYPE( htype);
 
       if (hsize != 2)
         result = FALSE;
 
-      else if (IS_ARRAY (fieldType))
+      else if (IS_ARRAY( fieldType))
         {
-          if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (fieldType) > T_UNDETERMINED))
+          if ((GET_BASIC_TYPE( fieldType) == T_UNKNOWN)
+              || (GET_BASIC_TYPE( fieldType) > T_UNDETERMINED))
             {
               result = FALSE;
             }
         }
       else
         {
-          if ((GET_BASIC_TYPE (fieldType) == T_UNKNOWN)
-              || (GET_BASIC_TYPE (fieldType) > T_UNDETERMINED))
+          if ((GET_BASIC_TYPE( fieldType) == T_UNKNOWN)
+              || (GET_BASIC_TYPE( fieldType) > T_UNDETERMINED))
             {
               result = FALSE;
             }
         }
     }
-  else if (IS_ARRAY (htype))
+  else if (IS_ARRAY( htype))
     {
       if ((hsize != 2)
-          || (GET_BASIC_TYPE (htype) == T_UNKNOWN)
-          || (GET_BASIC_TYPE (htype) > T_UNDETERMINED) )
+          || (GET_BASIC_TYPE( htype) == T_UNKNOWN)
+          || (GET_BASIC_TYPE( htype) > T_UNDETERMINED) )
         {
           result = FALSE;
         }
     }
-  else if (IS_TABLE (htype))
+  else if (IS_TABLE( htype))
     {
       uint_t index = 0;
 
-      if (GET_BASIC_TYPE (htype) != 0)
+      if (GET_BASIC_TYPE( htype) != 0)
         result = FALSE;
 
-      while ((index < (uint_t) (hsize - 2)) && (result != FALSE))
+      while( (index < (uint_t) (hsize - 2)) && (result != FALSE))
         {
           uint16_t type;
-          uint_t   identifierLength = strlen ((char *) &spec->data[index]);
+          uint_t   identifierLength = strlen( (char *) &spec->data[index]);
 
-          /* Don't check for zero here, because of strlen () */
+          /* Don't check for zero here, because of strlen( ) */
           index += identifierLength + 1;
           type   = load_le_int16 (&(spec->data[index]));
 
           /* Ignore an eventual array mask */
-          if ( (GET_BASIC_TYPE (type) == T_UNKNOWN) ||
-               (GET_BASIC_TYPE (type) > T_UNDETERMINED))
+          if ( (GET_BASIC_TYPE( type) == T_UNKNOWN) ||
+               (GET_BASIC_TYPE( type) > T_UNDETERMINED))
             {
               result = FALSE;
               break;
@@ -188,7 +188,7 @@ is_type_spec_valid (const struct TypeSpec* spec)
 
 
 bool_t
-compare_type_spec (const struct TypeSpec* const spec1,
+compare_type_spec( const struct TypeSpec* const spec1,
                    const struct TypeSpec* const spec2)
 {
   const uint_t t1 = load_le_int16 (spec1->type);
@@ -197,8 +197,8 @@ compare_type_spec (const struct TypeSpec* const spec1,
   const uint_t t2 = load_le_int16 (spec2->type);
   const uint_t s2 = load_le_int16 (spec2->dataSize);
 
-  return (t1 == t2 )
+  return( t1 == t2 )
          && (s1 == s2)
-         && (memcmp (spec1->data, spec2->data, s1) == 0);
+         && (memcmp( spec1->data, spec2->data, s1) == 0);
 }
 

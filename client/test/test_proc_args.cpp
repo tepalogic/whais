@@ -108,7 +108,7 @@ ProcedureEntry _procedures[] =
     };
 
 static bool
-check_field_entry (FieldEntry*   fields,
+check_field_entry( FieldEntry*   fields,
                    const uint_t  fieldsCount,
                    const char* fieldName,
                    uint_t        fieldType)
@@ -118,7 +118,7 @@ check_field_entry (FieldEntry*   fields,
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       entry = fields + i;
-      if (strcmp (entry->name, fieldName) == 0)
+      if (strcmp( entry->name, fieldName) == 0)
         break;
     }
 
@@ -133,7 +133,7 @@ check_field_entry (FieldEntry*   fields,
 }
 
 static bool
-test_proc_one_field_tab_ret (WH_CONNECTION hnd)
+test_proc_one_field_tab_ret( WH_CONNECTION hnd)
 {
   const char  procName[]  = "one_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   const char* fieldName;
@@ -143,13 +143,13 @@ test_proc_one_field_tab_ret (WH_CONNECTION hnd)
 
   cout << "Testing one field ret tab ... ";
 
-  if ((WProcParamField (hnd, procName, 0, 0, &fieldName, &fieldType) != WCS_OK)
-      || (strcmp (fieldName, "field1") != 0)
+  if ((WProcParamField( hnd, procName, 0, 0, &fieldName, &fieldType) != WCS_OK)
+      || (strcmp( fieldName, "field1") != 0)
       || (fieldType != WHC_TYPE_TEXT))
     {
       goto test_proc_one_field_tab_ret_err;
     }
-  else if ((WProcParamFieldCount (hnd, procName, 0, &fieldsCount) != WCS_OK)
+  else if ((WProcParamFieldCount( hnd, procName, 0, &fieldsCount) != WCS_OK)
            || (fieldsCount != 1))
     {
       goto test_proc_one_field_tab_ret_err;
@@ -165,7 +165,7 @@ test_proc_one_field_tab_ret_err:
 }
 
 static bool
-test_proc_two_field_tab_ret (WH_CONNECTION hnd)
+test_proc_two_field_tab_ret( WH_CONNECTION hnd)
 {
   const char  procName[]  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
@@ -175,7 +175,7 @@ test_proc_two_field_tab_ret (WH_CONNECTION hnd)
           {"field2", WHC_TYPE_ARRAY_MASK | WHC_TYPE_UINT64, false}
       };
 
-  uint_t fieldsCount = sizeof (fields) / sizeof (fields[0]);
+  uint_t fieldsCount = sizeof( fields) / sizeof( fields[0]);
   uint_t fieldType;
 
   cout << "Testing two field ret tab ... ";
@@ -183,8 +183,8 @@ test_proc_two_field_tab_ret (WH_CONNECTION hnd)
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       const char* fieldName;
-      if ((WProcParamField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
-        || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
+      if ((WProcParamField( hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
+        || ! check_field_entry( fields, fieldsCount, fieldName, fieldType))
         {
           goto test_proc_two_field_tab_ret_err;
         }
@@ -197,8 +197,8 @@ test_proc_two_field_tab_ret (WH_CONNECTION hnd)
     }
 
   fieldsCount = 0;
-  if ((WProcParamFieldCount (hnd, procName, 0, &fieldsCount) != WCS_OK)
-      || (fieldsCount != sizeof (fields) / sizeof (fields[0])))
+  if ((WProcParamFieldCount( hnd, procName, 0, &fieldsCount) != WCS_OK)
+      || (fieldsCount != sizeof( fields) / sizeof( fields[0])))
     {
       goto test_proc_two_field_tab_ret_err;
     }
@@ -213,7 +213,7 @@ test_proc_two_field_tab_ret_err:
 }
 
 static bool
-test_proc_complete_field_tab_ret (WH_CONNECTION hnd)
+test_proc_complete_field_tab_ret( WH_CONNECTION hnd)
 {
   const char  procName[]  = "table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   const uint_t  procParamas[] =
@@ -329,7 +329,7 @@ test_proc_complete_field_tab_ret (WH_CONNECTION hnd)
           {"array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad", WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL, false}
       };
 
-  uint_t fieldsCount = sizeof (fields) / sizeof (fields[0]);
+  uint_t fieldsCount = sizeof( fields) / sizeof( fields[0]);
   uint_t fieldType;
 
   cout << "Testing complete proc   ... ";
@@ -337,7 +337,7 @@ test_proc_complete_field_tab_ret (WH_CONNECTION hnd)
   for (uint_t i = 0; i < COMPLETE_PROC_ARGS; ++i)
     {
       uint_t procType;
-      if ((WProcParamType (hnd, procName, i, &procType) != WCS_OK)
+      if ((WProcParamType( hnd, procName, i, &procType) != WCS_OK)
           || (procType != procParamas[i]))
         {
           goto test_proc_complete_field_tab_ret_err;
@@ -347,8 +347,8 @@ test_proc_complete_field_tab_ret (WH_CONNECTION hnd)
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       const char* fieldName;
-      if ((WProcParamField (hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
-        || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
+      if ((WProcParamField( hnd, procName, 0, i, &fieldName, &fieldType) != WCS_OK)
+        || ! check_field_entry( fields, fieldsCount, fieldName, fieldType))
         {
           goto test_proc_complete_field_tab_ret_err;
         }
@@ -365,8 +365,8 @@ test_proc_complete_field_tab_ret (WH_CONNECTION hnd)
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       const char* fieldName;
-      if ((WProcParamField (hnd, procName, COMPLETE_PROC_ARGS - 1, i, &fieldName, &fieldType) != WCS_OK)
-        || ! check_field_entry (fields, fieldsCount, fieldName, fieldType))
+      if ((WProcParamField( hnd, procName, COMPLETE_PROC_ARGS - 1, i, &fieldName, &fieldType) != WCS_OK)
+        || ! check_field_entry( fields, fieldsCount, fieldName, fieldType))
         {
           goto test_proc_complete_field_tab_ret_err;
         }
@@ -390,25 +390,25 @@ test_proc_complete_field_tab_ret_err:
 }
 
 static bool
-test_proc_entry_ret_match (WH_CONNECTION hnd, ProcedureEntry* entry)
+test_proc_entry_ret_match( WH_CONNECTION hnd, ProcedureEntry* entry)
 {
   const char suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   char buffer[1024];
   uint_t type;
   uint_t paramsCount;
 
-  strcpy (buffer, entry->name);
-  strcat (buffer, suffix);
+  strcpy( buffer, entry->name);
+  strcat( buffer, suffix);
 
-  if ((WProcParamType (hnd, buffer, 0, &type) != WCS_OK)
+  if ((WProcParamType( hnd, buffer, 0, &type) != WCS_OK)
       || (type != entry->retRawType))
     {
       goto test_proc_name_match_error;
     }
-  else if (WProcParamsCount (hnd, buffer, &paramsCount) != WCS_OK)
+  else if (WProcParamsCount( hnd, buffer, &paramsCount) != WCS_OK)
     goto test_proc_name_match_error;
 
-  if (strcmp (entry->name, "table_return_proc_all_type_args") == 0)
+  if (strcmp( entry->name, "table_return_proc_all_type_args") == 0)
     {
       if (paramsCount != 68)
         goto test_proc_name_match_error;
@@ -425,14 +425,14 @@ test_proc_name_match_error:
 }
 
 static bool
-test_procedures_list (WH_CONNECTION hnd)
+test_procedures_list( WH_CONNECTION hnd)
 {
-  uint_t procsCount = sizeof (_procedures) / sizeof (_procedures[0]);
+  uint_t procsCount = sizeof( _procedures) / sizeof( _procedures[0]);
   cout << "Testing the procedures return values ... ";
 
   for (uint_t i = 0; i < procsCount; ++i)
     {
-      if (! test_proc_entry_ret_match (hnd, &_procedures[i]))
+      if (! test_proc_entry_ret_match( hnd, &_procedures[i]))
         goto test_procedures_list_error;
     }
 
@@ -446,7 +446,7 @@ test_procedures_list_error:
 }
 
 static bool
-test_for_errors (WH_CONNECTION hnd)
+test_for_errors( WH_CONNECTION hnd)
 {
   uint_t        paramsCount;
   uint_t        type;
@@ -455,32 +455,32 @@ test_for_errors (WH_CONNECTION hnd)
   const char* procName  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
   cout << "Testing against error conditions ... ";
-  if ((WProcParamsCount (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamsCount (NULL, procName, &paramsCount) != WCS_INVALID_ARGS)
-      || (WProcParamsCount (hnd, procName, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamsCount (hnd, NULL, &paramsCount) != WCS_INVALID_ARGS))
+  if ((WProcParamsCount( NULL, NULL, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamsCount( NULL, procName, &paramsCount) != WCS_INVALID_ARGS)
+      || (WProcParamsCount( hnd, procName, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamsCount( hnd, NULL, &paramsCount) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcParamType (NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamType (NULL, procName, 0, &type) != WCS_INVALID_ARGS)
-      || (WProcParamType (hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamType (hnd, NULL, 0, &type) != WCS_INVALID_ARGS))
+  else if ((WProcParamType( NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamType( NULL, procName, 0, &type) != WCS_INVALID_ARGS)
+      || (WProcParamType( hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamType( hnd, NULL, 0, &type) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcParamFieldCount (NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamFieldCount (NULL, procName, 0, &fieldCount) != WCS_INVALID_ARGS)
-      || (WProcParamFieldCount (hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamFieldCount (hnd, NULL, 0, &fieldCount) != WCS_INVALID_ARGS))
+  else if ((WProcParamFieldCount( NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount( NULL, procName, 0, &fieldCount) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount( hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount( hnd, NULL, 0, &fieldCount) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcParamField (NULL, NULL, 0, 0, NULL, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamField (NULL, procName, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS)
-      || (WProcParamField (hnd, procName, 0, 0, NULL, &type) != WCS_INVALID_ARGS)
-      || (WProcParamField (hnd, procName, 0, 0, &fieldName, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamField (hnd, NULL, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS))
+  else if ((WProcParamField( NULL, NULL, 0, 0, NULL, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamField( NULL, procName, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS)
+      || (WProcParamField( hnd, procName, 0, 0, NULL, &type) != WCS_INVALID_ARGS)
+      || (WProcParamField( hnd, procName, 0, 0, &fieldName, NULL) != WCS_INVALID_ARGS)
+      || (WProcParamField( hnd, NULL, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -494,37 +494,37 @@ test_for_errors_fail :
 }
 
 const char*
-DefaultDatabaseName ()
+DefaultDatabaseName( )
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId ()
+DefaultUserId( )
 {
   return 0;
 }
 
 const char*
-DefaultUserPassword ()
+DefaultUserPassword( )
 {
   return "root_test_password";
 }
 
 int
-main (int argc, const char** argv)
+main( int argc, const char** argv)
 {
   WH_CONNECTION       hnd = NULL;
 
-  bool success = tc_settup_connection (argc, argv, &hnd);
+  bool success = tc_settup_connection( argc, argv, &hnd);
 
-  success = success && test_for_errors (hnd);
-  success = success && test_procedures_list (hnd);
-  success = success && test_proc_one_field_tab_ret (hnd);
-  success = success && test_proc_two_field_tab_ret (hnd);
-  success = success && test_proc_complete_field_tab_ret (hnd);
+  success = success && test_for_errors( hnd);
+  success = success && test_procedures_list( hnd);
+  success = success && test_proc_one_field_tab_ret( hnd);
+  success = success && test_proc_two_field_tab_ret( hnd);
+  success = success && test_proc_complete_field_tab_ret( hnd);
 
-  WClose (hnd);
+  WClose( hnd);
 
   if (!success)
     {

@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CLIENT_CONNECTION_H_
 #define CLIENT_CONNECTION_H_
 
-#include "whisper_connector.h"
+#include "whais_connector.h"
 
 #include "connector.h"
 
@@ -33,11 +33,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    connection autentication step. */
 
 uint_t
-read_raw_frame (struct INTERNAL_HANDLER* const pHnd,
+read_raw_frame( struct INTERNAL_HANDLER* const pHnd,
                 uint_t* const                  outFrameSize);
 
 uint_t
-write_raw_frame (struct INTERNAL_HANDLER* const pHnd,
+write_raw_frame( struct INTERNAL_HANDLER* const pHnd,
                  const  uint_t                  frameSize);
 
 #endif /* CLIENT_CONNECTION_H_ */

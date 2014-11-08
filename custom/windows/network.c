@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "whisper.h"
+#include "whais.h"
 
 #include <assert.h>
 #include <windows.h>
@@ -31,30 +31,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 
 // Need to link with Ws2_32.lib
-#pragma comment(lib, "ws2_32.lib")
+#pragma comment( lib, "ws2_32.lib")
 
 
 
 bool_t
-whs_init ()
+whs_init( )
 {
   static bool_t _inited = FALSE;
 
   WORD wVersionRequested;
   WSADATA wsaData;
 
-  assert (_inited == FALSE);
+  assert( _inited == FALSE);
   if (_inited)
     return FALSE;
 
-  wVersionRequested = MAKEWORD(2, 2);
+  wVersionRequested = MAKEWORD( 2, 2);
 
-  if (WSAStartup(wVersionRequested, &wsaData) != 0)
+  if (WSAStartup( wVersionRequested, &wsaData) != 0)
     return FALSE;
 
-  if ((LOBYTE (wsaData.wVersion) != 2) || (HIBYTE (wsaData.wVersion) != 2))
+  if ((LOBYTE( wsaData.wVersion) != 2) || (HIBYTE( wsaData.wVersion) != 2))
     {
-        WSACleanup();
+        WSACleanup( );
         return FALSE;
     }
 
@@ -63,7 +63,7 @@ whs_init ()
 }
 
 uint32_t
-whs_create_client (const char* const          server,
+whs_create_client( const char* const          server,
                    const char* const          port,
                    WH_SOCKET* const           outSocket)
 {
@@ -75,44 +75,44 @@ whs_create_client (const char* const          server,
   const char       on       = 1;
 
 
-  assert (server != NULL);
-  assert (port != NULL);
+  assert( server != NULL);
+  assert( port != NULL);
 
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_ADDRCONFIG;
 
-  status = getaddrinfo (server, port, &hints, &pResults);
+  status = getaddrinfo( server, port, &hints, &pResults);
   if (status != 0)
     return status;
 
 
   for (pIt = pResults; pIt != NULL; pIt = pResults->ai_next)
     {
-      sd = socket (pIt->ai_family, pIt->ai_socktype, pIt->ai_protocol);
+      sd = socket( pIt->ai_family, pIt->ai_socktype, pIt->ai_protocol);
       if (sd == INVALID_SOCKET)
         continue ;
 
-      if (setsockopt (sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
+      if (setsockopt( sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
         {
-          status = WSAGetLastError ();
-          closesocket (sd);
+          status = WSAGetLastError( );
+          closesocket( sd);
 
           return status;
         }
-      else if (connect (sd, pIt->ai_addr, pIt->ai_addrlen) == 0)
+      else if (connect( sd, pIt->ai_addr, pIt->ai_addrlen) == 0)
           break;
       else
         {
-          status = WSAGetLastError ();
-          closesocket (sd);
+          status = WSAGetLastError( );
+          closesocket( sd);
 
           return status;
         }
     }
 
-  status = WSAGetLastError ();
-  freeaddrinfo (pResults);
+  status = WSAGetLastError( );
+  freeaddrinfo( pResults);
 
   if (pIt != NULL)
     {
@@ -125,7 +125,7 @@ whs_create_client (const char* const          server,
 }
 
 uint32_t
-whs_create_server (const char* const         localAdress,
+whs_create_server( const char* const         localAdress,
                    const char* const         port,
                    const uint_t              listenBackLog,
                    WH_SOCKET* const          outSocket)
@@ -137,52 +137,52 @@ whs_create_server (const char* const         localAdress,
   int              sd       = -1;
   const char       on       = 1;
 
-  assert (port != NULL);
+  assert( port != NULL);
 
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags    = AI_ADDRCONFIG | AI_NUMERICHOST | AI_PASSIVE;
 
-  status = getaddrinfo (localAdress, port, &hints, &pResults);
+  status = getaddrinfo( localAdress, port, &hints, &pResults);
   if (status != 0)
     return status;
 
   for (pIt = pResults; pIt != NULL; pIt = pResults->ai_next)
     {
-      sd = socket (pIt->ai_family, pIt->ai_socktype, pIt->ai_protocol);
+      sd = socket( pIt->ai_family, pIt->ai_socktype, pIt->ai_protocol);
       if (sd == INVALID_SOCKET)
         continue ;
 
-      if ((setsockopt (sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
-          || (setsockopt (sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) != 0))
+      if ((setsockopt( sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
+          || (setsockopt( sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) != 0))
         {
-          status = WSAGetLastError ();
-          closesocket (sd);
+          status = WSAGetLastError( );
+          closesocket( sd);
 
           return status;
         }
-      else if (bind (sd, pIt->ai_addr, pIt->ai_addrlen) == 0)
+      else if (bind( sd, pIt->ai_addr, pIt->ai_addrlen) == 0)
         break;
 
       else
         {
-          status = WSAGetLastError ();
-          closesocket (sd);
+          status = WSAGetLastError( );
+          closesocket( sd);
 
           return status;
         }
     }
 
-  status = WSAGetLastError ();
-  freeaddrinfo (pResults);
+  status = WSAGetLastError( );
+  freeaddrinfo( pResults);
 
   if (pIt != NULL)
     {
       /* We have a valid socket */
-      if (listen (sd, listenBackLog) != 0)
+      if (listen( sd, listenBackLog) != 0)
         {
-          status = WSAGetLastError ();
-          closesocket (sd);
+          status = WSAGetLastError( );
+          closesocket( sd);
 
           return status;
         }
@@ -195,13 +195,13 @@ whs_create_server (const char* const         localAdress,
 }
 
 uint32_t
-whs_accept (const WH_SOCKET            sd,
+whs_accept( const WH_SOCKET            sd,
                   WH_SOCKET* const     outSocket)
 {
-  const WH_SOCKET csd = accept (sd, NULL, NULL);
+  const WH_SOCKET csd = accept( sd, NULL, NULL);
 
   if (csd == INVALID_SOCKET)
-    return WSAGetLastError ();
+    return WSAGetLastError( );
 
   *outSocket = csd;
 
@@ -209,55 +209,55 @@ whs_accept (const WH_SOCKET            sd,
 }
 
 uint32_t
-whs_write (const WH_SOCKET            sd,
+whs_write( const WH_SOCKET            sd,
            const uint8_t*             srcBuffer,
            const uint_t               count)
 {
   uint_t   wrote = 0;
 
-  assert (count > 0);
+  assert( count > 0);
 
-  while (wrote < count)
+  while( wrote < count)
     {
-      const int chunk = send (sd, srcBuffer + wrote, count - wrote, 0);
+      const int chunk = send( sd, srcBuffer + wrote, count - wrote, 0);
       if (chunk < 0)
         {
-          const uint32_t status = WSAGetLastError ();
+          const uint32_t status = WSAGetLastError( );
           if (status != WSATRY_AGAIN)
             return status;
         }
       else
         {
-          assert (chunk > 0);
+          assert( chunk > 0);
           wrote += chunk;
         }
     }
 
-  assert (wrote == count);
+  assert( wrote == count);
 
   return WOP_OK;
 }
 
 uint32_t
-whs_read (const WH_SOCKET           sd,
+whs_read( const WH_SOCKET           sd,
           uint8_t*                  dstBuffer,
           uint_t* const             inoutCount)
 {
   if (*inoutCount == 0)
     return WSAEINVAL;
 
-  while (TRUE)
+  while( TRUE)
     {
-      const int chunk = recv (sd, dstBuffer, *inoutCount, 0);
+      const int chunk = recv( sd, dstBuffer, *inoutCount, 0);
       if (chunk < 0)
         {
-          const uint32_t status = WSAGetLastError ();
+          const uint32_t status = WSAGetLastError( );
           if (status != WSATRY_AGAIN)
             return status;
         }
       else
         {
-          assert ((uint_t)chunk <= *inoutCount);
+          assert( (uint_t)chunk <= *inoutCount);
 
           *inoutCount = chunk;
           break;
@@ -268,15 +268,15 @@ whs_read (const WH_SOCKET           sd,
 }
 
 void
-whs_close (const WH_SOCKET sd)
+whs_close( const WH_SOCKET sd)
 {
-  shutdown (sd, SD_BOTH);
-  closesocket (sd);
+  shutdown( sd, SD_BOTH);
+  closesocket( sd);
 }
 
 void
-whs_clean ()
+whs_clean( )
 {
-  WSACleanup();
+  WSACleanup( );
 }
 

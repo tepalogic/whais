@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -24,11 +24,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 
-#include "whisper.h"
-#include "whisper_fileio.h"
+#include "whais.h"
+#include "whais_fileio.h"
 
 WH_FILE
-whf_open (const char* const file, uint_t mode)
+whf_open( const char* const file, uint_t mode)
 {
   DWORD       dwDesiredAccess = 0;
   DWORD       dwCreation      = 0;
@@ -50,7 +50,7 @@ whf_open (const char* const file, uint_t mode)
   dwDesiredAccess |= (mode & WHC_FILEREAD) ? GENERIC_READ : 0;
   dwDesiredAccess |= (mode & WHC_FILEWRITE) ? GENERIC_WRITE : 0;
 
-  result = CreateFile (file,
+  result = CreateFile( file,
                        dwDesiredAccess,
                        0,
                        NULL,
@@ -62,13 +62,13 @@ whf_open (const char* const file, uint_t mode)
 }
 
 WH_FILE
-whf_dup (WH_FILE hnd)
+whf_dup( WH_FILE hnd)
 {
   WH_FILE result = INVALID_HANDLE_VALUE;
 
-  DuplicateHandle(GetCurrentProcess(),
+  DuplicateHandle( GetCurrentProcess( ),
                   hnd,
-                  GetCurrentProcess(),
+                  GetCurrentProcess( ),
                   &result,
                   0,
                   FALSE,
@@ -79,13 +79,13 @@ whf_dup (WH_FILE hnd)
 }
 
 bool_t
-whf_seek (WH_FILE hnd, int64_t where, int whence)
+whf_seek( WH_FILE hnd, int64_t where, int whence)
 {
   LARGE_INTEGER sliWhere;
 
   sliWhere.QuadPart = where;
 
-  switch (whence)
+  switch( whence)
     {
     case WHC_SEEK_BEGIN:
       whence = FILE_BEGIN;
@@ -100,25 +100,25 @@ whf_seek (WH_FILE hnd, int64_t where, int whence)
       break;
 
     default:
-      assert (FALSE);
+      assert( FALSE);
     }
 
-  if ( ! SetFilePointerEx (hnd, sliWhere, NULL, whence))
+  if ( ! SetFilePointerEx( hnd, sliWhere, NULL, whence))
     return FALSE;
 
   return TRUE;
 }
 
 bool_t
-whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
+whf_read( WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
 {
   bool_t result       = TRUE;
   uint_t actual_count = 0;
 
-  while (actual_count < size)
+  while( actual_count < size)
     {
       DWORD count;
-      if ( ! ReadFile (hnd,
+      if ( ! ReadFile( hnd,
                        dstBuffer + actual_count,
                        size - actual_count,
                        &count,
@@ -131,23 +131,23 @@ whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
       actual_count += count;
     }
 
-  assert ((result == TRUE) || (actual_count < size));
-  assert ((result == FALSE) || (size == actual_count));
+  assert( (result == TRUE) || (actual_count < size));
+  assert( (result == FALSE) || (size == actual_count));
 
   return result;
 }
 
 bool_t
-whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
+whf_write( WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
 {
 
   bool_t result       = TRUE;
   uint_t actualCount = 0;
 
-  while (actualCount < size)
+  while( actualCount < size)
     {
       DWORD count;
-      if ( ! WriteFile (hnd,
+      if ( ! WriteFile( hnd,
                         srcBuffer + actualCount,
                         size - actualCount,
                         &count,
@@ -160,19 +160,19 @@ whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
       actualCount += count;
     }
 
-  assert ((result == TRUE) || (actualCount < size));
-  assert ((result == FALSE) || (size == actualCount));
+  assert( (result == TRUE) || (actualCount < size));
+  assert( (result == FALSE) || (size == actualCount));
 
   return result;
 }
 
 bool_t
-whf_tell (WH_FILE hnd, uint64_t* const outPosition)
+whf_tell( WH_FILE hnd, uint64_t* const outPosition)
 {
 
   const LARGE_INTEGER sTemp = { 0, };
 
-  if (!SetFilePointerEx (hnd,
+  if (!SetFilePointerEx( hnd,
                          sTemp,
                          (LARGE_INTEGER*)outPosition,
                          FILE_CURRENT))
@@ -184,24 +184,24 @@ whf_tell (WH_FILE hnd, uint64_t* const outPosition)
 }
 
 bool_t
-whf_sync (WH_FILE hnd)
+whf_sync( WH_FILE hnd)
 {
   const HANDLE handler = (HANDLE) hnd;
 
-  return FlushFileBuffers (handler);
+  return FlushFileBuffers( handler);
 }
 
 bool_t
-whf_tell_size (WH_FILE hnd, uint64_t* const outSize)
+whf_tell_size( WH_FILE hnd, uint64_t* const outSize)
 {
-  return GetFileSizeEx (hnd, (LARGE_INTEGER*) outSize);
+  return GetFileSizeEx( hnd, (LARGE_INTEGER*) outSize);
 }
 
 bool_t
-whf_set_size (WH_FILE hnd, const uint64_t newSize)
+whf_set_size( WH_FILE hnd, const uint64_t newSize)
 {
-  if (whf_seek (hnd, newSize, WHC_SEEK_BEGIN)
-      && (SetEndOfFile (hnd) != 0))
+  if (whf_seek( hnd, newSize, WHC_SEEK_BEGIN)
+      && (SetEndOfFile( hnd) != 0))
     {
       return TRUE;
     }
@@ -210,54 +210,54 @@ whf_set_size (WH_FILE hnd, const uint64_t newSize)
 }
 
 bool_t
-whf_close (WH_FILE hnd)
+whf_close( WH_FILE hnd)
 {
-  return CloseHandle (hnd);
+  return CloseHandle( hnd);
 }
 
 uint32_t
-whf_last_error ()
+whf_last_error( )
 {
-  return GetLastError ();
+  return GetLastError( );
 }
 
 bool_t
-whf_err_to_str (uint64_t error_code, char* str, uint_t strSize)
+whf_err_to_str( uint64_t error_code, char* str, uint_t strSize)
 {
-  return FormatMessage (
+  return FormatMessage( 
               FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
               NULL,
               (DWORD) error_code,
-              MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+              MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT),
               str, strSize, NULL
                        ) != 0;
 }
 
 
 bool_t
-whf_remove (const char* const file)
+whf_remove( const char* const file)
 {
-  return DeleteFile (file);
+  return DeleteFile( file);
 }
 
 
 const char*
-whf_dir_delim ()
+whf_dir_delim( )
 {
   return "\\";
 }
 
 const char*
-whf_current_dir ()
+whf_current_dir( )
 {
   return ".\\";
 }
 
 bool_t
-whf_is_absolute (const char* const path)
+whf_is_absolute( const char* const path)
 {
-  assert (path != NULL);
+  assert( path != NULL);
 
-  return (path[1] == ':');
+  return( path[1] == ':');
 }
 

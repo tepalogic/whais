@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "stdlib/interface.h"
 #include "utils/wtypes.h"
@@ -33,7 +33,7 @@
 #include "base_types.h"
 
 
-using namespace whisper;
+using namespace whais;
 
 
 WLIB_PROC_DESCRIPTION     gProcPI;
@@ -84,9 +84,9 @@ WLIB_PROC_DESCRIPTION     gProcMaxRR;
 
 
 static WLIB_STATUS
-get_PI (SessionStack& stack, ISession&)
+get_PI( SessionStack& stack, ISession&)
 {
-  stack.Push (DRichReal (RICHREAL_T (3,
+  stack.Push( DRichReal( RICHREAL_T( 3,
                                      14159265358979ull,
                                      DBS_RICHREAL_PREC)));
 
@@ -97,7 +97,7 @@ get_PI (SessionStack& stack, ISession&)
 static WLIB_STATUS
 get_SQRT2 (SessionStack& stack, ISession&)
 {
-  stack.Push (DRichReal (RICHREAL_T (2,
+  stack.Push( DRichReal( RICHREAL_T( 2,
                                      41421356237309ull,
                                      DBS_RICHREAL_PREC)));
 
@@ -106,9 +106,9 @@ get_SQRT2 (SessionStack& stack, ISession&)
 
 
 static WLIB_STATUS
-get_NE (SessionStack& stack, ISession&)
+get_NE( SessionStack& stack, ISession&)
 {
-  stack.Push (DRichReal (RICHREAL_T (2,
+  stack.Push( DRichReal( RICHREAL_T( 2,
                                      71828182845904ull,
                                      DBS_RICHREAL_PREC)));
 
@@ -118,9 +118,9 @@ get_NE (SessionStack& stack, ISession&)
 
 template<class T>
 WLIB_STATUS
-get_min_value (SessionStack& stack, ISession& )
+get_min_value( SessionStack& stack, ISession& )
 {
-  stack.Push (T::Min ());
+  stack.Push( T::Min ());
 
   return WOP_OK;
 }
@@ -128,16 +128,16 @@ get_min_value (SessionStack& stack, ISession& )
 
 template<class T>
 WLIB_STATUS
-get_max_value (SessionStack& stack, ISession& )
+get_max_value( SessionStack& stack, ISession& )
 {
-  stack.Push (T::Max ());
+  stack.Push( T::Max ());
 
   return WOP_OK;
 }
 
 
 WLIB_STATUS
-base_generics_init ()
+base_generics_init( )
 {
   static const uint8_t* procLocalBType[]     = { gBoolType };
   static const uint8_t* procLocalCType[]     = { gCharType };

@@ -26,14 +26,14 @@
 
 #include <vector>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "utils/wthread.h"
 
 #include "ps_serializer.h"
 
 
-namespace whisper {
+namespace whais {
 namespace pastra {
 
 
@@ -57,159 +57,159 @@ static const NODE_INDEX NIL_NODE = ~0;
 class IBTreeNode
 {
 public:
-  IBTreeNode (IBTreeNodeManager&   nodesManager,
+  IBTreeNode( IBTreeNodeManager&   nodesManager,
               const NODE_INDEX     nodeId);
 
-  virtual ~IBTreeNode ();
+  virtual ~IBTreeNode( );
 
-  bool IsLeaf () const
+  bool IsLeaf( ) const
   {
     return mHeader->mLeaf != 0;
   }
 
-  bool IsDirty () const
+  bool IsDirty( ) const
   {
     return mHeader->mDirty != 0;
   }
 
-  bool IsRemoved() const
+  bool IsRemoved( ) const
   {
     return mHeader->mRemoved != 0;
   }
 
-  NODE_INDEX NodeId () const
+  NODE_INDEX NodeId( ) const
   {
-    return Serializer::LoadNode (&mHeader->mNodeId);
+    return Serializer::LoadNode( &mHeader->mNodeId);
   }
 
-  NODE_INDEX Next () const
+  NODE_INDEX Next( ) const
   {
-    return Serializer::LoadNode (&mHeader->mRight);
+    return Serializer::LoadNode( &mHeader->mRight);
   }
 
-  void Next (const NODE_INDEX next)
+  void Next( const NODE_INDEX next)
   {
-    Serializer::StoreNode (next, &mHeader->mRight);
-    MarkDirty ();
+    Serializer::StoreNode( next, &mHeader->mRight);
+    MarkDirty( );
   }
 
-  NODE_INDEX Prev () const
+  NODE_INDEX Prev( ) const
   {
-    return Serializer::LoadNode (&mHeader->mLeft);
+    return Serializer::LoadNode( &mHeader->mLeft);
   }
 
-  void Prev (const NODE_INDEX prev)
+  void Prev( const NODE_INDEX prev)
   {
-    Serializer::StoreNode (prev, &mHeader->mLeft);
-    MarkDirty ();
+    Serializer::StoreNode( prev, &mHeader->mLeft);
+    MarkDirty( );
   }
 
-  const uint8_t* DataForRead () const
+  const uint8_t* DataForRead( ) const
   {
     return _RC (const uint8_t*, (mHeader.get () + 1));
   }
 
-  uint8_t* DataForWrite ()
+  uint8_t* DataForWrite( )
   {
-    MarkDirty ();
+    MarkDirty( );
 
     return _RC (uint8_t*, (mHeader.get () + 1));
   }
 
-  uint8_t* RawData () const
+  uint8_t* RawData( ) const
   {
     return _RC (uint8_t*, mHeader.get ());
   }
 
-  void MarkDirty ()
+  void MarkDirty( )
   {
     mHeader->mDirty = 1;
   }
 
-  void MarkClean ()
+  void MarkClean( )
   {
     mHeader->mDirty = 0;
   }
 
-  void Leaf (bool leaf)
+  void Leaf( bool leaf)
   {
     mHeader->mLeaf = (leaf == false) ? 0 : 1;
   }
 
-  void MarkAsRemoved ()
+  void MarkAsRemoved( )
   {
     mHeader->mRemoved = 1;
-    MarkDirty ();
+    MarkDirty( );
   }
 
-  void MarkAsUsed ()
+  void MarkAsUsed( )
   {
     mHeader->mRemoved = 0;
-    MarkDirty ();
+    MarkDirty( );
   }
 
-  uint16_t NullKeysCount () const
+  uint16_t NullKeysCount( ) const
   {
     return load_le_int16 (mHeader->mNullKeysCount);
   }
 
-  void NullKeysCount (const uint_t count)
+  void NullKeysCount( const uint_t count)
   {
     store_le_int16 (count, mHeader->mNullKeysCount);
-    MarkDirty ();
+    MarkDirty( );
   }
 
-  uint_t KeysCount () const
+  uint_t KeysCount( ) const
   {
     return load_le_int16 (mHeader->mKeysCount);
   }
 
-  void KeysCount (const uint_t count)
+  void KeysCount( const uint_t count)
   {
     store_le_int16 (count, mHeader->mKeysCount);
-    MarkDirty ();
+    MarkDirty( );
   }
 
-  virtual uint_t KeysPerNode () const = 0;
+  virtual uint_t KeysPerNode( ) const = 0;
 
-  virtual bool NeedsSpliting () const;
+  virtual bool NeedsSpliting( ) const;
 
-  virtual bool NeedsJoining () const;
+  virtual bool NeedsJoining( ) const;
 
 
-  virtual KEY_INDEX GetParentKeyIndex (const IBTreeNode& parent) const = 0;
+  virtual KEY_INDEX GetParentKeyIndex( const IBTreeNode& parent) const = 0;
 
-  virtual NODE_INDEX GetChildNode (const IBTreeKey& key) const;
+  virtual NODE_INDEX GetChildNode( const IBTreeKey& key) const;
 
-  virtual NODE_INDEX NodeIdOfKey (const KEY_INDEX keyIndex) const = 0;
+  virtual NODE_INDEX NodeIdOfKey( const KEY_INDEX keyIndex) const = 0;
 
-  virtual void AdjustKeyNode (const IBTreeNode& childNode,
+  virtual void AdjustKeyNode( const IBTreeNode& childNode,
                               const KEY_INDEX    keyIndex) = 0;
 
-  virtual void SetNodeOfKey (const KEY_INDEX keyIndex,
+  virtual void SetNodeOfKey( const KEY_INDEX keyIndex,
                              const NODE_INDEX childNode) = 0;
 
-  virtual void SetData (const KEY_INDEX keyIndex, const uint8_t *data);
+  virtual void SetData( const KEY_INDEX keyIndex, const uint8_t *data);
 
-  virtual KEY_INDEX InsertKey (const IBTreeKey& key) = 0;
+  virtual KEY_INDEX InsertKey( const IBTreeKey& key) = 0;
 
-  void RemoveKey (const IBTreeKey& key);
+  void RemoveKey( const IBTreeKey& key);
 
-  virtual void RemoveKey (const KEY_INDEX keyIndex) = 0;
+  virtual void RemoveKey( const KEY_INDEX keyIndex) = 0;
 
-  virtual void Split (const NODE_INDEX parentId) = 0;
+  virtual void Split( const NODE_INDEX parentId) = 0;
 
-  virtual void Join (const bool toRight) = 0;
+  virtual void Join( const bool toRight) = 0;
 
-  virtual int CompareKey (const IBTreeKey&   key,
+  virtual int CompareKey( const IBTreeKey&   key,
                           const KEY_INDEX    nodeKeyIndex) const = 0;
 
-  virtual const IBTreeKey& SentinelKey () const = 0;
+  virtual const IBTreeKey& SentinelKey( ) const = 0;
 
-  bool   FindBiggerOrEqual (const IBTreeKey&  key,
+  bool   FindBiggerOrEqual( const IBTreeKey&  key,
                             KEY_INDEX* const  outIndex) const;
 
-  void   Release ();
+  void   Release( );
 
 protected:
   struct NodeHeader
@@ -238,30 +238,30 @@ private:
 class BTreeNodeRAII
 {
 public:
-  BTreeNodeRAII (IBTreeNode* node)
-    : mTreeNode (node)
+  BTreeNodeRAII( IBTreeNode* node)
+    : mTreeNode( node)
   {
   }
 
-  BTreeNodeRAII (IBTreeNode& node)
-    : mTreeNode (&node)
+  BTreeNodeRAII( IBTreeNode& node)
+    : mTreeNode( &node)
   {
   }
 
-  ~BTreeNodeRAII ()
+  ~BTreeNodeRAII( )
   {
-    mTreeNode->Release ();
+    mTreeNode->Release( );
   }
 
   void operator= (IBTreeNode& node)
   {
-    mTreeNode->Release ();
+    mTreeNode->Release( );
     mTreeNode = &node;
   }
 
   void operator= (IBTreeNode* node)
   {
-    mTreeNode->Release ();
+    mTreeNode->Release( );
     mTreeNode = node;
   }
 
@@ -276,7 +276,7 @@ public:
   }
 
 private:
-  BTreeNodeRAII (const BTreeNodeRAII &);
+  BTreeNodeRAII( const BTreeNodeRAII &);
   BTreeNodeRAII& operator= (const BTreeNodeRAII &);
 
 
@@ -288,41 +288,41 @@ private:
 class IBTreeNodeManager
 {
 public:
-  IBTreeNodeManager ();
-  virtual ~IBTreeNodeManager ();
+  IBTreeNodeManager( );
+  virtual ~IBTreeNodeManager( );
 
-  void Split (NODE_INDEX parentId, const NODE_INDEX nodeId);
+  void Split( NODE_INDEX parentId, const NODE_INDEX nodeId);
 
-  void Join (const NODE_INDEX parentId, const NODE_INDEX nodeId);
+  void Join( const NODE_INDEX parentId, const NODE_INDEX nodeId);
 
-  IBTreeNode* RetrieveNode (const NODE_INDEX nodeId);
+  IBTreeNode* RetrieveNode( const NODE_INDEX nodeId);
 
-  void ReleaseNode (const NODE_INDEX nodeId);
+  void ReleaseNode( const NODE_INDEX nodeId);
 
-  void ReleaseNode (IBTreeNode* const node)
+  void ReleaseNode( IBTreeNode* const node)
   {
-    ReleaseNode (node->NodeId());
+    ReleaseNode( node->NodeId( ));
   }
 
-  void FlushNodes ();
+  void FlushNodes( );
 
-  virtual uint64_t NodeRawSize () const = 0;
+  virtual uint64_t NodeRawSize( ) const = 0;
 
-  virtual NODE_INDEX AllocateNode (const NODE_INDEX parent,
+  virtual NODE_INDEX AllocateNode( const NODE_INDEX parent,
                                    const KEY_INDEX  parentKey) = 0;
 
-  virtual void FreeNode (const NODE_INDEX nodeId) = 0;
+  virtual void FreeNode( const NODE_INDEX nodeId) = 0;
 
-  virtual NODE_INDEX RootNodeId () = 0;
+  virtual NODE_INDEX RootNodeId( ) = 0;
 
-  virtual void RootNodeId (const NODE_INDEX nodeId) = 0;
+  virtual void RootNodeId( const NODE_INDEX nodeId) = 0;
 
 protected:
   struct CachedData
   {
-    CachedData (IBTreeNode* const node)
-      : mNode (node),
-        mRefsCount (0)
+    CachedData( IBTreeNode* const node)
+      : mNode( node),
+        mRefsCount( 0)
     {
     }
 
@@ -331,11 +331,11 @@ protected:
   };
 
 
-  virtual uint_t MaxCachedNodes () = 0;
+  virtual uint_t MaxCachedNodes( ) = 0;
 
-  virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId) = 0;
+  virtual IBTreeNode* LoadNode( const NODE_INDEX nodeId) = 0;
 
-  virtual void SaveNode (IBTreeNode* const node) = 0;
+  virtual void SaveNode( IBTreeNode* const node) = 0;
 
 
   Lock                             mSync;
@@ -347,26 +347,26 @@ protected:
 class BTree
 {
 public:
-  BTree (IBTreeNodeManager& nodesManager);
+  BTree( IBTreeNodeManager& nodesManager);
 
-  bool FindBiggerOrEqual (const IBTreeKey&    key,
+  bool FindBiggerOrEqual( const IBTreeKey&    key,
                           NODE_INDEX*         outNode,
                           KEY_INDEX*          outKeyIndex);
 
-  void InsertKey (const IBTreeKey&  key,
+  void InsertKey( const IBTreeKey&  key,
                   NODE_INDEX*       outNode,
                   KEY_INDEX*        outKeyIndex);
 
-  void RemoveKey (const IBTreeKey& key);
+  void RemoveKey( const IBTreeKey& key);
 
 private:
-  bool RecursiveInsertNodeKey (const NODE_INDEX parentId,
+  bool RecursiveInsertNodeKey( const NODE_INDEX parentId,
                                const NODE_INDEX nodeId,
                                const IBTreeKey& key,
                                NODE_INDEX*      outNode,
                                KEY_INDEX*       outKeyIndex);
 
-  bool RecursiveDeleteNodeKey (IBTreeNode& nodeId, const IBTreeKey& key);
+  bool RecursiveDeleteNodeKey( IBTreeNode& nodeId, const IBTreeKey& key);
 
 
   IBTreeNodeManager& mNodesManager;
@@ -374,7 +374,7 @@ private:
 
 
 static inline void
-make_array_room (const uint_t   lastIndex,
+make_array_room( const uint_t   lastIndex,
                  const uint_t   fromIndex,
                  const uint_t   elemSize,
                  uint8_t* const array)
@@ -382,7 +382,7 @@ make_array_room (const uint_t   lastIndex,
   uint_t lastPos = lastIndex * elemSize + elemSize - 1;
   uint_t fromPos = fromIndex * elemSize;
 
-  while (lastPos >= fromPos)
+  while( lastPos >= fromPos)
     {
       array[lastPos + elemSize] = array[lastPos];
       --lastPos;
@@ -391,7 +391,7 @@ make_array_room (const uint_t   lastIndex,
 
 
 static inline void
-remove_array_elemes (const uint_t   lastIndex,
+remove_array_elemes( const uint_t   lastIndex,
                      const uint_t   fromIndex,
                      const uint_t   elemSize,
                      uint8_t* const array)
@@ -399,7 +399,7 @@ remove_array_elemes (const uint_t   lastIndex,
   uint_t lastPos = lastIndex  * elemSize + elemSize - 1;
   uint_t fromPos = fromIndex  * elemSize;
 
-  while (fromPos + elemSize <= lastPos)
+  while( fromPos + elemSize <= lastPos)
     {
       array[fromPos] = array[fromPos + elemSize];
       ++fromPos;
@@ -407,6 +407,6 @@ remove_array_elemes (const uint_t   lastIndex,
 }
 
 } //namespace pastra
-} //namespace whisper
+} //namespace whais
 
 #endif /* PS_BTREE_INDEX_H_ */

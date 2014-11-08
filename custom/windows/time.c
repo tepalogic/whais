@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -24,18 +24,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cassert>
 
-#include "whisper.h"
+#include "whais.h"
 
 WTime
-wh_get_currtime ()
+wh_get_currtime( )
 {
   WTime      result;
   FILETIME   fileTime;
   SYSTEMTIME utcTime;
   uint64_t   usec;
 
-  GetSystemTimeAsFileTime (&fileTime);
-  FileTimeToSystemTime (&fileTime, &utcTime);
+  GetSystemTimeAsFileTime( &fileTime);
+  FileTimeToSystemTime( &fileTime, &utcTime);
 
   /* Convert the FILETIME to a real 64 bit integer. */
   usec = fileTime.dwHighDateTime;
@@ -48,7 +48,7 @@ wh_get_currtime ()
   /* Keep only the microseconds. */
   usec %= 1000000;
 
-  assert (usec / 1000 == utcTime.wMilliseconds);
+  assert( usec / 1000 == utcTime.wMilliseconds);
 
   result.year  = utcTime.wYear;
   result.month = utcTime.wMonth;
@@ -63,7 +63,7 @@ wh_get_currtime ()
 
 
 WTICKS
-wh_msec_ticks ()
+wh_msec_ticks( )
 {
   return GetTickCount64 ();
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_NET_H_
-#define WHISPER_NET_H_
+#ifndef WHAIS_NET_H_
+#define WHAIS_NET_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -31,42 +31,42 @@ extern "C"
 #endif
 
 bool_t
-whs_init ();
+whs_init( );
 
 uint32_t
-whs_create_client (const char* const       server,
+whs_create_client( const char* const       server,
                    const char* const       port,
                    WH_SOCKET* const        outSocket);
 
 uint32_t
-whs_create_server (const char* const       localAddress,
+whs_create_server( const char* const       localAddress,
                    const char* const       localPort,
                    const uint_t            listenBackLog,
                    WH_SOCKET* const        outSocket);
 
 uint32_t
-whs_accept (const WH_SOCKET           sd,
+whs_accept( const WH_SOCKET           sd,
             WH_SOCKET* const          outSocket);
 
 uint32_t
-whs_write (const WH_SOCKET           sd,
+whs_write( const WH_SOCKET           sd,
            const uint8_t*            srcBuffer,
            const uint_t              count);
 
 uint32_t
-whs_read (const WH_SOCKET           sd,
+whs_read( const WH_SOCKET           sd,
           uint8_t*                  dstBuffer,
           uint_t* const             inoutCount);
 
 void
-whs_close (const WH_SOCKET socket);
+whs_close( const WH_SOCKET socket);
 
 void
-whs_clean ();
+whs_clean( );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* WHISPER_NET_H_ */
+#endif /* WHAIS_NET_H_ */
 

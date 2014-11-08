@@ -25,7 +25,7 @@ wod_SHL=compiler/wcompiler custom/wcommon
  
 
 wcompiler_INC=
-wcompiler_SRC=parser/whisper.tab.c parser/parser.c parser/yy.c parser/whisperc.c parser/strstore.c \
+wcompiler_SRC=parser/whais.tab.c parser/parser.c parser/yy.c parser/whaisc.c parser/strstore.c \
 			 semantics/expression.c semantics/op_matrix.c semantics/procdecl.c \
 			 semantics/statement.c semantics/vardecl.c semantics/wlog.c \
 			 semantics/brlo_stmts.c wraper_cpp/compiledunit.cpp
@@ -36,7 +36,7 @@ wcompiler_SHL=custom/wcommon
 wslcompiler_SRC=$(wcompiler_SRC)
 wslcompiler_INC=$(wcompiler_INC)
 
-./compiler/parser/whisper.tab.c ./compiler/parser/whisper.tab.h : ./compiler/parser/whisper.y
+./compiler/parser/whais.tab.c ./compiler/parser/whais.tab.h : ./compiler/parser/whais.y
 	$(ECHO)if [ ! -f $@ ] ; then bison -d $? -o $@ ; fi
 
 

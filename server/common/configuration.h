@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <fstream>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "dbs/dbs_mgr.h"
 #include "interpreter/interpreter.h"
@@ -48,24 +48,24 @@ struct ListenEntry
 
 struct ServerSettings
 {
-  ServerSettings ()
-    : mMaxConnections (UNSET_VALUE),
-      mMaxFrameSize (UNSET_VALUE),
-      mTableCacheBlockSize (UNSET_VALUE),
-      mTableCacheBlockCount (UNSET_VALUE),
-      mVLBlockSize (UNSET_VALUE),
-      mVLBlockCount (UNSET_VALUE),
-      mTempValuesCache (UNSET_VALUE),
-      mAuthTMO (UNSET_VALUE),
-      mSyncWakeup (UNSET_VALUE),
-      mSyncInterval (UNSET_VALUE),
-      mWaitReqTmo (UNSET_VALUE),
-      mWorkDirectory (),
-      mTempDirectory (),
-      mLogFile (),
-      mListens (),
-      mCipher (UNSET_VALUE),
-      mShowDebugLog (false)
+  ServerSettings( )
+    : mMaxConnections( UNSET_VALUE),
+      mMaxFrameSize( UNSET_VALUE),
+      mTableCacheBlockSize( UNSET_VALUE),
+      mTableCacheBlockCount( UNSET_VALUE),
+      mVLBlockSize( UNSET_VALUE),
+      mVLBlockCount( UNSET_VALUE),
+      mTempValuesCache( UNSET_VALUE),
+      mAuthTMO( UNSET_VALUE),
+      mSyncWakeup( UNSET_VALUE),
+      mSyncInterval( UNSET_VALUE),
+      mWaitReqTmo( UNSET_VALUE),
+      mWorkDirectory( ),
+      mTempDirectory( ),
+      mLogFile( ),
+      mListens( ),
+      mCipher( UNSET_VALUE),
+      mShowDebugLog( false)
   {
   }
 
@@ -94,18 +94,18 @@ struct ServerSettings
 
 struct DBSDescriptors
 {
-  DBSDescriptors (const uint_t configLine)
-    : mConfigLine (configLine),
-      mSyncInterval (UNSET_VALUE),
-      mWaitReqTmo (UNSET_VALUE),
-      mDbsName (),
-      mDbsDirectory (),
-      mObjectLibs (),
-      mNativeLibs (),
-      mDbs (NULL),
-      mSession (NULL),
-      mLogger (NULL),
-      mLastFlushTick (0)
+  DBSDescriptors( const uint_t configLine)
+    : mConfigLine( configLine),
+      mSyncInterval( UNSET_VALUE),
+      mWaitReqTmo( UNSET_VALUE),
+      mDbsName( ),
+      mDbsDirectory( ),
+      mObjectLibs( ),
+      mNativeLibs( ),
+      mDbs( NULL),
+      mSession( NULL),
+      mLogger( NULL),
+      mLastFlushTick( 0)
   {
   }
 
@@ -119,38 +119,38 @@ struct DBSDescriptors
   std::string                      mUserPasswd;
   std::vector<std::string>         mObjectLibs;
   std::vector<std::string>         mNativeLibs;
-  whisper::IDBSHandler*            mDbs;
-  whisper::ISession*               mSession;
-  whisper::Logger*                 mLogger;
+  whais::IDBSHandler*            mDbs;
+  whais::ISession*               mSession;
+  whais::Logger*                 mLogger;
   uint64_t			   mLastFlushTick;
 };
 
 const std::string&
-GlobalContextDatabase ();
+GlobalContextDatabase( );
 
 const ServerSettings&
-GetAdminSettings ();
+GetAdminSettings( );
 
 bool
-SeekAtConfigurationSection (std::ifstream& config, uint_t& outConfigLine);
+SeekAtConfigurationSection( std::ifstream& config, uint_t& outConfigLine);
 
 bool
-FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine);
+FindNextContextSection( std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseConfigurationSection (std::ifstream& config, uint_t& inoutConfigLine);
+ParseConfigurationSection( std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseContextSection (whisper::Logger&        log,
+ParseContextSection( whais::Logger&        log,
                      std::ifstream&          config,
                      uint_t&                 inoutConfigLine,
                      DBSDescriptors&         output);
 
 bool
-PrepareConfigurationSection (whisper::Logger& log);
+PrepareConfigurationSection( whais::Logger& log);
 
 bool
-PrepareContextSection (whisper::Logger& log, DBSDescriptors& inoutDesc);
+PrepareContextSection( whais::Logger& log, DBSDescriptors& inoutDesc);
 
 #endif /* CONFIGURATION_H_ */
 

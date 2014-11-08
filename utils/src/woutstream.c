@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,10 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "woutstream.h"
 
 struct WOutputStream*
-wh_ostream_init (const uint_t                increment,
+wh_ostream_init( const uint_t                increment,
                  struct WOutputStream* const outStream)
 {
-  assert (outStream != NULL);
+  assert( outStream != NULL);
 
   outStream->dataSize  = 0;
   outStream->increment = (increment != 0) ?
@@ -44,21 +44,21 @@ wh_ostream_init (const uint_t                increment,
 
 
 void
-wh_ostream_clean (struct WOutputStream* const stream)
+wh_ostream_clean( struct WOutputStream* const stream)
 {
   if (stream->data != NULL)
-    mem_free (stream->data);
+    mem_free( stream->data);
 
   stream->data = NULL;
 }
 
 
 struct WOutputStream*
-wh_ostream_write (struct WOutputStream* const stream,
+wh_ostream_write( struct WOutputStream* const stream,
                   const uint8_t*              data,
                   uint_t                      dataSize)
 {
-  assert (stream->reserved >= stream->dataSize);
+  assert( stream->reserved >= stream->dataSize);
 
   if (dataSize + stream->dataSize > stream->reserved)
     {
@@ -73,7 +73,7 @@ wh_ostream_write (struct WOutputStream* const stream,
           stream->increment = increment;
         }
 
-      temp = mem_realloc (stream->data, stream->increment + stream->reserved);
+      temp = mem_realloc( stream->data, stream->increment + stream->reserved);
       if (temp == NULL)
         return NULL;
 
@@ -82,7 +82,7 @@ wh_ostream_write (struct WOutputStream* const stream,
     }
 
   /* add the data at the end */
-  while (dataSize-- > 0)
+  while( dataSize-- > 0)
     stream->data[stream->dataSize++] = *data++;
 
   return stream;

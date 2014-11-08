@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,15 +22,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_MACROS_H
-#define WHISPER_MACROS_H
+#ifndef WHAIS_MACROS_H
+#define WHAIS_MACROS_H
 
 #ifndef TRUE
-#define TRUE    (1)
+#define TRUE      (1)
 #endif
 
 #ifndef FALSE
-#define FALSE   (0)
+#define FALSE     (0)
 #endif
 
 #ifndef MIN
@@ -41,5 +41,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MAX(a,b) ((a)<(b)?(b):(a))
 #endif
 
-#endif /*WHISPER_MACROS_H */
+#endif /*WHAIS_MACROS_H */
 

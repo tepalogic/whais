@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -31,12 +31,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wutf.h"
 #include "utils/range.h"
 #include "utils/valtranslator.h"
-#include "compiler/whisperc.h"
+#include "compiler/whaisc.h"
 
 #include "wcmd_valparser.h"
 
 using namespace std;
-using namespace whisper;
+using namespace whais;
 
 
 
@@ -50,27 +50,27 @@ static const char MAX_VALUE[]  = "max";
 
 
 template<class T>
-bool parse_defined_values (const char*       src,
+bool parse_defined_values( const char*       src,
                            size_t*           outSrcSize,
                            T* const          outValue)
 {
-  if (strncmp (src, NULL_VALUE, sizeof (NULL_VALUE) - 1) == 0)
+  if (strncmp( src, NULL_VALUE, sizeof( NULL_VALUE) - 1) == 0)
     {
-      *outSrcSize = sizeof (NULL_VALUE) - 1;
+      *outSrcSize = sizeof( NULL_VALUE) - 1;
       *outValue   = T ();
 
       return true;
     }
-  else if (strncmp (src, MIN_VALUE, sizeof (MIN_VALUE) - 1) == 0)
+  else if (strncmp( src, MIN_VALUE, sizeof( MIN_VALUE) - 1) == 0)
     {
-      *outSrcSize = sizeof (MIN_VALUE) - 1;
+      *outSrcSize = sizeof( MIN_VALUE) - 1;
       *outValue   = T::Min ();
 
       return true;
     }
-  else if (strncmp (src, MAX_VALUE, sizeof (MAX_VALUE) - 1) == 0)
+  else if (strncmp( src, MAX_VALUE, sizeof( MAX_VALUE) - 1) == 0)
     {
-      *outSrcSize = sizeof (MAX_VALUE) - 1;
+      *outSrcSize = sizeof( MAX_VALUE) - 1;
       *outValue   = T::Max ();
 
       return true;
@@ -81,7 +81,7 @@ bool parse_defined_values (const char*       src,
 
 
 template<typename T> bool
-ParseFieldValue (ostream* const  os,
+ParseFieldValue( ostream* const  os,
                  const char*     src,
                  const bool      apostrophe,
                  size_t* const   outSrcSize,
@@ -89,7 +89,7 @@ ParseFieldValue (ostream* const  os,
 {
   uint_t offset = 0;
 
-  if (parse_defined_values (src, outSrcSize, outValue))
+  if (parse_defined_values( src, outSrcSize, outValue))
     return true;
 
   if (apostrophe && (src[offset++] != '\''))
@@ -97,15 +97,15 @@ ParseFieldValue (ostream* const  os,
 
   try
     {
-       int size = Utf8Translator::Read (_RC (const uint8_t*, src) + offset,
-                                        strlen (src) - offset,
+       int size = Utf8Translator::Read( _RC (const uint8_t*, src) + offset,
+                                        strlen( src) - offset,
                                         outValue);
        if (size <= 0)
          return false;
 
        offset += size;
     }
-  catch (DBSException &)
+  catch( DBSException &)
     {
       return false;
     }
@@ -127,7 +127,7 @@ ParseFieldValue<DChar> (ostream* const  os,
   (void)apostrophe;
   uint_t offset = 0;
 
-  if (parse_defined_values (src, outSrcSize, outValue))
+  if (parse_defined_values( src, outSrcSize, outValue))
     return true;
 
   const bool specialChar = src[offset] == '\"';
@@ -138,8 +138,8 @@ ParseFieldValue<DChar> (ostream* const  os,
 
   try
     {
-       int size = Utf8Translator::Read (_RC (const uint8_t*, src) + offset,
-                                        strlen (src) - offset,
+       int size = Utf8Translator::Read( _RC (const uint8_t*, src) + offset,
+                                        strlen( src) - offset,
                                         specialChar,
                                         outValue);
        if (size <= 0)
@@ -147,7 +147,7 @@ ParseFieldValue<DChar> (ostream* const  os,
 
        offset += size;
     }
-  catch (DBSException &)
+  catch( DBSException &)
     {
       return false;
     }
@@ -160,7 +160,7 @@ ParseFieldValue<DChar> (ostream* const  os,
 }
 
 template<typename T> bool
-ParseFieldSpecifier (ostream* const              os,
+ParseFieldSpecifier( ostream* const              os,
                      const char*                 src,
                      size_t* const               outSrcSize,
                      const bool                  apostrophe,
@@ -172,7 +172,7 @@ ParseFieldSpecifier (ostream* const              os,
   size_t offset = 0;
   bool   result = false;
 
-  while ((src[offset] != 0) && ! isspace (src[offset]))
+  while( (src[offset] != 0) && ! isspace( src[offset]))
     {
       T first, second;
 
@@ -191,13 +191,13 @@ ParseFieldSpecifier (ostream* const              os,
 
       if ((src[offset] == ',')
           || (src[offset] == 0)
-          || (isspace (src[offset])))
+          || (isspace( src[offset])))
         {
-          if (first.IsNull ())
+          if (first.IsNull( ))
             outFieldValues.mSearchNull = true;
 
           else
-            range.Join (Interval<T> (first, first));
+            range.Join( Interval<T> (first, first));
 
           if (src[offset] == ',')
             ++offset;
@@ -219,15 +219,15 @@ ParseFieldSpecifier (ostream* const              os,
 
           if ((src[offset] != ',')
               && (src[offset] != 0)
-              && ! isspace(src[offset]))
+              && ! isspace( src[offset]))
             {
               goto ParseFieldSpecifier_msg_err;
             }
 
-          if (first.IsNull () || second.IsNull ())
+          if (first.IsNull( ) || second.IsNull( ))
             goto ParseFieldSpecifier_msg_err;
 
-          range.Join (Interval<T> (first, second));
+          range.Join( Interval<T> (first, second));
 
           if (src[offset] == ',')
             ++offset;
@@ -252,11 +252,11 @@ ParseFieldSpecifier_msg_err:
 
 
 static void*
-allocate_value_range (const uint_t fieldType)
+allocate_value_range( const uint_t fieldType)
 {
   void* result = NULL;
 
-  switch (fieldType)
+  switch( fieldType)
     {
     case T_BOOL:
       result = new Range<DBool> ();
@@ -319,16 +319,16 @@ allocate_value_range (const uint_t fieldType)
       break;
 
      default:
-      assert (false);
+      assert( false);
     }
 
   return result;
 }
 
 static void
-free_value_range (const uint_t fieldType, void* const range)
+free_value_range( const uint_t fieldType, void* const range)
 {
-  switch (fieldType)
+  switch( fieldType)
     {
     case T_BOOL:
       delete _RC (Range<DBool>*, range);
@@ -391,31 +391,31 @@ free_value_range (const uint_t fieldType, void* const range)
       break;
 
      default:
-      assert (false);
+      assert( false);
     }
 }
 
 
 static bool
-parse_rows_selection (ostream* const     os,
+parse_rows_selection( ostream* const     os,
                       ITable&            table,
                       const char* const  str,
                       size_t* const      outSelectSize,
                       Range<ROW_INDEX>&  outRowsRange)
 {
-  const size_t strSize = strlen (str);
+  const size_t strSize = strlen( str);
   size_t&      offset  = *outSelectSize;
 
   offset = 0;
-  while ((offset < strSize) && isspace (str[offset]))
+  while( (offset < strSize) && isspace( str[offset]))
     ++offset;
 
-  outRowsRange.Clear ();
+  outRowsRange.Clear( );
 
   Range<ROW_INDEX> allRows;
 
-  if (table.AllocatedRows () > 0)
-    allRows.Join (Interval<ROW_INDEX> (0, table.AllocatedRows() - 1));
+  if (table.AllocatedRows( ) > 0)
+    allRows.Join( Interval<ROW_INDEX> (0, table.AllocatedRows( ) - 1));
 
   if (offset >= strSize)
     {
@@ -429,26 +429,26 @@ parse_rows_selection (ostream* const     os,
       ++offset;
 
       //Check if the entry is valid.
-      if ((str[offset] != 0) && ! isspace (str[offset]))
+      if ((str[offset] != 0) && ! isspace( str[offset]))
         return false;
 
       outRowsRange = allRows;
 
       //Make sure we parse all the white chars after it.
-      while ((str[offset] != 0) && isspace (str[offset]))
+      while( (str[offset] != 0) && isspace( str[offset]))
         ++offset;
 
       return true;
     }
 
   ROW_INDEX from, to;
-  while ((str[offset] != 0)
-         && ! isspace (str[offset]))
+  while( (str[offset] != 0)
+         && ! isspace( str[offset]))
     {
       bool fromEntered = false;
 
-      from = 0, to = table.AllocatedRows ();
-      while (isdigit (str[offset]))
+      from = 0, to = table.AllocatedRows( );
+      while( isdigit( str[offset]))
         {
           const ROW_INDEX temp = from;
 
@@ -462,15 +462,15 @@ parse_rows_selection (ostream* const     os,
           fromEntered = true;
         }
 
-      if ((str[offset] == 0) || isspace (str[offset]))
+      if ((str[offset] == 0) || isspace( str[offset]))
         {
 
           if (! fromEntered)
             goto invalid_row_spec;
 
-          outRowsRange.Join (Interval<ROW_INDEX> (from, from));
+          outRowsRange.Join( Interval<ROW_INDEX> (from, from));
 
-          while ((str[offset] != 0) && isspace(str[offset]))
+          while( (str[offset] != 0) && isspace( str[offset]))
             ++offset;
 
           break;
@@ -480,17 +480,17 @@ parse_rows_selection (ostream* const     os,
           if (! fromEntered || (++offset >= strSize))
             goto invalid_row_spec;
 
-          outRowsRange.Join (Interval<ROW_INDEX> (from, from));
+          outRowsRange.Join( Interval<ROW_INDEX> (from, from));
 
           continue;
         }
       else if (str[offset++] != '-')
         goto invalid_row_spec;
 
-      if (isdigit (str[offset]))
+      if (isdigit( str[offset]))
         to = 0;
 
-      while (isdigit (str[offset]))
+      while( isdigit( str[offset]))
         {
           const ROW_INDEX temp = to;
 
@@ -503,7 +503,7 @@ parse_rows_selection (ostream* const     os,
           ++offset;
         }
 
-       outRowsRange.Join (Interval<ROW_INDEX> (from, to));
+       outRowsRange.Join( Interval<ROW_INDEX> (from, to));
 
        if (str[offset] == ',')
          {
@@ -512,7 +512,7 @@ parse_rows_selection (ostream* const     os,
          }
     }
 
-  outRowsRange.Match (allRows);
+  outRowsRange.Match( allRows);
 
   return true;
 
@@ -525,7 +525,7 @@ invalid_row_spec:
 
 
 static bool
-parse_field_values_selection (ostream* const              os,
+parse_field_values_selection( ostream* const              os,
                               ITable&                     table,
                               const char*                 str,
                               size_t*                     outSelectSize,
@@ -533,17 +533,17 @@ parse_field_values_selection (ostream* const              os,
 {
   size_t& offset  = *outSelectSize;
 
-  outRowsRange->~FieldValuesSelection ();
+  outRowsRange->~FieldValuesSelection( );
   _placement_new<FieldValuesSelection> (outRowsRange);
 
   /* Get the field information first. */
   offset = 0;
   string field;
-  while ((str[offset] != 0) && (str[offset] != '='))
-    field.push_back (str[offset++]);
+  while( (str[offset] != 0) && (str[offset] != '='))
+    field.push_back( str[offset++]);
 
-  outRowsRange->mFieldId = table.RetrieveField (field.c_str ());
-  DBSFieldDescriptor fd  = table.DescribeField (outRowsRange->mFieldId);
+  outRowsRange->mFieldId = table.RetrieveField( field.c_str( ));
+  DBSFieldDescriptor fd  = table.DescribeField( outRowsRange->mFieldId);
 
   if (fd.isArray)
     {
@@ -561,14 +561,14 @@ parse_field_values_selection (ostream* const              os,
     }
 
   outRowsRange->mFieldType = fd.type;
-  outRowsRange->mRange     = allocate_value_range (fd.type);
+  outRowsRange->mRange     = allocate_value_range( fd.type);
 
-  assert (outRowsRange->mRange != NULL);
+  assert( outRowsRange->mRange != NULL);
 
   if (str[offset] == '=')
     ++offset;
 
-  if ((str[offset] == 0) || isspace (str[offset]))
+  if ((str[offset] == 0) || isspace( str[offset]))
     {
       if (os != NULL)
         *os << "Field values are missing or are not properly specified.\n";
@@ -577,7 +577,7 @@ parse_field_values_selection (ostream* const              os,
     }
 
   size_t temp;
-  switch (outRowsRange->mFieldType)
+  switch( outRowsRange->mFieldType)
     {
     case T_BOOL:
       if (! ParseFieldSpecifier<DBool> (os,
@@ -760,28 +760,28 @@ parse_field_values_selection (ostream* const              os,
       break;
 
     default:
-      assert (false);
+      assert( false);
     }
   offset += temp;
 
-  assert (offset <= strlen (str));
+  assert( offset <= strlen( str));
 
   return true;
 }
 
 
 bool
-ParseRowsSelectionClause (ostream* const    os,
-                          whisper::ITable&  table,
+ParseRowsSelectionClause( ostream* const    os,
+                          whais::ITable&  table,
                           const char*       str,
                           RowsSelection&    outRowsSelection)
 {
   size_t offset = 0;
 
-  outRowsSelection.~RowsSelection ();
+  outRowsSelection.~RowsSelection( );
   _placement_new<RowsSelection> (&outRowsSelection);
 
-  if (! parse_rows_selection (os,
+  if (! parse_rows_selection( os,
                               table,
                               str,
                               &offset,
@@ -790,9 +790,9 @@ ParseRowsSelectionClause (ostream* const    os,
       return false;
     }
 
-  while (str[offset] != 0)
+  while( str[offset] != 0)
     {
-      if (isspace (str[offset]))
+      if (isspace( str[offset]))
         {
           ++offset;
           continue;
@@ -800,7 +800,7 @@ ParseRowsSelectionClause (ostream* const    os,
 
       FieldValuesSelection sel;
       size_t               temp;
-      if (! parse_field_values_selection (os,
+      if (! parse_field_values_selection( os,
                                           table,
                                           str + offset,
                                           &temp,
@@ -809,53 +809,53 @@ ParseRowsSelectionClause (ostream* const    os,
           return false;
         }
 
-      outRowsSelection.mSearchedValue.push_back (sel);
+      outRowsSelection.mSearchedValue.push_back( sel);
       sel.mRange = NULL;  //Manually release the ownership!
 
       offset += temp;
     }
 
-  assert (offset == strlen (str));
+  assert( offset == strlen( str));
 
   return true;
 }
 
 
 
-FieldValuesSelection::FieldValuesSelection ()
-  : mFieldId (0),
-    mFieldType (T_UNKNOWN),
-    mSearchNull (false),
-    mRange (NULL)
+FieldValuesSelection::FieldValuesSelection( )
+  : mFieldId( 0),
+    mFieldType( T_UNKNOWN),
+    mSearchNull( false),
+    mRange( NULL)
 {
 }
 
 
-FieldValuesSelection::~FieldValuesSelection ()
+FieldValuesSelection::~FieldValuesSelection( )
 {
   if (mFieldType != T_UNKNOWN)
-    free_value_range (mFieldType, mRange);
+    free_value_range( mFieldType, mRange);
 }
 
 
 
-FieldValuesUpdate::~FieldValuesUpdate ()
+FieldValuesUpdate::~FieldValuesUpdate( )
 {
-  assert ((T_UNKNOWN < GET_BASIC_TYPE (mFieldType))
+  assert( (T_UNKNOWN < GET_BASIC_TYPE( mFieldType))
           || (mFieldType == T_UNKNOWN));
-  assert (GET_BASIC_TYPE (mFieldType) < T_UNDETERMINED);
+  assert( GET_BASIC_TYPE( mFieldType) < T_UNDETERMINED);
 
-  if (IS_ARRAY (mFieldType))
-    _RC (DArray*, mValue)->~DArray ();
+  if (IS_ARRAY( mFieldType))
+    _RC (DArray*, mValue)->~DArray( );
 
-  else if (GET_BASIC_TYPE (mFieldType) == T_TEXT)
-    _RC (DText*, mValue)->~DText ();
+  else if (GET_BASIC_TYPE( mFieldType) == T_TEXT)
+    _RC (DText*, mValue)->~DText( );
 }
 
 
 
 bool
-ParseFieldUpdateValues (ostream* const              os,
+ParseFieldUpdateValues( ostream* const              os,
                         ITable&                     table,
                         const char*                 str,
                         size_t* const               outSize,
@@ -864,10 +864,10 @@ ParseFieldUpdateValues (ostream* const              os,
   size_t& offset = *outSize;
 
 
-  outUpdates.clear ();
+  outUpdates.clear( );
   offset = 0;
 
-  while ((str[offset] != 0) && isspace (str[offset]))
+  while( (str[offset] != 0) && isspace( str[offset]))
     ++offset;
 
   if (str[offset] == 0 )
@@ -878,12 +878,12 @@ ParseFieldUpdateValues (ostream* const              os,
       return false;
     }
 
-  while ((str[offset] != 0) && ! isspace (str[offset]))
+  while( (str[offset] != 0) && ! isspace( str[offset]))
     {
       string field;
 
-      while ((str[offset] != 0) && (str[offset] != '='))
-          field.push_back (str[offset++]);
+      while( (str[offset] != 0) && (str[offset] != '='))
+          field.push_back( str[offset++]);
 
       if (str[offset] == 0)
         {
@@ -895,8 +895,8 @@ ParseFieldUpdateValues (ostream* const              os,
       else
         ++offset;
 
-      const FIELD_INDEX        fieldId = table.RetrieveField (field.c_str ());
-      const DBSFieldDescriptor fd      = table.DescribeField (fieldId);
+      const FIELD_INDEX        fieldId = table.RetrieveField( field.c_str( ));
+      const DBSFieldDescriptor fd      = table.DescribeField( fieldId);
 
       if (fd.isArray)
         {
@@ -905,16 +905,16 @@ ParseFieldUpdateValues (ostream* const              os,
 
           DArray arrayVal;
 
-          while ((str[offset] != 0) && (str[offset] != ']'))
+          while( (str[offset] != 0) && (str[offset] != ']'))
             {
-              if (isspace (str[offset]))
+              if (isspace( str[offset]))
                 {
                   ++offset;
                   continue;
                 }
 
               const size_t temp = offset;
-              switch (GET_BASIC_TYPE (fd.type))
+              switch( GET_BASIC_TYPE( fd.type))
                 {
                 case T_BOOL:
                     {
@@ -1157,7 +1157,7 @@ ParseFieldUpdateValues (ostream* const              os,
                   break;
 
                 default:
-                  assert (false);
+                  assert( false);
                 }
               offset += temp;
             }
@@ -1166,14 +1166,14 @@ ParseFieldUpdateValues (ostream* const              os,
             return false;
 
           uint_t type = fd.type;
-          MARK_ARRAY (type);
+          MARK_ARRAY( type);
 
-          outUpdates.push_back (FieldValuesUpdate (fieldId, type, arrayVal));
+          outUpdates.push_back( FieldValuesUpdate( fieldId, type, arrayVal));
         }
       else
         {
           const size_t temp = offset;
-          switch (fd.type)
+          switch( fd.type)
             {
             case T_BOOL:
                 {
@@ -1187,7 +1187,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1205,7 +1205,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1223,7 +1223,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1241,7 +1241,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1259,7 +1259,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1277,7 +1277,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1295,7 +1295,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1313,7 +1313,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1331,7 +1331,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1349,7 +1349,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1367,7 +1367,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1385,7 +1385,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1403,7 +1403,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1421,7 +1421,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1439,7 +1439,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       return false;
                     }
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
@@ -1455,13 +1455,13 @@ ParseFieldUpdateValues (ostream* const              os,
 
                   DText  value;
 
-                  const size_t strSize = strlen (str);
-                  while ((str[offset] != 0) && (str[offset] != delimCh))
+                  const size_t strSize = strlen( str);
+                  while( (str[offset] != 0) && (str[offset] != delimCh))
                     {
                       DChar  ch;
 
 
-                      const int chLen = Utf8Translator::Read (
+                      const int chLen = Utf8Translator::Read( 
                                           _RC (const uint8_t*, str) + offset,
                                           strSize - offset,
                                           specialChars,
@@ -1470,28 +1470,28 @@ ParseFieldUpdateValues (ostream* const              os,
                       if (chLen <= 0)
                         return false;
 
-                      assert (ch.IsNull () == false);
+                      assert( ch.IsNull( ) == false);
 
-                      value.Append (ch);
+                      value.Append( ch);
                       offset += chLen;
                     }
-                  assert (offset <= strSize);
+                  assert( offset <= strSize);
 
                   if (str[offset++] != delimCh)
                     return false;
 
-                  assert (temp < offset);
+                  assert( temp < offset);
                   offset -= temp; //Needed here for consistency. It will be
                                   //cleared outside the 'switch' block.
 
-                  outUpdates.push_back (FieldValuesUpdate (fieldId,
+                  outUpdates.push_back( FieldValuesUpdate( fieldId,
                                                            fd.type,
                                                            value));
                 }
               break;
 
             default:
-              assert (false);
+              assert( false);
             }
           offset += temp;
         }
@@ -1504,25 +1504,25 @@ ParseFieldUpdateValues (ostream* const              os,
 }
 
 bool
-UpdateTableRow (ostream const*                   os,
+UpdateTableRow( ostream const*                   os,
                 ITable&                          table,
                 const ROW_INDEX                  row,
                 const vector<FieldValuesUpdate>& fieldVals)
 {
-  size_t field = fieldVals.size ();
+  size_t field = fieldVals.size( );
 
-  while (field-- > 0)
+  while( field-- > 0)
     {
       const FieldValuesUpdate& fv = fieldVals[field];
 
-      if (IS_ARRAY (fv.mFieldType))
+      if (IS_ARRAY( fv.mFieldType))
         {
           const DArray& value = *_RC (const DArray*, fv.mValue);
           table.Set (row, fv.mFieldId, value);
         }
       else
         {
-          switch (fv.mFieldType)
+          switch( fv.mFieldType)
             {
             case T_BOOL:
                 {
@@ -1638,7 +1638,7 @@ UpdateTableRow (ostream const*                   os,
               break;
 
             default:
-              assert (false);
+              assert( false);
             }
         }
     }
@@ -1648,10 +1648,10 @@ UpdateTableRow (ostream const*                   os,
 
 
 static void
-add_rows_to_interval (DArray&           rows,
+add_rows_to_interval( DArray&           rows,
                       Range<ROW_INDEX>& inoutRange)
 {
-  const uint64_t count = rows.Count ();
+  const uint64_t count = rows.Count( );
 
   DROW_INDEX  prev, last, first;
 
@@ -1659,40 +1659,40 @@ add_rows_to_interval (DArray&           rows,
     {
       rows.Get (i, last);
 
-      if (prev.IsNull ())
+      if (prev.IsNull( ))
         first = prev = last;
 
-      else if (last.Prev () == prev)
+      else if (last.Prev( ) == prev)
         prev = last;
 
       else
         {
-          assert (first.IsNull () == false);
+          assert( first.IsNull( ) == false);
 
-          inoutRange.Join (Interval<ROW_INDEX> (first.mValue, prev.mValue));
+          inoutRange.Join( Interval<ROW_INDEX> (first.mValue, prev.mValue));
 
           first = prev = last;
         }
     }
 
-  if (! first.IsNull ())
+  if (! first.IsNull( ))
     {
-      assert (last.IsNull () == false);
+      assert( last.IsNull( ) == false);
 
-      inoutRange.Join (Interval<ROW_INDEX> (first.mValue, last.mValue));
+      inoutRange.Join( Interval<ROW_INDEX> (first.mValue, last.mValue));
     }
 }
 
 
 template<typename T>
-void match_field_value (ITable&                     table,
+void match_field_value( ITable&                     table,
                         const FieldValuesSelection  values,
                         Range<ROW_INDEX>&           inoutRow)
 {
   const Range<T>& valRange = * _RC (Range<T>*, values.mRange);
 
-  const size_t rowIntervals = inoutRow.mIntervals.size ();
-  const size_t valIntervals = valRange.mIntervals.size ();
+  const size_t rowIntervals = inoutRow.mIntervals.size( );
+  const size_t valIntervals = valRange.mIntervals.size( );
 
   Range<ROW_INDEX> fieldRows;
 
@@ -1704,40 +1704,40 @@ void match_field_value (ITable&                     table,
         {
           const Interval<T>& vals = valRange.mIntervals[v];
 
-          DArray rowsFound = table.MatchRows (vals.mFrom,
+          DArray rowsFound = table.MatchRows( vals.mFrom,
                                               vals.mTo,
                                               rows.mFrom,
                                               rows.mTo,
                                               values.mFieldId);
-          add_rows_to_interval (rowsFound, fieldRows);
+          add_rows_to_interval( rowsFound, fieldRows);
         }
 
       if (values.mSearchNull)
         {
-          DArray rowsFound = table.MatchRows (T (),
+          DArray rowsFound = table.MatchRows( T (),
                                               T (),
                                               rows.mFrom,
                                               rows.mTo,
                                               values.mFieldId);
-          add_rows_to_interval (rowsFound, fieldRows);
+          add_rows_to_interval( rowsFound, fieldRows);
         }
     }
 
-  fieldRows.Complement ();
-  inoutRow.Match (fieldRows);
+  fieldRows.Complement( );
+  inoutRow.Match( fieldRows);
 }
 
 
 void
-MatchSelectedRows (ITable&             table,
+MatchSelectedRows( ITable&             table,
                    RowsSelection&      select)
 {
-  const size_t fieldsCount = select.mSearchedValue.size ();
+  const size_t fieldsCount = select.mSearchedValue.size( );
 
   for (size_t i = 0; i < fieldsCount; ++i)
     {
       Range<ROW_INDEX> fieldRows = select.mRows;
-      switch (select.mSearchedValue[i].mFieldType)
+      switch( select.mSearchedValue[i].mFieldType)
         {
         case T_BOOL:
           match_field_value<DBool> (table,
@@ -1830,27 +1830,27 @@ MatchSelectedRows (ITable&             table,
           break;
 
         default:
-          assert (false);
+          assert( false);
         }
 
-      fieldRows.Complement ();
-      select.mRows.Match (fieldRows);
+      fieldRows.Complement( );
+      select.mRows.Match( fieldRows);
     }
 }
 
 
 template<typename T>
 void
-print_basic_value (ostream&      os,
+print_basic_value( ostream&      os,
                    const T&      value,
                    const bool    apostrophe)
 {
   char temp[MAX_VALUE_OUTPUT_SIZE];
 
-  if (value.IsNull ())
+  if (value.IsNull( ))
     return ;
 
-  Utf8Translator::Write (_RC (uint8_t*, temp), sizeof (temp), value);
+  Utf8Translator::Write( _RC (uint8_t*, temp), sizeof( temp), value);
 
   if (apostrophe)
     os << '\'';
@@ -1868,10 +1868,10 @@ print_basic_value<DChar> (ostream&        os,
 {
   char temp[MAX_VALUE_OUTPUT_SIZE];
 
-  if (value.IsNull ())
+  if (value.IsNull( ))
     return ;
 
-  Utf8Translator::Write (_RC (uint8_t*, temp), sizeof (temp), true, value);
+  Utf8Translator::Write( _RC (uint8_t*, temp), sizeof( temp), true, value);
 
   if (apostrophe)
     os << '\'';
@@ -1885,23 +1885,23 @@ print_basic_value<DChar> (ostream&        os,
 
 
 void
-PrintFieldValue (ostream&             os,
+PrintFieldValue( ostream&             os,
                  ITable&              table,
                  const ROW_INDEX      row,
                  const FIELD_INDEX    field)
 {
-  DBSFieldDescriptor fd = table.DescribeField (field);
+  DBSFieldDescriptor fd = table.DescribeField( field);
 
   if (fd.isArray)
     {
       DArray  array;
       table.Get (row, field, array);
 
-      const uint64_t count = array.Count ();
+      const uint64_t count = array.Count( );
       for (uint64_t i = 0; i < count; i++)
         {
           os << ' ';
-          switch (fd.type)
+          switch( fd.type)
             {
             case T_BOOL:
                 {
@@ -2023,14 +2023,14 @@ PrintFieldValue (ostream&             os,
                 }
               break;
             default:
-              assert (false);
+              assert( false);
             }
         }
     }
   else
     {
       os << ' ';
-      switch (fd.type)
+      switch( fd.type)
         {
         case T_BOOL:
             {
@@ -2157,23 +2157,23 @@ PrintFieldValue (ostream&             os,
               DText value;
 
               table.Get (row, field, value);
-              const uint64_t textLength = value.Count ();
-              if (value.IsNull ())
+              const uint64_t textLength = value.Count( );
+              if (value.IsNull( ))
                 break;
 
               os << '\'';
 
-              assert (textLength > 0);
+              assert( textLength > 0);
 
               for (uint64_t i = 0; i < textLength; ++i)
-                print_basic_value<DChar> (os, value.CharAt (i), false);
+                print_basic_value<DChar> (os, value.CharAt( i), false);
 
               os << '\'';
             }
           break;
 
         default:
-          assert (false);
+          assert( false);
         }
     }
 }

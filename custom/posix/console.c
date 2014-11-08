@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <termios.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #ifndef STDIN_FILENO
   #define STDIN_FILENO    0
@@ -35,15 +35,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 bool_t
-wh_disable_echo ()
+wh_disable_echo( )
 {
   struct termios t;
 
-  if (tcgetattr (STDIN_FILENO, &t) < 0)
+  if (tcgetattr( STDIN_FILENO, &t) < 0)
     return FALSE;
 
   t.c_lflag &= ~ECHO;
-  if (tcsetattr (STDIN_FILENO, TCSANOW, &t) < 0)
+  if (tcsetattr( STDIN_FILENO, TCSANOW, &t) < 0)
     return FALSE;
 
   return TRUE;
@@ -51,15 +51,15 @@ wh_disable_echo ()
 
 
 bool_t
-wh_enable_echo ()
+wh_enable_echo( )
 {
   struct termios t;
 
-  if (tcgetattr (STDIN_FILENO, &t) < 0)
+  if (tcgetattr( STDIN_FILENO, &t) < 0)
     return FALSE;
 
   t.c_lflag |= ECHO;
-  if (tcsetattr (STDIN_FILENO, TCSANOW, &t) < 0)
+  if (tcsetattr( STDIN_FILENO, TCSANOW, &t) < 0)
     return FALSE;
 
   return TRUE;

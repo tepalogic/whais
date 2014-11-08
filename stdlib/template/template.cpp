@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -22,12 +22,12 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 /******************************************************************************
- Template file containing a skeleton to write a a natve Whisper library.
+ Template file containing a skeleton to write a a natve Whais library.
  *****************************************************************************/
 
 #include <assert.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "utils/wthread.h"
 #include "stdlib/interface.h"
@@ -36,7 +36,7 @@
 
 
 
-using namespace whisper;
+using namespace whais;
 
 
 
@@ -45,7 +45,7 @@ static const WLIB_PROC_DESCRIPTION sgRegisteredProcs[] = {
                                                          };
 
 static const WLIB_DESCRIPTION sgLibraryDescription = {
-    sizeof (sgRegisteredProcs) / sizeof (sgRegisteredProcs[0]),
+    sizeof( sgRegisteredProcs) / sizeof( sgRegisteredProcs[0]),
     sgRegisteredProcs
                                                      };
 
@@ -60,11 +60,11 @@ extern "C" {
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_start ()
+wlib_start( )
 {
-  LockRAII syncHolder (sgShlLocker);
+  LockRAII syncHolder( sgShlLocker);
 
-  assert (sgRefsCount >= 0);
+  assert( sgRefsCount >= 0);
 
   if (sgRefsCount == 0)
     {
@@ -83,11 +83,11 @@ wlib_start ()
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_end ()
+wlib_end( )
 {
-  LockRAII syncHolder (sgShlLocker);
+  LockRAII syncHolder( sgShlLocker);
 
-  assert ((! sgInited) || (sgRefsCount > 0));
+  assert( (! sgInited) || (sgRefsCount > 0));
 
   if (sgInited && (--sgRefsCount == 0))
     {
@@ -100,7 +100,7 @@ wlib_end ()
 
 
 SHL_EXPORT_SYMBOL const WLIB_DESCRIPTION*
-wlib_describe ()
+wlib_describe( )
 {
   if (sgInited)
     return &sgLibraryDescription;

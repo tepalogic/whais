@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -361,7 +361,7 @@ static const uint16_t SECOND_BYTE_MARK = 0x80;
 
 
 struct WOutputStream*
-encode_opcode (struct WOutputStream* stream, const enum W_OPCODE opcode)
+encode_opcode( struct WOutputStream* stream, const enum W_OPCODE opcode)
 {
   uint16_t tempOpcode = opcode;
 
@@ -379,7 +379,7 @@ encode_opcode (struct WOutputStream* stream, const enum W_OPCODE opcode)
 
 
 enum W_OPCODE
-decode_opcode (const uint8_t* instrs)
+decode_opcode( const uint8_t* instrs)
 {
   if (*instrs & SECOND_BYTE_MARK)
     {
@@ -394,7 +394,7 @@ decode_opcode (const uint8_t* instrs)
 
 
 uint_t
-wh_compiler_decode_op (const uint8_t* instrs, enum W_OPCODE* const outOpcode)
+wh_compiler_decode_op( const uint8_t* instrs, enum W_OPCODE* const outOpcode)
 {
   if (*instrs & SECOND_BYTE_MARK)
     {

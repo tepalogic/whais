@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -29,19 +29,19 @@
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldTable;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcIsFielsIndexed;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldName;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldIndex;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFindValueRange;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldAverage;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldTable;
+extern whais::WLIB_PROC_DESCRIPTION         gProcIsFielsIndexed;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldName;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldIndex;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFindValueRange;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldAverage;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
 
-whisper::WLIB_STATUS
-base_fields_init ();
+whais::WLIB_STATUS
+base_fields_init( );
 
 #endif /* BASE_FIELDS_H_ */
 

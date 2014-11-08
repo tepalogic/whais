@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHASH_H_
 #define WHASH_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 
 #ifdef __cplusplus
@@ -34,7 +34,7 @@ extern "C" {
 
 
 uint64_t
-wh_hash (const uint8_t* key, const uint_t keySize);
+wh_hash( const uint8_t* key, const uint_t keySize);
 
 
 #ifdef __cplusplus

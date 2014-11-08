@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,25 +25,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WFILE_H_
 #define WFILE_H_
 
-#include "whisper.h"
+#include "whais.h"
 
-namespace whisper
+namespace whais
 {
 
 class EXCEP_SHL FileException : public Exception
 {
 public:
-  FileException (const uint32_t    code,
+  FileException( const uint32_t    code,
                  const char*       file,
                  uint32_t          line,
                  const char*       fmtMsg,
                  ...);
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone( ) const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type( ) const;
 
-  virtual const char* Description () const;
+  virtual const char* Description( ) const;
 };
 
 
@@ -51,28 +51,28 @@ public:
 class EXCEP_SHL File
 {
 public:
-  explicit File (const char* name, uint_t mode = 0);
+  explicit File( const char* name, uint_t mode = 0);
 
-  File (const File& src);
+  File( const File& src);
   File& operator= (const File&);
 
-  ~File ();
+  ~File( );
 
-  void     Read (uint8_t* buffer, uint_t size);
+  void     Read( uint8_t* buffer, uint_t size);
 
-  void     Write (const uint8_t* buffer, uint_t size);
+  void     Write( const uint8_t* buffer, uint_t size);
 
-  void     Seek (const int64_t where, const int whence);
+  void     Seek( const int64_t where, const int whence);
 
-  uint64_t Tell ();
+  uint64_t Tell( );
 
-  void     Sync ();
+  void     Sync( );
 
-  uint64_t Size () const;
+  uint64_t Size( ) const;
 
-  void     Size (const uint64_t size);
+  void     Size( const uint64_t size);
 
-  void     Close ();
+  void     Close( );
 
 
 private:
@@ -81,6 +81,6 @@ private:
   uint64_t    mFileSize;
 };
 
-} //namespace whisper
+} //namespace whais
 
 #endif /* WFILE_H_ */

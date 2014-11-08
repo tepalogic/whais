@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SERVER_PROTOCOL_H_
 #define SERVER_PROTOCOL_H_
 
-#include "client/whisper_connector.h"
+#include "client/whais_connector.h"
 
 
 #define FRAME_SIZE_OFF                  0x00

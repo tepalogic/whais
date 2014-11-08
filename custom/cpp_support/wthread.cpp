@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -29,61 +29,61 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-namespace whisper
+namespace whais
 {
 
 
 
-Lock::Lock ()
+Lock::Lock( )
 {
-  const uint_t result = wh_lock_init (&mLock);
+  const uint_t result = wh_lock_init( &mLock);
 
   if (result != WOP_OK)
-    throw LockException (_EXTRA (result), "Failed to initialize a lock.");
+    throw LockException( _EXTRA( result), "Failed to initialize a lock.");
 }
 
 
-Lock::~Lock ()
+Lock::~Lock( )
 {
-  const uint_t result = wh_lock_destroy (&mLock);
+  const uint_t result = wh_lock_destroy( &mLock);
 
   (void)result;
-  assert (result == WOP_OK);
+  assert( result == WOP_OK);
 }
 
 
 void
-Lock::Acquire ()
+Lock::Acquire( )
 {
-  const uint_t result = wh_lock_acquire (&mLock);
+  const uint_t result = wh_lock_acquire( &mLock);
   if (result != WOP_OK)
-    throw LockException (_EXTRA (result), "Failed to acquire a lock.");
+    throw LockException( _EXTRA( result), "Failed to acquire a lock.");
 }
 
 
 void
-Lock::Release ()
+Lock::Release( )
 {
-  const uint_t result = wh_lock_release (&mLock);
+  const uint_t result = wh_lock_release( &mLock);
 
   (void)result;
-  assert (result == WOP_OK);
+  assert( result == WOP_OK);
 }
 
 
 
 
-Thread::Thread ()
-  : mRoutine (NULL),
-    mRoutineArgs (NULL),
-    mException (NULL),
-    mThread (0),
-    mLock (),
-    mUnkExceptSignaled (false),
-    mIgnoreExceptions (false),
-    mEnded (true),
-    mStarted (true),
-    mNeedsClean (false)
+Thread::Thread( )
+  : mRoutine( NULL),
+    mRoutineArgs( NULL),
+    mException( NULL),
+    mThread( 0),
+    mLock( ),
+    mUnkExceptSignaled( false),
+    mIgnoreExceptions( false),
+    mEnded( true),
+    mStarted( true),
+    mNeedsClean( false)
 {
 }
 
@@ -92,36 +92,36 @@ void
 Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
 {
   //Wait for the the previous thread to be cleared.
-  WaitToEnd ();
+  WaitToEnd( );
 
-  assert (mEnded);
-  assert (mNeedsClean == false);
+  assert( mEnded);
+  assert( mNeedsClean == false);
 
   mEnded       = true;
   mStarted     = false;
   mRoutine     = routine;
   mRoutineArgs = args;
 
-  const uint_t res = wh_thread_create (&mThread,
+  const uint_t res = wh_thread_create( &mThread,
                                        Thread::ThreadWrapperRoutine,
                                        this);
   if (res != WOP_OK)
     {
-      assert (mEnded);
+      assert( mEnded);
 
       mStarted = true;
-      throw ThreadException (_EXTRA (errno), "Failed to create a thread.");
+      throw ThreadException( _EXTRA( errno), "Failed to create a thread.");
     }
 
   mNeedsClean = true;
 }
 
 
-Thread::~Thread ()
+Thread::~Thread( )
 {
-  WaitToEnd (false);
+  WaitToEnd( false);
 
-  assert (mNeedsClean == false);
+  assert( mNeedsClean == false);
 
   //If you did not throwed the exception until now,
   //do not do it from during class destructor.
@@ -130,47 +130,47 @@ Thread::~Thread ()
 
 
 void
-Thread::WaitToEnd (const bool throwPending)
+Thread::WaitToEnd( const bool throwPending)
 {
   //Give a chance for the thread it owns to execute. Make sure it had
-  //acquired the lock (if it did not then spin), in case this method was
+  //acquired the lock( if it did not then spin), in case this method was
   //called to soon.
-  while ( ! mStarted)
-    wh_yield ();
+  while(  ! mStarted)
+    wh_yield( );
 
   //Wait till the spawned thread releases the lock.
-  LockRAII holder (mLock);
+  LockRAII holder( mLock);
 
-  assert (mEnded);
+  assert( mEnded);
 
   if (mNeedsClean)
-    wh_thread_free (mThread);
+    wh_thread_free( mThread);
 
   mNeedsClean = false;
 
   if (throwPending)
-    ThrowPendingException ();
+    ThrowPendingException( );
 }
 
 
 void
-Thread::ThrowPendingException ()
+Thread::ThrowPendingException( )
 {
-  assert (mEnded);
+  assert( mEnded);
 
-  if (HasExceptionPending () == false)
+  if (HasExceptionPending( ) == false)
     return;
 
   if (mUnkExceptSignaled)
     {
-      DiscardException ();
-      throw ThreadException (_EXTRA (WOP_UNKNOW));
+      DiscardException( );
+      throw ThreadException( _EXTRA( WOP_UNKNOW));
     }
 
   if (mException != NULL)
     {
-      Exception* clone = mException->Clone ();
-      DiscardException ();
+      Exception* clone = mException->Clone( );
+      DiscardException( );
 
       throw clone;
     }
@@ -178,40 +178,40 @@ Thread::ThrowPendingException ()
 
 
 void
-Thread::ThreadWrapperRoutine (void* const args)
+Thread::ThreadWrapperRoutine( void* const args)
 {
   Thread* const th = _RC (Thread*, args);
 
   th->mEnded = false;
-  th->mLock.Acquire ();
+  th->mLock.Acquire( );
   th->mStarted = true; //Signal the we grabbed the lock
 
   try
   {
-      th->mRoutine (th->mRoutineArgs);
+      th->mRoutine( th->mRoutineArgs);
   }
-  catch (Exception &e)
+  catch( Exception &e)
   {
     if (th->mIgnoreExceptions == false)
-      th->mException = e.Clone ();
+      th->mException = e.Clone( );
   }
-  catch (Exception* pE)
+  catch( Exception* pE)
   {
     if (th->mIgnoreExceptions == false)
       th->mException = pE;
   }
-  catch (...)
+  catch( ...)
   {
     if (th->mIgnoreExceptions == false)
       th->mUnkExceptSignaled = true;
   }
 
-  assert (th->mEnded == false);
+  assert( th->mEnded == false);
 
   th->mEnded = true;
-  th->mLock.Release ();
+  th->mLock.Release( );
 }
 
 
-} //namespace whisper
+} //namespace whais
 

@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -28,18 +28,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-namespace whisper
+namespace whais
 {
 
 
 
 const std::string
-NextToken (const std::string&       text,
+NextToken( const std::string&       text,
            size_t&                  inoutOff,
            const std::string&       delims);
 
 
-} //namespace whisper
+} //namespace whais
 
 #endif /* TOKENIZER_H_ */
 

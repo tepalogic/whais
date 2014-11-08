@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -26,15 +26,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 
-#include "whisper.h"
+#include "whais.h"
 
-#define IGNORE_BUFFER_POS      (uint_t)(~0)
+#define IGNORE_BUFFER_POS (uint_t)(~0)
 
 
 
 typedef const void* WLOG_FUNC_CONTEXT;
 
-typedef void (*WLOG_FUNC) (WLOG_FUNC_CONTEXT      bag,
+typedef void( *WLOG_FUNC) (WLOG_FUNC_CONTEXT      bag,
                            uint_t                 msgPosition,
                            uint_t                 msgCode,
                            uint_t                 msgType,
@@ -45,20 +45,20 @@ typedef void (*WLOG_FUNC) (WLOG_FUNC_CONTEXT      bag,
 /* Allow one to personalize the message handling for messages generated
  * during compilation phase. */
 void
-wh_register_logger (WLOG_FUNC callback, WLOG_FUNC_CONTEXT context);
+wh_register_logger( WLOG_FUNC callback, WLOG_FUNC_CONTEXT context);
 
 
 WLOG_FUNC
-wh_logger (void);
+wh_logger( void);
 
 
 WLOG_FUNC_CONTEXT
-wh_logger_context (void);
+wh_logger_context( void);
 
 
 /* Called whenever a message has to be generated. */
 void
-wh_log_msg (uint_t          position,
+wh_log_msg( uint_t          position,
             uint_t          code,
             uint_t          type,
             char*           formatedMsg,
@@ -68,7 +68,7 @@ wh_log_msg (uint_t          position,
 /* Utility function to truncate and append '...' when the source
  * is too large. */
 char*
-wh_copy_first (char* dest, const char* src, uint_t destMax, uint_t srcLength);
+wh_copy_first( char* dest, const char* src, uint_t destMax, uint_t srcLength);
 
 #endif /*MSGLOG_H_ */
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -28,18 +28,18 @@
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableIsPersistent;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFieldsCount;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFieldByIndex;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFieldByName;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableRowsCount;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableAddRow;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTableSort;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableIsPersistent;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableFieldsCount;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableFieldByIndex;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableFieldByName;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableRowsCount;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableAddRow;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTableSort;
 
-whisper::WLIB_STATUS
-base_tables_init ();
+whais::WLIB_STATUS
+base_tables_init( );
 
 #endif /* BASE_TABLES_H_ */

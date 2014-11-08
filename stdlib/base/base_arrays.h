@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -28,24 +28,24 @@
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayCount;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArraySort;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayBinSearch;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArraySearch;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayMin;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayMax;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayAverage;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayIntersect;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayUnion;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayDiff;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayPushBack;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
-extern whisper::WLIB_PROC_DESCRIPTION         gProcArrayHash;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayCount;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArraySort;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayBinSearch;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArraySearch;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayMin;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayMax;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayAverage;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayIntersect;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayUnion;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayDiff;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayPushBack;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
+extern whais::WLIB_PROC_DESCRIPTION         gProcArrayHash;
 
 
 
-whisper::WLIB_STATUS
-base_arrays_init ();
+whais::WLIB_STATUS
+base_arrays_init( );
 
 #endif /* BASE_ARRAYS_H_ */
 

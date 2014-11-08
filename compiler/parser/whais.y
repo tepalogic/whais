@@ -1,4 +1,4 @@
-/* WHISPER grammar file */
+/* WHAIS grammar file */
 
 %pure-parser
 %verbose
@@ -59,17 +59,17 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token UNTIL
 %token UNSIGNED
 %token WHILE
-%token WHISPER_NULL
+%token WHAIS_NULL
 %token W_FALSE
 %token W_TRUE
 
 %token IDENTIFIER
 
-%token WHISPER_INTEGER
-%token WHISPER_REAL
-%token WHISPER_TEXT
-%token WHISPER_CHARACTER
-%token WHISPER_TIME
+%token WHAIS_INTEGER
+%token WHAIS_REAL
+%token WHAIS_TEXT
+%token WHAIS_CHARACTER
+%token WHAIS_TIME
 
 //Operator precedence and associativity
 
@@ -501,32 +501,32 @@ exp : const_exp
         }
 ;
 
-const_exp: WHISPER_INTEGER
+const_exp: WHAIS_INTEGER
             {
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;
             }
-         | WHISPER_REAL
+         | WHAIS_REAL
             {
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;
             }
-         | WHISPER_TEXT
+         | WHAIS_TEXT
             {
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;
             }
-         | WHISPER_CHARACTER
+         | WHAIS_CHARACTER
             {
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;
             }
-         | WHISPER_TIME
+         | WHAIS_TIME
             {
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;
             }
-         | WHISPER_NULL
+         | WHAIS_NULL
             {
                 /* null operation and NULL operands means
                    the NULL value */

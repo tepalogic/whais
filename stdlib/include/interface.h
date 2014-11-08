@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard native libraries for a Whisper interpreter.
+ WSTDLIB - Standard native libraries for a Whais interpreter.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -25,12 +25,12 @@
 #ifndef INTERFACE_H_
 #define INTERFACE_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "interpreter/operands.h"
 #include "interpreter/interpreter.h"
 
-namespace whisper {
+namespace whais {
 
 // A type to hold the result of various library related calls.
 typedef int32_t             WLIB_STATUS;
@@ -40,7 +40,7 @@ typedef int32_t             WLIB_STATUS;
 //behavior. Its paramters are on the top of the stack, a DBS handler is
 //provided for extra fucntionality too. It the responsability of the function
 //to clear the stack of its arguments and put the result on top of it.
-typedef WLIB_STATUS (*WLIB_PROCEDURE) (SessionStack&, ISession&);
+typedef WLIB_STATUS( *WLIB_PROCEDURE) (SessionStack&, ISession&);
 
 typedef const uint8_t* WLIB_PARAM_TYPE;
 
@@ -60,11 +60,11 @@ typedef struct {
 
 // The signature of the function that should be called after the lib is loaded
 // to allow the library initialisation.
-typedef WLIB_STATUS (*WLIB_START_LIB_FUNC) ();
+typedef WLIB_STATUS( *WLIB_START_LIB_FUNC) ();
 
 // The signature of the function that should be called before the library is
 // unloaded to allow any clean up work to take place before clearing.
-typedef WLIB_STATUS (*WLIB_END_LIB_FUNC) ();
+typedef WLIB_STATUS( *WLIB_END_LIB_FUNC) ();
 
 // The signature of the function called to retreive the functions published
 // by this library.
@@ -76,7 +76,7 @@ static const char WSTDLIB_END_FUNC[]     = "wlib_end";
 static const char WSTDLIB_DESC_FUNC[]    = "wlib_describe";
 
 
-} //namespace whisper
+} //namespace whais
 
 #endif /* INTERFACE_H_ */
 

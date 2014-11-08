@@ -7,11 +7,11 @@
 #define YYSTYPE struct SemValue*
 struct ParserState;
 
-#include "../parser/whisper.tab.h"
+#include "../parser/whais.tab.h"
 #include "../parser/parser.h"
 #include "../parser/strstore.h"
 
-extern int yylex (YYSTYPE * lvalp, struct ParserState *state);
+extern int yylex( YYSTYPE * lvalp, struct ParserState *state);
 
 const char tokens[] =
   " ArRaY   aS #comment\n  BOOL \t brEak CHARACTER  Continue DATE DATETIME   DO"
@@ -22,12 +22,12 @@ const char tokens[] =
 const int tokens_values[] =
   { ARRAY, AS, BOOL, BREAK, CHARACTER, CONTINUE, DATE, DATETIME, DO,
     ELSE, END, ENDPROC, ENDSYNC, EXTERN, W_FALSE, FIELD, FOR, HIRESTIME,
-    IF, INT8, INT16, INT32, INT64, LET, OF, WHISPER_NULL, REAL, RETURN, RICHREAL,
+    IF, INT8, INT16, INT32, INT64, LET, OF, WHAIS_NULL, REAL, RETURN, RICHREAL,
     PROCEDURE, SYNC, TABLE, TEXT, W_TRUE, UNDEFINED, UNTIL, UNSIGNED, WHILE
   };
 
 static int
-test_tokens (void)
+test_tokens( void)
 {
   int result = 0;
   int count = 0;
@@ -35,27 +35,27 @@ test_tokens (void)
   YYSTYPE lvalp;
 
   state.buffer = tokens;
-  state.bufferSize = strlen (tokens);
+  state.bufferSize = strlen( tokens);
 
-  printf ("Testing keywords...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  printf( "Testing keywords...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
       if (tokens_values[count++] != result ||
-          wh_array_count (&(state.values)) != 0)
+          wh_array_count( &(state.values)) != 0)
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
     }
   if ((count != (W_TRUE - ARRAY + 1)) ||
-      (count != sizeof (tokens_values) / sizeof (tokens_values[0])) ||
-      (state.bufferPos != sizeof (tokens)))
+      (count != sizeof( tokens_values) / sizeof( tokens_values[0])) ||
+      (state.bufferPos != sizeof( tokens)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
@@ -73,7 +73,7 @@ static struct SemId ids_vals[] = {
 };
 
 static int
-test_buff_ids (void)
+test_buff_ids( void)
 {
   int result = 0;
   int count = 0;
@@ -81,29 +81,29 @@ test_buff_ids (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_ids;
-  state.bufferSize = strlen (state.buffer);
-  wh_array_init (&state.values, sizeof (struct SemValue));
-  printf ("Testing identifiers...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  state.bufferSize = strlen( state.buffer);
+  wh_array_init( &state.values, sizeof( struct SemValue));
+  printf( "Testing identifiers...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
       if ((result != IDENTIFIER) ||
           (lvalp->val_type != VAL_ID) ||
           (lvalp->val.u_id.length != ids_vals[count].length) ||
-          (strncmp (lvalp->val.u_id.name, ids_vals[count].name, ids_vals[count].length) != 0))
+          (strncmp( lvalp->val.u_id.name, ids_vals[count].name, ids_vals[count].length) != 0))
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
       count++;
     }
 
-  if (count != wh_array_count (&(state.values)))
+  if (count != wh_array_count( &(state.values)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
@@ -113,7 +113,7 @@ static struct SemCInt int_vals[] = {
 };
 
 static int
-test_buff_integers (void)
+test_buff_integers( void)
 {
   int result = 0;
   int count = 0;
@@ -121,28 +121,28 @@ test_buff_integers (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_integers;
-  state.bufferSize = strlen (state.buffer);
-  wh_array_init (&state.values, sizeof (struct SemValue));
-  printf ("Testing integers...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  state.bufferSize = strlen( state.buffer);
+  wh_array_init( &state.values, sizeof( struct SemValue));
+  printf( "Testing integers...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
-      if ((result != WHISPER_INTEGER) ||
+      if ((result != WHAIS_INTEGER) ||
           (lvalp->val_type != VAL_C_INT) ||
           (lvalp->val.u_int.value != int_vals[count].value))
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
       count++;
     }
 
-  if (count != wh_array_count (&(state.values)))
+  if (count != wh_array_count( &(state.values)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
@@ -160,7 +160,7 @@ static struct SemCReal real_vals[] = {
 };
 
 static int
-test_buff_reals (void)
+test_buff_reals( void)
 {
   int result = 0;
   int count = 0;
@@ -168,29 +168,29 @@ test_buff_reals (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_reals;
-  state.bufferSize = strlen (state.buffer);
-  wh_array_init (&state.values, sizeof (struct SemValue));
-  printf ("Testing reals...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  state.bufferSize = strlen( state.buffer);
+  wh_array_init( &state.values, sizeof( struct SemValue));
+  printf( "Testing reals...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
-      if ((result != WHISPER_REAL) ||
+      if ((result != WHAIS_REAL) ||
           (lvalp->val_type != VAL_C_REAL) ||
           (lvalp->val.u_real.integerPart != real_vals[count].integerPart) ||
           (lvalp->val.u_real.fractionalPart != real_vals[count].fractionalPart))
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
       count++;
     }
 
-  if (count != wh_array_count (&(state.values)))
+  if (count != wh_array_count( &(state.values)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
@@ -203,7 +203,7 @@ static struct SemCChar char_vals[] = {
 };
 
 static int
-test_buff_chars (void)
+test_buff_chars( void)
 {
   int result = 0;
   int count = 0;
@@ -211,28 +211,28 @@ test_buff_chars (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_chars;
-  state.bufferSize = strlen (state.buffer);
-  wh_array_init (&state.values, sizeof (struct SemValue));
-  printf ("Testing chars...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  state.bufferSize = strlen( state.buffer);
+  wh_array_init( &state.values, sizeof( struct SemValue));
+  printf( "Testing chars...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
-      if ((result != WHISPER_CHARACTER) ||
+      if ((result != WHAIS_CHARACTER) ||
           (lvalp->val_type != VAL_C_CHAR) ||
           (lvalp->val.u_char.value != char_vals[count].value))
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
       count++;
     }
 
-  if (count != wh_array_count (&(state.values)))
+  if (count != wh_array_count( &(state.values)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
@@ -245,7 +245,7 @@ static struct SemCTime date_vals[] = {
 };
 
 static int
-test_buff_dates (void)
+test_buff_dates( void)
 {
   int result = 0;
   int count = 0;
@@ -253,29 +253,29 @@ test_buff_dates (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_dates;
-  state.bufferSize = strlen (state.buffer);
-  wh_array_init (&state.values, sizeof (struct SemValue));
-  printf ("Testing dates...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  state.bufferSize = strlen( state.buffer);
+  wh_array_init( &state.values, sizeof( struct SemValue));
+  printf( "Testing dates...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
-      if ((result != WHISPER_TIME) ||
+      if ((result != WHAIS_TIME) ||
           (lvalp->val_type != VAL_C_TIME) ||
-          memcmp (&lvalp->val.u_time,
+          memcmp( &lvalp->val.u_time,
                   &date_vals[count], sizeof date_vals[0]) != 0)
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
       count++;
     }
 
-  if (count != wh_array_count (&(state.values)))
+  if (count != wh_array_count( &(state.values)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
@@ -305,7 +305,7 @@ static char *strs_vals[] = {
 };
 
 static int
-test_buff_strs (void)
+test_buff_strs( void)
 {
   int result = 0;
   int count = 0;
@@ -313,78 +313,78 @@ test_buff_strs (void)
   YYSTYPE lvalp;
 
   state.buffer = buff_strs;
-  state.bufferSize = strlen (state.buffer);
-  wh_array_init (&state.values, sizeof (struct SemValue));
-  state.strings = create_string_store ();
-  printf ("Testing string...");
-  while ((result = yylex (&lvalp, &state)) != 0)
+  state.bufferSize = strlen( state.buffer);
+  wh_array_init( &state.values, sizeof( struct SemValue));
+  state.strings = create_string_store( );
+  printf( "Testing string...");
+  while( (result = yylex( &lvalp, &state)) != 0)
     {
-      if ((result != WHISPER_TEXT) ||
+      if ((result != WHAIS_TEXT) ||
           (lvalp->val_type != VAL_C_TEXT) ||
-          memcmp (lvalp->val.u_text.text, strs_vals[count],
+          memcmp( lvalp->val.u_text.text, strs_vals[count],
                   lvalp->val.u_text.length) != 0)
         {
-          printf ("FAIL\n");
+          printf( "FAIL\n");
           return -1;
         }
       count++;
     }
 
-  if (count != wh_array_count (&(state.values)))
+  if (count != wh_array_count( &(state.values)))
     {
-      printf ("FAIL\n");
+      printf( "FAIL\n");
       return -2;
     }
 
-  printf ("PASS\n");
+  printf( "PASS\n");
   return 0;
 }
 
 int
-main (void)
+main( void)
 {
   bool_t test_result = TRUE;
-  if ((test_tokens () < 0))
+  if ((test_tokens( ) < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_ids () < 0))
+  if ((test_buff_ids( ) < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_integers () < 0))
+  if ((test_buff_integers( ) < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_reals () < 0))
+  if ((test_buff_reals( ) < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_chars () < 0))
+  if ((test_buff_chars( ) < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_dates () < 0))
+  if ((test_buff_dates( ) < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_strs () < 0))
+  if ((test_buff_strs( ) < 0))
     {
       test_result = FALSE;
     }
 
   if (test_result == FALSE)
     {
-      printf ("TEST RESULT: FAIL\n");
+      printf( "TEST RESULT: FAIL\n");
       return -1;
     }
 
-  printf ("TEST RESULT: PASS\n");
+  printf( "TEST RESULT: PASS\n");
   return 0;
 }

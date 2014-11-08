@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WARRAY_H
 #define WARRAY_H
 
-#include "whisper.h"
+#include "whais.h"
 
 
 
@@ -50,37 +50,37 @@ struct WArray
 
 /* The size of allocated memory chunk when the array has to be extended. */
 #define ARRAY_INCRMENT_SIZE     512
-#define wh_array_init(a, x) wh_array_init_ex ( \
+#define wh_array_init( a, x) wh_array_init_ex(  \
                                        (a),\
                                        (x),\
                                        (ARRAY_INCRMENT_SIZE + (x)+1)/(x),\
-                                       sizeof(uint64_t)\
+                                       sizeof( uint64_t)\
                                              )
 
 struct  WArray*
-wh_array_init_ex (struct WArray* const outArray,
+wh_array_init_ex( struct WArray* const outArray,
                   size_t               itemSize,
                   uint_t               increment,
                   uint_t               alignment);
 
 
 void*
-wh_array_add (struct WArray* const array, const void* const data);
+wh_array_add( struct WArray* const array, const void* const data);
 
 
 void*
-wh_array_get (const struct WArray* const array, const uint_t index);
+wh_array_get( const struct WArray* const array, const uint_t index);
 
 
 uint_t
-wh_array_count (const struct WArray* const array);
+wh_array_count( const struct WArray* const array);
 
 
 void
-wh_array_resize (struct WArray* const array, const uint_t count);
+wh_array_resize( struct WArray* const array, const uint_t count);
 
 
 void
-wh_array_clean (struct WArray* const array);
+wh_array_clean( struct WArray* const array);
 
 #endif /* WARRAY_H */

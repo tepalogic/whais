@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,23 +25,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "wlog.h"
 #include "statement.h"
 #include "vardecl.h"
 
 YYSTYPE
-add_id_to_list (YYSTYPE list, YYSTYPE id)
+add_id_to_list( YYSTYPE list, YYSTYPE id)
 {
   struct SemId temp;
 
-  assert (id->val_type == VAL_ID);
-  assert ((list == NULL) || (list->val_type == VAL_ID_LIST));
+  assert( id->val_type == VAL_ID);
+  assert( (list == NULL) || (list->val_type == VAL_ID_LIST));
 
   /* transform the id into in an list of ids node */
-  memcpy (&temp, &(id->val.u_id), sizeof (temp));
-  memcpy (&(id->val.u_idlist.id), &temp, sizeof (temp));
+  memcpy( &temp, &(id->val.u_id), sizeof( temp));
+  memcpy( &(id->val.u_idlist.id), &temp, sizeof( temp));
 
   id->val_type          = VAL_ID_LIST;
   id->val.u_idlist.next = list;
@@ -51,9 +51,9 @@ add_id_to_list (YYSTYPE list, YYSTYPE id)
 
 
 YYSTYPE
-create_type_spec (struct ParserState* paser, const uint16_t type)
+create_type_spec( struct ParserState* paser, const uint16_t type)
 {
-  struct SemValue* result = alloc_sem_value (paser);
+  struct SemValue* result = alloc_sem_value( paser);
 
   if (result != NULL)
     {
@@ -62,20 +62,20 @@ create_type_spec (struct ParserState* paser, const uint16_t type)
       result->val.u_tspec.extra = NULL;
     }
   else
-    log_message (paser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    log_message( paser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
   return result;
 }
 
 
 static bool_t
-process_table_decls (struct ParserState* paser,
+process_table_decls( struct ParserState* paser,
                      struct DeclaredVar* var,
                      void*               extra)
 {
   bool_t result = TRUE;
 
-  assert (IS_TABLE (var->type));
+  assert( IS_TABLE( var->type));
 
   var->extra = (struct DeclaredVar*) extra;
 
@@ -84,7 +84,7 @@ process_table_decls (struct ParserState* paser,
 
 
 struct DeclaredVar*
-add_declaration (struct ParserState* const paser,
+add_declaration( struct ParserState* const paser,
                  YYSTYPE                   var,
                  YYSTYPE                   type,
                  const bool_t              parameter,
@@ -95,27 +95,27 @@ add_declaration (struct ParserState* const paser,
   struct SemId* const     id     = &(var->val.u_id);
   struct Statement* const stmt   = paser->pCurrentStmt;
 
-  assert (var->val_type == VAL_ID);
-  assert (type->val_type == VAL_TYPE_SPEC);
+  assert( var->val_type == VAL_ID);
+  assert( type->val_type == VAL_TYPE_SPEC);
 
   if (unique)
     {
-      assert (IS_TABLE_FIELD (type->val.u_tspec.type) == FALSE);
+      assert( IS_TABLE_FIELD( type->val.u_tspec.type) == FALSE);
 
-      decl = stmt_find_declaration (stmt, id->name, id->length, FALSE, FALSE);
+      decl = stmt_find_declaration( stmt, id->name, id->length, FALSE, FALSE);
     }
   else
     {
-      assert (IS_TABLE_FIELD (type->val.u_tspec.type));
+      assert( IS_TABLE_FIELD( type->val.u_tspec.type));
     }
 
   if (decl != NULL)
     {
       char text[128];
 
-      wh_copy_first (text, decl->label, sizeof text, decl->labelLength);
+      wh_copy_first( text, decl->label, sizeof text, decl->labelLength);
 
-      log_message (paser, paser->bufferPos, MSG_VAR_DEFINED, text);
+      log_message( paser, paser->bufferPos, MSG_VAR_DEFINED, text);
     }
   else
     {
@@ -127,17 +127,17 @@ add_declaration (struct ParserState* const paser,
       var.extra       = NULL;
       var.offset      = 0;
 
-      if (IS_TABLE (var.type)
-          && ! process_table_decls (paser, &var, type->val.u_tspec.extra))
+      if (IS_TABLE( var.type)
+          && ! process_table_decls( paser, &var, type->val.u_tspec.extra))
         {
           result = NULL;   /* Something went wrong along the way */
         }
-      else if ((result = stmt_add_declaration (stmt, &var, parameter)) == NULL)
+      else if ((result = stmt_add_declaration( stmt, &var, parameter)) == NULL)
         {
-          log_message (paser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          log_message( paser, IGNORE_BUFFER_POS, MSG_NO_MEM);
           paser->abortError = TRUE;
         }
-      else if (IS_TABLE (var.type))
+      else if (IS_TABLE( var.type))
         {
           struct DeclaredVar* it = result->extra;
 
@@ -146,7 +146,7 @@ add_declaration (struct ParserState* const paser,
 
           else
             {
-              while (it->extra && IS_TABLE_FIELD (it->extra->type))
+              while( it->extra && IS_TABLE_FIELD( it->extra->type))
                 it = it->extra;
 
               it->extra = result;
@@ -156,20 +156,20 @@ add_declaration (struct ParserState* const paser,
 
   if (result && paser->externDecl)
     {
-      assert (paser->pCurrentStmt == &paser->globalStmt);
-      assert (result->varId & GLOBAL_DECL);
+      assert( paser->pCurrentStmt == &paser->globalStmt);
+      assert( result->varId & GLOBAL_DECL);
 
-      MARK_AS_EXTERNAL (result->varId);
+      MARK_AS_EXTERNAL( result->varId);
     }
   else if (result
-           && (IS_TABLE_FIELD (result->type) == FALSE)
-           && IS_GLOBAL (result->varId))
+           && (IS_TABLE_FIELD( result->type) == FALSE)
+           && IS_GLOBAL( result->varId))
     {
-      assert (paser->pCurrentStmt == &paser->globalStmt);
+      assert( paser->pCurrentStmt == &paser->globalStmt);
 
       /* Defined globals are referenced by default. */
       result->varId |= paser->globalStmt.localsUsed++;
-      MARK_AS_REFERENCED (result->varId);
+      MARK_AS_REFERENCED( result->varId);
     }
 
   return result;
@@ -177,34 +177,34 @@ add_declaration (struct ParserState* const paser,
 
 
 YYSTYPE
-add_list_declaration (struct ParserState* paser,
+add_list_declaration( struct ParserState* paser,
                      YYSTYPE              varsList,
                      YYSTYPE              type)
 {
   YYSTYPE           result = NULL;
   struct SemIdList* it     = &varsList->val.u_idlist;
 
-  assert (varsList->val_type == VAL_ID_LIST);
-  assert (type->val_type == VAL_TYPE_SPEC);
+  assert( varsList->val_type == VAL_ID_LIST);
+  assert( type->val_type == VAL_TYPE_SPEC);
 
-  free_sem_value (varsList);
+  free_sem_value( varsList);
 
-  while (it != NULL)
+  while( it != NULL)
     {
       struct SemValue id;
 
       id.val_type = VAL_ID;
       id.val.u_id = it->id;
 
-      result = (YYSTYPE)add_declaration (paser, &id, type, FALSE, TRUE);
+      result = (YYSTYPE)add_declaration( paser, &id, type, FALSE, TRUE);
       if (result == NULL)
         break;    /* Some error has been encountered */
 
       if (it->next != NULL)
         {
-          assert (it->next->val_type == VAL_ID_LIST);
+          assert( it->next->val_type == VAL_ID_LIST);
 
-          free_sem_value (it->next);
+          free_sem_value( it->next);
           it = &(it->next->val.u_idlist);
         }
       else
@@ -212,14 +212,14 @@ add_list_declaration (struct ParserState* paser,
     }
 
   /* mark this as free for reuse */
-  free_sem_value (type);
+  free_sem_value( type);
 
   return result;
 }
 
 
 YYSTYPE
-add_field_declaration (struct ParserState*       paser,
+add_field_declaration( struct ParserState*       paser,
                        YYSTYPE                   var,
                        YYSTYPE                   type,
                        struct DeclaredVar* const extra)
@@ -229,23 +229,23 @@ add_field_declaration (struct ParserState*       paser,
   struct DeclaredVar* it     = extra;
   struct SemId*       id     = &var->val.u_id;
 
-  assert (type->val_type == VAL_TYPE_SPEC);
-  assert (IS_TABLE_FIELD (type->val.u_tspec.type));
-  assert (var->val_type == VAL_ID);
+  assert( type->val_type == VAL_TYPE_SPEC);
+  assert( IS_TABLE_FIELD( type->val.u_tspec.type));
+  assert( var->val_type == VAL_ID);
 
   /* Check for fields with the same name. */
-  while (it != NULL)
+  while( it != NULL)
     {
-      assert (IS_TABLE_FIELD (it->type) != 0);
+      assert( IS_TABLE_FIELD( it->type) != 0);
 
       if ((it->labelLength == id->length) &&
-          (strncmp (it->label, id->name, it->labelLength) == 0))
+          (strncmp( it->label, id->name, it->labelLength) == 0))
         {
           char tname[128];
 
-          wh_copy_first (tname, id->name, sizeof tname, id->length);
+          wh_copy_first( tname, id->name, sizeof tname, id->length);
 
-          log_message (paser, paser->bufferPos, MSG_SAME_FIELD, tname);
+          log_message( paser, paser->bufferPos, MSG_SAME_FIELD, tname);
 
           paser->abortError = TRUE;
           return NULL;
@@ -253,31 +253,31 @@ add_field_declaration (struct ParserState*       paser,
       it = it->extra;
     }
 
-  if (GET_BASIC_TYPE (type->val.u_tspec.type) == T_UNDETERMINED)
+  if (GET_BASIC_TYPE( type->val.u_tspec.type) == T_UNDETERMINED)
     {
       char tname[128];
 
-      wh_copy_first (tname, id->name, sizeof tname, id->length);
+      wh_copy_first( tname, id->name, sizeof tname, id->length);
 
-      log_message (paser, paser->bufferPos, MSG_FIELD_TYPE_INVALID, tname);
+      log_message( paser, paser->bufferPos, MSG_FIELD_TYPE_INVALID, tname);
 
       return NULL;
     }
 
-  result = add_declaration (paser, var, type, FALSE, FALSE);
+  result = add_declaration( paser, var, type, FALSE, FALSE);
 
   result->extra = NULL, it = extra;
-  while (it != NULL)
+  while( it != NULL)
     {
       /* Insert this alphabetically to avoid equivalent fields declarations. */
-      const int compare = strncmp (it->label,
+      const int compare = strncmp( it->label,
                                    result->label,
                                    MIN (it->labelLength,
                                         result->labelLength));
       if ((compare > 0)
           || ((compare == 0) && (it->labelLength >= result->labelLength)))
         {
-          assert ((compare > 0) || (it->labelLength > result->labelLength));
+          assert( (compare > 0) || (it->labelLength > result->labelLength));
 
           if (prev == NULL)
             {
@@ -286,7 +286,7 @@ add_field_declaration (struct ParserState*       paser,
             }
           else
             {
-              assert (prev->extra == it);
+              assert( prev->extra == it);
 
               result->extra = prev->extra;
               prev->extra  = result;
@@ -305,9 +305,9 @@ add_field_declaration (struct ParserState*       paser,
         }
     }
 
-  free_sem_value (var);
-  free_sem_value (type);
+  free_sem_value( var);
+  free_sem_value( type);
 
-  return (YYSTYPE) result;
+  return( YYSTYPE) result;
 }
 

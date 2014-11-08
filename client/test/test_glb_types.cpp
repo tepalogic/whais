@@ -140,11 +140,11 @@ static const char one_field_table[] = "one_field_table_global_var_this_is_a_long
 static const char complete_field_table[] = "complete_field_table_global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
 static bool
-test_global_value_description (WH_CONNECTION hnd)
+test_global_value_description( WH_CONNECTION hnd)
 {
   const char suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   char buffer[1024];
-  const uint_t glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
+  const uint_t glbsCount = sizeof( no_fileds_types)/sizeof( no_fileds_types[0]);
 
   cout << "Testing global values types ... ";
 
@@ -153,15 +153,15 @@ test_global_value_description (WH_CONNECTION hnd)
       uint_t type;
       uint_t fieldsCount;
 
-      strcpy (buffer, no_fileds_types[i].name);
-      strcat (buffer, suffix);
+      strcpy( buffer, no_fileds_types[i].name);
+      strcat( buffer, suffix);
 
-      if ((WDescribeGlobal (hnd, buffer, &type) != WCS_OK)
+      if ((WDescribeGlobal( hnd, buffer, &type) != WCS_OK)
           || (type != no_fileds_types[i].type))
         {
           goto test_global_value_description_err;
         }
-      else if ((WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
+      else if ((WValueFieldsCount( hnd, &fieldsCount) != WCS_OK)
           || (fieldsCount != no_fileds_types[i].fieldsCount))
         {
           goto test_global_value_description_err;
@@ -178,12 +178,12 @@ test_global_value_description_err:
 }
 
 static bool
-test_field_match (const char*   field,
+test_field_match( const char*   field,
                   const uint_t    type)
 {
-  for (uint_t i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
+  for (uint_t i = 0; i < sizeof( tableFields) / sizeof( tableFields[0]); ++i)
     {
-      if (strcmp (tableFields[i].name, field) == 0)
+      if (strcmp( tableFields[i].name, field) == 0)
         {
           if (tableFields[i].visited
               || (tableFields[i].type != type))
@@ -202,7 +202,7 @@ test_field_match (const char*   field,
 }
 
 static bool
-test_complete_field_global (WH_CONNECTION hnd)
+test_complete_field_global( WH_CONNECTION hnd)
 {
   uint_t        type;
   const char* fieldName;
@@ -210,32 +210,32 @@ test_complete_field_global (WH_CONNECTION hnd)
 
   cout << "Testing the complete field ... ";
 
-  if ((WDescribeGlobal (hnd, complete_field_table, &type) != WCS_OK)
+  if ((WDescribeGlobal( hnd, complete_field_table, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK)
-      || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
-      || (fieldsCount != sizeof (tableFields) / sizeof (tableFields[0])))
+      || (WValueFieldsCount( hnd, &fieldsCount) != WCS_OK)
+      || (fieldsCount != sizeof( tableFields) / sizeof( tableFields[0])))
     {
       goto test_complete_field_global_err;
     }
 
-  while (fieldsCount-- > 0)
+  while( fieldsCount-- > 0)
     {
-      if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
-          || ! test_field_match (fieldName, type))
+      if ((WValueFetchField( hnd, &fieldName, &type) != WCS_OK)
+          || ! test_field_match( fieldName, type))
         {
           goto test_complete_field_global_err;
         }
     }
 
-  if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
+  if ((WValueFetchField( hnd, &fieldName, &type) != WCS_OK)
       || (fieldName != NULL)
       || (type != WHC_TYPE_NOTSET)
-      || (WValueFetchField (hnd, &fieldName, &type) == WCS_OK))
+      || (WValueFetchField( hnd, &fieldName, &type) == WCS_OK))
     {
       goto test_complete_field_global_err; //Should not allow an extra fetch!
     }
 
-  for (uint_t i = 0; i < sizeof (tableFields) / sizeof (tableFields[0]); ++i)
+  for (uint_t i = 0; i < sizeof( tableFields) / sizeof( tableFields[0]); ++i)
     {
       if (! tableFields[i].visited)
         goto test_complete_field_global_err;
@@ -250,29 +250,29 @@ test_complete_field_global_err:
 }
 
 static bool
-test_one_field_global (WH_CONNECTION hnd)
+test_one_field_global( WH_CONNECTION hnd)
 {
   uint_t        type;
   const char* fieldName;
 
   cout << "Testing the one field ... ";
 
-  if ((WDescribeGlobal (hnd, one_field_table, &type) != WCS_OK)
+  if ((WDescribeGlobal( hnd, one_field_table, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK))
     {
       goto test_one_field_global_err;
     }
-  else if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
+  else if ((WValueFetchField( hnd, &fieldName, &type) != WCS_OK)
             || (type != WHC_TYPE_BOOL)
-            || (strcmp (fieldName, "field1") != 0))
+            || (strcmp( fieldName, "field1") != 0))
     {
       goto test_one_field_global_err;
     }
 
-  if ((WValueFetchField (hnd, &fieldName, &type) != WCS_OK)
+  if ((WValueFetchField( hnd, &fieldName, &type) != WCS_OK)
       || (fieldName != NULL)
       || (type != WHC_TYPE_NOTSET)
-      || (WValueFetchField (hnd, &fieldName, &type) == WCS_OK))
+      || (WValueFetchField( hnd, &fieldName, &type) == WCS_OK))
     {
       goto test_one_field_global_err; //Should not allow an extra fetch!
     }
@@ -286,7 +286,7 @@ test_one_field_global_err:
 }
 
 static bool
-test_for_errors (WH_CONNECTION hnd)
+test_for_errors( WH_CONNECTION hnd)
 {
   uint_t          fieldsCount;
   uint_t          type;
@@ -294,29 +294,29 @@ test_for_errors (WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WValueFetchField (hnd, &nameFetched, &type) != WCS_INCOMPLETE_CMD)
-      || (WValueFieldsCount (hnd, &fieldsCount) != WCS_INCOMPLETE_CMD))
+  if ((WValueFetchField( hnd, &nameFetched, &type) != WCS_INCOMPLETE_CMD)
+      || (WValueFieldsCount( hnd, &fieldsCount) != WCS_INCOMPLETE_CMD))
     {
       goto test_for_errors_fail;
     }
-  else if ((WDescribeGlobal (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WDescribeGlobal (hnd, one_field_table, NULL) != WCS_INVALID_ARGS)
-           || (WDescribeGlobal (hnd, NULL, &type) != WCS_INVALID_ARGS))
+  else if ((WDescribeGlobal( NULL, NULL, NULL) != WCS_INVALID_ARGS)
+           || (WDescribeGlobal( hnd, one_field_table, NULL) != WCS_INVALID_ARGS)
+           || (WDescribeGlobal( hnd, NULL, &type) != WCS_INVALID_ARGS))
 
     {
       goto test_for_errors_fail;
     }
-  else if ((WDescribeGlobal (hnd, one_field_table, &type) != WCS_OK)
+  else if ((WDescribeGlobal( hnd, one_field_table, &type) != WCS_OK)
 
-           || (WValueFieldsCount (NULL, NULL) != WCS_INVALID_ARGS)
-           || (WValueFieldsCount (hnd, NULL) != WCS_INVALID_ARGS)
-           || (WValueFetchField (NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WValueFetchField (NULL, &nameFetched, &type) != WCS_INVALID_ARGS)
-           || (WValueFetchField (hnd, NULL, &type) != WCS_INVALID_ARGS)
-           || (WValueFetchField (hnd, &nameFetched, NULL) != WCS_INVALID_ARGS)
+           || (WValueFieldsCount( NULL, NULL) != WCS_INVALID_ARGS)
+           || (WValueFieldsCount( hnd, NULL) != WCS_INVALID_ARGS)
+           || (WValueFetchField( NULL, NULL, NULL) != WCS_INVALID_ARGS)
+           || (WValueFetchField( NULL, &nameFetched, &type) != WCS_INVALID_ARGS)
+           || (WValueFetchField( hnd, NULL, &type) != WCS_INVALID_ARGS)
+           || (WValueFetchField( hnd, &nameFetched, NULL) != WCS_INVALID_ARGS)
 
-           || (WValueFetchField (hnd, &nameFetched, &type) != WCS_OK)
-           || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK))
+           || (WValueFetchField( hnd, &nameFetched, &type) != WCS_OK)
+           || (WValueFieldsCount( hnd, &fieldsCount) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
@@ -330,36 +330,36 @@ test_for_errors_fail :
 }
 
 const char*
-DefaultDatabaseName ()
+DefaultDatabaseName( )
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId ()
+DefaultUserId( )
 {
   return 0;
 }
 
 const char*
-DefaultUserPassword ()
+DefaultUserPassword( )
 {
   return "root_test_password";
 }
 
 int
-main (int argc, const char** argv)
+main( int argc, const char** argv)
 {
   WH_CONNECTION       hnd = NULL;
 
-  bool success = tc_settup_connection (argc, argv, &hnd);
+  bool success = tc_settup_connection( argc, argv, &hnd);
 
-  success = success && test_for_errors (hnd);
-  success = success && test_global_value_description (hnd);
-  success = success && test_complete_field_global (hnd);
-  success = success && test_one_field_global (hnd);
+  success = success && test_for_errors( hnd);
+  success = success && test_global_value_description( hnd);
+  success = success && test_complete_field_global( hnd);
+  success = success && test_one_field_global( hnd);
 
-  WClose (hnd);
+  WClose( hnd);
 
   if (!success)
     {

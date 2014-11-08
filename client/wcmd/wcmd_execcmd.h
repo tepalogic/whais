@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -30,6 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_cmdsmgr.h"
 
 bool
-cmdExec (const std::string& cmdLine, ENTRY_CMD_CONTEXT context);
+cmdExec( const std::string& cmdLine, ENTRY_CMD_CONTEXT context);
 
 #endif /* WCMD_EXECCMD_H_ */

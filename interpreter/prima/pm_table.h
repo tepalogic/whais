@@ -33,7 +33,7 @@
 
 
 
-namespace whisper {
+namespace whais {
 namespace prima {
 
 
@@ -41,45 +41,45 @@ namespace prima {
 class TableReference
 {
 public:
-  TableReference (IDBSHandler& dbs, ITable& table)
-    : mDbsHnd (dbs),
-      mTable (table),
-      mRefCount (0)
+  TableReference( IDBSHandler& dbs, ITable& table)
+    : mDbsHnd( dbs),
+      mTable( table),
+      mRefCount( 0)
   {
   }
 
-  void IncrementRefCount ()
+  void IncrementRefCount( )
   {
     ++mRefCount;
   }
 
-  void DecrementRefCount ()
+  void DecrementRefCount( )
   {
-    assert (mRefCount > 0);
+    assert( mRefCount > 0);
 
     if (--mRefCount == 0)
       delete this;
   }
 
-  ITable& GetTable ()
+  ITable& GetTable( )
   {
-    assert (mRefCount > 0);
+    assert( mRefCount > 0);
 
     return mTable;
   }
 
-  IDBSHandler& GetDBSHandler ()
+  IDBSHandler& GetDBSHandler( )
   {
-    assert (mRefCount > 0);
+    assert( mRefCount > 0);
 
     return mDbsHnd;
   }
 
 private:
-  ~TableReference ()
+  ~TableReference( )
   {
-    if (&mTable != &GeneralTable::Instance ())
-      mDbsHnd.ReleaseTable (mTable);
+    if (&mTable != &GeneralTable::Instance( ))
+      mDbsHnd.ReleaseTable( mTable);
   }
 
   IDBSHandler&     mDbsHnd;
@@ -87,7 +87,7 @@ private:
   uint64_t         mRefCount;
 };
 
-} //namespace whisper
+} //namespace whais
 } //namespace prima
 
 #endif // PM_TABLE_H_

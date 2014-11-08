@@ -32,63 +32,63 @@ using namespace std;
 
 
 
-namespace whisper {
+namespace whais {
 namespace prima {
 
 
 
-GlobalsManager::~GlobalsManager ()
+GlobalsManager::~GlobalsManager( )
 {
-  for (vector<GlobalValue>::iterator it = mStorage.begin ();
+  for (vector<GlobalValue>::iterator it = mStorage.begin( );
        it != mStorage.end ();
        ++it)
     {
-      it->Operand ().~BaseOperand();
+      it->Operand( ).~BaseOperand( );
     }
 }
 
 
 uint32_t
-GlobalsManager::AddGlobal (const uint8_t* const name,
+GlobalsManager::AddGlobal( const uint8_t* const name,
                            const uint_t         nameLength,
                            const GlobalValue&   value,
                            const uint32_t       typeOffset)
 {
-  assert (FindGlobal (name, nameLength) == INVALID_ENTRY);
-  assert (mGlobalsEntrys.size () == mStorage.size ());
+  assert( FindGlobal( name, nameLength) == INVALID_ENTRY);
+  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
 
-  const uint32_t result   = mGlobalsEntrys.size ();
-  const uint32_t IdOffset = mIdentifiers.size ();
+  const uint32_t result   = mGlobalsEntrys.size( );
+  const uint32_t IdOffset = mIdentifiers.size( );
 
-  mIdentifiers.insert (mIdentifiers.end (), name, name + nameLength);
-  mIdentifiers.push_back (0);
+  mIdentifiers.insert( mIdentifiers.end (), name, name + nameLength);
+  mIdentifiers.push_back( 0);
 
-  mStorage.push_back (value);
+  mStorage.push_back( value);
 
   const GlobalEntry entry = {IdOffset, typeOffset};
 
-  mGlobalsEntrys.push_back (entry);
+  mGlobalsEntrys.push_back( entry);
 
   return result;
 }
 
 
 uint32_t
-GlobalsManager::FindGlobal (const uint8_t* const name,
+GlobalsManager::FindGlobal( const uint8_t* const name,
                             const uint_t         nameLength)
 {
-  assert (mGlobalsEntrys.size () == mStorage.size ());
+  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
 
   uint32_t iterator = 0;
 
-  while (iterator < mGlobalsEntrys.size ())
+  while( iterator < mGlobalsEntrys.size( ))
     {
       const GlobalEntry& entry     = mGlobalsEntrys[iterator];
       const char* const  entryName = _RC (const char*,
                                           &mIdentifiers[entry.mIdOffet]);
 
-      if ((strlen (entryName) == nameLength)
-          && (memcmp (entryName, name, nameLength) == 0))
+      if ((strlen( entryName) == nameLength)
+          && (memcmp( entryName, name, nameLength) == 0))
         {
           return iterator;
         }
@@ -101,10 +101,10 @@ GlobalsManager::FindGlobal (const uint8_t* const name,
 
 
 const uint8_t*
-GlobalsManager::Name (const uint_t index) const
+GlobalsManager::Name( const uint_t index) const
 {
-  if (index >= mStorage.size ())
-    throw InterException (_EXTRA (InterException::INVALID_GLOBAL_REQ));
+  if (index >= mStorage.size( ))
+    throw InterException( _EXTRA( InterException::INVALID_GLOBAL_REQ));
 
   const GlobalEntry& entry = mGlobalsEntrys[index];
 
@@ -112,40 +112,40 @@ GlobalsManager::Name (const uint_t index) const
 }
 
 GlobalValue&
-GlobalsManager::Value (const uint32_t glbId)
+GlobalsManager::Value( const uint32_t glbId)
 {
   const uint32_t index = glbId & ~GLOBAL_ID;
 
-  assert (mGlobalsEntrys.size () == mStorage.size ());
+  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
 
-  if ((IsValid (glbId) == false) || (index >= mStorage.size ()))
-    throw InterException (_EXTRA (InterException::INVALID_GLOBAL_REQ));
+  if ((IsValid( glbId) == false) || (index >= mStorage.size( )))
+    throw InterException( _EXTRA( InterException::INVALID_GLOBAL_REQ));
 
   return mStorage[index];
 }
 
 const uint8_t*
-GlobalsManager::TypeDescription (const uint32_t glbId)
+GlobalsManager::TypeDescription( const uint32_t glbId)
 {
   const uint32_t index = glbId & ~GLOBAL_ID;
 
-  assert (IsValid (glbId));
-  assert (mGlobalsEntrys.size () == mStorage.size ());
-  assert (index < mGlobalsEntrys.size ());
+  assert( IsValid( glbId));
+  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
+  assert( index < mGlobalsEntrys.size( ));
 
-  if (index >= mGlobalsEntrys.size ())
-    throw InterException (_EXTRA (InterException::INVALID_GLOBAL_REQ));
+  if (index >= mGlobalsEntrys.size( ))
+    throw InterException( _EXTRA( InterException::INVALID_GLOBAL_REQ));
 
-  TypeManager&   typeMgr = mNames.GetTypeManager ();
-  const uint8_t* pType   = typeMgr.TypeDescription (
+  TypeManager&   typeMgr = mNames.GetTypeManager( );
+  const uint8_t* pType   = typeMgr.TypeDescription( 
                                           mGlobalsEntrys[index].mTypeOffset
                                                    );
 
-  assert (typeMgr.IsTypeValid (pType));
+  assert( typeMgr.IsTypeValid( pType));
 
   return pType;
 }
 
 } //namespace prima
-} //namespace whisper
+} //namespace whais
 

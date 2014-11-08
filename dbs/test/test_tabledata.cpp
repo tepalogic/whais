@@ -16,7 +16,7 @@
 #include "../pastra/ps_table.h"
 #include "../pastra/ps_serializer.h"
 
-using namespace whisper;
+using namespace whais;
 using namespace pastra;
 
 const char db_name[] = "t_baza_date_1";
@@ -49,119 +49,119 @@ static char text4[] = "Total domination of the world is the goal, but why?\n"
   std::vector<DInt64> vectInt64;\
   std::vector<DText> vectText;\
 \
-  vectBool.push_back (DBool(true));\
-  vectBool.push_back (DBool(true));\
-  vectBool.push_back (DBool(false));\
-  vectBool.push_back (DBool());\
-  vectBool.push_back (DBool(false));\
+  vectBool.push_back( DBool( true));\
+  vectBool.push_back( DBool( true));\
+  vectBool.push_back( DBool( false));\
+  vectBool.push_back( DBool( ));\
+  vectBool.push_back( DBool( false));\
   \
-  vectChar.push_back (DChar ());\
-  vectChar.push_back (DChar ('B'));\
-  vectChar.push_back (DChar (0x2312));\
-  vectChar.push_back (DChar ('V'));\
-  vectChar.push_back (DChar ('\n'));\
+  vectChar.push_back( DChar( ));\
+  vectChar.push_back( DChar( 'B'));\
+  vectChar.push_back( DChar( 0x2312));\
+  vectChar.push_back( DChar( 'V'));\
+  vectChar.push_back( DChar( '\n'));\
 \
-  vectDate.push_back (DDate (1981, 11, 14));\
-  vectDate.push_back (DDate (2091, 10, 11));\
-  vectDate.push_back (DDate (92, 3, 30));\
-  vectDate.push_back (DDate ());\
-  vectDate.push_back (DDate (-1, 3, 30));\
+  vectDate.push_back( DDate( 1981, 11, 14));\
+  vectDate.push_back( DDate( 2091, 10, 11));\
+  vectDate.push_back( DDate( 92, 3, 30));\
+  vectDate.push_back( DDate( ));\
+  vectDate.push_back( DDate( -1, 3, 30));\
 \
-  vectDateTime.push_back (DDateTime (781, 1, 1, 10, 11, 12));\
-  vectDateTime.push_back (DDateTime (1970, 1, 1, 0, 0, 0));\
-  vectDateTime.push_back (DDateTime (0, 1, 1, 0, 0, 0));\
-  vectDateTime.push_back (DDateTime (21, 12, 31, 23, 59, 59));\
-  vectDateTime.push_back (DDateTime ());\
+  vectDateTime.push_back( DDateTime( 781, 1, 1, 10, 11, 12));\
+  vectDateTime.push_back( DDateTime( 1970, 1, 1, 0, 0, 0));\
+  vectDateTime.push_back( DDateTime( 0, 1, 1, 0, 0, 0));\
+  vectDateTime.push_back( DDateTime( 21, 12, 31, 23, 59, 59));\
+  vectDateTime.push_back( DDateTime( ));\
 \
-  vectHiResDate.push_back (DHiresTime (1, 1, 1, 0, 0, 0, 2312));\
-  vectHiResDate.push_back (DHiresTime ());\
-  vectHiResDate.push_back (DHiresTime (0, 1, 2, 1, 1, 1, 2132));\
-  vectHiResDate.push_back (DHiresTime (-1324, 12, 31, 23, 59, 59, 9897));\
-  vectHiResDate.push_back (DHiresTime ());\
+  vectHiResDate.push_back( DHiresTime( 1, 1, 1, 0, 0, 0, 2312));\
+  vectHiResDate.push_back( DHiresTime( ));\
+  vectHiResDate.push_back( DHiresTime( 0, 1, 2, 1, 1, 1, 2132));\
+  vectHiResDate.push_back( DHiresTime( -1324, 12, 31, 23, 59, 59, 9897));\
+  vectHiResDate.push_back( DHiresTime( ));\
 \
-  vectUInt8.push_back (DUInt8 ());\
-  vectUInt8.push_back (DUInt8 (2));\
-  vectUInt8.push_back (DUInt8 ());\
-  vectUInt8.push_back (DUInt8 (0x67));\
-  vectUInt8.push_back (DUInt8 (2));\
+  vectUInt8.push_back( DUInt8 ());\
+  vectUInt8.push_back( DUInt8 (2));\
+  vectUInt8.push_back( DUInt8 ());\
+  vectUInt8.push_back( DUInt8 (0x67));\
+  vectUInt8.push_back( DUInt8 (2));\
 \
-  vectUInt16.push_back (DUInt16 (0xAABB));\
-  vectUInt16.push_back (DUInt16 ( 0xBBAA));\
-  vectUInt16.push_back (DUInt16 ());\
-  vectUInt16.push_back (DUInt16 (0x67));\
-  vectUInt16.push_back (DUInt16 (0xFF00));\
+  vectUInt16.push_back( DUInt16 (0xAABB));\
+  vectUInt16.push_back( DUInt16 ( 0xBBAA));\
+  vectUInt16.push_back( DUInt16 ());\
+  vectUInt16.push_back( DUInt16 (0x67));\
+  vectUInt16.push_back( DUInt16 (0xFF00));\
 \
-  vectUInt32.push_back (DUInt32 (0x0));\
-  vectUInt32.push_back (DUInt32 ( 0xCDDEBBAA));\
-  vectUInt32.push_back (DUInt32 (0x0));\
-  vectUInt32.push_back (DUInt32 (0xFF0000FF));\
-  vectUInt32.push_back (DUInt32 ());\
+  vectUInt32.push_back( DUInt32 (0x0));\
+  vectUInt32.push_back( DUInt32 ( 0xCDDEBBAA));\
+  vectUInt32.push_back( DUInt32 (0x0));\
+  vectUInt32.push_back( DUInt32 (0xFF0000FF));\
+  vectUInt32.push_back( DUInt32 ());\
 \
-  vectUInt64.push_back (DUInt64 (~0x0));\
-  vectUInt64.push_back (DUInt64 ( 0x0102030405060708));\
-  vectUInt64.push_back (DUInt64 (1));\
-  vectUInt64.push_back (DUInt64 (2));\
-  vectUInt64.push_back (DUInt64 ());\
+  vectUInt64.push_back( DUInt64 (~0x0));\
+  vectUInt64.push_back( DUInt64 ( 0x0102030405060708));\
+  vectUInt64.push_back( DUInt64 (1));\
+  vectUInt64.push_back( DUInt64 (2));\
+  vectUInt64.push_back( DUInt64 ());\
 \
-  vectInt8.push_back (DInt8 ());\
-  vectInt8.push_back (DInt8 (-2));\
-  vectInt8.push_back (DInt8 ());\
-  vectInt8.push_back (DInt8 (-67));\
-  vectInt8.push_back (DInt8 (2));\
+  vectInt8.push_back( DInt8 ());\
+  vectInt8.push_back( DInt8 (-2));\
+  vectInt8.push_back( DInt8 ());\
+  vectInt8.push_back( DInt8 (-67));\
+  vectInt8.push_back( DInt8 (2));\
 \
-  vectInt16.push_back (DInt16 (-21));\
-  vectInt16.push_back (DInt16 ( 21112));\
-  vectInt16.push_back (DInt16 ());\
-  vectInt16.push_back (DInt16 (-2312));\
-  vectInt16.push_back (DInt16 (-12));\
+  vectInt16.push_back( DInt16 (-21));\
+  vectInt16.push_back( DInt16 ( 21112));\
+  vectInt16.push_back( DInt16 ());\
+  vectInt16.push_back( DInt16 (-2312));\
+  vectInt16.push_back( DInt16 (-12));\
 \
-  vectInt32.push_back (DInt32 (0x10));\
-  vectInt32.push_back (DInt32 (0x80808080));\
-  vectInt32.push_back (DInt32 (-1));\
-  vectInt32.push_back (DInt32 (-2));\
-  vectInt32.push_back (DInt32 ());\
+  vectInt32.push_back( DInt32 (0x10));\
+  vectInt32.push_back( DInt32 (0x80808080));\
+  vectInt32.push_back( DInt32 (-1));\
+  vectInt32.push_back( DInt32 (-2));\
+  vectInt32.push_back( DInt32 ());\
 \
-  vectInt64.push_back (DInt64 (~0x0));\
-  vectInt64.push_back (DInt64 (0x0102030405060708));\
-  vectInt64.push_back (DInt64 (-1));\
-  vectInt64.push_back (DInt64 (2));\
-  vectInt64.push_back (DInt64 ());\
+  vectInt64.push_back( DInt64 (~0x0));\
+  vectInt64.push_back( DInt64 (0x0102030405060708));\
+  vectInt64.push_back( DInt64 (-1));\
+  vectInt64.push_back( DInt64 (2));\
+  vectInt64.push_back( DInt64 ());\
 \
-  vectReal.push_back (DReal (-199.21));\
-  vectReal.push_back (DReal (199.21));\
-  vectReal.push_back (DReal ());\
-  vectReal.push_back (DReal (0.98989));\
-  vectReal.push_back (DReal (98989.0));\
+  vectReal.push_back( DReal( -199.21));\
+  vectReal.push_back( DReal( 199.21));\
+  vectReal.push_back( DReal( ));\
+  vectReal.push_back( DReal( 0.98989));\
+  vectReal.push_back( DReal( 98989.0));\
 \
-  vectRichReal.push_back (DRichReal (1.0));\
-  vectRichReal.push_back (DRichReal (1234.91823412));\
-  vectRichReal.push_back (DRichReal (3.141592653589793));\
-  vectRichReal.push_back (DRichReal (-1.6180339887498948482));\
-  vectRichReal.push_back (DRichReal ());\
+  vectRichReal.push_back( DRichReal( 1.0));\
+  vectRichReal.push_back( DRichReal( 1234.91823412));\
+  vectRichReal.push_back( DRichReal( 3.141592653589793));\
+  vectRichReal.push_back( DRichReal( -1.6180339887498948482));\
+  vectRichReal.push_back( DRichReal( ));\
 \
-  vectText.push_back (DText (_RC(uint8_t*, text1)));\
-  vectText.push_back (DText ());\
-  vectText.push_back (DText (_RC(uint8_t*, text2)));\
-  vectText.push_back (DText (_RC(uint8_t*, text3)));\
-  vectText.push_back (DText (_RC(uint8_t*, text4)));
+  vectText.push_back( DText( _RC(uint8_t*, text1)));\
+  vectText.push_back( DText( ));\
+  vectText.push_back( DText( _RC(uint8_t*, text2)));\
+  vectText.push_back( DText( _RC(uint8_t*, text3)));\
+  vectText.push_back( DText( _RC(uint8_t*, text4)));
 
 
-#define CLEAR_VECTORS vectBool.clear();\
-  vectChar.clear();\
-  vectDate.clear();\
-  vectDateTime.clear();\
-  vectHiResDate.clear();\
-  vectUInt8.clear();\
-  vectUInt16.clear();\
-  vectUInt32.clear();\
-  vectUInt64.clear();\
-  vectInt8.clear();\
-  vectInt16.clear ();\
-  vectInt32.clear();\
-  vectInt64.clear();\
-  vectReal.clear();\
-  vectRichReal.clear();\
-  vectText.clear();
+#define CLEAR_VECTORS vectBool.clear( );\
+  vectChar.clear( );\
+  vectDate.clear( );\
+  vectDateTime.clear( );\
+  vectHiResDate.clear( );\
+  vectUInt8.clear( );\
+  vectUInt16.clear( );\
+  vectUInt32.clear( );\
+  vectUInt64.clear( );\
+  vectInt8.clear( );\
+  vectInt16.clear( );\
+  vectInt32.clear( );\
+  vectInt64.clear( );\
+  vectReal.clear( );\
+  vectRichReal.clear( );\
+  vectText.clear( );
 
 
 struct DBSFieldDescriptor field_descs[] = {
@@ -207,7 +207,7 @@ static const uint_t VAR_DESC_FIELDS_COUNT = 16;
 static const uint_t TOTAL_DESC_FIELDS_COUNT = 31;
 
 static const char *
-type_to_text (uint_t type)
+type_to_text( uint_t type)
 {
   if (type == T_BOOL)
     {
@@ -273,41 +273,41 @@ type_to_text (uint_t type)
     {
       return "UNSIGNED INT64";
     }
-  assert (0);
+  assert( 0);
   return NULL;
 }
 
 
 static void
-print_table_fields (IDBSHandler& rDbs, const char* tb_name)
+print_table_fields( IDBSHandler& rDbs, const char* tb_name)
 {
   uint_t      fieldIndex = 0;
-  ITable& table      = rDbs.RetrievePersistentTable (tb_name);
+  ITable& table      = rDbs.RetrievePersistentTable( tb_name);
 
   std::cout << "Field list:" << std::endl;
-  while (fieldIndex < table.FieldsCount ())
+  while( fieldIndex < table.FieldsCount( ))
     {
-      DBSFieldDescriptor currField = table.DescribeField (fieldIndex);
+      DBSFieldDescriptor currField = table.DescribeField( fieldIndex);
 
       std::cout << '\t' << currField.name << "\t: ";
       if (currField.isArray)
         std::cout << "ARRAY ";
-      std::cout << type_to_text (currField.type) << std::endl;
+      std::cout << type_to_text( currField.type) << std::endl;
 
       ++fieldIndex;
     }
-  rDbs.ReleaseTable (table);
+  rDbs.ReleaseTable( table);
 }
 
 template <class T> uint_t
-add_fixed_values_vector_to_table (ITable& table, std::vector<T> &vectValues)
+add_fixed_values_vector_to_table( ITable& table, std::vector<T> &vectValues)
 {
   uint_t fieldIndex = 0;
 
-  while (fieldIndex < table.FieldsCount())
+  while( fieldIndex < table.FieldsCount( ))
     {
-      DBSFieldDescriptor desc = table.DescribeField (fieldIndex);
-      if ((desc.type == vectValues[0].DBSType ()) &&
+      DBSFieldDescriptor desc = table.DescribeField( fieldIndex);
+      if ((desc.type == vectValues[0].DBSType( )) &&
           (desc.isArray == false))
         {
           break;
@@ -316,14 +316,14 @@ add_fixed_values_vector_to_table (ITable& table, std::vector<T> &vectValues)
       ++fieldIndex;
     }
 
-  if (fieldIndex >= table.FieldsCount ())
+  if (fieldIndex >= table.FieldsCount( ))
     return ~0;
 
 
-  for (uint_t index = 0; index < vectValues.size(); ++index)
+  for (uint_t index = 0; index < vectValues.size( ); ++index)
     {
-      if (table.AllocatedRows() <= index)
-        table.AddRow();
+      if (table.AllocatedRows( ) <= index)
+        table.AddRow( );
 
       table.Set (index, fieldIndex, vectValues[index]);
     }
@@ -332,11 +332,11 @@ add_fixed_values_vector_to_table (ITable& table, std::vector<T> &vectValues)
 }
 
 template <class T> bool
-test_fixed_values_vector (ITable& table, const uint_t fieldIndex, std::vector<T> &vectValues)
+test_fixed_values_vector( ITable& table, const uint_t fieldIndex, std::vector<T> &vectValues)
 {
   T fieldValue;
 
-  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows(); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows( ); ++rowIndex)
     {
       table.Get(rowIndex, fieldIndex, fieldValue);
       if (! (fieldValue == vectValues[rowIndex]))
@@ -347,12 +347,12 @@ test_fixed_values_vector (ITable& table, const uint_t fieldIndex, std::vector<T>
 }
 
 template <class T> bool
-test_fixed_values_vector_reverse (ITable& table,
+test_fixed_values_vector_reverse( ITable& table,
                                   const uint_t fieldIndex,
                                   std::vector<T> &vectValues)
 {
   T fieldValue;
-  uint_t rowIndex = table.AllocatedRows();
+  uint_t rowIndex = table.AllocatedRows( );
 
   do
     {
@@ -361,67 +361,67 @@ test_fixed_values_vector_reverse (ITable& table,
       if (! (fieldValue == vectValues[rowIndex]))
         return false;
     }
-  while (rowIndex > 0);
+  while( rowIndex > 0);
 
   return true;
 }
 
 template <class T> bool
-test_fixed_value_field (IDBSHandler& rDbs, std::vector<T> &valuesVect)
+test_fixed_value_field( IDBSHandler& rDbs, std::vector<T> &valuesVect)
 {
 
   uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
-    ITable& table = rDbs.RetrievePersistentTable(tb_name);
+    ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-    fieldIndex = add_fixed_values_vector_to_table (table, valuesVect);
+    fieldIndex = add_fixed_values_vector_to_table( table, valuesVect);
 
     if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
-    if (result && test_fixed_values_vector (table, fieldIndex, valuesVect) == false)
+    if (result && test_fixed_values_vector( table, fieldIndex, valuesVect) == false)
       result = false;
 
-    rDbs.ReleaseTable (table);
+    rDbs.ReleaseTable( table);
   }
 
   if (result)
   {
-    ITable& table = rDbs.RetrievePersistentTable(tb_name);
+    ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-    if (test_fixed_values_vector_reverse (table, fieldIndex, valuesVect) == false)
+    if (test_fixed_values_vector_reverse( table, fieldIndex, valuesVect) == false)
       result = false;
 
-    rDbs.ReleaseTable (table);
+    rDbs.ReleaseTable( table);
   }
 
   return result;
 }
 
 template <class T> bool
-test_fixed_value_field (ITable& table, std::vector<T> &valuesVect)
+test_fixed_value_field( ITable& table, std::vector<T> &valuesVect)
 {
 
   uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
-    fieldIndex = add_fixed_values_vector_to_table (table, valuesVect);
+    fieldIndex = add_fixed_values_vector_to_table( table, valuesVect);
 
     if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
-    if (result && test_fixed_values_vector (table, fieldIndex, valuesVect) == false)
+    if (result && test_fixed_values_vector( table, fieldIndex, valuesVect) == false)
       result = false;
   }
 
   if (result)
   {
-    if (test_fixed_values_vector_reverse (table, fieldIndex, valuesVect) == false)
+    if (test_fixed_values_vector_reverse( table, fieldIndex, valuesVect) == false)
       result = false;
   }
 
@@ -429,35 +429,35 @@ test_fixed_value_field (ITable& table, std::vector<T> &valuesVect)
 }
 
 bool
-test_fixed_values_table (IDBSHandler& rDbs)
+test_fixed_values_table( IDBSHandler& rDbs)
 {
   std::cout << "Testing fixed values ... ";
   bool result = true;
 
   INIT_VECTORS;
 
-  rDbs.AddTable (tb_name, FIXED_DESC_FIELDS_COUNT, field_descs);
-  print_table_fields (rDbs, tb_name);
+  rDbs.AddTable( tb_name, FIXED_DESC_FIELDS_COUNT, field_descs);
+  print_table_fields( rDbs, tb_name);
 
-  result = result && test_fixed_value_field (rDbs, vectBool);
-  result = result && test_fixed_value_field (rDbs, vectChar);
-  result = result && test_fixed_value_field (rDbs, vectDate);
-  result = result && test_fixed_value_field (rDbs, vectDateTime);
-  result = result && test_fixed_value_field (rDbs, vectHiResDate);
-  result = result && test_fixed_value_field (rDbs, vectUInt8);
-  result = result && test_fixed_value_field (rDbs, vectUInt16);
-  result = result && test_fixed_value_field (rDbs, vectUInt32);
-  result = result && test_fixed_value_field (rDbs, vectUInt64);
+  result = result && test_fixed_value_field( rDbs, vectBool);
+  result = result && test_fixed_value_field( rDbs, vectChar);
+  result = result && test_fixed_value_field( rDbs, vectDate);
+  result = result && test_fixed_value_field( rDbs, vectDateTime);
+  result = result && test_fixed_value_field( rDbs, vectHiResDate);
+  result = result && test_fixed_value_field( rDbs, vectUInt8);
+  result = result && test_fixed_value_field( rDbs, vectUInt16);
+  result = result && test_fixed_value_field( rDbs, vectUInt32);
+  result = result && test_fixed_value_field( rDbs, vectUInt64);
 
-  result = result && test_fixed_value_field (rDbs, vectReal);
-  result = result && test_fixed_value_field (rDbs, vectRichReal);
+  result = result && test_fixed_value_field( rDbs, vectReal);
+  result = result && test_fixed_value_field( rDbs, vectRichReal);
 
-  result = result && test_fixed_value_field (rDbs, vectInt8);
-  result = result && test_fixed_value_field (rDbs, vectInt16);
-  result = result && test_fixed_value_field (rDbs, vectInt32);
-  result = result && test_fixed_value_field (rDbs, vectInt64);
+  result = result && test_fixed_value_field( rDbs, vectInt8);
+  result = result && test_fixed_value_field( rDbs, vectInt16);
+  result = result && test_fixed_value_field( rDbs, vectInt32);
+  result = result && test_fixed_value_field( rDbs, vectInt64);
 
-  rDbs.DeleteTable (tb_name);
+  rDbs.DeleteTable( tb_name);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
@@ -465,18 +465,18 @@ test_fixed_values_table (IDBSHandler& rDbs)
 
 
 template <class T> bool
-check_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
+check_value_array( std::vector<T> &source, DArray& array, const uint_t seed)
 {
-  if (array.Type() != source[0].DBSType ())
+  if (array.Type( ) != source[0].DBSType( ))
     return false;
 
   uint_t arrayIndex = 0;
 
-  for (uint_t elIndex = 0; elIndex < source.size (); ++elIndex)
+  for (uint_t elIndex = 0; elIndex < source.size( ); ++elIndex)
     {
       T testElement;
 
-      uint64_t testIndex = (elIndex + seed) % source.size ();
+      uint64_t testIndex = (elIndex + seed) % source.size( );
       if (source[testIndex] == T ())
         continue;
 
@@ -493,50 +493,50 @@ check_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
 
 
 template <class T> bool
-fill_value_array (std::vector<T> &source, DArray& array, const uint_t seed)
+fill_value_array( std::vector<T> &source, DArray& array, const uint_t seed)
 {
-  if (array.Type() != source[0].DBSType ())
+  if (array.Type( ) != source[0].DBSType( ))
     return false;
 
-  for (uint_t elIndex = 0; elIndex < source.size (); ++elIndex)
+  for (uint_t elIndex = 0; elIndex < source.size( ); ++elIndex)
     {
-      uint64_t testIndex = (elIndex + seed) % source.size ();
+      uint64_t testIndex = (elIndex + seed) % source.size( );
       if (source[testIndex] == T ())
         continue;
 
       array.Add (source[testIndex]);
     }
-  return check_value_array (source, array, seed);
+  return check_value_array( source, array, seed);
 }
 
 
 template <class T> uint_t
-add_vectors_values_to_table (ITable& table, std::vector<T> &testVect)
+add_vectors_values_to_table( ITable& table, std::vector<T> &testVect)
 {
   uint_t fieldIndex = 0;
 
-  for (; fieldIndex < table.FieldsCount(); ++fieldIndex)
+  for (; fieldIndex < table.FieldsCount( ); ++fieldIndex)
     {
-      struct DBSFieldDescriptor fieldDesc = table.DescribeField (fieldIndex);
+      struct DBSFieldDescriptor fieldDesc = table.DescribeField( fieldIndex);
       if (fieldDesc.isArray &&
-          (fieldDesc.type == testVect[0].DBSType ()))
+          (fieldDesc.type == testVect[0].DBSType( )))
         {
           break;
         }
     }
 
-  if (fieldIndex >= table.FieldsCount())
+  if (fieldIndex >= table.FieldsCount( ))
     return ~0;
 
 
-  for (uint_t rowIndex = 0; rowIndex < testVect.size (); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < testVect.size( ); ++rowIndex)
     {
-      DArray valueArray (_SC(T*, NULL));
+      DArray valueArray( _SC(T*, NULL));
 
-      if (rowIndex == table.AllocatedRows())
-        table.AddRow();
+      if (rowIndex == table.AllocatedRows( ))
+        table.AddRow( );
 
-      if (fill_value_array (testVect, valueArray, rowIndex) == false)
+      if (fill_value_array( testVect, valueArray, rowIndex) == false)
         return ~0;
 
       table.Set (rowIndex, fieldIndex, valueArray);
@@ -546,20 +546,20 @@ add_vectors_values_to_table (ITable& table, std::vector<T> &testVect)
 }
 
 template <class T> bool
-test_vector_values_table (ITable& table, uint_t fieldIndex, std::vector<T> &testVect)
+test_vector_values_table( ITable& table, uint_t fieldIndex, std::vector<T> &testVect)
 {
-  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows(); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows( ); ++rowIndex)
     {
 
-      DArray testArray (_SC(T*, NULL));
+      DArray testArray( _SC(T*, NULL));
       table.Get (rowIndex, fieldIndex, testArray);
 
-      if (testVect[rowIndex].IsNull ())
+      if (testVect[rowIndex].IsNull( ))
         {
-          if (testArray.IsNull() != false)
+          if (testArray.IsNull( ) != false)
             return false;
         }
-      else if (check_value_array (testVect, testArray, rowIndex) == false)
+      else if (check_value_array( testVect, testArray, rowIndex) == false)
         return false;
     }
 
@@ -567,61 +567,61 @@ test_vector_values_table (ITable& table, uint_t fieldIndex, std::vector<T> &test
 }
 
 template <class T> bool
-test_variable_field_array (IDBSHandler& rDbs, std::vector<T> &testVect)
+test_variable_field_array( IDBSHandler& rDbs, std::vector<T> &testVect)
 {
 
   uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
-    ITable& table = rDbs.RetrievePersistentTable(tb_name);
+    ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-    fieldIndex = add_vectors_values_to_table (table, testVect);
+    fieldIndex = add_vectors_values_to_table( table, testVect);
 
     if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
-    if (result && test_vector_values_table (table, fieldIndex, testVect) == false)
+    if (result && test_vector_values_table( table, fieldIndex, testVect) == false)
       result = false;
 
-    rDbs.ReleaseTable (table);
+    rDbs.ReleaseTable( table);
   }
 
   if (result)
   {
-    ITable& table = rDbs.RetrievePersistentTable(tb_name);
+    ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-    if (test_vector_values_table (table, fieldIndex, testVect) == false)
+    if (test_vector_values_table( table, fieldIndex, testVect) == false)
       result = false;
 
-    rDbs.ReleaseTable (table);
+    rDbs.ReleaseTable( table);
   }
 
   return result;
 }
 
 template <class T> bool
-test_variable_field_array (ITable& table, std::vector<T> &testVect)
+test_variable_field_array( ITable& table, std::vector<T> &testVect)
 {
 
   uint_t fieldIndex = ~0;
   bool   result = true;
 
   {
-    fieldIndex = add_vectors_values_to_table (table, testVect);
+    fieldIndex = add_vectors_values_to_table( table, testVect);
 
     if (fieldIndex == _SC(uint_t, ~0))
       result = false;
 
 
-    if (result && test_vector_values_table (table, fieldIndex, testVect) == false)
+    if (result && test_vector_values_table( table, fieldIndex, testVect) == false)
       result = false;
   }
 
   if (result)
   {
-    if (test_vector_values_table (table, fieldIndex, testVect) == false)
+    if (test_vector_values_table( table, fieldIndex, testVect) == false)
       result = false;
   }
 
@@ -629,40 +629,40 @@ test_variable_field_array (ITable& table, std::vector<T> &testVect)
 }
 
 bool
-test_text_value_table (IDBSHandler& rDbs, std::vector<DText> &vectText)
+test_text_value_table( IDBSHandler& rDbs, std::vector<DText> &vectText)
 {
   uint_t fieldIndex = 0;
   bool result = true;
 
   {
-    ITable& table = rDbs.RetrievePersistentTable(tb_name);
-    for (; fieldIndex < table.FieldsCount (); ++ fieldIndex)
+    ITable& table = rDbs.RetrievePersistentTable( tb_name);
+    for (; fieldIndex < table.FieldsCount( ); ++ fieldIndex)
       {
-        const DBSFieldDescriptor fieldDesc = table.DescribeField(fieldIndex);
+        const DBSFieldDescriptor fieldDesc = table.DescribeField( fieldIndex);
         if (fieldDesc.type == T_TEXT)
           {
-            assert (fieldDesc.isArray == false);
+            assert( fieldDesc.isArray == false);
             break;
           }
       }
 
-    if (fieldIndex >= table.FieldsCount())
+    if (fieldIndex >= table.FieldsCount( ))
       result = false;
 
-    rDbs.ReleaseTable (table);
+    rDbs.ReleaseTable( table);
   }
 
   if (result)
-    {      ITable& table = rDbs.RetrievePersistentTable(tb_name);
+    {      ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
         {
-          if (rowIndex >= table.AllocatedRows())
-            table.AddRow();
+          if (rowIndex >= table.AllocatedRows( ))
+            table.AddRow( );
           table.Set (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
-      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
         {
           DText testValue;
           table.Get (rowIndex, fieldIndex, testValue);
@@ -673,14 +673,14 @@ test_text_value_table (IDBSHandler& rDbs, std::vector<DText> &vectText)
             }
         }
 
-      rDbs.ReleaseTable (table);
+      rDbs.ReleaseTable( table);
     }
 
   if (result)
     {
-      ITable& table = rDbs.RetrievePersistentTable(tb_name);
+      ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-      for (uint_t rowIndex = table.AllocatedRows(); rowIndex > 0; )
+      for (uint_t rowIndex = table.AllocatedRows( ); rowIndex > 0; )
         {
           --rowIndex;
           DText testValue;
@@ -691,43 +691,43 @@ test_text_value_table (IDBSHandler& rDbs, std::vector<DText> &vectText)
               break;
             }
         }
-      rDbs.ReleaseTable (table);
+      rDbs.ReleaseTable( table);
     }
 
   return result;
 }
 
 bool
-test_text_value_table (ITable& table, std::vector<DText> &vectText)
+test_text_value_table( ITable& table, std::vector<DText> &vectText)
 {
   uint_t fieldIndex = 0;
   bool result = true;
 
   {
-    for (; fieldIndex < table.FieldsCount (); ++ fieldIndex)
+    for (; fieldIndex < table.FieldsCount( ); ++ fieldIndex)
       {
-        const DBSFieldDescriptor fieldDesc = table.DescribeField(fieldIndex);
+        const DBSFieldDescriptor fieldDesc = table.DescribeField( fieldIndex);
         if (fieldDesc.type == T_TEXT)
           {
-            assert (fieldDesc.isArray == false);
+            assert( fieldDesc.isArray == false);
             break;
           }
       }
 
-    if (fieldIndex >= table.FieldsCount())
+    if (fieldIndex >= table.FieldsCount( ))
       result = false;
   }
 
   if (result)
     {
-      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
         {
-          if (rowIndex >= table.AllocatedRows())
-            table.AddRow();
+          if (rowIndex >= table.AllocatedRows( ))
+            table.AddRow( );
           table.Set (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
-      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
         {
           DText testValue;
           table.Get (rowIndex, fieldIndex, testValue);
@@ -741,7 +741,7 @@ test_text_value_table (ITable& table, std::vector<DText> &vectText)
 
   if (result)
     {
-      for (uint_t rowIndex = table.AllocatedRows(); rowIndex > 0; )
+      for (uint_t rowIndex = table.AllocatedRows( ); rowIndex > 0; )
         {
           --rowIndex;
           DText testValue;
@@ -758,176 +758,176 @@ test_text_value_table (ITable& table, std::vector<DText> &vectText)
 }
 
 bool
-test_variable_values_table (IDBSHandler& rDbs)
+test_variable_values_table( IDBSHandler& rDbs)
 {
   std::cout << "Testing variable values ... ";
   bool result = true;
 
   INIT_VECTORS;
 
-  rDbs.AddTable (tb_name, VAR_DESC_FIELDS_COUNT, field_descs + FIXED_DESC_FIELDS_COUNT);
-  print_table_fields (rDbs, tb_name);
+  rDbs.AddTable( tb_name, VAR_DESC_FIELDS_COUNT, field_descs + FIXED_DESC_FIELDS_COUNT);
+  print_table_fields( rDbs, tb_name);
 
-  result = result && test_variable_field_array (rDbs, vectBool);
-  result = result && test_variable_field_array (rDbs, vectChar);
-  result = result && test_variable_field_array (rDbs, vectDate);
-  result = result && test_variable_field_array (rDbs, vectDateTime);
-  result = result && test_variable_field_array (rDbs, vectHiResDate);
-  result = result && test_variable_field_array (rDbs, vectUInt8);
-  result = result && test_variable_field_array (rDbs, vectUInt16);
-  result = result && test_variable_field_array (rDbs, vectUInt32);
-  result = result && test_variable_field_array (rDbs, vectUInt64);
-  result = result && test_variable_field_array (rDbs, vectInt8);
-  result = result && test_variable_field_array (rDbs, vectInt16);
-  result = result && test_variable_field_array (rDbs, vectInt32);
-  result = result && test_variable_field_array (rDbs, vectInt64);
-  result = result && test_variable_field_array (rDbs, vectReal);
-  result = result && test_variable_field_array (rDbs, vectRichReal);
+  result = result && test_variable_field_array( rDbs, vectBool);
+  result = result && test_variable_field_array( rDbs, vectChar);
+  result = result && test_variable_field_array( rDbs, vectDate);
+  result = result && test_variable_field_array( rDbs, vectDateTime);
+  result = result && test_variable_field_array( rDbs, vectHiResDate);
+  result = result && test_variable_field_array( rDbs, vectUInt8);
+  result = result && test_variable_field_array( rDbs, vectUInt16);
+  result = result && test_variable_field_array( rDbs, vectUInt32);
+  result = result && test_variable_field_array( rDbs, vectUInt64);
+  result = result && test_variable_field_array( rDbs, vectInt8);
+  result = result && test_variable_field_array( rDbs, vectInt16);
+  result = result && test_variable_field_array( rDbs, vectInt32);
+  result = result && test_variable_field_array( rDbs, vectInt64);
+  result = result && test_variable_field_array( rDbs, vectReal);
+  result = result && test_variable_field_array( rDbs, vectRichReal);
 
   //Special case for DText!
-  result = result && test_text_value_table (rDbs, vectText);
+  result = result && test_text_value_table( rDbs, vectText);
 
 
-  rDbs.DeleteTable (tb_name);
+  rDbs.DeleteTable( tb_name);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
 }
 
 bool
-test_full_value_table (IDBSHandler& rDbs)
+test_full_value_table( IDBSHandler& rDbs)
 {
   std::cout << "Testing all values ... ";
   bool result = true;
 
   INIT_VECTORS;
 
-  rDbs.AddTable (tb_name, TOTAL_DESC_FIELDS_COUNT, field_descs);
-  print_table_fields (rDbs, tb_name);
+  rDbs.AddTable( tb_name, TOTAL_DESC_FIELDS_COUNT, field_descs);
+  print_table_fields( rDbs, tb_name);
 
-  result = result && test_fixed_value_field (rDbs, vectBool);
-  result = result && test_fixed_value_field (rDbs, vectChar);
-  result = result && test_fixed_value_field (rDbs, vectDate);
-  result = result && test_fixed_value_field (rDbs, vectDateTime);
-  result = result && test_fixed_value_field (rDbs, vectHiResDate);
-  result = result && test_fixed_value_field (rDbs, vectUInt8);
-  result = result && test_fixed_value_field (rDbs, vectUInt16);
-  result = result && test_fixed_value_field (rDbs, vectUInt32);
-  result = result && test_fixed_value_field (rDbs, vectUInt64);
+  result = result && test_fixed_value_field( rDbs, vectBool);
+  result = result && test_fixed_value_field( rDbs, vectChar);
+  result = result && test_fixed_value_field( rDbs, vectDate);
+  result = result && test_fixed_value_field( rDbs, vectDateTime);
+  result = result && test_fixed_value_field( rDbs, vectHiResDate);
+  result = result && test_fixed_value_field( rDbs, vectUInt8);
+  result = result && test_fixed_value_field( rDbs, vectUInt16);
+  result = result && test_fixed_value_field( rDbs, vectUInt32);
+  result = result && test_fixed_value_field( rDbs, vectUInt64);
 
-  result = result && test_variable_field_array (rDbs, vectBool);
-  result = result && test_variable_field_array (rDbs, vectChar);
-  result = result && test_variable_field_array (rDbs, vectDate);
-
-
-  result = result && test_fixed_value_field (rDbs, vectReal);
-  result = result && test_fixed_value_field (rDbs, vectRichReal);
-
-  result = result && test_variable_field_array (rDbs, vectDateTime);
-  result = result && test_variable_field_array (rDbs, vectHiResDate);
-  result = result && test_variable_field_array (rDbs, vectUInt8);
-  result = result && test_variable_field_array (rDbs, vectUInt16);
-  result = result && test_variable_field_array (rDbs, vectUInt32);
-  result = result && test_variable_field_array (rDbs, vectUInt64);
-  result = result && test_variable_field_array (rDbs, vectInt8);
-  result = result && test_variable_field_array (rDbs, vectInt16);
-
-  result = result && test_fixed_value_field (rDbs, vectInt8);
-  result = result && test_fixed_value_field (rDbs, vectInt16);
-  result = result && test_fixed_value_field (rDbs, vectInt32);
-  result = result && test_fixed_value_field (rDbs, vectInt64);
+  result = result && test_variable_field_array( rDbs, vectBool);
+  result = result && test_variable_field_array( rDbs, vectChar);
+  result = result && test_variable_field_array( rDbs, vectDate);
 
 
-  result = result && test_variable_field_array (rDbs, vectInt32);
-  result = result && test_variable_field_array (rDbs, vectInt64);
-  result = result && test_variable_field_array (rDbs, vectReal);
-  result = result && test_variable_field_array (rDbs, vectRichReal);
+  result = result && test_fixed_value_field( rDbs, vectReal);
+  result = result && test_fixed_value_field( rDbs, vectRichReal);
+
+  result = result && test_variable_field_array( rDbs, vectDateTime);
+  result = result && test_variable_field_array( rDbs, vectHiResDate);
+  result = result && test_variable_field_array( rDbs, vectUInt8);
+  result = result && test_variable_field_array( rDbs, vectUInt16);
+  result = result && test_variable_field_array( rDbs, vectUInt32);
+  result = result && test_variable_field_array( rDbs, vectUInt64);
+  result = result && test_variable_field_array( rDbs, vectInt8);
+  result = result && test_variable_field_array( rDbs, vectInt16);
+
+  result = result && test_fixed_value_field( rDbs, vectInt8);
+  result = result && test_fixed_value_field( rDbs, vectInt16);
+  result = result && test_fixed_value_field( rDbs, vectInt32);
+  result = result && test_fixed_value_field( rDbs, vectInt64);
+
+
+  result = result && test_variable_field_array( rDbs, vectInt32);
+  result = result && test_variable_field_array( rDbs, vectInt64);
+  result = result && test_variable_field_array( rDbs, vectReal);
+  result = result && test_variable_field_array( rDbs, vectRichReal);
 
   //Special case for DText!
-  result = result && test_text_value_table (rDbs, vectText);
+  result = result && test_text_value_table( rDbs, vectText);
 
-  rDbs.DeleteTable (tb_name);
+  rDbs.DeleteTable( tb_name);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
 }
 
 bool
-test_full_value_temp_table (IDBSHandler& rDbs)
+test_full_value_temp_table( IDBSHandler& rDbs)
 {
   std::cout << "Testing all values on temporal table... ";
   bool result = true;
 
   INIT_VECTORS;
 
-  ITable& table = rDbs.CreateTempTable (TOTAL_DESC_FIELDS_COUNT, field_descs);
+  ITable& table = rDbs.CreateTempTable( TOTAL_DESC_FIELDS_COUNT, field_descs);
 
-  result = result && test_fixed_value_field (table, vectBool);
-  result = result && test_fixed_value_field (table, vectChar);
-  result = result && test_fixed_value_field (table, vectDate);
-  result = result && test_fixed_value_field (table, vectDateTime);
-  result = result && test_fixed_value_field (table, vectHiResDate);
-  result = result && test_fixed_value_field (table, vectUInt8);
-  result = result && test_fixed_value_field (table, vectUInt16);
-  result = result && test_fixed_value_field (table, vectUInt32);
-  result = result && test_fixed_value_field (table, vectUInt64);
+  result = result && test_fixed_value_field( table, vectBool);
+  result = result && test_fixed_value_field( table, vectChar);
+  result = result && test_fixed_value_field( table, vectDate);
+  result = result && test_fixed_value_field( table, vectDateTime);
+  result = result && test_fixed_value_field( table, vectHiResDate);
+  result = result && test_fixed_value_field( table, vectUInt8);
+  result = result && test_fixed_value_field( table, vectUInt16);
+  result = result && test_fixed_value_field( table, vectUInt32);
+  result = result && test_fixed_value_field( table, vectUInt64);
 
-  result = result && test_variable_field_array (table, vectBool);
-  result = result && test_variable_field_array (table, vectChar);
-  result = result && test_variable_field_array (table, vectDate);
-
-
-  result = result && test_fixed_value_field (table, vectReal);
-  result = result && test_fixed_value_field (table, vectRichReal);
-
-  result = result && test_variable_field_array (table, vectDateTime);
-  result = result && test_variable_field_array (table, vectHiResDate);
-  result = result && test_variable_field_array (table, vectUInt8);
-  result = result && test_variable_field_array (table, vectUInt16);
-  result = result && test_variable_field_array (table, vectUInt32);
-  result = result && test_variable_field_array (table, vectUInt64);
-  result = result && test_variable_field_array (table, vectInt8);
-  result = result && test_variable_field_array (table, vectInt16);
-
-  result = result && test_fixed_value_field (table, vectInt8);
-  result = result && test_fixed_value_field (table, vectInt16);
-  result = result && test_fixed_value_field (table, vectInt32);
-  result = result && test_fixed_value_field (table, vectInt64);
+  result = result && test_variable_field_array( table, vectBool);
+  result = result && test_variable_field_array( table, vectChar);
+  result = result && test_variable_field_array( table, vectDate);
 
 
-  result = result && test_variable_field_array (table, vectInt32);
-  result = result && test_variable_field_array (table, vectInt64);
-  result = result && test_variable_field_array (table, vectReal);
-  result = result && test_variable_field_array (table, vectRichReal);
+  result = result && test_fixed_value_field( table, vectReal);
+  result = result && test_fixed_value_field( table, vectRichReal);
+
+  result = result && test_variable_field_array( table, vectDateTime);
+  result = result && test_variable_field_array( table, vectHiResDate);
+  result = result && test_variable_field_array( table, vectUInt8);
+  result = result && test_variable_field_array( table, vectUInt16);
+  result = result && test_variable_field_array( table, vectUInt32);
+  result = result && test_variable_field_array( table, vectUInt64);
+  result = result && test_variable_field_array( table, vectInt8);
+  result = result && test_variable_field_array( table, vectInt16);
+
+  result = result && test_fixed_value_field( table, vectInt8);
+  result = result && test_fixed_value_field( table, vectInt16);
+  result = result && test_fixed_value_field( table, vectInt32);
+  result = result && test_fixed_value_field( table, vectInt64);
+
+
+  result = result && test_variable_field_array( table, vectInt32);
+  result = result && test_variable_field_array( table, vectInt64);
+  result = result && test_variable_field_array( table, vectReal);
+  result = result && test_variable_field_array( table, vectRichReal);
 
   //Special case for DText!
-  result = result && test_text_value_table (table, vectText);
+  result = result && test_text_value_table( table, vectText);
 
-  rDbs.ReleaseTable (table);
+  rDbs.ReleaseTable( table);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
 }
 
 int
-main ()
+main( )
 {
   bool success = true;
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
+    DBSInit( DBSSettings( ));
+    DBSCreateDatabase( db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase( db_name);
 
-  success = success && test_fixed_values_table (handler);
-  success = success && test_variable_values_table (handler);
-  success = success && test_full_value_table (handler);
-  success = success && test_full_value_temp_table (handler);
+  success = success && test_fixed_values_table( handler);
+  success = success && test_variable_values_table( handler);
+  success = success && test_full_value_table( handler);
+  success = success && test_full_value_temp_table( handler);
 
-  DBSReleaseDatabase (handler);
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSReleaseDatabase( handler);
+  DBSRemoveDatabase( db_name);
+  DBSShoutdown( );
 
   if (!success)
     {

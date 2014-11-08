@@ -6,9 +6,9 @@
 
 .settings/
 bin/
-compiler/parser/whisper.output
-compiler/parser/whisper.tab.c
-compiler/parser/whisper.tab.h
+compiler/parser/whais.output
+compiler/parser/whais.tab.c
+compiler/parser/whais.tab.h
 tmp/
 *~
 *.idb

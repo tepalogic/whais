@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -24,28 +24,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dlfcn.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 WH_SHLIB
-wh_shl_load (const char* const library)
+wh_shl_load( const char* const library)
 {
-  const WH_SHLIB result = dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+  const WH_SHLIB result = dlopen( library, RTLD_NOW | RTLD_GLOBAL);
 
   return result;
 }
 
 
 void
-wh_shl_release (WH_SHLIB shl)
+wh_shl_release( WH_SHLIB shl)
 {
-  dlclose  (shl);
+  dlclose( shl);
 }
 
 
 void*
-wh_shl_symbol (WH_SHLIB shl, const char* const symbol)
+wh_shl_symbol( WH_SHLIB shl, const char* const symbol)
 {
-  void* const result = dlsym (shl, symbol);
+  void* const result = dlsym( shl, symbol);
 
   return result;
 }

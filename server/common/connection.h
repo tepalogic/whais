@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <memory>
 
-#include "whisper.h"
+#include "whais.h"
 
 
 #include "utils/auto_array.h"
@@ -39,25 +39,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "configuration.h"
 
 
-using namespace whisper;
+using namespace whais;
 
 
 struct UserHandler
 {
-  UserHandler ()
-    : mDesc (NULL),
-      mLastReqTick (0),
-      mThread (),
-      mSocket (INVALID_SOCKET),
-      mRoot (false),
-      mEndConnetion (true)
+  UserHandler( )
+    : mDesc( NULL),
+      mLastReqTick( 0),
+      mThread( ),
+      mSocket( INVALID_SOCKET),
+      mRoot( false),
+      mEndConnetion( true)
   {
-    mThread.IgnoreExceptions (true);
+    mThread.IgnoreExceptions( true);
   }
 
-  ~UserHandler ()
+  ~UserHandler( )
   {
-    assert (mThread.IsEnded ());
+    assert( mThread.IsEnded( ));
   }
 
   const DBSDescriptors* mDesc;
@@ -73,17 +73,17 @@ struct UserHandler
 class ConnectionException : public Exception
 {
 public:
-  ConnectionException (const uint32_t  code,
+  ConnectionException( const uint32_t  code,
                        const char*     file,
                        uint32_t        line,
                        const char*     fmtMsg = NULL,
                        ...);
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone( ) const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type( ) const;
 
-  virtual const char* Description () const;
+  virtual const char* Description( ) const;
 };
 
 
@@ -91,43 +91,43 @@ public:
 class ClientConnection
 {
 public:
-  ClientConnection (UserHandler&                 client,
+  ClientConnection( UserHandler&                 client,
                     std::vector<DBSDescriptors>& databases);
 
-  uint_t MaxSize () const;
+  uint_t MaxSize( ) const;
 
-  uint_t DataSize () const;
-  void   DataSize (const uint16_t size);
+  uint_t DataSize( ) const;
+  void   DataSize( const uint16_t size);
 
-  uint8_t* Data ();
+  uint8_t* Data( );
 
-  uint32_t ReadCommand ();
+  uint32_t ReadCommand( );
 
-  void SendCmdResponse (const uint16_t respType);
+  void SendCmdResponse( const uint16_t respType);
 
   const DBSDescriptors& Dbs ()
   {
-    assert (mUserHandler.mDesc != NULL);
+    assert( mUserHandler.mDesc != NULL);
 
     return *mUserHandler.mDesc;
   }
 
-  SessionStack& Stack ()
+  SessionStack& Stack( )
   {
     return mStack;
   }
 
-  bool IsAdmin () const
+  bool IsAdmin( ) const
   {
     return mUserHandler.mRoot;
   }
 
 private:
-  uint8_t* RawCmdData ();
+  uint8_t* RawCmdData( );
 
-  void ReciveRawClientFrame ();
+  void ReciveRawClientFrame( );
 
-  void SendRawClientFrame (const uint8_t type);
+  void SendRawClientFrame( const uint8_t type);
 
   UserHandler&              mUserHandler;
   SessionStack              mStack;
@@ -143,7 +143,7 @@ private:
   std::string         		mKey;
 
 
-  ClientConnection (const ClientConnection&);
+  ClientConnection( const ClientConnection&);
   const ClientConnection& operator= (const ClientConnection&);
 };
 

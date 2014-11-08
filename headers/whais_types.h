@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,36 +22,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_TIME_H_
-#define WHISPER_TIME_H_
 
-typedef struct
-{
-  int16_t  year;
-  uint8_t  month;
-  uint8_t  day;
-  uint8_t  hour;
-  uint8_t  min;
-  uint8_t  sec;
-  uint_t   usec;
-}WTime;
+#ifndef WHAIS_TYPES_H_
+#define WHAIS_TYPES_H_
 
-
-typedef uint64_t WTICKS;
-
-#ifdef __cplusplus
-extern "C"
-{
+#ifdef ARCH_LINUX_GCC
+#include "linux_gcc/types.h"
 #endif
 
-WTime
-wh_get_currtime ();
-
-WTICKS
-wh_msec_ticks ();
-
-#ifdef __cplusplus
-}
+#ifdef ARCH_WINDOWS_VC
+#include "windows_vc/types.h"
 #endif
 
-#endif /* WHISPER_TIME_H_ */
+#endif /* WHAIS_TYPES_H_ */

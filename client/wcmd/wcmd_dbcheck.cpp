@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -32,17 +32,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_optglbs.h"
 
 using namespace std;
-using namespace whisper;
+using namespace whais;
 
 static bool sgAllAnswersYes = false;
 
 static bool
-ask_question (const char* question, const bool allowAllYes = false)
+ask_question( const char* question, const bool allowAllYes = false)
 {
   if (sgAllAnswersYes)
     return true;
 
-  while (true)
+  while( true)
     {
       char c;
 
@@ -69,13 +69,13 @@ ask_question (const char* question, const bool allowAllYes = false)
         cout << "Please choose 'y' or 'n'!\n";
     }
 
-  assert (false);
+  assert( false);
   return false;
 }
 
 
 static bool
-repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
+repair_callback( const FIX_ERROR_CALLBACK_TYPE type,
                  const char* const             format,
                  ... )
 {
@@ -83,7 +83,7 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 
   bool  result   = true;
 
-  switch (type)
+  switch( type)
     {
   case INFORMATION:
     cout << "CHK INF: ";
@@ -112,7 +112,7 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 
   default:
 
-    assert (false);
+    assert( false);
     cout << "CRITICAL ERROR: Unexpected execution flow.\n";
     result = false;
     break;
@@ -121,11 +121,11 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 
   va_list vl;
 
-  va_start (vl, format);
-  vprintf (format, vl);
-  va_end (vl);
+  va_start( vl, format);
+  vprintf( format, vl);
+  va_end( vl);
 
-  printf ("\n");
+  printf( "\n");
 
 
   if ((type == CONFIRMATION_QUESTION)
@@ -133,7 +133,7 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
       || (type == OPTIMISE_QUESTION)
       || (type == FIX_QUESTION))
     {
-      result = ask_question (question, true);
+      result = ask_question( question, true);
     }
 
   return result;
@@ -141,20 +141,20 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 
 
 bool
-repair_database_erros ()
+repair_database_erros( )
 {
-  return ask_question ("Should I try to check and fix the database? (y/n)");
+  return ask_question( "Should I try to check and fix the database? (y/n)");
 }
 
 
 int
-check_database_for_errors (const bool allAnswersYes, const bool userRequest)
+check_database_for_errors( const bool allAnswersYes, const bool userRequest)
 {
   sgAllAnswersYes = allAnswersYes;
 
   if ( ! userRequest)
     {
-      if (! ask_question ("--- WARNING ---\n"
+      if (! ask_question( "--- WARNING ---\n"
                           " It is strongly recommended to backup the"
                           " database's files before continuing. Was the"
                           " back up made? (y/n)"))
@@ -163,9 +163,9 @@ check_database_for_errors (const bool allAnswersYes, const bool userRequest)
         }
     }
 
-  const char* const dbName = GetWorkingDB().c_str ();
+  const char* const dbName = GetWorkingDB( ).c_str( );
 
-  if ( ! DBSRepairDatabase (dbName, NULL, repair_callback))
+  if ( ! DBSRepairDatabase( dbName, NULL, repair_callback))
     return -1;
 
   return 0;

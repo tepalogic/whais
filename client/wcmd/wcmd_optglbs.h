@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "dbs/dbs_mgr.h"
 
@@ -45,77 +45,77 @@ typedef enum
 
 
 const std::string&
-GetRemoteHostName ();
+GetRemoteHostName( );
 
 
 void
-SetRemoteHostName (const char* const host);
+SetRemoteHostName( const char* const host);
 
 
 const std::string&
-GetConnectionPort ();
+GetConnectionPort( );
 
 
 void
-SetConnectionPort (const char* const port);
+SetConnectionPort( const char* const port);
 
 
 uint_t
-GetUserId ();
+GetUserId( );
 
 
 void
-SetUserId (const uint_t userId);
+SetUserId( const uint_t userId);
 
 const std::string&
-GetUserPassword ();
+GetUserPassword( );
 
 
 void
-SetUserPassword (const char* const password);
-
-
-const std::string&
-GetWorkingDirectory ();
-
-
-void
-SetWorkingDirectory (const char* const directory);
+SetUserPassword( const char* const password);
 
 
 const std::string&
-GetWorkingDB ();
+GetWorkingDirectory( );
+
 
 void
-SetWorkingDB (const char* const dbName);
+SetWorkingDirectory( const char* const directory);
+
+
+const std::string&
+GetWorkingDB( );
+
+void
+SetWorkingDB( const char* const dbName);
 
 
 VERBOSE_LEVEL
-GetVerbosityLevel ();
+GetVerbosityLevel( );
 
 
 void
-SetVerbosityLevel (const uint_t level);
+SetVerbosityLevel( const uint_t level);
 
 
 bool
-SetMaximumFileSize (std::string size);
+SetMaximumFileSize( std::string size);
 
 
 uint64_t
-GetMaximumFileSize ();
+GetMaximumFileSize( );
 
 
 void
-SetDbsHandler (whisper::IDBSHandler& dbs);
+SetDbsHandler( whais::IDBSHandler& dbs);
 
 
-whisper::IDBSHandler&
-GetDBSHandler ();
+whais::IDBSHandler&
+GetDBSHandler( );
 
 
 bool
-IsOnlineDatabase ();
+IsOnlineDatabase( );
 
 
 #endif //WCMD_OPTGLBS_H_

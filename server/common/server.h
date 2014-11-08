@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "utils/logger.h"
 
@@ -35,10 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 void
-StartServer (whisper::FileLogger& log, std::vector<DBSDescriptors>& databases);
+StartServer( whais::FileLogger& log, std::vector<DBSDescriptors>& databases);
 
 void
-StopServer ();
+StopServer( );
 
 
 #endif /* SERVER_H_ */

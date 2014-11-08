@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -22,44 +22,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef WHISPER_THREAD_H_
-#define WHISPER_THREAD_H_
+#ifndef WHAIS_TIME_H_
+#define WHAIS_TIME_H_
+
+typedef struct
+{
+  int16_t  year;
+  uint8_t  month;
+  uint8_t  day;
+  uint8_t  hour;
+  uint8_t  min;
+  uint8_t  sec;
+  uint_t   usec;
+}WTime;
+
+
+typedef uint64_t WTICKS;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-typedef void (*WH_THREAD_ROUTINE) (void*);
+WTime
+wh_get_currtime( );
 
-uint_t
-wh_lock_init (WH_LOCK* const lock);
-
-uint_t
-wh_lock_destroy (WH_LOCK* const lock);
-
-uint_t
-wh_lock_acquire (WH_LOCK* const lock);
-
-uint_t
-wh_lock_release (WH_LOCK* const lock);
-
-uint_t
-wh_thread_create (WH_THREAD*                    outThread,
-                  const WH_THREAD_ROUTINE       routine,
-                  void*                         args);
-
-uint_t
-wh_thread_free (WH_THREAD thread);
-
-void
-wh_yield ();
-
-void
-wh_sleep (const uint_t millisecs);
+WTICKS
+wh_msec_ticks( );
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* WHISPER_THREAD_H_ */
+#endif /* WHAIS_TIME_H_ */

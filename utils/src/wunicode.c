@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -29,9 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static INLINE uint32_t
-to_uppercase_basic_latin (const uint32_t codePoint)
+to_uppercase_basic_latin( const uint32_t codePoint)
 {
-  assert ((0 <= codePoint) && (codePoint < 0x0080));
+  assert( (0 <= codePoint) && (codePoint < 0x0080));
 
   if (('a' <= codePoint) && (codePoint <= 'z'))
     return codePoint - 'a' + 'A';
@@ -41,9 +41,9 @@ to_uppercase_basic_latin (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_lowercase_basic_latin (const uint32_t codePoint)
+to_lowercase_basic_latin( const uint32_t codePoint)
 {
-  assert ((0 <= codePoint) && (codePoint < 0x0080));
+  assert( (0 <= codePoint) && (codePoint < 0x0080));
 
   if (('A' <= codePoint) && (codePoint <= 'Z'))
     return codePoint - 'A' + 'a';
@@ -53,9 +53,9 @@ to_lowercase_basic_latin (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_uppercase_basic_latin1_supp (const uint32_t codePoint)
+to_uppercase_basic_latin1_supp( const uint32_t codePoint)
 {
-  assert ((0x0080 <= codePoint) && (codePoint < 0x0100));
+  assert( (0x0080 <= codePoint) && (codePoint < 0x0100));
 
   if ((0x00E0 <= codePoint) && (codePoint <= 0x00F6))
     return codePoint - 0x00E0 + 0x00C0;
@@ -71,9 +71,9 @@ to_uppercase_basic_latin1_supp (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_lowercase_basic_latin1_supp (const uint32_t codePoint)
+to_lowercase_basic_latin1_supp( const uint32_t codePoint)
 {
-  assert ((0x0080 <= codePoint) && (codePoint < 0x0100));
+  assert( (0x0080 <= codePoint) && (codePoint < 0x0100));
 
   if ((0x00C0 <= codePoint) && (codePoint <= 0x00D6))
     return codePoint - 0x00C0 + 0x00E0;
@@ -86,9 +86,9 @@ to_lowercase_basic_latin1_supp (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_uppercase_basic_latinA_ext (const uint32_t codePoint)
+to_uppercase_basic_latinA_ext( const uint32_t codePoint)
 {
-  assert ((0x0100 <= codePoint) && (codePoint < 0x0180));
+  assert( (0x0100 <= codePoint) && (codePoint < 0x0180));
 
   if ((codePoint & 1) != 0)
     {
@@ -115,9 +115,9 @@ to_uppercase_basic_latinA_ext (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_lowercase_basic_latinA_ext (const uint32_t codePoint)
+to_lowercase_basic_latinA_ext( const uint32_t codePoint)
 {
-  assert ((0x0100 <= codePoint) && (codePoint < 0x0180));
+  assert( (0x0100 <= codePoint) && (codePoint < 0x0180));
 
   if ((codePoint & 1) == 0)
     {
@@ -147,9 +147,9 @@ to_lowercase_basic_latinA_ext (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_uppercase_basic_latinB_ext (const uint32_t codePoint)
+to_uppercase_basic_latinB_ext( const uint32_t codePoint)
 {
-  assert ((0x0180 <= codePoint) && (codePoint < 0x0250));
+  assert( (0x0180 <= codePoint) && (codePoint < 0x0250));
 
   if ((codePoint & 1) == 0)
     {
@@ -171,7 +171,7 @@ to_uppercase_basic_latinB_ext (const uint32_t codePoint)
         return codePoint - 1;
     }
 
-  switch (codePoint)
+  switch( codePoint)
     {
     case 0x0180:
       return 0x0243;
@@ -217,9 +217,9 @@ to_uppercase_basic_latinB_ext (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_lowercase_basic_latinB_ext (const uint32_t codePoint)
+to_lowercase_basic_latinB_ext( const uint32_t codePoint)
 {
-  assert ((0x0180 <= codePoint) && (codePoint < 0x0250));
+  assert( (0x0180 <= codePoint) && (codePoint < 0x0250));
 
   if ((codePoint & 1) != 0)
     {
@@ -241,7 +241,7 @@ to_lowercase_basic_latinB_ext (const uint32_t codePoint)
         return codePoint + 1;
     }
 
-  switch (codePoint)
+  switch( codePoint)
     {
     case 0x0182:
     case 0x0184:
@@ -299,9 +299,9 @@ to_lowercase_basic_latinB_ext (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_uppercase_greek_coptic (const uint32_t codePoint)
+to_uppercase_greek_coptic( const uint32_t codePoint)
 {
-  assert ((0x0374 <= codePoint) && (codePoint <= 0x03FF));
+  assert( (0x0374 <= codePoint) && (codePoint <= 0x03FF));
 
   if (codePoint == 0x03AC)
     return 0x0386;
@@ -325,16 +325,16 @@ to_uppercase_greek_coptic (const uint32_t codePoint)
     return 0x038F;
 
   if ((0x03E2 <= codePoint) && (codePoint <= 0x03EF))
-    return ((codePoint & 1) != 0) ? codePoint - 1 : codePoint;
+    return( (codePoint & 1) != 0) ? codePoint - 1 : codePoint;
 
   return codePoint;
 }
 
 
 static INLINE uint32_t
-to_lowercase_greek_coptic (const uint32_t codePoint)
+to_lowercase_greek_coptic( const uint32_t codePoint)
 {
-  assert ((0x0374 <= codePoint) && (codePoint <= 0x03FF));
+  assert( (0x0374 <= codePoint) && (codePoint <= 0x03FF));
 
   if (codePoint == 0x0386)
     return 0x03AC;
@@ -358,16 +358,16 @@ to_lowercase_greek_coptic (const uint32_t codePoint)
     return codePoint - 0x03A3 + 0x03C3;
 
   if ((0x03E2 <= codePoint) && (codePoint <= 0x03EF))
-    return ((codePoint & 1) == 0) ? codePoint + 1 : codePoint;
+    return( (codePoint & 1) == 0) ? codePoint + 1 : codePoint;
 
   return codePoint;
 }
 
 
 static INLINE uint32_t
-to_uppercase_cyrillic (const uint32_t codePoint)
+to_uppercase_cyrillic( const uint32_t codePoint)
 {
-  assert ((0x0400 <= codePoint) && (codePoint <= 0x0527));
+  assert( (0x0400 <= codePoint) && (codePoint <= 0x0527));
 
   if ((0x0430 <= codePoint) && (codePoint <= 0x044F))
     return codePoint - 0x0430 + 0x0410;
@@ -400,9 +400,9 @@ to_uppercase_cyrillic (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_lowercase_cyrillic (const uint32_t codePoint)
+to_lowercase_cyrillic( const uint32_t codePoint)
 {
-  assert ((0x0400 <= codePoint) && (codePoint <= 0x0527));
+  assert( (0x0400 <= codePoint) && (codePoint <= 0x0527));
 
   if ((0x0410 <= codePoint) && (codePoint <= 0x042F))
     return codePoint - 0x0410 + 0x0430;
@@ -436,27 +436,27 @@ to_lowercase_cyrillic (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_uppercase_armenian (const uint32_t codePoint)
+to_uppercase_armenian( const uint32_t codePoint)
 {
-  assert ((0x0561 <= codePoint) && (codePoint <= 0x0586));
+  assert( (0x0561 <= codePoint) && (codePoint <= 0x0586));
 
   return codePoint - 0x0561 + 0x0531;
 }
 
 
 static INLINE uint32_t
-to_lowercase_armenian (const uint32_t codePoint)
+to_lowercase_armenian( const uint32_t codePoint)
 {
-  assert ((0x0531 <= codePoint) && (codePoint <= 0x0556));
+  assert( (0x0531 <= codePoint) && (codePoint <= 0x0556));
 
   return codePoint - 0x0531 + 0x0561;
 }
 
 
 static INLINE uint32_t
-to_canonical_latin1_supp (const uint32_t codePoint)
+to_canonical_latin1_supp( const uint32_t codePoint)
 {
-  assert ((0x0080 <= codePoint) && (codePoint <= 0x00FF));
+  assert( (0x0080 <= codePoint) && (codePoint <= 0x00FF));
 
   if ((0x00E0 <= codePoint) && (codePoint <= 0x00E6))
     return 'a';
@@ -511,9 +511,9 @@ to_canonical_latin1_supp (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_canonical_latinA_ext (const uint32_t codePoint)
+to_canonical_latinA_ext( const uint32_t codePoint)
 {
-  assert ((0x0100 <= codePoint) && (codePoint <= 0x17F));
+  assert( (0x0100 <= codePoint) && (codePoint <= 0x17F));
 
   if ((codePoint & 1) == 0)
     {
@@ -653,11 +653,11 @@ to_canonical_latinA_ext (const uint32_t codePoint)
 
 
 static INLINE uint32_t
-to_canonical_latinB_ext (const uint32_t codePoint)
+to_canonical_latinB_ext( const uint32_t codePoint)
 {
-  assert ((0x0180 <= codePoint) && (codePoint <= 0x024F));
+  assert( (0x0180 <= codePoint) && (codePoint <= 0x024F));
 
-  switch (codePoint)
+  switch( codePoint)
     {
     case 0x0187:
       return 'C';
@@ -981,9 +981,9 @@ to_canonical_latinB_ext (const uint32_t codePoint)
 
 
 static uint32_t
-to_canonical_greek_coptic(const u_int32_t codePoint)
+to_canonical_greek_coptic( const u_int32_t codePoint)
 {
-  switch (codePoint)
+  switch( codePoint)
     {
     case 0x0386:
       return 0x0391;
@@ -1060,9 +1060,9 @@ to_canonical_greek_coptic(const u_int32_t codePoint)
 
 
 static uint32_t
-to_canonical_cyrillic (const u_int32_t codePoint)
+to_canonical_cyrillic( const u_int32_t codePoint)
 {
-  switch (codePoint)
+  switch( codePoint)
   {
   case 0x0400:
     return 0x0415;
@@ -1369,7 +1369,7 @@ to_canonical_cyrillic (const u_int32_t codePoint)
 
 
 uint32_t
-wh_to_canonical (const uint32_t codePoint)
+wh_to_canonical( const uint32_t codePoint)
 {
   if (codePoint < 0x0374)
     {
@@ -1377,28 +1377,28 @@ wh_to_canonical (const uint32_t codePoint)
         return codePoint;
 
       else if (codePoint < 0x0100)
-        return to_canonical_latin1_supp (codePoint);
+        return to_canonical_latin1_supp( codePoint);
 
       else if (codePoint < 0x0180)
-        return to_canonical_latinA_ext (codePoint);
+        return to_canonical_latinA_ext( codePoint);
 
       else if (codePoint < 0x0250)
-        return to_canonical_latinB_ext (codePoint);
+        return to_canonical_latinB_ext( codePoint);
     }
   else if ((0x0374 <= codePoint) && (codePoint < 0x0400))
-    return to_canonical_greek_coptic (codePoint);
+    return to_canonical_greek_coptic( codePoint);
 
   else if (codePoint < 0x528)
-    return to_canonical_cyrillic (codePoint);
+    return to_canonical_cyrillic( codePoint);
 
   return codePoint;
 }
 
 
 bool_t
-wh_is_lowercase (const uint32_t codePoint)
+wh_is_lowercase( const uint32_t codePoint)
 {
-  if (wh_to_uppercase (codePoint) != codePoint)
+  if (wh_to_uppercase( codePoint) != codePoint)
     return TRUE;
 
   return FALSE;
@@ -1406,9 +1406,9 @@ wh_is_lowercase (const uint32_t codePoint)
 
 
 bool_t
-wh_is_uppercase (const uint32_t codePoint)
+wh_is_uppercase( const uint32_t codePoint)
 {
-  if (wh_to_lowercase (codePoint) != codePoint)
+  if (wh_to_lowercase( codePoint) != codePoint)
     return TRUE;
 
   return FALSE;
@@ -1416,86 +1416,86 @@ wh_is_uppercase (const uint32_t codePoint)
 
 
 uint32_t
-wh_to_lowercase (const uint32_t codePoint)
+wh_to_lowercase( const uint32_t codePoint)
 {
   if (codePoint < 0x0374)
     {
       if (codePoint < 0x80)
-        return to_lowercase_basic_latin (codePoint);
+        return to_lowercase_basic_latin( codePoint);
 
       else if (codePoint < 0x0100)
-        return to_lowercase_basic_latin1_supp (codePoint);
+        return to_lowercase_basic_latin1_supp( codePoint);
 
       else if (codePoint < 0x0180)
-        return to_lowercase_basic_latinA_ext (codePoint);
+        return to_lowercase_basic_latinA_ext( codePoint);
 
       else if (codePoint < 0x0250)
-        return to_lowercase_basic_latinB_ext (codePoint);
+        return to_lowercase_basic_latinB_ext( codePoint);
     }
   else if ((0x0374 <= codePoint) && (codePoint < 0x0400))
-    return to_lowercase_greek_coptic (codePoint);
+    return to_lowercase_greek_coptic( codePoint);
 
   else if (codePoint < 0x528)
-    return to_lowercase_cyrillic (codePoint);
+    return to_lowercase_cyrillic( codePoint);
 
   else if ((0x0531 <= codePoint) && (codePoint <= 0x0556))
-    return to_lowercase_armenian (codePoint);
+    return to_lowercase_armenian( codePoint);
 
   return codePoint;
 }
 
 
 uint32_t
-wh_to_uppercase (const uint32_t codePoint)
+wh_to_uppercase( const uint32_t codePoint)
 {
   if (codePoint < 0x0374)
     {
       if (codePoint < 0x80)
-        return to_uppercase_basic_latin (codePoint);
+        return to_uppercase_basic_latin( codePoint);
 
       else if (codePoint < 0x0100)
-        return to_uppercase_basic_latin1_supp (codePoint);
+        return to_uppercase_basic_latin1_supp( codePoint);
 
       else if (codePoint < 0x0180)
-        return to_uppercase_basic_latinA_ext (codePoint);
+        return to_uppercase_basic_latinA_ext( codePoint);
 
       else if (codePoint < 0x0250)
-        return to_uppercase_basic_latinB_ext (codePoint);
+        return to_uppercase_basic_latinB_ext( codePoint);
     }
   else if ((0x0374 <= codePoint) && (codePoint < 0x0400))
-    return to_uppercase_greek_coptic (codePoint);
+    return to_uppercase_greek_coptic( codePoint);
 
   else if (codePoint < 0x528)
-    return to_uppercase_cyrillic (codePoint);
+    return to_uppercase_cyrillic( codePoint);
 
   else if ((0x0561 <= codePoint) && (codePoint <= 0x0586))
-    return to_uppercase_armenian (codePoint);
+    return to_uppercase_armenian( codePoint);
 
   return codePoint;
 }
 
 
 int
-wh_cmp_alphabetically (const uint32_t cp1, const uint32_t cp2)
+wh_cmp_alphabetically( const uint32_t cp1, const uint32_t cp2)
 {
-  const int bcp1 = wh_to_canonical (cp1);
-  const int bcp2 = wh_to_canonical (cp2);
+  const int bcp1 = wh_to_canonical( cp1);
+  const int bcp2 = wh_to_canonical( cp2);
 
   if (bcp1 == bcp2)
-    return (int)cp1 - (int)cp2;
+    return( int)cp1 - (int)cp2;
 
-  const int lbcp1 = wh_to_uppercase (bcp1);
-  const int lbcp2 = wh_to_uppercase (bcp2);
+  const int lbcp1 = wh_to_uppercase( bcp1);
+  const int lbcp2 = wh_to_uppercase( bcp2);
 
-  return (lbcp1 == lbcp2) ? (bcp1 - bcp2 ) : (lbcp1 - lbcp2);
+  return( lbcp1 == lbcp2) ? (bcp1 - bcp2 ) : (lbcp1 - lbcp2);
 }
 
 
 uint32_t
-wh_prev_char (const uint32_t codePoint)
+wh_prev_char( const uint32_t codePoint)
 {
-  assert (codePoint > 1);
-  assert (codePoint <= UTF_LAST_CODEPOINT);
+  assert( codePoint > 1);
+  assert( codePoint <= UTF_LAST_CODEPOINT);
 
   if (codePoint == (UTF16_EXTRA_BYTE_MAX + 1))
     return UTF16_EXTRA_BYTE_MIN - 1;
@@ -1505,10 +1505,10 @@ wh_prev_char (const uint32_t codePoint)
 
 
 uint32_t
-wh_next_char (const uint32_t codePoint)
+wh_next_char( const uint32_t codePoint)
 {
-  assert (codePoint >= 1);
-  assert (codePoint < UTF_LAST_CODEPOINT);
+  assert( codePoint >= 1);
+  assert( codePoint < UTF_LAST_CODEPOINT);
 
   if (codePoint == (UTF16_EXTRA_BYTE_MIN - 1))
     return UTF16_EXTRA_BYTE_MAX + 1;

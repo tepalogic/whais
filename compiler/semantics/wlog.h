@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WLOG_H_
 #define WLOG_H_
 
-#include "whisper.h"
+#include "whais.h"
 #include "utils/msglog.h"
 #include "../parser/parser.h"
 
@@ -119,7 +119,7 @@ struct MsgCodeEntry
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
 
 void
-log_message (struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);
+log_message( struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);
 
 #endif /*WLOG_H_ */
 

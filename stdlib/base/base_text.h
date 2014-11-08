@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -30,33 +30,33 @@
 
 
 
-extern whisper::WLIB_PROC_DESCRIPTION       gIsUpper;
-extern whisper::WLIB_PROC_DESCRIPTION       gIsLower;
-extern whisper::WLIB_PROC_DESCRIPTION       gIsDigit;
-extern whisper::WLIB_PROC_DESCRIPTION       gIsAlpha;
-extern whisper::WLIB_PROC_DESCRIPTION       gIsSpace;
-extern whisper::WLIB_PROC_DESCRIPTION       gIsPunct;
-extern whisper::WLIB_PROC_DESCRIPTION       gIsPrint;
-extern whisper::WLIB_PROC_DESCRIPTION       gUnicodeCP;
-extern whisper::WLIB_PROC_DESCRIPTION       gUpperChar;
-extern whisper::WLIB_PROC_DESCRIPTION       gLowerChar;
-extern whisper::WLIB_PROC_DESCRIPTION       gUpperText;
-extern whisper::WLIB_PROC_DESCRIPTION       gLowerText;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextToUtf8;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextFromUtf8;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextToUtf16;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextFromUtf16;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextToCharArray;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextFromCharArray;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextCharsCount;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextHash;
-extern whisper::WLIB_PROC_DESCRIPTION       gCharFind;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextFind;
-extern whisper::WLIB_PROC_DESCRIPTION       gTextCompare;
+extern whais::WLIB_PROC_DESCRIPTION       gIsUpper;
+extern whais::WLIB_PROC_DESCRIPTION       gIsLower;
+extern whais::WLIB_PROC_DESCRIPTION       gIsDigit;
+extern whais::WLIB_PROC_DESCRIPTION       gIsAlpha;
+extern whais::WLIB_PROC_DESCRIPTION       gIsSpace;
+extern whais::WLIB_PROC_DESCRIPTION       gIsPunct;
+extern whais::WLIB_PROC_DESCRIPTION       gIsPrint;
+extern whais::WLIB_PROC_DESCRIPTION       gUnicodeCP;
+extern whais::WLIB_PROC_DESCRIPTION       gUpperChar;
+extern whais::WLIB_PROC_DESCRIPTION       gLowerChar;
+extern whais::WLIB_PROC_DESCRIPTION       gUpperText;
+extern whais::WLIB_PROC_DESCRIPTION       gLowerText;
+extern whais::WLIB_PROC_DESCRIPTION       gTextToUtf8;
+extern whais::WLIB_PROC_DESCRIPTION       gTextFromUtf8;
+extern whais::WLIB_PROC_DESCRIPTION       gTextToUtf16;
+extern whais::WLIB_PROC_DESCRIPTION       gTextFromUtf16;
+extern whais::WLIB_PROC_DESCRIPTION       gTextToCharArray;
+extern whais::WLIB_PROC_DESCRIPTION       gTextFromCharArray;
+extern whais::WLIB_PROC_DESCRIPTION       gTextCharsCount;
+extern whais::WLIB_PROC_DESCRIPTION       gTextHash;
+extern whais::WLIB_PROC_DESCRIPTION       gCharFind;
+extern whais::WLIB_PROC_DESCRIPTION       gTextFind;
+extern whais::WLIB_PROC_DESCRIPTION       gTextCompare;
 
 
-whisper::WLIB_STATUS
-base_text_init ();
+whais::WLIB_STATUS
+base_text_init( );
 
 #endif //BASE_TEXT_H_
 

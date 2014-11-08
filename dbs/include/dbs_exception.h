@@ -25,20 +25,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DBS_EXCEPTION_H_
 #define DBS_EXCEPTION_H_
 
-#include "whisper.h"
+#include "whais.h"
 
-namespace whisper
+namespace whais
 {
 
 class DBS_SHL DBSException : public Exception
 {
 public:
-  DBSException (const uint32_t  code,
+  DBSException( const uint32_t  code,
                 const char*     file,
                 uint32_t        line,
                 const char*     fmtMsg = NULL,
                 ...);
-  virtual ~DBSException ();
+  virtual ~DBSException( );
 
   enum ExceptionCodes
   {
@@ -80,13 +80,13 @@ public:
     GENERAL_CONTROL_ERROR
   };
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone( ) const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type( ) const;
 
-  virtual const char* Description () const;
+  virtual const char* Description( ) const;
 };
 
-} //namespace whisper
+} //namespace whais
 
 #endif /* DBS_EXCEPTION_H_ */

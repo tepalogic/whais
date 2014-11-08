@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -30,47 +30,47 @@
 
 
 
-extern uint8_t gBoolType[sizeof (TypeSpec)];
-extern uint8_t gCharType[sizeof (TypeSpec)];
-extern uint8_t gDateType[sizeof (TypeSpec)];
-extern uint8_t gDateTimeType[sizeof (TypeSpec)];
-extern uint8_t gHiresTimeType[sizeof (TypeSpec)];
-extern uint8_t gUInt8Type[sizeof (TypeSpec)];
-extern uint8_t gUInt16Type[sizeof (TypeSpec)];
-extern uint8_t gUInt32Type[sizeof (TypeSpec)];
-extern uint8_t gUInt64Type[sizeof (TypeSpec)];
-extern uint8_t gInt8Type[sizeof (TypeSpec)];
-extern uint8_t gInt16Type[sizeof (TypeSpec)];
-extern uint8_t gInt32Type[sizeof (TypeSpec)];
-extern uint8_t gInt64Type[sizeof (TypeSpec)];
-extern uint8_t gRealType[sizeof (TypeSpec)];
-extern uint8_t gRichRealType[sizeof (TypeSpec)];
-extern uint8_t gTextType[sizeof (TypeSpec)];
-extern uint8_t gUndefinedType[sizeof (TypeSpec)];
+extern uint8_t gBoolType[sizeof( TypeSpec)];
+extern uint8_t gCharType[sizeof( TypeSpec)];
+extern uint8_t gDateType[sizeof( TypeSpec)];
+extern uint8_t gDateTimeType[sizeof( TypeSpec)];
+extern uint8_t gHiresTimeType[sizeof( TypeSpec)];
+extern uint8_t gUInt8Type[sizeof( TypeSpec)];
+extern uint8_t gUInt16Type[sizeof( TypeSpec)];
+extern uint8_t gUInt32Type[sizeof( TypeSpec)];
+extern uint8_t gUInt64Type[sizeof( TypeSpec)];
+extern uint8_t gInt8Type[sizeof( TypeSpec)];
+extern uint8_t gInt16Type[sizeof( TypeSpec)];
+extern uint8_t gInt32Type[sizeof( TypeSpec)];
+extern uint8_t gInt64Type[sizeof( TypeSpec)];
+extern uint8_t gRealType[sizeof( TypeSpec)];
+extern uint8_t gRichRealType[sizeof( TypeSpec)];
+extern uint8_t gTextType[sizeof( TypeSpec)];
+extern uint8_t gUndefinedType[sizeof( TypeSpec)];
 
-extern uint8_t gGenericArrayType[sizeof (TypeSpec)];
-extern uint8_t gGenericFieldType[sizeof (TypeSpec)];
-extern uint8_t gGenericTableType[sizeof (TypeSpec)];
+extern uint8_t gGenericArrayType[sizeof( TypeSpec)];
+extern uint8_t gGenericFieldType[sizeof( TypeSpec)];
+extern uint8_t gGenericTableType[sizeof( TypeSpec)];
 
-extern uint8_t gABoolType[sizeof (TypeSpec)];
-extern uint8_t gACharType[sizeof (TypeSpec)];
-extern uint8_t gADateType[sizeof (TypeSpec)];
-extern uint8_t gADateTimeType[sizeof (TypeSpec)];
-extern uint8_t gAHiresTimeType[sizeof (TypeSpec)];
-extern uint8_t gAUInt8Type[sizeof (TypeSpec)];
-extern uint8_t gAUInt16Type[sizeof (TypeSpec)];
-extern uint8_t gAUInt32Type[sizeof (TypeSpec)];
-extern uint8_t gAUInt64Type[sizeof (TypeSpec)];
-extern uint8_t gAInt8Type[sizeof (TypeSpec)];
-extern uint8_t gAInt16Type[sizeof (TypeSpec)];
-extern uint8_t gAInt32Type[sizeof (TypeSpec)];
-extern uint8_t gAInt64Type[sizeof (TypeSpec)];
-extern uint8_t gARealType[sizeof (TypeSpec)];
-extern uint8_t gARichRealType[sizeof (TypeSpec)];
+extern uint8_t gABoolType[sizeof( TypeSpec)];
+extern uint8_t gACharType[sizeof( TypeSpec)];
+extern uint8_t gADateType[sizeof( TypeSpec)];
+extern uint8_t gADateTimeType[sizeof( TypeSpec)];
+extern uint8_t gAHiresTimeType[sizeof( TypeSpec)];
+extern uint8_t gAUInt8Type[sizeof( TypeSpec)];
+extern uint8_t gAUInt16Type[sizeof( TypeSpec)];
+extern uint8_t gAUInt32Type[sizeof( TypeSpec)];
+extern uint8_t gAUInt64Type[sizeof( TypeSpec)];
+extern uint8_t gAInt8Type[sizeof( TypeSpec)];
+extern uint8_t gAInt16Type[sizeof( TypeSpec)];
+extern uint8_t gAInt32Type[sizeof( TypeSpec)];
+extern uint8_t gAInt64Type[sizeof( TypeSpec)];
+extern uint8_t gARealType[sizeof( TypeSpec)];
+extern uint8_t gARichRealType[sizeof( TypeSpec)];
 
 
 
-whisper::WLIB_STATUS
-base_types_init ();
+whais::WLIB_STATUS
+base_types_init( );
 
 #endif //BASE_TYPES_H_

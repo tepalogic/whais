@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,14 +27,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "compiler/wopcodes.h"
 #include "compiler/compiledunit.h"
 
 #include "utils/wfile.h"
 
-namespace whisper {
+namespace whais {
 namespace wod {
 
 
@@ -44,39 +44,39 @@ namespace wod {
 class DumpException : public Exception
 {
 public:
-  DumpException (const uint32_t  code,
+  DumpException( const uint32_t  code,
                  const char*     file,
                  uint32_t        line,
                  const char*     fmtMsg = NULL,
                  ...)
-    : Exception (code, file, line)
+    : Exception( code, file, line)
   {
     if (fmtMsg != NULL)
       {
         va_list vl;
 
-        va_start (vl, fmtMsg);
-        this->Message (fmtMsg, vl);
-        va_end (vl);
+        va_start( vl, fmtMsg);
+        this->Message( fmtMsg, vl);
+        va_end( vl);
       }
   }
 
-  virtual ~DumpException ()
+  virtual ~DumpException( )
   {
   };
 
-  virtual Exception* Clone () const { return new DumpException (*this); }
+  virtual Exception* Clone( ) const { return new DumpException( *this); }
 
-  virtual EXCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
+  virtual EXCEPTION_TYPE Type( ) const { return DUMP_EXCEPTION; }
 
-  virtual const char* Description () const
+  virtual const char* Description( ) const
   {
     return "General exception by object dumper.";
   }
 };
 
 
-typedef uint_t (*FDECODE_OPCODE) (const uint8_t*      args,
+typedef uint_t( *FDECODE_OPCODE) (const uint8_t*      args,
                                   char* const         op1,
                                   char* const         op2);
 
@@ -88,26 +88,26 @@ extern const char*    wod_str_table[];
 
 
 void
-wod_dump_header (File& obj, std::ostream& output);
+wod_dump_header( File& obj, std::ostream& output);
 
 
 void
-wod_dump_const_area (WIFunctionalUnit& unit, std::ostream& output);
+wod_dump_const_area( WIFunctionalUnit& unit, std::ostream& output);
 
 
 void
-wod_dump_globals_tables (WIFunctionalUnit& unit, std::ostream& output);
+wod_dump_globals_tables( WIFunctionalUnit& unit, std::ostream& output);
 
 
 void
-wod_dump_procs (WIFunctionalUnit&     unit,
+wod_dump_procs( WIFunctionalUnit&     unit,
                 std::ostream&         output,
                 bool_t                showCode);
 
 
 
 } //namespace wod
-} //namespace whisper
+} //namespace whais
 
 #endif /* WOD_DUMP_H_ */
 

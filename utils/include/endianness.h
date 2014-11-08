@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ENDIANNESS_H_
 #define ENDIANNESS_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 #ifdef __cplusplus
 #undef INLINE

@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <vector>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "utils/range.h"
 #include "dbs/dbs_table.h"
@@ -40,19 +40,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct FieldValuesUpdate
 {
   template<typename T>
-  FieldValuesUpdate (const uint_t field, const uint_t type, const T& value)
-    : mFieldId (field),
-      mFieldType (type)
+  FieldValuesUpdate( const uint_t field, const uint_t type, const T& value)
+    : mFieldId( field),
+      mFieldType( type)
   {
-    assert (sizeof (value) <= sizeof (mValue));
-    _placement_new (mValue, value);
+    assert( sizeof( value) <= sizeof( mValue));
+    _placement_new( mValue, value);
   }
 
-  FieldValuesUpdate (const FieldValuesUpdate& src)
-    : mFieldId (src.mFieldId),
-      mFieldType (src.mFieldType)
+  FieldValuesUpdate( const FieldValuesUpdate& src)
+    : mFieldId( src.mFieldId),
+      mFieldType( src.mFieldType)
   {
-    memcpy (mValue, src.mValue, sizeof (mValue));
+    memcpy( mValue, src.mValue, sizeof( mValue));
 
     _CC (uint_t&, src.mFieldType) = T_UNKNOWN;
   }
@@ -61,14 +61,14 @@ struct FieldValuesUpdate
   {
     if (this != &src)
     {
-      this->~FieldValuesUpdate ();
-      _placement_new (this, src);
+      this->~FieldValuesUpdate( );
+      _placement_new( this, src);
     }
 
     return *this;
   }
 
-  ~FieldValuesUpdate ();
+  ~FieldValuesUpdate( );
 
 
   uint_t    mFieldId;
@@ -80,14 +80,14 @@ struct FieldValuesUpdate
 
 struct FieldValuesSelection
 {
-  FieldValuesSelection ();
-  ~FieldValuesSelection ();
+  FieldValuesSelection( );
+  ~FieldValuesSelection( );
 
-  FieldValuesSelection (const FieldValuesSelection& src)
-    : mFieldId (src.mFieldId),
-      mFieldType (src.mFieldType),
-      mSearchNull (src.mSearchNull),
-      mRange (src.mRange)
+  FieldValuesSelection( const FieldValuesSelection& src)
+    : mFieldId( src.mFieldId),
+      mFieldType( src.mFieldType),
+      mSearchNull( src.mSearchNull),
+      mRange( src.mRange)
     {
       _CC (void*&, src.mRange) = NULL;
     }
@@ -96,8 +96,8 @@ struct FieldValuesSelection
   {
     if (this != &src)
       {
-        this->~FieldValuesSelection ();
-        _placement_new (this, src);
+        this->~FieldValuesSelection( );
+        _placement_new( this, src);
       }
 
     return *this;
@@ -113,42 +113,42 @@ struct FieldValuesSelection
 
 struct RowsSelection
 {
-  whisper::Range<ROW_INDEX>          mRows;
+  whais::Range<ROW_INDEX>          mRows;
   std::vector<FieldValuesSelection>  mSearchedValue;
 };
 
 
 
 bool
-ParseRowsSelectionClause (std::ostream* const    os,
-                          whisper::ITable&       table,
+ParseRowsSelectionClause( std::ostream* const    os,
+                          whais::ITable&       table,
                           const char*            str,
                           RowsSelection&         outRowsSelection);
 
 
 
 bool
-ParseFieldUpdateValues (std::ostream* const              os,
-                        whisper::ITable&                 table,
+ParseFieldUpdateValues( std::ostream* const              os,
+                        whais::ITable&                 table,
                         const char*                      str,
                         size_t*                          outSize,
                         std::vector<FieldValuesUpdate>&  outUpdates);
 
 bool
-UpdateTableRow (std::ostream const*                   os,
-                whisper::ITable&                      table,
+UpdateTableRow( std::ostream const*                   os,
+                whais::ITable&                      table,
                 const ROW_INDEX                       row,
                 const std::vector<FieldValuesUpdate>& fieldVals);
 
 
 void
-MatchSelectedRows (whisper::ITable&    table,
+MatchSelectedRows( whais::ITable&    table,
                    RowsSelection&      select);
 
 
 void
-PrintFieldValue (std::ostream&        os,
-                 whisper::ITable&     table,
+PrintFieldValue( std::ostream&        os,
+                 whais::ITable&     table,
                  const ROW_INDEX      row,
                  const FIELD_INDEX    field);
 

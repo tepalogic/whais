@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 using namespace std;
-using namespace whisper;
+using namespace whais;
 
 
 
@@ -40,7 +40,7 @@ static const char       DEFAULT_PORT[]    = "1761";
 static const uint_t     DEFAULT_USER      = 1;
 
 
-static string        sWorkingDirectory (whf_current_dir ());
+static string        sWorkingDirectory( whf_current_dir( ));
 static string        sDBName;
 static VERBOSE_LEVEL sVerbLevel       = VL_ERROR;
 static uint64_t      sMaxFileSize     = 0x80000000; //default: 2GB
@@ -53,25 +53,25 @@ static uint_t        sUserId          = DEFAULT_USER;
 
 
 const string&
-GetRemoteHostName ()
+GetRemoteHostName( )
 {
   return sRemoteHost;
 }
 
 
 void
-SetRemoteHostName (const char* const host)
+SetRemoteHostName( const char* const host)
 {
   sRemoteHost = host;
 }
 
 
 const string&
-GetConnectionPort ()
+GetConnectionPort( )
 {
-  assert (IsOnlineDatabase ());
+  assert( IsOnlineDatabase( ));
 
-  if (sConnectPort.size () == 0)
+  if (sConnectPort.size( ) == 0)
     sConnectPort = DEFAULT_PORT;
 
   return sConnectPort;
@@ -79,102 +79,102 @@ GetConnectionPort ()
 
 
 void
-SetConnectionPort (const char* const port)
+SetConnectionPort( const char* const port)
 {
   sConnectPort = port;
 }
 
 
 uint_t
-GetUserId ()
+GetUserId( )
 {
-  assert (IsOnlineDatabase ());
+  assert( IsOnlineDatabase( ));
 
   return sUserId;
 }
 
 
 void
-SetUserId (const uint_t userId)
+SetUserId( const uint_t userId)
 {
   sUserId = userId;
 }
 
 
 const string&
-GetUserPassword ()
+GetUserPassword( )
 {
-  assert (IsOnlineDatabase ());
+  assert( IsOnlineDatabase( ));
 
   return sPassword;
 }
 
 
 void
-SetUserPassword (const char* const password)
+SetUserPassword( const char* const password)
 {
   sPassword = password;
 }
 
 
 const string&
-GetWorkingDirectory ()
+GetWorkingDirectory( )
 {
-  assert (! IsOnlineDatabase ());
+  assert( ! IsOnlineDatabase( ));
 
   return sWorkingDirectory;
 }
 
 
 void
-SetWorkingDirectory (const char* const directory)
+SetWorkingDirectory( const char* const directory)
 {
   sWorkingDirectory = directory;
 }
 
 
 const string&
-GetWorkingDB ()
+GetWorkingDB( )
 {
   return sDBName;
 }
 
 
 void
-SetWorkingDB (const char* const dbName)
+SetWorkingDB( const char* const dbName)
 {
   sDBName = dbName;
 }
 
 
 VERBOSE_LEVEL
-GetVerbosityLevel ()
+GetVerbosityLevel( )
 {
   return sVerbLevel;
 }
 
 
 void
-SetVerbosityLevel (const uint_t level)
+SetVerbosityLevel( const uint_t level)
 {
   sVerbLevel = _SC (VERBOSE_LEVEL, MIN (level, VL_MAX));
 }
 
 
 bool
-SetMaximumFileSize (string size)
+SetMaximumFileSize( string size)
 {
   static const string digits = "0123456789";
 
-  if (size.length () == 0)
+  if (size.length( ) == 0)
     return false;
 
   uint64_t multiplier = 1;
-  size_t   lastPos    = size.find_first_not_of (digits);
+  size_t   lastPos    = size.find_first_not_of( digits);
 
   if (lastPos != size.npos)
     {
-      switch (size[lastPos])
+      switch( size[lastPos])
         {
         case 'k':
         case 'K':
@@ -199,7 +199,7 @@ SetMaximumFileSize (string size)
         }
     }
 
-  sMaxFileSize = atoi (size.c_str ()) * multiplier;
+  sMaxFileSize = atoi( size.c_str( )) * multiplier;
 
   if (sMaxFileSize < MINIMUM_FILE_SIZE)
     return false;
@@ -208,37 +208,37 @@ SetMaximumFileSize (string size)
 }
 
 uint64_t
-GetMaximumFileSize ()
+GetMaximumFileSize( )
 {
-  assert (! IsOnlineDatabase ());
+  assert( ! IsOnlineDatabase( ));
 
   return sMaxFileSize;
 }
 
 
 void
-SetDbsHandler (IDBSHandler& dbs)
+SetDbsHandler( IDBSHandler& dbs)
 {
-  assert (! IsOnlineDatabase ());
+  assert( ! IsOnlineDatabase( ));
 
   sDBSHnd = &dbs;
 }
 
 
 IDBSHandler&
-GetDBSHandler ()
+GetDBSHandler( )
 {
-  assert (sDBSHnd != NULL);
-  assert (! IsOnlineDatabase ());
+  assert( sDBSHnd != NULL);
+  assert( ! IsOnlineDatabase( ));
 
   return *sDBSHnd;
 }
 
 
 bool
-IsOnlineDatabase ()
+IsOnlineDatabase( )
 {
-  if (GetRemoteHostName ().size () > 0)
+  if (GetRemoteHostName( ).size( ) > 0)
     return true;
 
   return false;

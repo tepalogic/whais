@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whisper database files.
+  WCMD - An utility to manage whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,11 +27,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 bool
-repair_database_erros ();
+repair_database_erros( );
 
 
 int
-check_database_for_errors (const bool allAnswersYes, const bool userRequest);
+check_database_for_errors( const bool allAnswersYes, const bool userRequest);
 
 
 #endif /* WCMD_DBCHECK_H_ */

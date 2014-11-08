@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WTYPES_H_
 #define WTYPES_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 enum DBS_FIELD_TYPE
 {
@@ -69,25 +69,25 @@ struct DBSFieldDescriptor
 #define T_TABLE_FIELD          0x0800    /* Internal flag for table fields. */
 #define T_L_VALUE              0x1000    /* Internal flag for l-values. */
 
-#define IS_ARRAY(type)         ((((type) \
+#define IS_ARRAY( type)         ((((type) \
                                  & (T_FIELD_MASK | T_ARRAY_MASK)) == \
                                    T_ARRAY_MASK))
-#define IS_FIELD(type)         (((type) & T_FIELD_MASK) != 0)
-#define IS_TABLE(type)         (((type) & T_TABLE_MASK) != 0)
+#define IS_FIELD( type)         (((type) & T_FIELD_MASK) != 0)
+#define IS_TABLE( type)         (((type) & T_TABLE_MASK) != 0)
 
-#define IS_TABLE_FIELD(type)   (((type) & T_TABLE_FIELD) != 0)
-#define IS_L_VALUE(type)       (((type) & T_L_VALUE) != 0)
+#define IS_TABLE_FIELD( type)   (((type) & T_TABLE_FIELD) != 0)
+#define IS_L_VALUE( type)       (((type) & T_L_VALUE) != 0)
 
-#define MARK_ARRAY(type)       ((type) |= T_ARRAY_MASK)
-#define MARK_FIELD(type)       ((type) |= T_FIELD_MASK)
-#define MARK_TABLE(type)       ((type) |= T_TABLE_MASK)
-#define MARK_TABLE_FIELD(type) ((type) |= T_TABLE_FIELD)
-#define MARK_L_VALUE(type)     ((type) |= T_L_VALUE)
+#define MARK_ARRAY( type)       ((type) |= T_ARRAY_MASK)
+#define MARK_FIELD( type)       ((type) |= T_FIELD_MASK)
+#define MARK_TABLE( type)       ((type) |= T_TABLE_MASK)
+#define MARK_TABLE_FIELD( type) ((type) |= T_TABLE_FIELD)
+#define MARK_L_VALUE( type)     ((type) |= T_L_VALUE)
 
-#define GET_TYPE(type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
-#define GET_FIELD_TYPE(type)   ((type) \
+#define GET_TYPE( type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
+#define GET_FIELD_TYPE( type)   ((type) \
                                  & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
-#define GET_BASIC_TYPE(type)   ((type) & 0xFF)
+#define GET_BASIC_TYPE( type)   ((type) & 0xFF)
 
 #define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
@@ -108,26 +108,26 @@ extern "C" {
 
 
 int
-wh_define_basic_type (const enum DBS_BASIC_TYPE    type,
+wh_define_basic_type( const enum DBS_BASIC_TYPE    type,
                       struct TypeSpec* const       dest);
 
 
 int
-wh_apply_array_modifier (struct TypeSpec* const ioBuffer);
+wh_apply_array_modifier( struct TypeSpec* const ioBuffer);
 
 
 int
-wh_apply_field_modifier (struct TypeSpec* const ioBuffer);
+wh_apply_field_modifier( struct TypeSpec* const ioBuffer);
 
 int
-wh_apply_table_modifier (struct TypeSpec* const ioBuffer);
+wh_apply_table_modifier( struct TypeSpec* const ioBuffer);
 
 bool_t
-is_type_spec_valid (const struct TypeSpec* spec);
+is_type_spec_valid( const struct TypeSpec* spec);
 
 
 bool_t
-compare_type_spec (const struct TypeSpec* const spec1,
+compare_type_spec( const struct TypeSpec* const spec1,
                    const struct TypeSpec* const spec2);
 
 #ifdef __cplusplus

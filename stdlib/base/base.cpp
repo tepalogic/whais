@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "utils/wthread.h"
 #include "stdlib/interface.h"
@@ -40,7 +40,7 @@
 
 
 
-using namespace whisper;
+using namespace whais;
 
 
 
@@ -232,7 +232,7 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
 
 
 static const WLIB_DESCRIPTION sgLibraryDescription = {
-    sizeof (sgRegisteredProcs) / sizeof (sgRegisteredProcs[0]),
+    sizeof( sgRegisteredProcs) / sizeof( sgRegisteredProcs[0]),
     sgRegisteredProcs
                                                      };
 
@@ -247,24 +247,24 @@ extern "C" {
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_start ()
+wlib_start( )
 {
-  LockRAII syncHolder (sgShlLocker);
+  LockRAII syncHolder( sgShlLocker);
 
-  assert (sgRefsCount >= 0);
+  assert( sgRefsCount >= 0);
 
   if (sgRefsCount == 0)
     {
       WLIB_STATUS status;
 
-      if (((status = base_types_init ()) != WOP_OK)
-          || ((status = base_generics_init ()) != WOP_OK)
-          || ((status = base_constants_init ()) != WOP_OK)
-          || ((status = base_dates_init ()) != WOP_OK)
-          || ((status = base_text_init ()) != WOP_OK)
-          || ((status = base_arrays_init ()) != WOP_OK)
-          || ((status = base_fields_init ()) != WOP_OK)
-          || ((status = base_tables_init ()) != WOP_OK))
+      if (((status = base_types_init( )) != WOP_OK)
+          || ((status = base_generics_init( )) != WOP_OK)
+          || ((status = base_constants_init( )) != WOP_OK)
+          || ((status = base_dates_init( )) != WOP_OK)
+          || ((status = base_text_init( )) != WOP_OK)
+          || ((status = base_arrays_init( )) != WOP_OK)
+          || ((status = base_fields_init( )) != WOP_OK)
+          || ((status = base_tables_init( )) != WOP_OK))
         {
           return status;
         }
@@ -278,11 +278,11 @@ wlib_start ()
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_end ()
+wlib_end( )
 {
-  LockRAII syncHolder (sgShlLocker);
+  LockRAII syncHolder( sgShlLocker);
 
-  assert ((! sgInited) || (sgRefsCount > 0));
+  assert( (! sgInited) || (sgRefsCount > 0));
 
   if (sgInited)
     --sgRefsCount;
@@ -294,7 +294,7 @@ wlib_end ()
 
 
 SHL_EXPORT_SYMBOL const WLIB_DESCRIPTION*
-wlib_describe ()
+wlib_describe( )
 {
   if (sgInited)
     return &sgLibraryDescription;

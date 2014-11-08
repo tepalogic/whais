@@ -16,7 +16,7 @@
 #include "../pastra/ps_table.h"
 #include "../pastra/ps_serializer.h"
 
-using namespace whisper;
+using namespace whais;
 using namespace pastra;
 
 
@@ -24,13 +24,13 @@ bool
 operator!= (const DBSFieldDescriptor& field_1,
             const DBSFieldDescriptor& field_2)
 {
-  return (field_1.type != field_2.type) ||
+  return( field_1.type != field_2.type) ||
          (field_1.isArray != field_2.isArray) ||
-         (strcmp (field_1.name, field_2.name) != 0);
+         (strcmp( field_1.name, field_2.name) != 0);
 }
 
 bool
-test_for_no_args (IDBSHandler& rDbs)
+test_for_no_args( IDBSHandler& rDbs)
 {
   bool result = false;
 
@@ -38,11 +38,11 @@ test_for_no_args (IDBSHandler& rDbs)
 
   try
   {
-    rDbs.AddTable ("test_dummy", 10, NULL);
+    rDbs.AddTable( "test_dummy", 10, NULL);
   }
-  catch (DBSException& e)
+  catch( DBSException& e)
   {
-    if (e.Code() == DBSException::INVALID_PARAMETERS)
+    if (e.Code( ) == DBSException::INVALID_PARAMETERS)
       result = true;
   }
 
@@ -54,12 +54,12 @@ test_for_no_args (IDBSHandler& rDbs)
     temp.isArray = false;
 
     if (result)
-      rDbs.AddTable ("test_dummy", 0, &temp);
+      rDbs.AddTable( "test_dummy", 0, &temp);
     result = false;
   }
-  catch (DBSException& e)
+  catch( DBSException& e)
   {
-    if (e.Code() == DBSException::INVALID_PARAMETERS)
+    if (e.Code( ) == DBSException::INVALID_PARAMETERS)
       result = true;
     else
       result = false;
@@ -70,7 +70,7 @@ test_for_no_args (IDBSHandler& rDbs)
 }
 
 bool
-test_for_invalid_fields (IDBSHandler& rDbs)
+test_for_invalid_fields( IDBSHandler& rDbs)
 {
   bool result = false;
   DBSFieldDescriptor temp;
@@ -83,11 +83,11 @@ test_for_invalid_fields (IDBSHandler& rDbs)
 
   try
   {
-    rDbs.AddTable("test_dummy", 1, &temp);
+    rDbs.AddTable( "test_dummy", 1, &temp);
   }
-  catch (DBSException& e)
+  catch( DBSException& e)
   {
-    if (e.Code () == DBSException::FIELD_TYPE_INVALID)
+    if (e.Code( ) == DBSException::FIELD_TYPE_INVALID)
       result = true;
   }
 
@@ -97,12 +97,12 @@ test_for_invalid_fields (IDBSHandler& rDbs)
   try
   {
     if( result )
-      rDbs.AddTable("test_dummy", 1, &temp);
+      rDbs.AddTable( "test_dummy", 1, &temp);
     result = false;
   }
-  catch (DBSException& e)
+  catch( DBSException& e)
   {
-    if (e.Code () == DBSException::FIELD_NAME_INVALID)
+    if (e.Code( ) == DBSException::FIELD_NAME_INVALID)
       result = true;
     else
       result = false;
@@ -120,12 +120,12 @@ test_for_invalid_fields (IDBSHandler& rDbs)
     more_temps[2] = temp;
 
     if( result )
-      rDbs.AddTable("test_dummy", 3, more_temps);
+      rDbs.AddTable( "test_dummy", 3, more_temps);
     result = false;
   }
-  catch (DBSException& e)
+  catch( DBSException& e)
   {
-    if (e.Code () == DBSException::FIELD_NAME_INVALID)
+    if (e.Code( ) == DBSException::FIELD_NAME_INVALID)
       result = true;
     else
       result = false;
@@ -137,7 +137,7 @@ test_for_invalid_fields (IDBSHandler& rDbs)
 }
 
 bool
-test_for_one_field (IDBSHandler& rDbs)
+test_for_one_field( IDBSHandler& rDbs)
 {
   bool result = true;
 
@@ -148,17 +148,17 @@ test_for_one_field (IDBSHandler& rDbs)
   temp.type = T_INT16;
   temp.isArray = false;
 
-  rDbs.AddTable ("t_test_tab", 1, &temp);
-  ITable& table = rDbs.RetrievePersistentTable ("t_test_tab");
+  rDbs.AddTable( "t_test_tab", 1, &temp);
+  ITable& table = rDbs.RetrievePersistentTable( "t_test_tab");
 
-  uint_t rowSize = (_RC (pastra::PrototypeTable &, table)).RowSize ();
+  uint_t rowSize = (_RC (pastra::PrototypeTable &, table)).RowSize( );
 
   //Check if we added the byte to keep the null bit.
-  if (rowSize != (pastra::Serializer::Size(T_INT16, false) + 1))
+  if (rowSize != (pastra::Serializer::Size( T_INT16, false) + 1))
     result = false;
 
-  rDbs.ReleaseTable (table);
-  rDbs.DeleteTable ("t_test_tab");
+  rDbs.ReleaseTable( table);
+  rDbs.DeleteTable( "t_test_tab");
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
@@ -166,9 +166,9 @@ test_for_one_field (IDBSHandler& rDbs)
 
 struct StorageInterval
   {
-    StorageInterval (uint32_t begin_byte, uint32_t end_byte) :
-        mBegin (begin_byte),
-        mEnd (end_byte)
+    StorageInterval( uint32_t begin_byte, uint32_t end_byte) :
+        mBegin( begin_byte),
+        mEnd( end_byte)
     {}
 
     uint32_t mBegin;
@@ -177,7 +177,7 @@ struct StorageInterval
   };
 
 bool
-test_for_fields (IDBSHandler& rDbs,
+test_for_fields( IDBSHandler& rDbs,
                  DBSFieldDescriptor* pDesc,
                  const uint32_t fieldsCount)
 {
@@ -185,55 +185,55 @@ test_for_fields (IDBSHandler& rDbs,
 
   std::cout << "Test with fields with count " << fieldsCount << " ... ";
 
-  rDbs.AddTable ("t_test_tab", fieldsCount, pDesc);
-  ITable& table = rDbs.RetrievePersistentTable ("t_test_tab");
+  rDbs.AddTable( "t_test_tab", fieldsCount, pDesc);
+  ITable& table = rDbs.RetrievePersistentTable( "t_test_tab");
 
   std::vector<uint32_t > nullPositions;
   std::vector<StorageInterval> storage;
 
-  if (table.FieldsCount () != fieldsCount)
+  if (table.FieldsCount( ) != fieldsCount)
     result = false;
 
   for (uint32_t fieldIndex = 0;
        result && (fieldIndex < fieldsCount);
       ++fieldIndex)
     {
-      FieldDescriptor& descr = _SC(PrototypeTable&, table).GetFieldDescriptorInternal (fieldIndex);
+      FieldDescriptor& descr = _SC(PrototypeTable&, table).GetFieldDescriptorInternal( fieldIndex);
 
-      if (descr.NullBitIndex () != fieldIndex)
+      if (descr.NullBitIndex( ) != fieldIndex)
         {
           result = false;
           break;
         }
 
-      nullPositions.push_back (descr.NullBitIndex ());
+      nullPositions.push_back( descr.NullBitIndex( ));
 
       if (! result)
         break;
 
-      uint_t elem_start = descr.RowDataOff ();
+      uint_t elem_start = descr.RowDataOff( );
       uint_t elem_end = elem_start +
-          Serializer::Size (_SC (DBS_FIELD_TYPE, descr.Type () & PS_TABLE_FIELD_TYPE_MASK),
-                            (descr.Type () & PS_TABLE_ARRAY_MASK) != 0);
+          Serializer::Size( _SC (DBS_FIELD_TYPE, descr.Type( ) & PS_TABLE_FIELD_TYPE_MASK),
+                            (descr.Type( ) & PS_TABLE_ARRAY_MASK) != 0);
 
-      for (uint_t index = 0; index < storage.size (); ++index)
+      for (uint_t index = 0; index < storage.size( ); ++index)
         {
           if ( ((storage[index].mBegin >= elem_start) &&
               (elem_start <= storage[index].mEnd))
               || ((storage[index].mBegin >= elem_end) &&
                   (elem_end <= storage[index].mEnd))
               || (elem_start >= elem_end)
-              || (storage[index].mBegin <= descr.NullBitIndex () / 8))
+              || (storage[index].mBegin <= descr.NullBitIndex( ) / 8))
             {
               result = false;
               break;
             }
         }
-      storage.push_back (StorageInterval (elem_start, elem_end - 1));
+      storage.push_back( StorageInterval( elem_start, elem_end - 1));
 
       if (result)
         {
-          DBSFieldDescriptor desc = table.DescribeField(fieldIndex);
+          DBSFieldDescriptor desc = table.DescribeField( fieldIndex);
           uint_t array_index = desc.name[0] - 'a';
           if (desc != pDesc[array_index])
             {
@@ -244,8 +244,8 @@ test_for_fields (IDBSHandler& rDbs,
 
     }
 
-  rDbs.ReleaseTable (table);
-  rDbs.DeleteTable ("t_test_tab");
+  rDbs.ReleaseTable( table);
+  rDbs.DeleteTable( "t_test_tab");
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
@@ -294,29 +294,29 @@ struct DBSFieldDescriptor alt_descs[] = {
 
 const char db_name[] = "t_baza_date_1";
 int
-main ()
+main( )
 {
   bool success = true;
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
+    DBSInit( DBSSettings( ));
+    DBSCreateDatabase( db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase( db_name);
 
-  success = test_for_no_args (handler);
-  success = success && test_for_invalid_fields (handler);
-  success = success && test_for_one_field (handler);
-  success = success && test_for_fields (handler, int_descs,
-                                        sizeof (int_descs) / sizeof (int_descs[0]));
-  success = success && test_for_fields (handler,
-                                        non_int_descs, sizeof (non_int_descs) / sizeof (non_int_descs[0]));
-  success = success && test_for_fields (handler,
-                                        alt_descs, sizeof (alt_descs) / sizeof (alt_descs[0]));
+  success = test_for_no_args( handler);
+  success = success && test_for_invalid_fields( handler);
+  success = success && test_for_one_field( handler);
+  success = success && test_for_fields( handler, int_descs,
+                                        sizeof( int_descs) / sizeof( int_descs[0]));
+  success = success && test_for_fields( handler,
+                                        non_int_descs, sizeof( non_int_descs) / sizeof( non_int_descs[0]));
+  success = success && test_for_fields( handler,
+                                        alt_descs, sizeof( alt_descs) / sizeof( alt_descs[0]));
 
-  DBSReleaseDatabase (handler);
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSReleaseDatabase( handler);
+  DBSRemoveDatabase( db_name);
+  DBSShoutdown( );
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;

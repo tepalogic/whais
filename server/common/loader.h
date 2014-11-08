@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPER - An advanced database system
+WHAIS - An advanced database system
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,12 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LOADER_H_
 #define LOADER_H_
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "configuration.h"
 
 bool
-LoadDatabase (whisper::FileLogger& log, DBSDescriptors& inoutDesc);
+LoadDatabase( whais::FileLogger& log, DBSDescriptors& inoutDesc);
 
 #endif /* LOADER_H_ */
 

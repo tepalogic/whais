@@ -16,7 +16,7 @@ prepare_env:
 			if [ ! -d ./tmp/$(ARCH)/$$unit/libs ]; then mkdir ./tmp/$(ARCH)/$$unit/libs ; fi;\
 		done ;
 		
-generate_files: prepare_env ./compiler/parser/whisper.tab.c
+generate_files: prepare_env ./compiler/parser/whais.tab.c
 	$(ECHO)$(MAKE) --no-print-directory -otarget executables 
 		
 executables:  $(EXES) $(SHLS) $(LIBS)
@@ -24,7 +24,7 @@ executables:  $(EXES) $(SHLS) $(LIBS)
 clean:
 	rm -rf ./tmp
 	rm -rf ./bin
-	rm -rf compiler/parser/whisper.tab.c compiler/parser/whisper.tab.h compiler/parser/whisper.output
+	rm -rf compiler/parser/whais.tab.c compiler/parser/whais.tab.h compiler/parser/whais.output
 	rm -rf vc90.idb vc90.pdb vc100.idb vc100.pdb
 	rm -rf _CL_*
 

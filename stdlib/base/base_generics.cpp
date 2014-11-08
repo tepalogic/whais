@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <sstream>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "stdlib/interface.h"
 #include "utils/wtypes.h"
@@ -35,7 +35,7 @@
 #include "base_types.h"
 
 
-using namespace whisper;
+using namespace whais;
 
 
 WLIB_PROC_DESCRIPTION     gProcPrevB;
@@ -91,16 +91,16 @@ WLIB_PROC_DESCRIPTION     gProcAbs;
 
 template<class T>
 WLIB_STATUS
-get_prev_value (SessionStack& stack, ISession& )
+get_prev_value( SessionStack& stack, ISession& )
 {
   T value;
 
-  stack[stack.Size () - 1].Operand ().GetValue (value);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
 
-  value = value.Prev ();
+  value = value.Prev( );
 
   stack.Pop (1);
-  stack.Push (value);
+  stack.Push( value);
 
   return WOP_OK;
 }
@@ -108,43 +108,43 @@ get_prev_value (SessionStack& stack, ISession& )
 
 template<class T>
 WLIB_STATUS
-get_next_value (SessionStack& stack, ISession& )
+get_next_value( SessionStack& stack, ISession& )
 {
   T value;
 
-  stack[stack.Size () - 1].Operand ().GetValue (value);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
 
-  value = value.Next ();
+  value = value.Next( );
 
   stack.Pop (1);
-  stack.Push (value);
+  stack.Push( value);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-sleep (SessionStack& stack, ISession&)
+sleep( SessionStack& stack, ISession&)
 {
   DUInt64 ms;
 
-  stack[stack.Size () - 1].Operand ().GetValue (ms);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( ms);
 
-  if (ms.IsNull () || (ms.mValue == 0))
-    wh_yield ();
+  if (ms.IsNull( ) || (ms.mValue == 0))
+    wh_yield( );
 
   else
-    wh_sleep (ms.mValue);
+    wh_sleep( ms.mValue);
 
   stack.Pop (1);
-  stack.Push (DBool (true));
+  stack.Push( DBool( true));
 
 
   return WOP_OK;
 }
 
 static WLIB_STATUS
-write_log (SessionStack& stack, ISession& session)
+write_log( SessionStack& stack, ISession& session)
 {
   DText   text;
   bool    result = false;
@@ -152,15 +152,15 @@ write_log (SessionStack& stack, ISession& session)
 
   utf8Reserved[0] = 0;
 
-  stack[stack.Size () - 1].Operand ().GetValue (text);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( text);
 
-  const uint64_t textRawSize = text.RawSize ();
-  if (textRawSize < sizeof (utf8Reserved) - 1)
+  const uint64_t textRawSize = text.RawSize( );
+  if (textRawSize < sizeof( utf8Reserved) - 1)
     {
-      text.RawRead (0, textRawSize, utf8Reserved);
+      text.RawRead( 0, textRawSize, utf8Reserved);
       utf8Reserved[textRawSize] = 0;
 
-      session.GetLogger ().Log (LOG_INFO, _RC (const char*, utf8Reserved));
+      session.GetLogger( ).Log (LOG_INFO, _RC (const char*, utf8Reserved));
       result = true;
     }
   else
@@ -168,130 +168,130 @@ write_log (SessionStack& stack, ISession& session)
       std::stringstream logEntry;
 
       uint64_t offset = 0;
-      while (offset < textRawSize)
+      while( offset < textRawSize)
         {
           const uint64_t chunkSize = MIN (textRawSize - offset,
-                                          sizeof (utf8Reserved) -  1);
+                                          sizeof( utf8Reserved) -  1);
 
-          text.RawRead (offset, chunkSize, utf8Reserved);
+          text.RawRead( offset, chunkSize, utf8Reserved);
           utf8Reserved[chunkSize] = 0;
 
           logEntry << _RC (const char*, utf8Reserved);
 
           offset += chunkSize;
         }
-      session.GetLogger ().Log (LOG_INFO, logEntry.str ());
+      session.GetLogger( ).Log (LOG_INFO, logEntry.str ());
       result = true;
     }
 
   stack.Pop (1);
-  stack.Push (DBool (result));
+  stack.Push( DBool( result));
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-ceil (SessionStack& stack, ISession& session)
+ceil( SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
-  stack[stack.Size () - 1].Operand ().GetValue (value);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
 
-  if (value.IsNull ())
+  if (value.IsNull( ))
     {
       stack.Pop (1);
-      stack.Push (DInt64 ());
+      stack.Push( DInt64 ());
 
       return WOP_OK;
     }
 
   int64_t result;
 
-  if (value < DRichReal (RICHREAL_T (0, 0, DBS_RICHREAL_PREC)))
-    result = value.mValue.Integer ();
+  if (value < DRichReal( RICHREAL_T( 0, 0, DBS_RICHREAL_PREC)))
+    result = value.mValue.Integer( );
 
-  else if (value.mValue.Fractional () != 0)
-    result = value.mValue.Integer () + 1;
+  else if (value.mValue.Fractional( ) != 0)
+    result = value.mValue.Integer( ) + 1;
 
   else
-    result =value.mValue.Integer ();
+    result =value.mValue.Integer( );
 
   stack.Pop (1);
-  stack.Push (DInt64 (result));
+  stack.Push( DInt64 (result));
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-floor (SessionStack& stack, ISession& session)
+floor( SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
-  stack[stack.Size () - 1].Operand ().GetValue (value);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
 
-  if (value.IsNull ())
+  if (value.IsNull( ))
     {
       stack.Pop (1);
-      stack.Push (DInt64 ());
+      stack.Push( DInt64 ());
 
       return WOP_OK;
     }
 
   int64_t result;
 
-  if (DRichReal (RICHREAL_T (0, 0, DBS_RICHREAL_PREC)) <= value)
-    result = value.mValue.Integer ();
+  if (DRichReal( RICHREAL_T( 0, 0, DBS_RICHREAL_PREC)) <= value)
+    result = value.mValue.Integer( );
 
-  else if (value.mValue.Fractional () != 0)
-    result = value.mValue.Integer () - 1;
+  else if (value.mValue.Fractional( ) != 0)
+    result = value.mValue.Integer( ) - 1;
 
   else
-    result =value.mValue.Integer ();
+    result =value.mValue.Integer( );
 
   stack.Pop (1);
-  stack.Push (DInt64 (result));
+  stack.Push( DInt64 (result));
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-round (SessionStack& stack, ISession& session)
+round( SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
-  stack[stack.Size () - 1].Operand ().GetValue (value);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
 
-  if (value.IsNull ())
+  if (value.IsNull( ))
     {
       stack.Pop (1);
-      stack.Push (DInt64 ());
+      stack.Push( DInt64 ());
 
       return WOP_OK;
     }
 
   int64_t result;
 
-  if (DRichReal (RICHREAL_T (0, 0, DBS_RICHREAL_PREC)) <= value)
+  if (DRichReal( RICHREAL_T( 0, 0, DBS_RICHREAL_PREC)) <= value)
     {
-      result = value.mValue.Integer ();
+      result = value.mValue.Integer( );
 
-      if (value.mValue.Fractional () >= (5 * value.mValue.Precision () / 10))
+      if (value.mValue.Fractional( ) >= (5 * value.mValue.Precision( ) / 10))
         ++result;
     }
 
   else
     {
-      result = value.mValue.Integer ();
+      result = value.mValue.Integer( );
 
-      if (value.mValue.Fractional () < (-5 * value.mValue.Precision () / 10))
+      if (value.mValue.Fractional( ) < (-5 * value.mValue.Precision( ) / 10))
         --result;
     }
 
   stack.Pop (1);
-  stack.Push (DInt64 (result));
+  stack.Push( DInt64 (result));
 
   return WOP_OK;
 }
@@ -302,25 +302,25 @@ abs (SessionStack& stack, ISession& session)
 {
   DInt64 value;
 
-  stack[stack.Size () - 1].Operand ().GetValue (value);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
 
-  if (value.IsNull () || (value.mValue >= 0))
+  if (value.IsNull( ) || (value.mValue >= 0))
     {
       stack.Pop (1);
-      stack.Push (value);
+      stack.Push( value);
 
       return WOP_OK;
     }
 
   stack.Pop (1);
-  stack.Push (DInt64 (-value.mValue));
+  stack.Push( DInt64 (-value.mValue));
 
   return WOP_OK;
 }
 
 
 WLIB_STATUS
-base_constants_init ()
+base_constants_init( )
 {
   static const uint8_t* localsBType[]     = { gBoolType, gBoolType };
   static const uint8_t* localsCType[]     = { gCharType, gCharType };

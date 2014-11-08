@@ -1,5 +1,5 @@
 /******************************************************************************
-UTILS - Common routines used trough WHISPER project
+UTILS - Common routines used trough WHAIS project
 Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,18 +27,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "warray.h"
 
 struct WArray*
-wh_array_init_ex (struct WArray* const outArray,
+wh_array_init_ex( struct WArray* const outArray,
                   size_t               itemSize,
                   uint_t               increment,
                   uint_t               alignment)
 {
   /* Check if the reuired alignment is supported. */
-  if ((alignment > sizeof (uint64_t)) || (alignment == 0))
+  if ((alignment > sizeof( uint64_t)) || (alignment == 0))
     return NULL;
 
   if (outArray != NULL)
     {
-      memset (outArray, 0, sizeof (outArray[0]));
+      memset( outArray, 0, sizeof( outArray[0]));
       outArray->incrementCount = increment;
       outArray->userItemSize   = itemSize;
 
@@ -54,15 +54,15 @@ wh_array_init_ex (struct WArray* const outArray,
 
 
 static bool_t
-increment_array (struct WArray* const array)
+increment_array( struct WArray* const array)
 {
-  int8_t **temp = mem_realloc (array->arraysList,
-                               (array->arraysCount + 1) * sizeof (temp[0]));
+  int8_t **temp = mem_realloc( array->arraysList,
+                               (array->arraysCount + 1) * sizeof( temp[0]));
   if (temp == NULL)
     return FALSE;
 
   array->arraysList        = temp;
-  temp[array->arraysCount] = mem_alloc (array->realItemSize *
+  temp[array->arraysCount] = mem_alloc( array->realItemSize *
                                           array->incrementCount);
   if (temp[array->arraysCount] == NULL)
     return FALSE;
@@ -75,27 +75,27 @@ increment_array (struct WArray* const array)
 
 
 void*
-wh_array_add (struct WArray* const array, const void *data)
+wh_array_add( struct WArray* const array, const void *data)
 {
   void *dest_data;
 
   if ((array->itemsReserved <= array->itemsCount) &&
-      ( ! increment_array (array)))
+      ( ! increment_array( array)))
     {
       /* Failed to allocated memory. */
       return NULL;
     }
 
   array->itemsCount++;
-  dest_data = wh_array_get (array, array->itemsCount - 1);
+  dest_data = wh_array_get( array, array->itemsCount - 1);
 
-  memcpy (dest_data, data, array->userItemSize);
+  memcpy( dest_data, data, array->userItemSize);
   return dest_data;
 }
 
 
 void*
-wh_array_get (const struct WArray* const array, const uint_t index)
+wh_array_get( const struct WArray* const array, const uint_t index)
 {
   uint_t seg, offset;
 
@@ -111,14 +111,14 @@ wh_array_get (const struct WArray* const array, const uint_t index)
 
 
 uint_t
-wh_array_count (const struct WArray* const array)
+wh_array_count( const struct WArray* const array)
 {
   return array->itemsCount;
 }
 
 
 void
-wh_array_resize (struct WArray* const array, const uint_t count)
+wh_array_resize( struct WArray* const array, const uint_t count)
 {
   if (count < array->itemsCount)
     {
@@ -133,7 +133,7 @@ wh_array_resize (struct WArray* const array, const uint_t count)
       array->itemsReserved = startSeg * array->incrementCount;
 
       for (iterator = startSeg; iterator < array->arraysCount; iterator++)
-        mem_free (array->arraysList[startSeg]);
+        mem_free( array->arraysList[startSeg]);
 
       array->arraysCount = startSeg;
     }
@@ -142,14 +142,14 @@ wh_array_resize (struct WArray* const array, const uint_t count)
 
 
 void
-wh_array_clean (struct WArray* const array)
+wh_array_clean( struct WArray* const array)
 {
   uint_t count = 0;
 
   for (count = 0; count < array->arraysCount; count++)
-    mem_free (array->arraysList[count]);
+    mem_free( array->arraysList[count]);
 
   if (array->arraysList != NULL)
-    mem_free (array->arraysList);
+    mem_free( array->arraysList);
 }
 

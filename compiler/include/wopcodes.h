@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -25,9 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WOPCODES_H
 #define WOPCODES_H
 
-#include "whisper.h"
+#include "whais.h"
 
-#include "whisperc.h"
+#include "whaisc.h"
 
 enum W_OPCODE
 {
@@ -207,7 +207,7 @@ extern "C"
 #endif
 
 COMPILER_SHL uint_t
-wh_compiler_decode_op (const uint8_t*        instrs,
+wh_compiler_decode_op( const uint8_t*        instrs,
                        enum W_OPCODE* const  outOpcode);
 #ifdef __cplusplus
 }

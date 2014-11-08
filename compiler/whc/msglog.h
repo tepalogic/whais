@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -27,9 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 
-#include "whisper.h"
+#include "whais.h"
 
-#include "compiler/whisperc.h"
+#include "compiler/whaisc.h"
 
 #ifndef MSGLOG_H_
 #define MSGLOG_H_
@@ -38,14 +38,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct SourceCodeMark
 {
-  SourceCodeMark (uint32_t      bufferOffset,
+  SourceCodeMark( uint32_t      bufferOffset,
                   uint32_t      bufferLine,
                   std::string   bufferSource,
                   uint_t        inclusionLevel)
-    : mBufferOffset (bufferOffset),
-      mBufferLine (bufferLine),
-      mLevel (inclusionLevel),
-      mBufferSource (bufferSource)
+    : mBufferOffset( bufferOffset),
+      mBufferLine( bufferLine),
+      mLevel( inclusionLevel),
+      mBufferSource( bufferSource)
   {
   }
 
@@ -58,10 +58,10 @@ struct SourceCodeMark
 
 struct WHC_MESSAGE_CTX
 {
-  WHC_MESSAGE_CTX (const std::vector<SourceCodeMark>& codeMarks,
+  WHC_MESSAGE_CTX( const std::vector<SourceCodeMark>& codeMarks,
                    const char* const                  sourceCode)
-    : mCodeMarks (codeMarks),
-      mCode (sourceCode)
+    : mCodeMarks( codeMarks),
+      mCode( sourceCode)
   {
   }
 
@@ -72,7 +72,7 @@ struct WHC_MESSAGE_CTX
 
 
 void
-whc_messenger (WH_MESSENGER_CTXT data,
+whc_messenger( WH_MESSENGER_CTXT data,
                uint_t            buffOff,
                uint_t            msgId,
                uint_t            msgType,
@@ -80,7 +80,7 @@ whc_messenger (WH_MESSENGER_CTXT data,
                va_list           args);
 
 void
-whc_messenger (WH_MESSENGER_CTXT data,
+whc_messenger( WH_MESSENGER_CTXT data,
                uint_t            buffOff,
                uint_t            msgId,
                uint_t            msgType,

@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -36,7 +36,7 @@
 #define MAX_FIELD_NAME_LENGTH     256
 
 
-using namespace whisper;
+using namespace whais;
 using namespace std;
 
 
@@ -54,8 +54,8 @@ WLIB_PROC_DESCRIPTION       gProcTableSort;
 static bool
 operator< (const DText& text1, const DText& text2)
 {
-  const uint64_t text1Count = text1.Count ();
-  const uint64_t text2Count = text2.Count ();
+  const uint64_t text1Count = text1.Count( );
+  const uint64_t text2Count = text2.Count( );
 
   uint64_t i, j;
 
@@ -63,8 +63,8 @@ operator< (const DText& text1, const DText& text2)
        ((i < text1Count) && (j < text2Count));
        ++i, ++j)
     {
-      const DChar c1 = text1.CharAt (i);
-      const DChar c2 = text2.CharAt (j);
+      const DChar c1 = text1.CharAt( i);
+      const DChar c2 = text2.CharAt( j);
 
       if (c1 < c2)
         return true;
@@ -94,16 +94,16 @@ public:
       friend class TableSortContainer;
 
     public:
-      Value ()
-        : mContainer (NULL),
-          mRow (0)
+      Value( )
+        : mContainer( NULL),
+          mRow( 0)
         {
         }
 
-      Value (const TableSortContainer& container,
+      Value( const TableSortContainer& container,
              const ROW_INDEX           row)
-        : mContainer (&container),
-          mRow (row)
+        : mContainer( &container),
+          mRow( row)
         {
         }
 
@@ -115,9 +115,9 @@ public:
           else if (val.mContainer == NULL)
             return false;
 
-          assert (val.mContainer == mContainer);
+          assert( val.mContainer == mContainer);
 
-          for (FIELD_INDEX i = 0; i < mContainer->mFields.size (); ++i)
+          for (FIELD_INDEX i = 0; i < mContainer->mFields.size( ); ++i)
             {
               const field_comparator compare = mContainer->mComparators[i];
 
@@ -142,7 +142,7 @@ public:
           else if (mContainer != val.mContainer)
             return false;
 
-          for (FIELD_INDEX i = 0; i < mContainer->mFields.size (); ++i)
+          for (FIELD_INDEX i = 0; i < mContainer->mFields.size( ); ++i)
             {
               const field_comparator compare = mContainer->mComparators[i];
 
@@ -169,24 +169,24 @@ public:
     };
 
 
-  TableSortContainer (ITable&       table,
+  TableSortContainer( ITable&       table,
                       const DArray& fields,
                       const DArray& fieldsSortOrder)
-    : mTable (table)
+    : mTable( table)
     {
-      assert (fields.Count () > 0);
-      assert (fields.Count () == fieldsSortOrder.Count ());
+      assert( fields.Count( ) > 0);
+      assert( fields.Count( ) == fieldsSortOrder.Count( ));
 
-      extract_fields_ids (fields);
+      extract_fields_ids( fields);
 
-      for (FIELD_INDEX field = 0; field < mFields.size (); ++field)
+      for (FIELD_INDEX field = 0; field < mFields.size( ); ++field)
         {
-          const DBSFieldDescriptor fd = mTable.DescribeField (mFields[field]);
+          const DBSFieldDescriptor fd = mTable.DescribeField( mFields[field]);
 
           if (fd.isArray)
             {
-              throw InterException (
-                          _EXTRA (InterException::INVALID_PARAMETER_TYPE),
+              throw InterException( 
+                          _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                           "Cannot sort a table using an array field."
                                    );
             }
@@ -194,10 +194,10 @@ public:
           DBool sortOrder;
           fieldsSortOrder.Get (field, sortOrder);
 
-          switch (fd.type)
+          switch( fd.type)
             {
             case T_BOOL:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DBool>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DBool>)
@@ -205,7 +205,7 @@ public:
               break;
 
             case T_CHAR:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DChar>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DChar>)
@@ -213,7 +213,7 @@ public:
               break;
 
             case T_DATE:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDate>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DDate>)
@@ -221,7 +221,7 @@ public:
               break;
 
             case T_DATETIME:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDateTime>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DDateTime>)
@@ -229,7 +229,7 @@ public:
               break;
 
             case T_HIRESTIME:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DHiresTime>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DHiresTime>)
@@ -237,7 +237,7 @@ public:
               break;
 
             case T_INT8:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt8>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt8>)
@@ -245,7 +245,7 @@ public:
               break;
 
             case T_INT16:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt16>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt16>)
@@ -254,7 +254,7 @@ public:
 
 
             case T_INT32:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt32>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt32>)
@@ -262,7 +262,7 @@ public:
               break;
 
             case T_INT64:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt64>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt64>)
@@ -270,7 +270,7 @@ public:
               break;
 
             case T_REAL:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DReal>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DReal>)
@@ -278,7 +278,7 @@ public:
               break;
 
             case T_RICHREAL:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DRichReal>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DRichReal>)
@@ -286,7 +286,7 @@ public:
               break;
 
             case T_UINT8:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt8>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt8>)
@@ -294,7 +294,7 @@ public:
               break;
 
             case T_UINT16:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt16>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt16>)
@@ -303,7 +303,7 @@ public:
 
 
             case T_UINT32:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt32>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt32>)
@@ -311,7 +311,7 @@ public:
               break;
 
             case T_UINT64:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt64>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt64>)
@@ -319,7 +319,7 @@ public:
               break;
 
             case T_TEXT:
-              mComparators.push_back (
+              mComparators.push_back( 
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DText>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DText>)
@@ -327,38 +327,38 @@ public:
               break;
 
             default:
-              throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+              throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
             }
         }
     }
 
   const Value operator[] (const int64_t position) const
     {
-      return Value (*this, position);
+      return Value( *this, position);
     }
 
-  void Exchange (const int64_t pos1, const int64_t pos2)
+  void Exchange( const int64_t pos1, const int64_t pos2)
     {
-      mTable.ExchangeRows (pos1, pos2);
+      mTable.ExchangeRows( pos1, pos2);
 
       if (mPivot.mRow == _SC (ROW_INDEX, pos1))
-        mPivot = Value (*this, pos2);
+        mPivot = Value( *this, pos2);
 
       else if (mPivot.mRow == _SC (ROW_INDEX, pos2))
-        mPivot = Value (*this, pos1);
+        mPivot = Value( *this, pos1);
     }
 
-  uint64_t Count () const
+  uint64_t Count( ) const
     {
-      return mTable.AllocatedRows ();
+      return mTable.AllocatedRows( );
     }
 
-  void Pivot (const uint64_t from, const uint64_t to)
+  void Pivot( const uint64_t from, const uint64_t to)
     {
-      mPivot = Value (*this, (from + to) / 2);
+      mPivot = Value( *this, (from + to) / 2);
     }
 
-  const Value& Pivot () const
+  const Value& Pivot( ) const
     {
       return mPivot;
     }
@@ -367,7 +367,7 @@ private:
   friend class TableSortContainer::Value;
 
   template<typename T> int
-  compare_field_values (const ROW_INDEX     row1,
+  compare_field_values( const ROW_INDEX     row1,
                         const ROW_INDEX     row2,
                         const FIELD_INDEX   field) const
   {
@@ -386,7 +386,7 @@ private:
   }
 
   template<typename T> int
-  compare_field_values_reverse (const ROW_INDEX     row1,
+  compare_field_values_reverse( const ROW_INDEX     row1,
                                 const ROW_INDEX     row2,
                                 const FIELD_INDEX   field) const
   {
@@ -405,23 +405,23 @@ private:
   }
 
 
-  void extract_fields_ids (const DArray& fields)
+  void extract_fields_ids( const DArray& fields)
   {
-    const DBS_FIELD_TYPE arrayType   = fields.Type ();
-    const uint64_t       fieldsCount = fields.Count ();
+    const DBS_FIELD_TYPE arrayType   = fields.Type( );
+    const uint64_t       fieldsCount = fields.Count( );
 
-    assert (fieldsCount != 0);
+    assert( fieldsCount != 0);
 
     for (uint64_t field = 0; field < fieldsCount; ++field)
       {
-        switch (arrayType)
+        switch( arrayType)
           {
           case T_INT8:
               {
                 DInt8 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -430,7 +430,7 @@ private:
                 DInt16 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -439,7 +439,7 @@ private:
                 DInt32 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -448,7 +448,7 @@ private:
                 DInt64 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -457,7 +457,7 @@ private:
                 DUInt8 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -466,7 +466,7 @@ private:
                 DUInt16 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -475,7 +475,7 @@ private:
                 DUInt32 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
@@ -484,13 +484,13 @@ private:
                 DUInt64 temp;
                 fields.Get (field, temp);
 
-                mFields.push_back (temp.mValue);
+                mFields.push_back( temp.mValue);
               }
             break;
 
           default:
-            throw InterException (
-                        _EXTRA (InterException::INVALID_PARAMETER_TYPE),
+            throw InterException( 
+                        _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                         "The fields list should be an array of integers."
                                  );
           }
@@ -507,216 +507,216 @@ private:
 
 
 static WLIB_STATUS
-proc_table_ispersistent (SessionStack& stack, ISession&)
+proc_table_ispersistent( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size () - 1].Operand ();
+  IOperand& op = stack[stack.Size( ) - 1].Operand( );
 
-  if (op.IsNull ())
+  if (op.IsNull( ))
     {
       stack.Pop (1);
-      stack.Push (DBool ());
+      stack.Push( DBool( ));
 
       return WOP_OK;
     }
 
-  ITable& table = op.GetTable ();
+  ITable& table = op.GetTable( );
 
-  DBool result ( ! table.IsTemporal ());
+  DBool result(  ! table.IsTemporal( ));
 
   stack.Pop (1);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_fields_count (SessionStack& stack, ISession&)
+proc_table_fields_count( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size () - 1].Operand ();
+  IOperand& op = stack[stack.Size( ) - 1].Operand( );
 
-  ITable* const table = &op.GetTable ();
+  ITable* const table = &op.GetTable( );
 
   if (table == NULL)
-    throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+    throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 
-  DUInt64 result (table->FieldsCount ());
+  DUInt64 result( table->FieldsCount( ));
 
   stack.Pop (1);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_field_by_id (SessionStack& stack, ISession&)
+proc_table_field_by_id( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size () - 2].Operand ();
+  IOperand& op = stack[stack.Size( ) - 2].Operand( );
 
   DUInt64 fieldId;
-  stack[stack.Size () - 1].Operand ().GetValue (fieldId);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( fieldId);
 
-  if (fieldId.IsNull ())
+  if (fieldId.IsNull( ))
     {
-      throw InterException (
-                  _EXTRA (InterException::INVALID_PARAMETER_VALUE),
+      throw InterException( 
+                  _EXTRA( InterException::INVALID_PARAMETER_VALUE),
                   "A non null index is required for retrieving a table field."
                            );
     }
-  StackValue result = op.GetFieldAt (fieldId.mValue);
+  StackValue result = op.GetFieldAt( fieldId.mValue);
 
   stack.Pop (2);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_field_name (SessionStack& stack, ISession&)
+proc_table_field_name( SessionStack& stack, ISession&)
 {
   uint8_t fieldName[MAX_FIELD_NAME_LENGTH];
 
   DText       field;
 
-  IOperand&     opTable = stack[stack.Size () - 2].Operand ();
-  ITable* const table   = &opTable.GetTable ();
+  IOperand&     opTable = stack[stack.Size( ) - 2].Operand( );
+  ITable* const table   = &opTable.GetTable( );
 
-  stack[stack.Size () - 1].Operand ().GetValue (field);
-  if (field.IsNull ())
+  stack[stack.Size( ) - 1].Operand( ).GetValue( field);
+  if (field.IsNull( ))
     {
-      throw InterException (_EXTRA (InterException::INVALID_PARAMETER_VALUE),
+      throw InterException( _EXTRA( InterException::INVALID_PARAMETER_VALUE),
                             "A non null name is required to retrieve a field.");
     }
-  else if (field.RawSize () >= sizeof fieldName)
+  else if (field.RawSize( ) >= sizeof fieldName)
     {
-      throw InterException (
-                _EXTRA (InterException::FIELD_NAME_TOO_LONG),
+      throw InterException( 
+                _EXTRA( InterException::FIELD_NAME_TOO_LONG),
                 "This implementation support fields names up to %d characters.",
                 sizeof fieldName
                             );
     }
   else if (table == NULL)
-    throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+    throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 
-  field.RawRead (0, field.RawSize (), fieldName);
-  fieldName[field.RawSize ()] = 0;
+  field.RawRead( 0, field.RawSize( ), fieldName);
+  fieldName[field.RawSize( )] = 0;
 
-  const FIELD_INDEX fieldId = table->RetrieveField (_RC (char*, fieldName));
-  StackValue        result  = opTable.GetFieldAt (fieldId);
+  const FIELD_INDEX fieldId = table->RetrieveField( _RC (char*, fieldName));
+  StackValue        result  = opTable.GetFieldAt( fieldId);
 
   stack.Pop (2);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_rows_count (SessionStack& stack, ISession&)
+proc_table_rows_count( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size () - 1].Operand ();
+  IOperand& op = stack[stack.Size( ) - 1].Operand( );
 
-  if (op.IsNull ())
+  if (op.IsNull( ))
     {
       stack.Pop (1);
-      stack.Push (DUInt64 (0));
+      stack.Push( DUInt64 (0));
 
       return WOP_OK;
     }
 
-  ITable& table = op.GetTable ();
+  ITable& table = op.GetTable( );
 
-  DUInt64 result (table.AllocatedRows ());
+  DUInt64 result( table.AllocatedRows( ));
 
   stack.Pop (1);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_add_row (SessionStack& stack, ISession&)
+proc_table_add_row( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size () - 1].Operand ();
+  IOperand& op = stack[stack.Size( ) - 1].Operand( );
 
-  ITable& table = op.GetTable ();
+  ITable& table = op.GetTable( );
 
-  DUInt64 result (table.AddRow ());
+  DUInt64 result( table.AddRow( ));
 
   stack.Pop (1);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_reusable_row (SessionStack& stack, ISession&)
+proc_table_reusable_row( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size () - 1].Operand ();
+  IOperand& op = stack[stack.Size( ) - 1].Operand( );
 
-  ITable& table = op.GetTable ();
+  ITable& table = op.GetTable( );
 
-  DUInt64 result (table.GetReusableRow (true));
+  DUInt64 result( table.GetReusableRow( true));
 
   stack.Pop (1);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-proc_table_reuse_row (SessionStack& stack, ISession&)
+proc_table_reuse_row( SessionStack& stack, ISession&)
 {
   DUInt64 row;
   DUInt64 result;
 
-  ITable& table = stack[stack.Size () - 2].Operand ().GetTable ();
-  stack[stack.Size () - 1].Operand ().GetValue (row);
+  ITable& table = stack[stack.Size( ) - 2].Operand( ).GetTable( );
+  stack[stack.Size( ) - 1].Operand( ).GetValue( row);
 
-  if (! row.IsNull ()
-      && (row.mValue < table.AllocatedRows ()))
+  if (! row.IsNull( )
+      && (row.mValue < table.AllocatedRows( )))
     {
-      table.MarkRowForReuse (row.mValue);
+      table.MarkRowForReuse( row.mValue);
 
       result = row;
     }
 
   stack.Pop (2);
-  stack.Push (result);
+  stack.Push( result);
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-table_exchange_rows (SessionStack& stack, ISession&)
+table_exchange_rows( SessionStack& stack, ISession&)
 {
   DUInt64 row1, row2;
 
-  IOperand& op = stack[stack.Size () - 3].Operand ();
+  IOperand& op = stack[stack.Size( ) - 3].Operand( );
 
-  stack[stack.Size () - 2].Operand ().GetValue (row1);
-  stack[stack.Size () - 1].Operand ().GetValue (row2);
+  stack[stack.Size( ) - 2].Operand( ).GetValue( row1);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( row2);
 
-  if (op.IsNull () || row1.IsNull () || row2.IsNull ())
+  if (op.IsNull( ) || row1.IsNull( ) || row2.IsNull( ))
     {
       stack.Pop (3);
-      stack.Push (DBool ());
+      stack.Push( DBool( ));
 
       return WOP_OK;
     }
 
-  ITable& table = op.GetTable ();
+  ITable& table = op.GetTable( );
 
-  table.ExchangeRows (row1.mValue, row2.mValue);
+  table.ExchangeRows( row1.mValue, row2.mValue);
 
   stack.Pop (3);
-  stack.Push (DBool (true));
+  stack.Push( DBool( true));
 
   return WOP_OK;
 
@@ -724,35 +724,35 @@ table_exchange_rows (SessionStack& stack, ISession&)
 
 
 static WLIB_STATUS
-proc_table_sort (SessionStack& stack, ISession&)
+proc_table_sort( SessionStack& stack, ISession&)
 {
   DArray fields, sortOrder;
 
-  IOperand& opTable = stack[stack.Size () - 3].Operand ();
-  stack[stack.Size () - 2].Operand ().GetValue (fields);
-  stack[stack.Size () - 1].Operand ().GetValue (sortOrder);
+  IOperand& opTable = stack[stack.Size( ) - 3].Operand( );
+  stack[stack.Size( ) - 2].Operand( ).GetValue( fields);
+  stack[stack.Size( ) - 1].Operand( ).GetValue( sortOrder);
 
-  if (opTable.IsNull () || fields.IsNull ())
+  if (opTable.IsNull( ) || fields.IsNull( ))
     {
       stack.Pop (2);
       return WOP_OK;
     }
-  else if ( ! sortOrder.IsNull ()
-           && (fields.Count () != sortOrder.Count ()))
+  else if ( ! sortOrder.IsNull( )
+           && (fields.Count( ) != sortOrder.Count( )))
     {
-      throw InterException (
-            _EXTRA (InterException::INVALID_PARAMETER_VALUE),
+      throw InterException( 
+            _EXTRA( InterException::INVALID_PARAMETER_VALUE),
             "The field list and sort order arrays should have the same "
               "count of elements."
                            );
     }
 
-  ITable& table = opTable.GetTable ();
-  TableSortContainer container (table, fields, sortOrder);
+  ITable& table = opTable.GetTable( );
+  TableSortContainer container( table, fields, sortOrder);
 
   quick_sort<TableSortContainer::Value, TableSortContainer> (
                                                    0,
-                                                   table.AllocatedRows () - 1,
+                                                   table.AllocatedRows( ) - 1,
                                                    false,
                                                    container
                                                              );
@@ -762,7 +762,7 @@ proc_table_sort (SessionStack& stack, ISession&)
 
 
 WLIB_STATUS
-base_tables_init ()
+base_tables_init( )
 {
   static const uint8_t* isPersistentLocals[] = {
                                                  gBoolType,

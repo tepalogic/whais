@@ -27,11 +27,11 @@
 
 #include <vector>
 
-#include "whisper.h"
+#include "whais.h"
 
 #include "pm_operand.h"
 
-namespace whisper {
+namespace whais {
 namespace prima {
 
 
@@ -51,51 +51,51 @@ struct GlobalEntry
 class GlobalsManager
 {
 public:
-  GlobalsManager (NameSpace& space)
-    : mNames (space),
-      mIdentifiers (),
-      mStorage (),
-      mGlobalsEntrys ()
+  GlobalsManager( NameSpace& space)
+    : mNames( space),
+      mIdentifiers( ),
+      mStorage( ),
+      mGlobalsEntrys( )
   {
   }
 
-  ~GlobalsManager ();
+  ~GlobalsManager( );
 
-  uint_t Count () const
+  uint_t Count( ) const
   {
-    return mGlobalsEntrys.size ();
+    return mGlobalsEntrys.size( );
   }
 
-  uint32_t AddGlobal (const uint8_t* const name,
+  uint32_t AddGlobal( const uint8_t* const name,
                       const uint_t         nameLength,
                       const GlobalValue&   value,
                       const uint32_t       tiOffset);
 
-  uint32_t FindGlobal (const uint8_t *const name, const uint_t nameLength);
+  uint32_t FindGlobal( const uint8_t *const name, const uint_t nameLength);
 
-  const uint8_t* Name (const uint_t index) const;
+  const uint8_t* Name( const uint_t index) const;
 
-  GlobalValue& Value (const uint32_t glbId);
+  GlobalValue& Value( const uint32_t glbId);
 
-  const uint8_t* TypeDescription (const uint32_t glbId);
+  const uint8_t* TypeDescription( const uint32_t glbId);
 
-  static bool IsValid (const uint32_t glbId)
+  static bool IsValid( const uint32_t glbId)
   {
     return glbId != INVALID_ENTRY;
   }
 
-  static bool IsGlobalEntry (const uint32_t glbId)
+  static bool IsGlobalEntry( const uint32_t glbId)
   {
-    return IsValid (glbId) && ((glbId & GLOBAL_ID) != 0);
+    return IsValid( glbId) && ((glbId & GLOBAL_ID) != 0);
   }
 
-  static void MarkAsGlobalEntry (uint32_t& glbId)
+  static void MarkAsGlobalEntry( uint32_t& glbId)
   {
     glbId |= GLOBAL_ID;
   }
 
 private:
-  GlobalsManager (const GlobalsManager&);
+  GlobalsManager( const GlobalsManager&);
   GlobalsManager& operator= (const GlobalsManager);
 
   static const uint32_t GLOBAL_ID     = 0x80000000;
@@ -108,7 +108,7 @@ private:
 };
 
 } //namespace prima
-} //namespace whisper
+} //namespace whais
 
 
 #endif /* PM_GLOBALS_H_ */

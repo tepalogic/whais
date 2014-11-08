@@ -1,5 +1,5 @@
 /******************************************************************************
-WHISPERC - A compiler for whisper programs
+WHAISC - A compiler for whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -34,21 +34,21 @@ template <class T>
 class auto_array
 {
 public:
-  auto_array ()
+  auto_array( )
     : mpT (NULL),
-      mSize (0)
+      mSize( 0)
   {
   }
 
 
-  auto_array (const unsigned int size)
+  auto_array( const unsigned int size)
     : mpT (new T [size]),
-      mSize (size)
+      mSize( size)
   {
   }
 
 
-  ~auto_array ()
+  ~auto_array( )
   {
     delete [] mpT;
   }
@@ -58,7 +58,7 @@ public:
   {
 
     if (i >= mSize)
-      throw std::out_of_range ("Index is bigger then the array size.");
+      throw std::out_of_range( "Index is bigger then the array size.");
 
     return mpT[i];
   }
@@ -68,13 +68,13 @@ public:
   {
 
     if (i >= mSize)
-      throw std::out_of_range ("Index is bigger then the array size.");
+      throw std::out_of_range( "Index is bigger then the array size.");
 
     return mpT[i];
   }
 
 
-  unsigned int Size () const
+  unsigned int Size( ) const
   {
     return mSize;
   }
@@ -92,7 +92,7 @@ public:
   }
 
 
-  T* Size (const unsigned int newSize)
+  T* Size( const unsigned int newSize)
   {
     if (newSize == 0)
       {
@@ -112,7 +112,7 @@ public:
         for (unsigned int i = 0; i < min; ++i)
           pNewArray[i] = mpT[i];
     }
-    catch (...)
+    catch( ...)
     {
         delete [] pNewArray;
         throw;
@@ -125,14 +125,14 @@ public:
   }
 
 
-  T* Reset (const unsigned int newSize)
+  T* Reset( const unsigned int newSize)
   {
     T* const pNewArray = ((newSize == 0) ? NULL : new T[newSize]);
     try
     {
         delete [] mpT;
     }
-    catch (...)
+    catch( ...)
     {
         delete [] pNewArray;
         throw;
@@ -148,7 +148,7 @@ private:
   T*           mpT;
   unsigned int mSize;
 
-  auto_array (const auto_array&);
+  auto_array( const auto_array&);
   auto_array& operator= (const auto_array&);
 };
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- WSTDLIB - Standard mathemetically library for Whisper.
+ WSTDLIB - Standard mathemetically library for Whais.
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -29,29 +29,29 @@
 #include "stdlib/interface.h"
 
 
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTicks;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcNow;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeYear;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeMonth;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeDay;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeHours;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeMinutess;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeSeconds;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcTimeMicroseconds;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateDaysDiff;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateDaysDelta;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateSecondsDiff;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateSecondsDelta;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateMicrosecondsDiff;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateMicrosecondsDelta;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcNativeYear;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDateWeek;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcLastDateOfWeek;
-extern whisper::WLIB_PROC_DESCRIPTION       gProcDayOfWeek;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTicks;
+extern whais::WLIB_PROC_DESCRIPTION       gProcNow;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeYear;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeMonth;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeDay;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeHours;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeMinutess;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeSeconds;
+extern whais::WLIB_PROC_DESCRIPTION       gProcTimeMicroseconds;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateDaysDiff;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateDaysDelta;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateSecondsDiff;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateSecondsDelta;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateMicrosecondsDiff;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateMicrosecondsDelta;
+extern whais::WLIB_PROC_DESCRIPTION       gProcNativeYear;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDateWeek;
+extern whais::WLIB_PROC_DESCRIPTION       gProcLastDateOfWeek;
+extern whais::WLIB_PROC_DESCRIPTION       gProcDayOfWeek;
 
 
-whisper::WLIB_STATUS
-base_dates_init ();
+whais::WLIB_STATUS
+base_dates_init( );
 
 #endif //BASE_DATES_H_
 

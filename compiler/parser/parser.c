@@ -1,5 +1,5 @@
 /******************************************************************************
- WHISPERC - A compiler for whisper programs
+ WHAISC - A compiler for whais programs
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -33,16 +33,16 @@
 
 
 struct SemValue*
-alloc_sem_value (struct ParserState* const parser)
+alloc_sem_value( struct ParserState* const parser)
 {
   struct SemValue* result      = NULL;
   uint_t           iter        = 0;
-  uint_t           stored_vals = wh_array_count (&parser->values);
+  uint_t           stored_vals = wh_array_count( &parser->values);
 
-  while (iter < stored_vals)
+  while( iter < stored_vals)
     {
-      result = wh_array_get (&parser->values, iter);
-      assert (result != NULL);
+      result = wh_array_get( &parser->values, iter);
+      assert( result != NULL);
 
       if (result->val_type == VAL_REUSE)
         break;                        /* found something to be reused */
@@ -53,7 +53,7 @@ alloc_sem_value (struct ParserState* const parser)
    if (result == NULL || result->val_type != VAL_REUSE)
     {
       static struct SemValue dummy;
-      result = (struct SemValue*) wh_array_add (&parser->values, &dummy);
+      result = (struct SemValue*) wh_array_add( &parser->values, &dummy);
     }
 
   return result;
@@ -61,13 +61,13 @@ alloc_sem_value (struct ParserState* const parser)
 
 
 struct SemValue*
-alloc_bool_sem_value (struct ParserState* const parser,
+alloc_bool_sem_value( struct ParserState* const parser,
                          const bool_t              value)
 {
-  struct SemValue *val = alloc_sem_value (parser);
+  struct SemValue *val = alloc_sem_value( parser);
 
   if (val == NULL)
-    log_message (parser, IGNORE_BUFFER_POS, parser->bufferPos, MSG_NO_MEM);
+    log_message( parser, IGNORE_BUFFER_POS, parser->bufferPos, MSG_NO_MEM);
 
   else
     {
