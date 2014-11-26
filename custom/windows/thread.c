@@ -77,7 +77,7 @@ wh_thread_create( WH_THREAD* const              outThread,
                            NULL);
   if (*outThread == NULL)
     {
-      const uint_t result = GetLastError( );
+      const uint_t result = GetLastError();
 
       return( result == WOP_OK) ? WOP_UNKNOW : result;
     }
@@ -98,7 +98,7 @@ wh_thread_free( WH_THREAD thread)
 
 
 void
-wh_yield( )
+wh_yield()
 {
   Sleep( 0);
 }

@@ -31,34 +31,34 @@ using namespace std;
 namespace whais {
 namespace pastra {
 
-IBlocksManager::~IBlocksManager( )
+IBlocksManager::~IBlocksManager()
 {
 }
 
 
 
-BlockCache::BlockCache( )
+BlockCache::BlockCache()
   : mManager( NULL),
     mItemSize( 0),
     mBlockSize( 0),
     mMaxCachedBlocks( 0),
-    mCachedBlocks( )
+    mCachedBlocks()
 {
 }
 
 
-BlockCache::~BlockCache( )
+BlockCache::~BlockCache()
 {
   if (mItemSize == 0)
     return ; //This has not been initialized. So nothing to do here!
 
-  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin( );
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin();
   while( it != mCachedBlocks.end ())
     {
-      assert( it->second.IsInUse( ) == false);
-      assert( mSkipFlush || it->second.IsDirty( ) == false);
+      assert( it->second.IsInUse() == false);
+      assert( mSkipFlush || it->second.IsDirty() == false);
 
-      delete [] it->second.Data( );
+      delete [] it->second.Data();
       ++it;
     }
 }
@@ -99,14 +99,14 @@ BlockCache::Init( IBlocksManager&  blocksMgr,
 }
 
 void
-BlockCache::Flush( )
+BlockCache::Flush()
 {
   assert( mItemSize != 0);
 
   if (mSkipFlush)
     return;
 
-  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin( );
+  map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin();
   while( it != mCachedBlocks.end ())
     {
       FlushItem( it->first);
@@ -127,17 +127,17 @@ BlockCache::RetriveItem( const uint64_t item)
     return StoredItem( it->second, (item % itemsPerBlock) * mItemSize);
 
   /* Make sure you have room to cache the new item. */
-  if (mCachedBlocks.size( ) >= mMaxCachedBlocks)
+  if (mCachedBlocks.size() >= mMaxCachedBlocks)
     {
-      it = mCachedBlocks.begin( );
+      it = mCachedBlocks.begin();
       while( it != mCachedBlocks.end ())
         {
-          if (it->second.IsInUse( ))
+          if (it->second.IsInUse())
             continue ;
 
-          uint8_t* const data_ = it->second.Data( );
+          uint8_t* const data_ = it->second.Data();
 
-          if (it->second.IsDirty( ))
+          if (it->second.IsDirty())
             mManager->StoreItems( it->first, itemsPerBlock, data_);
 
           delete [] data_;
@@ -151,7 +151,7 @@ BlockCache::RetriveItem( const uint64_t item)
 
   mCachedBlocks.insert( pair<uint64_t, BlockEntry> (baseBlockItem,
                                                     BlockEntry( data_)));
-  block.release( );
+  block.release();
 
   mManager->RetrieveItems( baseBlockItem, itemsPerBlock, data_);
 
@@ -169,10 +169,10 @@ BlockCache::FlushItem( const uint64_t item)
   if (it == mCachedBlocks.end ())
     return;
 
-  if (it->second.IsDirty( ))
+  if (it->second.IsDirty())
     {
-      mManager->StoreItems( baseBlockItem, itemsPerBlock, it->second.Data( ));
-      it->second.MarkClean( );
+      mManager->StoreItems( baseBlockItem, itemsPerBlock, it->second.Data());
+      it->second.MarkClean();
     }
 }
 
@@ -187,9 +187,9 @@ BlockCache::RefreshItem( const uint64_t item)
   if (it == mCachedBlocks.end ())
     return;
 
-  assert( it->second.IsDirty( ) == false);
+  assert( it->second.IsDirty() == false);
 
-  mManager->RetrieveItems( baseBlockItem, itemsPerBlock, it->second.Data( ));
+  mManager->RetrieveItems( baseBlockItem, itemsPerBlock, it->second.Data());
 }
 
 } //namespace pastra

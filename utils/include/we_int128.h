@@ -346,7 +346,7 @@ private:
   }
 
   const WE_I128&
-  lshift( )
+  lshift()
   {
     mHi <<= 1;
     mHi  |= (mLo >> 63) & 1;
@@ -356,7 +356,7 @@ private:
   }
 
   const WE_I128&
-  rshift( )
+  rshift()
   {
     const uint64_t one = 1;
 
@@ -486,9 +486,9 @@ private:
 
     for (uint_t i = 0; i < 128; ++i)
       {
-        reminder.lshift( );
+        reminder.lshift();
         reminder.mLo |= (quotient.mHi >> 63) & 1;
-        quotient.lshift( );
+        quotient.lshift();
 
         if (reminder >= op)
           {

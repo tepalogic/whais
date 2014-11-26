@@ -66,10 +66,10 @@ array_elems_count( SessionStack& stack, ISession&)
 {
   DArray array;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array);
+  stack[stack.Size() - 1].Operand().GetValue( array);
   stack.Pop (1);
 
-  stack.Push( DUInt64 (array.Count( )));
+  stack.Push( DUInt64 (array.Count()));
 
   return WOP_OK;
 }
@@ -81,8 +81,8 @@ array_sort( SessionStack& stack, ISession&)
   DArray array;
   DBool  reverse;
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( array);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( reverse);
+  stack[stack.Size() - 2].Operand().GetValue( array);
+  stack[stack.Size() - 1].Operand().GetValue( reverse);
   stack.Pop (2);
 
   array.Sort( reverse == DBool( true));
@@ -98,10 +98,10 @@ binary_array_search( const DArray&     array,
                      const T&          value,
                      const DInt64&     searchType)
 {
-  if (value.IsNull( ))
+  if (value.IsNull())
     return NOT_FOUND_VALUE;
 
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   assert( arrayCount > 0);
 
@@ -129,18 +129,18 @@ binary_array_search( const DArray&     array,
   else
     current = T ();
 
-  assert( current.IsNull( ) || (value <= current));
+  assert( current.IsNull() || (value <= current));
 
   if (current == value)
     return i;
 
-  if (searchType.IsNull( ) || (searchType.mValue == 0))
+  if (searchType.IsNull() || (searchType.mValue == 0))
     return NOT_FOUND_VALUE;
 
   else if (searchType.mValue < 0)
     return( i == 0) ? NOT_FOUND_VALUE : i - 1;
 
-  return i == array.Count( ) ? NOT_FOUND_VALUE : i;
+  return i == array.Count() ? NOT_FOUND_VALUE : i;
 }
 
 
@@ -150,9 +150,9 @@ binary_array_search_proc( SessionStack& stack, ISession&)
   uint64_t foundPos;
   DArray   array;
 
-  stack[stack.Size( ) - 3].Operand( ).GetValue( array);
+  stack[stack.Size() - 3].Operand().GetValue( array);
 
-  if (array.IsNull( ))
+  if (array.IsNull())
     {
       stack.Pop (3);
       stack.Push( DUInt64 ());
@@ -161,15 +161,15 @@ binary_array_search_proc( SessionStack& stack, ISession&)
     }
 
   DInt64 searchType;
-  stack[stack.Size( ) - 1].Operand( ).GetValue( searchType);
+  stack[stack.Size() - 1].Operand().GetValue( searchType);
 
-  switch( array.Type( ))
+  switch( array.Type())
     {
     case T_BOOL:
         {
           DBool value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -179,7 +179,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DChar value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -189,7 +189,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DDate value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -199,7 +199,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DDate value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -209,7 +209,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DDate value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -219,7 +219,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt8 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -229,7 +229,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt16 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -239,7 +239,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt32 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -249,7 +249,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt64 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -259,7 +259,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt8 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -269,7 +269,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt16 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -279,7 +279,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt32 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -289,7 +289,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt64 value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -299,7 +299,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DReal value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -309,7 +309,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
         {
           DReal value;
 
-          stack[stack.Size( ) - 2].Operand( ).GetValue( value);
+          stack[stack.Size() - 2].Operand().GetValue( value);
 
           foundPos = binary_array_search( array, value, searchType);
         }
@@ -330,10 +330,10 @@ template<typename T> uint64_t
 unsorted_array_search( const DArray&     array,
                        const T&          value)
 {
-  if (value.IsNull( ))
+  if (value.IsNull())
     return NOT_FOUND_VALUE;
 
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   assert( arrayCount > 0);
 
@@ -358,9 +358,9 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
   uint64_t foundPos;
   DArray   array;
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( array);
+  stack[stack.Size() - 2].Operand().GetValue( array);
 
-  if (array.IsNull( ))
+  if (array.IsNull())
     {
       stack.Pop (2);
       stack.Push( DUInt64 ());
@@ -368,13 +368,13 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  switch( array.Type( ))
+  switch( array.Type())
     {
     case T_BOOL:
         {
           DBool value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -384,7 +384,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DChar value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -394,7 +394,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DDate value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -404,7 +404,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DDate value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -414,7 +414,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DDate value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -424,7 +424,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt8 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -434,7 +434,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt16 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -444,7 +444,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt32 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -454,7 +454,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DInt64 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -464,7 +464,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt8 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -474,7 +474,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt16 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -484,7 +484,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt32 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -494,7 +494,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DUInt64 value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -504,7 +504,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DReal value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -514,7 +514,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
         {
           DReal value;
 
-          stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+          stack[stack.Size() - 1].Operand().GetValue( value);
 
           foundPos = unsorted_array_search( array, value);
         }
@@ -534,7 +534,7 @@ unsorted_array_search_proc( SessionStack& stack, ISession&)
 template<typename T> uint64_t
 retrieve_minim_value( const DArray& array)
 {
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   uint64_t pos      = 0;
   uint64_t foundPos = NOT_FOUND_VALUE;
@@ -560,7 +560,7 @@ retrieve_minim_value( const DArray& array)
 template<typename T> uint64_t
 retrieve_maxim_value( const DArray& array)
 {
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   uint64_t pos      = 0;
   uint64_t foundPos = NOT_FOUND_VALUE;
@@ -589,16 +589,16 @@ search_minmax( SessionStack& stack, ISession&)
   uint64_t foundPos;
   DArray   array;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array);
+  stack[stack.Size() - 1].Operand().GetValue( array);
   stack.Pop (1);
 
-  if (array.IsNull( ))
+  if (array.IsNull())
     {
       stack.Push( DUInt64 ());
       return WOP_OK;
     }
 
-   switch( array.Type( ))
+   switch( array.Type())
     {
     case T_BOOL:
         {
@@ -734,7 +734,7 @@ search_minmax( SessionStack& stack, ISession&)
 template<typename T> DRichReal
 compute_integer_array_average_value( const DArray& array)
 {
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   assert( arrayCount > 0);
 
@@ -758,7 +758,7 @@ compute_integer_array_average_value( const DArray& array)
 template<typename T> DRichReal
 compute_real_array_average_value( const DArray& array)
 {
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   assert( arrayCount > 0);
 
@@ -771,8 +771,8 @@ compute_real_array_average_value( const DArray& array)
 
       const RICHREAL_T temp = currentValue.mValue;
 
-      integerSum    += temp.Integer( );
-      fractionalSum += temp.Fractional( );
+      integerSum    += temp.Integer();
+      fractionalSum += temp.Fractional();
     }
 
   integerSum    += fractionalSum / DBS_RICHREAL_PREC;
@@ -792,17 +792,17 @@ compute_array_average( SessionStack& stack, ISession&)
   DArray    array;
   DRichReal result;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array);
+  stack[stack.Size() - 1].Operand().GetValue( array);
   stack.Pop (1);
 
-  if (array.IsNull( ))
+  if (array.IsNull())
     {
       stack.Push( result);
 
       return WOP_OK;
     }
 
-  switch( array.Type( ))
+  switch( array.Type())
     {
     case T_INT8:
       result = compute_integer_array_average_value<DInt8> (array);
@@ -861,13 +861,13 @@ intersect_arrays( DArray& ar1, DArray ar2)
 {
   DArray result;
 
-  assert( ! ar1.IsNull( ));
-  assert( ! ar2.IsNull( ));
+  assert( ! ar1.IsNull());
+  assert( ! ar2.IsNull());
 
-  ar1.Sort( );
-  ar2.Sort( );
+  ar1.Sort();
+  ar2.Sort();
 
-  int64_t  i = ar1.Count( ) - 1, j = ar2.Count( ) - 1;
+  int64_t  i = ar1.Count() - 1, j = ar2.Count() - 1;
   while(  (0 <= i) && (0 <= j))
     {
       T ti, tj;
@@ -899,30 +899,30 @@ proc_interesect_arrays( SessionStack& stack, ISession&)
   DArray  array1, array2;
   DArray  result;
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( array1);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array2);
+  stack[stack.Size() - 2].Operand().GetValue( array1);
+  stack[stack.Size() - 1].Operand().GetValue( array2);
   stack.Pop (2);
 
-  if (array1.Type( ) != array2.Type( ))
+  if (array1.Type() != array2.Type())
     {
       throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                             "Intersection requires array of the same type.");
     }
 
-  if (array1.IsNull( ))
+  if (array1.IsNull())
     {
       stack.Push( result);
 
       return WOP_OK;
     }
-  else if (array2.IsNull( ))
+  else if (array2.IsNull())
     {
       stack.Push( array1);
 
       return WOP_OK;
     }
 
-  switch( array1.Type( ))
+  switch( array1.Type())
     {
     case T_BOOL:
       result = intersect_arrays<DBool> (array1, array2);
@@ -996,13 +996,13 @@ diff_arrays( DArray& ar1, DArray ar2)
 {
   DArray result;
 
-  assert( ! ar1.IsNull( ));
-  assert( ! ar2.IsNull( ));
+  assert( ! ar1.IsNull());
+  assert( ! ar2.IsNull());
 
-  ar1.Sort( );
-  ar2.Sort( );
+  ar1.Sort();
+  ar2.Sort();
 
-  int64_t  i = ar1.Count( ) - 1, j = ar2.Count( ) - 1;
+  int64_t  i = ar1.Count() - 1, j = ar2.Count() - 1;
   while(  (0 <= i) && (0 <= j))
     {
       T ti, tj;
@@ -1044,30 +1044,30 @@ proc_diff_arrays( SessionStack& stack, ISession&)
   DArray  array1, array2;
   DArray  result;
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( array1);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array2);
+  stack[stack.Size() - 2].Operand().GetValue( array1);
+  stack[stack.Size() - 1].Operand().GetValue( array2);
   stack.Pop (2);
 
-  if (array1.Type( ) != array2.Type( ))
+  if (array1.Type() != array2.Type())
     {
       throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                             "Differentiation requires arrays of the same type.");
     }
 
-  if (array1.IsNull( ))
+  if (array1.IsNull())
     {
       stack.Push( result);
 
       return WOP_OK;
     }
-  else if (array2.IsNull( ))
+  else if (array2.IsNull())
     {
       stack.Push( array1);
 
       return WOP_OK;
     }
 
-  switch( array1.Type( ))
+  switch( array1.Type())
     {
     case T_BOOL:
       result = diff_arrays<DBool> (array1, array2);
@@ -1141,7 +1141,7 @@ union_arrays( DArray& ar1, DArray ar2)
 {
   DArray result = ar1;
 
-  const uint64_t ar2Count = ar2.Count( );
+  const uint64_t ar2Count = ar2.Count();
 
   for (uint64_t i = 0; i < ar2Count; ++i)
     {
@@ -1161,30 +1161,30 @@ proc_union_arrays( SessionStack& stack, ISession&)
   DArray  array1, array2;
   DArray  result;
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( array1);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array2);
+  stack[stack.Size() - 2].Operand().GetValue( array1);
+  stack[stack.Size() - 1].Operand().GetValue( array2);
   stack.Pop (2);
 
-  if (array1.Type( ) != array2.Type( ))
+  if (array1.Type() != array2.Type())
     {
       throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                             "Union requires arrays of the same type.");
     }
 
-  if (array1.IsNull( ))
+  if (array1.IsNull())
     {
       stack.Push( result);
 
       return WOP_OK;
     }
-  else if (array2.IsNull( ))
+  else if (array2.IsNull())
     {
       stack.Push( array1);
 
       return WOP_OK;
     }
 
-  switch( array1.Type( ))
+  switch( array1.Type())
     {
     case T_BOOL:
       result = union_arrays<DBool> (array1, array2);
@@ -1258,20 +1258,20 @@ proc_array_pushback( SessionStack& stack, ISession&)
 {
   DArray array;
 
-  IOperand& opArray = stack[stack.Size( ) - 2].Operand( );
-  IOperand& opValue = stack[stack.Size( ) - 1].Operand( );
+  IOperand& opArray = stack[stack.Size() - 2].Operand();
+  IOperand& opValue = stack[stack.Size() - 1].Operand();
 
-  if (IS_TABLE( opValue.GetType( ))
-      || IS_ARRAY( opValue.GetType( )))
+  if (IS_TABLE( opValue.GetType())
+      || IS_ARRAY( opValue.GetType()))
     {
       throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE));
     }
 
   opArray.GetValue( array);
 
-  const uint_t type = (array.Type( ) != T_UNDETERMINED) ?
-                        array.Type( ) :
-                        GET_BASIC_TYPE( opValue.GetType( ));
+  const uint_t type = (array.Type() != T_UNDETERMINED) ?
+                        array.Type() :
+                        GET_BASIC_TYPE( opValue.GetType());
   switch( type)
     {
     case T_BOOL:
@@ -1289,7 +1289,7 @@ proc_array_pushback( SessionStack& stack, ISession&)
 
           opValue.GetValue( value);
 
-          if (! value.IsNull( ))
+          if (! value.IsNull())
             array.Add(value);
         }
       break;
@@ -1430,20 +1430,20 @@ proc_array_truncate( SessionStack& stack, ISession&)
   DArray      array;
   DInt64      newArraySize;
 
-  IOperand&   refOp = stack[stack.Size( ) - 2].Operand( );
+  IOperand&   refOp = stack[stack.Size() - 2].Operand();
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( array);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( newArraySize);
+  stack[stack.Size() - 2].Operand().GetValue( array);
+  stack[stack.Size() - 1].Operand().GetValue( newArraySize);
 
-  if (array.IsNull( ) || newArraySize.IsNull( ))
+  if (array.IsNull() || newArraySize.IsNull())
     {
       stack.Pop (2);
-      stack.Push( DUInt64 (array.Count( )));
+      stack.Push( DUInt64 (array.Count()));
 
       return WOP_OK;
     }
 
-  for (int64_t i = array.Count( ) - 1;
+  for (int64_t i = array.Count() - 1;
        MAX (newArraySize.mValue, 0) <= i;
        --i)
     {
@@ -1464,7 +1464,7 @@ compute_array_hash( const DArray& array)
 {
   uint8_t key[512];
 
-  const uint64_t arrayCount = array.Count( );
+  const uint64_t arrayCount = array.Count();
 
   assert( arrayCount > 0);
 
@@ -1490,17 +1490,17 @@ proc_hash_array( SessionStack& stack, ISession&)
   DArray   array;
   DUInt64  result;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( array);
+  stack[stack.Size() - 1].Operand().GetValue( array);
   stack.Pop (1);
 
-  if (array.IsNull( ))
+  if (array.IsNull())
     {
       stack.Push( result);
 
       return WOP_OK;
     }
 
-  switch( array.Type( ))
+  switch( array.Type())
     {
     case T_BOOL:
       result = DUInt64 (compute_array_hash<DBool> (array));
@@ -1570,7 +1570,7 @@ proc_hash_array( SessionStack& stack, ISession&)
 
 
 WLIB_STATUS
-base_arrays_init( )
+base_arrays_init()
 {
 
   static const uint8_t* arrayCountLocals[] = {

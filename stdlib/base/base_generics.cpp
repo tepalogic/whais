@@ -95,9 +95,9 @@ get_prev_value( SessionStack& stack, ISession& )
 {
   T value;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+  stack[stack.Size() - 1].Operand().GetValue( value);
 
-  value = value.Prev( );
+  value = value.Prev();
 
   stack.Pop (1);
   stack.Push( value);
@@ -112,9 +112,9 @@ get_next_value( SessionStack& stack, ISession& )
 {
   T value;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+  stack[stack.Size() - 1].Operand().GetValue( value);
 
-  value = value.Next( );
+  value = value.Next();
 
   stack.Pop (1);
   stack.Push( value);
@@ -128,10 +128,10 @@ sleep( SessionStack& stack, ISession&)
 {
   DUInt64 ms;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( ms);
+  stack[stack.Size() - 1].Operand().GetValue( ms);
 
-  if (ms.IsNull( ) || (ms.mValue == 0))
-    wh_yield( );
+  if (ms.IsNull() || (ms.mValue == 0))
+    wh_yield();
 
   else
     wh_sleep( ms.mValue);
@@ -152,15 +152,15 @@ write_log( SessionStack& stack, ISession& session)
 
   utf8Reserved[0] = 0;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( text);
+  stack[stack.Size() - 1].Operand().GetValue( text);
 
-  const uint64_t textRawSize = text.RawSize( );
+  const uint64_t textRawSize = text.RawSize();
   if (textRawSize < sizeof( utf8Reserved) - 1)
     {
       text.RawRead( 0, textRawSize, utf8Reserved);
       utf8Reserved[textRawSize] = 0;
 
-      session.GetLogger( ).Log (LOG_INFO, _RC (const char*, utf8Reserved));
+      session.GetLogger().Log (LOG_INFO, _RC (const char*, utf8Reserved));
       result = true;
     }
   else
@@ -180,7 +180,7 @@ write_log( SessionStack& stack, ISession& session)
 
           offset += chunkSize;
         }
-      session.GetLogger( ).Log (LOG_INFO, logEntry.str ());
+      session.GetLogger().Log (LOG_INFO, logEntry.str ());
       result = true;
     }
 
@@ -196,9 +196,9 @@ ceil( SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+  stack[stack.Size() - 1].Operand().GetValue( value);
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       stack.Pop (1);
       stack.Push( DInt64 ());
@@ -209,13 +209,13 @@ ceil( SessionStack& stack, ISession& session)
   int64_t result;
 
   if (value < DRichReal( RICHREAL_T( 0, 0, DBS_RICHREAL_PREC)))
-    result = value.mValue.Integer( );
+    result = value.mValue.Integer();
 
-  else if (value.mValue.Fractional( ) != 0)
-    result = value.mValue.Integer( ) + 1;
+  else if (value.mValue.Fractional() != 0)
+    result = value.mValue.Integer() + 1;
 
   else
-    result =value.mValue.Integer( );
+    result =value.mValue.Integer();
 
   stack.Pop (1);
   stack.Push( DInt64 (result));
@@ -229,9 +229,9 @@ floor( SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+  stack[stack.Size() - 1].Operand().GetValue( value);
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       stack.Pop (1);
       stack.Push( DInt64 ());
@@ -242,13 +242,13 @@ floor( SessionStack& stack, ISession& session)
   int64_t result;
 
   if (DRichReal( RICHREAL_T( 0, 0, DBS_RICHREAL_PREC)) <= value)
-    result = value.mValue.Integer( );
+    result = value.mValue.Integer();
 
-  else if (value.mValue.Fractional( ) != 0)
-    result = value.mValue.Integer( ) - 1;
+  else if (value.mValue.Fractional() != 0)
+    result = value.mValue.Integer() - 1;
 
   else
-    result =value.mValue.Integer( );
+    result =value.mValue.Integer();
 
   stack.Pop (1);
   stack.Push( DInt64 (result));
@@ -262,9 +262,9 @@ round( SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+  stack[stack.Size() - 1].Operand().GetValue( value);
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       stack.Pop (1);
       stack.Push( DInt64 ());
@@ -276,17 +276,17 @@ round( SessionStack& stack, ISession& session)
 
   if (DRichReal( RICHREAL_T( 0, 0, DBS_RICHREAL_PREC)) <= value)
     {
-      result = value.mValue.Integer( );
+      result = value.mValue.Integer();
 
-      if (value.mValue.Fractional( ) >= (5 * value.mValue.Precision( ) / 10))
+      if (value.mValue.Fractional() >= (5 * value.mValue.Precision() / 10))
         ++result;
     }
 
   else
     {
-      result = value.mValue.Integer( );
+      result = value.mValue.Integer();
 
-      if (value.mValue.Fractional( ) < (-5 * value.mValue.Precision( ) / 10))
+      if (value.mValue.Fractional() < (-5 * value.mValue.Precision() / 10))
         --result;
     }
 
@@ -302,9 +302,9 @@ abs (SessionStack& stack, ISession& session)
 {
   DInt64 value;
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( value);
+  stack[stack.Size() - 1].Operand().GetValue( value);
 
-  if (value.IsNull( ) || (value.mValue >= 0))
+  if (value.IsNull() || (value.mValue >= 0))
     {
       stack.Pop (1);
       stack.Push( value);
@@ -320,7 +320,7 @@ abs (SessionStack& stack, ISession& session)
 
 
 WLIB_STATUS
-base_constants_init( )
+base_constants_init()
 {
   static const uint8_t* localsBType[]     = { gBoolType, gBoolType };
   static const uint8_t* localsCType[]     = { gCharType, gCharType };

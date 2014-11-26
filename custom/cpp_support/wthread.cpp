@@ -34,7 +34,7 @@ namespace whais
 
 
 
-Lock::Lock( )
+Lock::Lock()
 {
   const uint_t result = wh_lock_init( &mLock);
 
@@ -43,7 +43,7 @@ Lock::Lock( )
 }
 
 
-Lock::~Lock( )
+Lock::~Lock()
 {
   const uint_t result = wh_lock_destroy( &mLock);
 
@@ -53,7 +53,7 @@ Lock::~Lock( )
 
 
 void
-Lock::Acquire( )
+Lock::Acquire()
 {
   const uint_t result = wh_lock_acquire( &mLock);
   if (result != WOP_OK)
@@ -62,7 +62,7 @@ Lock::Acquire( )
 
 
 void
-Lock::Release( )
+Lock::Release()
 {
   const uint_t result = wh_lock_release( &mLock);
 
@@ -73,12 +73,12 @@ Lock::Release( )
 
 
 
-Thread::Thread( )
+Thread::Thread()
   : mRoutine( NULL),
     mRoutineArgs( NULL),
     mException( NULL),
     mThread( 0),
-    mLock( ),
+    mLock(),
     mUnkExceptSignaled( false),
     mIgnoreExceptions( false),
     mEnded( true),
@@ -92,7 +92,7 @@ void
 Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
 {
   //Wait for the the previous thread to be cleared.
-  WaitToEnd( );
+  WaitToEnd();
 
   assert( mEnded);
   assert( mNeedsClean == false);
@@ -117,7 +117,7 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
 }
 
 
-Thread::~Thread( )
+Thread::~Thread()
 {
   WaitToEnd( false);
 
@@ -136,7 +136,7 @@ Thread::WaitToEnd( const bool throwPending)
   //acquired the lock( if it did not then spin), in case this method was
   //called to soon.
   while(  ! mStarted)
-    wh_yield( );
+    wh_yield();
 
   //Wait till the spawned thread releases the lock.
   LockRAII holder( mLock);
@@ -149,28 +149,28 @@ Thread::WaitToEnd( const bool throwPending)
   mNeedsClean = false;
 
   if (throwPending)
-    ThrowPendingException( );
+    ThrowPendingException();
 }
 
 
 void
-Thread::ThrowPendingException( )
+Thread::ThrowPendingException()
 {
   assert( mEnded);
 
-  if (HasExceptionPending( ) == false)
+  if (HasExceptionPending() == false)
     return;
 
   if (mUnkExceptSignaled)
     {
-      DiscardException( );
+      DiscardException();
       throw ThreadException( _EXTRA( WOP_UNKNOW));
     }
 
   if (mException != NULL)
     {
-      Exception* clone = mException->Clone( );
-      DiscardException( );
+      Exception* clone = mException->Clone();
+      DiscardException();
 
       throw clone;
     }
@@ -183,7 +183,7 @@ Thread::ThreadWrapperRoutine( void* const args)
   Thread* const th = _RC (Thread*, args);
 
   th->mEnded = false;
-  th->mLock.Acquire( );
+  th->mLock.Acquire();
   th->mStarted = true; //Signal the we grabbed the lock
 
   try
@@ -193,7 +193,7 @@ Thread::ThreadWrapperRoutine( void* const args)
   catch( Exception &e)
   {
     if (th->mIgnoreExceptions == false)
-      th->mException = e.Clone( );
+      th->mException = e.Clone();
   }
   catch( Exception* pE)
   {
@@ -209,7 +209,7 @@ Thread::ThreadWrapperRoutine( void* const args)
   assert( th->mEnded == false);
 
   th->mEnded = true;
-  th->mLock.Release( );
+  th->mLock.Release();
 }
 
 

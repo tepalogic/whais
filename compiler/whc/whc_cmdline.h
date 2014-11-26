@@ -45,45 +45,45 @@ class CmdLineParser
 {
 public:
   CmdLineParser( int argc, char **argv);
-  ~CmdLineParser( );
+  ~CmdLineParser();
 
-  const char* SourceFile( ) const
+  const char* SourceFile() const
   {
     return mSourceFile;
   }
 
-  const char* OutputFile( ) const
+  const char* OutputFile() const
   {
     return mOutputFile;
   }
 
 
-  const bool JustPreprocess( ) const
+  const bool JustPreprocess() const
   {
     return mPreprocessOnly;
   }
 
-  const bool BuildDependencies( ) const
+  const bool BuildDependencies() const
   {
     return mBuildDependencies;
   }
 
-  const std::vector<std::string>& InclusionPaths( ) const
+  const std::vector<std::string>& InclusionPaths() const
   {
     return mInclusionPaths;
   }
 
-  const std::vector<ReplacementTag>& ReplacementTags( ) const
+  const std::vector<ReplacementTag>& ReplacementTags() const
   {
     return mReplacementTags;
   }
 
 private:
-  void Parse( );
+  void Parse();
 
-  void DisplayUsage( ) const;
+  void DisplayUsage() const;
 
-  void CheckArguments( );
+  void CheckArguments();
 
   void AddInclusionPaths( const char* const paths);
 
@@ -111,11 +111,11 @@ public:
                     const char*         fmtMsg = NULL,
                     ... );
 
-  virtual Exception* Clone( ) const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type( ) const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description( ) const;
+  virtual const char* Description() const;
 };
 
 } //namespace whc

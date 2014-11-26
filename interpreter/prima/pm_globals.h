@@ -53,17 +53,17 @@ class GlobalsManager
 public:
   GlobalsManager( NameSpace& space)
     : mNames( space),
-      mIdentifiers( ),
-      mStorage( ),
-      mGlobalsEntrys( )
+      mIdentifiers(),
+      mStorage(),
+      mGlobalsEntrys()
   {
   }
 
-  ~GlobalsManager( );
+  ~GlobalsManager();
 
-  uint_t Count( ) const
+  uint_t Count() const
   {
-    return mGlobalsEntrys.size( );
+    return mGlobalsEntrys.size();
   }
 
   uint32_t AddGlobal( const uint8_t* const name,

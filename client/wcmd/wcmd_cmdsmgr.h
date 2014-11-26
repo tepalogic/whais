@@ -52,7 +52,7 @@ struct CmdEntry
 
 
 void
-InitCmdManager( );
+InitCmdManager();
 
 
 void

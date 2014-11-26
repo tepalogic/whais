@@ -41,7 +41,7 @@ extern whais::WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
 
 whais::WLIB_STATUS
-base_fields_init( );
+base_fields_init();
 
 #endif /* BASE_FIELDS_H_ */
 

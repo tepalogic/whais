@@ -196,13 +196,13 @@ send_raw_frame( struct INTERNAL_HANDLER* const hnd,
       uint8_t  prev, i;
 
       while( frameSize % sizeof( uint32_t) != 0)
-        hnd->data[frameSize++] = wh_rnd( ) & 0xFF;
+        hnd->data[frameSize++] = wh_rnd() & 0xFF;
 
-      firstKing  = wh_rnd( ) & 0xFFFFFFFF;
+      firstKing  = wh_rnd() & 0xFFFFFFFF;
       store_le_int32 (firstKing,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_FIRST_KING_OFF);
 
-      secondKing = wh_rnd( ) & 0xFFFFFFFF;
+      secondKing = wh_rnd() & 0xFFFFFFFF;
       store_le_int32 (secondKing,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
 
@@ -217,7 +217,7 @@ send_raw_frame( struct INTERNAL_HANDLER* const hnd,
       store_le_int16 (plainSize,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
 
-      store_le_int16 (wh_rnd( ) & 0xFFFF,
+      store_le_int16 (wh_rnd() & 0xFFFF,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
 
       wh_buff_3k_encode( firstKing,
@@ -354,7 +354,7 @@ send_command( struct INTERNAL_HANDLER* const hnd,
   uint_t         cs       = WCS_OK;
   uint16_t       chkSum   = 0;
 
-  hnd->clientCookie = wh_rnd( );
+  hnd->clientCookie = wh_rnd();
 
   for (index = 0; index < dataSize; index++)
     chkSum += data( hnd)[index];
@@ -2141,7 +2141,7 @@ WFlush( const WH_CONNECTION hnd)
   if (hnd_ == NULL)
     return WCS_INVALID_ARGS;
 
-  /* Currently WFlush( ) knows that only stack update commands are cached.
+  /* Currently WFlush() knows that only stack update commands are cached.
    * If the current frame holds a different command type, return the proper
    * error status. */
   else if (hnd_->buildingCmd != CMD_UPDATE_STACK)

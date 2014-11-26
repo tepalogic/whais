@@ -38,8 +38,8 @@ typedef uint32_t NODE_INDEX;
 class Serializer
 {
 private:
-  Serializer( );
-  ~Serializer( );
+  Serializer();
+  ~Serializer();
 
 public:
   static void Store( uint8_t* const dest, const DBool& value);

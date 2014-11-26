@@ -64,12 +64,12 @@ operator new (std::size_t size)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc( );
+    throw std::bad_alloc();
   return ptr;
 }
 
 void*
-operator new (std::size_t size, const std::nothrow_t&) throw( )
+operator new (std::size_t size, const std::nothrow_t&) throw ()
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc( size);
@@ -92,7 +92,7 @@ operator new (std::size_t size, const char* pFile, uint_t line)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc( );
+    throw std::bad_alloc();
   return ptr;
 }
 
@@ -107,12 +107,12 @@ operator new [] (std::size_t size)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc( );
+    throw std::bad_alloc();
   return ptr;
 }
 
 void*
-operator new[] (std::size_t size, const std::nothrow_t&) throw( )
+operator new[] (std::size_t size, const std::nothrow_t&) throw ()
 {
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc( size);
@@ -135,7 +135,7 @@ operator new [] (size_t size, const char* pFile, uint_t line)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc( );
+    throw std::bad_alloc();
   return ptr;
 }
 

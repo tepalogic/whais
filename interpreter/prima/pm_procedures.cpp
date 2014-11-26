@@ -56,21 +56,21 @@ ProcedureManager::AddProcedure( const uint8_t* const  name,
 
   Procedure entry;
 
-  entry.mId          = mProcsEntrys.size( );
+  entry.mId          = mProcsEntrys.size();
   entry.mLocalsCount = localsCount;
   entry.mArgsCount   = argsCount;
   entry.mSyncCount   = syncCount;
-  entry.mSyncIndex   = mSyncStmts.size( );
-  entry.mLocalsIndex = mLocalsValues.size( );
-  entry.mIdIndex     = mIdentifiers.size( );
-  entry.mTypeOff     = mLocalsTypes.size( );
-  entry.mCodeIndex   = mDefinitions.size( );
+  entry.mSyncIndex   = mSyncStmts.size();
+  entry.mLocalsIndex = mLocalsValues.size();
+  entry.mIdIndex     = mIdentifiers.size();
+  entry.mTypeOff     = mLocalsTypes.size();
+  entry.mCodeIndex   = mDefinitions.size();
   entry.mCodeSize    = codeSize;
   entry.mUnit        = unit;
   entry.mProcMgr     = this;
   entry.mNativeCode  = (unit == NULL) ? _RC (WLIB_PROCEDURE, code) : NULL;
 
-  const uint32_t result = mProcsEntrys.size( );
+  const uint32_t result = mProcsEntrys.size();
 
   mSyncStmts.insert( mSyncStmts.end(), syncCount, false);
   mLocalsValues.insert( mLocalsValues.end (),
@@ -93,7 +93,7 @@ uint32_t
 ProcedureManager::GetProcedure( const uint8_t* const name,
                                 const uint_t         nameLength) const
 {
-  for (uint32_t index = 0; index < mProcsEntrys.size( ); ++index)
+  for (uint32_t index = 0; index < mProcsEntrys.size(); ++index)
     {
       const char* const entryName =
               _RC (const char*, &mIdentifiers[mProcsEntrys[index].mIdIndex]);
@@ -113,9 +113,9 @@ ProcedureManager::GetProcedure( const uint32_t procId)
 {
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
-  assert( procedure < mProcsEntrys.size( ));
+  assert( procedure < mProcsEntrys.size());
 
-  if (procedure >= mProcsEntrys.size( ))
+  if (procedure >= mProcsEntrys.size())
     throw InterException( _EXTRA( InterException::INVALID_PROC_REQ));
 
   return mProcsEntrys[procedure];
@@ -125,7 +125,7 @@ ProcedureManager::GetProcedure( const uint32_t procId)
 const uint8_t*
 ProcedureManager::Name( const uint_t procId) const
 {
-  if (procId >= mProcsEntrys.size( ))
+  if (procId >= mProcsEntrys.size())
     throw InterException( _EXTRA( InterException::INVALID_PROC_REQ));
 
   return &mIdentifiers[mProcsEntrys[procId].mIdIndex];
@@ -136,7 +136,7 @@ ProcedureManager::ArgsCount( const uint_t procId) const
 {
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
-  if (procedure >= mProcsEntrys.size( ))
+  if (procedure >= mProcsEntrys.size())
     throw InterException( _EXTRA( InterException::INVALID_PROC_REQ));
 
   return mProcsEntrys[procedure].mArgsCount;
@@ -149,7 +149,7 @@ ProcedureManager::LocalValue( const uint_t   procId,
 {
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
-  if (procedure >= mProcsEntrys.size( ))
+  if (procedure >= mProcsEntrys.size())
     throw InterException( _EXTRA( InterException::INVALID_PROC_REQ));
 
   const Procedure& entry = mProcsEntrys[procedure];
@@ -167,9 +167,9 @@ ProcedureManager::LocalTypeDescription( const uint_t   procId,
 {
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
-  assert( procedure < mProcsEntrys.size( ));
+  assert( procedure < mProcsEntrys.size());
 
-  if (procedure >= mProcsEntrys.size( ))
+  if (procedure >= mProcsEntrys.size())
     throw InterException( _EXTRA( InterException::INVALID_PROC_REQ));
 
   const Procedure& entry = mProcsEntrys[procedure];
@@ -179,7 +179,7 @@ ProcedureManager::LocalTypeDescription( const uint_t   procId,
   if (local >= entry.mLocalsCount)
     throw InterException( _EXTRA( InterException::INVALID_LOCAL_REQ));
 
-  const TypeManager& typeMgr = mNameSpace.GetTypeManager( );
+  const TypeManager& typeMgr = mNameSpace.GetTypeManager();
 
   return typeMgr.TypeDescription( mLocalsTypes[entry.mTypeOff + local]);
 }
@@ -214,8 +214,8 @@ ProcedureManager::AquireSync( const Procedure& proc, const uint32_t sync)
       if (aquired)
         {
           //Some one has taken this before us! Prepare to try again!
-          holder.Release( );
-          wh_yield( );
+          holder.Release();
+          wh_yield();
         }
       else
         {

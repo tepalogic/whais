@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 
 WTime
-wh_get_currtime( )
+wh_get_currtime()
 {
   WTime      result;
   FILETIME   fileTime;
@@ -63,7 +63,7 @@ wh_get_currtime( )
 
 
 WTICKS
-wh_msec_ticks( )
+wh_msec_ticks()
 {
   return GetTickCount64 ();
 }

@@ -123,9 +123,9 @@ wh_thread_free( WH_THREAD thread)
 
 
 void
-wh_yield( )
+wh_yield()
 {
-  sched_yield( );
+  sched_yield();
 }
 
 

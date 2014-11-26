@@ -45,10 +45,10 @@ class INativeObject;
 class INTERP_SHL INativeObject
 {
 public:
-  virtual ~INativeObject( );
+  virtual ~INativeObject();
 
-  virtual void RegisterUser( ) = 0;
-  virtual void ReleaseUser( ) = 0;
+  virtual void RegisterUser() = 0;
+  virtual void ReleaseUser() = 0;
 };
 
 
@@ -57,13 +57,13 @@ class INTERP_SHL IOperand
   friend class StackValue;
 
 public:
-  IOperand( )
+  IOperand()
   {
   }
 
-  virtual ~IOperand( );
+  virtual ~IOperand();
 
-  virtual bool IsNull( ) const = 0;
+  virtual bool IsNull() const = 0;
 
   virtual void GetValue( DBool& outValue) const = 0;
   virtual void GetValue( DChar& outValue) const = 0;
@@ -127,25 +127,25 @@ public:
   virtual void SelfOr( const DInt64& value) = 0;
   virtual void SelfOr( const DBool& value) = 0;
 
-  virtual uint_t GetType( ) = 0;
+  virtual uint_t GetType() = 0;
 
-  virtual FIELD_INDEX GetField( ) = 0;
+  virtual FIELD_INDEX GetField() = 0;
 
-  virtual ITable& GetTable( ) = 0;
+  virtual ITable& GetTable() = 0;
 
-  virtual StackValue GetTableValue( ) = 0;
+  virtual StackValue GetTableValue() = 0;
 
   virtual StackValue GetFieldAt( const FIELD_INDEX field) = 0;
 
   virtual StackValue GetValueAt( const uint64_t index) = 0;
 
-  virtual StackValue Duplicate( ) const = 0;
+  virtual StackValue Duplicate() const = 0;
 
   virtual void           NativeObject( INativeObject* const value) = 0;
-  virtual INativeObject& NativeObject( ) = 0;
+  virtual INativeObject& NativeObject() = 0;
 
 protected:
-  virtual void NotifyCopy( ) = 0;
+  virtual void NotifyCopy() = 0;
 };
 
 
@@ -165,40 +165,40 @@ public:
 
   StackValue( const StackValue& source)
   {
-    IOperand& op = _CC (StackValue&, source).Operand( );
+    IOperand& op = _CC (StackValue&, source).Operand();
 
-    op.NotifyCopy( );
+    op.NotifyCopy();
 
     memcpy( &mStorage, &source.mStorage, sizeof mStorage);
   }
 
-  ~StackValue( )
+  ~StackValue()
   {
-    Clear( );
+    Clear();
   }
 
   StackValue&
   operator= (const StackValue& source)
   {
-    IOperand& op = _CC (StackValue&, source).Operand( );
+    IOperand& op = _CC (StackValue&, source).Operand();
 
-    op.NotifyCopy( );
+    op.NotifyCopy();
 
-    Clear( );
+    Clear();
     memcpy( &mStorage, &source.mStorage, sizeof mStorage);
 
     return *this;
   }
 
-  IOperand& Operand( )
+  IOperand& Operand()
   {
     return *_RC (IOperand*, mStorage);
   }
 
 private:
-  void Clear( )
+  void Clear()
   {
-    Operand( ).~IOperand( );
+    Operand().~IOperand();
   }
 
   uint64_t mStorage[MAX_OP_QWORDS];
@@ -209,10 +209,10 @@ private:
 class INTERP_SHL SessionStack
 {
 public:
-  SessionStack( );
-  ~SessionStack( );
+  SessionStack();
+  ~SessionStack();
 
-  void  Push( );
+  void  Push();
   void  Push( const DBool& value);
   void  Push( const DChar& value);
   void  Push( const DDate& value);
@@ -236,7 +236,7 @@ public:
 
   void  Pop (const uint_t count);
 
-  size_t Size( ) const;
+  size_t Size() const;
 
   StackValue& operator[] (const uint_t index);
 

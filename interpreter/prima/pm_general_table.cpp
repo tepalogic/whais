@@ -32,28 +32,28 @@ namespace prima {
 
 
 
-GeneralTable::GeneralTable( )
-  : ITable( )
+GeneralTable::GeneralTable()
+  : ITable()
 {
 }
 
 
 bool
-GeneralTable::IsTemporal( ) const
+GeneralTable::IsTemporal() const
 {
   return true;
 }
 
 
 ITable&
-GeneralTable::Spawn( ) const
+GeneralTable::Spawn() const
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
 
 
 FIELD_INDEX
-GeneralTable::FieldsCount( )
+GeneralTable::FieldsCount()
 {
   return 0;
 }
@@ -74,14 +74,14 @@ GeneralTable::DescribeField( const FIELD_INDEX)
 
 
 ROW_INDEX
-GeneralTable::AllocatedRows( )
+GeneralTable::AllocatedRows()
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
 
 
 ROW_INDEX
-GeneralTable::AddRow( )
+GeneralTable::AddRow()
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
@@ -95,7 +95,7 @@ GeneralTable::GetReusableRow( const bool forceAdd)
 
 
 ROW_INDEX
-GeneralTable::ReusableRowsCount( )
+GeneralTable::ReusableRowsCount()
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
@@ -553,26 +553,26 @@ GeneralTable::MatchRows( const DRichReal&,
 
 
 void
-GeneralTable::Flush( )
+GeneralTable::Flush()
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
 
 
 void
-GeneralTable::LockTable( )
+GeneralTable::LockTable()
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
 
 void
-GeneralTable::UnlockTable( )
+GeneralTable::UnlockTable()
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
 
 GeneralTable&
-GeneralTable::Instance( )
+GeneralTable::Instance()
 {
   static GeneralTable singleton;
 

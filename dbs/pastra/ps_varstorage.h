@@ -51,7 +51,7 @@ public:
 
   static const uint_t  ENTRY_SIZE          = 48;
 
-  StoreEntry( )
+  StoreEntry()
   {
     memset( mPrevEntry, 0xFF, sizeof mPrevEntry);
     memset( mNextEntry, 0xFF, sizeof mPrevEntry);
@@ -76,17 +76,17 @@ public:
     store_le_int64 (entry, mNextEntry);
   }
 
-  bool IsDeleted( ) const
+  bool IsDeleted() const
   {
     return( load_le_int64 (mNextEntry) & ENTRY_DELETED_MASK) != 0;
   }
 
-  bool IsFirstEntry( ) const
+  bool IsFirstEntry() const
   {
     return( load_le_int64 (mNextEntry) & FIRST_RECORD_ENTRY) != 0;
   }
 
-  uint64_t PrevEntry( ) const
+  uint64_t PrevEntry() const
   {
     return load_le_int64 (mPrevEntry);
   }
@@ -96,7 +96,7 @@ public:
     store_le_int64 (content, mPrevEntry);
   }
 
-  uint64_t NextEntry( ) const
+  uint64_t NextEntry() const
   {
     return load_le_int64 (mNextEntry) &
              ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
@@ -116,7 +116,7 @@ public:
 
   uint_t Write( uint_t offset, uint_t count, const uint8_t* buffer);
 
-  static uint8_t Size( )
+  static uint8_t Size()
   {
     return ENTRY_SIZE;
   }
@@ -132,11 +132,11 @@ private:
 class VariableSizeStore : public IBlocksManager
 {
 public:
-  VariableSizeStore( );
+  VariableSizeStore();
 
-  void RegisterReference( );
+  void RegisterReference();
 
-  void ReleaseReference( );
+  void ReleaseReference();
 
   void Init( const char*       tempDir,
              const uint32_t    reservedMem);
@@ -145,9 +145,9 @@ public:
              const uint64_t     storeSize,
              const uint64_t     maxFileSize);
 
-  void Flush( );
+  void Flush();
 
-  void MarkForRemoval( );
+  void MarkForRemoval();
 
   uint64_t AddRecord( const uint8_t*      buffer,
                       const uint64_t      size);
@@ -188,7 +188,7 @@ public:
 
   void DecrementRecordRef( const uint64_t recordFirstEntry);
 
-  uint64_t Size( ) const;
+  uint64_t Size() const;
 
   virtual void StoreItems( uint64_t          firstItem,
                            uint_t            itemsCount,
@@ -198,7 +198,7 @@ public:
                               uint_t         itemsCount,
                               uint8_t*       to);
 
-  void PrepareToCheckStorage( );
+  void PrepareToCheckStorage();
 
   bool CheckArrayEntry( const uint64_t          recordFirstEntry,
                         const uint64_t          recordSize,
@@ -207,14 +207,14 @@ public:
   bool CheckTextEntry( const uint64_t   recordFirstEntry,
                        const uint64_t   recordSize);
 
-  void ConcludeStorageCheck( );
+  void ConcludeStorageCheck();
 
 private:
   void FinishInit( const bool nonPersitentData);
 
   uint64_t AllocateEntry( const uint64_t prevEntryId);
 
-  uint64_t ExtentFreeList( );
+  uint64_t ExtentFreeList();
 
   void RemoveRecord( uint64_t recordFirstEntry);
 

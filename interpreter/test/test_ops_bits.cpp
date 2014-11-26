@@ -121,13 +121,13 @@ test_op_notb( Session& session)
 
   session.ExecuteProcedure( bool_not, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBool result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.IsNull( ) || (result.mValue == value.mValue))
+  if (result.IsNull() || (result.mValue == value.mValue))
     return false;
 
   return true;
@@ -145,13 +145,13 @@ test_op_not( Session& session)
 
   session.ExecuteProcedure( int_not, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt16 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.IsNull( ) || (result.mValue != ~value.mValue))
+  if (result.IsNull() || (result.mValue != ~value.mValue))
     return false;
 
   return true;
@@ -172,13 +172,13 @@ test_op_andXX( Session&       session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.IsNull( ) || (result != DBS_T( val1.mValue & val2.mValue)))
+  if (result.IsNull() || (result != DBS_T( val1.mValue & val2.mValue)))
     return false;
 
   return true;
@@ -199,13 +199,13 @@ test_op_orXX( Session&        session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.IsNull( ) || (result != DBS_T( val1.mValue | val2.mValue)))
+  if (result.IsNull() || (result != DBS_T( val1.mValue | val2.mValue)))
     return false;
 
   return true;
@@ -226,13 +226,13 @@ test_op_xorXX( Session&       session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.IsNull( ) || (result != DBS_T( val1.mValue ^ val2.mValue)))
+  if (result.IsNull() || (result != DBS_T( val1.mValue ^ val2.mValue)))
     return false;
 
   return true;
@@ -240,16 +240,16 @@ test_op_xorXX( Session&       session,
 
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   DBSCreateDatabase( admin);
-  InitInterpreter( );
+  InitInterpreter();
 
   {
     const DBool  val1_b (true), val2_b (false);
@@ -300,9 +300,9 @@ main( )
     ReleaseInstance( commonSession);
   }
 
-  CleanInterpreter( );
+  CleanInterpreter();
   DBSRemoveDatabase( admin);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

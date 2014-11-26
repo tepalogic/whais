@@ -79,8 +79,8 @@ FIELD_INDEX f_t;
 static bool
 operator< (const DText& text1, const DText& text2)
 {
-  const uint64_t text1Count = text1.Count( );
-  const uint64_t text2Count = text2.Count( );
+  const uint64_t text1Count = text1.Count();
+  const uint64_t text2Count = text2.Count();
 
   uint64_t i, j;
 
@@ -105,38 +105,38 @@ operator< (const DText& text1, const DText& text2)
 }
 
 DDateTime
-get_random_datetime( )
+get_random_datetime()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
-  uint8_t hour  = wh_rnd( ) % 24;
-  uint8_t mins  = wh_rnd( ) % 60;
-  uint8_t secs  = wh_rnd( ) % 60;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
+  uint8_t hour  = wh_rnd() % 24;
+  uint8_t mins  = wh_rnd() % 60;
+  uint8_t secs  = wh_rnd() % 60;
 
   return DDateTime( year, month, day, hour, mins, secs);
 }
 
 DHiresTime
-get_random_hirestime( )
+get_random_hirestime()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
-  uint8_t hour  = wh_rnd( ) % 24;
-  uint8_t mins  = wh_rnd( ) % 60;
-  uint8_t secs  = wh_rnd( ) % 60;
-  uint32_t  mic = wh_rnd( ) % 1000000;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
+  uint8_t hour  = wh_rnd() % 24;
+  uint8_t mins  = wh_rnd() % 60;
+  uint8_t secs  = wh_rnd() % 60;
+  uint32_t  mic = wh_rnd() % 1000000;
 
   return DHiresTime( year, month, day, hour, mins, secs, mic);
 }
 
 DDate
-get_random_date( )
+get_random_date()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
 
   return DDate( year, month, day);
 }
@@ -147,7 +147,7 @@ get_random_text( uint_t count)
   DText result;
 
   while( count-- != 0)
-    result.Append( DChar( wh_rnd( ) % 300 + 1));
+    result.Append( DChar( wh_rnd() % 300 + 1));
 
   return result;
 }
@@ -179,48 +179,48 @@ build_reference_table( IDBSHandler& dbs, const uint_t rowsCount)
 
   for (uint_t row = 0; row < rowsCount; ++row)
     {
-      const DChar c (wh_rnd( ) % 0x300 + 1);
-      const DDate d (get_random_date( ));
-      const DDateTime dt (get_random_datetime( ));
-      const DHiresTime ht (get_random_hirestime( ));
+      const DChar c (wh_rnd() % 0x300 + 1);
+      const DDate d (get_random_date());
+      const DDateTime dt (get_random_datetime());
+      const DHiresTime ht (get_random_hirestime());
 
-      const DReal r (DBS_REAL_T( wh_rnd( ) % 100000,
-                                 wh_rnd( ) % 100000,
+      const DReal r (DBS_REAL_T( wh_rnd() % 100000,
+                                 wh_rnd() % 100000,
                                  DBS_REAL_PREC));
-      const DRichReal rr (DBS_RICHREAL_T( wh_rnd( ) % 10000000,
-                                          wh_rnd( ) % 10000000,
+      const DRichReal rr (DBS_RICHREAL_T( wh_rnd() % 10000000,
+                                          wh_rnd() % 10000000,
                                           DBS_RICHREAL_PREC));
-      const DInt8  i8 (wh_rnd( ));
-      const DInt16 i16 (wh_rnd( ));
-      const DInt32 i32 (wh_rnd( ));
-      const DInt64 i64 (wh_rnd( ));
+      const DInt8  i8 (wh_rnd());
+      const DInt16 i16 (wh_rnd());
+      const DInt32 i32 (wh_rnd());
+      const DInt64 i64 (wh_rnd());
 
-      const DUInt8  u8 (wh_rnd( ));
-      const DUInt16 u16 (wh_rnd( ));
-      const DUInt32 u32 (wh_rnd( ));
-      const DUInt64 u64 (wh_rnd( ));
+      const DUInt8  u8 (wh_rnd());
+      const DUInt16 u16 (wh_rnd());
+      const DUInt32 u32 (wh_rnd());
+      const DUInt64 u64 (wh_rnd());
 
-      const DText t (get_random_text( wh_rnd( ) % 32));
+      const DText t (get_random_text( wh_rnd() % 32));
 
       result.Set (row, f_a, DUInt32 (row));
-      result.Set (row, f_c, (row % (wh_rnd( ) % 4 + 1)) ? DChar( ) : c);
+      result.Set (row, f_c, (row % (wh_rnd() % 4 + 1)) ? DChar() : c);
 
-      result.Set (row, f_d, (row % (wh_rnd( ) % 4 + 1)) ? DDate( ) : d);
-      result.Set (row, f_dt, (row % (wh_rnd( ) % 4 + 1)) ? DDateTime( ) : dt);
-      result.Set (row, f_ht, (row % (wh_rnd( ) % 4 + 1)) ? DHiresTime( ) : ht);
+      result.Set (row, f_d, (row % (wh_rnd() % 4 + 1)) ? DDate() : d);
+      result.Set (row, f_dt, (row % (wh_rnd() % 4 + 1)) ? DDateTime() : dt);
+      result.Set (row, f_ht, (row % (wh_rnd() % 4 + 1)) ? DHiresTime() : ht);
 
-      result.Set (row, f_i8, (row % (wh_rnd( ) % 4 + 1)) ? DInt8 () : i8);
-      result.Set (row, f_i16, (row % (wh_rnd( ) % 4 + 1)) ? DInt16 () : i16);
-      result.Set (row, f_i32, (row % (wh_rnd( ) % 4 + 1)) ? DInt32 () : i32);
-      result.Set (row, f_i64, (row % (wh_rnd( ) % 4 + 1)) ? DInt64 () : i64);
+      result.Set (row, f_i8, (row % (wh_rnd() % 4 + 1)) ? DInt8 () : i8);
+      result.Set (row, f_i16, (row % (wh_rnd() % 4 + 1)) ? DInt16 () : i16);
+      result.Set (row, f_i32, (row % (wh_rnd() % 4 + 1)) ? DInt32 () : i32);
+      result.Set (row, f_i64, (row % (wh_rnd() % 4 + 1)) ? DInt64 () : i64);
 
-      result.Set (row, f_r, (row % (wh_rnd( ) % 4 + 1)) ? DReal( ) : r);
-      result.Set (row, f_rr, (row % (wh_rnd( ) % 4 + 1)) ? DRichReal( ) : rr);
+      result.Set (row, f_r, (row % (wh_rnd() % 4 + 1)) ? DReal() : r);
+      result.Set (row, f_rr, (row % (wh_rnd() % 4 + 1)) ? DRichReal() : rr);
 
-      result.Set (row, f_u8, (row % (wh_rnd( ) % 4 + 1)) ? DUInt8 () : u8);
-      result.Set (row, f_u16, (row % (wh_rnd( ) % 4 + 1)) ? DUInt16 () : u16);
-      result.Set (row, f_u32, (row % (wh_rnd( ) % 4 + 1)) ? DUInt32 () : u32);
-      result.Set (row, f_u64, (row % (wh_rnd( ) % 4 + 1)) ? DUInt64 () : u64);
+      result.Set (row, f_u8, (row % (wh_rnd() % 4 + 1)) ? DUInt8 () : u8);
+      result.Set (row, f_u16, (row % (wh_rnd() % 4 + 1)) ? DUInt16 () : u16);
+      result.Set (row, f_u32, (row % (wh_rnd() % 4 + 1)) ? DUInt32 () : u32);
+      result.Set (row, f_u64, (row % (wh_rnd() % 4 + 1)) ? DUInt64 () : u64);
 
       result.Set (row, f_t, t);
     }
@@ -233,7 +233,7 @@ build_reference_table( IDBSHandler& dbs, const uint_t rowsCount)
 static ITable&
 copy_table( IDBSHandler& dbs, ITable& originalTable)
 {
-  const uint_t rowsCount = originalTable.AllocatedRows( );
+  const uint_t rowsCount = originalTable.AllocatedRows();
 
   ITable& result = dbs.CreateTempTable( FIELDS_COUNT, fieldsDescs);
 
@@ -316,9 +316,9 @@ test_table_sort( ITable&           tableSorted,
                  const FIELD_INDEX field,
                  const bool        reverseSort)
 {
-  const uint64_t rowsCount = tableSorted.AllocatedRows( );
+  const uint64_t rowsCount = tableSorted.AllocatedRows();
 
-  if (rowsCount != tableOriginal.AllocatedRows( ))
+  if (rowsCount != tableOriginal.AllocatedRows())
     return false;
 
   T lastEtry;
@@ -338,7 +338,7 @@ test_table_sort( ITable&           tableSorted,
           else
             lastEtry = value;
 
-          if (rowValue.IsNull( ))
+          if (rowValue.IsNull())
             return false;
 
           tableOriginal.Get (rowValue.mValue, field, orgValue);
@@ -362,7 +362,7 @@ test_table_sort( ITable&           tableSorted,
           else
             lastEtry = value;
 
-          if (rowValue.IsNull( ))
+          if (rowValue.IsNull())
             return false;
 
           tableOriginal.Get (rowValue.mValue, field, orgValue);
@@ -395,7 +395,7 @@ check_field_sort( IDBSHandler&      dbs,
   else
     std::cout << "Starting the sort of field '" << fd.name << "'.\n";
 
-  table.Sort( field, 0, table.AllocatedRows( ) - 1, reverseSort);
+  table.Sort( field, 0, table.AllocatedRows() - 1, reverseSort);
 
   if (reverseSort)
     std::cout << "Ending the sort of field '" << fd.name << "' (reverse).\n";
@@ -547,7 +547,7 @@ main( int argc, char** argv)
     _elemsCount = atol( argv[1]);
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
     DBSCreateDatabase( db_name);
   }
 
@@ -692,7 +692,7 @@ main( int argc, char** argv)
 
   DBSReleaseDatabase( handler);
   DBSRemoveDatabase( db_name);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

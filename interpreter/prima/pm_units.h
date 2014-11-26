@@ -60,19 +60,19 @@ struct Unit
 class UnitsManager
 {
 public:
-  UnitsManager( )
-    : mUnits( )
+  UnitsManager()
+    : mUnits()
   {
   }
 
-  ~UnitsManager( );
+  ~UnitsManager();
 
   uint32_t AddUnit( const uint32_t      glbsCount,
                     const uint32_t      procsCount,
                     const uint8_t*      constData,
                     const uint32_t      constDataSize);
 
-  void RemoveLastUnit( );
+  void RemoveLastUnit();
 
   Unit& GetUnit( const uint32_t unitIndex);
 

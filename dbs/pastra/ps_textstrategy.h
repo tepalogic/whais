@@ -44,28 +44,28 @@ class RowFieldText;
 class ITextStrategy
 {
 public:
-  ITextStrategy( ) {};
-  virtual ~ITextStrategy( ) {};
+  ITextStrategy() {};
+  virtual ~ITextStrategy() {};
 
-  virtual uint_t ReferenceCount( ) const = 0;
+  virtual uint_t ReferenceCount() const = 0;
 
-  virtual void   IncreaseReferenceCount( ) = 0;
+  virtual void   IncreaseReferenceCount() = 0;
 
-  virtual void   DecreaseReferenceCount( ) = 0;
+  virtual void   DecreaseReferenceCount() = 0;
 
-  virtual uint_t ShareCount( ) const = 0;
+  virtual uint_t ShareCount() const = 0;
 
-  virtual void   IncreaseShareCount( ) = 0;
+  virtual void   IncreaseShareCount() = 0;
 
-  virtual void   DecreaseShareCount( ) = 0;
+  virtual void   DecreaseShareCount() = 0;
 
-  virtual uint64_t CharsCount( ) = 0;
+  virtual uint64_t CharsCount() = 0;
 
   virtual uint64_t CharsUntilOffset( const uint64_t offset) = 0;
 
   virtual uint64_t OffsetOfChar( const uint64_t index) = 0;
 
-  virtual uint64_t BytesCount( ) const = 0;
+  virtual uint64_t BytesCount() const = 0;
 
   virtual void Duplicate( ITextStrategy&  source,
                           const uint64_t  maxCharsCount) = 0;
@@ -94,11 +94,11 @@ public:
 
   virtual void TruncateUtf8 (const uint64_t newSize) = 0;
 
-  virtual bool                  IsRowValue( ) const = 0;
+  virtual bool                  IsRowValue() const = 0;
 
-  virtual pastra::TemporalText& GetTemporal( ) = 0;
+  virtual pastra::TemporalText& GetTemporal() = 0;
 
-  virtual pastra::RowFieldText& GetRow( ) = 0;
+  virtual pastra::RowFieldText& GetRow() = 0;
 
 protected:
 };
@@ -116,25 +116,25 @@ public:
   GenericText( uint64_t bytesSize);
 
   //Implementations of public ITextStrategy
-  virtual uint_t ReferenceCount( ) const;
+  virtual uint_t ReferenceCount() const;
 
-  virtual void   IncreaseReferenceCount( );
+  virtual void   IncreaseReferenceCount();
 
-  virtual void   DecreaseReferenceCount( );
+  virtual void   DecreaseReferenceCount();
 
-  virtual uint_t ShareCount( ) const;
+  virtual uint_t ShareCount() const;
 
-  virtual void   IncreaseShareCount( );
+  virtual void   IncreaseShareCount();
 
-  virtual void   DecreaseShareCount( );
+  virtual void   DecreaseShareCount();
 
-  virtual uint64_t CharsCount( );
+  virtual uint64_t CharsCount();
 
   virtual uint64_t CharsUntilOffset( const uint64_t offset);
 
   virtual uint64_t OffsetOfChar( const uint64_t index);
 
-  virtual uint64_t BytesCount( ) const;
+  virtual uint64_t BytesCount() const;
 
   virtual void Duplicate( ITextStrategy&  source,
                           const uint64_t  bytesCount);
@@ -153,20 +153,20 @@ public:
                                 const uint64_t   index,
                                 ITextStrategy**  inoutStrategy);
 
-  virtual bool IsRowValue( ) const;
+  virtual bool IsRowValue() const;
 
-  virtual TemporalText& GetTemporal( );
+  virtual TemporalText& GetTemporal();
 
-  virtual RowFieldText& GetRow( );
+  virtual RowFieldText& GetRow();
 
 protected:
   static const uint64_t INVALID_CACHE_VALUE     = ~0ull;
   static const uint_t   GENERIC_CACHE_BUFF_SIZE = 512;
 
 
-  virtual ~GenericText( );
+  virtual ~GenericText();
 
-  virtual void ClearMyself( ) = 0;
+  virtual void ClearMyself() = 0;
 
   uint64_t    mBytesSize;
   uint64_t    mCachedCharCount;
@@ -186,17 +186,17 @@ class NullText : public GenericText
 {
 public:
   //Implementations of ITextStrategy
-  virtual uint_t ReferenceCount( ) const;
+  virtual uint_t ReferenceCount() const;
 
-  virtual void   IncreaseReferenceCount( );
+  virtual void   IncreaseReferenceCount();
 
-  virtual void   DecreaseReferenceCount( );
+  virtual void   DecreaseReferenceCount();
 
-  virtual uint_t ShareCount( ) const;
+  virtual uint_t ShareCount() const;
 
-  virtual void   IncreaseShareCount( );
+  virtual void   IncreaseShareCount();
 
-  virtual void   DecreaseShareCount( );
+  virtual void   DecreaseShareCount();
 
   virtual void ReadUtf8 (const uint64_t offset,
                          const uint64_t count,
@@ -208,14 +208,14 @@ public:
 
   virtual void TruncateUtf8 (const uint64_t newSize);
 
-  static NullText& GetSingletoneInstace( );
+  static NullText& GetSingletoneInstace();
 
 protected:
-  NullText( );
-  ~NullText( );
+  NullText();
+  ~NullText();
 
   //Implementations of GenericText
-  virtual void ClearMyself( );
+  virtual void ClearMyself();
 
 };
 
@@ -242,10 +242,10 @@ public:
                              const uint64_t   index,
                              ITextStrategy**  inoutStrategy);
 
-  virtual TemporalText& GetTemporal( );
+  virtual TemporalText& GetTemporal();
 
 protected:
-  virtual void ClearMyself( );
+  virtual void ClearMyself();
 
   TemporalContainer mStorage;
 };
@@ -276,16 +276,16 @@ public:
                              const uint64_t   index,
                              ITextStrategy**  inoutStrategy);
 
-  virtual bool IsRowValue( ) const;
+  virtual bool IsRowValue() const;
 
-  virtual TemporalText& GetTemporal( );
+  virtual TemporalText& GetTemporal();
 
-  virtual RowFieldText& GetRow( );
+  virtual RowFieldText& GetRow();
 
 protected:
-  virtual ~RowFieldText( );
+  virtual ~RowFieldText();
 
-  virtual void ClearMyself( );
+  virtual void ClearMyself();
 
   static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof( uint32_t);
   static const uint32_t MAX_CHARS_COUNT      = 0xFFFFFFFF;

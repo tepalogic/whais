@@ -40,6 +40,6 @@ extern whais::WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableSort;
 
 whais::WLIB_STATUS
-base_tables_init( );
+base_tables_init();
 
 #endif /* BASE_TABLES_H_ */

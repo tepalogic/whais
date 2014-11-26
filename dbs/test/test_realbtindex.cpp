@@ -34,7 +34,7 @@ uint_t _removedRows = _rowsCount / 10;
 
 
 DReal
-MaxValue( )
+MaxValue()
 {
   static const int64_t intPart  = 0xFFFFFFFFFFull >> 1;
   static const int64_t fracPart = DBS_REAL_PREC - 1;
@@ -46,10 +46,10 @@ MaxValue( )
 
 
 DReal
-get_random_real( )
+get_random_real()
 {
-  int64_t intPart  = _SC (int32_t, wh_rnd( ) & 0xFFFFFFFF);
-  int64_t fracPart = _SC (int16_t, wh_rnd( ) & 0xFFFF);
+  int64_t intPart  = _SC (int32_t, wh_rnd() & 0xFFFFFFFF);
+  int64_t fracPart = _SC (int16_t, wh_rnd() & 0xFFFF);
 
   if (((intPart < 0) && (fracPart > 0))
       || ((intPart > 0) && (fracPart < 0)))
@@ -76,8 +76,8 @@ fill_table_with_values( ITable& table,
   wh_rnd_set_seed( seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DReal value = get_random_real( );
-      if (table.AddRow( ) != index)
+      DReal value = get_random_real();
+      if (table.AddRow() != index)
         {
           result = false;
           break;
@@ -86,7 +86,7 @@ fill_table_with_values( ITable& table,
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
 
 
@@ -96,13 +96,13 @@ fill_table_with_values( ITable& table,
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DArray values = table.MatchRows( DReal( ),
-                                   MaxValue( ),
+  DArray values = table.MatchRows( DReal(),
+                                   MaxValue(),
                                    0,
                                    ~0,
                                    0);
-if ((values.Count( ) != tableValues.Count( )) ||
-      (values.Count( ) != rowCount))
+if ((values.Count() != tableValues.Count()) ||
+      (values.Count() != rowCount))
     {
       result = false;
     }
@@ -113,13 +113,13 @@ if ((values.Count( ) != tableValues.Count( )) ||
       DROW_INDEX rowIndex;
 
       values.Get (checkIndex, rowIndex);
-      assert( rowIndex.IsNull( ) == false);
+      assert( rowIndex.IsNull() == false);
 
       table.Get (rowIndex.mValue, 0, rowValue);
 
       DReal generated;
       tableValues.Get (rowIndex.mValue, generated);
-      assert( generated.IsNull( ) == false);
+      assert( generated.IsNull() == false);
 
       if (((rowValue == generated) == false) ||
           (rowValue < prev))
@@ -133,7 +133,7 @@ if ((values.Count( ) != tableValues.Count( )) ||
       if (((checkIndex * 100) % rowCount) == 0)
         {
           std::cout << (checkIndex * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -157,7 +157,7 @@ fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -172,17 +172,17 @@ fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull( ) || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DReal rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
-  if (values.Count( ) != rowCount)
+  if (values.Count() != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -209,18 +209,18 @@ test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull( ) || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DReal rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
   values  = table.MatchRows( nullValue,
-                             MaxValue( ),
+                             MaxValue(),
                              _removedRows,
                              ~0,
                               0);
@@ -233,7 +233,7 @@ test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
       DReal rowValue;
       table.Get (element.mValue, 0, rowValue);
 
-      if (rowValue.IsNull( ) == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DReal generatedValue;
@@ -254,7 +254,7 @@ callback_index_create( CreateIndexCallbackContext* const pData)
   if (((pData->mRowIndex * 100) % pData->mRowsCount) == 0)
     {
       std::cout << (pData->mRowIndex * 100) / pData->mRowsCount << "%\r";
-      std::cout.flush( );
+      std::cout.flush();
     }
 }
 
@@ -280,13 +280,13 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
 
   table.CreateIndex( 0, callback_index_create, &data);
 
-  DArray values  = table.MatchRows( DReal( ),
-                                    MaxValue( ),
+  DArray values  = table.MatchRows( DReal(),
+                                    MaxValue(),
                                     0,
                                     ~0,
                                     0);
 
-  if (values.Count( ) != _rowsCount)
+  if (values.Count() != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -298,7 +298,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
       DReal rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DReal generatedValue;
@@ -309,7 +309,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
       if (((index * 100) % _rowsCount) == 0)
         {
           std::cout << (index * 100) / _rowsCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -330,7 +330,7 @@ main( int argc, char **argv)
 
   bool success = true;
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
     DBSCreateDatabase( db_name);
   }
 
@@ -352,7 +352,7 @@ main( int argc, char **argv)
   }
   DBSReleaseDatabase( handler);
   DBSRemoveDatabase( db_name);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

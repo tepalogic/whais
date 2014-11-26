@@ -48,9 +48,9 @@ static const uint32_t DEFAULT_VLVALUE_CACHE_SIZE      = 512u;
 class DBS_SHL IDBSHandler
 {
 public:
-  virtual ~IDBSHandler( ) {}
+  virtual ~IDBSHandler() {}
 
-  virtual TABLE_INDEX PersistentTablesCount( ) = 0;
+  virtual TABLE_INDEX PersistentTablesCount() = 0;
 
   virtual ITable& RetrievePersistentTable( const TABLE_INDEX index) = 0;
 
@@ -74,9 +74,9 @@ public:
 
 struct DBSSettings
 {
-  DBSSettings( )
-    : mWorkDir( whf_current_dir( )),
-      mTempDir( whf_current_dir( )),
+  DBSSettings()
+    : mWorkDir( whf_current_dir()),
+      mTempDir( whf_current_dir()),
       mMaxFileSize( DEFAULT_MAX_FILE_SIZE),
       mTableCacheBlkSize( DEFAULT_TABLE_CACHE_BLK_SIZE),
       mTableCacheBlkCount( DEFAULT_TABLE_CACHE_BLK_COUNT),
@@ -116,11 +116,11 @@ DBSInit( const DBSSettings& setup);
 
 
 DBS_SHL void
-DBSShoutdown( );
+DBSShoutdown();
 
 
 DBS_SHL const DBSSettings&
-DBSGetSeettings( );
+DBSGetSeettings();
 
 
 DBS_SHL void

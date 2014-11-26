@@ -44,27 +44,27 @@ class NameSpace
 public:
   NameSpace( IDBSHandler& dbsHandler);
 
-  IDBSHandler& GetDBSHandler( )
+  IDBSHandler& GetDBSHandler()
   {
     return mDbsHandler;
   }
 
-  TypeManager& GetTypeManager( )
+  TypeManager& GetTypeManager()
   {
     return mTypeManager;
   }
 
-  GlobalsManager& GetGlobalsManager( )
+  GlobalsManager& GetGlobalsManager()
   {
     return mGlbsManager;
   }
 
-  ProcedureManager& GetProcedureManager( )
+  ProcedureManager& GetProcedureManager()
   {
     return mProcsManager;
   }
 
-  UnitsManager& GetUnitsManager( )
+  UnitsManager& GetUnitsManager()
   {
     return mUnitsManager;
   }
@@ -97,13 +97,13 @@ public:
     _CC (uint64_t&,   source.mRefsCount)  = 0;
   }
 
-  ~NameSpaceHolder( )
+  ~NameSpaceHolder()
   {
     assert( mRefsCount == 0);
 
     if (mSpace != NULL)
       {
-        IDBSHandler& dbsHandler = mSpace->GetDBSHandler( );
+        IDBSHandler& dbsHandler = mSpace->GetDBSHandler();
 
         delete mSpace;
 
@@ -117,24 +117,24 @@ public:
     return *mSpace;
   }
 
-  uint64_t RefsCount( )
+  uint64_t RefsCount()
   {
     return mRefsCount;
   }
 
-  void IncRefsCount( )
+  void IncRefsCount()
   {
     ++mRefsCount;
   }
 
-  void DecRefsCount( )
+  void DecRefsCount()
   {
     assert( mRefsCount > 0);
 
     --mRefsCount;
   }
 
-  void ForceRelease( )
+  void ForceRelease()
   {
     mRefsCount = 0;
   }
@@ -155,7 +155,7 @@ public:
           NameSpaceHolder&   globalNames,
           NameSpaceHolder&   privateNames);
 
-  virtual ~Session( );
+  virtual ~Session();
 
   virtual void LoadCompiledUnit( WIFunctionalUnit& unit);
   virtual bool LoadSharedLib( WH_SHLIB shl);
@@ -163,9 +163,9 @@ public:
   virtual void ExecuteProcedure( const char* const   procedure,
                                  SessionStack&       stack);
 
-  virtual uint_t GlobalValuesCount( ) const;
+  virtual uint_t GlobalValuesCount() const;
 
-  virtual uint_t ProceduresCount( ) const;
+  virtual uint_t ProceduresCount() const;
 
   virtual const char* GlobalValueName( const uint_t index) const;
 
@@ -227,12 +227,12 @@ public:
 
   const uint8_t* FindLocalTI( const uint32_t procId, const uint32_t local);
 
-  IDBSHandler& DBSHandler( );
+  IDBSHandler& DBSHandler();
 
   const Procedure& GetProcedure( const uint32_t procId);
 
 private:
-  void DefineTablesGlobalValues( );
+  void DefineTablesGlobalValues();
 
   uint32_t DefineGlobalValue( const uint8_t* const   name,
                               const uint_t           nameLength,

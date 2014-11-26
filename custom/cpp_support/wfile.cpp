@@ -40,12 +40,12 @@ File::File( const char* name, uint_t mode)
 
   if (mHandle == INVALID_FILE)
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Could not open file '%s'.",
                            name);
     }
 
-  Size( );
+  Size();
 }
 
 
@@ -55,14 +55,14 @@ File::File( const File &src) :
 {
   if (mHandle == INVALID_FILE)
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to duplicate file( %d) handle.",
                            mHandle);
     }
 }
 
 
-File::~File( )
+File::~File()
 {
   /* Close it only if is not already closed */
   if (mHandle != INVALID_FILE)
@@ -75,7 +75,7 @@ File::Read( uint8_t* pBuffer, uint_t size)
 {
   if ( ! whf_read( mHandle, pBuffer, size))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to read file( %d) content.",
                            mHandle);
     }
@@ -87,7 +87,7 @@ File::Write( const uint8_t* pBuffer, uint_t size)
 {
   if (mFileSize != UNKNOWN_SIZE)
     {
-      uint64_t currPos = Tell( );
+      uint64_t currPos = Tell();
 
       if (mFileSize < currPos + size)
         mFileSize = currPos + size;
@@ -95,7 +95,7 @@ File::Write( const uint8_t* pBuffer, uint_t size)
 
   if ( ! whf_write( mHandle, pBuffer, size))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to update file( %d).",
                            mHandle);
     }
@@ -107,20 +107,20 @@ File::Seek( const int64_t where, const int whence)
 {
   if ( ! whf_seek( mHandle, where, whence))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to seek in file( %d).",
                            mHandle);
     }
 }
 
 
-uint64_t File::Tell( )
+uint64_t File::Tell()
 {
   uint64_t position;
 
   if ( ! whf_tell( mHandle, &position))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to to get file( %d) current position.",
                            mHandle);
     }
@@ -130,25 +130,25 @@ uint64_t File::Tell( )
 
 
 void
-File::Sync( )
+File::Sync()
 {
   if ( ! whf_sync( mHandle))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to flush file( %d) content.",
                            mHandle);
     }
 }
 
 
-uint64_t File::Size( ) const
+uint64_t File::Size() const
 {
   if (mFileSize != UNKNOWN_SIZE)
     return mFileSize;
 
   if ( ! whf_tell_size( mHandle, &_CC (uint64_t&, mFileSize)))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to get file( %d) size.",
                            mHandle);
     }
@@ -162,7 +162,7 @@ File::Size( const uint64_t size)
 {
   if ( ! whf_set_size( mHandle, size))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to update file( %d) size.",
                            mHandle);
     }
@@ -172,13 +172,13 @@ File::Size( const uint64_t size)
 
 
 void
-File::Close( )
+File::Close()
 {
   assert( mHandle != INVALID_FILE);
 
   if ( ! whf_close( mHandle))
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to close file( %d).",
                            mHandle);
     }
@@ -193,12 +193,12 @@ File::operator= (const File &src)
   if (&src == this)
     return *this;
 
-  Close( ); // Close the old handler
+  Close(); // Close the old handler
 
   mHandle = whf_dup( src.mHandle);
   if (mHandle == INVALID_FILE)
     {
-      throw FileException( _EXTRA( whf_last_error( )),
+      throw FileException( _EXTRA( whf_last_error()),
                            "Failed to duplicate file( %d) handle.",
                            src.mHandle);
     }

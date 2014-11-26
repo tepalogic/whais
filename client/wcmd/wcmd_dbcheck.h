@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 bool
-repair_database_erros( );
+repair_database_erros();
 
 
 int

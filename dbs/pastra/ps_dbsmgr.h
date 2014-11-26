@@ -51,9 +51,9 @@ public:
 
   DbsHandler( const DbsHandler&     source);
 
-  virtual ~DbsHandler( );
+  virtual ~DbsHandler();
 
-  virtual TABLE_INDEX PersistentTablesCount( );
+  virtual TABLE_INDEX PersistentTablesCount();
 
   virtual ITable& RetrievePersistentTable( const TABLE_INDEX index);
 
@@ -74,30 +74,30 @@ public:
 
   virtual const char* TableName( const TABLE_INDEX index);
 
-  void Discard( );
+  void Discard();
 
-  void RemoveFromStorage( );
+  void RemoveFromStorage();
 
-  const std::string& WorkingDir( ) const
+  const std::string& WorkingDir() const
   {
     return mDbsLocationDir;
   }
 
-  const std::string& TemporalDir( ) const
+  const std::string& TemporalDir() const
   {
     return mGlbSettings.mTempDir;
   }
 
-  uint64_t MaxFileSize( ) const
+  uint64_t MaxFileSize() const
   {
     return mGlbSettings.mMaxFileSize;
   }
 
-  bool HasUnreleasedTables( );
+  bool HasUnreleasedTables();
 
-  void RegisterTableSpawn( );
+  void RegisterTableSpawn();
 
-  const DBSSettings& Settings( ) const
+  const DBSSettings& Settings() const
   {
     return mGlbSettings;
   }
@@ -106,7 +106,7 @@ private:
 
   typedef std::map<std::string, PersistentTable*> TABLES;
 
-  void SyncToFile( );
+  void SyncToFile();
 
   const DBSSettings&      mGlbSettings;
   Lock                    mSync;
@@ -139,12 +139,12 @@ struct DbsManager
   typedef std::map<std::string, DbsElement> DATABASES_MAP;
 
   DbsManager( const DBSSettings& settings)
-    : mSync( ),
+    : mSync(),
       mDBSSettings( settings),
-      mDatabases( )
+      mDatabases()
   {
-    if ((mDBSSettings.mWorkDir.length( ) == 0)
-        || (mDBSSettings.mTempDir.length( ) == 0)
+    if ((mDBSSettings.mWorkDir.length() == 0)
+        || (mDBSSettings.mTempDir.length() == 0)
         || (mDBSSettings.mTableCacheBlkSize == 0)
         || (mDBSSettings.mTableCacheBlkCount == 0)
         || (mDBSSettings.mVLStoreCacheBlkSize == 0)
@@ -157,16 +157,16 @@ struct DbsManager
                            );
       }
 
-    if (mDBSSettings.mWorkDir[mDBSSettings.mWorkDir.length( ) - 1] !=
-          whf_dir_delim( )[0])
+    if (mDBSSettings.mWorkDir[mDBSSettings.mWorkDir.length() - 1] !=
+          whf_dir_delim()[0])
       {
-        mDBSSettings.mWorkDir += whf_dir_delim( );
+        mDBSSettings.mWorkDir += whf_dir_delim();
       }
 
-    if (mDBSSettings.mTempDir[mDBSSettings.mTempDir.length( ) - 1] !=
-          whf_dir_delim( )[0])
+    if (mDBSSettings.mTempDir[mDBSSettings.mTempDir.length() - 1] !=
+          whf_dir_delim()[0])
       {
-        mDBSSettings.mTempDir += whf_dir_delim( );
+        mDBSSettings.mTempDir += whf_dir_delim();
       }
   }
 

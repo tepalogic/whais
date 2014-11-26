@@ -51,7 +51,7 @@ extern whais::WLIB_PROC_DESCRIPTION       gProcDayOfWeek;
 
 
 whais::WLIB_STATUS
-base_dates_init( );
+base_dates_init();
 
 #endif //BASE_DATES_H_
 

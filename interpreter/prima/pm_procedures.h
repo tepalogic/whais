@@ -70,19 +70,19 @@ class ProcedureManager
 public:
   ProcedureManager( NameSpace& space)
     : mNameSpace( space),
-      mProcsEntrys( ),
-      mIdentifiers( ),
-      mLocalsValues( ),
-      mLocalsTypes( ),
-      mDefinitions( ),
-      mSyncStmts( ),
-      mSync( )
+      mProcsEntrys(),
+      mIdentifiers(),
+      mLocalsValues(),
+      mLocalsTypes(),
+      mDefinitions(),
+      mSyncStmts(),
+      mSync()
   {
   }
 
-  uint_t Count( ) const
+  uint_t Count() const
   {
-    return mProcsEntrys.size( );
+    return mProcsEntrys.size();
   }
 
   uint32_t AddProcedure( const uint8_t* const     name,

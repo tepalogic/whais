@@ -170,7 +170,7 @@ test_op_cts( Session& session)
 
   session.ExecuteProcedure( cts_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   return true;
@@ -198,11 +198,11 @@ test_op_inull( Session& session)
 
   session.ExecuteProcedure( inull_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBool result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DBool( true) )
     return false;
@@ -232,13 +232,13 @@ test_op_nnull( Session& session)
 
   session.ExecuteProcedure( nnull_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBool result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   if (result == DBool( true) )
@@ -258,11 +258,11 @@ test_op_call( Session& session)
 
   session.ExecuteProcedure( "p2", stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DUInt8 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DUInt8 (24) )
     return false;
@@ -284,16 +284,16 @@ test_op_text_index( Session& session)
 
   session.ExecuteProcedure( "text_index", stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DChar result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != value )
     return false;
 
-  stack[0].Operand( ).GetValue( text);
+  stack[0].Operand().GetValue( text);
   value = text.CharAt( 0);
 
   if (value != DChar( 'B') )
@@ -318,16 +318,16 @@ test_op_array_index( Session& session)
 
   session.ExecuteProcedure( "array_index", stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DInt8 result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != value )
     return false;
 
-  stack[0].Operand( ).GetValue( array);
+  stack[0].Operand().GetValue( array);
   array.Get (0, value);
 
   if (value != DInt8 (10) )
@@ -346,25 +346,25 @@ test_op_table_index( Session& session)
   DInt8 value( 0x23);
   LocalOperand localOp( stack, 0);
 
-  ITable& tempTable = session.DBSHandler( ).CreateTempTable( 1, &fd);
+  ITable& tempTable = session.DBSHandler().CreateTempTable( 1, &fd);
   tempTable.GetReusableRow( true);
   tempTable.Set (0, 0, value);
 
-  stack.Push( session.DBSHandler( ), tempTable);
+  stack.Push( session.DBSHandler(), tempTable);
   stack.Push( StackValue( localOp));
 
   session.ExecuteProcedure( "table_index", stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DInt8 result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].Operand( ).GetTable( );
+  ITable& stackTable = stack[0].Operand().GetTable();
 
   if (&stackTable != &tempTable)
     return false;
@@ -386,25 +386,25 @@ test_op_field_index( Session& session)
   DInt8 value( 0x23);
   LocalOperand localOp( stack, 0);
 
-  ITable& tempTable = session.DBSHandler( ).CreateTempTable( 1, &fd);
+  ITable& tempTable = session.DBSHandler().CreateTempTable( 1, &fd);
   tempTable.GetReusableRow( true);
   tempTable.Set (0, 0, value);
 
-  stack.Push( session.DBSHandler( ), tempTable);
+  stack.Push( session.DBSHandler(), tempTable);
   stack.Push( StackValue( localOp));
 
   session.ExecuteProcedure( "field_index", stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DInt8 result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].Operand( ).GetTable( );
+  ITable& stackTable = stack[0].Operand().GetTable();
 
   if (&stackTable != &tempTable)
     return false;
@@ -448,11 +448,11 @@ test_op_jfc( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (0) )
     return false;
@@ -464,10 +464,10 @@ test_op_jfc( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand( ).GetValue( result);
+   stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (1) )
     return false;
@@ -507,11 +507,11 @@ test_op_jtc( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (0) )
     return false;
@@ -523,10 +523,10 @@ test_op_jtc( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand( ).GetValue( result);
+   stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (1) )
     return false;
@@ -566,11 +566,11 @@ test_op_jf( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (0) )
     return false;
@@ -582,10 +582,10 @@ test_op_jf( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand( ).GetValue( result);
+   stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (1) )
     return false;
@@ -624,11 +624,11 @@ test_op_jt( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (0) )
     return false;
@@ -640,10 +640,10 @@ test_op_jt( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand( ).GetValue( result);
+   stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (1) )
     return false;
@@ -681,11 +681,11 @@ test_op_jmp( Session& session)
 
   session.ExecuteProcedure( field_proc, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != DInt8 (10) )
     return false;
@@ -695,16 +695,16 @@ test_op_jmp( Session& session)
 
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   DBSCreateDatabase( admin);
-  InitInterpreter( );
+  InitInterpreter();
 
   {
     ISession& commonSession = GetInstance( NULL);
@@ -733,9 +733,9 @@ main( )
     ReleaseInstance( commonSession);
   }
 
-  CleanInterpreter( );
+  CleanInterpreter();
   DBSRemoveDatabase( admin);
-  DBSShoutdown( );
+  DBSShoutdown();
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;

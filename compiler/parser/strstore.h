@@ -35,7 +35,7 @@
 typedef void* StringStoreHnd;
 
 StringStoreHnd
-create_string_store( );
+create_string_store();
 
 void
 release_string_store( StringStoreHnd* pStore);

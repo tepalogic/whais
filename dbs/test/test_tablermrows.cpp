@@ -34,7 +34,7 @@ fill_table( ITable& table)
   for (uint32_t index = 0; index < gElemsCount; ++index)
     {
       DUInt32 fieldValue( index);
-      uint_t rowIndex = table.AddRow( );
+      uint_t rowIndex = table.AddRow();
 
       if (rowIndex != index)
         {
@@ -176,14 +176,14 @@ main( int argc, char **argv)
 
   bool success = true;
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
     DBSCreateDatabase( db_name);
   }
 
   IDBSHandler& handler = DBSRetrieveDatabase( db_name);
   handler.AddTable( "t_test_tab", sizeof field_desc / sizeof( field_desc[0]), field_desc);
   ITable& table        = handler.RetrievePersistentTable( "t_test_tab");
-  ITable& spawnedTable = table.Spawn( );
+  ITable& spawnedTable = table.Spawn();
 
   success = success && fill_table( table);
   success = success && remove_first_rows( table);
@@ -201,7 +201,7 @@ main( int argc, char **argv)
 
   DBSReleaseDatabase( handler);
   DBSRemoveDatabase( db_name);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

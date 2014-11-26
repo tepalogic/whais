@@ -34,11 +34,11 @@ namespace whais {
 class EXCEP_SHL Lock
 {
 public:
-  Lock( );
-  ~Lock( );
+  Lock();
+  ~Lock();
 
-  void Acquire( );
-  void Release( );
+  void Acquire();
+  void Release();
 
 private:
   Lock( const Lock&);
@@ -55,25 +55,25 @@ public:
     mLock( lock),
     mIsAcquireed( true)
   {
-    mLock.Acquire( );
+    mLock.Acquire();
   }
 
-  ~LockRAII( )
+  ~LockRAII()
   {
     if (mIsAcquireed)
-      mLock.Release( );
+      mLock.Release();
   }
 
-  void Acquire( )
+  void Acquire()
   {
-    mLock.Acquire( );
+    mLock.Acquire();
     mIsAcquireed = true;
   }
 
-  void Release( )
+  void Release()
   {
     mIsAcquireed = false;
-    mLock.Release( );
+    mLock.Release();
   }
 
 private:
@@ -91,11 +91,11 @@ public:
                  const char*       fmtMsg = NULL,
                  ...);
 
-  virtual Exception* Clone( ) const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type( ) const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description( ) const;
+  virtual const char* Description() const;
 };
 
 
@@ -103,21 +103,21 @@ public:
 class EXCEP_SHL Thread
 {
 public:
-  Thread( );
-  ~Thread( );
+  Thread();
+  ~Thread();
 
   void Run (WH_THREAD_ROUTINE routine, void* const args);
 
   void WaitToEnd( const bool throwPending = true);
 
-  void ThrowPendingException( );
+  void ThrowPendingException();
 
   void IgnoreExceptions( bool ignore)
   {
     mIgnoreExceptions = ignore;
   }
 
-  void DiscardException( )
+  void DiscardException()
   {
     mUnkExceptSignaled = false;
 
@@ -125,12 +125,12 @@ public:
     mException = NULL;
   }
 
-  bool IsEnded( ) const
+  bool IsEnded() const
   {
     return mEnded;
   }
 
-  bool HasExceptionPending( )
+  bool HasExceptionPending()
   {
     return( mUnkExceptSignaled || (mException != NULL));
   }
@@ -165,11 +165,11 @@ public:
                    ...);
 
 
-  virtual Exception* Clone( ) const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type( ) const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description( ) const;
+  virtual const char* Description() const;
 };
 
 

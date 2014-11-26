@@ -116,14 +116,14 @@ test_op_stb( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DBool result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -160,14 +160,14 @@ test_op_stc( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DChar result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -205,14 +205,14 @@ test_op_std( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DDate result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -249,14 +249,14 @@ test_op_stdt( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DDateTime result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -293,14 +293,14 @@ test_op_stht( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DHiresTime result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -339,14 +339,14 @@ test_op_stXX( Session&       session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -383,14 +383,14 @@ test_op_stt( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DText result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
   if (result != op2)
     return false;
@@ -416,8 +416,8 @@ test_op_stta( Session& session)
 
   DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
 
-  ITable& firstTable = session.DBSHandler( ).CreateTempTable( 1, &fd);
-  ITable& secondTable = session.DBSHandler( ).CreateTempTable( 1, &fd);
+  ITable& firstTable = session.DBSHandler().CreateTempTable( 1, &fd);
+  ITable& secondTable = session.DBSHandler().CreateTempTable( 1, &fd);
 
   secondTable.Set (secondTable.GetReusableRow( true), 0, firstVal);
   secondTable.Set (secondTable.GetReusableRow( true), 0, secondVal);
@@ -431,24 +431,24 @@ test_op_stta( Session& session)
   w_encode_opcode( W_RET, testCode + opSize);
 
 
-  stack.Push( session.DBSHandler( ), firstTable);
-  stack.Push( session.DBSHandler( ), secondTable);
+  stack.Push( session.DBSHandler(), firstTable);
+  stack.Push( session.DBSHandler(), secondTable);
 
-  if (stack[0].Operand( ).IsNull( ) == false)
+  if (stack[0].Operand().IsNull() == false)
     return false;
 
-  if (stack[1].Operand( ).IsNull( ))
+  if (stack[1].Operand().IsNull())
     return false;
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
-  ITable& result = stack[0].Operand( ).GetTable( );
+  ITable& result = stack[0].Operand().GetTable();
 
   if (&result != &secondTable)
     return false;
@@ -474,8 +474,8 @@ test_op_stf( Session& session)
 
   DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
 
-  ITable& firstTable = session.DBSHandler( ).CreateTempTable( 1, &fd);
-  TableOperand tableOp( session.DBSHandler( ), firstTable);
+  ITable& firstTable = session.DBSHandler().CreateTempTable( 1, &fd);
+  TableOperand tableOp( session.DBSHandler(), firstTable);
 
   FieldOperand op;
   FieldOperand op2 (tableOp, 0);
@@ -493,26 +493,26 @@ test_op_stf( Session& session)
   stack.Push( sv1);
   stack.Push( sv2);
 
-  if (stack[0].Operand( ).IsNull( ) == false)
+  if (stack[0].Operand().IsNull() == false)
     return false;
 
-  if (stack[1].Operand( ).IsNull( ))
+  if (stack[1].Operand().IsNull())
     return false;
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
-  ITable& result = stack[0].Operand( ).GetTable( );
+  ITable& result = stack[0].Operand().GetTable();
 
   if (&result != &firstTable)
     return false;
 
-  if (stack[0].Operand( ).GetField( ) != 0)
+  if (stack[0].Operand().GetField() != 0)
     return false;
 
   return true;
@@ -550,19 +550,19 @@ test_op_sta( Session& session)
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (stack[0].Operand( ).IsNull( ))
+  if (stack[0].Operand().IsNull())
     return false;
 
   DArray result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.Count( ) != op2.Count( ))
+  if (result.Count() != op2.Count())
     return false;
 
-  for (uint_t index = 0; index < result.Count( ); ++index)
+  for (uint_t index = 0; index < result.Count(); ++index)
     {
       DUInt8 first, second;
 
@@ -577,16 +577,16 @@ test_op_sta( Session& session)
 }
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   DBSCreateDatabase( admin);
-  InitInterpreter( );
+  InitInterpreter();
 
   {
     ISession& commonSession = GetInstance( NULL);
@@ -663,9 +663,9 @@ main( )
     ReleaseInstance( commonSession);
   }
 
-  CleanInterpreter( );
+  CleanInterpreter();
   DBSRemoveDatabase( admin);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

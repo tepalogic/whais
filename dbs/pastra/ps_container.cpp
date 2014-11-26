@@ -105,23 +105,23 @@ WFileContainerException::WFileContainerException( const uint32_t       code,
 
 
 Exception*
-WFileContainerException::Clone( ) const
+WFileContainerException::Clone() const
 {
   return new WFileContainerException( *this);
 }
 
 
 EXCEPTION_TYPE
-WFileContainerException::Type( ) const
+WFileContainerException::Type() const
 {
   return FILE_CONTAINER_EXCEPTION;
 }
 
 
 const char*
-WFileContainerException::Description( ) const
+WFileContainerException::Description() const
 {
-  switch( Code( ))
+  switch( Code())
     {
     case INVALID_PARAMETERS:
       return "Container operation failed due to invalid parameters.";
@@ -142,7 +142,7 @@ WFileContainerException::Description( ) const
 
 
 
-IDataContainer::~IDataContainer( )
+IDataContainer::~IDataContainer()
 {
 }
 
@@ -152,7 +152,7 @@ FileContainer::FileContainer( const char*       baseName,
                               const uint64_t    maxFileSize,
                               const uint64_t    unitsCount)
   : mMaxFileUnitSize( maxFileSize),
-    mFilesHandles( ),
+    mFilesHandles(),
     mFileNamePrefix( baseName),
     mToRemove( false)
 {
@@ -168,28 +168,28 @@ FileContainer::FileContainer( const char*       baseName,
       if (unit != 0)
         append_int_to_str( unit, baseName);
 
-      File container( baseName.c_str( ), openMode);
+      File container( baseName.c_str(), openMode);
       mFilesHandles.push_back( container);
     }
 
-  assert( mFilesHandles.size( ) == unitsCount);
+  assert( mFilesHandles.size() == unitsCount);
 
   // Check for structural consistency
   for (uint_t unit = 0; unit < unitsCount; ++unit)
     {
       File& file = mFilesHandles[unit];
 
-      if ((file.Size( ) != maxFileSize)
-          && ((unit != (unitsCount - 1)) || (file.Size( ) > maxFileSize)))
+      if ((file.Size() != maxFileSize)
+          && ((unit != (unitsCount - 1)) || (file.Size() > maxFileSize)))
         {
           throw WFileContainerException( 
                          _EXTRA( WFileContainerException::CONTAINTER_INVALID),
                          "Inconsistent container "
                            "(base name: '%s', unit %d (of %d), fs: %d (max %d)!",
-                         mFileNamePrefix.c_str( ),
+                         mFileNamePrefix.c_str(),
                          unit,
                          unitsCount,
-                         file.Size( ),
+                         file.Size(),
                          maxFileSize
                                         );
         }
@@ -197,17 +197,17 @@ FileContainer::FileContainer( const char*       baseName,
 }
 
 
-FileContainer::~FileContainer( )
+FileContainer::~FileContainer()
 {
   if (mToRemove)
-    Colapse( 0, Size( ) );
+    Colapse( 0, Size() );
 }
 
 
 void
 FileContainer::Write( uint64_t to, uint64_t size, const uint8_t* buffer)
 {
-  const uint_t unitsCount   = mFilesHandles.size( );
+  const uint_t unitsCount   = mFilesHandles.size();
   uint64_t     unitIndex    = to / mMaxFileUnitSize;
   uint64_t     unitPosition = to % mMaxFileUnitSize;
 
@@ -237,7 +237,7 @@ FileContainer::Write( uint64_t to, uint64_t size, const uint8_t* buffer)
                                         );
         }
       else
-        ExtendContainer( );
+        ExtendContainer();
     }
 
   uint64_t actualSize = size;
@@ -249,13 +249,13 @@ FileContainer::Write( uint64_t to, uint64_t size, const uint8_t* buffer)
 
   File& file = mFilesHandles[unitIndex];
 
-  if (file.Size( ) < unitPosition)
+  if (file.Size() < unitPosition)
     {
       throw WFileContainerException( 
                    _EXTRA( WFileContainerException::INVALID_ACCESS_POSITION),
                    "Unit position %lu (%lu).",
                    _SC (long, unitPosition),
-                   _SC (long, file.Size( ))
+                   _SC (long, file.Size())
                                     );
     }
 
@@ -271,11 +271,11 @@ FileContainer::Write( uint64_t to, uint64_t size, const uint8_t* buffer)
 void
 FileContainer::Read( uint64_t from, uint64_t size, uint8_t* buffer)
 {
-  const uint_t unitsCount   = mFilesHandles.size( );
+  const uint_t unitsCount   = mFilesHandles.size();
   uint64_t     unitIndex    = from / mMaxFileUnitSize;
   uint64_t     unitPosition = from % mMaxFileUnitSize;
 
-  if ((unitIndex > unitsCount) || (from + size > Size( )))
+  if ((unitIndex > unitsCount) || (from + size > Size()))
     {
       throw WFileContainerException( 
                      _EXTRA( WFileContainerException::INVALID_ACCESS_POSITION),
@@ -283,7 +283,7 @@ FileContainer::Read( uint64_t from, uint64_t size, uint8_t* buffer)
                        "unit %d ( of %d).",
                      _SC (long, size),
                      _SC (long, from),
-                     _SC (long, Size( )),
+                     _SC (long, Size()),
                      unitIndex,
                      unitsCount
                                     );
@@ -293,8 +293,8 @@ FileContainer::Read( uint64_t from, uint64_t size, uint8_t* buffer)
 
   uint64_t actualSize = size;
 
-  if (actualSize + unitPosition > file.Size( ))
-    actualSize = file.Size( ) - unitPosition;
+  if (actualSize + unitPosition > file.Size())
+    actualSize = file.Size() - unitPosition;
 
   file.Seek( unitPosition, WH_SEEK_BEGIN);
   file.Read( buffer, actualSize);
@@ -311,7 +311,7 @@ FileContainer::Colapse( uint64_t from, uint64_t to)
 {
   const uint_t   bufferSize    = 4096;        //4KB
   const uint64_t intervalSize  = to - from;
-  const uint64_t containerSize = Size( );
+  const uint64_t containerSize = Size();
 
   if ((to < from) || (containerSize < to))
     {
@@ -352,55 +352,55 @@ FileContainer::Colapse( uint64_t from, uint64_t to)
   else
     mFilesHandles[lastUnit].Size( lastUnitSize);
 
-  for (int unit = mFilesHandles.size( ) - 1; unit > lastUnit; --unit)
+  for (int unit = mFilesHandles.size() - 1; unit > lastUnit; --unit)
     {
-      mFilesHandles[unit].Close( );
+      mFilesHandles[unit].Close();
 
       string baseName = mFileNamePrefix;
 
       if (unit != 0)
         append_int_to_str( unit, baseName);
 
-      if ( ! whf_remove( baseName.c_str( )))
+      if ( ! whf_remove( baseName.c_str()))
         {
           throw WFileContainerException( 
                            _EXTRA( WFileContainerException::FILE_OS_IO_ERROR),
                            "Failed to remove file '%s'.",
-                           baseName.c_str( )
+                           baseName.c_str()
                                         );
         }
-      mFilesHandles.pop_back( );
+      mFilesHandles.pop_back();
     }
 }
 
 
 uint64_t
-FileContainer::Size( ) const
+FileContainer::Size() const
 {
-  if (mFilesHandles.size( ) == 0)
+  if (mFilesHandles.size() == 0)
     return 0;
 
-  const File&  lastUnitFile = mFilesHandles[mFilesHandles.size( ) - 1];
-  uint64_t     result       = (mFilesHandles.size( ) - 1) * mMaxFileUnitSize;
+  const File&  lastUnitFile = mFilesHandles[mFilesHandles.size() - 1];
+  uint64_t     result       = (mFilesHandles.size() - 1) * mMaxFileUnitSize;
 
-  result += lastUnitFile.Size( );
+  result += lastUnitFile.Size();
 
   return result;
 }
 
 
 void
-FileContainer::MarkForRemoval( )
+FileContainer::MarkForRemoval()
 {
   mToRemove = true;
 }
 
 
 void
-FileContainer::Flush( )
+FileContainer::Flush()
 {
-  for (size_t i = 0; i < mFilesHandles.size( ); ++i)
-    mFilesHandles[i].Sync( );
+  for (size_t i = 0; i < mFilesHandles.size(); ++i)
+    mFilesHandles[i].Sync();
 }
 
 
@@ -424,12 +424,12 @@ FileContainer::Fix (const char* const           baseFile,
       if (size >= newContainerSize)
         {
           //Remove all trailing container files until you found a missing one
-          if (! whf_remove( fileName.c_str( )))
+          if (! whf_remove( fileName.c_str()))
             break;
         }
       else
         {
-          File unitFile( fileName.c_str( ), WH_FILECREATE | WH_FILEWRITE);
+          File unitFile( fileName.c_str(), WH_FILECREATE | WH_FILEWRITE);
 
           if (newContainerSize - size >= maxFileSize)
             {
@@ -446,15 +446,15 @@ FileContainer::Fix (const char* const           baseFile,
 }
 
 void
-FileContainer::ExtendContainer( )
+FileContainer::ExtendContainer()
 {
-  uint_t count    = mFilesHandles.size( );
+  uint_t count    = mFilesHandles.size();
   string baseName = mFileNamePrefix;
 
   if (count != 0)
     append_int_to_str( count, baseName);
 
-  File unitFile( baseName.c_str( ), WH_FILECREATE_NEW | WH_FILERDWR);
+  File unitFile( baseName.c_str(), WH_FILECREATE_NEW | WH_FILERDWR);
   mFilesHandles.push_back( unitFile);
 }
 
@@ -464,13 +464,13 @@ TemporalFileContainer::TemporalFileContainer( const char*    baseName,
                                               const uint32_t maxFileSize)
   : FileContainer( baseName, maxFileSize, 0)
 {
-  MarkForRemoval( );
+  MarkForRemoval();
 }
 
 
 
 TemporalContainer::TemporalContainer( const uint_t reservedMemory)
-  : IDataContainer( ),
+  : IDataContainer(),
     mFileContainer( NULL),
     mCache_1 (new uint8_t[reservedMemory / 2]),
     mCache_2 (NULL),
@@ -489,14 +489,14 @@ TemporalContainer::TemporalContainer( const uint_t reservedMemory)
 void
 TemporalContainer::Write( uint64_t to, uint64_t size, const uint8_t* buffer)
 {
-  if (to > Size( ))
+  if (to > Size())
     {
       throw WFileContainerException( 
                    _EXTRA( WFileContainerException::INVALID_ACCESS_POSITION),
                    "Failed to write %lu bytes at %lu (of %lu).",
                    _SC (long, size),
                    _SC (long, to),
-                   _SC (long, Size( ))
+                   _SC (long, Size())
                                     );
     }
 
@@ -546,14 +546,14 @@ TemporalContainer::Write( uint64_t to, uint64_t size, const uint8_t* buffer)
 void
 TemporalContainer::Read( uint64_t from, uint64_t size, uint8_t* buffer)
 {
-  if (from + size > Size( ))
+  if (from + size > Size())
     {
       throw WFileContainerException( 
                    _EXTRA( WFileContainerException::INVALID_ACCESS_POSITION),
                    "Failed to read %lu bytes from %lu (of %lu).",
                    _SC (long, size),
                    _SC (long, from),
-                   _SC (long, Size( ))
+                   _SC (long, Size())
                                     );
     }
 
@@ -589,7 +589,7 @@ TemporalContainer::Read( uint64_t from, uint64_t size, uint8_t* buffer)
 void
 TemporalContainer::Colapse( uint64_t from, uint64_t to)
 {
-  const uint64_t containerSize = Size( );
+  const uint64_t containerSize = Size();
 
   if ((to < from) || (containerSize < to))
     {
@@ -675,14 +675,14 @@ TemporalContainer::Colapse( uint64_t from, uint64_t to)
     }
 
   if ((mFileContainer.get () != NULL)
-      && (mFileContainer->Size( ) <= (2 * mCacheSize)))
+      && (mFileContainer->Size() <= (2 * mCacheSize)))
     {
-      if (mFileContainer->Size( ) > mCacheSize)
+      if (mFileContainer->Size() > mCacheSize)
         {
           assert( mCache_2.get () != NULL);
 
           mCacheStartPos_2 = mCacheSize;
-          mCacheEndPos_2   = mFileContainer->Size( );
+          mCacheEndPos_2   = mFileContainer->Size();
 
           mFileContainer->Read( mCacheStartPos_2,
                                 mCacheEndPos_2 - mCacheStartPos_2,
@@ -699,7 +699,7 @@ TemporalContainer::Colapse( uint64_t from, uint64_t to)
         }
 
       mCacheStartPos_1 = 0;
-      mCacheEndPos_1   = MIN (mFileContainer->Size( ), mCacheSize);
+      mCacheEndPos_1   = MIN (mFileContainer->Size(), mCacheSize);
 
       mFileContainer->Read( mCacheStartPos_1,
                             mCacheEndPos_1 - mCacheStartPos_1,
@@ -728,7 +728,7 @@ TemporalContainer::Colapse( uint64_t from, uint64_t to)
         from = mCacheSize;
 
       mCacheStartPos_2 = from;
-      mCacheEndPos_2   = MIN (mFileContainer->Size( ), from + mCacheSize);
+      mCacheEndPos_2   = MIN (mFileContainer->Size(), from + mCacheSize);
 
       mFileContainer->Read( mCacheStartPos_2,
                             mCacheEndPos_2 - mCacheStartPos_2,
@@ -741,22 +741,22 @@ TemporalContainer::Colapse( uint64_t from, uint64_t to)
 
 
 void
-TemporalContainer::MarkForRemoval( )
+TemporalContainer::MarkForRemoval()
 {
   return ; //This will be deleted automatically. Nothing to do here!
 }
 
 
 void
-TemporalContainer::Flush( )
+TemporalContainer::Flush()
 {
   if (mFileContainer.get () != NULL)
-    mFileContainer->Flush( );
+    mFileContainer->Flush();
 }
 
 
 uint64_t
-TemporalContainer::Size( ) const
+TemporalContainer::Size() const
 {
   assert( (mCacheStartPos_1 % mCacheSize) == 0);
   assert( (mCacheStartPos_2 % mCacheSize) == 0);
@@ -773,7 +773,7 @@ TemporalContainer::Size( ) const
 
       const uint64_t temp = MAX (mCacheEndPos_1, mCacheEndPos_2);
 
-      return MAX (temp, mFileContainer->Size( ));
+      return MAX (temp, mFileContainer->Size());
     }
   else if (mCache_2.get () != NULL)
     {
@@ -821,9 +821,9 @@ TemporalContainer::FillCache( uint64_t position)
 
   if (mFileContainer.get () == NULL)
     {
-      smSync.Acquire( );
+      smSync.Acquire();
       const uint64_t currentId = smTemporalsCount++;
-      smSync.Release( );
+      smSync.Release();
 
       assert( mCacheStartPos_1 == 0);
       assert( mCacheEndPos_1 == mCacheSize);
@@ -831,14 +831,14 @@ TemporalContainer::FillCache( uint64_t position)
       assert( mCacheEndPos_2 == 2 * mCacheSize);
       assert( position == 2 * mCacheSize);
 
-      const DBSSettings& settings = DBSGetSeettings( );
+      const DBSSettings& settings = DBSGetSeettings();
 
       string baseName( settings.mTempDir);
       baseName += "wtemp";
       append_int_to_str( currentId, baseName);
       baseName += ".tmp";
 
-      mFileContainer.reset( new TemporalFileContainer( baseName.c_str( ),
+      mFileContainer.reset( new TemporalFileContainer( baseName.c_str(),
                                                        settings.mMaxFileSize));
 
       mFileContainer->Write( 0, mCacheSize, mCache_1.get ());
@@ -861,7 +861,7 @@ TemporalContainer::FillCache( uint64_t position)
           mDirtyCache_2 = false;
         }
 
-      if (position >= mFileContainer->Size( ))
+      if (position >= mFileContainer->Size())
         {
           if (mDirtyCache_1)
             {
@@ -873,7 +873,7 @@ TemporalContainer::FillCache( uint64_t position)
         }
 
       const uint_t toRead = MIN (mCacheSize,
-                                 mFileContainer->Size( ) - position);
+                                 mFileContainer->Size() - position);
 
       mFileContainer->Read( position, toRead, mCache_2.get ());
 
@@ -891,7 +891,7 @@ TemporalContainer::FillCache( uint64_t position)
           mDirtyCache_1 = false;
         }
 
-      if (position >= mFileContainer->Size( ))
+      if (position >= mFileContainer->Size())
         {
           if (mDirtyCache_2)
             {
@@ -903,7 +903,7 @@ TemporalContainer::FillCache( uint64_t position)
         }
 
       const uint_t toRead = MIN (mCacheSize,
-                                 mFileContainer->Size( ) - position);
+                                 mFileContainer->Size() - position);
 
       mFileContainer->Read( position, toRead, mCache_1.get ());
 

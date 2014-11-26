@@ -58,7 +58,7 @@ IArrayStrategy::IArrayStrategy( const DBS_FIELD_TYPE elemsType)
 }
 
 
-IArrayStrategy::~IArrayStrategy( )
+IArrayStrategy::~IArrayStrategy()
 {
   assert( mReferenceCount == 0);
   assert( mShareCount == 0);
@@ -66,14 +66,14 @@ IArrayStrategy::~IArrayStrategy( )
 
 
 uint_t
-IArrayStrategy::ReferenceCount( ) const
+IArrayStrategy::ReferenceCount() const
 {
   return mReferenceCount;
 }
 
 
 void
-IArrayStrategy::IncrementReferenceCount( )
+IArrayStrategy::IncrementReferenceCount()
 {
   assert( mShareCount == 0);
 
@@ -82,7 +82,7 @@ IArrayStrategy::IncrementReferenceCount( )
 
 
 void
-IArrayStrategy::DecrementReferenceCount( )
+IArrayStrategy::DecrementReferenceCount()
 {
   assert( mReferenceCount > 0);
   assert( mShareCount == 0);
@@ -93,14 +93,14 @@ IArrayStrategy::DecrementReferenceCount( )
 
 
 uint_t
-IArrayStrategy::ShareCount( ) const
+IArrayStrategy::ShareCount() const
 {
   return mShareCount;
 }
 
 
 void
-IArrayStrategy::IncrementShareCount( )
+IArrayStrategy::IncrementShareCount()
 {
   assert( mReferenceCount == 1);
 
@@ -109,7 +109,7 @@ IArrayStrategy::IncrementShareCount( )
 
 
 void
-IArrayStrategy::DecrementShareCount( )
+IArrayStrategy::DecrementShareCount()
 {
   assert( mReferenceCount == 1);
   assert( mShareCount > 0);
@@ -121,11 +121,11 @@ IArrayStrategy::DecrementShareCount( )
 void
 IArrayStrategy::Clone( IArrayStrategy& strategy)
 {
-  assert( strategy.Type( ) == mElementsType);
+  assert( strategy.Type() == mElementsType);
   assert( this != &strategy);
 
   uint64_t currentPosition = 0;
-  uint64_t cloneSize       = strategy.RawSize( );
+  uint64_t cloneSize       = strategy.RawSize();
 
   while( cloneSize > 0)
     {
@@ -148,14 +148,14 @@ IArrayStrategy::Clone( IArrayStrategy& strategy)
 
 
 bool
-IArrayStrategy::IsRowValue( ) const
+IArrayStrategy::IsRowValue() const
 {
   return false;
 }
 
 
 pastra::TemporalArray&
-IArrayStrategy::GetTemporal( )
+IArrayStrategy::GetTemporal()
 {
   throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 
@@ -164,7 +164,7 @@ IArrayStrategy::GetTemporal( )
 
 
 pastra::RowFieldArray&
-IArrayStrategy::GetRow( )
+IArrayStrategy::GetRow()
 {
   throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 
@@ -184,35 +184,35 @@ NullArray::NullArray( const DBS_FIELD_TYPE elemsType)
 
 
 uint_t
-NullArray::ReferenceCount( ) const
+NullArray::ReferenceCount() const
 {
   return ~0; //To force new allocation when it will be modified.
 }
 
 
 void
-NullArray::IncrementReferenceCount( )
+NullArray::IncrementReferenceCount()
 {
   return ; //Do nothing as we are a singletone that lifes for ever.
 }
 
 
 void
-NullArray::DecrementReferenceCount( )
+NullArray::DecrementReferenceCount()
 {
   return ; //Do nothing as we are a singletone that lifes for ever.
 }
 
 
 uint_t
-NullArray::ShareCount( ) const
+NullArray::ShareCount() const
 {
   return 0;
 }
 
 
 void
-NullArray::IncrementShareCount( )
+NullArray::IncrementShareCount()
 {
   //Someone does not know what is doing!
   throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
@@ -220,7 +220,7 @@ NullArray::IncrementShareCount( )
 
 
 void
-NullArray::DecrementShareCount( )
+NullArray::DecrementShareCount()
 {
   //Someone does not know what is doing!
   throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
@@ -256,7 +256,7 @@ NullArray::ColapseRaw( const uint64_t offset, const uint64_t count)
 
 
 uint64_t
-NullArray::RawSize( ) const
+NullArray::RawSize() const
 {
   return 0;
 }
@@ -347,12 +347,12 @@ NullArray::GetSingletoneInstace( const DBS_FIELD_TYPE type)
 
 TemporalArray::TemporalArray( const DBS_FIELD_TYPE type)
   : IArrayStrategy( type),
-    mStorage( )
+    mStorage()
 {
 }
 
 
-TemporalArray::~TemporalArray( )
+TemporalArray::~TemporalArray()
 {
   assert( mReferenceCount == 0);
 }
@@ -378,19 +378,19 @@ TemporalArray::RawWrite( const uint64_t       offset,
 
   mStorage.Write( offset, size, buffer);
 
-  mElementsCount = mStorage.Size( ) / mElementRawSize;
+  mElementsCount = mStorage.Size() / mElementRawSize;
 }
 
 
 uint64_t
-TemporalArray::RawSize( ) const
+TemporalArray::RawSize() const
 {
-  return mStorage.Size( ) ;
+  return mStorage.Size() ;
 }
 
 
 TemporalArray&
-TemporalArray::GetTemporal( )
+TemporalArray::GetTemporal()
 {
   return *this;
 }
@@ -405,7 +405,7 @@ TemporalArray::ColapseRaw( const uint64_t offset, const uint64_t count)
 
   mStorage.Colapse( offset, offset + count);
 
-  mElementsCount = mStorage.Size( ) / mElementRawSize;
+  mElementsCount = mStorage.Size() / mElementRawSize;
 }
 
 
@@ -422,7 +422,7 @@ RowFieldArray::RowFieldArray( VariableSizeStore&    storage,
   assert( (mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
   assert( mElementRawSize > 0);
 
-  mStorage.RegisterReference( );
+  mStorage.RegisterReference();
   mStorage.IncrementRecordRef( mFirstRecordEntry);
 
   uint8_t elemetsCount[METADATA_SIZE];
@@ -433,37 +433,37 @@ RowFieldArray::RowFieldArray( VariableSizeStore&    storage,
 }
 
 
-RowFieldArray::~RowFieldArray( )
+RowFieldArray::~RowFieldArray()
 {
   assert( mReferenceCount == 0);
 
   if (mTempArray == NULL)
     {
       mStorage.DecrementRecordRef( mFirstRecordEntry);
-      mStorage.Flush( );
-      mStorage.ReleaseReference( );
+      mStorage.Flush();
+      mStorage.ReleaseReference();
     }
   else
-    mTempArray->DecrementReferenceCount( );
+    mTempArray->DecrementReferenceCount();
 }
 
 
 bool
-RowFieldArray::IsRowValue( ) const
+RowFieldArray::IsRowValue() const
 {
   return( mTempArray == NULL);
 }
 
 
 RowFieldArray&
-RowFieldArray::GetRow( )
+RowFieldArray::GetRow()
 {
   return *this;
 }
 
 
 TemporalArray&
-RowFieldArray::GetTemporal( )
+RowFieldArray::GetTemporal()
 {
   assert( mTempArray != NULL);
 
@@ -498,7 +498,7 @@ RowFieldArray::RawWrite( const uint64_t       offset,
   if (mTempArray)
     {
       mTempArray->RawWrite( offset, size, buffer);
-      mElementsCount = RawSize( ) / mElementRawSize;
+      mElementsCount = RawSize() / mElementRawSize;
     }
   else
     {
@@ -509,11 +509,11 @@ RowFieldArray::RawWrite( const uint64_t       offset,
                              size,
                              buffer);
 
-      if ((offset + size) > RawSize( ))
+      if ((offset + size) > RawSize())
         {
-          assert( ((offset + size - RawSize( )) % mElementRawSize) == 0);
+          assert( ((offset + size - RawSize()) % mElementRawSize) == 0);
 
-          mElementsCount += (offset + size - RawSize( )) / mElementRawSize;
+          mElementsCount += (offset + size - RawSize()) / mElementRawSize;
 
           uint8_t temp[METADATA_SIZE];
 
@@ -524,10 +524,10 @@ RowFieldArray::RawWrite( const uint64_t       offset,
 }
 
 uint64_t
-RowFieldArray::RawSize( ) const
+RowFieldArray::RawSize() const
 {
   if (mTempArray)
-    return mTempArray->RawSize( );
+    return mTempArray->RawSize();
 
   assert( mElementRawSize > 0);
 
@@ -544,31 +544,31 @@ RowFieldArray::ColapseRaw( const uint64_t offset, const uint64_t count)
       return;
     }
   else
-    EnableTemporalStorage( );
+    EnableTemporalStorage();
 
   mTempArray->ColapseRaw( offset, count);
 
   assert( mElementRawSize > 0);
-  assert( (mTempArray->RawSize( ) % mElementRawSize) == 0);
+  assert( (mTempArray->RawSize() % mElementRawSize) == 0);
 
-  mElementsCount = mTempArray->RawSize( ) / mElementRawSize;
+  mElementsCount = mTempArray->RawSize() / mElementRawSize;
 }
 
 
 void
-RowFieldArray::EnableTemporalStorage( )
+RowFieldArray::EnableTemporalStorage()
 {
   assert( mTempArray == NULL);
 
   auto_ptr<TemporalArray> tempArray( new TemporalArray( mElementsType));
 
   tempArray->Clone( *this);
-  tempArray->IncrementReferenceCount( );
+  tempArray->IncrementReferenceCount();
 
-  mTempArray = tempArray.release( );
+  mTempArray = tempArray.release();
 
   mStorage.DecrementRecordRef( mFirstRecordEntry);
-  mStorage.ReleaseReference( );
+  mStorage.ReleaseReference();
 }
 
 

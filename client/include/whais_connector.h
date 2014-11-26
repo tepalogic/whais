@@ -405,7 +405,7 @@ WDescribeStackTop( const WH_CONNECTION   hnd,
 /* Get the list of fields of a table value.
  *
  * This function should be called only after a call to WDescribeGlobal or
- * WDescribeStackTop( ).
+ * WDescribeStackTop().
  * In case the value's type turns out to be a table, this function will be
  * called to retrieve the count of table fields.
   *
@@ -422,7 +422,7 @@ WValueFieldsCount( const WH_CONNECTION  hnd,
 /* Fetch the field type of the stack top value.
  *
  * This function should be called only after a call to WDescribeGlobal or
- * WDescribeStackTop( ).
+ * WDescribeStackTop().
  * In case the value's type turns out to be a table, this function will be
  * called repeatedly to retrieve the tables fields names and types.
  *
@@ -449,8 +449,8 @@ WValueFetchField( const WH_CONNECTION  hnd,
 /* Add a value on the stack top.
  *
  * Push a value on top of the connections stack. The newly added value will
- * have a null value bu default, but can be update with 'WUpdateValue( )'.
- * The actual update would be cached internally( see 'WFlush( )' for
+ * have a null value bu default, but can be update with 'WUpdateValue()'.
+ * The actual update would be cached internally( see 'WFlush()' for
  * more information).
  */
 
@@ -463,7 +463,7 @@ WPushValue( const WH_CONNECTION             hnd,
 /* Remove values from the stack top.
  *
  * Clears a certain number of values from the connection stack. The actual
- * update would be cached internally( see 'WFlush( )' for more
+ * update would be cached internally( see 'WFlush()' for more
  * information).
  */
 uint_t
@@ -480,7 +480,7 @@ WPopValues( const WH_CONNECTION hnd, const uint_t count);
  *
  * Note: 1. There is no way to to have a table with a NULL row.
  *       2. The result of this could be a fake success, as all it could be
- *          cached internally( see 'WFlush( )' for more details).
+ *          cached internally( see 'WFlush()' for more details).
  */
 uint_t
 WUpdateValue( const WH_CONNECTION     hnd,
@@ -550,7 +550,7 @@ WValueTextLength( const WH_CONNECTION     hnd,
  *          sequentially, from lower rows to bigger ones, and using the same
  *          fields order as the one returned during fetching.
  *       2. For big text values, not all chars will be returned by this call.
- *          Using a combination of 'WValueTextLength( )' and a text
+ *          Using a combination of 'WValueTextLength()' and a text
  *          offset the all text should be accessible.
  *       3. Any text offsets are in terms of Unicode code points rather than
  *          bytes.

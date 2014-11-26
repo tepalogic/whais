@@ -168,7 +168,7 @@ is_type_spec_valid( const struct TypeSpec* spec)
           uint16_t type;
           uint_t   identifierLength = strlen( (char *) &spec->data[index]);
 
-          /* Don't check for zero here, because of strlen( ) */
+          /* Don't check for zero here, because of strlen() */
           index += identifierLength + 1;
           type   = load_le_int16 (&(spec->data[index]));
 

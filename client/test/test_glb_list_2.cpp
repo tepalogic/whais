@@ -14,7 +14,7 @@ check_type( const WH_CONNECTION          hnd,
             const string&                glbType)
 {
   uint_t type;
-  if (WDescribeGlobal( hnd, glbName.c_str( ), &type) != WCS_OK)
+  if (WDescribeGlobal( hnd, glbName.c_str(), &type) != WCS_OK)
     {
       cout << "Failed to describe global " << glbName << "\n.";
       return false;
@@ -28,7 +28,7 @@ check_type( const WH_CONNECTION          hnd,
 
   //Count the ',' and '(' to get the number of table fields.
   uint_t fieldsCount = 0;
-  for (size_t i = 0; i < glbType.size( ); ++i)
+  for (size_t i = 0; i < glbType.size(); ++i)
     {
       if ((glbType[i] == ',') || (glbType[i] == '('))
         ++fieldsCount;
@@ -91,7 +91,7 @@ check_type( const WH_CONNECTION          hnd,
         }
       else
         {
-          for (temp = 0; temp < offsets.size( ); temp++)
+          for (temp = 0; temp < offsets.size(); temp++)
             {
               if (offset == offsets[temp])
                 {
@@ -104,7 +104,7 @@ check_type( const WH_CONNECTION          hnd,
         }
     }
 
-  if (fieldsCount != offsets.size( ))
+  if (fieldsCount != offsets.size())
     {
       cout << "Found fields count does not match.\n";
       return false;
@@ -119,10 +119,10 @@ test_global_variables( WH_CONNECTION hnd, vector<string> glbNames, vector<string
 {
   uint_t glbsCount = 0;
   if ((WStartGlobalsList( hnd, &glbsCount) != WCS_OK)
-      || (glbsCount != glbNames.size( )))
+      || (glbsCount != glbNames.size()))
     {
       cout << "Globals count mismatch: "
-           << glbsCount << " vs. " << glbNames.size( ) << endl;
+           << glbsCount << " vs. " << glbNames.size() << endl;
       return false;
     }
   vector<bool> foundGlbs( glbsCount, false);
@@ -141,13 +141,13 @@ test_global_variables( WH_CONNECTION hnd, vector<string> glbNames, vector<string
         break;
 
       size_t index;
-      for (index = 0; index < glbNames.size( ); ++index)
+      for (index = 0; index < glbNames.size(); ++index)
         {
           if (glbNames[index] == string( name))
             break;
         }
 
-      if (index >= glbNames.size( ))
+      if (index >= glbNames.size())
         {
           cout << "Found global '" << name << "' that we don't know it.\n";
           return false;
@@ -199,21 +199,21 @@ test_global_variables( WH_CONNECTION hnd, vector<string> glbNames, vector<string
 
 
 const char*
-DefaultDatabaseName( )
+DefaultDatabaseName()
 {
-  return sDbName.c_str( );
+  return sDbName.c_str();
 }
 
 
 const uint_t
-DefaultUserId( )
+DefaultUserId()
 {
   return 0;
 }
 
 
 const char*
-DefaultUserPassword( )
+DefaultUserPassword()
 {
   return "root_test_password";
 }
@@ -225,8 +225,8 @@ setup_database( const string& db, vector<string>& glbNames, vector<string>& glbT
   cout << "\n\n Setting up for database " << db << ".\n";
   sDbName = db;
 
-  glbNames.clear( );
-  glbTypes.clear( );
+  glbNames.clear();
+  glbTypes.clear();
 
   if (sDbName == "administrator")
     {

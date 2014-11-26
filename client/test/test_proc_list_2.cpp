@@ -19,15 +19,15 @@ struct ProcedureDescription
 static bool
 check_procedure( WH_CONNECTION hnd, const ProcedureDescription& proc)
 {
-  const char* const name = proc.mName.c_str( );
+  const char* const name = proc.mName.c_str();
 
   uint_t paramsCount = 0;
-  if (WProcParamsCount( hnd, proc.mName.c_str( ), &paramsCount) != WCS_OK)
+  if (WProcParamsCount( hnd, proc.mName.c_str(), &paramsCount) != WCS_OK)
     {
       cout << "Cannot get the parameters count for procedure '" << name << "'.\n";
       return false;
     }
-  else if (paramsCount != proc.mParameters.size( ))
+  else if (paramsCount != proc.mParameters.size())
     {
       cout << "For procedure '" << name << "' parameters count does not match.\n";
       return false;
@@ -57,7 +57,7 @@ check_procedure( WH_CONNECTION hnd, const ProcedureDescription& proc)
       else
         {
           uint_t fieldsCount = 0;
-          for (size_t i = 0; i < proc.mParameters[parameter].length( ); ++i)
+          for (size_t i = 0; i < proc.mParameters[parameter].length(); ++i)
             {
               if ((proc.mParameters[parameter][i] == '(')
                   || (proc.mParameters[parameter][i] == ','))
@@ -122,7 +122,7 @@ check_procedure( WH_CONNECTION hnd, const ProcedureDescription& proc)
                 }
               else
                 {
-                  for (temp = 0; temp < offsets.size( ); temp++)
+                  for (temp = 0; temp < offsets.size(); temp++)
                     {
                       if (offset == offsets[temp])
                         {
@@ -149,10 +149,10 @@ test_procedures( WH_CONNECTION hnd, vector<ProcedureDescription> procs)
 {
   uint_t procsCount = 0;
   if ((WStartProceduresList( hnd, &procsCount) != WCS_OK)
-      || (procsCount != procs.size( )))
+      || (procsCount != procs.size()))
     {
       cout << "Procedures count mismatch: "
-           << procsCount << " vs. " << procs.size( ) << endl;
+           << procsCount << " vs. " << procs.size() << endl;
       return false;
     }
   vector<bool> foundProcs( procsCount, false);
@@ -171,13 +171,13 @@ test_procedures( WH_CONNECTION hnd, vector<ProcedureDescription> procs)
         break;
 
       size_t index;
-      for (index = 0; index < procs.size( ); ++index)
+      for (index = 0; index < procs.size(); ++index)
         {
           if (procs[index].mName == string( name))
             break;
         }
 
-      if (index >= procs.size( ))
+      if (index >= procs.size())
         {
           cout << "Found procedure '" << name << "' that we don't know it.\n";
           return false;
@@ -215,7 +215,7 @@ test_procedures( WH_CONNECTION hnd, vector<ProcedureDescription> procs)
       return false;
     }
 
-  for (i = 0; i < procs.size( ); ++i)
+  for (i = 0; i < procs.size(); ++i)
     {
       if ( ! check_procedure( hnd, procs[i]))
         {
@@ -229,21 +229,21 @@ test_procedures( WH_CONNECTION hnd, vector<ProcedureDescription> procs)
 
 
 const char*
-DefaultDatabaseName( )
+DefaultDatabaseName()
 {
-  return sDbName.c_str( );
+  return sDbName.c_str();
 }
 
 
 const uint_t
-DefaultUserId( )
+DefaultUserId()
 {
   return 0;
 }
 
 
 const char*
-DefaultUserPassword( )
+DefaultUserPassword()
 {
   return "root_test_password";
 }
@@ -255,14 +255,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
   cout << "\n\n Setting up for database " << db << ".\n";
   sDbName = db;
 
-  procs.clear( );
+  procs.clear();
 
   if (sDbName == "echo_proc_db")
     {
       ProcedureDescription proc;
 
       proc.mName = "echo_test";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNDEFINED");
 
@@ -273,7 +273,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
       ProcedureDescription proc;
 
       proc.mName = "proc_0_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT16");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -327,7 +327,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF BOOL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
@@ -387,7 +387,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_2_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "ARRAY OF CHARACTER");
       proc.mParameters.push_back( "RICHREAL");
@@ -395,7 +395,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_3_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -412,7 +412,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_4_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT16");
@@ -443,7 +443,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_5_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "FIELD OF INT64");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
@@ -456,7 +456,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_6_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
@@ -481,7 +481,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_7_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -511,7 +511,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_8_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATETIME, field_2_012 AS UNSIGNED INT16, field_3_0123 AS RICHREAL, field_4_01234 AS INT32, field_5_012345 AS UNSIGNED INT16, field_6_0123456 AS REAL, field_7_01234567 AS BOOL, field_8_012345678 AS UNSIGNED INT8, field_9_0123456789 AS INT8, field_10_0 AS DATE, field_11_01 AS INT16, field_12_012 AS INT8, field_13_0123 AS REAL, field_14_01234 AS ARRAY OF REAL, field_15_012345 AS INT64, field_16_0123456 AS ARRAY OF UNSIGNED INT32, field_17_01234567 AS UNSIGNED INT64, field_18_012345678 AS HIRESTIME, field_19_0123456789 AS INT64, field_20_0 AS DATE, field_21_01 AS ARRAY OF UNSIGNED INT16, field_22_012 AS ARRAY OF INT32, field_23_0123 AS DATETIME, field_24_01234 AS DATE, field_25_012345 AS INT16, field_26_0123456 AS REAL, field_27_01234567 AS UNSIGNED INT8, field_28_012345678 AS UNSIGNED INT16, field_29_0123456789 AS INT8, field_30_0 AS BOOL, field_31_01 AS DATETIME, field_32_012 AS CHARACTER, field_33_0123 AS ARRAY OF INT32, field_34_01234 AS REAL, field_35_012345 AS HIRESTIME, field_36_0123456 AS INT32, field_37_01234567 AS RICHREAL, field_38_012345678 AS BOOL, field_39_0123456789 AS CHARACTER, field_40_0 AS HIRESTIME, field_41_01 AS INT32, field_42_012 AS UNSIGNED INT8, field_43_0123 AS INT32, field_44_01234 AS DATETIME, field_45_012345 AS ARRAY OF DATE, field_46_0123456 AS DATETIME, field_47_01234567 AS UNSIGNED INT32, field_48_012345678 AS INT64, field_49_0123456789 AS UNSIGNED INT8, field_50_0 AS UNSIGNED INT64, field_51_01 AS INT32, field_52_012 AS ARRAY OF UNSIGNED INT16, field_53_0123 AS ARRAY OF INT64, field_54_01234 AS INT32, field_55_012345 AS HIRESTIME, field_56_0123456 AS UNSIGNED INT64, field_57_01234567 AS UNSIGNED INT16, field_58_012345678 AS INT64, field_59_0123456789 AS INT64, field_60_0 AS REAL, field_61_01 AS INT8, field_62_012 AS ARRAY OF BOOL, field_63_0123 AS ARRAY OF HIRESTIME, field_64_01234 AS UNSIGNED INT16, field_65_012345 AS UNSIGNED INT16, field_66_0123456 AS RICHREAL, field_67_01234567 AS UNSIGNED INT16, field_68_012345678 AS HIRESTIME, field_69_0123456789 AS BOOL, field_70_0 AS REAL, field_71_01 AS ARRAY OF DATETIME, field_72_012 AS INT16, field_73_0123 AS UNSIGNED INT32, field_74_01234 AS RICHREAL, field_75_012345 AS INT8, field_76_0123456 AS INT32, field_77_01234567 AS REAL, field_78_012345678 AS INT16, field_79_0123456789 AS DATE, field_80_0 AS INT32, field_81_01 AS DATE, field_82_012 AS ARRAY OF REAL, field_83_0123 AS DATE, field_84_01234 AS UNSIGNED INT32, field_85_012345 AS RICHREAL, field_86_0123456 AS INT16, field_87_01234567 AS ARRAY OF DATETIME, field_88_012345678 AS RICHREAL, field_89_0123456789 AS RICHREAL, field_90_0 AS UNSIGNED INT64, field_91_01 AS INT8, field_92_012 AS HIRESTIME, field_93_0123 AS DATE, field_94_01234 AS ARRAY OF RICHREAL)");
@@ -538,7 +538,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_9_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
@@ -573,7 +573,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_10_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TABLE");
@@ -599,7 +599,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_11_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "FIELD OF INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -618,7 +618,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_12_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -674,7 +674,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_13_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATETIME");
@@ -710,7 +710,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_14_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT32");
@@ -734,7 +734,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_15_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -766,7 +766,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_16_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
@@ -784,7 +784,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_17_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
@@ -840,7 +840,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_18_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
@@ -900,7 +900,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_19_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS CHARACTER, field_2_012 AS CHARACTER, field_3_0123 AS BOOL, field_4_01234 AS INT16, field_5_012345 AS UNSIGNED INT8, field_6_0123456 AS DATE, field_7_01234567 AS INT32, field_8_012345678 AS ARRAY OF REAL, field_9_0123456789 AS ARRAY OF INT64, field_10_0 AS CHARACTER, field_11_01 AS HIRESTIME, field_12_012 AS UNSIGNED INT16, field_13_0123 AS DATETIME, field_14_01234 AS INT32, field_15_012345 AS INT32, field_16_0123456 AS INT16, field_17_01234567 AS DATETIME, field_18_012345678 AS DATETIME, field_19_0123456789 AS INT8, field_20_0 AS ARRAY OF INT64, field_21_01 AS UNSIGNED INT16, field_22_012 AS INT16, field_23_0123 AS ARRAY OF INT16, field_24_01234 AS DATE, field_25_012345 AS DATETIME, field_26_0123456 AS CHARACTER, field_27_01234567 AS INT64, field_28_012345678 AS UNSIGNED INT16, field_29_0123456789 AS UNSIGNED INT8, field_30_0 AS HIRESTIME, field_31_01 AS ARRAY OF BOOL, field_32_012 AS ARRAY OF INT16, field_33_0123 AS UNSIGNED INT32, field_34_01234 AS HIRESTIME, field_35_012345 AS UNSIGNED INT64, field_36_0123456 AS CHARACTER, field_37_01234567 AS INT8, field_38_012345678 AS DATETIME, field_39_0123456789 AS UNSIGNED INT8, field_40_0 AS ARRAY OF DATETIME, field_41_01 AS HIRESTIME, field_42_012 AS ARRAY OF UNSIGNED INT64, field_43_0123 AS ARRAY OF UNSIGNED INT8, field_44_01234 AS ARRAY OF DATETIME, field_45_012345 AS RICHREAL, field_46_0123456 AS BOOL, field_47_01234567 AS CHARACTER, field_48_012345678 AS INT8, field_49_0123456789 AS UNSIGNED INT16, field_50_0 AS ARRAY OF UNSIGNED INT8, field_51_01 AS ARRAY OF DATETIME, field_52_012 AS REAL, field_53_0123 AS UNSIGNED INT64, field_54_01234 AS UNSIGNED INT8, field_55_012345 AS INT16, field_56_0123456 AS INT64, field_57_01234567 AS CHARACTER, field_58_012345678 AS RICHREAL)");
@@ -950,7 +950,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_20_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT64");
@@ -990,7 +990,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_21_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
@@ -1005,7 +1005,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_22_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
@@ -1031,7 +1031,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_23_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
@@ -1058,7 +1058,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_24_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
@@ -1089,7 +1089,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_25_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT64");
@@ -1100,7 +1100,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_26_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
@@ -1132,7 +1132,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_27_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATE");
@@ -1190,7 +1190,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_28_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -1210,7 +1210,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_29_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -1248,7 +1248,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_30_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
@@ -1267,7 +1267,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_31_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
@@ -1283,7 +1283,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_32_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
@@ -1298,7 +1298,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_33_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
@@ -1316,7 +1316,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_34_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "BOOL");
@@ -1381,7 +1381,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_35_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -1400,7 +1400,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_36_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT64");
       proc.mParameters.push_back( "DATETIME");
@@ -1433,7 +1433,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_37_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF HIRESTIME, field_2_012 AS REAL, field_3_0123 AS UNSIGNED INT32, field_4_01234 AS DATE, field_5_012345 AS INT32, field_6_0123456 AS CHARACTER, field_7_01234567 AS UNSIGNED INT64, field_8_012345678 AS REAL, field_9_0123456789 AS INT8, field_10_0 AS UNSIGNED INT16, field_11_01 AS ARRAY OF HIRESTIME, field_12_012 AS DATE, field_13_0123 AS REAL, field_14_01234 AS ARRAY OF UNSIGNED INT64, field_15_012345 AS UNSIGNED INT16, field_16_0123456 AS ARRAY OF UNSIGNED INT16, field_17_01234567 AS ARRAY OF CHARACTER, field_18_012345678 AS UNSIGNED INT32, field_19_0123456789 AS INT64, field_20_0 AS INT8, field_21_01 AS INT64, field_22_012 AS INT64, field_23_0123 AS INT8, field_24_01234 AS INT32, field_25_012345 AS ARRAY OF UNSIGNED INT32, field_26_0123456 AS HIRESTIME, field_27_01234567 AS UNSIGNED INT8, field_28_012345678 AS DATE, field_29_0123456789 AS DATETIME, field_30_0 AS RICHREAL, field_31_01 AS DATE, field_32_012 AS INT32, field_33_0123 AS INT8, field_34_01234 AS INT64, field_35_012345 AS REAL, field_36_0123456 AS ARRAY OF DATETIME, field_37_01234567 AS CHARACTER, field_38_012345678 AS UNSIGNED INT64, field_39_0123456789 AS DATE, field_40_0 AS ARRAY OF DATETIME, field_41_01 AS UNSIGNED INT16, field_42_012 AS REAL, field_43_0123 AS UNSIGNED INT16, field_44_01234 AS UNSIGNED INT64, field_45_012345 AS ARRAY OF INT8, field_46_0123456 AS DATETIME, field_47_01234567 AS INT16, field_48_012345678 AS ARRAY OF REAL, field_49_0123456789 AS DATE, field_50_0 AS INT8, field_51_01 AS INT16, field_52_012 AS BOOL, field_53_0123 AS ARRAY OF INT8, field_54_01234 AS UNSIGNED INT32, field_55_012345 AS UNSIGNED INT16, field_56_0123456 AS BOOL, field_57_01234567 AS ARRAY OF DATE, field_58_012345678 AS UNSIGNED INT64, field_59_0123456789 AS ARRAY OF INT64, field_60_0 AS BOOL, field_61_01 AS HIRESTIME, field_62_012 AS INT64, field_63_0123 AS DATE, field_64_01234 AS INT16, field_65_012345 AS INT8, field_66_0123456 AS UNSIGNED INT8, field_67_01234567 AS DATE, field_68_012345678 AS HIRESTIME)");
@@ -1464,7 +1464,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_38_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "HIRESTIME");
@@ -1505,7 +1505,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_39_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -1531,7 +1531,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_40_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT16");
@@ -1591,7 +1591,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_41_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
@@ -1617,7 +1617,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_42_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
@@ -1644,7 +1644,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_43_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -1684,7 +1684,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_44_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF INT16, field_2_012 AS HIRESTIME, field_3_0123 AS BOOL, field_4_01234 AS UNSIGNED INT8, field_5_012345 AS INT32, field_6_0123456 AS REAL, field_7_01234567 AS UNSIGNED INT8, field_8_012345678 AS DATETIME, field_9_0123456789 AS DATETIME, field_10_0 AS ARRAY OF RICHREAL, field_11_01 AS BOOL, field_12_012 AS UNSIGNED INT16, field_13_0123 AS BOOL, field_14_01234 AS ARRAY OF HIRESTIME, field_15_012345 AS HIRESTIME, field_16_0123456 AS INT8, field_17_01234567 AS REAL, field_18_012345678 AS ARRAY OF HIRESTIME, field_19_0123456789 AS UNSIGNED INT32, field_20_0 AS INT16, field_21_01 AS UNSIGNED INT64, field_22_012 AS BOOL, field_23_0123 AS BOOL, field_24_01234 AS UNSIGNED INT64, field_25_012345 AS ARRAY OF BOOL, field_26_0123456 AS CHARACTER, field_27_01234567 AS ARRAY OF BOOL, field_28_012345678 AS ARRAY OF REAL, field_29_0123456789 AS HIRESTIME, field_30_0 AS DATE, field_31_01 AS INT16, field_32_012 AS RICHREAL, field_33_0123 AS INT64, field_34_01234 AS UNSIGNED INT16, field_35_012345 AS UNSIGNED INT16, field_36_0123456 AS CHARACTER, field_37_01234567 AS INT16, field_38_012345678 AS INT32, field_39_0123456789 AS INT32, field_40_0 AS INT64, field_41_01 AS UNSIGNED INT8, field_42_012 AS BOOL, field_43_0123 AS UNSIGNED INT8, field_44_01234 AS INT16, field_45_012345 AS DATE, field_46_0123456 AS BOOL, field_47_01234567 AS INT64, field_48_012345678 AS INT16, field_49_0123456789 AS DATE, field_50_0 AS DATE, field_51_01 AS RICHREAL, field_52_012 AS DATETIME, field_53_0123 AS ARRAY OF INT16, field_54_01234 AS CHARACTER, field_55_012345 AS REAL, field_56_0123456 AS DATE, field_57_01234567 AS UNSIGNED INT16, field_58_012345678 AS INT8, field_59_0123456789 AS ARRAY OF CHARACTER, field_60_0 AS BOOL, field_61_01 AS INT16, field_62_012 AS ARRAY OF UNSIGNED INT64, field_63_0123 AS INT64, field_64_01234 AS RICHREAL, field_65_012345 AS UNSIGNED INT16, field_66_0123456 AS UNSIGNED INT16, field_67_01234567 AS DATE, field_68_012345678 AS ARRAY OF INT16, field_69_0123456789 AS ARRAY OF INT64, field_70_0 AS INT64, field_71_01 AS UNSIGNED INT32, field_72_012 AS ARRAY OF INT32, field_73_0123 AS INT16, field_74_01234 AS ARRAY OF UNSIGNED INT64, field_75_012345 AS INT16, field_76_0123456 AS BOOL, field_77_01234567 AS UNSIGNED INT32, field_78_012345678 AS CHARACTER, field_79_0123456789 AS INT8, field_80_0 AS DATE, field_81_01 AS RICHREAL, field_82_012 AS CHARACTER, field_83_0123 AS UNSIGNED INT16, field_84_01234 AS ARRAY OF RICHREAL, field_85_012345 AS REAL, field_86_0123456 AS CHARACTER, field_87_01234567 AS CHARACTER, field_88_012345678 AS ARRAY OF REAL, field_89_0123456789 AS RICHREAL, field_90_0 AS INT32, field_91_01 AS REAL, field_92_012 AS INT8, field_93_0123 AS RICHREAL, field_94_01234 AS INT32, field_95_012345 AS ARRAY OF DATE, field_96_0123456 AS INT64, field_97_01234567 AS HIRESTIME, field_98_012345678 AS ARRAY OF UNSIGNED INT32, field_99_0123456789 AS INT8)");
       proc.mParameters.push_back( "FIELD OF REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -1707,7 +1707,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_45_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -1716,7 +1716,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_46_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
@@ -1743,7 +1743,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_47_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT16");
@@ -1759,7 +1759,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_48_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -1795,7 +1795,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_49_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -1811,7 +1811,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_50_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -1863,7 +1863,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_51_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT64");
@@ -1884,7 +1884,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_52_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TEXT");
@@ -1923,7 +1923,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_53_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -1962,7 +1962,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_54_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
@@ -1976,7 +1976,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_55_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNDEFINED");
@@ -1986,7 +1986,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_56_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -1996,7 +1996,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_57_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -2020,7 +2020,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_58_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATE");
@@ -2038,7 +2038,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_59_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -2088,7 +2088,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_60_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS BOOL, field_2_012 AS ARRAY OF DATETIME, field_3_0123 AS INT8, field_4_01234 AS HIRESTIME, field_5_012345 AS ARRAY OF UNSIGNED INT64, field_6_0123456 AS ARRAY OF INT64, field_7_01234567 AS ARRAY OF INT8, field_8_012345678 AS HIRESTIME, field_9_0123456789 AS RICHREAL, field_10_0 AS HIRESTIME, field_11_01 AS UNSIGNED INT16, field_12_012 AS CHARACTER, field_13_0123 AS UNSIGNED INT8, field_14_01234 AS ARRAY OF INT16, field_15_012345 AS INT32, field_16_0123456 AS ARRAY OF UNSIGNED INT8, field_17_01234567 AS UNSIGNED INT32, field_18_012345678 AS RICHREAL, field_19_0123456789 AS CHARACTER, field_20_0 AS UNSIGNED INT16, field_21_01 AS UNSIGNED INT16, field_22_012 AS DATE, field_23_0123 AS ARRAY OF UNSIGNED INT8, field_24_01234 AS UNSIGNED INT16, field_25_012345 AS UNSIGNED INT8, field_26_0123456 AS ARRAY OF INT64, field_27_01234567 AS UNSIGNED INT16, field_28_012345678 AS ARRAY OF HIRESTIME, field_29_0123456789 AS RICHREAL, field_30_0 AS UNSIGNED INT8, field_31_01 AS ARRAY OF BOOL, field_32_012 AS DATETIME, field_33_0123 AS INT16, field_34_01234 AS INT8, field_35_012345 AS ARRAY OF DATETIME, field_36_0123456 AS CHARACTER, field_37_01234567 AS INT32, field_38_012345678 AS INT32, field_39_0123456789 AS INT32, field_40_0 AS ARRAY OF DATETIME, field_41_01 AS CHARACTER, field_42_012 AS ARRAY OF INT16, field_43_0123 AS INT8, field_44_01234 AS REAL, field_45_012345 AS UNSIGNED INT8, field_46_0123456 AS RICHREAL, field_47_01234567 AS ARRAY OF UNSIGNED INT8, field_48_012345678 AS INT8, field_49_0123456789 AS INT64, field_50_0 AS CHARACTER, field_51_01 AS INT8, field_52_012 AS BOOL, field_53_0123 AS DATE, field_54_01234 AS DATE, field_55_012345 AS CHARACTER, field_56_0123456 AS INT64, field_57_01234567 AS INT16, field_58_012345678 AS UNSIGNED INT32, field_59_0123456789 AS DATE, field_60_0 AS ARRAY OF DATETIME, field_61_01 AS DATETIME, field_62_012 AS INT8, field_63_0123 AS BOOL, field_64_01234 AS UNSIGNED INT64, field_65_012345 AS ARRAY OF INT16, field_66_0123456 AS CHARACTER, field_67_01234567 AS DATE, field_68_012345678 AS UNSIGNED INT64, field_69_0123456789 AS INT16, field_70_0 AS ARRAY OF UNSIGNED INT8, field_71_01 AS UNSIGNED INT16, field_72_012 AS ARRAY OF RICHREAL, field_73_0123 AS UNSIGNED INT64, field_74_01234 AS INT32, field_75_012345 AS HIRESTIME, field_76_0123456 AS DATE, field_77_01234567 AS ARRAY OF UNSIGNED INT64, field_78_012345678 AS UNSIGNED INT16, field_79_0123456789 AS ARRAY OF CHARACTER, field_80_0 AS UNSIGNED INT8, field_81_01 AS CHARACTER, field_82_012 AS UNSIGNED INT64)");
       proc.mParameters.push_back( "ARRAY OF REAL");
@@ -2124,7 +2124,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_61_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -2147,7 +2147,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_62_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
@@ -2199,7 +2199,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_63_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT32");
@@ -2217,7 +2217,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_64_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
@@ -2285,7 +2285,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_65_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATE");
@@ -2312,7 +2312,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_66_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "FIELD OF TEXT");
@@ -2367,7 +2367,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_67_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -2403,7 +2403,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_68_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT32");
@@ -2416,7 +2416,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_69_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT64");
@@ -2467,7 +2467,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_70_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "ARRAY OF INT8");
@@ -2494,7 +2494,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_71_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -2508,7 +2508,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_72_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "BOOL");
@@ -2539,7 +2539,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_73_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "BOOL");
@@ -2601,7 +2601,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_74_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
@@ -2615,7 +2615,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_75_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "REAL");
@@ -2633,7 +2633,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_76_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
@@ -2669,7 +2669,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_77_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "CHARACTER");
@@ -2699,7 +2699,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_78_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT64");
       proc.mParameters.push_back( "DATETIME");
@@ -2745,7 +2745,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_79_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -2758,7 +2758,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_80_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
@@ -2799,13 +2799,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_81_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       procs.push_back( proc);
 
 
       proc.mName = "proc_82_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "FIELD OF INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -2873,7 +2873,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_83_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
@@ -2900,7 +2900,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_84_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -2915,7 +2915,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_85_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
@@ -2950,7 +2950,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_86_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -2968,7 +2968,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_87_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATE");
@@ -3037,7 +3037,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_88_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
@@ -3045,7 +3045,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_89_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -3103,7 +3103,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_90_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "BOOL");
@@ -3147,7 +3147,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_91_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -3157,7 +3157,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_92_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -3195,7 +3195,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_93_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -3220,7 +3220,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_94_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "ARRAY OF INT64");
@@ -3265,7 +3265,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_95_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF UNSIGNED INT32, field_2_012 AS INT64, field_3_0123 AS INT32, field_4_01234 AS INT32, field_5_012345 AS INT64, field_6_0123456 AS UNSIGNED INT32, field_7_01234567 AS RICHREAL, field_8_012345678 AS INT8, field_9_0123456789 AS ARRAY OF UNSIGNED INT32, field_10_0 AS UNSIGNED INT8, field_11_01 AS ARRAY OF CHARACTER, field_12_012 AS CHARACTER, field_13_0123 AS UNSIGNED INT16, field_14_01234 AS HIRESTIME, field_15_012345 AS UNSIGNED INT32, field_16_0123456 AS BOOL, field_17_01234567 AS CHARACTER, field_18_012345678 AS DATETIME, field_19_0123456789 AS UNSIGNED INT8, field_20_0 AS ARRAY OF INT64, field_21_01 AS RICHREAL, field_22_012 AS BOOL, field_23_0123 AS BOOL, field_24_01234 AS RICHREAL, field_25_012345 AS UNSIGNED INT64, field_26_0123456 AS UNSIGNED INT32, field_27_01234567 AS HIRESTIME, field_28_012345678 AS DATETIME, field_29_0123456789 AS CHARACTER, field_30_0 AS CHARACTER, field_31_01 AS ARRAY OF UNSIGNED INT16, field_32_012 AS HIRESTIME, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS INT8, field_35_012345 AS UNSIGNED INT64, field_36_0123456 AS UNSIGNED INT32, field_37_01234567 AS ARRAY OF HIRESTIME, field_38_012345678 AS CHARACTER, field_39_0123456789 AS BOOL, field_40_0 AS UNSIGNED INT16, field_41_01 AS UNSIGNED INT32, field_42_012 AS DATE, field_43_0123 AS INT16, field_44_01234 AS HIRESTIME, field_45_012345 AS UNSIGNED INT64, field_46_0123456 AS DATETIME, field_47_01234567 AS UNSIGNED INT8, field_48_012345678 AS INT16, field_49_0123456789 AS RICHREAL, field_50_0 AS UNSIGNED INT16, field_51_01 AS ARRAY OF UNSIGNED INT16, field_52_012 AS UNSIGNED INT8, field_53_0123 AS INT64, field_54_01234 AS UNSIGNED INT16, field_55_012345 AS CHARACTER, field_56_0123456 AS ARRAY OF INT32, field_57_01234567 AS BOOL, field_58_012345678 AS INT16, field_59_0123456789 AS ARRAY OF UNSIGNED INT64, field_60_0 AS REAL, field_61_01 AS INT32, field_62_012 AS UNSIGNED INT32, field_63_0123 AS RICHREAL, field_64_01234 AS BOOL, field_65_012345 AS RICHREAL, field_66_0123456 AS ARRAY OF UNSIGNED INT64, field_67_01234567 AS RICHREAL, field_68_012345678 AS BOOL, field_69_0123456789 AS DATE, field_70_0 AS ARRAY OF CHARACTER, field_71_01 AS DATETIME, field_72_012 AS UNSIGNED INT16, field_73_0123 AS ARRAY OF RICHREAL, field_74_01234 AS RICHREAL, field_75_012345 AS BOOL, field_76_0123456 AS INT8, field_77_01234567 AS ARRAY OF INT64, field_78_012345678 AS RICHREAL, field_79_0123456789 AS HIRESTIME, field_80_0 AS UNSIGNED INT8, field_81_01 AS ARRAY OF BOOL, field_82_012 AS RICHREAL, field_83_0123 AS INT16, field_84_01234 AS ARRAY OF UNSIGNED INT16, field_85_012345 AS BOOL, field_86_0123456 AS ARRAY OF CHARACTER, field_87_01234567 AS ARRAY OF CHARACTER, field_88_012345678 AS DATETIME)");
       proc.mParameters.push_back( "CHARACTER");
@@ -3278,7 +3278,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_96_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
@@ -3287,14 +3287,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_97_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
       procs.push_back( proc);
 
 
       proc.mName = "proc_98_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -3348,7 +3348,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_99_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "FIELD OF INT32");
@@ -3414,7 +3414,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "a";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -3464,7 +3464,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xa";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNDEFINED");
@@ -3499,7 +3499,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_102_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -3535,7 +3535,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_103_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT8");
@@ -3557,7 +3557,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_104_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT8, field_2_012 AS REAL, field_3_0123 AS ARRAY OF RICHREAL, field_4_01234 AS HIRESTIME, field_5_012345 AS DATETIME, field_6_0123456 AS INT32, field_7_01234567 AS ARRAY OF HIRESTIME, field_8_012345678 AS REAL, field_9_0123456789 AS DATETIME, field_10_0 AS INT32, field_11_01 AS REAL, field_12_012 AS HIRESTIME, field_13_0123 AS UNSIGNED INT16, field_14_01234 AS UNSIGNED INT64, field_15_012345 AS UNSIGNED INT16, field_16_0123456 AS UNSIGNED INT64, field_17_01234567 AS INT64)");
       proc.mParameters.push_back( "FIELD OF INT32");
@@ -3576,7 +3576,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_105_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
@@ -3604,7 +3604,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_106_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF BOOL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT16");
@@ -3620,7 +3620,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_107_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
@@ -3643,7 +3643,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_108_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "TEXT");
@@ -3689,7 +3689,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_109_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -3724,7 +3724,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_110_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -3744,7 +3744,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_111_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -3782,7 +3782,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_112_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -3801,7 +3801,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_113_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT64");
       proc.mParameters.push_back( "INT8");
@@ -3810,7 +3810,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_114_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS RICHREAL, field_2_012 AS BOOL, field_3_0123 AS INT8, field_4_01234 AS RICHREAL, field_5_012345 AS ARRAY OF UNSIGNED INT8, field_6_0123456 AS UNSIGNED INT32, field_7_01234567 AS DATETIME, field_8_012345678 AS INT32, field_9_0123456789 AS INT32, field_10_0 AS UNSIGNED INT16, field_11_01 AS INT32, field_12_012 AS RICHREAL, field_13_0123 AS ARRAY OF DATETIME, field_14_01234 AS UNSIGNED INT64, field_15_012345 AS UNSIGNED INT16, field_16_0123456 AS UNSIGNED INT32, field_17_01234567 AS RICHREAL, field_18_012345678 AS ARRAY OF UNSIGNED INT32, field_19_0123456789 AS ARRAY OF INT32, field_20_0 AS INT8, field_21_01 AS INT16, field_22_012 AS INT64, field_23_0123 AS INT32, field_24_01234 AS INT32, field_25_012345 AS ARRAY OF UNSIGNED INT32, field_26_0123456 AS RICHREAL, field_27_01234567 AS UNSIGNED INT64, field_28_012345678 AS CHARACTER, field_29_0123456789 AS DATE, field_30_0 AS UNSIGNED INT64, field_31_01 AS REAL, field_32_012 AS HIRESTIME, field_33_0123 AS RICHREAL, field_34_01234 AS ARRAY OF INT32, field_35_012345 AS INT32, field_36_0123456 AS UNSIGNED INT64, field_37_01234567 AS INT8, field_38_012345678 AS UNSIGNED INT16, field_39_0123456789 AS HIRESTIME, field_40_0 AS DATE, field_41_01 AS UNSIGNED INT64, field_42_012 AS BOOL, field_43_0123 AS ARRAY OF UNSIGNED INT8, field_44_01234 AS INT64, field_45_012345 AS BOOL, field_46_0123456 AS INT8)");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -3830,7 +3830,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_115_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "FIELD OF RICHREAL");
@@ -3847,7 +3847,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_116_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
@@ -3861,7 +3861,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_117_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "BOOL");
@@ -3908,7 +3908,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_118_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT16");
@@ -3938,7 +3938,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_119_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
@@ -3988,7 +3988,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_120_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -4019,7 +4019,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_121_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -4075,7 +4075,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_122_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -4097,7 +4097,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_123_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -4138,7 +4138,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_124_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
@@ -4157,7 +4157,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_125_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -4215,7 +4215,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_126_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -4238,7 +4238,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_127_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "CHARACTER");
@@ -4290,7 +4290,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_128_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "BOOL");
@@ -4298,7 +4298,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_129_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -4312,7 +4312,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_130_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -4336,7 +4336,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_131_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
@@ -4373,7 +4373,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_132_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "ARRAY OF REAL");
       proc.mParameters.push_back( "DATE");
@@ -4382,7 +4382,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_133_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "BOOL");
@@ -4400,7 +4400,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_134_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "CHARACTER");
@@ -4456,13 +4456,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_135_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       procs.push_back( proc);
 
 
       proc.mName = "proc_136_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT8");
@@ -4484,7 +4484,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_137_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
@@ -4516,7 +4516,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_138_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT8");
@@ -4552,7 +4552,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_139_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -4561,7 +4561,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_140_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -4622,7 +4622,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_141_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -4636,7 +4636,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_142_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
@@ -4665,7 +4665,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_143_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
@@ -4686,7 +4686,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_144_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
@@ -4721,14 +4721,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_145_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       procs.push_back( proc);
 
 
       proc.mName = "proc_146_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -4756,7 +4756,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_147_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
@@ -4792,7 +4792,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_148_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT64");
@@ -4846,13 +4846,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_149_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       procs.push_back( proc);
 
 
       proc.mName = "proc_150_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -4869,7 +4869,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_151_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT16, field_2_012 AS ARRAY OF DATE, field_3_0123 AS ARRAY OF CHARACTER, field_4_01234 AS INT64, field_5_012345 AS ARRAY OF UNSIGNED INT64, field_6_0123456 AS INT64, field_7_01234567 AS ARRAY OF UNSIGNED INT32, field_8_012345678 AS DATETIME, field_9_0123456789 AS UNSIGNED INT16, field_10_0 AS DATE, field_11_01 AS INT8, field_12_012 AS DATETIME, field_13_0123 AS HIRESTIME, field_14_01234 AS INT16, field_15_012345 AS ARRAY OF UNSIGNED INT64, field_16_0123456 AS BOOL, field_17_01234567 AS CHARACTER, field_18_012345678 AS DATETIME, field_19_0123456789 AS RICHREAL, field_20_0 AS INT32, field_21_01 AS INT8, field_22_012 AS UNSIGNED INT8, field_23_0123 AS UNSIGNED INT16, field_24_01234 AS UNSIGNED INT16, field_25_012345 AS UNSIGNED INT32, field_26_0123456 AS ARRAY OF CHARACTER, field_27_01234567 AS ARRAY OF DATE, field_28_012345678 AS DATETIME, field_29_0123456789 AS ARRAY OF REAL, field_30_0 AS ARRAY OF UNSIGNED INT64, field_31_01 AS INT32, field_32_012 AS INT64, field_33_0123 AS BOOL, field_34_01234 AS ARRAY OF UNSIGNED INT8, field_35_012345 AS UNSIGNED INT32, field_36_0123456 AS DATETIME, field_37_01234567 AS DATETIME, field_38_012345678 AS INT8, field_39_0123456789 AS UNSIGNED INT16, field_40_0 AS ARRAY OF UNSIGNED INT16, field_41_01 AS INT8, field_42_012 AS ARRAY OF INT64, field_43_0123 AS CHARACTER, field_44_01234 AS INT16, field_45_012345 AS REAL, field_46_0123456 AS UNSIGNED INT32, field_47_01234567 AS UNSIGNED INT8, field_48_012345678 AS INT64, field_49_0123456789 AS REAL, field_50_0 AS UNSIGNED INT32, field_51_01 AS REAL, field_52_012 AS UNSIGNED INT64, field_53_0123 AS DATE, field_54_01234 AS UNSIGNED INT8, field_55_012345 AS UNSIGNED INT64, field_56_0123456 AS INT16, field_57_01234567 AS INT64, field_58_012345678 AS ARRAY OF RICHREAL, field_59_0123456789 AS DATETIME, field_60_0 AS UNSIGNED INT8, field_61_01 AS INT32, field_62_012 AS ARRAY OF UNSIGNED INT64, field_63_0123 AS ARRAY OF INT16, field_64_01234 AS ARRAY OF HIRESTIME, field_65_012345 AS ARRAY OF INT64, field_66_0123456 AS HIRESTIME, field_67_01234567 AS ARRAY OF UNSIGNED INT16, field_68_012345678 AS ARRAY OF INT32, field_69_0123456789 AS ARRAY OF HIRESTIME, field_70_0 AS UNSIGNED INT64, field_71_01 AS HIRESTIME, field_72_012 AS ARRAY OF UNSIGNED INT16, field_73_0123 AS DATETIME, field_74_01234 AS UNSIGNED INT32, field_75_012345 AS CHARACTER, field_76_0123456 AS ARRAY OF INT8, field_77_01234567 AS INT64, field_78_012345678 AS ARRAY OF INT32, field_79_0123456789 AS DATE, field_80_0 AS UNSIGNED INT64, field_81_01 AS HIRESTIME, field_82_012 AS INT16, field_83_0123 AS UNSIGNED INT16)");
@@ -4926,7 +4926,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_152_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
@@ -4983,7 +4983,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_153_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT32");
@@ -5008,7 +5008,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_154_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT16");
@@ -5057,7 +5057,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_155_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -5120,7 +5120,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_156_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "DATETIME");
@@ -5149,7 +5149,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_157_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "REAL");
@@ -5181,7 +5181,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_158_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -5214,7 +5214,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_159_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
@@ -5248,7 +5248,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_160_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
@@ -5280,7 +5280,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_161_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "DATE");
@@ -5302,7 +5302,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_162_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
@@ -5311,7 +5311,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_163_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT8");
@@ -5322,7 +5322,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_164_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT16");
@@ -5351,7 +5351,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_165_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT64");
@@ -5360,7 +5360,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_166_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -5428,7 +5428,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_167_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "ARRAY OF REAL");
@@ -5492,7 +5492,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_168_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -5516,14 +5516,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_169_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       procs.push_back( proc);
 
 
       proc.mName = "proc_170_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -5564,7 +5564,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_171_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -5586,7 +5586,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_172_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -5629,7 +5629,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_173_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT64");
@@ -5648,7 +5648,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_174_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF RICHREAL, field_2_012 AS ARRAY OF RICHREAL, field_3_0123 AS INT64, field_4_01234 AS CHARACTER, field_5_012345 AS HIRESTIME, field_6_0123456 AS RICHREAL, field_7_01234567 AS INT32, field_8_012345678 AS CHARACTER, field_9_0123456789 AS CHARACTER, field_10_0 AS INT16, field_11_01 AS ARRAY OF INT64, field_12_012 AS ARRAY OF INT8, field_13_0123 AS UNSIGNED INT16, field_14_01234 AS INT16, field_15_012345 AS ARRAY OF REAL, field_16_0123456 AS UNSIGNED INT32, field_17_01234567 AS BOOL, field_18_012345678 AS UNSIGNED INT32, field_19_0123456789 AS INT16, field_20_0 AS INT64, field_21_01 AS ARRAY OF DATE, field_22_012 AS CHARACTER, field_23_0123 AS ARRAY OF DATETIME, field_24_01234 AS INT64, field_25_012345 AS INT32, field_26_0123456 AS CHARACTER, field_27_01234567 AS INT8, field_28_012345678 AS DATETIME, field_29_0123456789 AS ARRAY OF HIRESTIME, field_30_0 AS INT16, field_31_01 AS ARRAY OF DATETIME, field_32_012 AS BOOL, field_33_0123 AS CHARACTER, field_34_01234 AS HIRESTIME, field_35_012345 AS UNSIGNED INT16, field_36_0123456 AS ARRAY OF CHARACTER, field_37_01234567 AS BOOL, field_38_012345678 AS INT8, field_39_0123456789 AS INT16, field_40_0 AS INT64, field_41_01 AS UNSIGNED INT8, field_42_012 AS INT8, field_43_0123 AS INT8, field_44_01234 AS CHARACTER, field_45_012345 AS INT8, field_46_0123456 AS BOOL, field_47_01234567 AS DATETIME, field_48_012345678 AS UNSIGNED INT8, field_49_0123456789 AS HIRESTIME, field_50_0 AS REAL, field_51_01 AS UNSIGNED INT16, field_52_012 AS ARRAY OF DATE, field_53_0123 AS INT16, field_54_01234 AS UNSIGNED INT32, field_55_012345 AS HIRESTIME, field_56_0123456 AS ARRAY OF UNSIGNED INT16, field_57_01234567 AS REAL, field_58_012345678 AS HIRESTIME)");
@@ -5664,7 +5664,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_175_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -5733,7 +5733,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_176_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF REAL");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "HIRESTIME");
@@ -5750,7 +5750,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_177_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "FIELD OF DATE");
@@ -5788,7 +5788,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_178_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT32");
@@ -5808,7 +5808,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_179_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
@@ -5855,7 +5855,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_180_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -5897,7 +5897,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_181_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -5941,7 +5941,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_182_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT64");
@@ -5980,7 +5980,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_183_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT8, field_2_012 AS UNSIGNED INT16, field_3_0123 AS DATE, field_4_01234 AS UNSIGNED INT8, field_5_012345 AS UNSIGNED INT64, field_6_0123456 AS BOOL, field_7_01234567 AS CHARACTER, field_8_012345678 AS UNSIGNED INT64, field_9_0123456789 AS REAL, field_10_0 AS INT32, field_11_01 AS ARRAY OF INT16, field_12_012 AS INT32, field_13_0123 AS ARRAY OF INT64, field_14_01234 AS INT32, field_15_012345 AS RICHREAL, field_16_0123456 AS INT64, field_17_01234567 AS INT16, field_18_012345678 AS RICHREAL, field_19_0123456789 AS ARRAY OF UNSIGNED INT32, field_20_0 AS BOOL, field_21_01 AS BOOL, field_22_012 AS ARRAY OF INT32, field_23_0123 AS REAL, field_24_01234 AS UNSIGNED INT16, field_25_012345 AS INT16, field_26_0123456 AS ARRAY OF INT8, field_27_01234567 AS UNSIGNED INT64, field_28_012345678 AS UNSIGNED INT16, field_29_0123456789 AS UNSIGNED INT8, field_30_0 AS INT8, field_31_01 AS UNSIGNED INT64, field_32_012 AS ARRAY OF INT64, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS DATETIME, field_35_012345 AS INT16, field_36_0123456 AS INT8, field_37_01234567 AS UNSIGNED INT64, field_38_012345678 AS UNSIGNED INT8, field_39_0123456789 AS ARRAY OF DATE, field_40_0 AS ARRAY OF BOOL, field_41_01 AS UNSIGNED INT8, field_42_012 AS UNSIGNED INT8, field_43_0123 AS REAL, field_44_01234 AS INT16, field_45_012345 AS UNSIGNED INT8, field_46_0123456 AS HIRESTIME, field_47_01234567 AS DATE, field_48_012345678 AS BOOL, field_49_0123456789 AS INT8, field_50_0 AS ARRAY OF INT32, field_51_01 AS ARRAY OF RICHREAL, field_52_012 AS UNSIGNED INT32, field_53_0123 AS REAL, field_54_01234 AS CHARACTER, field_55_012345 AS UNSIGNED INT16, field_56_0123456 AS INT8, field_57_01234567 AS ARRAY OF CHARACTER, field_58_012345678 AS INT64, field_59_0123456789 AS INT64, field_60_0 AS HIRESTIME, field_61_01 AS ARRAY OF UNSIGNED INT16, field_62_012 AS DATETIME, field_63_0123 AS CHARACTER, field_64_01234 AS UNSIGNED INT8, field_65_012345 AS DATETIME, field_66_0123456 AS ARRAY OF INT64, field_67_01234567 AS INT8, field_68_012345678 AS UNSIGNED INT32, field_69_0123456789 AS BOOL, field_70_0 AS INT8, field_71_01 AS DATE, field_72_012 AS BOOL, field_73_0123 AS INT32)");
@@ -6011,7 +6011,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_184_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
@@ -6025,7 +6025,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_185_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -6059,7 +6059,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_186_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -6072,7 +6072,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_187_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATETIME");
@@ -6113,13 +6113,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_188_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       procs.push_back( proc);
 
 
       proc.mName = "proc_189_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF CHARACTER");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -6158,7 +6158,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_190_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
@@ -6212,7 +6212,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_191_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATE, field_2_012 AS RICHREAL, field_3_0123 AS ARRAY OF DATETIME, field_4_01234 AS HIRESTIME, field_5_012345 AS INT16, field_6_0123456 AS UNSIGNED INT16, field_7_01234567 AS HIRESTIME, field_8_012345678 AS INT32, field_9_0123456789 AS ARRAY OF HIRESTIME, field_10_0 AS DATE, field_11_01 AS CHARACTER, field_12_012 AS UNSIGNED INT64, field_13_0123 AS INT64, field_14_01234 AS ARRAY OF UNSIGNED INT64, field_15_012345 AS UNSIGNED INT32, field_16_0123456 AS RICHREAL)");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATE");
@@ -6245,7 +6245,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_192_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
@@ -6257,7 +6257,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_193_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -6318,7 +6318,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_194_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -6329,7 +6329,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_195_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -6342,7 +6342,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_196_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT16");
@@ -6371,7 +6371,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_197_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNDEFINED");
@@ -6407,7 +6407,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_198_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "FIELD OF RICHREAL");
@@ -6440,7 +6440,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_199_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -6481,7 +6481,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "b";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -6533,7 +6533,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xb";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -6598,7 +6598,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_202_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
@@ -6611,7 +6611,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_203_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -6624,7 +6624,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_204_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
@@ -6661,7 +6661,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_205_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "ARRAY OF CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -6722,7 +6722,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_206_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT32");
@@ -6790,7 +6790,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_207_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "HIRESTIME");
@@ -6856,7 +6856,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_208_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
@@ -6892,7 +6892,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_209_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
@@ -6900,7 +6900,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_210_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -6945,7 +6945,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_211_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT16, field_2_012 AS BOOL, field_3_0123 AS ARRAY OF INT8, field_4_01234 AS UNSIGNED INT8, field_5_012345 AS ARRAY OF INT64, field_6_0123456 AS UNSIGNED INT8, field_7_01234567 AS ARRAY OF DATE, field_8_012345678 AS CHARACTER, field_9_0123456789 AS INT32, field_10_0 AS CHARACTER, field_11_01 AS RICHREAL, field_12_012 AS INT8, field_13_0123 AS DATETIME, field_14_01234 AS UNSIGNED INT64, field_15_012345 AS UNSIGNED INT8, field_16_0123456 AS INT64, field_17_01234567 AS DATETIME, field_18_012345678 AS RICHREAL, field_19_0123456789 AS INT16, field_20_0 AS ARRAY OF INT16, field_21_01 AS REAL, field_22_012 AS DATE, field_23_0123 AS REAL, field_24_01234 AS INT32, field_25_012345 AS UNSIGNED INT16, field_26_0123456 AS ARRAY OF INT64, field_27_01234567 AS UNSIGNED INT64)");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
@@ -6963,7 +6963,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_212_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "ARRAY OF INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -6993,7 +6993,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_213_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -7025,7 +7025,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_214_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
@@ -7084,7 +7084,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_215_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -7129,7 +7129,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_216_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
       proc.mParameters.push_back( "HIRESTIME");
@@ -7150,7 +7150,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_217_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -7169,7 +7169,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_218_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -7194,7 +7194,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_219_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
@@ -7206,7 +7206,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_220_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
@@ -7245,7 +7245,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_221_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -7260,7 +7260,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_222_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
@@ -7300,7 +7300,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_223_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
@@ -7363,7 +7363,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_224_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT64");
@@ -7418,7 +7418,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_225_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -7431,7 +7431,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_226_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TEXT");
@@ -7454,7 +7454,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_227_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
@@ -7507,7 +7507,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_228_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
@@ -7548,7 +7548,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_229_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
@@ -7578,7 +7578,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_230_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT64");
@@ -7638,7 +7638,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_231_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -7654,7 +7654,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_232_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -7672,7 +7672,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_233_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -7733,7 +7733,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_234_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -7755,7 +7755,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_235_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT64");
@@ -7775,7 +7775,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_236_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATETIME, field_2_012 AS INT8, field_3_0123 AS CHARACTER, field_4_01234 AS DATETIME, field_5_012345 AS REAL, field_6_0123456 AS RICHREAL, field_7_01234567 AS UNSIGNED INT8, field_8_012345678 AS UNSIGNED INT32, field_9_0123456789 AS INT64, field_10_0 AS UNSIGNED INT32, field_11_01 AS ARRAY OF DATE, field_12_012 AS UNSIGNED INT32, field_13_0123 AS DATETIME, field_14_01234 AS INT16, field_15_012345 AS DATETIME, field_16_0123456 AS ARRAY OF UNSIGNED INT64, field_17_01234567 AS HIRESTIME, field_18_012345678 AS UNSIGNED INT32, field_19_0123456789 AS DATE, field_20_0 AS DATETIME, field_21_01 AS DATETIME, field_22_012 AS INT8, field_23_0123 AS UNSIGNED INT16, field_24_01234 AS BOOL, field_25_012345 AS HIRESTIME, field_26_0123456 AS HIRESTIME, field_27_01234567 AS INT64, field_28_012345678 AS ARRAY OF DATE, field_29_0123456789 AS INT32, field_30_0 AS INT64, field_31_01 AS INT64, field_32_012 AS DATETIME, field_33_0123 AS HIRESTIME, field_34_01234 AS DATETIME, field_35_012345 AS INT64, field_36_0123456 AS DATE, field_37_01234567 AS DATE, field_38_012345678 AS UNSIGNED INT8, field_39_0123456789 AS UNSIGNED INT8, field_40_0 AS DATE, field_41_01 AS UNSIGNED INT16, field_42_012 AS RICHREAL, field_43_0123 AS RICHREAL, field_44_01234 AS UNSIGNED INT16, field_45_012345 AS UNSIGNED INT16, field_46_0123456 AS INT64, field_47_01234567 AS ARRAY OF UNSIGNED INT32, field_48_012345678 AS INT32, field_49_0123456789 AS UNSIGNED INT32, field_50_0 AS ARRAY OF DATE, field_51_01 AS DATETIME, field_52_012 AS UNSIGNED INT16, field_53_0123 AS ARRAY OF INT64, field_54_01234 AS INT64, field_55_012345 AS INT64, field_56_0123456 AS INT64, field_57_01234567 AS ARRAY OF BOOL, field_58_012345678 AS HIRESTIME, field_59_0123456789 AS BOOL, field_60_0 AS RICHREAL, field_61_01 AS HIRESTIME, field_62_012 AS INT64, field_63_0123 AS HIRESTIME, field_64_01234 AS ARRAY OF INT8, field_65_012345 AS ARRAY OF INT16, field_66_0123456 AS CHARACTER, field_67_01234567 AS BOOL, field_68_012345678 AS HIRESTIME, field_69_0123456789 AS INT16, field_70_0 AS ARRAY OF INT64, field_71_01 AS INT32, field_72_012 AS UNSIGNED INT8, field_73_0123 AS ARRAY OF INT32, field_74_01234 AS UNSIGNED INT64, field_75_012345 AS UNSIGNED INT64, field_76_0123456 AS BOOL, field_77_01234567 AS DATETIME, field_78_012345678 AS INT8, field_79_0123456789 AS UNSIGNED INT64, field_80_0 AS INT64, field_81_01 AS DATE, field_82_012 AS INT8, field_83_0123 AS ARRAY OF CHARACTER, field_84_01234 AS ARRAY OF RICHREAL, field_85_012345 AS INT8, field_86_0123456 AS INT16, field_87_01234567 AS UNSIGNED INT64, field_88_012345678 AS UNSIGNED INT64, field_89_0123456789 AS INT64, field_90_0 AS INT16, field_91_01 AS UNSIGNED INT64, field_92_012 AS DATETIME, field_93_0123 AS DATETIME, field_94_01234 AS ARRAY OF INT16, field_95_012345 AS ARRAY OF DATETIME, field_96_0123456 AS INT64, field_97_01234567 AS REAL, field_98_012345678 AS BOOL, field_99_0123456789 AS ARRAY OF UNSIGNED INT16)");
@@ -7786,7 +7786,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_237_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -7817,7 +7817,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_238_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -7870,7 +7870,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_239_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -7892,7 +7892,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_240_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -7961,7 +7961,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_241_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "HIRESTIME");
@@ -7988,7 +7988,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_242_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "HIRESTIME");
@@ -8034,7 +8034,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_243_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
@@ -8074,7 +8074,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_244_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -8085,7 +8085,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_245_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
@@ -8114,7 +8114,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_246_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -8178,7 +8178,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_247_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNDEFINED");
@@ -8215,7 +8215,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_248_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "CHARACTER");
@@ -8223,7 +8223,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_249_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT8");
@@ -8277,7 +8277,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_250_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT16");
@@ -8296,7 +8296,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_251_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT8");
@@ -8337,7 +8337,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_252_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -8365,7 +8365,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_253_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -8406,7 +8406,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_254_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNDEFINED");
@@ -8420,7 +8420,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_255_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -8445,7 +8445,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_256_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT16");
@@ -8499,7 +8499,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_257_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -8544,7 +8544,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_258_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
@@ -8572,7 +8572,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_259_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -8608,7 +8608,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_260_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS CHARACTER, field_2_012 AS UNSIGNED INT64, field_3_0123 AS UNSIGNED INT32, field_4_01234 AS INT8, field_5_012345 AS CHARACTER, field_6_0123456 AS INT16, field_7_01234567 AS DATETIME, field_8_012345678 AS REAL)");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -8647,7 +8647,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_261_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATETIME, field_2_012 AS INT8, field_3_0123 AS INT32, field_4_01234 AS UNSIGNED INT16, field_5_012345 AS ARRAY OF UNSIGNED INT8, field_6_0123456 AS DATETIME, field_7_01234567 AS BOOL, field_8_012345678 AS DATETIME, field_9_0123456789 AS ARRAY OF REAL, field_10_0 AS ARRAY OF INT16, field_11_01 AS RICHREAL, field_12_012 AS HIRESTIME, field_13_0123 AS DATETIME, field_14_01234 AS INT16, field_15_012345 AS DATE, field_16_0123456 AS INT8, field_17_01234567 AS UNSIGNED INT32, field_18_012345678 AS INT8, field_19_0123456789 AS UNSIGNED INT32, field_20_0 AS UNSIGNED INT8, field_21_01 AS RICHREAL, field_22_012 AS BOOL, field_23_0123 AS HIRESTIME, field_24_01234 AS ARRAY OF BOOL, field_25_012345 AS ARRAY OF UNSIGNED INT8, field_26_0123456 AS CHARACTER, field_27_01234567 AS CHARACTER, field_28_012345678 AS ARRAY OF INT32, field_29_0123456789 AS RICHREAL, field_30_0 AS REAL, field_31_01 AS CHARACTER, field_32_012 AS UNSIGNED INT64, field_33_0123 AS INT8, field_34_01234 AS UNSIGNED INT32, field_35_012345 AS RICHREAL, field_36_0123456 AS ARRAY OF INT8, field_37_01234567 AS INT16, field_38_012345678 AS UNSIGNED INT8, field_39_0123456789 AS UNSIGNED INT16, field_40_0 AS UNSIGNED INT64, field_41_01 AS INT16, field_42_012 AS ARRAY OF DATETIME, field_43_0123 AS REAL, field_44_01234 AS DATETIME, field_45_012345 AS CHARACTER, field_46_0123456 AS ARRAY OF CHARACTER, field_47_01234567 AS UNSIGNED INT64, field_48_012345678 AS INT32, field_49_0123456789 AS HIRESTIME, field_50_0 AS DATE, field_51_01 AS INT32, field_52_012 AS ARRAY OF INT32, field_53_0123 AS INT64, field_54_01234 AS UNSIGNED INT64, field_55_012345 AS DATETIME, field_56_0123456 AS INT8, field_57_01234567 AS HIRESTIME, field_58_012345678 AS CHARACTER, field_59_0123456789 AS UNSIGNED INT8, field_60_0 AS BOOL, field_61_01 AS INT8, field_62_012 AS ARRAY OF DATETIME, field_63_0123 AS ARRAY OF HIRESTIME, field_64_01234 AS UNSIGNED INT8, field_65_012345 AS INT8, field_66_0123456 AS ARRAY OF BOOL, field_67_01234567 AS UNSIGNED INT8, field_68_012345678 AS INT64, field_69_0123456789 AS ARRAY OF INT16, field_70_0 AS DATETIME, field_71_01 AS INT32, field_72_012 AS INT16, field_73_0123 AS REAL, field_74_01234 AS REAL, field_75_012345 AS ARRAY OF CHARACTER, field_76_0123456 AS HIRESTIME, field_77_01234567 AS CHARACTER, field_78_012345678 AS ARRAY OF UNSIGNED INT64, field_79_0123456789 AS ARRAY OF INT16, field_80_0 AS CHARACTER, field_81_01 AS ARRAY OF CHARACTER, field_82_012 AS DATETIME, field_83_0123 AS INT16, field_84_01234 AS UNSIGNED INT8, field_85_012345 AS UNSIGNED INT8, field_86_0123456 AS UNSIGNED INT32, field_87_01234567 AS ARRAY OF CHARACTER)");
@@ -8705,14 +8705,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_262_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
       procs.push_back( proc);
 
 
       proc.mName = "proc_263_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
@@ -8748,7 +8748,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_264_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
@@ -8778,7 +8778,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_265_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -8790,7 +8790,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_266_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -8857,7 +8857,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_267_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNDEFINED");
@@ -8900,7 +8900,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_268_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -8917,7 +8917,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_269_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -8966,7 +8966,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_270_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -9010,7 +9010,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_271_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
@@ -9025,7 +9025,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_272_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNDEFINED");
@@ -9066,7 +9066,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_273_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -9108,7 +9108,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_274_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
@@ -9135,7 +9135,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_275_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
@@ -9182,7 +9182,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_276_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT64");
@@ -9192,7 +9192,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_277_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
@@ -9208,7 +9208,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_278_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "ARRAY OF INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -9222,7 +9222,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_279_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF BOOL, field_2_012 AS UNSIGNED INT32, field_3_0123 AS ARRAY OF INT32, field_4_01234 AS UNSIGNED INT8, field_5_012345 AS INT32, field_6_0123456 AS REAL, field_7_01234567 AS INT32, field_8_012345678 AS CHARACTER, field_9_0123456789 AS REAL, field_10_0 AS RICHREAL, field_11_01 AS HIRESTIME, field_12_012 AS UNSIGNED INT16, field_13_0123 AS INT16, field_14_01234 AS UNSIGNED INT32, field_15_012345 AS ARRAY OF INT64, field_16_0123456 AS INT32, field_17_01234567 AS BOOL, field_18_012345678 AS UNSIGNED INT8, field_19_0123456789 AS UNSIGNED INT64, field_20_0 AS REAL, field_21_01 AS UNSIGNED INT32, field_22_012 AS ARRAY OF INT16, field_23_0123 AS RICHREAL, field_24_01234 AS HIRESTIME, field_25_012345 AS INT16, field_26_0123456 AS REAL, field_27_01234567 AS REAL, field_28_012345678 AS INT64, field_29_0123456789 AS UNSIGNED INT16, field_30_0 AS HIRESTIME, field_31_01 AS INT8, field_32_012 AS INT16, field_33_0123 AS INT16, field_34_01234 AS HIRESTIME, field_35_012345 AS ARRAY OF CHARACTER, field_36_0123456 AS ARRAY OF UNSIGNED INT64, field_37_01234567 AS UNSIGNED INT16, field_38_012345678 AS HIRESTIME, field_39_0123456789 AS BOOL, field_40_0 AS ARRAY OF INT64, field_41_01 AS UNSIGNED INT64, field_42_012 AS INT64, field_43_0123 AS UNSIGNED INT32, field_44_01234 AS ARRAY OF UNSIGNED INT64, field_45_012345 AS INT64, field_46_0123456 AS RICHREAL, field_47_01234567 AS ARRAY OF HIRESTIME, field_48_012345678 AS INT32, field_49_0123456789 AS UNSIGNED INT32, field_50_0 AS INT32, field_51_01 AS UNSIGNED INT8, field_52_012 AS INT32, field_53_0123 AS CHARACTER, field_54_01234 AS INT8, field_55_012345 AS INT8, field_56_0123456 AS INT8, field_57_01234567 AS INT16, field_58_012345678 AS ARRAY OF INT8, field_59_0123456789 AS DATETIME, field_60_0 AS HIRESTIME, field_61_01 AS INT32, field_62_012 AS INT64, field_63_0123 AS ARRAY OF INT64, field_64_01234 AS RICHREAL, field_65_012345 AS UNSIGNED INT32, field_66_0123456 AS UNSIGNED INT8, field_67_01234567 AS INT64, field_68_012345678 AS REAL)");
@@ -9263,7 +9263,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_280_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATE, field_2_012 AS HIRESTIME, field_3_0123 AS UNSIGNED INT16, field_4_01234 AS DATE, field_5_012345 AS INT64, field_6_0123456 AS ARRAY OF BOOL, field_7_01234567 AS ARRAY OF UNSIGNED INT64, field_8_012345678 AS INT32, field_9_0123456789 AS ARRAY OF RICHREAL, field_10_0 AS INT64, field_11_01 AS DATETIME, field_12_012 AS INT32, field_13_0123 AS DATE, field_14_01234 AS INT64, field_15_012345 AS DATE, field_16_0123456 AS DATETIME, field_17_01234567 AS HIRESTIME, field_18_012345678 AS REAL, field_19_0123456789 AS INT8, field_20_0 AS ARRAY OF RICHREAL, field_21_01 AS INT64, field_22_012 AS INT64, field_23_0123 AS UNSIGNED INT16, field_24_01234 AS ARRAY OF UNSIGNED INT64, field_25_012345 AS UNSIGNED INT32, field_26_0123456 AS DATE, field_27_01234567 AS BOOL, field_28_012345678 AS BOOL, field_29_0123456789 AS CHARACTER, field_30_0 AS ARRAY OF RICHREAL, field_31_01 AS ARRAY OF INT8)");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
@@ -9284,7 +9284,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_281_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
@@ -9295,7 +9295,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_282_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
@@ -9356,7 +9356,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_283_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "CHARACTER");
@@ -9389,13 +9389,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_284_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       procs.push_back( proc);
 
 
       proc.mName = "proc_285_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT16");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -9409,7 +9409,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_286_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -9471,7 +9471,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_287_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -9480,7 +9480,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_288_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
@@ -9503,7 +9503,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_289_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -9544,7 +9544,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_290_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT32");
@@ -9598,7 +9598,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_291_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -9615,7 +9615,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_292_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT32");
@@ -9683,7 +9683,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_293_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -9743,7 +9743,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_294_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "FIELD OF DATETIME");
@@ -9765,7 +9765,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_295_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
@@ -9808,7 +9808,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_296_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
@@ -9854,7 +9854,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_297_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -9876,7 +9876,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_298_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
@@ -9932,7 +9932,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_299_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TEXT");
@@ -9955,7 +9955,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "c";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "FIELD OF INT8");
       proc.mParameters.push_back( "INT32");
@@ -9963,7 +9963,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xc";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
@@ -9991,7 +9991,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_302_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT32");
@@ -10030,7 +10030,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_303_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -10085,7 +10085,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_304_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "BOOL");
@@ -10154,7 +10154,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_305_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
@@ -10196,7 +10196,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_306_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
@@ -10212,7 +10212,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_307_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
@@ -10253,7 +10253,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_308_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT8, field_2_012 AS ARRAY OF UNSIGNED INT16, field_3_0123 AS ARRAY OF DATE, field_4_01234 AS CHARACTER, field_5_012345 AS ARRAY OF BOOL, field_6_0123456 AS UNSIGNED INT8, field_7_01234567 AS ARRAY OF UNSIGNED INT8, field_8_012345678 AS ARRAY OF INT16, field_9_0123456789 AS DATETIME, field_10_0 AS ARRAY OF DATETIME, field_11_01 AS DATETIME, field_12_012 AS UNSIGNED INT8, field_13_0123 AS ARRAY OF HIRESTIME, field_14_01234 AS UNSIGNED INT32, field_15_012345 AS REAL, field_16_0123456 AS DATETIME, field_17_01234567 AS ARRAY OF HIRESTIME, field_18_012345678 AS UNSIGNED INT64, field_19_0123456789 AS CHARACTER, field_20_0 AS HIRESTIME, field_21_01 AS INT32, field_22_012 AS ARRAY OF HIRESTIME, field_23_0123 AS UNSIGNED INT32, field_24_01234 AS DATETIME, field_25_012345 AS HIRESTIME, field_26_0123456 AS ARRAY OF UNSIGNED INT8, field_27_01234567 AS BOOL, field_28_012345678 AS CHARACTER, field_29_0123456789 AS INT32, field_30_0 AS DATE, field_31_01 AS INT8, field_32_012 AS UNSIGNED INT64, field_33_0123 AS BOOL, field_34_01234 AS DATETIME, field_35_012345 AS UNSIGNED INT64, field_36_0123456 AS CHARACTER, field_37_01234567 AS ARRAY OF INT16, field_38_012345678 AS ARRAY OF UNSIGNED INT16, field_39_0123456789 AS HIRESTIME, field_40_0 AS UNSIGNED INT64, field_41_01 AS UNSIGNED INT8, field_42_012 AS INT64, field_43_0123 AS REAL, field_44_01234 AS BOOL, field_45_012345 AS ARRAY OF RICHREAL, field_46_0123456 AS INT32, field_47_01234567 AS ARRAY OF UNSIGNED INT8, field_48_012345678 AS DATETIME, field_49_0123456789 AS DATETIME)");
@@ -10310,7 +10310,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_309_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
@@ -10332,7 +10332,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_310_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -10379,7 +10379,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_311_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT32");
@@ -10423,7 +10423,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_312_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -10488,7 +10488,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_313_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT8");
@@ -10507,7 +10507,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_314_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
@@ -10542,7 +10542,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_315_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
@@ -10560,7 +10560,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_316_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT16, field_2_012 AS DATETIME, field_3_0123 AS UNSIGNED INT32, field_4_01234 AS ARRAY OF INT64, field_5_012345 AS UNSIGNED INT32, field_6_0123456 AS UNSIGNED INT64, field_7_01234567 AS REAL, field_8_012345678 AS INT32, field_9_0123456789 AS BOOL, field_10_0 AS INT8, field_11_01 AS HIRESTIME, field_12_012 AS BOOL, field_13_0123 AS ARRAY OF HIRESTIME, field_14_01234 AS BOOL, field_15_012345 AS RICHREAL, field_16_0123456 AS ARRAY OF UNSIGNED INT8, field_17_01234567 AS CHARACTER, field_18_012345678 AS REAL, field_19_0123456789 AS INT8, field_20_0 AS ARRAY OF DATETIME, field_21_01 AS INT16, field_22_012 AS RICHREAL, field_23_0123 AS RICHREAL, field_24_01234 AS UNSIGNED INT16, field_25_012345 AS DATE, field_26_0123456 AS INT32, field_27_01234567 AS DATE, field_28_012345678 AS CHARACTER, field_29_0123456789 AS BOOL, field_30_0 AS ARRAY OF UNSIGNED INT16, field_31_01 AS CHARACTER, field_32_012 AS ARRAY OF BOOL, field_33_0123 AS CHARACTER, field_34_01234 AS BOOL, field_35_012345 AS INT64, field_36_0123456 AS BOOL, field_37_01234567 AS ARRAY OF UNSIGNED INT16, field_38_012345678 AS INT32, field_39_0123456789 AS INT8, field_40_0 AS CHARACTER, field_41_01 AS DATE, field_42_012 AS RICHREAL, field_43_0123 AS ARRAY OF BOOL, field_44_01234 AS ARRAY OF DATETIME, field_45_012345 AS UNSIGNED INT32, field_46_0123456 AS ARRAY OF INT8, field_47_01234567 AS INT64, field_48_012345678 AS DATE, field_49_0123456789 AS UNSIGNED INT32, field_50_0 AS INT32, field_51_01 AS UNSIGNED INT32, field_52_012 AS UNSIGNED INT64, field_53_0123 AS INT16, field_54_01234 AS DATE, field_55_012345 AS REAL, field_56_0123456 AS HIRESTIME, field_57_01234567 AS DATE, field_58_012345678 AS ARRAY OF CHARACTER, field_59_0123456789 AS ARRAY OF DATETIME, field_60_0 AS INT32, field_61_01 AS BOOL, field_62_012 AS CHARACTER, field_63_0123 AS ARRAY OF INT16, field_64_01234 AS RICHREAL, field_65_012345 AS CHARACTER, field_66_0123456 AS ARRAY OF INT64, field_67_01234567 AS HIRESTIME, field_68_012345678 AS ARRAY OF HIRESTIME, field_69_0123456789 AS INT64, field_70_0 AS DATETIME, field_71_01 AS INT8, field_72_012 AS BOOL, field_73_0123 AS RICHREAL, field_74_01234 AS INT32, field_75_012345 AS ARRAY OF INT32, field_76_0123456 AS INT32, field_77_01234567 AS ARRAY OF REAL, field_78_012345678 AS INT64, field_79_0123456789 AS INT64)");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF CHARACTER, field_2_012 AS INT32, field_3_0123 AS UNSIGNED INT8, field_4_01234 AS UNSIGNED INT8, field_5_012345 AS ARRAY OF BOOL, field_6_0123456 AS INT32, field_7_01234567 AS HIRESTIME, field_8_012345678 AS REAL, field_9_0123456789 AS BOOL, field_10_0 AS INT32, field_11_01 AS UNSIGNED INT64, field_12_012 AS ARRAY OF REAL, field_13_0123 AS INT64, field_14_01234 AS DATETIME, field_15_012345 AS INT32, field_16_0123456 AS HIRESTIME, field_17_01234567 AS INT16)");
       proc.mParameters.push_back( "UNDEFINED");
@@ -10608,7 +10608,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_317_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "CHARACTER");
@@ -10648,7 +10648,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_318_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "TEXT");
@@ -10665,7 +10665,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_319_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TABLE");
@@ -10697,7 +10697,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_320_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "FIELD OF RICHREAL");
@@ -10707,7 +10707,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_321_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -10737,7 +10737,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_322_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "HIRESTIME");
@@ -10753,7 +10753,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_323_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -10792,7 +10792,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_324_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT64");
@@ -10804,7 +10804,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_325_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "TEXT");
@@ -10838,7 +10838,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_326_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
@@ -10899,7 +10899,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_327_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TEXT");
@@ -10957,7 +10957,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_328_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
@@ -10966,7 +10966,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_329_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT16");
@@ -11009,14 +11009,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_330_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       procs.push_back( proc);
 
 
       proc.mName = "proc_331_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT64");
@@ -11057,7 +11057,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_332_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "RICHREAL");
@@ -11070,7 +11070,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_333_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
@@ -11105,7 +11105,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_334_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -11140,14 +11140,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_335_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
       procs.push_back( proc);
 
 
       proc.mName = "proc_336_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT64");
@@ -11195,7 +11195,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_337_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
@@ -11249,7 +11249,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_338_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -11269,7 +11269,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_339_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -11307,7 +11307,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_340_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
@@ -11316,7 +11316,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_341_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -11377,7 +11377,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_342_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -11418,7 +11418,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_343_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
@@ -11479,7 +11479,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_344_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
@@ -11502,7 +11502,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_345_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -11538,7 +11538,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_346_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "FIELD OF REAL");
@@ -11590,7 +11590,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_347_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -11655,7 +11655,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_348_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
@@ -11685,13 +11685,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_349_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       procs.push_back( proc);
 
 
       proc.mName = "proc_350_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
@@ -11713,7 +11713,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_351_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
@@ -11740,7 +11740,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_352_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATETIME");
@@ -11802,7 +11802,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_353_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF DATE");
       proc.mParameters.push_back( "ARRAY OF BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -11836,7 +11836,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_354_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TEXT");
@@ -11844,7 +11844,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_355_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "FIELD OF INT32");
@@ -11887,7 +11887,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_356_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
@@ -11917,7 +11917,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_357_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "REAL");
@@ -11943,7 +11943,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_358_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -11996,7 +11996,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_359_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATE");
@@ -12009,13 +12009,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_360_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       procs.push_back( proc);
 
 
       proc.mName = "proc_361_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
@@ -12050,7 +12050,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_362_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
@@ -12095,7 +12095,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_363_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -12117,7 +12117,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_364_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
@@ -12134,7 +12134,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_365_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
@@ -12157,14 +12157,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_366_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "REAL");
       procs.push_back( proc);
 
 
       proc.mName = "proc_367_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -12211,7 +12211,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_368_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS CHARACTER, field_2_012 AS INT64, field_3_0123 AS INT16, field_4_01234 AS UNSIGNED INT64, field_5_012345 AS INT64, field_6_0123456 AS RICHREAL, field_7_01234567 AS INT8, field_8_012345678 AS INT64, field_9_0123456789 AS DATETIME, field_10_0 AS REAL, field_11_01 AS UNSIGNED INT16, field_12_012 AS INT32, field_13_0123 AS DATE, field_14_01234 AS REAL, field_15_012345 AS DATETIME, field_16_0123456 AS INT8, field_17_01234567 AS INT64, field_18_012345678 AS UNSIGNED INT8, field_19_0123456789 AS HIRESTIME, field_20_0 AS UNSIGNED INT32, field_21_01 AS ARRAY OF INT64, field_22_012 AS UNSIGNED INT16, field_23_0123 AS HIRESTIME, field_24_01234 AS UNSIGNED INT16, field_25_012345 AS INT16, field_26_0123456 AS CHARACTER, field_27_01234567 AS ARRAY OF BOOL, field_28_012345678 AS UNSIGNED INT16, field_29_0123456789 AS INT16, field_30_0 AS HIRESTIME, field_31_01 AS CHARACTER, field_32_012 AS INT16)");
       proc.mParameters.push_back( "TEXT");
@@ -12247,7 +12247,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_369_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
@@ -12262,7 +12262,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_370_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -12291,7 +12291,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_371_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT16");
@@ -12326,7 +12326,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_372_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "ARRAY OF INT64");
@@ -12390,7 +12390,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_373_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS HIRESTIME, field_2_012 AS INT16, field_3_0123 AS HIRESTIME, field_4_01234 AS ARRAY OF INT64, field_5_012345 AS INT32, field_6_0123456 AS INT64, field_7_01234567 AS RICHREAL, field_8_012345678 AS ARRAY OF INT32, field_9_0123456789 AS UNSIGNED INT8, field_10_0 AS ARRAY OF CHARACTER, field_11_01 AS UNSIGNED INT32, field_12_012 AS DATETIME, field_13_0123 AS INT16, field_14_01234 AS UNSIGNED INT16, field_15_012345 AS UNSIGNED INT64, field_16_0123456 AS UNSIGNED INT32, field_17_01234567 AS INT64, field_18_012345678 AS UNSIGNED INT8, field_19_0123456789 AS DATETIME, field_20_0 AS RICHREAL, field_21_01 AS DATETIME, field_22_012 AS ARRAY OF BOOL, field_23_0123 AS RICHREAL, field_24_01234 AS INT16, field_25_012345 AS INT32, field_26_0123456 AS HIRESTIME, field_27_01234567 AS REAL, field_28_012345678 AS RICHREAL, field_29_0123456789 AS UNSIGNED INT32, field_30_0 AS UNSIGNED INT16, field_31_01 AS UNSIGNED INT8, field_32_012 AS ARRAY OF BOOL, field_33_0123 AS INT16, field_34_01234 AS DATETIME, field_35_012345 AS INT64, field_36_0123456 AS UNSIGNED INT64, field_37_01234567 AS UNSIGNED INT16, field_38_012345678 AS RICHREAL, field_39_0123456789 AS DATETIME, field_40_0 AS CHARACTER, field_41_01 AS UNSIGNED INT32, field_42_012 AS UNSIGNED INT64, field_43_0123 AS UNSIGNED INT8, field_44_01234 AS UNSIGNED INT16, field_45_012345 AS HIRESTIME, field_46_0123456 AS UNSIGNED INT8, field_47_01234567 AS ARRAY OF UNSIGNED INT16, field_48_012345678 AS BOOL, field_49_0123456789 AS UNSIGNED INT64, field_50_0 AS RICHREAL, field_51_01 AS UNSIGNED INT32, field_52_012 AS INT8, field_53_0123 AS REAL, field_54_01234 AS BOOL, field_55_012345 AS REAL, field_56_0123456 AS DATETIME, field_57_01234567 AS DATE, field_58_012345678 AS UNSIGNED INT64, field_59_0123456789 AS CHARACTER, field_60_0 AS INT16, field_61_01 AS UNSIGNED INT32, field_62_012 AS UNSIGNED INT16, field_63_0123 AS INT64, field_64_01234 AS BOOL, field_65_012345 AS UNSIGNED INT16, field_66_0123456 AS RICHREAL, field_67_01234567 AS DATETIME, field_68_012345678 AS ARRAY OF CHARACTER, field_69_0123456789 AS INT32, field_70_0 AS INT16, field_71_01 AS UNSIGNED INT32, field_72_012 AS INT16, field_73_0123 AS CHARACTER, field_74_01234 AS BOOL, field_75_012345 AS ARRAY OF RICHREAL, field_76_0123456 AS DATE, field_77_01234567 AS UNSIGNED INT16, field_78_012345678 AS ARRAY OF UNSIGNED INT16, field_79_0123456789 AS UNSIGNED INT16, field_80_0 AS REAL, field_81_01 AS INT8, field_82_012 AS DATETIME, field_83_0123 AS UNSIGNED INT16, field_84_01234 AS UNSIGNED INT16, field_85_012345 AS UNSIGNED INT16, field_86_0123456 AS ARRAY OF DATETIME)");
@@ -12421,7 +12421,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_374_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "CHARACTER");
@@ -12436,7 +12436,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_375_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
@@ -12463,7 +12463,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_376_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "DATE");
@@ -12476,7 +12476,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_377_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNDEFINED");
@@ -12511,7 +12511,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_378_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -12532,7 +12532,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_379_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
@@ -12552,7 +12552,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_380_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "CHARACTER");
@@ -12579,7 +12579,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_381_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -12589,7 +12589,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_382_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
@@ -12618,7 +12618,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_383_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -12656,7 +12656,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_384_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -12700,7 +12700,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_385_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
@@ -12760,7 +12760,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_386_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "RICHREAL");
@@ -12808,7 +12808,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_387_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "ARRAY OF DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -12836,7 +12836,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_388_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -12848,7 +12848,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_389_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -12908,7 +12908,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_390_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -12936,7 +12936,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_391_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT8");
@@ -12967,7 +12967,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_392_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
@@ -13005,7 +13005,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_393_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -13038,7 +13038,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_394_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "CHARACTER");
@@ -13060,7 +13060,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_395_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT8");
@@ -13098,7 +13098,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_396_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -13146,7 +13146,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_397_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -13181,7 +13181,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_398_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -13209,7 +13209,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_399_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -13245,7 +13245,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "d";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
@@ -13289,7 +13289,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xd";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
@@ -13310,7 +13310,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_402_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -13372,7 +13372,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_403_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "ARRAY OF INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -13396,7 +13396,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_404_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -13439,14 +13439,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_405_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF HIRESTIME");
       proc.mParameters.push_back( "INT8");
       procs.push_back( proc);
 
 
       proc.mName = "proc_406_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -13500,7 +13500,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_407_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -13564,7 +13564,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_408_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
@@ -13588,7 +13588,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_409_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -13622,7 +13622,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_410_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF REAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -13677,7 +13677,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_411_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
@@ -13702,7 +13702,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_412_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
@@ -13765,7 +13765,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_413_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -13799,7 +13799,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_414_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TEXT");
@@ -13815,7 +13815,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_415_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -13828,7 +13828,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_416_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -13843,7 +13843,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_417_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "FIELD OF INT16");
@@ -13911,7 +13911,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_418_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TEXT");
@@ -13919,7 +13919,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_419_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -13977,7 +13977,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_420_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -14029,7 +14029,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_421_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT64, field_2_012 AS INT8, field_3_0123 AS BOOL, field_4_01234 AS ARRAY OF INT32, field_5_012345 AS INT8, field_6_0123456 AS CHARACTER, field_7_01234567 AS ARRAY OF INT8, field_8_012345678 AS RICHREAL, field_9_0123456789 AS BOOL, field_10_0 AS HIRESTIME, field_11_01 AS RICHREAL, field_12_012 AS UNSIGNED INT8, field_13_0123 AS INT32, field_14_01234 AS UNSIGNED INT32, field_15_012345 AS INT32, field_16_0123456 AS RICHREAL, field_17_01234567 AS BOOL, field_18_012345678 AS ARRAY OF HIRESTIME, field_19_0123456789 AS INT16, field_20_0 AS ARRAY OF DATE, field_21_01 AS INT16, field_22_012 AS RICHREAL, field_23_0123 AS UNSIGNED INT16, field_24_01234 AS REAL, field_25_012345 AS INT16, field_26_0123456 AS ARRAY OF BOOL, field_27_01234567 AS UNSIGNED INT64, field_28_012345678 AS HIRESTIME, field_29_0123456789 AS ARRAY OF CHARACTER, field_30_0 AS DATETIME, field_31_01 AS ARRAY OF DATETIME, field_32_012 AS UNSIGNED INT16, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS ARRAY OF INT8, field_35_012345 AS DATETIME, field_36_0123456 AS UNSIGNED INT64, field_37_01234567 AS ARRAY OF INT64, field_38_012345678 AS INT16, field_39_0123456789 AS INT32, field_40_0 AS INT32, field_41_01 AS INT16, field_42_012 AS REAL, field_43_0123 AS INT64, field_44_01234 AS INT8, field_45_012345 AS INT32, field_46_0123456 AS BOOL, field_47_01234567 AS DATE, field_48_012345678 AS ARRAY OF CHARACTER, field_49_0123456789 AS ARRAY OF UNSIGNED INT64, field_50_0 AS INT8, field_51_01 AS ARRAY OF UNSIGNED INT32, field_52_012 AS HIRESTIME, field_53_0123 AS UNSIGNED INT32, field_54_01234 AS ARRAY OF INT32, field_55_012345 AS HIRESTIME, field_56_0123456 AS UNSIGNED INT32, field_57_01234567 AS RICHREAL, field_58_012345678 AS UNSIGNED INT64, field_59_0123456789 AS HIRESTIME, field_60_0 AS INT32, field_61_01 AS ARRAY OF INT64, field_62_012 AS CHARACTER, field_63_0123 AS INT32, field_64_01234 AS DATETIME, field_65_012345 AS CHARACTER, field_66_0123456 AS ARRAY OF DATETIME, field_67_01234567 AS INT32, field_68_012345678 AS UNSIGNED INT16, field_69_0123456789 AS UNSIGNED INT64, field_70_0 AS INT64, field_71_01 AS CHARACTER, field_72_012 AS ARRAY OF HIRESTIME, field_73_0123 AS BOOL, field_74_01234 AS BOOL, field_75_012345 AS UNSIGNED INT32, field_76_0123456 AS UNSIGNED INT16, field_77_01234567 AS ARRAY OF UNSIGNED INT16, field_78_012345678 AS DATETIME, field_79_0123456789 AS DATE, field_80_0 AS ARRAY OF INT32)");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -14043,7 +14043,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_422_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TABLE");
@@ -14093,7 +14093,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_423_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT16");
@@ -14134,7 +14134,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_424_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
@@ -14149,7 +14149,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_425_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "CHARACTER");
@@ -14210,7 +14210,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_426_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
@@ -14269,7 +14269,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_427_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -14310,7 +14310,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_428_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF DATETIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATETIME");
@@ -14319,7 +14319,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_429_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT64");
@@ -14339,7 +14339,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_430_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -14377,7 +14377,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_431_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -14443,7 +14443,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_432_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -14505,7 +14505,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_433_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
@@ -14573,7 +14573,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_434_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -14634,7 +14634,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_435_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
@@ -14701,7 +14701,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_436_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
@@ -14739,7 +14739,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_437_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -14775,7 +14775,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_438_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
@@ -14823,7 +14823,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_439_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -14832,7 +14832,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_440_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "FIELD OF DATETIME");
@@ -14892,7 +14892,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_441_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TEXT");
@@ -14946,7 +14946,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_442_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
@@ -14983,7 +14983,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_443_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -15047,7 +15047,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_444_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -15068,7 +15068,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_445_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT64, field_2_012 AS INT8, field_3_0123 AS INT16, field_4_01234 AS INT8, field_5_012345 AS DATE, field_6_0123456 AS RICHREAL, field_7_01234567 AS BOOL, field_8_012345678 AS ARRAY OF UNSIGNED INT16, field_9_0123456789 AS UNSIGNED INT32, field_10_0 AS INT16, field_11_01 AS CHARACTER, field_12_012 AS INT16, field_13_0123 AS UNSIGNED INT8, field_14_01234 AS HIRESTIME, field_15_012345 AS BOOL, field_16_0123456 AS DATETIME, field_17_01234567 AS ARRAY OF BOOL, field_18_012345678 AS INT32, field_19_0123456789 AS INT8, field_20_0 AS INT16, field_21_01 AS ARRAY OF BOOL, field_22_012 AS DATE, field_23_0123 AS HIRESTIME, field_24_01234 AS CHARACTER, field_25_012345 AS UNSIGNED INT32, field_26_0123456 AS BOOL, field_27_01234567 AS BOOL, field_28_012345678 AS UNSIGNED INT32, field_29_0123456789 AS DATE, field_30_0 AS ARRAY OF INT8, field_31_01 AS UNSIGNED INT32, field_32_012 AS DATETIME, field_33_0123 AS UNSIGNED INT32)");
@@ -15113,7 +15113,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_446_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "HIRESTIME");
@@ -15172,7 +15172,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_447_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -15181,7 +15181,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_448_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -15215,7 +15215,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_449_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -15256,7 +15256,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_450_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -15270,7 +15270,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_451_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT32");
@@ -15284,14 +15284,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_452_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "FIELD OF INT16");
       procs.push_back( proc);
 
 
       proc.mName = "proc_453_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "BOOL");
@@ -15331,7 +15331,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_454_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TEXT");
@@ -15398,7 +15398,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_455_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
@@ -15411,7 +15411,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_456_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
@@ -15448,7 +15448,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_457_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
@@ -15494,7 +15494,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_458_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
@@ -15557,7 +15557,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_459_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
@@ -15568,14 +15568,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_460_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       procs.push_back( proc);
 
 
       proc.mName = "proc_461_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
@@ -15604,7 +15604,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_462_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "ARRAY OF DATETIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -15631,7 +15631,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_463_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -15647,7 +15647,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_464_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -15714,7 +15714,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_465_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "BOOL");
@@ -15741,7 +15741,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_466_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT8");
@@ -15788,7 +15788,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_467_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -15802,7 +15802,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_468_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -15830,7 +15830,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_469_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
@@ -15855,7 +15855,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_470_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT64");
@@ -15884,7 +15884,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_471_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -15910,7 +15910,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_472_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -15924,7 +15924,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_473_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
@@ -15940,7 +15940,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_474_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -15948,7 +15948,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_475_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -15978,7 +15978,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_476_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "RICHREAL");
@@ -16011,14 +16011,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_477_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATETIME");
       procs.push_back( proc);
 
 
       proc.mName = "proc_478_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "ARRAY OF CHARACTER");
@@ -16029,7 +16029,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_479_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -16058,7 +16058,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_480_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF ARRAY OF REAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT64");
@@ -16097,7 +16097,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_481_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -16120,7 +16120,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_482_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNDEFINED");
@@ -16147,7 +16147,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_483_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -16195,7 +16195,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_484_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
@@ -16244,7 +16244,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_485_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "HIRESTIME");
@@ -16254,7 +16254,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_486_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT8");
@@ -16288,13 +16288,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_487_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       procs.push_back( proc);
 
 
       proc.mName = "proc_488_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNDEFINED");
@@ -16318,7 +16318,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_489_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATE");
@@ -16333,7 +16333,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_490_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -16344,7 +16344,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_491_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "BOOL");
@@ -16402,7 +16402,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_492_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -16427,7 +16427,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_493_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -16453,7 +16453,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_494_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -16471,7 +16471,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_495_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -16486,7 +16486,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_496_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -16527,7 +16527,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_497_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -16560,7 +16560,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_498_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -16602,7 +16602,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_499_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -16625,7 +16625,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "e";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "REAL");
@@ -16650,7 +16650,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xe";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
@@ -16672,7 +16672,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_502_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT16, field_2_012 AS REAL, field_3_0123 AS INT64, field_4_01234 AS RICHREAL, field_5_012345 AS UNSIGNED INT8, field_6_0123456 AS INT64, field_7_01234567 AS DATETIME, field_8_012345678 AS REAL, field_9_0123456789 AS RICHREAL, field_10_0 AS BOOL, field_11_01 AS CHARACTER, field_12_012 AS RICHREAL, field_13_0123 AS ARRAY OF UNSIGNED INT64, field_14_01234 AS DATE, field_15_012345 AS UNSIGNED INT64, field_16_0123456 AS ARRAY OF HIRESTIME, field_17_01234567 AS INT32, field_18_012345678 AS REAL, field_19_0123456789 AS ARRAY OF UNSIGNED INT16, field_20_0 AS UNSIGNED INT8, field_21_01 AS UNSIGNED INT32, field_22_012 AS UNSIGNED INT8, field_23_0123 AS HIRESTIME, field_24_01234 AS INT64, field_25_012345 AS CHARACTER, field_26_0123456 AS INT16, field_27_01234567 AS DATETIME, field_28_012345678 AS RICHREAL, field_29_0123456789 AS UNSIGNED INT8, field_30_0 AS RICHREAL, field_31_01 AS ARRAY OF UNSIGNED INT8, field_32_012 AS ARRAY OF HIRESTIME, field_33_0123 AS UNSIGNED INT16, field_34_01234 AS ARRAY OF DATETIME, field_35_012345 AS ARRAY OF DATE, field_36_0123456 AS HIRESTIME, field_37_01234567 AS UNSIGNED INT64, field_38_012345678 AS HIRESTIME, field_39_0123456789 AS ARRAY OF UNSIGNED INT8, field_40_0 AS INT16, field_41_01 AS BOOL, field_42_012 AS UNSIGNED INT64, field_43_0123 AS DATETIME, field_44_01234 AS UNSIGNED INT16, field_45_012345 AS HIRESTIME, field_46_0123456 AS INT8, field_47_01234567 AS INT64, field_48_012345678 AS UNSIGNED INT32, field_49_0123456789 AS INT64, field_50_0 AS INT16, field_51_01 AS ARRAY OF DATE, field_52_012 AS HIRESTIME, field_53_0123 AS INT16, field_54_01234 AS DATE, field_55_012345 AS INT64, field_56_0123456 AS UNSIGNED INT32, field_57_01234567 AS REAL, field_58_012345678 AS CHARACTER, field_59_0123456789 AS ARRAY OF CHARACTER, field_60_0 AS BOOL, field_61_01 AS UNSIGNED INT64, field_62_012 AS HIRESTIME, field_63_0123 AS BOOL, field_64_01234 AS UNSIGNED INT64)");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -16687,7 +16687,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_503_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS BOOL, field_2_012 AS CHARACTER, field_3_0123 AS CHARACTER, field_4_01234 AS BOOL, field_5_012345 AS UNSIGNED INT64, field_6_0123456 AS INT64, field_7_01234567 AS ARRAY OF INT32, field_8_012345678 AS CHARACTER, field_9_0123456789 AS BOOL, field_10_0 AS INT16, field_11_01 AS REAL, field_12_012 AS INT32, field_13_0123 AS UNSIGNED INT8, field_14_01234 AS DATE, field_15_012345 AS REAL, field_16_0123456 AS ARRAY OF INT64, field_17_01234567 AS ARRAY OF INT8, field_18_012345678 AS HIRESTIME, field_19_0123456789 AS INT32, field_20_0 AS UNSIGNED INT32, field_21_01 AS DATETIME, field_22_012 AS DATETIME, field_23_0123 AS ARRAY OF HIRESTIME, field_24_01234 AS UNSIGNED INT8, field_25_012345 AS INT32, field_26_0123456 AS ARRAY OF CHARACTER, field_27_01234567 AS INT32, field_28_012345678 AS CHARACTER, field_29_0123456789 AS INT32, field_30_0 AS RICHREAL, field_31_01 AS ARRAY OF INT8, field_32_012 AS CHARACTER, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS INT8, field_35_012345 AS INT64, field_36_0123456 AS ARRAY OF UNSIGNED INT64, field_37_01234567 AS ARRAY OF CHARACTER, field_38_012345678 AS ARRAY OF INT8, field_39_0123456789 AS INT16, field_40_0 AS BOOL, field_41_01 AS UNSIGNED INT32, field_42_012 AS RICHREAL, field_43_0123 AS INT32, field_44_01234 AS ARRAY OF DATETIME, field_45_012345 AS DATETIME, field_46_0123456 AS ARRAY OF INT8, field_47_01234567 AS UNSIGNED INT64, field_48_012345678 AS ARRAY OF HIRESTIME, field_49_0123456789 AS BOOL, field_50_0 AS ARRAY OF UNSIGNED INT16, field_51_01 AS INT16, field_52_012 AS DATE, field_53_0123 AS RICHREAL, field_54_01234 AS BOOL, field_55_012345 AS DATETIME, field_56_0123456 AS INT32, field_57_01234567 AS INT16, field_58_012345678 AS UNSIGNED INT64, field_59_0123456789 AS DATETIME, field_60_0 AS ARRAY OF HIRESTIME, field_61_01 AS UNSIGNED INT16, field_62_012 AS UNSIGNED INT16, field_63_0123 AS ARRAY OF REAL, field_64_01234 AS INT16, field_65_012345 AS INT8, field_66_0123456 AS UNSIGNED INT16, field_67_01234567 AS CHARACTER, field_68_012345678 AS UNSIGNED INT8, field_69_0123456789 AS INT32, field_70_0 AS UNSIGNED INT16, field_71_01 AS INT16, field_72_012 AS INT16, field_73_0123 AS ARRAY OF BOOL, field_74_01234 AS UNSIGNED INT16, field_75_012345 AS DATETIME, field_76_0123456 AS DATETIME, field_77_01234567 AS BOOL, field_78_012345678 AS REAL, field_79_0123456789 AS HIRESTIME, field_80_0 AS UNSIGNED INT64, field_81_01 AS UNSIGNED INT8, field_82_012 AS ARRAY OF HIRESTIME, field_83_0123 AS ARRAY OF UNSIGNED INT16, field_84_01234 AS UNSIGNED INT32, field_85_012345 AS ARRAY OF REAL, field_86_0123456 AS REAL, field_87_01234567 AS CHARACTER, field_88_012345678 AS ARRAY OF INT16)");
       proc.mParameters.push_back( "CHARACTER");
@@ -16709,7 +16709,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_504_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
@@ -16758,7 +16758,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_505_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -16814,7 +16814,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_506_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -16872,7 +16872,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_507_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
@@ -16881,7 +16881,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_508_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -16894,7 +16894,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_509_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
@@ -16933,7 +16933,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_510_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT8");
@@ -16963,7 +16963,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_511_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -17034,7 +17034,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_512_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
@@ -17047,7 +17047,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_513_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
@@ -17095,7 +17095,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_514_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
@@ -17159,7 +17159,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_515_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
@@ -17180,7 +17180,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_516_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
@@ -17210,7 +17210,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_517_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT32");
@@ -17223,7 +17223,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_518_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
@@ -17284,7 +17284,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_519_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -17346,7 +17346,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_520_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
@@ -17415,7 +17415,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_521_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -17434,7 +17434,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_522_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -17485,7 +17485,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_523_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -17514,7 +17514,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_524_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATETIME");
@@ -17568,7 +17568,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_525_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
@@ -17578,7 +17578,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_526_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF INT16");
@@ -17614,7 +17614,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_527_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
@@ -17671,7 +17671,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_528_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TEXT");
@@ -17691,7 +17691,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_529_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -17700,7 +17700,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_530_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
@@ -17752,7 +17752,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_531_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
@@ -17771,7 +17771,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_532_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -17781,7 +17781,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_533_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT16");
@@ -17813,7 +17813,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_534_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
@@ -17834,7 +17834,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_535_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT32");
@@ -17863,7 +17863,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_536_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "REAL");
@@ -17876,7 +17876,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_537_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
@@ -17938,7 +17938,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_538_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNDEFINED");
@@ -17963,7 +17963,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_539_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -17998,7 +17998,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_540_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -18030,7 +18030,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_541_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -18081,7 +18081,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_542_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
@@ -18106,7 +18106,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_543_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -18142,7 +18142,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_544_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "RICHREAL");
@@ -18159,7 +18159,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_545_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "FIELD OF RICHREAL");
@@ -18194,7 +18194,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_546_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATE");
@@ -18228,7 +18228,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_547_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -18264,7 +18264,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_548_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -18314,7 +18314,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_549_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -18325,7 +18325,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_550_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -18375,7 +18375,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_551_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
@@ -18433,7 +18433,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_552_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "BOOL");
@@ -18447,7 +18447,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_553_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT32");
@@ -18463,7 +18463,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_554_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF DATE, field_2_012 AS ARRAY OF REAL, field_3_0123 AS ARRAY OF UNSIGNED INT64, field_4_01234 AS INT16, field_5_012345 AS UNSIGNED INT64)");
       proc.mParameters.push_back( "TEXT");
@@ -18488,7 +18488,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_555_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -18541,7 +18541,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_556_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
@@ -18580,7 +18580,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_557_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
@@ -18648,7 +18648,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_558_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "FIELD OF HIRESTIME");
@@ -18666,7 +18666,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_559_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TEXT");
@@ -18687,7 +18687,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_560_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -18718,7 +18718,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_561_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -18782,7 +18782,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_562_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
@@ -18822,7 +18822,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_563_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "ARRAY OF INT32");
@@ -18877,7 +18877,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_564_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATETIME");
@@ -18892,7 +18892,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_565_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -18926,7 +18926,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_566_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "RICHREAL");
@@ -18972,7 +18972,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_567_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
@@ -18992,7 +18992,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_568_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -19029,13 +19029,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_569_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT32, field_2_012 AS DATETIME, field_3_0123 AS DATETIME, field_4_01234 AS ARRAY OF UNSIGNED INT32, field_5_012345 AS BOOL, field_6_0123456 AS RICHREAL, field_7_01234567 AS INT64, field_8_012345678 AS ARRAY OF UNSIGNED INT16, field_9_0123456789 AS INT16, field_10_0 AS DATETIME, field_11_01 AS ARRAY OF UNSIGNED INT16, field_12_012 AS HIRESTIME, field_13_0123 AS ARRAY OF UNSIGNED INT8, field_14_01234 AS BOOL, field_15_012345 AS INT32, field_16_0123456 AS INT32, field_17_01234567 AS INT8, field_18_012345678 AS DATETIME, field_19_0123456789 AS ARRAY OF UNSIGNED INT32, field_20_0 AS UNSIGNED INT64, field_21_01 AS INT16, field_22_012 AS UNSIGNED INT64, field_23_0123 AS DATE, field_24_01234 AS DATE, field_25_012345 AS UNSIGNED INT8, field_26_0123456 AS DATE, field_27_01234567 AS REAL, field_28_012345678 AS INT32, field_29_0123456789 AS CHARACTER, field_30_0 AS UNSIGNED INT8, field_31_01 AS UNSIGNED INT64, field_32_012 AS UNSIGNED INT64, field_33_0123 AS REAL, field_34_01234 AS RICHREAL, field_35_012345 AS HIRESTIME, field_36_0123456 AS INT32, field_37_01234567 AS UNSIGNED INT8, field_38_012345678 AS UNSIGNED INT64, field_39_0123456789 AS UNSIGNED INT8, field_40_0 AS CHARACTER, field_41_01 AS INT16, field_42_012 AS DATE, field_43_0123 AS INT16, field_44_01234 AS DATE, field_45_012345 AS BOOL, field_46_0123456 AS UNSIGNED INT32, field_47_01234567 AS CHARACTER, field_48_012345678 AS ARRAY OF UNSIGNED INT8, field_49_0123456789 AS REAL, field_50_0 AS ARRAY OF DATETIME, field_51_01 AS BOOL, field_52_012 AS ARRAY OF CHARACTER, field_53_0123 AS INT16, field_54_01234 AS ARRAY OF BOOL, field_55_012345 AS ARRAY OF UNSIGNED INT8, field_56_0123456 AS REAL, field_57_01234567 AS UNSIGNED INT64, field_58_012345678 AS ARRAY OF CHARACTER, field_59_0123456789 AS ARRAY OF BOOL, field_60_0 AS UNSIGNED INT8, field_61_01 AS HIRESTIME, field_62_012 AS UNSIGNED INT16, field_63_0123 AS UNSIGNED INT32, field_64_01234 AS ARRAY OF INT16, field_65_012345 AS HIRESTIME, field_66_0123456 AS INT16, field_67_01234567 AS UNSIGNED INT8, field_68_012345678 AS ARRAY OF INT64, field_69_0123456789 AS RICHREAL, field_70_0 AS INT32, field_71_01 AS REAL, field_72_012 AS ARRAY OF UNSIGNED INT8, field_73_0123 AS INT64, field_74_01234 AS HIRESTIME, field_75_012345 AS DATETIME, field_76_0123456 AS REAL, field_77_01234567 AS RICHREAL, field_78_012345678 AS INT32, field_79_0123456789 AS INT16)");
       procs.push_back( proc);
 
 
       proc.mName = "proc_570_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
@@ -19068,14 +19068,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_571_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "HIRESTIME");
       procs.push_back( proc);
 
 
       proc.mName = "proc_572_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "CHARACTER");
@@ -19083,7 +19083,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_573_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
       proc.mParameters.push_back( "FIELD OF TEXT");
@@ -19117,7 +19117,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_574_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
@@ -19155,7 +19155,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_575_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT64, field_2_012 AS RICHREAL, field_3_0123 AS DATE, field_4_01234 AS DATE, field_5_012345 AS UNSIGNED INT16, field_6_0123456 AS REAL, field_7_01234567 AS ARRAY OF RICHREAL, field_8_012345678 AS REAL, field_9_0123456789 AS HIRESTIME, field_10_0 AS INT64, field_11_01 AS RICHREAL, field_12_012 AS DATETIME, field_13_0123 AS INT64, field_14_01234 AS ARRAY OF DATETIME, field_15_012345 AS ARRAY OF BOOL, field_16_0123456 AS UNSIGNED INT8, field_17_01234567 AS INT64, field_18_012345678 AS UNSIGNED INT64, field_19_0123456789 AS ARRAY OF INT32, field_20_0 AS INT16, field_21_01 AS ARRAY OF CHARACTER, field_22_012 AS UNSIGNED INT32, field_23_0123 AS ARRAY OF UNSIGNED INT64, field_24_01234 AS UNSIGNED INT64, field_25_012345 AS DATE, field_26_0123456 AS INT64, field_27_01234567 AS ARRAY OF BOOL, field_28_012345678 AS INT16, field_29_0123456789 AS HIRESTIME, field_30_0 AS INT8, field_31_01 AS BOOL, field_32_012 AS ARRAY OF DATETIME, field_33_0123 AS HIRESTIME, field_34_01234 AS UNSIGNED INT16, field_35_012345 AS CHARACTER, field_36_0123456 AS ARRAY OF INT64)");
       proc.mParameters.push_back( "INT16");
@@ -19215,7 +19215,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_576_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -19230,7 +19230,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_577_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS RICHREAL, field_2_012 AS CHARACTER, field_3_0123 AS ARRAY OF BOOL, field_4_01234 AS UNSIGNED INT8, field_5_012345 AS RICHREAL, field_6_0123456 AS BOOL, field_7_01234567 AS RICHREAL, field_8_012345678 AS HIRESTIME, field_9_0123456789 AS ARRAY OF INT16, field_10_0 AS DATETIME, field_11_01 AS RICHREAL, field_12_012 AS CHARACTER, field_13_0123 AS UNSIGNED INT64, field_14_01234 AS ARRAY OF DATETIME, field_15_012345 AS HIRESTIME, field_16_0123456 AS UNSIGNED INT64, field_17_01234567 AS UNSIGNED INT16, field_18_012345678 AS INT16, field_19_0123456789 AS INT16, field_20_0 AS INT16, field_21_01 AS INT8, field_22_012 AS DATETIME, field_23_0123 AS ARRAY OF REAL, field_24_01234 AS INT16, field_25_012345 AS ARRAY OF RICHREAL, field_26_0123456 AS REAL, field_27_01234567 AS CHARACTER, field_28_012345678 AS INT32, field_29_0123456789 AS HIRESTIME, field_30_0 AS INT16, field_31_01 AS RICHREAL, field_32_012 AS BOOL, field_33_0123 AS REAL, field_34_01234 AS UNSIGNED INT16, field_35_012345 AS INT64, field_36_0123456 AS ARRAY OF INT32, field_37_01234567 AS DATETIME, field_38_012345678 AS RICHREAL, field_39_0123456789 AS UNSIGNED INT8, field_40_0 AS BOOL, field_41_01 AS HIRESTIME, field_42_012 AS HIRESTIME, field_43_0123 AS INT8, field_44_01234 AS INT8, field_45_012345 AS UNSIGNED INT8, field_46_0123456 AS DATE, field_47_01234567 AS INT64, field_48_012345678 AS UNSIGNED INT32, field_49_0123456789 AS UNSIGNED INT8, field_50_0 AS UNSIGNED INT32, field_51_01 AS ARRAY OF INT16, field_52_012 AS ARRAY OF INT8, field_53_0123 AS ARRAY OF HIRESTIME, field_54_01234 AS ARRAY OF INT16, field_55_012345 AS ARRAY OF HIRESTIME, field_56_0123456 AS DATE, field_57_01234567 AS INT64, field_58_012345678 AS INT32, field_59_0123456789 AS ARRAY OF RICHREAL, field_60_0 AS BOOL, field_61_01 AS UNSIGNED INT8, field_62_012 AS UNSIGNED INT64, field_63_0123 AS HIRESTIME, field_64_01234 AS HIRESTIME, field_65_012345 AS INT32, field_66_0123456 AS ARRAY OF CHARACTER, field_67_01234567 AS ARRAY OF DATE, field_68_012345678 AS ARRAY OF UNSIGNED INT8, field_69_0123456789 AS BOOL, field_70_0 AS DATETIME, field_71_01 AS INT8, field_72_012 AS UNSIGNED INT16)");
       proc.mParameters.push_back( "BOOL");
@@ -19256,7 +19256,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_578_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -19310,7 +19310,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_579_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -19338,7 +19338,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_580_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
@@ -19399,7 +19399,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_581_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "HIRESTIME");
@@ -19432,7 +19432,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_582_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
@@ -19461,7 +19461,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_583_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -19495,7 +19495,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_584_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT32");
@@ -19508,7 +19508,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_585_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
@@ -19521,7 +19521,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_586_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
@@ -19533,7 +19533,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_587_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TEXT");
@@ -19547,7 +19547,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_588_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATETIME");
@@ -19585,7 +19585,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_589_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -19598,7 +19598,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_590_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
@@ -19611,7 +19611,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_591_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT32");
@@ -19636,7 +19636,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_592_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TEXT");
@@ -19675,7 +19675,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_593_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
@@ -19741,7 +19741,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_594_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TEXT");
@@ -19765,7 +19765,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_595_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "RICHREAL");
@@ -19798,7 +19798,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_596_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT32");
@@ -19831,7 +19831,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_597_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -19857,7 +19857,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_598_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
@@ -19874,7 +19874,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_599_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
@@ -19938,7 +19938,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "f";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
@@ -19981,7 +19981,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xf";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "HIRESTIME");
@@ -19999,7 +19999,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_602_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -20026,7 +20026,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_603_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
@@ -20037,7 +20037,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_604_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
@@ -20097,7 +20097,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_605_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "RICHREAL");
@@ -20158,7 +20158,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_606_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATETIME");
@@ -20170,7 +20170,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_607_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF CHARACTER");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNDEFINED");
@@ -20192,7 +20192,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_608_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
@@ -20208,7 +20208,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_609_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -20229,7 +20229,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_610_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT32, field_2_012 AS CHARACTER, field_3_0123 AS ARRAY OF INT32, field_4_01234 AS DATE, field_5_012345 AS INT32, field_6_0123456 AS INT32, field_7_01234567 AS ARRAY OF HIRESTIME, field_8_012345678 AS INT16, field_9_0123456789 AS INT8, field_10_0 AS ARRAY OF BOOL, field_11_01 AS ARRAY OF DATETIME, field_12_012 AS ARRAY OF REAL, field_13_0123 AS REAL, field_14_01234 AS DATE, field_15_012345 AS ARRAY OF DATETIME, field_16_0123456 AS DATETIME, field_17_01234567 AS UNSIGNED INT32, field_18_012345678 AS DATE, field_19_0123456789 AS UNSIGNED INT8, field_20_0 AS HIRESTIME, field_21_01 AS INT64, field_22_012 AS UNSIGNED INT32, field_23_0123 AS INT8, field_24_01234 AS CHARACTER, field_25_012345 AS DATETIME, field_26_0123456 AS UNSIGNED INT16, field_27_01234567 AS UNSIGNED INT64, field_28_012345678 AS DATETIME, field_29_0123456789 AS UNSIGNED INT8, field_30_0 AS ARRAY OF UNSIGNED INT8, field_31_01 AS ARRAY OF BOOL, field_32_012 AS INT64, field_33_0123 AS UNSIGNED INT32, field_34_01234 AS INT8, field_35_012345 AS UNSIGNED INT32, field_36_0123456 AS INT16, field_37_01234567 AS HIRESTIME, field_38_012345678 AS BOOL, field_39_0123456789 AS BOOL, field_40_0 AS BOOL, field_41_01 AS UNSIGNED INT16, field_42_012 AS UNSIGNED INT8, field_43_0123 AS RICHREAL, field_44_01234 AS CHARACTER, field_45_012345 AS ARRAY OF UNSIGNED INT8, field_46_0123456 AS ARRAY OF DATE, field_47_01234567 AS INT8, field_48_012345678 AS ARRAY OF RICHREAL, field_49_0123456789 AS INT16, field_50_0 AS UNSIGNED INT8, field_51_01 AS INT32, field_52_012 AS UNSIGNED INT8, field_53_0123 AS HIRESTIME, field_54_01234 AS INT64, field_55_012345 AS UNSIGNED INT16, field_56_0123456 AS UNSIGNED INT64, field_57_01234567 AS ARRAY OF INT8, field_58_012345678 AS DATE, field_59_0123456789 AS ARRAY OF UNSIGNED INT16, field_60_0 AS RICHREAL, field_61_01 AS CHARACTER, field_62_012 AS INT16, field_63_0123 AS UNSIGNED INT16, field_64_01234 AS DATE, field_65_012345 AS RICHREAL, field_66_0123456 AS INT64, field_67_01234567 AS UNSIGNED INT8, field_68_012345678 AS DATETIME, field_69_0123456789 AS DATE, field_70_0 AS BOOL, field_71_01 AS CHARACTER, field_72_012 AS ARRAY OF INT64, field_73_0123 AS UNSIGNED INT32, field_74_01234 AS UNSIGNED INT8, field_75_012345 AS INT32, field_76_0123456 AS ARRAY OF UNSIGNED INT32)");
       proc.mParameters.push_back( "HIRESTIME");
@@ -20244,7 +20244,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_611_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT64");
@@ -20279,7 +20279,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_612_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -20288,7 +20288,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_613_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
@@ -20346,7 +20346,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_614_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "DATETIME");
@@ -20366,7 +20366,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_615_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
@@ -20401,7 +20401,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_616_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "ARRAY OF INT64");
       proc.mParameters.push_back( "INT8");
@@ -20468,7 +20468,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_617_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -20501,7 +20501,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_618_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "ARRAY OF INT64");
       proc.mParameters.push_back( "REAL");
@@ -20570,7 +20570,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_619_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -20637,7 +20637,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_620_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATE");
@@ -20690,7 +20690,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_621_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -20720,7 +20720,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_622_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
@@ -20745,7 +20745,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_623_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT8, field_2_012 AS ARRAY OF REAL, field_3_0123 AS UNSIGNED INT64, field_4_01234 AS ARRAY OF UNSIGNED INT64, field_5_012345 AS UNSIGNED INT32, field_6_0123456 AS UNSIGNED INT32, field_7_01234567 AS INT8, field_8_012345678 AS DATE, field_9_0123456789 AS UNSIGNED INT16, field_10_0 AS RICHREAL, field_11_01 AS UNSIGNED INT64, field_12_012 AS INT32, field_13_0123 AS UNSIGNED INT16, field_14_01234 AS INT32, field_15_012345 AS INT64, field_16_0123456 AS INT16, field_17_01234567 AS CHARACTER, field_18_012345678 AS REAL, field_19_0123456789 AS BOOL, field_20_0 AS RICHREAL, field_21_01 AS DATE, field_22_012 AS UNSIGNED INT32, field_23_0123 AS ARRAY OF DATETIME, field_24_01234 AS UNSIGNED INT16, field_25_012345 AS UNSIGNED INT8, field_26_0123456 AS INT32, field_27_01234567 AS UNSIGNED INT8, field_28_012345678 AS RICHREAL, field_29_0123456789 AS CHARACTER, field_30_0 AS ARRAY OF CHARACTER, field_31_01 AS DATE, field_32_012 AS INT32, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS DATE, field_35_012345 AS BOOL, field_36_0123456 AS INT32, field_37_01234567 AS INT32, field_38_012345678 AS UNSIGNED INT8, field_39_0123456789 AS UNSIGNED INT16, field_40_0 AS DATETIME, field_41_01 AS REAL, field_42_012 AS INT64, field_43_0123 AS ARRAY OF INT32, field_44_01234 AS UNSIGNED INT16, field_45_012345 AS ARRAY OF REAL, field_46_0123456 AS BOOL, field_47_01234567 AS ARRAY OF UNSIGNED INT64, field_48_012345678 AS UNSIGNED INT32, field_49_0123456789 AS ARRAY OF INT16, field_50_0 AS REAL, field_51_01 AS INT64, field_52_012 AS INT16, field_53_0123 AS UNSIGNED INT8, field_54_01234 AS UNSIGNED INT16, field_55_012345 AS CHARACTER, field_56_0123456 AS UNSIGNED INT8, field_57_01234567 AS BOOL, field_58_012345678 AS INT16, field_59_0123456789 AS INT32, field_60_0 AS UNSIGNED INT64, field_61_01 AS BOOL, field_62_012 AS UNSIGNED INT64, field_63_0123 AS REAL, field_64_01234 AS DATETIME, field_65_012345 AS INT16, field_66_0123456 AS INT8, field_67_01234567 AS INT8, field_68_012345678 AS DATETIME, field_69_0123456789 AS DATE, field_70_0 AS ARRAY OF INT32, field_71_01 AS INT16, field_72_012 AS INT32, field_73_0123 AS INT32)");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -20779,7 +20779,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_624_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "ARRAY OF RICHREAL");
@@ -20800,7 +20800,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_625_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATETIME, field_2_012 AS UNSIGNED INT64, field_3_0123 AS DATE, field_4_01234 AS DATE, field_5_012345 AS INT32, field_6_0123456 AS INT64, field_7_01234567 AS RICHREAL, field_8_012345678 AS UNSIGNED INT16)");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
@@ -20830,7 +20830,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_626_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
@@ -20849,7 +20849,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_627_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT8");
@@ -20893,7 +20893,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_628_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -20914,7 +20914,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_629_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -20932,7 +20932,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_630_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT64");
@@ -20962,7 +20962,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_631_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "INT64");
@@ -20973,7 +20973,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_632_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATE");
@@ -20996,7 +20996,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_633_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -21010,7 +21010,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_634_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -21025,7 +21025,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_635_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
@@ -21074,7 +21074,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_636_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
@@ -21090,7 +21090,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_637_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT16");
@@ -21109,7 +21109,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_638_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT64");
@@ -21167,7 +21167,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_639_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -21192,7 +21192,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_640_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -21201,7 +21201,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_641_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "HIRESTIME");
@@ -21233,14 +21233,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_642_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "HIRESTIME");
       procs.push_back( proc);
 
 
       proc.mName = "proc_643_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
@@ -21248,7 +21248,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_644_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -21271,7 +21271,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_645_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS REAL, field_2_012 AS UNSIGNED INT32, field_3_0123 AS BOOL, field_4_01234 AS ARRAY OF CHARACTER, field_5_012345 AS DATE, field_6_0123456 AS UNSIGNED INT8, field_7_01234567 AS ARRAY OF UNSIGNED INT32, field_8_012345678 AS HIRESTIME, field_9_0123456789 AS INT16, field_10_0 AS UNSIGNED INT16, field_11_01 AS INT64, field_12_012 AS UNSIGNED INT32, field_13_0123 AS UNSIGNED INT8, field_14_01234 AS ARRAY OF HIRESTIME, field_15_012345 AS ARRAY OF BOOL, field_16_0123456 AS UNSIGNED INT32, field_17_01234567 AS INT32, field_18_012345678 AS ARRAY OF CHARACTER, field_19_0123456789 AS HIRESTIME, field_20_0 AS INT8, field_21_01 AS UNSIGNED INT16, field_22_012 AS RICHREAL, field_23_0123 AS UNSIGNED INT64, field_24_01234 AS ARRAY OF BOOL, field_25_012345 AS INT8, field_26_0123456 AS CHARACTER, field_27_01234567 AS ARRAY OF HIRESTIME, field_28_012345678 AS REAL, field_29_0123456789 AS RICHREAL, field_30_0 AS ARRAY OF INT32, field_31_01 AS UNSIGNED INT8, field_32_012 AS UNSIGNED INT64)");
@@ -21318,7 +21318,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_646_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "ARRAY OF CHARACTER");
       proc.mParameters.push_back( "TABLE");
@@ -21329,7 +21329,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_647_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT16");
@@ -21393,7 +21393,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_648_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -21455,7 +21455,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_649_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
@@ -21520,7 +21520,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_650_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT8, field_2_012 AS HIRESTIME, field_3_0123 AS HIRESTIME, field_4_01234 AS UNSIGNED INT64, field_5_012345 AS BOOL, field_6_0123456 AS ARRAY OF HIRESTIME, field_7_01234567 AS UNSIGNED INT32, field_8_012345678 AS INT32, field_9_0123456789 AS UNSIGNED INT8, field_10_0 AS DATE, field_11_01 AS HIRESTIME, field_12_012 AS BOOL, field_13_0123 AS RICHREAL, field_14_01234 AS DATETIME, field_15_012345 AS UNSIGNED INT8, field_16_0123456 AS CHARACTER, field_17_01234567 AS ARRAY OF UNSIGNED INT64, field_18_012345678 AS ARRAY OF UNSIGNED INT32, field_19_0123456789 AS DATE, field_20_0 AS INT64, field_21_01 AS DATE, field_22_012 AS CHARACTER, field_23_0123 AS UNSIGNED INT64, field_24_01234 AS INT32, field_25_012345 AS ARRAY OF INT8, field_26_0123456 AS ARRAY OF INT8, field_27_01234567 AS CHARACTER, field_28_012345678 AS UNSIGNED INT8, field_29_0123456789 AS ARRAY OF INT32, field_30_0 AS UNSIGNED INT64, field_31_01 AS UNSIGNED INT64, field_32_012 AS CHARACTER, field_33_0123 AS ARRAY OF INT64, field_34_01234 AS ARRAY OF INT16, field_35_012345 AS ARRAY OF UNSIGNED INT8, field_36_0123456 AS CHARACTER, field_37_01234567 AS INT32, field_38_012345678 AS UNSIGNED INT64, field_39_0123456789 AS ARRAY OF INT16, field_40_0 AS DATE, field_41_01 AS UNSIGNED INT16)");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TEXT");
@@ -21577,7 +21577,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_651_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
@@ -21598,7 +21598,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_652_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
@@ -21617,7 +21617,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_653_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TEXT");
@@ -21644,7 +21644,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_654_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -21693,7 +21693,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_655_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -21743,7 +21743,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_656_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF HIRESTIME, field_2_012 AS INT8, field_3_0123 AS ARRAY OF UNSIGNED INT16, field_4_01234 AS INT8, field_5_012345 AS INT8, field_6_0123456 AS UNSIGNED INT8, field_7_01234567 AS RICHREAL, field_8_012345678 AS UNSIGNED INT32, field_9_0123456789 AS INT8, field_10_0 AS UNSIGNED INT8, field_11_01 AS REAL, field_12_012 AS HIRESTIME, field_13_0123 AS ARRAY OF HIRESTIME, field_14_01234 AS ARRAY OF INT16, field_15_012345 AS BOOL, field_16_0123456 AS ARRAY OF DATE, field_17_01234567 AS ARRAY OF INT64, field_18_012345678 AS CHARACTER, field_19_0123456789 AS INT64, field_20_0 AS DATETIME, field_21_01 AS ARRAY OF UNSIGNED INT8, field_22_012 AS ARRAY OF INT32, field_23_0123 AS UNSIGNED INT32, field_24_01234 AS ARRAY OF DATE, field_25_012345 AS CHARACTER, field_26_0123456 AS ARRAY OF DATETIME, field_27_01234567 AS ARRAY OF INT32, field_28_012345678 AS INT8, field_29_0123456789 AS HIRESTIME, field_30_0 AS INT16, field_31_01 AS ARRAY OF INT16, field_32_012 AS INT16, field_33_0123 AS CHARACTER, field_34_01234 AS DATE, field_35_012345 AS INT16, field_36_0123456 AS INT8, field_37_01234567 AS UNSIGNED INT8, field_38_012345678 AS UNSIGNED INT8, field_39_0123456789 AS HIRESTIME, field_40_0 AS CHARACTER, field_41_01 AS ARRAY OF DATE, field_42_012 AS ARRAY OF INT64, field_43_0123 AS UNSIGNED INT16, field_44_01234 AS REAL, field_45_012345 AS HIRESTIME, field_46_0123456 AS INT8, field_47_01234567 AS RICHREAL, field_48_012345678 AS ARRAY OF UNSIGNED INT64, field_49_0123456789 AS ARRAY OF RICHREAL, field_50_0 AS ARRAY OF UNSIGNED INT16, field_51_01 AS INT8, field_52_012 AS REAL, field_53_0123 AS ARRAY OF CHARACTER, field_54_01234 AS INT64, field_55_012345 AS UNSIGNED INT64, field_56_0123456 AS BOOL, field_57_01234567 AS REAL, field_58_012345678 AS RICHREAL, field_59_0123456789 AS ARRAY OF UNSIGNED INT16, field_60_0 AS ARRAY OF UNSIGNED INT8, field_61_01 AS DATETIME, field_62_012 AS UNSIGNED INT64, field_63_0123 AS RICHREAL, field_64_01234 AS UNSIGNED INT64, field_65_012345 AS UNSIGNED INT64, field_66_0123456 AS CHARACTER, field_67_01234567 AS INT8)");
       proc.mParameters.push_back( "HIRESTIME");
@@ -21785,7 +21785,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_657_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
@@ -21812,7 +21812,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_658_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -21846,7 +21846,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_659_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "ARRAY OF DATETIME");
       proc.mParameters.push_back( "TEXT");
@@ -21855,7 +21855,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_660_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TABLE");
@@ -21880,7 +21880,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_661_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -21938,7 +21938,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_662_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -21958,7 +21958,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_663_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "ARRAY OF DATE");
@@ -22014,7 +22014,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_664_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -22043,7 +22043,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_665_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -22071,7 +22071,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_666_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -22140,7 +22140,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_667_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATETIME");
@@ -22169,7 +22169,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_668_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -22196,7 +22196,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_669_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
@@ -22249,7 +22249,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_670_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -22280,7 +22280,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_671_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "REAL");
@@ -22302,7 +22302,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_672_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
@@ -22321,7 +22321,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_673_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT64");
@@ -22331,7 +22331,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_674_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
@@ -22339,7 +22339,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_675_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATETIME");
@@ -22383,7 +22383,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_676_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT16");
@@ -22425,7 +22425,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_677_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -22457,7 +22457,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_678_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS RICHREAL, field_2_012 AS INT32, field_3_0123 AS DATETIME, field_4_01234 AS UNSIGNED INT32, field_5_012345 AS BOOL, field_6_0123456 AS UNSIGNED INT32, field_7_01234567 AS UNSIGNED INT8, field_8_012345678 AS ARRAY OF UNSIGNED INT16, field_9_0123456789 AS ARRAY OF INT64, field_10_0 AS UNSIGNED INT16, field_11_01 AS UNSIGNED INT64, field_12_012 AS INT8, field_13_0123 AS DATE, field_14_01234 AS INT16, field_15_012345 AS UNSIGNED INT32, field_16_0123456 AS HIRESTIME, field_17_01234567 AS ARRAY OF INT32, field_18_012345678 AS BOOL, field_19_0123456789 AS ARRAY OF UNSIGNED INT64, field_20_0 AS ARRAY OF UNSIGNED INT8, field_21_01 AS UNSIGNED INT16, field_22_012 AS CHARACTER, field_23_0123 AS UNSIGNED INT8, field_24_01234 AS INT32, field_25_012345 AS INT32, field_26_0123456 AS DATETIME, field_27_01234567 AS INT16, field_28_012345678 AS DATE, field_29_0123456789 AS UNSIGNED INT32, field_30_0 AS CHARACTER, field_31_01 AS UNSIGNED INT8, field_32_012 AS UNSIGNED INT64, field_33_0123 AS INT64, field_34_01234 AS UNSIGNED INT32, field_35_012345 AS UNSIGNED INT16, field_36_0123456 AS INT64, field_37_01234567 AS DATE, field_38_012345678 AS INT16, field_39_0123456789 AS INT8, field_40_0 AS INT64, field_41_01 AS INT64, field_42_012 AS INT32, field_43_0123 AS UNSIGNED INT16, field_44_01234 AS INT8, field_45_012345 AS DATETIME, field_46_0123456 AS UNSIGNED INT32, field_47_01234567 AS UNSIGNED INT32, field_48_012345678 AS CHARACTER, field_49_0123456789 AS DATETIME, field_50_0 AS DATE, field_51_01 AS HIRESTIME, field_52_012 AS DATETIME, field_53_0123 AS DATETIME, field_54_01234 AS INT16, field_55_012345 AS UNSIGNED INT8, field_56_0123456 AS UNSIGNED INT8, field_57_01234567 AS DATE, field_58_012345678 AS INT32, field_59_0123456789 AS HIRESTIME, field_60_0 AS UNSIGNED INT32, field_61_01 AS DATETIME, field_62_012 AS BOOL, field_63_0123 AS INT16, field_64_01234 AS REAL, field_65_012345 AS CHARACTER, field_66_0123456 AS ARRAY OF UNSIGNED INT16, field_67_01234567 AS ARRAY OF UNSIGNED INT16, field_68_012345678 AS INT64, field_69_0123456789 AS INT64)");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
@@ -22466,7 +22466,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_679_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF INT8");
@@ -22496,7 +22496,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_680_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "RICHREAL");
@@ -22508,7 +22508,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_681_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
@@ -22523,7 +22523,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_682_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
@@ -22589,7 +22589,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_683_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
@@ -22623,7 +22623,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_684_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -22692,7 +22692,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_685_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNDEFINED");
@@ -22719,7 +22719,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_686_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT64, field_2_012 AS ARRAY OF INT64, field_3_0123 AS REAL, field_4_01234 AS UNSIGNED INT16, field_5_012345 AS DATE, field_6_0123456 AS UNSIGNED INT8, field_7_01234567 AS UNSIGNED INT16, field_8_012345678 AS INT32, field_9_0123456789 AS UNSIGNED INT64, field_10_0 AS ARRAY OF INT8, field_11_01 AS ARRAY OF DATETIME, field_12_012 AS HIRESTIME, field_13_0123 AS CHARACTER, field_14_01234 AS ARRAY OF BOOL, field_15_012345 AS RICHREAL, field_16_0123456 AS HIRESTIME, field_17_01234567 AS UNSIGNED INT16, field_18_012345678 AS DATE, field_19_0123456789 AS CHARACTER, field_20_0 AS UNSIGNED INT64, field_21_01 AS INT64, field_22_012 AS ARRAY OF UNSIGNED INT16, field_23_0123 AS BOOL, field_24_01234 AS INT8, field_25_012345 AS UNSIGNED INT64, field_26_0123456 AS ARRAY OF DATETIME, field_27_01234567 AS CHARACTER, field_28_012345678 AS ARRAY OF DATE, field_29_0123456789 AS DATETIME, field_30_0 AS ARRAY OF INT16, field_31_01 AS INT32, field_32_012 AS ARRAY OF INT32, field_33_0123 AS ARRAY OF BOOL, field_34_01234 AS UNSIGNED INT8, field_35_012345 AS UNSIGNED INT32, field_36_0123456 AS ARRAY OF UNSIGNED INT64, field_37_01234567 AS ARRAY OF DATE, field_38_012345678 AS UNSIGNED INT16, field_39_0123456789 AS INT32, field_40_0 AS INT64, field_41_01 AS UNSIGNED INT32, field_42_012 AS DATE, field_43_0123 AS BOOL, field_44_01234 AS DATE, field_45_012345 AS INT32, field_46_0123456 AS INT16, field_47_01234567 AS INT64, field_48_012345678 AS HIRESTIME, field_49_0123456789 AS UNSIGNED INT8, field_50_0 AS REAL, field_51_01 AS DATE, field_52_012 AS DATE, field_53_0123 AS ARRAY OF UNSIGNED INT16, field_54_01234 AS REAL, field_55_012345 AS ARRAY OF CHARACTER, field_56_0123456 AS ARRAY OF UNSIGNED INT16, field_57_01234567 AS CHARACTER)");
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "UNDEFINED");
@@ -22756,14 +22756,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_687_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT8");
       procs.push_back( proc);
 
 
       proc.mName = "proc_688_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS REAL, field_2_012 AS ARRAY OF DATETIME, field_3_0123 AS ARRAY OF UNSIGNED INT32, field_4_01234 AS INT16, field_5_012345 AS UNSIGNED INT32, field_6_0123456 AS INT8, field_7_01234567 AS ARRAY OF DATE, field_8_012345678 AS DATETIME, field_9_0123456789 AS REAL, field_10_0 AS ARRAY OF INT8, field_11_01 AS INT64, field_12_012 AS HIRESTIME, field_13_0123 AS DATETIME, field_14_01234 AS RICHREAL, field_15_012345 AS ARRAY OF UNSIGNED INT32, field_16_0123456 AS INT64, field_17_01234567 AS BOOL, field_18_012345678 AS INT32, field_19_0123456789 AS INT8, field_20_0 AS HIRESTIME, field_21_01 AS UNSIGNED INT16, field_22_012 AS REAL, field_23_0123 AS INT16, field_24_01234 AS RICHREAL, field_25_012345 AS HIRESTIME, field_26_0123456 AS UNSIGNED INT32, field_27_01234567 AS INT32, field_28_012345678 AS ARRAY OF CHARACTER, field_29_0123456789 AS DATETIME, field_30_0 AS INT16, field_31_01 AS INT32, field_32_012 AS DATETIME, field_33_0123 AS ARRAY OF INT64, field_34_01234 AS UNSIGNED INT16, field_35_012345 AS REAL, field_36_0123456 AS INT16, field_37_01234567 AS ARRAY OF INT64)");
       proc.mParameters.push_back( "INT8");
@@ -22796,7 +22796,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_689_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "FIELD OF RICHREAL");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
@@ -22834,7 +22834,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_690_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
@@ -22866,7 +22866,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_691_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "FIELD OF INT16");
@@ -22906,7 +22906,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_692_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF HIRESTIME");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT64");
       proc.mParameters.push_back( "UNDEFINED");
@@ -22918,7 +22918,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_693_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT32");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS CHARACTER, field_2_012 AS RICHREAL, field_3_0123 AS DATETIME, field_4_01234 AS UNSIGNED INT64, field_5_012345 AS RICHREAL, field_6_0123456 AS REAL, field_7_01234567 AS ARRAY OF UNSIGNED INT64, field_8_012345678 AS INT64, field_9_0123456789 AS REAL, field_10_0 AS UNSIGNED INT16, field_11_01 AS UNSIGNED INT16, field_12_012 AS BOOL, field_13_0123 AS ARRAY OF INT32, field_14_01234 AS UNSIGNED INT16, field_15_012345 AS BOOL, field_16_0123456 AS UNSIGNED INT32, field_17_01234567 AS ARRAY OF BOOL, field_18_012345678 AS INT64, field_19_0123456789 AS INT64, field_20_0 AS UNSIGNED INT64, field_21_01 AS INT32, field_22_012 AS UNSIGNED INT8, field_23_0123 AS ARRAY OF UNSIGNED INT64, field_24_01234 AS UNSIGNED INT32, field_25_012345 AS ARRAY OF INT32, field_26_0123456 AS INT32, field_27_01234567 AS BOOL, field_28_012345678 AS DATETIME, field_29_0123456789 AS UNSIGNED INT32, field_30_0 AS ARRAY OF RICHREAL, field_31_01 AS UNSIGNED INT64)");
@@ -22928,7 +22928,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_694_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TEXT");
@@ -22961,7 +22961,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_695_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -22986,7 +22986,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_696_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -23026,7 +23026,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_697_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "CHARACTER");
@@ -23082,7 +23082,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_698_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -23109,7 +23109,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_699_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
@@ -23137,7 +23137,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "g";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -23171,7 +23171,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xg";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -23222,7 +23222,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_702_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -23284,7 +23284,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_703_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -23325,7 +23325,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_704_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -23359,7 +23359,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_705_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
@@ -23376,7 +23376,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_706_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
@@ -23435,7 +23435,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_707_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF INT64, field_2_012 AS ARRAY OF DATETIME, field_3_0123 AS UNSIGNED INT64, field_4_01234 AS CHARACTER, field_5_012345 AS UNSIGNED INT32, field_6_0123456 AS UNSIGNED INT8, field_7_01234567 AS DATE, field_8_012345678 AS INT64, field_9_0123456789 AS BOOL, field_10_0 AS UNSIGNED INT16, field_11_01 AS DATETIME, field_12_012 AS ARRAY OF INT16, field_13_0123 AS ARRAY OF INT8, field_14_01234 AS ARRAY OF DATETIME, field_15_012345 AS UNSIGNED INT64, field_16_0123456 AS ARRAY OF UNSIGNED INT64, field_17_01234567 AS CHARACTER, field_18_012345678 AS DATETIME, field_19_0123456789 AS HIRESTIME, field_20_0 AS INT16, field_21_01 AS UNSIGNED INT32, field_22_012 AS INT16, field_23_0123 AS ARRAY OF UNSIGNED INT8, field_24_01234 AS ARRAY OF INT8, field_25_012345 AS REAL, field_26_0123456 AS INT16, field_27_01234567 AS ARRAY OF UNSIGNED INT8, field_28_012345678 AS ARRAY OF HIRESTIME, field_29_0123456789 AS INT8, field_30_0 AS DATE, field_31_01 AS UNSIGNED INT8, field_32_012 AS INT64, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS REAL, field_35_012345 AS REAL, field_36_0123456 AS INT32, field_37_01234567 AS ARRAY OF HIRESTIME, field_38_012345678 AS INT8, field_39_0123456789 AS UNSIGNED INT32, field_40_0 AS ARRAY OF INT64, field_41_01 AS ARRAY OF BOOL, field_42_012 AS ARRAY OF UNSIGNED INT32, field_43_0123 AS CHARACTER, field_44_01234 AS INT16, field_45_012345 AS UNSIGNED INT64, field_46_0123456 AS HIRESTIME, field_47_01234567 AS UNSIGNED INT32, field_48_012345678 AS INT32, field_49_0123456789 AS INT16, field_50_0 AS CHARACTER, field_51_01 AS ARRAY OF UNSIGNED INT8, field_52_012 AS INT8, field_53_0123 AS ARRAY OF BOOL, field_54_01234 AS ARRAY OF INT16, field_55_012345 AS BOOL, field_56_0123456 AS INT32, field_57_01234567 AS DATETIME, field_58_012345678 AS INT8, field_59_0123456789 AS RICHREAL, field_60_0 AS INT32, field_61_01 AS REAL, field_62_012 AS ARRAY OF INT32, field_63_0123 AS INT16, field_64_01234 AS ARRAY OF DATETIME, field_65_012345 AS RICHREAL, field_66_0123456 AS DATE, field_67_01234567 AS DATE, field_68_012345678 AS DATE, field_69_0123456789 AS UNSIGNED INT16, field_70_0 AS UNSIGNED INT16, field_71_01 AS ARRAY OF RICHREAL, field_72_012 AS UNSIGNED INT64, field_73_0123 AS REAL, field_74_01234 AS UNSIGNED INT64, field_75_012345 AS ARRAY OF INT16)");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATETIME");
@@ -23499,14 +23499,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_708_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       procs.push_back( proc);
 
 
       proc.mName = "proc_709_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -23542,7 +23542,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_710_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT64");
@@ -23565,7 +23565,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_711_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -23577,7 +23577,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_712_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
@@ -23585,7 +23585,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_713_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATE");
@@ -23620,7 +23620,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_714_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "TABLE");
@@ -23686,7 +23686,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_715_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -23700,7 +23700,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_716_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -23715,7 +23715,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_717_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT64");
@@ -23734,7 +23734,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_718_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
@@ -23766,7 +23766,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_719_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
@@ -23801,7 +23801,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_720_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "TEXT");
@@ -23862,7 +23862,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_721_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -23888,7 +23888,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_722_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -23920,7 +23920,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_723_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
@@ -23978,7 +23978,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_724_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
@@ -23997,14 +23997,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_725_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       procs.push_back( proc);
 
 
       proc.mName = "proc_726_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -24056,7 +24056,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_727_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "ARRAY OF RICHREAL");
@@ -24084,7 +24084,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_728_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -24142,7 +24142,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_729_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
@@ -24171,7 +24171,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_730_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT8");
@@ -24197,7 +24197,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_731_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -24240,7 +24240,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_732_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
@@ -24273,7 +24273,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_733_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -24299,7 +24299,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_734_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "REAL");
@@ -24334,7 +24334,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_735_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF ARRAY OF DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
@@ -24369,7 +24369,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_736_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT8, field_2_012 AS CHARACTER, field_3_0123 AS ARRAY OF INT32, field_4_01234 AS ARRAY OF HIRESTIME, field_5_012345 AS ARRAY OF UNSIGNED INT8, field_6_0123456 AS INT8, field_7_01234567 AS UNSIGNED INT32, field_8_012345678 AS RICHREAL, field_9_0123456789 AS DATETIME, field_10_0 AS DATE, field_11_01 AS RICHREAL, field_12_012 AS BOOL, field_13_0123 AS BOOL, field_14_01234 AS HIRESTIME, field_15_012345 AS UNSIGNED INT8, field_16_0123456 AS INT32, field_17_01234567 AS INT8, field_18_012345678 AS INT64, field_19_0123456789 AS INT32)");
       proc.mParameters.push_back( "REAL");
@@ -24413,7 +24413,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_737_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "HIRESTIME");
@@ -24437,7 +24437,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_738_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
@@ -24448,7 +24448,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_739_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "FIELD OF BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -24477,7 +24477,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_740_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
@@ -24514,7 +24514,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_741_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT8, field_2_012 AS DATETIME, field_3_0123 AS ARRAY OF CHARACTER, field_4_01234 AS RICHREAL, field_5_012345 AS UNSIGNED INT32, field_6_0123456 AS UNSIGNED INT32, field_7_01234567 AS RICHREAL, field_8_012345678 AS INT64, field_9_0123456789 AS ARRAY OF HIRESTIME, field_10_0 AS UNSIGNED INT64, field_11_01 AS ARRAY OF BOOL, field_12_012 AS REAL, field_13_0123 AS ARRAY OF UNSIGNED INT8, field_14_01234 AS INT8, field_15_012345 AS BOOL, field_16_0123456 AS UNSIGNED INT8, field_17_01234567 AS UNSIGNED INT32, field_18_012345678 AS ARRAY OF INT32, field_19_0123456789 AS UNSIGNED INT8, field_20_0 AS ARRAY OF CHARACTER, field_21_01 AS ARRAY OF UNSIGNED INT16, field_22_012 AS INT64, field_23_0123 AS DATETIME, field_24_01234 AS ARRAY OF INT32, field_25_012345 AS ARRAY OF INT8, field_26_0123456 AS UNSIGNED INT8, field_27_01234567 AS BOOL, field_28_012345678 AS DATE, field_29_0123456789 AS DATETIME, field_30_0 AS DATE, field_31_01 AS RICHREAL, field_32_012 AS INT32, field_33_0123 AS INT16)");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
@@ -24571,7 +24571,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_742_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -24604,7 +24604,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_743_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
@@ -24658,7 +24658,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_744_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT8, field_2_012 AS ARRAY OF UNSIGNED INT64, field_3_0123 AS UNSIGNED INT16, field_4_01234 AS INT8, field_5_012345 AS ARRAY OF UNSIGNED INT8, field_6_0123456 AS UNSIGNED INT16, field_7_01234567 AS INT64, field_8_012345678 AS INT8, field_9_0123456789 AS CHARACTER, field_10_0 AS UNSIGNED INT16, field_11_01 AS RICHREAL, field_12_012 AS ARRAY OF HIRESTIME, field_13_0123 AS ARRAY OF DATETIME, field_14_01234 AS CHARACTER, field_15_012345 AS DATE, field_16_0123456 AS HIRESTIME, field_17_01234567 AS ARRAY OF INT32, field_18_012345678 AS HIRESTIME, field_19_0123456789 AS REAL, field_20_0 AS RICHREAL, field_21_01 AS ARRAY OF UNSIGNED INT8, field_22_012 AS CHARACTER, field_23_0123 AS ARRAY OF INT16, field_24_01234 AS ARRAY OF DATE, field_25_012345 AS UNSIGNED INT8, field_26_0123456 AS DATE, field_27_01234567 AS UNSIGNED INT16, field_28_012345678 AS UNSIGNED INT16, field_29_0123456789 AS REAL, field_30_0 AS INT8, field_31_01 AS DATETIME, field_32_012 AS ARRAY OF INT8, field_33_0123 AS ARRAY OF RICHREAL, field_34_01234 AS UNSIGNED INT8, field_35_012345 AS UNSIGNED INT64, field_36_0123456 AS ARRAY OF BOOL, field_37_01234567 AS ARRAY OF INT64, field_38_012345678 AS BOOL, field_39_0123456789 AS UNSIGNED INT32, field_40_0 AS DATE, field_41_01 AS CHARACTER, field_42_012 AS HIRESTIME, field_43_0123 AS UNSIGNED INT64, field_44_01234 AS INT16, field_45_012345 AS UNSIGNED INT8, field_46_0123456 AS UNSIGNED INT32, field_47_01234567 AS RICHREAL, field_48_012345678 AS BOOL, field_49_0123456789 AS BOOL, field_50_0 AS ARRAY OF INT32, field_51_01 AS UNSIGNED INT16, field_52_012 AS UNSIGNED INT64, field_53_0123 AS BOOL, field_54_01234 AS INT16, field_55_012345 AS BOOL, field_56_0123456 AS INT16, field_57_01234567 AS DATE, field_58_012345678 AS INT32, field_59_0123456789 AS UNSIGNED INT8, field_60_0 AS UNSIGNED INT8, field_61_01 AS CHARACTER, field_62_012 AS ARRAY OF DATETIME, field_63_0123 AS RICHREAL, field_64_01234 AS UNSIGNED INT64, field_65_012345 AS CHARACTER, field_66_0123456 AS REAL, field_67_01234567 AS ARRAY OF DATETIME, field_68_012345678 AS CHARACTER, field_69_0123456789 AS REAL, field_70_0 AS ARRAY OF DATE, field_71_01 AS DATETIME, field_72_012 AS CHARACTER, field_73_0123 AS CHARACTER, field_74_01234 AS UNSIGNED INT16, field_75_012345 AS UNSIGNED INT32, field_76_0123456 AS CHARACTER, field_77_01234567 AS BOOL, field_78_012345678 AS CHARACTER, field_79_0123456789 AS INT16, field_80_0 AS BOOL, field_81_01 AS ARRAY OF UNSIGNED INT8, field_82_012 AS INT8, field_83_0123 AS INT64, field_84_01234 AS UNSIGNED INT8, field_85_012345 AS UNSIGNED INT8, field_86_0123456 AS ARRAY OF BOOL, field_87_01234567 AS CHARACTER, field_88_012345678 AS UNSIGNED INT8, field_89_0123456789 AS CHARACTER, field_90_0 AS ARRAY OF UNSIGNED INT16)");
       proc.mParameters.push_back( "DATETIME");
@@ -24672,7 +24672,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_745_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
@@ -24730,7 +24730,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_746_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -24739,7 +24739,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_747_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT32");
       proc.mParameters.push_back( "ARRAY OF INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -24757,7 +24757,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_748_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -24812,14 +24812,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_749_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "REAL");
       procs.push_back( proc);
 
 
       proc.mName = "proc_750_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS DATETIME, field_2_012 AS UNSIGNED INT16, field_3_0123 AS ARRAY OF INT64, field_4_01234 AS ARRAY OF CHARACTER, field_5_012345 AS UNSIGNED INT16, field_6_0123456 AS CHARACTER, field_7_01234567 AS HIRESTIME, field_8_012345678 AS ARRAY OF UNSIGNED INT16, field_9_0123456789 AS ARRAY OF UNSIGNED INT8, field_10_0 AS ARRAY OF BOOL, field_11_01 AS DATE, field_12_012 AS ARRAY OF INT32, field_13_0123 AS DATE, field_14_01234 AS DATE, field_15_012345 AS ARRAY OF INT64, field_16_0123456 AS ARRAY OF UNSIGNED INT16, field_17_01234567 AS CHARACTER, field_18_012345678 AS ARRAY OF BOOL, field_19_0123456789 AS RICHREAL, field_20_0 AS UNSIGNED INT32, field_21_01 AS ARRAY OF CHARACTER, field_22_012 AS INT64, field_23_0123 AS ARRAY OF RICHREAL, field_24_01234 AS BOOL, field_25_012345 AS DATE, field_26_0123456 AS RICHREAL, field_27_01234567 AS INT16, field_28_012345678 AS RICHREAL, field_29_0123456789 AS UNSIGNED INT8, field_30_0 AS UNSIGNED INT16, field_31_01 AS INT8, field_32_012 AS UNSIGNED INT8, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS UNSIGNED INT64, field_35_012345 AS ARRAY OF BOOL, field_36_0123456 AS INT16, field_37_01234567 AS INT64, field_38_012345678 AS UNSIGNED INT64, field_39_0123456789 AS REAL, field_40_0 AS CHARACTER, field_41_01 AS RICHREAL, field_42_012 AS UNSIGNED INT16, field_43_0123 AS ARRAY OF UNSIGNED INT16, field_44_01234 AS ARRAY OF CHARACTER, field_45_012345 AS ARRAY OF INT64, field_46_0123456 AS ARRAY OF HIRESTIME, field_47_01234567 AS CHARACTER, field_48_012345678 AS ARRAY OF CHARACTER, field_49_0123456789 AS UNSIGNED INT64, field_50_0 AS INT16, field_51_01 AS UNSIGNED INT16, field_52_012 AS UNSIGNED INT32, field_53_0123 AS INT32, field_54_01234 AS CHARACTER, field_55_012345 AS UNSIGNED INT16, field_56_0123456 AS UNSIGNED INT16, field_57_01234567 AS UNSIGNED INT32, field_58_012345678 AS REAL, field_59_0123456789 AS ARRAY OF INT16, field_60_0 AS ARRAY OF HIRESTIME, field_61_01 AS UNSIGNED INT8, field_62_012 AS INT8, field_63_0123 AS UNSIGNED INT8, field_64_01234 AS INT8, field_65_012345 AS DATE, field_66_0123456 AS BOOL, field_67_01234567 AS INT64, field_68_012345678 AS UNSIGNED INT8, field_69_0123456789 AS ARRAY OF INT64, field_70_0 AS UNSIGNED INT16)");
@@ -24845,7 +24845,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_751_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF INT8");
@@ -24884,7 +24884,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_752_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -24917,7 +24917,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_753_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -24931,7 +24931,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_754_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -24989,7 +24989,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_755_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNDEFINED");
@@ -25012,7 +25012,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_756_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "ARRAY OF INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -25079,7 +25079,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_757_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -25120,7 +25120,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_758_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TEXT");
@@ -25138,7 +25138,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_759_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT32");
@@ -25152,7 +25152,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_760_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
@@ -25181,7 +25181,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_761_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -25191,7 +25191,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_762_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT64");
@@ -25218,7 +25218,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_763_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT16");
@@ -25242,7 +25242,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_764_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
@@ -25291,7 +25291,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_765_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
@@ -25359,7 +25359,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_766_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS BOOL, field_2_012 AS INT8, field_3_0123 AS INT64, field_4_01234 AS RICHREAL, field_5_012345 AS REAL, field_6_0123456 AS ARRAY OF BOOL, field_7_01234567 AS CHARACTER, field_8_012345678 AS RICHREAL, field_9_0123456789 AS ARRAY OF INT8, field_10_0 AS DATE, field_11_01 AS UNSIGNED INT64)");
       proc.mParameters.push_back( "BOOL");
@@ -25421,7 +25421,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_767_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS REAL, field_2_012 AS HIRESTIME, field_3_0123 AS ARRAY OF CHARACTER, field_4_01234 AS BOOL, field_5_012345 AS INT32, field_6_0123456 AS DATETIME, field_7_01234567 AS ARRAY OF CHARACTER, field_8_012345678 AS DATETIME, field_9_0123456789 AS ARRAY OF UNSIGNED INT16, field_10_0 AS ARRAY OF REAL, field_11_01 AS BOOL, field_12_012 AS RICHREAL, field_13_0123 AS ARRAY OF RICHREAL, field_14_01234 AS RICHREAL, field_15_012345 AS CHARACTER, field_16_0123456 AS HIRESTIME, field_17_01234567 AS INT64, field_18_012345678 AS HIRESTIME, field_19_0123456789 AS CHARACTER, field_20_0 AS UNSIGNED INT64, field_21_01 AS UNSIGNED INT8, field_22_012 AS UNSIGNED INT8, field_23_0123 AS UNSIGNED INT32, field_24_01234 AS INT32, field_25_012345 AS UNSIGNED INT32, field_26_0123456 AS BOOL, field_27_01234567 AS UNSIGNED INT64, field_28_012345678 AS UNSIGNED INT8, field_29_0123456789 AS DATETIME, field_30_0 AS UNSIGNED INT32, field_31_01 AS BOOL, field_32_012 AS INT16, field_33_0123 AS ARRAY OF DATE, field_34_01234 AS INT64, field_35_012345 AS ARRAY OF UNSIGNED INT8, field_36_0123456 AS UNSIGNED INT64, field_37_01234567 AS ARRAY OF HIRESTIME, field_38_012345678 AS RICHREAL, field_39_0123456789 AS INT8, field_40_0 AS DATE, field_41_01 AS RICHREAL, field_42_012 AS ARRAY OF INT16, field_43_0123 AS RICHREAL, field_44_01234 AS INT16, field_45_012345 AS ARRAY OF INT16, field_46_0123456 AS HIRESTIME, field_47_01234567 AS UNSIGNED INT64, field_48_012345678 AS DATETIME, field_49_0123456789 AS ARRAY OF INT8, field_50_0 AS ARRAY OF UNSIGNED INT16, field_51_01 AS ARRAY OF DATETIME, field_52_012 AS ARRAY OF BOOL, field_53_0123 AS REAL, field_54_01234 AS DATETIME, field_55_012345 AS DATE, field_56_0123456 AS INT8, field_57_01234567 AS REAL, field_58_012345678 AS INT16, field_59_0123456789 AS INT64, field_60_0 AS ARRAY OF UNSIGNED INT64, field_61_01 AS INT16, field_62_012 AS ARRAY OF UNSIGNED INT32, field_63_0123 AS BOOL, field_64_01234 AS DATETIME, field_65_012345 AS INT8, field_66_0123456 AS UNSIGNED INT64, field_67_01234567 AS ARRAY OF CHARACTER, field_68_012345678 AS UNSIGNED INT64, field_69_0123456789 AS ARRAY OF INT64, field_70_0 AS INT64, field_71_01 AS UNSIGNED INT16, field_72_012 AS BOOL, field_73_0123 AS UNSIGNED INT8, field_74_01234 AS REAL, field_75_012345 AS INT64, field_76_0123456 AS REAL, field_77_01234567 AS REAL, field_78_012345678 AS ARRAY OF DATE, field_79_0123456789 AS ARRAY OF HIRESTIME, field_80_0 AS UNSIGNED INT16, field_81_01 AS UNSIGNED INT64, field_82_012 AS INT64, field_83_0123 AS ARRAY OF INT64, field_84_01234 AS INT32, field_85_012345 AS ARRAY OF UNSIGNED INT32, field_86_0123456 AS HIRESTIME, field_87_01234567 AS BOOL, field_88_012345678 AS INT32, field_89_0123456789 AS ARRAY OF UNSIGNED INT64, field_90_0 AS INT32, field_91_01 AS ARRAY OF INT16, field_92_012 AS CHARACTER, field_93_0123 AS REAL, field_94_01234 AS INT64, field_95_012345 AS UNSIGNED INT16, field_96_0123456 AS ARRAY OF BOOL, field_97_01234567 AS RICHREAL)");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -25478,7 +25478,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_768_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
@@ -25504,7 +25504,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_769_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
@@ -25514,7 +25514,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_770_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -25543,7 +25543,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_771_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT16");
@@ -25559,7 +25559,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_772_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
@@ -25568,7 +25568,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_773_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -25636,7 +25636,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_774_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
@@ -25666,13 +25666,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_775_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       procs.push_back( proc);
 
 
       proc.mName = "proc_776_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -25718,7 +25718,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_777_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "TEXT");
@@ -25753,7 +25753,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_778_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF BOOL");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -25808,7 +25808,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_779_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
@@ -25831,7 +25831,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_780_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -25868,7 +25868,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_781_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -25913,7 +25913,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_782_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -25971,7 +25971,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_783_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -26005,7 +26005,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_784_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -26034,14 +26034,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_785_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       procs.push_back( proc);
 
 
       proc.mName = "proc_786_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
@@ -26057,7 +26057,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_787_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT32");
@@ -26074,7 +26074,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_788_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF DATETIME, field_2_012 AS ARRAY OF DATETIME, field_3_0123 AS ARRAY OF INT16, field_4_01234 AS UNSIGNED INT32, field_5_012345 AS ARRAY OF INT32, field_6_0123456 AS ARRAY OF CHARACTER, field_7_01234567 AS RICHREAL, field_8_012345678 AS INT16, field_9_0123456789 AS INT64, field_10_0 AS DATE, field_11_01 AS INT8, field_12_012 AS ARRAY OF UNSIGNED INT16, field_13_0123 AS INT32, field_14_01234 AS DATETIME, field_15_012345 AS RICHREAL, field_16_0123456 AS ARRAY OF RICHREAL, field_17_01234567 AS UNSIGNED INT16, field_18_012345678 AS INT8, field_19_0123456789 AS INT64, field_20_0 AS INT32, field_21_01 AS UNSIGNED INT64, field_22_012 AS INT8, field_23_0123 AS INT8, field_24_01234 AS UNSIGNED INT32, field_25_012345 AS INT16, field_26_0123456 AS INT64, field_27_01234567 AS UNSIGNED INT16, field_28_012345678 AS ARRAY OF INT16, field_29_0123456789 AS ARRAY OF BOOL, field_30_0 AS UNSIGNED INT16, field_31_01 AS DATE, field_32_012 AS ARRAY OF INT8, field_33_0123 AS REAL, field_34_01234 AS HIRESTIME, field_35_012345 AS INT64, field_36_0123456 AS ARRAY OF RICHREAL, field_37_01234567 AS ARRAY OF INT16, field_38_012345678 AS UNSIGNED INT32, field_39_0123456789 AS ARRAY OF DATE, field_40_0 AS INT64, field_41_01 AS UNSIGNED INT32, field_42_012 AS ARRAY OF HIRESTIME, field_43_0123 AS CHARACTER, field_44_01234 AS INT8, field_45_012345 AS INT32, field_46_0123456 AS ARRAY OF INT32, field_47_01234567 AS INT8, field_48_012345678 AS INT32, field_49_0123456789 AS ARRAY OF INT64, field_50_0 AS ARRAY OF HIRESTIME, field_51_01 AS UNSIGNED INT64, field_52_012 AS CHARACTER, field_53_0123 AS ARRAY OF INT64, field_54_01234 AS INT64, field_55_012345 AS INT64, field_56_0123456 AS ARRAY OF INT16, field_57_01234567 AS DATETIME, field_58_012345678 AS CHARACTER, field_59_0123456789 AS UNSIGNED INT32, field_60_0 AS INT32, field_61_01 AS ARRAY OF HIRESTIME, field_62_012 AS UNSIGNED INT8, field_63_0123 AS HIRESTIME, field_64_01234 AS DATETIME, field_65_012345 AS RICHREAL, field_66_0123456 AS INT8, field_67_01234567 AS REAL, field_68_012345678 AS ARRAY OF REAL, field_69_0123456789 AS DATETIME, field_70_0 AS INT64, field_71_01 AS UNSIGNED INT8, field_72_012 AS ARRAY OF BOOL, field_73_0123 AS BOOL, field_74_01234 AS ARRAY OF RICHREAL, field_75_012345 AS UNSIGNED INT32, field_76_0123456 AS ARRAY OF UNSIGNED INT16, field_77_01234567 AS CHARACTER, field_78_012345678 AS ARRAY OF REAL, field_79_0123456789 AS DATE, field_80_0 AS ARRAY OF UNSIGNED INT8, field_81_01 AS INT64, field_82_012 AS UNSIGNED INT16)");
@@ -26118,7 +26118,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_789_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -26183,7 +26183,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_790_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "REAL");
@@ -26251,7 +26251,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_791_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT64, field_2_012 AS INT64, field_3_0123 AS RICHREAL, field_4_01234 AS ARRAY OF HIRESTIME, field_5_012345 AS INT8, field_6_0123456 AS CHARACTER, field_7_01234567 AS DATETIME, field_8_012345678 AS HIRESTIME, field_9_0123456789 AS UNSIGNED INT8, field_10_0 AS RICHREAL, field_11_01 AS HIRESTIME, field_12_012 AS UNSIGNED INT8, field_13_0123 AS ARRAY OF INT64, field_14_01234 AS REAL, field_15_012345 AS UNSIGNED INT32, field_16_0123456 AS UNSIGNED INT64, field_17_01234567 AS UNSIGNED INT16, field_18_012345678 AS ARRAY OF UNSIGNED INT8, field_19_0123456789 AS HIRESTIME, field_20_0 AS DATE, field_21_01 AS INT64, field_22_012 AS INT8, field_23_0123 AS DATE, field_24_01234 AS ARRAY OF DATETIME, field_25_012345 AS DATE, field_26_0123456 AS UNSIGNED INT8, field_27_01234567 AS INT8, field_28_012345678 AS INT32, field_29_0123456789 AS DATE, field_30_0 AS REAL, field_31_01 AS DATE, field_32_012 AS ARRAY OF CHARACTER, field_33_0123 AS INT16, field_34_01234 AS HIRESTIME, field_35_012345 AS HIRESTIME, field_36_0123456 AS HIRESTIME, field_37_01234567 AS INT8, field_38_012345678 AS RICHREAL, field_39_0123456789 AS CHARACTER, field_40_0 AS REAL, field_41_01 AS DATE, field_42_012 AS ARRAY OF UNSIGNED INT16, field_43_0123 AS ARRAY OF INT16, field_44_01234 AS UNSIGNED INT64, field_45_012345 AS DATE, field_46_0123456 AS DATE, field_47_01234567 AS DATETIME, field_48_012345678 AS INT16, field_49_0123456789 AS DATE, field_50_0 AS UNSIGNED INT16, field_51_01 AS INT16, field_52_012 AS ARRAY OF DATE, field_53_0123 AS DATE, field_54_01234 AS RICHREAL, field_55_012345 AS ARRAY OF CHARACTER, field_56_0123456 AS CHARACTER, field_57_01234567 AS INT8, field_58_012345678 AS HIRESTIME, field_59_0123456789 AS ARRAY OF UNSIGNED INT64, field_60_0 AS ARRAY OF BOOL, field_61_01 AS REAL, field_62_012 AS RICHREAL, field_63_0123 AS INT64, field_64_01234 AS INT8, field_65_012345 AS CHARACTER, field_66_0123456 AS UNSIGNED INT32, field_67_01234567 AS INT64)");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -26273,7 +26273,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_792_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -26296,7 +26296,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_793_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -26338,7 +26338,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_794_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TEXT");
@@ -26406,7 +26406,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_795_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -26428,7 +26428,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_796_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
@@ -26436,7 +26436,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_797_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -26466,7 +26466,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_798_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "FIELD OF DATE");
       proc.mParameters.push_back( "BOOL");
@@ -26523,7 +26523,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_799_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT8");
@@ -26555,7 +26555,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "h";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT16");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATETIME");
@@ -26587,7 +26587,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xh";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT16");
@@ -26597,7 +26597,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_802_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT32");
@@ -26619,7 +26619,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_803_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS ARRAY OF DATETIME, field_2_012 AS DATE, field_3_0123 AS UNSIGNED INT64, field_4_01234 AS ARRAY OF DATE, field_5_012345 AS INT16, field_6_0123456 AS DATE, field_7_01234567 AS INT8, field_8_012345678 AS INT64, field_9_0123456789 AS DATE, field_10_0 AS INT8, field_11_01 AS ARRAY OF BOOL, field_12_012 AS RICHREAL, field_13_0123 AS CHARACTER, field_14_01234 AS UNSIGNED INT8, field_15_012345 AS ARRAY OF REAL, field_16_0123456 AS ARRAY OF INT32, field_17_01234567 AS CHARACTER, field_18_012345678 AS UNSIGNED INT64, field_19_0123456789 AS INT32, field_20_0 AS ARRAY OF INT16, field_21_01 AS INT64, field_22_012 AS HIRESTIME, field_23_0123 AS DATE, field_24_01234 AS UNSIGNED INT32, field_25_012345 AS INT64, field_26_0123456 AS UNSIGNED INT32, field_27_01234567 AS REAL, field_28_012345678 AS ARRAY OF UNSIGNED INT8, field_29_0123456789 AS INT16, field_30_0 AS UNSIGNED INT8, field_31_01 AS UNSIGNED INT16, field_32_012 AS UNSIGNED INT16, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS CHARACTER, field_35_012345 AS INT64, field_36_0123456 AS UNSIGNED INT64, field_37_01234567 AS RICHREAL, field_38_012345678 AS REAL, field_39_0123456789 AS REAL, field_40_0 AS DATETIME, field_41_01 AS RICHREAL, field_42_012 AS DATETIME, field_43_0123 AS RICHREAL, field_44_01234 AS INT8, field_45_012345 AS HIRESTIME, field_46_0123456 AS INT8, field_47_01234567 AS DATETIME, field_48_012345678 AS DATETIME, field_49_0123456789 AS DATETIME, field_50_0 AS INT16, field_51_01 AS INT64, field_52_012 AS BOOL, field_53_0123 AS DATE, field_54_01234 AS ARRAY OF INT64, field_55_012345 AS DATETIME, field_56_0123456 AS HIRESTIME, field_57_01234567 AS UNSIGNED INT64, field_58_012345678 AS ARRAY OF DATE, field_59_0123456789 AS UNSIGNED INT64, field_60_0 AS ARRAY OF UNSIGNED INT32, field_61_01 AS BOOL, field_62_012 AS DATE, field_63_0123 AS RICHREAL, field_64_01234 AS UNSIGNED INT64, field_65_012345 AS ARRAY OF RICHREAL, field_66_0123456 AS UNSIGNED INT32, field_67_01234567 AS ARRAY OF UNSIGNED INT32, field_68_012345678 AS BOOL, field_69_0123456789 AS UNSIGNED INT32, field_70_0 AS INT8, field_71_01 AS ARRAY OF INT8, field_72_012 AS INT16, field_73_0123 AS ARRAY OF INT8, field_74_01234 AS HIRESTIME, field_75_012345 AS ARRAY OF CHARACTER, field_76_0123456 AS INT8, field_77_01234567 AS ARRAY OF DATE, field_78_012345678 AS INT8, field_79_0123456789 AS INT32, field_80_0 AS UNSIGNED INT32, field_81_01 AS DATETIME, field_82_012 AS INT32, field_83_0123 AS INT32, field_84_01234 AS UNSIGNED INT32, field_85_012345 AS DATETIME, field_86_0123456 AS ARRAY OF HIRESTIME)");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT16");
@@ -26659,7 +26659,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_804_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "FIELD OF DATE");
       proc.mParameters.push_back( "DATE");
@@ -26705,7 +26705,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_805_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -26759,7 +26759,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_806_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -26799,7 +26799,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_807_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS BOOL, field_2_012 AS UNSIGNED INT16, field_3_0123 AS INT32, field_4_01234 AS DATE, field_5_012345 AS ARRAY OF INT64, field_6_0123456 AS ARRAY OF DATETIME, field_7_01234567 AS REAL, field_8_012345678 AS ARRAY OF INT8, field_9_0123456789 AS UNSIGNED INT8, field_10_0 AS RICHREAL, field_11_01 AS DATE, field_12_012 AS ARRAY OF DATE, field_13_0123 AS INT32, field_14_01234 AS ARRAY OF INT32, field_15_012345 AS HIRESTIME, field_16_0123456 AS INT8)");
       proc.mParameters.push_back( "DATE");
@@ -26812,7 +26812,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_808_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -26824,7 +26824,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_809_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
@@ -26871,7 +26871,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_810_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -26889,7 +26889,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_811_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNDEFINED");
@@ -26911,7 +26911,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_812_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -26922,7 +26922,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_813_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "CHARACTER");
@@ -26952,7 +26952,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_814_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATE");
@@ -26986,7 +26986,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_815_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
@@ -27022,7 +27022,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_816_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -27052,7 +27052,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_817_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS HIRESTIME, field_2_012 AS UNSIGNED INT16, field_3_0123 AS UNSIGNED INT8, field_4_01234 AS UNSIGNED INT32, field_5_012345 AS HIRESTIME, field_6_0123456 AS ARRAY OF INT32, field_7_01234567 AS DATE, field_8_012345678 AS UNSIGNED INT8, field_9_0123456789 AS BOOL, field_10_0 AS INT16, field_11_01 AS INT64, field_12_012 AS INT16, field_13_0123 AS ARRAY OF UNSIGNED INT64, field_14_01234 AS UNSIGNED INT16, field_15_012345 AS BOOL, field_16_0123456 AS INT8, field_17_01234567 AS UNSIGNED INT8, field_18_012345678 AS DATE, field_19_0123456789 AS UNSIGNED INT16, field_20_0 AS ARRAY OF BOOL, field_21_01 AS DATETIME, field_22_012 AS ARRAY OF UNSIGNED INT8, field_23_0123 AS DATETIME, field_24_01234 AS INT16, field_25_012345 AS DATETIME, field_26_0123456 AS INT32, field_27_01234567 AS HIRESTIME, field_28_012345678 AS ARRAY OF RICHREAL, field_29_0123456789 AS RICHREAL)");
@@ -27113,7 +27113,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_818_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -27146,7 +27146,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_819_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
@@ -27157,7 +27157,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_820_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNDEFINED");
@@ -27178,7 +27178,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_821_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT16");
@@ -27229,7 +27229,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_822_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
@@ -27237,7 +27237,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_823_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATE");
@@ -27249,7 +27249,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_824_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -27280,7 +27280,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_825_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
@@ -27309,7 +27309,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_826_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "TEXT");
@@ -27366,7 +27366,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_827_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -27431,7 +27431,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_828_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -27455,7 +27455,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_829_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -27496,7 +27496,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_830_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -27518,14 +27518,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_831_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
       procs.push_back( proc);
 
 
       proc.mName = "proc_832_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "FIELD OF REAL");
       proc.mParameters.push_back( "INT16");
@@ -27590,7 +27590,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_833_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -27607,7 +27607,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_834_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
@@ -27620,7 +27620,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_835_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT32");
@@ -27664,7 +27664,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_836_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATE");
@@ -27707,7 +27707,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_837_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
@@ -27757,7 +27757,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_838_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "INT32");
@@ -27797,7 +27797,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_839_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "DATE");
@@ -27844,7 +27844,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_840_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -27854,7 +27854,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_841_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "ARRAY OF BOOL");
@@ -27881,7 +27881,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_842_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "DATETIME");
@@ -27937,7 +27937,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_843_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF TEXT");
@@ -27949,7 +27949,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_844_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
@@ -27962,7 +27962,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_845_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "REAL");
@@ -27999,7 +27999,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_846_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT32");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "ARRAY");
@@ -28007,7 +28007,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_847_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
@@ -28030,7 +28030,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_848_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -28051,7 +28051,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_849_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -28064,7 +28064,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_850_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -28090,7 +28090,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_851_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -28113,7 +28113,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_852_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "BOOL");
@@ -28179,7 +28179,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_853_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -28190,7 +28190,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_854_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
@@ -28210,7 +28210,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_855_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
@@ -28245,7 +28245,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_856_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
@@ -28289,7 +28289,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_857_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -28304,7 +28304,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_858_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -28331,7 +28331,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_859_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT16");
@@ -28377,13 +28377,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_860_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       procs.push_back( proc);
 
 
       proc.mName = "proc_861_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -28433,7 +28433,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_862_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -28464,7 +28464,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_863_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -28510,7 +28510,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_864_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
@@ -28551,7 +28551,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_865_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -28585,7 +28585,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_866_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
@@ -28603,7 +28603,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_867_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -28616,7 +28616,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_868_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -28655,7 +28655,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_869_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATETIME");
@@ -28695,7 +28695,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_870_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -28754,7 +28754,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_871_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "TEXT");
@@ -28766,7 +28766,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_872_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
@@ -28827,7 +28827,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_873_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "REAL");
@@ -28877,7 +28877,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_874_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
@@ -28891,7 +28891,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_875_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT8, field_2_012 AS INT64, field_3_0123 AS DATETIME, field_4_01234 AS HIRESTIME, field_5_012345 AS ARRAY OF UNSIGNED INT32, field_6_0123456 AS ARRAY OF DATETIME, field_7_01234567 AS INT16, field_8_012345678 AS INT32, field_9_0123456789 AS INT8, field_10_0 AS UNSIGNED INT64, field_11_01 AS DATE, field_12_012 AS INT64, field_13_0123 AS ARRAY OF UNSIGNED INT8, field_14_01234 AS INT32, field_15_012345 AS BOOL, field_16_0123456 AS REAL, field_17_01234567 AS INT32, field_18_012345678 AS ARRAY OF BOOL, field_19_0123456789 AS ARRAY OF HIRESTIME, field_20_0 AS RICHREAL, field_21_01 AS INT16, field_22_012 AS ARRAY OF DATETIME, field_23_0123 AS DATE, field_24_01234 AS UNSIGNED INT32, field_25_012345 AS DATE, field_26_0123456 AS INT16, field_27_01234567 AS ARRAY OF BOOL, field_28_012345678 AS DATE, field_29_0123456789 AS INT8, field_30_0 AS ARRAY OF INT16, field_31_01 AS ARRAY OF DATETIME, field_32_012 AS HIRESTIME, field_33_0123 AS UNSIGNED INT8, field_34_01234 AS CHARACTER, field_35_012345 AS ARRAY OF CHARACTER, field_36_0123456 AS CHARACTER, field_37_01234567 AS BOOL, field_38_012345678 AS INT64, field_39_0123456789 AS INT64, field_40_0 AS INT32, field_41_01 AS INT16)");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -28913,7 +28913,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_876_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT64");
@@ -28943,7 +28943,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_877_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -28968,7 +28968,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_878_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
@@ -29034,7 +29034,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_879_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF TEXT");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -29047,7 +29047,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_880_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT16");
@@ -29082,13 +29082,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_881_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       procs.push_back( proc);
 
 
       proc.mName = "proc_882_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
@@ -29096,7 +29096,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_883_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATE");
@@ -29130,7 +29130,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_884_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "HIRESTIME");
@@ -29177,7 +29177,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_885_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -29227,7 +29227,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_886_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "FIELD OF INT64");
       proc.mParameters.push_back( "UNDEFINED");
@@ -29235,7 +29235,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_887_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
@@ -29246,7 +29246,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_888_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -29275,7 +29275,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_889_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -29286,14 +29286,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_890_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "TEXT");
       procs.push_back( proc);
 
 
       proc.mName = "proc_891_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "RICHREAL");
@@ -29307,7 +29307,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_892_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -29320,7 +29320,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_893_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "DATE");
@@ -29342,7 +29342,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_894_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "ARRAY OF HIRESTIME");
       proc.mParameters.push_back( "FIELD OF BOOL");
@@ -29401,7 +29401,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_895_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -29428,7 +29428,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_896_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TEXT");
@@ -29465,7 +29465,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_897_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
@@ -29500,7 +29500,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_898_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF HIRESTIME");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
@@ -29526,7 +29526,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_899_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -29562,7 +29562,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "i";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -29616,7 +29616,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xi";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATETIME");
@@ -29650,7 +29650,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_902_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
@@ -29718,7 +29718,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_903_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -29728,7 +29728,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_904_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
@@ -29746,7 +29746,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_905_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNDEFINED");
@@ -29755,7 +29755,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_906_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -29824,7 +29824,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_907_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -29886,7 +29886,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_908_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "DATETIME");
@@ -29944,7 +29944,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_909_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "FIELD OF REAL");
       proc.mParameters.push_back( "ARRAY OF DATETIME");
@@ -30013,7 +30013,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_910_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -30051,7 +30051,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_911_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TEXT");
@@ -30079,7 +30079,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_912_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT64");
@@ -30103,7 +30103,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_913_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS BOOL, field_2_012 AS ARRAY OF BOOL, field_3_0123 AS UNSIGNED INT16, field_4_01234 AS ARRAY OF UNSIGNED INT32, field_5_012345 AS ARRAY OF BOOL, field_6_0123456 AS INT64, field_7_01234567 AS UNSIGNED INT64, field_8_012345678 AS ARRAY OF UNSIGNED INT8, field_9_0123456789 AS ARRAY OF DATETIME, field_10_0 AS DATETIME, field_11_01 AS ARRAY OF INT64, field_12_012 AS ARRAY OF CHARACTER)");
@@ -30151,14 +30151,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_914_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT32");
       procs.push_back( proc);
 
 
       proc.mName = "proc_915_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "RICHREAL");
@@ -30217,7 +30217,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_916_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "BOOL");
@@ -30240,7 +30240,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_917_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -30268,7 +30268,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_918_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
@@ -30327,7 +30327,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_919_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT32, field_2_012 AS ARRAY OF INT64, field_3_0123 AS INT8, field_4_01234 AS BOOL, field_5_012345 AS ARRAY OF UNSIGNED INT8, field_6_0123456 AS ARRAY OF RICHREAL, field_7_01234567 AS INT32, field_8_012345678 AS REAL, field_9_0123456789 AS ARRAY OF UNSIGNED INT32, field_10_0 AS UNSIGNED INT8, field_11_01 AS INT16, field_12_012 AS DATE, field_13_0123 AS ARRAY OF BOOL, field_14_01234 AS HIRESTIME, field_15_012345 AS BOOL, field_16_0123456 AS HIRESTIME, field_17_01234567 AS DATETIME, field_18_012345678 AS UNSIGNED INT8, field_19_0123456789 AS REAL, field_20_0 AS CHARACTER, field_21_01 AS ARRAY OF UNSIGNED INT32, field_22_012 AS ARRAY OF HIRESTIME, field_23_0123 AS ARRAY OF INT8, field_24_01234 AS INT8, field_25_012345 AS INT16, field_26_0123456 AS DATE, field_27_01234567 AS CHARACTER, field_28_012345678 AS CHARACTER, field_29_0123456789 AS HIRESTIME, field_30_0 AS INT64, field_31_01 AS HIRESTIME, field_32_012 AS ARRAY OF UNSIGNED INT64, field_33_0123 AS DATE, field_34_01234 AS ARRAY OF UNSIGNED INT32, field_35_012345 AS UNSIGNED INT8, field_36_0123456 AS BOOL, field_37_01234567 AS INT16, field_38_012345678 AS DATE, field_39_0123456789 AS UNSIGNED INT64, field_40_0 AS ARRAY OF INT8, field_41_01 AS RICHREAL, field_42_012 AS UNSIGNED INT8, field_43_0123 AS INT64, field_44_01234 AS ARRAY OF INT32, field_45_012345 AS REAL, field_46_0123456 AS BOOL, field_47_01234567 AS DATETIME, field_48_012345678 AS INT16, field_49_0123456789 AS ARRAY OF INT16, field_50_0 AS BOOL, field_51_01 AS ARRAY OF DATETIME, field_52_012 AS INT8, field_53_0123 AS ARRAY OF INT32, field_54_01234 AS UNSIGNED INT16, field_55_012345 AS HIRESTIME, field_56_0123456 AS INT8, field_57_01234567 AS INT16, field_58_012345678 AS ARRAY OF UNSIGNED INT16, field_59_0123456789 AS REAL, field_60_0 AS ARRAY OF UNSIGNED INT64, field_61_01 AS INT32, field_62_012 AS HIRESTIME, field_63_0123 AS DATETIME, field_64_01234 AS BOOL, field_65_012345 AS BOOL)");
@@ -30358,7 +30358,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_920_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS REAL, field_2_012 AS ARRAY OF BOOL, field_3_0123 AS INT64, field_4_01234 AS BOOL, field_5_012345 AS UNSIGNED INT8, field_6_0123456 AS INT8, field_7_01234567 AS UNSIGNED INT8, field_8_012345678 AS ARRAY OF HIRESTIME, field_9_0123456789 AS DATETIME, field_10_0 AS ARRAY OF DATE, field_11_01 AS DATETIME, field_12_012 AS UNSIGNED INT8, field_13_0123 AS ARRAY OF INT8, field_14_01234 AS INT32, field_15_012345 AS UNSIGNED INT64, field_16_0123456 AS ARRAY OF UNSIGNED INT32, field_17_01234567 AS UNSIGNED INT16, field_18_012345678 AS INT16, field_19_0123456789 AS UNSIGNED INT32, field_20_0 AS UNSIGNED INT8, field_21_01 AS UNSIGNED INT32, field_22_012 AS ARRAY OF CHARACTER, field_23_0123 AS REAL, field_24_01234 AS DATETIME, field_25_012345 AS UNSIGNED INT8, field_26_0123456 AS INT32, field_27_01234567 AS INT64, field_28_012345678 AS UNSIGNED INT32, field_29_0123456789 AS UNSIGNED INT32, field_30_0 AS HIRESTIME, field_31_01 AS ARRAY OF DATE, field_32_012 AS DATETIME, field_33_0123 AS UNSIGNED INT16, field_34_01234 AS ARRAY OF INT16, field_35_012345 AS UNSIGNED INT64, field_36_0123456 AS INT64, field_37_01234567 AS HIRESTIME, field_38_012345678 AS INT8, field_39_0123456789 AS INT32, field_40_0 AS BOOL, field_41_01 AS DATETIME, field_42_012 AS HIRESTIME, field_43_0123 AS ARRAY OF BOOL, field_44_01234 AS INT32, field_45_012345 AS ARRAY OF UNSIGNED INT64, field_46_0123456 AS RICHREAL, field_47_01234567 AS ARRAY OF UNSIGNED INT8, field_48_012345678 AS UNSIGNED INT32, field_49_0123456789 AS DATE, field_50_0 AS UNSIGNED INT8, field_51_01 AS ARRAY OF INT16, field_52_012 AS UNSIGNED INT8, field_53_0123 AS HIRESTIME, field_54_01234 AS REAL, field_55_012345 AS INT16, field_56_0123456 AS UNSIGNED INT16, field_57_01234567 AS RICHREAL, field_58_012345678 AS ARRAY OF INT8, field_59_0123456789 AS UNSIGNED INT8, field_60_0 AS UNSIGNED INT16, field_61_01 AS REAL, field_62_012 AS BOOL, field_63_0123 AS RICHREAL, field_64_01234 AS DATETIME, field_65_012345 AS DATE, field_66_0123456 AS UNSIGNED INT32, field_67_01234567 AS CHARACTER, field_68_012345678 AS UNSIGNED INT32, field_69_0123456789 AS HIRESTIME, field_70_0 AS UNSIGNED INT8, field_71_01 AS INT32, field_72_012 AS UNSIGNED INT16, field_73_0123 AS HIRESTIME, field_74_01234 AS REAL)");
@@ -30399,7 +30399,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_921_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -30450,7 +30450,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_922_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TEXT");
@@ -30465,7 +30465,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_923_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "DATETIME");
@@ -30503,7 +30503,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_924_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -30517,7 +30517,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_925_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT16, field_2_012 AS ARRAY OF INT32, field_3_0123 AS RICHREAL, field_4_01234 AS UNSIGNED INT64, field_5_012345 AS HIRESTIME, field_6_0123456 AS INT64, field_7_01234567 AS ARRAY OF DATETIME, field_8_012345678 AS ARRAY OF HIRESTIME, field_9_0123456789 AS UNSIGNED INT8, field_10_0 AS UNSIGNED INT8, field_11_01 AS ARRAY OF UNSIGNED INT16, field_12_012 AS ARRAY OF UNSIGNED INT32, field_13_0123 AS INT64, field_14_01234 AS ARRAY OF UNSIGNED INT8, field_15_012345 AS RICHREAL)");
@@ -30578,7 +30578,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_926_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "DATE");
@@ -30646,7 +30646,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_927_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
@@ -30678,7 +30678,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_928_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "TEXT");
@@ -30719,7 +30719,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_929_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
@@ -30738,7 +30738,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_930_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT32");
@@ -30789,7 +30789,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_931_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "BOOL");
@@ -30842,7 +30842,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_932_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
@@ -30870,7 +30870,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_933_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -30924,7 +30924,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_934_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
@@ -30976,7 +30976,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_935_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "ARRAY OF INT32");
@@ -31019,7 +31019,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_936_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
@@ -31039,14 +31039,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_937_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "RICHREAL");
       procs.push_back( proc);
 
 
       proc.mName = "proc_938_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -31062,7 +31062,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_939_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -31079,7 +31079,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_940_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATE");
@@ -31118,7 +31118,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_941_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -31164,7 +31164,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_942_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -31181,7 +31181,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_943_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT8");
@@ -31245,7 +31245,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_944_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -31286,7 +31286,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_945_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT8");
@@ -31338,7 +31338,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_946_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -31393,7 +31393,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_947_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -31433,7 +31433,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_948_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF RICHREAL");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
@@ -31470,7 +31470,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_949_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "BOOL");
@@ -31507,13 +31507,13 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_950_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       procs.push_back( proc);
 
 
       proc.mName = "proc_951_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -31558,7 +31558,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_952_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT16");
@@ -31622,7 +31622,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_953_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNDEFINED");
@@ -31640,7 +31640,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_954_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
@@ -31660,7 +31660,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_955_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "ARRAY OF RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -31713,7 +31713,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_956_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF REAL");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "FIELD");
@@ -31773,7 +31773,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_957_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "REAL");
@@ -31830,7 +31830,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_958_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
@@ -31859,7 +31859,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_959_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "ARRAY OF DATETIME");
       proc.mParameters.push_back( "BOOL");
@@ -31887,7 +31887,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_960_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT32");
@@ -31895,7 +31895,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_961_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
@@ -31958,7 +31958,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_962_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "INT16");
@@ -31995,7 +31995,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_963_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "REAL");
@@ -32049,7 +32049,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_964_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "INT64");
@@ -32069,7 +32069,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_965_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "ARRAY OF INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -32082,7 +32082,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_966_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "TEXT");
@@ -32121,7 +32121,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_967_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT64");
@@ -32175,7 +32175,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_968_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "INT8");
@@ -32232,7 +32232,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_969_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF BOOL");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
@@ -32252,7 +32252,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_970_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "CHARACTER");
@@ -32313,7 +32313,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_971_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT16");
@@ -32348,7 +32348,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_972_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -32388,7 +32388,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_973_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "ARRAY OF INT8");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
@@ -32430,7 +32430,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_974_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "UNDEFINED");
@@ -32489,7 +32489,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_975_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "TEXT");
@@ -32497,7 +32497,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_976_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
@@ -32521,7 +32521,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_977_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "INT64");
@@ -32530,7 +32530,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_978_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "DATE");
@@ -32558,7 +32558,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_979_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -32573,7 +32573,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_980_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT32, field_2_012 AS DATETIME, field_3_0123 AS UNSIGNED INT32, field_4_01234 AS DATETIME, field_5_012345 AS REAL, field_6_0123456 AS DATETIME, field_7_01234567 AS INT8, field_8_012345678 AS HIRESTIME, field_9_0123456789 AS ARRAY OF INT8, field_10_0 AS ARRAY OF INT8, field_11_01 AS DATETIME, field_12_012 AS INT32, field_13_0123 AS INT16)");
       proc.mParameters.push_back( "INT64");
@@ -32625,7 +32625,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_981_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "INT32");
@@ -32675,7 +32675,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_982_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "INT8");
@@ -32691,7 +32691,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_983_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
@@ -32737,7 +32737,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_984_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "RICHREAL");
@@ -32763,7 +32763,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_985_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
@@ -32783,7 +32783,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_986_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "INT32");
@@ -32805,7 +32805,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_987_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "ARRAY OF DATETIME");
@@ -32867,7 +32867,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_988_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -32875,7 +32875,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_989_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -32904,7 +32904,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_990_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT32, field_2_012 AS INT8, field_3_0123 AS UNSIGNED INT16, field_4_01234 AS INT32, field_5_012345 AS UNSIGNED INT16, field_6_0123456 AS ARRAY OF INT32, field_7_01234567 AS INT16, field_8_012345678 AS ARRAY OF BOOL, field_9_0123456789 AS UNSIGNED INT16, field_10_0 AS REAL, field_11_01 AS UNSIGNED INT64, field_12_012 AS DATE, field_13_0123 AS ARRAY OF BOOL, field_14_01234 AS CHARACTER, field_15_012345 AS CHARACTER, field_16_0123456 AS UNSIGNED INT16, field_17_01234567 AS DATETIME, field_18_012345678 AS INT32, field_19_0123456789 AS INT8, field_20_0 AS INT64, field_21_01 AS INT64, field_22_012 AS ARRAY OF INT32, field_23_0123 AS UNSIGNED INT64, field_24_01234 AS BOOL, field_25_012345 AS UNSIGNED INT64, field_26_0123456 AS DATETIME, field_27_01234567 AS DATETIME, field_28_012345678 AS BOOL, field_29_0123456789 AS INT8, field_30_0 AS UNSIGNED INT16, field_31_01 AS HIRESTIME, field_32_012 AS UNSIGNED INT8, field_33_0123 AS DATE, field_34_01234 AS INT16, field_35_012345 AS UNSIGNED INT32, field_36_0123456 AS UNSIGNED INT8, field_37_01234567 AS INT8, field_38_012345678 AS DATE, field_39_0123456789 AS DATE, field_40_0 AS HIRESTIME, field_41_01 AS INT64, field_42_012 AS ARRAY OF INT64, field_43_0123 AS BOOL, field_44_01234 AS INT32, field_45_012345 AS ARRAY OF BOOL, field_46_0123456 AS UNSIGNED INT32, field_47_01234567 AS RICHREAL, field_48_012345678 AS ARRAY OF RICHREAL, field_49_0123456789 AS ARRAY OF BOOL, field_50_0 AS UNSIGNED INT8, field_51_01 AS HIRESTIME, field_52_012 AS REAL, field_53_0123 AS REAL, field_54_01234 AS DATE, field_55_012345 AS UNSIGNED INT8, field_56_0123456 AS UNSIGNED INT64, field_57_01234567 AS UNSIGNED INT32, field_58_012345678 AS UNSIGNED INT64, field_59_0123456789 AS DATETIME, field_60_0 AS BOOL, field_61_01 AS ARRAY OF REAL, field_62_012 AS INT8, field_63_0123 AS DATETIME, field_64_01234 AS UNSIGNED INT8, field_65_012345 AS UNSIGNED INT64, field_66_0123456 AS CHARACTER, field_67_01234567 AS INT8, field_68_012345678 AS INT8, field_69_0123456789 AS BOOL, field_70_0 AS ARRAY OF DATE, field_71_01 AS INT16, field_72_012 AS INT8, field_73_0123 AS ARRAY OF DATETIME, field_74_01234 AS ARRAY OF DATETIME, field_75_012345 AS INT8, field_76_0123456 AS CHARACTER, field_77_01234567 AS UNSIGNED INT64, field_78_012345678 AS ARRAY OF UNSIGNED INT64, field_79_0123456789 AS ARRAY OF HIRESTIME, field_80_0 AS INT16, field_81_01 AS BOOL, field_82_012 AS ARRAY OF UNSIGNED INT16, field_83_0123 AS DATETIME, field_84_01234 AS ARRAY OF BOOL, field_85_012345 AS ARRAY OF DATE, field_86_0123456 AS HIRESTIME, field_87_01234567 AS UNSIGNED INT8)");
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -32959,7 +32959,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_991_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "RICHREAL");
@@ -32982,7 +32982,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_992_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "FIELD OF BOOL");
@@ -33000,7 +33000,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_993_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "DATETIME");
@@ -33008,7 +33008,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_994_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "UNSIGNED INT64");
       proc.mParameters.push_back( "HIRESTIME");
@@ -33053,7 +33053,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_995_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATETIME");
@@ -33076,7 +33076,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_996_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "HIRESTIME");
@@ -33115,7 +33115,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_997_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "FIELD OF CHARACTER");
@@ -33139,7 +33139,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_998_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "RICHREAL");
@@ -33171,7 +33171,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_999_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "UNDEFINED");
@@ -33196,7 +33196,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "j";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "TEXT");
@@ -33242,7 +33242,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "xj";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "ARRAY OF UNSIGNED INT8");
       proc.mParameters.push_back( "FIELD OF BOOL");
@@ -33306,7 +33306,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1002_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATE");
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "REAL");
@@ -33360,7 +33360,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1003_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "DATE");
@@ -33393,7 +33393,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1004_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "INT8");
@@ -33427,7 +33427,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1005_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF UNSIGNED INT16");
       proc.mParameters.push_back( "INT16");
       proc.mParameters.push_back( "RICHREAL");
@@ -33446,7 +33446,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1006_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT32, field_2_012 AS ARRAY OF REAL, field_3_0123 AS UNSIGNED INT32, field_4_01234 AS ARRAY OF INT32, field_5_012345 AS RICHREAL, field_6_0123456 AS UNSIGNED INT32, field_7_01234567 AS CHARACTER, field_8_012345678 AS INT16, field_9_0123456789 AS CHARACTER, field_10_0 AS HIRESTIME, field_11_01 AS ARRAY OF HIRESTIME, field_12_012 AS INT32, field_13_0123 AS UNSIGNED INT16, field_14_01234 AS HIRESTIME, field_15_012345 AS UNSIGNED INT16, field_16_0123456 AS UNSIGNED INT32, field_17_01234567 AS UNSIGNED INT64, field_18_012345678 AS DATETIME, field_19_0123456789 AS UNSIGNED INT32, field_20_0 AS UNSIGNED INT8, field_21_01 AS INT32, field_22_012 AS CHARACTER, field_23_0123 AS INT8, field_24_01234 AS INT8, field_25_012345 AS DATE, field_26_0123456 AS UNSIGNED INT8)");
@@ -33461,7 +33461,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1007_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "BOOL");
       proc.mParameters.push_back( "CHARACTER");
       proc.mParameters.push_back( "REAL");
@@ -33503,7 +33503,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1008_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "DATETIME");
@@ -33515,7 +33515,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1009_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "INT16");
@@ -33536,7 +33536,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1010_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF DATETIME");
       proc.mParameters.push_back( "DATETIME");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -33589,7 +33589,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1011_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT64");
       proc.mParameters.push_back( "FIELD OF DATE");
       proc.mParameters.push_back( "INT64");
@@ -33641,14 +33641,14 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1012_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "INT32");
       procs.push_back( proc);
 
 
       proc.mName = "proc_1013_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT32");
       proc.mParameters.push_back( "UNSIGNED INT8");
       proc.mParameters.push_back( "CHARACTER");
@@ -33656,7 +33656,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1014_01234";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS UNSIGNED INT16, field_2_012 AS INT64, field_3_0123 AS ARRAY OF INT16, field_4_01234 AS REAL, field_5_012345 AS ARRAY OF INT64, field_6_0123456 AS RICHREAL, field_7_01234567 AS INT32, field_8_012345678 AS REAL, field_9_0123456789 AS BOOL, field_10_0 AS DATE, field_11_01 AS UNSIGNED INT16, field_12_012 AS HIRESTIME, field_13_0123 AS ARRAY OF INT64, field_14_01234 AS ARRAY OF UNSIGNED INT16, field_15_012345 AS ARRAY OF CHARACTER, field_16_0123456 AS INT32, field_17_01234567 AS HIRESTIME, field_18_012345678 AS DATETIME, field_19_0123456789 AS DATETIME, field_20_0 AS ARRAY OF UNSIGNED INT32, field_21_01 AS CHARACTER, field_22_012 AS DATE, field_23_0123 AS ARRAY OF RICHREAL, field_24_01234 AS INT8, field_25_012345 AS UNSIGNED INT32, field_26_0123456 AS INT16, field_27_01234567 AS BOOL, field_28_012345678 AS ARRAY OF UNSIGNED INT8, field_29_0123456789 AS ARRAY OF DATETIME, field_30_0 AS DATETIME, field_31_01 AS ARRAY OF UNSIGNED INT16, field_32_012 AS CHARACTER, field_33_0123 AS BOOL, field_34_01234 AS REAL, field_35_012345 AS UNSIGNED INT32, field_36_0123456 AS INT32, field_37_01234567 AS RICHREAL, field_38_012345678 AS ARRAY OF HIRESTIME, field_39_0123456789 AS INT16, field_40_0 AS INT16, field_41_01 AS ARRAY OF INT32, field_42_012 AS HIRESTIME, field_43_0123 AS DATE, field_44_01234 AS UNSIGNED INT32, field_45_012345 AS DATE, field_46_0123456 AS INT8, field_47_01234567 AS INT64, field_48_012345678 AS ARRAY OF INT8, field_49_0123456789 AS DATETIME, field_50_0 AS UNSIGNED INT32, field_51_01 AS INT8, field_52_012 AS UNSIGNED INT16, field_53_0123 AS DATETIME)");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -33688,7 +33688,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1015_012345";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "TABLE OF (field_1_01 AS INT64, field_2_012 AS REAL, field_3_0123 AS REAL, field_4_01234 AS ARRAY OF UNSIGNED INT8, field_5_012345 AS UNSIGNED INT32, field_6_0123456 AS DATE, field_7_01234567 AS HIRESTIME, field_8_012345678 AS INT8, field_9_0123456789 AS INT8, field_10_0 AS ARRAY OF INT64, field_11_01 AS ARRAY OF UNSIGNED INT64, field_12_012 AS INT8, field_13_0123 AS ARRAY OF INT16, field_14_01234 AS BOOL, field_15_012345 AS DATE, field_16_0123456 AS UNSIGNED INT8, field_17_01234567 AS ARRAY OF BOOL, field_18_012345678 AS ARRAY OF DATE, field_19_0123456789 AS INT8, field_20_0 AS DATETIME, field_21_01 AS ARRAY OF RICHREAL, field_22_012 AS HIRESTIME, field_23_0123 AS DATETIME, field_24_01234 AS INT32, field_25_012345 AS RICHREAL, field_26_0123456 AS BOOL, field_27_01234567 AS ARRAY OF INT32, field_28_012345678 AS REAL, field_29_0123456789 AS UNSIGNED INT64, field_30_0 AS ARRAY OF DATE, field_31_01 AS ARRAY OF DATETIME, field_32_012 AS ARRAY OF REAL, field_33_0123 AS ARRAY OF REAL, field_34_01234 AS CHARACTER, field_35_012345 AS UNSIGNED INT64, field_36_0123456 AS CHARACTER, field_37_01234567 AS INT8, field_38_012345678 AS INT8, field_39_0123456789 AS UNSIGNED INT8, field_40_0 AS RICHREAL, field_41_01 AS INT64, field_42_012 AS RICHREAL, field_43_0123 AS RICHREAL, field_44_01234 AS ARRAY OF UNSIGNED INT16, field_45_012345 AS UNSIGNED INT32, field_46_0123456 AS BOOL, field_47_01234567 AS REAL, field_48_012345678 AS INT16, field_49_0123456789 AS INT8, field_50_0 AS ARRAY OF DATE, field_51_01 AS ARRAY OF DATE, field_52_012 AS HIRESTIME, field_53_0123 AS ARRAY OF UNSIGNED INT8, field_54_01234 AS REAL, field_55_012345 AS UNSIGNED INT16, field_56_0123456 AS UNSIGNED INT8, field_57_01234567 AS ARRAY OF INT64, field_58_012345678 AS ARRAY OF UNSIGNED INT64, field_59_0123456789 AS HIRESTIME)");
       proc.mParameters.push_back( "DATETIME");
@@ -33696,7 +33696,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1016_0123456";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "FIELD OF INT32");
@@ -33718,7 +33718,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1017_01234567";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT8");
@@ -33736,7 +33736,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1018_012345678";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "DATE");
@@ -33757,7 +33757,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1019_0123456789";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "UNSIGNED INT16");
       proc.mParameters.push_back( "UNDEFINED");
       proc.mParameters.push_back( "UNSIGNED INT32");
@@ -33765,7 +33765,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1020_0";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "FIELD OF CHARACTER");
       proc.mParameters.push_back( "UNSIGNED INT32");
       proc.mParameters.push_back( "DATETIME");
@@ -33781,7 +33781,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1021_01";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "TEXT");
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "BOOL");
@@ -33794,7 +33794,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1022_012";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "HIRESTIME");
       proc.mParameters.push_back( "REAL");
       proc.mParameters.push_back( "CHARACTER");
@@ -33837,7 +33837,7 @@ setup_database( const string& db, vector<ProcedureDescription>& procs)
 
 
       proc.mName = "proc_1023_0123";
-      proc.mParameters.clear( );
+      proc.mParameters.clear();
       proc.mParameters.push_back( "INT8");
       proc.mParameters.push_back( "RICHREAL");
       proc.mParameters.push_back( "UNSIGNED INT64");

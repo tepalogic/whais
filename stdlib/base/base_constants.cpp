@@ -137,7 +137,7 @@ get_max_value( SessionStack& stack, ISession& )
 
 
 WLIB_STATUS
-base_generics_init( )
+base_generics_init()
 {
   static const uint8_t* procLocalBType[]     = { gBoolType };
   static const uint8_t* procLocalCType[]     = { gCharType };

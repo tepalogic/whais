@@ -24,25 +24,25 @@ namespace whais {
 template<typename T>
 static inline T Prev( const T& t)
 {
-  return t.Prev( );
+  return t.Prev();
 }
 
 template<typename T>
 static inline T Next( const T& t)
 {
-  return t.Next( );
+  return t.Next();
 }
 
 
 template<typename T>
-static inline T Minimum( )
+static inline T Minimum()
 {
   return T::Min ();
 }
 
 
 template<typename T>
-static inline T Maximum( )
+static inline T Maximum()
 {
   return T::Max ();
 }
@@ -50,8 +50,8 @@ static inline T Maximum( )
 template<class T>
 struct Interval
 {
-  Interval( )
-    : mFrom( ),
+  Interval()
+    : mFrom(),
       mTo ()
   {
   }
@@ -369,13 +369,13 @@ struct Range
   {
     size_t bOffset = FindJoinInsertPlace( v.mFrom);
 
-    if (bOffset == mIntervals.size( ))
+    if (bOffset == mIntervals.size())
       mIntervals.push_back( v);
 
     else if (v.mFrom < mIntervals[bOffset].mFrom)
       {
         if (v.mTo < Prev( mIntervals[bOffset].mFrom))
-          mIntervals.insert( mIntervals.begin( ) + bOffset, v);
+          mIntervals.insert( mIntervals.begin() + bOffset, v);
 
         else
           mIntervals[bOffset].mFrom = v.mFrom;
@@ -386,14 +386,14 @@ struct Range
         if (mIntervals[bOffset - 1].mTo  == Prev( mIntervals[bOffset].mFrom))
           {
             mIntervals[bOffset - 1].mTo = mIntervals[bOffset].mTo;
-            mIntervals.erase(  mIntervals.begin( ) + bOffset--);
+            mIntervals.erase(  mIntervals.begin() + bOffset--);
           }
       }
 
 
     size_t lOffset = FindJoinInsertPlace( v.mTo);
 
-    if (lOffset == mIntervals.size( ))
+    if (lOffset == mIntervals.size())
       {
         mIntervals[bOffset].mTo = v.mTo;
         mIntervals.resize( bOffset + 1);
@@ -402,20 +402,20 @@ struct Range
       {
         mIntervals[bOffset].mTo = mIntervals[lOffset].mTo;
 
-        mIntervals.erase( mIntervals.begin( ) + (bOffset + 1),
-                          mIntervals.begin( ) + (lOffset + 1));
+        mIntervals.erase( mIntervals.begin() + (bOffset + 1),
+                          mIntervals.begin() + (lOffset + 1));
       }
     else
       {
         mIntervals[bOffset].mTo = v.mTo;
-        mIntervals.erase( mIntervals.begin( ) + (bOffset + 1),
-                          mIntervals.begin( ) + lOffset);
+        mIntervals.erase( mIntervals.begin() + (bOffset + 1),
+                          mIntervals.begin() + lOffset);
       }
   }
 
   Range& Join( const Range& r)
   {
-    const size_t count = r.mIntervals.size( );
+    const size_t count = r.mIntervals.size();
 
     for (size_t i = 0; i < count; ++i)
       Join( r.mIntervals[i]);
@@ -425,8 +425,8 @@ struct Range
 
   Range& Match( const Range& r)
   {
-    size_t offset  = mIntervals.size( );
-    size_t offsetR = r.mIntervals.size( );
+    size_t offset  = mIntervals.size();
+    size_t offsetR = r.mIntervals.size();
 
     if (offset == 0)
       return *this;
@@ -450,7 +450,7 @@ struct Range
 
         else if (v.mTo < curr.mFrom)
           {
-            mIntervals.erase( mIntervals.begin( ) + offset);
+            mIntervals.erase( mIntervals.begin() + offset);
             ++offsetR;
           }
         else
@@ -460,19 +460,19 @@ struct Range
           }
       }
 
-     assert( offset <= mIntervals.size( ));
+     assert( offset <= mIntervals.size());
 
-     mIntervals.erase( mIntervals.begin( ), mIntervals.begin( ) + offset);
+     mIntervals.erase( mIntervals.begin(), mIntervals.begin() + offset);
 
      return *this;
   }
 
 
-  Range& Complement( )
+  Range& Complement()
   {
     const T      min       = Minimum<T> ();
     const T      max       = Maximum<T> ();
-    const size_t rangeSize = mIntervals.size( );
+    const size_t rangeSize = mIntervals.size();
 
     Interval<T> v (min, max);
 
@@ -501,7 +501,7 @@ struct Range
               {
                 assert( offset == rangeSize - 1);
 
-                mIntervals.pop_back( );
+                mIntervals.pop_back();
 
                 break;
               }
@@ -556,9 +556,9 @@ struct Range
 
   bool operator== (const Range& r) const
   {
-    const size_t count = mIntervals.size( );
+    const size_t count = mIntervals.size();
 
-    if (count != r.mIntervals.size( ))
+    if (count != r.mIntervals.size())
       return false;
 
     for (size_t i = 0; i < count; ++i)
@@ -577,14 +577,14 @@ struct Range
   }
 
 
-  void Clear( )
+  void Clear()
   {
     mIntervals.resize( 0);
   }
 
   size_t FindJoinInsertPlace( const T& v)
   {
-    size_t offset = mIntervals.size( );
+    size_t offset = mIntervals.size();
 
     if (offset == 0)
       return 0;
@@ -608,7 +608,7 @@ struct Range
       }
     while( first < last);
 
-    assert( offset == mIntervals.size( ) ||
+    assert( offset == mIntervals.size() ||
             (v <= mIntervals[offset].mTo));
     assert( (offset == 0)
             || (mIntervals[offset - 1].mTo < v));
@@ -619,7 +619,7 @@ struct Range
   void Isolate( size_t& offset, const Interval<T>& v)
   {
     assert( v.mFrom <= v.mTo);
-    assert( offset < mIntervals.size( ));
+    assert( offset < mIntervals.size());
 
     Interval<T> curr = mIntervals[offset];
 
@@ -644,7 +644,7 @@ struct Range
         else
           mIntervals[offset] = v;
 
-        mIntervals.insert( mIntervals.begin( ) + offset, curr);
+        mIntervals.insert( mIntervals.begin() + offset, curr);
         ++offset;
       }
   }

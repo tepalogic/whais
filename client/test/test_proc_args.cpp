@@ -494,19 +494,19 @@ test_for_errors_fail :
 }
 
 const char*
-DefaultDatabaseName( )
+DefaultDatabaseName()
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId( )
+DefaultUserId()
 {
   return 0;
 }
 
 const char*
-DefaultUserPassword( )
+DefaultUserPassword()
 {
   return "root_test_password";
 }

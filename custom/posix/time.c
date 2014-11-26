@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 WTime
-wh_get_currtime( )
+wh_get_currtime()
 {
   WTime          result;
   struct tm      timeUtc;
@@ -57,7 +57,7 @@ wh_get_currtime( )
 
 
 WTICKS
-wh_msec_ticks( )
+wh_msec_ticks()
 {
   struct timeval tv;
 

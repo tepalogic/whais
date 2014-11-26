@@ -88,7 +88,7 @@ uint8_t gARichRealType[sizeof( TypeSpec)];
 
 
 WLIB_STATUS
-base_types_init( )
+base_types_init()
 {
   if ((wh_define_basic_type( T_BOOL, _RC (TypeSpec*, gBoolType)) <= 0)
       || (wh_define_basic_type( T_CHAR, _RC (TypeSpec*, gCharType)) <= 0)

@@ -54,8 +54,8 @@ WLIB_PROC_DESCRIPTION       gProcTableSort;
 static bool
 operator< (const DText& text1, const DText& text2)
 {
-  const uint64_t text1Count = text1.Count( );
-  const uint64_t text2Count = text2.Count( );
+  const uint64_t text1Count = text1.Count();
+  const uint64_t text2Count = text2.Count();
 
   uint64_t i, j;
 
@@ -94,7 +94,7 @@ public:
       friend class TableSortContainer;
 
     public:
-      Value( )
+      Value()
         : mContainer( NULL),
           mRow( 0)
         {
@@ -117,7 +117,7 @@ public:
 
           assert( val.mContainer == mContainer);
 
-          for (FIELD_INDEX i = 0; i < mContainer->mFields.size( ); ++i)
+          for (FIELD_INDEX i = 0; i < mContainer->mFields.size(); ++i)
             {
               const field_comparator compare = mContainer->mComparators[i];
 
@@ -142,7 +142,7 @@ public:
           else if (mContainer != val.mContainer)
             return false;
 
-          for (FIELD_INDEX i = 0; i < mContainer->mFields.size( ); ++i)
+          for (FIELD_INDEX i = 0; i < mContainer->mFields.size(); ++i)
             {
               const field_comparator compare = mContainer->mComparators[i];
 
@@ -174,12 +174,12 @@ public:
                       const DArray& fieldsSortOrder)
     : mTable( table)
     {
-      assert( fields.Count( ) > 0);
-      assert( fields.Count( ) == fieldsSortOrder.Count( ));
+      assert( fields.Count() > 0);
+      assert( fields.Count() == fieldsSortOrder.Count());
 
       extract_fields_ids( fields);
 
-      for (FIELD_INDEX field = 0; field < mFields.size( ); ++field)
+      for (FIELD_INDEX field = 0; field < mFields.size(); ++field)
         {
           const DBSFieldDescriptor fd = mTable.DescribeField( mFields[field]);
 
@@ -348,9 +348,9 @@ public:
         mPivot = Value( *this, pos1);
     }
 
-  uint64_t Count( ) const
+  uint64_t Count() const
     {
-      return mTable.AllocatedRows( );
+      return mTable.AllocatedRows();
     }
 
   void Pivot( const uint64_t from, const uint64_t to)
@@ -358,7 +358,7 @@ public:
       mPivot = Value( *this, (from + to) / 2);
     }
 
-  const Value& Pivot( ) const
+  const Value& Pivot() const
     {
       return mPivot;
     }
@@ -407,8 +407,8 @@ private:
 
   void extract_fields_ids( const DArray& fields)
   {
-    const DBS_FIELD_TYPE arrayType   = fields.Type( );
-    const uint64_t       fieldsCount = fields.Count( );
+    const DBS_FIELD_TYPE arrayType   = fields.Type();
+    const uint64_t       fieldsCount = fields.Count();
 
     assert( fieldsCount != 0);
 
@@ -509,19 +509,19 @@ private:
 static WLIB_STATUS
 proc_table_ispersistent( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  if (op.IsNull( ))
+  if (op.IsNull())
     {
       stack.Pop (1);
-      stack.Push( DBool( ));
+      stack.Push( DBool());
 
       return WOP_OK;
     }
 
-  ITable& table = op.GetTable( );
+  ITable& table = op.GetTable();
 
-  DBool result(  ! table.IsTemporal( ));
+  DBool result(  ! table.IsTemporal());
 
   stack.Pop (1);
   stack.Push( result);
@@ -533,14 +533,14 @@ proc_table_ispersistent( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_fields_count( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  ITable* const table = &op.GetTable( );
+  ITable* const table = &op.GetTable();
 
   if (table == NULL)
     throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 
-  DUInt64 result( table->FieldsCount( ));
+  DUInt64 result( table->FieldsCount());
 
   stack.Pop (1);
   stack.Push( result);
@@ -552,12 +552,12 @@ proc_table_fields_count( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_field_by_id( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 2].Operand( );
+  IOperand& op = stack[stack.Size() - 2].Operand();
 
   DUInt64 fieldId;
-  stack[stack.Size( ) - 1].Operand( ).GetValue( fieldId);
+  stack[stack.Size() - 1].Operand().GetValue( fieldId);
 
-  if (fieldId.IsNull( ))
+  if (fieldId.IsNull())
     {
       throw InterException( 
                   _EXTRA( InterException::INVALID_PARAMETER_VALUE),
@@ -580,16 +580,16 @@ proc_table_field_name( SessionStack& stack, ISession&)
 
   DText       field;
 
-  IOperand&     opTable = stack[stack.Size( ) - 2].Operand( );
-  ITable* const table   = &opTable.GetTable( );
+  IOperand&     opTable = stack[stack.Size() - 2].Operand();
+  ITable* const table   = &opTable.GetTable();
 
-  stack[stack.Size( ) - 1].Operand( ).GetValue( field);
-  if (field.IsNull( ))
+  stack[stack.Size() - 1].Operand().GetValue( field);
+  if (field.IsNull())
     {
       throw InterException( _EXTRA( InterException::INVALID_PARAMETER_VALUE),
                             "A non null name is required to retrieve a field.");
     }
-  else if (field.RawSize( ) >= sizeof fieldName)
+  else if (field.RawSize() >= sizeof fieldName)
     {
       throw InterException( 
                 _EXTRA( InterException::FIELD_NAME_TOO_LONG),
@@ -600,8 +600,8 @@ proc_table_field_name( SessionStack& stack, ISession&)
   else if (table == NULL)
     throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 
-  field.RawRead( 0, field.RawSize( ), fieldName);
-  fieldName[field.RawSize( )] = 0;
+  field.RawRead( 0, field.RawSize(), fieldName);
+  fieldName[field.RawSize()] = 0;
 
   const FIELD_INDEX fieldId = table->RetrieveField( _RC (char*, fieldName));
   StackValue        result  = opTable.GetFieldAt( fieldId);
@@ -616,9 +616,9 @@ proc_table_field_name( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_rows_count( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  if (op.IsNull( ))
+  if (op.IsNull())
     {
       stack.Pop (1);
       stack.Push( DUInt64 (0));
@@ -626,9 +626,9 @@ proc_table_rows_count( SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  ITable& table = op.GetTable( );
+  ITable& table = op.GetTable();
 
-  DUInt64 result( table.AllocatedRows( ));
+  DUInt64 result( table.AllocatedRows());
 
   stack.Pop (1);
   stack.Push( result);
@@ -640,11 +640,11 @@ proc_table_rows_count( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_add_row( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  ITable& table = op.GetTable( );
+  ITable& table = op.GetTable();
 
-  DUInt64 result( table.AddRow( ));
+  DUInt64 result( table.AddRow());
 
   stack.Pop (1);
   stack.Push( result);
@@ -656,9 +656,9 @@ proc_table_add_row( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_reusable_row( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  ITable& table = op.GetTable( );
+  ITable& table = op.GetTable();
 
   DUInt64 result( table.GetReusableRow( true));
 
@@ -675,11 +675,11 @@ proc_table_reuse_row( SessionStack& stack, ISession&)
   DUInt64 row;
   DUInt64 result;
 
-  ITable& table = stack[stack.Size( ) - 2].Operand( ).GetTable( );
-  stack[stack.Size( ) - 1].Operand( ).GetValue( row);
+  ITable& table = stack[stack.Size() - 2].Operand().GetTable();
+  stack[stack.Size() - 1].Operand().GetValue( row);
 
-  if (! row.IsNull( )
-      && (row.mValue < table.AllocatedRows( )))
+  if (! row.IsNull()
+      && (row.mValue < table.AllocatedRows()))
     {
       table.MarkRowForReuse( row.mValue);
 
@@ -698,20 +698,20 @@ table_exchange_rows( SessionStack& stack, ISession&)
 {
   DUInt64 row1, row2;
 
-  IOperand& op = stack[stack.Size( ) - 3].Operand( );
+  IOperand& op = stack[stack.Size() - 3].Operand();
 
-  stack[stack.Size( ) - 2].Operand( ).GetValue( row1);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( row2);
+  stack[stack.Size() - 2].Operand().GetValue( row1);
+  stack[stack.Size() - 1].Operand().GetValue( row2);
 
-  if (op.IsNull( ) || row1.IsNull( ) || row2.IsNull( ))
+  if (op.IsNull() || row1.IsNull() || row2.IsNull())
     {
       stack.Pop (3);
-      stack.Push( DBool( ));
+      stack.Push( DBool());
 
       return WOP_OK;
     }
 
-  ITable& table = op.GetTable( );
+  ITable& table = op.GetTable();
 
   table.ExchangeRows( row1.mValue, row2.mValue);
 
@@ -728,17 +728,17 @@ proc_table_sort( SessionStack& stack, ISession&)
 {
   DArray fields, sortOrder;
 
-  IOperand& opTable = stack[stack.Size( ) - 3].Operand( );
-  stack[stack.Size( ) - 2].Operand( ).GetValue( fields);
-  stack[stack.Size( ) - 1].Operand( ).GetValue( sortOrder);
+  IOperand& opTable = stack[stack.Size() - 3].Operand();
+  stack[stack.Size() - 2].Operand().GetValue( fields);
+  stack[stack.Size() - 1].Operand().GetValue( sortOrder);
 
-  if (opTable.IsNull( ) || fields.IsNull( ))
+  if (opTable.IsNull() || fields.IsNull())
     {
       stack.Pop (2);
       return WOP_OK;
     }
-  else if ( ! sortOrder.IsNull( )
-           && (fields.Count( ) != sortOrder.Count( )))
+  else if ( ! sortOrder.IsNull()
+           && (fields.Count() != sortOrder.Count()))
     {
       throw InterException( 
             _EXTRA( InterException::INVALID_PARAMETER_VALUE),
@@ -747,12 +747,12 @@ proc_table_sort( SessionStack& stack, ISession&)
                            );
     }
 
-  ITable& table = opTable.GetTable( );
+  ITable& table = opTable.GetTable();
   TableSortContainer container( table, fields, sortOrder);
 
   quick_sort<TableSortContainer::Value, TableSortContainer> (
                                                    0,
-                                                   table.AllocatedRows( ) - 1,
+                                                   table.AllocatedRows() - 1,
                                                    false,
                                                    container
                                                              );
@@ -762,7 +762,7 @@ proc_table_sort( SessionStack& stack, ISession&)
 
 
 WLIB_STATUS
-base_tables_init( )
+base_tables_init()
 {
   static const uint8_t* isPersistentLocals[] = {
                                                  gBoolType,

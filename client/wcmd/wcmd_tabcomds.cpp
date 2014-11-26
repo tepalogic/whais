@@ -242,7 +242,7 @@ cmdTableAdd( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   IDBSHandler&               dbs     = *_RC (IDBSHandler*, context);
   size_t                     linePos = 0;
   string                     token   = CmdLineNextToken( cmdLine, linePos);
-  const  VERBOSE_LEVEL       level   = GetVerbosityLevel( );
+  const  VERBOSE_LEVEL       level   = GetVerbosityLevel();
   vector<DBSFieldDescriptor> fields;
   vector<string>             fieldsNames;
   string                     tableName;
@@ -251,7 +251,7 @@ cmdTableAdd( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   assert( token == "table_add");
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   tableName = CmdLineNextToken( cmdLine, linePos);
@@ -259,7 +259,7 @@ cmdTableAdd( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   if (level > VL_INFO)
     cout << "Adding table " << tableName << "...\n";
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   do
@@ -268,12 +268,12 @@ cmdTableAdd( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       //The field name
       token = CmdLineNextToken( cmdLine, linePos);
-      assert( token.length( ) > 0);
+      assert( token.length() > 0);
 
       fieldsNames.push_back( token);
-      desc.name = fieldsNames.back( ).c_str( );
+      desc.name = fieldsNames.back().c_str();
 
-      if (linePos >= cmdLine.length( ))
+      if (linePos >= cmdLine.length())
         goto invalid_args;
 
       //The filed type
@@ -281,7 +281,7 @@ cmdTableAdd( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       if (token == "ARRAY")
         {
-          if (linePos >= cmdLine.length( ))
+          if (linePos >= cmdLine.length())
             goto invalid_args;
 
           desc.isArray = true;
@@ -353,13 +353,13 @@ cmdTableAdd( const string& cmdLine, ENTRY_CMD_CONTEXT context)
           print_field_desc( desc, false);
         }
 
-      assert( fields.size( ) == fieldsNames.size( ));
+      assert( fields.size() == fieldsNames.size());
     }
-  while( linePos < cmdLine.length( ));
+  while( linePos < cmdLine.length());
 
   try
   {
-    dbs.AddTable( tableName.c_str( ), fields.size( ), &(fields.front( )));
+    dbs.AddTable( tableName.c_str(), fields.size(), &(fields.front()));
   }
   catch( const Exception& e)
   {
@@ -383,12 +383,12 @@ cmdTableRemove( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken( cmdLine, linePos);
-  const  VERBOSE_LEVEL level   = GetVerbosityLevel( );
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel();
   bool                 result  = false;
 
   assert( token == "table_remove");
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   if (level > VL_INFO)
@@ -399,7 +399,7 @@ cmdTableRemove( const string& cmdLine, ENTRY_CMD_CONTEXT context)
       try
       {
         token = CmdLineNextToken( cmdLine, linePos);
-        dbs.DeleteTable( token.c_str( ));
+        dbs.DeleteTable( token.c_str());
 
         if (level >= VL_INFO)
           cout << " ... " << token << endl;
@@ -411,7 +411,7 @@ cmdTableRemove( const string& cmdLine, ENTRY_CMD_CONTEXT context)
         printException( cerr, e);
       }
     }
-  while( linePos < cmdLine.length( ));
+  while( linePos < cmdLine.length());
 
   return result;
 
@@ -429,16 +429,16 @@ cmdTablePrint( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken( cmdLine, linePos);
-  const  VERBOSE_LEVEL level   = GetVerbosityLevel( );
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel();
   bool                 result  = true;
 
   assert( token == "table");
 
   try
   {
-    if (linePos >= cmdLine.length( ))
+    if (linePos >= cmdLine.length())
       {
-        const TABLE_INDEX tablesCount = dbs.PersistentTablesCount( );
+        const TABLE_INDEX tablesCount = dbs.PersistentTablesCount();
 
         if (level >= VL_INFO)
           cout << "Retrieved " << tablesCount << " persistent tables.\n";
@@ -452,9 +452,9 @@ cmdTablePrint( const string& cmdLine, ENTRY_CMD_CONTEXT context)
           {
             token = CmdLineNextToken( cmdLine, linePos);
 
-            ITable& table = dbs.RetrievePersistentTable( token.c_str( ));
+            ITable& table = dbs.RetrievePersistentTable( token.c_str());
 
-            const FIELD_INDEX fieldCount = table.FieldsCount( );
+            const FIELD_INDEX fieldCount = table.FieldsCount();
 
             cout << "Table '"<< token << "' fields description:\n";
 
@@ -467,7 +467,7 @@ cmdTablePrint( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
             dbs.ReleaseTable( table);
           }
-        while( linePos < cmdLine.length( ));
+        while( linePos < cmdLine.length());
       }
   }
   catch( const Exception& e)
@@ -495,7 +495,7 @@ create_index_call_back( CreateIndexCallbackContext* cbContext)
       cout << '\r';
       cout <<(cbContext->mRowIndex * 100) / cbContext->mRowsCount << '%';
 
-      cout.flush( );
+      cout.flush();
     }
 }
 
@@ -506,19 +506,19 @@ cmdTableAddIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken( cmdLine, linePos);
-  const  VERBOSE_LEVEL level   = GetVerbosityLevel( );
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel();
   ITable*              table   = NULL;
   bool                 result  = true;
 
   assert( token == "table_index");
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   try
   {
     token = CmdLineNextToken( cmdLine, linePos);
-    table = &dbs.RetrievePersistentTable( token.c_str( ));
+    table = &dbs.RetrievePersistentTable( token.c_str());
   }
   catch( const Exception& e)
   {
@@ -531,7 +531,7 @@ cmdTableAddIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   }
 
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   do
@@ -540,7 +540,7 @@ cmdTableAddIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
       {
         token = CmdLineNextToken( cmdLine, linePos);
 
-        const FIELD_INDEX field = table->RetrieveField( token.c_str( ));
+        const FIELD_INDEX field = table->RetrieveField( token.c_str());
 
         if ( ! table->IsIndexed( field))
           {
@@ -567,7 +567,7 @@ cmdTableAddIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
         break;
       }
     }
-  while( linePos < cmdLine.length( ));
+  while( linePos < cmdLine.length());
 
   dbs.ReleaseTable( *table);
 
@@ -591,19 +591,19 @@ cmdTableRmIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken( cmdLine, linePos);
-  const  VERBOSE_LEVEL level   = GetVerbosityLevel( );
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel();
   ITable*              table   = NULL;
   bool                 result  = true;
 
   assert( token == "table_rmindex");
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   try
   {
     token = CmdLineNextToken( cmdLine, linePos);
-    table = &dbs.RetrievePersistentTable( token.c_str( ));
+    table = &dbs.RetrievePersistentTable( token.c_str());
   }
   catch( const Exception& e)
   {
@@ -615,7 +615,7 @@ cmdTableRmIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
     return false;
   }
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   do
@@ -624,7 +624,7 @@ cmdTableRmIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
       {
         token = CmdLineNextToken( cmdLine, linePos);
 
-        const FIELD_INDEX field = table->RetrieveField( token.c_str( ));
+        const FIELD_INDEX field = table->RetrieveField( token.c_str());
 
         if (table->IsIndexed( field))
           {
@@ -648,7 +648,7 @@ cmdTableRmIndex( const string& cmdLine, ENTRY_CMD_CONTEXT context)
         break;
       }
     }
-  while( linePos < cmdLine.length( ));
+  while( linePos < cmdLine.length());
 
   dbs.ReleaseTable( *table);
 
@@ -684,11 +684,11 @@ parse_list_table_fields( ITable&                      table,
 {
   const string fieldSpec = NextToken( cmdLine, inoutLinePos, sArgsDelimiter);
 
-  outParams.clear( );
-  if ((fieldSpec.length( ) == 0) || (fieldSpec == "*"))
+  outParams.clear();
+  if ((fieldSpec.length() == 0) || (fieldSpec == "*"))
     {
 
-      for (FIELD_INDEX i = 0; i < table.FieldsCount( ); ++i)
+      for (FIELD_INDEX i = 0; i < table.FieldsCount(); ++i)
         {
           TableFieldParameter field;
 
@@ -702,24 +702,24 @@ parse_list_table_fields( ITable&                      table,
     {
       size_t fieldSpecPos = 0;
 
-      while( fieldSpecPos < fieldSpec.length( ))
+      while( fieldSpecPos < fieldSpec.length())
         {
           const string fieldName = NextToken( fieldSpec,
                                               fieldSpecPos,
                                               sListDelimiter);
-          if (fieldName.length( ) == 0)
+          if (fieldName.length() == 0)
             break;
 
           TableFieldParameter field;
 
-          field.mField = table.RetrieveField( fieldName.c_str( ));
+          field.mField = table.RetrieveField( fieldName.c_str());
           field.mDesc  = table.DescribeField( field.mField);
 
           outParams.push_back( field);
         }
     }
 
-    assert( outParams.size( )  > 0);
+    assert( outParams.size()  > 0);
 
     return true;
 }
@@ -736,11 +736,11 @@ print_match_statistic( ostream&                os,
   const uint_t  secs  = ticks / 1000;
   const uint_t  msecs = ticks % 1000;
 
-  if (GetVerbosityLevel( ) >= VL_INFO)
+  if (GetVerbosityLevel() >= VL_INFO)
     return;
 
   ROW_INDEX matchedRows = 0;
-  for (size_t r = 0; r < rows.mIntervals.size( ); ++r)
+  for (size_t r = 0; r < rows.mIntervals.size(); ++r)
     {
       const Interval<ROW_INDEX> intv = rows.mIntervals[r];
 
@@ -748,7 +748,7 @@ print_match_statistic( ostream&                os,
     }
 
   os << "Matched "<< matchedRows;
-  os << '(' << table.AllocatedRows( ) << ") rows in ";
+  os << '(' << table.AllocatedRows() << ") rows in ";
   os << secs << '.' << setw( 3) << setfill( '0') << msecs;
   os << setw( 1) << setfill( ' ') << "s.\n";
 }
@@ -759,18 +759,18 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
   size_t               linePos = 0;
   string               token   = CmdLineNextToken( cmdLine, linePos);
-  const  VERBOSE_LEVEL level   = GetVerbosityLevel( );
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel();
   ITable*              table   = NULL;
 
   assert( token == "rows");
 
-  if (linePos >= cmdLine.length( ))
+  if (linePos >= cmdLine.length())
     goto invalid_args;
 
   try
   {
     token = CmdLineNextToken( cmdLine, linePos);
-    table = &dbs.RetrievePersistentTable( token.c_str( ));
+    table = &dbs.RetrievePersistentTable( token.c_str());
   }
   catch( const Exception& e)
   {
@@ -787,11 +787,11 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   try
   {
     token = CmdLineNextToken( cmdLine, linePos);
-    if ((token == "info") || (token.length( ) == 0))
+    if ((token == "info") || (token.length() == 0))
       {
         const ROW_INDEX firstReusableRow  = table->GetReusableRow( false);
-        const ROW_INDEX reusableRowsCount = table->ReusableRowsCount( );
-        const ROW_INDEX rowsCount         = table->AllocatedRows( );
+        const ROW_INDEX reusableRowsCount = table->ReusableRowsCount();
+        const ROW_INDEX rowsCount         = table->AllocatedRows();
 
         cout << "Allocated rows    : " << rowsCount << endl;
         cout << "Reusable rows     : " << reusableRowsCount << endl;
@@ -809,28 +809,28 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
         if (! parse_list_table_fields( *table, cmdLine, linePos, fields))
           goto invalid_args;
 
-        assert( linePos <= cmdLine.length( ));
+        assert( linePos <= cmdLine.length());
         if (! ParseRowsSelectionClause( &cerr,
                                         *table,
-                                        cmdLine.c_str( ) + linePos,
+                                        cmdLine.c_str() + linePos,
                                         rows))
           {
             goto invalid_args;
           }
 
-        const WTICKS matchBegin = wh_msec_ticks( );
+        const WTICKS matchBegin = wh_msec_ticks();
 
         MatchSelectedRows( *table, rows);
 
-        const WTICKS matchEnd = wh_msec_ticks( );
+        const WTICKS matchEnd = wh_msec_ticks();
 
-        for (size_t r = 0; r < rows.mRows.mIntervals.size( ); ++r)
+        for (size_t r = 0; r < rows.mRows.mIntervals.size(); ++r)
           {
             const Interval<ROW_INDEX>& intv = rows.mRows.mIntervals[r];
 
             for (ROW_INDEX row = intv.mFrom; row <= intv.mTo; ++row)
               {
-                for (size_t f = 0; f < fields.size( ); ++f)
+                for (size_t f = 0; f < fields.size(); ++f)
                   {
                     cout << row << ':' << fields[f].mDesc.name << ':';
                     PrintFieldValue( cout, *table, row, fields[f].mField);
@@ -850,7 +850,7 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         if (! ParseFieldUpdateValues( &cerr,
                                       *table,
-                                      cmdLine.c_str( ) + linePos,
+                                      cmdLine.c_str() + linePos,
                                       &temp,
                                       fieldVals))
           {
@@ -858,30 +858,30 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
           }
 
         linePos += temp;
-        assert( linePos <= cmdLine.length( ));
+        assert( linePos <= cmdLine.length());
         if (! ParseRowsSelectionClause( &cerr,
                                         *table,
-                                        cmdLine.c_str( ) + linePos,
+                                        cmdLine.c_str() + linePos,
                                         rows))
           {
             goto invalid_args;
           }
 
-        const WTICKS matchBegin = wh_msec_ticks( );
+        const WTICKS matchBegin = wh_msec_ticks();
 
         MatchSelectedRows( *table, rows);
 
-        const WTICKS matchEnd = wh_msec_ticks( );
+        const WTICKS matchEnd = wh_msec_ticks();
 
         print_match_statistic( cout, *table, rows.mRows, matchBegin, matchEnd);
 
-        for (size_t r = 0; r < rows.mRows.mIntervals.size( ); ++r)
+        for (size_t r = 0; r < rows.mRows.mIntervals.size(); ++r)
           {
             const Interval<ROW_INDEX>& intv = rows.mRows.mIntervals[r];
 
             for (ROW_INDEX row = intv.mFrom; row <= intv.mTo; ++row)
               {
-                for (size_t f = 0; f < fieldVals.size( ); ++f)
+                for (size_t f = 0; f < fieldVals.size(); ++f)
                   {
                     if (! UpdateTableRow( &cerr, *table, row, fieldVals))
                       goto invalid_args;
@@ -896,14 +896,14 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         if (! ParseFieldUpdateValues( &cerr,
                                       *table,
-                                      cmdLine.c_str( ) + linePos,
+                                      cmdLine.c_str() + linePos,
                                       &temp,
                                       fieldVals))
           {
             goto invalid_args;
           }
 
-        const ROW_INDEX row = table->AllocatedRows( );
+        const ROW_INDEX row = table->AllocatedRows();
         if (! UpdateTableRow( &cerr, *table, row, fieldVals))
           return false;
 
@@ -917,7 +917,7 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         if (! ParseFieldUpdateValues( &cerr,
                                       *table,
-                                      cmdLine.c_str( ) + linePos,
+                                      cmdLine.c_str() + linePos,
                                       &temp,
                                       fieldVals))
           {
@@ -937,7 +937,7 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         if ( ! ParseRowsSelectionClause( &cerr,
                                          *table,
-                                         cmdLine.c_str( ) + linePos,
+                                         cmdLine.c_str() + linePos,
                                          select))
           {
             goto invalid_args;
@@ -945,7 +945,7 @@ cmdRowsMgm( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         MatchSelectedRows( *table, select);
 
-        const size_t rowIntervals = select.mRows.mIntervals.size( );
+        const size_t rowIntervals = select.mRows.mIntervals.size();
         for (size_t rowI = 0; rowI < rowIntervals; ++rowI)
           {
             const Interval<ROW_INDEX>& r = select.mRows.mIntervals[rowI];
@@ -995,11 +995,11 @@ invalid_args:
 
 
 void
-AddOfflineTableCommands( )
+AddOfflineTableCommands()
 {
   CmdEntry entry;
 
-  entry.mContext = &(GetDBSHandler( ));
+  entry.mContext = &(GetDBSHandler());
 
   entry.mShowStatus   = false;
   entry.mName         = "table";

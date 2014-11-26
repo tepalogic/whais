@@ -193,8 +193,8 @@ custom_mem_alloc( size_t size)
 
   size += sizeof( W_ALLOCATED_MEMORY);
   size++;                       /* control byte */
-  if (test_get_mem_max( ) &&
-      ((test_get_mem_used( ) + size) > test_get_mem_max( )))
+  if (test_get_mem_max() &&
+      ((test_get_mem_used() + size) > test_get_mem_max()))
     {
       /* do not allow allocation */
       return NULL;
@@ -254,7 +254,7 @@ custom_mem_free( void *ptr)
   size = real_ptr->size;
 
   if (((uint8_t* )real_ptr)[size - 1] != CONTROL_BYTE)
-    abort( );                   /* blow it up */
+    abort();                   /* blow it up */
 
   free( real_ptr);
 

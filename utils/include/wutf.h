@@ -121,7 +121,7 @@ public:
     return UTF8_CU_COUNTER::COUNTS [cu];
   }
 
-  UTF8_CU_COUNTER( )
+  UTF8_CU_COUNTER()
     {
       for (uint_t i = 0; i < sizeof( COUNTS); ++i)
         COUNTS[i] = wh_utf8_cu_count( i);

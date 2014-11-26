@@ -24,28 +24,28 @@ using namespace whais;
 uint_t _elemsCount = 1000000;
 
 DDateTime
-get_random_datetime( )
+get_random_datetime()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
-  uint8_t hour  = wh_rnd( ) % 24;
-  uint8_t mins  = wh_rnd( ) % 60;
-  uint8_t secs  = wh_rnd( ) % 60;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
+  uint8_t hour  = wh_rnd() % 24;
+  uint8_t mins  = wh_rnd() % 60;
+  uint8_t secs  = wh_rnd() % 60;
 
   return DDateTime( year, month, day, hour, mins, secs);
 }
 
 DHiresTime
-get_random_hirestime( )
+get_random_hirestime()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
-  uint8_t hour  = wh_rnd( ) % 24;
-  uint8_t mins  = wh_rnd( ) % 60;
-  uint8_t secs  = wh_rnd( ) % 60;
-  uint32_t  mic = wh_rnd( ) % 1000000;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
+  uint8_t hour  = wh_rnd() % 24;
+  uint8_t mins  = wh_rnd() % 60;
+  uint8_t secs  = wh_rnd() % 60;
+  uint32_t  mic = wh_rnd() % 1000000;
 
   return DHiresTime( year, month, day, hour, mins, secs, mic);
 }
@@ -53,11 +53,11 @@ get_random_hirestime( )
 
 
 DDate
-get_random_date( )
+get_random_date()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
 
   return DDate( year, month, day);
 }
@@ -69,11 +69,11 @@ test_array_with_dates( void *)
   DArray array( _SC (DDate*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (get_random_date( ));
+    array.Add (get_random_date());
 
-  array.Sort( );
+  array.Sort();
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 0;
 
   DDate lastValue;
@@ -97,11 +97,11 @@ test_array_with_datetimes( void *)
   DArray array( _SC (DDateTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (get_random_datetime( ));
+    array.Add (get_random_datetime());
 
-  array.Sort( );
+  array.Sort();
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 2;
 
   DDateTime lastValue;
@@ -125,11 +125,11 @@ test_array_with_hirestimes( void *)
   DArray array( _SC (DHiresTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (get_random_hirestime( ));
+    array.Add (get_random_hirestime());
 
-  array.Sort( );
+  array.Sort();
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 4;
 
   DHiresTime lastValue;
@@ -153,11 +153,11 @@ test_array_with_int8 (void *)
   DArray array( _SC (DUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (DUInt8 ( wh_rnd( ) & 0xFF));
+    array.Add (DUInt8 ( wh_rnd() & 0xFF));
 
-  array.Sort( );
+  array.Sort();
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 6;
 
   DUInt8 lastValue;
@@ -182,11 +182,11 @@ test_array_with_dates_r( void *)
   DArray array( _SC (DDate*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (get_random_date( ));
+    array.Add (get_random_date());
 
   array.Sort( true);
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 8;
 
   DDate lastValue;
@@ -211,11 +211,11 @@ test_array_with_datetimes_r( void *)
   DArray array( _SC (DDateTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (get_random_datetime( ));
+    array.Add (get_random_datetime());
 
   array.Sort( true);
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 10;
 
   DDateTime lastValue;
@@ -239,11 +239,11 @@ test_array_with_hirestimes_r( void *)
   DArray array( _SC (DHiresTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (get_random_hirestime( ));
+    array.Add (get_random_hirestime());
 
   array.Sort( true);
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 12;
 
   DHiresTime lastValue;
@@ -268,11 +268,11 @@ test_array_with_int8_r (void *)
   DArray array( _SC (DUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (DUInt8 (wh_rnd( ) & 0xFF));
+    array.Add (DUInt8 (wh_rnd() & 0xFF));
 
   array.Sort( true);
 
-  if (array.Count( ) != _elemsCount)
+  if (array.Count() != _elemsCount)
     throw 14;
 
   DUInt8 lastValue;
@@ -300,7 +300,7 @@ main( int argc, char** argv)
 
   std::cout << "Sorting array with " << _elemsCount << " elements.\n";
 
-  DBSInit( DBSSettings( ));
+  DBSInit( DBSSettings());
 
   {
     Thread th[8];
@@ -324,7 +324,7 @@ main( int argc, char** argv)
     th[7].WaitToEnd( true);
   }
 
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

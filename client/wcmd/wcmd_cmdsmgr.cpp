@@ -155,10 +155,10 @@ cmdHelp( const string& cmdLine, ENTRY_CMD_CONTEXT)
 
   assert( token == "help");
 
-  if (currPosition >= (cmdLine.length( ) - 1))
+  if (currPosition >= (cmdLine.length() - 1))
     {
       //This is the only token. List commands.
-      map<string, CmdEntry>::iterator it = sCommands.begin( );
+      map<string, CmdEntry>::iterator it = sCommands.begin();
 
       while( it != sCommands.end ())
         {
@@ -176,12 +176,12 @@ cmdHelp( const string& cmdLine, ENTRY_CMD_CONTEXT)
     }
 
   token = CmdLineNextToken( cmdLine, currPosition);
-  if ( ! CmdLineNextToken( cmdLine, currPosition).empty( ))
+  if ( ! CmdLineNextToken( cmdLine, currPosition).empty())
     {
       cout << "Invalid command parameters.\n";
       return false;
     }
-  const CmdEntry *const entry = FindCmdEntry( token.c_str( ));
+  const CmdEntry *const entry = FindCmdEntry( token.c_str());
   if (entry == NULL)
     {
       cout << "Unknown command '" << token << "'.\n";
@@ -211,7 +211,7 @@ cmdEcho( const string& cmdLine, ENTRY_CMD_CONTEXT)
 
   assert( token == "echo");
 
-  while( currPosition < cmdLine.length( )
+  while( currPosition < cmdLine.length()
          && isspace( cmdLine.at (currPosition)))
     {
       ++currPosition;
@@ -224,7 +224,7 @@ cmdEcho( const string& cmdLine, ENTRY_CMD_CONTEXT)
 
 
 void
-InitCmdManager( )
+InitCmdManager()
 {
   CmdEntry entry;
 
@@ -288,24 +288,24 @@ CmdLineNextToken( const string& cmdLine, size_t& inoutPosition)
 void
 printException( ostream& outputStream, const Exception& e)
 {
-  const VERBOSE_LEVEL level = GetVerbosityLevel( );
+  const VERBOSE_LEVEL level = GetVerbosityLevel();
 
-  if (e.Type( ) == DBS_EXCEPTION)
+  if (e.Type() == DBS_EXCEPTION)
     {
       if (level >= VL_DEBUG)
         outputStream << "DBS framework exception.\n";
 
-      if ( e.Message( ).empty( ))
-        outputStream << e.Description( ) <<endl;
+      if ( e.Message().empty())
+        outputStream << e.Description() <<endl;
     }
-  else if (e.Type( ) == FILE_EXCEPTION)
+  else if (e.Type() == FILE_EXCEPTION)
     {
       if (level >= VL_DEBUG)
         outputStream << "File system IO exception.\n";
 
       char errorDesc[MAX_DECODED_STRING];
 
-      whf_err_to_str( e.Code( ), errorDesc, sizeof errorDesc);
+      whf_err_to_str( e.Code(), errorDesc, sizeof errorDesc);
       outputStream << errorDesc << endl;
     }
   else
@@ -315,13 +315,13 @@ printException( ostream& outputStream, const Exception& e)
       outputStream << "Unknown exception throwed.\n";
     }
 
-  if ( ! e.Message( ).empty( ))
-    outputStream << e.Message( ) << endl;
+  if ( ! e.Message().empty())
+    outputStream << e.Message() << endl;
 
   if (level >= VL_DEBUG)
     {
-      outputStream << "file: " << e.File( ) << endl;
-      outputStream << "line: " << e.Line( ) << endl;
+      outputStream << "file: " << e.File() << endl;
+      outputStream << "line: " << e.Line() << endl;
     }
 }
 

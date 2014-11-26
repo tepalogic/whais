@@ -73,22 +73,22 @@ public:
                         const uint64_t toChar,
                         const bool     ignoreCase);
 
-  int64_t NextMatch( );
+  int64_t NextMatch();
 
-  int64_t NextMatchRaw( );
+  int64_t NextMatchRaw();
 
 private:
   uint_t ComparingWindowShift( uint_t position) const;
 
-  bool SuffixesMatch( ) const;
+  bool SuffixesMatch() const;
 
-  uint_t FindInCache( ) const;
+  uint_t FindInCache() const;
 
   void CountCachedChars( const uint_t offset);
 
-  bool FillTextCache( );
+  bool FillTextCache();
 
-  int64_t FindSubstr( );
+  int64_t FindSubstr();
 
 
   const DText*        mText;
@@ -178,10 +178,10 @@ is_valid_hiresdate( const int       year,
 bool
 DChar::operator< (const DChar& second) const
 {
-  if (IsNull( ))
-    return second.IsNull( ) ?  false : true;
+  if (IsNull())
+    return second.IsNull() ?  false : true;
 
-  else if (second.IsNull( ))
+  else if (second.IsNull())
     return false;
 
   return wh_cmp_alphabetically( mValue, second.mValue) < 0;
@@ -189,20 +189,20 @@ DChar::operator< (const DChar& second) const
 
 
 DChar
-DChar::Prev( ) const
+DChar::Prev() const
 {
   if (mIsNull || (mValue == 1))
-    return DChar( );
+    return DChar();
 
   return DChar( wh_prev_char( mValue));
 }
 
 
 DChar
-DChar::Next( ) const
+DChar::Next() const
 {
   if (mIsNull || (mValue == UTF_LAST_CODEPOINT))
-      return DChar( );
+      return DChar();
 
   return DChar( wh_next_char( mValue));
 }
@@ -238,10 +238,10 @@ DDate::Max ()
 
 
 DDate
-DDate::Prev( ) const
+DDate::Prev() const
 {
   if (mIsNull || (*this == Min ()))
-    return DDate( );
+    return DDate();
 
   uint16_t year = mYear;
   uint8_t  mnth = mMonth;
@@ -264,10 +264,10 @@ DDate::Prev( ) const
 
 
 DDate
-DDate::Next( ) const
+DDate::Next() const
 {
   if (mIsNull || (*this == Max ()))
-    return DDate( );
+    return DDate();
 
   uint16_t year = mYear;
   uint8_t  mnth = mMonth;
@@ -328,10 +328,10 @@ DDateTime::Max ()
 
 
 DDateTime
-DDateTime::Prev( ) const
+DDateTime::Prev() const
 {
   if (mIsNull || (*this == Min ()))
-    return DDateTime( );
+    return DDateTime();
 
   uint16_t year  = mYear;
   uint8_t  mnth  = mMonth;
@@ -369,10 +369,10 @@ DDateTime::Prev( ) const
 
 
 DDateTime
-DDateTime::Next( ) const
+DDateTime::Next() const
 {
   if (mIsNull || (*this == Max ()))
-    return DDateTime( );
+    return DDateTime();
 
   uint16_t year  = mYear;
   uint8_t  mnth  = mMonth;
@@ -456,11 +456,11 @@ DHiresTime::Max ()
 
 
 DHiresTime
-DHiresTime::Prev( ) const
+DHiresTime::Prev() const
 {
   if (mIsNull || (*this == Min ()))
     {
-      return DHiresTime( );
+      return DHiresTime();
     }
 
   uint16_t year  = mYear;
@@ -504,10 +504,10 @@ DHiresTime::Prev( ) const
 
 
 DHiresTime
-DHiresTime::Next( ) const
+DHiresTime::Next() const
 {
   if (mIsNull || (*this == Max ()))
-    return DHiresTime( );
+    return DHiresTime();
 
   uint16_t year  = mYear;
   uint8_t  mnth  = mMonth;
@@ -572,20 +572,20 @@ DReal::Max ()
 
 
 DReal
-DReal::Prev( ) const
+DReal::Prev() const
 {
   if (mIsNull || (*this == Min ()))
-    return DReal( );
+    return DReal();
 
   return DReal( mValue - DBS_REAL_T( 0, 1, DBS_REAL_PREC));
 }
 
 
 DReal
-DReal::Next( ) const
+DReal::Next() const
 {
   if (mIsNull || (*this == Max ()))
-    return DReal( );
+    return DReal();
 
   return DReal( mValue + DBS_REAL_T( 0, 1, DBS_REAL_PREC));
 }
@@ -613,20 +613,20 @@ DRichReal::Max ()
 
 
 DRichReal
-DRichReal::Prev( ) const
+DRichReal::Prev() const
 {
   if (mIsNull || (*this == Min ()))
-    return DRichReal( );
+    return DRichReal();
 
   return DRichReal( mValue - DBS_RICHREAL_T( 0, 1, DBS_RICHREAL_PREC));
 }
 
 
 DRichReal
-DRichReal::Next( ) const
+DRichReal::Next() const
 {
   if (mIsNull || (*this == Max ()))
-    return DRichReal( );
+    return DRichReal();
 
   return DRichReal( mValue + DBS_RICHREAL_T( 0, 1, DBS_RICHREAL_PREC));
 }
@@ -634,7 +634,7 @@ DRichReal::Next( ) const
 
 
 DText::DText( const char* text)
-  : mText( &pastra::NullText::GetSingletoneInstace( )),
+  : mText( &pastra::NullText::GetSingletoneInstace()),
     mStringMatcher( NULL)
 
 {
@@ -643,30 +643,30 @@ DText::DText( const char* text)
       auto_ptr<ITextStrategy> strategy( 
                                new TemporalText( _RC (const uint8_t*, text))
                                        );
-      strategy.get ()->IncreaseReferenceCount( );
+      strategy.get ()->IncreaseReferenceCount();
 
-      mText = strategy.release( );
+      mText = strategy.release();
 
-      assert( mText->ReferenceCount( ) == 1);
-      assert( mText->ShareCount( ) == 0);
+      assert( mText->ReferenceCount() == 1);
+      assert( mText->ShareCount() == 0);
     }
 }
 
 
 DText::DText( const uint8_t *utf8Src, uint_t unitsCount)
-  : mText( & NullText::GetSingletoneInstace( )),
+  : mText( & NullText::GetSingletoneInstace()),
     mStringMatcher( NULL)
 
 {
   if ((utf8Src != NULL) && (utf8Src[0] != 0) && (unitsCount > 0))
     {
       auto_ptr<ITextStrategy> strategy( new TemporalText( utf8Src, unitsCount));
-      strategy.get ()->IncreaseReferenceCount( );
+      strategy.get ()->IncreaseReferenceCount();
 
-      mText = strategy.release( );
+      mText = strategy.release();
 
-      assert( mText->ReferenceCount( ) == 1);
-      assert( mText->ShareCount( ) == 0);
+      assert( mText->ReferenceCount() == 1);
+      assert( mText->ShareCount() == 0);
     }
 }
 
@@ -675,14 +675,14 @@ DText::DText( ITextStrategy& text)
   : mText( NULL),
     mStringMatcher( NULL)
 {
-  if (text.ShareCount( ) == 0)
-    text.IncreaseReferenceCount( );
+  if (text.ShareCount() == 0)
+    text.IncreaseReferenceCount();
 
   else
     {
-      assert( text.ReferenceCount( ) == 1);
+      assert( text.ReferenceCount() == 1);
 
-      text.IncreaseShareCount( );
+      text.IncreaseShareCount();
     }
 
   mText = &text;
@@ -693,23 +693,23 @@ DText::DText( const DText& source)
   : mText( NULL),
     mStringMatcher( NULL)
 {
-  if (source.mText->ShareCount( ) > 0)
+  if (source.mText->ShareCount() > 0)
     {
-      assert( source.mText->ReferenceCount( ) == 1);
+      assert( source.mText->ReferenceCount() == 1);
 
       auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount( );
+      newText->IncreaseReferenceCount();
       newText.get()->Duplicate( *source.mText,
-                                 source.mText->BytesCount( ));
+                                 source.mText->BytesCount());
 
-      mText = newText.release( );
+      mText = newText.release();
 
-      assert( mText->ShareCount( ) == 0);
-      assert( mText->ReferenceCount( ) == 1);
+      assert( mText->ShareCount() == 0);
+      assert( mText->ReferenceCount() == 1);
     }
   else
     {
-      source.mText->IncreaseReferenceCount( );
+      source.mText->IncreaseReferenceCount();
       mText = source.mText;
     }
 
@@ -717,22 +717,22 @@ DText::DText( const DText& source)
 }
 
 
-DText::~DText( )
+DText::~DText()
 {
   delete _SC (StringMatcher*, mStringMatcher);
 
-  if (mText->ShareCount( ) > 0)
-    mText->DecreaseShareCount( );
+  if (mText->ShareCount() > 0)
+    mText->DecreaseShareCount();
 
   else
-    mText->DecreaseReferenceCount( );
+    mText->DecreaseReferenceCount();
 }
 
 
 bool
-DText::IsNull( ) const
+DText::IsNull() const
 {
-  return( mText->BytesCount( ) == 0);
+  return( mText->BytesCount() == 0);
 }
 
 
@@ -747,31 +747,31 @@ DText::operator= (const DText& source)
 
   ITextStrategy* const oldText = mText;
 
-  if (source.mText->ShareCount( ) > 0)
+  if (source.mText->ShareCount() > 0)
     {
-      assert( source.mText->ReferenceCount( ) == 1);
+      assert( source.mText->ReferenceCount() == 1);
 
       auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount( );
+      newText->IncreaseReferenceCount();
       newText.get()->Duplicate( *source.mText,
-                                 source.mText->BytesCount( ));
+                                 source.mText->BytesCount());
 
-      mText = newText.release( );
+      mText = newText.release();
 
-      assert( mText->ShareCount( ) == 0);
-      assert( mText->ReferenceCount( ) == 1);
+      assert( mText->ShareCount() == 0);
+      assert( mText->ReferenceCount() == 1);
     }
   else
     {
-      source.mText->IncreaseReferenceCount( );
+      source.mText->IncreaseReferenceCount();
       mText = source.mText;
     }
 
-  if (oldText->ShareCount( ) > 0)
-    oldText->DecreaseShareCount( );
+  if (oldText->ShareCount() > 0)
+    oldText->DecreaseShareCount();
 
   else
-    oldText->DecreaseReferenceCount( );
+    oldText->DecreaseReferenceCount();
 
   return *this;
 }
@@ -783,18 +783,18 @@ DText::operator== (const DText& text) const
   if (mText == text.mText)
     return true;
 
-  if (IsNull( ) != text.IsNull( ))
+  if (IsNull() != text.IsNull())
     return false;
 
-  if (IsNull( ) == true)
+  if (IsNull() == true)
     return true;
 
-  uint64_t textSize = RawSize( );
+  uint64_t textSize = RawSize();
 
   assert( textSize != 0);
-  assert( text.RawSize( ) != 0);
+  assert( text.RawSize() != 0);
 
-  if (textSize != text.RawSize( ))
+  if (textSize != text.RawSize())
     return false;
 
   uint64_t offset = 0;
@@ -819,16 +819,16 @@ DText::operator== (const DText& text) const
 
 
 uint64_t
-DText::Count( ) const
+DText::Count() const
 {
-  return mText->CharsCount( );
+  return mText->CharsCount();
 }
 
 
 uint64_t
-DText::RawSize( ) const
+DText::RawSize() const
 {
-  return mText->BytesCount( );
+  return mText->BytesCount();
 }
 
 
@@ -837,10 +837,10 @@ DText::RawRead( uint64_t        offset,
                 uint64_t        count,
                 uint8_t* const  dest) const
 {
-  if (IsNull( ))
+  if (IsNull())
     return;
 
-  count = min<uint64_t> (count, mText->BytesCount( ));
+  count = min<uint64_t> (count, mText->BytesCount());
 
   mText->ReadUtf8 (offset, count, dest);
 }
@@ -866,51 +866,51 @@ DText::AppendRaw( const DText&   text,
                   const uint64_t toOff)
 {
 
-  if (text.IsNull( ))
+  if (text.IsNull())
     return;
 
   delete _SC (StringMatcher*, mStringMatcher);
   mStringMatcher = NULL;
 
-  if (mText->ReferenceCount( ) > 1)
+  if (mText->ReferenceCount() > 1)
     {
       auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount( );
-      newText.get()->Duplicate( *mText, mText->BytesCount( ));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate( *mText, mText->BytesCount());
 
-      mText->DecreaseReferenceCount( );
-      mText = newText.release( );
+      mText->DecreaseReferenceCount();
+      mText = newText.release();
 
-      assert( mText->ShareCount( ) == 0);
-      assert( mText->ReferenceCount( ) == 1);
+      assert( mText->ShareCount() == 0);
+      assert( mText->ReferenceCount() == 1);
     }
 
-  mText->Append( *text.mText, fromOff, min (text.RawSize( ), toOff));
+  mText->Append( *text.mText, fromOff, min (text.RawSize(), toOff));
 }
 
 void
 DText::Append( const DChar& ch)
 {
-  if (ch.IsNull( ))
+  if (ch.IsNull())
     return ;
 
   delete _SC (StringMatcher*, mStringMatcher);
   mStringMatcher = NULL;
 
-  if (mText->ReferenceCount( ) > 1)
+  if (mText->ReferenceCount() > 1)
     {
       auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount( );
-      newText.get()->Duplicate( *mText, mText->BytesCount( ));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate( *mText, mText->BytesCount());
 
-      mText->DecreaseReferenceCount( );
-      mText = newText.release( );
+      mText->DecreaseReferenceCount();
+      mText = newText.release();
 
-      assert( mText->ShareCount( ) == 0);
-      assert( mText->ReferenceCount( ) == 1);
+      assert( mText->ShareCount() == 0);
+      assert( mText->ReferenceCount() == 1);
     }
 
-  assert( mText->ReferenceCount( ) != 0);
+  assert( mText->ReferenceCount() != 0);
 
   mText->Append( ch.mValue);
 }
@@ -933,7 +933,7 @@ DText::CharAt( const uint64_t index) const
 void
 DText::CharAt( const uint64_t index, const DChar& ch)
 {
-  const uint64_t charsCount = mText->CharsCount( );
+  const uint64_t charsCount = mText->CharsCount();
 
   delete _SC (StringMatcher*, mStringMatcher);
   mStringMatcher = NULL;
@@ -947,7 +947,7 @@ DText::CharAt( const uint64_t index, const DChar& ch)
   else if (charsCount < index)
     throw DBSException( _EXTRA( DBSException::STRING_INDEX_TOO_BIG));
 
-  if (ch.IsNull( ))
+  if (ch.IsNull())
     mText->Truncate( index);
 
   else
@@ -961,10 +961,10 @@ DText::FindInText( const DText&      text,
                    const uint64_t    fromCh,
                    const uint64_t    toCh)
 {
-  if (IsNull( )
-      || text.IsNull( )
+  if (IsNull()
+      || text.IsNull()
       || (toCh <= fromCh)
-      || (toCh - fromCh < Count( )))
+      || (toCh - fromCh < Count()))
     {
       return DUInt64 ();
     }
@@ -979,7 +979,7 @@ DText::FindInText( const DText&      text,
                                                           ignoreCase);
   assert( (result < 0)
           || ((fromCh <= (uint64_t)result)
-              && ((uint64_t)result <= toCh - Count( ))));
+              && ((uint64_t)result <= toCh - Count())));
 
   if (result >= 0)
     return DUInt64 (result);
@@ -1005,7 +1005,7 @@ DText::ReplaceSubstr( DText&             substr,
                       const uint64_t     fromCh,
                       const uint64_t     toCh)
 {
-  const uint64_t substrSize = substr.RawSize( );
+  const uint64_t substrSize = substr.RawSize();
 
   DText     result;
   DUInt64   matchPos;
@@ -1013,19 +1013,19 @@ DText::ReplaceSubstr( DText&             substr,
 
   matchPos = substr.FindInTextUTF8 (*this, ignoreCase, fromCh, toCh);
 
-  while( ! matchPos.IsNull( ))
+  while( ! matchPos.IsNull())
     {
       result.AppendRaw( *this, lastMatchPos.mValue, matchPos.mValue);
       result.Append( newSubstr);
 
       lastMatchPos = DUInt64 (matchPos.mValue + substrSize);
-      assert( lastMatchPos.mValue <= RawSize( ));
+      assert( lastMatchPos.mValue <= RawSize());
 
       matchPos = substr.FindNextUTF8 ();
     }
 
-  if (matchPos.IsNull( ))
-    matchPos = DUInt64 (RawSize( ));
+  if (matchPos.IsNull())
+    matchPos = DUInt64 (RawSize());
 
   result.AppendRaw( *this, lastMatchPos.mValue, matchPos.mValue);
 
@@ -1034,7 +1034,7 @@ DText::ReplaceSubstr( DText&             substr,
 
 
 DText
-DText::LowerCase( ) const
+DText::LowerCase() const
 {
   DText result = *this;
 
@@ -1044,7 +1044,7 @@ DText::LowerCase( ) const
 
 
 DText
-DText::UpperCase( ) const
+DText::UpperCase() const
 {
   DText result = *this;
 
@@ -1057,33 +1057,33 @@ DText::UpperCase( ) const
 void
 DText::MakeMirror( DText& inoutText) const
 {
-  if (mText->ReferenceCount( ) == 1)
-    mText->IncreaseShareCount( );
+  if (mText->ReferenceCount() == 1)
+    mText->IncreaseShareCount();
 
   else
     {
       auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount( );
-      newText.get()->Duplicate( *mText, mText->BytesCount( ));
-      mText->DecreaseReferenceCount( );
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate( *mText, mText->BytesCount());
+      mText->DecreaseReferenceCount();
 
-      _CC (DText*, this)->mText = newText.release( );
+      _CC (DText*, this)->mText = newText.release();
 
-      assert( mText->ShareCount( ) == 0);
-      assert( mText->ReferenceCount( ) == 1);
+      assert( mText->ShareCount() == 0);
+      assert( mText->ReferenceCount() == 1);
 
-      mText->IncreaseShareCount( );
+      mText->IncreaseShareCount();
     }
 
-  assert( mText->ReferenceCount( ) == 1);
+  assert( mText->ReferenceCount() == 1);
 
   if (this != &inoutText)
     {
-      if (inoutText.mText->ShareCount( ) > 0)
-        inoutText.mText->DecreaseShareCount( );
+      if (inoutText.mText->ShareCount() > 0)
+        inoutText.mText->DecreaseShareCount();
 
       else
-        inoutText.mText->DecreaseReferenceCount( );
+        inoutText.mText->DecreaseReferenceCount();
 
       inoutText.mText = mText;
     }
@@ -1096,10 +1096,10 @@ DText::FindInTextUTF8 (const DText&      text,
                        const uint64_t    fromCh,
                        const uint64_t    toCh)
 {
-  if (IsNull( )
-      || text.IsNull( )
+  if (IsNull()
+      || text.IsNull()
       || (toCh <= fromCh)
-      || (toCh - fromCh < Count( )))
+      || (toCh - fromCh < Count()))
     {
       return DUInt64 ();
     }
@@ -1114,7 +1114,7 @@ DText::FindInTextUTF8 (const DText&      text,
                                                              ignoreCase);
   assert( (result < 0)
           || ((fromCh <= (uint64_t)result)
-              && ((uint64_t)result <= toCh - Count( ))));
+              && ((uint64_t)result <= toCh - Count())));
 
   if (result >= 0)
     return DUInt64 (result);
@@ -1129,7 +1129,7 @@ DText::FindNextUTF8 () const
   if (mStringMatcher == NULL)
     return DUInt64 ();
 
-  const int64_t result = _SC (StringMatcher*, mStringMatcher)->NextMatchRaw( );
+  const int64_t result = _SC (StringMatcher*, mStringMatcher)->NextMatchRaw();
   if (result >= 0)
     return DUInt64 (result);
 
@@ -1140,7 +1140,7 @@ DText::FindNextUTF8 () const
 void
 DText::AllCharsToCase( const bool lowerCase)
 {
-  const uint64_t charsCount = Count( );
+  const uint64_t charsCount = Count();
 
   for (uint64_t i = 0; i < charsCount; ++i)
     {
@@ -1165,7 +1165,7 @@ wh_array_init( const T* const       array,
     {
       assert( array == NULL);
 
-      *outStrategy = &NullArray::GetSingletoneInstace( array[0].DBSType( ));
+      *outStrategy = &NullArray::GetSingletoneInstace( array[0].DBSType());
 
       return;
     }
@@ -1173,15 +1173,15 @@ wh_array_init( const T* const       array,
   if (array == NULL)
     throw DBSException( _EXTRA( DBSException::BAD_PARAMETERS));
 
-  auto_ptr<TemporalArray> autoP( new TemporalArray( array[0].DBSType( )));
+  auto_ptr<TemporalArray> autoP( new TemporalArray( array[0].DBSType()));
   *outStrategy = autoP.get ();
 
   uint64_t       currentOffset  = 0;
-  const uint_t   valueSize      = Serializer::Size( array[0].DBSType( ),
+  const uint_t   valueSize      = Serializer::Size( array[0].DBSType(),
                                                     false);
   for (uint64_t index = 0; index < count; ++index)
     {
-      if (array[index].IsNull( ))
+      if (array[index].IsNull())
         continue;
 
       uint8_t rawStorage [MAX_VALUE_RAW_STORAGE];
@@ -1193,16 +1193,16 @@ wh_array_init( const T* const       array,
       currentOffset += valueSize;
     }
 
-  (*outStrategy)->IncrementReferenceCount( );
+  (*outStrategy)->IncrementReferenceCount();
 
-  assert( (*outStrategy)->ShareCount( ) == 0);
-  assert( (*outStrategy)->ReferenceCount( ) == 1);
+  assert( (*outStrategy)->ShareCount() == 0);
+  assert( (*outStrategy)->ReferenceCount() == 1);
 
-  autoP.release( );
+  autoP.release();
 }
 
 
-DArray::DArray( )
+DArray::DArray()
   : mArray( &NullArray::GetSingletoneInstace( T_UNDETERMINED))
 {
 }
@@ -1316,11 +1316,11 @@ DArray::DArray( const DInt64* const array, const uint64_t count)
 DArray::DArray( IArrayStrategy& array)
   : mArray( NULL)
 {
-  if (array.ShareCount( ) == 0)
-    array.IncrementReferenceCount( );
+  if (array.ShareCount() == 0)
+    array.IncrementReferenceCount();
 
   else
-   array.IncrementShareCount( );
+   array.IncrementShareCount();
 
   mArray = &array;
 }
@@ -1329,36 +1329,36 @@ DArray::DArray( IArrayStrategy& array)
 DArray::DArray( const DArray& source)
   : mArray( NULL)
 {
-  if (source.mArray->ShareCount( ) == 0)
+  if (source.mArray->ShareCount() == 0)
     {
       mArray = source.mArray;
-      mArray->IncrementReferenceCount( );
+      mArray->IncrementReferenceCount();
     }
   else
     {
-      assert( source.mArray->ReferenceCount( ) == 1);
+      assert( source.mArray->ReferenceCount() == 1);
 
       auto_ptr<IArrayStrategy> newStrategy( 
-                                    new TemporalArray( source.mArray->Type( ))
+                                    new TemporalArray( source.mArray->Type())
                                            );
 
       newStrategy->Clone( *source.mArray);
-      newStrategy->IncrementReferenceCount( );
-      mArray = newStrategy.release( );
+      newStrategy->IncrementReferenceCount();
+      mArray = newStrategy.release();
 
-      assert( mArray->ShareCount( ) == 0);
-      assert( mArray->ReferenceCount( ) == 1);
+      assert( mArray->ShareCount() == 0);
+      assert( mArray->ReferenceCount() == 1);
     }
 }
 
 
-DArray::~DArray( )
+DArray::~DArray()
 {
-  if (mArray->ShareCount( ) == 0)
-    mArray->DecrementReferenceCount( );
+  if (mArray->ShareCount() == 0)
+    mArray->DecrementReferenceCount();
 
   else
-    mArray->DecrementShareCount( );
+    mArray->DecrementShareCount();
 }
 
 
@@ -1368,102 +1368,102 @@ DArray::operator= (const DArray& source)
   if (&source == this)
     return *this;
 
-  if ((Type( ) != T_UNDETERMINED)
-      && source.Type( ) != Type( ))
+  if ((Type() != T_UNDETERMINED)
+      && source.Type() != Type())
     {
       throw DBSException( _EXTRA( DBSException::INVALID_ARRAY_TYPE));
     }
 
   IArrayStrategy* const oldArray = mArray;
 
-  if (source.mArray->ShareCount( ) == 0)
+  if (source.mArray->ShareCount() == 0)
     {
       mArray = source.mArray;
-      mArray->IncrementReferenceCount( );
+      mArray->IncrementReferenceCount();
     }
   else
     {
-      assert( source.mArray->ReferenceCount( ) == 1);
+      assert( source.mArray->ReferenceCount() == 1);
 
       auto_ptr<IArrayStrategy> newStrategy( 
-                                    new TemporalArray( source.mArray->Type( ))
+                                    new TemporalArray( source.mArray->Type())
                                            );
 
       newStrategy->Clone( *source.mArray);
-      newStrategy->IncrementReferenceCount( );
-      mArray = newStrategy.release( );
+      newStrategy->IncrementReferenceCount();
+      mArray = newStrategy.release();
 
-      assert( mArray->ShareCount( ) == 0);
-      assert( mArray->ReferenceCount( ) == 1);
+      assert( mArray->ShareCount() == 0);
+      assert( mArray->ReferenceCount() == 1);
     }
 
-  if (oldArray->ShareCount( ) == 0)
-    oldArray->DecrementReferenceCount( );
+  if (oldArray->ShareCount() == 0)
+    oldArray->DecrementReferenceCount();
 
   else
-    oldArray->DecrementShareCount( );
+    oldArray->DecrementShareCount();
 
   return *this;
 }
 
 
 uint64_t
-DArray::Count( ) const
+DArray::Count() const
 {
-  return mArray->Count( );
+  return mArray->Count();
 }
 
 
 DBS_FIELD_TYPE
-DArray::Type( ) const
+DArray::Type() const
 {
-  return mArray->Type( );
+  return mArray->Type();
 }
 
 
 static void
 prepare_array_strategy( IArrayStrategy** inoutStrategy)
 {
-  assert( (*inoutStrategy)->ReferenceCount( ) > 0);
-  assert( ((*inoutStrategy)->ShareCount( ) == 0)
-          || ((*inoutStrategy)->ReferenceCount( ) == 1));
+  assert( (*inoutStrategy)->ReferenceCount() > 0);
+  assert( ((*inoutStrategy)->ShareCount() == 0)
+          || ((*inoutStrategy)->ReferenceCount() == 1));
 
-  if ((*inoutStrategy)->ReferenceCount( ) == 1)
+  if ((*inoutStrategy)->ReferenceCount() == 1)
     return ; //Do not change anything!
 
   auto_ptr<IArrayStrategy> newStrategy( 
-                              new TemporalArray( (*inoutStrategy)->Type( ))
+                              new TemporalArray( (*inoutStrategy)->Type())
                                        );
 
   newStrategy->Clone( *(*inoutStrategy));
-  (*inoutStrategy)->DecrementReferenceCount( );
-  *inoutStrategy = newStrategy.release( );
-  (*inoutStrategy)->IncrementReferenceCount( );
+  (*inoutStrategy)->DecrementReferenceCount();
+  *inoutStrategy = newStrategy.release();
+  (*inoutStrategy)->IncrementReferenceCount();
 
-  assert( (*inoutStrategy)->ShareCount( ) == 0);
-  assert( (*inoutStrategy)->ReferenceCount( ) == 1);
+  assert( (*inoutStrategy)->ShareCount() == 0);
+  assert( (*inoutStrategy)->ReferenceCount() == 1);
 }
 
 
 template <class T> inline uint64_t
 add_array_element( const T& element, IArrayStrategy** inoutStrategy)
 {
-  if ((*inoutStrategy)->Type( ) != element.DBSType( ))
+  if ((*inoutStrategy)->Type() != element.DBSType())
     {
-      if ((*inoutStrategy)->Type( ) != T_UNDETERMINED)
+      if ((*inoutStrategy)->Type() != T_UNDETERMINED)
         throw DBSException( _EXTRA( DBSException::INVALID_ARRAY_TYPE));
 
       assert( (*inoutStrategy) ==
                 &NullArray::GetSingletoneInstace( T_UNDETERMINED));
 
-      *inoutStrategy = &NullArray::GetSingletoneInstace( element.DBSType( ));
+      *inoutStrategy = &NullArray::GetSingletoneInstace( element.DBSType());
 
       return add_array_element( element, inoutStrategy);
     }
-  else if (element.IsNull( ))
+  else if (element.IsNull())
     throw DBSException( _EXTRA( DBSException::NULL_ARRAY_ELEMENT));
 
-  static const uint_t storageSize = Serializer::Size( element.DBSType( ),
+  static const uint_t storageSize = Serializer::Size( element.DBSType(),
                                                       false);
   prepare_array_strategy( inoutStrategy);
 
@@ -1472,13 +1472,13 @@ add_array_element( const T& element, IArrayStrategy** inoutStrategy)
   assert( storageSize <= sizeof rawElement);
 
   Serializer::Store( rawElement, element);
-  (*inoutStrategy)->RawWrite( (*inoutStrategy)->RawSize( ),
+  (*inoutStrategy)->RawWrite( (*inoutStrategy)->RawSize(),
                               storageSize,
                               rawElement);
 
-  assert( ((*inoutStrategy)->RawSize( ) % storageSize) == 0);
+  assert( ((*inoutStrategy)->RawSize() % storageSize) == 0);
 
-  return( (*inoutStrategy)->Count( ) - 1);
+  return( (*inoutStrategy)->Count() - 1);
 }
 
 
@@ -1592,13 +1592,13 @@ get_array_element( IArrayStrategy&        strategy,
                    const uint64_t         index,
                    T&                     outElement)
 {
-  if (strategy.Count( ) <= index)
+  if (strategy.Count() <= index)
     throw DBSException( _EXTRA( DBSException::ARRAY_INDEX_TOO_BIG));
 
-  else if (strategy.Type( ) != outElement.DBSType( ))
+  else if (strategy.Type() != outElement.DBSType())
     throw DBSException( _EXTRA( DBSException::INVALID_ARRAY_TYPE));
 
-  static const uint_t storageSize = Serializer::Size( outElement.DBSType( ),
+  static const uint_t storageSize = Serializer::Size( outElement.DBSType(),
                                                       false);
   uint8_t rawElement[MAX_VALUE_RAW_STORAGE];
 
@@ -1719,22 +1719,22 @@ set_array_element( const T&          value,
                    const uint64_t    index,
                    IArrayStrategy**  inoutStrategy)
 {
-  if (index == (*inoutStrategy)->Count( ))
+  if (index == (*inoutStrategy)->Count())
     {
-      if (value.IsNull( ))
+      if (value.IsNull())
         return;
 
       add_array_element( value, inoutStrategy);
       return ;
     }
-  else if (index > (*inoutStrategy)->Count( ))
+  else if (index > (*inoutStrategy)->Count())
     throw DBSException( _EXTRA( DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy( inoutStrategy);
 
-  static const uint_t storageSize = Serializer::Size( (*inoutStrategy)->Type( ),
+  static const uint_t storageSize = Serializer::Size( (*inoutStrategy)->Type(),
                                                       false);
-  if (value.IsNull( ))
+  if (value.IsNull())
       (*inoutStrategy)->ColapseRaw( index * storageSize, storageSize);
 
   else
@@ -1855,12 +1855,12 @@ DArray::Set (const uint64_t index, const DInt64& newValue)
 void
 DArray::Remove( const uint64_t index)
 {
-  if (index >= mArray->Count( ))
+  if (index >= mArray->Count())
     throw DBSException( _EXTRA( DBSException::ARRAY_INDEX_TOO_BIG));
 
   prepare_array_strategy( &mArray);
 
-  const uint_t storageSize = Serializer::Size( mArray->Type( ), false);
+  const uint_t storageSize = Serializer::Size( mArray->Type(), false);
 
   mArray->ColapseRaw( index * storageSize, storageSize);
 }
@@ -1894,9 +1894,9 @@ public:
       mArray.Set (pos1, val2);
     }
 
-  uint64_t Count( ) const
+  uint64_t Count() const
     {
-      return mArray. Count( );
+      return mArray. Count();
     }
 
   void Pivot( const int64_t from, const int64_t to)
@@ -1904,7 +1904,7 @@ public:
     mArray.Get ((from + to) / 2, mPivot);
   }
 
-  const TE& Pivot( ) const
+  const TE& Pivot() const
   {
     return mPivot;
   }
@@ -1919,12 +1919,12 @@ void
 DArray::Sort( bool reverse)
 {
 
-  const int64_t arrayCount = Count( );
+  const int64_t arrayCount = Count();
 
   if (arrayCount == 0)
     return ;
 
-  switch( Type( ))
+  switch( Type())
   {
   case T_BOOL:
       {
@@ -2085,37 +2085,37 @@ DArray::Sort( bool reverse)
 void
 DArray::MakeMirror( DArray& inoutArray) const
 {
-  if (mArray->ReferenceCount( ) == 1)
-    mArray->IncrementShareCount( );
+  if (mArray->ReferenceCount() == 1)
+    mArray->IncrementShareCount();
 
   else
     {
-      assert( mArray->ShareCount( ) == 0);
+      assert( mArray->ShareCount() == 0);
 
       auto_ptr<IArrayStrategy> newStrategy( 
-                                      new TemporalArray( mArray->Type( ))
+                                      new TemporalArray( mArray->Type())
                                            );
 
       newStrategy->Clone( *mArray);
-      newStrategy->IncrementReferenceCount( );
-      mArray->DecrementReferenceCount( );
-      _CC (DArray*, this)->mArray = newStrategy.release( );
+      newStrategy->IncrementReferenceCount();
+      mArray->DecrementReferenceCount();
+      _CC (DArray*, this)->mArray = newStrategy.release();
 
-      assert( mArray->ShareCount( ) == 0);
-      assert( mArray->ReferenceCount( ) == 1);
+      assert( mArray->ShareCount() == 0);
+      assert( mArray->ReferenceCount() == 1);
 
-      mArray->IncrementShareCount( );
+      mArray->IncrementShareCount();
     }
 
-  assert( mArray->ReferenceCount( ) == 1);
+  assert( mArray->ReferenceCount() == 1);
 
   if (this != &inoutArray)
     {
-      if (inoutArray.mArray->ShareCount( ) == 0)
-        inoutArray.mArray->DecrementReferenceCount( );
+      if (inoutArray.mArray->ShareCount() == 0)
+        inoutArray.mArray->DecrementReferenceCount();
 
       else
-        inoutArray.mArray->DecrementShareCount( );
+        inoutArray.mArray->DecrementShareCount();
 
       inoutArray.mArray = mArray;
     }
@@ -2126,7 +2126,7 @@ DArray::MakeMirror( DArray& inoutArray) const
 StringMatcher::StringMatcher( const DText& pattern)
   : mText( NULL),
     mPattern( pattern),
-    mPatternSize( min<uint64_t> (pattern.RawSize( ), MAX_PATTERN_SIZE)),
+    mPatternSize( min<uint64_t> (pattern.RawSize(), MAX_PATTERN_SIZE)),
     mIgnoreCase( false),
     mLastChar( DEFAULT_LAST_CHAR),
     mCurrentChar( 0),
@@ -2141,7 +2141,7 @@ StringMatcher::StringMatcher( const DText& pattern)
 
   mPattern.RawRead( 0, mPatternSize, mPatternRaw);
 
-  if (mPatternSize < pattern.RawSize( ))
+  if (mPatternSize < pattern.RawSize())
     {
       uint_t chOffset = 0;
       while( chOffset < mPatternSize)
@@ -2174,7 +2174,7 @@ StringMatcher::FindMatch( const DText&       text,
   bool patternRefreshed = false;
 
   if ((fromChar >= toChar)
-      || (toChar - fromChar < mPattern.Count( )))
+      || (toChar - fromChar < mPattern.Count()))
     {
       return PATTERN_NOT_FOUND;
     }
@@ -2186,7 +2186,7 @@ StringMatcher::FindMatch( const DText&       text,
   mCacheValid         = 0;
   mCacheStartPos      = 0;
 
-  if (mText->RawSize( ) < mCurrentRawOffset + mPattern.RawSize( ))
+  if (mText->RawSize() < mCurrentRawOffset + mPattern.RawSize())
     return PATTERN_NOT_FOUND;
 
   if (ignoreCase != mIgnoreCase)
@@ -2220,10 +2220,10 @@ StringMatcher::FindMatch( const DText&       text,
         mShiftTable[mPatternRaw[i]] = i;
     }
 
-  if (FindSubstr( ) < 0)
+  if (FindSubstr() < 0)
     return PATTERN_NOT_FOUND;
 
-  assert( mPattern.Count( ) <= toChar - mCurrentChar);
+  assert( mPattern.Count() <= toChar - mCurrentChar);
 
   assert( mText->CharsUntilOffset( mCurrentRawOffset) == mCurrentChar);
   assert( mText->OffsetOfChar( mCurrentChar) == mCurrentRawOffset);
@@ -2246,12 +2246,12 @@ StringMatcher::FindMatchRaw( const DText&       text,
 
 
 int64_t
-StringMatcher::NextMatch( )
+StringMatcher::NextMatch()
 {
   if (mText == NULL)
     return PATTERN_NOT_FOUND;
 
-  const uint64_t patternCount = mPattern.Count( );
+  const uint64_t patternCount = mPattern.Count();
 
   assert( mCurrentChar + patternCount <= mLastChar);
 
@@ -2262,15 +2262,15 @@ StringMatcher::NextMatch( )
     }
 
   mCurrentChar      += patternCount;
-  mCurrentRawOffset += mPattern.RawSize( );
+  mCurrentRawOffset += mPattern.RawSize();
 
-  if (mText->RawSize( ) < mCurrentRawOffset + mPattern.RawSize( ))
+  if (mText->RawSize() < mCurrentRawOffset + mPattern.RawSize())
     return PATTERN_NOT_FOUND;
 
   assert( mText->CharsUntilOffset( mCurrentRawOffset) == mCurrentChar);
   assert( mText->OffsetOfChar( mCurrentChar) == mCurrentRawOffset);
 
-  if (FindSubstr( ) < 0)
+  if (FindSubstr() < 0)
     return PATTERN_NOT_FOUND;
 
   return mCurrentChar;
@@ -2278,9 +2278,9 @@ StringMatcher::NextMatch( )
 
 
 int64_t
-StringMatcher::NextMatchRaw( )
+StringMatcher::NextMatchRaw()
 {
-  if (NextMatch( ) < 0)
+  if (NextMatch() < 0)
     return PATTERN_NOT_FOUND;
 
   return mCurrentRawOffset;
@@ -2347,17 +2347,17 @@ compare_text_buffers( const uint8_t* buffer1,
 
 
 bool
-StringMatcher::SuffixesMatch( ) const
+StringMatcher::SuffixesMatch() const
 {
-  const uint64_t chCount = mPattern.Count( );
+  const uint64_t chCount = mPattern.Count();
 
   if (mLastChar < mCurrentChar + chCount)
     return false;
 
-  const uint_t buffSize   = mPattern.RawSize( );
+  const uint_t buffSize   = mPattern.RawSize();
   uint_t       buffOffset = mPatternSize;
 
-  if (mText->RawSize( ) < (mCurrentRawOffset + buffSize))
+  if (mText->RawSize() < (mCurrentRawOffset + buffSize))
     return false;
 
   while( buffOffset < buffSize)
@@ -2384,7 +2384,7 @@ StringMatcher::SuffixesMatch( ) const
 
 
 uint_t
-StringMatcher::FindInCache( ) const
+StringMatcher::FindInCache() const
 {
   assert( (mTextRawCache[0] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG);
   assert( (mCacheStartPos <= mCurrentRawOffset)
@@ -2430,11 +2430,11 @@ StringMatcher::CountCachedChars( const uint_t offset)
 
 
 bool
-StringMatcher::FillTextCache( )
+StringMatcher::FillTextCache()
 {
   assert( mText->OffsetOfChar( mCurrentChar) == mCurrentRawOffset);
 
-  if (mLastChar < mCurrentChar + mPattern.Count( ))
+  if (mLastChar < mCurrentChar + mPattern.Count())
     return false;
 
   if ((mCacheStartPos <= mCurrentRawOffset)
@@ -2444,7 +2444,7 @@ StringMatcher::FillTextCache( )
     }
 
   mCacheValid = min<uint64_t> (mAvailableCache,
-                               mText->RawSize( ) - mCurrentRawOffset);
+                               mText->RawSize() - mCurrentRawOffset);
   if (mCacheValid < mPatternSize)
     {
       mCacheValid = 0;
@@ -2484,19 +2484,19 @@ StringMatcher::FillTextCache( )
 
 
 int64_t
-StringMatcher::FindSubstr( )
+StringMatcher::FindSubstr()
 {
   assert( mCurrentChar <= mLastChar);
 
-  const uint64_t textSize = mText->RawSize( );
+  const uint64_t textSize = mText->RawSize();
 
   int cacheOffset = 0;
   while( mCurrentRawOffset < textSize)
     {
-      if ( ! FillTextCache( ))
+      if ( ! FillTextCache())
         return PATTERN_NOT_FOUND;
 
-      cacheOffset = FindInCache( );
+      cacheOffset = FindInCache();
       if (cacheOffset < mCacheValid)
         {
           assert( (mPatternSize - 1) <= cacheOffset);
@@ -2505,10 +2505,10 @@ StringMatcher::FindSubstr( )
 
           CountCachedChars( cacheOffset);
 
-          if (mPatternSize == mPattern.RawSize( ))
+          if (mPatternSize == mPattern.RawSize())
             break; // Match  found.
 
-          else if (! SuffixesMatch( ))
+          else if (! SuffixesMatch())
             {
               //A prefix match was found but the rest of string don't match.
               ++mCurrentChar;
@@ -2532,7 +2532,7 @@ StringMatcher::FindSubstr( )
 
   if ((textSize <= mCurrentRawOffset)
       || (mLastChar <= mCurrentChar)
-      || (mLastChar - mCurrentChar < mPattern.Count( )))
+      || (mLastChar - mCurrentChar < mPattern.Count()))
     {
       return PATTERN_NOT_FOUND;
     }

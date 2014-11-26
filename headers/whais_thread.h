@@ -53,7 +53,7 @@ uint_t
 wh_thread_free( WH_THREAD thread);
 
 void
-wh_yield( );
+wh_yield();
 
 void
 wh_sleep( const uint_t millisecs);

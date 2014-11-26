@@ -40,7 +40,7 @@ static const char       DEFAULT_PORT[]    = "1761";
 static const uint_t     DEFAULT_USER      = 1;
 
 
-static string        sWorkingDirectory( whf_current_dir( ));
+static string        sWorkingDirectory( whf_current_dir());
 static string        sDBName;
 static VERBOSE_LEVEL sVerbLevel       = VL_ERROR;
 static uint64_t      sMaxFileSize     = 0x80000000; //default: 2GB
@@ -53,7 +53,7 @@ static uint_t        sUserId          = DEFAULT_USER;
 
 
 const string&
-GetRemoteHostName( )
+GetRemoteHostName()
 {
   return sRemoteHost;
 }
@@ -67,11 +67,11 @@ SetRemoteHostName( const char* const host)
 
 
 const string&
-GetConnectionPort( )
+GetConnectionPort()
 {
-  assert( IsOnlineDatabase( ));
+  assert( IsOnlineDatabase());
 
-  if (sConnectPort.size( ) == 0)
+  if (sConnectPort.size() == 0)
     sConnectPort = DEFAULT_PORT;
 
   return sConnectPort;
@@ -86,9 +86,9 @@ SetConnectionPort( const char* const port)
 
 
 uint_t
-GetUserId( )
+GetUserId()
 {
-  assert( IsOnlineDatabase( ));
+  assert( IsOnlineDatabase());
 
   return sUserId;
 }
@@ -102,9 +102,9 @@ SetUserId( const uint_t userId)
 
 
 const string&
-GetUserPassword( )
+GetUserPassword()
 {
-  assert( IsOnlineDatabase( ));
+  assert( IsOnlineDatabase());
 
   return sPassword;
 }
@@ -118,9 +118,9 @@ SetUserPassword( const char* const password)
 
 
 const string&
-GetWorkingDirectory( )
+GetWorkingDirectory()
 {
-  assert( ! IsOnlineDatabase( ));
+  assert( ! IsOnlineDatabase());
 
   return sWorkingDirectory;
 }
@@ -134,7 +134,7 @@ SetWorkingDirectory( const char* const directory)
 
 
 const string&
-GetWorkingDB( )
+GetWorkingDB()
 {
   return sDBName;
 }
@@ -148,7 +148,7 @@ SetWorkingDB( const char* const dbName)
 
 
 VERBOSE_LEVEL
-GetVerbosityLevel( )
+GetVerbosityLevel()
 {
   return sVerbLevel;
 }
@@ -166,7 +166,7 @@ SetMaximumFileSize( string size)
 {
   static const string digits = "0123456789";
 
-  if (size.length( ) == 0)
+  if (size.length() == 0)
     return false;
 
   uint64_t multiplier = 1;
@@ -199,7 +199,7 @@ SetMaximumFileSize( string size)
         }
     }
 
-  sMaxFileSize = atoi( size.c_str( )) * multiplier;
+  sMaxFileSize = atoi( size.c_str()) * multiplier;
 
   if (sMaxFileSize < MINIMUM_FILE_SIZE)
     return false;
@@ -208,9 +208,9 @@ SetMaximumFileSize( string size)
 }
 
 uint64_t
-GetMaximumFileSize( )
+GetMaximumFileSize()
 {
-  assert( ! IsOnlineDatabase( ));
+  assert( ! IsOnlineDatabase());
 
   return sMaxFileSize;
 }
@@ -219,26 +219,26 @@ GetMaximumFileSize( )
 void
 SetDbsHandler( IDBSHandler& dbs)
 {
-  assert( ! IsOnlineDatabase( ));
+  assert( ! IsOnlineDatabase());
 
   sDBSHnd = &dbs;
 }
 
 
 IDBSHandler&
-GetDBSHandler( )
+GetDBSHandler()
 {
   assert( sDBSHnd != NULL);
-  assert( ! IsOnlineDatabase( ));
+  assert( ! IsOnlineDatabase());
 
   return *sDBSHnd;
 }
 
 
 bool
-IsOnlineDatabase( )
+IsOnlineDatabase()
 {
-  if (GetRemoteHostName( ).size( ) > 0)
+  if (GetRemoteHostName().size() > 0)
     return true;
 
   return false;

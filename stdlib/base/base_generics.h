@@ -68,7 +68,7 @@ extern whais::WLIB_PROC_DESCRIPTION     gProcAbs;
 
 
 whais::WLIB_STATUS
-base_generics_init( );
+base_generics_init();
 
 
 #endif //BASE_GENERICS_H_

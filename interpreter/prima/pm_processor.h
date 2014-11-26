@@ -42,44 +42,44 @@ public:
 
   void ReleaseSync( const uint8_t sync);
 
-  Session& GetSession( ) const
+  Session& GetSession() const
   {
     return mSession;
   }
 
-  SessionStack& GetStack( ) const
+  SessionStack& GetStack() const
   {
     return mStack;
   }
 
-  const Unit& GetUnit( ) const
+  const Unit& GetUnit() const
   {
     assert( mProcedure.mUnit != NULL);
 
     return *mProcedure.mUnit;
   }
 
-  const uint8_t* Code( ) const
+  const uint8_t* Code() const
   {
     return mCode;
   }
 
-  uint32_t CodeSize( ) const
+  uint32_t CodeSize() const
   {
     return mProcedure.mCodeSize;
   }
 
-  uint32_t CurrentOffset( ) const
+  uint32_t CurrentOffset() const
   {
     return mCodePos;
   }
 
-  size_t LocalsCount( ) const
+  size_t LocalsCount() const
   {
     return mProcedure.mLocalsCount;
   }
 
-  uint32_t StackBegin( ) const
+  uint32_t StackBegin() const
   {
     return mStackBegin;
   }

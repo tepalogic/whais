@@ -18,9 +18,9 @@ class Int64NodeArray
 public:
   Int64NodeArray( VectInt64 &vect) : mVect( vect) {};
 
-  uint64_t GetSize( )
+  uint64_t GetSize()
   {
-    return mVect.size( );
+    return mVect.size();
   }
 
   void Exchange( uint64_t firstNode, uint64_t secondNode)
@@ -40,9 +40,9 @@ public:
     changes = 0;
   }
 
-  void DeleteLast( )
+  void DeleteLast()
   {
-    mVect.pop_back( );
+    mVect.pop_back();
   }
 
   uint64_t& operator[] (uint64_t index)
@@ -85,10 +85,10 @@ bool create_tree( VectInt64 &rInVect, VectInt64 &rOutVect)
   Int64NodeArray array( rOutVect);
   CATree <uint64_t, uint64_t, Int64NodeArray> tree( array);
 
-  for (unsigned int index = 0; index < rInVect.size( ); ++index)
+  for (unsigned int index = 0; index < rInVect.size(); ++index)
     tree.AddNode( rInVect[index]);
 
-  if (rOutVect.size( ) != rInVect.size( ))
+  if (rOutVect.size() != rInVect.size())
     return false;
 
   return true;
@@ -127,7 +127,7 @@ uint64_t check_tree_consistency( VectInt64 &rInVect, uint64_t rootNode)
   return result;
 }
 
-int main( )
+int main()
 {
   VectInt64 temp;
   Int64NodeArray array( temp);

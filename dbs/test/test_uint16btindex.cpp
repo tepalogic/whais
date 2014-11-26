@@ -48,8 +48,8 @@ fill_table_with_values( ITable& table,
   wh_rnd_set_seed( seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DUInt16 value( wh_rnd( ) & 0xFFFF);
-      if (table.AddRow( ) != index)
+      DUInt16 value( wh_rnd() & 0xFFFF);
+      if (table.AddRow() != index)
         {
           result = false;
           break;
@@ -58,7 +58,7 @@ fill_table_with_values( ITable& table,
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
 
       table.Set (index, 0, value);
@@ -72,8 +72,8 @@ fill_table_with_values( ITable& table,
                                    0,
                                    ~0,
                                    0);
-  if ((values.Count( ) != tableValues.Count( )) ||
-      (values.Count( ) != rowCount))
+  if ((values.Count() != tableValues.Count()) ||
+      (values.Count() != rowCount))
     {
       result = false;
     }
@@ -84,13 +84,13 @@ fill_table_with_values( ITable& table,
       DROW_INDEX rowIndex;
 
       values.Get (checkIndex, rowIndex);
-      assert( rowIndex.IsNull( ) == false);
+      assert( rowIndex.IsNull() == false);
 
       table.Get (rowIndex.mValue, 0, rowValue);
 
       DUInt16 generated;
       tableValues.Get (rowIndex.mValue, generated);
-      assert( generated.IsNull( ) == false);
+      assert( generated.IsNull() == false);
 
       if (((rowValue == generated) == false) ||
           (rowValue < prev))
@@ -104,7 +104,7 @@ fill_table_with_values( ITable& table,
       if (((checkIndex * 100) % rowCount) == 0)
         {
           std::cout << (checkIndex * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -128,7 +128,7 @@ fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -139,17 +139,17 @@ fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull( ) || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DUInt16 rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
-  if (values.Count( ) != rowCount)
+  if (values.Count() != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -176,13 +176,13 @@ test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull( ) || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DUInt16 rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
@@ -200,7 +200,7 @@ test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
       DUInt16 rowValue;
       table.Get (element.mValue, 0, rowValue);
 
-      if (rowValue.IsNull( ) == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DUInt16 generatedValue;
@@ -221,7 +221,7 @@ callback_index_create( CreateIndexCallbackContext* const pData)
   if (((pData->mRowIndex * 100) % pData->mRowsCount) == 0)
     {
       std::cout << (pData->mRowIndex * 100) / pData->mRowsCount << "%\r";
-      std::cout.flush( );
+      std::cout.flush();
     }
 }
 
@@ -253,7 +253,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
                                     ~0,
                                     0);
 
-  if (values.Count( ) != _rowsCount)
+  if (values.Count() != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -265,7 +265,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
       DUInt16 rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DUInt16 generatedValue;
@@ -276,7 +276,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
       if (((index * 100) % _rowsCount) == 0)
         {
           std::cout << (index * 100) / _rowsCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -297,7 +297,7 @@ main( int argc, char **argv)
 
   bool success = true;
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
     DBSCreateDatabase( db_name);
   }
 
@@ -319,7 +319,7 @@ main( int argc, char **argv)
   }
   DBSReleaseDatabase( handler);
   DBSRemoveDatabase( db_name);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

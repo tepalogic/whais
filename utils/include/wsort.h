@@ -39,7 +39,7 @@ partition( int64_t            from,
            bool* const        outAlreadySorted)
 {
   assert( from < to);
-  assert( to < _SC (int64_t, inoutContainer.Count( )));
+  assert( to < _SC (int64_t, inoutContainer.Count()));
 
   const int64_t originalFrom = from;
 
@@ -72,19 +72,19 @@ partition( int64_t            from,
       while( from <= to)
         {
           leftEl = inoutContainer[from];
-          if (leftEl < inoutContainer.Pivot( ))
+          if (leftEl < inoutContainer.Pivot())
             ++from;
 
           else
             break;
         }
 
-      if (leftEl == inoutContainer.Pivot( ))
+      if (leftEl == inoutContainer.Pivot())
         {
           while( from < to)
             {
               temp = inoutContainer[from + 1];
-              if (temp == inoutContainer.Pivot( ))
+              if (temp == inoutContainer.Pivot())
                 ++from;
 
               else
@@ -92,25 +92,25 @@ partition( int64_t            from,
             }
         }
 
-      assert( (from < to) || (leftEl == inoutContainer.Pivot( )));
+      assert( (from < to) || (leftEl == inoutContainer.Pivot()));
 
       while( from <= to)
         {
           rightEl = inoutContainer[to];
-          if (inoutContainer.Pivot( ) < rightEl)
+          if (inoutContainer.Pivot() < rightEl)
             --to;
 
           else
             break;
         }
 
-      assert( (from < to) || (rightEl == inoutContainer.Pivot( )));
+      assert( (from < to) || (rightEl == inoutContainer.Pivot()));
 
       if (from < to)
         {
           if (leftEl == rightEl)
             {
-              assert( leftEl == inoutContainer.Pivot( ));
+              assert( leftEl == inoutContainer.Pivot());
               ++from;
             }
           else
@@ -129,7 +129,7 @@ partition_reverse( int64_t            from,
                    bool* const        outAlreadySorted)
 {
   assert( from < to);
-  assert( to < _SC (int64_t, inoutContainer.Count( )));
+  assert( to < _SC (int64_t, inoutContainer.Count()));
 
   const int64_t originalFrom = from;
 
@@ -164,19 +164,19 @@ partition_reverse( int64_t            from,
       while( from <= to)
         {
           leftEl = inoutContainer[from];
-          if (inoutContainer.Pivot( ) < leftEl)
+          if (inoutContainer.Pivot() < leftEl)
             ++from;
 
           else
             break;
         }
 
-      if (leftEl == inoutContainer.Pivot( ))
+      if (leftEl == inoutContainer.Pivot())
         {
           while( from < to)
             {
               temp = inoutContainer[from + 1];
-              if (temp == inoutContainer.Pivot( ))
+              if (temp == inoutContainer.Pivot())
                 ++from;
 
               else
@@ -184,25 +184,25 @@ partition_reverse( int64_t            from,
             }
         }
 
-      assert( (from < to) || (leftEl == inoutContainer.Pivot( )));
+      assert( (from < to) || (leftEl == inoutContainer.Pivot()));
 
       while( from <= to)
         {
          rightEl = inoutContainer[to];
-          if (rightEl < inoutContainer.Pivot( ))
+          if (rightEl < inoutContainer.Pivot())
             --to;
 
           else
             break;
         }
 
-      assert( (from < to) || (rightEl == inoutContainer.Pivot( )));
+      assert( (from < to) || (rightEl == inoutContainer.Pivot()));
 
       if (from < to)
         {
           if (leftEl == rightEl)
             {
-              assert( leftEl == inoutContainer.Pivot( ));
+              assert( leftEl == inoutContainer.Pivot());
               ++from;
             }
           else
@@ -239,8 +239,8 @@ quick_sort( int64_t           from,
 
   do
     {
-      _partition_t current = partStack[partStack.size( ) - 1];
-      partStack.pop_back( );
+      _partition_t current = partStack[partStack.size() - 1];
+      partStack.pop_back();
 
       if (current.mFrom >= current.mTo)
         continue;
@@ -272,7 +272,7 @@ quick_sort( int64_t           from,
             partStack.push_back( _partition_t( current.mFrom, pivot - 1));
         }
     }
-  while( partStack.size( ) > 0);
+  while( partStack.size() > 0);
 }
 
 

@@ -39,7 +39,7 @@ namespace prima {
 class NativeObjectOperand : public BaseOperand
 {
 public:
-  NativeObjectOperand( );
+  NativeObjectOperand();
   explicit NativeObjectOperand( INativeObject& object);
   explicit NativeObjectOperand( const DArray&  array);
   explicit NativeObjectOperand( const DText&   text);
@@ -71,11 +71,11 @@ public:
                                 const uint_t          type);
 
   NativeObjectOperand( const NativeObjectOperand& source);
-  virtual ~NativeObjectOperand( );
+  virtual ~NativeObjectOperand();
 
   NativeObjectOperand& operator= (const NativeObjectOperand& source);
 
-  virtual bool IsNull( ) const;
+  virtual bool IsNull() const;
   virtual void GetValue( DBool& outValue) const;
   virtual void GetValue( DChar& outValue) const;
   virtual void GetValue( DDate& outValue) const;
@@ -112,22 +112,22 @@ public:
   virtual void SetValue( const DText& value);
   virtual void SetValue( const DArray& value);
 
-  virtual uint_t GetType( );
+  virtual uint_t GetType();
 
-  virtual FIELD_INDEX GetField( );
+  virtual FIELD_INDEX GetField();
 
-  virtual ITable& GetTable( );
+  virtual ITable& GetTable();
 
-  virtual StackValue Duplicate( ) const;
+  virtual StackValue Duplicate() const;
 
   virtual void CopyNativeObjectOperand( const NativeObjectOperand& source);
 
   virtual void           NativeObject( INativeObject* const value);
-  virtual INativeObject& NativeObject( );
+  virtual INativeObject& NativeObject();
 
-  virtual void NotifyCopy( );
+  virtual void NotifyCopy();
 
-  virtual TableReference& GetTableReference( );
+  virtual TableReference& GetTableReference();
 
 private:
   struct RealValue
@@ -169,8 +169,8 @@ private:
   };
 
 
-  void Initialise( );
-  void Cleanup( );
+  void Initialise();
+  void Cleanup();
 
 
 

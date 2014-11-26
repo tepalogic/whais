@@ -71,6 +71,6 @@ extern uint8_t gARichRealType[sizeof( TypeSpec)];
 
 
 whais::WLIB_STATUS
-base_types_init( );
+base_types_init();
 
 #endif //BASE_TYPES_H_

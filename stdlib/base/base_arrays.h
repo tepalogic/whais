@@ -45,7 +45,7 @@ extern whais::WLIB_PROC_DESCRIPTION         gProcArrayHash;
 
 
 whais::WLIB_STATUS
-base_arrays_init( );
+base_arrays_init();
 
 #endif /* BASE_ARRAYS_H_ */
 

@@ -117,14 +117,14 @@ test_op_saddXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -165,14 +165,14 @@ test_op_ssubXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -212,14 +212,14 @@ test_op_smulXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -259,14 +259,14 @@ test_op_sdivXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -307,14 +307,14 @@ test_op_smodXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -354,14 +354,14 @@ test_op_sandXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -401,14 +401,14 @@ test_op_sxorXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -448,14 +448,14 @@ test_op_sorXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 2)
+  if (stack.Size() != 2)
     return false;
 
   DBS_T modified;
-  stack[0].Operand( ).GetValue( modified);
+  stack[0].Operand().GetValue( modified);
 
   DBS_T result;
-  stack[1].Operand( ).GetValue( result);
+  stack[1].Operand().GetValue( result);
 
   if (result != modified)
     return false;
@@ -471,16 +471,16 @@ test_op_sorXX( Session& session,
 
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   DBSCreateDatabase( admin);
-  InitInterpreter( );
+  InitInterpreter();
 
   {
     DBool     val1_b (true), val2_b (false);
@@ -580,9 +580,9 @@ main( )
     ReleaseInstance( commonSession);
   }
 
-  CleanInterpreter( );
+  CleanInterpreter();
   DBSRemoveDatabase( admin);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

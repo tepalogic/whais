@@ -315,7 +315,7 @@ test_buff_strs( void)
   state.buffer = buff_strs;
   state.bufferSize = strlen( state.buffer);
   wh_array_init( &state.values, sizeof( struct SemValue));
-  state.strings = create_string_store( );
+  state.strings = create_string_store();
   printf( "Testing string...");
   while( (result = yylex( &lvalp, &state)) != 0)
     {
@@ -344,37 +344,37 @@ int
 main( void)
 {
   bool_t test_result = TRUE;
-  if ((test_tokens( ) < 0))
+  if ((test_tokens() < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_ids( ) < 0))
+  if ((test_buff_ids() < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_integers( ) < 0))
+  if ((test_buff_integers() < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_reals( ) < 0))
+  if ((test_buff_reals() < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_chars( ) < 0))
+  if ((test_buff_chars() < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_dates( ) < 0))
+  if ((test_buff_dates() < 0))
     {
       test_result = FALSE;
     }
 
-  if ((test_buff_strs( ) < 0))
+  if ((test_buff_strs() < 0))
     {
       test_result = FALSE;
     }

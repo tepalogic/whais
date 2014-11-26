@@ -38,7 +38,7 @@ void
 StartServer( whais::FileLogger& log, std::vector<DBSDescriptors>& databases);
 
 void
-StopServer( );
+StopServer();
 
 
 #endif /* SERVER_H_ */

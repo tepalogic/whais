@@ -50,7 +50,7 @@ enum LOG_TYPE
 class Logger
 {
 public:
-  virtual ~Logger( );
+  virtual ~Logger();
 
   virtual void Log (const LOG_TYPE type, const char* str) = 0;
   virtual void Log (const LOG_TYPE type, const std::string& str) = 0;
@@ -71,7 +71,7 @@ private:
   FileLogger& operator= (const Logger&);
 
   uint_t PrintTimeMark( LOG_TYPE type);
-  void   SwitchFile( );
+  void   SwitchFile();
 
   WTICKS        mStartTick;
   Lock          mSync;

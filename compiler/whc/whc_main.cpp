@@ -55,7 +55,7 @@ fill_globals_table( WIFunctionalUnit&     unit,
                     struct WOutputStream* symbols,
                     struct WOutputStream* glblsTable)
 {
-  const uint_t globals_count = unit.GlobalsCount( );
+  const uint_t globals_count = unit.GlobalsCount();
 
   for (uint_t glbIt = 0; glbIt < globals_count; ++glbIt)
     {
@@ -73,7 +73,7 @@ fill_globals_table( WIFunctionalUnit&     unit,
                                 unit.GlobalNameLength( glbIt)) == NULL)
           || (wh_ostream_wint8 (symbols, 0) == NULL))
         {
-          throw bad_alloc( );
+          throw bad_alloc();
         }
     }
 }
@@ -85,13 +85,13 @@ process_procedures_table( WIFunctionalUnit&   unit,
                           WOutputStream*      symbols,
                           WOutputStream*      procTable)
 {
-  const uint_t proc_count = unit.ProceduresCount( );
+  const uint_t proc_count = unit.ProceduresCount();
 
   for (uint_t procIt = 0; procIt < proc_count; ++procIt)
     {
       const uint16_t localsCount  = unit.ProcLocalsCount( procIt);
       const uint16_t paramsCound  = unit.ProcParametersCount( procIt);
-      const uint32_t procOff      = destFile.Tell( );
+      const uint32_t procOff      = destFile.Tell();
       const uint32_t procCodeSize = unit.ProcCodeAreaSize( procIt);
       uint32_t       procRetType  = unit.GetProcReturnTypeOff( procIt);
 
@@ -125,7 +125,7 @@ process_procedures_table( WIFunctionalUnit&   unit,
           || (wh_ostream_wint16 (procTable, paramsCound) == NULL)
           || (wh_ostream_wint32 (procTable, procCodeSize) == NULL))
         {
-          throw bad_alloc( );
+          throw bad_alloc();
         }
 
       if ((wh_ostream_write( symbols,
@@ -134,7 +134,7 @@ process_procedures_table( WIFunctionalUnit&   unit,
                              unit.GetProcNameSize( procIt)) == NULL)
           || (wh_ostream_wint8 (symbols, 0) == NULL))
         {
-          throw bad_alloc( );
+          throw bad_alloc();
         }
     }
 }
@@ -160,10 +160,10 @@ create_object_file( const char* const                  outFile,
 
   try
   {
-    WHC_MESSAGE_CTX ctx (codeMarks, sourceCode.c_str( ));
+    WHC_MESSAGE_CTX ctx (codeMarks, sourceCode.c_str());
 
-    CompiledBufferUnit unit( _RC (const uint8_t*, sourceCode.c_str( )),
-                             sourceCode.size( ),
+    CompiledBufferUnit unit( _RC (const uint8_t*, sourceCode.c_str()),
+                             sourceCode.size(),
                              whc_messenger,
                              &ctx);
 
@@ -192,26 +192,26 @@ create_object_file( const char* const                  outFile,
 
     assert( (wh_ostream_size( &procsTableStream) % WHC_PROC_ENTRY_SIZE) == 0);
 
-    store_le_int32 (outputObject.Tell( ), wh_header + WHC_TYPEINFO_START_OFF);
-    store_le_int32 (unit.TypeAreaSize( ),
+    store_le_int32 (outputObject.Tell(), wh_header + WHC_TYPEINFO_START_OFF);
+    store_le_int32 (unit.TypeAreaSize(),
                     wh_header + WHC_TYPEINFO_SIZE_OFF);
 
-    outputObject.Write( unit.RetriveTypeArea( ),
-                      unit.TypeAreaSize( ));
+    outputObject.Write( unit.RetriveTypeArea(),
+                      unit.TypeAreaSize());
 
-    store_le_int32 (outputObject.Tell( ), wh_header + WHC_SYMTABLE_START_OFF);
+    store_le_int32 (outputObject.Tell(), wh_header + WHC_SYMTABLE_START_OFF);
     store_le_int32 (wh_ostream_size( &symbolsStream),
                     wh_header + WHC_SYMTABLE_SIZE_OFF);
 
     outputObject.Write( wh_ostream_data( &symbolsStream),
                       wh_ostream_size( &symbolsStream));
 
-    store_le_int32 (outputObject.Tell( ), wh_header + WHC_CONSTAREA_START_OFF);
-    store_le_int32 (unit.ConstsAreaSize( ),
+    store_le_int32 (outputObject.Tell(), wh_header + WHC_CONSTAREA_START_OFF);
+    store_le_int32 (unit.ConstsAreaSize(),
                     wh_header + WHC_CONSTAREA_SIZE_OFF);
 
-    outputObject.Write( unit.RetrieveConstArea( ),
-                      unit.ConstsAreaSize( ));
+    outputObject.Write( unit.RetrieveConstArea(),
+                      unit.ConstsAreaSize());
     outputObject.Write( wh_ostream_data( &glbsTableStream),
                       wh_ostream_size( &glbsTableStream));
     outputObject.Write( wh_ostream_data( &procsTableStream),
@@ -226,7 +226,7 @@ create_object_file( const char* const                  outFile,
 
     outputObject.Seek( 0, WH_SEEK_BEGIN);
     outputObject.Write( wh_header, sizeof wh_header);
-    outputObject.Sync( );
+    outputObject.Sync();
   }
   catch( ...)
   {
@@ -256,9 +256,9 @@ main( int argc, char **argv)
   {
     CmdLineParser args( argc, argv);
 
-    if (! preprocess_source( args.SourceFile( ),
-                             args.InclusionPaths( ),
-                             args.ReplacementTags( ),
+    if (! preprocess_source( args.SourceFile(),
+                             args.InclusionPaths(),
+                             args.ReplacementTags(),
                              buffer,
                              codeMarks,
                              usedFiles))
@@ -269,21 +269,21 @@ main( int argc, char **argv)
         return -1;
       }
 
-    if (args.JustPreprocess( ))
+    if (args.JustPreprocess())
       {
         cout << endl << buffer.str () << endl;
 
         return 0;
       }
-    else if (args.BuildDependencies( ))
+    else if (args.BuildDependencies())
       {
-        assert( usedFiles.size( ) > 0);
+        assert( usedFiles.size() > 0);
 
-        cout << args.OutputFile( ) << " : ";
-        for (size_t i = 0; i < usedFiles.size( ); ++i)
+        cout << args.OutputFile() << " : ";
+        for (size_t i = 0; i < usedFiles.size(); ++i)
           {
             cout << usedFiles[i];
-            if (i < usedFiles.size( ) - 1)
+            if (i < usedFiles.size() - 1)
               cout << " \\\n ";
 
             else
@@ -293,16 +293,16 @@ main( int argc, char **argv)
         return 0;
       }
 
-    create_object_file( args.OutputFile( ),
+    create_object_file( args.OutputFile(),
                         buffer.str (),
                         codeMarks);
   }
   catch( FileException & e)
   {
-    std::cerr << "File IO error: " << e.Code( );
+    std::cerr << "File IO error: " << e.Code();
 
-    if ( ! e.Message( ).empty( ))
-      std::cerr << ": " << e.Message( ) << std::endl;
+    if ( ! e.Message().empty())
+      std::cerr << ": " << e.Message() << std::endl;
 
     else
       std::cerr << '.' << std::endl;
@@ -315,13 +315,13 @@ main( int argc, char **argv)
   }
   catch( CmdLineException& e)
   {
-    std::cerr << e.Message( ) << std::endl;
+    std::cerr << e.Message() << std::endl;
   }
   catch( Exception& e)
   {
-    std::cerr << "error: " << e.Message( ) << std::endl;
-    std::cerr << "file:  " << e.File( ) << " : " << e.Line( ) << std::endl;
-    std::cerr << "extra: " << e.Code( ) << std::endl;
+    std::cerr << "error: " << e.Message() << std::endl;
+    std::cerr << "file:  " << e.File() << " : " << e.Line() << std::endl;
+    std::cerr << "extra: " << e.Code() << std::endl;
 
     retCode = -1;
   }

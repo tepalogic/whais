@@ -17,7 +17,7 @@ using namespace prima;
 static const char admin[] = "administrator";
 
 DArray
-get_test_array( )
+get_test_array()
 {
   DArray array;
 
@@ -43,7 +43,7 @@ test_self_add( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -66,7 +66,7 @@ test_self_sub( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -89,7 +89,7 @@ test_self_mul( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -112,7 +112,7 @@ test_self_div( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -135,7 +135,7 @@ test_self_mod( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -158,7 +158,7 @@ test_self_and( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -181,7 +181,7 @@ test_self_xor( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -204,7 +204,7 @@ test_self_or( IOperand& op)
   }
   catch( InterException& e)
   {
-      assert( e.Code( ) == InterException::INVALID_OP_REQ);
+      assert( e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
   catch( ...)
@@ -228,7 +228,7 @@ test_operand_for_exceptions( IOperand& op)
   }
   catch( InterException& e)
   {
-      if (e.Code( ) == InterException::INVALID_OP_REQ)
+      if (e.Code() == InterException::INVALID_OP_REQ)
         result = true;
   }
   catch( ...)
@@ -306,12 +306,12 @@ test_op_invalid_conv( IOperand& op)
 
   try
   {
-      op.GetField( );
+      op.GetField();
       result = false;
   }
   catch( InterException& e)
   {
-      if (e.Code( ) != InterException::INVALID_OP_REQ)
+      if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch( ...)
@@ -321,12 +321,12 @@ test_op_invalid_conv( IOperand& op)
 
   try
   {
-      op.GetTable( );
+      op.GetTable();
       result = false;
   }
   catch( InterException& e)
   {
-      if (e.Code( ) != InterException::INVALID_OP_REQ)
+      if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch( ...)
@@ -341,7 +341,7 @@ test_op_invalid_conv( IOperand& op)
   }
   catch( InterException& e)
   {
-      if (e.Code( ) != InterException::INVALID_OP_REQ)
+      if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
   catch( ...)
@@ -357,10 +357,10 @@ test_null_write( IOperand& op, DBS_T value)
 {
   bool result = true;
 
-  op.SetValue( DBS_T( ));
+  op.SetValue( DBS_T());
   op.GetValue( value);
 
-  if (value.IsNull( ) == false)
+  if (value.IsNull() == false)
     result = false;
 
   return result;
@@ -376,11 +376,11 @@ test_array_read_value( DArray array, const DBS_T testVal)
   IOperand* pOp = NULL;
 
   for (uint_t index = 0;
-       (index < array.Count( )) && result;
+       (index < array.Count()) && result;
        ++index)
     {
       sv = arrayOp.GetValueAt( index);
-      pOp = &sv.Operand( );
+      pOp = &sv.Operand();
 
 
       DBS_T first, second;
@@ -391,15 +391,15 @@ test_array_read_value( DArray array, const DBS_T testVal)
         result = false;
     }
 
-  sv = arrayOp.GetValueAt( array.Count( ) - 1);
-  pOp = &sv.Operand( );
+  sv = arrayOp.GetValueAt( array.Count() - 1);
+  pOp = &sv.Operand();
   result &= test_op_invalid_conv( *pOp);
   pOp->SetValue( testVal);
 
   DBS_T val;
 
   arrayOp.GetValue( array);
-  array.Get (array.Count( ) - 1, val);
+  array.Get (array.Count() - 1, val);
 
   if ( val != testVal)
     result = false;
@@ -424,10 +424,10 @@ test_table_value( ITable& table, DArray& array, const DBS_T testVal)
   if (testVal != simpleVal)
     return false;
 
-  if (array.Count( ) != fieldArray.Count( ))
+  if (array.Count() != fieldArray.Count())
     return false;
 
-  for (uint64_t el = 0; el < array.Count( ); ++el)
+  for (uint64_t el = 0; el < array.Count(); ++el)
     {
       DBS_T firstVal, secondVal;
 
@@ -455,11 +455,11 @@ test_array_tableread_value( IDBSHandler& dbsHnd,
   DBSFieldDescriptor fd[2];
 
   fd[0].isArray      = true;
-  fd[0].type  = testVal.DBSType( );
+  fd[0].type  = testVal.DBSType();
   fd[0].name = "array_type";
 
   fd[1].isArray      = false;
-  fd[1].type  = testVal.DBSType( );
+  fd[1].type  = testVal.DBSType();
   fd[1].name = "simple_type";
 
   ITable& testTable = dbsHnd.CreateTempTable( 2, fd);
@@ -479,38 +479,38 @@ test_array_tableread_value( IDBSHandler& dbsHnd,
 
   assert( testVal != firstArrayVal);
 
-  result &= test_op_invalid_conv( svSimple.Operand( ));
+  result &= test_op_invalid_conv( svSimple.Operand());
 
-  svArray.Operand( ).SetValue( array);
-  svSimple.Operand( ).SetValue( firstArrayVal);
+  svArray.Operand().SetValue( array);
+  svSimple.Operand().SetValue( firstArrayVal);
 
   result &= test_table_value( testTable, array, firstArrayVal);
 
   array.Set (0, testVal);
-  svArrayEl = svArray.Operand( ).GetValueAt( 0);
+  svArrayEl = svArray.Operand().GetValueAt( 0);
 
-  result &= test_op_invalid_conv( svArrayEl.Operand( ));
+  result &= test_op_invalid_conv( svArrayEl.Operand());
 
-  svArrayEl.Operand( ).SetValue( testVal);
-  svSimple.Operand( ).SetValue( testVal);
+  svArrayEl.Operand().SetValue( testVal);
+  svSimple.Operand().SetValue( testVal);
 
   result &= test_table_value( testTable, array, testVal);
 
-  result &= test_null_write( svSimple.Operand( ), DBS_T( ));
+  result &= test_null_write( svSimple.Operand(), DBS_T());
 
-  result &= test_table_value( testTable, array, DBS_T( ));
+  result &= test_table_value( testTable, array, DBS_T());
 
   return result;
 }
 
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   DBSCreateDatabase( admin);
@@ -520,17 +520,17 @@ main( )
     UInt64Operand op (DUInt64 (10));
     success = success && test_op_invalid_conv( op);
     success = success && test_null_write( op, DUInt64 (3));
-    success = success && test_array_read_value( get_test_array( ),
+    success = success && test_array_read_value( get_test_array(),
                                                 DUInt64 (3));
     success = success && test_array_tableread_value( dbsHnd,
-                                                     get_test_array( ),
+                                                     get_test_array(),
                                                      DUInt64 (3));
 
     DBSReleaseDatabase( dbsHnd);
   }
 
   DBSRemoveDatabase( admin);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

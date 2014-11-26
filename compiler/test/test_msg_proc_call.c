@@ -105,7 +105,7 @@ char test_prog_3[] = ""
   " \n"
   "PROCEDURE Proc_1_2 () RETURN DATE \n"
   "DO \n"
-  "Proc_1 ( ); \n" "RETURN '2010/01/01'; \n" "ENDPROC \n";
+  "Proc_1 (); \n" "RETURN '2010/01/01'; \n" "ENDPROC \n";
 
 char test_prog_4[] = ""
   "PROCEDURE Proc_1 ( v1 as DATE, v2 as INT16) RETURN INT16 \n"
@@ -153,17 +153,17 @@ test_for_error( const char *test_buffer, uint_t err_expected, uint_t err_type)
         }
     }
 
-  if (test_get_mem_used( ) != 0)
+  if (test_get_mem_used() != 0)
     {
       printf( "Current memory usage: %u bytes! It should be 0.",
-              test_get_mem_used( ));
+              test_get_mem_used());
       test_result = FALSE;
     }
   return test_result;
 }
 
 int
-main( )
+main()
 {
   bool_t test_result = TRUE;
 

@@ -56,7 +56,7 @@ extern whais::WLIB_PROC_DESCRIPTION       gTextCompare;
 
 
 whais::WLIB_STATUS
-base_text_init( );
+base_text_init();
 
 #endif //BASE_TEXT_H_
 

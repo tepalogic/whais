@@ -65,7 +65,7 @@ extern whais::WLIB_PROC_DESCRIPTION     gProcMaxRR;
 
 
 whais::WLIB_STATUS
-base_constants_init( );
+base_constants_init();
 
 #endif //BASE_CONSTANTS_H_
 

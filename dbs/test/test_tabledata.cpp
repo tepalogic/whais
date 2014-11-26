@@ -52,10 +52,10 @@ static char text4[] = "Total domination of the world is the goal, but why?\n"
   vectBool.push_back( DBool( true));\
   vectBool.push_back( DBool( true));\
   vectBool.push_back( DBool( false));\
-  vectBool.push_back( DBool( ));\
+  vectBool.push_back( DBool());\
   vectBool.push_back( DBool( false));\
   \
-  vectChar.push_back( DChar( ));\
+  vectChar.push_back( DChar());\
   vectChar.push_back( DChar( 'B'));\
   vectChar.push_back( DChar( 0x2312));\
   vectChar.push_back( DChar( 'V'));\
@@ -64,20 +64,20 @@ static char text4[] = "Total domination of the world is the goal, but why?\n"
   vectDate.push_back( DDate( 1981, 11, 14));\
   vectDate.push_back( DDate( 2091, 10, 11));\
   vectDate.push_back( DDate( 92, 3, 30));\
-  vectDate.push_back( DDate( ));\
+  vectDate.push_back( DDate());\
   vectDate.push_back( DDate( -1, 3, 30));\
 \
   vectDateTime.push_back( DDateTime( 781, 1, 1, 10, 11, 12));\
   vectDateTime.push_back( DDateTime( 1970, 1, 1, 0, 0, 0));\
   vectDateTime.push_back( DDateTime( 0, 1, 1, 0, 0, 0));\
   vectDateTime.push_back( DDateTime( 21, 12, 31, 23, 59, 59));\
-  vectDateTime.push_back( DDateTime( ));\
+  vectDateTime.push_back( DDateTime());\
 \
   vectHiResDate.push_back( DHiresTime( 1, 1, 1, 0, 0, 0, 2312));\
-  vectHiResDate.push_back( DHiresTime( ));\
+  vectHiResDate.push_back( DHiresTime());\
   vectHiResDate.push_back( DHiresTime( 0, 1, 2, 1, 1, 1, 2132));\
   vectHiResDate.push_back( DHiresTime( -1324, 12, 31, 23, 59, 59, 9897));\
-  vectHiResDate.push_back( DHiresTime( ));\
+  vectHiResDate.push_back( DHiresTime());\
 \
   vectUInt8.push_back( DUInt8 ());\
   vectUInt8.push_back( DUInt8 (2));\
@@ -129,7 +129,7 @@ static char text4[] = "Total domination of the world is the goal, but why?\n"
 \
   vectReal.push_back( DReal( -199.21));\
   vectReal.push_back( DReal( 199.21));\
-  vectReal.push_back( DReal( ));\
+  vectReal.push_back( DReal());\
   vectReal.push_back( DReal( 0.98989));\
   vectReal.push_back( DReal( 98989.0));\
 \
@@ -137,31 +137,31 @@ static char text4[] = "Total domination of the world is the goal, but why?\n"
   vectRichReal.push_back( DRichReal( 1234.91823412));\
   vectRichReal.push_back( DRichReal( 3.141592653589793));\
   vectRichReal.push_back( DRichReal( -1.6180339887498948482));\
-  vectRichReal.push_back( DRichReal( ));\
+  vectRichReal.push_back( DRichReal());\
 \
   vectText.push_back( DText( _RC(uint8_t*, text1)));\
-  vectText.push_back( DText( ));\
+  vectText.push_back( DText());\
   vectText.push_back( DText( _RC(uint8_t*, text2)));\
   vectText.push_back( DText( _RC(uint8_t*, text3)));\
   vectText.push_back( DText( _RC(uint8_t*, text4)));
 
 
-#define CLEAR_VECTORS vectBool.clear( );\
-  vectChar.clear( );\
-  vectDate.clear( );\
-  vectDateTime.clear( );\
-  vectHiResDate.clear( );\
-  vectUInt8.clear( );\
-  vectUInt16.clear( );\
-  vectUInt32.clear( );\
-  vectUInt64.clear( );\
-  vectInt8.clear( );\
-  vectInt16.clear( );\
-  vectInt32.clear( );\
-  vectInt64.clear( );\
-  vectReal.clear( );\
-  vectRichReal.clear( );\
-  vectText.clear( );
+#define CLEAR_VECTORS vectBool.clear();\
+  vectChar.clear();\
+  vectDate.clear();\
+  vectDateTime.clear();\
+  vectHiResDate.clear();\
+  vectUInt8.clear();\
+  vectUInt16.clear();\
+  vectUInt32.clear();\
+  vectUInt64.clear();\
+  vectInt8.clear();\
+  vectInt16.clear();\
+  vectInt32.clear();\
+  vectInt64.clear();\
+  vectReal.clear();\
+  vectRichReal.clear();\
+  vectText.clear();
 
 
 struct DBSFieldDescriptor field_descs[] = {
@@ -285,7 +285,7 @@ print_table_fields( IDBSHandler& rDbs, const char* tb_name)
   ITable& table      = rDbs.RetrievePersistentTable( tb_name);
 
   std::cout << "Field list:" << std::endl;
-  while( fieldIndex < table.FieldsCount( ))
+  while( fieldIndex < table.FieldsCount())
     {
       DBSFieldDescriptor currField = table.DescribeField( fieldIndex);
 
@@ -304,10 +304,10 @@ add_fixed_values_vector_to_table( ITable& table, std::vector<T> &vectValues)
 {
   uint_t fieldIndex = 0;
 
-  while( fieldIndex < table.FieldsCount( ))
+  while( fieldIndex < table.FieldsCount())
     {
       DBSFieldDescriptor desc = table.DescribeField( fieldIndex);
-      if ((desc.type == vectValues[0].DBSType( )) &&
+      if ((desc.type == vectValues[0].DBSType()) &&
           (desc.isArray == false))
         {
           break;
@@ -316,14 +316,14 @@ add_fixed_values_vector_to_table( ITable& table, std::vector<T> &vectValues)
       ++fieldIndex;
     }
 
-  if (fieldIndex >= table.FieldsCount( ))
+  if (fieldIndex >= table.FieldsCount())
     return ~0;
 
 
-  for (uint_t index = 0; index < vectValues.size( ); ++index)
+  for (uint_t index = 0; index < vectValues.size(); ++index)
     {
-      if (table.AllocatedRows( ) <= index)
-        table.AddRow( );
+      if (table.AllocatedRows() <= index)
+        table.AddRow();
 
       table.Set (index, fieldIndex, vectValues[index]);
     }
@@ -336,7 +336,7 @@ test_fixed_values_vector( ITable& table, const uint_t fieldIndex, std::vector<T>
 {
   T fieldValue;
 
-  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows( ); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows(); ++rowIndex)
     {
       table.Get(rowIndex, fieldIndex, fieldValue);
       if (! (fieldValue == vectValues[rowIndex]))
@@ -352,7 +352,7 @@ test_fixed_values_vector_reverse( ITable& table,
                                   std::vector<T> &vectValues)
 {
   T fieldValue;
-  uint_t rowIndex = table.AllocatedRows( );
+  uint_t rowIndex = table.AllocatedRows();
 
   do
     {
@@ -467,16 +467,16 @@ test_fixed_values_table( IDBSHandler& rDbs)
 template <class T> bool
 check_value_array( std::vector<T> &source, DArray& array, const uint_t seed)
 {
-  if (array.Type( ) != source[0].DBSType( ))
+  if (array.Type() != source[0].DBSType())
     return false;
 
   uint_t arrayIndex = 0;
 
-  for (uint_t elIndex = 0; elIndex < source.size( ); ++elIndex)
+  for (uint_t elIndex = 0; elIndex < source.size(); ++elIndex)
     {
       T testElement;
 
-      uint64_t testIndex = (elIndex + seed) % source.size( );
+      uint64_t testIndex = (elIndex + seed) % source.size();
       if (source[testIndex] == T ())
         continue;
 
@@ -495,12 +495,12 @@ check_value_array( std::vector<T> &source, DArray& array, const uint_t seed)
 template <class T> bool
 fill_value_array( std::vector<T> &source, DArray& array, const uint_t seed)
 {
-  if (array.Type( ) != source[0].DBSType( ))
+  if (array.Type() != source[0].DBSType())
     return false;
 
-  for (uint_t elIndex = 0; elIndex < source.size( ); ++elIndex)
+  for (uint_t elIndex = 0; elIndex < source.size(); ++elIndex)
     {
-      uint64_t testIndex = (elIndex + seed) % source.size( );
+      uint64_t testIndex = (elIndex + seed) % source.size();
       if (source[testIndex] == T ())
         continue;
 
@@ -515,26 +515,26 @@ add_vectors_values_to_table( ITable& table, std::vector<T> &testVect)
 {
   uint_t fieldIndex = 0;
 
-  for (; fieldIndex < table.FieldsCount( ); ++fieldIndex)
+  for (; fieldIndex < table.FieldsCount(); ++fieldIndex)
     {
       struct DBSFieldDescriptor fieldDesc = table.DescribeField( fieldIndex);
       if (fieldDesc.isArray &&
-          (fieldDesc.type == testVect[0].DBSType( )))
+          (fieldDesc.type == testVect[0].DBSType()))
         {
           break;
         }
     }
 
-  if (fieldIndex >= table.FieldsCount( ))
+  if (fieldIndex >= table.FieldsCount())
     return ~0;
 
 
-  for (uint_t rowIndex = 0; rowIndex < testVect.size( ); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < testVect.size(); ++rowIndex)
     {
       DArray valueArray( _SC(T*, NULL));
 
-      if (rowIndex == table.AllocatedRows( ))
-        table.AddRow( );
+      if (rowIndex == table.AllocatedRows())
+        table.AddRow();
 
       if (fill_value_array( testVect, valueArray, rowIndex) == false)
         return ~0;
@@ -548,15 +548,15 @@ add_vectors_values_to_table( ITable& table, std::vector<T> &testVect)
 template <class T> bool
 test_vector_values_table( ITable& table, uint_t fieldIndex, std::vector<T> &testVect)
 {
-  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows( ); ++rowIndex)
+  for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows(); ++rowIndex)
     {
 
       DArray testArray( _SC(T*, NULL));
       table.Get (rowIndex, fieldIndex, testArray);
 
-      if (testVect[rowIndex].IsNull( ))
+      if (testVect[rowIndex].IsNull())
         {
-          if (testArray.IsNull( ) != false)
+          if (testArray.IsNull() != false)
             return false;
         }
       else if (check_value_array( testVect, testArray, rowIndex) == false)
@@ -636,7 +636,7 @@ test_text_value_table( IDBSHandler& rDbs, std::vector<DText> &vectText)
 
   {
     ITable& table = rDbs.RetrievePersistentTable( tb_name);
-    for (; fieldIndex < table.FieldsCount( ); ++ fieldIndex)
+    for (; fieldIndex < table.FieldsCount(); ++ fieldIndex)
       {
         const DBSFieldDescriptor fieldDesc = table.DescribeField( fieldIndex);
         if (fieldDesc.type == T_TEXT)
@@ -646,7 +646,7 @@ test_text_value_table( IDBSHandler& rDbs, std::vector<DText> &vectText)
           }
       }
 
-    if (fieldIndex >= table.FieldsCount( ))
+    if (fieldIndex >= table.FieldsCount())
       result = false;
 
     rDbs.ReleaseTable( table);
@@ -655,14 +655,14 @@ test_text_value_table( IDBSHandler& rDbs, std::vector<DText> &vectText)
   if (result)
     {      ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
-          if (rowIndex >= table.AllocatedRows( ))
-            table.AddRow( );
+          if (rowIndex >= table.AllocatedRows())
+            table.AddRow();
           table.Set (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
-      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           DText testValue;
           table.Get (rowIndex, fieldIndex, testValue);
@@ -680,7 +680,7 @@ test_text_value_table( IDBSHandler& rDbs, std::vector<DText> &vectText)
     {
       ITable& table = rDbs.RetrievePersistentTable( tb_name);
 
-      for (uint_t rowIndex = table.AllocatedRows( ); rowIndex > 0; )
+      for (uint_t rowIndex = table.AllocatedRows(); rowIndex > 0; )
         {
           --rowIndex;
           DText testValue;
@@ -704,7 +704,7 @@ test_text_value_table( ITable& table, std::vector<DText> &vectText)
   bool result = true;
 
   {
-    for (; fieldIndex < table.FieldsCount( ); ++ fieldIndex)
+    for (; fieldIndex < table.FieldsCount(); ++ fieldIndex)
       {
         const DBSFieldDescriptor fieldDesc = table.DescribeField( fieldIndex);
         if (fieldDesc.type == T_TEXT)
@@ -714,20 +714,20 @@ test_text_value_table( ITable& table, std::vector<DText> &vectText)
           }
       }
 
-    if (fieldIndex >= table.FieldsCount( ))
+    if (fieldIndex >= table.FieldsCount())
       result = false;
   }
 
   if (result)
     {
-      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
-          if (rowIndex >= table.AllocatedRows( ))
-            table.AddRow( );
+          if (rowIndex >= table.AllocatedRows())
+            table.AddRow();
           table.Set (rowIndex, fieldIndex, vectText[rowIndex]);
         }
 
-      for (uint_t rowIndex = 0; rowIndex < vectText.size( ); ++rowIndex)
+      for (uint_t rowIndex = 0; rowIndex < vectText.size(); ++rowIndex)
         {
           DText testValue;
           table.Get (rowIndex, fieldIndex, testValue);
@@ -741,7 +741,7 @@ test_text_value_table( ITable& table, std::vector<DText> &vectText)
 
   if (result)
     {
-      for (uint_t rowIndex = table.AllocatedRows( ); rowIndex > 0; )
+      for (uint_t rowIndex = table.AllocatedRows(); rowIndex > 0; )
         {
           --rowIndex;
           DText testValue;
@@ -910,11 +910,11 @@ test_full_value_temp_table( IDBSHandler& rDbs)
 }
 
 int
-main( )
+main()
 {
   bool success = true;
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
     DBSCreateDatabase( db_name);
   }
 
@@ -927,7 +927,7 @@ main( )
 
   DBSReleaseDatabase( handler);
   DBSRemoveDatabase( db_name);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

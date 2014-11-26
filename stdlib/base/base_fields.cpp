@@ -49,9 +49,9 @@ WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 static WLIB_STATUS
 proc_field_table( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  StackValue temp = op.GetTableValue( );
+  StackValue temp = op.GetTableValue();
 
   stack.Pop(1);
 
@@ -64,18 +64,18 @@ proc_field_table( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_field_isindexed( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  if (op.IsNull( ))
+  if (op.IsNull())
     {
       stack.Pop (1);
-      stack.Push( DBool( ));
+      stack.Push( DBool());
 
       return WOP_OK;
     }
 
-  ITable&           table = op.GetTable( );
-  const FIELD_INDEX field = op.GetField( );
+  ITable&           table = op.GetTable();
+  const FIELD_INDEX field = op.GetField();
 
   DBool result( table.IsIndexed( field));
 
@@ -89,18 +89,18 @@ proc_field_isindexed( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_field_name( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  if (op.IsNull( ))
+  if (op.IsNull())
     {
       stack.Pop (1);
-      stack.Push( DText( ));
+      stack.Push( DText());
 
       return WOP_OK;
     }
 
-  ITable&           table = op.GetTable( );
-  const FIELD_INDEX field = op.GetField( );
+  ITable&           table = op.GetTable();
+  const FIELD_INDEX field = op.GetField();
 
   DBSFieldDescriptor fd = table.DescribeField( field);
   DText result( fd.name);
@@ -115,9 +115,9 @@ proc_field_name( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_field_index( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size( ) - 1].Operand( );
+  IOperand& op = stack[stack.Size() - 1].Operand();
 
-  if (op.IsNull( ))
+  if (op.IsNull())
     {
       stack.Pop (1);
       stack.Push( DUInt64 ());
@@ -125,7 +125,7 @@ proc_field_index( SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  const uint64_t field = op.GetField( );
+  const uint64_t field = op.GetField();
 
   stack.Pop (1);
   stack.Push( DUInt64 (field));
@@ -152,17 +152,17 @@ match_field_rows( ITable&               table,
 static WLIB_STATUS
 proc_field_find_range( SessionStack& stack, ISession&)
 {
-  IOperand& opField = stack[stack.Size( ) - 5].Operand( );
+  IOperand& opField = stack[stack.Size() - 5].Operand();
 
-  if (opField.IsNull( ))
+  if (opField.IsNull())
     {
       stack.Pop (5);
-      stack.Push( DArray( ));
+      stack.Push( DArray());
 
       return WOP_OK;
     }
 
-  const uint_t fieldType = opField.GetType( );
+  const uint_t fieldType = opField.GetType();
   if (IS_ARRAY( fieldType)
       || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
@@ -174,21 +174,21 @@ proc_field_find_range( SessionStack& stack, ISession&)
 
     }
 
-  IOperand&    opFrom       = stack[stack.Size( ) - 4].Operand( );
-  IOperand&    opTo         = stack[stack.Size( ) - 3].Operand( );
-  IOperand&    opFromRow    = stack[stack.Size( ) - 2].Operand( );
-  IOperand&    opToRow      = stack[stack.Size( ) - 1].Operand( );
-  ITable&      table        = opField.GetTable( );
+  IOperand&    opFrom       = stack[stack.Size() - 4].Operand();
+  IOperand&    opTo         = stack[stack.Size() - 3].Operand();
+  IOperand&    opFromRow    = stack[stack.Size() - 2].Operand();
+  IOperand&    opToRow      = stack[stack.Size() - 1].Operand();
+  ITable&      table        = opField.GetTable();
   DArray       result;
   DUInt64      row;
 
   opFromRow.GetValue( row);
-  const ROW_INDEX fromRow = row.IsNull( ) ? 0 : row.mValue;
+  const ROW_INDEX fromRow = row.IsNull() ? 0 : row.mValue;
 
   opToRow.GetValue( row);
-  const ROW_INDEX toRow = row.IsNull( ) ? table.AllocatedRows( ) : row.mValue;
+  const ROW_INDEX toRow = row.IsNull() ? table.AllocatedRows() : row.mValue;
 
-  const FIELD_INDEX field = opField.GetField( );
+  const FIELD_INDEX field = opField.GetField();
   switch( GET_BASIC_TYPE( fieldType))
     {
     case T_BOOL:
@@ -360,7 +360,7 @@ template<typename T> uint64_t
 retrieve_minim_value( ITable&           table,
                       const FIELD_INDEX field)
 {
-  const uint64_t rowsCount = table.AllocatedRows( );
+  const uint64_t rowsCount = table.AllocatedRows();
   T              minim     = T::Max ();
   uint64_t       foundRow  = 0;
 
@@ -369,7 +369,7 @@ retrieve_minim_value( ITable&           table,
       T value;
       table.Get (row, field, value);
 
-      if ( ! value.IsNull( ) && (value <= minim))
+      if ( ! value.IsNull() && (value <= minim))
         {
           minim    = value;
           foundRow = row;
@@ -384,7 +384,7 @@ template<typename T> uint64_t
 retrieve_maxim_value( ITable&           table,
                       const FIELD_INDEX field)
 {
-  const uint64_t rowsCount = table.AllocatedRows( );
+  const uint64_t rowsCount = table.AllocatedRows();
   T              maxim     = T::Min ();
   uint64_t       foundRow  = 0;
 
@@ -393,7 +393,7 @@ retrieve_maxim_value( ITable&           table,
       T value;
       table.Get (row, field, value);
 
-      if ( ! value.IsNull( ) && (maxim <= value))
+      if ( ! value.IsNull() && (maxim <= value))
         {
           maxim    = value;
           foundRow = row;
@@ -407,10 +407,10 @@ retrieve_maxim_value( ITable&           table,
 template<bool minSearch> WLIB_STATUS
 field_search_minmax( SessionStack& stack, ISession&)
 {
-  IOperand& opField = stack[stack.Size( ) - 1].Operand( );
+  IOperand& opField = stack[stack.Size() - 1].Operand();
   uint64_t  foundRow;
 
-  if (opField.IsNull( ))
+  if (opField.IsNull())
     {
       stack.Pop (1);
       stack.Push( DUInt64 ());
@@ -418,7 +418,7 @@ field_search_minmax( SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  const uint_t fieldType = opField.GetType( );
+  const uint_t fieldType = opField.GetType();
   if (IS_ARRAY( fieldType)
       || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
@@ -429,8 +429,8 @@ field_search_minmax( SessionStack& stack, ISession&)
                               "dates, etc. and not for arrays or text.");
     }
 
-  ITable&           table = opField.GetTable( );
-  const FIELD_INDEX field = opField.GetField( );
+  ITable&           table = opField.GetTable();
+  const FIELD_INDEX field = opField.GetField();
 
   switch( GET_BASIC_TYPE( fieldType))
   {
@@ -569,7 +569,7 @@ template<typename T> DRichReal
 compute_integer_field_average_value( ITable&              table,
                                      const FIELD_INDEX    field)
 {
-  const uint64_t rowsCount = table.AllocatedRows( );
+  const uint64_t rowsCount = table.AllocatedRows();
   uint64_t       rowsAdded = 0;
   WE_I128        sum       = 0;
 
@@ -578,7 +578,7 @@ compute_integer_field_average_value( ITable&              table,
     {
       table.Get (row, field, currentValue);
 
-      if ( ! currentValue.IsNull( ))
+      if ( ! currentValue.IsNull())
         {
           sum += currentValue.mValue;
           ++rowsAdded;
@@ -586,7 +586,7 @@ compute_integer_field_average_value( ITable&              table,
     }
 
   if (rowsAdded == 0)
-    return DRichReal( );
+    return DRichReal();
 
   const RICHREAL_T quotient = sum / rowsAdded;
   const RICHREAL_T reminder = sum % rowsAdded;
@@ -599,7 +599,7 @@ template<typename T> DRichReal
 compute_real_field_average_value( ITable&             table,
                                   const FIELD_INDEX   field)
 {
-  const uint64_t rowsCount = table.AllocatedRows( );
+  const uint64_t rowsCount = table.AllocatedRows();
   uint64_t       rowsAdded = 0;
   WE_I128        integerSum = 0, fractionalSum = 0;
 
@@ -608,19 +608,19 @@ compute_real_field_average_value( ITable&             table,
     {
       table.Get (row, field, currentValue);
 
-      if ( ! currentValue.IsNull( ))
+      if ( ! currentValue.IsNull())
         {
           const RICHREAL_T temp = currentValue.mValue;
 
-          integerSum    += temp.Integer( );
-          fractionalSum += temp.Fractional( );
+          integerSum    += temp.Integer();
+          fractionalSum += temp.Fractional();
 
           ++rowsAdded;
         }
     }
 
   if (rowsAdded == 0)
-    return DRichReal( );
+    return DRichReal();
 
   integerSum    += fractionalSum / DBS_RICHREAL_PREC;
   fractionalSum %= DBS_RICHREAL_PREC;
@@ -636,17 +636,17 @@ compute_real_field_average_value( ITable&             table,
 static WLIB_STATUS
 compute_field_average( SessionStack& stack, ISession&)
 {
-  IOperand& opField = stack[stack.Size( ) - 1].Operand( );
+  IOperand& opField = stack[stack.Size() - 1].Operand();
 
-  if (opField.IsNull( ))
+  if (opField.IsNull())
     {
       stack.Pop (1);
-      stack.Push( DRichReal( ));
+      stack.Push( DRichReal());
 
       return WOP_OK;
     }
 
-  const uint_t fieldType = opField.GetType( );
+  const uint_t fieldType = opField.GetType();
   if (IS_ARRAY( fieldType)
       || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
@@ -657,8 +657,8 @@ compute_field_average( SessionStack& stack, ISession&)
                               "dates, etc. and not for arrays or text.");
     }
 
-  ITable&           table = opField.GetTable( );
-  const FIELD_INDEX field = opField.GetField( );
+  ITable&           table = opField.GetTable();
+  const FIELD_INDEX field = opField.GetField();
   DRichReal         result;
 
   switch( fieldType)
@@ -720,19 +720,19 @@ field_sort_table( SessionStack& stack, ISession&)
   DBool  result;
   DBool  reverseSort;
 
-  IOperand& opField = stack[stack.Size( ) - 2].Operand( );
-  stack[stack.Size( ) - 1].Operand( ).GetValue( reverseSort);
+  IOperand& opField = stack[stack.Size() - 2].Operand();
+  stack[stack.Size() - 1].Operand().GetValue( reverseSort);
 
 
-  if ( ! opField.IsNull( ))
+  if ( ! opField.IsNull())
     {
-      const FIELD_INDEX field = opField.GetField( );
-      ITable&           table = opField.GetTable( );
+      const FIELD_INDEX field = opField.GetField();
+      ITable&           table = opField.GetTable();
 
       table.Sort( field,
                   0,
-                  table.AllocatedRows( ) - 1,
-                  reverseSort.IsNull( ) ? false : reverseSort.mValue);
+                  table.AllocatedRows() - 1,
+                  reverseSort.IsNull() ? false : reverseSort.mValue);
       result = DBool( true);
     }
 
@@ -743,7 +743,7 @@ field_sort_table( SessionStack& stack, ISession&)
 
 
 WLIB_STATUS
-base_fields_init( )
+base_fields_init()
 {
   static const uint8_t* fieldTableLocals[] = {
                                                 gGenericTableType,

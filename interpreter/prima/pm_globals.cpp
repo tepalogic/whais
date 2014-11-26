@@ -37,13 +37,13 @@ namespace prima {
 
 
 
-GlobalsManager::~GlobalsManager( )
+GlobalsManager::~GlobalsManager()
 {
-  for (vector<GlobalValue>::iterator it = mStorage.begin( );
+  for (vector<GlobalValue>::iterator it = mStorage.begin();
        it != mStorage.end ();
        ++it)
     {
-      it->Operand( ).~BaseOperand( );
+      it->Operand().~BaseOperand();
     }
 }
 
@@ -55,10 +55,10 @@ GlobalsManager::AddGlobal( const uint8_t* const name,
                            const uint32_t       typeOffset)
 {
   assert( FindGlobal( name, nameLength) == INVALID_ENTRY);
-  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
+  assert( mGlobalsEntrys.size() == mStorage.size());
 
-  const uint32_t result   = mGlobalsEntrys.size( );
-  const uint32_t IdOffset = mIdentifiers.size( );
+  const uint32_t result   = mGlobalsEntrys.size();
+  const uint32_t IdOffset = mIdentifiers.size();
 
   mIdentifiers.insert( mIdentifiers.end (), name, name + nameLength);
   mIdentifiers.push_back( 0);
@@ -77,11 +77,11 @@ uint32_t
 GlobalsManager::FindGlobal( const uint8_t* const name,
                             const uint_t         nameLength)
 {
-  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
+  assert( mGlobalsEntrys.size() == mStorage.size());
 
   uint32_t iterator = 0;
 
-  while( iterator < mGlobalsEntrys.size( ))
+  while( iterator < mGlobalsEntrys.size())
     {
       const GlobalEntry& entry     = mGlobalsEntrys[iterator];
       const char* const  entryName = _RC (const char*,
@@ -103,7 +103,7 @@ GlobalsManager::FindGlobal( const uint8_t* const name,
 const uint8_t*
 GlobalsManager::Name( const uint_t index) const
 {
-  if (index >= mStorage.size( ))
+  if (index >= mStorage.size())
     throw InterException( _EXTRA( InterException::INVALID_GLOBAL_REQ));
 
   const GlobalEntry& entry = mGlobalsEntrys[index];
@@ -116,9 +116,9 @@ GlobalsManager::Value( const uint32_t glbId)
 {
   const uint32_t index = glbId & ~GLOBAL_ID;
 
-  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
+  assert( mGlobalsEntrys.size() == mStorage.size());
 
-  if ((IsValid( glbId) == false) || (index >= mStorage.size( )))
+  if ((IsValid( glbId) == false) || (index >= mStorage.size()))
     throw InterException( _EXTRA( InterException::INVALID_GLOBAL_REQ));
 
   return mStorage[index];
@@ -130,13 +130,13 @@ GlobalsManager::TypeDescription( const uint32_t glbId)
   const uint32_t index = glbId & ~GLOBAL_ID;
 
   assert( IsValid( glbId));
-  assert( mGlobalsEntrys.size( ) == mStorage.size( ));
-  assert( index < mGlobalsEntrys.size( ));
+  assert( mGlobalsEntrys.size() == mStorage.size());
+  assert( index < mGlobalsEntrys.size());
 
-  if (index >= mGlobalsEntrys.size( ))
+  if (index >= mGlobalsEntrys.size())
     throw InterException( _EXTRA( InterException::INVALID_GLOBAL_REQ));
 
-  TypeManager&   typeMgr = mNames.GetTypeManager( );
+  TypeManager&   typeMgr = mNames.GetTypeManager();
   const uint8_t* pType   = typeMgr.TypeDescription( 
                                           mGlobalsEntrys[index].mTypeOffset
                                                    );

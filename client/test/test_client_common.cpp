@@ -16,9 +16,9 @@
 
 using namespace std;
 
-extern const char* DefaultDatabaseName( );
-extern const uint_t  DefaultUserId( );
-extern const char* DefaultUserPassword( );
+extern const char* DefaultDatabaseName();
+extern const uint_t  DefaultUserId();
+extern const char* DefaultUserPassword();
 
 static const char DEFAULT_HOST_SEREVR[]   = "localhost";
 static const char DEFAULT_PORT_SERVER[]   = "1761";
@@ -50,9 +50,9 @@ tc_settup_connection( int              argc,
 {
   const char*   host          = DEFAULT_HOST_SEREVR;
   const char*   port          = DEFAULT_PORT_SERVER;
-  const char*   database      = DefaultDatabaseName( );
-  uint_t        userid        = DefaultUserId( );
-  const char*   password      = DefaultUserPassword( );
+  const char*   database      = DefaultDatabaseName();
+  uint_t        userid        = DefaultUserId();
+  const char*   password      = DefaultUserPassword();
   uint_t        frameSize     = DEFAULT_FRAME_SIZE;
 
   uint_t status = WCS_OK;

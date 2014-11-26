@@ -39,17 +39,17 @@ NextToken( const std::string&     text,
 
   if (inoutOff == string::npos)
     {
-      inoutOff  = text.length( );
-      return string( );
+      inoutOff  = text.length();
+      return string();
     }
 
   assert( inoutOff != string::npos);
-  assert( inoutOff < text.length( ));
+  assert( inoutOff < text.length());
 
   size_t lastPos = text.find_first_of( delims, inoutOff);
 
   if (lastPos == string::npos)
-    lastPos = text.length( ) - 1;
+    lastPos = text.length() - 1;
 
   else
     --lastPos;

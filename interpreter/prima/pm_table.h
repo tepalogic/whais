@@ -48,12 +48,12 @@ public:
   {
   }
 
-  void IncrementRefCount( )
+  void IncrementRefCount()
   {
     ++mRefCount;
   }
 
-  void DecrementRefCount( )
+  void DecrementRefCount()
   {
     assert( mRefCount > 0);
 
@@ -61,14 +61,14 @@ public:
       delete this;
   }
 
-  ITable& GetTable( )
+  ITable& GetTable()
   {
     assert( mRefCount > 0);
 
     return mTable;
   }
 
-  IDBSHandler& GetDBSHandler( )
+  IDBSHandler& GetDBSHandler()
   {
     assert( mRefCount > 0);
 
@@ -76,9 +76,9 @@ public:
   }
 
 private:
-  ~TableReference( )
+  ~TableReference()
   {
-    if (&mTable != &GeneralTable::Instance( ))
+    if (&mTable != &GeneralTable::Instance())
       mDbsHnd.ReleaseTable( mTable);
   }
 

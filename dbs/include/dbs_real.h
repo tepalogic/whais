@@ -42,7 +42,7 @@ template <typename TI, typename TF, const int64_t PRECISION>
 class DBSReal
 {
 public:
-  DBSReal( )
+  DBSReal()
     : mIntPart( 0),
       mFracPart( 0)
   {
@@ -61,7 +61,7 @@ public:
   template <typename TI_S, typename TF_S, const int64_t PREC_S>
   DBSReal( const DBSReal<TI_S, TF_S, PREC_S>& source)
   {
-    build( source.Integer( ), source.Fractional( ), PREC_S);
+    build( source.Integer(), source.Fractional(), PREC_S);
   }
 
   template <typename T_INT>
@@ -293,19 +293,19 @@ public:
     return *this = *this % op;
   }
 
-  int64_t Integer( ) const
+  int64_t Integer() const
   {
     return mIntPart;
   }
 
   int64_t
-  Fractional( ) const
+  Fractional() const
   {
     return mFracPart;
   }
 
   int64_t
-  Precision( ) const
+  Precision() const
   {
     return PRECISION;
   }
@@ -393,13 +393,13 @@ operator* (const T op1, const DBS_RICHREAL_T& op2)
 static inline int64_t
 toInt64 (const DBS_REAL_T& value)
 {
-  return value.Integer( );
+  return value.Integer();
 }
 
 static inline int64_t
 toInt64 (const DBS_RICHREAL_T& value)
 {
-  return value.Integer( );
+  return value.Integer();
 }
 
 } //namespace whais

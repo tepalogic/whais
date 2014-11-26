@@ -167,7 +167,7 @@ Utf8Translator::Read( const uint8_t* const  utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DBool( );
+      *outValue = DBool();
       return 0;
     }
   else
@@ -199,7 +199,7 @@ Utf8Translator::Read( const uint8_t* const utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DChar( );
+      *outValue = DChar();
       return 0;
     }
 
@@ -289,7 +289,7 @@ Utf8Translator::Read( const uint8_t* const utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DDate( );
+      *outValue = DDate();
       return 0;
     }
 
@@ -327,7 +327,7 @@ Utf8Translator::Read( const uint8_t* const utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DDateTime( );
+      *outValue = DDateTime();
       return 0;
     }
 
@@ -380,7 +380,7 @@ Utf8Translator::Read( const uint8_t* const utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DHiresTime( );
+      *outValue = DHiresTime();
       return 0;
     }
 
@@ -674,7 +674,7 @@ Utf8Translator::Read( const uint8_t* const utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DReal( );
+      *outValue = DReal();
       return 0;
     }
 
@@ -700,7 +700,7 @@ Utf8Translator::Read( const uint8_t* const utf8Src,
 
   else if (*utf8Src == 0)
     {
-      *outValue = DRichReal( );
+      *outValue = DRichReal();
       return 0;
     }
 
@@ -725,7 +725,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -754,7 +754,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -813,7 +813,7 @@ Utf8Translator::Write( uint8_t* const    utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -841,7 +841,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -872,7 +872,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -913,7 +913,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -938,7 +938,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -963,7 +963,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -988,7 +988,7 @@ Utf8Translator::Write( uint8_t* const    utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -1013,7 +1013,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -1038,7 +1038,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -1063,7 +1063,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -1088,7 +1088,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
   if (maxSize == 0)
     return 0;
 
-  if (value.IsNull( ))
+  if (value.IsNull())
     {
       utf8Dest[0] = 0;
       return 1;
@@ -1117,11 +1117,11 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
      return 0;
 
    *utf8Dest = 0;
-   if (value.IsNull( ))
+   if (value.IsNull())
      return 1;
 
-   uint64_t intPart  = _SC (uint64_t, value.mValue.Integer( ));
-   uint64_t fracPart = _SC (uint64_t, value.mValue.Fractional( ));
+   uint64_t intPart  = _SC (uint64_t, value.mValue.Integer());
+   uint64_t fracPart = _SC (uint64_t, value.mValue.Fractional());
    if ((MAX_SIGNED_ABS <= intPart) || (MAX_SIGNED_ABS <= fracPart))
      {
        strcat( _RC (char*, utf8Dest),  "-");
@@ -1155,7 +1155,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
            utf8Dest[result]   = 0;
          }
 
-       uint64_t precision = value.mValue.Precision( ) / 10;
+       uint64_t precision = value.mValue.Precision() / 10;
        while( precision > fracPart)
          {
            if (result + 1 >= maxSize)
@@ -1206,11 +1206,11 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
      return 0;
 
    *utf8Dest = 0;
-   if (value.IsNull( ))
+   if (value.IsNull())
      return 1;
 
-   uint64_t intPart  = _SC (uint64_t, value.mValue.Integer( ));
-   uint64_t fracPart = _SC (uint64_t, value.mValue.Fractional( ));
+   uint64_t intPart  = _SC (uint64_t, value.mValue.Integer());
+   uint64_t fracPart = _SC (uint64_t, value.mValue.Fractional());
    if ((MAX_SIGNED_ABS <= intPart) || (MAX_SIGNED_ABS <= fracPart))
      {
        strcat( _RC (char*, utf8Dest),  "-");
@@ -1245,7 +1245,7 @@ Utf8Translator::Write( uint8_t* const      utf8Dest,
            utf8Dest[result]   = 0;
          }
 
-       uint64_t precision = value.mValue.Precision( ) / 10;
+       uint64_t precision = value.mValue.Precision() / 10;
        while( precision > fracPart)
          {
            if (result + 1 >= maxSize)

@@ -117,15 +117,15 @@ test_op_addXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (first.IsNull( ))
+  if (first.IsNull())
     return result == second;
-  else if (second.IsNull( ))
+  else if (second.IsNull())
     return result == first;
 
   return result == DBS_T( first.mValue + second.mValue);
@@ -160,13 +160,13 @@ test_op_addt( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DText result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (result.IsNull( ))
+  if (result.IsNull())
     return false;
 
   first.Append( second);
@@ -203,15 +203,15 @@ test_op_subXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (first.IsNull( ))
+  if (first.IsNull())
     return result == second;
-  else if (second.IsNull( ))
+  else if (second.IsNull())
     return result == first;
 
   return result == DBS_T( first.mValue - second.mValue);
@@ -247,15 +247,15 @@ test_op_mulXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (first.IsNull( ))
+  if (first.IsNull())
     return result == second;
-  else if (second.IsNull( ))
+  else if (second.IsNull())
     return result == first;
 
   return result == DBS_T( first.mValue * second.mValue);
@@ -290,15 +290,15 @@ test_op_divXX( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBS_T result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (first.IsNull( ))
+  if (first.IsNull())
     return result == second;
-  else if (second.IsNull( ))
+  else if (second.IsNull())
     return result == first;
 
   return result == DBS_T( first.mValue / second.mValue);
@@ -333,15 +333,15 @@ test_op_mod( Session& session,
 
   session.ExecuteProcedure( procName, stack);
 
-  if (stack.Size( ) != 1)
+  if (stack.Size() != 1)
     return false;
 
   DUInt64 result;
-  stack[0].Operand( ).GetValue( result);
+  stack[0].Operand().GetValue( result);
 
-  if (first.IsNull( ))
+  if (first.IsNull())
     return result == second;
-  else if (second.IsNull( ))
+  else if (second.IsNull())
     return result == first;
 
   return result == DUInt64 (first.mValue % second.mValue);
@@ -349,16 +349,16 @@ test_op_mod( Session& session,
 
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   DBSCreateDatabase( admin);
-  InitInterpreter( );
+  InitInterpreter();
 
   {
     ISession& commonSession = GetInstance( NULL);
@@ -374,12 +374,12 @@ main( )
 
     success = success && test_op_addt( _SC (Session&, commonSession),
                                         "text( first null)",
-                                        DText( ),
+                                        DText(),
                                         DText( "World!"));
     success = success && test_op_addt( _SC (Session&, commonSession),
                                         "text( second null)",
                                         DText( "Hello, "),
-                                        DText( ));
+                                        DText());
 
     success = success && test_op_addt( _SC (Session&, commonSession),
                                         "text( no nulls)",
@@ -411,13 +411,13 @@ main( )
     success = success && test_op_addXX( _SC (Session&, commonSession),
                                         "real with first null",
                                         W_ADDRR,
-                                        DReal( ),
+                                        DReal(),
                                         DReal( 20.00));
     success = success && test_op_addXX( _SC (Session&, commonSession),
                                         "real with second null",
                                         W_ADDRR,
                                         DReal( 10.00),
-                                        DReal( ));
+                                        DReal());
 
     success = success && test_op_addXX( _SC (Session&, commonSession),
                                         "richreal",
@@ -427,13 +427,13 @@ main( )
     success = success && test_op_addXX( _SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_ADDRR,
-                                        DRichReal( ),
+                                        DRichReal(),
                                         DRichReal( 20.00));
     success = success && test_op_addXX( _SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_ADDRR,
                                         DRichReal( 10.00),
-                                        DRichReal( ));
+                                        DRichReal());
 
 
     //Substraction
@@ -463,13 +463,13 @@ main( )
     success = success && test_op_subXX( _SC (Session&, commonSession),
                                         "real with first null",
                                         W_SUBRR,
-                                        DReal( ),
+                                        DReal(),
                                         DReal( 20.00));
     success = success && test_op_subXX( _SC (Session&, commonSession),
                                         "real with second null",
                                         W_SUBRR,
                                         DReal( 10.00),
-                                        DReal( ));
+                                        DReal());
 
     success = success && test_op_subXX( _SC (Session&, commonSession),
                                         "richreal",
@@ -479,13 +479,13 @@ main( )
     success = success && test_op_subXX( _SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_SUBRR,
-                                        DRichReal( ),
+                                        DRichReal(),
                                         DRichReal( 20.00));
     success = success && test_op_subXX( _SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_SUBRR,
                                         DRichReal( 10.00),
-                                        DRichReal( ));
+                                        DRichReal());
 
     //Multiplication
 
@@ -514,13 +514,13 @@ main( )
     success = success && test_op_mulXX( _SC (Session&, commonSession),
                                         "real with first null",
                                         W_MULRR,
-                                        DReal( ),
+                                        DReal(),
                                         DReal( 20.00));
     success = success && test_op_mulXX( _SC (Session&, commonSession),
                                         "real with second null",
                                         W_MULRR,
                                         DReal( 10.00),
-                                        DReal( ));
+                                        DReal());
 
     success = success && test_op_mulXX( _SC (Session&, commonSession),
                                         "richreal",
@@ -530,13 +530,13 @@ main( )
     success = success && test_op_mulXX( _SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_MULRR,
-                                        DRichReal( ),
+                                        DRichReal(),
                                         DRichReal( 20.00));
     success = success && test_op_mulXX( _SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_MULRR,
                                         DRichReal( 10.00),
-                                        DRichReal( ));
+                                        DRichReal());
 
     //Divide
 
@@ -566,13 +566,13 @@ main( )
     success = success && test_op_divXX( _SC (Session&, commonSession),
                                         "real with first null",
                                         W_DIVRR,
-                                        DReal( ),
+                                        DReal(),
                                         DReal( 20.00));
     success = success && test_op_divXX( _SC (Session&, commonSession),
                                         "real with second null",
                                         W_DIVRR,
                                         DReal( 10.00),
-                                        DReal( ));
+                                        DReal());
 
     success = success && test_op_divXX( _SC (Session&, commonSession),
                                         "richreal",
@@ -582,13 +582,13 @@ main( )
     success = success && test_op_divXX( _SC (Session&, commonSession),
                                         "richreal with first null",
                                         W_DIVRR,
-                                        DRichReal( ),
+                                        DRichReal(),
                                         DRichReal( 20.00));
     success = success && test_op_divXX( _SC (Session&, commonSession),
                                         "richreal with second null",
                                         W_DIVRR,
                                         DRichReal( 10.00),
-                                        DRichReal( ));
+                                        DRichReal());
 
 
     //Modulo
@@ -614,9 +614,9 @@ main( )
     ReleaseInstance( commonSession);
   }
 
-  CleanInterpreter( );
+  CleanInterpreter();
   DBSRemoveDatabase( admin);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

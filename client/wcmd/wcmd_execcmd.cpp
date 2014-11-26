@@ -54,7 +54,7 @@ static const char     NULL_LABEL[]   = "(null)";
 struct FieldEntry
 {
   FieldEntry( const uint_t fieldType = WHC_TYPE_NOTSET)
-    : mValues( ),
+    : mValues(),
       mType( fieldType)
   {
   }
@@ -86,8 +86,8 @@ typedef FIELD_VALUE::iterator        FIELD_VALUE_IT;
 
 struct TableParameter
 {
-  TableParameter( )
-    : mFields( ),
+  TableParameter()
+    : mFields(),
       mRowsCount( 0)
   {
   }
@@ -184,12 +184,12 @@ parse_value( const string&    cmdLine,
              size_t&          inoutLineOff,
              string&          outValue)
 {
-  const char* const line = cmdLine.c_str( );
+  const char* const line = cmdLine.c_str();
 
   assert( line[inoutLineOff - 1] == '\'');
 
-  outValue.clear( );
-  while( inoutLineOff < cmdLine.length( ))
+  outValue.clear();
+  while( inoutLineOff < cmdLine.length())
     {
       if (line[inoutLineOff] == '\'')
         {
@@ -199,7 +199,7 @@ parse_value( const string&    cmdLine,
 
       if (line[inoutLineOff] == '\\')
         {
-          if (++inoutLineOff >= cmdLine.length( ))
+          if (++inoutLineOff >= cmdLine.length())
             return false;
 
           switch( line[inoutLineOff++])
@@ -316,7 +316,7 @@ parse_type( const string&       cmdLine,
             size_t&             inoutLineOff,
             uint_t&             outType)
 {
-  const char* const line = cmdLine.c_str( );
+  const char* const line = cmdLine.c_str();
 
   switch( line[inoutLineOff++])
   {
@@ -459,7 +459,7 @@ handle_param_value( WH_CONNECTION           hnd,
         }
       return false;
     }
-  else if ((value.length( ) == 0) && (arrayOff != WIGNORE_OFF))
+  else if ((value.length() == 0) && (arrayOff != WIGNORE_OFF))
     {
       cerr << "Invalid command format. "
               "An array value cannot hold a null value( e.g. '').\n";
@@ -467,7 +467,7 @@ handle_param_value( WH_CONNECTION           hnd,
       return false;
     }
 
-  wcs = update_stack_value( hnd, type, field, row, arrayOff, value.c_str( ));
+  wcs = update_stack_value( hnd, type, field, row, arrayOff, value.c_str());
   if (wcs != WCS_OK)
     goto proc_param_connector_error;
 
@@ -491,14 +491,14 @@ handle_procedure_array_param( WH_CONNECTION           hnd,
                               const WHT_ROW_INDEX     row,
                               size_t&                 inoutLineOff)
 {
-  const char* const line = cmdLine.c_str( );
+  const char* const line = cmdLine.c_str();
 
   uint64_t arrayIndex = 0;
 
   assert( type != WHC_TYPE_TEXT);
   assert( line[inoutLineOff - 1] == '{');
 
-  while( inoutLineOff < cmdLine.length( ))
+  while( inoutLineOff < cmdLine.length())
     {
       if (line[inoutLineOff] == '}')
         {
@@ -544,7 +544,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
                               const string&       cmdLine,
                               size_t&             inoutLineOff)
 {
-  const char* const   line         = cmdLine.c_str( );
+  const char* const   line         = cmdLine.c_str();
   uint_t              wcs          = WCS_OK;
   uint_t              row          = 0;
   uint_t              type         = 0;
@@ -561,7 +561,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
 
   assert( line[inoutLineOff - 1] == '(');
 
-  while( inoutLineOff < cmdLine.length( ))
+  while( inoutLineOff < cmdLine.length())
     {
       if (ignoreSpaces
           && ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t')))
@@ -591,7 +591,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
           rowStarted = true;
           fieldParse = true;
 
-          field.clear( );
+          field.clear();
 
           continue;
         }
@@ -607,7 +607,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
               fieldParse = false;
               typeParse  = true;
 
-              if (field.length( ) == 0)
+              if (field.length() == 0)
                 {
                   cerr << "Invalid command format. "
                           "A non empty field has to be provided.\n";
@@ -681,7 +681,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
                   valueParse   = false;
                   fieldParse   = true;
 
-                  field.clear( );
+                  field.clear();
 
                   continue ;
                 }
@@ -713,7 +713,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
               valueParse   = false;
               fieldParse   = true;
 
-              field.clear( );
+              field.clear();
             }
           else
             {
@@ -739,22 +739,22 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
     }
 
   vector<WField> fields;
-  for (FIELD_VALUE_IT it = table.mFields.begin( );
+  for (FIELD_VALUE_IT it = table.mFields.begin();
        it != table.mFields.end ();
        ++it)
     {
       WField fd;
 
-      fd.name = it->first.c_str( );
+      fd.name = it->first.c_str();
       fd.type = it->second.mType;
 
       fields.push_back( fd);
     }
 
-  assert( fields.size( ) == table.mFields.size( ));
-  assert( fields.size( ) > 0);
+  assert( fields.size() == table.mFields.size());
+  assert( fields.size() > 0);
 
-  wcs = WPushValue( hnd, WHC_TYPE_TABLE_MASK, fields.size( ), &fields[0]);
+  wcs = WPushValue( hnd, WHC_TYPE_TABLE_MASK, fields.size(), &fields[0]);
   if (wcs != WCS_OK)
     goto proc_param_connector_error;
 
@@ -766,7 +766,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
 
   for (uint_t row = 0; row < table.mRowsCount; ++row)
     {
-      for (FIELD_VALUE_IT it = table.mFields.begin( );
+      for (FIELD_VALUE_IT it = table.mFields.begin();
            it != table.mFields.end ();
            ++it)
         {
@@ -776,19 +776,19 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
 
           if (it->second.mType & WHC_TYPE_ARRAY_MASK)
             {
-              assert( entry->second.size( ) >= 1);
+              assert( entry->second.size() >= 1);
 
               for (uint_t arrayId = 0;
-                   arrayId < entry->second.size( );
+                   arrayId < entry->second.size();
                    ++arrayId)
                 {
                   wcs = update_stack_value( 
                               hnd,
                               it->second.mType & ~WHC_TYPE_ARRAY_MASK,
-                              it->first.c_str( ),
+                              it->first.c_str(),
                               row,
                               arrayId,
-                              entry->second[arrayId].c_str( )
+                              entry->second[arrayId].c_str()
                                             );
                   if (wcs != WCS_OK)
                     goto proc_param_connector_error;
@@ -796,14 +796,14 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
             }
           else
             {
-              assert( entry->second.size( ) == 1);
+              assert( entry->second.size() == 1);
 
               wcs = update_stack_value( hnd,
                                         it->second.mType,
-                                        it->first.c_str( ),
+                                        it->first.c_str(),
                                         row,
                                         WIGNORE_OFF,
-                                        entry->second[0].c_str( ));
+                                        entry->second[0].c_str());
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
             }
@@ -828,12 +828,12 @@ handle_procedure_parameters( WH_CONNECTION   hnd,
                              const string&   cmdLine,
                              size_t&         inoutLineOff)
 {
-  const char* const   line       = cmdLine.c_str( );
+  const char* const   line       = cmdLine.c_str();
   uint_t              type       = WHC_TYPE_NOTSET;
   uint_t              wcs        = WCS_OK;
   bool                needsFlush = false;
 
-  while( (inoutLineOff < cmdLine.length( ))
+  while( (inoutLineOff < cmdLine.length())
          && (wcs == WCS_OK))
     {
       if ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t'))
@@ -857,7 +857,7 @@ handle_procedure_parameters( WH_CONNECTION   hnd,
           if (! parse_type( cmdLine, inoutLineOff, type))
             return false;
 
-          while( (inoutLineOff < cmdLine.length( ))
+          while( (inoutLineOff < cmdLine.length())
                  && (line[inoutLineOff] == ' ')
                  && (line[inoutLineOff] == '\t'))
             {
@@ -866,7 +866,7 @@ handle_procedure_parameters( WH_CONNECTION   hnd,
               continue;
             }
 
-          if (inoutLineOff >= cmdLine.length( ))
+          if (inoutLineOff >= cmdLine.length())
             {
               cerr << "Invalid command format. No values was specified.\n";
 
@@ -1117,7 +1117,7 @@ fetch_execution_table_result( WH_CONNECTION       hnd,
   uint_t wcs = WCS_OK;
 
   uint_t largestFieldName = 0;
-  for (size_t i = 0; i < fields.size( ); ++i)
+  for (size_t i = 0; i < fields.size(); ++i)
     {
       if (strlen( fields[i].name) > largestFieldName)
         largestFieldName = strlen( fields[i].name);
@@ -1130,7 +1130,7 @@ fetch_execution_table_result( WH_CONNECTION       hnd,
     {
       for (uint64_t row = 0; row < rowsCount; ++row)
         {
-          for (uint_t i = 0; i < fields.size( ); ++i )
+          for (uint_t i = 0; i < fields.size(); ++i )
             {
               cout.width( 3);
               cout << std::right << row;
@@ -1219,7 +1219,7 @@ fetch_execution_result( WH_CONNECTION hnd)
 
           fields.push_back( fieldName);
 
-          fd.name = fields.back( ).c_str( );
+          fd.name = fields.back().c_str();
           fd.type = fieldType;
 
           fieldsDescriptors.push_back( fd);
@@ -1232,8 +1232,8 @@ fetch_execution_result( WH_CONNECTION hnd)
         }
       cout << ")\n";
 
-      assert( fieldsCount == fields.size( ));
-      assert( fieldsCount == fieldsDescriptors.size( ));
+      assert( fieldsCount == fields.size());
+      assert( fieldsCount == fieldsDescriptors.size());
 
       if ( !  fetch_execution_table_result( hnd, fieldsDescriptors))
         return false;
@@ -1294,7 +1294,7 @@ fetch_result_fail:
 bool
 cmdExec( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  const VERBOSE_LEVEL level    = GetVerbosityLevel( );
+  const VERBOSE_LEVEL level    = GetVerbosityLevel();
   size_t              linePos  = 0;
   string              token    = CmdLineNextToken( cmdLine, linePos);
   WH_CONNECTION       conHdl   = NULL;
@@ -1305,17 +1305,17 @@ cmdExec( const string& cmdLine, ENTRY_CMD_CONTEXT context)
   assert( token == "exec");
 
   const string procName = CmdLineNextToken( cmdLine, linePos);
-  if (procName.length( ) == 0)
+  if (procName.length() == 0)
     {
       cerr << "Invalid command format. The procedure name is missing.\n";
       return false;
     }
 
-  uint32_t cs  = WConnect( GetRemoteHostName( ).c_str( ),
-                           GetConnectionPort( ).c_str( ),
-                           GetWorkingDB( ).c_str( ),
-                           GetUserPassword( ).c_str( ),
-                           GetUserId( ),
+  uint32_t cs  = WConnect( GetRemoteHostName().c_str(),
+                           GetConnectionPort().c_str(),
+                           GetWorkingDB().c_str(),
+                           GetUserPassword().c_str(),
+                           GetUserId(),
                            DEFAULT_FRAME_SIZE,
                            &conHdl);
   if (cs != WCS_OK)
@@ -1324,7 +1324,7 @@ cmdExec( const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  paramTicks = wh_msec_ticks( );
+  paramTicks = wh_msec_ticks();
   if (! handle_procedure_parameters( conHdl, cmdLine, linePos))
     {
       if (level >= VL_DEBUG)
@@ -1332,10 +1332,10 @@ cmdExec( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       goto cmd_exec_err;
     }
-  paramTicks = wh_msec_ticks( ) - paramTicks;
+  paramTicks = wh_msec_ticks() - paramTicks;
 
-  execTicks = wh_msec_ticks( );
-  if ((cs = WExecuteProcedure( conHdl, procName.c_str( ))) != WCS_OK)
+  execTicks = wh_msec_ticks();
+  if ((cs = WExecuteProcedure( conHdl, procName.c_str())) != WCS_OK)
     {
       if (level >= VL_DEBUG)
         cerr << "Failed to execute remote procedure '" << procName << "': ";
@@ -1343,9 +1343,9 @@ cmdExec( const string& cmdLine, ENTRY_CMD_CONTEXT context)
       cerr << wcmd_translate_status( cs) << endl;
       goto cmd_exec_err;
     }
-  execTicks = wh_msec_ticks( ) - execTicks;
+  execTicks = wh_msec_ticks() - execTicks;
 
-  fetchTicks = wh_msec_ticks( );
+  fetchTicks = wh_msec_ticks();
   if (! fetch_execution_result( conHdl))
     {
       if (level >= VL_DEBUG)
@@ -1356,7 +1356,7 @@ cmdExec( const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         goto cmd_exec_err;
     }
-  fetchTicks = wh_msec_ticks( ) - fetchTicks;
+  fetchTicks = wh_msec_ticks() - fetchTicks;
 
   if  (level >= VL_INFO)
     {

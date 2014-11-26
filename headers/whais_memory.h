@@ -97,7 +97,7 @@ void*
 operator new (std::size_t size) throw( std::bad_alloc);
 
 void*
-operator new (std::size_t size, const std::nothrow_t&) throw( );
+operator new (std::size_t size, const std::nothrow_t&) throw ();
 
 void*
 operator new (std::size_t size, const char* file, uint_t line);
@@ -106,19 +106,19 @@ void*
 operator new[] (std::size_t size) throw( std::bad_alloc);
 
 void*
-operator new[] (std::size_t size, const std::nothrow_t&) throw( );
+operator new[] (std::size_t size, const std::nothrow_t&) throw ();
 
 void*
 operator new[] (std::size_t size, const char* file, uint_t line);
 
 void
-operator delete( void* ptr) throw( );
+operator delete( void* ptr) throw ();
 
 void
 operator delete( void* ptr, const char*, uint_t);
 
 void
-operator delete[] (void* ptr) throw( );
+operator delete[] (void* ptr) throw ();
 
 void
 operator delete[] (void* ptr, const char*, uint_t );
@@ -154,12 +154,12 @@ class WMemoryTracker
 {
 public:
 
-  WMemoryTracker( )
+  WMemoryTracker()
   {
     smInitCount++;
   }
 
-  ~WMemoryTracker( )
+  ~WMemoryTracker()
   {
     if (smInitCount == 0)
       {
@@ -170,25 +170,25 @@ public:
       }
 
     if ((--smInitCount & 0x7FFFFFFF) == 0)
-      PrintMemoryStatistics( );
+      PrintMemoryStatistics();
   }
 
-  static size_t MaxMemoryUsage( )
+  static size_t MaxMemoryUsage()
   {
-    return test_get_mem_max( );
+    return test_get_mem_max();
   }
   static void MaxMemoryUsage( const size_t size)
   {
     test_set_mem_max( size);
   }
-  static size_t GetMemoryUsagePeak( )
+  static size_t GetMemoryUsagePeak()
   {
-    return test_get_mem_peak( );
+    return test_get_mem_peak();
   }
 
-  static size_t GetCurrentMemoryUsage( )
+  static size_t GetCurrentMemoryUsage()
   {
-    return test_get_mem_used( );
+    return test_get_mem_used();
   }
 
   static void PrintMemResume( const bool print)
@@ -200,27 +200,27 @@ public:
       smInitCount &= 0x7FFFFFFF;
   }
 
-  static bool PrintMemResume( )
+  static bool PrintMemResume()
   {
     return( smInitCount & 0x80000000) != 0;
   }
 
 private:
-  static void PrintMemoryStatistics( )
+  static void PrintMemoryStatistics()
   {
-    if ((GetCurrentMemoryUsage( ) == 0) && (! PrintMemResume( )))
+    if ((GetCurrentMemoryUsage() == 0) && (! PrintMemResume()))
       return ;
 
     std::cout << '(' << smModule << ") ";
-    if (GetCurrentMemoryUsage( ) != 0)
+    if (GetCurrentMemoryUsage() != 0)
       {
         std::cout << "MEMORY: FAILED\n";
-        test_print_unfree_mem( );
+        test_print_unfree_mem();
       }
       std::cout << "MEMORY: OK\n";
 
-    std::cout << "Memory peak  : " << GetMemoryUsagePeak( ) << " bytes.\n";
-    std::cout << "Memory in use: " << GetCurrentMemoryUsage( ) << " bytes.\n";
+    std::cout << "Memory peak  : " << GetMemoryUsagePeak() << " bytes.\n";
+    std::cout << "Memory in use: " << GetCurrentMemoryUsage() << " bytes.\n";
   }
 
   static uint32_t       smInitCount;

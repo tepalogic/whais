@@ -35,14 +35,14 @@ uint_t _removedRows = _rowsCount / 10;
 static DDateTime _max_date( 0x7FFF, 12, 31, 23, 59, 59);
 
 DDateTime
-get_random_datetime( )
+get_random_datetime()
 {
-  int16_t year  = wh_rnd( ) & 0xFFFF;
-  uint8_t month = wh_rnd( ) % 12 + 1;
-  uint8_t day   = wh_rnd( ) % 27 + 1;
-  uint8_t hour  = wh_rnd( ) % 24;
-  uint8_t mins  = wh_rnd( ) % 60;
-  uint8_t secs  = wh_rnd( ) % 60;
+  int16_t year  = wh_rnd() & 0xFFFF;
+  uint8_t month = wh_rnd() % 12 + 1;
+  uint8_t day   = wh_rnd() % 27 + 1;
+  uint8_t hour  = wh_rnd() % 24;
+  uint8_t mins  = wh_rnd() % 60;
+  uint8_t secs  = wh_rnd() % 60;
 
   return DDateTime( year, month, day, hour, mins, secs);
 }
@@ -63,8 +63,8 @@ fill_table_with_values( ITable& table,
   wh_rnd_set_seed( seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DDateTime value = get_random_datetime( );
-      if (table.AddRow( ) != index)
+      DDateTime value = get_random_datetime();
+      if (table.AddRow() != index)
         {
           result = false;
           break;
@@ -73,7 +73,7 @@ fill_table_with_values( ITable& table,
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
 
       table.Set (index, 0, value);
@@ -82,13 +82,13 @@ fill_table_with_values( ITable& table,
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DArray values = table.MatchRows( DDateTime( ),
+  DArray values = table.MatchRows( DDateTime(),
                                    _max_date,
                                    0,
                                    ~0,
                                    0);
-  if ((values.Count( ) != tableValues.Count( )) ||
-      (values.Count( ) != rowCount))
+  if ((values.Count() != tableValues.Count()) ||
+      (values.Count() != rowCount))
     {
       result = false;
     }
@@ -99,13 +99,13 @@ fill_table_with_values( ITable& table,
       DROW_INDEX rowIndex;
 
       values.Get (checkIndex, rowIndex);
-      assert( rowIndex.IsNull( ) == false);
+      assert( rowIndex.IsNull() == false);
 
       table.Get (rowIndex.mValue, 0, rowValue);
 
       DDateTime generated;
       tableValues.Get (rowIndex.mValue, generated);
-      assert( generated.IsNull( ) == false);
+      assert( generated.IsNull() == false);
 
       if (((rowValue == generated) == false) ||
           (rowValue < prev))
@@ -119,7 +119,7 @@ fill_table_with_values( ITable& table,
       if (((checkIndex * 100) % rowCount) == 0)
         {
           std::cout << (checkIndex * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -143,7 +143,7 @@ fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
       if (((index * 100) % rowCount) == 0)
         {
           std::cout << (index * 100) / rowCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -158,17 +158,17 @@ fill_table_with_first_nulls( ITable& table, const uint32_t rowCount)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull( ) || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DDateTime rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
-  if (values.Count( ) != rowCount)
+  if (values.Count() != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -195,13 +195,13 @@ test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull( ) || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DDateTime rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
@@ -219,7 +219,7 @@ test_table_index_survival( IDBSHandler& dbsHnd, DArray& tableValues)
       DDateTime rowValue;
       table.Get (element.mValue, 0, rowValue);
 
-      if (rowValue.IsNull( ) == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DDateTime generatedValue;
@@ -240,7 +240,7 @@ callback_index_create( CreateIndexCallbackContext* const pData)
   if (((pData->mRowIndex * 100) % pData->mRowsCount) == 0)
     {
       std::cout << (pData->mRowIndex * 100) / pData->mRowsCount << "%\r";
-      std::cout.flush( );
+      std::cout.flush();
     }
 }
 
@@ -266,13 +266,13 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
 
   table.CreateIndex( 0, callback_index_create, &data);
 
-  DArray values  = table.MatchRows( DDateTime( ),
+  DArray values  = table.MatchRows( DDateTime(),
                                     _max_date,
                                     0,
                                     ~0,
                                     0);
 
-  if (values.Count( ) != _rowsCount)
+  if (values.Count() != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -284,7 +284,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
       DDateTime rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull( ) == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DDateTime generatedValue;
@@ -295,7 +295,7 @@ test_index_creation( IDBSHandler& dbsHnd, DArray& tableValues)
       if (((index * 100) % _rowsCount) == 0)
         {
           std::cout << (index * 100) / _rowsCount << "%\r";
-          std::cout.flush( );
+          std::cout.flush();
         }
     }
 
@@ -316,7 +316,7 @@ main( int argc, char **argv)
 
   bool success = true;
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
     DBSCreateDatabase( db_name);
   }
 
@@ -338,7 +338,7 @@ main( int argc, char **argv)
   }
   DBSReleaseDatabase( handler);
   DBSRemoveDatabase( db_name);
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

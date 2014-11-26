@@ -38,7 +38,7 @@ class IBlocksManager
 {
 public:
 
-  virtual ~IBlocksManager( );
+  virtual ~IBlocksManager();
 
 
   virtual void StoreItems( uint64_t           firstItem,
@@ -62,39 +62,39 @@ public:
     assert( data != NULL);
   }
 
-  bool IsDirty( ) const
+  bool IsDirty() const
   {
     return( mFlags & BLOCK_ENTRY_DIRTY) != 0;
   }
 
-  bool IsInUse( ) const
+  bool IsInUse() const
   {
     return mReferenceCount > 0;
   }
 
-  void MarkDirty( )
+  void MarkDirty()
   {
     mFlags |= BLOCK_ENTRY_DIRTY;
   }
 
-  void MarkClean( )
+  void MarkClean()
   {
     mFlags &= ~BLOCK_ENTRY_DIRTY;
   }
 
-  void RegisterUser( )
+  void RegisterUser()
   {
     mReferenceCount++;
   }
 
-  void ReleaseUser( )
+  void ReleaseUser()
   {
     assert(  mReferenceCount > 0);
 
     mReferenceCount--;
   }
 
-  uint8_t* Data( )
+  uint8_t* Data()
   {
     return mData;
   }
@@ -116,19 +116,19 @@ public:
     : mBlockEntry( &blockEntry),
       mItemOffset( itemOffset)
   {
-    mBlockEntry->RegisterUser( );
+    mBlockEntry->RegisterUser();
   }
 
   StoredItem( const StoredItem& src) :
     mBlockEntry( src.mBlockEntry),
     mItemOffset( src.mItemOffset)
   {
-    mBlockEntry->RegisterUser( );
+    mBlockEntry->RegisterUser();
   }
 
-  ~StoredItem( )
+  ~StoredItem()
   {
-    mBlockEntry->ReleaseUser( );
+    mBlockEntry->ReleaseUser();
   }
 
   StoredItem& operator= (const StoredItem& src)
@@ -136,8 +136,8 @@ public:
     if (this == &src)
       return *this;
 
-    src.mBlockEntry->RegisterUser( );
-    mBlockEntry->ReleaseUser( );
+    src.mBlockEntry->RegisterUser();
+    mBlockEntry->ReleaseUser();
 
     _CC (BlockEntry*&, mBlockEntry) = src.mBlockEntry;
     _CC (uint_t&,      mItemOffset) = src.mItemOffset;
@@ -145,15 +145,15 @@ public:
     return *this;
   }
 
-  uint8_t* GetDataForUpdate( ) const
+  uint8_t* GetDataForUpdate() const
   {
-    mBlockEntry->MarkDirty( );
-    return mBlockEntry->Data( ) + mItemOffset;
+    mBlockEntry->MarkDirty();
+    return mBlockEntry->Data() + mItemOffset;
   }
 
-  const uint8_t* GetDataForRead( ) const
+  const uint8_t* GetDataForRead() const
   {
-    return mBlockEntry->Data( ) + mItemOffset;
+    return mBlockEntry->Data() + mItemOffset;
   }
 
 protected:
@@ -166,8 +166,8 @@ protected:
 class BlockCache
 {
 public:
-  BlockCache( );
-  ~BlockCache( );
+  BlockCache();
+  ~BlockCache();
 
   void Init( IBlocksManager&      blocksMgr,
              const uint_t         itemSize,
@@ -175,7 +175,7 @@ public:
              const uint_t         maxCachedBlocks,
              const bool           nonPersitentData);
 
-  void Flush( );
+  void Flush();
 
   void FlushItem( const uint64_t item);
 

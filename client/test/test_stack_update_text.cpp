@@ -40,7 +40,7 @@ insert_a_string( WH_CONNECTION        hnd,
                  const uint64_t         row,
                  const bool             bulk)
 {
-  const uint_t thisStringSize = wh_rnd( ) % MAX_STRING_SIZE;
+  const uint_t thisStringSize = wh_rnd() % MAX_STRING_SIZE;
 
   char* result = new char[MAX_STRING_SIZE];
 
@@ -48,7 +48,7 @@ insert_a_string( WH_CONNECTION        hnd,
 
   while( true)
     {
-      const char* temp = _refStrings[wh_rnd( ) % MAX_REFS_STRINGS];
+      const char* temp = _refStrings[wh_rnd() % MAX_REFS_STRINGS];
 
       if (strlen( result) + strlen( temp) >= thisStringSize)
         break;
@@ -78,7 +78,7 @@ insert_a_string( WH_CONNECTION        hnd,
 static bool
 test_simple_text( WH_CONNECTION hnd)
 {
-  uint_t              aSimpleOffset = wh_rnd( ) % 7;
+  uint_t              aSimpleOffset = wh_rnd() % 7;
 
   const char*       ref;
   char              aValue[MAX_STRING_SIZE];
@@ -143,7 +143,7 @@ test_simple_text( WH_CONNECTION hnd)
       goto test_simple_text_fail;
     }
 
-  aSimpleOffset = wh_rnd( ) % 7;
+  aSimpleOffset = wh_rnd() % 7;
   aValue[0]     = 0;
   while( strlen( aValue) < strlen( ref + aSimpleOffset))
     {
@@ -207,7 +207,7 @@ test_table_text( WH_CONNECTION hnd)
 
   for (uint_t row = 0; row < rowsCount; row++)
     {
-      aSimpleOffset = wh_rnd( ) % 7;
+      aSimpleOffset = wh_rnd() % 7;
       aValue[0]     = 0;
       while( strlen( aValue) < strlen( ref[row * _fieldsCount] + aSimpleOffset))
         {
@@ -225,7 +225,7 @@ test_table_text( WH_CONNECTION hnd)
       if (strcmp( aValue, ref[row * _fieldsCount] + aSimpleOffset) != 0)
         goto test_table_text_fail;
 
-      aSimpleOffset = wh_rnd( ) % 7;
+      aSimpleOffset = wh_rnd() % 7;
       aValue[0]     = 0;
       while( strlen( aValue) < strlen( ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
@@ -318,19 +318,19 @@ test_for_errors_fail:
 }
 
 const char*
-DefaultDatabaseName( )
+DefaultDatabaseName()
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId( )
+DefaultUserId()
 {
   return 1;
 }
 
 const char*
-DefaultUserPassword( )
+DefaultUserPassword()
 {
   return "test_password";
 }

@@ -247,7 +247,7 @@ extern "C" {
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_start( )
+wlib_start()
 {
   LockRAII syncHolder( sgShlLocker);
 
@@ -257,14 +257,14 @@ wlib_start( )
     {
       WLIB_STATUS status;
 
-      if (((status = base_types_init( )) != WOP_OK)
-          || ((status = base_generics_init( )) != WOP_OK)
-          || ((status = base_constants_init( )) != WOP_OK)
-          || ((status = base_dates_init( )) != WOP_OK)
-          || ((status = base_text_init( )) != WOP_OK)
-          || ((status = base_arrays_init( )) != WOP_OK)
-          || ((status = base_fields_init( )) != WOP_OK)
-          || ((status = base_tables_init( )) != WOP_OK))
+      if (((status = base_types_init()) != WOP_OK)
+          || ((status = base_generics_init()) != WOP_OK)
+          || ((status = base_constants_init()) != WOP_OK)
+          || ((status = base_dates_init()) != WOP_OK)
+          || ((status = base_text_init()) != WOP_OK)
+          || ((status = base_arrays_init()) != WOP_OK)
+          || ((status = base_fields_init()) != WOP_OK)
+          || ((status = base_tables_init()) != WOP_OK))
         {
           return status;
         }
@@ -278,7 +278,7 @@ wlib_start( )
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_end( )
+wlib_end()
 {
   LockRAII syncHolder( sgShlLocker);
 
@@ -294,7 +294,7 @@ wlib_end( )
 
 
 SHL_EXPORT_SYMBOL const WLIB_DESCRIPTION*
-wlib_describe( )
+wlib_describe()
 {
   if (sgInited)
     return &sgLibraryDescription;

@@ -61,14 +61,14 @@ CmdLineParser::CmdLineParser( int argc, char** argv)
     mOutputFileOwn( true),
     mPreprocessOnly( false),
     mBuildDependencies( false),
-    mInclusionPaths( ),
-    mReplacementTags( )
+    mInclusionPaths(),
+    mReplacementTags()
 {
-  Parse( );
+  Parse();
 }
 
 
-CmdLineParser::~CmdLineParser( )
+CmdLineParser::~CmdLineParser()
 {
   if (mOutputFileOwn)
     delete [] mOutputFile;
@@ -76,7 +76,7 @@ CmdLineParser::~CmdLineParser( )
 
 
 void
-CmdLineParser::Parse( )
+CmdLineParser::Parse()
 {
   int index = 1;
 
@@ -130,7 +130,7 @@ CmdLineParser::Parse( )
             {
               mReplacementTags.push_back( 
                   ReplacementTag( param.substr( 0, separatorPos),
-                                  string( ))
+                                  string())
                                          );
             }
           else
@@ -189,22 +189,22 @@ CmdLineParser::Parse( )
         }
     }
 
-  CheckArguments( );
+  CheckArguments();
 }
 
 
 static string&
 normalize_path( string& path)
 {
-  const char* const dirDelim = whf_dir_delim( );
+  const char* const dirDelim = whf_dir_delim();
 
-  for (uint_t i = 0; i < path.size( ); ++i)
+  for (uint_t i = 0; i < path.size(); ++i)
     {
       if ((path[i] == '/') || (path[i] =='\\'))
         path[i] = dirDelim[0];
     }
 
-  if (path[path.size( ) - 1] != dirDelim[0])
+  if (path[path.size() - 1] != dirDelim[0])
     path.append( dirDelim);
 
   return path;
@@ -244,11 +244,11 @@ CmdLineParser::AddInclusionPaths( const char* const paths)
 
 
 void
-CmdLineParser::CheckArguments( )
+CmdLineParser::CheckArguments()
 {
   if (mShowHelp)
     {
-      DisplayUsage( );
+      DisplayUsage();
       exit( 0);
     }
   else if (mSourceFile == NULL)
@@ -278,7 +278,7 @@ CmdLineParser::CheckArguments( )
     AddInclusionPaths( defaults_inc);
 
   char  temp[64];
-  const WTime t  = wh_get_currtime( );
+  const WTime t  = wh_get_currtime();
 
   snprintf( temp, sizeof temp, "%d", t.year);
   mReplacementTags.push_back( ReplacementTag( "YEAR", temp));
@@ -314,7 +314,7 @@ CmdLineParser::CheckArguments( )
 
   mReplacementTags.push_back( ReplacementTag( "TIME_STAMP", temp));
 
-  for (size_t i = 0; i < mReplacementTags.size( ); ++i)
+  for (size_t i = 0; i < mReplacementTags.size(); ++i)
     {
       mReplacementTags[i].mTagName.insert( 0, "%");
       mReplacementTags[i].mTagName.push_back( '%');
@@ -323,7 +323,7 @@ CmdLineParser::CheckArguments( )
 
 
 void
-CmdLineParser::DisplayUsage( ) const
+CmdLineParser::DisplayUsage() const
 {
   using namespace std;
 
@@ -371,21 +371,21 @@ CmdLineException::CmdLineException( const uint32_t      code,
 
 
 Exception*
-CmdLineException::Clone( ) const
+CmdLineException::Clone() const
 {
   return new CmdLineException( *this);
 }
 
 
 EXCEPTION_TYPE
-CmdLineException::Type( ) const
+CmdLineException::Type() const
 {
   return COMPILER_CMD_LINE_EXCEPTION;
 }
 
 
 const char*
-CmdLineException::Description( ) const
+CmdLineException::Description() const
 {
   return "Invalid command line.";
 }

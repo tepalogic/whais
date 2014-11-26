@@ -64,11 +64,11 @@ public:
                            const char*          fmtMsg = NULL,
                            ...);
 
-  virtual Exception* Clone( ) const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type( ) const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description( ) const;
+  virtual const char* Description() const;
 
   enum
   {
@@ -85,7 +85,7 @@ class IDataContainer
 {
 public:
 
-  virtual ~IDataContainer( );
+  virtual ~IDataContainer();
 
   virtual void Write( uint64_t to, uint64_t size, const uint8_t* buffer) = 0;
 
@@ -93,11 +93,11 @@ public:
 
   virtual void Colapse( uint64_t from, uint64_t to) = 0;
 
-  virtual uint64_t Size( ) const = 0;
+  virtual uint64_t Size() const = 0;
 
-  virtual void MarkForRemoval( ) = 0;
+  virtual void MarkForRemoval() = 0;
 
-  virtual void Flush( ) = 0;
+  virtual void Flush() = 0;
 };
 
 
@@ -109,7 +109,7 @@ public:
                  const uint64_t    maxFileSize,
                  const uint64_t    unitsCount);
 
-  virtual ~FileContainer( );
+  virtual ~FileContainer();
 
   virtual void Write( uint64_t to, uint64_t size, const uint8_t* buffer);
 
@@ -117,17 +117,17 @@ public:
 
   virtual void Colapse( uint64_t from, uint64_t to);
 
-  virtual uint64_t Size( ) const;
+  virtual uint64_t Size() const;
 
-  virtual void MarkForRemoval( );
+  virtual void MarkForRemoval();
 
-  virtual void Flush( );
+  virtual void Flush();
 
   static void Fix (const char* const       baseFile,
                    const uint64_t          maxFileSize,
                    const uint64_t          newContainerSize);
 private:
-  void ExtendContainer( );
+  void ExtendContainer();
 
   const uint64_t       mMaxFileUnitSize;
   std::vector<File>    mFilesHandles;
@@ -159,11 +159,11 @@ public:
 
   virtual void Colapse( uint64_t from, uint64_t to);
 
-  virtual uint64_t Size( ) const;
+  virtual uint64_t Size() const;
 
-  virtual void MarkForRemoval( );
+  virtual void MarkForRemoval();
 
-  virtual void Flush( );
+  virtual void Flush();
 
 private:
   void  FillCache( uint64_t position);

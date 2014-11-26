@@ -60,7 +60,7 @@ extern "C" {
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_start( )
+wlib_start()
 {
   LockRAII syncHolder( sgShlLocker);
 
@@ -83,7 +83,7 @@ wlib_start( )
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
-wlib_end( )
+wlib_end()
 {
   LockRAII syncHolder( sgShlLocker);
 
@@ -100,7 +100,7 @@ wlib_end( )
 
 
 SHL_EXPORT_SYMBOL const WLIB_DESCRIPTION*
-wlib_describe( )
+wlib_describe()
 {
   if (sgInited)
     return &sgLibraryDescription;

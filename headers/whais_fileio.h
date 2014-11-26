@@ -75,7 +75,7 @@ bool_t
 whf_close( WH_FILE hnd);
 
 uint32_t
-whf_last_error( );
+whf_last_error();
 
 bool_t
 whf_err_to_str( uint64_t errorCode, char* str, uint_t strSize);
@@ -84,10 +84,10 @@ bool_t
 whf_remove( const char* const file);
 
 const char*
-whf_dir_delim( );
+whf_dir_delim();
 
 const char*
-whf_current_dir( );
+whf_current_dir();
 
 bool_t
 whf_is_absolute( const char* const path);

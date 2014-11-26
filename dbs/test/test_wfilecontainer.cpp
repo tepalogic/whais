@@ -40,7 +40,7 @@ create_container( uint_t max_file_size, const uint_t container_size)
       left_to_write -= write_size;
       current_pos += write_size;
     }
-  return container.Size( ) == container_size;
+  return container.Size() == container_size;
 }
 
 static bool
@@ -54,7 +54,7 @@ check_container( uint_t max_file_size,
   uint8_t marker = marker_start;
   uint_t left_to_read = container_size;
 
-  if (container.Size( ) != container_size)
+  if (container.Size() != container_size)
     return false;
 
   while( left_to_read > 0)
@@ -78,15 +78,15 @@ colapse_container( uint_t max_file_size, const uint_t container_size)
   uint64_t current_pos = 0;
   FileContainer container( fileName, max_file_size,
                            (container_size / max_file_size) + 1);
-  uint64_t new_container_size = container.Size( );
+  uint64_t new_container_size = container.Size();
 
   if (new_container_size != container_size)
     return false;
 
-  while( current_pos < container.Size( ))
+  while( current_pos < container.Size())
     {
       uint64_t to_delete = MIN (sizeof buffer,
-                                container.Size( ) - current_pos);
+                                container.Size() - current_pos);
       container.Colapse( current_pos, current_pos + to_delete);
       current_pos += to_delete;
       new_container_size -= to_delete;
@@ -97,8 +97,8 @@ colapse_container( uint_t max_file_size, const uint_t container_size)
 static bool
 check_temp_container( uint_t uTestContainerSize)
 {
-  const uint_t storeSize = wh_rnd( ) % 761 + 761;
-  const uint_t uStepSize = wh_rnd( ) % 100 + 1;
+  const uint_t storeSize = wh_rnd() % 761 + 761;
+  const uint_t uStepSize = wh_rnd() % 100 + 1;
 
   TemporalContainer container( storeSize);
 
@@ -117,21 +117,21 @@ check_temp_container( uint_t uTestContainerSize)
       current_pos += write_size;
     }
 
-  if (container.Size( ) != uTestContainerSize)
+  if (container.Size() != uTestContainerSize)
     return false;
 
   container.Colapse( uTestContainerSize - uStepSize,
                             uTestContainerSize);
 
-  if (container.Size( ) != (uTestContainerSize - uStepSize))
+  if (container.Size() != (uTestContainerSize - uStepSize))
     return false;
 
   container.Colapse( 0, uStepSize);
 
-  if (container.Size( ) != (uTestContainerSize - 2 * uStepSize))
+  if (container.Size() != (uTestContainerSize - 2 * uStepSize))
     return false;
 
-  uint_t left_to_read = container.Size( );
+  uint_t left_to_read = container.Size();
   marker = 1;
   current_pos = 0;
 
@@ -154,12 +154,12 @@ check_temp_container( uint_t uTestContainerSize)
 
 
 int
-main( )
+main()
 {
   bool success = true;
 
   {
-    DBSInit( DBSSettings( ));
+    DBSInit( DBSSettings());
   }
 
   const uint_t max_file_size = 512 * 1024;
@@ -196,7 +196,7 @@ main( )
   if (!check_temp_container( 23400))
     success = false;
 
-  DBSShoutdown( );
+  DBSShoutdown();
 
   if (!success)
     {

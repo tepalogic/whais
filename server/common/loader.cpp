@@ -51,10 +51,10 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
-  inoutDesc.mDbs = &DBSRetrieveDatabase( inoutDesc.mDbsName.c_str( ),
-                                         inoutDesc.mDbsDirectory.c_str( ));
+  inoutDesc.mDbs = &DBSRetrieveDatabase( inoutDesc.mDbsName.c_str(),
+                                         inoutDesc.mDbsDirectory.c_str());
   std::auto_ptr<Logger> dbsLogger( 
-                         new FileLogger( inoutDesc.mDbsLogFile.c_str( ), true)
+                         new FileLogger( inoutDesc.mDbsLogFile.c_str(), true)
                                   );
   logEntry << "Sync interval is set at " << inoutDesc.mSyncInterval
            << " milliseconds";
@@ -68,15 +68,15 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
-  if (inoutDesc.mDbsName != GlobalContextDatabase( ))
+  if (inoutDesc.mDbsName != GlobalContextDatabase())
     {
-      inoutDesc.mSession = &GetInstance( inoutDesc.mDbsName.c_str( ),
+      inoutDesc.mSession = &GetInstance( inoutDesc.mDbsName.c_str(),
                                          dbsLogger.get ());
     }
   else
     inoutDesc.mSession = &GetInstance( NULL, &log);
 
-  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin( );
+  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin();
        it != inoutDesc.mNativeLibs.end ();
        ++it)
     {
@@ -85,7 +85,7 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
       log.Log (LOG_INFO, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
 
-      WH_SHLIB shl = wh_shl_load( it->c_str( ));
+      WH_SHLIB shl = wh_shl_load( it->c_str());
       if ((shl == INVALID_SHL)
           || ! inoutDesc.mSession->LoadSharedLib( shl))
         {
@@ -93,7 +93,7 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
         }
     }
 
-  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin( );
+  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin();
        it != inoutDesc.mObjectLibs.end ();
        ++it)
     {
@@ -102,11 +102,11 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
       log.Log (LOG_INFO, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
 
-      CompiledFileUnit unit( it->c_str( ));
+      CompiledFileUnit unit( it->c_str());
       inoutDesc.mSession->LoadCompiledUnit( unit);
     }
 
-  inoutDesc.mLogger = dbsLogger.release( );
+  inoutDesc.mLogger = dbsLogger.release();
 
   return true;
 }
