@@ -117,8 +117,7 @@ private:
 static bool
 is_valid_date( const int year, const uint_t month, const uint_t day)
 {
-
-  if (month > 12)
+  if ((month == 0) || (month > 12))
     return false;
 
   else if (day == 0)
@@ -640,7 +639,7 @@ DText::DText( const char* text)
 {
   if ((text != NULL) && (text[0] != 0))
     {
-      auto_ptr<ITextStrategy> strategy( 
+      auto_ptr<ITextStrategy> strategy(
                                new TemporalText( _RC (const uint8_t*, text))
                                        );
       strategy.get ()->IncreaseReferenceCount();
@@ -1338,7 +1337,7 @@ DArray::DArray( const DArray& source)
     {
       assert( source.mArray->ReferenceCount() == 1);
 
-      auto_ptr<IArrayStrategy> newStrategy( 
+      auto_ptr<IArrayStrategy> newStrategy(
                                     new TemporalArray( source.mArray->Type())
                                            );
 
@@ -1385,7 +1384,7 @@ DArray::operator= (const DArray& source)
     {
       assert( source.mArray->ReferenceCount() == 1);
 
-      auto_ptr<IArrayStrategy> newStrategy( 
+      auto_ptr<IArrayStrategy> newStrategy(
                                     new TemporalArray( source.mArray->Type())
                                            );
 
@@ -1431,7 +1430,7 @@ prepare_array_strategy( IArrayStrategy** inoutStrategy)
   if ((*inoutStrategy)->ReferenceCount() == 1)
     return ; //Do not change anything!
 
-  auto_ptr<IArrayStrategy> newStrategy( 
+  auto_ptr<IArrayStrategy> newStrategy(
                               new TemporalArray( (*inoutStrategy)->Type())
                                        );
 
@@ -2092,7 +2091,7 @@ DArray::MakeMirror( DArray& inoutArray) const
     {
       assert( mArray->ShareCount() == 0);
 
-      auto_ptr<IArrayStrategy> newStrategy( 
+      auto_ptr<IArrayStrategy> newStrategy(
                                       new TemporalArray( mArray->Type())
                                            );
 
@@ -2512,7 +2511,7 @@ StringMatcher::FindSubstr()
             {
               //A prefix match was found but the rest of string don't match.
               ++mCurrentChar;
-              mCurrentRawOffset += _cuCache.Count( 
+              mCurrentRawOffset += _cuCache.Count(
                               mTextRawCache[mCurrentRawOffset - mCacheStartPos]
                                                   );
             }

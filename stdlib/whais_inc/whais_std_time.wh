@@ -1,0 +1,139 @@
+##############################################################################
+# WHAIS - An advanced database system
+# Copyright (C) 2008  Iulian Popa
+#
+# Address: Str Olimp nr. 6
+#           Pantelimon Ilfov,
+#           Romania
+# Phone:   +40721939650
+# e-mail:  popaiulian@gmail.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
+##############################################################################
+# Describes common WHAIS procedures signatures used to manipulate WHAIS'
+# date and time values in user procedures.
+##############################################################################
+
+#@guard whais_std_time
+
+#Get the number of ticks (on a millisecond resolution).
+EXTERN PROCEDURE ticks () RETURN UNSIGNED INT64;
+
+#Get the current moment.
+EXTERN PROCEDURE now () RETURN HIRESTIME;
+
+#Get the year part from a date.
+#In:
+#    @d - The date value.
+#Out:
+#    The year part of the date.
+EXTERN PROCEDURE year (d AS DATE) RETURN INT16;
+
+#Get the month part from a date.
+#In:
+#   @d - The date value.
+#Out:
+#   The month part of the date (counting from 1 for January).
+EXTERN PROCEDURE month (d AS DATE) RETURN UNSIGNED INT8;
+
+#Get the day part from a date.
+#In:
+#   @d - The date value.
+#Out:
+#   The day part of the date (counting from 1 for the first day of month).
+EXTERN PROCEDURE day (d AS DATE) RETURN UNSIGNED INT8;
+
+#Get the hours part from a time value.
+#In:
+#   @t - The time value.
+#Out:
+#   The hours part.
+EXTERN PROCEDURE hours (t AS DATETIME) RETURN UNSIGNED INT8;
+
+#Get the minutes part from a time value.
+#In:
+#   @t - The time value.
+#Out:
+#   The minutes part.
+EXTERN PROCEDURE minutes (t AS DATETIME) RETURN UNSIGNED INT8;
+
+#Get the seconds part from a time value.
+#In:
+#   @t - The time value.
+#Out:
+#   The seconds part.
+EXTERN PROCEDURE seconds (t AS DATETIME) RETURN UNSIGNED INT8;
+
+#Get the microseconds part from a high resolution time value.
+#In:
+#   @t - The time value.
+#Out:
+#   The seconds part.
+EXTERN PROCEDURE microsecs (t AS HIRESTIME) RETURN UNSIGNED INT8;
+
+#Calculate the difference in days between to dates.
+#In:
+#   @first - The first date.
+#   @second - The second date.
+#Out:
+#   The number of days between those dates. The result is negative if the
+#   @first date is newer than @second.
+EXTERN PROCEDURE days_diff (first AS DATE, second AS DATE) RETURN INT32;
+
+#Calculate the difference in seconds between to time related values.
+#In:
+#   @first - The first time value.
+#   @second - The second time value.
+#Out:
+#   The number of seconds between those values. The result is negative if the
+#   @first value is newer than @second.
+EXTERN PROCEDURE seconds_diff (first AS DATETIME, 
+                               second AS DATETIME) RETURN INT64;
+
+#Calculate the difference in microseconds between to high resolution
+#time values.
+#In:
+#   @first - The first time value.
+#   @second - The second time value.
+#Out:
+#   The number of microseconds between those values. The result is negative if
+#   the @first value is newer than @second.
+EXTERN PROCEDURE microsecs_diff (first AS HIRESTIME, 
+                                 second AS HIRESTIME) RETURN INT64;
+
+EXTERN PROCEDURE add_days (time AS HIRESTIME, days AS INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE add_seconds (time AS HIRESTIME, secs AS INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE add_microsecs (time AS HIRESTIME, usecs AS INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE year_leaps (y AS INT64) RETURN BOOL;
+
+#Get the week of the year for a date.
+EXTERN PROCEDURE week (d AS DATE) RETURN UNSIGNED INT8;
+
+#Get the last date of week.
+#In:
+#   @y - The year to compute the date for.
+#   @w - The week number of the year
+#Out:
+#   The last date of the week from the specified year or a NULL value in case
+#   of invalid inputs.
+EXTERN PROCEDURE last_week_date (y AS INT16, w AS UNSIGNED INT8) RETURN DATE;
+
+
+#Get the weekday of a date.
+#In:
+#   @d - The date value.
+#Out:
+#   The weekday date (counting from 0 for Monday).
+EXTERN PROCEDURE weekday (d AS DATE) RETURN UNSIGNED INT8;

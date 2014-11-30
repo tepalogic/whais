@@ -1,0 +1,108 @@
+##############################################################################
+# WHAIS - An advanced database system
+# Copyright (C) 2008  Iulian Popa
+#
+# Address: Str Olimp nr. 6
+#           Pantelimon Ilfov,
+#           Romania
+# Phone:   +40721939650
+# e-mail:  popaiulian@gmail.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
+##############################################################################
+# Describes common WHAIS procedures signatures used to manipulate WHAIS'
+# table's fields in user defined procedures.
+##############################################################################
+
+#@guard whais_std_field
+
+
+#Retrieve the table that this field belongs of.
+#In:
+#   @f - The field value.
+#Out:
+#   If successfully this will return the table holding the provided field.
+EXTERN PROCEDURE table_of_field(f AS FIELD) RETURN TABLE;
+
+#Check if the value of a table field are indexed.
+#In:
+#   @f - The field value.
+#Out:
+#   TRUE if the field values are indexed. 
+EXTERN PROCEDURE field_values_indexed(f AS FIELD) RETURN BOOL;
+
+#Get the associated name of a table field.
+#In:
+#   @f - The field value.
+#Out:
+#   A text holding the field name. 
+EXTERN PROCEDURE table_name(f AS FIELD) RETURN TEXT;
+
+#Get the index of a table field.
+#In:
+#   @f - The field value.
+#Out:
+#   The field index. 
+EXTERN PROCEDURE field_index(f AS FIELD) RETURN UNSIGNED INT64;
+
+#Retrieves the rows indexes holding values that are in a supplied interval 
+#of values.
+#In:
+#   @f          - The field value.
+#   @v_min      - The lower bound of the value interval.
+#   @v_max      - The upper bound of the value interval.
+#   @from_row   - Search from this row upward.
+#   @to_row     - Search until this row.
+#Out:
+#   An array holding the rows indexes that holds value in the interval hold by
+#   [@v_min, @v_max].
+EXTERN PROCEDURE match_rows( f AS FIELD,
+                             v_min AS UNDEFINED,
+                             v_max AS UNDEFINED,
+                             from_row AS UNSIGNED INT64,
+                             to_row AS UNSIGNED INT64) RETURN ARRAY OF UNSIGNED INT64;
+
+#Retrieve a row holding the biggest from the specified field values.
+#In:
+#   @f - The field value.
+#Out:
+#   If successfully this will return a row index that holds
+#   the respective value.
+EXTERN PROCEDURE field_biggest (f AS FIELD) RETURN UNSIGNED INT64;
+
+#Retrieve a row holding the lowest from the specified field values.
+#In:
+#   @f - The field value.
+#Out:
+#   If successfully this will return a row index that holds
+#   the respective value.
+EXTERN PROCEDURE field_smallest (f AS FIELD) RETURN UNSIGNED INT64;
+
+
+#Computes the average value for fields holding numeric values.
+#In:
+#   @f - The field value.
+#Out:
+#   If successfully this will return a row index that holds
+#   the respective value.
+EXTERN PROCEDURE field_average (f AS FIELD) RETURN RICHREAL;
+
+#Sort a table based on the values of the specified field.
+#In:
+#   @f - The field value.
+#   @r - TRUE to sort reversely.
+#Out:
+#   If successfully this will the osrted table.
+EXTERN PROCEDURE field_sort_table (f AS FIELD, r AS BOOL) RETURN TABLE;

@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server_protocol.h"
 
-#define UNSET_VALUE		(0)
+#define UNSET_VALUE       (0)
 
 struct ListenEntry
 {

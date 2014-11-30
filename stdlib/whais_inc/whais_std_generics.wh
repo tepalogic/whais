@@ -1,0 +1,80 @@
+##############################################################################
+# WHAIS - An advanced database system
+# Copyright (C) 2008  Iulian Popa
+#
+# Address: Str Olimp nr. 6
+#           Pantelimon Ilfov,
+#           Romania
+# Phone:   +40721939650
+# e-mail:  popaiulian@gmail.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
+##############################################################################
+# Describes WHAIS procedures signatures for general use.
+##############################################################################
+
+#@guard whais_std_generics
+
+
+EXTERN PROCEDURE prev_bool (v AS BOOL) RETURN BOOL;
+EXTERN PROCEDURE next_bool (v AS BOOL) RETURN BOOL;
+EXTERN PROCEDURE prev_char (v AS CHARACTER) RETURN CHARACTER;
+EXTERN PROCEDURE next_char (v AS CHARACTER) RETURN CHARACTER;
+EXTERN PROCEDURE prev_date (v AS DATE) RETURN DATE;
+EXTERN PROCEDURE next_date (v AS DATE) RETURN DATE;
+EXTERN PROCEDURE prev_dtime (v AS DATETIME) RETURN DATETIME;
+EXTERN PROCEDURE next_dtime (v AS DATETIME) RETURN DATETIME;
+EXTERN PROCEDURE prev_htime (v AS HIRESTIME) RETURN HIRESTIME;
+EXTERN PROCEDURE next_htime (v AS HIRESTIME) RETURN HIRESTIME;
+EXTERN PROCEDURE prev_i8 (v AS INT8) RETURN INT8;
+EXTERN PROCEDURE next_i8 (v AS INT8) RETURN INT8;
+EXTERN PROCEDURE prev_i16 (v AS INT16) RETURN INT16;
+EXTERN PROCEDURE next_i16 (v AS INT16) RETURN INT16;
+EXTERN PROCEDURE prev_i32 (v AS INT32) RETURN INT32;
+EXTERN PROCEDURE next_i32 (v AS INT32) RETURN INT32;
+EXTERN PROCEDURE prev_i64 (v AS INT64) RETURN INT64;
+EXTERN PROCEDURE next_i64 (v AS INT64) RETURN INT64;
+EXTERN PROCEDURE prev_u8 (v AS UNSIGNED INT8) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE next_u8 (v AS UNSIGNED INT8) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE prev_u16 (v AS UNSIGNED INT16) RETURN UNSIGNED INT16;
+EXTERN PROCEDURE next_u16 (v AS UNSIGNED INT16) RETURN UNSIGNED INT16;
+EXTERN PROCEDURE prev_u32 (v AS UNSIGNED INT32) RETURN UNSIGNED INT32;
+EXTERN PROCEDURE next_u32 (v AS UNSIGNED INT32) RETURN UNSIGNED INT32;
+EXTERN PROCEDURE prev_u64 (v AS UNSIGNED INT64) RETURN UNSIGNED INT64;
+EXTERN PROCEDURE next_u64 (v AS UNSIGNED INT64) RETURN UNSIGNED INT64;
+EXTERN PROCEDURE prev_real (v AS REAL) RETURN REAL;
+EXTERN PROCEDURE next_real (v AS REAL) RETURN REAL;
+EXTERN PROCEDURE prev_rreal (v AS RICHREAL) RETURN RICHREAL;
+EXTERN PROCEDURE next_rreal (v AS RICHREAL) RETURN RICHREAL;
+
+#Pause the execution thread for specified amount of time
+#In:
+#   @tmo - The amount of time to sleep in miliseconds.
+#Out:
+#   TRUE if successfully.
+EXTERN PROCEDURE sleep (tmo AS UNSIGNED INT64) RETURN BOOL;
+
+#Outputs the supplied text on the namespace associated logger.
+#In:
+#   @t - Text text to output.
+#Out:
+#   TRUE if successfully.
+EXTERN PROCEDURE write_log (t AS TEXT) RETURN BOOL;
+
+EXTERN PROCEDURE ceil (v as RICHREAL) RETURN INT64;
+EXTERN PROCEDURE floor (v as RICHREAL) RETURN INT64;
+EXTERN PROCEDURE round (v as RICHREAL) RETURN INT64;
+
+EXTERN PROCEDURE abs (v as RICHREAL) RETURN RICHREAL;

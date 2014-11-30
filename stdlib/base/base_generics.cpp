@@ -300,20 +300,20 @@ round( SessionStack& stack, ISession& session)
 static WLIB_STATUS
 abs (SessionStack& stack, ISession& session)
 {
-  DInt64 value;
+  DRichReal value;
 
   stack[stack.Size() - 1].Operand().GetValue( value);
 
-  if (value.IsNull() || (value.mValue >= 0))
+  if (! value.IsNull() &&
+      ((value.mValue.Integer() <= 0) || (value.mValue.Fractional() < 0)))
     {
+      const RICHREAL_T t( -value.mValue.Integer(),
+                          -value.mValue.Fractional(),
+                          DBS_RICHREAL_PREC);
+
       stack.Pop (1);
-      stack.Push( value);
-
-      return WOP_OK;
+      stack.Push( DRichReal (t));
     }
-
-  stack.Pop (1);
-  stack.Push( DInt64 (-value.mValue));
 
   return WOP_OK;
 }
@@ -432,7 +432,6 @@ base_constants_init()
   gProcNextI64.localsTypes  = localsI64Type;
   gProcNextI64.code         = get_next_value<DInt64>;
 
-
   gProcPrevU8.name          = "prev_u8";
   gProcPrevU8.localsCount   = 2;
   gProcPrevU8.localsTypes   = localsUI8Type;
@@ -526,7 +525,7 @@ base_constants_init()
   gProcRound.localsTypes    = roundLocalsType;
   gProcRound.code           = round;
 
-  static const uint8_t* absLocalsType[] = { gInt64Type, gInt64Type };
+  static const uint8_t* absLocalsType[] = { gRichRealType, gRichRealType };
 
   gProcAbs.name             = "abs";
   gProcAbs.localsCount      = 2;

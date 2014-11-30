@@ -185,7 +185,7 @@ public:
 
           if (fd.isArray)
             {
-              throw InterException( 
+              throw InterException(
                           _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                           "Cannot sort a table using an array field."
                                    );
@@ -197,7 +197,7 @@ public:
           switch( fd.type)
             {
             case T_BOOL:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DBool>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DBool>)
@@ -205,7 +205,7 @@ public:
               break;
 
             case T_CHAR:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DChar>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DChar>)
@@ -213,7 +213,7 @@ public:
               break;
 
             case T_DATE:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDate>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DDate>)
@@ -221,7 +221,7 @@ public:
               break;
 
             case T_DATETIME:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDateTime>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DDateTime>)
@@ -229,7 +229,7 @@ public:
               break;
 
             case T_HIRESTIME:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DHiresTime>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DHiresTime>)
@@ -237,7 +237,7 @@ public:
               break;
 
             case T_INT8:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt8>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt8>)
@@ -245,7 +245,7 @@ public:
               break;
 
             case T_INT16:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt16>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt16>)
@@ -254,7 +254,7 @@ public:
 
 
             case T_INT32:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt32>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt32>)
@@ -262,7 +262,7 @@ public:
               break;
 
             case T_INT64:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt64>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DInt64>)
@@ -270,7 +270,7 @@ public:
               break;
 
             case T_REAL:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DReal>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DReal>)
@@ -278,7 +278,7 @@ public:
               break;
 
             case T_RICHREAL:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DRichReal>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DRichReal>)
@@ -286,7 +286,7 @@ public:
               break;
 
             case T_UINT8:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt8>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt8>)
@@ -294,7 +294,7 @@ public:
               break;
 
             case T_UINT16:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt16>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt16>)
@@ -303,7 +303,7 @@ public:
 
 
             case T_UINT32:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt32>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt32>)
@@ -311,7 +311,7 @@ public:
               break;
 
             case T_UINT64:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt64>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt64>)
@@ -319,7 +319,7 @@ public:
               break;
 
             case T_TEXT:
-              mComparators.push_back( 
+              mComparators.push_back(
                             sortOrder.mValue ?
                               _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DText>) :
                               _SC (field_comparator, &TableSortContainer::compare_field_values<DText>)
@@ -489,7 +489,7 @@ private:
             break;
 
           default:
-            throw InterException( 
+            throw InterException(
                         _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                         "The fields list should be an array of integers."
                                  );
@@ -559,7 +559,7 @@ proc_table_field_by_id( SessionStack& stack, ISession&)
 
   if (fieldId.IsNull())
     {
-      throw InterException( 
+      throw InterException(
                   _EXTRA( InterException::INVALID_PARAMETER_VALUE),
                   "A non null index is required for retrieving a table field."
                            );
@@ -591,7 +591,7 @@ proc_table_field_name( SessionStack& stack, ISession&)
     }
   else if (field.RawSize() >= sizeof fieldName)
     {
-      throw InterException( 
+      throw InterException(
                 _EXTRA( InterException::FIELD_NAME_TOO_LONG),
                 "This implementation support fields names up to %d characters.",
                 sizeof fieldName
@@ -673,7 +673,7 @@ static WLIB_STATUS
 proc_table_reuse_row( SessionStack& stack, ISession&)
 {
   DUInt64 row;
-  DUInt64 result;
+  DBool   result;
 
   ITable& table = stack[stack.Size() - 2].Operand().GetTable();
   stack[stack.Size() - 1].Operand().GetValue( row);
@@ -683,10 +683,10 @@ proc_table_reuse_row( SessionStack& stack, ISession&)
     {
       table.MarkRowForReuse( row.mValue);
 
-      result = row;
+      result = DBool( true);
     }
 
-  stack.Pop (2);
+  stack.Pop( 2);
   stack.Push( result);
 
   return WOP_OK;
@@ -737,15 +737,17 @@ proc_table_sort( SessionStack& stack, ISession&)
       stack.Pop (2);
       return WOP_OK;
     }
-  else if ( ! sortOrder.IsNull()
-           && (fields.Count() != sortOrder.Count()))
+  else if (fields.Count() <sortOrder.Count())
     {
-      throw InterException( 
+      throw InterException(
             _EXTRA( InterException::INVALID_PARAMETER_VALUE),
             "The field list and sort order arrays should have the same "
               "count of elements."
                            );
     }
+
+  for (int i = fields.Count() - sortOrder.Count(); i > 0; --i)
+    sortOrder.Add (DBool (false));
 
   ITable& table = opTable.GetTable();
   TableSortContainer container( table, fields, sortOrder);
@@ -822,9 +824,15 @@ base_tables_init()
   gProcTableFindRemovedRow.localsTypes = tableFieldsLocals; //reusing
   gProcTableFindRemovedRow.code        = proc_table_reusable_row;
 
-  gProcTableRemoveRow.name        = "table_remove_row";
+  static const uint8_t* tableReuseRowLocals[] = {
+                                                  gBoolType,
+                                                  gGenericTableType,
+                                                  gUInt64Type
+                                                };
+
+  gProcTableRemoveRow.name        = "table_reuse_row";
   gProcTableRemoveRow.localsCount = 3;
-  gProcTableRemoveRow.localsTypes = tableFieldsLocals; //reusing
+  gProcTableRemoveRow.localsTypes = tableReuseRowLocals;
   gProcTableRemoveRow.code        = proc_table_reuse_row;
 
   static const uint8_t* tableExchangeRows[] = {
@@ -840,10 +848,10 @@ base_tables_init()
   gProcTableExchangeRows.code        = table_exchange_rows;
 
   static const uint8_t* tableSortLocals[] = {
-                                              gBoolType,
+                                              gGenericTableType,
                                               gGenericTableType,
                                               gGenericArrayType,
-                                              gGenericTableType
+                                              gABoolType
                                             };
 
   gProcTableSort.name        = "table_sort";

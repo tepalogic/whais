@@ -645,7 +645,7 @@ base_text_init()
   gLowerText.code            = get_text_lower;
 
 
-  static const uint8_t* textToUtf8Locals[] = { gAInt8Type, gTextType };
+  static const uint8_t* textToUtf8Locals[] = { gAUInt8Type, gTextType };
 
   gTextToUtf8.name           = "text_to_utf8";
   gTextToUtf8.localsCount    = 2;
@@ -653,7 +653,7 @@ base_text_init()
   gTextToUtf8.code           = store_utf8_text;
 
 
-  static const uint8_t* textLoadUtf8Locals[] = { gTextType, gAInt8Type };
+  static const uint8_t* textLoadUtf8Locals[] = { gTextType, gAUInt8Type };
 
   gTextFromUtf8.name         = "text_from_utf8";
   gTextFromUtf8.localsCount  = 2;
@@ -661,7 +661,7 @@ base_text_init()
   gTextFromUtf8.code         = load_utf8_text;
 
 
-  static const uint8_t* textToUtf16Locals[] = { gAInt16Type, gTextType };
+  static const uint8_t* textToUtf16Locals[] = { gAUInt16Type, gTextType };
 
   gTextToUtf16.name          = "text_to_utf16";
   gTextToUtf16.localsCount   = 2;
@@ -669,7 +669,7 @@ base_text_init()
   gTextToUtf16.code          = store_utf16_text;
 
 
-  static const uint8_t* textLoadUtf16Locals[] = { gTextType, gAInt16Type };
+  static const uint8_t* textLoadUtf16Locals[] = { gTextType, gAUInt16Type };
 
   gTextFromUtf16.name        = "text_from_utf16";
   gTextFromUtf16.localsCount = 2;

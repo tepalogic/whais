@@ -750,7 +750,7 @@ base_fields_init()
                                                 gGenericFieldType
                                              };
 
-  gProcFieldTable.name        = "field_table";
+  gProcFieldTable.name        = "table_of_field";
   gProcFieldTable.localsCount = 2;
   gProcFieldTable.localsTypes = fieldTableLocals;
   gProcFieldTable.code        = proc_field_table;
@@ -761,7 +761,7 @@ base_fields_init()
                                                     gGenericFieldType
                                                  };
 
-  gProcIsFielsIndexed.name        = "field_isindexed";
+  gProcIsFielsIndexed.name        = "field_values_indexed";
   gProcIsFielsIndexed.localsCount = 2;
   gProcIsFielsIndexed.localsTypes = fieldIsIndexedLocals;
   gProcIsFielsIndexed.code        = proc_field_isindexed;
@@ -795,7 +795,7 @@ base_fields_init()
                                                      gUInt64Type
                                                    };
 
-  gProcFindValueRange.name        = "field_match_rows";
+  gProcFindValueRange.name        = "match_rows";
   gProcFindValueRange.localsCount = 6;
   gProcFindValueRange.localsTypes = fieldMatchValuesLocals;
   gProcFindValueRange.code        = proc_field_find_range;
@@ -806,12 +806,12 @@ base_fields_init()
                                                  gGenericFieldType
                                                };
 
-  gProcFieldMinimum.name        = "field_minimum";
+  gProcFieldMinimum.name        = "field_biggest";
   gProcFieldMinimum.localsCount = 2;
   gProcFieldMinimum.localsTypes = fieldMinimumLocals;
   gProcFieldMinimum.code        = field_search_minmax<true>;
 
-  gProcFieldMaximum.name        = "field_maximum";
+  gProcFieldMaximum.name        = "field_smallest";
   gProcFieldMaximum.localsCount = 2;
   gProcFieldMaximum.localsTypes = fieldMinimumLocals; //reusing
   gProcFieldMaximum.code        = field_search_minmax<false>;

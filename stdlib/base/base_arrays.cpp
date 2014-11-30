@@ -96,7 +96,7 @@ array_sort( SessionStack& stack, ISession&)
 template<typename T> uint64_t
 binary_array_search( const DArray&     array,
                      const T&          value,
-                     const DInt64&     searchType)
+                     const DInt8&      searchType)
 {
   if (value.IsNull())
     return NOT_FOUND_VALUE;
@@ -160,7 +160,7 @@ binary_array_search_proc( SessionStack& stack, ISession&)
       return WOP_OK;
     }
 
-  DInt64 searchType;
+  DInt8 searchType;
   stack[stack.Size() - 1].Operand().GetValue( searchType);
 
   switch( array.Type())
@@ -845,7 +845,7 @@ compute_array_average( SessionStack& stack, ISession&)
       break;
 
     default:
-      throw InterException( 
+      throw InterException(
           _EXTRA( InterException::INVALID_PARAMETER_TYPE),
           "You need a numeric array type to compute the average."
                            );
@@ -1437,9 +1437,7 @@ proc_array_truncate( SessionStack& stack, ISession&)
 
   if (array.IsNull() || newArraySize.IsNull())
     {
-      stack.Pop (2);
-      stack.Push( DUInt64 (array.Count()));
-
+      stack.Pop (1);
       return WOP_OK;
     }
 
@@ -1599,7 +1597,7 @@ base_arrays_init()
                                                gUInt64Type,
                                                gGenericArrayType,
                                                gUndefinedType,
-                                               gInt64Type
+                                               gInt8Type
                                             };
 
   gProcArrayBinSearch.name         = "array_binary_search";
@@ -1623,12 +1621,12 @@ base_arrays_init()
 
   gProcArrayMin.name         = "array_min";
   gProcArrayMin.localsCount  = 2;
-  gProcArrayMin.localsTypes  = searchLocals;
+  gProcArrayMin.localsTypes  = searchLocals; //reuse
   gProcArrayMin.code         = search_minmax<true>;
 
   gProcArrayMax.name         = "array_max";
   gProcArrayMax.localsCount  = 2;
-  gProcArrayMax.localsTypes  = searchLocals;
+  gProcArrayMax.localsTypes  = searchLocals; //reuse
   gProcArrayMax.code         = search_minmax<false>;
 
 

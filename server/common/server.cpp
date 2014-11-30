@@ -109,7 +109,7 @@ public:
         if (mUsersPool[c].mDesc == NULL)
           {
             if ((wh_msec_ticks() - mUsersPool[c].mLastReqTick) <
-                GetAdminSettings().mAuthTMO)
+                _SC( uint_t, GetAdminSettings().mAuthTMO))
               {
                 continue ;
               }
@@ -120,7 +120,7 @@ public:
             continue ;
           }
         else if ((wh_msec_ticks() - mUsersPool[c].mLastReqTick) <
-                 mUsersPool[c].mDesc->mWaitReqTmo)
+                 _SC( uint_t, mUsersPool[c].mDesc->mWaitReqTmo))
           {
             continue;
           }
@@ -194,14 +194,14 @@ client_handler_routine( void* args)
               cmdType /= 2;
               if (cmdType >= ADMIN_CMDS_COUNT)
                 {
-                  throw ConnectionException( 
+                  throw ConnectionException(
                                   _EXTRA( cmdType),
                                   "Invalid administrator command received."
                                             );
                 }
               else if (! connection.IsAdmin())
                 {
-                  throw ConnectionException( 
+                  throw ConnectionException(
                       _EXTRA( cmdType),
                       "Regular user wants to execute an administrator command."
                                             );

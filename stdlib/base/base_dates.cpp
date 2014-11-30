@@ -154,7 +154,7 @@ day_of_date( const int year, const uint_t month, const uint_t day)
 {
   assert( 0 < day);
 
-  return days_to_month( year, month ) + day;
+  return days_to_month( year, month) + day;
 }
 
 
@@ -232,7 +232,7 @@ get_date_weekday( const int year, const uint_t month, const uint_t day)
   assert( janFirst < 7);
   assert( dateDays > 0);
 
-  return( janFirst + dateDays - 1) % 7;
+  return (janFirst + dateDays - 1) % 7;
 }
 
 
@@ -739,12 +739,12 @@ add_time_delta_microseconds( SessionStack& stack, ISession&)
 static WLIB_STATUS
 native_is_leap_year( SessionStack& stack, ISession& )
 {
-  DInt64 year;
+  DInt16 year;
 
   stack[stack.Size() - 1].Operand().GetValue( year);
   stack.Pop (1);
 
-  if ((year.IsNull() || (year.mValue < -32768) || (32768 <= year.mValue)))
+  if (year.IsNull())
     stack.Push( DBool());
 
   else
@@ -959,7 +959,7 @@ base_dates_init()
   gProcDateMicrosecondsDelta.localsTypes  = deltaAddLocals;
   gProcDateMicrosecondsDelta.code         = add_time_delta_microseconds;
 
-  static const uint8_t* leapLocals[]   = { gBoolType, gInt64Type };
+  static const uint8_t* leapLocals[]   = { gBoolType, gInt16Type };
 
   gProcNativeYear.name        = "year_leaps";
   gProcNativeYear.localsCount = 2;

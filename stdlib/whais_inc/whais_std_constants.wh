@@ -1,0 +1,130 @@
+##############################################################################
+# WHAIS - An advanced database system
+# Copyright (C) 2008  Iulian Popa
+#
+# Address: Str Olimp nr. 6
+#           Pantelimon Ilfov,
+#           Romania
+# Phone:   +40721939650
+# e-mail:  popaiulian@gmail.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##############################################################################
+##############################################################################
+# Follows WHAIS procedures signatures that return widely used constants in 
+# user defined procedures.
+##############################################################################
+
+
+#@guard whais_std_constants
+
+
+#Get the mathematical PI constant.
+EXTERN PROCEDURE pi() RETURN RICHREAL;
+
+#Get the square root of 2.
+EXTERN PROCEDURE sqrt2() RETURN RICHREAL;
+
+#Get the mathematical Euler's number.
+EXTERN PROCEDURE e() RETURN RICHREAL;
+
+#Get the minimum non null value for a BOOL typed value.
+EXTERN PROCEDURE min_bool() RETURN BOOL;
+
+#Get the maximum non null values for a BOOL typed value.
+EXTERN PROCEDURE max_bool() RETURN BOOL;
+
+#Get the minimum non null values for a CHARACTER typed value.
+EXTERN PROCEDURE min_char() RETURN CHARACTER;
+
+#Get the maximum non null values for a CHARACTER typed value.
+EXTERN PROCEDURE max_char() RETURN CHARACTER;
+
+#Get the minimum non null values for a DATE typed value.
+EXTERN PROCEDURE min_date() RETURN DATE;
+
+#Get the maximum non null values for a DATE typed value.
+EXTERN PROCEDURE max_date() RETURN DATE;
+
+#Get the minimum non null values for a DATETIME typed value.
+EXTERN PROCEDURE min_dtime() RETURN DATETIME;
+
+#Get the maximum non null values for a DATETIME typed values.
+EXTERN PROCEDURE max_dtime() RETURN DATETIME;
+
+#Get the minimum non null values for a HIRESTIME typed value.
+EXTERN PROCEDURE min_htime() RETURN HIRESTIME;
+
+#Get the maximum non null values for a HIRESTIME typed values.
+EXTERN PROCEDURE max_htime() RETURN HIRESTIME;
+
+#Get the minimum non null values for a INT8 typed value.
+EXTERN PROCEDURE min_i8() RETURN INT8;
+
+#Get the maximum non null values for a INT8 typed values.
+EXTERN PROCEDURE max_i8() RETURN INT8;
+
+#Get the minimum non null values for a INT16 typed value.
+EXTERN PROCEDURE min_i16() RETURN INT16;
+
+#Get the maximum non null values for a INT16 typed values.
+EXTERN PROCEDURE max_i16() RETURN INT16;
+
+#Get the minimum non null values for a INT32 typed value.
+EXTERN PROCEDURE min_i32() RETURN INT32;
+
+#Get the maximum non null values for a INT32 typed values.
+EXTERN PROCEDURE max_i32() RETURN INT32;
+
+#Get the minimum non null values for a INT64 typed value.
+EXTERN PROCEDURE min_i64() RETURN INT64;
+
+#Get the maximum non null values for a INT64 typed values.
+EXTERN PROCEDURE max_i64() RETURN INT64;
+
+#Get the minimum non null values for a UNSIGNED INT8 typed value.
+EXTERN PROCEDURE min_u8() RETURN UNSIGNED INT8;
+
+#Get the maximum non null values for a UNSIGNED INT8 typed values.
+EXTERN PROCEDURE max_u8() RETURN UNSIGNED INT8;
+
+#Get the minimum non null values for a UNSIGNED INT16 typed value.
+EXTERN PROCEDURE min_u16() RETURN UNSIGNED INT16;
+
+#Get the maximum non null values for a UNSIGNED INT16 typed values.
+EXTERN PROCEDURE max_u16() RETURN UNSIGNED INT16;
+
+#Get the minimum non null values for a UNSIGNED INT32 typed value.
+EXTERN PROCEDURE min_u32() RETURN UNSIGNED INT32;
+
+#Get the maximum non null values for a UNSIGNED INT32 typed values.
+EXTERN PROCEDURE max_u32() RETURN UNSIGNED INT32;
+
+#Get the minimum non null values for a UNSIGNED INT64 typed value.
+EXTERN PROCEDURE min_u64() RETURN UNSIGNED INT64;
+
+#Get the maximum non null values for a UNSIGNED INT64 typed values.
+EXTERN PROCEDURE max_u64() RETURN UNSIGNED INT64;
+
+#Get the minimum non null values for a REAL typed value.
+EXTERN PROCEDURE min_real() RETURN REAL;
+
+#Get the maximum non null values for a REAL typed values.
+EXTERN PROCEDURE max_real() RETURN REAL;
+
+#Get the minimum non null values for a RICHREAL typed value.
+EXTERN PROCEDURE min_rreal() RETURN RICHREAL;
+
+#Get the maximum non null values for a RICHREAL typed values.
+EXTERN PROCEDURE max_rreal() RETURN RICHREAL;
