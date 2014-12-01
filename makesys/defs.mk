@@ -81,17 +81,16 @@ $(foreach src, $($(1)_SRC), $(eval $(1)_OBJ+=$(call obj_name,$(2),$(src),shls)))
 $(foreach src, $($(1)_SRC), $(eval $(1)_DEP+=$(call dep_name,$(2),$(src),shls)))
 $(foreach src, $($(1)_SRC), $(eval $(call create_source_compile_rule,$(1),$(2),$(src),shls)))
 
-
-SHLS+=./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
-SHLS+=$(if $(3),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4),)
+SHLS+=$(if $(3),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT))
 ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) : $($(1)_OBJ) $(call arch_dependecy_shlib,$(1)) $(call arch_dependecy_lib,$(1)) 
 	@echo Building shared lib $(ARCH)/$(1)  
 	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_shl_linker_flags,$(1),$(3),$(4)) $$(call arch_add_lib_dirs,$(1))\
 		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_sharedlib,$(1),$(2))
 
 ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) : ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
-	@ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
-	@ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
+	$(ECHO)mv ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
+	$(ECHO)ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
+	$(ECHO)ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
 	
 endef
 

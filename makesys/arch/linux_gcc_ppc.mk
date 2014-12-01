@@ -12,6 +12,19 @@ CXX:=g++
 LD:=g++
 AR:=ar
 
+#Default output directories
+ifneq ($(WHAIS_OUT_DIR),)
+EXES_OUT_DIR?=$(WHAIS_OUT_DIR)/bin/
+SHLS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
+LIBS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
+HDRS_OUT_DIR?=$(WHAIS_OUT_DIR)/include/
+else
+EXES_OUT_DIR?=/usr/bin/
+SHLS_OUT_DIR?=/usr/lib/
+LIBS_OUT_DIR?=/usr/lib/
+HDRS_OUT_DIR?=/usr/include/whais
+endif
+
 #Commn compile flags
 CC_FLAGS:=-Wall -m32 -c -ansi -fvisibility=hidden -fPIC -Wno-unknown-pragmas -Wno-format-security -fno-omit-frame-pointer -Wno-strict-aliasing 
 

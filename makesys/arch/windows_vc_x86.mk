@@ -12,6 +12,13 @@ CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
 LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/link.exe'
 AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/lib.exe'
 
+#Default output directories
+WHAIS_OUT_DIR?=/cygdrive/c/WHAIS
+EXES_OUT_DIR?=$(WHAIS_OUT_DIR)/bin/
+SHLS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
+LIBS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
+HDRS_OUT_DIR?=$(WHAIS_OUT_DIR)/include/
+
 CC_FLAGS:=/LD /W3 /TC /c  /Y- /arch:SSE2 /nologo /wd4242 /wd4244 /wd4290 /wd4355 
 
 ifeq ($(ASSERTS),no)
