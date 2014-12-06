@@ -215,7 +215,7 @@ type_to_text( uint_t type)
     }
   else if (type == T_CHAR)
     {
-      return "CHARACTER";
+      return "CHAR";
     }
   else if (type == T_DATE)
     {
@@ -259,19 +259,19 @@ type_to_text( uint_t type)
     }
   else if (type == T_UINT8)
     {
-      return "UNSIGNED INT8";
+      return "UINT8";
     }
   else if (type == T_UINT16)
     {
-      return "UNSIGNED INT16";
+      return "UINT16";
     }
   else if (type == T_UINT32)
     {
-      return "UNSIGNED INT32";
+      return "UINT32";
     }
   else if (type == T_UINT64)
     {
-      return "UNSIGNED INT64";
+      return "UINT64";
     }
   assert( 0);
   return NULL;

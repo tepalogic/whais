@@ -49,12 +49,12 @@ check_used_vals( struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-  "PROCEDURE ProcId0 (v1 AS INT8, v2 AS UNSIGNED INT8) RETURN INT8 "
+  "PROCEDURE ProcId0 (v1 AS INT8, v2 AS UINT8) RETURN INT8 "
   "DO "
   "RETURN v1 &= v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId1 (v1 AS UNSIGNED INT16, v2 AS INT16) RETURN UNSIGNED INT16 "
+  "PROCEDURE ProcId1 (v1 AS UINT16, v2 AS INT16) RETURN UINT16 "
   "DO "
   "RETURN v1 &= v2; "
   "ENDPROC\n\n"
@@ -64,7 +64,7 @@ char proc_decl_buffer[] =
   "RETURN v1 &= v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId3 (v1 AS INT64, v2 AS UNSIGNED INT64) RETURN INT64 "
+  "PROCEDURE ProcId3 (v1 AS INT64, v2 AS UINT64) RETURN INT64 "
   "DO "
   "RETURN v1 &= v2; "
   "ENDPROC\n\n"

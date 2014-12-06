@@ -82,11 +82,11 @@ char test_prog_3[] = ""
   "DO\n " "RETURN( arg + arg) -= 10;\n " "ENDPROC\n ";
 
 char test_prog_4[] = ""
-  "PROCEDURE Proc_1 (arg AS CHARACTER) RETURN CHARACTER\n "
+  "PROCEDURE Proc_1 (arg AS CHAR) RETURN CHAR\n "
   "DO\n " "RETURN arg *= arg;\n " "ENDPROC\n ";
 
 char test_prog_5[] = ""
-  "PROCEDURE Proc_1 (arg AS UNSIGNED INT32) RETURN UNSIGNED INT32\n "
+  "PROCEDURE Proc_1 (arg AS UINT32) RETURN UINT32\n "
   "DO\n " "RETURN( arg + arg) *= 10;\n " "ENDPROC\n ";
 
 char test_prog_6[] = ""
@@ -102,7 +102,7 @@ char test_prog_8[] = ""
   "DO\n " "RETURN arg %= arg;\n " "ENDPROC\n ";
 
 char test_prog_9[] = ""
-  "PROCEDURE Proc_1 (arg AS UNSIGNED INT8) RETURN UNSIGNED INT8\n "
+  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) %= 10;\n " "ENDPROC\n ";
 
 char test_prog_10[] = ""
@@ -110,7 +110,7 @@ char test_prog_10[] = ""
   "DO\n " "RETURN arg &= arg;\n " "ENDPROC\n ";
 
 char test_prog_11[] = ""
-  "PROCEDURE Proc_1 (arg AS UNSIGNED INT8) RETURN UNSIGNED INT8\n "
+  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) &= 10;\n " "ENDPROC\n ";
 
 char test_prog_12[] = ""
@@ -118,7 +118,7 @@ char test_prog_12[] = ""
   "DO\n " "RETURN arg ^= arg;\n " "ENDPROC\n ";
 
 char test_prog_13[] = ""
-  "PROCEDURE Proc_1 (arg AS UNSIGNED INT8) RETURN UNSIGNED INT8\n "
+  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) ^= 10;\n " "ENDPROC\n ";
 
 char test_prog_14[] = ""
@@ -126,7 +126,7 @@ char test_prog_14[] = ""
   "DO\n " "RETURN arg |= arg;\n " "ENDPROC\n ";
 
 char test_prog_15[] = ""
-  "PROCEDURE Proc_1 (arg AS UNSIGNED INT8) RETURN UNSIGNED INT8\n "
+  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) |= 10;\n " "ENDPROC\n ";
 
 

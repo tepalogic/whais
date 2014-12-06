@@ -14,16 +14,18 @@ struct ParserState;
 extern int yylex( YYSTYPE * lvalp, struct ParserState *state);
 
 const char tokens[] =
-  " ArRaY   aS #comment\n  BOOL \t brEak CHARACTER  Continue DATE DATETIME   DO"
+  " ArRaY   aS #comment\n  BOOL \t brEak CHAR  Continue DATE DATETIME   DO"
   " elSE  \t \n \n  END ENDPROC \n ENDsync\t ExTerN false fielD FOR HIrESTIME   IF "
   " InT8\n\n\t\tINT16 \n  \t\t\tINT32 INT64 LET OF NULL real RETURN"
   "\t\t \nRICHREAL      PROCEDURE \nSynC\n\tTABLE \n TEXT tRUE "
-  " undefined UNTIL  \n###bau#bau\n#bau\n#hello\n\n#bau again\n   UNSIGNED  wHIle";
+  "\t\t \nuint8 uint16 uint32 uint64 "
+  " undefined UNTIL  \n###bau#bau\n#bau\n#hello\n\n#bau again\n    wHIle";
 const int tokens_values[] =
-  { ARRAY, AS, BOOL, BREAK, CHARACTER, CONTINUE, DATE, DATETIME, DO,
+  { ARRAY, AS, BOOL, BREAK, CHAR, CONTINUE, DATE, DATETIME, DO,
     ELSE, END, ENDPROC, ENDSYNC, EXTERN, W_FALSE, FIELD, FOR, HIRESTIME,
     IF, INT8, INT16, INT32, INT64, LET, OF, WHAIS_NULL, REAL, RETURN, RICHREAL,
-    PROCEDURE, SYNC, TABLE, TEXT, W_TRUE, UNDEFINED, UNTIL, UNSIGNED, WHILE
+    PROCEDURE, SYNC, TABLE, TEXT, W_TRUE, UINT8, UINT16, UINT32, UINT64,
+    UNDEFINED, UNTIL, WHILE
   };
 
 static int
@@ -216,7 +218,7 @@ test_buff_chars( void)
   printf( "Testing chars...");
   while( (result = yylex( &lvalp, &state)) != 0)
     {
-      if ((result != WHAIS_CHARACTER) ||
+      if ((result != WHAIS_CHAR) ||
           (lvalp->val_type != VAL_C_CHAR) ||
           (lvalp->val.u_char.value != char_vals[count].value))
         {

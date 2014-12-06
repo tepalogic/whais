@@ -67,7 +67,7 @@ my_postman( WLOG_FUNC_CONTEXT bag,
 char test_prog_1[] = ""
   "PROCEDURE Proc_1 () RETURN FIELD\n "
   "DO\n "
-  "LET test_table AS TABLE OF (field1 AS INT8, field2 AS UNSIGNED INT8);\n "
+  "LET test_table AS TABLE OF (field1 AS INT8, field2 AS UINT8);\n "
   "RETURN test_table.field3;\n " "ENDPROC\n ";
 
 char test_prog_2[] = ""

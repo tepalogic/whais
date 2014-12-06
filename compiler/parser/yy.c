@@ -270,7 +270,7 @@ static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"AS", AS},
                                         {"BOOL", BOOL},
                                         {"BREAK", BREAK},
-                                        {"CHARACTER", CHARACTER},
+                                        {"CHAR", CHAR},
                                         {"CONTINUE", CONTINUE},
                                         {"DATE", DATE},
                                         {"DATETIME", DATETIME},
@@ -302,9 +302,12 @@ static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"TABLE", TABLE},
                                         {"TEXT", TEXT},
                                         {"TRUE", W_TRUE},
+                                        {"UINT8", UINT8},
+                                        {"UINT16", UINT16},
+                                        {"UINT32", UINT32},
+                                        {"UINT64", UINT64},
                                         {"UNDEFINED", UNDEFINED},
                                         {"UNTIL", UNTIL},
-                                        {"UNSIGNED", UNSIGNED},
                                         {"WHILE", WHILE},
                                         {"XOR", XOR},
 
@@ -916,7 +919,7 @@ yylex( YYSTYPE * lvalp, struct ParserState* parser)
       if (result != 0)
         {                        /* parsing was successful */
           (*lvalp)->val_type = VAL_C_CHAR;
-          result             = WHAIS_CHARACTER;
+          result             = WHAIS_CHAR;
         }
       break;
 

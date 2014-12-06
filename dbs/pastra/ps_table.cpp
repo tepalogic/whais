@@ -97,7 +97,7 @@ field_type_to_text( const uint_t type)
         return "ARRAY OF BOOL";
 
       case T_CHAR:
-        return "ARRAY OF CHARACTER";
+        return "ARRAY OF CHAR";
 
       case T_DATE:
         return "ARRAY OF DATE";
@@ -109,16 +109,16 @@ field_type_to_text( const uint_t type)
         return "ARRAY OF HIRESTIME";
 
       case T_UINT8:
-        return "ARRAY OF UNSIGNED OF INT8";
+        return "ARRAY OF UINT8";
 
       case T_UINT16:
-        return "ARRAY OF UNSIGNED OF INT16";
+        return "ARRAY OF UINT16";
 
       case T_UINT32:
-        return "ARRAY OF UNSIGNED OF INT32";
+        return "ARRAY OF UINT32";
 
       case T_UINT64:
-        return "ARRAY OF UNSIGNED OF INT64";
+        return "ARRAY OF UINT64";
 
       case T_INT8:
         return "ARRAY OF INT8";
@@ -150,7 +150,7 @@ field_type_to_text( const uint_t type)
         return "BOOL";
 
       case T_CHAR:
-        return "CHARACTER";
+        return "CHAR";
 
       case T_DATE:
         return "DATE";
@@ -162,16 +162,16 @@ field_type_to_text( const uint_t type)
         return "HIRESTIME";
 
       case T_UINT8:
-        return "UNSIGNED INT8";
+        return "UINT8";
 
       case T_UINT16:
-        return "UNSIGNED INT16";
+        return "UINT16";
 
       case T_UINT32:
-        return "UNSIGNED INT32";
+        return "UINT32";
 
       case T_UINT64:
-        return "UNSIGNED INT64";
+        return "UINT64";
 
       case T_INT8:
         return "INT8";
@@ -348,7 +348,7 @@ create_table_file( const uint64_t                  maxFileSize,
   //Check the arguments
   if ((fields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
     {
-      throw DBSException( 
+      throw DBSException(
           _EXTRA( DBSException::OPER_NOT_SUPPORTED),
           "Could not create a persistent table with %d fields count.",
           (fields == NULL ) ? 0 : fieldsCount
@@ -909,7 +909,7 @@ PersistentTable::InitFromFile( const string& tableName)
 
   if (memcmp( tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
     {
-      throw DBSException( 
+      throw DBSException(
           _EXTRA( DBSException::TABLE_INVALID),
           "Persistent table file '%s' has an invalid signature.",
           mFileNamePrefix.c_str());
@@ -929,7 +929,7 @@ PersistentTable::InitFromFile( const string& tableName)
       (mDescriptorsSize < (sizeof( FieldDescriptor) * mFieldsCount)) ||
       (mainTableSize < PS_HEADER_SIZE))
     {
-      throw DBSException( 
+      throw DBSException(
           _EXTRA( DBSException::TABLE_INVALID),
           "Persistent table file '%s' has an invalid signature.",
           mFileNamePrefix.c_str());
@@ -950,7 +950,7 @@ PersistentTable::InitFromFile( const string& tableName)
                      mDescriptorsSize);
   mainTableFile.Close();
 
-  mTableData.reset( new FileContainer( 
+  mTableData.reset( new FileContainer(
                           mFileNamePrefix.c_str(),
                           mMaxFileSize,
                           (mainTableSize + mMaxFileSize - 1) / mMaxFileSize
@@ -962,8 +962,8 @@ void
 PersistentTable::InitVariableStorages()
 {
   // Loading the rows regular should be done up front.
-  mRowsData.reset( 
-              new FileContainer( 
+  mRowsData.reset(
+              new FileContainer(
                 (mFileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str(),
                 mMaxFileSize,
                 ((mRowSize * mRowsCount) + mMaxFileSize - 1) / mMaxFileSize
@@ -1019,12 +1019,12 @@ PersistentTable::InitIndexedFields()
                               field.NameOffset();
       containerName += "_bt";
 
-      auto_ptr<IDataContainer> indexContainer( 
+      auto_ptr<IDataContainer> indexContainer(
                              new FileContainer( containerName.c_str(),
                                                 mMaxFileSize,
                                                 field.IndexUnitsCount() )
                                                );
-      mvIndexNodeMgrs.push_back( 
+      mvIndexNodeMgrs.push_back(
             new FieldIndexNodeManager( indexContainer,
                                        field.IndexNodeSizeKB() * 1024,
                                        0x400000, //4MB
@@ -1349,12 +1349,12 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
       FileContainer::Fix (containerName.c_str(), settings.mMaxFileSize, 0);
 
-      auto_ptr<IDataContainer> indexContainer( 
+      auto_ptr<IDataContainer> indexContainer(
                              new FileContainer( containerName.c_str(),
                                                 settings.mMaxFileSize,
                                                 0 )
                                               );
-      indexNodeMgrs.push_back( 
+      indexNodeMgrs.push_back(
             new FieldIndexNodeManager( indexContainer,
                                        fds[i].IndexNodeSizeKB() * 1024,
                                        0x400000, //4MB
@@ -1373,7 +1373,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
   if (rowSize * rowsCount != rowsData.Size())
     {
-      const bool toFix = fixCallback( 
+      const bool toFix = fixCallback(
                               FIX_QUESTION,
                               "The table's row data does not match table "
                                 "header descriptions."
@@ -1434,7 +1434,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                                                         );
               if ((fieldSize & 0x8000000000000000ull) != 0)
                 {
-                  if ( ! check_array_buffer( 
+                  if ( ! check_array_buffer(
                                 fieldData,
                                 (fieldSize >> 56) & 0x7F,
                                 _SC (DBS_FIELD_TYPE,
@@ -1452,7 +1452,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                       isNullValue = true;
                     }
                 }
-              else if ( ! vsData->CheckArrayEntry( 
+              else if ( ! vsData->CheckArrayEntry(
                                      fieldEntry,
                                      fieldSize,
                                      _SC (DBS_FIELD_TYPE,
@@ -1522,7 +1522,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DBool> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1549,7 +1549,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DChar> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1576,7 +1576,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DDate> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1603,7 +1603,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DDateTime> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1630,7 +1630,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DHiresTime> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1657,7 +1657,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt8> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1684,7 +1684,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt16> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1711,7 +1711,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt32> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1738,7 +1738,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt64> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1765,7 +1765,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DReal> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1791,7 +1791,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DRichReal> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1818,7 +1818,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt8> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1845,7 +1845,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt16> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1872,7 +1872,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt32> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1899,7 +1899,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue)
                     Serializer::Load( fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey( 
+                  BTree( *indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt64> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1986,7 +1986,7 @@ TemporalTable::TemporalTable( DbsHandler&                     dbs,
       || (fieldsCount == 0)
       || (fieldsCount > 0xFFFFu))
     {
-      throw DBSException( 
+      throw DBSException(
           _EXTRA( DBSException::OPER_NOT_SUPPORTED),
           "Could not create a temporal table with %d fields count.",
           (fields == NULL ) ? 0 : fieldsCount

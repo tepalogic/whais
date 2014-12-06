@@ -53,7 +53,7 @@ decode_basic_type( const uint16_t type)
     return "BOOL";
 
   case T_CHAR:
-    return "CHARACTER";
+    return "CHAR";
 
   case T_DATE:
     return "DATE";
@@ -65,16 +65,16 @@ decode_basic_type( const uint16_t type)
     return "HIRESTIME";
 
   case T_UINT8:
-    return "UNSIGNED INT8";
+    return "UINT8";
 
   case T_UINT16:
-    return "UNSIGNED INT16";
+    return "UINT16";
 
   case T_UINT32:
-    return "UNSIGNED INT32";
+    return "UINT32";
 
   case T_UINT64:
-    return "UNSIGNED INT64";
+    return "UINT64";
 
   case T_INT8:
     return "INT8";

@@ -23,7 +23,7 @@ static const char test_db2[] = "t_testdb_2";
 
 static const uint8_t commonCode[] =
     "LET gb0 AS DATE;\n"
-    "LET gb1 AS UNSIGNED INT32;\n"
+    "LET gb1 AS UINT32;\n"
     "LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
     "\n"
     "PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
@@ -34,8 +34,8 @@ static const uint8_t commonCode[] =
     "DO\n"
     "\n"
     "LET p1 AS TEXT;\n"
-    "LET p2 AS ARRAY OF UNSIGNED INT8;\n"
-    "LET p3 AS UNSIGNED INT64;\n"
+    "LET p2 AS ARRAY OF UINT8;\n"
+    "LET p3 AS UINT64;\n"
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
@@ -51,7 +51,7 @@ static const uint8_t commonCode[] =
     "LET dummy AS ARRAY OF INT64;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p1 as INT8;\n"
-    "LET p2 as UNSIGNED INT8;\n"
+    "LET p2 as UINT8;\n"
     "LET p3 as INT64;\n"
     "\n"
     "dummy2[p3] = p1;\n"
@@ -63,7 +63,7 @@ static const uint8_t commonCode[] =
     "ENDPROC\n";
 
 static const uint8_t db1Code_Fail_1 [] =
-    "LET gb1 AS UNSIGNED INT32;\n"
+    "LET gb1 AS UINT32;\n"
     "\n"
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
@@ -122,7 +122,7 @@ static const uint8_t db1Code_Fail_3 [] =
     "LET dummy AS ARRAY OF DATETIME;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p1 as INT8;\n"
-    "LET p2 as UNSIGNED INT8;\n"
+    "LET p2 as UINT8;\n"
     "LET p3 as INT64;\n"
     "\n"
     "dummy2[p3] = p1;\n"
@@ -141,14 +141,14 @@ static const uint8_t db1Code_Fail_4 [] =
     "RETURN DATE\n"
     "DO\n"
     "\n"
-    "LET ind AS UNSIGNED INT64;\n"
+    "LET ind AS UINT64;\n"
     "\n"
     "RETURN tab1[ind, vasile];\n"
     "\n"
     "ENDPROC\n";
 
 static const uint8_t db1Code_Fail_5 [] =
-    "EXTERN LET gb1 AS UNSIGNED INT32;\n"
+    "EXTERN LET gb1 AS UINT32;\n"
     "EXTERN LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
     "PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
     "                    p1v2 AS ARRAY OF INT8, \n"
@@ -158,8 +158,8 @@ static const uint8_t db1Code_Fail_5 [] =
     "DO\n"
     "\n"
     "LET p1 AS TEXT;\n"
-    "LET p2 AS ARRAY OF UNSIGNED INT8;\n"
-    "LET p3 AS UNSIGNED INT64;\n"
+    "LET p2 AS ARRAY OF UINT8;\n"
+    "LET p3 AS UINT64;\n"
     "LET p4 AS HIRESTIME;\n"
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
@@ -180,7 +180,7 @@ static const uint8_t db1Code_Fail_6 [] =
     "ENDPROC\n";
 
 static const uint8_t db1_Code_1 [] =
-    "LET private_gb1 AS UNSIGNED INT32;\n"
+    "LET private_gb1 AS UINT32;\n"
     "\n"
     "EXTERN PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
@@ -203,7 +203,7 @@ static const uint8_t db1_Code_1 [] =
     "ENDPROC\n";
 
 static const uint8_t db1_Code_2 [] =
-    "EXTERN LET private_gb1 AS UNSIGNED INT32;\n"
+    "EXTERN LET private_gb1 AS UINT32;\n"
     "\n"
     "EXTERN PROCEDURE c_proc_1 (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"

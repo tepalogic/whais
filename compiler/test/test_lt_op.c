@@ -50,7 +50,7 @@ check_used_vals( struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-  "PROCEDURE ProcId1 (v1 AS CHARACTER, v2 AS CHARACTER) RETURN BOOL "
+  "PROCEDURE ProcId1 (v1 AS CHAR, v2 AS CHAR) RETURN BOOL "
   "DO "
   "RETURN v1 < v2; "
   "ENDPROC\n\n"

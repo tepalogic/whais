@@ -228,7 +228,7 @@ wod_dump_nontable_type_info( ostream& output, uint16_t type)
       break;
 
     case T_CHAR:
-      output << "CHARACTER";
+      output << "CHAR";
       break;
 
     case T_DATE:
@@ -272,19 +272,19 @@ wod_dump_nontable_type_info( ostream& output, uint16_t type)
       break;
 
     case T_UINT8:
-      output << "UNSIGNED INT8";
+      output << "UINT8";
       break;
 
     case T_UINT16:
-      output << "UNSIGNED INT16";
+      output << "UINT16";
       break;
 
     case T_UINT32:
-      output << "UNSIGNED INT32";
+      output << "UINT32";
       break;
 
     case T_UINT64:
-      output << "UNSIGNED INT64";
+      output << "UINT64";
       break;
 
     case T_UNDETERMINED:

@@ -55,7 +55,7 @@ char proc_decl_buffer[] =
   "RETURN v1 == v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId2 (v1 AS CHARACTER, v2 AS CHARACTER) RETURN BOOL "
+  "PROCEDURE ProcId2 (v1 AS CHAR, v2 AS CHAR) RETURN BOOL "
   "DO "
   "RETURN v1 == v2; "
   "ENDPROC\n\n"

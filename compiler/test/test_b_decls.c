@@ -51,7 +51,7 @@ check_used_vals( struct ParserState *state)
 
 char buffer[] =
   "LET _var_01 AS BOOL;\n"
-  "LET _var_02 AS CHARACTER;\n"
+  "LET _var_02 AS CHAR;\n"
   "LET _var_03 AS DATE;\n"
   "LET _var_04 AS DATETIME;\n"
   "LET _var_05 AS HIRESTIME;\n"
@@ -62,9 +62,9 @@ char buffer[] =
   "LET _var_10, _1, a2, _a3 AS REAL;\n"
   "LET _var_11, b4c AS RICHREAL;\n"
   "LET _var_12 AS TEXT;\n"
-  "LET _var_13 AS UNSIGNED INT8;\n"
-  "LET _var_14 AS UNSIGNED INT16;\n"
-  "LET _var_15 AS UNSIGNED INT32;\n" "LET _var_16 AS UNSIGNED INT64;\n";
+  "LET _var_13 AS UINT8;\n"
+  "LET _var_14 AS UINT16;\n"
+  "LET _var_15 AS UINT32;\n" "LET _var_16 AS UINT64;\n";
 
 static bool_t
 check_declared_var( struct Statement *stm,

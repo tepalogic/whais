@@ -75,28 +75,28 @@ char test_prog_2[] = ""
   "PROCEDURE Proc_2 () RETURN BOOL\n "
   "DO\n "
   "LET first, second AS BOOL;\n "
-  "LET _some AS UNSIGNED INT32;\n "
+  "LET _some AS UINT32;\n "
   "_some = 3;\n " "4 = _some;\n " "RETURN TRUE;" "ENDPROC\n ";
 
 char test_prog_3[] = ""
   "PROCEDURE Proc_3 () RETURN BOOL\n "
   "DO\n "
   "LET first, second AS BOOL;\n "
-  "LET _some AS UNSIGNED INT32;\n "
+  "LET _some AS UINT32;\n "
   "(4 + 1) = _some;\n " "RETURN TRUE;" "ENDPROC\n ";
 
 char test_prog_4[] = ""
   "PROCEDURE Proc_4 () RETURN BOOL\n "
   "DO\n "
   "LET first, second AS BOOL;\n "
-  "LET _some AS UNSIGNED INT32;\n "
+  "LET _some AS UINT32;\n "
   "(_some + 04) = _some;\n " "RETURN TRUE;" "ENDPROC\n ";
 
 char test_prog_5[] = ""
   "PROCEDURE Proc_5 () RETURN BOOL\n "
   "DO\n "
   "LET first, second AS BOOL;\n "
-  "LET _some AS UNSIGNED INT32;\n "
+  "LET _some AS UINT32;\n "
   "(_some + _some) = _some;\n " "RETURN TRUE;" "ENDPROC\n ";
 
 bool_t

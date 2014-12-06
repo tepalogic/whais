@@ -1142,11 +1142,11 @@ char test_prog_6[] = ""
 
 char test_prog_7[] = ""
   "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE OF (v1 AS TEXT, v2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+  "DO \n" "LET some_var AS TABLE OF (v1 AS TEXT, v2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_8[] = ""
   "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UNSIGNED INT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 bool_t
 test_for_error( const char *test_buffer, uint_t err_expected, uint_t err_type)

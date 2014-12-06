@@ -73,7 +73,7 @@ char test_prog_2[] = ""
   "DO\n " "RETURN v1[v2];\n " "ENDPROC\n ";
 
 char test_prog_3[] = ""
-  "PROCEDURE Proc_1 (v1 AS ARRAY, v2 AS UNSIGNED INT16) RETURN DATE\n "
+  "PROCEDURE Proc_1 (v1 AS ARRAY, v2 AS UINT16) RETURN DATE\n "
   "DO\n " "RETURN v1[v2];\n " "ENDPROC\n ";
 
 bool_t

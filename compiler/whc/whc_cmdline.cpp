@@ -273,9 +273,9 @@ CmdLineParser::CheckArguments()
     mOutputFile = tempBuffer;
   }
 
-  const char* const defaults_inc = getenv( "WHAIS_INC");
-  if (defaults_inc != NULL)
-    AddInclusionPaths( defaults_inc);
+  const char* const defaultIncDirs = getenv( "WHAIS_INC");
+  if (defaultIncDirs != NULL)
+    AddInclusionPaths( defaultIncDirs);
 
   char  temp[64];
   const WTime t  = wh_get_currtime();

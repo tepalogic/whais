@@ -53,7 +53,7 @@ char proc_decl_buffer[] =
   "LET gb AS INT16; "
   "PROCEDURE ProcId1 (v1 AS ARRAY OF INT16) RETURN INT16 "
   "DO " "RETURN v1[gb]; " "ENDPROC\n\n" ""
-  "PROCEDURE ProcId2 (v1 AS TEXT) RETURN CHARACTER "
+  "PROCEDURE ProcId2 (v1 AS TEXT) RETURN CHAR "
   "DO " "RETURN v1[gb]; " "ENDPROC\n\n" "";
 
 static bool_t

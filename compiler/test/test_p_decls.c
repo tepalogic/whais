@@ -95,7 +95,7 @@ char proc_decl_buffer[] =
   ""
   "PROCEDURE ProcId_3_ (Var1 as REAL, "
   "                   Var2 as TEXT, Var3 as ARRAY, "
-  "                   Var4 AS TABLE OF ( f1 AS REAL, f2 as UNSIGNED INT32, "
+  "                   Var4 AS TABLE OF ( f1 AS REAL, f2 as UINT32, "
   "                                      f3 as ARRAY OF INT16),"
   "                   Var5 AS INT64,"
   "                   Var6 AS FIELD OF HIRESTIME) "

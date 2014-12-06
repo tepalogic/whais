@@ -28,7 +28,7 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token AS
 %token BOOL
 %token BREAK
-%token CHARACTER
+%token CHAR
 %token CONTINUE
 %token DATE
 %token DATETIME
@@ -55,9 +55,12 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token SYNC
 %token TABLE
 %token TEXT
+%token UINT8
+%token UINT16
+%token UINT32
+%token UINT64
 %token UNDEFINED
 %token UNTIL
-%token UNSIGNED
 %token WHILE
 %token WHAIS_NULL
 %token W_FALSE
@@ -68,7 +71,7 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token WHAIS_INTEGER
 %token WHAIS_REAL
 %token WHAIS_TEXT
-%token WHAIS_CHARACTER
+%token WHAIS_CHAR
 %token WHAIS_TIME
 
 //Operator precedence and associativity
@@ -125,7 +128,7 @@ type_spec: basic_type_spec
 
 basic_type_spec: BOOL
 					{ $$ = create_type_spec(state, T_BOOL); CHK_SEM_ERROR; }
-               | CHARACTER
+               | CHAR
 					{ $$ = create_type_spec(state, T_CHAR); CHK_SEM_ERROR; }
                | DATE
                		{ $$ = create_type_spec(state, T_DATE); CHK_SEM_ERROR; }
@@ -149,13 +152,13 @@ basic_type_spec: BOOL
                		{ $$ = create_type_spec(state, T_RICHREAL); CHK_SEM_ERROR;}
                | TEXT 
                		{ $$ = create_type_spec(state, T_TEXT); CHK_SEM_ERROR; }
-               | UNSIGNED INT8
+               | UINT8
                		{ $$ = create_type_spec(state, T_UINT8);  CHK_SEM_ERROR; }
-               | UNSIGNED INT16
+               | UINT16
                		{ $$ = create_type_spec(state, T_UINT16); CHK_SEM_ERROR; }
-               | UNSIGNED INT32
+               | UINT32
                		{ $$ = create_type_spec(state, T_UINT32);  CHK_SEM_ERROR; }
-               | UNSIGNED INT64
+               | UINT64
                		{ $$ = create_type_spec(state, T_UINT64);  CHK_SEM_ERROR; }
                | UNDEFINED
                		{ $$ = create_type_spec(state, T_UNDETERMINED);  CHK_SEM_ERROR; }
@@ -516,7 +519,7 @@ const_exp: WHAIS_INTEGER
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;
             }
-         | WHAIS_CHARACTER
+         | WHAIS_CHAR
             {
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR;

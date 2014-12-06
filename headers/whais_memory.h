@@ -52,6 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //These headers are include here because we need the standard
 //STL functionality before we override the new operator.
 #include <cstddef>
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <map>
@@ -202,7 +203,8 @@ public:
 
   static bool PrintMemResume()
   {
-    return( smInitCount & 0x80000000) != 0;
+    return ((smInitCount & 0x80000000) != 0)
+            || (getenv ("WHAIS_TST_MEM") != NULL);
   }
 
 private:

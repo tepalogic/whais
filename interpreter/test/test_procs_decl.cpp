@@ -74,7 +74,7 @@ static const uint8_t commonCode[] =
     "DO\n"
     "RETURN NULL;\n"
     "ENDPROC\n"
-    "PROCEDURE c2 (field1 AS FIELD) RETURN ARRAY OF UNSIGNED INT32\n"
+    "PROCEDURE c2 (field1 AS FIELD) RETURN ARRAY OF UINT32\n"
     "DO\n"
     "RETURN NULL;\n"
     "ENDPROC\n"

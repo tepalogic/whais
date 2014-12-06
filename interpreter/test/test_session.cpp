@@ -21,7 +21,7 @@ static const char admin[] = "administrator";
 
 static const uint8_t firstCode[] =
     "LET gb0 AS DATE;\n"
-    "LET gb1 AS UNSIGNED INT32;\n"
+    "LET gb1 AS UINT32;\n"
     "LET tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
     "\n"
     "PROCEDURE proced_1 (p1v1 AS TEXT,\n"
@@ -32,8 +32,8 @@ static const uint8_t firstCode[] =
     "DO\n"
     "\n"
     "LET p1 AS TEXT;\n"
-    "LET p2 AS ARRAY OF UNSIGNED INT8;\n"
-    "LET p3 AS UNSIGNED INT64;\n"
+    "LET p2 AS ARRAY OF UINT8;\n"
+    "LET p3 AS UINT64;\n"
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
@@ -49,7 +49,7 @@ static const uint8_t firstCode[] =
     "LET dummy AS ARRAY OF HIRESTIME;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p1 as INT8;\n"
-    "LET p2 as UNSIGNED INT8;\n"
+    "LET p2 as UINT8;\n"
     "LET p3 as INT64;\n"
     "\n"
     "dummy2[p3] = p1;\n"
@@ -61,7 +61,7 @@ static const uint8_t firstCode[] =
     "ENDPROC\n";
 
 static const uint8_t secondCode[] =
-    "EXTERN LET gb1 AS UNSIGNED INT32;\n"
+    "EXTERN LET gb1 AS UINT32;\n"
     "\n"
     "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
@@ -72,7 +72,7 @@ static const uint8_t secondCode[] =
     "\n"
     "PROCEDURE proc_3 () RETURN HIRESTIME\n"
     "DO\n"
-    "LET dummy  AS ARRAY OF UNSIGNED INT16;\n"
+    "LET dummy  AS ARRAY OF UINT16;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
     "LET p3 as INT64;\n"
     "\n"
@@ -84,7 +84,7 @@ static const uint8_t secondCode[] =
     "ENDPROC\n";
 
 static const uint8_t notDefGlbCode[] =
-    "EXTERN LET someGlobal AS UNSIGNED INT32;"
+    "EXTERN LET someGlobal AS UINT32;"
     "PROCEDURE random_proc_name() RETURN INT32\n"
     "DO\n"
     "RETURN someGlobal;\n"
@@ -108,8 +108,8 @@ static const uint8_t notDefProcCode[] =
 
 
 static const uint8_t doubleDefGlbCode[] =
-    "EXTERN LET gb1 AS UNSIGNED INT32;\n"
-    "LET gb0 AS UNSIGNED INT32;"
+    "EXTERN LET gb1 AS UINT32;\n"
+    "LET gb0 AS UINT32;"
     "PROCEDURE random_proc_name_2 () RETURN INT32\n"
     "DO\n"
     "RETURN gb1;\n"
@@ -132,7 +132,7 @@ static const uint8_t doubleDefProcCode[] =
     "ENDPROC\n";
 
 static const uint8_t diffDefGlbCode[] =
-    "EXTERN LET gb1 AS UNSIGNED INT64;\n"
+    "EXTERN LET gb1 AS UINT64;\n"
     "PROCEDURE random_proc_name_4 () RETURN INT64\n"
     "DO\n"
     "RETURN gb1;\n"

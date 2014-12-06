@@ -52,7 +52,7 @@ create_exp_link( struct ParserState* const parser,
       return NULL;
     }
 
-  /* Check if it's a special case of comparision against NULL values. */
+  /* Check if it's a special case of comparing against NULL values. */
   if ((opcode == OP_EQ) || (opcode == OP_NE))
     {
       const struct SemExpression* exp = &firstOp->val.u_exp;
@@ -220,7 +220,7 @@ array_to_text( uint_t type)
     return "ARRAY OF BOOL";
 
   else if (type == T_CHAR)
-    return "ARRAY OF CHARACTER";
+    return "ARRAY OF CHAR";
 
   else if (type == T_DATE)
     return "ARRAY OF DATE";
@@ -253,16 +253,16 @@ array_to_text( uint_t type)
     return "ARRAY OF TEXT";
 
   else if (type == T_UINT8)
-    return "ARRAY OF UNSIGNED INT8";
+    return "ARRAY OF UINT8";
 
   else if (type == T_UINT16)
-    return "ARRAY OF UNSIGNED INT16";
+    return "ARRAY OF UINT16";
 
   else if (type == T_UINT32)
-    return "ARRAY OF UNSIGNED INT32";
+    return "ARRAY OF UINT32";
 
   else if (type == T_UINT64)
-    return "ARRAY OF UNSIGNED INT64";
+    return "ARRAY OF UINT64";
 
   return "ARRAY OF UNDEFINED";
 }
@@ -282,7 +282,7 @@ field_to_text( uint_t type)
     return "FIELD OF BOOL";
 
   else if (type == T_CHAR)
-    return "FIELD OF CHARACTER";
+    return "FIELD OF CHAR";
 
   else if (type == T_DATE)
     return "FIELD OF DATE";
@@ -315,16 +315,16 @@ field_to_text( uint_t type)
     return "FIELD OF TEXT";
 
   else if (type == T_UINT8)
-    return "FIELD OF UNSIGNED INT8";
+    return "FIELD OF UINT8";
 
   else if (type == T_UINT16)
-    return "FIELD OF UNSIGNED INT16";
+    return "FIELD OF UINT16";
 
   else if (type == T_UINT32)
-    return "FIELD OF UNSIGNED INT32";
+    return "FIELD OF UINT32";
 
   else if (type == T_UINT64)
-    return "FIELD OF UNSIGNED INT64";
+    return "FIELD OF UINT64";
 
   else if (IS_ARRAY( type))
     {
@@ -335,7 +335,7 @@ field_to_text( uint_t type)
         return "FIELD OF ARRAY OF BOOL";
 
       else if (type == T_CHAR)
-        return "FIELD OF ARRAY OF CHARACTER";
+        return "FIELD OF ARRAY OF CHAR";
 
       else if (type == T_DATE)
         return "FIELD OF ARRAY OF DATE";
@@ -368,16 +368,16 @@ field_to_text( uint_t type)
         return "FIELD OF ARRAY OF TEXT";
 
       else if (type == T_UINT8)
-        return "FIELD OF ARRAY OF UNSIGNED INT8";
+        return "FIELD OF ARRAY OF UINT8";
 
       else if (type == T_UINT16)
-        return "FIELD OF ARRAY OF UNSIGNED INT16";
+        return "FIELD OF ARRAY OF UINT16";
 
       else if (type == T_UINT32)
-        return "FIELD OF ARRAY OF UNSIGNED INT32";
+        return "FIELD OF ARRAY OF UINT32";
 
       else if (type == T_UINT64)
-        return "FIELD OF ARRAY OF UNSIGNED INT64";
+        return "FIELD OF ARRAY OF UINT64";
 
       else if (type == T_UNDETERMINED)
 	return "FIELD OF ARRAY OF UNDEFINED";
@@ -396,7 +396,7 @@ type_to_text( uint_t type)
     return "BOOL";
 
   else if (type == T_CHAR)
-    return "CHARACTER";
+    return "CHAR";
 
   else if (type == T_DATE)
     return "DATE";
@@ -429,16 +429,16 @@ type_to_text( uint_t type)
     return "TEXT";
 
   else if (type == T_UINT8)
-    return "UNSIGNED INT8";
+    return "UINT8";
 
   else if (type == T_UINT16)
-    return "UNSIGNED INT16";
+    return "UINT16";
 
   else if (type == T_UINT32)
-    return "UNSIGNED INT32";
+    return "UINT32";
 
   else if (type == T_UINT64)
-    return "UNSIGNED INT64";
+    return "UINT64";
 
   else if (type == T_UNDETERMINED)
     return "UNDEFINED";
@@ -2378,7 +2378,7 @@ translate_leaf_exp( struct ParserState* const parser,
   else if (exp->val_type == VAL_C_TEXT)
     {
       struct SemCText* const value    = &exp->val.u_text;
-      int32_t                constPos = add_constant_text( 
+      int32_t                constPos = add_constant_text(
                                                   stmt,
                                                   (const uint8_t*)value->text,
                                                   value->length
@@ -2509,7 +2509,7 @@ translate_call_exp( struct ParserState* const   parser,
         {
           if (IS_FIELD( result.type))
             {
-              const bool_t isArgArray = IS_ARRAY( 
+              const bool_t isArgArray = IS_ARRAY(
                                             GET_FIELD_TYPE( argType.type)
                                                  );
 
@@ -2651,7 +2651,7 @@ translate_tabval_exp( struct ParserState* const   parser,
                       struct SemExpression* const exp)
 {
   const struct DeclaredVar*   fieldVar = NULL;
-  struct WOutputStream* const instrs   = stmt_query_instrs( 
+  struct WOutputStream* const instrs   = stmt_query_instrs(
                                                         parser->pCurrentStmt
                                                            );
   struct SemExpression* const expOp1 = &exp->firstTree->val.u_exp;
@@ -2749,7 +2749,7 @@ translate_field_exp( struct ParserState* const   parser,
                      struct SemExpression* const exp)
 {
   const struct DeclaredVar*    fieldVar = NULL;
-  struct WOutputStream* const  instrs   = stmt_query_instrs( 
+  struct WOutputStream* const  instrs   = stmt_query_instrs(
                                                          parser->pCurrentStmt
                                                             );
   struct SemExpression* const  expOp1   = &exp->firstTree->val.u_exp;
@@ -2825,7 +2825,7 @@ translate_tree_exp( struct ParserState* const   parser,
                     struct Statement* const     stmt,
                     struct SemExpression* const tree)
 {
-  struct WOutputStream* const instrs = stmt_query_instrs( 
+  struct WOutputStream* const instrs = stmt_query_instrs(
                                                       parser->pCurrentStmt
                                                          );
 
