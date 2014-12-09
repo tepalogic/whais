@@ -1,7 +1,7 @@
 #Test file to check if the different constants are properly handled.
 
 LET glb0 AS BOOL;
-LET glb1 AS CHARACTER;
+LET glb1 AS UINT;
 LET glb2 AS DATE;
 LET glb3 AS DATETIME;
 LET glb4 AS HIRESTIME;

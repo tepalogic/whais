@@ -55,7 +55,7 @@ EXTERN PROCEDURE table_name(f AS FIELD) RETURN TEXT;
 #   @f - The field value.
 #Out:
 #   The field index. 
-EXTERN PROCEDURE field_index(f AS FIELD) RETURN UNSIGNED INT64;
+EXTERN PROCEDURE field_index(f AS FIELD) RETURN UINT64;
 
 #Retrieves the rows indexes holding values that are in a supplied interval 
 #of values.
@@ -71,8 +71,8 @@ EXTERN PROCEDURE field_index(f AS FIELD) RETURN UNSIGNED INT64;
 EXTERN PROCEDURE match_rows( f AS FIELD,
                              v_min AS UNDEFINED,
                              v_max AS UNDEFINED,
-                             from_row AS UNSIGNED INT64,
-                             to_row AS UNSIGNED INT64) RETURN ARRAY OF UNSIGNED INT64;
+                             from_row AS UINT64,
+                             to_row AS UINT64) RETURN ARRAY OF UINT64;
 
 #Retrieve a row holding the biggest from the specified field values.
 #In:
@@ -80,7 +80,7 @@ EXTERN PROCEDURE match_rows( f AS FIELD,
 #Out:
 #   If successfully this will return a row index that holds
 #   the respective value.
-EXTERN PROCEDURE field_biggest (f AS FIELD) RETURN UNSIGNED INT64;
+EXTERN PROCEDURE field_biggest (f AS FIELD) RETURN UINT64;
 
 #Retrieve a row holding the lowest from the specified field values.
 #In:
@@ -88,7 +88,7 @@ EXTERN PROCEDURE field_biggest (f AS FIELD) RETURN UNSIGNED INT64;
 #Out:
 #   If successfully this will return a row index that holds
 #   the respective value.
-EXTERN PROCEDURE field_smallest (f AS FIELD) RETURN UNSIGNED INT64;
+EXTERN PROCEDURE field_smallest (f AS FIELD) RETURN UINT64;
 
 
 #Computes the average value for fields holding numeric values.

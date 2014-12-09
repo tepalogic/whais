@@ -51,7 +51,8 @@ struct MsgCodeEntry
 #define DCLS_MSGS               250
 #define MSG_VAR_DEFINED         DCLS_MSGS
 #define MSG_VAR_NFOUND          (MSG_VAR_DEFINED + 1)
-#define MSG_NOT_TABLE           (MSG_VAR_NFOUND + 1)
+#define MSG_VAR_LATE            (MSG_VAR_NFOUND + 1)
+#define MSG_NOT_TABLE           (MSG_VAR_LATE + 1)
 #define MSG_SAME_FIELD          (MSG_NOT_TABLE + 1)
 #define MSG_FIELD_TYPE_INVALID  (MSG_SAME_FIELD + 1)
 #define MSG_PROC_ADECL          (MSG_FIELD_TYPE_INVALID + 1)

@@ -72,7 +72,7 @@ InterException::Description() const
     return "An operation was requested on a undefined object that turns out it cannot handle.";
 
   case NATIVE_NULL_DEREFERENCE:
-    return "Tried to derefence an undefined object that turns out to be null.";
+    return "Tried to dereference an undefined object that turns out to be null.";
 
   case INVALID_PARAMETER_TYPE:
     return "A requested operation could not be completed due of the invalid type of an operand.";
@@ -127,6 +127,9 @@ InterException::Description() const
 
   case ARRAY_INDEX_NULL:
     return "Cannot retrieve an array value due to null index operand.";
+
+  case TEXT_ARRAY_NOT_SUPP:
+    return "This implementation cannot handle ARRAY OF TEXT typed variables.";
 
   case ROW_INDEX_NULL:
     return "Cannot retrieve an table row due to null index operand.";

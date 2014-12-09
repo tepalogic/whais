@@ -34,7 +34,7 @@ using namespace std;
 
 
 static const char *MSG_PREFIX[] = {
-  "", "error ", "warning ", "error "
+  "", "error ", "warning ", "error ", "extra "
 };
 
 

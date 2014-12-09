@@ -146,7 +146,7 @@ DbsHandler::DbsHandler( const DBSSettings&    settings,
 
   while( tablesCount-- > 0)
     {
-      mTables.insert( 
+      mTables.insert(
           pair<string, PersistentTable*> (_RC (char*, buffer),
                                           _RC (PersistentTable*, NULL))
                      );
@@ -717,7 +717,6 @@ DBSRepairDatabase( const char* const            name,
   const char*    tableName    = _RC (const char*, buffer + PS_DBS_HEADER_SIZE);
   while( (*tableName != 0)
          && ((_RC (const uint8_t*, tableName) - buffer) < fileSize))
-
     {
       --tablesCount, ++actualCount;
 
@@ -780,7 +779,7 @@ DBSRetrieveDatabase( const char* const name, const char* path)
       if (path == NULL)
         path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
-      dbses.insert( 
+      dbses.insert(
           pair<string, DbsElement> (
                         name,
                         DbsElement( DbsHandler( dbsMgrs_->mDBSSettings,
@@ -875,7 +874,7 @@ DBSRemoveDatabase( const char* const name, const char* path)
       if (path == NULL)
         path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
-      dbses.insert( 
+      dbses.insert(
           pair<string, DbsElement> (
                         name,
                         DbsElement( DbsHandler( dbsMgrs_->mDBSSettings,
@@ -890,7 +889,7 @@ DBSRemoveDatabase( const char* const name, const char* path)
 
   if (it->second.mRefCount != 0)
     {
-      throw DBSException( 
+      throw DBSException(
                     _EXTRA( DBSException::DATABASE_IN_USE),
                     "Cannot remove database '%s' because is still in use.",
                     name

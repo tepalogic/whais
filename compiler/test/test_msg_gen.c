@@ -43,7 +43,7 @@ get_buffer_line_from_pos( const char *buffer, uint_t buff_pos)
 }
 
 static char *MSG_PREFIX[] = {
-  "", "error ", "warning ", "error "
+  "", "error ", "warning ", "error ", "extra "
 };
 
 void

@@ -29,7 +29,7 @@
 #@guard whais_std_time
 
 #Get the number of ticks (on a millisecond resolution).
-EXTERN PROCEDURE ticks () RETURN UNSIGNED INT64;
+EXTERN PROCEDURE ticks () RETURN UINT64;
 
 #Get the current moment.
 EXTERN PROCEDURE now () RETURN HIRESTIME;
@@ -46,42 +46,42 @@ EXTERN PROCEDURE year (d AS DATE) RETURN INT16;
 #   @d - The date value.
 #Out:
 #   The month part of the date (counting from 1 for January).
-EXTERN PROCEDURE month (d AS DATE) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE month (d AS DATE) RETURN UINT8;
 
 #Get the day part from a date.
 #In:
 #   @d - The date value.
 #Out:
 #   The day part of the date (counting from 1 for the first day of month).
-EXTERN PROCEDURE day (d AS DATE) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE day (d AS DATE) RETURN UINT8;
 
 #Get the hours part from a time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The hours part.
-EXTERN PROCEDURE hours (t AS DATETIME) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE hours (t AS DATETIME) RETURN UINT8;
 
 #Get the minutes part from a time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The minutes part.
-EXTERN PROCEDURE minutes (t AS DATETIME) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE minutes (t AS DATETIME) RETURN UINT8;
 
 #Get the seconds part from a time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The seconds part.
-EXTERN PROCEDURE seconds (t AS DATETIME) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE seconds (t AS DATETIME) RETURN UINT8;
 
 #Get the microseconds part from a high resolution time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The seconds part.
-EXTERN PROCEDURE microsecs (t AS HIRESTIME) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE microsecs (t AS HIRESTIME) RETURN UINT8;
 
 #Calculate the difference in days between to dates.
 #In:
@@ -119,7 +119,7 @@ EXTERN PROCEDURE add_microsecs (time AS HIRESTIME, usecs AS INT64) RETURN HIREST
 EXTERN PROCEDURE year_leaps (y AS INT64) RETURN BOOL;
 
 #Get the week of the year for a date.
-EXTERN PROCEDURE week (d AS DATE) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE week (d AS DATE) RETURN UINT8;
 
 #Get the last date of week.
 #In:
@@ -128,7 +128,7 @@ EXTERN PROCEDURE week (d AS DATE) RETURN UNSIGNED INT8;
 #Out:
 #   The last date of the week from the specified year or a NULL value in case
 #   of invalid inputs.
-EXTERN PROCEDURE last_week_date (y AS INT16, w AS UNSIGNED INT8) RETURN DATE;
+EXTERN PROCEDURE last_week_date (y AS INT16, w AS UINT8) RETURN DATE;
 
 
 #Get the weekday of a date.
@@ -136,4 +136,4 @@ EXTERN PROCEDURE last_week_date (y AS INT16, w AS UNSIGNED INT8) RETURN DATE;
 #   @d - The date value.
 #Out:
 #   The weekday date (counting from 0 for Monday).
-EXTERN PROCEDURE weekday (d AS DATE) RETURN UNSIGNED INT8;
+EXTERN PROCEDURE weekday (d AS DATE) RETURN UINT8;

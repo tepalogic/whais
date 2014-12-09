@@ -219,7 +219,7 @@ stmt_add_declaration( struct Statement* const   stmt,
 
   else if (stmt->type == STMT_GLOBAL)
     {
-      var->varId = 0; /* The real id will be assigned when is refered */
+      var->varId = 0; /* The real id will be assigned when is refereed */
 
       MARK_AS_GLOBAL( var->varId);
       MARK_AS_NOT_REFERENCED( var->varId);

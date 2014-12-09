@@ -14,7 +14,7 @@
 PROCEDURE bool_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN BOOL
 DO RETURN NULL; ENDPROC
 
-PROCEDURE char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN CHARACTER
+PROCEDURE char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN CHAR
 DO RETURN NULL; ENDPROC
 
 PROCEDURE date_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN DATE
@@ -38,16 +38,16 @@ DO RETURN NULL; ENDPROC
 PROCEDURE int64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN INT64
 DO RETURN NULL; ENDPROC
 
-PROCEDURE uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UNSIGNED INT8
+PROCEDURE uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UINT8
 DO RETURN NULL; ENDPROC
 
-PROCEDURE uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UNSIGNED INT16
+PROCEDURE uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UINT16
 DO RETURN NULL; ENDPROC
 
-PROCEDURE uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UNSIGNED INT32
+PROCEDURE uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UINT32
 DO RETURN NULL; ENDPROC
 
-PROCEDURE uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UNSIGNED INT64
+PROCEDURE uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN UINT64
 DO RETURN NULL; ENDPROC
 
 PROCEDURE real_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN REAL
@@ -67,7 +67,7 @@ DO RETURN NULL; ENDPROC
 PROCEDURE array_bool_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF BOOL
 DO RETURN NULL; ENDPROC
 
-PROCEDURE array_char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF CHARACTER
+PROCEDURE array_char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF CHAR
 DO RETURN NULL; ENDPROC
 
 PROCEDURE array_date_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF DATE
@@ -91,16 +91,16 @@ DO RETURN NULL; ENDPROC
 PROCEDURE array_int64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF INT64
 DO RETURN NULL; ENDPROC
 
-PROCEDURE array_uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UNSIGNED INT8
+PROCEDURE array_uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UINT8
 DO RETURN NULL; ENDPROC
 
-PROCEDURE array_uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UNSIGNED INT16
+PROCEDURE array_uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UINT16
 DO RETURN NULL; ENDPROC
 
-PROCEDURE array_uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UNSIGNED INT32
+PROCEDURE array_uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UINT32
 DO RETURN NULL; ENDPROC
 
-PROCEDURE array_uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UNSIGNED INT64
+PROCEDURE array_uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF UINT64
 DO RETURN NULL; ENDPROC
 
 PROCEDURE array_real_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN ARRAY OF REAL
@@ -122,7 +122,7 @@ DO RETURN NULL; ENDPROC
 PROCEDURE field_bool_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF BOOL
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF CHARACTER
+PROCEDURE field_char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF CHAR
 DO RETURN NULL; ENDPROC
 
 PROCEDURE field_date_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF DATE
@@ -146,16 +146,16 @@ DO RETURN NULL; ENDPROC
 PROCEDURE field_int64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF INT64
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UNSIGNED INT8
+PROCEDURE field_uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UINT8
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UNSIGNED INT16
+PROCEDURE field_uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UINT16
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UNSIGNED INT32
+PROCEDURE field_uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UINT32
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UNSIGNED INT64
+PROCEDURE field_uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF UINT64
 DO RETURN NULL; ENDPROC
 
 PROCEDURE field_real_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF REAL
@@ -174,7 +174,7 @@ DO RETURN NULL; ENDPROC
 PROCEDURE field_array_bool_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF BOOL
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_array_char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF CHARACTER
+PROCEDURE field_array_char_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF CHAR
 DO RETURN NULL; ENDPROC
 
 PROCEDURE field_array_date_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF DATE
@@ -198,16 +198,16 @@ DO RETURN NULL; ENDPROC
 PROCEDURE field_array_int64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF INT64
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_array_uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UNSIGNED INT8
+PROCEDURE field_array_uint8_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UINT8
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_array_uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UNSIGNED INT16
+PROCEDURE field_array_uint16_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UINT16
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_array_uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UNSIGNED INT32
+PROCEDURE field_array_uint32_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UINT32
 DO RETURN NULL; ENDPROC
 
-PROCEDURE field_array_uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UNSIGNED INT64
+PROCEDURE field_array_uint64_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF UINT64
 DO RETURN NULL; ENDPROC
 
 PROCEDURE field_array_real_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN FIELD OF ARRAY OF REAL
@@ -232,7 +232,7 @@ DO RETURN NULL; ENDPROC
 PROCEDURE one_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN TABLE OF ( field1 AS TEXT) 
 DO RETURN NULL; ENDPROC
 
-PROCEDURE two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN TABLE OF ( field1 AS CHARACTER, field2 AS ARRAY OF UNSIGNED INT64) 
+PROCEDURE two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN TABLE OF ( field1 AS CHAR, field2 AS ARRAY OF UINT64) 
 DO RETURN NULL; ENDPROC
 
 PROCEDURE table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good () RETURN TABLE 
@@ -244,7 +244,7 @@ DO RETURN NULL; ENDPROC
 
 PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good (
 	bool_arg AS BOOL,
-	char_arg AS CHARACTER,
+	char_arg AS CHAR,
 	date_arg AS DATE,
 	datetime_arg AS DATETIME,
 	hirestime_arg AS HIRESTIME,
@@ -252,16 +252,16 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 	int16_arg AS INT16,
 	int32_arg AS INT32,
 	int64_arg AS INT64,
-	uint8_arg AS UNSIGNED INT8,
-	uint16_arg AS UNSIGNED INT16,
-	uint32_arg AS UNSIGNED INT32,
-	uint64_arg AS UNSIGNED INT64,
+	uint8_arg AS UINT8,
+	uint16_arg AS UINT16,
+	uint32_arg AS UINT32,
+	uint64_arg AS UINT64,
 	real_arg AS REAL,
 	richreal_arg AS RICHREAL,
 	text_arg AS TEXT,
 
 	array_bool_arg AS ARRAY OF BOOL,
-	array_char_arg AS ARRAY OF CHARACTER,
+	array_char_arg AS ARRAY OF CHAR,
 	array_date_arg AS ARRAY OF DATE,
 	array_datetime_arg AS ARRAY OF DATETIME,
 	array_hirestime_arg AS ARRAY OF HIRESTIME,
@@ -269,17 +269,17 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 	array_int16_arg AS ARRAY OF INT16,
 	array_int32_arg AS ARRAY OF INT32,
 	array_int64_arg AS ARRAY OF INT64,
-	array_uint8_arg AS ARRAY OF UNSIGNED INT8,
-	array_uint16_arg AS ARRAY OF UNSIGNED INT16,
-	array_uint32_arg AS ARRAY OF UNSIGNED INT32,
-	array_uint64_arg AS ARRAY OF UNSIGNED INT64,
+	array_uint8_arg AS ARRAY OF UINT8,
+	array_uint16_arg AS ARRAY OF UINT16,
+	array_uint32_arg AS ARRAY OF UINT32,
+	array_uint64_arg AS ARRAY OF UINT64,
 	array_real_arg AS ARRAY OF REAL,
 	array_richreal_arg AS ARRAY OF RICHREAL,
 #	array_text_arg AS ARRAY OF TEXT,
 	array_arg AS ARRAY,
 
 	field_bool_arg AS FIELD OF BOOL,
-	field_char_arg AS FIELD OF CHARACTER,
+	field_char_arg AS FIELD OF CHAR,
 	field_date_arg AS FIELD OF DATE,
 	field_datetime_arg AS FIELD OF DATETIME,
 	field_hirestime_arg AS FIELD OF HIRESTIME,
@@ -287,16 +287,16 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 	field_int16_arg AS FIELD OF INT16,
 	field_int32_arg AS FIELD OF INT32,
 	field_int64_arg AS FIELD OF INT64,
-	field_uint8_arg AS FIELD OF UNSIGNED INT8,
-	field_uint16_arg AS FIELD OF UNSIGNED INT16,
-	field_uint32_arg AS FIELD OF UNSIGNED INT32,
-	field_uint64_arg AS FIELD OF UNSIGNED INT64,
+	field_uint8_arg AS FIELD OF UINT8,
+	field_uint16_arg AS FIELD OF UINT16,
+	field_uint32_arg AS FIELD OF UINT32,
+	field_uint64_arg AS FIELD OF UINT64,
 	field_real_arg AS FIELD OF REAL,
 	field_richreal_arg AS FIELD OF RICHREAL,
 	field_text_arg AS FIELD OF TEXT,
 
 	field_array_bool_arg AS FIELD OF ARRAY OF BOOL,
-	field_array_char_arg AS FIELD OF ARRAY OF CHARACTER,
+	field_array_char_arg AS FIELD OF ARRAY OF CHAR,
 	field_array_date_arg AS FIELD OF ARRAY OF DATE,
 	field_array_datetime_arg AS FIELD OF ARRAY OF DATETIME,
 	field_array_hirestime_arg AS FIELD OF ARRAY OF HIRESTIME,
@@ -304,10 +304,10 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 	field_array_int16_arg AS FIELD OF ARRAY OF INT16,
 	field_array_int32_arg AS FIELD OF ARRAY OF INT32,
 	field_array_int64_arg AS FIELD OF ARRAY OF INT64,
-	field_array_uint8_arg AS FIELD OF ARRAY OF UNSIGNED INT8,
-	field_array_uint16_arg AS FIELD OF ARRAY OF UNSIGNED INT16,
-	field_array_uint32_arg AS FIELD OF ARRAY OF UNSIGNED INT32,
-	field_array_uint64_arg AS FIELD OF ARRAY OF UNSIGNED INT64,
+	field_array_uint8_arg AS FIELD OF ARRAY OF UINT8,
+	field_array_uint16_arg AS FIELD OF ARRAY OF UINT16,
+	field_array_uint32_arg AS FIELD OF ARRAY OF UINT32,
+	field_array_uint64_arg AS FIELD OF ARRAY OF UINT64,
 	field_array_real_arg AS FIELD OF ARRAY OF REAL,
 	field_array_richreal_arg AS FIELD OF ARRAY OF RICHREAL,
 #	field_array_text_arg AS FIELD OF ARRAY OF TEXT,
@@ -317,7 +317,7 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 	table_arg AS TABLE,
 	table_complete_arg AS TABLE OF (
 		bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS BOOL,
-		char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS CHARACTER,
+		char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS CHAR,
 		date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS DATE,
 		datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS DATETIME,
 		hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS HIRESTIME,
@@ -325,16 +325,16 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 		int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS INT16,
 		int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS INT32,
 		int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS INT64,
-		uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT8,
-		uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT16,
-		uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT32,
-		uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT64,
+		uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT8,
+		uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT16,
+		uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT32,
+		uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT64,
 		real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS REAL,
 		richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS RICHREAL,
 		text_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS TEXT,
 
 		array_bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF BOOL,
-		array_char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF CHARACTER,
+		array_char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF CHAR,
 		array_date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF DATE,
 		array_datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF DATETIME,
 		array_hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF HIRESTIME,
@@ -342,16 +342,16 @@ PROCEDURE table_return_proc_all_type_args_This_is_a_long_variable_name_suffix_co
 		array_int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF INT16,
 		array_int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF INT32,
 		array_int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF INT64,
-		array_uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT8,
-		array_uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT16,
-		array_uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT32,
-		array_uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT64,
+		array_uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT8,
+		array_uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT16,
+		array_uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT32,
+		array_uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT64,
 		array_real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF REAL,
 		array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF RICHREAL))
 #		array_text_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF TEXT))
 RETURN TABLE OF (
 		bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS BOOL,
-		char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS CHARACTER,
+		char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS CHAR,
 		date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS DATE,
 		datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS DATETIME,
 		hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS HIRESTIME,
@@ -359,16 +359,16 @@ RETURN TABLE OF (
 		int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS INT16,
 		int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS INT32,
 		int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS INT64,
-		uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT8,
-		uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT16,
-		uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT32,
-		uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UNSIGNED INT64,
+		uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT8,
+		uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT16,
+		uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT32,
+		uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS UINT64,
 		real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS REAL,
 		richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS RICHREAL,
 		text_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS TEXT,
 
 		array_bool_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF BOOL,
-		array_char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF CHARACTER,
+		array_char_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF CHAR,
 		array_date_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF DATE,
 		array_datetime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF DATETIME,
 		array_hirestime_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF HIRESTIME,
@@ -376,10 +376,10 @@ RETURN TABLE OF (
 		array_int16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF INT16,
 		array_int32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF INT32,
 		array_int64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF INT64,
-		array_uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT8,
-		array_uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT16,
-		array_uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT32,
-		array_uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UNSIGNED INT64,
+		array_uint8_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT8,
+		array_uint16_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT16,
+		array_uint32_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT32,
+		array_uint64_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF UINT64,
 		array_real_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF REAL,
 		array_richreal_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF RICHREAL)
 #		array_text_field_This_is_a_long_field_suffix_coz_I_need_to_trigger_an_odd_behavior_002_bad AS ARRAY OF TEXT)

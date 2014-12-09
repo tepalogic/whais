@@ -93,7 +93,7 @@ GetInstance( const char* name, Logger* log)
   if (it == gmNameSpaces.end ())
     {
       IDBSHandler& hnd = DBSRetrieveDatabase( name);
-      gmNameSpaces.insert( NameSpacePair( 
+      gmNameSpaces.insert( NameSpacePair(
                         name,
                         prima::NameSpaceHolder( new prima::NameSpace( hnd))
                                          ));
@@ -105,7 +105,7 @@ GetInstance( const char* name, Logger* log)
   //TODO: 1. Investigate a potential mechanism to avoid allocating session on heap
   //         You need this in order to handle requested for force shout down.
   //      2. Throw an execution exception when pLog is null at this point
-  return *(new prima::Session( 
+  return *(new prima::Session(
                         *log,
                         gmNameSpaces.find( gDBSName)->second,
                         it->second)
@@ -283,7 +283,7 @@ Session::LoadCompiledUnit( WIFunctionalUnit& unit)
             values.push_back( value);
           }
 
-          const uint32_t procIndex = DefineProcedure( 
+          const uint32_t procIndex = DefineProcedure(
                                   name,
                                   nameLength,
                                   localsCount,
@@ -865,7 +865,8 @@ Session::DefineGlobalValue( const uint8_t* const   name,
 
       mLog.Log (LOG_ERROR, message);
 
-      throw InterException( _EXTRA( InterException::INVALID_TYPE_DESC));
+      throw InterException( _EXTRA( InterException::INVALID_TYPE_DESC),
+                            message.c_str ());
     }
 
 
@@ -888,7 +889,8 @@ Session::DefineGlobalValue( const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException( _EXTRA( InterException::EXTERNAL_FIRST));
+          throw InterException( _EXTRA( InterException::EXTERNAL_FIRST),
+                                message.c_str ());
         }
 
       const uint32_t  typeOff = typeMgr.AddType( tdBuff.get ());
@@ -910,7 +912,8 @@ Session::DefineGlobalValue( const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException( _EXTRA( InterException::EXTERNAL_MISMATCH));
+          throw InterException( _EXTRA( InterException::EXTERNAL_MISMATCH),
+                                message.c_str ());
         }
     }
   else
@@ -921,7 +924,8 @@ Session::DefineGlobalValue( const uint8_t* const   name,
 
       mLog.Log (LOG_ERROR, message);
 
-      throw InterException( _EXTRA( InterException::DUPLICATE_DEFINITION));
+      throw InterException( _EXTRA( InterException::DUPLICATE_DEFINITION),
+                            message.c_str ());
     }
 
   return glbEntry;
@@ -948,7 +952,7 @@ Session::DefineProcedure( const uint8_t* const   name,
 
   for (uint_t localIt = 0; localIt < localsCount; ++ localIt)
     {
-      const uint8_t* const typeDesc = typeMgr.TypeDescription( 
+      const uint8_t* const typeDesc = typeMgr.TypeDescription(
                                                         typesOffset[localIt]
                                                               );
 
@@ -962,7 +966,8 @@ Session::DefineProcedure( const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException( _EXTRA( InterException::INVALID_TYPE_DESC));
+          throw InterException( _EXTRA( InterException::INVALID_TYPE_DESC),
+                                message.c_str ());
         }
     }
 
@@ -982,14 +987,15 @@ Session::DefineProcedure( const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException( _EXTRA( InterException::EXTERNAL_FIRST));
+          throw InterException( _EXTRA( InterException::EXTERNAL_FIRST),
+                                message.c_str ());
         }
 
       bool argsMatch = (argsCount == ArgsCount( procIndex));
 
       for (uint_t localIt = 0; (localIt <= argsCount) && argsMatch; ++localIt)
         {
-          const uint8_t* const typeDesc = typeMgr.TypeDescription( 
+          const uint8_t* const typeDesc = typeMgr.TypeDescription(
                                                         typesOffset[localIt]
                                                                   );
           if (memcmp( typeDesc,
@@ -1008,7 +1014,8 @@ Session::DefineProcedure( const uint8_t* const   name,
 
           mLog.Log (LOG_ERROR, message);
 
-          throw InterException( _EXTRA( InterException::EXTERNAL_MISMATCH));
+          throw InterException( _EXTRA( InterException::EXTERNAL_MISMATCH),
+                                message.c_str ());
 
         }
 
@@ -1022,7 +1029,8 @@ Session::DefineProcedure( const uint8_t* const   name,
 
       mLog.Log (LOG_ERROR, message);
 
-      throw InterException( _EXTRA( InterException::DUPLICATE_DEFINITION));
+      throw InterException( _EXTRA( InterException::DUPLICATE_DEFINITION),
+                            message.c_str ());
     }
 
   return procMgr.AddProcedure( name,

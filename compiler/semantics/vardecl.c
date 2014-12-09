@@ -114,7 +114,6 @@ add_declaration( struct ParserState* const paser,
       char text[128];
 
       wh_copy_first( text, decl->label, sizeof text, decl->labelLength);
-
       log_message( paser, paser->bufferPos, MSG_VAR_DEFINED, text);
     }
   else
@@ -131,6 +130,16 @@ add_declaration( struct ParserState* const paser,
           && ! process_table_decls( paser, &var, type->val.u_tspec.extra))
         {
           result = NULL;   /* Something went wrong along the way */
+        }
+      else if ((stmt->type != STMT_GLOBAL)
+               && (wh_ostream_size (&stmt->spec.proc.code) > 0))
+        {
+          char text[128];
+
+          wh_copy_first( text, var.label, sizeof text, var.labelLength);
+          log_message( paser, paser->bufferPos, MSG_VAR_LATE, text);
+
+          paser->abortError = TRUE;
         }
       else if ((result = stmt_add_declaration( stmt, &var, parameter)) == NULL)
         {

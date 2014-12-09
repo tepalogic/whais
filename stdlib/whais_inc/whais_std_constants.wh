@@ -45,11 +45,11 @@ EXTERN PROCEDURE min_bool() RETURN BOOL;
 #Get the maximum non null values for a BOOL typed value.
 EXTERN PROCEDURE max_bool() RETURN BOOL;
 
-#Get the minimum non null values for a CHARACTER typed value.
-EXTERN PROCEDURE min_char() RETURN CHARACTER;
+#Get the minimum non null values for a CHAR typed value.
+EXTERN PROCEDURE min_char() RETURN CHAR;
 
-#Get the maximum non null values for a CHARACTER typed value.
-EXTERN PROCEDURE max_char() RETURN CHARACTER;
+#Get the maximum non null values for a CHAR typed value.
+EXTERN PROCEDURE max_char() RETURN CHAR;
 
 #Get the minimum non null values for a DATE typed value.
 EXTERN PROCEDURE min_date() RETURN DATE;
@@ -93,29 +93,29 @@ EXTERN PROCEDURE min_i64() RETURN INT64;
 #Get the maximum non null values for a INT64 typed values.
 EXTERN PROCEDURE max_i64() RETURN INT64;
 
-#Get the minimum non null values for a UNSIGNED INT8 typed value.
-EXTERN PROCEDURE min_u8() RETURN UNSIGNED INT8;
+#Get the minimum non null values for a UINT8 typed value.
+EXTERN PROCEDURE min_u8() RETURN UINT8;
 
-#Get the maximum non null values for a UNSIGNED INT8 typed values.
-EXTERN PROCEDURE max_u8() RETURN UNSIGNED INT8;
+#Get the maximum non null values for a UINT8 typed values.
+EXTERN PROCEDURE max_u8() RETURN UINT8;
 
-#Get the minimum non null values for a UNSIGNED INT16 typed value.
-EXTERN PROCEDURE min_u16() RETURN UNSIGNED INT16;
+#Get the minimum non null values for a UINT16 typed value.
+EXTERN PROCEDURE min_u16() RETURN UINT16;
 
-#Get the maximum non null values for a UNSIGNED INT16 typed values.
-EXTERN PROCEDURE max_u16() RETURN UNSIGNED INT16;
+#Get the maximum non null values for a UINT16 typed values.
+EXTERN PROCEDURE max_u16() RETURN UINT16;
 
-#Get the minimum non null values for a UNSIGNED INT32 typed value.
-EXTERN PROCEDURE min_u32() RETURN UNSIGNED INT32;
+#Get the minimum non null values for a UINT32 typed value.
+EXTERN PROCEDURE min_u32() RETURN UINT32;
 
-#Get the maximum non null values for a UNSIGNED INT32 typed values.
-EXTERN PROCEDURE max_u32() RETURN UNSIGNED INT32;
+#Get the maximum non null values for a UINT32 typed values.
+EXTERN PROCEDURE max_u32() RETURN UINT32;
 
-#Get the minimum non null values for a UNSIGNED INT64 typed value.
-EXTERN PROCEDURE min_u64() RETURN UNSIGNED INT64;
+#Get the minimum non null values for a UINT64 typed value.
+EXTERN PROCEDURE min_u64() RETURN UINT64;
 
-#Get the maximum non null values for a UNSIGNED INT64 typed values.
-EXTERN PROCEDURE max_u64() RETURN UNSIGNED INT64;
+#Get the maximum non null values for a UINT64 typed values.
+EXTERN PROCEDURE max_u64() RETURN UINT64;
 
 #Get the minimum non null values for a REAL typed value.
 EXTERN PROCEDURE min_real() RETURN REAL;

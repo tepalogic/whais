@@ -330,8 +330,7 @@ TypeManager::CreateGlobalValue( uint8_t*    inoutTypeDesc,
 
       case T_TEXT:
         throw InterException( _EXTRA( InterException::TEXT_ARRAY_NOT_SUPP),
-                              "This implementation does not support variables "
-                                "with array of text type.");
+                              NULL);
 
       case T_UNDETERMINED:
         return GlobalValue( ArrayOperand(  DArray()));
@@ -344,13 +343,20 @@ TypeManager::CreateGlobalValue( uint8_t*    inoutTypeDesc,
     {
       assert( persitentTable == NULL);
 
+      const uint16_t type = GET_FIELD_TYPE (spec.Type ());
+      if (IS_ARRAY (type) && (GET_BASIC_TYPE (type) == T_TEXT))
+        {
+          throw InterException( _EXTRA( InterException::TEXT_ARRAY_NOT_SUPP),
+                                NULL);
+        }
+
       return GlobalValue( FieldOperand( GET_FIELD_TYPE( spec.Type())));
     }
   else if (IS_TABLE( spec.Type()))
     {
       if (persitentTable == NULL)
         {
-          ITable& table = create_non_persistent_table( 
+          ITable& table = create_non_persistent_table(
                                              mNameSpace.GetDBSHandler(),
                                              inoutTypeDesc
                                                       );
@@ -487,8 +493,7 @@ TypeManager::CreateLocalValue( uint8_t* inoutTypeDesc)
 
       case T_TEXT:
         throw InterException( _EXTRA( InterException::TEXT_ARRAY_NOT_SUPP),
-                              "This implementation does not support variables "
-                                "with array of text type.");
+                              NULL);
 
       case T_UNDETERMINED:
         //Just a default
@@ -500,11 +505,18 @@ TypeManager::CreateLocalValue( uint8_t* inoutTypeDesc)
     }
   else if (IS_FIELD( spec.Type()))
     {
+      const uint16_t type = GET_FIELD_TYPE (spec.Type ());
+      if (IS_ARRAY (type) && (GET_BASIC_TYPE (type) == T_TEXT))
+        {
+          throw InterException( _EXTRA( InterException::TEXT_ARRAY_NOT_SUPP),
+                                NULL);
+        }
+
       return StackValue( FieldOperand( GET_FIELD_TYPE( spec.Type())));
     }
   else if (IS_TABLE( spec.Type()))
     {
-      ITable& table = create_non_persistent_table( 
+      ITable& table = create_non_persistent_table(
                                              mNameSpace.GetDBSHandler(),
                                              inoutTypeDesc
                                                   );
