@@ -158,11 +158,38 @@ install_proc_decl( struct ParserState* const parser,
 
           MARK_AS_EXTERNAL( stmt.spec.proc.procId);
           MARK_AS_NOT_REFERENCED( stmt.spec.proc.procId);
+
+          check = wh_array_add( procs, &stmt);
         }
       else
-        stmt.spec.proc.procId = parser->globalStmt.spec.glb.procsCount++;
+        {
+          stmt.spec.proc.procId = parser->globalStmt.spec.glb.procsCount++;
+          check = wh_array_add( procs, &stmt);
+          if ((check != NULL)
+              && (parser->globalStmt.spec.glb.procsCount !=
+                  wh_array_count( procs)))
+            {
+              assert( parser->globalStmt.spec.glb.procsCount <
+                      wh_array_count( procs));
 
-      check = wh_array_add( procs, &stmt);
+              struct Statement* movedEntry = wh_array_get(
+                                                      procs,
+                                                      stmt.spec.proc.procId
+                                                          );
+
+              assert (IS_EXTERNAL( movedEntry->spec.proc.procId));
+              assert (! IS_REFERRED( movedEntry->spec.proc.procId));
+
+              memcpy (check, movedEntry, sizeof *movedEntry);
+              memcpy (movedEntry, &stmt, sizeof stmt);
+
+              assert (! IS_EXTERNAL( movedEntry->spec.proc.procId));
+              assert (IS_REFERRED( movedEntry->spec.proc.procId));
+
+              check = movedEntry;
+            }
+        }
+
       if (check == NULL)
         {
           log_message( parser, IGNORE_BUFFER_POS, MSG_NO_MEM);

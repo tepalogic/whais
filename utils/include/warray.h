@@ -67,7 +67,6 @@ wh_array_init_ex( struct WArray* const outArray,
 void*
 wh_array_add( struct WArray* const array, const void* const data);
 
-
 void*
 wh_array_get( const struct WArray* const array, const uint_t index);
 

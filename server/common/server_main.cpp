@@ -130,7 +130,7 @@ ServerStopHandler( DWORD)
 static BOOL
 set_signals()
 {
- return SetConsoleCtrlHandler( ServerStopHandler, TRUE);
+  return SetConsoleCtrlHandler( ServerStopHandler, TRUE);
 }
 
 #endif

@@ -2,6 +2,11 @@
 
 rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size
 
+if [ "$1" == "--clean" ]; then
+	echo "Clean done!" ;
+	exit 0;
+fi
+
 
 mkdir admin_db
 if [ $? -ne 0 ]; then

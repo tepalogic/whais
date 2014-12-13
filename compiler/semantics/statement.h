@@ -68,7 +68,7 @@ struct _ProcStatementSpec
   struct WArray        branchStack;  /* Keeps track of conditional branches.*/
   struct WArray        loopStack;    /* Keeps track of looping statements */
   uint32_t             procId;       /* Procedure's ID in the import table. */
-  uint16_t             syncTracker;  /* Keeps track of sync staments. */
+  uint16_t             syncTracker;  /* Keeps track of sync statements. */
 };
 
 

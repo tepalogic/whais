@@ -81,7 +81,7 @@ EXTERN PROCEDURE table_reusable_row( t AS TABLE) RETURN UINT64;
 #Out:
 #   The provided row index.
 EXTERN PROCEDURE table_reuse_row( t AS TABLE,
-                                  r AS UINT64) RETURN UINT64;
+                                  r AS UINT64) RETURN BOOL;
                                      
 #Exchange the content of two tables' rows.
 #In:
