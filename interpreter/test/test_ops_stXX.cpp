@@ -92,7 +92,7 @@ test_op_stb( Session& session)
 {
   std::cout << "Testing bool assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -136,7 +136,7 @@ test_op_stc( Session& session)
 {
   std::cout << "Testing char assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -180,7 +180,7 @@ test_op_std( Session& session)
 {
   std::cout << "Testing date assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -225,7 +225,7 @@ test_op_stdt( Session& session)
 {
   std::cout << "Testing date time assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -269,7 +269,7 @@ test_op_stht( Session& session)
 {
   std::cout << "Testing hires date time assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -315,7 +315,7 @@ test_op_stXX( Session&       session,
 {
   std::cout << "Testing " << pText << " assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -359,7 +359,7 @@ test_op_stt( Session& session)
 {
   std::cout << "Testing text assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -403,7 +403,7 @@ test_op_stta( Session& session)
 {
   std::cout << "Testing table assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -461,7 +461,7 @@ test_op_stf( Session& session)
 {
   std::cout << "Testing field assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );
@@ -475,7 +475,7 @@ test_op_stf( Session& session)
   DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
 
   ITable& firstTable = session.DBSHandler().CreateTempTable( 1, &fd);
-  TableOperand tableOp( session.DBSHandler(), firstTable);
+  TableOperand tableOp( session.DBSHandler(), firstTable, true);
 
   FieldOperand op;
   FieldOperand op2 (tableOp, 0);
@@ -523,7 +523,7 @@ test_op_sta( Session& session)
 {
   std::cout << "Testing attay assignment...\n";
 
-  const uint32_t procId = session.FindProcedure( 
+  const uint32_t procId = session.FindProcedure(
                                               _RC (const uint8_t*, procName),
                                               sizeof procName - 1
                                                 );

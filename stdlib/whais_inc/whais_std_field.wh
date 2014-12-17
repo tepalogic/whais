@@ -48,7 +48,7 @@ EXTERN PROCEDURE field_values_indexed(f AS FIELD) RETURN BOOL;
 #   @f - The field value.
 #Out:
 #   A text holding the field name. 
-EXTERN PROCEDURE table_name(f AS FIELD) RETURN TEXT;
+EXTERN PROCEDURE field_name(f AS FIELD) RETURN TEXT;
 
 #Get the index of a table field.
 #In:
@@ -104,5 +104,5 @@ EXTERN PROCEDURE field_average (f AS FIELD) RETURN RICHREAL;
 #   @f - The field value.
 #   @r - TRUE to sort reversely.
 #Out:
-#   If successfully this will the osrted table.
+#   If successfully this will the sorted table.
 EXTERN PROCEDURE field_sort_table (f AS FIELD, r AS BOOL) RETURN TABLE;

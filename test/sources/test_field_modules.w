@@ -6,21 +6,8 @@
 #
 ################################################################################
 
-EXTERN PROCEDURE table_field_by_id (t AS TABLE, f AS UINT64) RETURN FIELD;
 
-EXTERN PROCEDURE field_name (t as FIELD) RETURN TEXT;
-
-EXTERN PROCEDURE field_smallest (t as FIELD) RETURN UINT64;
-EXTERN PROCEDURE field_biggest (t as FIELD) RETURN UINT64;
-EXTERN PROCEDURE field_average (t as FIELD) RETURN RICHREAL;
-
-EXTERN PROCEDURE match_rows (t    AS FIELD, 
-                             min  AS UNDEFINED,
-						     max  AS UNDEFINED,
-							 from AS UINT64,
-						     to   AS UINT64) RETURN ARRAY OF UINT64;
-
-EXTERN PROCEDURE field_sort_table (t as FIELD, reverse AS BOOL) RETURN TABLE;
+#@include whais_std.wh
 
 PROCEDURE test_field_sort (t AS TABLE, f AS UINT64, reverse AS BOOL)
 RETURN TABLE

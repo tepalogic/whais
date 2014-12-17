@@ -301,10 +301,10 @@ test_table_value( IDBSHandler&            dbsHnd,
         return false;
 
       //This op should take the table ownership!
-      TableOperand tableOp( dbsHnd, *refTable);
+      TableOperand tableOp( dbsHnd, *refTable, true);
 
       //The table owner ship should be shared with this.
-      nativeOp.CopyNativeObjectOperand( 
+      nativeOp.CopyNativeObjectOperand(
                         NativeObjectOperand( tableOp.GetTableReference())
                                        );
     }
@@ -434,13 +434,13 @@ test_field_value( IDBSHandler&            dbsHnd,
         return false;
 
       //This op should take the table ownership!
-      TableOperand tableOp( dbsHnd, *refTable);
+      TableOperand tableOp( dbsHnd, *refTable, true);
 
       op1 = FieldOperand( tableOp.GetTableReference(), 0);
       op2 = FieldOperand( tableOp.GetTableReference(), 1);
 
       //The table owner ship should be shared with this.
-      nativeOp.CopyNativeObjectOperand( 
+      nativeOp.CopyNativeObjectOperand(
                         NativeObjectOperand( tableOp.GetTableReference())
                                        );
     }

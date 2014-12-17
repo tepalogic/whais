@@ -2091,10 +2091,7 @@ DArray::MakeMirror( DArray& inoutArray) const
     {
       assert( mArray->ShareCount() == 0);
 
-      auto_ptr<IArrayStrategy> newStrategy(
-                                      new TemporalArray( mArray->Type())
-                                           );
-
+      auto_ptr<IArrayStrategy> newStrategy(new TemporalArray( mArray->Type()));
       newStrategy->Clone( *mArray);
       newStrategy->IncrementReferenceCount();
       mArray->DecrementReferenceCount();

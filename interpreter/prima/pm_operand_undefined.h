@@ -168,11 +168,8 @@ private:
     bool       mNull;
   };
 
-
   void Initialise();
   void Cleanup();
-
-
 
   uint16_t               mType;
   union

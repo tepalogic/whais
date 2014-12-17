@@ -68,7 +68,7 @@ TableOperand::GetFieldAt( const FIELD_INDEX field)
 ITable&
 TableOperand::GetTable()
 {
-  return mTableRef->GetTable();
+  return TableOperand::GetTableReference().GetTable();
 }
 
 
@@ -104,6 +104,16 @@ TableReference&
 TableOperand::GetTableReference()
 {
   assert( mTableRef != NULL);
+
+  if ( ! mChangeable)
+    {
+      TableReference* const temp = mTableRef->Spawn ();
+
+      mTableRef->DecrementRefCount ();
+      mTableRef = temp;
+      mTableRef->IncrementRefCount ();
+      mChangeable = true;
+    }
 
   return *mTableRef;
 }

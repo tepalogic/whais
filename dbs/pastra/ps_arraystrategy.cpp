@@ -232,8 +232,8 @@ NullArray::RawRead( const uint64_t      offset,
                     const uint64_t      size,
                     uint8_t* const      buffer)
 {
-  //Someone does not know what is doing!
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+  if ((offset != 0) || (size != 0))
+    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -242,16 +242,16 @@ NullArray::RawWrite( const uint64_t           offset,
                      const uint64_t           size,
                      const uint8_t* const     buffer)
 {
-  //Someone does not know what is doing!
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+  if ((offset != 0) || (size != 0))
+    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 void
 NullArray::ColapseRaw( const uint64_t offset, const uint64_t count)
 {
-  //Someone does not know what is doing!
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+  if ((offset != 0) || (count != 0))
+    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 }
 
 

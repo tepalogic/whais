@@ -443,14 +443,14 @@ op_func_stud( ProcedureCall& call, int64_t& offset)
 
       else
         {
-          dest.CopyNativeObjectOperand( 
+          dest.CopyNativeObjectOperand(
                               NativeObjectOperand( src.NativeObject())
                                        );
         }
     }
   else if (IS_TABLE( srcType))
     {
-      dest.CopyNativeObjectOperand( 
+      dest.CopyNativeObjectOperand(
                             NativeObjectOperand( src.GetTableReference())
                                    );
     }
@@ -464,7 +464,7 @@ op_func_stud( ProcedureCall& call, int64_t& offset)
       const FIELD_INDEX fieldIndex  = src.GetField();
 
 
-      dest.CopyNativeObjectOperand( 
+      dest.CopyNativeObjectOperand(
                         NativeObjectOperand( temp, fieldIndex, type)
                                    );
     }

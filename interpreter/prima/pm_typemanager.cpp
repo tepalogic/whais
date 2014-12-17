@@ -361,12 +361,14 @@ TypeManager::CreateGlobalValue( uint8_t*    inoutTypeDesc,
                                              inoutTypeDesc
                                                       );
           return GlobalValue( TableOperand( mNameSpace.GetDBSHandler(),
-                                            table));
+                                            table,
+                                            true));
         }
       else
         {
           return GlobalValue( TableOperand( mNameSpace.GetDBSHandler(),
-                                            *persitentTable));
+                                            *persitentTable,
+                                            true));
         }
     }
 
@@ -521,7 +523,9 @@ TypeManager::CreateLocalValue( uint8_t* inoutTypeDesc)
                                              inoutTypeDesc
                                                   );
 
-      return StackValue( TableOperand( mNameSpace.GetDBSHandler(), table));
+      return StackValue( TableOperand( mNameSpace.GetDBSHandler(),
+                                       table,
+                                       false));
     }
 
   assert( false);

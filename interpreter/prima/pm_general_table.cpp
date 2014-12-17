@@ -48,7 +48,7 @@ GeneralTable::IsTemporal() const
 ITable&
 GeneralTable::Spawn() const
 {
-  throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
+  return Instance ();
 }
 
 
@@ -129,7 +129,6 @@ GeneralTable::IsIndexed( const FIELD_INDEX) const
 {
   throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 }
-
 
 
 void

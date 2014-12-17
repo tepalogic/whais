@@ -13,7 +13,7 @@ if [ $? -ne 0 ]; then
 	echo "Failed to create 'admin_db' directory"
 	exit 1
 fi
-echo 'table_add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db -v 5
+echo 'table_add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Failed to create 'administrator' database"
 	exit 1
@@ -25,7 +25,7 @@ create_empty_test_db () {
 		echo "Failed to create '$1' directory."
 		exit 1
 	fi
-	echo 'quit' |  wcmd -c $1 -d ./$1 -v 5
+	echo 'quit' |  wcmd -c $1 -d ./$1  > /dev/null
 	if [ $? -ne 0 ]; then
 		echo "Failed to create '$1' database."
 		exit 1
@@ -46,7 +46,8 @@ fi
 
 for src in ./sources/*.w
 do
-	whc ${src}
+	echo "Compiling '${src}' ... "
+	whc ${src} -I ../stdlib/whais_inc/
 	if [ $? -ne 0 ]; then
 		echo "Failed to compile '${src}' directory"
 		exit 1

@@ -25,6 +25,8 @@
  * strstore.c - Implements a string storage used to hold the parsed text.
  */
 
+#include <assert.h>
+
 #include "whais.h"
 
 #include "strstore.h"
@@ -72,7 +74,6 @@ release_string_store( StringStoreHnd* handle)
       mem_free( link);
       link = temp;
     }
-
 }
 
 
@@ -85,13 +86,15 @@ alloc_str( StringStoreHnd handle, uint_t length)
   while( (link->unused < length) && (link->next != NULL))
     link = link->next;
 
-  if (link->unused > length)
+  if (link->unused >= length)
     {
       result        = (link->allocated - link->unused) + link->data;
       link->unused -= length;
     }
   else
     {
+      assert (link->next == NULL);
+
       link->next = alloc_link( MAX (length,  DEFAULT_STR_SIZE));
       link       = link->next;
 

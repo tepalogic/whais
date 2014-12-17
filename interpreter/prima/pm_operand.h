@@ -1546,16 +1546,18 @@ public:
 class TableOperand : public BaseOperand
 {
 public:
-  TableOperand( IDBSHandler& dbsHnd, ITable& table)
+  TableOperand( IDBSHandler& dbsHnd, ITable& table, const bool changeable)
     : BaseOperand(),
-      mTableRef( new TableReference( dbsHnd, table))
+      mTableRef( new TableReference( dbsHnd, table)),
+      mChangeable (changeable)
   {
     mTableRef->IncrementRefCount();
   }
 
   TableOperand( const TableOperand& source)
     : BaseOperand(),
-      mTableRef( source.mTableRef)
+      mTableRef( source.mTableRef),
+      mChangeable (source.mChangeable)
   {
     mTableRef->IncrementRefCount();
   }
@@ -1576,6 +1578,8 @@ public:
         mTableRef->DecrementRefCount();
         mTableRef = source.mTableRef;
         mTableRef->IncrementRefCount();
+
+        mChangeable = source.mChangeable;
       }
     return *this;
   }
@@ -1600,6 +1604,7 @@ public:
 
 private:
   TableReference* mTableRef;
+  bool            mChangeable;
 };
 
 

@@ -37,8 +37,6 @@ namespace prima {
 class GeneralTable : public ITable
 {
 public:
-  GeneralTable();
-
   virtual bool IsTemporal() const;
 
   virtual ITable& Spawn() const;
@@ -211,7 +209,6 @@ public:
                      const ROW_INDEX    to,
                      const bool         reverse);
 
-
   virtual DArray MatchRows( const DBool&        min,
                             const DBool&        max,
                             const ROW_INDEX     fromRow,
@@ -301,7 +298,6 @@ public:
                             const ROW_INDEX       fromRow,
                             const ROW_INDEX       toRow,
                             const FIELD_INDEX     field);
-
   virtual void Flush();
 
   virtual void LockTable();
@@ -309,6 +305,9 @@ public:
   virtual void UnlockTable();
 
   static GeneralTable& Instance();
+
+private:
+  GeneralTable();
 };
 
 } //namespace prima

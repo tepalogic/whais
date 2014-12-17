@@ -2540,9 +2540,9 @@ translate_call_exp( struct ParserState* const   parser,
                   return sgResultUnk;
                 }
             }
-          else if (IS_TABLE( result.type) == FALSE)
+          else if ( ! IS_TABLE( result.type))
             {
-              if (IS_ARRAY( result.type) == IS_ARRAY( argType.type))
+              if (IS_ARRAY (argType.type))
                 {
                   const uint_t        arg_t  = GET_BASIC_TYPE( argType.type);
                   const uint_t        res_t  = GET_BASIC_TYPE( result.type);
@@ -2551,9 +2551,8 @@ translate_call_exp( struct ParserState* const   parser,
                   assert( arg_t <= T_UNDETERMINED);
                   assert( res_t <= T_UNDETERMINED);
 
-                  if (((IS_ARRAY( result.type) == FALSE) && (W_NA == tempOp))
-                      || (IS_ARRAY( result.type)
-                         && (arg_t != T_UNDETERMINED) && (arg_t != res_t)))
+                  if ( ! IS_ARRAY (result.type)
+                      || ((arg_t != T_UNDETERMINED) && (tempOp == W_NA)))
                     {
                       log_message( parser,
                                    parser->bufferPos,
@@ -2569,7 +2568,32 @@ translate_call_exp( struct ParserState* const   parser,
                       return sgResultUnk;
                     }
                 }
-              else
+              else if ( ! IS_ARRAY( result.type))
+                {
+                  const uint_t        arg_t  = GET_BASIC_TYPE( argType.type);
+                  const uint_t        res_t  = GET_BASIC_TYPE( result.type);
+                  const enum W_OPCODE tempOp = store_op[arg_t][res_t];
+
+                  assert( arg_t <= T_UNDETERMINED);
+                  assert( res_t <= T_UNDETERMINED);
+
+                  if ((arg_t != T_UNDETERMINED) && (tempOp == W_NA))
+                    {
+                      log_message( parser,
+                                   parser->bufferPos,
+                                   MSG_PROC_ARG_NA,
+                                   wh_copy_first( temp,
+                                                  proc->spec.proc.name,
+                                                  sizeof temp,
+                                                  proc->spec.proc.nameLength),
+                                   argCount,
+                                   type_to_text( result.type),
+                                   type_to_text( argType.type));
+
+                      return sgResultUnk;
+                    }
+                }
+              else if (GET_BASIC_TYPE( argType.type) != T_UNDETERMINED)
                 {
                   log_message( parser,
                                parser->bufferPos,

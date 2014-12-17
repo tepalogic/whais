@@ -547,7 +547,7 @@ NullOperand::GetValue( DDate& outValue) const
 void
 NullOperand::GetValue( DDateTime& outValue) const
 {
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
+  assign_null( outValue);
 }
 
 
@@ -3758,7 +3758,7 @@ SessionStack::Push( const DArray& value)
 void
 SessionStack::Push( IDBSHandler& dbsHnd, ITable& table)
 {
-  TableOperand stackOp( dbsHnd, table);
+  TableOperand stackOp( dbsHnd, table, true);
 
   StackValue stackValue( stackOp);
 

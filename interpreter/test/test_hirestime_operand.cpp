@@ -463,7 +463,7 @@ test_array_tableread_value( IDBSHandler& dbsHnd,
   ITable& testTable = dbsHnd.CreateTempTable( 2, fd);
   const ROW_INDEX row = testTable.GetReusableRow( true);
   {
-    TableOperand tableOp( dbsHnd, testTable);
+    TableOperand tableOp( dbsHnd, testTable, true);
     FieldOperand fieldArrayOp( tableOp, testTable.RetrieveField( "array_type"));
     FieldOperand fieldSimpleOp( tableOp,
                                 testTable.RetrieveField( "simple_type"));
@@ -519,11 +519,11 @@ main()
     success = success && test_op_invalid_conv( op);
     success = success && test_null_write( op,
                                           DHiresTime( 0,1,1, 0, 59, 0, 0));
-    success = success && test_array_read_value( 
+    success = success && test_array_read_value(
                                             get_test_array(),
                                             DHiresTime( 0,1,1, 0, 59, 0, 0)
                                                 );
-    success = success && test_array_tableread_value( 
+    success = success && test_array_tableread_value(
                                               dbsHnd,
                                               get_test_array(),
                                               DHiresTime( 0,1,1, 0, 59, 0, 0)

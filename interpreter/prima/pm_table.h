@@ -48,6 +48,11 @@ public:
   {
   }
 
+  TableReference* const Spawn ()
+  {
+    return new TableReference (mDbsHnd, mTable.Spawn ());
+  }
+
   void IncrementRefCount()
   {
     ++mRefCount;
