@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <map>
 #include <vector>
@@ -782,7 +783,7 @@ handle_procedure_table_param( WH_CONNECTION       hnd,
                    arrayId < entry->second.size();
                    ++arrayId)
                 {
-                  wcs = update_stack_value( 
+                  wcs = update_stack_value(
                               hnd,
                               it->second.mType & ~WHC_TYPE_ARRAY_MASK,
                               it->first.c_str(),
@@ -1132,18 +1133,15 @@ fetch_execution_table_result( WH_CONNECTION       hnd,
         {
           for (uint_t i = 0; i < fields.size(); ++i )
             {
-              cout.width( 3);
-              cout << std::right << row;
-              cout.width( 0);
-              cout << '|';
-              cout.width( largestFieldName);
-              cout << std::left << fields[i].name << std::right;
-              cout.width( 0);
-              cout << " : ";
+              cout << setw (3) << right << setfill (' ') << row
+                   << setw (0) << '|'
+                   << setw ( largestFieldName) << left << setfill (' ')
+                   << fields[i].name
+                   << std::right << setw (0) << " : ";
 
               if (fields[i].type & WHC_TYPE_ARRAY_MASK)
                 {
-                  if ( ! fetch_execution_array_result( 
+                  if ( ! fetch_execution_array_result(
                                       hnd,
                                       fields[i].type & ~WHC_TYPE_ARRAY_MASK,
                                       fields[i].name,
@@ -1204,7 +1202,11 @@ fetch_execution_result( WH_CONNECTION hnd)
       if ((wcs = WValueFieldsCount( hnd, &fieldsCount)) != WCS_OK)
         goto fetch_result_fail;
 
-      assert( fieldsCount > 0);
+      if (fieldsCount == 0)
+        {
+          cout << "TABLE\n";
+          return true;
+        }
 
       cout << "TABLE OF (";
       for (uint_t i = 0; i < fieldsCount; ++i)

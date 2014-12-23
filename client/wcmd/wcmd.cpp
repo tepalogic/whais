@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 
 #include "dbs/dbs_mgr.h"
+#include "client/whais_connector.h"
 
 #include "wcmd_optglbs.h"
 #include "wcmd_cmdsmgr.h"
@@ -96,7 +97,7 @@ static const char usageDescription[] =
 "                            4: Print the various information in addition.\n"
 "                            5: Print the debug information in addition.\n"
 "                           Default values is 2.\n"
-"    -s, --command script   Execute the script supplied at the command line,\n"
+"    -s, --script file      Execute the commands from the supplied file,\n"
 "                           rather to execute interactively.\n"
 "\n"
 "    -l, --license          Prints license terms.\n"
@@ -283,9 +284,7 @@ ExecuteInteractively( istream& is)
   while( ! sFinishInteraction)
     {
       if ((commandStmt.length() == 0) && (&is == &cin))
-        {
-          cout << "> ";
-        }
+        cout << "> ";
 
       string line;
       if (getline( is, line))
@@ -585,7 +584,7 @@ main( const int argc, char *argv[])
           SetVerbosityLevel( verbosityLevel);
         }
       else if ((strcmp( argv[currentArg], "-s") == 0) ||
-               (strcmp( argv[currentArg], "--command" ) == 0))
+               (strcmp( argv[currentArg], "--script" ) == 0))
         {
           ++currentArg;
           if (currentArg == argc)
@@ -729,21 +728,56 @@ main( const int argc, char *argv[])
 
           if (IsOnlineDatabase())
             {
-            if (GetUserPassword().size() == 0)
-              {
-                string password;
+              if (GetUserPassword ().size () == 0)
+                {
+                  string password;
 
-                cout << "Password"
-                     << ( (GetUserId() == 0) ? "(root): " : ": ");
+                  cout << "Password"
+                      << ((GetUserId () == 0) ? "(root): " : ": ");
 
-                wh_disable_echo();
-                getline( cin, password);
-                wh_enable_echo();
-                cout << endl;
+                  wh_disable_echo ();
+                  getline (cin, password);
+                  wh_enable_echo ();
+                  cout << endl;
 
-                SetUserPassword( password.c_str());
-              }
-              AddOnlineTableCommands();
+                  SetUserPassword (password.c_str ());
+                }
+
+              try
+                {
+                  WH_CONNECTION conHdl = NULL;
+                  uint32_t cs = WConnect (GetRemoteHostName ().c_str (),
+                                          GetConnectionPort ().c_str (),
+                                          GetWorkingDB ().c_str (),
+                                          GetUserPassword ().c_str (),
+                                          GetUserId (), DEFAULT_FRAME_SIZE,
+                                          &conHdl);
+                  if (cs != WCS_OK)
+                    throw 0;
+
+                  cs = WPingServer (conHdl);
+                  WClose (conHdl);
+                  if (cs != WCS_OK)
+                    throw 0;
+                }
+              catch (...)
+                {
+                  /*
+                   * This message might or might not appear. Though
+                   * the program terminates, if it gets on this path, the
+                   * error message is displayed from time to time.
+                   *
+                   * Probably a toolchain/OS/Bash bug!
+                   */
+
+                  cerr << "ERROR: Failed to properly connect at '"
+                       << GetRemoteHostName () << ':'
+                       << GetConnectionPort () << "'!\n";
+
+                  return 0;
+                }
+
+              AddOnlineTableCommands ();
             }
           else
             {
@@ -784,7 +818,7 @@ main( const int argc, char *argv[])
   catch( ...)
   {
     cerr << "Fatal error ... Unknown exception was thrown.\n";
-    result = 0xFF;
+    result = 1;
   }
 
   try
@@ -813,7 +847,7 @@ main( const int argc, char *argv[])
   catch( ...)
   {
     cerr << "Fatal error ... Unknown exception was thrown.\n";
-    result = (result != 0)  ? result : 0xFF;
+    result = (result != 0)  ? result : 1;
   }
 
   whs_clean();

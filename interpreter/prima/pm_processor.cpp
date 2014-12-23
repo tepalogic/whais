@@ -388,7 +388,18 @@ op_func_stta( ProcedureCall& call, int64_t& offset)
   BaseOperand& src  = _SC (BaseOperand&, stack[stackSize - 1].Operand());
   BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand());
 
-  dest.CopyTableOp( src.GetTableOp());
+  if (src.GetType () == T_UNKNOWN)
+    {
+      assert (src.IsNull ());
+      assert (IS_TABLE (dest.GetType ()));
+
+      TableReference& ref = dest.GetTableReference ();
+      dest.CopyTableOp (TableOperand (ref.GetDBSHandler (),
+                                      ref.GetTable ().Spawn (),
+                                      true));
+    }
+  else
+    dest.CopyTableOp( src.GetTableOp());
 
   stack.Pop (1);
 }
@@ -406,7 +417,15 @@ op_func_stf( ProcedureCall& call, int64_t& offset)
   BaseOperand& src  = _SC (BaseOperand&, stack[stackSize - 1].Operand());
   BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand());
 
-  dest.CopyFieldOp( src.GetFieldOp());
+  if (src.GetType () == T_UNKNOWN)
+    {
+      assert (src.IsNull ());
+      assert (IS_FIELD (dest.GetType ()));
+
+      dest.CopyFieldOp (FieldOperand (GET_BASIC_TYPE (dest.GetType ())));
+    }
+  else
+    dest.CopyFieldOp( src.GetFieldOp());
 
   stack.Pop (1);
 }

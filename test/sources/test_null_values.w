@@ -37,6 +37,7 @@ DO
     write_log ("Start of null_test_1");
     IF (row != NULL) DO
         write_log ("... FAIL: 'row' is not null by default");
+        
     END
 
     IF (result != NULL) DO
@@ -1031,6 +1032,94 @@ DO
 ENDPROC
 
 
+
+#TEST: null_test_1_4
+#Call this function twice a row and make sure it returns TRUE each time.
+PROCEDURE null_test_1_4 ()
+RETURN BOOL
+DO
+    LET row AS UINT64;
+    LET tab AS TABLE OF (field1 AS DATE);
+
+    write_log ("Start of null_test_1_4");
+    IF (row != NULL) DO
+        write_log ("... FAIL: 'row' is not null by default");
+        RETURN FALSE;
+    END
+
+    IF (tab != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+        RETURN FALSE;
+    END
+
+    write_log ("... Local values are null by default.");
+
+    row = 0;
+    tab.field1[row] = '1800/10/14';
+    IF (tab == NULL) DO
+        write_log ("Table is null though it should not.");
+        RETURN FALSE;
+    END
+
+    tab = NULL;
+
+    IF (tab != NULL) DO
+        write_log ("Table is not null though it should be.");
+        RETURN FALSE;
+    END
+
+    write_log ("End of null_test_1_4");
+
+    RETURN TRUE;
+ENDPROC
+
+#TEST: null_test_1_5
+#Call this function twice a row and make sure it returns TRUE each time.
+PROCEDURE null_test_1_5 ()
+RETURN BOOL
+DO
+    LET tab AS TABLE OF (field1 AS DATE);
+    LET fld AS FIELD OF DATE;
+
+    write_log ("Start of null_test_1_5");
+    IF (tab != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+        RETURN FALSE;
+    END
+    
+    IF (fld != NULL) DO
+        write_log ("... FAIL: 'fld' is not null by default");
+        RETURN FALSE;
+    END
+
+    write_log ("... Local values are null by default.");
+    
+    fld = tab.field1;
+    fld[0] = '1800/10/14';
+    
+    IF (tab == NULL) DO
+        write_log ("Table is null though it should not.");
+        RETURN FALSE;
+    END
+    
+    IF (fld == NULL) DO
+        write_log ("Table field is null though it should not.");
+        RETURN FALSE;
+    END
+
+    fld = NULL;
+
+    IF (fld != NULL) DO
+        write_log ("Table field is not null though it should be.");
+        RETURN FALSE;
+    END
+
+    write_log ("End of null_test_1_5");
+
+    RETURN TRUE;
+ENDPROC
+
+
 #TEST: null_test_2
 #Call this function twice in and make sure it returns the same result.
 PROCEDURE null_test_2 ()
@@ -1412,7 +1501,7 @@ DO
     array15[0] = 2.12;
     array16[0] = 'r';
     
-        IF (array1 == NULL) DO
+    IF (array1 == NULL) DO
         write_log ("... FAIL: Array1 is null");
         RETURN FALSE;
     END
