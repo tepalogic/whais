@@ -22,9 +22,10 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
+#include "utils/include/valtranslator.h"
+
 #include "pm_operand.h"
 #include "pm_operand_undefined.h"
-
 #include "pm_typemanager.h"
 
 using namespace std;
@@ -145,13 +146,11 @@ BaseOperand::GetValue( DUInt32& outValue) const
   throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
 }
 
-
 void
 BaseOperand::GetValue( DText& outValue) const
 {
   throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
 }
-
 
 void
 BaseOperand::GetValue( DArray& outValue) const
@@ -182,20 +181,6 @@ BaseOperand::SetValue( const DChar& value)
 
 
 void
-BaseOperand::SetValue( const DDate& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
-BaseOperand::SetValue( const DDateTime& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
 BaseOperand::SetValue( const DHiresTime& value)
 {
   throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
@@ -203,25 +188,10 @@ BaseOperand::SetValue( const DHiresTime& value)
 
 
 void
-BaseOperand::SetValue( const DInt8& value)
+BaseOperand::SetValue( const DUInt64& value)
 {
   throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
 }
-
-
-void
-BaseOperand::SetValue( const DInt16& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
-BaseOperand::SetValue( const DInt32& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
 
 void
 BaseOperand::SetValue( const DInt64& value)
@@ -231,42 +201,7 @@ BaseOperand::SetValue( const DInt64& value)
 
 
 void
-BaseOperand::SetValue( const DReal& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
 BaseOperand::SetValue( const DRichReal& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
-BaseOperand::SetValue( const DUInt8& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
-BaseOperand::SetValue( const DUInt16& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
-BaseOperand::SetValue( const DUInt32& value)
-{
-  throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
-}
-
-
-void
-BaseOperand::SetValue( const DUInt64& value)
 {
   throw InterException( _EXTRA( InterException::INVALID_OP_REQ));
 }
@@ -671,6 +606,20 @@ BoolOperand::GetValue( DBool& outValue) const
   outValue = mValue;
 }
 
+void
+BoolOperand::GetValue( DText& outValue) const
+{
+  if (mValue.IsNull ())
+    outValue = DText ();
+
+  else if (mValue.mValue)
+    outValue = DText ("TRUE");
+
+  else
+    outValue = DText ("FALSE");
+}
+
+
 
 void
 BoolOperand::SetValue( const DBool& value)
@@ -775,41 +724,38 @@ DateOperand::GetValue( DDate& outValue) const
   outValue = mValue;
 }
 
-
 void
 DateOperand::GetValue( DDateTime& outValue) const
 {
-  if (mValue.IsNull())
-    outValue = DDateTime();
-
-  else
-    outValue = DDateTime( mValue.mYear, mValue.mMonth, mValue.mDay, 0, 0, 0);
+  outValue = mValue;
 }
 
 
 void
 DateOperand::GetValue( DHiresTime& outValue) const
 {
-  if (mValue.IsNull())
-    outValue = DHiresTime();
-
-  else
-    {
-      outValue = DHiresTime( mValue.mYear,
-                             mValue.mMonth,
-                             mValue.mDay,
-                             0,
-                             0,
-                             0,
-                             0);
-    }
+  outValue = mValue;
 }
 
 
 void
-DateOperand::SetValue( const DDate& value)
+DateOperand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[32];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+
+void
+DateOperand::SetValue( const DHiresTime& value)
+{
+  _CC (bool&,    mValue.mIsNull) = value.mIsNull;
+  _CC (int16_t&, mValue.mYear)   = value.mYear;
+  _CC (uint8_t&, mValue.mMonth)  = value.mMonth;
+  _CC (uint8_t&, mValue.mDay)    = value.mDay;
 }
 
 
@@ -838,11 +784,10 @@ DateTimeOperand::IsNull() const
 void
 DateTimeOperand::GetValue( DDate& outValue) const
 {
-  if (mValue.IsNull())
-    outValue = DDate();
-
-  else
-    outValue = DDate( mValue.mYear, mValue.mMonth, mValue.mDay);
+  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
+  _CC (int16_t&, outValue.mYear)   = mValue.mYear;
+  _CC (uint8_t&, outValue.mMonth)  = mValue.mMonth;
+  _CC (uint8_t&, outValue.mDay)    = mValue.mDay;
 }
 
 
@@ -856,25 +801,30 @@ DateTimeOperand::GetValue( DDateTime& outValue) const
 void
 DateTimeOperand::GetValue( DHiresTime& outValue) const
 {
-  if (mValue.IsNull())
-    outValue = DHiresTime();
+  outValue = mValue;
+}
 
-  else
-    {
-      outValue = DHiresTime( mValue.mYear,
-                             mValue.mMonth,
-                             mValue.mDay,
-                             mValue.mHour,
-                             mValue.mMinutes,
-                             mValue.mSeconds,
-                             0);
-    }
+
+void
+DateTimeOperand::GetValue( DText& outValue) const
+{
+  uint8_t text[32];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
 }
 
 void
-DateTimeOperand::SetValue( const DDateTime& value)
+DateTimeOperand::SetValue( const DHiresTime& value)
 {
-  mValue = value;
+  _CC (bool&,    mValue.mIsNull)   = value.mIsNull;
+  _CC (int16_t&, mValue.mYear)     = value.mYear;
+  _CC (uint8_t&, mValue.mMonth)    = value.mMonth;
+  _CC (uint8_t&, mValue.mDay)      = value.mDay;
+  _CC (uint8_t&, mValue.mDay)      = value.mDay;
+  _CC (uint8_t&, mValue.mHour)     = value.mHour;
+  _CC (uint8_t&, mValue.mMinutes)  = value.mMinutes;
+  _CC (uint8_t&, mValue.mSeconds)  = value.mSeconds;
 }
 
 
@@ -903,29 +853,23 @@ HiresTimeOperand::IsNull() const
 void
 HiresTimeOperand::GetValue( DDate& outValue) const
 {
-  if (mValue.IsNull())
-    outValue = DDate();
-
-  else
-    outValue = DDate( mValue.mYear, mValue.mMonth, mValue.mDay);
+  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
+  _CC (int16_t&, outValue.mYear)   = mValue.mYear;
+  _CC (uint8_t&, outValue.mMonth)  = mValue.mMonth;
+  _CC (uint8_t&, outValue.mDay)    = mValue.mDay;
 }
 
 
 void
 HiresTimeOperand::GetValue( DDateTime& outValue) const
 {
-  if (mValue.IsNull())
-    outValue = DDateTime();
-
-  else
-    {
-      outValue = DDateTime( mValue.mYear,
-                            mValue.mMonth,
-                            mValue.mDay,
-                            mValue.mHour,
-                            mValue.mMinutes,
-                            mValue.mSeconds);
-    }
+  _CC (bool&,    outValue.mIsNull)   = mValue.mIsNull;
+  _CC (int16_t&, outValue.mYear)     = mValue.mYear;
+  _CC (uint8_t&, outValue.mMonth)    = mValue.mMonth;
+  _CC (uint8_t&, outValue.mDay)      = mValue.mDay;
+  _CC (uint8_t&, outValue.mHour)     = mValue.mHour;
+  _CC (uint8_t&, outValue.mMinutes)  = mValue.mMinutes;
+  _CC (uint8_t&, outValue.mSeconds)  = mValue.mSeconds;
 }
 
 
@@ -935,6 +879,15 @@ HiresTimeOperand::GetValue( DHiresTime& outValue) const
   outValue = mValue;
 }
 
+
+void
+HiresTimeOperand::GetValue( DText& outValue) const
+{
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
 
 void
 HiresTimeOperand::SetValue( const DHiresTime& value)
@@ -968,85 +921,92 @@ UInt8Operand::IsNull() const
 void
 UInt8Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull) = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)  = _SC (int8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt8Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)  = _SC (int16_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt8Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)  = _SC (int32_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
-
 
 void
 UInt8Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)  = _SC (int64_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt8Operand::GetValue( DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal( mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt8Operand::GetValue( DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal( mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt8Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)   = _SC (uint8_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 UInt8Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue)   = _SC (uint16_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 UInt8Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue)  = _SC (uint32_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 UInt8Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue)   = _SC (uint64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
-UInt8Operand::SetValue( const DUInt8& value)
+UInt8Operand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+UInt8Operand::SetValue( const DUInt64& value)
+{
+  number_convert( value, mValue);
+}
+
+void
+UInt8Operand::SetValue( const DInt64& value)
+{
+  number_convert( value, mValue);
 }
 
 
@@ -1132,32 +1092,28 @@ UInt16Operand::IsNull() const
 void
 UInt16Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt16Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)  = _SC (int16_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt16Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)  = _SC (int32_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt16Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)  = _SC (int64_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
@@ -1178,39 +1134,51 @@ UInt16Operand::GetValue( DReal& outValue) const
 void
 UInt16Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)   = _SC (uint8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt16Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue)   = _SC (uint16_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 UInt16Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue)   = _SC (uint32_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 UInt16Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue)  = _SC (uint64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
-UInt16Operand::SetValue( const DUInt16& value)
+UInt16Operand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+UInt16Operand::SetValue( const DUInt64& value)
+{
+  number_convert( value, mValue);
+}
+
+void
+UInt16Operand::SetValue( const DInt64& value)
+{
+  number_convert( value, mValue);
 }
 
 
@@ -1295,32 +1263,31 @@ UInt32Operand::IsNull() const
 void
 UInt32Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt32Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)  = _SC (int16_t, mValue.mValue);
+  number_convert( mValue, outValue);
+
 }
 
 
 void
 UInt32Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)  = _SC (int32_t, mValue.mValue);
+  number_convert( mValue, outValue);
+
 }
 
 
 void
 UInt32Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)  = _SC (int64_t, mValue.mValue);
+  number_convert( mValue, outValue);
+
 }
 
 
@@ -1341,39 +1308,51 @@ UInt32Operand::GetValue( DReal& outValue) const
 void
 UInt32Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)   = _SC (uint8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt32Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue)   = _SC (uint16_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt32Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue)   = _SC (uint32_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 UInt32Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue)   = _SC (uint64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
-UInt32Operand::SetValue( const DUInt32& value)
+UInt32Operand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+UInt32Operand::SetValue( const DUInt64& value)
+{
+  number_convert (value, mValue);
+}
+
+void
+UInt32Operand::SetValue( const DInt64& value)
+{
+  number_convert (value, mValue);
 }
 
 
@@ -1457,32 +1436,28 @@ UInt64Operand::IsNull() const
 void
 UInt64Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt64Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)  = _SC (int16_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt64Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)   = _SC (int32_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt64Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)   = _SC (int64_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
@@ -1503,32 +1478,38 @@ UInt64Operand::GetValue( DReal& outValue) const
 void
 UInt64Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt64Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt64Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
+  number_convert( mValue, outValue);
 }
 
 
 void
 UInt64Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
+  outValue = mValue;
+}
+
+
+void
+UInt64Operand::GetValue( DText& outValue) const
+{
+  uint8_t text[64];
+
+  Utf8Translator::Write( text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
 }
 
 
@@ -1536,6 +1517,12 @@ void
 UInt64Operand::SetValue( const DUInt64& value)
 {
   mValue = value;
+}
+
+void
+UInt64Operand::SetValue( const DInt64& value)
+{
+  number_convert (value, mValue);
 }
 
 
@@ -1620,32 +1607,28 @@ Int8Operand::IsNull() const
 void
 Int8Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 Int8Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)   = _SC (int16_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 Int8Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)   = _SC (int32_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 Int8Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)   = _SC (int64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
@@ -1666,41 +1649,52 @@ Int8Operand::GetValue( DReal& outValue) const
 void
 Int8Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int8Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue)  = _SC (uint16_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int8Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue)  = _SC (uint32_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int8Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue)  = _SC (uint64_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
-Int8Operand::SetValue( const DInt8& value)
+Int8Operand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
 }
 
+
+void
+Int8Operand::SetValue( const DUInt64& value)
+{
+  number_convert (value, mValue);
+}
+
+void
+Int8Operand::SetValue( const DInt64& value)
+{
+  number_convert (value, mValue);
+}
 
 void
 Int8Operand::SelfAdd( const DInt64& value)
@@ -1782,32 +1776,28 @@ Int16Operand::IsNull() const
 void
 Int16Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int16Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)   = _SC (int16_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 Int16Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)   = _SC (int32_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 Int16Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)   = _SC (int64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
@@ -1828,39 +1818,51 @@ Int16Operand::GetValue( DReal& outValue) const
 void
 Int16Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)   = _SC (uint8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int16Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue)   = _SC (uint16_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int16Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue)   = _SC (uint32_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int16Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue)   = _SC (uint64_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
-Int16Operand::SetValue( const DInt16& value)
+Int16Operand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int16Operand::SetValue( const DUInt64& value)
+{
+  number_convert (value, mValue);
+}
+
+void
+Int16Operand::SetValue( const DInt64& value)
+{
+  number_convert (value, mValue);
 }
 
 
@@ -1945,32 +1947,28 @@ Int32Operand::IsNull() const
 void
 Int32Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int32Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)   = _SC (int16_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int32Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)   = _SC (int32_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
 void
 Int32Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)   = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue) = _SC (int64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
@@ -1991,39 +1989,51 @@ Int32Operand::GetValue( DReal& outValue) const
 void
 Int32Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int32Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull) = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue)  = _SC (uint16_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int32Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue)   = _SC (uint32_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int32Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&,     outValue.mIsNull)  = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue)   = _SC (uint64_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
-Int32Operand::SetValue( const DInt32& value)
+Int32Operand::GetValue( DText& outValue) const
 {
-  mValue = value;
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int32Operand::SetValue( const DUInt64& value)
+{
+  number_convert (value, mValue);
+}
+
+void
+Int32Operand::SetValue( const DInt64& value)
+{
+  number_convert (value, mValue);
 }
 
 
@@ -2108,32 +2118,28 @@ Int64Operand::IsNull() const
 void
 Int64Operand::GetValue( DInt8& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int8_t&, outValue.mValue)   = _SC (int8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int64Operand::GetValue( DInt16& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull) = mValue.mIsNull;
-  _CC (int16_t&, outValue.mValue)  = _SC (int16_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int64Operand::GetValue( DInt32& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int32_t&, outValue.mValue)   = _SC (int32_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int64Operand::GetValue( DInt64& outValue) const
 {
-  _CC (bool&,    outValue.mIsNull)  = mValue.mIsNull;
-  _CC (int64_t&, outValue.mValue)   = _SC (int64_t, mValue.mValue);
+  outValue = mValue;
 }
 
 
@@ -2154,34 +2160,46 @@ Int64Operand::GetValue( DReal& outValue) const
 void
 Int64Operand::GetValue( DUInt8& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint8_t&, outValue.mValue)  = _SC (uint8_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int64Operand::GetValue( DUInt16& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint16_t&, outValue.mValue) = _SC (uint16_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int64Operand::GetValue( DUInt32& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint32_t&, outValue.mValue) = _SC (uint32_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
 
 void
 Int64Operand::GetValue( DUInt64& outValue) const
 {
-  _CC (bool&, outValue.mIsNull)    = mValue.mIsNull;
-  _CC (uint64_t&, outValue.mValue) = _SC (uint64_t, mValue.mValue);
+  number_convert (mValue, outValue);
 }
 
+
+void
+Int64Operand::GetValue( DText& outValue) const
+{
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int64Operand::SetValue( const DUInt64& value)
+{
+  number_convert (value, mValue);
+}
 
 void
 Int64Operand::SetValue( const DInt64& value)
@@ -2278,15 +2296,23 @@ RealOperand::GetValue( DReal& outValue) const
 void
 RealOperand::GetValue( DRichReal& outValue) const
 {
-  _CC (bool&,       outValue.mIsNull) = mValue.mIsNull;
-  _CC (RICHREAL_T&, outValue.mValue)  = mValue.mValue;
+  outValue = mValue;
+}
+
+void
+RealOperand::GetValue( DText& outValue) const
+{
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
 }
 
 
 void
-RealOperand::SetValue( const DReal& value)
+RealOperand::SetValue( const DRichReal& value)
 {
-  mValue = value;
+  mValue = value.IsNull () ? DReal () : DReal (value.mValue);
 }
 
 
@@ -2361,7 +2387,6 @@ RealOperand::Duplicate() const
 
 
 
-
 bool
 RichRealOperand::IsNull() const
 {
@@ -2372,8 +2397,7 @@ RichRealOperand::IsNull() const
 void
 RichRealOperand::GetValue( DReal& outValue) const
 {
-  _CC (bool&,   outValue.mIsNull) = mValue.mIsNull;
-  _CC (REAL_T&, outValue.mValue)  = mValue.mValue;
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -2381,6 +2405,16 @@ void
 RichRealOperand::GetValue( DRichReal& outValue) const
 {
   outValue = mValue;
+}
+
+
+void
+RichRealOperand::GetValue( DText& outValue) const
+{
+  uint8_t text[64];
+
+  Utf8Translator::Write (text, sizeof text, mValue);
+  outValue = DText (_RC (char*, text));
 }
 
 
@@ -2522,7 +2556,10 @@ TextOperand::Duplicate() const
 void
 TextOperand::NotifyCopy()
 {
-  mValue.MakeMirror( mValue);
+  uint8_t _t [sizeof mValue]; //To make sure DText::~DText() is not called at
+                              //the end of this function, and yet increase the
+                              //reference counter;
+  _placement_new (_t, mValue);
 }
 
 
@@ -2531,15 +2568,16 @@ TextOperand::NotifyCopy()
 bool
 CharTextElOperand::IsNull() const
 {
-  //A text could not hold NULL characters!
-  return false;
+  return (mText.Count () <= mIndex) ? true : false;
 }
 
 
 void
 CharTextElOperand::GetValue( DChar& outValue) const
 {
-  outValue = mText.CharAt( mIndex);
+  outValue = (mText.Count() <= mIndex) ?
+               DChar () :
+               mText.CharAt( mIndex);
 }
 
 
@@ -2732,21 +2770,6 @@ GlobalOperand::SetValue( const DChar& outValue)
   mValue.SetValue( outValue);
 }
 
-
-void
-GlobalOperand::SetValue( const DDate& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DDateTime& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
 void
 GlobalOperand::SetValue( const DHiresTime& outValue)
 {
@@ -2755,21 +2778,7 @@ GlobalOperand::SetValue( const DHiresTime& outValue)
 
 
 void
-GlobalOperand::SetValue( const DInt8& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DInt16& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DInt32& outValue)
+GlobalOperand::SetValue( const DUInt64& outValue)
 {
   mValue.SetValue( outValue);
 }
@@ -2783,42 +2792,7 @@ GlobalOperand::SetValue( const DInt64& outValue)
 
 
 void
-GlobalOperand::SetValue( const DReal& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
 GlobalOperand::SetValue( const DRichReal& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DUInt8& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DUInt16& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DUInt32& outValue)
-{
-  mValue.SetValue( outValue);
-}
-
-
-void
-GlobalOperand::SetValue( const DUInt64& outValue)
 {
   mValue.SetValue( outValue);
 }
@@ -3212,20 +3186,6 @@ LocalOperand::SetValue( const DChar& outValue)
 
 
 void
-LocalOperand::SetValue( const DDate& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DDateTime& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
 LocalOperand::SetValue( const DHiresTime& outValue)
 {
   mStack[mIndex].Operand().SetValue( outValue);
@@ -3233,21 +3193,7 @@ LocalOperand::SetValue( const DHiresTime& outValue)
 
 
 void
-LocalOperand::SetValue( const DInt8& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DInt16& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DInt32& outValue)
+LocalOperand::SetValue( const DUInt64& outValue)
 {
   mStack[mIndex].Operand().SetValue( outValue);
 }
@@ -3259,44 +3205,8 @@ LocalOperand::SetValue( const DInt64& outValue)
   mStack[mIndex].Operand().SetValue( outValue);
 }
 
-
-void
-LocalOperand::SetValue( const DReal& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
 void
 LocalOperand::SetValue( const DRichReal& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DUInt8& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DUInt16& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DUInt32& outValue)
-{
-  mStack[mIndex].Operand().SetValue( outValue);
-}
-
-
-void
-LocalOperand::SetValue( const DUInt64& outValue)
 {
   mStack[mIndex].Operand().SetValue( outValue);
 }

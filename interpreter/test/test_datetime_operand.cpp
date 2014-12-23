@@ -262,6 +262,7 @@ test_op_invalid_conv( IOperand& op)
   result = result && test_operand_for_conv<DDate> (op);
   result = result && test_operand_for_conv<DDateTime> (op);
   result = result && test_operand_for_conv<DHiresTime> (op);
+  result = result && test_operand_for_conv<DText> (op);
 
   result = result && test_operand_for_exceptions<DBool> (op);
   result = result && test_operand_for_exceptions<DChar> (op);
@@ -275,7 +276,6 @@ test_op_invalid_conv( IOperand& op)
   result = result && test_operand_for_exceptions<DInt64> (op);
   result = result && test_operand_for_exceptions<DReal> (op);
   result = result && test_operand_for_exceptions<DRichReal> (op);
-  result = result && test_operand_for_exceptions<DText> (op);
   result = result && test_operand_for_exceptions<DArray> (op);
 
   result = result && (! test_self_add<DChar> (op));

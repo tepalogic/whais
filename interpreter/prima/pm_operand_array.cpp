@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+#include "utils/include/valtranslator.h"
+
 #include "pm_operand.h"
 #include "pm_typemanager.h"
 
@@ -140,6 +142,13 @@ ArrayOperand::NotifyCopy()
 
 
 
+bool
+BaseArrayElOperand::IsNull () const
+{
+  return (mArray.Count () <= mIndex) ? true : false;
+}
+
+
 void
 BaseArrayElOperand::NotifyCopy()
 {
@@ -148,19 +157,27 @@ BaseArrayElOperand::NotifyCopy()
 
 
 
-bool
-BoolArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 BoolArrayElOperand::GetValue( DBool& outValue) const
 {
   Get (outValue);
 }
 
+void
+BoolArrayElOperand::GetValue( DText& outValue) const
+{
+  DBool currValue;
+  Get (currValue);
+
+  if (currValue.IsNull ())
+    outValue = DText ();
+
+  else if (currValue.mValue)
+    outValue = DText ("TRUE");
+
+  else
+    outValue = DText ("FALSE");
+}
 
 void
 BoolArrayElOperand::SetValue( const DBool& value)
@@ -173,7 +190,6 @@ void
 BoolArrayElOperand::SelfAnd( const DBool& value)
 {
   DBool currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -186,7 +202,6 @@ void
 BoolArrayElOperand::SelfXor( const DBool& value)
 {
   DBool currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -199,7 +214,6 @@ void
 BoolArrayElOperand::SelfOr( const DBool& value)
 {
   DBool currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -219,19 +233,11 @@ StackValue
 BoolArrayElOperand::Duplicate() const
 {
   DBool value;
-
   Get (value);
 
   return StackValue( BoolOperand( value));
 }
 
-
-
-bool
-CharArrayElOperand::IsNull() const
-{
-  return false;
-}
 
 
 void
@@ -245,7 +251,6 @@ void
 CharArrayElOperand::GetValue( DText& outValue) const
 {
   DChar ch;
-
   Get (ch);
 
   outValue = DText();
@@ -278,13 +283,6 @@ CharArrayElOperand::Duplicate() const
 
 
 
-bool
-DateArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 DateArrayElOperand::GetValue( DDate& outValue) const
 {
@@ -296,15 +294,9 @@ void
 DateArrayElOperand::GetValue( DDateTime& outValue) const
 {
   DDate currValue;
-
   Get (currValue);
 
-  outValue = DDateTime( currValue.mYear,
-                        currValue.mMonth,
-                        currValue.mDay,
-                        0,
-                        0,
-                        0);
+  outValue = currValue;
 }
 
 
@@ -312,23 +304,36 @@ void
 DateArrayElOperand::GetValue( DHiresTime& outValue) const
 {
   DDate currValue;
-
   Get (currValue);
 
-  outValue = DHiresTime( currValue.mYear,
-                         currValue.mMonth,
-                         currValue.mDay,
-                         0,
-                         0,
-                         0,
-                         0);
+  outValue = currValue;
 }
 
 
 void
-DateArrayElOperand::SetValue( const DDate& value)
+DateArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DDate   currValue;
+  uint8_t text[32];
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+DateArrayElOperand::SetValue( const DHiresTime& value)
+{
+  DDate v;
+
+  _CC (bool&,    v.mIsNull) = value.mIsNull;
+  _CC (int16_t&, v.mYear)   = value.mYear;
+  _CC (uint8_t&, v.mMonth)  = value.mMonth;
+  _CC (uint8_t&, v.mDay)    = value.mDay;
+
+  Set (v);
 }
 
 
@@ -351,20 +356,16 @@ DateArrayElOperand::Duplicate() const
 
 
 
-bool
-DateTimeArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 DateTimeArrayElOperand::GetValue( DDate& outValue) const
 {
   DDateTime currValue;
   Get (currValue);
 
-  outValue = DDate( currValue.mYear, currValue.mMonth, currValue.mDay);
+  _CC (bool&  ,   outValue.mIsNull) = currValue.mIsNull;
+  _CC (int16_t&,  outValue.mYear)   = currValue.mYear;
+  _CC (uint8_t&,  outValue.mMonth)  = currValue.mMonth;
+  _CC (uint8_t&,  outValue.mDay)    = currValue.mDay;
 }
 
 
@@ -379,23 +380,39 @@ void
 DateTimeArrayElOperand::GetValue( DHiresTime& outValue) const
 {
   DDateTime currValue;
-
   Get (currValue);
 
-  outValue = DHiresTime( currValue.mYear,
-                         currValue.mMonth,
-                         currValue.mDay,
-                         currValue.mHour,
-                         currValue.mMinutes,
-                         currValue.mSeconds,
-                         0);
+  outValue = currValue;
 }
 
 
 void
-DateTimeArrayElOperand::SetValue( const DDateTime& value)
+DateTimeArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DDateTime currValue;
+  uint8_t   text[32];
+
+  Get (currValue);
+  Utf8Translator::Write (text, sizeof text, currValue);
+
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+DateTimeArrayElOperand::SetValue( const DHiresTime& value)
+{
+  DDateTime v;
+
+  _CC (bool&,    v.mIsNull)   = value.mIsNull;
+  _CC (int16_t&, v.mYear)     = value.mYear;
+  _CC (uint8_t&, v.mMonth)    = value.mMonth;
+  _CC (uint8_t&, v.mDay)      = value.mDay;
+  _CC (uint8_t&, v.mHour)     = value.mHour;
+  _CC (uint8_t&, v.mMinutes)  = value.mMinutes;
+  _CC (uint8_t&, v.mSeconds)  = value.mSeconds;
+
+  Set (v);
 }
 
 
@@ -418,21 +435,16 @@ DateTimeArrayElOperand::Duplicate() const
 
 
 
-bool
-HiresTimeArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 HiresTimeArrayElOperand::GetValue( DDate& outValue) const
 {
   DHiresTime currValue;
-
   Get (currValue);
 
-  outValue = DDate( currValue.mYear, currValue.mMonth, currValue.mDay);
+  _CC (bool&,    outValue.mIsNull) = currValue.mIsNull;
+  _CC (int16_t&, outValue.mYear)   = currValue.mYear;
+  _CC (uint8_t&, outValue.mMonth)  = currValue.mMonth;
+  _CC (uint8_t&, outValue.mDay)    = currValue.mDay;;
 }
 
 
@@ -440,15 +452,15 @@ void
 HiresTimeArrayElOperand::GetValue( DDateTime& outValue) const
 {
   DHiresTime currValue;
-
   Get (currValue);
 
-  outValue = DDateTime( currValue.mYear,
-                        currValue.mMonth,
-                        currValue.mDay,
-                        currValue.mHour,
-                        currValue.mMinutes,
-                        currValue.mSeconds);
+  _CC (bool&,    outValue.mIsNull)   = currValue.mIsNull;
+  _CC (int16_t&, outValue.mYear)     = currValue.mYear;
+  _CC (uint8_t&, outValue.mMonth)    = currValue.mMonth;
+  _CC (uint8_t&, outValue.mDay)      = currValue.mDay;
+  _CC (uint8_t&, outValue.mHour)     = currValue.mHour;
+  _CC (uint8_t&, outValue.mMinutes)  = currValue.mMinutes;
+  _CC (uint8_t&, outValue.mSeconds)  = currValue.mSeconds;
 }
 
 
@@ -456,6 +468,19 @@ void
 HiresTimeArrayElOperand::GetValue( DHiresTime& outValue) const
 {
   Get (outValue);
+}
+
+
+void
+HiresTimeArrayElOperand::GetValue( DText& outValue) const
+{
+  DHiresTime currValue;
+  uint8_t    text[32];
+
+  Get (currValue);
+  Utf8Translator::Write (text, sizeof text, currValue);
+
+  outValue = DText (_RC (char*, text));
 }
 
 
@@ -477,7 +502,6 @@ StackValue
 HiresTimeArrayElOperand::Duplicate() const
 {
   DHiresTime value;
-
   Get (value);
 
   return StackValue( HiresTimeOperand( value));
@@ -485,18 +509,10 @@ HiresTimeArrayElOperand::Duplicate() const
 
 
 
-bool
-UInt8ArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 UInt8ArrayElOperand::GetValue( DInt8& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -507,7 +523,6 @@ void
 UInt8ArrayElOperand::GetValue( DInt16& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -518,7 +533,6 @@ void
 UInt8ArrayElOperand::GetValue( DInt32& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -529,7 +543,6 @@ void
 UInt8ArrayElOperand::GetValue( DInt64& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -540,7 +553,6 @@ void
 UInt8ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -551,7 +563,6 @@ void
 UInt8ArrayElOperand::GetValue( DReal& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -569,7 +580,6 @@ void
 UInt8ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -580,7 +590,6 @@ void
 UInt8ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -591,7 +600,6 @@ void
 UInt8ArrayElOperand::GetValue( DUInt64& outValue) const
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -599,9 +607,34 @@ UInt8ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
-UInt8ArrayElOperand::SetValue( const DUInt8& value)
+UInt8ArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DUInt8  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+UInt8ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DUInt8  v;
+
+  number_convert (value, v);
+  Set (v);
+}
+
+void
+UInt8ArrayElOperand::SetValue( const DInt64& value)
+{
+  DUInt8  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -609,7 +642,6 @@ void
 UInt8ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -622,7 +654,6 @@ void
 UInt8ArrayElOperand::SelfSub( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -635,7 +666,6 @@ void
 UInt8ArrayElOperand::SelfMul( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -648,7 +678,6 @@ void
 UInt8ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -661,7 +690,6 @@ void
 UInt8ArrayElOperand::SelfMod( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -674,7 +702,6 @@ void
 UInt8ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -687,7 +714,6 @@ void
 UInt8ArrayElOperand::SelfXor( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -700,7 +726,6 @@ void
 UInt8ArrayElOperand::SelfOr( const DInt64& value)
 {
   DUInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -727,18 +752,10 @@ UInt8ArrayElOperand::Duplicate() const
 
 
 
-bool
-UInt16ArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 UInt16ArrayElOperand::GetValue( DInt8& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -749,7 +766,6 @@ void
 UInt16ArrayElOperand::GetValue( DInt16& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -760,7 +776,6 @@ void
 UInt16ArrayElOperand::GetValue( DInt32& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -771,7 +786,6 @@ void
 UInt16ArrayElOperand::GetValue( DInt64& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -782,7 +796,6 @@ void
 UInt16ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -793,7 +806,6 @@ void
 UInt16ArrayElOperand::GetValue( DReal& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -804,7 +816,6 @@ void
 UInt16ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -822,7 +833,6 @@ void
 UInt16ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -833,7 +843,6 @@ void
 UInt16ArrayElOperand::GetValue( DUInt64& outValue) const
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -841,9 +850,34 @@ UInt16ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
-UInt16ArrayElOperand::SetValue( const DUInt16& value)
+UInt16ArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DUInt16  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+UInt16ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DUInt16  v;
+
+  number_convert (value, v);
+  Set (v);
+}
+
+void
+UInt16ArrayElOperand::SetValue( const DInt64& value)
+{
+  DUInt16  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -851,7 +885,6 @@ void
 UInt16ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -864,7 +897,6 @@ void
 UInt16ArrayElOperand::SelfSub( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -877,7 +909,6 @@ void
 UInt16ArrayElOperand::SelfMul( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -890,7 +921,6 @@ void
 UInt16ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -903,7 +933,6 @@ void
 UInt16ArrayElOperand::SelfMod( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -916,7 +945,6 @@ void
 UInt16ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -929,7 +957,6 @@ void
 UInt16ArrayElOperand::SelfXor( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -942,7 +969,6 @@ void
 UInt16ArrayElOperand::SelfOr( const DInt64& value)
 {
   DUInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -962,7 +988,6 @@ StackValue
 UInt16ArrayElOperand::Duplicate() const
 {
   DUInt16 value;
-
   Get (value);
 
   return StackValue( UInt16Operand( value));
@@ -970,18 +995,10 @@ UInt16ArrayElOperand::Duplicate() const
 
 
 
-bool
-UInt32ArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 UInt32ArrayElOperand::GetValue( DInt8& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -992,7 +1009,6 @@ void
 UInt32ArrayElOperand::GetValue( DInt16& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1003,7 +1019,6 @@ void
 UInt32ArrayElOperand::GetValue( DInt32& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1014,7 +1029,6 @@ void
 UInt32ArrayElOperand::GetValue( DInt64& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1025,7 +1039,6 @@ void
 UInt32ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1036,7 +1049,6 @@ void
 UInt32ArrayElOperand::GetValue( DReal& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1047,7 +1059,6 @@ void
 UInt32ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1058,7 +1069,6 @@ void
 UInt32ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1076,7 +1086,6 @@ void
 UInt32ArrayElOperand::GetValue( DUInt64& outValue) const
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1084,9 +1093,34 @@ UInt32ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
-UInt32ArrayElOperand::SetValue( const DUInt32& value)
+UInt32ArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DUInt32  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+UInt32ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DUInt32  v;
+
+  number_convert (value, v);
+  Set (v);
+}
+
+void
+UInt32ArrayElOperand::SetValue( const DInt64& value)
+{
+  DUInt32  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -1094,7 +1128,6 @@ void
 UInt32ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -1107,7 +1140,6 @@ void
 UInt32ArrayElOperand::SelfSub( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -1120,7 +1152,6 @@ void
 UInt32ArrayElOperand::SelfMul( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -1133,7 +1164,6 @@ void
 UInt32ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -1146,7 +1176,6 @@ void
 UInt32ArrayElOperand::SelfMod( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -1159,7 +1188,6 @@ void
 UInt32ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -1172,7 +1200,6 @@ void
 UInt32ArrayElOperand::SelfXor( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -1185,7 +1212,6 @@ void
 UInt32ArrayElOperand::SelfOr( const DInt64& value)
 {
   DUInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -1205,19 +1231,11 @@ StackValue
 UInt32ArrayElOperand::Duplicate() const
 {
   DUInt32 value;
-
   Get (value);
 
   return StackValue( UInt32Operand( value));
 }
 
-
-
-bool
-UInt64ArrayElOperand::IsNull() const
-{
-  return false;
-}
 
 
 void
@@ -1270,7 +1288,6 @@ void
 UInt64ArrayElOperand::GetValue( DReal& outValue) const
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1281,7 +1298,6 @@ void
 UInt64ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1292,7 +1308,6 @@ void
 UInt64ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1303,7 +1318,6 @@ void
 UInt64ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1318,9 +1332,31 @@ UInt64ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
+UInt64ArrayElOperand::GetValue( DText& outValue) const
+{
+  DUInt64  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
 UInt64ArrayElOperand::SetValue( const DUInt64& value)
 {
   Set (value);
+}
+
+void
+UInt64ArrayElOperand::SetValue( const DInt64& value)
+{
+  DUInt64  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -1340,7 +1376,6 @@ void
 UInt64ArrayElOperand::SelfSub( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -1352,7 +1387,6 @@ void
 UInt64ArrayElOperand::SelfMul( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -1365,7 +1399,6 @@ void
 UInt64ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -1378,7 +1411,6 @@ void
 UInt64ArrayElOperand::SelfMod( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -1391,7 +1423,6 @@ void
 UInt64ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -1404,7 +1435,6 @@ void
 UInt64ArrayElOperand::SelfXor( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -1417,7 +1447,6 @@ void
 UInt64ArrayElOperand::SelfOr( const DInt64& value)
 {
   DUInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -1437,19 +1466,11 @@ StackValue
 UInt64ArrayElOperand::Duplicate() const
 {
   DUInt64 value;
-
   Get (value);
 
   return StackValue( UInt64Operand( value));
 }
 
-
-
-bool
-Int8ArrayElOperand::IsNull() const
-{
-  return false;
-}
 
 
 void
@@ -1463,7 +1484,6 @@ void
 Int8ArrayElOperand::GetValue( DInt16& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1474,7 +1494,6 @@ void
 Int8ArrayElOperand::GetValue( DInt32& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1485,7 +1504,6 @@ void
 Int8ArrayElOperand::GetValue( DInt64& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1496,7 +1514,6 @@ void
 Int8ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1507,7 +1524,6 @@ void
 Int8ArrayElOperand::GetValue( DReal& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1518,7 +1534,6 @@ void
 Int8ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1529,7 +1544,6 @@ void
 Int8ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1540,7 +1554,6 @@ void
 Int8ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DInt8 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1558,9 +1571,34 @@ Int8ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
-Int8ArrayElOperand::SetValue( const DInt8& value)
+Int8ArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DInt8   currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int8ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DInt8  v;
+
+  number_convert (value, v);
+  Set (v);
+}
+
+void
+Int8ArrayElOperand::SetValue( const DInt64& value)
+{
+  DInt8  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -1568,7 +1606,6 @@ void
 Int8ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -1581,7 +1618,6 @@ void
 Int8ArrayElOperand::SelfSub( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -1594,7 +1630,6 @@ void
 Int8ArrayElOperand::SelfMul( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -1607,7 +1642,6 @@ void
 Int8ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -1620,7 +1654,6 @@ void
 Int8ArrayElOperand::SelfMod( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -1633,7 +1666,6 @@ void
 Int8ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -1646,7 +1678,6 @@ void
 Int8ArrayElOperand::SelfXor( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -1659,7 +1690,6 @@ void
 Int8ArrayElOperand::SelfOr( const DInt64& value)
 {
   DInt8 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -1679,7 +1709,6 @@ StackValue
 Int8ArrayElOperand::Duplicate() const
 {
   DInt8 value;
-
   Get (value);
 
   return StackValue( Int8Operand( value));
@@ -1687,18 +1716,10 @@ Int8ArrayElOperand::Duplicate() const
 
 
 
-bool
-Int16ArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 Int16ArrayElOperand::GetValue( DInt8& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1716,7 +1737,6 @@ void
 Int16ArrayElOperand::GetValue( DInt32& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1727,7 +1747,6 @@ void
 Int16ArrayElOperand::GetValue( DInt64& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1738,7 +1757,6 @@ void
 Int16ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1749,7 +1767,6 @@ void
 Int16ArrayElOperand::GetValue( DReal& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1760,7 +1777,6 @@ void
 Int16ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1771,7 +1787,6 @@ void
 Int16ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1782,7 +1797,6 @@ void
 Int16ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1793,7 +1807,6 @@ void
 Int16ArrayElOperand::GetValue( DUInt64& outValue) const
 {
   DInt16 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1801,9 +1814,35 @@ Int16ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
-Int16ArrayElOperand::SetValue( const DInt16& value)
+Int16ArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DInt16  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int16ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DInt16  v;
+
+  number_convert (value, v);
+  Set (v);
+}
+
+
+void
+Int16ArrayElOperand::SetValue( const DInt64& value)
+{
+  DInt16  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -1811,7 +1850,6 @@ void
 Int16ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -1824,7 +1862,6 @@ void
 Int16ArrayElOperand::SelfSub( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -1837,7 +1874,6 @@ void
 Int16ArrayElOperand::SelfMul( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -1850,7 +1886,6 @@ void
 Int16ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -1863,7 +1898,6 @@ void
 Int16ArrayElOperand::SelfMod( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -1876,7 +1910,6 @@ void
 Int16ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -1889,7 +1922,6 @@ void
 Int16ArrayElOperand::SelfXor( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -1902,7 +1934,6 @@ void
 Int16ArrayElOperand::SelfOr( const DInt64& value)
 {
   DInt16 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -1930,18 +1961,10 @@ Int16ArrayElOperand::Duplicate() const
 
 
 
-bool
-Int32ArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 Int32ArrayElOperand::GetValue( DInt8& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1952,7 +1975,6 @@ void
 Int32ArrayElOperand::GetValue( DInt16& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1970,7 +1992,6 @@ void
 Int32ArrayElOperand::GetValue( DInt64& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1981,7 +2002,6 @@ void
 Int32ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -1992,7 +2012,6 @@ void
 Int32ArrayElOperand::GetValue( DReal& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2003,7 +2022,6 @@ void
 Int32ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2014,7 +2032,6 @@ void
 Int32ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2025,7 +2042,6 @@ void
 Int32ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2036,7 +2052,6 @@ void
 Int32ArrayElOperand::GetValue( DUInt64& outValue) const
 {
   DInt32 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2044,9 +2059,35 @@ Int32ArrayElOperand::GetValue( DUInt64& outValue) const
 
 
 void
-Int32ArrayElOperand::SetValue( const DInt32& value)
+Int32ArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DInt32  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int32ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DInt32  v;
+
+  number_convert (value, v);
+  Set (v);
+}
+
+
+void
+Int32ArrayElOperand::SetValue( const DInt64& value)
+{
+  DInt32  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -2054,7 +2095,6 @@ void
 Int32ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -2067,7 +2107,6 @@ void
 Int32ArrayElOperand::SelfSub( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -2080,7 +2119,6 @@ void
 Int32ArrayElOperand::SelfMul( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -2093,7 +2131,6 @@ void
 Int32ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -2106,7 +2143,6 @@ void
 Int32ArrayElOperand::SelfMod( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -2119,7 +2155,6 @@ void
 Int32ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -2132,7 +2167,6 @@ void
 Int32ArrayElOperand::SelfXor( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -2145,7 +2179,6 @@ void
 Int32ArrayElOperand::SelfOr( const DInt64& value)
 {
   DInt32 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -2165,7 +2198,6 @@ StackValue
 Int32ArrayElOperand::Duplicate() const
 {
   DInt32 value;
-
   Get (value);
 
   return StackValue( Int32Operand( value));
@@ -2173,18 +2205,10 @@ Int32ArrayElOperand::Duplicate() const
 
 
 
-bool
-Int64ArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 Int64ArrayElOperand::GetValue( DInt8& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2206,7 +2230,6 @@ void
 Int64ArrayElOperand::GetValue( DInt32& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2224,7 +2247,6 @@ void
 Int64ArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2235,7 +2257,6 @@ void
 Int64ArrayElOperand::GetValue( DReal& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2246,7 +2267,6 @@ void
 Int64ArrayElOperand::GetValue( DUInt8& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2257,7 +2277,6 @@ void
 Int64ArrayElOperand::GetValue( DUInt16& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2268,7 +2287,6 @@ void
 Int64ArrayElOperand::GetValue( DUInt32& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
@@ -2279,10 +2297,32 @@ void
 Int64ArrayElOperand::GetValue( DUInt64& outValue) const
 {
   DInt64 currValue;
-
   Get (currValue);
 
   number_convert( currValue, outValue);
+}
+
+
+void
+Int64ArrayElOperand::GetValue( DText& outValue) const
+{
+  DInt64  currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
+}
+
+
+void
+Int64ArrayElOperand::SetValue( const DUInt64& value)
+{
+  DInt32  v;
+
+  number_convert (value, v);
+  Set (v);
 }
 
 
@@ -2297,7 +2337,6 @@ void
 Int64ArrayElOperand::SelfAdd( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -2310,7 +2349,6 @@ void
 Int64ArrayElOperand::SelfSub( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -2323,7 +2361,6 @@ void
 Int64ArrayElOperand::SelfMul( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -2336,7 +2373,6 @@ void
 Int64ArrayElOperand::SelfDiv( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -2349,7 +2385,6 @@ void
 Int64ArrayElOperand::SelfMod( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_mod( currValue, value);
@@ -2362,7 +2397,6 @@ void
 Int64ArrayElOperand::SelfAnd( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_and( currValue, value);
@@ -2375,7 +2409,6 @@ void
 Int64ArrayElOperand::SelfXor( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_xor( currValue, value);
@@ -2388,7 +2421,6 @@ void
 Int64ArrayElOperand::SelfOr( const DInt64& value)
 {
   DInt64 currValue;
-
   Get (currValue);
 
   currValue = internal_or( currValue, value);
@@ -2408,19 +2440,11 @@ StackValue
 Int64ArrayElOperand::Duplicate() const
 {
   DInt64 value;
-
   Get (value);
 
   return StackValue( Int64Operand( value));
 }
 
-
-
-bool
-RealArrayElOperand::IsNull() const
-{
-  return false;
-}
 
 
 void
@@ -2430,34 +2454,40 @@ RealArrayElOperand::GetValue( DReal& outValue) const
 }
 
 
-
 void
 RealArrayElOperand::GetValue( DRichReal& outValue) const
 {
   DReal currValue;
-
-
   Get (currValue);
 
   number_convert( currValue, outValue);
 }
 
 
-
 void
-RealArrayElOperand::SetValue( const DReal& value)
+RealArrayElOperand::GetValue( DText& outValue) const
 {
-  Set (value);
+  DReal   currValue;
+  uint8_t text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
 }
 
+
+void
+RealArrayElOperand::SetValue( const DRichReal& value)
+{
+  Set (value.IsNull () ? DReal () : DReal (value.mValue));
+}
 
 
 void
 RealArrayElOperand::SelfAdd( const DInt64& value)
 {
   DReal currValue;
-
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -2471,8 +2501,6 @@ void
 RealArrayElOperand::SelfAdd( const DRichReal& value)
 {
   DReal currValue;
-
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -2485,7 +2513,6 @@ void
 RealArrayElOperand::SelfSub( const DInt64& value)
 {
   DReal currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -2498,7 +2525,6 @@ void
 RealArrayElOperand::SelfSub( const DRichReal& value)
 {
   DReal currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -2511,7 +2537,6 @@ void
 RealArrayElOperand::SelfMul( const DInt64& value)
 {
   DReal currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -2524,7 +2549,6 @@ void
 RealArrayElOperand::SelfMul( const DRichReal& value)
 {
   DReal currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -2537,7 +2561,6 @@ void
 RealArrayElOperand::SelfDiv( const DInt64& value)
 {
   DReal currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -2550,7 +2573,6 @@ void
 RealArrayElOperand::SelfDiv( const DRichReal& value)
 {
   DReal currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -2577,19 +2599,13 @@ RealArrayElOperand::Duplicate() const
 }
 
 
-bool
-RichRealArrayElOperand::IsNull() const
-{
-  return false;
-}
-
-
 void
 RichRealArrayElOperand::GetValue( DReal& outValue) const
 {
   DRichReal currValue;
-
   Get (currValue);
+
+  number_convert(currValue, outValue);
 }
 
 
@@ -2597,6 +2613,19 @@ void
 RichRealArrayElOperand::GetValue( DRichReal& outValue) const
 {
   Get (outValue);
+}
+
+
+void
+RichRealArrayElOperand::GetValue( DText& outValue) const
+{
+  DRichReal currValue;
+  uint8_t   text[64];
+
+  Get (currValue);
+
+  Utf8Translator::Write (text, sizeof text, currValue);
+  outValue = DText (_RC (char*, text));
 }
 
 
@@ -2623,7 +2652,6 @@ void
 RichRealArrayElOperand::SelfAdd( const DRichReal& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_add( currValue, value);
@@ -2636,7 +2664,6 @@ void
 RichRealArrayElOperand::SelfSub( const DInt64& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -2649,7 +2676,6 @@ void
 RichRealArrayElOperand::SelfSub( const DRichReal& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_sub( currValue, value);
@@ -2662,7 +2688,6 @@ void
 RichRealArrayElOperand::SelfMul( const DInt64& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -2675,7 +2700,6 @@ void
 RichRealArrayElOperand::SelfMul( const DRichReal& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_mul( currValue, value);
@@ -2688,7 +2712,6 @@ void
 RichRealArrayElOperand::SelfDiv( const DInt64& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -2701,7 +2724,6 @@ void
 RichRealArrayElOperand::SelfDiv( const DRichReal& value)
 {
   DRichReal currValue;
-
   Get (currValue);
 
   currValue = internal_div( currValue, value);
@@ -2721,7 +2743,6 @@ StackValue
 RichRealArrayElOperand::Duplicate() const
 {
   DRichReal value;
-
   Get (value);
 
   return StackValue( RichRealOperand( value));

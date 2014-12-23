@@ -1,17 +1,19 @@
 ################################################################################
-# Test module used to verify the correct handling of local values,
-#
-# Iulian Popa
-#
+# Test module used to verify the correct handling of local values.             #
+#                                                                              #
+# All the test from this unit should be executed twice at least, and should    #
+# return the same result always if not otherwise specified, to validated the   #
+# test.                                                                        #
+# Multiple execution is needed to prevent contamination of the procedure       #
+# default null value.                                                          #
 ################################################################################
-
 
 #@include whais_std.wh
 
-#TEST: default_null_test_1
+#TEST: null_test_1
 #Call this function twice in a row and make sure it returns the same non 
 #null result.
-PROCEDURE default_null_test_1 ()
+PROCEDURE null_test_1 ()
 RETURN TABLE
 DO
     LET row AS UINT64;
@@ -32,6 +34,17 @@ DO
                             field15 AS RICHREAL,
                             field16 AS TEXT);
 
+    write_log ("Start of null_test_1");
+    IF (row != NULL) DO
+        write_log ("... FAIL: 'row' is not null by default");
+    END
+
+    IF (result != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+    END
+
+    write_log ("... Local values are null by default.");
+
     row = table_reusable_row (result);
     result.field1[row] = TRUE;
     result.field2[row] = 'C';
@@ -50,14 +63,17 @@ DO
     result.field15[row] = 2.12;
     result.field16[row] = "This should be a text";
 
+    write_log ("End of null_test_1");
+
     RETURN result;
 ENDPROC
 
-#TEST: default_null_test_1_1
+#TEST: null_test_1_1
 #Call this function twice in a row and make sure it returns TRUE 
-PROCEDURE default_null_test_1_1 ()
+PROCEDURE null_test_1_1 ()
 RETURN BOOL
 DO
+    LET row AS UINT64;
     LET result AS TABLE OF (field1 AS BOOL,
                             field2 AS CHAR,
                             field3 AS DATE,
@@ -75,94 +91,108 @@ DO
                             field15 AS RICHREAL,
                             field16 AS TEXT);
 
-    LET row AS UINT64;
+    write_log ("Start of null_test_1_1");
+    IF (row != NULL) DO
+        write_log ("... FAIL: 'row' is not null by default");
+        RETURN FALSE;
+    END
+
+    IF (result != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+        RETURN FALSE;
+    END
+
+    write_log ("... Local values are null by default.");
+
     row = table_reusable_row (result);
     
     IF (result.field1[row] != NULL) DO
-        write_log ("Field1 is not null");
+        write_log ("... FAIL: Field1 is not null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] != NULL) DO
-        write_log ("Field2 is not null");
+        write_log ("... FAIL: Field2 is not null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] != NULL) DO
-        write_log ("Field3 is not null");
+        write_log ("... FAIL: Field3 is not null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] != NULL) DO
-        write_log ("Field4 is not null");
+        write_log ("... FAIL: Field4 is not null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] != NULL) DO
-        write_log ("Field5 is not null");
+        write_log ("... FAIL: Field5 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field6 is not null");
+        write_log ("... FAIL: Field6 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] != NULL) DO
-        write_log ("Field8 is not null");
+        write_log ("... FAIL: Field8 is not null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] != NULL) DO
-        write_log ("Field9 is not null");
+        write_log ("... FAIL: Field9 is not null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] != NULL) DO
-        write_log ("Field10 is not null");
+        write_log ("... FAIL: Field10 is not null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] != NULL) DO
-        write_log ("Field11 is not null");
+        write_log ("... FAIL: Field11 is not null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] != NULL) DO
-        write_log ("Field12 is not null");
+        write_log ("... FAIL: Field12 is not null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] != NULL) DO
-        write_log ("Field13 is not null");
+        write_log ("... FAIL: Field13 is not null");
         RETURN FALSE;
     END
     
     IF (result.field14[row] != NULL) DO
-        write_log ("Field14 is not null");
+        write_log ("... FAIL: Field14 is not null");
         RETURN FALSE;
     END
     
     IF (result.field15[row] != NULL) DO
-        write_log ("Field15 is not null");
+        write_log ("... FAIL: Field15 is not null");
         RETURN FALSE;
     END
     
     IF (result.field16[row] != NULL) DO
-        write_log ("Field16 is not null");
+        write_log ("... FAIL: Field16 is not null");
         RETURN FALSE;
     END
     
+    write_log ("... Step 2");
+
     result.field1[row] = TRUE;
     result.field2[row] = 'C';
     result.field3[row] = '1800/10/14';
@@ -181,90 +211,92 @@ DO
     result.field16[row] = "This should be a text";
     
     IF (result.field1[row] == NULL) DO
-        write_log ("Field1 is null");
+        write_log ("... FAIL: Field1 is null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] == NULL) DO
-        write_log ("Field2 is null");
+        write_log ("... FAIL: Field2 is null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] == NULL) DO
-        write_log ("Field3 is null");
+        write_log ("... FAIL: Field3 is null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] == NULL) DO
-        write_log ("Field4 is null");
+        write_log ("... FAIL: Field4 is null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] == NULL) DO
-        write_log ("Field5 is null");
+        write_log ("... FAIL: Field5 is null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] == NULL) DO
-        write_log ("Field6 is null");
+        write_log ("... FAIL: Field6 is null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] == NULL) DO
-        write_log ("Field7 is null");
+        write_log ("... FAIL: Field7 is null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] == NULL) DO
-        write_log ("Field7 is null");
+        write_log ("... FAIL: Field7 is null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] == NULL) DO
-        write_log ("Field8 is null");
+        write_log ("... FAIL: Field8 is null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] == NULL) DO
-        write_log ("Field9 is null");
+        write_log ("... FAIL: Field9 is null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] == NULL) DO
-        write_log ("Field10 is null");
+        write_log ("... FAIL: Field10 is null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] == NULL) DO
-        write_log ("Field11 is null");
+        write_log ("... FAIL: Field11 is null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] == NULL) DO
-        write_log ("Field12 is null");
+        write_log ("... FAIL: Field12 is null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] == NULL) DO
-        write_log ("Field13 is null");
+        write_log ("... FAIL: Field13 is null");
         RETURN FALSE;
     END
     
     IF (result.field14[row] == NULL) DO
-        write_log ("Field14 is null");
+        write_log ("... FAIL: Field14 is null");
         RETURN FALSE;
     END
     
     IF (result.field15[row] == NULL) DO
-        write_log ("Field15 is null");
+        write_log ("... FAIL: Field15 is null");
         RETURN FALSE;
     END
     
     IF (result.field16[row] == NULL) DO
-        write_log ("Field16 is null");
+        write_log ("... FAIL: Field16 is null");
         RETURN FALSE;
     END    
     
+    write_log ("... Step 3");
+
     result.field1[row] = NULL;
     result.field2[row] = NULL;
     result.field3[row] = NULL;
@@ -283,98 +315,100 @@ DO
     result.field16[row] = NULL;
     
     IF (result.field1[row] != NULL) DO
-        write_log ("Field1 is not null");
+        write_log ("... FAIL: Field1 is not null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] != NULL) DO
-        write_log ("Field2 is not null");
+        write_log ("... FAIL: Field2 is not null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] != NULL) DO
-        write_log ("Field3 is not null");
+        write_log ("... FAIL: Field3 is not null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] != NULL) DO
-        write_log ("Field4 is not null");
+        write_log ("... FAIL: Field4 is not null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] != NULL) DO
-        write_log ("Field5 is not null");
+        write_log ("... FAIL: Field5 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field6 is not null");
+        write_log ("... FAIL: Field6 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] != NULL) DO
-        write_log ("Field8 is not null");
+        write_log ("... FAIL: Field8 is not null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] != NULL) DO
-        write_log ("Field9 is not null");
+        write_log ("... FAIL: Field9 is not null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] != NULL) DO
-        write_log ("Field10 is not null");
+        write_log ("... FAIL: Field10 is not null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] != NULL) DO
-        write_log ("Field11 is not null");
+        write_log ("... FAIL: Field11 is not null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] != NULL) DO
-        write_log ("Field12 is not null");
+        write_log ("... FAIL: Field12 is not null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] != NULL) DO
-        write_log ("Field13 is not null");
+        write_log ("... FAIL: Field13 is not null");
         RETURN FALSE;
     END
     
     IF (result.field14[row] != NULL) DO
-        write_log ("Field14 is not null");
+        write_log ("... FAIL: Field14 is not null");
         RETURN FALSE;
     END
     
     IF (result.field15[row] != NULL) DO
-        write_log ("Field15 is not null");
+        write_log ("... FAIL: Field15 is not null");
         RETURN FALSE;
     END
     
     IF (result.field16[row] != NULL) DO
-        write_log ("Field16 is not null");
+        write_log ("... FAIL: Field16 is not null");
         RETURN FALSE;
     END
+
+    write_log ("Start of null_test_1_1");
 
     RETURN TRUE;
 ENDPROC
 
 
-#TEST: default_null_test_1_2
+#TEST: null_test_1_2
 #Call this function twice in a row and make sure it returns the same non 
 #null result.
-PROCEDURE default_null_test_1_2 ()
+PROCEDURE null_test_1_2 ()
 RETURN TABLE
 DO
     LET row AS UINT64;
@@ -395,8 +429,18 @@ DO
                             field15 AS ARRAY OF RICHREAL,
                             field16 AS TEXT);
 
+    write_log ("Start of null_test_1_2");
+    IF (row != NULL) DO
+        write_log ("... FAIL: 'row' is not null by default");
+    END
+
+    IF (result != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+    END
+
+    write_log ("... Local values are null by default.");
+
     row = table_reusable_row (result);
-    
     
     array_pushback(result.field1[row], TRUE);
     array_pushback(result.field1[row], FALSE);
@@ -418,14 +462,16 @@ DO
     array_pushback(result.field14[row], -1.1);
     array_pushback(result.field15[row], 2.12);
     result.field16[row] = "Text field";
+    
+    write_log ("End of null_test_1_2");
 
     RETURN result;
 ENDPROC
 
 
-#TEST: default_null_test_1_3
+#TEST: null_test_1_3
 #Call this function twice in a row and make sure it returns TRUE 
-PROCEDURE default_null_test_1_3 ()
+PROCEDURE null_test_1_3 ()
 RETURN BOOL
 DO
     LET result AS TABLE OF (field1 AS ARRAY OF BOOL,
@@ -444,94 +490,107 @@ DO
                             field14 AS ARRAY OF REAL,
                             field15 AS ARRAY OF RICHREAL,
                             field16 AS TEXT);
-
     LET row AS UINT64;
+    
+    write_log ("Start of null_test_1_3");
+    IF (row != NULL) DO
+        write_log ("... FAIL: 'row' is not null by default");
+    END
+
+    IF (result != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+    END
+
+    write_log ("... Local values are null by default.");
+    
     row = table_reusable_row (result);
     
     IF (result.field1[row] != NULL) DO
-        write_log ("Field1 is not null");
+        write_log ("... FAIL: Field1 is not null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] != NULL) DO
-        write_log ("Field2 is not null");
+        write_log ("... FAIL: Field2 is not null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] != NULL) DO
-        write_log ("Field3 is not null");
+        write_log ("... FAIL: Field3 is not null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] != NULL) DO
-        write_log ("Field4 is not null");
+        write_log ("... FAIL: Field4 is not null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] != NULL) DO
-        write_log ("Field5 is not null");
+        write_log ("... FAIL: Field5 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field6 is not null");
+        write_log ("... FAIL: Field6 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] != NULL) DO
-        write_log ("Field8 is not null");
+        write_log ("... FAIL: Field8 is not null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] != NULL) DO
-        write_log ("Field9 is not null");
+        write_log ("... FAIL: Field9 is not null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] != NULL) DO
-        write_log ("Field10 is not null");
+        write_log ("... FAIL: Field10 is not null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] != NULL) DO
-        write_log ("Field11 is not null");
+        write_log ("... FAIL: Field11 is not null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] != NULL) DO
-        write_log ("Field12 is not null");
+        write_log ("... FAIL: Field12 is not null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] != NULL) DO
-        write_log ("Field13 is not null");
+        write_log ("... FAIL: Field13 is not null");
         RETURN FALSE;
     END
     
     IF (result.field14[row] != NULL) DO
-        write_log ("Field14 is not null");
+        write_log ("... FAIL: Field14 is not null");
         RETURN FALSE;
     END
     
     IF (result.field15[row] != NULL) DO
-        write_log ("Field15 is not null");
+        write_log ("... FAIL: Field15 is not null");
         RETURN FALSE;
     END
     
     IF (result.field16[row] != NULL) DO
-        write_log ("Field16 is not null");
+        write_log ("... FAIL: Field16 is not null");
         RETURN FALSE;
     END
+    
+    write_log ("...Step 2");
     
     array_pushback(result.field1[row], TRUE);
     array_pushback(result.field1[row], FALSE);
@@ -554,90 +613,92 @@ DO
     result.field16[row][0] = 'T';
     
     IF (result.field1[row] == NULL) DO
-        write_log ("Field1 is null");
+        write_log ("... FAIL: Field1 is null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] == NULL) DO
-        write_log ("Field2 is null");
+        write_log ("... FAIL: Field2 is null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] == NULL) DO
-        write_log ("Field3 is null");
+        write_log ("... FAIL: Field3 is null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] == NULL) DO
-        write_log ("Field4 is null");
+        write_log ("... FAIL: Field4 is null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] == NULL) DO
-        write_log ("Field5 is null");
+        write_log ("... FAIL: Field5 is null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] == NULL) DO
-        write_log ("Field6 is null");
+        write_log ("... FAIL: Field6 is null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] == NULL) DO
-        write_log ("Field7 is null");
+        write_log ("... FAIL: Field7 is null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] == NULL) DO
-        write_log ("Field7 is null");
+        write_log ("... FAIL: Field7 is null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] == NULL) DO
-        write_log ("Field8 is null");
+        write_log ("... FAIL: Field8 is null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] == NULL) DO
-        write_log ("Field9 is null");
+        write_log ("... FAIL: Field9 is null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] == NULL) DO
-        write_log ("Field10 is null");
+        write_log ("... FAIL: Field10 is null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] == NULL) DO
-        write_log ("Field11 is null");
+        write_log ("... FAIL: Field11 is null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] == NULL) DO
-        write_log ("Field12 is null");
+        write_log ("... FAIL: Field12 is null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] == NULL) DO
-        write_log ("Field13 is null");
+        write_log ("... FAIL: Field13 is null");
         RETURN FALSE;
     END
     
     IF (result.field14[row] == NULL) DO
-        write_log ("Field14 is null");
+        write_log ("... FAIL: Field14 is null");
         RETURN FALSE;
     END
     
     IF (result.field15[row] == NULL) DO
-        write_log ("Field15 is null");
+        write_log ("... FAIL: Field15 is null");
         RETURN FALSE;
     END
     
     IF (result.field16[row] == NULL) DO
-        write_log ("Field16 is null");
+        write_log ("... FAIL: Field16 is null");
         RETURN FALSE;
-    END    
-    
+    END 
+
+    write_log ("...Step 3");
+
     result.field1[row] = NULL;
     result.field2[row] = NULL;
     result.field3[row] = NULL;
@@ -656,90 +717,92 @@ DO
     result.field16[row] = NULL;
     
     IF (result.field1[row] != NULL) DO
-        write_log ("Field1 is not null");
+        write_log ("... FAIL: Field1 is not null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] != NULL) DO
-        write_log ("Field2 is not null");
+        write_log ("... FAIL: Field2 is not null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] != NULL) DO
-        write_log ("Field3 is not null");
+        write_log ("... FAIL: Field3 is not null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] != NULL) DO
-        write_log ("Field4 is not null");
+        write_log ("... FAIL: Field4 is not null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] != NULL) DO
-        write_log ("Field5 is not null");
+        write_log ("... FAIL: Field5 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field6 is not null");
+        write_log ("... FAIL: Field6 is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] != NULL) DO
-        write_log ("Field7 is not null");
+        write_log ("... FAIL: Field7 is not null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] != NULL) DO
-        write_log ("Field8 is not null");
+        write_log ("... FAIL: Field8 is not null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] != NULL) DO
-        write_log ("Field9 is not null");
+        write_log ("... FAIL: Field9 is not null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] != NULL) DO
-        write_log ("Field10 is not null");
+        write_log ("... FAIL: Field10 is not null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] != NULL) DO
-        write_log ("Field11 is not null");
+        write_log ("... FAIL: Field11 is not null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] != NULL) DO
-        write_log ("Field12 is not null");
+        write_log ("... FAIL: Field12 is not null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] != NULL) DO
-        write_log ("Field13 is not null");
+        write_log ("... FAIL: Field13 is not null");
         RETURN FALSE;
     END
     
     IF (result.field14[row] != NULL) DO
-        write_log ("Field14 is not null");
+        write_log ("... FAIL: Field14 is not null");
         RETURN FALSE;
     END
     
     IF (result.field15[row] != NULL) DO
-        write_log ("Field15 is not null");
+        write_log ("... FAIL: Field15 is not null");
         RETURN FALSE;
     END
     
     IF (result.field16[row] != NULL) DO
-        write_log ("Field16 is not null");
+        write_log ("... FAIL: Field16 is not null");
         RETURN FALSE;
     END
     
+    write_log ("...Step 4");
+
     array_pushback(result.field1[row], TRUE);
     array_pushback(result.field2[row], 'C');
     array_pushback(result.field3[row], '1800/10/14');
@@ -774,90 +837,92 @@ DO
     result.field16[row][0] = 'r';
     
     IF (result.field1[row][0] == NULL) DO
-        write_log ("Field1 array is null");
+        write_log ("... FAIL: Field1 array is null");
         RETURN FALSE;
     END
     
     IF (result.field2[row][0] == NULL) DO
-        write_log ("Field2 array is null");
+        write_log ("... FAIL: Field2 array is null");
         RETURN FALSE;
     END
     
     IF (result.field3[row][0] == NULL) DO
-        write_log ("Field3 array is null");
+        write_log ("... FAIL: Field3 array is null");
         RETURN FALSE;
     END
     
     IF (result.field4[row][0] == NULL) DO
-        write_log ("Field4 array is null");
+        write_log ("... FAIL: Field4 array is null");
         RETURN FALSE;
     END
     
     IF (result.field5[row][0] == NULL) DO
-        write_log ("Field5 array is null");
+        write_log ("... FAIL: Field5 array is null");
         RETURN FALSE;
     END
     
     IF (result.field6[row][0] == NULL) DO
-        write_log ("Field6 array is null");
+        write_log ("... FAIL: Field6 array is null");
         RETURN FALSE;
     END
     
     IF (result.field6[row][0] == NULL) DO
-        write_log ("Field7 array is null");
+        write_log ("... FAIL: Field7 array is null");
         RETURN FALSE;
     END
     
     IF (result.field7[row][0] == NULL) DO
-        write_log ("Field7 array is null");
+        write_log ("... FAIL: Field7 array is null");
         RETURN FALSE;
     END
        
     IF (result.field8[row][0] == NULL) DO
-        write_log ("Field8 array is null");
+        write_log ("... FAIL: Field8 array is null");
         RETURN FALSE;
     END
     
     IF (result.field9[row][0] == NULL) DO
-        write_log ("Field9 array is null");
+        write_log ("... FAIL: Field9 array is null");
         RETURN FALSE;
     END
     
     IF (result.field10[row][0] == NULL) DO
-        write_log ("Field10 array is null");
+        write_log ("... FAIL: Field10 array is null");
         RETURN FALSE;
     END
     
     IF (result.field11[row][0] == NULL) DO
-        write_log ("Field11 array is null");
+        write_log ("... FAIL: Field11 array is null");
         RETURN FALSE;
     END
     
     IF (result.field12[row][0] == NULL) DO
-        write_log ("Field12 array is null");
+        write_log ("... FAIL: Field12 array is null");
         RETURN FALSE;
     END
     
     IF (result.field13[row][0] == NULL) DO
-        write_log ("Field13 array is null");
+        write_log ("... FAIL: Field13 array is null");
         RETURN FALSE;
     END
     
     IF (result.field14[row][0] == NULL) DO
-        write_log ("Field14 array is null");
+        write_log ("... FAIL: Field14 array is null");
         RETURN FALSE;
     END
     
     IF (result.field15[row][0] == NULL) DO
-        write_log ("Field15 array is null");
+        write_log ("... FAIL: Field15 array is null");
         RETURN FALSE;
     END
     
     IF (result.field16[row][0] == NULL) DO
-        write_log ("Field16 array is null");
+        write_log ("... FAIL: Field16 array is null");
         RETURN FALSE;
     END
     
+    write_log ("...Step 5");
+
     result.field1[row][0] = NULL;
     result.field2[row][0] = NULL;
     result.field3[row][0] = NULL;
@@ -876,112 +941,123 @@ DO
     result.field16[row][0] = NULL;
     
     IF (result.field1[row] != NULL) DO
-        write_log ("Field1 array is not null");
+        write_log ("... FAIL: Field1 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field2[row] != NULL) DO
-        write_log ("Field2 array is not null");
+        write_log ("... FAIL: Field2 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field3[row] != NULL) DO
-        write_log ("Field3 array is not null");
+        write_log ("... FAIL: Field3 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field4[row] != NULL) DO
-        write_log ("Field4 array is not null");
+        write_log ("... FAIL: Field4 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field5[row] != NULL) DO
-        write_log ("Field5 array is not null");
+        write_log ("... FAIL: Field5 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field6 array is not null");
+        write_log ("... FAIL: Field6 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field6[row] != NULL) DO
-        write_log ("Field7 array is not null");
+        write_log ("... FAIL: Field7 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field7[row] != NULL) DO
-        write_log ("Field7 array is not null");
+        write_log ("... FAIL: Field7 array is not null");
         RETURN FALSE;
     END
        
     IF (result.field8[row] != NULL) DO
-        write_log ("Field8 array is not null");
+        write_log ("... FAIL: Field8 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field9[row] != NULL) DO
-        write_log ("Field9 array is not null");
+        write_log ("... FAIL: Field9 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field10[row] != NULL) DO
-        write_log ("Field10 array is not null");
+        write_log ("... FAIL: Field10 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field11[row] != NULL) DO
-        write_log ("Field11 array is not null");
+        write_log ("... FAIL: Field11 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field12[row] != NULL) DO
-        write_log ("Field12 array is not null");
+        write_log ("... FAIL: Field12 array is not null");
         RETURN FALSE;
     END
     
     IF (result.field13[row] != NULL) DO
-        write_log ("Field13 array is not null");
+        write_log ("... FAIL: Field13 array is not null");
         RETURN FALSE;
     END
-    
+
     IF (result.field14[row] != NULL) DO
-        write_log ("Field14 array is not null");
+        write_log ("... FAIL: Field14 array is not null");
         RETURN FALSE;
     END
-    
+
     IF (result.field15[row] != NULL) DO
-        write_log ("Field15 array is not null");
+        write_log ("... FAIL: Field15 array is not null");
         RETURN FALSE;
     END
-    
+
     IF (result.field16[row] != NULL) DO
-        write_log ("Field16 array is not null");
+        write_log ("... FAIL: Field16 array is not null");
         RETURN FALSE;
     END
-    
+
+    write_log ("End of null_test_1_3");
+
     RETURN TRUE;
 ENDPROC
 
 
-#TEST: default_null_test_2
+#TEST: null_test_2
 #Call this function twice in and make sure it returns the same result.
-PROCEDURE default_null_test_2 ()
+PROCEDURE null_test_2 ()
 RETURN ARRAY
 DO
-    LET result AS ARRAY OF UINT32;
+    LET result AS ARRAY OF INT32;
+    
+    write_log ("Start of null_test_2");
+    IF (result != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+    END
+
+    write_log ("... Local values are null by default.");
 
     array_pushback (result, -1000);
     array_pushback (result, 20);
+
+    write_log ("End of null_test_2");
 
     RETURN result;
 ENDPROC
 
 
 
-#TEST: default_null_test_2_1
+#TEST: null_test_2_1
 #Call this function and it should return TRUE for the test to pass.
-PROCEDURE default_null_test_2_1 ()
+PROCEDURE null_test_2_1 ()
 RETURN BOOL
 DO
 
@@ -1001,91 +1077,95 @@ DO
     LET array14 AS ARRAY OF REAL;
     LET array15 AS ARRAY OF RICHREAL;
     LET array16 AS TEXT;
+
+    write_log ("Start of null_test_2_1");
         
     IF (array1 != NULL) DO
-        write_log ("Array1 is not null");
+        write_log ("... FAIL: Array1 is not null");
         RETURN FALSE;
     END
     
     IF (array2 != NULL) DO
-        write_log ("Array2 is not null");
+        write_log ("... FAIL: Array2 is not null");
         RETURN FALSE;
     END
     
     IF (array3 != NULL) DO
-        write_log ("Array3 is not null");
+        write_log ("... FAIL: Array3 is not null");
         RETURN FALSE;
     END
     
     IF (array4 != NULL) DO
-        write_log ("Array4 is not null");
+        write_log ("... FAIL: Array4 is not null");
         RETURN FALSE;
     END
     
     IF (array5 != NULL) DO
-        write_log ("Array5 is not null");
+        write_log ("... FAIL: Array5 is not null");
         RETURN FALSE;
     END
     
     IF (array6 != NULL) DO
-        write_log ("Array6 is not null");
+        write_log ("... FAIL: Array6 is not null");
         RETURN FALSE;
     END
     
     IF (array6 != NULL) DO
-        write_log ("Array7 is not null");
+        write_log ("... FAIL: Array7 is not null");
         RETURN FALSE;
     END
     
     IF (array7 != NULL) DO
-        write_log ("Array7 is not null");
+        write_log ("... FAIL: Array7 is not null");
         RETURN FALSE;
     END
        
     IF (array8 != NULL) DO
-        write_log ("Array8 is not null");
+        write_log ("... FAIL: Array8 is not null");
         RETURN FALSE;
     END
     
     IF (array9 != NULL) DO
-        write_log ("Array9 is not null");
+        write_log ("... FAIL: Array9 is not null");
         RETURN FALSE;
     END
     
     IF (array10 != NULL) DO
-        write_log ("Array10 is not null");
+        write_log ("... FAIL: Array10 is not null");
         RETURN FALSE;
     END
     
     IF (array11 != NULL) DO
-        write_log ("Array11 is not null");
+        write_log ("... FAIL: Array11 is not null");
         RETURN FALSE;
     END
     
     IF (array12 != NULL) DO
-        write_log ("Array12 is not null");
+        write_log ("... FAIL: Array12 is not null");
         RETURN FALSE;
     END
     
     IF (array13 != NULL) DO
-        write_log ("Array13 is not null");
+        write_log ("... FAIL: Array13 is not null");
         RETURN FALSE;
     END
     
     IF (array14 != NULL) DO
-        write_log ("Array14 is not null");
+        write_log ("... FAIL: Array14 is not null");
         RETURN FALSE;
     END
     
     IF (array15 != NULL) DO
-        write_log ("Array15 is not null");
+        write_log ("... FAIL: Array15 is not null");
         RETURN FALSE;
     END
     
     IF (array16 != NULL) DO
-        write_log ("Array16 is not null");
+        write_log ("... FAIL: Array16 is not null");
         RETURN FALSE;
     END
+
+    write_log ("... Step 2");
     
     array_pushback(array1, TRUE);
     array_pushback(array1, FALSE);
@@ -1108,90 +1188,92 @@ DO
     array16[0] = 'T';
     
     IF (array1 == NULL) DO
-        write_log ("Array1 is null");
+        write_log ("... FAIL: Array1 is null");
         RETURN FALSE;
     END
     
     IF (array2 == NULL) DO
-        write_log ("Array2 is null");
+        write_log ("... FAIL: Array2 is null");
         RETURN FALSE;
     END
     
     IF (array3 == NULL) DO
-        write_log ("Array3 is null");
+        write_log ("... FAIL: Array3 is null");
         RETURN FALSE;
     END
     
     IF (array4 == NULL) DO
-        write_log ("Array4 is null");
+        write_log ("... FAIL: Array4 is null");
         RETURN FALSE;
     END
     
     IF (array5 == NULL) DO
-        write_log ("Array5 is null");
+        write_log ("... FAIL: Array5 is null");
         RETURN FALSE;
     END
     
     IF (array6 == NULL) DO
-        write_log ("Array6 is null");
+        write_log ("... FAIL: Array6 is null");
         RETURN FALSE;
     END
     
     IF (array6 == NULL) DO
-        write_log ("Array7 is null");
+        write_log ("... FAIL: Array7 is null");
         RETURN FALSE;
     END
     
     IF (array7 == NULL) DO
-        write_log ("Array7 is null");
+        write_log ("... FAIL: Array7 is null");
         RETURN FALSE;
     END
        
     IF (array8 == NULL) DO
-        write_log ("Array8 is null");
+        write_log ("... FAIL: Array8 is null");
         RETURN FALSE;
     END
     
     IF (array9 == NULL) DO
-        write_log ("Array9 is null");
+        write_log ("... FAIL: Array9 is null");
         RETURN FALSE;
     END
     
     IF (array10 == NULL) DO
-        write_log ("Array10 is null");
+        write_log ("... FAIL: Array10 is null");
         RETURN FALSE;
     END
     
     IF (array11 == NULL) DO
-        write_log ("Array11 is null");
+        write_log ("... FAIL: Array11 is null");
         RETURN FALSE;
     END
     
     IF (array12 == NULL) DO
-        write_log ("Array12 is null");
+        write_log ("... FAIL: Array12 is null");
         RETURN FALSE;
     END
     
     IF (array13 == NULL) DO
-        write_log ("Array13 is null");
+        write_log ("... FAIL: Array13 is null");
         RETURN FALSE;
     END
     
     IF (array14 == NULL) DO
-        write_log ("Array14 is null");
+        write_log ("... FAIL: Array14 is null");
         RETURN FALSE;
     END
     
     IF (array15 == NULL) DO
-        write_log ("Array15 is null");
+        write_log ("... FAIL: Array15 is null");
         RETURN FALSE;
     END
     
     IF (array16 == NULL) DO
-        write_log ("Array16 is null");
+        write_log ("... FAIL: Array16 is null");
         RETURN FALSE;
     END
     
+    write_log ("... Step 3");
+
     array1 = NULL;
     array2 = NULL;
     array3 = NULL;
@@ -1210,89 +1292,91 @@ DO
     array16 = NULL;
     
     IF (array1 != NULL) DO
-        write_log ("Array1 is not null");
+        write_log ("... FAIL: Array1 is not null");
         RETURN FALSE;
     END
     
     IF (array2 != NULL) DO
-        write_log ("Array2 is not null");
+        write_log ("... FAIL: Array2 is not null");
         RETURN FALSE;
     END
     
     IF (array3 != NULL) DO
-        write_log ("Array3 is not null");
+        write_log ("... FAIL: Array3 is not null");
         RETURN FALSE;
     END
     
     IF (array4 != NULL) DO
-        write_log ("Array4 is not null");
+        write_log ("... FAIL: Array4 is not null");
         RETURN FALSE;
     END
     
     IF (array5 != NULL) DO
-        write_log ("Array5 is not null");
+        write_log ("... FAIL: Array5 is not null");
         RETURN FALSE;
     END
     
     IF (array6 != NULL) DO
-        write_log ("Array6 is not null");
+        write_log ("... FAIL: Array6 is not null");
         RETURN FALSE;
     END
     
     IF (array6 != NULL) DO
-        write_log ("Array7 is not null");
+        write_log ("... FAIL: Array7 is not null");
         RETURN FALSE;
     END
     
     IF (array7 != NULL) DO
-        write_log ("Array7 is not null");
+        write_log ("... FAIL: Array7 is not null");
         RETURN FALSE;
     END
        
     IF (array8 != NULL) DO
-        write_log ("Array8 is not null");
+        write_log ("... FAIL: Array8 is not null");
         RETURN FALSE;
     END
     
     IF (array9 != NULL) DO
-        write_log ("Array9 is not null");
+        write_log ("... FAIL: Array9 is not null");
         RETURN FALSE;
     END
     
     IF (array10 != NULL) DO
-        write_log ("Array10 is not null");
+        write_log ("... FAIL: Array10 is not null");
         RETURN FALSE;
     END
     
     IF (array11 != NULL) DO
-        write_log ("Array11 is not null");
+        write_log ("... FAIL: Array11 is not null");
         RETURN FALSE;
     END
     
     IF (array12 != NULL) DO
-        write_log ("Array12 is not null");
+        write_log ("... FAIL: Array12 is not null");
         RETURN FALSE;
     END
     
     IF (array13 != NULL) DO
-        write_log ("Array13 is not null");
+        write_log ("... FAIL: Array13 is not null");
         RETURN FALSE;
     END
     
     IF (array14 != NULL) DO
-        write_log ("Array14 is not null");
+        write_log ("... FAIL: Array14 is not null");
         RETURN FALSE;
     END
     
     IF (array15 != NULL) DO
-        write_log ("Array15 is not null");
+        write_log ("... FAIL: Array15 is not null");
         RETURN FALSE;
     END
     
     IF (array16 != NULL) DO
-        write_log ("Array16 is not null");
+        write_log ("... FAIL: Array16 is not null");
         RETURN FALSE;
     END
+    
+    write_log ("... Step 4");
     
     array_pushback(array1, TRUE);
     array_pushback(array2, 'C');
@@ -1329,90 +1413,92 @@ DO
     array16[0] = 'r';
     
         IF (array1 == NULL) DO
-        write_log ("Array1 is null");
+        write_log ("... FAIL: Array1 is null");
         RETURN FALSE;
     END
     
     IF (array2 == NULL) DO
-        write_log ("Array2 is null");
+        write_log ("... FAIL: Array2 is null");
         RETURN FALSE;
     END
     
     IF (array3 == NULL) DO
-        write_log ("Array3 is null");
+        write_log ("... FAIL: Array3 is null");
         RETURN FALSE;
     END
     
     IF (array4 == NULL) DO
-        write_log ("Array4 is null");
+        write_log ("... FAIL: Array4 is null");
         RETURN FALSE;
     END
     
     IF (array5 == NULL) DO
-        write_log ("Array5 is null");
+        write_log ("... FAIL: Array5 is null");
         RETURN FALSE;
     END
     
     IF (array6 == NULL) DO
-        write_log ("Array6 is null");
+        write_log ("... FAIL: Array6 is null");
         RETURN FALSE;
     END
     
     IF (array6 == NULL) DO
-        write_log ("Array7 is null");
+        write_log ("... FAIL: Array7 is null");
         RETURN FALSE;
     END
     
     IF (array7 == NULL) DO
-        write_log ("Array7 is null");
+        write_log ("... FAIL: Array7 is null");
         RETURN FALSE;
     END
        
     IF (array8 == NULL) DO
-        write_log ("Array8 is null");
+        write_log ("... FAIL: Array8 is null");
         RETURN FALSE;
     END
     
     IF (array9 == NULL) DO
-        write_log ("Array9 is null");
+        write_log ("... FAIL: Array9 is null");
         RETURN FALSE;
     END
     
     IF (array10 == NULL) DO
-        write_log ("Array10 is null");
+        write_log ("... FAIL: Array10 is null");
         RETURN FALSE;
     END
     
     IF (array11 == NULL) DO
-        write_log ("Array11 is null");
+        write_log ("... FAIL: Array11 is null");
         RETURN FALSE;
     END
     
     IF (array12 == NULL) DO
-        write_log ("Array12 is null");
+        write_log ("... FAIL: Array12 is null");
         RETURN FALSE;
     END
     
     IF (array13 == NULL) DO
-        write_log ("Array13 is null");
+        write_log ("... FAIL: Array13 is null");
         RETURN FALSE;
     END
     
     IF (array14 == NULL) DO
-        write_log ("Array14 is null");
+        write_log ("... FAIL: Array14 is null");
         RETURN FALSE;
     END
     
     IF (array15 == NULL) DO
-        write_log ("Array15 is null");
+        write_log ("... FAIL: Array15 is null");
         RETURN FALSE;
     END
     
     IF (array16 == NULL) DO
-        write_log ("Array16 is null");
+        write_log ("... FAIL: Array16 is null");
         RETURN FALSE;
     END
     
+    write_log ("... Step 5");
+
     array1[0] = NULL;
     array2[0] = NULL;
     array3[0] = NULL;
@@ -1432,98 +1518,198 @@ DO
     
     
     IF (array1 != NULL) DO
-        write_log ("Array1 is not null");
+        write_log ("... FAIL: Array1 is not null");
         RETURN FALSE;
     END
     
     IF (array2 != NULL) DO
-        write_log ("Array2 is not null");
+        write_log ("... FAIL: Array2 is not null");
         RETURN FALSE;
     END
     
     IF (array3 != NULL) DO
-        write_log ("Array3 is not null");
+        write_log ("... FAIL: Array3 is not null");
         RETURN FALSE;
     END
     
     IF (array4 != NULL) DO
-        write_log ("Array4 is not null");
+        write_log ("... FAIL: Array4 is not null");
         RETURN FALSE;
     END
     
     IF (array5 != NULL) DO
-        write_log ("Array5 is not null");
+        write_log ("... FAIL: Array5 is not null");
         RETURN FALSE;
     END
     
     IF (array6 != NULL) DO
-        write_log ("Array6 is not null");
+        write_log ("... FAIL: Array6 is not null");
         RETURN FALSE;
     END
     
     IF (array6 != NULL) DO
-        write_log ("Array7 is not null");
+        write_log ("... FAIL: Array7 is not null");
         RETURN FALSE;
     END
     
     IF (array7 != NULL) DO
-        write_log ("Array7 is not null");
+        write_log ("... FAIL: Array7 is not null");
         RETURN FALSE;
     END
        
     IF (array8 != NULL) DO
-        write_log ("Array8 is not null");
+        write_log ("... FAIL: Array8 is not null");
         RETURN FALSE;
     END
     
     IF (array9 != NULL) DO
-        write_log ("Array9 is not null");
+        write_log ("... FAIL: Array9 is not null");
         RETURN FALSE;
     END
     
     IF (array10 != NULL) DO
-        write_log ("Array10 is not null");
+        write_log ("... FAIL: Array10 is not null");
         RETURN FALSE;
     END
     
     IF (array11 != NULL) DO
-        write_log ("Array11 is not null");
+        write_log ("... FAIL: Array11 is not null");
         RETURN FALSE;
     END
     
     IF (array12 != NULL) DO
-        write_log ("Array12 is not null");
+        write_log ("... FAIL: Array12 is not null");
         RETURN FALSE;
     END
     
     IF (array13 != NULL) DO
-        write_log ("Array13 is not null");
+        write_log ("... FAIL: Array13 is not null");
         RETURN FALSE;
     END
     
     IF (array14 != NULL) DO
-        write_log ("Array14 is not null");
+        write_log ("... FAIL: Array14 is not null");
         RETURN FALSE;
     END
     
     IF (array15 != NULL) DO
-        write_log ("Array15 is not null");
+        write_log ("... FAIL: Array15 is not null");
         RETURN FALSE;
     END
     
     IF (array16 != NULL) DO
-        write_log ("Array16 is not null");
+        write_log ("... FAIL: Array16 is not null");
         RETURN FALSE;
     END
+
+    write_log ("End of null_test_2_1");
     
     RETURN TRUE;
 
 ENDPROC
 
 
-#TEST: default_null_test_3
+#TEST: null_test_2_2
+#Call this function twice in and make sure it returns the same result.
+PROCEDURE null_test_2_2 ()
+RETURN ARRAY
+DO
+    LET result AS ARRAY OF INT8;
+
+    write_log ("Start of null_test_2_2");
+    IF (result != NULL) DO
+        write_log ("... FAIL: 'result' is not null by default.");
+    END
+    
+    IF (result[0] != NULL) DO
+        write_log ("... FAIL: 'result[0]' is not null.");
+    END
+
+    result[0] = -10;
+
+    IF (result == NULL) DO
+        write_log ("... FAIL: 'result' is null.");
+    END
+    
+    IF (result[0] != NULL) DO
+        write_log ("... FAIL: 'result[0]' is null.");
+    END
+
+    IF (result[1] != NULL) DO
+        write_log ("... FAIL: 'result[1]' is not null.");
+    END
+    
+    IF (result[2] != NULL) DO
+        write_log ("... FAIL: 'result[2]' is not null.");
+    END
+
+    write_log ("End of null_test_2");
+
+    RETURN result;
+ENDPROC
+
+
+#TEST: null_test_2_3
+#Call this function twice in and make sure it returns the same result.
+PROCEDURE null_test_2_3 ()
+RETURN BOOL
+DO
+    LET tab AS TABLE OF (field1 AS ARRAY OF DATE);
+
+    write_log ("Started test null_test_2_3");
+
+    IF (tab != NULL) DO
+        write_log ("... FAIL: Table is not null");
+        RETURN FALSE;
+    END
+
+    IF (tab.field1[0] != NULL) DO
+        write_log ("... FAIL: The array field is not null.");
+        RETURN FALSE;    
+    END
+
+    IF (tab.field1[0][0] != NULL) DO
+        write_log ("... FAIL: The first element of field is not null.");
+        RETURN FALSE;
+    END
+
+    tab.field1[0][0] = '1/1/1';
+
+    IF (tab == NULL) DO
+        write_log ("... FAIL: The table is null.");
+        RETURN FALSE;
+    END
+
+    IF (tab.field1[0] == NULL) DO
+        write_log ("... FAIL: The array field is null.");
+        RETURN FALSE;
+    END
+
+    IF (tab.field1[0][0] == NULL) DO
+        write_log ("... FAIL: The first element of array field is null");
+        RETURN FALSE;
+    END
+    
+    IF (tab.field1[0][1] != NULL) DO
+        write_log ("... FAIL: The second element of array field is not null.");
+        RETURN FALSE;
+    END
+    
+    IF (tab.field1[0][2] != NULL) DO
+        write_log ("... FAIL: The third element of array field is not null.");
+        RETURN FALSE;
+    END
+
+    write_log ("End of null_test_2_3");
+
+    RETURN TRUE;
+ENDPROC
+
+
+
+#TEST: null_test_3
 #Call this function twice and make sure it returns TRUE in both cases.
-PROCEDURE default_null_test_3 () RETURN BOOL
+PROCEDURE null_test_3 () RETURN BOOL
 DO
     LET b AS BOOL;
     LET c AS CHAR;
@@ -1542,127 +1728,127 @@ DO
     LET rr AS RICHREAL;
     LET t AS TEXT;
     
-    write_log ("Started test default_null_test_3");
+    write_log ("Started test null_test_3");
     
     IF (b != NULL) DO
-        write_log ("FAIL: b is not null");
+        write_log ("... FAIL: b is not null");
         RETURN FALSE;
     END
     
     b = FALSE;
     
     IF (c != NULL) DO
-        write_log ("FAIL: c is not null");
+        write_log ("... FAIL: c is not null");
         RETURN FALSE;
     END
     
     c = 'a';
 
     IF (d != NULL) DO
-        write_log ("FAIL: d is not null");
+        write_log ("... FAIL: d is not null");
         RETURN FALSE;
     END
     
     d = '1800/10/14';
     
     IF (dt != NULL) DO
-        write_log ("FAIL: dt is not null");
+        write_log ("... FAIL: dt is not null");
         RETURN FALSE;
     END
     
     dt = '-1/10/14 10:31:12';
     
     IF (ht != NULL) DO
-        write_log ("FAIL: ht is not null");
+        write_log ("... FAIL: ht is not null");
         RETURN FALSE;
     END
     
     ht = '1/10/14 10:31:12.111222';
     
     IF (i8 != NULL) DO
-        write_log ("FAIL: i8 is not null");
+        write_log ("... FAIL: i8 is not null");
         RETURN FALSE;
     END
     
     i8 = -8;
     
     IF (i16 != NULL) DO
-        write_log ("FAIL: i16 is not null");
+        write_log ("... FAIL: i16 is not null");
         RETURN FALSE;
     END
     
     i16 = -1024;
     
     IF (i32 != NULL) DO
-        write_log ("FAIL: i32 is not null");
+        write_log ("... FAIL: i32 is not null");
         RETURN FALSE;
     END
     
     i32 = -6789001;
     
     IF (i64 != NULL) DO
-        write_log ("FAIL: i64 is not null");
+        write_log ("... FAIL: i64 is not null");
         RETURN FALSE;
     END
     
     i64 = -678900100911122;
     
     IF (u8 != NULL) DO
-        write_log ("FAIL: u8 is not null");
+        write_log ("... FAIL: u8 is not null");
         RETURN FALSE;
     END
 
     u8 = 1;
     
     IF (u16 != NULL) DO
-        write_log ("FAIL: u16 is not null");
+        write_log ("... FAIL: u16 is not null");
         RETURN FALSE;
     END
     
     u16 = 12;
    
     IF (u32 != NULL) DO
-        write_log ("FAIL: u32 is not null");
+        write_log ("... FAIL: u32 is not null");
         RETURN FALSE;
     END
     
     u32 = 10;
     
     IF (u64 != NULL) DO
-        write_log ("FAIL: u64 is not null");
+        write_log ("... FAIL: u64 is not null");
         RETURN FALSE;
     END
     
     u64 = 11;
     
     IF (r != NULL) DO
-        write_log ("FAIL: r is not null");
+        write_log ("... FAIL: r is not null");
         RETURN FALSE;
     END
     
     r = -12.11;
 
     IF (rr != NULL) DO
-        write_log ("FAIL: rr is not null");
+        write_log ("... FAIL: rr is not null");
         RETURN FALSE;
     END
     
     rr = -111.009990111;
 
     IF (t != NULL) DO
-        write_log ("FAIL: t is not null");
+        write_log ("... FAIL: t is not null");
         RETURN FALSE;
     END
     
-    t = "Test default_null_test_3 has finished OK";
+    t = "End of null_test_3";
     write_log (t);
     
     RETURN TRUE;
 ENDPROC
 
-#TEST: default_null_test_3_1
+#TEST: null_test_3_1
 #This function should return true
-PROCEDURE default_null_test_3_1 () RETURN BOOL
+PROCEDURE null_test_3_1 () RETURN BOOL
 DO
     LET b AS BOOL;
     LET c AS CHAR;
@@ -1681,7 +1867,7 @@ DO
     LET rr AS RICHREAL;
     LET t AS TEXT;
     
-    write_log ("Started test default_null_test_3_1");
+    write_log ("Started test null_test_3_1");
     
     b = FALSE;
     c = 'a';
@@ -1701,198 +1887,301 @@ DO
     t = "Some text.";
 
     IF (b == NULL) DO
-        write_log ("FAIL: b is null");
+        write_log ("... FAIL: b is null");
         RETURN FALSE;
     END
         
     b = NULL;
 
     IF (b != NULL) DO
-        write_log ("FAIL: b is not null");
+        write_log ("... FAIL: b is not null");
         RETURN FALSE;
     END
 
     IF (c == NULL) DO
-        write_log ("FAIL: c is null");
+        write_log ("... FAIL: c is null");
         RETURN FALSE;
     END
     
     c = NULL;
         
     IF (c != NULL) DO
-        write_log ("FAIL: c is not null");
+        write_log ("... FAIL: c is not null");
         RETURN FALSE;
     END
 
     IF (d == NULL) DO
-        write_log ("FAIL: d is null");
+        write_log ("... FAIL: d is null");
         RETURN FALSE;
     END
    
     d = NULL;
 
     IF (d != NULL) DO
-        write_log ("FAIL: d is not null");
+        write_log ("... FAIL: d is not null");
         RETURN FALSE;
     END
     
     IF (dt == NULL) DO
-        write_log ("FAIL: dt is null");
+        write_log ("... FAIL: dt is null");
         RETURN FALSE;
     END
 
     dt = NULL;
 
     IF (dt != NULL) DO
-        write_log ("FAIL: dt is not null");
+        write_log ("... FAIL: dt is not null");
         RETURN FALSE;
     END
 
     IF (ht == NULL) DO
-        write_log ("FAIL: ht is null");
+        write_log ("... FAIL: ht is null");
         RETURN FALSE;
     END
     
     ht = NULL;    
     
     IF (ht != NULL) DO
-        write_log ("FAIL: ht is not null");
+        write_log ("... FAIL: ht is not null");
         RETURN FALSE;
     END
     
     IF (i8 == NULL) DO
-        write_log ("FAIL: i8 is null");
+        write_log ("... FAIL: i8 is null");
         RETURN FALSE;
     END
 
     i8 = NULL;
 
     IF (i8 != NULL) DO
-        write_log ("FAIL: i8 is not null");
+        write_log ("... FAIL: i8 is not null");
         RETURN FALSE;
     END
     
     IF (i16 == NULL) DO
-        write_log ("FAIL: i16 is null");
+        write_log ("... FAIL: i16 is null");
         RETURN FALSE;
     END
 
     i16 = NULL;
 
     IF (i16 != NULL) DO
-        write_log ("FAIL: i16 is not null");
+        write_log ("... FAIL: i16 is not null");
         RETURN FALSE;
     END
         
     IF (i32 == NULL) DO
-        write_log ("FAIL: i32 is null");
+        write_log ("... FAIL: i32 is null");
         RETURN FALSE;
     END
 
     i32 = NULL;
 
     IF (i32 != NULL) DO
-        write_log ("FAIL: i32 is not null");
+        write_log ("... FAIL: i32 is not null");
         RETURN FALSE;
     END
     
     IF (i64 == NULL) DO
-        write_log ("FAIL: i64 is null");
+        write_log ("... FAIL: i64 is null");
         RETURN FALSE;
     END
 
     i64 = NULL;
 
     IF (i64 != NULL) DO
-        write_log ("FAIL: i64 is not null");
+        write_log ("... FAIL: i64 is not null");
         RETURN FALSE;
     END
     
     IF (u8 == NULL) DO
-        write_log ("FAIL: u8 is null");
+        write_log ("... FAIL: u8 is null");
         RETURN FALSE;
     END
 
     u8 = NULL;
 
     IF (u8 != NULL) DO
-        write_log ("FAIL: u8 is not null");
+        write_log ("... FAIL: u8 is not null");
         RETURN FALSE;
     END
     
     IF (u16 == NULL) DO
-        write_log ("FAIL: u16 is null");
+        write_log ("... FAIL: u16 is null");
         RETURN FALSE;
     END
 
     u16 = NULL;
 
     IF (u16 != NULL) DO
-        write_log ("FAIL: u16 is not null");
+        write_log ("... FAIL: u16 is not null");
         RETURN FALSE;
     END
         
     IF (u32 == NULL) DO
-        write_log ("FAIL: u32 is null");
+        write_log ("... FAIL: u32 is null");
         RETURN FALSE;
     END
 
     u32 = NULL;
 
     IF (u32 != NULL) DO
-        write_log ("FAIL: u32 is not null");
+        write_log ("... FAIL: u32 is not null");
         RETURN FALSE;
     END
     
     IF (u64 == NULL) DO
-        write_log ("FAIL: u64 is null");
+        write_log ("... FAIL: u64 is null");
         RETURN FALSE;
     END
 
     u64 = NULL;
 
     IF (u64 != NULL) DO
-        write_log ("FAIL: u64 is not null");
+        write_log ("... FAIL: u64 is not null");
         RETURN FALSE;
     END
 
     IF (r == NULL) DO
-        write_log ("FAIL: r is null");
+        write_log ("... FAIL: r is null");
         RETURN FALSE;
     END
     
     r = NULL;
     
     IF (r != NULL) DO
-        write_log ("FAIL: r is not null");
+        write_log ("... FAIL: r is not null");
         RETURN FALSE;
     END
 
     IF (rr == NULL) DO
-        write_log ("FAIL: rr is  null");
+        write_log ("... FAIL: rr is  null");
         RETURN FALSE;
     END
 
     rr = NULL;
  
     IF (rr != NULL) DO
-        write_log ("FAIL: rr is not null");
+        write_log ("... FAIL: rr is not null");
         RETURN FALSE;
     END
 
     IF (t == NULL) DO
-        write_log ("FAIL: t is null");
+        write_log ("... FAIL: t is null");
         RETURN FALSE;
     END
     
     t = NULL;
     
     IF (t != NULL) DO
-        write_log ("FAIL: t is not null");
+        write_log ("... FAIL: t is not null");
         RETURN FALSE;
     END
     
-    write_log ("Test default_null_test_3_1 has finished OK");
+    write_log ("End of test null_test_3_1");
     
     RETURN TRUE;
 ENDPROC
+
+
+#TEST: null_test_4
+#This function should return true
+PROCEDURE null_test_4 () RETURN BOOL
+DO
+    LET t AS TEXT;
+
+    write_log ("Started test null_test_4");
+
+    IF (t != NULL) DO
+        write_log ("... FAIL: The text is not null: " + t);
+        RETURN FALSE;    
+    END
+
+    IF (t[0] != NULL) DO
+        write_log ("... FAIL: The first char of text is not null: " + t);
+        RETURN FALSE;
+    END
+
+    t[0] = 'P';
+
+    IF (t == NULL) DO
+        write_log ("... FAIL: The text is null.");
+        RETURN FALSE;
+    END
+    
+    IF (t[0] == NULL) DO
+        write_log ("... FAIL: The first char of text is null");
+        RETURN FALSE;
+    END
+    
+    IF (t[1] != NULL) DO
+        write_log ("... FAIL: The second char of text is not null: " + t);
+        RETURN FALSE;
+    END
+
+    IF (t[2] != NULL) DO
+        write_log ("... FAIL: The third char of text is not null: " + t);
+        RETURN FALSE;
+    END
+
+    write_log ("End of null_test_4");
+
+    RETURN TRUE;
+ENDPROC
+
+#TEST: null_test_4_1
+#This function should return true
+PROCEDURE null_test_4_1 () RETURN BOOL
+DO
+    LET tab AS TABLE OF (field1 AS TEXT);
+
+    write_log ("Started test null_test_4_1");
+
+    IF (tab != NULL) DO
+        write_log ("... FAIL: Table is not null");
+        RETURN FALSE;
+    END
+
+    IF (tab.field1[0] != NULL) DO
+        write_log ("... FAIL: The text field is not null.");
+        RETURN FALSE;    
+    END
+
+    IF (tab.field1[0] != NULL) DO
+        write_log ("... FAIL: The first char of text field is not null.");
+        RETURN FALSE;
+    END
+
+    tab.field1[0][0] = 'P';
+
+    IF (tab == NULL) DO
+        write_log ("... FAIL: The table is null.");
+        RETURN FALSE;
+    END
+
+    IF (tab.field1[0] == NULL) DO
+        write_log ("... FAIL: The text field is null.");
+        RETURN FALSE;
+    END
+
+    IF (tab.field1[0][0] == NULL) DO
+        write_log ("... FAIL: The first char of text field is null");
+        RETURN FALSE;
+    END
+    
+    IF (tab.field1[0][1] != NULL) DO
+        write_log ("... FAIL: The second char of text field is not null.");
+        RETURN FALSE;
+    END
+    
+    IF (tab.field1[0][2] != NULL) DO
+        write_log ("... FAIL: The third char of text field is not null.");
+        RETURN FALSE;
+    END
+
+    write_log ("End of null_test_4_1");
+
+    RETURN TRUE;
+ENDPROC
+
+

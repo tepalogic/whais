@@ -136,7 +136,6 @@ class NativeObjectOperand;
 class BaseOperand : public IOperand
 {
 public:
-
   virtual bool IsNull() const;
 
   virtual void GetValue( DBool& outValue) const;
@@ -159,21 +158,13 @@ public:
 
   virtual void SetValue( const DBool& value);
   virtual void SetValue( const DChar& value);
-  virtual void SetValue( const DDate& value);
-  virtual void SetValue( const DDateTime& value);
   virtual void SetValue( const DHiresTime& value);
-  virtual void SetValue( const DInt8& value);
-  virtual void SetValue( const DInt16& value);
-  virtual void SetValue( const DInt32& value);
   virtual void SetValue( const DInt64& value);
-  virtual void SetValue( const DReal& value);
-  virtual void SetValue( const DRichReal& value);
-  virtual void SetValue( const DUInt8& value);
-  virtual void SetValue( const DUInt16& value);
-  virtual void SetValue( const DUInt32& value);
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DRichReal& value);
   virtual void SetValue( const DText& value);
   virtual void SetValue( const DArray& value);
+
 
   virtual void SelfAdd( const DInt64& value);
   virtual void SelfAdd( const DRichReal& value);
@@ -278,6 +269,7 @@ public:
   virtual bool IsNull() const;
 
   virtual void GetValue( DBool& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DBool& value);
 
@@ -335,8 +327,9 @@ public:
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDate& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -361,8 +354,9 @@ public:
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDateTime& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -387,6 +381,7 @@ public:
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DHiresTime& value);
 
@@ -420,8 +415,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -469,8 +466,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -516,8 +515,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -565,8 +566,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -614,8 +617,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -663,8 +668,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -712,8 +719,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -761,7 +770,9 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
+  virtual void SetValue( const DUInt64& value);
   virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
@@ -802,8 +813,9 @@ public:
 
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DReal& value);
+  virtual void SetValue( const DRichReal& value);
 
   virtual void SelfAdd( const DInt64& value);
   virtual void SelfAdd( const DRichReal& value);
@@ -839,6 +851,7 @@ public:
 
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DRichReal& value);
 
@@ -967,7 +980,7 @@ class BaseArrayElOperand : public BaseOperand
 protected:
   BaseArrayElOperand( DArray& array, const uint64_t index)
     : BaseOperand(),
-      mElementIndex( index),
+      mIndex( index),
       mArray()
   {
     array.MakeMirror( mArray);
@@ -975,7 +988,7 @@ protected:
 
   BaseArrayElOperand( const BaseArrayElOperand& source)
     : BaseOperand(),
-      mElementIndex( source.mElementIndex),
+      mIndex( source.mIndex),
       mArray()
   {
     source.mArray.MakeMirror( mArray);
@@ -984,23 +997,30 @@ protected:
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
-    mArray.Get (mElementIndex, out);
+    if (mArray.Count () <= mIndex)
+      {
+        out = DBS_T ();
+        return ;
+      }
 
-    assert( out.IsNull() == false);
+    mArray.Get (mIndex, out);
+
+    assert (! out.IsNull ());
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    mArray.Set (mElementIndex, value);
+    mArray.Set (mIndex, value);
   }
 
+  virtual bool IsNull () const;
   virtual void NotifyCopy();
 
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
 
-  const uint64_t mElementIndex;
-  DArray       mArray;
+  const uint64_t mIndex;
+  DArray         mArray;
 };
 
 
@@ -1012,9 +1032,8 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DBool& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DBool& value);
 
@@ -1038,8 +1057,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DChar& outValue) const;
   virtual void GetValue( DText& outValue) const;
 
@@ -1059,13 +1076,12 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDate& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -1081,13 +1097,12 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDateTime& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -1103,11 +1118,10 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DHiresTime& value);
 
@@ -1125,8 +1139,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1137,8 +1149,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
 
   virtual void SelfAdd( const DInt64& value);
@@ -1171,8 +1185,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1183,8 +1195,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1216,8 +1230,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1228,8 +1240,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1261,8 +1275,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1273,8 +1285,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1306,8 +1320,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1318,8 +1330,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1350,8 +1364,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1362,8 +1374,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1395,8 +1409,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1407,8 +1419,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1440,8 +1454,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -1452,7 +1464,9 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
+  virtual void SetValue( const DUInt64& value);
   virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
@@ -1485,12 +1499,11 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DReal& value);
+  virtual void SetValue( const DRichReal& value);
 
   virtual void SelfAdd( const DInt64& value);
   virtual void SelfAdd( const DRichReal& value);
@@ -1518,10 +1531,9 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DRichReal& value);
 
@@ -1685,6 +1697,12 @@ protected:
   {
     ITable& table = mTableRef->GetTable();
 
+    if (table.AllocatedRows () <= mRow)
+      {
+        out = DBS_T ();
+        return ;
+      }
+
     table.Get (mRow, mField, out);
   }
 
@@ -1719,6 +1737,7 @@ public:
   virtual bool IsNull() const;
 
   virtual void GetValue( DBool& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DBool& value);
 
@@ -1772,8 +1791,9 @@ public:
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDate& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -1797,8 +1817,9 @@ public:
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDateTime& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -1821,6 +1842,7 @@ public:
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DHiresTime& value);
 
@@ -1852,8 +1874,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1899,8 +1923,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1946,8 +1972,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -1993,8 +2021,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2040,8 +2070,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2087,8 +2119,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2134,8 +2168,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2181,8 +2217,11 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
+  virtual void SetValue( const DUInt64& value);
   virtual void SetValue( const DInt64& value);
+
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2220,8 +2259,9 @@ public:
 
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DReal& value);
+  virtual void SetValue( const DRichReal& value);
 
   virtual void SelfAdd( const DInt64& value);
   virtual void SelfAdd( const DRichReal& value);
@@ -2255,6 +2295,7 @@ public:
 
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DRichReal& value);
 
@@ -2383,11 +2424,24 @@ protected:
   {
     ITable& table = mTableRef->GetTable();
 
+    if (table.AllocatedRows () <= mRow)
+      {
+        outValue = DBS_T ();
+        return ;
+      }
+
     DArray array;
     table.Get (mRow, mField, array);
 
+    if (array.Count () <= mIndex)
+      {
+        outValue = DBS_T ();
+        return ;
+      }
+
     array.Get (mIndex, outValue);
-    assert( outValue.IsNull() == false);
+
+    assert( ! outValue.IsNull());
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
@@ -2403,6 +2457,7 @@ protected:
     table.Set (mRow, mField, array);
   }
 
+  virtual bool IsNull () const;
   virtual void NotifyCopy();
 
 private:
@@ -2426,9 +2481,8 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DBool& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DBool& value);
 
@@ -2455,8 +2509,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DChar& outValue) const;
   virtual void GetValue( DText& outValue) const;
 
@@ -2479,13 +2531,12 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDate& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -2503,13 +2554,12 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DDateTime& value);
+  virtual void SetValue( const DHiresTime& value);
 
   virtual uint_t GetType();
 
@@ -2527,11 +2577,10 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DDate& outValue) const;
   virtual void GetValue( DDateTime& outValue) const;
   virtual void GetValue( DHiresTime& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DHiresTime& value);
 
@@ -2551,8 +2600,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2563,8 +2610,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2599,8 +2648,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2611,8 +2658,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2645,8 +2694,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2657,8 +2704,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DUInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2693,8 +2742,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2705,8 +2752,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2740,8 +2789,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2752,8 +2799,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt8& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2788,8 +2837,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2800,8 +2847,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt16& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2836,8 +2885,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2848,8 +2895,10 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DInt32& value);
+  virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
 
@@ -2884,8 +2933,6 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DInt8& outValue) const;
   virtual void GetValue( DInt16& outValue) const;
   virtual void GetValue( DInt32& outValue) const;
@@ -2896,7 +2943,9 @@ public:
   virtual void GetValue( DUInt16& outValue) const;
   virtual void GetValue( DUInt32& outValue) const;
   virtual void GetValue( DUInt64& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
+  virtual void SetValue( const DUInt64& value);
   virtual void SetValue( const DInt64& value);
 
   virtual void SelfAdd( const DInt64& value);
@@ -2932,12 +2981,11 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
-  virtual void SetValue( const DReal& value);
+  virtual void SetValue( const DRichReal& value);
 
   virtual void SelfAdd( const DInt64& value);
   virtual void SelfAdd( const DRichReal& value);
@@ -2968,10 +3016,9 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
-
   virtual void GetValue( DReal& outValue) const;
   virtual void GetValue( DRichReal& outValue) const;
+  virtual void GetValue( DText& outValue) const;
 
   virtual void SetValue( const DRichReal& value);
 
@@ -3267,19 +3314,10 @@ public:
 
   virtual void SetValue( const DBool& value);
   virtual void SetValue( const DChar& value);
-  virtual void SetValue( const DDate& value);
-  virtual void SetValue( const DDateTime& value);
   virtual void SetValue( const DHiresTime& value);
-  virtual void SetValue( const DInt8& value);
-  virtual void SetValue( const DInt16& value);
-  virtual void SetValue( const DInt32& value);
   virtual void SetValue( const DInt64& value);
-  virtual void SetValue( const DReal& value);
-  virtual void SetValue( const DRichReal& value);
-  virtual void SetValue( const DUInt8& value);
-  virtual void SetValue( const DUInt16& value);
-  virtual void SetValue( const DUInt32& value);
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DRichReal& value);
   virtual void SetValue( const DText& value);
   virtual void SetValue( const DArray& value);
 
@@ -3368,19 +3406,10 @@ public:
 
   virtual void SetValue( const DBool& value);
   virtual void SetValue( const DChar& value);
-  virtual void SetValue( const DDate& value);
-  virtual void SetValue( const DDateTime& value);
   virtual void SetValue( const DHiresTime& value);
-  virtual void SetValue( const DInt8& value);
-  virtual void SetValue( const DInt16& value);
-  virtual void SetValue( const DInt32& value);
   virtual void SetValue( const DInt64& value);
-  virtual void SetValue( const DReal& value);
-  virtual void SetValue( const DRichReal& value);
-  virtual void SetValue( const DUInt8& value);
-  virtual void SetValue( const DUInt16& value);
-  virtual void SetValue( const DUInt32& value);
   virtual void SetValue( const DUInt64& value);
+  virtual void SetValue( const DRichReal& value);
   virtual void SetValue( const DText& value);
   virtual void SetValue( const DArray& value);
 

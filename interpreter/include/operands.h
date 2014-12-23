@@ -85,19 +85,10 @@ public:
 
   virtual void SetValue( const DBool& value) = 0;
   virtual void SetValue( const DChar& value) = 0;
-  virtual void SetValue( const DDate& value) = 0;
-  virtual void SetValue( const DDateTime& value) = 0;
   virtual void SetValue( const DHiresTime& value) = 0;
-  virtual void SetValue( const DInt8& value) = 0;
-  virtual void SetValue( const DInt16& value) = 0;
-  virtual void SetValue( const DInt32& value) = 0;
   virtual void SetValue( const DInt64& value) = 0;
-  virtual void SetValue( const DReal& value) = 0;
-  virtual void SetValue( const DRichReal& value) = 0;
-  virtual void SetValue( const DUInt8& value) = 0;
-  virtual void SetValue( const DUInt16& value) = 0;
-  virtual void SetValue( const DUInt32& value) = 0;
   virtual void SetValue( const DUInt64& value) = 0;
+  virtual void SetValue( const DRichReal& value) = 0;
   virtual void SetValue( const DText& value) = 0;
   virtual void SetValue( const DArray& value) = 0;
 

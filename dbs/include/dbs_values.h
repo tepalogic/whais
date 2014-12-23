@@ -400,6 +400,17 @@ struct DBS_SHL DDateTime
   {
   }
 
+  DDateTime (const DDate& source)
+  : mYear( source.mYear),
+    mMonth( source.mMonth),
+    mDay( source.mDay),
+    mHour( 0),
+    mMinutes( 0),
+    mSeconds( 0),
+    mIsNull( source.mIsNull)
+  {
+  }
+
   DDateTime& operator= (const DDateTime& source)
   {
     _CC (int16_t&, mYear)    = source.mYear;
@@ -543,6 +554,31 @@ struct DBS_SHL DHiresTime
 
   DHiresTime( const DHiresTime& source)
     : mMicrosec( source.mMicrosec),
+      mYear( source.mYear),
+      mMonth( source.mMonth),
+      mDay( source.mDay),
+      mHour( source.mHour),
+      mMinutes( source.mMinutes),
+      mSeconds( source.mSeconds),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DHiresTime( const DDate& source)
+    : mMicrosec( 0),
+      mYear( source.mYear),
+      mMonth( source.mMonth),
+      mDay( source.mDay),
+      mHour( 0),
+      mMinutes( 0),
+      mSeconds( 0),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+
+  DHiresTime( const DDateTime& source)
+    : mMicrosec( 0),
       mYear( source.mYear),
       mMonth( source.mMonth),
       mDay( source.mDay),
@@ -811,6 +847,12 @@ struct DBS_SHL DUInt16
   {
   }
 
+  DUInt16 (const DUInt8& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
   DUInt16& operator= (const DUInt16& source)
   {
     _CC (uint16_t&, mValue)  = source.mValue;
@@ -916,10 +958,24 @@ struct DBS_SHL DUInt32
   {
   }
 
-  DUInt32 (const DUInt32& source) :
-    mValue( source.mValue),
-    mIsNull( source.mIsNull)
-  {}
+  DUInt32 (const DUInt32& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DUInt32 (const DUInt16& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DUInt32 (const DUInt8& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
 
   DUInt32& operator= (const DUInt32& source)
   {
@@ -1029,6 +1085,24 @@ struct DBS_SHL DUInt64
   DUInt64 (const DUInt64& source)
     : mValue( source.mValue),
       mIsNull( source.mIsNull)
+  {
+  }
+
+  DUInt64 (const DUInt8& source)
+      : mValue( source.mValue),
+        mIsNull( source.mIsNull)
+  {
+  }
+
+  DUInt64 (const DUInt16& source)
+      : mValue( source.mValue),
+        mIsNull( source.mIsNull)
+  {
+  }
+
+  DUInt64 (const DUInt32& source)
+      : mValue( source.mValue),
+        mIsNull( source.mIsNull)
   {
   }
 
@@ -1254,6 +1328,12 @@ struct DBS_SHL DInt16
   {
   }
 
+  DInt16 (const DInt8& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
   DInt16& operator= (const DInt16& source)
   {
     _CC (int16_t&, mValue)  = source.mValue;
@@ -1365,6 +1445,18 @@ struct DBS_SHL DInt32
   {
   }
 
+  DInt32 (const DInt16& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DInt32 (const DInt8& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
   DInt32& operator= (const DInt32& source)
   {
     _CC (int32_t&, mValue)   = source.mValue;
@@ -1471,6 +1563,24 @@ struct DBS_SHL DInt64
   }
 
   DInt64 (const DInt64& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DInt64 (const DInt8& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DInt64 (const DInt16& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DInt64 (const DInt32& source)
     : mValue( source.mValue),
       mIsNull( source.mIsNull)
   {
@@ -1678,6 +1788,12 @@ struct DBS_SHL DRichReal
   }
 
   DRichReal( const DRichReal& source)
+    : mValue( source.mValue),
+      mIsNull( source.mIsNull)
+  {
+  }
+
+  DRichReal( const DReal& source)
     : mValue( source.mValue),
       mIsNull( source.mIsNull)
   {

@@ -1367,8 +1367,9 @@ DArray::operator= (const DArray& source)
   if (&source == this)
     return *this;
 
-  if ((Type() != T_UNDETERMINED)
-      && source.Type() != Type())
+  if ((source.Type() != Type())
+      && (Type () != T_UNDETERMINED)
+      && ! ((source.Type () == T_UNDETERMINED) && source.IsNull ()))
     {
       throw DBSException( _EXTRA( DBSException::INVALID_ARRAY_TYPE));
     }
