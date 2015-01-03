@@ -313,7 +313,7 @@ wod_dump_table_type_inf( const uint8_t* typeDesc, ostream& output)
     {
       bool_t printComma = FALSE;
 
-      output << " WITH(  ";
+      output << " OF (";
       while( typeDesc[0] != ';' && typeDesc[1] != 0)
         {
           if (printComma)
