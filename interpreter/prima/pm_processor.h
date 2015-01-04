@@ -79,6 +79,11 @@ public:
     return mProcedure.mLocalsCount;
   }
 
+  const StackValue& GetLocalDefault (const uint_t local) const
+  {
+    return mProcedure.mProcMgr->LocalValue (mProcedure.mId, local);
+  }
+
   uint32_t StackBegin() const
   {
     return mStackBegin;

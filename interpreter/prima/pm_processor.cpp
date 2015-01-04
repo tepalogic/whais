@@ -577,8 +577,8 @@ op_func_nnull( ProcedureCall& call, int64_t& offset)
 static void
 op_func_call( ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code() +
-                                call.CurrentOffset() +
+  const uint8_t* const data = call.Code()             +
+                                call.CurrentOffset()  +
                                 offset;
 
   const uint32_t procIndex = load_le_int32 (data);
@@ -604,7 +604,15 @@ op_func_ret( ProcedureCall& call, int64_t& offset)
   StackValue result = stack[stackSize - 1].Operand().Duplicate();
 
   stack.Pop (stackSize - call.StackBegin());
-  stack.Push( result);
+
+  if (result.Operand().GetType () == T_UNKNOWN)
+    {
+      assert (result.Operand().IsNull ());
+
+      stack.Push (call.GetLocalDefault (0));
+    }
+  else
+    stack.Push( result);
 
   offset = call.CodeSize(); //Signal the procedure return
 }
@@ -1670,12 +1678,10 @@ ProcedureCall::ProcedureCall( Session&                  session,
       //Fill the stack with default values for the local values( don't
       //include the arguments as they should be on the stack already and the
       uint32_t local = mProcedure.mArgsCount + 1;
-      if (local < mProcedure.mLocalsCount)
+      if (local < LocalsCount ())
         {
-          const StackValue* localValue =
-            &(mProcedure.mProcMgr->LocalValue) (mProcedure.mId, local);
-
-          while( local < mProcedure.mLocalsCount)
+          const StackValue* localValue = &GetLocalDefault (local);
+          while( local < LocalsCount ())
             {
               stack.Push( *localValue);
               ++local, ++localValue;
@@ -1684,7 +1690,7 @@ ProcedureCall::ProcedureCall( Session&                  session,
 
       //Count only procedure's parameters and local values,
       //but not the result value too.
-      if ((mProcedure.mLocalsCount - 1) > stack.Size())
+      if ((LocalsCount () - 1) > stack.Size())
         {
           throw InterException( _EXTRA( InterException::STACK_CORRUPTED),
                                 "Stack corruption detected after procedure"
@@ -1702,14 +1708,16 @@ ProcedureCall::ProcedureCall( Session&                  session,
 
           if ( ! message.empty())
             {
-              e.Message( "%s\n\tCalled from '%s'.",
+              e.Message( "%s\n\tCalled from '%s'(pc: %04u).",
                          message.c_str(),
-                         mProcedure.mProcMgr->Name( mProcedure.mId));
+                         mProcedure.mProcMgr->Name( mProcedure.mId),
+                         mCodePos);
             }
           else
             {
-              e.Message( "Current procedure '%s'.",
-                         mProcedure.mProcMgr->Name( mProcedure.mId));
+              e.Message( "Current procedure '%s'(pc: %%04u).",
+                         mProcedure.mProcMgr->Name( mProcedure.mId),
+                         mCodePos);
             }
           throw ;
       }

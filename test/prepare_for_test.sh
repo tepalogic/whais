@@ -49,7 +49,7 @@ do
 	echo "Compiling '${src}' ... "
 	whc ${src} -I ../stdlib/whais_inc/
 	if [ $? -ne 0 ]; then
-		echo "Failed to compile '${src}' directory"
+		echo "Failed to compile '${src}' source file."
 		exit 1
 	fi
 done

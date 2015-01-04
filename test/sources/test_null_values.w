@@ -2273,4 +2273,42 @@ DO
     RETURN TRUE;
 ENDPROC
 
+#TEST: null_test_5
+#This function should return a null table with the correct signature.
+PROCEDURE null_test_5 () RETURN TABLE OF (field1 AS TEXT, field2 AS UINT32)
+DO
+    write_log ("Started test null_test_5");
+    write_log ("End of null_test_5");
 
+    RETURN NULL;
+ENDPROC
+
+#TEST: null_test_5_1
+#This function should return a null table with the correct signature.
+PROCEDURE null_test_5_1 () RETURN ARRAY OF INT32
+DO
+    write_log ("Started test null_test_5_1");
+    write_log ("End of null_test_5_1");
+
+    RETURN NULL;
+ENDPROC
+
+#TEST: null_test_5_2
+#This function should return a null table with the correct signature.
+PROCEDURE null_test_5_2 () RETURN TEXT
+DO
+    write_log ("Started test null_test_5_2");
+    write_log ("End of null_test_5_2");
+
+    RETURN NULL;
+ENDPROC
+
+#TEST: null_test_5_3
+#This function should return a null table with the correct signature.
+PROCEDURE null_test_5_3 () RETURN BOOL
+DO
+    write_log ("Started test null_test_5_3");
+    write_log ("End of null_test_5_3");
+
+    RETURN NULL;
+ENDPROC
