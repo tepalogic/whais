@@ -78,7 +78,8 @@ public:
                           const uint64_t fromOff,
                           const uint64_t toOff) = 0;
 
-  virtual void    Truncate( uint64_t newCharCount) = 0;
+  virtual void    Truncate( uint64_t        newCharCount,
+                            ITextStrategy** inoutStrategy) = 0;
 
   virtual void    UpdateCharAt( const uint32_t   ch,
                                 const uint64_t   index,
@@ -147,7 +148,8 @@ public:
                           const uint64_t fromOff,
                           const uint64_t toOff);
 
-  virtual void    Truncate( uint64_t newCharCount);
+  virtual void    Truncate( uint64_t          newCharCount,
+                            ITextStrategy**   inoutStrategy);
 
   virtual void    UpdateCharAt( const uint32_t   ch,
                                 const uint64_t   index,

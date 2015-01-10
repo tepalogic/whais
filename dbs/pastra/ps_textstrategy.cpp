@@ -120,7 +120,7 @@ GenericText::DecreaseReferenceCount()
   assert( mShareCount == 0);
   assert( mReferenceCount > 0);
 
-  -- mReferenceCount;
+  --mReferenceCount;
 
   if (mReferenceCount  == 0)
     ClearMyself();
@@ -175,7 +175,7 @@ GenericText::CharsCount()
 
       while( offset < mCacheStartOff + mCacheValid)
         {
-          const uint_t charSize = _cuCache.Count( 
+          const uint_t charSize = _cuCache.Count(
                                         mCacheBuffer[offset - mCacheStartOff]
                                                  );
           assert( charSize != 0);
@@ -217,7 +217,7 @@ GenericText::CharsUntilOffset( const uint64_t offset)
       while( (chOffset < offset)
              && (chOffset < mCacheStartOff + mCacheValid))
         {
-          const uint_t charSize = _cuCache.Count( 
+          const uint_t charSize = _cuCache.Count(
                                       mCacheBuffer[chOffset - mCacheStartOff]
                                                  );
           assert( charSize != 0);
@@ -266,7 +266,7 @@ GenericText::OffsetOfChar( const uint64_t index)
       while( (chIndex < index)
              && (result < mCacheStartOff + mCacheValid))
         {
-          const uint_t charSize = _cuCache.Count( 
+          const uint_t charSize = _cuCache.Count(
                                       mCacheBuffer[result - mCacheStartOff]
                                                  );
           assert( charSize != 0);
@@ -299,7 +299,7 @@ void
 GenericText::Duplicate( ITextStrategy&    source,
                         const uint64_t    bytesCount)
 {
-  Truncate( 0);
+  TruncateUtf8 (0);
 
   assert( mBytesSize == 0);
   assert( mCachedCharCount == 0);
@@ -457,7 +457,8 @@ GenericText::Append( ITextStrategy& text,
 
 
 void
-GenericText::Truncate( uint64_t newCharCount)
+GenericText::Truncate( uint64_t          newCharCount,
+                       ITextStrategy**   inoutStrategy)
 {
   if ((mCachedCharCount != INVALID_CACHE_VALUE)
       && (mCachedCharCount <= newCharCount))
@@ -500,7 +501,27 @@ GenericText::Truncate( uint64_t newCharCount)
 
   assert( offset <= mBytesSize);
 
-  TruncateUtf8 (offset);
+  if (ReferenceCount () > 1)
+    {
+      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
+      newText->IncreaseReferenceCount();
+
+      assert (this == *inoutStrategy);
+      newText->Duplicate (*this, offset);
+
+      if (ShareCount() > 0)
+        {
+          assert( ReferenceCount() == 1);
+          TruncateUtf8 (offset);
+        }
+      else
+        {
+          *inoutStrategy = newText.release();
+          DecreaseReferenceCount();
+        }
+    }
+  else
+    TruncateUtf8 (offset);
 }
 
 
@@ -814,35 +835,21 @@ RowFieldText::WriteUtf8 (const uint64_t       offset,
                             " with more than %lu characters.",
                           _SC (long, MAX_BYTES_COUNT));
     }
-
-  if (mTempText != NULL)
+  else if (mTempText == NULL)
     {
-      mTempText->WriteUtf8 (offset, count, buffer);
-      mBytesSize = mTempText->BytesCount();
+      auto_ptr<TemporalText> newText( new TemporalText( NULL));
+      newText->IncreaseReferenceCount ();
+      newText->Duplicate( *this, mBytesSize);
 
-      return ;
+      mTempText = newText.release();
+
+      mStorage.DecrementRecordRef( mFirstEntry);
+      mStorage.Flush();
+      mStorage.ReleaseReference();
     }
 
-  assert( mFirstEntry > 0);
-  assert( mCachedCharCount <= MAX_CHARS_COUNT);
-  assert( mCachedCharIndex <= MAX_CHARS_COUNT);
-  assert( mCachedCharIndexOffset <= MAX_BYTES_COUNT);
-
-  uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
-
-  store_le_int32 (mCachedCharCount, cachedMetaData);
-  store_le_int32 (mCachedCharIndex, cachedMetaData + sizeof( uint32_t));
-  store_le_int32 (mCachedCharIndexOffset,
-                  cachedMetaData + 2 * sizeof( uint32_t));
-
-  mStorage.UpdateRecord( mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
-  mStorage.UpdateRecord( mFirstEntry,
-                         offset + CACHE_META_DATA_SIZE,
-                         count,
-                         buffer);
-
-  if (offset + count > mBytesSize)
-    mBytesSize = offset + count;
+  mTempText->WriteUtf8 (offset, count, buffer);
+  mBytesSize = mTempText->BytesCount();
 }
 
 
@@ -869,12 +876,7 @@ RowFieldText::TruncateUtf8 (const uint64_t newSize)
   mBytesSize             = mTempText->BytesCount();
   mCachedCharIndex       = 0;
   mCachedCharIndexOffset = 0;
-
-  if (mBytesSize == 0)
-    mCachedCharCount = 0;
-
-  else
-    mCachedCharCount = INVALID_CACHE_VALUE;
+  mCachedCharCount       = (mBytesSize == 0) ? 0 : INVALID_CACHE_VALUE;
 }
 
 void
@@ -884,36 +886,7 @@ RowFieldText::UpdateCharAt( const uint32_t   ch,
 {
   assert( ch != 0);
 
-  const uint32_t utf8CodeUnitsCount = wh_utf8_store_size( ch);
-
-  assert( (utf8CodeUnitsCount > 0)
-          && (utf8CodeUnitsCount < UTF8_MAX_BYTES_COUNT));
-
-  const uint32_t oldChar = CharAt( index).mValue;
-
-  assert( oldChar != 0);
-
-  if ((ReferenceCount() > 1)
-      || utf8CodeUnitsCount != wh_utf8_store_size( oldChar))
-    {
-      this->GenericText::UpdateCharAt( ch, index, inoutStrategy);
-      return;
-    }
-
-  assert( mCachedCharIndex == index);
-
-  uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-
-  wh_store_utf8_cp (ch, utf8CodeUnits);
-  WriteUtf8 (mCachedCharIndexOffset, utf8CodeUnitsCount, utf8CodeUnits);
-
-  assert( (mCacheStartOff <= mCachedCharIndexOffset)
-          && (mCachedCharIndexOffset + utf8CodeUnitsCount <=
-              mCacheStartOff + mCacheValid));
-
-  memcpy( &mCacheBuffer[mCachedCharIndexOffset - mCacheStartOff],
-          utf8CodeUnits,
-          utf8CodeUnitsCount);
+  this->GenericText::UpdateCharAt( ch, index, inoutStrategy);
 }
 
 
@@ -995,7 +968,11 @@ TemporalText::TruncateUtf8 (const uint64_t newSize)
 
   mStorage.Colapse( newSize, mBytesSize);
 
-  mBytesSize = newSize;
+  mBytesSize             = newSize;
+  mCachedCharIndex       = 0;
+  mCachedCharIndexOffset = 0;
+
+  mCachedCharCount = (mBytesSize == 0) ? 0 : INVALID_CACHE_VALUE;
 }
 
 

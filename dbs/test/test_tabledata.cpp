@@ -787,7 +787,6 @@ test_variable_values_table( IDBSHandler& rDbs)
   //Special case for DText!
   result = result && test_text_value_table( rDbs, vectText);
 
-
   rDbs.DeleteTable( tb_name);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;

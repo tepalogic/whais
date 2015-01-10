@@ -185,7 +185,6 @@ public:
                      uint64_t           sourceCount);
 
   void IncrementRecordRef( const uint64_t recordFirstEntry);
-
   void DecrementRecordRef( const uint64_t recordFirstEntry);
 
   uint64_t Size() const;

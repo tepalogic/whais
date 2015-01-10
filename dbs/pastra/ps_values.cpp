@@ -934,9 +934,6 @@ DText::CharAt( const uint64_t index, const DChar& ch)
 {
   const uint64_t charsCount = mText->CharsCount();
 
-  delete _SC (StringMatcher*, mStringMatcher);
-  mStringMatcher = NULL;
-
   if (charsCount == index)
     {
       Append( ch);
@@ -946,8 +943,24 @@ DText::CharAt( const uint64_t index, const DChar& ch)
   else if (charsCount < index)
     throw DBSException( _EXTRA( DBSException::STRING_INDEX_TOO_BIG));
 
+  delete _SC (StringMatcher*, mStringMatcher);
+  mStringMatcher = NULL;
+
+  if (mText->ReferenceCount() > 1)
+    {
+      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
+      newText->IncreaseReferenceCount();
+      newText.get()->Duplicate( *mText, mText->BytesCount());
+
+      mText->DecreaseReferenceCount();
+      mText = newText.release();
+
+      assert( mText->ShareCount() == 0);
+      assert( mText->ReferenceCount() == 1);
+    }
+
   if (ch.IsNull())
-    mText->Truncate( index);
+     mText->Truncate( index, &mText);
 
   else
     mText->UpdateCharAt( ch.mValue, index, &mText);
@@ -1472,9 +1485,7 @@ add_array_element( const T& element, IArrayStrategy** inoutStrategy)
   assert( storageSize <= sizeof rawElement);
 
   Serializer::Store( rawElement, element);
-  (*inoutStrategy)->RawWrite( (*inoutStrategy)->RawSize(),
-                              storageSize,
-                              rawElement);
+  (*inoutStrategy)->Append (storageSize, rawElement);
 
   assert( ((*inoutStrategy)->RawSize() % storageSize) == 0);
 

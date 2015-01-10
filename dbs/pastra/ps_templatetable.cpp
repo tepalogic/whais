@@ -542,7 +542,7 @@ PrototypeTable::CreateIndex( const FIELD_INDEX                 field,
   const uint_t nodeSizeKB  = 16; //16KB
 
   auto_ptr<IDataContainer> indexContainer( CreateIndexContainer( field));
-  auto_ptr<FieldIndexNodeManager> nodeMgr( 
+  auto_ptr<FieldIndexNodeManager> nodeMgr(
                             new FieldIndexNodeManager( indexContainer,
                                                        nodeSizeKB * 1024,
                                                        0x400000, //4MB
@@ -1149,7 +1149,6 @@ PrototypeTable::Set (const ROW_INDEX      row,
           else
             {
               value.mStorage.IncrementRecordRef( value.mFirstEntry);
-
               newFirstEntry = value.mFirstEntry;
             }
         }
@@ -1239,8 +1238,6 @@ PrototypeTable::Set (const ROW_INDEX      row,
       syncHolder.Release();
 
       VSStore().DecrementRecordRef( load_le_int64 (fieldFirstEntry));
-
-      return ;
     }
 
   if (skipVariableStore)
@@ -1307,7 +1304,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
           else
             {
               newFieldValueSize = value.RawSize();
-              newFirstEntry     = VSStore().AddRecord( 
+              newFirstEntry     = VSStore().AddRecord(
                                                       value.mStorage,
                                                       value.mFirstRecordEntry,
                                                       0,
@@ -1381,8 +1378,6 @@ PrototypeTable::Set (const ROW_INDEX        row,
                                     value.Type());
 
       VSStore().DecrementRecordRef( load_le_int64 (fieldFirstEntry));
-
-      return ;
     }
 
   if (skipVariableStore)
@@ -1843,7 +1838,7 @@ PrototypeTable::Get (const ROW_INDEX        row,
       const uint64_t fieldFirstEntry = load_le_int64 (rowData +
                                                         desc.RowDataOff());
 
-      IArrayStrategy& rowArray = *allocate_row_field_array( 
+      IArrayStrategy& rowArray = *allocate_row_field_array(
                                VSStore(),
                                fieldFirstEntry,
                               _SC (DBS_FIELD_TYPE,
@@ -3006,7 +3001,7 @@ TableRmNode::Join( const bool toRight)
             {
               const NODE_INDEX n = Serializer::LoadNode( nodes + index);
 
-              Serializer::StoreNode( 
+              Serializer::StoreNode(
                                   n,
                                   destNodes + index + nextNode->KeysCount()
                                     );

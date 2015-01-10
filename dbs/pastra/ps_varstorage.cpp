@@ -369,7 +369,7 @@ VariableSizeStore::CheckTextEntry( const uint64_t   recordFirstEntry,
 
       if (readCodeUnits == 0)
         {
-          codeUnitsCount = wh_utf8_cu_count( 
+          codeUnitsCount = wh_utf8_cu_count(
                                       temp[actualSize % StoreEntry::ENTRY_SIZE]
                                             );
           if ((codeUnitsCount == 0)
@@ -892,8 +892,8 @@ VariableSizeStore::UpdateRecord( uint64_t           recordFirstEntry,
             break;
         }
 
-      StoredItem cachedItem = sourceStore.mEntriesCache.RetriveItem( 
-                                                          recordFirstEntry
+      StoredItem cachedItem = sourceStore.mEntriesCache.RetriveItem (
+                                                          sourceFirstEntry
                                                                     );
       const StoreEntry* entry = _RC (const StoreEntry*,
                                      cachedItem.GetDataForRead());
@@ -926,7 +926,7 @@ VariableSizeStore::UpdateRecord( uint64_t           recordFirstEntry,
       {
         LockRAII sourceSynchHolder( sourceStore.mSync);
 
-        StoredItem cachedItem = sourceStore.mEntriesCache.RetriveItem( 
+        StoredItem cachedItem = sourceStore.mEntriesCache.RetriveItem(
                                                              sourceFirstEntry
                                                                       );
         StoreEntry* entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
@@ -1176,7 +1176,7 @@ VariableSizeStore::AllocateEntry( const uint64_t prevEntryId)
 
       if (entry->NextEntry() != StoreEntry::LAST_CHAINED_ENTRY)
         {
-          StoredItem nextCachedItem = mEntriesCache.RetriveItem( 
+          StoredItem nextCachedItem = mEntriesCache.RetriveItem(
                                                       entry->NextEntry()
                                                                 );
           entry = _RC (StoreEntry*, nextCachedItem.GetDataForUpdate());

@@ -119,6 +119,14 @@ IArrayStrategy::DecrementShareCount()
 
 
 void
+IArrayStrategy::Append (const uint64_t         size,
+                        const uint8_t* const   buffer)
+{
+  RawWrite (RawSize (), size, buffer);
+}
+
+
+void
 IArrayStrategy::Clone( IArrayStrategy& strategy)
 {
   assert( strategy.Type() == mElementsType);
@@ -126,6 +134,9 @@ IArrayStrategy::Clone( IArrayStrategy& strategy)
 
   uint64_t currentPosition = 0;
   uint64_t cloneSize       = strategy.RawSize();
+
+  if (strategy.IsRowValue ())
+      cloneSize -= pastra::RowFieldArray::METADATA_SIZE;
 
   while( cloneSize > 0)
     {
@@ -451,7 +462,7 @@ RowFieldArray::~RowFieldArray()
 bool
 RowFieldArray::IsRowValue() const
 {
-  return( mTempArray == NULL);
+  return mTempArray == NULL;
 }
 
 
@@ -495,32 +506,12 @@ RowFieldArray::RawWrite( const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer)
 {
-  if (mTempArray)
-    {
-      mTempArray->RawWrite( offset, size, buffer);
-      mElementsCount = RawSize() / mElementRawSize;
-    }
-  else
-    {
-      assert( (size % mElementRawSize) == 0);
+  if (mTempArray == NULL)
+    EnableTemporalStorage ();
 
-      mStorage.UpdateRecord( mFirstRecordEntry,
-                             offset + METADATA_SIZE,
-                             size,
-                             buffer);
+  mTempArray->RawWrite( offset, size, buffer);
+  mElementsCount = RawSize() / mElementRawSize;
 
-      if ((offset + size) > RawSize())
-        {
-          assert( ((offset + size - RawSize()) % mElementRawSize) == 0);
-
-          mElementsCount += (offset + size - RawSize()) / mElementRawSize;
-
-          uint8_t temp[METADATA_SIZE];
-
-          store_le_int64 (mElementsCount, temp);
-          mStorage.UpdateRecord( mFirstRecordEntry, 0, sizeof( temp), temp);
-        }
-    }
 }
 
 uint64_t
@@ -531,7 +522,17 @@ RowFieldArray::RawSize() const
 
   assert( mElementRawSize > 0);
 
-  return mElementsCount * mElementRawSize;
+  return mElementsCount * mElementRawSize + METADATA_SIZE;
+}
+
+void
+RowFieldArray::Append (const uint64_t         size,
+                       const uint8_t* const   buffer)
+{
+  if (mTempArray == NULL)
+     EnableTemporalStorage ();
+
+  RawWrite (RawSize (), size, buffer);
 }
 
 

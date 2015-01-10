@@ -72,6 +72,9 @@ public:
                          const uint64_t         size,
                          const uint8_t* const   buffer) = 0;
 
+  virtual void Append (const uint64_t         size,
+                       const uint8_t* const   buffer);
+
   virtual void ColapseRaw( const uint64_t offset, const uint64_t count) = 0;
 
   virtual uint64_t RawSize() const = 0 ;
@@ -166,6 +169,7 @@ public:
 
 class RowFieldArray : public IArrayStrategy
 {
+  friend class IArrayStrategy;
   friend class PrototypeTable;
 
 public:
@@ -181,6 +185,9 @@ public:
   virtual void RawWrite( const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer);
+
+  virtual void Append (const uint64_t         size,
+                       const uint8_t* const   buffer);
 
   virtual void ColapseRaw( const uint64_t offset, const uint64_t count);
 
@@ -202,7 +209,7 @@ private:
 
   void EnableTemporalStorage();
 
-  static const uint_t METADATA_SIZE = sizeof( uint64_t);
+  static const uint_t METADATA_SIZE = sizeof (uint64_t);
 };
 
 } //namespace pastra
