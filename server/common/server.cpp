@@ -536,12 +536,14 @@ StopServer()
     return; //Ignore! The server probably did not even start.
 
   sMainLog->Log (LOG_INFO, "Server asked to shutdown.");
-
   sAcceptUsersConnections = false;
   sServerStopped          = true;
 
-  for (uint_t index = 0; index < sListeners->Size(); ++index)
-    (*sListeners)[index].Close();
+  for (size_t i = 0; i < sDbsDescriptors->size (); i++)
+    (*sDbsDescriptors)[i].mSession->NotifyEvent (ISession::SERVER_STOPED, NULL);
+
+  for (uint_t i = 0; i < sListeners->Size(); ++i)
+    (*sListeners)[i].Close();
 }
 
 #ifdef ENABLE_MEMORY_TRACE

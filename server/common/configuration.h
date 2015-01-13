@@ -36,7 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "server_protocol.h"
 
-#define UNSET_VALUE       (0)
+#define UNSET_VALUE             0
+#define DEFAULT_MAX_STACK_CNT   4096
 
 struct ListenEntry
 {
@@ -98,6 +99,7 @@ struct DBSDescriptors
     : mConfigLine( configLine),
       mSyncInterval( UNSET_VALUE),
       mWaitReqTmo( UNSET_VALUE),
+      mStackCount (DEFAULT_MAX_STACK_CNT),
       mDbsName(),
       mDbsDirectory(),
       mObjectLibs(),
@@ -112,6 +114,7 @@ struct DBSDescriptors
   uint_t                           mConfigLine;
   int                              mSyncInterval;
   int                              mWaitReqTmo;
+  uint_t                           mStackCount;
   std::string                      mDbsName;
   std::string                      mDbsDirectory;
   std::string                      mDbsLogFile;
@@ -119,10 +122,10 @@ struct DBSDescriptors
   std::string                      mUserPasswd;
   std::vector<std::string>         mObjectLibs;
   std::vector<std::string>         mNativeLibs;
-  whais::IDBSHandler*            mDbs;
-  whais::ISession*               mSession;
-  whais::Logger*                 mLogger;
-  uint64_t			   mLastFlushTick;
+  whais::IDBSHandler*              mDbs;
+  whais::ISession*                 mSession;
+  whais::Logger*                   mLogger;
+  uint64_t                         mLastFlushTick;
 };
 
 const std::string&

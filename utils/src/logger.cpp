@@ -47,12 +47,6 @@ FileLogger::FileLogger( const char* const file, const bool printStart)
     mLogFile( file),
     mTodayTime( wh_get_currtime())
 {
-  if (! mOutStream.good())
-    {
-      throw ios_base::failure( "The file associated with the output stream "
-                               "could not be opened");
-    }
-
   mLogFile.append( ".wlog.yyyymmdd");
   SwitchFile();
 
@@ -66,6 +60,12 @@ FileLogger::FileLogger( const char* const file, const bool printStart)
       mOutStream << ' ' << (int)dayStart.hour;
       mOutStream << ':' << (int)dayStart.min;
       mOutStream << ':' << (int)dayStart.sec << "\n\n";
+    }
+
+  if (! mOutStream.good())
+    {
+      throw ios_base::failure( "The file associated with the output stream "
+                               "could not be opened.");
     }
 }
 

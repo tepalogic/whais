@@ -45,6 +45,7 @@ bool
 LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
 {
   ostringstream logEntry;
+  uint64_t      temp;
 
 
   logEntry << "Loading database: " << inoutDesc.mDbsName;
@@ -53,7 +54,7 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
 
   inoutDesc.mDbs = &DBSRetrieveDatabase( inoutDesc.mDbsName.c_str(),
                                          inoutDesc.mDbsDirectory.c_str());
-  std::auto_ptr<Logger> dbsLogger( 
+  std::auto_ptr<Logger> dbsLogger(
                          new FileLogger( inoutDesc.mDbsLogFile.c_str(), true)
                                   );
   logEntry << "Sync interval is set at " << inoutDesc.mSyncInterval
@@ -74,7 +75,19 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
                                          dbsLogger.get ());
     }
   else
-    inoutDesc.mSession = &GetInstance( NULL, &log);
+    inoutDesc.mSession = &GetInstance( NULL, dbsLogger.get ());
+
+  temp = inoutDesc.mStackCount;
+  if ( ! inoutDesc.mSession->NotifyEvent (ISession::MAX_STACK_COUNT, &temp))
+    {
+      logEntry << "Failed to set the maximum stack count limitation for "
+                  "session '" << inoutDesc.mDbsName << "' at "
+               << inoutDesc.mStackCount << " elements.";
+
+      log.Log (LOG_ERROR, logEntry.str ());
+      logEntry.str (CLEAR_LOG_STREAM);
+      logEntry.str (CLEAR_LOG_STREAM);
+    }
 
   for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin();
        it != inoutDesc.mNativeLibs.end ();

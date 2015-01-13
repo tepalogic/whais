@@ -191,7 +191,9 @@ Session::Session( Logger&           log,
                   NameSpaceHolder&  privateNames)
   : ISession( log),
     mGlobalNames( globalNames),
-    mPrivateNames( privateNames)
+    mPrivateNames( privateNames),
+    mMaxStackCount (~0),
+    mServerStopped (false)
 {
   mGlobalNames.IncRefsCount();
   mPrivateNames.IncRefsCount();
@@ -705,6 +707,38 @@ Session::ProcedurePameterFieldType( const char* const name,
   return ProcedurePameterFieldType( procId, param, field);
 }
 
+bool
+Session::NotifyEvent (const uint_t     event,
+                      uint64_t* const  extra)
+{
+   Logger& log = GetLogger ();
+
+  if (event == ISession::SERVER_STOPED)
+    {
+      log.Log (LOG_INFO, "Server asked to shutdown!");
+      mServerStopped = true;
+    }
+  else if (event == ISession::MAX_STACK_COUNT)
+    {
+      if (extra == NULL)
+        {
+          log.Log (LOG_ERROR,
+                   "Could not set the maximum stack size, "
+                     "the value is missing.");
+          return false;
+        }
+
+      std::stringstream s;
+      s << "Setting the maximum stack count at " << *extra << '.';
+
+      log.Log (LOG_INFO, s.str ());
+      mMaxStackCount = *extra;
+    }
+  else
+    return false;
+
+  return true;
+}
 
 uint32_t
 Session::FindGlobal( const uint8_t* pName, const uint_t nameLength)

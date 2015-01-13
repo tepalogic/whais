@@ -2630,7 +2630,6 @@ GlobalOperand::GlobalOperand( GlobalValue& value)
 {
 }
 
-
 bool
 GlobalOperand::IsNull() const
 {
@@ -2997,7 +2996,8 @@ GlobalOperand::GetTableReference()
 void
 GlobalOperand::NotifyCopy()
 {
-  mValue.NotifyCopy();
+  //This should not do anything, as field or array operands are keeping their
+  //own references.
 }
 
 

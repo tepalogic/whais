@@ -422,7 +422,7 @@ op_func_stf( ProcedureCall& call, int64_t& offset)
       assert (src.IsNull ());
       assert (IS_FIELD (dest.GetType ()));
 
-      dest.CopyFieldOp (FieldOperand (GET_BASIC_TYPE (dest.GetType ())));
+      dest.CopyFieldOp (FieldOperand (GET_FIELD_TYPE (dest.GetType ())));
     }
   else
     dest.CopyFieldOp( src.GetFieldOp());
@@ -1675,6 +1675,16 @@ ProcedureCall::ProcedureCall( Session&                  session,
     }
   else
     {
+      if (stack.Size () + LocalsCount () > session.MaxStackCount ())
+        {
+          throw InterException (_EXTRA (InterException::STACK_TOO_BIG),
+                                "Failed to call procedure '%s' as it will "
+                                  "exceed the maximum stack count of %u "
+                                  "elements limit.",
+                                  mProcedure.mProcMgr->Name( mProcedure.mId),
+                                  session.MaxStackCount ());
+        }
+
       //Fill the stack with default values for the local values( don't
       //include the arguments as they should be on the stack already and the
       uint32_t local = mProcedure.mArgsCount + 1;
@@ -1708,14 +1718,14 @@ ProcedureCall::ProcedureCall( Session&                  session,
 
           if ( ! message.empty())
             {
-              e.Message( "%s\n\tCalled from '%s'(pc: %04u).",
+              e.Message( "%s\n\tCalled from '%s' (PC: %04u).",
                          message.c_str(),
                          mProcedure.mProcMgr->Name( mProcedure.mId),
                          mCodePos);
             }
           else
             {
-              e.Message( "Current procedure '%s'(pc: %%04u).",
+              e.Message( "Current procedure '%s'(PC: %04u).",
                          mProcedure.mProcMgr->Name( mProcedure.mId),
                          mCodePos);
             }
@@ -1734,8 +1744,11 @@ ProcedureCall::Run ()
 
   try
   {
-    while( mCodePos < CodeSize())
+    while (mCodePos < CodeSize())
       {
+        if (mSession.IsServerShoutdowing())
+          throw InterException (_EXTRA (InterException::SERVER_STOPPED));
+
         int64_t offset = wh_compiler_decode_op( mCode + mCodePos, &opcode);
 
         assert( opcode < _SC (int, (sizeof operations / sizeof operations[0])));
@@ -1749,6 +1762,8 @@ ProcedureCall::Run ()
         assert( (mCodePos <= CodeSize())
                 || (_SC (uint64_t, offset) == CodeSize()));
       }
+
+
   }
   catch( ...)
   {

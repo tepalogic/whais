@@ -91,6 +91,9 @@ public:
 
     DIVIDE_BY_ZERO,
 
+    STACK_TOO_BIG,
+    SERVER_STOPPED,
+
     //The exception codes below this line cause an application stop.
     __CRITICAL_EXCEPTIONS,
     ALREADY_INITED,
@@ -166,12 +169,21 @@ public:
   virtual uint_t ProcedurePameterFieldType( const char* const   name,
                                             const uint_t        param,
                                             const uint_t        field) = 0;
+
+  virtual bool NotifyEvent (const uint_t     event,
+                            uint64_t* const  extra) = 0;
   Logger& GetLogger()
   {
     return mLog;
   }
 
+  static const uint_t SERVER_STOPED           = 1;
+  static const uint_t MAX_PROCS_TMO           = 2;
+  static const uint_t MAX_STACK_COUNT         = 3;
+  static const uint_t MAX_PROCS_CALL_DEPTH    = 4;
+
 protected:
+
   Logger& mLog;
 };
 

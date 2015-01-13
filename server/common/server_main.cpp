@@ -183,6 +183,13 @@ main( int argc, char** argv)
       glbLog.reset( new FileLogger( GetAdminSettings().mLogFile.c_str()));
 
   }
+  catch (ios_base::failure& e)
+  {
+      cerr << "Unexpected error during configuration read:\n";
+      cerr << e.what () << endl;
+
+      return -1;
+  }
   catch( ...)
   {
     cerr << "Unknown error encountered during main configuration reading!\n";
@@ -301,7 +308,6 @@ main( int argc, char** argv)
     clean_frameworks( *glbLog);
 
     return -1;
-
   }
   catch( std::bad_alloc&)
   {

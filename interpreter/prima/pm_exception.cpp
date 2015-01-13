@@ -1,5 +1,5 @@
 /******************************************************************************
- PRIMA - A language interpretor for wshiper source objects
+ PRIMA - A language interpreter for WHAIS source objects
  Copyright (C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
@@ -142,6 +142,12 @@ InterException::Description() const
 
   case DIVIDE_BY_ZERO:
     return "Cannot divide by zero.";
+
+  case STACK_TOO_BIG:
+    return "Cannot allocated stack elements.";
+
+  case SERVER_STOPPED:
+    return "Server was asked to stop.";
 
   case ALREADY_INITED:
     return "Cannot initialize the interpreter as it was already initialized.";

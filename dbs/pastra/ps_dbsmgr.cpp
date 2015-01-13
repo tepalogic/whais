@@ -477,7 +477,7 @@ DbsHandler::SyncToFile()
 bool
 DbsHandler::HasUnreleasedTables()
 {
-  for (TABLES::iterator it = mTables.begin(); it != mTables.end (); ++it)
+  for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
       if (it->second != NULL)
         return true;
@@ -819,8 +819,8 @@ DBSReleaseDatabase( IDBSHandler& hnd)
           if (it->second.mDbs.HasUnreleasedTables())
             {
               throw DBSException( _EXTRA( DBSException::DATABASE_IN_USE),
-                                  "Could not release a database handler with"
-                                  " associated persistent tables unreleased.");
+                                  "Could not release a database handler due to"
+                                  " unreleased tables associated with it.");
             }
 
           if (--it->second.mRefCount == 0)

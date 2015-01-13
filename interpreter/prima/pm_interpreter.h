@@ -151,9 +151,9 @@ private:
 class Session : public ISession
 {
 public:
-  Session( Logger&           log,
-          NameSpaceHolder&   globalNames,
-          NameSpaceHolder&   privateNames);
+  Session (Logger&            log,
+           NameSpaceHolder&   globalNames,
+           NameSpaceHolder&   privateNames);
 
   virtual ~Session();
 
@@ -214,6 +214,8 @@ public:
                                             const uint_t        param,
                                             const uint_t        field);
 
+  virtual bool NotifyEvent (const uint_t     event,
+                            uint64_t* const  extra);
 
   uint32_t FindGlobal( const uint8_t* name, const uint_t nameLength);
 
@@ -230,6 +232,16 @@ public:
   IDBSHandler& DBSHandler();
 
   const Procedure& GetProcedure( const uint32_t procId);
+
+  bool IsServerShoutdowing () const
+  {
+    return mServerStopped;
+  }
+
+  uint_t MaxStackCount () const
+  {
+    return mMaxStackCount;
+  }
 
 private:
   void DefineTablesGlobalValues();
@@ -255,6 +267,8 @@ private:
   NameSpaceHolder&            mGlobalNames;
   NameSpaceHolder&            mPrivateNames;
   std::vector<WH_SHLIB>       mNativeLibs;
+  volatile uint_t             mMaxStackCount;
+  volatile bool               mServerStopped;
 };
 
 

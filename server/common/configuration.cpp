@@ -83,6 +83,7 @@ static const string gEntObjectLib( "load_object");
 static const string gEntNativeLib( "load_native");
 static const string gEntRootPasswrd( "root_password");
 static const string gEntUserPasswrd( "user_password");
+static const string gEntStackCount ("max_stack_count");
 
 static ServerSettings gMainSettings;
 
@@ -913,6 +914,27 @@ ParseContextSection( Logger&          log,
              }
            else
              output.mUserPasswd = token;
+        }
+       else if (token == gEntStackCount)
+        {
+           token = NextToken( line, pos, delimiters);
+           if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+            {
+              cerr << "Configuration error at line "
+                   << inoutConfigLine << ".\n";
+
+              return false;
+            }
+
+           output.mStackCount = atoi( token.c_str());
+           if (output.mStackCount <= 0)
+            {
+              cerr << "At line " << inoutConfigLine << "the request waiting "
+                      "timeout parameter should be an integer value bigger "
+                      "than 0 (currently set to "
+                   << gMainSettings.mWaitReqTmo << " ).\n";
+              return false;
+            }
         }
       else
         {
