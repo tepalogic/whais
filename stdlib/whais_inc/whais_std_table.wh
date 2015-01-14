@@ -34,7 +34,7 @@
 #   @t - The table value.
 #Out:
 #   TRUE if the table is persistent.
-EXTERN PROCEDURE table_is_peristent( t AS TABLE) RETURN BOOL;
+EXTERN PROCEDURE table_is_persistent( t AS TABLE) RETURN BOOL;
 
 #Get the fields count of a table.
 #In:
@@ -58,6 +58,14 @@ EXTERN PROCEDURE table_field_by_id( t AS TABLE,
 #Out:
 #   The numbers of rows allocated by the supplied table.
 EXTERN PROCEDURE table_rows( t AS TABLE) RETURN UINT64;
+
+#Get the count of reusable rows of a table.
+#In:
+#   @t - The table value.
+#Out:
+#   The numbers of rows allocated by the supplied table.
+EXTERN PROCEDURE table_reusable_rows ( t AS TABLE) RETURN UINT64;
+
 
 #Allocate a row into a table.
 #In:

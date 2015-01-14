@@ -770,7 +770,7 @@ main( const int argc, char *argv[])
                    * Probably a toolchain/OS/Bash bug!
                    */
 
-                  cerr << "ERROR: Failed to properly connect at '"
+                  cerr << "ERROR: Failed to connect at '"
                        << GetRemoteHostName () << ':'
                        << GetConnectionPort () << "'!\n";
 
