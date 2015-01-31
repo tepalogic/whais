@@ -177,18 +177,19 @@ test_for_errors( WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
   if ((WStartProceduresList( NULL, &procsCount) != WCS_INVALID_ARGS)
-      || (WStartProceduresList( hnd, NULL) != WCS_INVALID_ARGS)
       || (WStartProceduresList( NULL, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
   else if (WFetchProcedure( hnd, &nameFetched) != WCS_INVALID_ARGS)
     goto test_for_errors_fail;
-  else if (WStartProceduresList( hnd, &procsCount) != WCS_OK)
+
+  else if (WStartProceduresList( hnd, NULL) != WCS_OK)
     goto test_for_errors_fail;
+
   else if ((WFetchProcedure( NULL, NULL) != WCS_INVALID_ARGS)
-            || (WFetchProcedure( NULL, &nameFetched) != WCS_INVALID_ARGS)
-            || (WFetchProcedure( hnd, NULL) != WCS_INVALID_ARGS))
+           || (WFetchProcedure( NULL, &nameFetched) != WCS_INVALID_ARGS)
+           || (WFetchProcedure( hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }

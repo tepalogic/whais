@@ -29,6 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <assert.h>
 
+
+#include "utils/enc_des.h"
+
 #include "dbs/dbs_mgr.h"
 #include "client/whais_connector.h"
 
@@ -442,8 +445,6 @@ main( const int argc, char *argv[])
   const char*   scriptFile = NULL;
   string        dbDirectory;
 
-
-
   if (! whs_init())
     {
       cerr << "Couldn't not initialize the network socket framework.\n";
@@ -767,10 +768,10 @@ main( const int argc, char *argv[])
                    * the program terminates, if it gets on this path, the
                    * error message is displayed from time to time.
                    *
-                   * Probably a toolchain/OS/Bash bug!
+                   * Probably a tool chain/OS/Bash bug!
                    */
 
-                  cerr << "ERROR: Failed to properly connect at '"
+                  cerr << "ERROR: Failed to connect at '"
                        << GetRemoteHostName () << ':'
                        << GetConnectionPort () << "'!\n";
 

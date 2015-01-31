@@ -230,7 +230,7 @@ test_complete_field_global( WH_CONNECTION hnd)
   if ((WValueFetchField( hnd, &fieldName, &type) != WCS_OK)
       || (fieldName != NULL)
       || (type != WHC_TYPE_NOTSET)
-      || (WValueFetchField( hnd, &fieldName, &type) == WCS_OK))
+      || (WValueFetchField( hnd, &fieldName, &type) != WCS_OK))
     {
       goto test_complete_field_global_err; //Should not allow an extra fetch!
     }
@@ -272,7 +272,7 @@ test_one_field_global( WH_CONNECTION hnd)
   if ((WValueFetchField( hnd, &fieldName, &type) != WCS_OK)
       || (fieldName != NULL)
       || (type != WHC_TYPE_NOTSET)
-      || (WValueFetchField( hnd, &fieldName, &type) == WCS_OK))
+      || (WValueFetchField( hnd, &fieldName, &type) != WCS_OK))
     {
       goto test_one_field_global_err; //Should not allow an extra fetch!
     }
@@ -307,14 +307,12 @@ test_for_errors( WH_CONNECTION hnd)
       goto test_for_errors_fail;
     }
   else if ((WDescribeGlobal( hnd, one_field_table, &type) != WCS_OK)
-
            || (WValueFieldsCount( NULL, NULL) != WCS_INVALID_ARGS)
            || (WValueFieldsCount( hnd, NULL) != WCS_INVALID_ARGS)
            || (WValueFetchField( NULL, NULL, NULL) != WCS_INVALID_ARGS)
            || (WValueFetchField( NULL, &nameFetched, &type) != WCS_INVALID_ARGS)
            || (WValueFetchField( hnd, NULL, &type) != WCS_INVALID_ARGS)
            || (WValueFetchField( hnd, &nameFetched, NULL) != WCS_INVALID_ARGS)
-
            || (WValueFetchField( hnd, &nameFetched, &type) != WCS_OK)
            || (WValueFieldsCount( hnd, &fieldsCount) != WCS_OK))
     {

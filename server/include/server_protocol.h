@@ -43,12 +43,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define FRAME_ENCTYPE_PLAIN             0x01
 #define FRAME_ENCTYPE_3K                0x02
+#define FRAME_ENCTYPE_DES               0x03
+#define FRAME_ENCTYPE_3DES              0x04
 
 #define ENC_3K_FIRST_KING_OFF           0x00
 #define ENC_3K_SECOND_KING_OFF          0x04
-#define ENC_3K_PLAIN_SIZE_OFF           0x08
-#define ENC_3K_SPARE_OFF                0x0A
-#define ENC_3K_HDR_SIZE                 0x0C
+#define ENC_PLAIN_SIZE_OFF              0x08
+#define ENC_SPARE_OFF                   0x0A
+#define ENC_HDR_SIZE                    0x0C
 
 #define PLAIN_CLNT_COOKIE_OFF           0x00
 #define PLAIN_SERV_COOKIE_OFF           0x04
@@ -82,15 +84,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define FRAME_AUTH_VER_OFF                  0x00
 #define FRAME_AUTH_SIZE_OFF                 0x04
 #define FRAME_AUTH_SPARE_1_OFF              0x06
-#define FRAME_AUTH_ENC_OFF                  0x08
-#define FRAME_AUTH_SPARE_2_OFF              0x09
-#define FRAME_AUTH_SIZE                     0x0C
+#define FRAME_AUTH_CHALLENGE_OFF            0x08
+#define FRAME_AUTH_ENC_OFF                  0x10
+#define FRAME_AUTH_SPARE_2_OFF              0x11
+#define FRAME_AUTH_SIZE                     0x14
 
 #define FRAME_AUTH_RSP_VER_OFF              0x00
 #define FRAME_AUTH_RSP_USR_OFF              0x04
 #define FRAME_AUTH_RSP_ENC_OFF              0x05
 #define FRAME_AUTH_RSP_SIZE_OFF             0x06
-#define FRAME_AUTH_RSP_FIXED_SIZE           0x08
+#define FRAME_AUTH_RSP_CHALLENGE_OFF        0x08
+#define FRAME_AUTH_RSP_FIXED_SIZE           0x10
 
 #define ADMIN_CMD_BASE                      0x0000
 #define USER_CMD_BASE                       0x1000

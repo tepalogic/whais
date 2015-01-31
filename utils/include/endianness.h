@@ -109,5 +109,82 @@ store_le_int64 (const uint64_t value, uint8_t* const to)
 }
 
 
+static INLINE uint16_t
+load_ge_int16 (const uint8_t* from)
+{
+  uint16_t result;
+
+  result = from[0];
+  result <<= 8; result |= from[1];
+
+  return result;
+}
+
+
+static INLINE uint32_t
+load_ge_int32 (const uint8_t* from)
+{
+  uint32_t result;
+
+  result = from[0];
+  result <<= 8; result |= from[1];
+  result <<= 8; result |= from[2];
+  result <<= 8; result |= from[3];
+
+  return result;
+}
+
+
+static INLINE uint64_t
+load_ge_int64 (const uint8_t* from)
+{
+  uint64_t result;
+
+  result = from[0];
+  result <<= 8; result |= from[1];
+  result <<= 8; result |= from[2];
+  result <<= 8; result |= from[3];
+  result <<= 8; result |= from[4];
+  result <<= 8; result |= from[5];
+  result <<= 8; result |= from[6];
+  result <<= 8; result |= from[7];
+
+  return result;
+}
+
+
+static INLINE void
+store_ge_int16 (const uint16_t value, uint8_t* const to)
+{
+  to[1] = value        & 0xFF;
+  to[0] = (value >> 8) & 0xFF;
+}
+
+
+static INLINE void
+store_ge_int32 (const uint32_t value, uint8_t* const to)
+{
+  to[3] = value         & 0xFF;
+  to[2] = (value >>  8) & 0xFF;
+  to[1] = (value >> 16) & 0xFF;
+  to[0] = (value >> 24) & 0xFF;
+}
+
+
+static INLINE void
+store_ge_int64 (const uint64_t value, uint8_t* const to)
+{
+  to[7] = value         & 0xFF;
+  to[6] = (value >>  8) & 0xFF;
+  to[5] = (value >> 16) & 0xFF;
+  to[4] = (value >> 24) & 0xFF;
+  to[3] = (value >> 32) & 0xFF;
+  to[2] = (value >> 40) & 0xFF;
+  to[1] = (value >> 48) & 0xFF;
+  to[0] = (value >> 56) & 0xFF;
+}
+
+
+
 #endif /* ENDIANNESS_H_ */
 

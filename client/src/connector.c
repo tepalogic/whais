@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wrandom.h"
 #include "utils/wutf.h"
 #include "utils/enc_3k.h"
+#include "utils/enc_des.h"
 #include "server/server_protocol.h"
 
 #include "connector.h"
@@ -57,24 +58,16 @@ max_data_size( const struct INTERNAL_HANDLER* const hnd)
   uint_t metaDataSize = 0;
 
   assert( (hnd->cipher == FRAME_ENCTYPE_PLAIN)
-          || (hnd->cipher == FRAME_ENCTYPE_3K));
+          || (hnd->cipher == FRAME_ENCTYPE_3K)
+          || (hnd->cipher == FRAME_ENCTYPE_DES)
+          || (hnd->cipher == FRAME_ENCTYPE_3DES));
 
   assert( MIN_FRAME_SIZE <= hnd->dataSize);
   assert( hnd->dataSize <= MAX_FRAME_SIZE);
 
-  switch( hnd->cipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( FALSE);
-  }
+  metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+  if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   return hnd->dataSize - metaDataSize;
 }
@@ -83,23 +76,11 @@ max_data_size( const struct INTERNAL_HANDLER* const hnd)
 static uint_t
 data_size( const struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize = 0;
-
   const uint16_t frameSize = load_le_int16 (&hnd->data[FRAME_SIZE_OFF]);
+  uint_t metaDataSize      = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
 
-  switch( hnd->cipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( FALSE);
-  }
+  if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   assert( (frameSize >= metaDataSize) && (frameSize <= hnd->dataSize));
 
@@ -110,21 +91,10 @@ data_size( const struct INTERNAL_HANDLER* const hnd)
 static void
 set_data_size( struct INTERNAL_HANDLER* const hnd, const uint_t size)
 {
-  uint_t metaDataSize = 0;
+  uint_t metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
 
-  switch( hnd->cipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( FALSE);
-  }
+  if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   assert( size <= max_data_size( hnd));
 
@@ -135,21 +105,10 @@ set_data_size( struct INTERNAL_HANDLER* const hnd, const uint_t size)
 static uint8_t*
 data( struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize = 0;
+  uint_t metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
 
-  switch( hnd->cipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( FALSE);
-  }
+  if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   return hnd->data + metaDataSize;
 }
@@ -159,21 +118,10 @@ data( struct INTERNAL_HANDLER* const hnd)
 static uint8_t*
 raw_data( struct INTERNAL_HANDLER* const hnd)
 {
-  uint_t metaDataSize = 0;
+  uint_t metaDataSize = FRAME_HDR_SIZE;
 
-  switch( hnd->cipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
-    break;
-
-  default:
-    assert( FALSE);
-  }
+  if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   return hnd->data + metaDataSize;
 }
@@ -190,6 +138,8 @@ send_raw_frame( struct INTERNAL_HANDLER* const hnd,
 
   if (hnd->cipher == FRAME_ENCTYPE_3K)
     {
+      const uint_t keySize = strlen ((char*)hnd->keys._3K);
+
       const uint16_t plainSize = frameSize;
 
       uint32_t firstKing, secondKing;
@@ -206,29 +156,55 @@ send_raw_frame( struct INTERNAL_HANDLER* const hnd,
       store_le_int32 (secondKing,
                       hnd->data + FRAME_HDR_SIZE + ENC_3K_SECOND_KING_OFF);
 
-      for (i = 0, prev = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+      for (i = 0, prev = 0; i < ENC_PLAIN_SIZE_OFF; ++i)
         {
           const uint8_t temp = hnd->data[FRAME_HDR_SIZE + i];
-          hnd->data[FRAME_HDR_SIZE + i] ^=
-                              hnd->encriptionKey[prev % hnd->encKeySize];
+          hnd->data[FRAME_HDR_SIZE + i] ^= hnd->keys._3K[prev % keySize];
           prev = temp;
         }
 
       store_le_int16 (plainSize,
-                      hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
+                      hnd->data + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF);
 
       store_le_int16 (wh_rnd() & 0xFFFF,
-                      hnd->data + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
+                      hnd->data + FRAME_HDR_SIZE + ENC_SPARE_OFF);
 
       wh_buff_3k_encode( firstKing,
                          secondKing,
-                         hnd->encriptionKey,
-                         hnd->encKeySize,
-                         hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
-                         frameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF));
+                         hnd->keys._3K,
+                         keySize,
+                         hnd->data + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF,
+                         frameSize - (FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF));
 
       store_le_int16 (frameSize, hnd->data + FRAME_SIZE_OFF);
     }
+  else if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    {
+      const uint16_t plainSize = frameSize;
+
+      while( frameSize % sizeof( uint64_t) != 0)
+        hnd->data[frameSize++] = wh_rnd() & 0xFF;
+
+      store_le_int16 (plainSize,
+                      hnd->data + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF);
+
+      if (hnd->cipher == FRAME_ENCTYPE_DES)
+        {
+          wh_buff_des_encode_ex (hnd->keys._DES,
+                                 hnd->data + FRAME_HDR_SIZE,
+                                 frameSize - FRAME_HDR_SIZE);
+        }
+      else
+        {
+          assert (hnd->cipher == FRAME_ENCTYPE_3DES);
+          wh_buff_3des_encode_ex (hnd->keys._DES,
+                                  hnd->data + FRAME_HDR_SIZE,
+                                  frameSize - FRAME_HDR_SIZE);
+        }
+        store_le_int16 (frameSize, hnd->data + FRAME_SIZE_OFF);
+    }
+  else
+    wh_buff_des_encode_ex (hnd->keys._DES, raw_data (hnd), sizeof (uint64_t));
 
   assert( (frameSize > 0) && (frameSize <= hnd->dataSize));
 
@@ -306,14 +282,15 @@ receive_raw_frame( struct INTERNAL_HANDLER* const hnd)
 
   if (hnd->cipher == FRAME_ENCTYPE_3K)
     {
+      const uint_t keySize = strlen ((char*)hnd->keys._3K);
+
       uint32_t  firstKing, secondKing;
       uint16_t  plainSize;
       uint8_t   i, prev;
 
-      for (i = 0, prev = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+      for (i = 0, prev = 0; i < ENC_PLAIN_SIZE_OFF; ++i)
         {
-          hnd->data[FRAME_HDR_SIZE + i] ^=
-                              hnd->encriptionKey[prev % hnd->encKeySize];
+          hnd->data[FRAME_HDR_SIZE + i] ^=  hnd->keys._3K[prev % keySize];
           prev = hnd->data[FRAME_HDR_SIZE + i];
         }
 
@@ -326,20 +303,47 @@ receive_raw_frame( struct INTERNAL_HANDLER* const hnd)
 
       wh_buff_3k_decode( firstKing,
                          secondKing,
-                         hnd->encriptionKey,
-                         hnd->encKeySize,
-                         hnd->data + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
-                         frameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF));
+                         hnd->keys._3K,
+                         keySize,
+                         hnd->data + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF,
+                         frameSize - (FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF));
 
-      plainSize = load_le_int16 (hnd->data+
-                                 FRAME_HDR_SIZE +
-                                 ENC_3K_PLAIN_SIZE_OFF);
-
+      plainSize = load_le_int16 (hnd->data
+                                   + FRAME_HDR_SIZE
+                                   + ENC_PLAIN_SIZE_OFF);
       assert( plainSize <= frameSize);
 
       frameSize = plainSize;
       store_le_int16 (plainSize, hnd->data + FRAME_SIZE_OFF);
     }
+  else if (hnd->cipher != FRAME_ENCTYPE_PLAIN)
+    {
+      uint16_t  plainSize;
+
+      if (hnd->cipher == FRAME_ENCTYPE_DES)
+        {
+          wh_buff_des_decode_ex (hnd->keys._DES,
+                                 hnd->data + FRAME_HDR_SIZE,
+                                 frameSize - FRAME_HDR_SIZE);
+        }
+      else
+        {
+          assert (hnd->cipher == FRAME_ENCTYPE_3DES);
+          wh_buff_3des_decode_ex (hnd->keys._DES,
+                                  hnd->data + FRAME_HDR_SIZE,
+                                  frameSize - FRAME_HDR_SIZE);
+        }
+
+      plainSize = load_le_int16 (hnd->data
+                                   + FRAME_HDR_SIZE
+                                   + ENC_PLAIN_SIZE_OFF);
+      assert( plainSize <= frameSize);
+
+      frameSize = plainSize;
+      store_le_int16 (plainSize, hnd->data + FRAME_SIZE_OFF);
+    }
+  else
+    wh_buff_des_decode_ex (hnd->keys._DES, raw_data (hnd), sizeof (uint64_t));
 
   return WCS_OK;
 }
@@ -431,8 +435,8 @@ WConnect( const char* const    host,
   const uint_t             passwordLen = strlen( password);
   uint_t                   frameSize   = 0;
   uint32_t                 status      = WCS_OK;
-
   uint8_t                  tempBuffer[MIN_FRAME_SIZE];
+  uint8_t                  challenge[sizeof (uint64_t)];
 
   if ((host == NULL)
       || (port == NULL)
@@ -448,15 +452,13 @@ WConnect( const char* const    host,
       goto fail_ret;
     }
 
-  result = mem_alloc( sizeof( *result) + passwordLen);
+  result = mem_alloc( sizeof( *result));
   memset( result, 0, sizeof( *result));
-  memcpy( result->encriptionKey, password, passwordLen);
 
   result->data       = tempBuffer;
   result->dataSize   = sizeof tempBuffer;
   result->userId     = userId;
   result->socket     = INVALID_SOCKET;
-  result->encKeySize = passwordLen;
   result->cipher     = FRAME_ENCTYPE_PLAIN;
 
   if ((status = whs_create_client( host, port, &result->socket)) != WCS_OK)
@@ -473,57 +475,77 @@ WConnect( const char* const    host,
   assert( frameSize == result->dataSize);
 
   {
-      /* The authentication frame will always be send in plain, and it publish
-       * some communication settings set at the server size( e.g. frame size,
-       * cipher to be used, version, etc.). */
-      uint_t serverFrameSize = 0;
+    /* The authentication frame will always be send in plain, and it publish
+     * some communication settings set at the server size( e.g. frame size,
+     * cipher to be used, version, etc.). */
+    uint_t serverFrameSize = 0;
 
-      const uint32_t frameId = load_le_int32 (&result->data[FRAME_ID_OFF]);
+    const uint32_t frameId = load_le_int32 (&result->data[FRAME_ID_OFF]);
 
-      if ((frameId != 0)
-          || (result->data[FRAME_TYPE_OFF] != FRAME_TYPE_AUTH_CLNT))
-        {
-          status = WCS_UNEXPECTED_FRAME;
-          goto fail_ret;
-        }
+    if ((frameId != 0)
+        || (result->data[FRAME_TYPE_OFF] != FRAME_TYPE_AUTH_CLNT))
+      {
+        status = WCS_UNEXPECTED_FRAME;
+        goto fail_ret;
+      }
 
-      assert( result->data[FRAME_ENCTYPE_OFF] == FRAME_ENCTYPE_PLAIN);
+    assert( result->data[FRAME_ENCTYPE_OFF] == FRAME_ENCTYPE_PLAIN);
 
-      result->cipher = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];
-      if ((result->cipher != FRAME_ENCTYPE_PLAIN)
-          && (result->cipher != FRAME_ENCTYPE_3K))
-        {
-          status = WCS_ENCTYPE_NOTSUPP;
-          goto fail_ret;
-        }
-      result->version = load_le_int32 (result->data 		+
-                                         FRAME_HDR_SIZE 	+
-                                         FRAME_AUTH_VER_OFF);
-      if ((result->version & CLIENT_VERSION) == 0)
-        {
-          status = WCS_PROTOCOL_NOTSUPP;
-          goto fail_ret;
-        }
-      else
-        result->version = CLIENT_VERSION;
+    result->cipher = result->data[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF];
+    if ((result->cipher != FRAME_ENCTYPE_PLAIN)
+        && (result->cipher != FRAME_ENCTYPE_3K)
+        && (result->cipher != FRAME_ENCTYPE_DES)
+        && (result->cipher != FRAME_ENCTYPE_3DES))
+      {
+        status = WCS_ENCTYPE_NOTSUPP;
+        goto fail_ret;
+      }
+    else if (result->cipher == FRAME_ENCTYPE_3K)
+      {
+        memcpy( result->keys._3K,
+                password,
+                MIN (passwordLen, sizeof result->keys - 1));
+      }
+    else
+      {
+        wh_prepare_des_keys ((uint8_t *)password,
+                             passwordLen,
+                             result->cipher == FRAME_ENCTYPE_3DES,
+                             result->keys._DES);
+      }
 
-      /* Make sure we are able to handle server's published max frames size */
-      serverFrameSize = load_le_int16 (result->data 		+
-                                         FRAME_HDR_SIZE 	+
-                                         FRAME_AUTH_SIZE_OFF);
-      assert( MIN_FRAME_SIZE <= serverFrameSize);
-      assert( serverFrameSize <= MAX_FRAME_SIZE);
+    result->version = load_le_int32 (result->data           +
+                                       FRAME_HDR_SIZE       +
+                                       FRAME_AUTH_VER_OFF);
+    if ((result->version & CLIENT_VERSION) == 0)
+      {
+        status = WCS_PROTOCOL_NOTSUPP;
+        goto fail_ret;
+      }
+    else
+      result->version = CLIENT_VERSION;
 
-      if (maxFrameSize < serverFrameSize)
-	serverFrameSize = maxFrameSize;
+    /* Make sure we are able to handle server's published max frames size */
+    serverFrameSize = load_le_int16 (result->data           +
+                                       FRAME_HDR_SIZE       +
+                                       FRAME_AUTH_SIZE_OFF);
+    assert( MIN_FRAME_SIZE <= serverFrameSize);
+    assert( serverFrameSize <= MAX_FRAME_SIZE);
 
-      result->data     = mem_alloc( serverFrameSize);
-      result->dataSize = serverFrameSize;
+    if (maxFrameSize < serverFrameSize)
+      serverFrameSize = maxFrameSize;
 
-      store_le_int16 (result->dataSize,
-                      result->data 		+
-			  FRAME_HDR_SIZE 	+
-			  FRAME_AUTH_RSP_SIZE_OFF);
+    memcpy (challenge,
+            result->data + FRAME_HDR_SIZE + FRAME_AUTH_CHALLENGE_OFF,
+            sizeof challenge);
+
+    result->data     = mem_alloc (serverFrameSize);
+    result->dataSize = serverFrameSize;
+
+    store_le_int16 (result->dataSize,
+                    result->data            +
+                      FRAME_HDR_SIZE        +
+                      FRAME_AUTH_RSP_SIZE_OFF);
   }
 
   {
@@ -532,9 +554,7 @@ WConnect( const char* const    host,
     const uint_t frameSize = FRAME_HDR_SIZE               +
                                FRAME_AUTH_RSP_FIXED_SIZE  +
                                strlen( database) + 1      +
-                               passwordLen + 1;
-    char* const pAuthData =
-        (char*)&result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE];
+                               sizeof (uint64_t);
 
     if (frameSize > result->dataSize)
       {
@@ -552,11 +572,12 @@ WConnect( const char* const    host,
     result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] = userId;
     result->data[FRAME_HDR_SIZE + FRAME_AUTH_RSP_ENC_OFF] = result->cipher;
 
-    strcpy( pAuthData, database);
-
-    if (result->cipher == FRAME_ENCTYPE_PLAIN)
-      strcpy( pAuthData + strlen( database) + 1, password);
-
+    wh_buff_des_encode ((uint8_t *)password, challenge, sizeof challenge);
+    memcpy (result->data + FRAME_HDR_SIZE + FRAME_AUTH_RSP_CHALLENGE_OFF,
+            challenge,
+            sizeof challenge);
+    strcpy ((char*)result->data + FRAME_HDR_SIZE + FRAME_AUTH_RSP_FIXED_SIZE,
+            database);
     if ((status = write_raw_frame( result, frameSize)) != WCS_OK)
       goto fail_ret;
   }
@@ -1140,13 +1161,14 @@ describe_value_fetch_field_again:
   if (fieldHint >= fieldCount)
     {
       *outFieldName = NULL;
+      *outFieldType = WHC_TYPE_NOTSET;
 
       return WCS_OK;
     }
   else if (offset < data_size( hnd_))
     {
       *outFieldName  = (char*)data( hnd_) + offset;
-      offset         += strlen( *outFieldName) + 1;
+      offset        += strlen( *outFieldName) + 1;
 
       *outFieldType  = load_le_int16 (data( hnd_) + offset);
       offset        += sizeof( uint16_t);

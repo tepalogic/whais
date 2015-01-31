@@ -238,6 +238,7 @@ whf_err_to_str( uint64_t errorCode, char* str, uint_t strSize)
   if (pMessage != NULL)
     {
       strncpy( str, pMessage, strSize);
+      str[strSize - 1] = 0;
       return TRUE;
     }
 

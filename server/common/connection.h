@@ -129,19 +129,21 @@ private:
 
   void SendRawClientFrame( const uint8_t type);
 
-  UserHandler&              mUserHandler;
-  SessionStack              mStack;
-  uint32_t                  mWaitingFrameId;
-  uint32_t                  mClientCookie;
-  uint32_t                  mServerCookie;
-  uint16_t                  mLastReceivedCmd;
-  uint16_t                  mFrameSize;
-  uint8_t                   mVersion;
-  uint8_t                   mCipher;
-  uint_t                    mDataSize;
-  std::vector<uint8_t>		mData;
-  std::string         		mKey;
-
+  UserHandler&                  mUserHandler;
+  SessionStack                  mStack;
+  uint_t                        mDataSize;
+  std::vector<uint8_t>          mData;
+  uint32_t                      mWaitingFrameId;
+  uint32_t                      mClientCookie;
+  uint32_t                      mServerCookie;
+  uint16_t                      mLastReceivedCmd;
+  uint16_t                      mFrameSize;
+  uint8_t                       mVersion;
+  uint8_t                       mCipher;
+  union {
+    uint64_t _DES[3 * 16];
+    uint8_t  _3K[1];
+  }                             mKey;
 
   ClientConnection( const ClientConnection&);
   const ClientConnection& operator= (const ClientConnection&);

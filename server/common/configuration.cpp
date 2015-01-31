@@ -42,7 +42,9 @@ static const char DEFAULT_LISTEN_PORT[]             = "1761";
 static const char CLEAR_LOG_STREAM[]                = "";
 
 static const char CIPHER_PLAIN[]                    = "plain";
-static const char CIPHER_3K[]                       = "3K";
+static const char CIPHER_3K[]                       = "3k";
+static const char CIPHER_DES[]                      = "des";
+static const char CIPHER_3DES[]                     = "3des";
 
 static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE      = 1024;
 static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT     = 128;
@@ -143,9 +145,7 @@ SeekAtConfigurationSection( ifstream& config, uint_t& outConfigLine)
   while( ! config.eof ())
     {
       string line;
-
       getline( config, line);
-
       ++outConfigLine;
 
       size_t pos   = 0;
@@ -258,11 +258,18 @@ ParseConfigurationSection( ifstream& config, uint_t& inoutConfigLine)
           else if (token == CIPHER_3K)
             gMainSettings.mCipher = FRAME_ENCTYPE_3K;
 
+          else if (token == CIPHER_DES)
+            gMainSettings.mCipher = FRAME_ENCTYPE_DES;
+
+          else if (token == CIPHER_3DES)
+            gMainSettings.mCipher = FRAME_ENCTYPE_3DES;
+
           else
             {
               cerr << "The cipher '" << token << "' is not supported. ";
-              cerr << "Allowed ciphers are '" << CIPHER_PLAIN << "' and '";
-              cerr << CIPHER_3K <<"'.\n";
+              cerr << "Allowed ciphers are " << CIPHER_PLAIN << ", "
+                   << CIPHER_DES << ", " << CIPHER_3DES << " and ";
+              cerr << CIPHER_3K <<".\n";
 
               return false;
             }
@@ -994,6 +1001,14 @@ PrepareConfigurationSection( Logger& log)
 
   case FRAME_ENCTYPE_3K:
     logStream << CIPHER_3K;
+    break;
+
+  case FRAME_ENCTYPE_DES:
+    logStream << CIPHER_DES;
+    break;
+
+  case FRAME_ENCTYPE_3DES:
+    logStream << CIPHER_3DES;
     break;
 
   default:

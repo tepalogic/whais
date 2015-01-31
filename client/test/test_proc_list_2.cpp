@@ -38,7 +38,8 @@ check_procedure( WH_CONNECTION hnd, const ProcedureDescription& proc)
       uint_t paramType = 0;
       if (WProcParamType( hnd, name, parameter, &paramType) != WCS_OK)
         {
-          cout << "Cannot find procedure '" << name << "' parameter index " << parameter << endl;
+          cout << "Cannot find procedure '" << name << "' parameter index "
+               << parameter << endl;
           return false;
         }
 

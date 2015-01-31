@@ -58,12 +58,15 @@ struct INTERNAL_HANDLER
   uint32_t  expectedFrameId;
   uint32_t  serverCookie;
   uint32_t  clientCookie;
-  uint32_t  encKeySize;
   uint16_t  lastCmdRespReceived;
   uint16_t  buildingCmd;
   uint8_t   userId;
   uint8_t   cipher;
-  uint8_t   encriptionKey[1];
+  union
+  {
+    uint64_t  _DES[3 * 16];
+    uint8_t   _3K[1];
+  } keys;
 };
 
 #endif /* CONNECTOR_H_ */

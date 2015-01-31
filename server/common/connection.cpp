@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/endianness.h"
 #include "utils/wrandom.h"
 #include "utils/enc_3k.h"
+#include "utils/enc_des.h"
 #include "server/server_protocol.h"
 
 #include "connection.h"
@@ -86,20 +87,20 @@ ClientConnection::ClientConnection( UserHandler&            client,
                                     vector<DBSDescriptors>& databases)
   : mUserHandler( client),
     mStack(),
+    mDataSize( GetAdminSettings().mMaxFrameSize),
+    mData( mDataSize, 0),
     mWaitingFrameId( 0),
     mClientCookie( 0),
     mServerCookie( 0),
     mLastReceivedCmd( CMD_INVALID),
     mFrameSize( 0),
     mVersion( 1),
-    mCipher( FRAME_ENCTYPE_PLAIN),
-    mDataSize( GetAdminSettings().mMaxFrameSize),
-    mData( mDataSize, 0)
+    mCipher( FRAME_ENCTYPE_PLAIN)
 {
   assert( (mDataSize >= MIN_FRAME_SIZE) && (mDataSize <= MAX_FRAME_SIZE));
 
-  if (mCipher == FRAME_ENCTYPE_3K)
-    mDataSize -= mDataSize % sizeof( uint32_t);
+  if (mCipher != FRAME_ENCTYPE_PLAIN)
+    mDataSize -= mDataSize % sizeof( uint64_t);
 
   mUserHandler.mDesc = NULL;
   const uint16_t authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
@@ -113,7 +114,10 @@ ClientConnection::ClientConnection( UserHandler&            client,
 
   store_le_int32 (mVersion, &mData[FRAME_HDR_SIZE + FRAME_AUTH_VER_OFF]);
   store_le_int16 (mDataSize, &mData[FRAME_HDR_SIZE + FRAME_AUTH_SIZE_OFF]);
-  mData[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = GetAdminSettings().mCipher;;
+  mData[FRAME_HDR_SIZE + FRAME_AUTH_ENC_OFF] = GetAdminSettings().mCipher;
+
+  const uint64_t challenge = wh_rnd ();
+  store_le_int64 (challenge, &mData[FRAME_HDR_SIZE + FRAME_AUTH_CHALLENGE_OFF]);
 
   mUserHandler.mSocket.Write( &mData.front(), MIN_FRAME_SIZE);
   ReciveRawClientFrame();
@@ -144,20 +148,20 @@ ClientConnection::ClientConnection( UserHandler&            client,
                                           + FRAME_AUTH_RSP_SIZE_OFF]);
       if (mDataSize < MIN_FRAME_SIZE)
         {
-          throw ConnectionException( 
+          throw ConnectionException(
               _EXTRA( 0),
               "Cannot use the client's specified frame size of %u bytes.",
               mDataSize
                                     );
         }
 
-      if (mCipher == FRAME_ENCTYPE_3K)
-        mDataSize -= mDataSize % sizeof( uint32_t);
+      if (mCipher != FRAME_ENCTYPE_PLAIN)
+        mDataSize -= mDataSize % sizeof( uint64_t);
     }
   else if (mDataSize <
             load_le_int16 (&mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_SIZE_OFF]))
     {
-      throw ConnectionException( 
+      throw ConnectionException(
             _EXTRA( 0),
             "Client requested a frame size of %u bytes. The server's "
               "maximum frame size is set at %u bytes.",
@@ -168,7 +172,7 @@ ClientConnection::ClientConnection( UserHandler&            client,
 
   const char* const dbsName = _RC (const char*,
                                    &mData[FRAME_HDR_SIZE
-                                            + FRAME_AUTH_RSP_FIXED_SIZE]);
+                                          + FRAME_AUTH_RSP_FIXED_SIZE]);
   for (vector<DBSDescriptors>::iterator it = databases.begin();
       it != databases.end ();
       ++it)
@@ -188,80 +192,65 @@ ClientConnection::ClientConnection( UserHandler&            client,
     }
 
   mUserHandler.mRoot = (mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_USR_OFF] == 0)
-                          ? true
-                          : false;
+                         ? true
+                         : false;
 
-  if (mCipher == FRAME_ENCTYPE_PLAIN)
-    {
-      const string passwd = _RC (const char*,
-                                 &mData.front()
-                                    + FRAME_HDR_SIZE
-                                    + FRAME_AUTH_RSP_FIXED_SIZE
-                                    + strlen( dbsName) + 1);
-      if (mUserHandler.mRoot)
-        {
-          if (mUserHandler.mDesc->mRootPass != passwd)
-            {
-              throw ConnectionException( 
-                        _EXTRA( 0),
-                        "Failed to authenticate database '%s' root user.",
-                        dbsName
-                                        );
-            }
-          else
-            mKey = mUserHandler.mDesc->mRootPass;
-        }
-      else
-        {
-          if (mUserHandler.mDesc->mUserPasswd != passwd)
-            {
-              throw ConnectionException( 
-                            _EXTRA( 0),
-                            "Failed to authenticate database '%s' user.",
-                            dbsName
-                                        );
-            }
-          else
-            mKey = mUserHandler.mDesc->mUserPasswd;
-        }
-    }
-  else if (mCipher == FRAME_ENCTYPE_3K)
-    {
-      if (mUserHandler.mRoot)
-         mKey = mUserHandler.mDesc->mRootPass;
 
-      else
-        mKey = mUserHandler.mDesc->mUserPasswd;
+  const string& password = mUserHandler.mRoot
+                             ? mUserHandler.mDesc->mRootPass
+                             : mUserHandler.mDesc->mUserPasswd;
+  if (mCipher == FRAME_ENCTYPE_3K)
+    {
+      strncpy (_RC (char*, mKey._3K), password.c_str (), sizeof mKey);
+      mKey._3K[sizeof mKey - 1] = 0;
     }
   else
     {
-      assert( false);
+      wh_prepare_des_keys (_RC (const uint8_t*, password.c_str ()),
+                           password.length (),
+                           mCipher == FRAME_ENCTYPE_3DES,
+                           mKey._DES);
     }
 
+  uint8_t challengeRsp[sizeof challenge];
+  memcpy (challengeRsp,
+          &mData[FRAME_HDR_SIZE + FRAME_AUTH_RSP_CHALLENGE_OFF],
+          sizeof challengeRsp);
+  wh_buff_des_decode (_RC (const uint8_t*, password.c_str ()),
+                      challengeRsp,
+                      sizeof challengeRsp);
+
+  if (load_le_int64 (challengeRsp) != challenge)
+    {
+      throw ConnectionException(
+                _EXTRA( 0),
+                mUserHandler.mRoot
+                     ? "Failed to authenticate database '%s' root user."
+                     : "Failed to authenticate database '%s' user.",
+                dbsName
+                               );
+    }
+
+  assert ((mCipher == FRAME_ENCTYPE_PLAIN)
+          || (mCipher == FRAME_ENCTYPE_3K)
+          || (mCipher == FRAME_ENCTYPE_DES)
+          || (mCipher == FRAME_ENCTYPE_3DES));
 }
 
 
 uint_t
 ClientConnection::MaxSize() const
 {
-  assert( (mCipher == FRAME_ENCTYPE_PLAIN) || (mCipher == FRAME_ENCTYPE_3K));
+  assert ((mCipher == FRAME_ENCTYPE_PLAIN)
+          || (mCipher == FRAME_ENCTYPE_3K)
+          || (mCipher == FRAME_ENCTYPE_DES)
+          || (mCipher == FRAME_ENCTYPE_3DES));
+
   assert( (MIN_FRAME_SIZE<= mDataSize) && (mDataSize <= MAX_FRAME_SIZE));
 
-  uint_t metaDataSize = 0;
-
-  switch( mCipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( false);
-  }
+  uint_t metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+  if (mCipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   return mDataSize - metaDataSize;
 }
@@ -270,21 +259,9 @@ ClientConnection::MaxSize() const
 uint_t
 ClientConnection::DataSize() const
 {
-  uint_t metaDataSize = 0;
-
-  switch( mCipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( false);
-  }
+  uint_t metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+  if (mCipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   assert( (mFrameSize == 0) || (mFrameSize >= metaDataSize));
   assert( mFrameSize <= mDataSize);
@@ -297,21 +274,9 @@ ClientConnection::DataSize() const
 uint8_t*
 ClientConnection::Data()
 {
-  uint_t metaDataSize = 0;
-
-  switch( mCipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( false);
-  }
+  uint_t metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+  if (mCipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   return &mData.front() + metaDataSize;
 }
@@ -322,21 +287,9 @@ ClientConnection::DataSize( const uint16_t size)
 {
   assert( size <= MaxSize());
 
-  uint_t metaDataSize = 0;
-
-  switch( mCipher)
-  {
-  case FRAME_ENCTYPE_PLAIN:
-    metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  case FRAME_ENCTYPE_3K:
-    metaDataSize = FRAME_HDR_SIZE + ENC_3K_HDR_SIZE + PLAIN_HDR_SIZE;
-    break;
-
-  default:
-    assert( false);
-  }
+  uint_t metaDataSize = FRAME_HDR_SIZE + PLAIN_HDR_SIZE;
+  if (mCipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
   mFrameSize = size + metaDataSize;
 
@@ -347,13 +300,11 @@ ClientConnection::DataSize( const uint16_t size)
 uint8_t*
 ClientConnection::RawCmdData()
 {
-  if (mCipher == FRAME_ENCTYPE_PLAIN)
-    return &mData.front() + FRAME_HDR_SIZE;
+  uint_t metaDataSize = FRAME_HDR_SIZE;
+  if (mCipher != FRAME_ENCTYPE_PLAIN)
+    metaDataSize += ENC_HDR_SIZE;
 
-  else if (mCipher == FRAME_ENCTYPE_3K)
-    return &mData.front() + FRAME_HDR_SIZE + ENC_3K_HDR_SIZE;
-
-  return NULL;
+  return &mData.front() + metaDataSize;
 }
 
 
@@ -377,7 +328,37 @@ ClientConnection::ReciveRawClientFrame()
   {
   case FRAME_TYPE_NORMAL:
   case FRAME_TYPE_AUTH_CLNT_RSP:
-    //These are legitimate frame types that could be received by a server.
+      mFrameSize = load_le_int16 (&mData.front() + FRAME_SIZE_OFF);
+      if ((mFrameSize < frameRead)
+          || (mFrameSize > mDataSize))
+        {
+          throw ConnectionException( _EXTRA( 0),
+                                     "Invalid frame received.");
+        }
+
+      while( frameRead < mFrameSize)
+        {
+          const uint16_t chunkSize =
+                       mUserHandler.mSocket.Read( &mData[frameRead],
+                                                  mFrameSize - frameRead);
+          if (chunkSize == 0)
+            throw ConnectionException( _EXTRA( 0),
+                                       "Connection reset by peer.");
+
+          frameRead += chunkSize;
+        }
+
+      assert( frameRead == mFrameSize);
+
+      if (load_le_int32 (&mData.front() + FRAME_ID_OFF) != mWaitingFrameId)
+        {
+          throw ConnectionException( _EXTRA( 0),
+                                     "Connection with peer is out of sync");
+
+        }
+
+      if (mCipher != mData[FRAME_ENCTYPE_OFF])
+        throw ConnectionException( _EXTRA( 0), "Peer has used a wrong cipher.");
     break;
 
   case FRAME_TYPE_TIMEOUT:
@@ -392,72 +373,66 @@ ClientConnection::ReciveRawClientFrame()
                                "Unexpected frame type received.");
   }
 
-  mFrameSize = load_le_int16 (&mData.front() + FRAME_SIZE_OFF);
+  if (mData[FRAME_TYPE_OFF] == FRAME_TYPE_AUTH_CLNT_RSP)
+    return ;
 
-  if ((mFrameSize < frameRead)
-      || (mFrameSize > mDataSize))
+  if (mCipher == FRAME_ENCTYPE_3K)
     {
-      throw ConnectionException( _EXTRA( 0),
-                                 "Invalid frame received.");
-    }
+      const uint keyLen = strlen (_RC (const char*, mKey._3K));
 
-  while( frameRead < mFrameSize)
-    {
-      const uint16_t chunkSize =
-                   mUserHandler.mSocket.Read( &mData[frameRead],
-                                              mFrameSize - frameRead);
-      if (chunkSize == 0)
-        throw ConnectionException( _EXTRA( 0),
-                                   "Connection reset by peer.");
-
-      frameRead += chunkSize;
-    }
-
-  assert( frameRead == mFrameSize);
-
-  const uint32_t frameId = load_le_int32 (&mData.front() + FRAME_ID_OFF);
-  if (frameId != mWaitingFrameId)
-    {
-      throw ConnectionException( _EXTRA( 0),
-                                 "Connection with peer is out of sync");
-
-    }
-
-  const uint32_t encType = mData[FRAME_ENCTYPE_OFF];
-  if (encType != mCipher)
-    throw ConnectionException( _EXTRA( 0), "Peer has used a wrong cipher.");
-
-  if (encType == FRAME_ENCTYPE_3K)
-    {
       uint8_t prev = 0;
-      for (uint_t i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+      for (uint_t i = 0; i < ENC_PLAIN_SIZE_OFF; ++i)
         {
-          mData[FRAME_HDR_SIZE + i] ^= mKey.at (prev % mKey.length());
+          mData[FRAME_HDR_SIZE + i] ^= mKey._3K[prev % keyLen];
           prev = mData[FRAME_HDR_SIZE + i];
         }
 
-      const uint32_t firstKing = load_le_int32 (&mData.front() 	    +
-                                                  FRAME_HDR_SIZE 	    +
-                                                  ENC_3K_FIRST_KING_OFF);
-      const uint32_t secondKing = load_le_int32 (&mData.front() 	    +
-                                                   FRAME_HDR_SIZE      	    +
-                                                   ENC_3K_SECOND_KING_OFF);
-
-      wh_buff_3k_decode( 
+      const uint32_t firstKing = load_le_int32 (&mData.front()
+                                                + FRAME_HDR_SIZE
+                                                + ENC_3K_FIRST_KING_OFF);
+      const uint32_t secondKing = load_le_int32 (&mData.front()
+                                                 + FRAME_HDR_SIZE
+                                                 + ENC_3K_SECOND_KING_OFF);
+      wh_buff_3k_decode(
                       firstKing,
                       secondKing,
-                      _RC (const uint8_t*, mKey.c_str()),
-                      mKey.length(),
-                      &mData.front() + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
-                      mFrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
+                      mKey._3K,
+                      keyLen,
+                      &mData.front() + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF,
+                      mFrameSize - (FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF)
                          );
 
-      const uint16_t plainSize = load_le_int16 (&mData.front() 	  +
-                                                  FRAME_HDR_SIZE 	  +
-                                                  ENC_3K_PLAIN_SIZE_OFF);
+      const uint16_t plainSize = load_le_int16 (&mData.front()
+                                                  + FRAME_HDR_SIZE
+                                                  + ENC_PLAIN_SIZE_OFF);
       mFrameSize = plainSize;
       store_le_int16 (plainSize, &mData.front() + FRAME_SIZE_OFF);
     }
+  else if (mCipher != FRAME_ENCTYPE_PLAIN)
+    {
+      if (mCipher == FRAME_ENCTYPE_DES)
+        {
+          wh_buff_des_decode_ex (mKey._DES,
+                                 &mData.front() + FRAME_HDR_SIZE,
+                                 mFrameSize - FRAME_HDR_SIZE);
+        }
+      else
+        {
+          assert (mCipher == FRAME_ENCTYPE_3DES);
+
+          wh_buff_3des_decode_ex (mKey._DES,
+                                  &mData.front() + FRAME_HDR_SIZE,
+                                  mFrameSize - FRAME_HDR_SIZE);
+        }
+
+      const uint16_t plainSize = load_le_int16 (&mData.front()
+                                                  + FRAME_HDR_SIZE
+                                                  + ENC_PLAIN_SIZE_OFF);
+      mFrameSize = plainSize;
+      store_le_int16 (plainSize, &mData.front() + FRAME_SIZE_OFF);
+    }
+  else
+    wh_buff_des_decode_ex (mKey._DES, RawCmdData (), sizeof (uint64_t));
 }
 
 
@@ -468,6 +443,8 @@ ClientConnection::SendRawClientFrame( const uint8_t type)
 
   if (mCipher == FRAME_ENCTYPE_3K)
     {
+      const uint_t keyLen = strlen (_RC (const char*, mKey._3K));
+
       const uint16_t plainSize = mFrameSize;
 
       while( mFrameSize % sizeof( uint32_t) != 0)
@@ -484,28 +461,55 @@ ClientConnection::SendRawClientFrame( const uint8_t type)
                                   + ENC_3K_SECOND_KING_OFF);
 
       uint8_t prev = 0;
-      for (uint_t i = 0; i < ENC_3K_PLAIN_SIZE_OFF; ++i)
+      for (uint_t i = 0; i < ENC_PLAIN_SIZE_OFF; ++i)
         {
           const uint8_t temp = mData[FRAME_HDR_SIZE + i];
 
-          mData[FRAME_HDR_SIZE + i] ^= mKey.at (prev % mKey.length());
+          mData[FRAME_HDR_SIZE + i] ^= mKey._3K[prev % keyLen];
           prev = temp;
         }
 
       store_le_int16 (plainSize,
-                      &mData.front() + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF);
+                      &mData.front() + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF);
       store_le_int16 (wh_rnd() & 0xFFFF,
-                      &mData.front() + FRAME_HDR_SIZE + ENC_3K_SPARE_OFF);
+                      &mData.front() + FRAME_HDR_SIZE + ENC_SPARE_OFF);
 
-      wh_buff_3k_encode( 
+      wh_buff_3k_encode(
                       firstKing,
                       secondKing,
-                      _RC (const uint8_t*, mKey.c_str()),
-                      mKey.length(),
-                      &mData.front() + FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF,
-                      mFrameSize - (FRAME_HDR_SIZE + ENC_3K_PLAIN_SIZE_OFF)
+                      mKey._3K,
+                      keyLen,
+                      &mData.front() + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF,
+                      mFrameSize - (FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF)
                          );
     }
+  else if (mCipher != FRAME_ENCTYPE_PLAIN)
+    {
+      const uint16_t plainSize = mFrameSize;
+
+      while( mFrameSize % sizeof( uint64_t) != 0)
+        mData[mFrameSize++] = wh_rnd() & 0xFF;
+
+      store_le_int16 (plainSize,
+                      &mData.front() + FRAME_HDR_SIZE + ENC_PLAIN_SIZE_OFF);
+
+      if (mCipher == FRAME_ENCTYPE_DES)
+        {
+          wh_buff_des_encode_ex (mKey._DES,
+                                 &mData.front() + FRAME_HDR_SIZE,
+                                 mFrameSize - FRAME_HDR_SIZE);
+        }
+      else
+        {
+          assert (mCipher == FRAME_ENCTYPE_3DES);
+
+          wh_buff_3des_encode_ex (mKey._DES,
+                                  &mData.front() + FRAME_HDR_SIZE,
+                                  mFrameSize - FRAME_HDR_SIZE);
+        }
+    }
+  else
+    wh_buff_des_encode_ex (mKey._DES, RawCmdData (), sizeof (uint64_t));
 
   store_le_int16 (mFrameSize, &mData.front() + FRAME_SIZE_OFF);
   store_le_int32 (++mWaitingFrameId, &mData.front() + FRAME_ID_OFF);
