@@ -45,6 +45,7 @@ WLIB_PROC_DESCRIPTION       gProcTableFieldsCount;
 WLIB_PROC_DESCRIPTION       gProcTableFieldByIndex;
 WLIB_PROC_DESCRIPTION       gProcTableFieldByName;
 WLIB_PROC_DESCRIPTION       gProcTableRowsCount;
+WLIB_PROC_DESCRIPTION       gProcTableReusableRowsCount;
 WLIB_PROC_DESCRIPTION       gProcTableAddRow;
 WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
 WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
@@ -638,6 +639,30 @@ proc_table_rows_count( SessionStack& stack, ISession&)
 
 
 static WLIB_STATUS
+proc_table_reusable_rows_count( SessionStack& stack, ISession&)
+{
+  IOperand& op = stack[stack.Size() - 1].Operand();
+
+  if (op.IsNull())
+    {
+      stack.Pop (1);
+      stack.Push( DUInt64 (0));
+
+      return WOP_OK;
+    }
+
+  ITable& table = op.GetTable();
+
+  DUInt64 result( table.AllocatedRows());
+
+  stack.Pop (1);
+  stack.Push( result);
+
+  return WOP_OK;
+}
+
+
+static WLIB_STATUS
 proc_table_add_row( SessionStack& stack, ISession&)
 {
   IOperand& op = stack[stack.Size() - 1].Operand();
@@ -813,6 +838,11 @@ base_tables_init()
   gProcTableRowsCount.localsCount = 2;
   gProcTableRowsCount.localsTypes = tableFieldsLocals; //reusing
   gProcTableRowsCount.code        = proc_table_rows_count;
+
+  gProcTableReusableRowsCount.name        = "table_resuable_rows";
+  gProcTableReusableRowsCount.localsCount = 2;
+  gProcTableReusableRowsCount.localsTypes = tableFieldsLocals; //reusing
+  gProcTableReusableRowsCount.code        = proc_table_reusable_rows_count;
 
   gProcTableAddRow.name        = "table_add_row";
   gProcTableAddRow.localsCount = 2;

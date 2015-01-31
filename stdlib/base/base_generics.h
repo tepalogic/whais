@@ -65,6 +65,7 @@ extern whais::WLIB_PROC_DESCRIPTION     gProcCeil;
 extern whais::WLIB_PROC_DESCRIPTION     gProcRound;
 extern whais::WLIB_PROC_DESCRIPTION     gProcFloor;
 extern whais::WLIB_PROC_DESCRIPTION     gProcAbs;
+extern whais::WLIB_PROC_DESCRIPTION     gProcRnd;
 
 
 whais::WLIB_STATUS

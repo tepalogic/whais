@@ -1576,7 +1576,8 @@ public:
 
   TableOperand( TableReference& tableRef)
     : BaseOperand(),
-      mTableRef( &tableRef)
+      mTableRef( &tableRef),
+      mChangeable (true)
   {
     mTableRef->IncrementRefCount();
   }

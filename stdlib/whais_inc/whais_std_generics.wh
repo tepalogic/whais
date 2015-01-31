@@ -61,7 +61,7 @@ EXTERN PROCEDURE next_rreal (v AS RICHREAL) RETURN RICHREAL;
 
 #Pause the execution thread for specified amount of time
 #In:
-#   @tmo - The amount of time to sleep in miliseconds.
+#   @tmo - The amount of time to sleep in milliseconds.
 #Out:
 #   TRUE if successfully.
 EXTERN PROCEDURE sleep (tmo AS UINT64) RETURN BOOL;
@@ -73,8 +73,10 @@ EXTERN PROCEDURE sleep (tmo AS UINT64) RETURN BOOL;
 #   TRUE if successfully.
 EXTERN PROCEDURE write_log (t AS TEXT) RETURN BOOL;
 
-EXTERN PROCEDURE ceil (v as RICHREAL) RETURN INT64;
-EXTERN PROCEDURE floor (v as RICHREAL) RETURN INT64;
-EXTERN PROCEDURE round (v as RICHREAL) RETURN INT64;
+EXTERN PROCEDURE ceil (v AS RICHREAL) RETURN INT64;
+EXTERN PROCEDURE floor (v AS RICHREAL) RETURN INT64;
+EXTERN PROCEDURE round (v AS RICHREAL) RETURN INT64;
 
-EXTERN PROCEDURE abs (v as RICHREAL) RETURN RICHREAL;
+EXTERN PROCEDURE abs (v AS RICHREAL) RETURN RICHREAL;
+
+EXTERN PROCEDURE random (maxValue AS UINT64) RETURN UINT64;

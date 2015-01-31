@@ -94,7 +94,7 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
 
                                                     &gProcMinRR,
                                                     &gProcMaxRR,
-          //Base generics procedures
+          //Base generic procedures
                                                     &gProcPrevB,
                                                     &gProcNextB,
 
@@ -147,6 +147,8 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcRound,
                                                     &gProcFloor,
                                                     &gProcAbs,
+
+                                                    &gProcRnd,
 
                         /* Date & time procedures. */
 
@@ -223,6 +225,7 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcTableFieldByIndex,
                                                     &gProcTableFieldByName,
                                                     &gProcTableRowsCount,
+                                                    &gProcTableReusableRowsCount,
                                                     &gProcTableAddRow,
                                                     &gProcTableFindRemovedRow,
                                                     &gProcTableRemoveRow,

@@ -30,6 +30,7 @@
 #include "stdlib/interface.h"
 #include "utils/wtypes.h"
 #include "utils/wutf.h"
+#include "utils/wrandom.h"
 #include "interpreter/interpreter.h"
 
 #include "base_types.h"
@@ -86,6 +87,8 @@ WLIB_PROC_DESCRIPTION     gProcCeil;
 WLIB_PROC_DESCRIPTION     gProcRound;
 WLIB_PROC_DESCRIPTION     gProcFloor;
 WLIB_PROC_DESCRIPTION     gProcAbs;
+
+WLIB_PROC_DESCRIPTION     gProcRnd;
 
 
 
@@ -319,6 +322,24 @@ abs (SessionStack& stack, ISession& session)
 }
 
 
+static WLIB_STATUS
+rnd (SessionStack& stack, ISession& session)
+{
+  DUInt64 maxValue;
+  stack[stack.Size() - 1].Operand().GetValue( maxValue);
+
+  uint64_t result = wh_rnd ();
+  if ( ! maxValue.IsNull () && (maxValue.mValue > 0))
+    result %= maxValue.mValue;
+
+  stack.Pop (1);
+  stack.Push (DUInt64 (result));
+
+  return WOP_OK;
+}
+
+
+
 WLIB_STATUS
 base_constants_init()
 {
@@ -531,6 +552,14 @@ base_constants_init()
   gProcAbs.localsCount      = 2;
   gProcAbs.localsTypes      = absLocalsType;
   gProcAbs.code             = abs;
+
+  static const uint8_t* rndLocalsType[] = { gUInt64Type, gUInt64Type };
+
+  gProcRnd.name             = "random";
+  gProcRnd.localsCount      = 2;
+  gProcRnd.localsTypes      = rndLocalsType;
+  gProcRnd.code             = rnd;
+
 
   return WOP_OK;
 }

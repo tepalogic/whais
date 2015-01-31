@@ -32,7 +32,6 @@ namespace whais {
 
 struct CreateIndexCallbackContext
 {
-  CreateIndexCallbackContext() {}
   virtual ~CreateIndexCallbackContext() {};
 
   uint64_t      mRowIndex;
