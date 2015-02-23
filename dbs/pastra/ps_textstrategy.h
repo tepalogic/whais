@@ -30,78 +30,111 @@
 #include "ps_container.h"
 #include "ps_varstorage.h"
 
+#include "utils/wthread.h"
+
 
 namespace whais {
 
 namespace pastra {
 
-//Justr forward declarations for now!
-class TemporalText;
-class RowFieldText;
+//Just forward declarations for now!
+class PrototypeTable;
+class StringMatcher;
 
 }
 
 class ITextStrategy
 {
+  friend class std::auto_ptr<ITextStrategy>;
+  friend class pastra::PrototypeTable;
+  friend class pastra::StringMatcher;
+
 public:
-  ITextStrategy() {};
-  virtual ~ITextStrategy() {};
+  bool operator== (ITextStrategy& o);
 
-  virtual uint_t ReferenceCount() const = 0;
+  uint64_t CharsCount();
+  uint64_t CharsUntilOffset( const uint64_t offset);
+  uint64_t OffsetOfChar( const uint64_t index);
+  DChar CharAt( const uint64_t index);
 
-  virtual void   IncreaseReferenceCount() = 0;
+  ITextStrategy* ToCase (const bool toLower);
 
-  virtual void   DecreaseReferenceCount() = 0;
+  ITextStrategy* Append( const uint32_t ch);
+  ITextStrategy* Append( ITextStrategy& text);
+  ITextStrategy* Append( ITextStrategy& text,
+                         const uint64_t fromOff,
+                         const uint64_t toOff);
 
-  virtual uint_t ShareCount() const = 0;
+  ITextStrategy* UpdateCharAt(const uint32_t   ch,
+                              const uint64_t   index);
 
-  virtual void   IncreaseShareCount() = 0;
+  DUInt64 FindMatch (ITextStrategy&   text,
+                     const uint64_t   fromCh,
+                     const uint64_t   toCh,
+                     const bool       ignoreCase);
 
-  virtual void   DecreaseShareCount() = 0;
+  ITextStrategy* Replace (ITextStrategy&   text,
+                          ITextStrategy&   newSubstr,
+                          const uint64_t   fromCh,
+                          const uint64_t   toCh,
+                          const bool       ignoreCase);
+  uint64_t Utf8Count();
+  void ReadUtf8 (const uint64_t offset,
+                 const uint64_t count,
+                 uint8_t *const buffer);
+  void WriteUtf8 (const uint64_t       offset,
+                  const uint64_t       count,
+                  const uint8_t* const buffer);
+  void TruncateUtf8 (const uint64_t offset);
 
-  virtual uint64_t CharsCount() = 0;
+  ITextStrategy*  MakeMirrorCopy ();
+  ITextStrategy*  MakeClone ();
 
-  virtual uint64_t CharsUntilOffset( const uint64_t offset) = 0;
+  virtual void  ReleaseReference ();
 
-  virtual uint64_t OffsetOfChar( const uint64_t index) = 0;
-
-  virtual uint64_t BytesCount() const = 0;
-
-  virtual void Duplicate( ITextStrategy&  source,
-                          const uint64_t  maxCharsCount) = 0;
-
-  virtual DChar   CharAt( const uint64_t index) = 0;
-
-  virtual void    Append( const uint32_t ch) = 0;
-
-  virtual void    Append( ITextStrategy& text,
-                          const uint64_t fromOff,
-                          const uint64_t toOff) = 0;
-
-  virtual void    Truncate( uint64_t        newCharCount,
-                            ITextStrategy** inoutStrategy) = 0;
-
-  virtual void    UpdateCharAt( const uint32_t   ch,
-                                const uint64_t   index,
-                                ITextStrategy**  inoutStrategy) = 0;
-
-  virtual void ReadUtf8 (const uint64_t offset,
-                         const uint64_t count,
-                         uint8_t *const buffer) = 0;
-
-  virtual void WriteUtf8 (const uint64_t       offset,
-                          const uint64_t       count,
-                          const uint8_t* const buffer) = 0;
-
-  virtual void TruncateUtf8 (const uint64_t newSize) = 0;
-
-  virtual bool                  IsRowValue() const = 0;
-
-  virtual pastra::TemporalText& GetTemporal() = 0;
-
-  virtual pastra::RowFieldText& GetRow() = 0;
+  virtual pastra::TemporalContainer& GetTemporalContainer ();
+  virtual pastra::VariableSizeStore& GetRowStorage ();
 
 protected:
+  uint64_t CharsUntilOffsetU ( const uint64_t offset);
+  uint64_t OffsetOfCharU ( const uint64_t index);
+  DChar CharAtU ( const uint64_t index);
+
+  ITextStrategy* DuplicateU ();
+
+  ITextStrategy* ToCaseU (const bool toLower);
+
+  ITextStrategy* AppendU (const uint32_t ch);
+  ITextStrategy* AppendU (ITextStrategy& text);
+  ITextStrategy* AppendU (ITextStrategy& text,
+                          const uint64_t fromOff,
+                          const uint64_t toOff);
+
+  ITextStrategy* UpdateCharAtU (const uint32_t   ch,
+                               const uint64_t   index);
+
+  virtual uint64_t Utf8CountU () = 0;
+  virtual void ReadUtf8U (const uint64_t offset,
+                          const uint64_t count,
+                          uint8_t *const buffer) = 0;
+  virtual void WriteUtf8U (const uint64_t       offset,
+                           const uint64_t       count,
+                           const uint8_t* const buffer) = 0;
+  virtual void TruncateUtf8U (const uint64_t offset) = 0;
+
+  ITextStrategy (uint32_t charsCount = 0);
+  virtual ~ITextStrategy ();
+
+  virtual uint32_t ReferenceCount() const;
+  virtual uint32_t MirrorsCount() const;
+
+  pastra::StringMatcher*  mMatcher;
+  uint64_t                mCachedCharsCount;
+  uint64_t                mCachedCharIndex;
+  uint64_t                mCachedCharIndexOffset;
+  uint32_t                mMirrorsCount;
+  uint32_t                mCopyReferences;
+  Lock                    mLock;
 };
 
 
@@ -109,197 +142,159 @@ protected:
 namespace pastra
 {
 
-
-
-class GenericText : public ITextStrategy
+class NullText : public ITextStrategy
 {
+  friend class PrototypeTable;
+
 public:
-  GenericText( uint64_t bytesSize);
-
-  //Implementations of public ITextStrategy
-  virtual uint_t ReferenceCount() const;
-
-  virtual void   IncreaseReferenceCount();
-
-  virtual void   DecreaseReferenceCount();
-
-  virtual uint_t ShareCount() const;
-
-  virtual void   IncreaseShareCount();
-
-  virtual void   DecreaseShareCount();
-
-  virtual uint64_t CharsCount();
-
-  virtual uint64_t CharsUntilOffset( const uint64_t offset);
-
-  virtual uint64_t OffsetOfChar( const uint64_t index);
-
-  virtual uint64_t BytesCount() const;
-
-  virtual void Duplicate( ITextStrategy&  source,
-                          const uint64_t  bytesCount);
-
-  virtual DChar   CharAt( const uint64_t index);
-
-  virtual void    Append( const uint32_t ch);
-
-  virtual void    Append( ITextStrategy& text,
-                          const uint64_t fromOff,
-                          const uint64_t toOff);
-
-  virtual void    Truncate( uint64_t          newCharCount,
-                            ITextStrategy**   inoutStrategy);
-
-  virtual void    UpdateCharAt( const uint32_t   ch,
-                                const uint64_t   index,
-                                ITextStrategy**  inoutStrategy);
-
-  virtual bool IsRowValue() const;
-
-  virtual TemporalText& GetTemporal();
-
-  virtual RowFieldText& GetRow();
-
-protected:
-  static const uint64_t INVALID_CACHE_VALUE     = ~0ull;
-  static const uint_t   GENERIC_CACHE_BUFF_SIZE = 512;
-
-
-  virtual ~GenericText();
-
-  virtual void ClearMyself() = 0;
-
-  uint64_t    mBytesSize;
-  uint64_t    mCachedCharCount;
-  uint64_t    mCachedCharIndex;
-  uint64_t    mCachedCharIndexOffset;
-  uint64_t    mCacheStartOff;
-  uint_t      mCacheValid;
-  uint_t      mReferenceCount;
-  uint_t      mShareCount;
-  uint8_t     mCacheBuffer[GENERIC_CACHE_BUFF_SIZE];
-
-
-};
-
-
-class NullText : public GenericText
-{
-public:
-  //Implementations of ITextStrategy
-  virtual uint_t ReferenceCount() const;
-
-  virtual void   IncreaseReferenceCount();
-
-  virtual void   DecreaseReferenceCount();
-
-  virtual uint_t ShareCount() const;
-
-  virtual void   IncreaseShareCount();
-
-  virtual void   DecreaseShareCount();
-
-  virtual void ReadUtf8 (const uint64_t offset,
-                         const uint64_t count,
-                         uint8_t *const buffer);
-
-  virtual void WriteUtf8 (const uint64_t       offset,
-                          const uint64_t       count,
-                          const uint8_t* const buffer);
-
-  virtual void TruncateUtf8 (const uint64_t newSize);
-
   static NullText& GetSingletoneInstace();
 
 protected:
   NullText();
-  ~NullText();
 
-  //Implementations of GenericText
-  virtual void ClearMyself();
-
-};
-
-
-class TemporalText : public GenericText
-{
-  friend class PrototypeTable;
-public:
-  TemporalText( const uint8_t* const utf8Str,
-                const uint64_t       unitsCount = ~0);
-
-  //Implementations of ITextStrategy
-  virtual void ReadUtf8 (const uint64_t offset,
+  virtual uint64_t Utf8CountU ();
+  virtual void ReadUtf8U (const uint64_t offset,
                          const uint64_t count,
                          uint8_t *const buffer);
-
-  virtual void WriteUtf8 (const uint64_t       offset,
+  virtual void WriteUtf8U (const uint64_t       offset,
                           const uint64_t       count,
                           const uint8_t* const buffer);
+  virtual void TruncateUtf8U (const uint64_t offset);
 
-  virtual void TruncateUtf8 (const uint64_t   newSize);
 
-  virtual void UpdateCharAt( const uint32_t   ch,
-                             const uint64_t   index,
-                             ITextStrategy**  inoutStrategy);
+  virtual uint32_t ReferenceCount() const;
+  virtual uint32_t MirrorsCount() const;
 
-  virtual TemporalText& GetTemporal();
-
-protected:
-  virtual void ClearMyself();
-
-  TemporalContainer mStorage;
+  virtual void ReleaseReference ();
 };
 
 
-class RowFieldText : public GenericText
+class TemporalText : public ITextStrategy
 {
   friend class PrototypeTable;
+
+public:
+  TemporalText( const uint8_t* const utf8Str    = NULL,
+                const uint64_t       unitsCount = ~0);
+
+  virtual TemporalContainer& GetTemporalContainer ();
+
+protected:
+  TemporalContainer mStorage;
+
+  virtual uint64_t Utf8CountU ();
+  virtual void ReadUtf8U (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t *const buffer);
+  virtual void WriteUtf8U (const uint64_t       offset,
+                          const uint64_t       count,
+                          const uint8_t* const buffer);
+  virtual void TruncateUtf8U (const uint64_t offset);
+
+private:
+  TemporalText (const TemporalText&);
+  TemporalText operator= (const TemporalText&);
+};
+
+
+class RowFieldText : public ITextStrategy
+{
   friend class VariableSizeStore;
+  friend class PrototypeTable;
 
 public:
   RowFieldText( VariableSizeStore& storage,
                 const uint64_t     firstEntry,
                 const uint64_t     bytesSize);
 
-  //Implementations of ITextStrategy
-  virtual void ReadUtf8 (const uint64_t offset,
-                         const uint64_t count,
-                         uint8_t *const buffer);
 
-  virtual void WriteUtf8 (const uint64_t       offset,
-                          const uint64_t       count,
-                          const uint8_t* const buffer);
-
-  virtual void TruncateUtf8 (const uint64_t newSize);
-
-  virtual void UpdateCharAt( const uint32_t   ch,
-                             const uint64_t   index,
-                             ITextStrategy**  inoutStrategy);
-
-  virtual bool IsRowValue() const;
-
-  virtual TemporalText& GetTemporal();
-
-  virtual RowFieldText& GetRow();
+  virtual TemporalContainer& GetTemporalContainer ();
+  virtual VariableSizeStore& GetRowStorage ();
 
 protected:
   virtual ~RowFieldText();
 
-  virtual void ClearMyself();
+  virtual uint64_t Utf8CountU ();
+  virtual void ReadUtf8U (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t *const buffer);
+  virtual void WriteUtf8U (const uint64_t       offset,
+                          const uint64_t       count,
+                          const uint8_t* const buffer);
+  virtual void TruncateUtf8U (const uint64_t offset);
+
 
   static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof( uint32_t);
   static const uint32_t MAX_CHARS_COUNT      = 0xFFFFFFFF;
   static const uint32_t MAX_BYTES_COUNT      = 0xFFFFFFFF;
 
   const uint64_t        mFirstEntry;
+  const uint64_t        mUtf8Count;
   VariableSizeStore&    mStorage;
-  TemporalText*         mTempText;
+  TemporalContainer     mTempContainer;
 
 private:
   RowFieldText( const RowFieldText&);
   RowFieldText operator= (const RowFieldText&);
+};
+
+
+
+class StringMatcher
+{
+private:
+  static const int       ALPHABET_SIZE           = 256;
+  static const int       MAX_TEXT_CACHE_SIZE     = 1024;
+  static const int       MAX_PATTERN_SIZE        = 255;
+  static const int64_t   PATTERN_NOT_FOUND       = -1;
+
+
+public:
+  explicit StringMatcher( ITextStrategy& pattern);
+
+  int64_t FindMatch (ITextStrategy&         text,
+                     const uint64_t         fromChar,
+                     const uint64_t         toChar,
+                     const bool             ignoreCase);
+
+  int64_t FindMatchRaw (ITextStrategy&      text,
+                        const uint64_t      fromChar,
+                        const uint64_t      toChar,
+                        const bool          ignoreCase);
+
+private:
+  uint_t ComparingWindowShift( uint_t position) const;
+
+  bool SuffixesMatch() const;
+
+  uint_t FindInCache() const;
+
+  void CountCachedChars( const uint_t offset);
+
+  bool FillTextCache();
+
+  int64_t FindSubstr();
+
+
+  ITextStrategy*        mText;
+  ITextStrategy&        mPattern;
+
+  uint8_t               mPatternSize;
+  bool                  mIgnoreCase;
+
+  uint64_t              mLastChar;
+  uint64_t              mCurrentChar;
+  uint64_t              mCurrentRawOffset;
+  uint64_t              mCacheStartPos;
+
+  uint8_t* const        mPatternRaw;
+  uint8_t* const        mTextRawCache;
+
+  uint16_t              mAvailableCache;
+  uint16_t              mCacheValid;
+
+  uint8_t               mShiftTable[ALPHABET_SIZE];
+  uint8_t               mCache[MAX_PATTERN_SIZE + MAX_TEXT_CACHE_SIZE];
 };
 
 

@@ -138,10 +138,12 @@ BaseArrayFieldElOperand::IsNull () const
   return (array.Count () <= mIndex) ? true : false;
 }
 
-void
-BaseArrayFieldElOperand::NotifyCopy()
+bool
+BaseArrayFieldElOperand::PrepareToCopy (void* const)
 {
   mTableRef->IncrementRefCount();
+
+  return true;
 }
 
 

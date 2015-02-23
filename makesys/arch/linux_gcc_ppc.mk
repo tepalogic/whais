@@ -48,11 +48,12 @@ ifeq ($(PROFILE),yes)
 CC_FLAGS+= -pg
 endif
 
-CXX_FLAGS:=$(CC_FLAGS) -fno-rtti $(EXT_CXX_FLAGS)
+CXX_FLAGS:=  -pthread $(CC_FLAGS) -fno-rtti $(EXT_CXX_FLAGS)
 CC_FLAGS+=$(EXT_CC_FLAGS)
 
 DEFINES+=ARCH_LINUX_GCC=1
 DEFINES+=INLINE=__inline__
+DEFINES+=_GNU_SOURCE
 
 
 #translate input files

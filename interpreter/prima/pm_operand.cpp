@@ -424,10 +424,10 @@ BaseOperand::NativeObject()
 }
 
 
-void
-BaseOperand::NotifyCopy()
+bool
+BaseOperand::PrepareToCopy (void* const)
 {
-  //Do nothing by default!
+  return true;
 }
 
 
@@ -2553,13 +2553,11 @@ TextOperand::Duplicate() const
 }
 
 
-void
-TextOperand::NotifyCopy()
+bool
+TextOperand::PrepareToCopy (void* const dest)
 {
-  uint8_t _t [sizeof mValue]; //To make sure DText::~DText() is not called at
-                              //the end of this function, and yet increase the
-                              //reference counter;
-  _placement_new (_t, mValue);
+  _placement_new (dest, TextOperand (mValue));
+  return false;
 }
 
 
@@ -2616,10 +2614,12 @@ CharTextElOperand::Duplicate() const
 }
 
 
-void
-CharTextElOperand::NotifyCopy()
+bool
+CharTextElOperand::PrepareToCopy (void* const dest)
 {
-  mText.MakeMirror( mText);
+  _placement_new (dest, CharTextElOperand (mText, mIndex));
+
+  return false;
 }
 
 
@@ -2993,11 +2993,10 @@ GlobalOperand::GetTableReference()
 }
 
 
-void
-GlobalOperand::NotifyCopy()
+bool
+GlobalOperand::PrepareToCopy (void* const)
 {
-  //This should not do anything, as field or array operands are keeping their
-  //own references.
+  return true;
 }
 
 
@@ -3691,8 +3690,6 @@ SessionStack::Push( const StackValue& value)
 {
   mStack.push_back( value);
 }
-
-
 
 
 

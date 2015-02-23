@@ -93,8 +93,8 @@ void
 PrototypeTable::Flush()
 {
   //Do not use RAII here as this locks migh be ownd
-  LockRAII syncHolder( mRowsSync);
-  LockRAII syncHolder2 (mIndexesSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder2 (mIndexesSync);
 
   FlushInternal();
 }
@@ -213,7 +213,7 @@ PrototypeTable::AddRow()
   uint8_t dummyValue[128];
   memset( dummyValue, 0xFF, sizeof dummyValue);
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   MarkRowModification();
 
@@ -234,7 +234,7 @@ PrototypeTable::AddRow()
 
   removedRows.InsertKey( TableRmKey( mRowsCount), &dummyNode, &dummyKey);
 
-  LockRAII syncHolder2 (mIndexesSync);
+  LockRAII<Lock> syncHolder2 (mIndexesSync);
 
   for (uint_t f = 0; f < mvIndexNodeMgrs.size(); f++)
     {
@@ -355,7 +355,7 @@ PrototypeTable::GetReusableRow( const bool forceAdd)
   TableRmKey   key (0);
   BTree        removedRows( *this);
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
   if (removedRows.FindBiggerOrEqual( key, &node, &keyIndex) == false)
     {
       if (forceAdd)
@@ -943,7 +943,7 @@ PrototypeTable::AcquireFieldIndex( FieldDescriptor* const field)
 {
   while( true)
     {
-      LockRAII syncHolder( mIndexesSync);
+      LockRAII<Lock> syncHolder( mIndexesSync);
 
       if (! field->IsAcquired())
         {
@@ -1123,42 +1123,40 @@ PrototypeTable::Set (const ROW_INDEX      row,
 
   assert( Serializer::Size( T_TEXT, false) == 2 * sizeof( uint64_t));
 
+  DText::StrategyRAII sMgr = value.GetStrategyRAII ();
+  ITextStrategy& s = sMgr;
+  LockRAII<Lock> _l (s.mLock);
+
   uint64_t    newFirstEntry      = ~0ull;
   uint64_t    newFieldValueSize  = 0;
-  const bool  skipVariableStore  = value.RawSize() < (2 * sizeof( uint64_t));
+  const bool  skipVariableStore  = s.Utf8CountU () < (2 * sizeof( uint64_t));
 
   MarkRowModification();
 
-  if ((value.IsNull() == false) && ! skipVariableStore)
+  if (! skipVariableStore)
     {
-      ITextStrategy& text = value;
-      if (text.IsRowValue())
+      if (s.GetTemporalContainer ().Size () == 0)
         {
-          RowFieldText& value = text.GetRow();
+          RowFieldText& r = _SC (RowFieldText&, s);
+          newFieldValueSize = r.Utf8CountU ()
+                                  + RowFieldText::CACHE_META_DATA_SIZE;
 
-          newFieldValueSize = value.mBytesSize +
-                                RowFieldText::CACHE_META_DATA_SIZE;
-
-          if (&value.mStorage != &VSStore())
+          if (&r.GetRowStorage () != &VSStore())
             {
-              newFirstEntry = VSStore().AddRecord( value.mStorage,
-                                                    value.mFirstEntry,
-                                                    0,
-                                                    newFieldValueSize);
+              newFirstEntry = VSStore().AddRecord (r.GetRowStorage (),
+                                                   r.mFirstEntry,
+                                                   0,
+                                                   newFieldValueSize);
             }
           else
             {
-              value.mStorage.IncrementRecordRef( value.mFirstEntry);
-              newFirstEntry = value.mFirstEntry;
+              r.GetRowStorage ().IncrementRecordRef (r.mFirstEntry);
+              newFirstEntry = r.mFirstEntry;
             }
         }
       else
         {
-          TemporalText& value = text.GetTemporal();
-
-          assert( value.mBytesSize > 0);
-
-          if (value.mBytesSize >= RowFieldText::MAX_BYTES_COUNT)
+          if (s.Utf8CountU () >= RowFieldText::MAX_BYTES_COUNT)
             {
               throw DBSException( _EXTRA( DBSException::OPER_NOT_SUPPORTED),
                                   "This implementation does not support text"
@@ -1166,29 +1164,28 @@ PrototypeTable::Set (const ROW_INDEX      row,
                                   _SC (long, RowFieldText::MAX_BYTES_COUNT));
             }
 
-          newFieldValueSize = value.mBytesSize +
+          newFieldValueSize = s.Utf8CountU () +
                                 RowFieldText::CACHE_META_DATA_SIZE;
 
-          assert( value.CharsCount() <= RowFieldText::MAX_CHARS_COUNT);
+          assert( s.mCachedCharsCount <= RowFieldText::MAX_CHARS_COUNT);
 
           uint8_t headerData[RowFieldText::CACHE_META_DATA_SIZE];
 
-          store_le_int32 (value.CharsCount(), headerData);
-          store_le_int32 (value.mCachedCharIndex,
-                          headerData + sizeof( uint32_t));
-          store_le_int32 (value.mCachedCharIndexOffset,
+          store_le_int32 (s.mCachedCharsCount, headerData);
+          store_le_int32 (s.mCachedCharIndex, headerData + sizeof( uint32_t));
+          store_le_int32 (s.mCachedCharIndexOffset,
                           headerData + 2 * sizeof( uint32_t));
 
           newFirstEntry = VSStore().AddRecord( headerData, sizeof headerData);
-          VSStore().UpdateRecord( newFirstEntry,
-                                   sizeof headerData,
-                                   value.mStorage,
-                                   0,
-                                   value.mBytesSize);
+          VSStore().UpdateRecord (newFirstEntry,
+                                  sizeof headerData,
+                                  s.GetTemporalContainer(),
+                                  0,
+                                  s.Utf8CountU ());
         }
     }
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem     cachedItem        = mRowCache.RetriveItem( row);
   uint8_t* const rowData           = cachedItem.GetDataForUpdate();
@@ -1196,9 +1193,9 @@ PrototypeTable::Set (const ROW_INDEX      row,
   bool           fieldValueWasNull = false;
 
   uint8_t* const fieldFirstEntry = rowData + desc.RowDataOff();
-  uint8_t* const fieldValueSize  = rowData              +
-                                     desc.RowDataOff() +
-                                     sizeof( uint64_t);
+  uint8_t* const fieldValueSize  = rowData
+                                      + desc.RowDataOff ()
+                                      + sizeof (uint64_t);
 
   const uint_t  byteOff = desc.NullBitIndex() / 8;
   const uint8_t bitOff  = desc.NullBitIndex() % 8;
@@ -1206,17 +1203,17 @@ PrototypeTable::Set (const ROW_INDEX      row,
   if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
 
-  if (fieldValueWasNull && value.IsNull())
+  if (fieldValueWasNull && (s.mCachedCharsCount == 0))
     return ;
 
-  else if ( (fieldValueWasNull == false) && value.IsNull())
+  else if ( (fieldValueWasNull == false) && (s.mCachedCharsCount == 0))
     {
       rowData[byteOff] |= (1 << bitOff);
 
       if (rowData[byteOff] == bitsSet)
         CheckRowToDelete( row);
     }
-  else if (value.IsNull() == false)
+  else if (s.mCachedCharsCount != 0)
     {
       if (rowData[byteOff] == bitsSet)
         {
@@ -1242,14 +1239,12 @@ PrototypeTable::Set (const ROW_INDEX      row,
 
   if (skipVariableStore)
     {
-      assert( value.RawSize() < _SC (uint_t,
-                                      Serializer::Size( T_TEXT, false)));
-      assert( _SC (ITextStrategy&, value).IsRowValue() == false);
+      assert (s.Utf8CountU () < _SC (uint_t, Serializer::Size( T_TEXT, false)));
 
-      fieldValueSize[sizeof( uint64_t) - 1]  = value.RawSize();
+      fieldValueSize[sizeof( uint64_t) - 1]  = s.Utf8CountU ();
       fieldValueSize[sizeof( uint64_t) - 1] |= 0x80;
 
-      value.RawRead( 0, value.RawSize(), rowData + desc.RowDataOff());
+      s.ReadUtf8U (0, s.Utf8CountU (), rowData + desc.RowDataOff());
     }
   else
     {
@@ -1331,7 +1326,7 @@ PrototypeTable::Set (const ROW_INDEX        row,
         }
     }
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem     cachedItem = mRowCache.RetriveItem( row);
   uint8_t *const rowData    = cachedItem.GetDataForUpdate();
@@ -1542,10 +1537,7 @@ allocate_row_field_text( VariableSizeStore&   store,
                          const uint64_t       firstRecordEntry,
                          const uint64_t       valueSize)
 {
-  ITextStrategy* const strategy = new RowFieldText( store,
-                                                    firstRecordEntry,
-                                                    valueSize);
-  return strategy;
+  return new RowFieldText( store, firstRecordEntry, valueSize);
 }
 
 
@@ -1574,21 +1566,19 @@ PrototypeTable::Get (const ROW_INDEX   row,
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem           cachedItem = mRowCache.RetriveItem( row);
   const uint8_t* const rowData    = cachedItem.GetDataForRead();
 
-  const uint64_t fieldValueSize  = load_le_int64 (rowData              +
-                                                    desc.RowDataOff() +
+  const uint64_t fieldValueSize  = load_le_int64 (rowData               +
+                                                    desc.RowDataOff()   +
                                                     sizeof( uint64_t));
-
   const uint_t  byteOff = desc.NullBitIndex() / 8;
   const uint8_t bitOff  = desc.NullBitIndex() % 8;
 
-  outValue.~DText();
   if (rowData[byteOff] & (1 << bitOff))
-    _placement_new( &outValue, DText());
+    outValue = DText ();
 
   else if ((fieldValueSize & 0x8000000000000000ull) != 0)
     {
@@ -1596,18 +1586,16 @@ PrototypeTable::Get (const ROW_INDEX   row,
       assert( ((fieldValueSize >> 56) & 0x7F) <
                 Serializer::Size( T_TEXT, false));
 
-      _placement_new( &outValue,
-                      DText( rowData + desc.RowDataOff(),
-                             (fieldValueSize >> 56) & 0x7F));
+      outValue = DText (rowData + desc.RowDataOff(),
+                        (fieldValueSize >> 56) & 0x7F);
     }
   else
     {
       const uint64_t fieldFirstEntry = load_le_int64 (rowData +
                                                         desc.RowDataOff());
-      _placement_new( &outValue,
-                      DText( *allocate_row_field_text( VSStore(),
-                                                       fieldFirstEntry,
-                                                       fieldValueSize)));
+      outValue = DText (*allocate_row_field_text( VSStore(),
+                        fieldFirstEntry,
+                        fieldValueSize));
     }
 }
 
@@ -1629,7 +1617,7 @@ PrototypeTable::Get (const ROW_INDEX        row,
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem           cachedItem = mRowCache.RetriveItem( row);
   const uint8_t *const rowData    = cachedItem.GetDataForRead();
@@ -2501,7 +2489,7 @@ PrototypeTable::StoreEntry( const ROW_INDEX   row,
   const uint_t       byteOff  = desc.NullBitIndex() / 8;
   const uint8_t      bitOff   = desc.NullBitIndex() % 8;
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem     cachedItem = mRowCache.RetriveItem( row);
   uint8_t *const rowData    = cachedItem.GetDataForUpdate();
@@ -2573,7 +2561,7 @@ PrototypeTable::RetrieveEntry( const ROW_INDEX   row,
   const uint_t  byteOff = desc.NullBitIndex() / 8;
   const uint8_t bitOff  = desc.NullBitIndex() % 8;
 
-  LockRAII syncHolder( mRowsSync);
+  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem           cachedItem = mRowCache.RetriveItem( row);
   const uint8_t* const rowData    = cachedItem.GetDataForRead();

@@ -30,6 +30,8 @@
 #include "dbs_real.h"
 #include "dbs_exception.h"
 
+#include "utils/wthread.h"
+
 namespace whais {
 
 #ifndef REAL_T
@@ -1916,49 +1918,74 @@ public:
                       const uint64_t   fromCh        = 0,
                       const uint64_t   toCh          = 0xFFFFFFFFFFFFFFFFull);
 
-  DUInt64 FindSubstring( DText&        substring,
-                        const bool     ignoreCase    = false,
-                        const uint64_t fromCh        = 0,
-                        const uint64_t toCh          = 0xFFFFFFFFFFFFFFFFull);
+  DUInt64 FindSubstring( const DText&   substr,
+                         const bool     ignoreCase    = false,
+                         const uint64_t fromCh        = 0,
+                         const uint64_t toCh          = 0xFFFFFFFFFFFFFFFFull);
 
-  DText ReplaceSubstr( DText&          substring,
-                       const DText&    newSubString,
-                       const bool      ignoreCase   = false,
-                       const uint64_t  fromCh       = 0,
-                       const uint64_t  toCh         = 0xFFFFFFFFFFFFFFFFull);
+  DText ReplaceSubstring (const DText&    substr,
+                          const DText&    newSubstr,
+                          const bool      ignoreCase  = false,
+                          const uint64_t  fromCh      = 0,
+                          const uint64_t  toCh        = 0xFFFFFFFFFFFFFFFFull);
 
   DText LowerCase() const;
   DText UpperCase() const;
 
-  void MakeMirror( DText& mirror) const;
+  void MakeMirror( DText& mirror);
 
   DBS_FIELD_TYPE DBSType() const
   {
     return T_TEXT;
   }
 
-  operator ITextStrategy&() const
+  class StrategyRAII
   {
-    return *mText;
-  }
+  public:
+    StrategyRAII (DText& source)
+      : mText (source),
+        mStrategy (NULL)
+    {
+    }
 
+    ~StrategyRAII ()
+    {
+      if (mStrategy != NULL)
+        mText.ReleaseStrategy ();
+    }
+
+    operator ITextStrategy& ()
+    {
+      if (mStrategy == NULL)
+        mStrategy = &mText.GetStrategy ();
+
+      return *mStrategy;
+    }
+
+    void Release ()
+    {
+      if (mStrategy != NULL)
+        {
+          mStrategy = NULL;
+          mText.ReleaseStrategy ();
+        }
+    }
+
+  private:
+    DText&          mText;
+    ITextStrategy*  mStrategy;
+  };
+
+  ITextStrategy& GetStrategy();
+  StrategyRAII   GetStrategyRAII () const;
+  void           ReleaseStrategy ();
+  void           ReplaceStrategy (ITextStrategy* const strategy);
 
 private:
-  void AppendRaw( const DText&     text,
-                  const uint64_t   fromOff,
-                  const uint64_t   toOff);
 
-  DUInt64 FindInTextUTF8 (const DText&       text,
-                          const bool         ignoreCase,
-                          const uint64_t     fromCh,
-                          const uint64_t     toCh);
-  DUInt64 FindNextUTF8 () const;
-
-
-  void AllCharsToCase( const bool lowerCase);
-
-  ITextStrategy*      mText;
-  void*               mStringMatcher;
+  ITextStrategy* volatile  mText;
+  volatile uint32_t        mTextRefs;
+  SpinLock                 mLock;
 };
 
 

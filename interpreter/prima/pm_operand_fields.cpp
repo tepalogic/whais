@@ -81,10 +81,11 @@ TableOperand::Duplicate() const
 }
 
 
-void
-TableOperand::NotifyCopy()
+bool
+TableOperand::PrepareToCopy (void* const)
 {
   mTableRef->IncrementRefCount();
+  return true;
 }
 
 
@@ -313,11 +314,13 @@ FieldOperand::Duplicate() const
 }
 
 
-void
-FieldOperand::NotifyCopy()
+bool
+FieldOperand::PrepareToCopy (void *const )
 {
   if (mTableRef)
     mTableRef->IncrementRefCount();
+
+  return true;
 }
 
 
@@ -351,10 +354,11 @@ BaseFieldElOperand::~BaseFieldElOperand()
 }
 
 
-void
-BaseFieldElOperand::NotifyCopy()
+bool
+BaseFieldElOperand::PrepareToCopy (void* const)
 {
   mTableRef->IncrementRefCount();
+  return true;
 }
 
 

@@ -520,7 +520,7 @@ StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
   for (uint_t index = 0; index < listeners.Size(); ++index)
     listeners[index].mListenThread.WaitToEnd( false);
 
-  LockRAII holder( sClosingLock);
+  LockRAII<Lock> holder( sClosingLock);
   sListeners = NULL;
 
   log.Log (LOG_DEBUG, "Server stopped!");
@@ -530,7 +530,7 @@ StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
 void
 StopServer()
 {
-  LockRAII holder( sClosingLock);
+  LockRAII<Lock> holder( sClosingLock);
 
   if ((sListeners == NULL)  || (sMainLog == NULL))
     return; //Ignore! The server probably did not even start.

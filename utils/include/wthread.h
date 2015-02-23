@@ -38,6 +38,7 @@ public:
   ~Lock();
 
   void Acquire();
+  bool TryAcquire ();
   void Release();
 
 private:
@@ -48,14 +49,32 @@ private:
 };
 
 
+class EXCEP_SHL SpinLock
+{
+public:
+  SpinLock ();
+
+  void Acquire();
+  bool TryAcquire ();
+  void Release();
+
+private:
+  SpinLock (const SpinLock&);
+  SpinLock& operator= (const SpinLock&);
+
+  volatile int16_t mLock;
+};
+
+template<class T>
 class LockRAII
 {
 public:
-  explicit LockRAII( Lock &lock) :
-    mLock( lock),
-    mIsAcquireed( true)
+  explicit LockRAII ( T &lock, const bool skipAcquire = false)
+    : mLock( lock),
+      mIsAcquireed( false)
   {
-    mLock.Acquire();
+    if ( ! skipAcquire)
+      Acquire ();
   }
 
   ~LockRAII()
@@ -70,16 +89,163 @@ public:
     mIsAcquireed = true;
   }
 
+  bool TryAcquire ()
+  {
+    mIsAcquireed = mLock.TryAcquire ();
+    return mIsAcquireed;
+  }
+
   void Release()
   {
-    mIsAcquireed = false;
     mLock.Release();
+    mIsAcquireed = false;
   }
 
 private:
-  Lock&       mLock;
-  bool        mIsAcquireed;
+  LockRAII (const LockRAII&);
+  LockRAII& operator= (const LockRAII& );
+
+  T&       mLock;
+  bool     mIsAcquireed;
 };
+
+
+template<typename T>
+class DoubleLockRAII
+{
+public:
+  DoubleLockRAII(T& lock1, T& lock2, const bool skipAcquire = false)
+    : mLock1 (lock1),
+      mLock2 (lock2),
+      mIsAcquireed1 (false),
+      mIsAcquireed2 (false)
+  {
+    if ( ! skipAcquire)
+      AcquireBoth ();
+  }
+
+  ~DoubleLockRAII()
+  {
+    ReleaseBoth ();
+  }
+
+  void AcquireBoth ()
+  {
+    if (&mLock1 == &mLock2)
+      {
+        mLock1.Acquire ();
+        mIsAcquireed1 = true;
+        return ;
+      }
+
+    while (true)
+      {
+        mLock1.Acquire();
+        mIsAcquireed1 = true;
+
+        if (mLock2.TryAcquire ())
+          {
+            mIsAcquireed2 = true;
+            return ;
+          }
+
+        mLock1.Release ();
+        mIsAcquireed1 = false;
+
+        wh_yield ();
+      }
+  }
+
+  void ReleaseBoth ()
+  {
+    if (mIsAcquireed1)
+      mLock1.Release();
+
+    if (mIsAcquireed2)
+      mLock2.Release ();
+  }
+
+private:
+  DoubleLockRAII (const DoubleLockRAII&);
+  DoubleLockRAII& operator= (const DoubleLockRAII& );
+
+  T&       mLock1;
+  T&       mLock2;
+  bool     mIsAcquireed1;
+  bool     mIsAcquireed2;
+};
+
+
+template<typename T>
+class TripleLockRAII
+{
+public:
+  TripleLockRAII (T& lock1, T& lock2, T& lock3, const bool skipAcquire = false)
+    : mLock1 (lock1),
+      mLock2 (lock2),
+      mLock3 (lock3),
+      mIsAcquireed1 (false),
+      mIsAcquireed2 (false),
+      mIsAcquireed3 (false)
+  {
+    if ( ! skipAcquire)
+      AcquireAll ();
+  }
+
+  ~TripleLockRAII()
+  {
+    ReleaseAll ();
+  }
+
+  void AcquireAll ()
+  {
+    while (true)
+      {
+        mLock1.Acquire();
+        mIsAcquireed1 = true;
+
+        if ((&mLock2 == &mLock1)
+            || ((mIsAcquireed2 = mLock2.TryAcquire ()) == true))
+        {
+            if ((&mLock3 == &mLock2)
+                || (&mLock3 == &mLock1)
+                || ((mIsAcquireed3 = mLock3.TryAcquire ()) == true))
+              {
+                return;
+              }
+        }
+
+        ReleaseAll ();
+        wh_yield ();
+      }
+  }
+
+  void ReleaseAll ()
+  {
+    if (mIsAcquireed1)
+      mLock1.Release();
+
+    if (mIsAcquireed2)
+      mLock2.Release ();
+
+    if (mIsAcquireed3)
+      mLock3.Release ();
+
+    mIsAcquireed1 = mIsAcquireed2 = mIsAcquireed3 = false;
+  }
+
+private:
+  TripleLockRAII (const TripleLockRAII&);
+  TripleLockRAII& operator= (const TripleLockRAII& );
+
+  T&       mLock1;
+  T&       mLock2;
+  T&       mLock3;
+  bool     mIsAcquireed1;
+  bool     mIsAcquireed2;
+  bool     mIsAcquireed3;
+};
+
 
 
 class EXCEP_SHL LockException : public Exception

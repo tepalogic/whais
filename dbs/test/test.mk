@@ -91,6 +91,10 @@ UNIT_EXES+=l_test_dbs_reals
 l_test_dbs_reals_SRC=test/test_dbs_reals.cpp
 l_test_dbs_reals_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 
+UNIT_EXES+=test_text_multithreading
+test_text_multithreading_SRC=test/test_text_multithreading.cpp
+test_text_multithreading_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
+
 UNIT_EXES+=test_range
 test_range_SRC=test/test_range.cpp
 test_range_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon

@@ -22,11 +22,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef _GNU_SOURCE
-/* Not exactly POSIX, but we can leave with it. */
-#define _GNU_SOURCE
-#endif
-
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/socket.h>

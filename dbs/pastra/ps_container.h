@@ -149,7 +149,7 @@ public:
 class TemporalContainer : public IDataContainer
 {
 public:
-  explicit TemporalContainer( 
+  explicit TemporalContainer(
                         const uint_t reservedMemory = DEFAULT_TEMP_MEM_RESERVED
                              );
 
@@ -180,8 +180,7 @@ private:
   bool                                 mDirtyCache_2;
   bool                                 mCache1LastUsed;
 
-  static uint64_t  smTemporalsCount;
-  static Lock      smSync;
+  static uint64_t                      smTemporalsCount;
 };
 
 

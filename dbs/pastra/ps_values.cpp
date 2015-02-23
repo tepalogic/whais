@@ -33,6 +33,7 @@
 #include "utils/wutf.h"
 #include "utils/wsort.h"
 #include "utils/wunicode.h"
+#include "utils/wthread.h"
 
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
@@ -47,70 +48,6 @@ static const uint_t  MAX_VALUE_RAW_STORAGE = 0x20;
 static const uint_t  MNTH_DAYS[]           = MNTH_DAYS_A;
 
 static const UTF8_CU_COUNTER _cuCache;
-
-static const uint64_t  DEFAULT_LAST_CHAR   = 0xFFFFFFFFFFFFFFFFull;
-
-
-class StringMatcher
-{
-private:
-  static const int       ALPHABET_SIZE           = 256;
-  static const int       MAX_TEXT_CACHE_SIZE     = 1024;
-  static const int       MAX_PATTERN_SIZE        = 255;
-  static const int64_t   PATTERN_NOT_FOUND       = -1;
-
-
-public:
-  explicit StringMatcher( const DText& pattern);
-
-  int64_t FindMatch( const DText&   text,
-                     const uint64_t fromChar,
-                     const uint64_t toChar,
-                     const bool     ignoreCase);
-
-  int64_t FindMatchRaw( const DText&   text,
-                        const uint64_t fromChar,
-                        const uint64_t toChar,
-                        const bool     ignoreCase);
-
-  int64_t NextMatch();
-
-  int64_t NextMatchRaw();
-
-private:
-  uint_t ComparingWindowShift( uint_t position) const;
-
-  bool SuffixesMatch() const;
-
-  uint_t FindInCache() const;
-
-  void CountCachedChars( const uint_t offset);
-
-  bool FillTextCache();
-
-  int64_t FindSubstr();
-
-
-  const DText*        mText;
-  const DText&        mPattern;
-
-  uint8_t             mPatternSize;
-  bool                mIgnoreCase;
-
-  uint64_t            mLastChar;
-  uint64_t            mCurrentChar;
-  uint64_t            mCurrentRawOffset;
-  uint64_t            mCacheStartPos;
-
-  uint8_t* const      mPatternRaw;
-  uint8_t* const      mTextRawCache;
-
-  uint16_t            mAvailableCache;
-  uint16_t            mCacheValid;
-
-  uint8_t             mShiftTable[ALPHABET_SIZE];
-  uint8_t             mCache[MAX_PATTERN_SIZE + MAX_TEXT_CACHE_SIZE];
-};
 
 
 
@@ -633,144 +570,73 @@ DRichReal::Next() const
 
 
 DText::DText( const char* text)
-  : mText( &pastra::NullText::GetSingletoneInstace()),
-    mStringMatcher( NULL)
+  : mText (&pastra::NullText::GetSingletoneInstace()),
+    mTextRefs (0)
 
 {
   if ((text != NULL) && (text[0] != 0))
-    {
-      auto_ptr<ITextStrategy> strategy(
-                               new TemporalText( _RC (const uint8_t*, text))
-                                       );
-      strategy.get ()->IncreaseReferenceCount();
-
-      mText = strategy.release();
-
-      assert( mText->ReferenceCount() == 1);
-      assert( mText->ShareCount() == 0);
-    }
+    mText = new TemporalText( _RC (const uint8_t*, text));
 }
 
 
 DText::DText( const uint8_t *utf8Src, uint_t unitsCount)
-  : mText( & NullText::GetSingletoneInstace()),
-    mStringMatcher( NULL)
+  : mText (& NullText::GetSingletoneInstace()),
+    mTextRefs (0)
 
 {
   if ((utf8Src != NULL) && (utf8Src[0] != 0) && (unitsCount > 0))
-    {
-      auto_ptr<ITextStrategy> strategy( new TemporalText( utf8Src, unitsCount));
-      strategy.get ()->IncreaseReferenceCount();
-
-      mText = strategy.release();
-
-      assert( mText->ReferenceCount() == 1);
-      assert( mText->ShareCount() == 0);
-    }
+    mText = new TemporalText( utf8Src, unitsCount);
 }
 
 
 DText::DText( ITextStrategy& text)
-  : mText( NULL),
-    mStringMatcher( NULL)
+  : mText (&text),
+    mTextRefs (0)
 {
-  if (text.ShareCount() == 0)
-    text.IncreaseReferenceCount();
-
-  else
-    {
-      assert( text.ReferenceCount() == 1);
-
-      text.IncreaseShareCount();
-    }
-
-  mText = &text;
 }
 
 
 DText::DText( const DText& source)
-  : mText( NULL),
-    mStringMatcher( NULL)
+  : mText (NULL),
+    mTextRefs (0)
 {
-  if (source.mText->ShareCount() > 0)
-    {
-      assert( source.mText->ReferenceCount() == 1);
+  StrategyRAII s = source.GetStrategyRAII ();
 
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate( *source.mText,
-                                 source.mText->BytesCount());
+  mText = _SC (ITextStrategy&, s).MakeClone ();
 
-      mText = newText.release();
-
-      assert( mText->ShareCount() == 0);
-      assert( mText->ReferenceCount() == 1);
-    }
-  else
-    {
-      source.mText->IncreaseReferenceCount();
-      mText = source.mText;
-    }
-
-  assert( mText != NULL);
+  assert (mText == source.mText);
 }
 
 
 DText::~DText()
 {
-  delete _SC (StringMatcher*, mStringMatcher);
+  assert (mTextRefs == 0);
 
-  if (mText->ShareCount() > 0)
-    mText->DecreaseShareCount();
-
-  else
-    mText->DecreaseReferenceCount();
+  mText->ReleaseReference ();
 }
 
 
 bool
 DText::IsNull() const
 {
-  return( mText->BytesCount() == 0);
+  return _SC (ITextStrategy&, GetStrategyRAII()).CharsCount () == 0;
 }
 
 
-DText &
+DText&
 DText::operator= (const DText& source)
 {
   if (this == &source)
     return *this;
 
-  delete _SC (StringMatcher*, mStringMatcher);
-  mStringMatcher = NULL;
+  StrategyRAII s = source.GetStrategyRAII ();
+  StrategyRAII t = GetStrategyRAII ();
 
-  ITextStrategy* const oldText = mText;
-
-  if (source.mText->ShareCount() > 0)
+  if(&_SC (ITextStrategy&, s) != &_SC (ITextStrategy&, t))
     {
-      assert( source.mText->ReferenceCount() == 1);
-
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate( *source.mText,
-                                 source.mText->BytesCount());
-
-      mText = newText.release();
-
-      assert( mText->ShareCount() == 0);
-      assert( mText->ReferenceCount() == 1);
+      t.Release ();
+      ReplaceStrategy (_SC (ITextStrategy&, s).MakeClone ());
     }
-  else
-    {
-      source.mText->IncreaseReferenceCount();
-      mText = source.mText;
-    }
-
-  if (oldText->ShareCount() > 0)
-    oldText->DecreaseShareCount();
-
-  else
-    oldText->DecreaseReferenceCount();
 
   return *this;
 }
@@ -779,55 +645,25 @@ DText::operator= (const DText& source)
 bool
 DText::operator== (const DText& text) const
 {
-  if (mText == text.mText)
+  if (this == &text)
     return true;
 
-  if (IsNull() != text.IsNull())
-    return false;
-
-  if (IsNull() == true)
-    return true;
-
-  uint64_t textSize = RawSize();
-
-  assert( textSize != 0);
-  assert( text.RawSize() != 0);
-
-  if (textSize != text.RawSize())
-    return false;
-
-  uint64_t offset = 0;
-  uint8_t  first[128];
-  uint8_t  second[sizeof first];
-
-  while( textSize > 0)
-  {
-    const uint_t chunkSize = MIN (sizeof first, textSize);
-
-    RawRead( offset, chunkSize, first);
-    text.RawRead( offset, chunkSize, second);
-
-    if (memcmp( first, second, chunkSize) != 0)
-      return false;
-
-    offset += chunkSize, textSize -= chunkSize;
-  }
-
-  return true;
+  return (_SC (ITextStrategy&, GetStrategyRAII()) ==
+            _SC (ITextStrategy&, text.GetStrategyRAII()));
 }
 
 
 uint64_t
 DText::Count() const
 {
-  return mText->CharsCount();
+  return _SC (ITextStrategy&, GetStrategyRAII()).CharsCount ();
 }
 
 
 uint64_t
 DText::RawSize() const
 {
-  return mText->BytesCount();
+  return _SC (ITextStrategy&, GetStrategyRAII()).Utf8Count();
 }
 
 
@@ -836,56 +672,23 @@ DText::RawRead( uint64_t        offset,
                 uint64_t        count,
                 uint8_t* const  dest) const
 {
-  if (IsNull())
-    return;
-
-  count = min<uint64_t> (count, mText->BytesCount());
-
-  mText->ReadUtf8 (offset, count, dest);
+  return _SC (ITextStrategy&, GetStrategyRAII()).ReadUtf8 (offset, count, dest);
 }
 
 
 uint64_t
 DText::OffsetOfChar( const uint64_t chIndex) const
 {
-  return mText->OffsetOfChar( chIndex);
+  return _SC (ITextStrategy&, GetStrategyRAII()).OffsetOfChar( chIndex);
 }
 
 
 uint64_t
 DText::CharsUntilOffset( const uint64_t offset) const
 {
-  return mText->CharsUntilOffset( offset);
+  return _SC (ITextStrategy&, GetStrategyRAII()).CharsUntilOffset( offset);
 }
 
-
-void
-DText::AppendRaw( const DText&   text,
-                  const uint64_t fromOff,
-                  const uint64_t toOff)
-{
-
-  if (text.IsNull())
-    return;
-
-  delete _SC (StringMatcher*, mStringMatcher);
-  mStringMatcher = NULL;
-
-  if (mText->ReferenceCount() > 1)
-    {
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate( *mText, mText->BytesCount());
-
-      mText->DecreaseReferenceCount();
-      mText = newText.release();
-
-      assert( mText->ShareCount() == 0);
-      assert( mText->ReferenceCount() == 1);
-    }
-
-  mText->Append( *text.mText, fromOff, min (text.RawSize(), toOff));
-}
 
 void
 DText::Append( const DChar& ch)
@@ -893,77 +696,59 @@ DText::Append( const DChar& ch)
   if (ch.IsNull())
     return ;
 
-  delete _SC (StringMatcher*, mStringMatcher);
-  mStringMatcher = NULL;
+  StrategyRAII    t = GetStrategyRAII ();
+  ITextStrategy&  s = t;
 
-  if (mText->ReferenceCount() > 1)
+  ITextStrategy* const newText = s.Append (ch.mValue);
+
+  if (newText != &s)
     {
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate( *mText, mText->BytesCount());
-
-      mText->DecreaseReferenceCount();
-      mText = newText.release();
-
-      assert( mText->ShareCount() == 0);
-      assert( mText->ReferenceCount() == 1);
+      t.Release ();
+      ReplaceStrategy (newText);
     }
-
-  assert( mText->ReferenceCount() != 0);
-
-  mText->Append( ch.mValue);
 }
 
 
 void
 DText::Append( const DText& text)
 {
-  AppendRaw( text, 0, 0xFFFFFFFFFFFFFFFFull);
+  if (text.IsNull ())
+    return ;
+
+  StrategyRAII    t   = GetStrategyRAII ();
+  StrategyRAII    src = text.GetStrategyRAII ();
+  ITextStrategy&  s   = t;
+
+  ITextStrategy* const newText = s.Append (src);
+  src.Release ();
+  if (newText != &s)
+    {
+      t.Release ();
+      ReplaceStrategy (newText);
+    }
 }
 
 
 DChar
 DText::CharAt( const uint64_t index) const
 {
-  return mText->CharAt( index);
+  return _SC (ITextStrategy&, GetStrategyRAII()).CharAt( index);
 }
 
 
 void
 DText::CharAt( const uint64_t index, const DChar& ch)
 {
-  const uint64_t charsCount = mText->CharsCount();
+  StrategyRAII    t = GetStrategyRAII ();
+  ITextStrategy&  s = t;
 
-  if (charsCount == index)
+  ITextStrategy* const newText = s.UpdateCharAt (ch.mValue, index);
+
+  if (newText != &s)
     {
-      Append( ch);
-
-      return ;
+      t.Release ();
+      ReplaceStrategy (newText);
     }
-  else if (charsCount < index)
-    throw DBSException( _EXTRA( DBSException::STRING_INDEX_TOO_BIG));
-
-  delete _SC (StringMatcher*, mStringMatcher);
-  mStringMatcher = NULL;
-
-  if (mText->ReferenceCount() > 1)
-    {
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate( *mText, mText->BytesCount());
-
-      mText->DecreaseReferenceCount();
-      mText = newText.release();
-
-      assert( mText->ShareCount() == 0);
-      assert( mText->ReferenceCount() == 1);
-    }
-
-  if (ch.IsNull())
-     mText->Truncate( index, &mText);
-
-  else
-    mText->UpdateCharAt( ch.mValue, index, &mText);
 }
 
 
@@ -973,199 +758,139 @@ DText::FindInText( const DText&      text,
                    const uint64_t    fromCh,
                    const uint64_t    toCh)
 {
-  if (IsNull()
-      || text.IsNull()
-      || (toCh <= fromCh)
-      || (toCh - fromCh < Count()))
-    {
-      return DUInt64 ();
-    }
+  StrategyRAII    s = GetStrategyRAII ();
+  ITextStrategy&  t = s;
 
-  if (mStringMatcher == NULL)
-    mStringMatcher = new StringMatcher( *this);
-
-  const int64_t result = _SC (StringMatcher*,
-                              mStringMatcher)->FindMatch( text,
-                                                          fromCh,
-                                                          toCh,
-                                                          ignoreCase);
-  assert( (result < 0)
-          || ((fromCh <= (uint64_t)result)
-              && ((uint64_t)result <= toCh - Count())));
-
-  if (result >= 0)
-    return DUInt64 (result);
-
-  return DUInt64 ();
+  return t.FindMatch (text.GetStrategyRAII (), fromCh, toCh, ignoreCase);
 }
 
 
 DUInt64
-DText::FindSubstring( DText&            substr,
+DText::FindSubstring( const DText&      substr,
                       const bool        ignoreCase,
                       const uint64_t    fromCh,
                       const uint64_t    toCh)
 {
-  return substr.FindInText( *this, ignoreCase, fromCh, toCh);
+  return _CC (DText&, substr).FindInText ( *this, ignoreCase, fromCh, toCh);
 }
 
 
 DText
-DText::ReplaceSubstr( DText&             substr,
-                      const DText&       newSubstr,
-                      const bool         ignoreCase,
-                      const uint64_t     fromCh,
-                      const uint64_t     toCh)
+DText::ReplaceSubstring (const DText&    substr,
+                         const DText&    newSubstr,
+                         const bool      ignoreCase,
+                         const uint64_t  fromCh,
+                         const uint64_t  toCh)
 {
-  const uint64_t substrSize = substr.RawSize();
+  StrategyRAII    s = substr.GetStrategyRAII ();
+  ITextStrategy&  t = s;
 
-  DText     result;
-  DUInt64   matchPos;
-  DUInt64   lastMatchPos( 0);
-
-  matchPos = substr.FindInTextUTF8 (*this, ignoreCase, fromCh, toCh);
-
-  while( ! matchPos.IsNull())
-    {
-      result.AppendRaw( *this, lastMatchPos.mValue, matchPos.mValue);
-      result.Append( newSubstr);
-
-      lastMatchPos = DUInt64 (matchPos.mValue + substrSize);
-      assert( lastMatchPos.mValue <= RawSize());
-
-      matchPos = substr.FindNextUTF8 ();
-    }
-
-  if (matchPos.IsNull())
-    matchPos = DUInt64 (RawSize());
-
-  result.AppendRaw( *this, lastMatchPos.mValue, matchPos.mValue);
-
-  return result;
+  ITextStrategy* const result = t.Replace (GetStrategyRAII (),
+                                           newSubstr.GetStrategyRAII(),
+                                           fromCh,
+                                           toCh,
+                                           ignoreCase);
+  return DText (*result);
 }
 
 
 DText
 DText::LowerCase() const
 {
-  DText result = *this;
-
-  result.AllCharsToCase( true);
-  return result;
+  return DText (*_SC (ITextStrategy&, GetStrategyRAII()).ToCase (true));
 }
 
 
 DText
 DText::UpperCase() const
 {
-  DText result = *this;
-
-  result.AllCharsToCase( false);
-
-  return result;
+  return DText (*_SC (ITextStrategy&, GetStrategyRAII()).ToCase (false));
 }
 
 
 void
-DText::MakeMirror( DText& inoutText) const
+DText::MakeMirror( DText& inoutText)
 {
-  if (mText->ReferenceCount() == 1)
-    mText->IncreaseShareCount();
+  if (this == &inoutText)
+    return ;
 
-  else
+  StrategyRAII    s = GetStrategyRAII ();
+  ITextStrategy&  t = s;
+
+  StrategyRAII    s2 = inoutText.GetStrategyRAII ();
+  ITextStrategy&  t2 = s2;
+
+  if (&t == &t2)
+    return ;
+
+  ITextStrategy* const newText = t.MakeMirrorCopy ();
+
+  if (newText != &t)
     {
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-      newText.get()->Duplicate( *mText, mText->BytesCount());
-      mText->DecreaseReferenceCount();
-
-      _CC (DText*, this)->mText = newText.release();
-
-      assert( mText->ShareCount() == 0);
-      assert( mText->ReferenceCount() == 1);
-
-      mText->IncreaseShareCount();
+      s.Release ();
+      ReplaceStrategy(newText);
     }
+  s.Release ();
 
-  assert( mText->ReferenceCount() == 1);
-
-  if (this != &inoutText)
+  if (newText != &t2)
     {
-      if (inoutText.mText->ShareCount() > 0)
-        inoutText.mText->DecreaseShareCount();
-
-      else
-        inoutText.mText->DecreaseReferenceCount();
-
-      inoutText.mText = mText;
+      s2.Release ();
+      inoutText.ReplaceStrategy (newText);
     }
 }
 
 
-DUInt64
-DText::FindInTextUTF8 (const DText&      text,
-                       const bool        ignoreCase,
-                       const uint64_t    fromCh,
-                       const uint64_t    toCh)
+ITextStrategy&
+DText::GetStrategy ()
 {
-  if (IsNull()
-      || text.IsNull()
-      || (toCh <= fromCh)
-      || (toCh - fromCh < Count()))
-    {
-      return DUInt64 ();
-    }
+  LockRAII<SpinLock> _l (mLock);
 
-  if (mStringMatcher == NULL)
-    mStringMatcher = new StringMatcher( *this);
-
-  const int64_t result = _SC (StringMatcher*,
-                              mStringMatcher)->FindMatchRaw( text,
-                                                             fromCh,
-                                                             toCh,
-                                                             ignoreCase);
-  assert( (result < 0)
-          || ((fromCh <= (uint64_t)result)
-              && ((uint64_t)result <= toCh - Count())));
-
-  if (result >= 0)
-    return DUInt64 (result);
-
-  return DUInt64 ();
+  ++mTextRefs;
+  return *mText;
 }
 
-
-DUInt64
-DText::FindNextUTF8 () const
+DText::StrategyRAII
+DText::GetStrategyRAII () const
 {
-  if (mStringMatcher == NULL)
-    return DUInt64 ();
-
-  const int64_t result = _SC (StringMatcher*, mStringMatcher)->NextMatchRaw();
-  if (result >= 0)
-    return DUInt64 (result);
-
-  return DUInt64 ();
+  return StrategyRAII ( _CC(DText&, *this));
 }
 
 
 void
-DText::AllCharsToCase( const bool lowerCase)
+DText::ReleaseStrategy ()
 {
-  const uint64_t charsCount = Count();
+  LockRAII<SpinLock> _l (mLock);
 
-  for (uint64_t i = 0; i < charsCount; ++i)
-    {
-      DChar ch = CharAt( i);
+  assert (mTextRefs > 0);
 
-      ch = DChar( lowerCase ?
-                    wh_to_lowercase( ch.mValue) :
-                    wh_to_uppercase( ch.mValue)
-                 );
-
-      CharAt( i, ch);
-    }
+  --mTextRefs;
 }
+
+
+void
+DText::ReplaceStrategy (ITextStrategy* const strategy)
+{
+  assert (strategy != NULL);
+  assert (mText != strategy);
+
+  LockRAII<SpinLock> _l (mLock);
+
+  do
+    {
+      if (mTextRefs == 0)
+        {
+          mText->ReleaseReference ();
+          mText = strategy;
+          return ;
+        }
+
+      _l.Release ();
+      wh_yield ();
+      _l.Acquire ();
+    }
+  while (true);
+}
+
 
 
 template <class T> void
@@ -2128,423 +1853,3 @@ DArray::MakeMirror( DArray& inoutArray) const
       inoutArray.mArray = mArray;
     }
 }
-
-
-
-StringMatcher::StringMatcher( const DText& pattern)
-  : mText( NULL),
-    mPattern( pattern),
-    mPatternSize( min<uint64_t> (pattern.RawSize(), MAX_PATTERN_SIZE)),
-    mIgnoreCase( false),
-    mLastChar( DEFAULT_LAST_CHAR),
-    mCurrentChar( 0),
-    mCurrentRawOffset( 0),
-    mCacheStartPos( 0),
-    mPatternRaw( mCache),
-    mTextRawCache( mPatternRaw + mPatternSize),
-    mAvailableCache( sizeof mCache - mPatternSize),
-    mCacheValid( 0)
-{
-  assert( mPatternSize > 0);
-
-  mPattern.RawRead( 0, mPatternSize, mPatternRaw);
-
-  if (mPatternSize < pattern.RawSize())
-    {
-      uint_t chOffset = 0;
-      while( chOffset < mPatternSize)
-        {
-          const uint32_t codeUnits = _cuCache.Count( mPatternRaw[chOffset]);
-
-          if (chOffset + codeUnits > mPatternSize)
-            mPatternSize = chOffset;
-
-          else
-            chOffset += codeUnits;
-        }
-      assert( chOffset == mPatternSize);
-    }
-
-  assert( mPatternSize != 0);
-
-  memset( mShiftTable, 0, sizeof( mShiftTable));
-  for (uint_t i = 0; i < mPatternSize; ++i)
-    mShiftTable[mPatternRaw[i]] = i;
-}
-
-
-int64_t
-StringMatcher::FindMatch( const DText&       text,
-                          const uint64_t     fromChar,
-                          const uint64_t     toChar,
-                          const bool         ignoreCase)
-{
-  bool patternRefreshed = false;
-
-  if ((fromChar >= toChar)
-      || (toChar - fromChar < mPattern.Count()))
-    {
-      return PATTERN_NOT_FOUND;
-    }
-
-  mText               = &text;
-  mLastChar           = toChar;
-  mCurrentChar        = fromChar;
-  mCurrentRawOffset   = mText->OffsetOfChar( mCurrentChar);
-  mCacheValid         = 0;
-  mCacheStartPos      = 0;
-
-  if (mText->RawSize() < mCurrentRawOffset + mPattern.RawSize())
-    return PATTERN_NOT_FOUND;
-
-  if (ignoreCase != mIgnoreCase)
-    {
-      memset( mShiftTable, 0, sizeof mShiftTable);
-      mPattern.RawRead( 0, mPatternSize, mPatternRaw);
-      patternRefreshed = true;
-    }
-
-  if (ignoreCase && patternRefreshed)
-    {
-      uint_t chOffset = 0;
-
-      while( chOffset < mPatternSize)
-        {
-          uint32_t codePoint;
-
-          wh_load_utf8_cp (mPatternRaw + chOffset, &codePoint);
-          chOffset += wh_store_utf8_cp (wh_to_lowercase( codePoint),
-                                        mPatternRaw + chOffset);
-        }
-      assert( chOffset == mPatternSize);
-    }
-
-  mIgnoreCase = ignoreCase;
-
-  if (patternRefreshed)
-    {
-      memset( mShiftTable, 0, sizeof( mShiftTable));
-      for (uint_t i = 0; i < mPatternSize; ++i)
-        mShiftTable[mPatternRaw[i]] = i;
-    }
-
-  if (FindSubstr() < 0)
-    return PATTERN_NOT_FOUND;
-
-  assert( mPattern.Count() <= toChar - mCurrentChar);
-
-  assert( mText->CharsUntilOffset( mCurrentRawOffset) == mCurrentChar);
-  assert( mText->OffsetOfChar( mCurrentChar) == mCurrentRawOffset);
-
-  return mCurrentChar;
-}
-
-
-int64_t
-StringMatcher::FindMatchRaw( const DText&       text,
-                             const uint64_t     fromChar,
-                             const uint64_t     toChar,
-                             const bool         ignoreCase)
-{
-  if (FindMatch( text, fromChar, toChar, ignoreCase) < 0)
-    return PATTERN_NOT_FOUND;
-
-  return mCurrentRawOffset;
-}
-
-
-int64_t
-StringMatcher::NextMatch()
-{
-  if (mText == NULL)
-    return PATTERN_NOT_FOUND;
-
-  const uint64_t patternCount = mPattern.Count();
-
-  assert( mCurrentChar + patternCount <= mLastChar);
-
-  if ((mLastChar <= mCurrentChar + patternCount)
-      || (mLastChar - (mCurrentChar + patternCount) < patternCount))
-    {
-      return PATTERN_NOT_FOUND;
-    }
-
-  mCurrentChar      += patternCount;
-  mCurrentRawOffset += mPattern.RawSize();
-
-  if (mText->RawSize() < mCurrentRawOffset + mPattern.RawSize())
-    return PATTERN_NOT_FOUND;
-
-  assert( mText->CharsUntilOffset( mCurrentRawOffset) == mCurrentChar);
-  assert( mText->OffsetOfChar( mCurrentChar) == mCurrentRawOffset);
-
-  if (FindSubstr() < 0)
-    return PATTERN_NOT_FOUND;
-
-  return mCurrentChar;
-}
-
-
-int64_t
-StringMatcher::NextMatchRaw()
-{
-  if (NextMatch() < 0)
-    return PATTERN_NOT_FOUND;
-
-  return mCurrentRawOffset;
-}
-
-
-uint_t
-StringMatcher::ComparingWindowShift( uint_t position) const
-{
-  assert( _SC (uint_t, (mPatternSize - 1)) <= position);
-  assert( position < mCacheValid);
-
-  for (int i = mPatternSize - 1; i >= 0; --i, --position)
-    {
-      if (mPatternRaw[i] != mTextRawCache[position])
-        return i - mShiftTable[mTextRawCache[position]];
-    }
-
-  return 0;
-}
-
-
-static bool
-compare_text_buffers( const uint8_t* buffer1,
-                      const uint8_t* buffer2,
-                      const bool     ignoreCase,
-                      uint_t*        ioSize)
-{
-  const uint_t maxSize = *ioSize;
-
-  uint_t offset = 0;
-  while( offset < maxSize)
-    {
-      const uint_t chSize = _cuCache.Count( buffer1[offset]);
-
-      assert( chSize != 0);
-
-      if (offset + chSize <= maxSize)
-        {
-          uint32_t ch1;
-          uint32_t ch2;
-
-          wh_load_utf8_cp (buffer1 + offset, &ch1);
-          wh_load_utf8_cp (buffer2 + offset, &ch2);
-
-          if (ignoreCase)
-            {
-              if (wh_to_lowercase( ch1) != wh_to_lowercase( ch2))
-                return false;
-            }
-          else if (ch1 != ch2)
-            return false;
-
-          offset += chSize;
-        }
-      else
-        break;
-    }
-
-  *ioSize = offset;
-
-  return offset != 0;
-}
-
-
-bool
-StringMatcher::SuffixesMatch() const
-{
-  const uint64_t chCount = mPattern.Count();
-
-  if (mLastChar < mCurrentChar + chCount)
-    return false;
-
-  const uint_t buffSize   = mPattern.RawSize();
-  uint_t       buffOffset = mPatternSize;
-
-  if (mText->RawSize() < (mCurrentRawOffset + buffSize))
-    return false;
-
-  while( buffOffset < buffSize)
-    {
-      uint8_t   buffer1[64];
-      uint8_t   buffer2[sizeof buffer1];
-
-      uint_t chunkSize = MIN (sizeof buffer1, buffSize - buffOffset);
-
-      mPattern.RawRead( buffOffset, chunkSize, buffer1);
-      mText->RawRead( mCurrentRawOffset + buffOffset,
-                      chunkSize,
-                      buffer2);
-      if (! compare_text_buffers( buffer1, buffer2, mIgnoreCase, &chunkSize))
-        return false;
-
-      buffOffset += chunkSize;
-    }
-
-  assert( buffOffset == buffSize);
-
-  return true;
-}
-
-
-uint_t
-StringMatcher::FindInCache() const
-{
-  assert( (mTextRawCache[0] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG);
-  assert( (mCacheStartPos <= mCurrentRawOffset)
-          && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
-
-  uint_t windowsPos = mCurrentRawOffset - mCacheStartPos + mPatternSize - 1;
-
-  while( windowsPos < mCacheValid)
-    {
-      const uint_t shift = ComparingWindowShift( windowsPos);
-
-      if (shift == 0)
-        break;
-
-      windowsPos += shift;
-    }
-
-  return windowsPos;
-}
-
-
-void
-StringMatcher::CountCachedChars( const uint_t offset)
-{
-  uint_t chOffset = mCurrentRawOffset - mCacheStartPos;
-
-  assert( offset <= mCacheValid);
-  assert( (mCacheStartPos <= mCurrentRawOffset)
-          && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
-
-  while( chOffset < offset)
-    {
-      const uint_t codeUnits = _cuCache.Count( mTextRawCache[chOffset]);
-
-      assert( codeUnits > 0);
-
-      ++mCurrentChar;
-
-      mCurrentRawOffset += codeUnits;
-      chOffset          += codeUnits;
-    }
-}
-
-
-bool
-StringMatcher::FillTextCache()
-{
-  assert( mText->OffsetOfChar( mCurrentChar) == mCurrentRawOffset);
-
-  if (mLastChar < mCurrentChar + mPattern.Count())
-    return false;
-
-  if ((mCacheStartPos <= mCurrentRawOffset)
-      && (mCurrentRawOffset + mPatternSize < (mCacheStartPos + mCacheValid)))
-    {
-      return true;
-    }
-
-  mCacheValid = min<uint64_t> (mAvailableCache,
-                               mText->RawSize() - mCurrentRawOffset);
-  if (mCacheValid < mPatternSize)
-    {
-      mCacheValid = 0;
-      return false;
-    }
-
-  mText->RawRead( mCurrentRawOffset, mCacheValid, mTextRawCache);
-  mCacheStartPos = mCurrentRawOffset;
-
-  if (mIgnoreCase)
-    {
-      uint_t chOffset = 0;
-
-      while( chOffset < mCacheValid)
-        {
-          uint32_t codePoint;
-
-          const uint_t codeUnits = wh_load_utf8_cp (mTextRawCache + chOffset,
-                                                    &codePoint);
-          if (chOffset + codeUnits <= mCacheValid)
-            {
-              wh_store_utf8_cp (wh_to_lowercase( codePoint),
-                                mTextRawCache + chOffset);
-              chOffset += codeUnits;
-            }
-          else
-            mCacheValid = chOffset;
-        }
-      assert( chOffset == mCacheValid);
-    }
-
-  if (mCacheValid < mPatternSize)
-    return false;
-
-  return true;
-}
-
-
-int64_t
-StringMatcher::FindSubstr()
-{
-  assert( mCurrentChar <= mLastChar);
-
-  const uint64_t textSize = mText->RawSize();
-
-  int cacheOffset = 0;
-  while( mCurrentRawOffset < textSize)
-    {
-      if ( ! FillTextCache())
-        return PATTERN_NOT_FOUND;
-
-      cacheOffset = FindInCache();
-      if (cacheOffset < mCacheValid)
-        {
-          assert( (mPatternSize - 1) <= cacheOffset);
-
-          cacheOffset -= mPatternSize - 1;
-
-          CountCachedChars( cacheOffset);
-
-          if (mPatternSize == mPattern.RawSize())
-            break; // Match  found.
-
-          else if (! SuffixesMatch())
-            {
-              //A prefix match was found but the rest of string don't match.
-              ++mCurrentChar;
-              mCurrentRawOffset += _cuCache.Count(
-                              mTextRawCache[mCurrentRawOffset - mCacheStartPos]
-                                                  );
-            }
-          else
-            break; //Match found( including the suffix).
-        }
-      else
-        {
-          assert( mPatternSize <= mCacheValid);
-
-          CountCachedChars( mCacheValid - (mPatternSize - 1));
-          mCacheValid = 0;
-        }
-    }
-
-  assert( mCurrentRawOffset <= textSize);
-
-  if ((textSize <= mCurrentRawOffset)
-      || (mLastChar <= mCurrentChar)
-      || (mLastChar - mCurrentChar < mPattern.Count()))
-    {
-      return PATTERN_NOT_FOUND;
-    }
-
-  return mCurrentChar;
-}
-

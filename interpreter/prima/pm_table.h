@@ -55,15 +55,21 @@ public:
 
   void IncrementRefCount()
   {
+    LockRAII<Lock> _lock (mLock);
     ++mRefCount;
   }
 
   void DecrementRefCount()
   {
+    LockRAII<Lock> _lock (mLock);
+
     assert( mRefCount > 0);
 
     if (--mRefCount == 0)
-      delete this;
+      {
+        _lock.Release();
+        delete this;
+      }
   }
 
   ITable& GetTable()
@@ -90,6 +96,7 @@ private:
   IDBSHandler&     mDbsHnd;
   ITable&          mTable;
   uint64_t         mRefCount;
+  Lock             mLock;
 };
 
 } //namespace whais

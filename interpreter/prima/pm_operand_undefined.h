@@ -125,7 +125,7 @@ public:
   virtual void           NativeObject( INativeObject* const value);
   virtual INativeObject& NativeObject();
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
   virtual TableReference& GetTableReference();
 

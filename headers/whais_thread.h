@@ -42,6 +42,10 @@ uint_t
 wh_lock_acquire( WH_LOCK* const lock);
 
 uint_t
+wh_lock_try_acquire( WH_LOCK* const lock,
+                     bool_t* const outAcquired);
+
+uint_t
 wh_lock_release( WH_LOCK* const lock);
 
 uint_t
@@ -57,6 +61,25 @@ wh_yield();
 
 void
 wh_sleep( const uint_t millisecs);
+
+int16_t
+wh_atomic_inc16 (volatile int16_t* const value);
+
+int16_t
+wh_atomic_dec16 (volatile int16_t* const value);
+
+int32_t
+wh_atomic_inc32 (volatile int32_t* const value);
+
+int32_t
+wh_atomic_dec32 (volatile int32_t* const value);
+
+int64_t
+wh_atomic_inc64 (volatile int64_t* const value);
+
+int64_t
+wh_atomic_dec64 (volatile int64_t* const value);
+ 
 
 #ifdef __cplusplus
 }

@@ -23,16 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include <termios.h>
+#include <unistd.h>
 
 #include "whais.h"
-
-#ifndef STDIN_FILENO
-  #define STDIN_FILENO    0
-#endif
-
-#ifndef STDOUT_FILENO
-  #define STDOUT_FILENO   1
-#endif
 
 bool_t
 wh_disable_echo()

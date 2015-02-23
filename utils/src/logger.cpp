@@ -72,7 +72,7 @@ FileLogger::FileLogger( const char* const file, const bool printStart)
 void
 FileLogger::Log (const LOG_TYPE type, const char* str)
 {
-  LockRAII holder( mSync);
+  LockRAII<Lock> holder( mSync);
 
   const int markSize = PrintTimeMark( type);
 

@@ -106,3 +106,7 @@ UNIT_EXES+=test_procs_decl
 test_procs_decl_SRC=test/test_procs_decl.cpp
 test_procs_decl_LIB=dbs/wslpastra  custom/wslcommon interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom 
 
+UNIT_EXES+=test_stackvalue_size
+test_stackvalue_size_SRC=test/test_stackvalue_size.cpp
+test_stackvalue_size_LIB=dbs/wslpastra  custom/wslcommon interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom 
+

@@ -214,7 +214,7 @@ public:
   virtual void           NativeObject( INativeObject* const value);
   virtual INativeObject& NativeObject();
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
   virtual TableReference& GetTableReference();
 };
@@ -900,7 +900,7 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
 private:
   DText mValue;
@@ -923,7 +923,7 @@ public:
       mIndex( source.mIndex),
       mText()
   {
-    source.mText.MakeMirror( mText);
+    _CC (DText&, source.mText).MakeMirror (mText);
   }
 
   virtual bool IsNull() const;
@@ -937,7 +937,7 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
 private:
   const uint64_t mIndex;
@@ -967,7 +967,7 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const);
 
 private:
   DArray    mValue;
@@ -1014,7 +1014,7 @@ protected:
   }
 
   virtual bool IsNull () const;
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
@@ -1607,7 +1607,7 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
   virtual TableOperand GetTableOp();
 
@@ -1651,7 +1651,7 @@ public:
   virtual StackValue GetValueAt( const uint64_t index);
 
   virtual StackValue Duplicate() const;
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
   virtual FieldOperand GetFieldOp();
 
@@ -1676,8 +1676,8 @@ protected:
   BaseFieldElOperand( TableReference*   tableRef,
                       const ROW_INDEX   row,
                       const FIELD_INDEX field)
-    : mRow( row),
-      mTableRef( tableRef),
+    : mTableRef( tableRef),
+      mRow( row),
       mField( field)
   {
     mTableRef->IncrementRefCount();
@@ -1685,8 +1685,8 @@ protected:
 
   BaseFieldElOperand( const BaseFieldElOperand& source)
     : BaseOperand(),
-      mRow( source.mRow),
       mTableRef( source.mTableRef),
+      mRow( source.mRow),
       mField( source.mField)
   {
     mTableRef->IncrementRefCount();
@@ -1714,13 +1714,13 @@ protected:
     table.Set (mRow, mField, value);
   }
 
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
 private:
   BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
 
-  const ROW_INDEX       mRow;
   TableReference*       mTableRef;
+  const ROW_INDEX       mRow;
   const FIELD_INDEX     mField;
 };
 
@@ -2403,8 +2403,8 @@ protected:
                            const FIELD_INDEX field,
                            const uint64_t    index)
      : mIndex( index),
-       mRow( row),
        mTableRef( tableRef),
+       mRow( row),
        mField( field)
   {
     mTableRef->IncrementRefCount();
@@ -2412,8 +2412,8 @@ protected:
 
   BaseArrayFieldElOperand( const BaseArrayFieldElOperand& source)
      : mIndex( source.mIndex),
-       mRow( source.mRow),
        mTableRef( source.mTableRef),
+       mRow( source.mRow),
        mField( source.mField)
   {
     mTableRef->IncrementRefCount();
@@ -2459,14 +2459,14 @@ protected:
   }
 
   virtual bool IsNull () const;
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const dest);
 
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
 
   const uint64_t    mIndex;
-  const ROW_INDEX   mRow;
   TableReference*   mTableRef;
+  const ROW_INDEX   mRow;
   const FIELD_INDEX mField;
 };
 
@@ -3087,7 +3087,7 @@ public:
 
   bool IsNull()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().IsNull();
   }
@@ -3095,7 +3095,7 @@ public:
   template <class DBS_T>
   void GetValue( DBS_T& outValue)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().GetValue( outValue);
   }
@@ -3103,7 +3103,7 @@ public:
   template <class DBS_T>
   void SetValue( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SetValue( value);
   }
@@ -3111,7 +3111,7 @@ public:
   template <class DBS_T>
   void SelfAdd( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfAdd( value);
   }
@@ -3119,7 +3119,7 @@ public:
   template <class DBS_T>
   void SelfSub( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfSub( value);
   }
@@ -3127,7 +3127,7 @@ public:
   template <class DBS_T>
   void SelfMul( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfAdd( value);
   }
@@ -3135,7 +3135,7 @@ public:
   template <class DBS_T>
   void SelfDiv( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfAdd( value);
   }
@@ -3143,7 +3143,7 @@ public:
   template <class DBS_T>
   void SelfMod( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfAdd( value);
   }
@@ -3151,7 +3151,7 @@ public:
   template <class DBS_T>
   void SelfAnd( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfAnd( value);
   }
@@ -3159,7 +3159,7 @@ public:
   template <class DBS_T>
   void SelfXor( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfXor( value);
   }
@@ -3167,7 +3167,7 @@ public:
   template <class DBS_T>
   void SelfOr( const DBS_T& value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().SelfOr( value);
   }
@@ -3180,97 +3180,98 @@ public:
 
   FIELD_INDEX GetField()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().GetField();
   }
 
   ITable& GetTable()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().GetTable();
   }
 
   StackValue GetFieldAt( const FIELD_INDEX field)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
     return Operand().GetFieldAt( field);
 
   }
 
   StackValue GetValueAt( const uint64_t index)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().GetValueAt( index);
   }
 
   StackValue Duplicate()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().Duplicate();
   }
 
-  void NotifyCopy()
+  bool PrepareToCopy (void* const dest)
   {
-    LockRAII dummy( mSync);
-    Operand().NotifyCopy();
+    LockRAII<Lock> dummy( mSync);
+
+    return Operand().PrepareToCopy(dest);
   }
 
   TableOperand GetTableOp()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().GetTableOp();
   }
 
   void CopyTableOp( const TableOperand& source)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().CopyTableOp( source);
   }
 
   FieldOperand  GetFieldOp()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().GetFieldOp();
   }
 
   void CopyFieldOp( const FieldOperand& source)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().CopyFieldOp( source);
   }
 
   void CopyNativeObjectOperand( const NativeObjectOperand& source)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().CopyNativeObjectOperand( source);
   }
 
   void NativeObject( INativeObject* const value)
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     Operand().NativeObject( value);
   }
 
   INativeObject& NativeObject()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().NativeObject();
   }
 
   TableReference& GetTableReference()
   {
-    LockRAII dummy( mSync);
+    LockRAII<Lock> dummy( mSync);
 
     return Operand().GetTableReference();
   }
@@ -3358,7 +3359,7 @@ public:
   virtual StackValue GetValueAt( const uint64_t index);
 
   virtual StackValue Duplicate() const;
-  virtual void NotifyCopy();
+  virtual bool PrepareToCopy (void* const);
 
   virtual TableOperand GetTableOp();
 

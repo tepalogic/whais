@@ -26,6 +26,7 @@
 
 #include "utils/endianness.h"
 #include "utils/wutf.h"
+#include "utils/wunicode.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs_exception.h"
@@ -35,8 +36,830 @@
 using namespace std;
 
 namespace whais {
-namespace pastra {
 
+ITextStrategy::ITextStrategy (uint32_t charsCount)
+  : mMatcher (NULL),
+    mCachedCharsCount (charsCount),
+    mCachedCharIndex (0),
+    mCachedCharIndexOffset (0),
+    mMirrorsCount (0),
+    mCopyReferences (1)
+{
+}
+
+
+ITextStrategy::~ITextStrategy()
+{
+  delete mMatcher;
+};
+
+bool
+ITextStrategy::operator== (ITextStrategy& o)
+{
+  if (this == &o)
+    return true;
+
+  DoubleLockRAII<Lock> _l (mLock, o.mLock);
+
+  const uint64_t utf8Count = Utf8CountU ();
+  if (utf8Count != o.Utf8CountU ())
+    return false;
+
+  uint8_t buff1[128];
+  uint8_t buff2[sizeof buff1];
+
+  uint64_t offset = 0;
+  while (offset < utf8Count)
+    {
+      const uint_t chunkSize = MIN (sizeof buff1, utf8Count - offset);
+      ReadUtf8U (offset, chunkSize, buff1);
+      o.ReadUtf8U (offset, chunkSize, buff2);
+
+      if (memcmp (buff1, buff2, chunkSize) != 0)
+        return false;
+
+      offset += chunkSize;
+    }
+
+  assert (offset == utf8Count);
+
+  return true;
+}
+
+uint64_t
+ITextStrategy::CharsCount ()
+{
+  LockRAII<Lock> _l (mLock);
+
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  return mCachedCharsCount;
+}
+
+uint64_t
+ITextStrategy::CharsUntilOffset (const uint64_t offset)
+{
+  LockRAII<Lock> _l (mLock);
+  return CharsUntilOffsetU (offset);
+}
+
+uint64_t
+ITextStrategy::CharsUntilOffsetU (const uint64_t offset)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  const uint64_t maxOffset = MIN (offset, Utf8CountU ());
+
+  if (mCachedCharIndexOffset > offset)
+    mCachedCharIndex = mCachedCharIndexOffset = 0;
+
+  uint64_t buffOffset = 0, buffValid = 0;
+  uint8_t tempBuffer[256];
+  while (mCachedCharIndexOffset < maxOffset)
+    {
+      if (buffOffset >= buffValid)
+        {
+          buffOffset = 0;
+          buffValid  = MIN (sizeof tempBuffer,
+                            maxOffset - mCachedCharIndexOffset);
+          ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
+        }
+
+      const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
+
+      mCachedCharIndexOffset += cuCount;
+      buffOffset             += cuCount;
+      ++mCachedCharIndex;
+    }
+
+  assert (mCachedCharIndex <= mCachedCharsCount);
+
+  return mCachedCharIndex;
+}
+
+
+uint64_t
+ITextStrategy::OffsetOfChar (const uint64_t index)
+{
+  LockRAII<Lock> _l (mLock);
+  return OffsetOfCharU (index);
+}
+
+
+uint64_t
+ITextStrategy::OffsetOfCharU (const uint64_t index)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (index == mCachedCharsCount)
+    return Utf8CountU ();
+
+  else if (index > mCachedCharsCount)
+    throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
+
+  else if (mCachedCharIndexOffset > index)
+    mCachedCharIndex = mCachedCharIndexOffset = 0;
+
+  const uint64_t maxOffset = Utf8CountU ();
+  uint64_t buffOffset = 0, buffValid = 0;
+  uint8_t tempBuffer[256];
+  while (mCachedCharIndex < index)
+    {
+      if (buffOffset >= buffValid)
+        {
+          buffOffset = 0;
+          buffValid  = MIN (sizeof tempBuffer,
+                            maxOffset - mCachedCharIndexOffset);
+          ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
+        }
+
+      const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
+
+      mCachedCharIndexOffset += cuCount;
+      buffOffset             += cuCount;
+      ++mCachedCharIndex;
+    }
+
+  assert (mCachedCharIndexOffset <= Utf8CountU ());
+
+  return mCachedCharIndexOffset;
+}
+
+
+DChar
+ITextStrategy::CharAt (const uint64_t index)
+{
+  LockRAII<Lock> _l (mLock);
+  return CharAtU (index);
+}
+
+
+DChar
+ITextStrategy::CharAtU (const uint64_t index)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (index == mCachedCharsCount)
+    return DChar ();
+
+  else if (index > mCachedCharsCount)
+    throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
+
+  else if (mCachedCharIndexOffset > index)
+    mCachedCharIndex = mCachedCharIndexOffset = 0;
+
+  const uint64_t maxOffset = Utf8CountU ();
+  uint64_t buffOffset = 0, buffValid = 0;
+  uint8_t tempBuffer[256];
+  while (true)
+    {
+      if (buffOffset >= buffValid)
+        {
+          buffOffset = 0;
+          buffValid  = MIN (sizeof tempBuffer,
+                            maxOffset - mCachedCharIndexOffset);
+          ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
+        }
+
+      const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
+
+      if (mCachedCharIndex == index)
+        {
+          uint32_t cp = 0;
+
+          if (cuCount + buffOffset >= buffValid)
+            {
+              buffOffset = 0;
+              ReadUtf8U (mCachedCharIndexOffset, cuCount, tempBuffer);
+            }
+
+          wh_load_utf8_cp (tempBuffer + buffOffset, &cp);
+
+          assert (cp > 0);
+          assert (mCachedCharIndexOffset < maxOffset);
+          assert (mCachedCharIndex < mCachedCharsCount);
+
+          return DChar (cp);
+        }
+
+      mCachedCharIndexOffset += cuCount;
+      buffOffset             += cuCount;
+      ++mCachedCharIndex;
+    }
+
+  assert (false);
+
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+}
+
+
+ITextStrategy*
+ITextStrategy::DuplicateU ()
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
+
+  const uint64_t utf8Count = Utf8CountU ();
+  uint64_t offset = 0;
+  uint8_t tempBuffer[256];
+  while (offset < utf8Count)
+    {
+      const uint_t chunkSize  = MIN (sizeof tempBuffer, utf8Count - offset);
+      ReadUtf8U (offset, chunkSize, tempBuffer);
+      result->WriteUtf8U (offset, chunkSize, tempBuffer);
+
+      offset += chunkSize;
+    }
+
+  assert (offset == utf8Count);
+
+  result->mCachedCharsCount      = mCachedCharsCount;
+  result->mCachedCharIndexOffset = mCachedCharIndexOffset;
+  result->mCachedCharIndex       = mCachedCharIndex;
+
+  return result.release ();
+}
+
+
+ITextStrategy*
+ITextStrategy::ToCase (const bool toLower)
+{
+  LockRAII<Lock> _l (mLock);
+  return ToCaseU (toLower);
+}
+
+
+ITextStrategy*
+ITextStrategy::ToCaseU (const bool toLower)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
+
+  const uint64_t utf8Count = Utf8CountU ();
+  uint64_t offset = 0, charsRemained = mCachedCharsCount;
+  uint8_t tempBuffer[256];
+  while (charsRemained > 0)
+    {
+      assert (offset < utf8Count);
+
+      const uint_t chunkSize  = MIN (sizeof tempBuffer, utf8Count - offset);
+      ReadUtf8U (offset, chunkSize, tempBuffer);
+
+      uint_t buffValid = 0;
+      while (charsRemained > 0)
+      {
+        uint32_t cp = 0;
+        if (buffValid >= chunkSize)
+          break;
+
+        const uint8_t cuCount = wh_utf8_cu_count (tempBuffer[buffValid]);
+        if (buffValid + cuCount > chunkSize)
+          break;
+
+        wh_load_utf8_cp (tempBuffer + buffValid, &cp);
+        wh_store_utf8_cp (toLower
+                            ? wh_to_lowercase (cp)
+                            : wh_to_uppercase (cp),
+                          tempBuffer + buffValid);
+        buffValid += cuCount;
+        --charsRemained;
+      }
+
+      assert (buffValid <= chunkSize);
+      assert ((charsRemained == 0) || (buffValid > 0));
+
+      result->WriteUtf8U (offset, buffValid, tempBuffer);
+      offset += buffValid;
+    }
+
+  assert (offset == utf8Count);
+
+  result->mCachedCharsCount      = mCachedCharsCount;
+  result->mCachedCharIndexOffset = mCachedCharIndex;
+  result->mCachedCharIndex       = mCachedCharIndexOffset;
+
+  return result.release ();
+}
+
+
+ITextStrategy*
+ITextStrategy::Append (const uint32_t ch)
+{
+  LockRAII<Lock> _l (mLock);
+  return AppendU (ch);
+}
+
+
+ITextStrategy*
+ITextStrategy::AppendU (const uint32_t ch)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+  assert (ch != 0);
+
+  auto_ptr<ITextStrategy> keeper (NULL);
+  ITextStrategy* result = this;
+
+  if (ReferenceCount () > 1)
+    {
+      keeper.reset (DuplicateU ());
+      result = keeper.get ();
+    }
+
+  assert (result->mCachedCharsCount == mCachedCharsCount);
+  assert (result->Utf8CountU () == Utf8CountU());
+
+  uint8_t buffer[16];
+  const uint_t cuCount = wh_store_utf8_cp (ch, buffer);
+
+  assert (cuCount < sizeof buffer);
+
+  result->WriteUtf8U (result->Utf8CountU (), cuCount, buffer);
+  result->mCachedCharsCount++;
+
+  if (result == this)
+    {
+      delete mMatcher;
+      mMatcher = NULL;
+    }
+
+  keeper.release();
+  return result;
+}
+
+ITextStrategy*
+ITextStrategy::Append (ITextStrategy& text)
+{
+  DoubleLockRAII<Lock> _l (text.mLock, mLock);
+  return AppendU (text);
+}
+
+
+ITextStrategy*
+ITextStrategy::AppendU (ITextStrategy& text)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (text.Utf8CountU () == 0)
+    return this;
+
+  auto_ptr<ITextStrategy> keeper (NULL);
+  ITextStrategy* result = this;
+
+  if (ReferenceCount () > 1)
+    {
+      keeper.reset (DuplicateU ());
+      result = keeper.get ();
+    }
+
+  assert (result->mCachedCharsCount == mCachedCharsCount);
+  assert (result->Utf8CountU () == Utf8CountU ());
+
+  result->mCachedCharIndex       = mCachedCharsCount;
+  result->mCachedCharIndexOffset = result->Utf8CountU ();
+
+  uint8_t tempBuffer[256];
+  uint64_t offset = 0;
+  const uint64_t utf8Count = text.Utf8CountU ();
+  while (offset < utf8Count)
+    {
+      const uint_t chunkSize = MIN (sizeof tempBuffer, utf8Count - offset);
+
+      text.ReadUtf8U (offset, chunkSize, tempBuffer);
+      result->WriteUtf8U (result->Utf8CountU (), chunkSize, tempBuffer);
+
+      offset += chunkSize;
+    }
+  result->mCachedCharsCount += text.mCachedCharsCount;
+
+  assert (offset == utf8Count);
+
+  if (result == this)
+    {
+      delete mMatcher;
+      mMatcher = NULL;
+    }
+
+  keeper.release ();
+  return result;
+}
+
+
+ITextStrategy*
+ITextStrategy::Append (ITextStrategy&   text,
+                       const uint64_t   utf8OffFrom,
+                       const uint64_t   utf8OffTo)
+{
+  DoubleLockRAII<Lock> _l (text.mLock, mLock);
+  return AppendU (text, utf8OffFrom, utf8OffTo);
+}
+
+
+ITextStrategy*
+ITextStrategy::AppendU (ITextStrategy&   text,
+                        const uint64_t   utf8OffFrom,
+                        const uint64_t   utf8OffTo)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if ((utf8OffFrom >= text.Utf8CountU ())
+      || (utf8OffTo <= utf8OffFrom))
+    {
+      return this;
+    }
+
+  auto_ptr<ITextStrategy> keeper (NULL);
+  ITextStrategy* result = this;
+
+  if (ReferenceCount () > 1)
+    {
+      keeper.reset (DuplicateU ());
+      result = keeper.get ();
+    }
+
+  assert (result->mCachedCharsCount == mCachedCharsCount);
+  assert (result->Utf8CountU() == Utf8CountU());
+
+  result->mCachedCharIndex       = mCachedCharsCount;
+  result->mCachedCharIndexOffset = result->Utf8CountU ();
+
+  uint8_t tempBuffer[256];
+  uint64_t offset = utf8OffFrom;
+  const uint64_t utf8To = MIN (text.Utf8CountU (), utf8OffTo);
+  while (offset < utf8To)
+    {
+      const uint_t chunkSize = MIN (sizeof tempBuffer, utf8To - offset);
+      text.ReadUtf8U (offset, chunkSize, tempBuffer);
+
+      uint_t buffValid = 0;
+      while (buffValid < chunkSize)
+        {
+          const uint8_t cuCount = wh_utf8_cu_count (tempBuffer[buffValid]);
+
+          if (buffValid + cuCount > chunkSize)
+            break;
+
+          buffValid += cuCount;
+          result->mCachedCharsCount++;
+        }
+
+      assert (buffValid <= chunkSize);
+      assert (buffValid > 0);
+
+      result->WriteUtf8U (result->Utf8CountU (), buffValid, tempBuffer);
+      offset += buffValid;
+    }
+
+  assert (offset == utf8To);
+
+  if (result == this)
+    {
+      delete mMatcher;
+      mMatcher = NULL;
+    }
+
+  keeper.release ();
+  return result;
+}
+
+
+
+ITextStrategy*
+ITextStrategy::UpdateCharAt (const uint32_t   newCh,
+                             const uint64_t   index)
+{
+  LockRAII<Lock> _l (mLock);
+  return UpdateCharAtU (newCh, index);
+}
+
+
+ITextStrategy*
+ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
+                              const uint64_t   index)
+{
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (index == mCachedCharsCount)
+    return AppendU (newCh);
+
+  const DChar oldCh = CharAtU (index);
+
+  if (DChar (newCh) == oldCh)
+    return this;
+
+  uint8_t newBuff[8];
+  const uint_t oldCUCnt = wh_utf8_store_size (oldCh.mValue);
+  const uint_t newCUCnt = wh_store_utf8_cp (newCh, newBuff);
+
+  auto_ptr<ITextStrategy> keeper (NULL);
+  ITextStrategy* result = this;
+
+  if (ReferenceCount () > 1)
+    {
+      keeper.reset (DuplicateU ());
+      result = keeper.get ();
+    }
+
+  result->mCachedCharIndex = mCachedCharIndex;
+  result->mCachedCharIndexOffset = mCachedCharIndexOffset;
+
+  assert (result->mCachedCharsCount == mCachedCharsCount);
+  assert (mCachedCharIndexOffset == index);
+
+  if (newCh == 0)
+    {
+      assert (result == this);
+
+      result->TruncateUtf8U (mCachedCharIndexOffset);
+      assert (result->Utf8CountU () == mCachedCharIndexOffset);
+
+      result->mCachedCharsCount = mCachedCharIndex;
+      result->mCachedCharIndex  = result->mCachedCharIndexOffset = 0;
+
+    }
+  else if ((oldCUCnt == newCUCnt)
+           || (oldCh.IsNull ()))
+    {
+      if (oldCh.IsNull ())
+        {
+          assert (mCachedCharsCount == index);
+
+          result->mCachedCharIndexOffset = result->Utf8CountU ();
+          result->mCachedCharIndex = result->mCachedCharsCount++;
+        }
+
+      assert (result->mCachedCharIndex < result->mCachedCharsCount);
+      result->WriteUtf8U (result->mCachedCharIndexOffset, newCUCnt, newBuff);
+    }
+  else if (oldCUCnt < newCUCnt)
+    {
+        uint8_t buffer[256];
+        uint64_t  offset = result->Utf8CountU ();
+        const uint64_t from = mCachedCharIndexOffset + oldCUCnt;
+        while (from < offset)
+          {
+            const uint_t chunkSize = MIN (sizeof buffer, offset - from);
+
+            assert (offset - chunkSize >= mCachedCharIndexOffset);
+
+            result->ReadUtf8U (offset - chunkSize, chunkSize, buffer);
+            result->WriteUtf8U (offset - chunkSize + (newCUCnt - oldCUCnt),
+                                chunkSize,
+                                buffer);
+            offset -= chunkSize;
+          }
+        assert (offset == from);
+        result->WriteUtf8U (mCachedCharIndexOffset, newCUCnt, newBuff);
+    }
+  else
+    {
+      uint8_t buffer[256];
+
+      result->WriteUtf8U (mCachedCharIndexOffset, newCUCnt, newBuff);
+      const uint64_t utf8Count = result->Utf8CountU ();
+      uint64_t offset = mCachedCharIndexOffset + oldCUCnt;
+      while (offset < utf8Count)
+        {
+          const uint_t chunkSize = MIN (sizeof buffer, utf8Count - offset);
+          result->ReadUtf8U (offset, chunkSize, buffer);
+          result->WriteUtf8U (offset - (oldCUCnt - newCUCnt),
+                              chunkSize,
+                              buffer);
+          offset += chunkSize;
+        }
+      assert (offset == utf8Count);
+      result->TruncateUtf8U (result->Utf8CountU () - (oldCUCnt - newCUCnt));
+    }
+
+  if (result == this)
+    {
+      delete mMatcher;
+      mMatcher = NULL;
+    }
+
+  keeper.release ();
+  return result;
+}
+
+
+DUInt64
+ITextStrategy::FindMatch (ITextStrategy&   text,
+                          const uint64_t   fromCh,
+                          const uint64_t   toCh,
+                          const bool       ignoreCase)
+{
+  DoubleLockRAII<Lock> _l (mLock, text.mLock);
+
+  if ((mCachedCharsCount == 0)
+      || (toCh <= fromCh)
+      || (toCh - fromCh < mCachedCharsCount))
+    {
+      return DUInt64 ();
+    }
+
+  if (mMatcher == NULL)
+    mMatcher = new pastra::StringMatcher (*this);
+
+  const int64_t res = mMatcher->FindMatch (text, fromCh, toCh, ignoreCase);
+
+  assert( (res < 0)
+          || ((fromCh <= (uint64_t)res)
+              && ((uint64_t)res <= toCh - mCachedCharsCount)));
+
+  return ((res < 0) ? DUInt64 () : DUInt64 (res));
+}
+
+
+ITextStrategy*
+ITextStrategy::Replace (ITextStrategy&   text,
+                        ITextStrategy&   newSubstr,
+                        const uint64_t   fromCh,
+                        const uint64_t   toCh,
+                        const bool       ignoreCase)
+{
+  TripleLockRAII<Lock> _l (mLock, text.mLock, newSubstr.mLock);
+
+  std::auto_ptr<ITextStrategy> _ns (NULL);
+  ITextStrategy* ns = &newSubstr;
+
+  if (this == ns)
+    return text.DuplicateU ();
+
+  else if (&text == ns)
+    {
+      _ns.reset (newSubstr.DuplicateU ());
+      ns = _ns.get ();
+    }
+
+  const uint64_t subStrSize = Utf8CountU ();
+  std::auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
+
+  if (mMatcher == NULL)
+    mMatcher = new pastra::StringMatcher (*this);
+
+  int64_t lastMatchPos = 0;
+  int64_t  matchPos    = mMatcher->FindMatchRaw (text,
+                                                 fromCh,
+                                                 toCh,
+                                                 ignoreCase);
+  while (matchPos >= 0)
+    {
+      result->AppendU (text, lastMatchPos, matchPos);
+      result->AppendU (*ns);
+
+      lastMatchPos = matchPos + subStrSize;
+      assert (lastMatchPos <= _SC (int64_t, text.Utf8CountU ()));
+
+      matchPos = mMatcher->FindMatchRaw (text,
+                                         text.CharsUntilOffsetU (lastMatchPos),
+                                         toCh,
+                                         ignoreCase);
+
+      assert ((matchPos < 0) || (lastMatchPos <= matchPos));
+    }
+
+  if (matchPos < 0)
+    matchPos = text.Utf8CountU ();
+
+  result->AppendU (text, lastMatchPos, matchPos);
+
+  return result.release ();
+}
+
+uint64_t
+ITextStrategy::Utf8Count ()
+{
+  LockRAII<Lock> _l (mLock);
+  return Utf8CountU ();
+}
+
+
+void
+ITextStrategy::ReadUtf8 (const uint64_t offset,
+                          const uint64_t count,
+                          uint8_t* const dest)
+{
+  LockRAII<Lock> _l (mLock);
+  return ReadUtf8U (offset, count, dest);
+}
+
+
+void
+ITextStrategy::WriteUtf8 (const uint64_t       offset,
+                          const uint64_t       count,
+                          const uint8_t* const buffer)
+{
+  LockRAII<Lock> _l (mLock);
+
+  delete mMatcher;
+  mMatcher = NULL;
+
+  return WriteUtf8U (offset, count, buffer);
+}
+
+void
+ITextStrategy::TruncateUtf8 (const uint64_t offset)
+{
+  LockRAII<Lock> _l (mLock);
+  return TruncateUtf8U (offset);
+}
+
+
+
+void
+ITextStrategy::ReleaseReference ()
+{
+  LockRAII<Lock> _l (mLock);
+
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (MirrorsCount () > 0)
+    --mMirrorsCount;
+
+  else
+    --mCopyReferences;
+
+  if (ReferenceCount () == 0)
+    {
+      _l.Release ();
+      delete this;
+    }
+}
+
+uint32_t
+ITextStrategy::ReferenceCount () const
+{
+  return mCopyReferences;
+}
+
+uint32_t
+ITextStrategy::MirrorsCount () const
+{
+  return mMirrorsCount;
+}
+
+ITextStrategy*
+ITextStrategy::MakeMirrorCopy ()
+{
+  LockRAII<Lock> _l (mLock);
+
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (ReferenceCount() > 1)
+    return DuplicateU ()->MakeMirrorCopy ();
+
+  ++mMirrorsCount;
+  return this;
+}
+
+ITextStrategy*
+ITextStrategy::MakeClone ()
+{
+  LockRAII<Lock> _l (mLock);
+
+  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert (ReferenceCount () > 0);
+
+  if (MirrorsCount() > 0)
+    {
+      ++mMirrorsCount;
+      return this;
+    }
+
+  ++mCopyReferences;
+  return this;
+}
+
+
+
+pastra::TemporalContainer&
+ITextStrategy::GetTemporalContainer ()
+{
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+}
+
+
+pastra::VariableSizeStore&
+ITextStrategy::GetRowStorage ()
+{
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
+}
+
+
+namespace pastra {
 
 
 static const UTF8_CU_COUNTER _cuCache;
@@ -46,10 +869,13 @@ static const UTF8_CU_COUNTER _cuCache;
 /* Return the numbers of characters encoded by this string. The string is
    either null terminated or 'maxBytesCount' bounded. */
 static uint64_t
-get_utf8_string_length( const uint8_t* utf8Str, uint64_t maxBytesCount)
+get_utf8_string_length( const uint8_t* utf8Str,
+                        uint64_t       maxBytesCount,
+                        uint64_t*      outCharsCount)
 {
   uint64_t result = 0;
 
+  *outCharsCount = 0;
   while( (maxBytesCount > 0) && (utf8Str[0] != 0))
     {
       const uint_t charSize = _cuCache.Count( utf8Str[0]);
@@ -72,639 +898,64 @@ get_utf8_string_length( const uint8_t* utf8Str, uint64_t maxBytesCount)
         throw DBSException( _EXTRA( DBSException::INVALID_UTF8_STRING));
 
       result += charSize, maxBytesCount -= charSize, utf8Str += charSize;
+      *outCharsCount += 1;
     }
 
   return result;
 }
 
 
-
-GenericText::GenericText( uint64_t bytesSize)
-  : mBytesSize( bytesSize),
-    mCachedCharCount( INVALID_CACHE_VALUE),
-    mCachedCharIndex( 0),
-    mCachedCharIndexOffset( 0),
-    mCacheStartOff( 0),
-    mCacheValid( 0),
-    mReferenceCount( 0),
-    mShareCount( 0)
-
+NullText::NullText()
 {
 }
-
-
-GenericText::~GenericText()
-{
-}
-
-
-uint_t
-GenericText::ReferenceCount() const
-{
-  return mReferenceCount;
-}
-
-
-void
-GenericText::IncreaseReferenceCount()
-{
-  assert( mShareCount == 0);
-
-  ++mReferenceCount;
-}
-
-
-void
-GenericText::DecreaseReferenceCount()
-{
-  assert( mShareCount == 0);
-  assert( mReferenceCount > 0);
-
-  --mReferenceCount;
-
-  if (mReferenceCount  == 0)
-    ClearMyself();
-}
-
-
-uint_t
-GenericText::ShareCount() const
-{
-  return mShareCount;
-}
-
-
-void
-GenericText::IncreaseShareCount()
-{
-  assert( mReferenceCount == 1);
-
-  ++mShareCount;
-}
-
-
-void
-GenericText::DecreaseShareCount()
-{
-  assert( mShareCount > 0);
-  assert( mReferenceCount == 1);
-
-  -- mShareCount;
-}
-
 
 uint64_t
-GenericText::CharsCount()
+NullText::Utf8CountU ()
 {
-  if (mCachedCharCount != INVALID_CACHE_VALUE)
-    return mCachedCharCount;
-
-  uint64_t offset = mCachedCharIndexOffset;
-  uint64_t result = mCachedCharIndex;
-
-  while( offset < mBytesSize)
-    {
-      if ((offset < mCacheStartOff)
-          || (mCacheStartOff + mCacheValid <= offset))
-        {
-          mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - offset);
-          mCacheStartOff = offset;
-
-          ReadUtf8 (offset, mCacheValid, mCacheBuffer);
-        }
-
-      while( offset < mCacheStartOff + mCacheValid)
-        {
-          const uint_t charSize = _cuCache.Count(
-                                        mCacheBuffer[offset - mCacheStartOff]
-                                                 );
-          assert( charSize != 0);
-          assert( offset + charSize <= mBytesSize);
-
-          ++result, offset += charSize;
-        }
-    }
-
-  mCachedCharCount = result;
-
-  return mCachedCharCount;
+  return 0;
 }
 
-
-uint64_t
-GenericText::CharsUntilOffset( const uint64_t offset)
+void
+NullText::ReadUtf8U (const uint64_t offset,
+                     const uint64_t count,
+                     uint8_t* const buffer)
 {
-  uint64_t  chIndex     = 0;
-  uint64_t  chOffset    = 0;
-
-  if (mCachedCharIndexOffset <= offset)
-    {
-      chOffset   = mCachedCharIndexOffset;
-      chIndex    = mCachedCharIndex;
-    }
-
-  while( chOffset < offset)
-    {
-      if ((chOffset < mCacheStartOff)
-          || (mCacheStartOff + mCacheValid <= chOffset))
-        {
-          mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - chOffset);
-          mCacheStartOff = chOffset;
-
-          ReadUtf8 (chOffset, mCacheValid, mCacheBuffer);
-        }
-
-      while( (chOffset < offset)
-             && (chOffset < mCacheStartOff + mCacheValid))
-        {
-          const uint_t charSize = _cuCache.Count(
-                                      mCacheBuffer[chOffset - mCacheStartOff]
-                                                 );
-          assert( charSize != 0);
-          assert( chOffset + charSize <= mBytesSize);
-
-          chOffset += charSize;
-          if (chOffset <= offset)
-            ++chIndex;
-        }
-    }
-
-  if ((mCachedCharCount != INVALID_CACHE_VALUE)
-      && (chIndex < mCachedCharCount))
-    {
-      mCachedCharIndex        = chIndex;
-      mCachedCharIndexOffset  = chOffset;
-    }
-
-  return chIndex;
-}
-
-
-uint64_t
-GenericText::OffsetOfChar( const uint64_t index)
-{
-  uint64_t  result     = 0;
-  uint64_t  chIndex    = 0;
-
-  if (mCachedCharIndexOffset <= index)
-    {
-      result   = mCachedCharIndexOffset;
-      chIndex  = mCachedCharIndex;
-    }
-
-  while( chIndex < index)
-    {
-      if ((result < mCacheStartOff)
-          || (mCacheStartOff + mCacheValid <= result))
-        {
-          mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - result);
-          mCacheStartOff = result;
-
-          ReadUtf8 (result, mCacheValid, mCacheBuffer);
-        }
-
-      while( (chIndex < index)
-             && (result < mCacheStartOff + mCacheValid))
-        {
-          const uint_t charSize = _cuCache.Count(
-                                      mCacheBuffer[result - mCacheStartOff]
-                                                 );
-          assert( charSize != 0);
-          assert( result + charSize <= mBytesSize);
-
-          result += charSize;
-          ++chIndex;
-        }
-    }
-
-  if ((mCachedCharCount != INVALID_CACHE_VALUE)
-      && (index < mCachedCharCount))
-    {
-      mCachedCharIndex        = index;
-      mCachedCharIndexOffset  = result;
-    }
-
-  return result;
-}
-
-
-uint64_t
-GenericText::BytesCount() const
-{
-  return mBytesSize;
+  if (offset > 0)
+    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 void
-GenericText::Duplicate( ITextStrategy&    source,
-                        const uint64_t    bytesCount)
-{
-  TruncateUtf8 (0);
-
-  assert( mBytesSize == 0);
-  assert( mCachedCharCount == 0);
-
-  mCacheStartOff  = 0;
-  mCacheValid     = 0;
-
-  const uint64_t size   = min (source.BytesCount(), bytesCount);
-  uint64_t       offset = 0;
-
-  while( offset < size)
-    {
-      mCacheValid    = MIN (sizeof mCacheBuffer, size - offset);
-      mCacheStartOff = offset;
-
-      source.ReadUtf8 (offset, mCacheValid, mCacheBuffer);
-      WriteUtf8 (offset, mCacheValid, mCacheBuffer);
-
-      offset += mCacheValid;
-    }
-
-  assert( mBytesSize <= bytesCount);
-
-  mCachedCharCount       = INVALID_CACHE_VALUE;
-  mCachedCharIndex       = 0;
-  mCachedCharIndexOffset = 0;
-}
-
-
-DChar
-GenericText::CharAt( const uint64_t index)
-{
-  uint64_t chIndex  = 0;
-  uint64_t chOffset = 0;
-  uint32_t chValue  = 0;
-
-  if (mCachedCharIndex <= index)
-    {
-      chIndex   = mCachedCharIndex;
-      chOffset  = mCachedCharIndexOffset;
-    }
-
-  while( (chIndex < index)
-         && (chOffset < mBytesSize))
-    {
-      if ((chOffset < mCacheStartOff)
-          || (mCacheStartOff + mCacheValid <= chOffset))
-        {
-          mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - chOffset);
-          mCacheStartOff = chOffset;
-
-          ReadUtf8 (chOffset, mCacheValid, mCacheBuffer);
-        }
-
-      while( (chIndex < index)
-             && (chOffset < mCacheStartOff + mCacheValid))
-        {
-          chOffset += _cuCache.Count( mCacheBuffer[chOffset - mCacheStartOff]);
-          ++chIndex;
-        }
-    }
-
-  assert( chOffset <= mBytesSize);
-
-  if (chOffset >= mBytesSize)
-    {
-      assert( chOffset == mBytesSize);
-      assert( (mCachedCharCount == INVALID_CACHE_VALUE)
-              || (mCachedCharCount == chIndex));
-
-      mCachedCharCount = chIndex;
-
-      return DChar();
-    }
-
-  assert( chIndex == index);
-
-  mCachedCharIndex       = chIndex;
-  mCachedCharIndexOffset = chOffset;
-
-  if ((chOffset < mCacheStartOff)
-      || (mCacheStartOff + mCacheValid <= chOffset))
-    {
-      mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - chOffset);
-      mCacheStartOff = chOffset;
-
-      ReadUtf8 (chOffset, mCacheValid, mCacheBuffer);
-    }
-
-  uint_t charSize = _cuCache.Count( mCacheBuffer[chOffset - mCacheStartOff]);
-
-  if (mCacheStartOff + mCacheValid < chOffset + charSize)
-    {
-      mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - chOffset);
-      mCacheStartOff = chOffset;
-
-      ReadUtf8 (chOffset, mCacheValid, mCacheBuffer);
-    }
-
-  charSize = wh_load_utf8_cp (mCacheBuffer + (chOffset - mCacheStartOff),
-                              &chValue);
-  assert( charSize != 0);
-
-  return DChar( chValue);
-}
-
-
-void
-GenericText::Append( const uint32_t ch)
-{
-  assert( mReferenceCount == 1);
-  assert( ch != 0);
-
-  uint8_t aUtf8Encoding[UTF8_MAX_BYTES_COUNT];
-
-  const uint_t encodeSize = wh_store_utf8_cp (ch, aUtf8Encoding);
-
-  WriteUtf8 (mBytesSize, encodeSize, aUtf8Encoding);
-
-  mCacheStartOff = 0;
-  mCacheValid    = 0;
-
-  if (mCachedCharCount != INVALID_CACHE_VALUE)
-    ++mCachedCharCount;
-}
-
-
-void
-GenericText::Append( ITextStrategy& text,
-                     const uint64_t fromOff,
-                     const uint64_t toOff)
-{
-  assert( toOff <= text.BytesCount());
-
-  uint64_t offset = fromOff;
-  while( offset < toOff)
-    {
-      mCacheStartOff = mBytesSize;
-      mCacheValid    = MIN (sizeof mCacheBuffer, toOff - offset);
-
-      text.ReadUtf8 (offset, mCacheValid, mCacheBuffer);
-      WriteUtf8 (mBytesSize, mCacheValid, mCacheBuffer);
-
-      offset += mCacheValid;
-    }
-
-  if ((mCachedCharCount != INVALID_CACHE_VALUE)
-      && (_SC (GenericText&, text).mCachedCharCount != INVALID_CACHE_VALUE))
-    {
-      mCachedCharCount += _SC (GenericText&, text).mCachedCharCount;
-    }
-  else
-    mCachedCharCount = INVALID_CACHE_VALUE;
-}
-
-
-void
-GenericText::Truncate( uint64_t          newCharCount,
-                       ITextStrategy**   inoutStrategy)
-{
-  if ((mCachedCharCount != INVALID_CACHE_VALUE)
-      && (mCachedCharCount <= newCharCount))
-    {
-      return ;
-    }
-
-  uint64_t offset;
-  if (mCachedCharIndex < newCharCount)
-    {
-      offset            = mCachedCharIndexOffset;
-      mCachedCharCount  = mCachedCharIndex;
-    }
-  else
-    {
-      offset                 = 0;
-      mCachedCharIndex       = 0;
-      mCachedCharIndexOffset = 0;
-      mCachedCharCount       = 0;
-    }
-
-  while( (mCachedCharCount < newCharCount)
-         && (offset < mBytesSize))
-    {
-      if ((offset < mCacheStartOff)
-          || (mCacheStartOff + mCacheValid <= offset))
-        {
-          mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - offset);
-          mCacheStartOff = offset;
-
-          ReadUtf8 (offset, mCacheValid, mCacheBuffer);
-        }
-
-      while( offset < mCacheStartOff + mCacheValid)
-        {
-          offset += _cuCache.Count( mCacheBuffer[offset - mCacheStartOff]);
-          ++mCachedCharCount;
-        }
-    }
-
-  assert( offset <= mBytesSize);
-
-  if (ReferenceCount () > 1)
-    {
-      auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount();
-
-      assert (this == *inoutStrategy);
-      newText->Duplicate (*this, offset);
-
-      if (ShareCount() > 0)
-        {
-          assert( ReferenceCount() == 1);
-          TruncateUtf8 (offset);
-        }
-      else
-        {
-          *inoutStrategy = newText.release();
-          DecreaseReferenceCount();
-        }
-    }
-  else
-    TruncateUtf8 (offset);
-}
-
-
-void
-GenericText::UpdateCharAt( const uint32_t   ch,
-                           const uint64_t   index,
-                           ITextStrategy**  inoutStrategy)
-{
-  assert( this == *inoutStrategy);
-  assert( ch != 0);
-
-  auto_ptr<ITextStrategy> newText( new TemporalText( NULL));
-  newText->IncreaseReferenceCount();
-
-  uint64_t it       = 0;
-  uint64_t offset  = 0;
-  while( it < index)
-    {
-      assert( offset <= mBytesSize);
-
-      mCacheStartOff = offset;
-      mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - offset);
-
-      ReadUtf8 (mCacheStartOff, mCacheValid, mCacheBuffer);
-
-      while( (it < index)
-             && (offset < mCacheStartOff + mCacheValid))
-        {
-          offset += _cuCache.Count( mCacheBuffer[offset - mCacheStartOff]);
-          ++it;
-        }
-
-      newText->WriteUtf8 (newText->BytesCount(),
-                          offset - mCacheStartOff,
-                          mCacheBuffer);
-    }
-
-  mCachedCharIndex        = index;
-  mCachedCharIndexOffset  = offset;
-
-  const DChar oldCh = CharAt( index);
-  newText->Append( ch);
-
-  if (oldCh.IsNull())
-    {
-      assert( mBytesSize == offset);
-
-      mCachedCharCount = it;
-    }
-  else
-    {
-      offset += wh_utf8_store_size( oldCh.mValue);
-
-      while( offset < mBytesSize)
-        {
-          mCacheStartOff = offset;
-          mCacheValid    = MIN (sizeof mCacheBuffer, mBytesSize - offset);
-
-          ReadUtf8 (mCacheStartOff, mCacheValid, mCacheBuffer);
-
-          newText->WriteUtf8 (newText->BytesCount(),
-                              mCacheValid,
-                              mCacheBuffer);
-
-          offset += mCacheValid;
-        }
-    }
-
-  if (ShareCount() > 0)
-    {
-      assert( ReferenceCount() == 1);
-      Duplicate( *newText.get (), newText->BytesCount());
-    }
-  else
-    {
-      *inoutStrategy = newText.release();
-      DecreaseReferenceCount();
-    }
-}
-
-
-bool
-GenericText::IsRowValue() const
-{
-  return false;
-}
-
-
-TemporalText&
-GenericText::GetTemporal()
+NullText::WriteUtf8U (const uint64_t       offset,
+                      const uint64_t       count,
+                      const uint8_t* const buffer)
 {
   throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
-RowFieldText&
-GenericText::GetRow()
+void
+NullText::TruncateUtf8U (const uint64_t offset)
 {
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+  if (offset > 0)
+    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
 }
 
-
-
-NullText::NullText() :
-    GenericText( 0)
-{
-}
-
-
-NullText::~NullText()
-{
-}
-
-
-uint_t
+uint32_t
 NullText::ReferenceCount() const
 {
-  return ~0; //Do not allow one to change us!
+  return 8; //Enough not to allow to change use
+}
+
+uint32_t
+NullText::MirrorsCount () const
+{
+  return 0;
 }
 
 
 void
-NullText::IncreaseReferenceCount()
-{
-  //This is a singleton. Do nothing!
-}
-
-
-void
-NullText::DecreaseReferenceCount()
-{
-  //This is a singleton. Do nothing!
-}
-
-
-uint_t
-NullText::ShareCount() const
-{
-  return 0; //Do not allow one to change us!
-}
-
-
-void
-NullText::IncreaseShareCount()
-{
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
-}
-
-
-void
-NullText::DecreaseShareCount()
-{
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
-}
-
-
-void
-NullText::ReadUtf8 (const uint64_t offset,
-                    const uint64_t count,
-                    uint8_t* const buffer)
-{
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
-}
-
-
-void
-NullText::WriteUtf8 (const uint64_t       offset,
-                     const uint64_t       count,
-                     const uint8_t* const buffer)
-{
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
-}
-
-
-void
-NullText::TruncateUtf8 (const uint64_t newSize)
-{
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
-}
-
-
-void
-NullText::ClearMyself()
+NullText::ReleaseReference ()
 {
   //This is a singleton. Do nothing!
 }
@@ -719,66 +970,106 @@ NullText::GetSingletoneInstace()
 }
 
 
+
+TemporalText::TemporalText( const uint8_t* const utf8Str,
+                            const uint64_t       unitsCount)
+{
+  if (utf8Str == NULL)
+    return;
+
+  const uint64_t bytesCount = get_utf8_string_length( utf8Str,
+                                                      unitsCount,
+                                                      &mCachedCharsCount);
+  mStorage.Write( 0, bytesCount, utf8Str);
+}
+
+
+uint64_t
+TemporalText::Utf8CountU ()
+{
+  return mStorage.Size ();
+}
+
+void
+TemporalText::ReadUtf8U (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t* const buffer)
+{
+  const uint64_t toRead = MIN (count, mStorage.Size() - offset);
+  mStorage.Read( offset, toRead, buffer);
+}
+
+
+void
+TemporalText::WriteUtf8U (const uint64_t       offset,
+                          const uint64_t       count,
+                          const uint8_t* const buffer)
+{
+  mStorage.Write( offset, count, buffer);
+}
+
+
+void
+TemporalText::TruncateUtf8U (const uint64_t offset)
+{
+  mStorage.Colapse (0, offset);
+}
+
+
+TemporalContainer&
+TemporalText::GetTemporalContainer ()
+{
+  return mStorage;
+}
+
+
+
 RowFieldText::RowFieldText( VariableSizeStore& storage,
                             const uint64_t     firstEntry,
                             const uint64_t     bytesSize)
-  : GenericText( (bytesSize == 0) ? 0 : (bytesSize - CACHE_META_DATA_SIZE)),
-    mFirstEntry( firstEntry),
+  : mFirstEntry( firstEntry),
+    mUtf8Count ((bytesSize == 0) ? 0 : bytesSize - CACHE_META_DATA_SIZE),
     mStorage( storage),
-    mTempText( NULL)
+    mTempContainer ()
 {
-  if (bytesSize > 0)
-    {
-      assert( bytesSize > CACHE_META_DATA_SIZE);
+  if (mUtf8Count == 0)
+    return ;
 
-      mStorage.RegisterReference();
-      mStorage.IncrementRecordRef( mFirstEntry);
+  assert (bytesSize > CACHE_META_DATA_SIZE);
 
-      assert( bytesSize > CACHE_META_DATA_SIZE);
+  mStorage.RegisterReference();
+  mStorage.IncrementRecordRef( mFirstEntry);
 
-      uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
-      mStorage.GetRecord( mFirstEntry,
-                          0,
-                          CACHE_META_DATA_SIZE,
-                          cachedMetaData);
+  assert( bytesSize > CACHE_META_DATA_SIZE);
 
-      mCachedCharCount = load_le_int32 (cachedMetaData);
-      mCachedCharIndex = load_le_int32 (cachedMetaData + sizeof( uint32_t));
+  uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
+  mStorage.GetRecord( mFirstEntry,
+                      0,
+                      CACHE_META_DATA_SIZE,
+                      cachedMetaData);
 
-      mCachedCharIndexOffset = load_le_int32 (
-                                        cachedMetaData + 2 * sizeof( uint32_t)
-                                              );
-    }
-  else
-    {
-      mTempText = new TemporalText( NULL);
-      mTempText->IncreaseReferenceCount();
-    }
+  mCachedCharsCount = load_le_int32 (cachedMetaData);
+  mCachedCharIndex  = load_le_int32 (cachedMetaData + sizeof( uint32_t));
+  mCachedCharIndexOffset = load_le_int32 (
+                                cachedMetaData + 2 * sizeof( uint32_t)
+                                         );
 }
+
 
 
 RowFieldText::~RowFieldText()
 {
-  assert( (mReferenceCount == 0) && (mShareCount == 0));
-  assert( mCachedCharCount <= MAX_CHARS_COUNT);
+  assert( mCachedCharsCount <= MAX_CHARS_COUNT);
   assert( mCachedCharIndex <= MAX_CHARS_COUNT);
   assert( mCachedCharIndexOffset <= MAX_BYTES_COUNT);
 
-  if (mTempText == NULL)
+  if (mUtf8Count != 0)
     {
       uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
 
       mStorage.GetRecord( mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
 
-      //Do not update the elements count if we have not modified ours
-      //Someone else might did it in the mean time, so we will do our
-      //best to avoid conflicts.
-      if (load_le_int32 (cachedMetaData) < mCachedCharCount)
-        store_le_int32 (mCachedCharCount, cachedMetaData);
-
-      //Char index and offset would in the worst case trigger only
-      //cache miss hits, but their values should stay valid, as they are
-      //protected if the string is truncated or modified.
+      //Do not update the elements count
       store_le_int32 (mCachedCharIndex, cachedMetaData + sizeof( uint32_t));
       store_le_int32 (mCachedCharIndexOffset,
                       cachedMetaData + 2 * sizeof( uint32_t));
@@ -792,41 +1083,47 @@ RowFieldText::~RowFieldText()
       mStorage.Flush();
       mStorage.ReleaseReference();
     }
-  else
-    {
-      assert( mBytesSize == mTempText->BytesCount());
-      assert( (mCachedCharCount == INVALID_CACHE_VALUE)
-              || (mCachedCharCount == mTempText->CharsCount()));
-
-      mTempText->DecreaseReferenceCount();
-    }
 }
 
+uint64_t
+RowFieldText::Utf8CountU ()
+{
+  return (mUtf8Count == 0) ? mTempContainer.Size () : mUtf8Count;
+}
 
 void
-RowFieldText::ReadUtf8 (const uint64_t offset,
-                        const uint64_t count,
-                        uint8_t* const buffer)
+RowFieldText::ReadUtf8U (const uint64_t offset,
+                         const uint64_t count,
+                         uint8_t* const buffer)
 {
-  if (mTempText != NULL)
+  assert (offset <= ((mUtf8Count == 0) ? mTempContainer.Size () : mUtf8Count));
+
+  const uint64_t containerSize = mTempContainer.Size ();
+  if (containerSize > 0)
     {
-      mTempText->ReadUtf8 (offset, count, buffer);
+      const uint64_t toRead = MIN (count, containerSize - offset);
+      if (toRead > 0)
+        mTempContainer.Read (offset, count, buffer);
       return ;
     }
 
   assert( mFirstEntry > 0);
 
-  mStorage.GetRecord( mFirstEntry,
+  const uint64_t toRead = MIN (count, mUtf8Count - offset);
+  if (toRead == 0)
+    return ;
+
+  mStorage.GetRecord (mFirstEntry,
                       offset + CACHE_META_DATA_SIZE,
-                      count,
+                      toRead,
                       buffer);
 }
 
 
 void
-RowFieldText::WriteUtf8 (const uint64_t       offset,
-                         const uint64_t       count,
-                         const uint8_t* const buffer)
+RowFieldText::WriteUtf8U (const uint64_t       offset,
+                          const uint64_t       count,
+                          const uint8_t* const buffer)
 {
   if ((offset + count) > MAX_BYTES_COUNT)
     {
@@ -835,199 +1132,470 @@ RowFieldText::WriteUtf8 (const uint64_t       offset,
                             " with more than %lu characters.",
                           _SC (long, MAX_BYTES_COUNT));
     }
-  else if (mTempText == NULL)
-    {
-      auto_ptr<TemporalText> newText( new TemporalText( NULL));
-      newText->IncreaseReferenceCount ();
-      newText->Duplicate( *this, mBytesSize);
 
-      mTempText = newText.release();
+  const uint64_t containerSize = mTempContainer.Size ();
+  if ((containerSize == 0)
+      && (mUtf8Count > 0))
+    {
+      uint8_t buffer[256];
+      uint64_t offset = 0;
+
+      while (offset < mUtf8Count)
+        {
+          const uint_t chunkSize = MIN (sizeof buffer, mUtf8Count - offset);
+          mStorage.GetRecord (mFirstEntry,
+                              offset + CACHE_META_DATA_SIZE,
+                              chunkSize,
+                              buffer);
+          mTempContainer.Write (offset, chunkSize, buffer);
+          offset += chunkSize;
+        }
+
+      assert (offset == mUtf8Count);
+      assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef( mFirstEntry);
       mStorage.Flush();
       mStorage.ReleaseReference();
+
+      _CC(uint64_t&, mUtf8Count) = 0;
+
     }
 
-  mTempText->WriteUtf8 (offset, count, buffer);
-  mBytesSize = mTempText->BytesCount();
-}
-
-
-void
-RowFieldText::TruncateUtf8 (const uint64_t newSize)
-{
-  if (newSize >= mBytesSize)
-    return;
-
-  if (mTempText == NULL)
-  {
-    auto_ptr<TemporalText> newText( new TemporalText( NULL));
-    newText->Duplicate( *this, newSize);
-
-    mTempText = newText.release();
-
-    mStorage.DecrementRecordRef( mFirstEntry);
-    mStorage.Flush();
-    mStorage.ReleaseReference();
-  }
- else
-  mTempText->TruncateUtf8 (newSize);
-
-  mBytesSize             = mTempText->BytesCount();
-  mCachedCharIndex       = 0;
-  mCachedCharIndexOffset = 0;
-  mCachedCharCount       = (mBytesSize == 0) ? 0 : INVALID_CACHE_VALUE;
+  mTempContainer.Write (offset, count, buffer);
 }
 
 void
-RowFieldText::UpdateCharAt( const uint32_t   ch,
-                            const uint64_t   index,
-                            ITextStrategy**  inoutStrategy)
+RowFieldText::TruncateUtf8U (const uint64_t atOffset)
 {
-  assert( ch != 0);
+  const uint64_t containerSize = mTempContainer.Size ();
 
-  this->GenericText::UpdateCharAt( ch, index, inoutStrategy);
+  if ((containerSize == 0)
+      && (mUtf8Count > 0))
+    {
+      uint8_t buffer[256];
+      uint64_t offset = 0;
+
+      while (offset < MIN (mUtf8Count, atOffset))
+        {
+          const uint_t chunkSize = MIN (sizeof buffer,
+                                        MIN (mUtf8Count, atOffset) - offset);
+          mStorage.GetRecord (mFirstEntry,
+                              offset + CACHE_META_DATA_SIZE,
+                              chunkSize,
+                              buffer);
+          mTempContainer.Write (offset, chunkSize, buffer);
+          offset += chunkSize;
+        }
+
+      assert (offset == MIN (mUtf8Count, atOffset));
+      assert (mTempContainer.Size () == mUtf8Count);
+
+      mStorage.DecrementRecordRef( mFirstEntry);
+      mStorage.Flush();
+      mStorage.ReleaseReference();
+
+      _CC(uint64_t&, mUtf8Count) = 0;
+   }
+  else
+    mTempContainer.Colapse(0, atOffset);
+}
+
+
+TemporalContainer&
+RowFieldText::GetTemporalContainer ()
+{
+  return mTempContainer;
+}
+
+VariableSizeStore&
+RowFieldText::GetRowStorage ()
+{
+  return mStorage;
+}
+
+
+
+
+StringMatcher::StringMatcher (ITextStrategy& pattern)
+  : mText( NULL),
+    mPattern( pattern),
+    mPatternSize( min<uint64_t> (pattern.Utf8CountU (), MAX_PATTERN_SIZE)),
+    mIgnoreCase( false),
+    mLastChar( 0xFFFFFFFFFFFFFFFFull),
+    mCurrentChar( 0),
+    mCurrentRawOffset( 0),
+    mCacheStartPos( 0),
+    mPatternRaw( mCache),
+    mTextRawCache( mPatternRaw + mPatternSize),
+    mAvailableCache( sizeof mCache - mPatternSize),
+    mCacheValid( 0)
+{
+  assert( mPatternSize > 0);
+
+  mPattern.ReadUtf8U ( 0, mPatternSize, mPatternRaw);
+
+  if (mPatternSize < pattern.Utf8CountU ())
+    {
+      uint_t chOffset = 0;
+      while( chOffset < mPatternSize)
+        {
+          const uint32_t codeUnits = _cuCache.Count( mPatternRaw[chOffset]);
+
+          if (chOffset + codeUnits > mPatternSize)
+            mPatternSize = chOffset;
+
+          else
+            chOffset += codeUnits;
+        }
+      assert( chOffset == mPatternSize);
+    }
+
+  assert( mPatternSize != 0);
+
+  memset( mShiftTable, 0, sizeof( mShiftTable));
+  for (uint_t i = 0; i < mPatternSize; ++i)
+    mShiftTable[mPatternRaw[i]] = i;
+}
+
+
+int64_t
+StringMatcher::FindMatch (ITextStrategy&  text,
+                          const uint64_t  fromChar,
+                          const uint64_t  toChar,
+                          const bool      ignoreCase)
+{
+  bool patternRefreshed = false;
+
+  mText             = &text;
+  mCurrentChar      = fromChar;
+  mCurrentRawOffset = mText->OffsetOfCharU (mCurrentChar);
+  mLastChar         = MIN (toChar, mText->mCachedCharsCount);
+
+  if ((fromChar >= mLastChar)
+      || (mLastChar - fromChar < mPattern.mCachedCharsCount))
+    {
+      return PATTERN_NOT_FOUND;
+    }
+
+  mCacheValid         = 0;
+  mCacheStartPos      = 0;
+
+  if (mText->OffsetOfCharU (mLastChar) <
+        mCurrentRawOffset + mPattern.Utf8CountU ())
+    {
+      return PATTERN_NOT_FOUND;
+    }
+
+  if (ignoreCase != mIgnoreCase)
+    {
+      memset( mShiftTable, 0, sizeof mShiftTable);
+      mPattern.ReadUtf8U ( 0, mPatternSize, mPatternRaw);
+      patternRefreshed = true;
+    }
+
+  if (ignoreCase && patternRefreshed)
+    {
+      uint_t chOffset = 0;
+
+      while( chOffset < mPatternSize)
+        {
+          uint32_t codePoint;
+
+          wh_load_utf8_cp (mPatternRaw + chOffset, &codePoint);
+          chOffset += wh_store_utf8_cp (wh_to_lowercase( codePoint),
+                                        mPatternRaw + chOffset);
+        }
+      assert( chOffset == mPatternSize);
+    }
+
+  mIgnoreCase = ignoreCase;
+
+  if (patternRefreshed)
+    {
+      memset( mShiftTable, 0, sizeof( mShiftTable));
+      for (uint_t i = 0; i < mPatternSize; ++i)
+        mShiftTable[mPatternRaw[i]] = i;
+    }
+
+  if (FindSubstr() < 0)
+    return PATTERN_NOT_FOUND;
+
+  assert( mPattern.mCachedCharsCount <= toChar - mCurrentChar);
+
+  assert( mText->CharsUntilOffsetU (mCurrentRawOffset) == mCurrentChar);
+  assert( mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
+
+  return mCurrentChar;
+}
+
+
+int64_t
+StringMatcher::FindMatchRaw (ITextStrategy&   text,
+                             const uint64_t   fromChar,
+                             const uint64_t   toChar,
+                             const bool       ignoreCase)
+{
+  if (FindMatch( text, fromChar, toChar, ignoreCase) < 0)
+    return PATTERN_NOT_FOUND;
+
+  return mCurrentRawOffset;
+}
+
+
+uint_t
+StringMatcher::ComparingWindowShift( uint_t position) const
+{
+  assert( _SC (uint_t, (mPatternSize - 1)) <= position);
+  assert( position < mCacheValid);
+
+  for (int i = mPatternSize - 1; i >= 0; --i, --position)
+    {
+      if (mPatternRaw[i] != mTextRawCache[position])
+        {
+          if (i > mShiftTable[mTextRawCache[position]])
+            return i - mShiftTable[mTextRawCache[position]];
+
+          else
+            return 1;
+        }
+    }
+
+  return 0;
+}
+
+
+static bool
+compare_text_buffers( const uint8_t* buffer1,
+                      const uint8_t* buffer2,
+                      const bool     ignoreCase,
+                      uint_t*        ioSize)
+{
+  const uint_t maxSize = *ioSize;
+
+  uint_t offset = 0;
+  while( offset < maxSize)
+    {
+      const uint_t chSize = _cuCache.Count( buffer1[offset]);
+
+      assert( chSize != 0);
+
+      if (offset + chSize <= maxSize)
+        {
+          uint32_t ch1;
+          uint32_t ch2;
+
+          wh_load_utf8_cp (buffer1 + offset, &ch1);
+          wh_load_utf8_cp (buffer2 + offset, &ch2);
+
+          if (ignoreCase)
+            {
+              if (wh_to_lowercase( ch1) != wh_to_lowercase( ch2))
+                return false;
+            }
+          else if (ch1 != ch2)
+            return false;
+
+          offset += chSize;
+        }
+      else
+        break;
+    }
+
+  *ioSize = offset;
+
+  return offset != 0;
 }
 
 
 bool
-RowFieldText::IsRowValue() const
+StringMatcher::SuffixesMatch() const
 {
-  return mTempText == NULL;
-}
+  if (mLastChar < mCurrentChar + mPattern.mCachedCharsCount)
+    return false;
 
+  const uint_t buffSize   = mPattern.Utf8CountU ();
+  uint_t       buffOffset = mPatternSize;
 
-TemporalText&
-RowFieldText::GetTemporal()
-{
-  assert( mTempText != NULL);
+  if (mText->Utf8CountU () < (mCurrentRawOffset + buffSize))
+    return false;
 
-  return *mTempText;
-}
-
-
-RowFieldText&
-RowFieldText::GetRow()
-{
-  assert( mTempText == NULL);
-  return *this;
-}
-
-
-void
-RowFieldText::ClearMyself()
-{
-  delete this;
-}
-
-
-TemporalText::TemporalText( const uint8_t* const utf8Str,
-                            const uint64_t       unitsCount)
-  : GenericText( 0),
-    mStorage()
-{
-  if (utf8Str == NULL)
-    return;
-
-  mBytesSize = get_utf8_string_length( utf8Str, unitsCount);
-  mStorage.Write( 0, mBytesSize, utf8Str);
-}
-
-
-void
-TemporalText::ReadUtf8 (const uint64_t offset,
-                        const uint64_t count,
-                        uint8_t* const buffer)
-{
-  assert( mBytesSize == mStorage.Size());
-
-  mStorage.Read( offset, count, buffer);
-}
-
-
-void
-TemporalText::WriteUtf8 (const uint64_t       offset,
-                         const uint64_t       count,
-                         const uint8_t* const buffer)
-{
-  assert( mBytesSize == mStorage.Size());
-
-  mStorage.Write( offset, count, buffer);
-
-  if (mBytesSize < offset + count)
-    mBytesSize = offset + count;
-
-  assert( mBytesSize == mStorage.Size());
-}
-
-
-void
-TemporalText::TruncateUtf8 (const uint64_t newSize)
-{
-  assert( mBytesSize == mStorage.Size());
-
-  mStorage.Colapse( newSize, mBytesSize);
-
-  mBytesSize             = newSize;
-  mCachedCharIndex       = 0;
-  mCachedCharIndexOffset = 0;
-
-  mCachedCharCount = (mBytesSize == 0) ? 0 : INVALID_CACHE_VALUE;
-}
-
-
-void
-TemporalText::UpdateCharAt( const uint32_t   ch,
-                            const uint64_t   index,
-                            ITextStrategy**  inoutStrategy)
-{
-  assert( this == *inoutStrategy);
-  assert( ch != 0);
-
-  const uint32_t utf8CodeUnitsCount = wh_utf8_store_size( ch);
-
-  assert( (utf8CodeUnitsCount > 0)
-          && (utf8CodeUnitsCount < UTF8_MAX_BYTES_COUNT));
-
-  const uint32_t oldChar = CharAt( index).mValue;
-
-  assert( oldChar != 0);
-
-  if ((ReferenceCount() > 1)
-      || utf8CodeUnitsCount != wh_utf8_store_size( oldChar))
+  while( buffOffset < buffSize)
     {
-      this->GenericText::UpdateCharAt( ch, index, inoutStrategy);
-      return;
+      uint8_t   buffer1[64];
+      uint8_t   buffer2[sizeof buffer1];
+
+      uint_t chunkSize = MIN (sizeof buffer1, buffSize - buffOffset);
+
+      mPattern.ReadUtf8U (buffOffset, chunkSize, buffer1);
+      mText->ReadUtf8U (mCurrentRawOffset + buffOffset, chunkSize, buffer2);
+      if (! compare_text_buffers( buffer1, buffer2, mIgnoreCase, &chunkSize))
+        return false;
+
+      buffOffset += chunkSize;
     }
 
-  assert( mCachedCharIndex == index);
+  assert( buffOffset == buffSize);
 
-  uint8_t utf8CodeUnits[UTF8_MAX_BYTES_COUNT];
-
-  wh_store_utf8_cp (ch, utf8CodeUnits);
-  WriteUtf8 (mCachedCharIndexOffset, utf8CodeUnitsCount, utf8CodeUnits);
-
-  assert( (mCacheStartOff <= mCachedCharIndexOffset)
-          && (mCachedCharIndexOffset + utf8CodeUnitsCount <=
-              mCacheStartOff + mCacheValid));
-
-  memcpy( &mCacheBuffer[mCachedCharIndexOffset - mCacheStartOff],
-          utf8CodeUnits,
-          utf8CodeUnitsCount);
+  return true;
 }
 
 
-TemporalText&
-TemporalText::GetTemporal()
+uint_t
+StringMatcher::FindInCache() const
 {
-  return *this;
+  assert( (mTextRawCache[0] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG);
+  assert( (mCacheStartPos <= mCurrentRawOffset)
+          && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
+
+  uint_t windowsPos = mCurrentRawOffset - mCacheStartPos + mPatternSize - 1;
+
+  while( windowsPos < mCacheValid)
+    {
+      const uint_t shift = ComparingWindowShift( windowsPos);
+
+      if (shift == 0)
+        break;
+
+      windowsPos += shift;
+    }
+
+  return windowsPos;
 }
 
 
 void
-TemporalText::ClearMyself()
+StringMatcher::CountCachedChars( const uint_t offset)
 {
-  delete this;
+  uint_t chOffset = mCurrentRawOffset - mCacheStartPos;
+
+  assert( offset <= mCacheValid);
+  assert( (mCacheStartPos <= mCurrentRawOffset)
+          && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
+
+  while( chOffset < offset)
+    {
+      const uint_t codeUnits = _cuCache.Count( mTextRawCache[chOffset]);
+
+      assert( codeUnits > 0);
+
+      ++mCurrentChar;
+
+      mCurrentRawOffset += codeUnits;
+      chOffset          += codeUnits;
+    }
+}
+
+
+bool
+StringMatcher::FillTextCache()
+{
+  assert( mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
+
+  if (mLastChar < mCurrentChar + mPattern.mCachedCharsCount)
+    return false;
+
+  if ((mCacheStartPos <= mCurrentRawOffset)
+      && (mCurrentRawOffset + mPatternSize < (mCacheStartPos + mCacheValid)))
+    {
+      return true;
+    }
+
+  mCacheValid = min<uint64_t> (mAvailableCache,
+                               mText->Utf8CountU () - mCurrentRawOffset);
+  if (mCacheValid < mPatternSize)
+    {
+      mCacheValid = 0;
+      return false;
+    }
+
+  mText->ReadUtf8U (mCurrentRawOffset, mCacheValid, mTextRawCache);
+  mCacheStartPos = mCurrentRawOffset;
+
+  if (mIgnoreCase)
+    {
+      uint_t chOffset = 0;
+
+      while( chOffset < mCacheValid)
+        {
+          uint32_t codePoint;
+
+          const uint_t codeUnits = wh_load_utf8_cp (mTextRawCache + chOffset,
+                                                    &codePoint);
+          if (chOffset + codeUnits <= mCacheValid)
+            {
+              wh_store_utf8_cp (wh_to_lowercase( codePoint),
+                                mTextRawCache + chOffset);
+              chOffset += codeUnits;
+            }
+          else
+            mCacheValid = chOffset;
+        }
+      assert( chOffset == mCacheValid);
+    }
+
+  if (mCacheValid < mPatternSize)
+    return false;
+
+  return true;
+}
+
+
+int64_t
+StringMatcher::FindSubstr()
+{
+  assert( mCurrentChar <= mLastChar);
+  assert (mCurrentRawOffset < mText->OffsetOfCharU (mLastChar));
+  assert (mText->OffsetOfCharU (mLastChar) >= mPattern.Utf8CountU ());
+
+  const uint64_t textSize = mText->OffsetOfCharU (mLastChar);
+
+  int cacheOffset = 0;
+  while( mCurrentRawOffset < textSize)
+    {
+      if ( ! FillTextCache())
+        return PATTERN_NOT_FOUND;
+
+      cacheOffset = FindInCache();
+      if (cacheOffset < mCacheValid)
+        {
+          assert( (mPatternSize - 1) <= cacheOffset);
+
+          cacheOffset -= mPatternSize - 1;
+
+          CountCachedChars( cacheOffset);
+
+          if (mPatternSize == mPattern.Utf8CountU ())
+            break; // Match  found.
+
+          else if (! SuffixesMatch())
+            {
+              //A prefix match was found but the rest of string don't match.
+              ++mCurrentChar;
+              mCurrentRawOffset += _cuCache.Count(
+                              mTextRawCache[mCurrentRawOffset - mCacheStartPos]
+                                                  );
+            }
+          else
+            break; //Match found( including the suffix).
+        }
+      else
+        {
+          assert( mPatternSize <= mCacheValid);
+
+          CountCachedChars( mCacheValid - (mPatternSize - 1));
+          mCacheValid = 0;
+        }
+    }
+
+  if (mLastChar < mCurrentChar + mPattern.mCachedCharsCount)
+    return PATTERN_NOT_FOUND;
+
+  assert (mLastChar - mCurrentChar >= mPattern.mCachedCharsCount);
+  assert( mCurrentRawOffset <=
+            mText->OffsetOfCharU (mLastChar) - mPattern.Utf8CountU ());
+
+  return mCurrentChar;
 }
 
 

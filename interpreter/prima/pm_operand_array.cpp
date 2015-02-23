@@ -134,10 +134,12 @@ ArrayOperand::Duplicate() const
 }
 
 
-void
-ArrayOperand::NotifyCopy()
+bool
+ArrayOperand::PrepareToCopy (void* const)
 {
   mValue.MakeMirror( mValue);
+
+  return true;
 }
 
 
@@ -149,10 +151,11 @@ BaseArrayElOperand::IsNull () const
 }
 
 
-void
-BaseArrayElOperand::NotifyCopy()
+bool
+BaseArrayElOperand::PrepareToCopy (void* const)
 {
   mArray.MakeMirror( mArray);
+  return true;
 }
 
 

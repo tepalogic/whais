@@ -35,7 +35,7 @@
 namespace whais {
 
 //TODO: Make sure you compute this limit properly for all architectures
-static const uint_t MAX_OP_QWORDS = 6;
+static const uint_t MAX_OP_QWORDS = 16;
 
 class StackValue;
 class INativeObject;
@@ -57,10 +57,6 @@ class INTERP_SHL IOperand
   friend class StackValue;
 
 public:
-  IOperand()
-  {
-  }
-
   virtual ~IOperand();
 
   virtual bool IsNull() const = 0;
@@ -136,7 +132,7 @@ public:
   virtual INativeObject& NativeObject() = 0;
 
 protected:
-  virtual void NotifyCopy() = 0;
+  virtual bool PrepareToCopy (void* const dest) = 0;
 };
 
 
@@ -158,9 +154,8 @@ public:
   {
     IOperand& op = _CC (StackValue&, source).Operand();
 
-    op.NotifyCopy();
-
-    memcpy( &mStorage, &source.mStorage, sizeof mStorage);
+    if (op.PrepareToCopy (mStorage));
+      memcpy (mStorage, &source.mStorage, sizeof mStorage);
   }
 
   ~StackValue()
@@ -172,11 +167,10 @@ public:
   operator= (const StackValue& source)
   {
     IOperand& op = _CC (StackValue&, source).Operand();
-
-    op.NotifyCopy();
-
     Clear();
-    memcpy( &mStorage, &source.mStorage, sizeof mStorage);
+
+    if (op.PrepareToCopy (mStorage));
+      memcpy (mStorage, &source.mStorage, sizeof mStorage);
 
     return *this;
   }

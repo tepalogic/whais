@@ -61,6 +61,21 @@ Lock::Acquire()
 }
 
 
+bool
+Lock::TryAcquire()
+{
+  bool_t acquired;
+
+  const int result = wh_lock_try_acquire( &mLock, &acquired);
+
+  if (result != WOP_OK)
+    throw LockException( _EXTRA( result), "Failed to try to acquire a lock.");
+
+  return acquired != FALSE;
+}
+
+
+
 void
 Lock::Release()
 {
@@ -70,6 +85,49 @@ Lock::Release()
   assert( result == WOP_OK);
 }
 
+
+
+
+SpinLock::SpinLock ()
+  : mLock (-1)
+{
+}
+
+
+void
+SpinLock::Acquire ()
+{
+  while (true)
+    {
+      assert (mLock >= -1);
+
+      if (wh_atomic_inc16 (&mLock) == 0)
+        break;
+
+      wh_atomic_dec16 (&mLock);
+      wh_yield ();
+    }
+}
+
+
+bool
+SpinLock::TryAcquire ()
+{
+  assert (mLock >= -1);
+
+  if (wh_atomic_inc16 (&mLock) == 0)
+    return true;
+
+  wh_atomic_dec16(&mLock);
+  return false;
+}
+
+void
+SpinLock::Release ()
+{
+  assert (mLock >= 0);
+  wh_atomic_dec16 (&mLock);
+}
 
 
 
@@ -139,7 +197,7 @@ Thread::WaitToEnd( const bool throwPending)
     wh_yield();
 
   //Wait till the spawned thread releases the lock.
-  LockRAII holder( mLock);
+  LockRAII<Lock> holder( mLock);
 
   assert( mEnded);
 

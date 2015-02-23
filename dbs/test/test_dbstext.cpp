@@ -27,7 +27,7 @@ using namespace pastra;
 static bool
 test_nulliness()
 {
-  std::cout << "Testing for nulliness ... ";
+  std::cout << "Testing for nulliness ... "; std::cout.flush();
   bool result = true;
   uint8_t nullUtf8[] = {0x00};
 
@@ -195,7 +195,7 @@ static const char* pOriginalText = "This is a text to test! Let's hope it will w
 static bool
 test_text_append()
 {
-  std::cout << "Testing for text appending ... ";
+  std::cout << "Testing for text appending ... "; std::cout.flush();
   bool result = true;
 
   if (result)
@@ -244,7 +244,7 @@ test_text_append()
         storage.Init( temp_file_base.c_str(), 0, 713);
         storage.RegisterReference();
 
-        allocated_entry = storage.AddRecord( 
+        allocated_entry = storage.AddRecord(
                                   tempBuff,
                                   (sizeof charValues / sizeof( uint32_t)) + 12
                                             );
@@ -263,7 +263,7 @@ test_text_append()
           storage.MarkForRemoval();
 
           {
-            DText destinationText( 
+            DText destinationText(
                       *(new RowFieldText( storage,
                                         allocated_entry,
                                         originalText.RawSize() + 12))
@@ -293,7 +293,7 @@ test_text_append()
 static bool
 test_character_insertion()
 {
-  std::cout << "Testing for text insertion ... ";
+  std::cout << "Testing for text insertion ... "; std::cout.flush();
   bool result = true;
 
   if (result)
@@ -339,13 +339,13 @@ test_character_insertion()
               strcpy( _RC (char*, tempBuff) + 12, pOriginalText);
               store_le_int32 ((sizeof charValues / sizeof( uint32_t)), tempBuff);
 
-              allocated_entry = storage.AddRecord( 
+              allocated_entry = storage.AddRecord(
                                   tempBuff,
                                   (sizeof charValues / sizeof( uint32_t)) + 12
                                                   );
 
-              DText originalText( 
-                    *(new RowFieldText( 
+              DText originalText(
+                    *(new RowFieldText(
                               storage,
                               allocated_entry,
                               sizeof( charValues) / sizeof( uint32_t) + 12
@@ -372,7 +372,7 @@ test_character_insertion()
 bool
 test_text_mirroring()
 {
-  std::cout << "Testing for text mirroring ... ";
+  std::cout << "Testing for text mirroring ... "; std::cout.flush();
   bool result = true;
 
   const DText arbiter( _RC(const uint8_t*, "Love is all you need!"));
@@ -722,10 +722,10 @@ test_text_substrings_replace( const uint_t  patternSize,
         }
     }
 
-  if (temp.ReplaceSubstr( pattern, newSubstr) != temp2)
+  if (temp.ReplaceSubstring ( pattern, newSubstr) != temp2)
     return false;
 
-  if (temp.ReplaceSubstr( pattern, newSubstr, false, 1, temp.Count() - 1) != temp3)
+  if (temp.ReplaceSubstring ( pattern, newSubstr, false, 1, temp.Count() - 1) != temp3)
     return false;
 
   temp = temp2 = temp3 = DText();
@@ -764,10 +764,10 @@ test_text_substrings_replace( const uint_t  patternSize,
         }
     }
 
- if (temp.ReplaceSubstr( pattern, newSubstr, true) != temp2)
+ if (temp.ReplaceSubstring (pattern, newSubstr, true) != temp2)
     return false;
 
-  if (temp.ReplaceSubstr( pattern, newSubstr, true, 1) != temp3)
+  if (temp.ReplaceSubstring (pattern, newSubstr, true, 1) != temp3)
     return false;
 
 
@@ -778,7 +778,7 @@ test_text_substrings_replace( const uint_t  patternSize,
 static bool
 test_text_substrings()
 {
-  std::cout << "Testing for text pattern matching ... ";
+  std::cout << "Testing for text pattern matching ... "; std::cout.flush();
   bool result = true;
 
   result = result && test_text_limit_matches( 19, 256);
@@ -799,7 +799,7 @@ test_text_substrings()
 static bool
 test_text_substrings_2 ()
 {
-  std::cout << "Testing for text pattern replace ... ";
+  std::cout << "Testing for text pattern replace ... "; std::cout.flush();
   bool result = true;
 
   result = result && test_text_substrings_replace( 15, 0);

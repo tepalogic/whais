@@ -209,7 +209,7 @@ ProcedureManager::AquireSync( const Procedure& proc, const uint32_t sync)
 
   do
     {
-      LockRAII holder( mSync);
+      LockRAII<Lock> holder( mSync);
       const bool aquired = mSyncStmts[proc.mSyncIndex + sync];
       if (aquired)
         {

@@ -171,7 +171,10 @@ custom_trace_mem_free( void *ptr, const char *file, uint_t line)
     {
       spListHead = spListHead->next;
       if (spListHead != NULL)
-        spListHead->prev = NULL;
+        {
+          assert (spListHead->prev == pMem);
+          spListHead->prev = NULL;
+        }
     }
   else
     {

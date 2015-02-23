@@ -874,7 +874,7 @@ NativeObjectOperand::NativeObject( INativeObject* const object)
 
 
 void
-NativeObjectOperand::CopyNativeObjectOperand( 
+NativeObjectOperand::CopyNativeObjectOperand(
                                         const NativeObjectOperand& source
                                              )
 {
@@ -903,10 +903,12 @@ NativeObjectOperand::Duplicate() const
 }
 
 
-void
-NativeObjectOperand::NotifyCopy()
+bool
+NativeObjectOperand::PrepareToCopy (void* const)
 {
   Initialise();
+
+  return true;
 }
 
 

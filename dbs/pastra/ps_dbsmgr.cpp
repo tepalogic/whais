@@ -186,7 +186,7 @@ DbsHandler::RetrievePersistentTable( const TABLE_INDEX index)
 {
   TABLE_INDEX iterator = index;
 
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   if (iterator >= mTables.size())
     {
@@ -224,7 +224,7 @@ DbsHandler::RetrievePersistentTable( const TABLE_INDEX index)
 ITable&
 DbsHandler::RetrievePersistentTable( const char* const name)
 {
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   TABLES::iterator it = mTables.find( name);
 
@@ -255,7 +255,7 @@ DbsHandler::AddTable( const char* const   name,
                       const FIELD_INDEX   fieldsCount,
                       DBSFieldDescriptor* inoutFields)
 {
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   if ((name == NULL) || (inoutFields == NULL) || (fieldsCount == 0))
     {
@@ -306,7 +306,7 @@ DbsHandler::ReleaseTable( ITable& hndTable)
                           " different database.");
     }
 
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   if (hndTable.IsTemporal())
     {
@@ -337,7 +337,7 @@ DbsHandler::TableName( const TABLE_INDEX index)
 {
   TABLE_INDEX iterator = index;
 
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   if (iterator >= mTables.size())
     {
@@ -363,7 +363,7 @@ DbsHandler::TableName( const TABLE_INDEX index)
 void
 DbsHandler::DeleteTable( const char* const name)
 {
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   TABLES::iterator it = mTables.find( name);
 
@@ -392,7 +392,7 @@ DbsHandler::SyncTableContent( const TABLE_INDEX index)
 {
   TABLE_INDEX iterator = index;
 
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   if (iterator >= mTables.size())
     {
@@ -422,7 +422,7 @@ DbsHandler::CreateTempTable( const FIELD_INDEX   fieldsCount,
 {
   ITable* const result = new TemporalTable( *this, inoutFields, fieldsCount);
 
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   ++mCreatedTemporalTables;
 
@@ -433,7 +433,7 @@ DbsHandler::CreateTempTable( const FIELD_INDEX   fieldsCount,
 void
 DbsHandler::Discard()
 {
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   for (TABLES::iterator it = mTables.begin(); it != mTables.end (); ++it)
     {
@@ -490,7 +490,7 @@ DbsHandler::HasUnreleasedTables()
 void
 DbsHandler::RegisterTableSpawn()
 {
-  LockRAII syncHolder( mSync);
+  LockRAII<Lock> syncHolder( mSync);
 
   ++mCreatedTemporalTables;
 }
@@ -769,7 +769,7 @@ DBSRetrieveDatabase( const char* const name, const char* path)
                           "DBS framework is not initialized.");
     }
 
-  LockRAII syncHolder( dbsMgrs_->mSync);
+  LockRAII<Lock> syncHolder( dbsMgrs_->mSync);
 
   DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
   DbsManager::DATABASES_MAP::iterator it    = dbses.find( name);
@@ -807,7 +807,7 @@ DBSReleaseDatabase( IDBSHandler& hnd)
                           "DBS framework is not initialized.");
     }
 
-  LockRAII syncHolder( dbsMgrs_->mSync);
+  LockRAII<Lock> syncHolder( dbsMgrs_->mSync);
 
   DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
   DbsManager::DATABASES_MAP::iterator it;
@@ -864,7 +864,7 @@ DBSRemoveDatabase( const char* const name, const char* path)
     }
 
   //Acquire the DBS's manager lock!
-  LockRAII syncHolder( dbsMgrs_->mSync);
+  LockRAII<Lock> syncHolder( dbsMgrs_->mSync);
 
   DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
   DbsManager::DATABASES_MAP::iterator it    = dbses.find( name);

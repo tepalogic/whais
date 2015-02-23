@@ -55,7 +55,7 @@ static map<string, prima::NameSpaceHolder> gmNameSpaces;
 INTERP_SHL void
 InitInterpreter( const char* adminDbsDir)
 {
-  LockRAII syncHolder( gSync);
+  LockRAII<Lock> syncHolder( gSync);
 
   if (gmNameSpaces.size() != 0)
     throw InterException( _EXTRA( InterException::ALREADY_INITED));
@@ -74,7 +74,7 @@ GetInstance( const char* name, Logger* log)
   if (log == NULL)
     log = &NULL_LOGGER;
 
-  LockRAII syncHolder( gSync);
+  LockRAII<Lock> syncHolder( gSync);
 
   if (gmNameSpaces.size() == 0)
     throw InterException( _EXTRA( InterException::NOT_INITED));
@@ -116,7 +116,7 @@ GetInstance( const char* name, Logger* log)
 INTERP_SHL void
 ReleaseInstance( ISession& instance)
 {
-  LockRAII syncHolder( gSync);
+  LockRAII<Lock> syncHolder( gSync);
 
   if (gmNameSpaces.size() == 0)
     throw InterException( _EXTRA( InterException::NOT_INITED));
@@ -130,7 +130,7 @@ ReleaseInstance( ISession& instance)
 INTERP_SHL void
 CleanInterpreter( const bool forced)
 {
-  LockRAII syncHolder( gSync);
+  LockRAII<Lock> syncHolder( gSync);
 
   if (gmNameSpaces.size() == 0)
     throw InterException( _EXTRA( InterException::NOT_INITED));
