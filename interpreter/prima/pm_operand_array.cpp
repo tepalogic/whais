@@ -135,11 +135,10 @@ ArrayOperand::Duplicate() const
 
 
 bool
-ArrayOperand::PrepareToCopy (void* const)
+ArrayOperand::PrepareToCopy (void* const dest)
 {
-  mValue.MakeMirror( mValue);
-
-  return true;
+  _placement_new (dest, *this);
+  return false;
 }
 
 
@@ -150,13 +149,6 @@ BaseArrayElOperand::IsNull () const
   return (mArray.Count () <= mIndex) ? true : false;
 }
 
-
-bool
-BaseArrayElOperand::PrepareToCopy (void* const)
-{
-  mArray.MakeMirror( mArray);
-  return true;
-}
 
 
 
@@ -241,6 +233,12 @@ BoolArrayElOperand::Duplicate() const
   return StackValue( BoolOperand( value));
 }
 
+bool
+BoolArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 
 void
@@ -284,6 +282,13 @@ CharArrayElOperand::Duplicate() const
   return StackValue( CharOperand( ch));
 }
 
+
+bool
+CharArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 
 void
@@ -357,6 +362,13 @@ DateArrayElOperand::Duplicate() const
   return StackValue( DateOperand( value));
 }
 
+
+bool
+DateArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 
 void
@@ -437,6 +449,13 @@ DateTimeArrayElOperand::Duplicate() const
 }
 
 
+bool
+DateTimeArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 
 void
 HiresTimeArrayElOperand::GetValue( DDate& outValue) const
@@ -510,6 +529,13 @@ HiresTimeArrayElOperand::Duplicate() const
   return StackValue( HiresTimeOperand( value));
 }
 
+
+bool
+HiresTimeArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 
 void
@@ -754,6 +780,13 @@ UInt8ArrayElOperand::Duplicate() const
 }
 
 
+bool
+UInt8ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 
 void
 UInt16ArrayElOperand::GetValue( DInt8& outValue) const
@@ -996,6 +1029,13 @@ UInt16ArrayElOperand::Duplicate() const
   return StackValue( UInt16Operand( value));
 }
 
+
+bool
+UInt16ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 
 void
@@ -1240,6 +1280,13 @@ UInt32ArrayElOperand::Duplicate() const
 }
 
 
+bool
+UInt32ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 
 void
 UInt64ArrayElOperand::GetValue( DInt8& outValue) const
@@ -1475,6 +1522,12 @@ UInt64ArrayElOperand::Duplicate() const
 }
 
 
+bool
+UInt64ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 void
 Int8ArrayElOperand::GetValue( DInt8& outValue) const
@@ -1717,6 +1770,13 @@ Int8ArrayElOperand::Duplicate() const
   return StackValue( Int8Operand( value));
 }
 
+
+bool
+Int8ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
 
 
 void
@@ -1963,6 +2023,13 @@ Int16ArrayElOperand::Duplicate() const
 }
 
 
+bool
+Int16ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 
 void
 Int32ArrayElOperand::GetValue( DInt8& outValue) const
@@ -2207,6 +2274,13 @@ Int32ArrayElOperand::Duplicate() const
 }
 
 
+bool
+Int32ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 
 void
 Int64ArrayElOperand::GetValue( DInt8& outValue) const
@@ -2449,6 +2523,13 @@ Int64ArrayElOperand::Duplicate() const
 }
 
 
+bool
+Int64ArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 
 void
 RealArrayElOperand::GetValue( DReal& outValue) const
@@ -2602,6 +2683,13 @@ RealArrayElOperand::Duplicate() const
 }
 
 
+bool
+RealArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
+}
+
 void
 RichRealArrayElOperand::GetValue( DReal& outValue) const
 {
@@ -2749,6 +2837,14 @@ RichRealArrayElOperand::Duplicate() const
   Get (value);
 
   return StackValue( RichRealOperand( value));
+}
+
+
+bool
+RichRealArrayElOperand::PrepareToCopy (void* const dest)
+{
+  _placement_new (dest, *this);
+  return false;
 }
 
 

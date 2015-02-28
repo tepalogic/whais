@@ -130,6 +130,8 @@ number_convert( const T_SRC& from, T_DEST& to)
 class TableOperand;
 class FieldOperand;
 class NativeObjectOperand;
+class LocalOperand;
+class GlobalOperand;
 
 
 
@@ -991,7 +993,7 @@ protected:
       mIndex( source.mIndex),
       mArray()
   {
-    source.mArray.MakeMirror( mArray);
+    source.mArray.MakeMirror (mArray);
   }
 
 
@@ -1014,7 +1016,6 @@ protected:
   }
 
   virtual bool IsNull () const;
-  virtual bool PrepareToCopy (void* const dest);
 
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
@@ -1046,6 +1047,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1065,6 +1068,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1086,6 +1091,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1107,6 +1114,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1128,6 +1137,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1174,6 +1185,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1219,6 +1232,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1264,6 +1279,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1309,6 +1326,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1354,6 +1373,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 class Int16ArrayElOperand : public BaseArrayElOperand
@@ -1398,6 +1419,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1443,6 +1466,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1488,6 +1513,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1520,6 +1547,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -1552,6 +1581,8 @@ public:
   virtual uint_t GetType();
 
   virtual StackValue Duplicate() const;
+
+  virtual bool PrepareToCopy (void* const dest);
 };
 
 
@@ -3359,6 +3390,7 @@ public:
   virtual StackValue GetValueAt( const uint64_t index);
 
   virtual StackValue Duplicate() const;
+
   virtual bool PrepareToCopy (void* const);
 
   virtual TableOperand GetTableOp();

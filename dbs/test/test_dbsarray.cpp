@@ -519,42 +519,6 @@ test_array_mirroring()
        }
     }
 
-  array3.Set (0, DUInt32 (0));
-  for (uint_t index = 0; result && (index < array1.Count()); ++index)
-    {
-      DUInt32 temp;
-      array1.Get (index, temp);
-
-      if (temp.mValue != firstVals[index])
-        {
-          result = false;
-          continue;
-        }
-
-      array2.Get (index, temp);
-      if (temp.mValue != firstVals[index])
-        {
-          result = false;
-          continue;
-       }
-
-      array3.Get (index, temp);
-      if ((index == 0))
-        {
-          if (temp.mValue != 0)
-            {
-              result = false;
-              continue;
-            }
-        }
-      else if (temp.mValue != firstVals[index])
-        {
-          result = false;
-          continue;
-       }
-
-    }
-
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
 }

@@ -1257,7 +1257,7 @@ PrototypeTable::Set (const ROW_INDEX      row,
 void
 PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     const DArray&          value)
+                     const DArray&          value1)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
 
@@ -1267,61 +1267,61 @@ PrototypeTable::Set (const ROW_INDEX        row,
   else if (row > mRowsCount)
     throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
 
+  DArray::StrategyRAII sMgr = value1.GetStrategyRAII ();
+  IArrayStrategy& s = sMgr;
+  LockRAII<Lock> _l (s.mLock);
+
   if ( ! IS_ARRAY( desc.Type())
-      || ((GET_BASIC_TYPE( desc.Type()) != value.Type())
-          && ! value.IsNull()))
+      || ((GET_BASIC_TYPE( desc.Type()) != s.Type()) && (s.Count() != 0)))
     {
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
+
 
   uint64_t      newFirstEntry     = ~0;
   uint64_t      newFieldValueSize = 0;
   const uint8_t bitsSet           = ~0;
   bool          fieldValueWasNull = false;
-  const bool    skipVariableStore = _SC (IArrayStrategy&, value).RawSize() <
-                                      (2 * sizeof( uint64_t));
+  const bool    skipVariableStore = s.RawSize() < (2 * sizeof (uint64_t));
+
   MarkRowModification();
 
-  if ((value.IsNull() == false) && ! skipVariableStore)
+  if (! skipVariableStore)
     {
-      IArrayStrategy& array = value;
-      if (array.IsRowValue())
+      if (s.GetTemporalContainer().Size () == 0)
         {
-          RowFieldArray& value = array.GetRow();
-
-          if (&value.mStorage == &VSStore())
+          VariableSizeStore& arrayStore  = s.GetRowStorage ();
+          const uint64_t arrayFirstEntry =
+                              _SC (RowFieldArray&, s).mFirstRecordEntry;
+          if (&arrayStore == &VSStore())
             {
-              value.mStorage.IncrementRecordRef( value.mFirstRecordEntry);
+              arrayStore.IncrementRecordRef (arrayFirstEntry);
 
-              newFieldValueSize = value.RawSize();
-              newFirstEntry     = value.mFirstRecordEntry;
+              newFieldValueSize = s.RawSize() + RowFieldArray::METADATA_SIZE;
+              newFirstEntry     = arrayFirstEntry;
             }
           else
             {
-              newFieldValueSize = value.RawSize();
-              newFirstEntry     = VSStore().AddRecord(
-                                                      value.mStorage,
-                                                      value.mFirstRecordEntry,
-                                                      0,
-                                                      newFieldValueSize
-                                                       );
+              newFieldValueSize = s.RawSize() + RowFieldArray::METADATA_SIZE;
+              newFirstEntry     = VSStore().AddRecord (arrayStore,
+                                                       arrayFirstEntry,
+                                                       0,
+                                                       newFieldValueSize);
             }
         }
       else
         {
-          TemporalArray& value = array.GetTemporal();
-          newFieldValueSize    = value.RawSize();
+          newFieldValueSize    = s.RawSize();
 
           uint8_t elemsCount[RowFieldArray::METADATA_SIZE];
+          store_le_int64 (s.Count (), elemsCount);
 
-          store_le_int64 (value.Count(), elemsCount);
-
-          newFirstEntry = VSStore().AddRecord( elemsCount, sizeof elemsCount);
-          VSStore().UpdateRecord( newFirstEntry,
-                                   sizeof elemsCount,
-                                   value.mStorage,
-                                   0,
-                                   newFieldValueSize);
+          newFirstEntry = VSStore().AddRecord (elemsCount, sizeof elemsCount);
+          VSStore().UpdateRecord (newFirstEntry,
+                                  sizeof elemsCount,
+                                  s.GetTemporalContainer (),
+                                  0,
+                                  newFieldValueSize);
           newFieldValueSize += sizeof elemsCount;
         }
     }
@@ -1342,17 +1342,17 @@ PrototypeTable::Set (const ROW_INDEX        row,
   if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
 
-  if (fieldValueWasNull && value.IsNull())
+  if (fieldValueWasNull && (s.Count () == 0))
     return ;
 
-  else if ( (fieldValueWasNull == false) && value.IsNull())
+  else if ( (fieldValueWasNull == false) && (s.Count () == 0))
     {
       rowData[byteOff] |= (1 << bitOff);
 
       if (rowData[byteOff] == bitsSet)
         CheckRowToDelete( row);
     }
-  else if (value.IsNull() == false)
+  else if (s.Count () != 0)
     {
       if (rowData[byteOff] == bitsSet)
         {
@@ -1370,23 +1370,19 @@ PrototypeTable::Set (const ROW_INDEX        row,
       //to allow other threads gain access to 'mSync' faster.
       RowFieldArray   oldEntryRAII( VSStore(),
                                     load_le_int64 (fieldFirstEntry),
-                                    value.Type());
+                                    s.Type ());
 
       VSStore().DecrementRecordRef( load_le_int64 (fieldFirstEntry));
     }
 
   if (skipVariableStore)
     {
-      IArrayStrategy& array = value;
+      assert (s.RawSize() < _SC (uint_t, Serializer::Size( T_HIRESTIME, true)));
 
-      assert( array.RawSize() < _SC (uint_t,
-                                      Serializer::Size( T_HIRESTIME, true)));
-      assert( array.IsRowValue() == false);
+      fieldValueSize[sizeof (uint64_t) - 1]  = s.RawSize();
+      fieldValueSize[sizeof (uint64_t) - 1] |= 0x80;
 
-      fieldValueSize[sizeof( uint64_t) - 1]  = array.RawSize();
-      fieldValueSize[sizeof( uint64_t) - 1] |= 0x80;
-
-      array.RawRead( 0, array.RawSize(), rowData + desc.RowDataOff());
+      s.RawRead (0, s.RawSize(), rowData + desc.RowDataOff ());
     }
   else
     {
@@ -1629,69 +1625,68 @@ PrototypeTable::Get (const ROW_INDEX        row,
   const uint_t  byteOff = desc.NullBitIndex() / 8;
   const uint8_t bitOff  = desc.NullBitIndex() % 8;
 
-  outValue.~DArray();
   if (rowData[byteOff] & (1 << bitOff))
     {
       switch( GET_BASIC_TYPE( desc.Type()))
       {
       case T_BOOL:
-        _placement_new( &outValue, DArray( _SC(DBool *, NULL)));
+        outValue = DArray( _SC(DBool *, NULL));
         break;
 
       case T_CHAR:
-        _placement_new( &outValue, DArray( _SC(DChar *, NULL)));
+        outValue = DArray( _SC(DChar *, NULL));
         break;
 
       case T_DATE:
-        _placement_new( &outValue, DArray( _SC(DDate *, NULL)));
+        outValue = DArray( _SC(DDate *, NULL));
         break;
 
       case T_DATETIME:
-        _placement_new( &outValue, DArray( _SC(DDateTime *, NULL)));
+        outValue = DArray( _SC(DDateTime *, NULL));
         break;
 
       case T_HIRESTIME:
-        _placement_new( &outValue, DArray( _SC(DHiresTime *, NULL)));
+        outValue = DArray( _SC(DHiresTime *, NULL));
         break;
 
       case T_UINT8:
-        _placement_new( &outValue, DArray( _SC(DUInt8 *, NULL)));
+        outValue = DArray( _SC(DUInt8 *, NULL));
         break;
 
       case T_UINT16:
-        _placement_new( &outValue, DArray( _SC(DUInt16 *, NULL)));
+        outValue = DArray( _SC(DUInt16 *, NULL));
         break;
 
       case T_UINT32:
-        _placement_new( &outValue, DArray( _SC(DUInt32 *, NULL)));
+        outValue = DArray( _SC(DUInt32 *, NULL));
         break;
 
       case T_UINT64:
-        _placement_new( &outValue, DArray( _SC(DUInt64 *, NULL)));
+        outValue = DArray( _SC(DUInt64 *, NULL));
         break;
 
       case T_REAL:
-        _placement_new( &outValue, DArray( _SC(DReal *, NULL)));
+        outValue = DArray( _SC(DReal *, NULL));
         break;
 
       case T_RICHREAL:
-        _placement_new( &outValue, DArray( _SC(DRichReal *, NULL)));
+        outValue = DArray( _SC(DRichReal *, NULL));
         break;
 
       case T_INT8:
-        _placement_new( &outValue, DArray( _SC(DInt8 *, NULL)));
+        outValue = DArray( _SC(DInt8 *, NULL));
         break;
 
       case T_INT16:
-        _placement_new( &outValue, DArray( _SC(DInt16 *, NULL)));
+        outValue = DArray( _SC(DInt16 *, NULL));
         break;
 
       case T_INT32:
-        _placement_new( &outValue, DArray( _SC(DInt32 *, NULL)));
+        outValue = DArray( _SC(DInt32 *, NULL));
         break;
 
       case T_INT64:
-        _placement_new( &outValue, DArray( _SC(DInt64 *, NULL)));
+        outValue = DArray( _SC(DInt64 *, NULL));
         break;
 
       default:
@@ -1700,139 +1695,32 @@ PrototypeTable::Get (const ROW_INDEX        row,
     }
   else if ((fieldValueSize & 0x8000000000000000ull) != 0)
     {
-
-      switch( GET_BASIC_TYPE( desc.Type()))
-      {
-      case T_BOOL:
-        {
-          DBool dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_CHAR:
-        {
-          DChar dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_DATE:
-        {
-          DDate dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_DATETIME:
-        {
-          DDateTime dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_HIRESTIME:
-        {
-          DHiresTime dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_UINT8:
-        {
-          DUInt8 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_UINT16:
-        {
-          DUInt16 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_UINT32:
-        {
-          DUInt32 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_UINT64:
-        {
-          DUInt64 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_REAL:
-        {
-          DReal dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_RICHREAL:
-        {
-          DRichReal dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_INT8:
-        {
-          DInt8 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_INT16:
-        {
-          DInt16 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_INT32:
-        {
-          DInt32 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      case T_INT64:
-        {
-          DInt64 dummy;
-          _placement_new( &outValue, DArray( &dummy, 1));
-        }
-        break;
-
-      default:
-        assert( false);
-      }
+      std::auto_ptr<IArrayStrategy> strategy (
+                          new TemporalArray (GET_BASIC_TYPE (desc.Type ()))
+                                             );
 
       assert( ((fieldValueSize >> 56) & 0x7F) > 0);
       assert( ((fieldValueSize >> 56) & 0x7F) <
                Serializer::Size( T_BOOL, true));
 
-      IArrayStrategy& array = outValue;
-      array.RawWrite( 0,
-                      (fieldValueSize >> 56) & 0x7F,
-                      rowData + desc.RowDataOff());
+      const uint64_t size = (fieldValueSize >> 56) & 0x7F;
+      strategy->RawWrite (0, size, rowData + desc.RowDataOff());
+      strategy->mElementsCount = size / strategy->mElementRawSize;
+      outValue = DArray (*strategy.release ());
     }
   else
     {
-      const uint64_t fieldFirstEntry = load_le_int64 (rowData +
-                                                        desc.RowDataOff());
+      const uint64_t fieldFirstEntry = load_le_int64 (rowData
+                                                      + desc.RowDataOff());
 
       IArrayStrategy& rowArray = *allocate_row_field_array(
                                VSStore(),
                                fieldFirstEntry,
                               _SC (DBS_FIELD_TYPE,
                                    desc.Type() & PS_TABLE_FIELD_TYPE_MASK)
-                                                            );
-      _placement_new( &outValue, DArray( rowArray));
+                                                         );
+
+      outValue = DArray (rowArray);
     }
 }
 

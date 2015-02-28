@@ -126,6 +126,8 @@ public:
 
   static VALUE_VALIDATOR SelectValidator( const DBS_FIELD_TYPE type);
 
+
+  static const int MAX_VALUE_RAW_SIZE = 0x20;
 };
 
 

@@ -1906,6 +1906,10 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                                                             );
                 }
                 break;
+              default:
+                throw DBSException (
+                    _EXTRA (DBSException::GENERAL_CONTROL_ERROR)
+                                   );
               }
             }
 

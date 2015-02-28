@@ -95,6 +95,10 @@ UNIT_EXES+=test_text_multithreading
 test_text_multithreading_SRC=test/test_text_multithreading.cpp
 test_text_multithreading_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
 
+UNIT_EXES+=test_array_multithreading
+test_array_multithreading_SRC=test/test_array_multithreading.cpp
+test_array_multithreading_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon
+
 UNIT_EXES+=test_range
 test_range_SRC=test/test_range.cpp
 test_range_LIB=dbs/wslpastra utils/wslutils custom/wslcustom custom/wslcommon

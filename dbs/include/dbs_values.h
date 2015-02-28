@@ -2076,18 +2076,56 @@ public:
   void Set (const uint64_t index, const DInt64& value);
 
   void Remove( const uint64_t index);
-
   void Sort( bool reverse = false);
-
   void MakeMirror( DArray& mirror) const;
 
-  operator IArrayStrategy&() const
+
+  class StrategyRAII
   {
-    return *mArray;
-  }
+  public:
+    StrategyRAII (DArray& source)
+      : mArray (source),
+        mStrategy (NULL)
+    {
+    }
+
+    ~StrategyRAII ()
+    {
+      if (mStrategy != NULL)
+        mArray.ReleaseStrategy ();
+    }
+
+    operator IArrayStrategy& ()
+    {
+      if (mStrategy == NULL)
+        mStrategy = &mArray.GetStrategy ();
+
+      return *mStrategy;
+    }
+
+    void Release ()
+    {
+      if (mStrategy != NULL)
+        {
+          mStrategy = NULL;
+          mArray.ReleaseStrategy ();
+        }
+    }
+
+  private:
+    DArray&          mArray;
+    IArrayStrategy*  mStrategy;
+  };
+
+  IArrayStrategy&     GetStrategy();
+  StrategyRAII        GetStrategyRAII () const;
+  void                ReleaseStrategy ();
+  void                ReplaceStrategy (IArrayStrategy* const strategy);
 
 private:
   IArrayStrategy       *mArray;
+  uint32_t              mArrayRefs;
+  SpinLock              mLock;
 };
 
 

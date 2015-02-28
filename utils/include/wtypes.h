@@ -51,7 +51,7 @@ enum DBS_FIELD_TYPE
   T_END_OF_TYPES
 };
 
-#define DBS_BASIC_TYPE DBS_FIELD_TYPE
+typedef enum DBS_FIELD_TYPE DBS_BASIC_TYPE;
 
 
 struct DBSFieldDescriptor
@@ -69,25 +69,25 @@ struct DBSFieldDescriptor
 #define T_TABLE_FIELD          0x0800    /* Internal flag for table fields. */
 #define T_L_VALUE              0x1000    /* Internal flag for l-values. */
 
-#define IS_ARRAY( type)         ((((type) \
+#define IS_ARRAY(type)         ((((type) \
                                  & (T_FIELD_MASK | T_ARRAY_MASK)) == \
                                    T_ARRAY_MASK))
-#define IS_FIELD( type)         (((type) & T_FIELD_MASK) != 0)
-#define IS_TABLE( type)         (((type) & T_TABLE_MASK) != 0)
+#define IS_FIELD(type)         (((type) & T_FIELD_MASK) != 0)
+#define IS_TABLE(type)         (((type) & T_TABLE_MASK) != 0)
 
-#define IS_TABLE_FIELD( type)   (((type) & T_TABLE_FIELD) != 0)
-#define IS_L_VALUE( type)       (((type) & T_L_VALUE) != 0)
+#define IS_TABLE_FIELD(type)   (((type) & T_TABLE_FIELD) != 0)
+#define IS_L_VALUE(type)       (((type) & T_L_VALUE) != 0)
 
-#define MARK_ARRAY( type)       ((type) |= T_ARRAY_MASK)
-#define MARK_FIELD( type)       ((type) |= T_FIELD_MASK)
-#define MARK_TABLE( type)       ((type) |= T_TABLE_MASK)
-#define MARK_TABLE_FIELD( type) ((type) |= T_TABLE_FIELD)
-#define MARK_L_VALUE( type)     ((type) |= T_L_VALUE)
+#define MARK_ARRAY(type)       ((type) |= T_ARRAY_MASK)
+#define MARK_FIELD(type)       ((type) |= T_FIELD_MASK)
+#define MARK_TABLE(type)       ((type) |= T_TABLE_MASK)
+#define MARK_TABLE_FIELD(type) ((type) |= T_TABLE_FIELD)
+#define MARK_L_VALUE(type)     ((type) |= T_L_VALUE)
 
-#define GET_TYPE( type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
-#define GET_FIELD_TYPE( type)   ((type) \
-                                 & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
-#define GET_BASIC_TYPE( type)   ((type) & 0xFF)
+#define GET_TYPE(type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
+#define GET_FIELD_TYPE(type)   ((type) \
+                                & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
+#define GET_BASIC_TYPE(type)   ((DBS_BASIC_TYPE)((type) & 0xFF))
 
 #define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
@@ -108,7 +108,7 @@ extern "C" {
 
 
 int
-wh_define_basic_type( const enum DBS_BASIC_TYPE    type,
+wh_define_basic_type( const DBS_BASIC_TYPE         type,
                       struct TypeSpec* const       dest);
 
 
