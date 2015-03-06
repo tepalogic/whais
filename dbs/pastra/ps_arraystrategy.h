@@ -123,9 +123,9 @@ public:
       return mArray.mElementsCount;
     }
 
-    void Pivot( const int64_t from, const int64_t to)
+    void Pivot (const int64_t index)
     {
-      mPivot = this->operator[] ((from + to) /2);
+      mPivot = this->operator[] (index);
     }
 
     const TE& Pivot() const

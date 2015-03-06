@@ -1887,13 +1887,6 @@ public:
   DText( const DText& source);
   DText& operator= (const DText& source);
 
-  bool operator== (const DText& text) const;
-
-  bool operator!= (const DText& text) const
-  {
-    return( *this == text) == false;
-  }
-
   virtual ~DText();
 
   bool IsNull() const;
@@ -1976,12 +1969,45 @@ public:
     ITextStrategy*  mStrategy;
   };
 
+  bool operator< (const DText& second) const
+  {
+    return CompareTo (second) < 0;
+  }
+
+  bool operator== (const DText& second) const
+  {
+    return CompareTo (second) == 0;
+  }
+
+  bool operator<= (const DText& second) const
+  {
+    return CompareTo (second) <= 0;
+  }
+
+  bool operator!= (const DText& second) const
+  {
+    return CompareTo (second) != 0;
+  }
+
+  bool operator> (const DText& second) const
+  {
+    return CompareTo (second) > 0;
+  }
+
+  bool operator>= (const DText& second) const
+  {
+    return CompareTo (second) >= 0;
+  }
+
+
   ITextStrategy& GetStrategy();
   StrategyRAII   GetStrategyRAII () const;
   void           ReleaseStrategy ();
   void           ReplaceStrategy (ITextStrategy* const strategy);
 
+
 private:
+  int            CompareTo (const DText& second) const;
 
   ITextStrategy* volatile  mText;
   volatile uint32_t        mTextRefs;
@@ -2123,9 +2149,9 @@ public:
   void                ReplaceStrategy (IArrayStrategy* const strategy);
 
 private:
-  IArrayStrategy       *mArray;
-  uint32_t              mArrayRefs;
-  SpinLock              mLock;
+  IArrayStrategy* volatile mArray;
+  volatile uint32_t        mArrayRefs;
+  SpinLock                 mLock;
 };
 
 

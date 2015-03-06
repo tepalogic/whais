@@ -284,6 +284,40 @@ test_to_upper (void* )
 
 
 static void
+test_compare (void *)
+{
+  cout << "Started " << __FUNCTION__ << endl;
+  wh_sleep (100);
+
+  try
+  {
+    uint_t i;
+    for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
+      {
+        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t z = wh_rnd () % TEST_VALUES_COUNT;
+
+        const bool c = (testValues[j] <= testValues[z]);
+
+        while (resetStart)
+          wh_sleep (1);
+
+        if (c)
+          wh_yield();
+      }
+  } catch (...)
+  {
+      testResult = false;
+      testEnd = true;
+      cout << "Got exception in " << __FUNCTION__ << endl;
+      throw;
+  }
+  cout << "Ended " << __FUNCTION__ << endl;
+
+}
+
+
+static void
 test_mirror (void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
@@ -391,7 +425,7 @@ main( int argc, char** argv)
     testEnd     = false;
     testResult = true;
 
-    Thread th[9];
+    Thread th[10];
 
     th[0].Run (reset_text_variables, NULL);
     th[1].Run (test_append_char, NULL);
@@ -402,6 +436,7 @@ main( int argc, char** argv)
     th[6].Run (test_update_char, NULL);
     th[7].Run (test_find_in_text, NULL);
     th[8].Run (test_find_subtext, NULL);
+    th[9].Run (test_compare, NULL);
 
     th[1].WaitToEnd (true);
     th[2].WaitToEnd (true);
@@ -411,6 +446,7 @@ main( int argc, char** argv)
     th[6].WaitToEnd (true);
     th[7].WaitToEnd (true);
     th[8].WaitToEnd (true);
+    th[9].WaitToEnd (true);
 
     testEnd = true;
 

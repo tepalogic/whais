@@ -160,7 +160,7 @@ ITextStrategy::OffsetOfCharU (const uint64_t index)
   else if (index > mCachedCharsCount)
     throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
 
-  else if (mCachedCharIndexOffset > index)
+  else if (mCachedCharIndex > index)
     mCachedCharIndex = mCachedCharIndexOffset = 0;
 
   const uint64_t maxOffset = Utf8CountU ();
@@ -193,6 +193,10 @@ DChar
 ITextStrategy::CharAt (const uint64_t index)
 {
   LockRAII<Lock> _l (mLock);
+
+  if (index > mCachedCharsCount)
+    throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
+
   return CharAtU (index);
 }
 
@@ -203,13 +207,12 @@ ITextStrategy::CharAtU (const uint64_t index)
   assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
   assert (ReferenceCount () > 0);
 
+  assert (index <= mCachedCharsCount);
+
   if (index == mCachedCharsCount)
     return DChar ();
 
-  else if (index > mCachedCharsCount)
-    throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
-
-  else if (mCachedCharIndexOffset > index)
+  if (mCachedCharIndex > index)
     mCachedCharIndex = mCachedCharIndexOffset = 0;
 
   const uint64_t maxOffset = Utf8CountU ();
@@ -540,6 +543,33 @@ ITextStrategy::UpdateCharAt (const uint32_t   newCh,
 {
   LockRAII<Lock> _l (mLock);
   return UpdateCharAtU (newCh, index);
+}
+
+
+int
+ITextStrategy::CompareTo (ITextStrategy& s)
+{
+  DoubleLockRAII<Lock> _l (mLock, s.mLock);
+
+  const uint64_t charsCount = max (mCachedCharsCount, s.mCachedCharsCount);
+
+  DChar c1, c2;
+  for (uint64_t i = 0;  i < charsCount; ++i)
+    {
+      c1 = CharAtU (i);
+      c2 = s.CharAtU (i);
+
+      if (c1 != c2)
+        break;
+    }
+
+  if (c1 < c2)
+    return -1;
+
+  else if (c1 == c2)
+    return 0;
+
+  return 1;
 }
 
 
@@ -1080,7 +1110,7 @@ RowFieldText::~RowFieldText()
                              cachedMetaData);
 
       mStorage.DecrementRecordRef( mFirstEntry);
-      mStorage.Flush();
+//      mStorage.Flush();
       mStorage.ReleaseReference();
     }
 }
@@ -1155,7 +1185,7 @@ RowFieldText::WriteUtf8U (const uint64_t       offset,
       assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef( mFirstEntry);
-      mStorage.Flush();
+//      mStorage.Flush();
       mStorage.ReleaseReference();
 
       _CC(uint64_t&, mUtf8Count) = 0;
@@ -1192,7 +1222,7 @@ RowFieldText::TruncateUtf8U (const uint64_t atOffset)
       assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef( mFirstEntry);
-      mStorage.Flush();
+//      mStorage.Flush();
       mStorage.ReleaseReference();
 
       _CC(uint64_t&, mUtf8Count) = 0;

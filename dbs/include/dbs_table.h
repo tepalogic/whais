@@ -57,7 +57,7 @@ public:
 
   virtual ROW_INDEX AllocatedRows() = 0;
 
-  virtual ROW_INDEX AddRow() = 0;
+  virtual ROW_INDEX AddRow(const bool skipThreadSafety = false) = 0;
 
   virtual ROW_INDEX GetReusableRow( const bool forceAdd) = 0;
 
@@ -75,143 +75,178 @@ public:
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DBool&      value) = 0;
+                    const DBool&      value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DChar&      value) = 0;
+                    const DChar&      value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DDate&      value) = 0;
+                    const DDate&      value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DDateTime&  value) = 0;
+                    const DDateTime&  value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DHiresTime& value) = 0;
+                    const DHiresTime& value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DInt8&      value) = 0;
+                    const DInt8&      value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DInt16&     value) = 0;
+                    const DInt16&     value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DInt32&     value) = 0;
+                    const DInt32&     value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DInt64&     value) = 0;
+                    const DInt64&     value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DReal&      value) = 0;
+                    const DReal&      value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DRichReal&  value) = 0;
+                    const DRichReal&  value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DUInt8&     value) = 0;
+                    const DUInt8&     value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DUInt16&    value) = 0;
+                    const DUInt16&    value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DUInt32&    value) = 0;
+                    const DUInt32&    value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DUInt64&    value) = 0;
+                    const DUInt64&    value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DText&      value) = 0;
+                    const DText&      value,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Set (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    const DArray&     value) = 0;
+                    const DArray&     value,
+                    const bool        skipThreadSafety = false) = 0;
 
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DBool&            outValue) = 0;
+                    DBool&            outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DChar&            outValue) = 0;
+                    DChar&            outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DDate&            outValue) = 0;
+                    DDate&            outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DDateTime&        outValue) = 0;
+                    DDateTime&        outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DHiresTime&       outValue) = 0;
+                    DHiresTime&       outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DInt8&            outValue) = 0;
+                    DInt8&            outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DInt16&           outValue) = 0;
+                    DInt16&           outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DInt32&           outValue) = 0;
+                    DInt32&           outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DInt64&           outValue) = 0;
+                    DInt64&           outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DReal&            outValue) = 0;
+                    DReal&            outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DRichReal&        outValue) = 0;
+                    DRichReal&        outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DUInt8&           outValue) = 0;
+                    DUInt8&           outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DUInt16&          outValue) = 0;
+                    DUInt16&          outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DUInt32&          outValue) = 0;
+                    DUInt32&          outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DUInt64&          outValue) = 0;
+                    DUInt64&          outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DText&            outValue) = 0;
+                    DText&            outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
   virtual void Get (const ROW_INDEX   row,
                     const FIELD_INDEX field,
-                    DArray&           outValue) = 0;
+                    DArray&           outValue,
+                    const bool        skipThreadSafety = false) = 0;
 
-  virtual void ExchangeRows( const ROW_INDEX    row1,
-                             const ROW_INDEX    row2) = 0;
+  virtual void ExchangeRows( const ROW_INDEX   row1,
+                             const ROW_INDEX   row2,
+                             const bool        skipThreadSafety = false) = 0;
 
   virtual void Sort( const FIELD_INDEX  field,
                      const ROW_INDEX    from,

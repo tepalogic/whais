@@ -795,7 +795,7 @@ RowFieldArray::~RowFieldArray()
   if (mFirstRecordEntry > 0)
     {
       mStorage.DecrementRecordRef (mFirstRecordEntry);
-      mStorage.Flush ();
+      //mStorage.Flush ();
       mStorage.ReleaseReference ();
     }
 }
@@ -851,7 +851,7 @@ RowFieldArray::RawWrite( const uint64_t       offset,
 
   mStorage.DecrementRecordRef (mFirstRecordEntry);
   mFirstRecordEntry = 0;
-  mStorage.Flush ();
+  //mStorage.Flush ();
   mStorage.ReleaseReference ();
 
   mTempStorage.Write (offset, size, buffer);
@@ -902,7 +902,7 @@ RowFieldArray::ColapseRaw( const uint64_t offset, const uint64_t count)
 
   mStorage.DecrementRecordRef (mFirstRecordEntry);
   mFirstRecordEntry = 0;
-  mStorage.Flush ();
+  //mStorage.Flush ();
   mStorage.ReleaseReference ();
 }
 

@@ -642,17 +642,6 @@ DText::operator= (const DText& source)
 }
 
 
-bool
-DText::operator== (const DText& text) const
-{
-  if (this == &text)
-    return true;
-
-  return (_SC (ITextStrategy&, GetStrategyRAII()) ==
-            _SC (ITextStrategy&, text.GetStrategyRAII()));
-}
-
-
 uint64_t
 DText::Count() const
 {
@@ -892,11 +881,30 @@ DText::ReplaceStrategy (ITextStrategy* const strategy)
 }
 
 
+int
+DText::CompareTo (const DText& second) const
+{
+  if (this == &second)
+    return 0;
+
+  StrategyRAII    s = GetStrategyRAII ();
+  ITextStrategy&  t = s;
+
+  StrategyRAII    s2 = second.GetStrategyRAII ();
+  ITextStrategy&  t2 = s2;
+
+  if (&t == &t2)
+    return 0;
+
+  return t.CompareTo (t2);
+}
+
+
 
 template <class T> void
 wh_array_init( const T* const       array,
                const uint64_t       count,
-               IArrayStrategy**     outStrategy)
+               IArrayStrategy* volatile *     outStrategy)
 {
   if (count == 0)
     {

@@ -68,6 +68,8 @@ public:
   ITextStrategy* UpdateCharAt(const uint32_t   ch,
                               const uint64_t   index);
 
+  int CompareTo (ITextStrategy& second);
+
   DUInt64 FindMatch (ITextStrategy&   text,
                      const uint64_t   fromCh,
                      const uint64_t   toCh,

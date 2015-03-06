@@ -46,7 +46,6 @@ BlockCache::BlockCache()
 {
 }
 
-
 BlockCache::~BlockCache()
 {
   if (mItemSize == 0)
@@ -143,6 +142,9 @@ BlockCache::RetriveItem( const uint64_t item)
           delete [] data_;
 
           mCachedBlocks.erase( it++);
+
+          if (mCachedBlocks.size () < mMaxCachedBlocks)
+            break;
         }
     }
 

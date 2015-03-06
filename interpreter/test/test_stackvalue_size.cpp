@@ -40,6 +40,8 @@ main()
 
   sgMaxValue = 0;
 
+  success &= test_stack_type<DText> ("DText");
+  success &= test_stack_type<DArray> ("DArray");
   success &= test_stack_type<BoolOperand> ("BoolOperand");
   success &= test_stack_type<BoolArrayElOperand> ("BoolArrayElOperand");
   success &= test_stack_type<BoolFieldElOperand> ("BoolFieldElOperand");

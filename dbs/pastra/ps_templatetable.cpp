@@ -24,6 +24,9 @@
 
 
 #include "utils/endianness.h"
+#include "utils/wutf.h"
+#include "utils/wunicode.h"
+#include "utils/wsort.h"
 
 #include "ps_templatetable.h"
 
@@ -92,9 +95,7 @@ PrototypeTable::PrototypeTable( const PrototypeTable& prototype)
 void
 PrototypeTable::Flush()
 {
-  //Do not use RAII here as this locks migh be ownd
-  LockRAII<Lock> syncHolder( mRowsSync);
-  LockRAII<Lock> syncHolder2 (mIndexesSync);
+  DoubleLockRAII<Lock> _l (mRowsSync, mIndexesSync);
 
   FlushInternal();
 }
@@ -151,9 +152,9 @@ PrototypeTable::RetrieveField( const char* name)
       fieldName += strlen( fieldName) + 1;
     }
 
-  throw DBSException( _EXTRA( DBSException::FIELD_NOT_FOUND),
-                     "Cannot find table field '%s'.",
-                     name);
+  throw DBSException (_EXTRA( DBSException::FIELD_NOT_FOUND),
+                      "Cannot find table field '%s'.",
+                      name);
 }
 
 
@@ -205,15 +206,15 @@ insert_null_field_value( BTree&                  tree,
 
 
 ROW_INDEX
-PrototypeTable::AddRow()
+PrototypeTable::AddRow (const bool skipThreadSafety)
 {
+  LockRAII<Lock> _l (mRowsSync, skipThreadSafety);
+
   uint64_t lastRowPosition = mRowsCount * mRowSize;
   uint_t   toWrite         = mRowSize;
 
   uint8_t dummyValue[128];
   memset( dummyValue, 0xFF, sizeof dummyValue);
-
-  LockRAII<Lock> syncHolder( mRowsSync);
 
   MarkRowModification();
 
@@ -391,6 +392,7 @@ PrototypeTable::ReusableRowsCount()
   TableRmKey   key (0);
   BTree        removedRows( *this);
 
+  LockRAII<Lock> syncHolder( mRowsSync);
   if (removedRows.FindBiggerOrEqual( key, &nodeId, &keyIndex) == false)
     return 0;
 
@@ -510,7 +512,7 @@ insert_row_field( PrototypeTable&         table,
   KEY_INDEX  dummyKey;
 
   T rowValue;
-  table.Get (row, field, rowValue);
+  table.Get (row, field, rowValue, true);
 
   T_BTreeKey<T> keyValue( rowValue, row);
 
@@ -523,11 +525,23 @@ PrototypeTable::CreateIndex( const FIELD_INDEX                 field,
                              CREATE_INDEX_CALLBACK_FUNC* const cbFunc,
                              CreateIndexCallbackContext* const cbContext)
 {
-  if (PrototypeTable::IsIndexed( field))
-    throw DBSException( _EXTRA( DBSException::FIELD_INDEXED));
-
   if ((cbFunc == NULL) && (cbContext != NULL))
     throw DBSException( _EXTRA( DBSException::INVALID_PARAMETERS));
+
+  if (field >= mFieldsCount)
+    {
+      throw DBSException( _EXTRA( DBSException::FIELD_NOT_FOUND),
+                         "Table field index is invalid %u (%u),",
+                         field,
+                         mFieldsCount);
+    }
+
+  LockRAII<Lock> syncHolder( mRowsSync);
+
+  assert( mvIndexNodeMgrs.size() == mFieldsCount);
+
+  if (mvIndexNodeMgrs[field] != NULL)
+    throw DBSException( _EXTRA( DBSException::FIELD_INDEXED));
 
   FieldDescriptor& desc = GetFieldDescriptorInternal( field);
 
@@ -645,29 +659,6 @@ PrototypeTable::CreateIndex( const FIELD_INDEX                 field,
 void
 PrototypeTable::RemoveIndex( const FIELD_INDEX field)
 {
-  if (PrototypeTable::IsIndexed( field) == false)
-    throw DBSException( _EXTRA( DBSException::FIELD_NOT_INDEXED));
-
-  FieldDescriptor& desc = GetFieldDescriptorInternal( field);
-
-  assert( desc.IndexNodeSizeKB() > 0);
-  assert( desc.IndexUnitsCount() > 0);
-
-  desc.IndexNodeSizeKB( 0);
-  desc.IndexUnitsCount( 0);
-
-  MakeHeaderPersistent();
-
-  auto_ptr<FieldIndexNodeManager> fieldMgr( mvIndexNodeMgrs[field]);
-  mvIndexNodeMgrs[field] = NULL;
-
-  fieldMgr->MarkForRemoval();
-}
-
-
-bool
-PrototypeTable::IsIndexed( const FIELD_INDEX field) const
-{
   if (field >= mFieldsCount)
     {
       throw DBSException( _EXTRA( DBSException::FIELD_NOT_FOUND),
@@ -678,7 +669,46 @@ PrototypeTable::IsIndexed( const FIELD_INDEX field) const
 
   assert( mvIndexNodeMgrs.size() == mFieldsCount);
 
-  return( mvIndexNodeMgrs[field] != NULL);
+  LockRAII<Lock> syncHolder (mRowsSync);
+
+  FieldDescriptor& desc = GetFieldDescriptorInternal( field);
+
+  if (mvIndexNodeMgrs[field] == NULL)
+    throw DBSException( _EXTRA( DBSException::FIELD_NOT_INDEXED));
+
+  AcquireFieldIndex (&desc);
+  assert( desc.IndexNodeSizeKB() > 0);
+  assert( desc.IndexUnitsCount() > 0);
+
+  desc.IndexNodeSizeKB( 0);
+  desc.IndexUnitsCount( 0);
+
+  auto_ptr<FieldIndexNodeManager> fieldMgr( mvIndexNodeMgrs[field]);
+  fieldMgr->MarkForRemoval();
+
+  mvIndexNodeMgrs[field] = NULL;
+  ReleaseIndexField (&desc);
+
+  MakeHeaderPersistent();
+}
+
+
+bool
+PrototypeTable::IsIndexed( const FIELD_INDEX field) const
+{
+  LockRAII<Lock> syncHolder (_CC (Lock&, mRowsSync));
+
+  if (field >= mFieldsCount)
+    {
+      throw DBSException( _EXTRA( DBSException::FIELD_NOT_FOUND),
+                         "Table field index is invalid %u (%u),",
+                         field,
+                         mFieldsCount);
+    }
+
+  assert( mvIndexNodeMgrs.size() == mFieldsCount);
+
+  return mvIndexNodeMgrs[field] != NULL;
 }
 
 
@@ -967,161 +997,109 @@ PrototypeTable::ReleaseIndexField( FieldDescriptor* const field)
 }
 
 
-void
-PrototypeTable::Set (const ROW_INDEX      row,
-                     const FIELD_INDEX    field,
-                     const DChar&         value)
+template <class T> void
+PrototypeTable::StoreEntry (const ROW_INDEX   row,
+                            const FIELD_INDEX field,
+                            const bool        threadSafe,
+                            const T&          value)
 {
-  StoreEntry( row, field, value);
+  T currentValue;
+
+  LockRAII<Lock> syncHolder (mRowsSync, ! threadSafe);
+  if (row == mRowsCount)
+    AddRow (true);
+
+  else
+    RetrieveEntry (row, field, false, currentValue);
+
+  if (currentValue == value)
+    return; //Nothing to change
+
+  MarkRowModification();
+
+  const uint8_t      bitsSet  = ~0;
+  FieldDescriptor&   desc     = GetFieldDescriptorInternal( field);
+  const uint_t       byteOff  = desc.NullBitIndex() / 8;
+  const uint8_t      bitOff   = desc.NullBitIndex() % 8;
+
+  StoredItem     cachedItem = mRowCache.RetriveItem( row);
+  uint8_t *const rowData    = cachedItem.GetDataForUpdate();
+
+  if (value.IsNull())
+    {
+      assert( (rowData[byteOff] & (1 << bitOff)) == 0);
+
+      rowData[byteOff] |= (1 << bitOff);
+
+      if (rowData[byteOff] == bitsSet)
+        CheckRowToDelete( row);
+    }
+  else
+    {
+      if (rowData[byteOff] == bitsSet)
+        CheckRowToReuse( row);
+
+      rowData[byteOff] &= ~(1 << bitOff);
+
+      Serializer::Store( rowData + desc.RowDataOff(), value);
+    }
+
+  //Update the field index if it exists
+  if (mvIndexNodeMgrs[field] != NULL)
+    {
+      NODE_INDEX        dummyNode;
+      KEY_INDEX         dummyKey;
+
+      if (threadSafe)
+        {
+          AcquireFieldIndex( &desc);
+          syncHolder.Release();
+        }
+
+      try
+        {
+          BTree fieldIndexTree( *mvIndexNodeMgrs[field]);
+
+          fieldIndexTree.RemoveKey( T_BTreeKey<T> (currentValue, row));
+          fieldIndexTree.InsertKey( T_BTreeKey<T> (value, row),
+                                    &dummyNode,
+                                    &dummyKey);
+        }
+      catch( ...)
+        {
+          ReleaseIndexField( &desc);
+          throw ;
+        }
+
+      if (threadSafe)
+        {
+          ReleaseIndexField( &desc);
+          syncHolder.Acquire ();
+        }
+    }
 }
 
 
-void
-PrototypeTable::Set (const ROW_INDEX       row,
-                     const FIELD_INDEX     field,
-                     const DBool&          value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX       row,
-                     const FIELD_INDEX     field,
-                     const DDate&          value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX       row,
-                     const FIELD_INDEX     field,
-                     const DDateTime&      value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DHiresTime&      value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DInt8&           value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DInt16&          value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DInt32&          value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DInt64&          value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DReal&           value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DRichReal&       value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX       row,
-                     const FIELD_INDEX     field,
-                     const DUInt8&         value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX      row,
-                     const FIELD_INDEX    field,
-                     const DUInt16&       value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX      row,
-                     const FIELD_INDEX    field,
-                     const DUInt32&       value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX      row,
-                     const FIELD_INDEX    field,
-                     const DUInt64&       value)
-{
-  StoreEntry( row, field, value);
-}
-
-
-void
-PrototypeTable::Set (const ROW_INDEX      row,
-                     const FIELD_INDEX    field,
-                     const DText&         value)
+template<> void
+PrototypeTable::StoreEntry (const ROW_INDEX        row,
+                            const FIELD_INDEX      field,
+                            const bool             threadSafe,
+                            const DText&           value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
-
-  if (row == mRowsCount)
-    AddRow();
-
-  else if (row > mRowsCount)
-    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
 
   if (IS_ARRAY( desc.Type())
       || (GET_BASIC_TYPE( desc.Type()) != T_TEXT))
     {
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
+  else if (row > mRowsCount)
+    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
 
   assert( Serializer::Size( T_TEXT, false) == 2 * sizeof( uint64_t));
+
+  LockRAII<Lock> syncHolder( mRowsSync, ! threadSafe);
+  MarkRowModification ();
 
   DText::StrategyRAII sMgr = value.GetStrategyRAII ();
   ITextStrategy& s = sMgr;
@@ -1130,8 +1108,6 @@ PrototypeTable::Set (const ROW_INDEX      row,
   uint64_t    newFirstEntry      = ~0ull;
   uint64_t    newFieldValueSize  = 0;
   const bool  skipVariableStore  = s.Utf8CountU () < (2 * sizeof( uint64_t));
-
-  MarkRowModification();
 
   if (! skipVariableStore)
     {
@@ -1185,7 +1161,8 @@ PrototypeTable::Set (const ROW_INDEX      row,
         }
     }
 
-  LockRAII<Lock> syncHolder( mRowsSync);
+  if (row == mRowsCount)
+    AddRow (true);
 
   StoredItem     cachedItem        = mRowCache.RetriveItem( row);
   uint8_t* const rowData           = cachedItem.GetDataForUpdate();
@@ -1227,13 +1204,6 @@ PrototypeTable::Set (const ROW_INDEX      row,
   if ((fieldValueWasNull == false)
       && ((load_le_int64 (fieldValueSize) & 0x8000000000000000ull) == 0))
     {
-      //Postpone the removal of the actual record entries
-      //to allow other threads gain access to 'mSync' faster.
-      RowFieldText oldEntryRAII( VSStore(),
-                                 load_le_int64 (fieldFirstEntry),
-                                 load_le_int64 (fieldValueSize));
-      syncHolder.Release();
-
       VSStore().DecrementRecordRef( load_le_int64 (fieldFirstEntry));
     }
 
@@ -1254,20 +1224,17 @@ PrototypeTable::Set (const ROW_INDEX      row,
 }
 
 
-void
-PrototypeTable::Set (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     const DArray&          value1)
+template<> void
+PrototypeTable::StoreEntry (const ROW_INDEX        row,
+                            const FIELD_INDEX      field,
+                            const bool             threadSafe,
+                            const DArray&          value)
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
 
-  if (row == mRowsCount)
-    AddRow();
+  LockRAII<Lock> syncHolder( mRowsSync, ! threadSafe);
 
-  else if (row > mRowsCount)
-    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
-
-  DArray::StrategyRAII sMgr = value1.GetStrategyRAII ();
+  DArray::StrategyRAII sMgr = value.GetStrategyRAII ();
   IArrayStrategy& s = sMgr;
   LockRAII<Lock> _l (s.mLock);
 
@@ -1276,15 +1243,17 @@ PrototypeTable::Set (const ROW_INDEX        row,
     {
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
+  else if (row > mRowsCount)
+    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
 
+
+  MarkRowModification ();
 
   uint64_t      newFirstEntry     = ~0;
   uint64_t      newFieldValueSize = 0;
   const uint8_t bitsSet           = ~0;
   bool          fieldValueWasNull = false;
   const bool    skipVariableStore = s.RawSize() < (2 * sizeof (uint64_t));
-
-  MarkRowModification();
 
   if (! skipVariableStore)
     {
@@ -1326,7 +1295,8 @@ PrototypeTable::Set (const ROW_INDEX        row,
         }
     }
 
-  LockRAII<Lock> syncHolder( mRowsSync);
+  if (row == mRowsCount)
+    AddRow (true);
 
   StoredItem     cachedItem = mRowCache.RetriveItem( row);
   uint8_t *const rowData    = cachedItem.GetDataForUpdate();
@@ -1366,12 +1336,6 @@ PrototypeTable::Set (const ROW_INDEX        row,
   if ((fieldValueWasNull == false)
       && ((load_le_int64 (fieldValueSize) & 0x8000000000000000ull) == 0))
     {
-      //Postpone the removal of the actual record entries
-      //to allow other threads gain access to 'mSync' faster.
-      RowFieldArray   oldEntryRAII( VSStore(),
-                                    load_le_int64 (fieldFirstEntry),
-                                    s.Type ());
-
       VSStore().DecrementRecordRef( load_le_int64 (fieldFirstEntry));
     }
 
@@ -1392,139 +1356,172 @@ PrototypeTable::Set (const ROW_INDEX        row,
 }
 
 
-
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX       field,
-                     DChar&                  outValue)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DBool&          value,
+                     const bool            skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DBool&                 outValue)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DChar&         value,
+                     const bool           skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DDate&                 outValue)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DDate&          value,
+                     const bool            skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DDateTime&             outValue)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DDateTime&      value,
+                     const bool            skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DHiresTime&            outValue)
+                     const DHiresTime&      value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DInt8&                 outValue)
+                     const DInt8&           value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DInt16&                outValue)
+                     const DInt16&          value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DInt32&                outValue)
+                     const DInt32&          value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DInt64&                outValue)
+                     const DInt64&          value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DReal&                 outValue)
+                     const DReal&           value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
+PrototypeTable::Set (const ROW_INDEX        row,
                      const FIELD_INDEX      field,
-                     DRichReal&             outValue)
+                     const DRichReal&       value,
+                     const bool             skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DUInt8&                outValue)
+PrototypeTable::Set (const ROW_INDEX       row,
+                     const FIELD_INDEX     field,
+                     const DUInt8&         value,
+                     const bool            skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DUInt16&               outValue)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DUInt16&       value,
+                     const bool           skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DUInt32&               outValue)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DUInt32&       value,
+                     const bool           skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
 void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DUInt64&               outValue)
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DUInt64&       value,
+                     const bool           skipThreadSafety)
 {
-  RetrieveEntry( row, field, outValue);
+  StoreEntry( row, field, ! skipThreadSafety, value);
+}
+
+
+void
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DText&         value,
+                     const bool           skipThreadSafety)
+{
+  StoreEntry( row, field, ! skipThreadSafety, value);
+}
+
+void
+PrototypeTable::Set (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     const DArray&        value,
+                     const bool           skipThreadSafety)
+{
+  StoreEntry( row, field, ! skipThreadSafety, value);
 }
 
 
@@ -1546,11 +1543,51 @@ allocate_row_field_array( VariableSizeStore&        store,
 }
 
 
-void
-PrototypeTable::Get (const ROW_INDEX   row,
-                     const FIELD_INDEX field,
-                     DText&            outValue)
+template <class T> void
+PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
+                               const FIELD_INDEX field,
+                               const bool        threadSafe,
+                               T&                outValue)
 {
+  LockRAII<Lock> syncHolder( mRowsSync, ! threadSafe);
+
+  const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
+
+  if ((desc.Type() & PS_TABLE_ARRAY_MASK)
+      || ((desc.Type() & PS_TABLE_FIELD_TYPE_MASK) !=
+            _SC(uint_t,  outValue.DBSType())))
+    {
+      throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
+    }
+
+  const uint_t  byteOff = desc.NullBitIndex() / 8;
+  const uint8_t bitOff  = desc.NullBitIndex() % 8;
+
+  if (row >= mRowsCount)
+    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
+
+  StoredItem           cachedItem = mRowCache.RetriveItem( row);
+  const uint8_t* const rowData    = cachedItem.GetDataForRead();
+
+  if (rowData[byteOff] & (1 << bitOff))
+    outValue = T();
+
+  else
+    {
+      outValue.~T ();
+      Serializer::Load( rowData + desc.RowDataOff(), &outValue);
+    }
+}
+
+
+template <> void
+PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
+                               const FIELD_INDEX field,
+                               const bool        threadSafe,
+                               DText&            outValue)
+{
+  LockRAII<Lock> syncHolder( mRowsSync, ! threadSafe);
+
   const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
 
   if (row >= mRowsCount)
@@ -1562,7 +1599,7 @@ PrototypeTable::Get (const ROW_INDEX   row,
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
 
-  LockRAII<Lock> syncHolder( mRowsSync);
+
 
   StoredItem           cachedItem = mRowCache.RetriveItem( row);
   const uint8_t* const rowData    = cachedItem.GetDataForRead();
@@ -1596,11 +1633,14 @@ PrototypeTable::Get (const ROW_INDEX   row,
 }
 
 
-void
-PrototypeTable::Get (const ROW_INDEX        row,
-                     const FIELD_INDEX      field,
-                     DArray&                outValue)
+template <> void
+PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
+                               const FIELD_INDEX field,
+                               const bool        threadSafe,
+                               DArray&           outValue)
 {
+  LockRAII<Lock> syncHolder( mRowsSync, ! threadSafe);
+
   const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
 
   if (row >= mRowsCount)
@@ -1612,8 +1652,6 @@ PrototypeTable::Get (const ROW_INDEX        row,
     {
       throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
     }
-
-  LockRAII<Lock> syncHolder( mRowsSync);
 
   StoredItem           cachedItem = mRowCache.RetriveItem( row);
   const uint8_t *const rowData    = cachedItem.GetDataForRead();
@@ -1725,70 +1763,201 @@ PrototypeTable::Get (const ROW_INDEX        row,
 }
 
 
-template<typename T>
-void table_exchange_rows( ITable&             table,
-                          const FIELD_INDEX   field,
-                          const ROW_INDEX     row1,
-                          const ROW_INDEX     row2)
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DBool&                 outValue,
+                     const bool             skipThreadSafety)
 {
-  T row1Value, row2Value;
-
-  assert( row1 < table.AllocatedRows());
-  assert( row2 < table.AllocatedRows());
-
-  table.Get (row1, field, row1Value);
-  table.Get (row2, field, row2Value);
-
-  if (row1Value == row2Value)
-    return ;
-
-  table.Set (row1, field, row2Value);
-  table.Set (row2, field, row1Value);
-}
-
-
-template<>
-void table_exchange_rows<DArray> (ITable&             table,
-                                  const FIELD_INDEX   field,
-                                  const ROW_INDEX     row1,
-                                  const ROW_INDEX     row2)
-{
-  DArray row1Value, row2Value;
-
-  assert( row1 < table.AllocatedRows());
-  assert( row2 < table.AllocatedRows());
-
-  table.Get (row1, field, row1Value);
-  table.Get (row2, field, row2Value);
-
-  table.Set (row1, field, row2Value);
-  table.Set (row2, field, row1Value);
-}
-
-
-template<>
-void table_exchange_rows<DText> (ITable&             table,
-                                 const FIELD_INDEX   field,
-                                 const ROW_INDEX     row1,
-                                 const ROW_INDEX     row2)
-{
-  DText row1Value, row2Value;
-
-  assert( row1 < table.AllocatedRows());
-  assert( row2 < table.AllocatedRows());
-
-  table.Get (row1, field, row1Value);
-  table.Get (row2, field, row2Value);
-
-  table.Set (row1, field, row2Value);
-  table.Set (row2, field, row1Value);
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
 }
 
 
 void
-PrototypeTable::ExchangeRows( const ROW_INDEX    row1,
-                              const ROW_INDEX    row2)
+PrototypeTable::Get (const ROW_INDEX      row,
+                     const FIELD_INDEX    field,
+                     DChar&               outValue,
+                     const bool             skipThreadSafety)
 {
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DDate&                 outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DDateTime&             outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DHiresTime&            outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt8&                 outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt16&                outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt32&                outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DInt64&                outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DReal&                 outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DRichReal&             outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt8&                outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt16&               outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt32&               outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DUInt64&               outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DText&                 outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+void
+PrototypeTable::Get (const ROW_INDEX        row,
+                     const FIELD_INDEX      field,
+                     DArray&                outValue,
+                     const bool             skipThreadSafety)
+{
+  RetrieveEntry( row, field, ! skipThreadSafety, outValue);
+}
+
+
+template<typename T> void
+PrototypeTable::table_exchange_rows( const FIELD_INDEX   field,
+                                     const ROW_INDEX     row1,
+                                     const ROW_INDEX     row2)
+{
+  T row1Value, row2Value;
+
+  assert( row1 < AllocatedRows());
+  assert( row2 < AllocatedRows());
+
+  Get (row1, field, row1Value, true);
+  Get (row2, field, row2Value, true);
+
+  Set (row1, field, row2Value, true);
+  Set (row2, field, row1Value, true);
+}
+
+
+void
+PrototypeTable::ExchangeRows (const ROW_INDEX    row1,
+                              const ROW_INDEX    row2,
+                              const bool         skipTthreadSafety)
+{
+  LockRAII<Lock> _l (mRowsSync, skipTthreadSafety);
+
   const ROW_INDEX     allocatedRows = AllocatedRows();
   const FIELD_INDEX   fieldsCount   = FieldsCount();
 
@@ -1800,74 +1969,74 @@ PrototypeTable::ExchangeRows( const ROW_INDEX    row1,
       const DBSFieldDescriptor fieldDesc = DescribeField( field);
 
       if (fieldDesc.isArray)
-        table_exchange_rows<DArray> (*this, field, row1, row2);
+        table_exchange_rows<DArray> (field, row1, row2);
 
       else
         {
           switch( fieldDesc.type)
             {
             case T_BOOL:
-              table_exchange_rows<DBool> (*this, field, row1, row2);
+              table_exchange_rows<DBool> (field, row1, row2);
               break;
 
             case T_CHAR:
-              table_exchange_rows<DChar> (*this, field, row1, row2);
+              table_exchange_rows<DChar> (field, row1, row2);
               break;
 
             case T_DATE:
-              table_exchange_rows<DDate> (*this, field, row1, row2);
+              table_exchange_rows<DDate> (field, row1, row2);
               break;
 
             case T_DATETIME:
-              table_exchange_rows<DDateTime> (*this, field, row1, row2);
+              table_exchange_rows<DDateTime> (field, row1, row2);
               break;
 
             case T_HIRESTIME:
-              table_exchange_rows<DHiresTime> (*this, field, row1, row2);
+              table_exchange_rows<DHiresTime> (field, row1, row2);
               break;
 
             case T_INT8:
-              table_exchange_rows<DInt8> (*this, field, row1, row2);
+              table_exchange_rows<DInt8> (field, row1, row2);
               break;
 
             case T_INT16:
-              table_exchange_rows<DInt16> (*this, field, row1, row2);
+              table_exchange_rows<DInt16> (field, row1, row2);
               break;
 
             case T_INT32:
-              table_exchange_rows<DInt32> (*this, field, row1, row2);
+              table_exchange_rows<DInt32> (field, row1, row2);
               break;
 
             case T_INT64:
-              table_exchange_rows<DInt64> (*this, field, row1, row2);
+              table_exchange_rows<DInt64> (field, row1, row2);
               break;
 
             case T_UINT8:
-              table_exchange_rows<DUInt8> (*this, field, row1, row2);
+              table_exchange_rows<DUInt8> (field, row1, row2);
               break;
 
             case T_UINT16:
-              table_exchange_rows<DUInt16> (*this, field, row1, row2);
+              table_exchange_rows<DUInt16> (field, row1, row2);
               break;
 
             case T_UINT32:
-              table_exchange_rows<DUInt32> (*this, field, row1, row2);
+              table_exchange_rows<DUInt32> (field, row1, row2);
               break;
 
             case T_UINT64:
-              table_exchange_rows<DUInt64> (*this, field, row1, row2);
+              table_exchange_rows<DUInt64> (field, row1, row2);
               break;
 
             case T_REAL:
-              table_exchange_rows<DReal> (*this, field, row1, row2);
+              table_exchange_rows<DReal> (field, row1, row2);
               break;
 
             case T_RICHREAL:
-              table_exchange_rows<DRichReal> (*this, field, row1, row2);
+              table_exchange_rows<DRichReal> (field, row1, row2);
               break;
 
             case T_TEXT:
-              table_exchange_rows<DText> (*this, field, row1, row2);
+              table_exchange_rows<DText> (field, row1, row2);
               break;
 
             default:
@@ -1877,81 +2046,83 @@ PrototypeTable::ExchangeRows( const ROW_INDEX    row1,
     }
 }
 
-
-static bool
-operator< (const DText& text1, const DText& text2)
-{
-  const uint64_t text1Count = text1.Count();
-  const uint64_t text2Count = text2.Count();
-
-  uint64_t i, j;
-
-  for (i = 0, j = 0;
-       ((i < text1Count) && (j < text2Count));
-       ++i, ++j)
-    {
-      const DChar c1 = text1.CharAt( i);
-      const DChar c2 = text2.CharAt( j);
-
-      if (c1 < c2)
-        return true;
-
-      else if (c1 > c2)
-        return false;
-    }
-
-  if (i < j)
-    return true;
-
-  return false;
-}
-
-//Keep this here! Other way g++ compiler fails to notice the operator<'s
-//definition.
-#include "utils/wsort.h"
-
 template<typename TF> class
 SortTableContainer
 {
 public:
-  SortTableContainer( ITable& table, const FIELD_INDEX field)
-    : mTable( table),
-      mField( field)
+  SortTableContainer( PrototypeTable& table, const FIELD_INDEX field)
+    : mTable (table),
+      mField (field)
   {
+    mRowsPermutation.resize (table.AllocatedRows ());
+    for (ROW_INDEX i = 0; i < mRowsPermutation.size (); ++i)
+      mRowsPermutation[i] = i;
   }
 
-  const TF operator[] (const int64_t position) const
+  ~SortTableContainer ()
+  {
+    ROW_INDEX row = 0;
+    while (row < mRowsPermutation.size ())
+      {
+        if (mRowsPermutation[row] == row)
+          {
+            ++row;
+            continue;
+          }
+
+        ROW_INDEX currentRow = row;
+        do
+          {
+            const ROW_INDEX correctRow = mRowsPermutation[currentRow];
+            if (correctRow == row)
+              {
+                mRowsPermutation[currentRow] = currentRow;
+                break;
+              }
+
+            mTable.ExchangeRows (currentRow, correctRow, true);
+            mRowsPermutation[currentRow] = currentRow;
+
+            currentRow = correctRow;
+          }
+        while (true);
+      }
+  }
+
+  const TF operator[] (const int64_t index) const
   {
     TF value;
-    mTable.Get (position, mField, value);
+    mTable.Get (mRowsPermutation[index], mField, value, true);
 
     return value;
   }
 
   void Exchange( const int64_t pos1, const int64_t pos2)
   {
-    mTable.ExchangeRows( pos1, pos2);
+    const ROW_INDEX t      = mRowsPermutation[pos1];
+    mRowsPermutation[pos1] = mRowsPermutation[pos2];
+    mRowsPermutation[pos2] = t;
   }
 
   uint64_t Count() const
   {
-    return mTable.AllocatedRows();
+    return mRowsPermutation.size ();
   }
 
-  void Pivot( const uint64_t from, const uint64_t to)
+  void Pivot (const uint64_t index)
   {
-    mTable.Get ((from + to) / 2, mField, mPivot);
+    mTable.Get (mRowsPermutation[index], mField, mPivot, true);
   }
-
   const TF& Pivot() const
   {
     return mPivot;
   }
 
 private:
-  ITable&             mTable;
-  const FIELD_INDEX   mField;
-  TF                  mPivot;
+  PrototypeTable&           mTable;
+  std::vector<ROW_INDEX>    mRowsPermutation;
+  const FIELD_INDEX         mField;
+  TF                        mPivot;
 };
 
 
@@ -1969,19 +2140,24 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
                           "This implementation does not sort array fields.");
     }
 
-  else if (fromRow > toRow)
-    throw DBSException( _EXTRA( DBSException::INVALID_PARAMETERS));
+  LockRAII<Lock> _l (mRowsSync);
 
-  else if (toRow >= AllocatedRows())
-    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
+  const ROW_INDEX from = MIN (fromRow, toRow);
+  const ROW_INDEX to   = MIN (MAX (fromRow, toRow), AllocatedRows () - 1);
+
+  if (from > to)
+    throw DBSException (_EXTRA (DBSException::INVALID_PARAMETERS));
+
+  else if (from == to)
+    return ;
 
   switch( fd.type)
     {
       case T_BOOL:
           {
             SortTableContainer<DBool> temp( *this, field);
-            quick_sort<DBool, SortTableContainer<DBool> > (fromRow,
-                                                           toRow,
+            quick_sort<DBool, SortTableContainer<DBool> > (from,
+                                                           to,
                                                            reverse,
                                                            temp);
           }
@@ -1990,8 +2166,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_CHAR:
          {
             SortTableContainer<DChar> temp( *this, field);
-            quick_sort<DChar, SortTableContainer<DChar> > (fromRow,
-                                                           toRow,
+            quick_sort<DChar, SortTableContainer<DChar> > (from,
+                                                           to,
                                                            reverse,
                                                            temp);
           }
@@ -2000,8 +2176,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_DATE:
          {
             SortTableContainer<DDate> temp( *this, field);
-            quick_sort<DDate, SortTableContainer<DDate> > (fromRow,
-                                                           toRow,
+            quick_sort<DDate, SortTableContainer<DDate> > (from,
+                                                           to,
                                                            reverse,
                                                            temp);
           }
@@ -2010,8 +2186,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_DATETIME:
          {
             SortTableContainer<DDateTime> temp( *this, field);
-            quick_sort<DDateTime, SortTableContainer<DDateTime> > (fromRow,
-                                                                   toRow,
+            quick_sort<DDateTime, SortTableContainer<DDateTime> > (from,
+                                                                   to,
                                                                    reverse,
                                                                    temp);
           }
@@ -2020,8 +2196,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_HIRESTIME:
          {
             SortTableContainer<DHiresTime> temp( *this, field);
-            quick_sort<DHiresTime, SortTableContainer<DHiresTime> > (fromRow,
-                                                                     toRow,
+            quick_sort<DHiresTime, SortTableContainer<DHiresTime> > (from,
+                                                                     to,
                                                                      reverse,
                                                                      temp);
           }
@@ -2030,8 +2206,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_UINT8:
          {
             SortTableContainer<DUInt8> temp( *this, field);
-            quick_sort<DUInt8, SortTableContainer<DUInt8> > (fromRow,
-                                                             toRow,
+            quick_sort<DUInt8, SortTableContainer<DUInt8> > (from,
+                                                             to,
                                                              reverse,
                                                              temp);
           }
@@ -2040,8 +2216,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_UINT16:
          {
             SortTableContainer<DUInt16> temp( *this, field);
-            quick_sort<DUInt16, SortTableContainer<DUInt16> > (fromRow,
-                                                               toRow,
+            quick_sort<DUInt16, SortTableContainer<DUInt16> > (from,
+                                                               to,
                                                                reverse,
                                                                temp);
           }
@@ -2050,8 +2226,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_UINT32:
          {
             SortTableContainer<DUInt32> temp( *this, field);
-            quick_sort<DUInt32, SortTableContainer<DUInt32> > (fromRow,
-                                                               toRow,
+            quick_sort<DUInt32, SortTableContainer<DUInt32> > (from,
+                                                               to,
                                                                reverse,
                                                                temp);
           }
@@ -2060,8 +2236,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_UINT64:
          {
             SortTableContainer<DUInt64> temp( *this, field);
-            quick_sort<DUInt64, SortTableContainer<DUInt64> > (fromRow,
-                                                               toRow,
+            quick_sort<DUInt64, SortTableContainer<DUInt64> > (from,
+                                                               to,
                                                                reverse,
                                                                temp);
           }
@@ -2070,8 +2246,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_REAL:
          {
             SortTableContainer<DReal> temp( *this, field);
-            quick_sort<DReal, SortTableContainer<DReal> > (fromRow,
-                                                           toRow,
+            quick_sort<DReal, SortTableContainer<DReal> > (from,
+                                                           to,
                                                            reverse,
                                                            temp);
           }
@@ -2080,8 +2256,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_RICHREAL:
          {
             SortTableContainer<DRichReal> temp( *this, field);
-            quick_sort<DRichReal, SortTableContainer<DRichReal> > (fromRow,
-                                                                   toRow,
+            quick_sort<DRichReal, SortTableContainer<DRichReal> > (from,
+                                                                   to,
                                                                    reverse,
                                                                    temp);
           }
@@ -2090,8 +2266,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_INT8:
          {
             SortTableContainer<DInt8> temp( *this, field);
-            quick_sort<DInt8, SortTableContainer<DInt8> > (fromRow,
-                                                           toRow,
+            quick_sort<DInt8, SortTableContainer<DInt8> > (from,
+                                                           to,
                                                            reverse,
                                                            temp);
           }
@@ -2100,8 +2276,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_INT16:
          {
             SortTableContainer<DInt16> temp( *this, field);
-            quick_sort<DInt16, SortTableContainer<DInt16> > (fromRow,
-                                                             toRow,
+            quick_sort<DInt16, SortTableContainer<DInt16> > (from,
+                                                             to,
                                                              reverse,
                                                              temp);
           }
@@ -2110,8 +2286,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_INT32:
          {
             SortTableContainer<DInt32> temp( *this, field);
-            quick_sort<DInt32, SortTableContainer<DInt32> > (fromRow,
-                                                             toRow,
+            quick_sort<DInt32, SortTableContainer<DInt32> > (from,
+                                                             to,
                                                              reverse,
                                                              temp);
           }
@@ -2120,8 +2296,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_INT64:
          {
             SortTableContainer<DInt64> temp( *this, field);
-            quick_sort<DInt64, SortTableContainer<DInt64> > (fromRow,
-                                                             toRow,
+            quick_sort<DInt64, SortTableContainer<DInt64> > (from,
+                                                             to,
                                                              reverse,
                                                              temp);
           }
@@ -2129,8 +2305,8 @@ PrototypeTable::Sort( const FIELD_INDEX     field,
       case T_TEXT:
          {
             SortTableContainer<DText> temp( *this, field);
-            quick_sort<DText, SortTableContainer<DText> > (fromRow,
-                                                           toRow,
+            quick_sort<DText, SortTableContainer<DText> > (from,
+                                                           to,
                                                            reverse,
                                                            temp);
           }
@@ -2349,118 +2525,6 @@ PrototypeTable::MatchRows( const DRichReal&    min,
     return MatchRowsWithIndex( min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex( min, max, fromRow, toRow, field);
-}
-
-
-template <class T> void
-PrototypeTable::StoreEntry( const ROW_INDEX   row,
-                            const FIELD_INDEX field,
-                            const T&          value)
-{
-
-  //Check if we are trying to write a different value
-  T currentValue;
-
-  if (row == mRowsCount)
-    AddRow();
-
-  else
-    RetrieveEntry( row, field, currentValue);
-
-  if (currentValue == value)
-    return; //Nothing to change
-
-  MarkRowModification();
-
-  const uint8_t      bitsSet  = ~0;
-  FieldDescriptor&   desc     = GetFieldDescriptorInternal( field);
-  const uint_t       byteOff  = desc.NullBitIndex() / 8;
-  const uint8_t      bitOff   = desc.NullBitIndex() % 8;
-
-  LockRAII<Lock> syncHolder( mRowsSync);
-
-  StoredItem     cachedItem = mRowCache.RetriveItem( row);
-  uint8_t *const rowData    = cachedItem.GetDataForUpdate();
-
-  if (value.IsNull())
-    {
-      assert( (rowData[byteOff] & (1 << bitOff)) == 0);
-
-      rowData[byteOff] |= (1 << bitOff);
-
-      if (rowData[byteOff] == bitsSet)
-        CheckRowToDelete( row);
-    }
-  else
-    {
-      if (rowData[byteOff] == bitsSet)
-        CheckRowToReuse( row);
-
-      rowData[byteOff] &= ~(1 << bitOff);
-
-      Serializer::Store( rowData + desc.RowDataOff(), value);
-    }
-
-  //Update the field index if it exists
-  if (mvIndexNodeMgrs[field] != NULL)
-    {
-      NODE_INDEX        dummyNode;
-      KEY_INDEX         dummyKey;
-
-      AcquireFieldIndex( &desc);
-      syncHolder.Release();
-
-      try
-        {
-          BTree fieldIndexTree( *mvIndexNodeMgrs[field]);
-
-          fieldIndexTree.RemoveKey( T_BTreeKey<T> (currentValue, row));
-          fieldIndexTree.InsertKey( T_BTreeKey<T> (value, row),
-                                    &dummyNode,
-                                    &dummyKey);
-        }
-      catch( ...)
-        {
-          ReleaseIndexField( &desc);
-          throw ;
-        }
-      ReleaseIndexField( &desc);
-    }
-}
-
-
-template <class T> void
-PrototypeTable::RetrieveEntry( const ROW_INDEX   row,
-                               const FIELD_INDEX field,
-                               T&                outValue)
-{
-  const FieldDescriptor& desc = GetFieldDescriptorInternal( field);
-
-  if (row >= mRowsCount)
-    throw DBSException( _EXTRA( DBSException::ROW_NOT_ALLOCATED));
-
-  if ((desc.Type() & PS_TABLE_ARRAY_MASK)
-      || ((desc.Type() & PS_TABLE_FIELD_TYPE_MASK) !=
-            _SC(uint_t,  outValue.DBSType())))
-    {
-      throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID));
-    }
-
-  const uint_t  byteOff = desc.NullBitIndex() / 8;
-  const uint8_t bitOff  = desc.NullBitIndex() % 8;
-
-  LockRAII<Lock> syncHolder( mRowsSync);
-
-  StoredItem           cachedItem = mRowCache.RetriveItem( row);
-  const uint8_t* const rowData    = cachedItem.GetDataForRead();
-
-  if (rowData[byteOff] & (1 << bitOff))
-    {
-      outValue.~T();
-      _placement_new( &outValue, T ());
-    }
-  else
-    Serializer::Load( rowData + desc.RowDataOff(), &outValue);
 }
 
 

@@ -31,6 +31,8 @@
 
 #include "whais.h"
 
+#include "utils/wthread.h"
+
 namespace whais {
 namespace pastra  {
 
@@ -84,14 +86,14 @@ public:
 
   void RegisterUser()
   {
-    mReferenceCount++;
+    wh_atomic_inc32 (_RC (int32_t*, &mReferenceCount));
   }
 
   void ReleaseUser()
   {
     assert(  mReferenceCount > 0);
 
-    mReferenceCount--;
+    wh_atomic_dec32 (_RC (int32_t*, &mReferenceCount));
   }
 
   uint8_t* Data()

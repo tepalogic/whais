@@ -13,6 +13,7 @@
 
 #include "utils/wrandom.h"
 #include "utils/wthread.h"
+#include "utils/wsort.h"
 #include "custom/include/test/test_fmw.h"
 
 #include "dbs/dbs_mgr.h"
@@ -75,34 +76,6 @@ FIELD_INDEX f_u64;
 FIELD_INDEX f_t;
 
 
-
-static bool
-operator< (const DText& text1, const DText& text2)
-{
-  const uint64_t text1Count = text1.Count();
-  const uint64_t text2Count = text2.Count();
-
-  uint64_t i, j;
-
-  for (i = 0, j = 0;
-       ((i < text1Count) && (j < text2Count));
-       ++i, ++j)
-    {
-      const DChar c1 = text1.CharAt( i);
-      const DChar c2 = text2.CharAt( j);
-
-      if (c1 < c2)
-        return true;
-
-      else if (c1 > c2)
-        return false;
-    }
-
-  if (i < j)
-    return true;
-
-  return false;
-}
 
 DDateTime
 get_random_datetime()

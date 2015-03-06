@@ -1057,7 +1057,7 @@ PersistentTable::MakeHeaderPersistent()
   store_le_int32 (mRootNode,           tableHdr + PS_TABLE_BT_ROOT_OFF);
   store_le_int32 (mUnallocatedHead,    tableHdr + PS_TABLE_BT_HEAD_OFF);
   store_le_int64 (mMaxFileSize,        tableHdr + PS_TABLE_MAX_FILE_SIZE_OFF);
-  store_le_int64 (mTableData->Size(), tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
+  store_le_int64 (mTableData->Size(),  tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
   store_le_int32 (flags,               tableHdr + PS_TABLE_FLAGS_OFF);
 
   store_le_int64 ((mVSData != NULL) ? mVSData->Size() : 0,

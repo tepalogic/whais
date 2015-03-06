@@ -613,9 +613,6 @@ TemporalContainer::Colapse( uint64_t from, uint64_t to)
       assert( mCacheEndPos_2   <= 2 * mCacheSize);
       assert( containerSize    == mCacheEndPos_2);
 
-      assert( mDirtyCache_1);
-      assert( mDirtyCache_2 || (mCacheStartPos_2 == mCacheEndPos_2));
-
       uint8_t   stepBuffer[128];
       uint64_t  tempFrom = from, tempTo = to;
 
@@ -669,6 +666,7 @@ TemporalContainer::Colapse( uint64_t from, uint64_t to)
   else
     {
       assert( containerSize == mCacheEndPos_1);
+      assert( (containerSize == 0) || mDirtyCache_1);
 
       uint8_t* const cache_     = mCache_1.get();
       const uint_t   remainSize = mCacheEndPos_1 - to;

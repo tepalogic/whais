@@ -79,8 +79,7 @@ public:
 
   ~LockRAII()
   {
-    if (mIsAcquireed)
-      mLock.Release();
+    Release ();
   }
 
   void Acquire()
@@ -97,8 +96,11 @@ public:
 
   void Release()
   {
-    mLock.Release();
-    mIsAcquireed = false;
+    if (mIsAcquireed)
+      {
+        mLock.Release();
+        mIsAcquireed = false;
+      }
   }
 
 private:
