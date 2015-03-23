@@ -51,9 +51,9 @@ add_id_to_list( YYSTYPE list, YYSTYPE id)
 
 
 YYSTYPE
-create_type_spec( struct ParserState* paser, const uint16_t type)
+create_type_spec( struct ParserState* parser, const uint16_t type)
 {
-  struct SemValue* result = alloc_sem_value( paser);
+  struct SemValue* result = alloc_sem_value( parser);
 
   if (result != NULL)
     {
@@ -62,14 +62,14 @@ create_type_spec( struct ParserState* paser, const uint16_t type)
       result->val.u_tspec.extra = NULL;
     }
   else
-    log_message( paser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    log_message( parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
   return result;
 }
 
 
 static bool_t
-process_table_decls( struct ParserState* paser,
+process_table_decls( struct ParserState* parser,
                      struct DeclaredVar* var,
                      void*               extra)
 {
@@ -82,9 +82,53 @@ process_table_decls( struct ParserState* paser,
   return result;
 }
 
+bool_t
+compare_extern_table_types (const struct DeclaredVar* const firstTable,
+                            const struct DeclaredVar* const secondFields)
+{
+  const struct DeclaredVar* fit = firstTable->extra;
+  const struct DeclaredVar* sit = secondFields;
+
+  while (fit != firstTable)
+    {
+      if (sit == NULL)
+        return FALSE;
+
+      assert (IS_TABLE_FIELD (fit->type));
+      assert (IS_TABLE_FIELD (sit->type));
+
+      fit = fit->extra, sit = sit->extra;
+    }
+
+  if (sit != NULL)
+    return FALSE;
+
+  fit = firstTable->extra;
+  while (fit != firstTable)
+    {
+      sit = secondFields;
+      while (sit != NULL)
+        {
+          if ((fit->labelLength == sit->labelLength)
+              && (strncmp (fit->label, sit->label, fit->labelLength) == 0))
+            {
+              break;
+            }
+          sit = sit->extra;
+        }
+
+      if ((sit == NULL) || (fit->type != sit->type))
+        return FALSE;
+
+      fit = fit->extra;
+    }
+
+  return TRUE;
+}
+
 
 struct DeclaredVar*
-add_declaration( struct ParserState* const paser,
+add_declaration( struct ParserState* const parser,
                  YYSTYPE                   var,
                  YYSTYPE                   type,
                  const bool_t              parameter,
@@ -93,7 +137,7 @@ add_declaration( struct ParserState* const paser,
   struct DeclaredVar*     result = NULL;
   struct DeclaredVar*     decl   = NULL;
   struct SemId* const     id     = &(var->val.u_id);
-  struct Statement* const stmt   = paser->pCurrentStmt;
+  struct Statement* const stmt   = parser->pCurrentStmt;
 
   assert( var->val_type == VAL_ID);
   assert( type->val_type == VAL_TYPE_SPEC);
@@ -103,6 +147,54 @@ add_declaration( struct ParserState* const paser,
       assert( IS_TABLE_FIELD( type->val.u_tspec.type) == FALSE);
 
       decl = stmt_find_declaration( stmt, id->name, id->length, FALSE, FALSE);
+      if ((decl != NULL)
+          && (parser->pCurrentStmt->type == STMT_GLOBAL))
+        {
+          assert ( ! parameter);
+
+          if ((decl->type != type->val.u_tspec.type)
+              || (IS_TABLE (decl->type)
+                  && ! compare_extern_table_types (
+                                        decl,
+                                        type->val.u_tspec.extra)))
+            {
+              char text[128];
+
+              wh_copy_first( text, decl->label, sizeof text, decl->labelLength);
+              log_message( parser, parser->bufferPos, MSG_VAR_DECL_NA, text);
+              log_message (parser, decl->declarationPos, MSG_DECL_PREV);
+
+              return decl;
+            }
+          else if ( ! IS_EXTERNAL (decl->varId) && parser->externDecl)
+            {
+              char text[128];
+
+              wh_copy_first( text, decl->label, sizeof text, decl->labelLength);
+              log_message( parser, parser->bufferPos, MSG_VAR_EXT_LATE, text);
+              log_message (parser, decl->definitionPos, MSG_DECL_PREV);
+
+              return decl;
+            }
+          else if (IS_EXTERNAL (decl->varId) && ! parser->externDecl)
+            {
+              decl->definitionPos = (id->name - parser->buffer);
+              decl->declarationPos = decl->definitionPos;
+
+              if (! IS_REFERRED (decl->varId))
+                decl->varId = parser->globalStmt.localsUsed++;
+
+              else
+                decl->varId = RETRIVE_ID (decl->varId);
+
+              MARK_AS_GLOBAL (decl->varId);
+              MARK_AS_REFERENCED (decl->varId);
+
+              return decl;
+            }
+          else if (IS_EXTERNAL (decl->varId))
+            return decl;
+        }
     }
   else
     {
@@ -114,20 +206,20 @@ add_declaration( struct ParserState* const paser,
       char text[128];
 
       wh_copy_first( text, decl->label, sizeof text, decl->labelLength);
-      log_message( paser, paser->bufferPos, MSG_VAR_DEFINED, text);
+      log_message (parser, parser->bufferPos, MSG_VAR_DEFINED, text);
+      log_message (parser, decl->declarationPos, MSG_DECL_PREV);
     }
   else
     {
-      struct DeclaredVar var;
+      struct DeclaredVar var = {0, };
 
-      var.label       = id->name;
-      var.labelLength = id->length;
-      var.type        = type->val.u_tspec.type;
-      var.extra       = NULL;
-      var.offset      = 0;
+      var.label          = id->name;
+      var.labelLength    = id->length;
+      var.type           = type->val.u_tspec.type;
+      var.declarationPos = (id->name - parser->buffer);
 
       if (IS_TABLE( var.type)
-          && ! process_table_decls( paser, &var, type->val.u_tspec.extra))
+          && ! process_table_decls( parser, &var, type->val.u_tspec.extra))
         {
           result = NULL;   /* Something went wrong along the way */
         }
@@ -137,14 +229,14 @@ add_declaration( struct ParserState* const paser,
           char text[128];
 
           wh_copy_first( text, var.label, sizeof text, var.labelLength);
-          log_message( paser, paser->bufferPos, MSG_VAR_LATE, text);
+          log_message( parser, parser->bufferPos, MSG_VAR_LATE, text);
 
-          paser->abortError = TRUE;
+          parser->abortError = TRUE;
         }
       else if ((result = stmt_add_declaration( stmt, &var, parameter)) == NULL)
         {
-          log_message( paser, IGNORE_BUFFER_POS, MSG_NO_MEM);
-          paser->abortError = TRUE;
+          log_message( parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          parser->abortError = TRUE;
         }
       else if (IS_TABLE( var.type))
         {
@@ -163,9 +255,9 @@ add_declaration( struct ParserState* const paser,
         }
     }
 
-  if (result && paser->externDecl)
+  if (result && parser->externDecl)
     {
-      assert( paser->pCurrentStmt == &paser->globalStmt);
+      assert( parser->pCurrentStmt == &parser->globalStmt);
       assert( result->varId & GLOBAL_DECL);
 
       MARK_AS_EXTERNAL( result->varId);
@@ -174,10 +266,11 @@ add_declaration( struct ParserState* const paser,
            && (IS_TABLE_FIELD( result->type) == FALSE)
            && IS_GLOBAL( result->varId))
     {
-      assert( paser->pCurrentStmt == &paser->globalStmt);
+      assert( parser->pCurrentStmt == &parser->globalStmt);
 
       /* Defined globals are referenced by default. */
-      result->varId |= paser->globalStmt.localsUsed++;
+      result->varId |= parser->globalStmt.localsUsed++;
+      result->definitionPos = result->declarationPos;
       MARK_AS_REFERENCED( result->varId);
     }
 
@@ -186,7 +279,7 @@ add_declaration( struct ParserState* const paser,
 
 
 YYSTYPE
-add_list_declaration( struct ParserState* paser,
+add_list_declaration( struct ParserState* parser,
                      YYSTYPE              varsList,
                      YYSTYPE              type)
 {
@@ -205,7 +298,7 @@ add_list_declaration( struct ParserState* paser,
       id.val_type = VAL_ID;
       id.val.u_id = it->id;
 
-      result = (YYSTYPE)add_declaration( paser, &id, type, FALSE, TRUE);
+      result = (YYSTYPE)add_declaration( parser, &id, type, FALSE, TRUE);
       if (result == NULL)
         break;    /* Some error has been encountered */
 
@@ -228,7 +321,7 @@ add_list_declaration( struct ParserState* paser,
 
 
 YYSTYPE
-add_field_declaration( struct ParserState*       paser,
+add_field_declaration( struct ParserState*       parser,
                        YYSTYPE                   var,
                        YYSTYPE                   type,
                        struct DeclaredVar* const extra)
@@ -254,9 +347,9 @@ add_field_declaration( struct ParserState*       paser,
 
           wh_copy_first( tname, id->name, sizeof tname, id->length);
 
-          log_message( paser, paser->bufferPos, MSG_SAME_FIELD, tname);
+          log_message( parser, parser->bufferPos, MSG_SAME_FIELD, tname);
 
-          paser->abortError = TRUE;
+          parser->abortError = TRUE;
           return NULL;
         }
       it = it->extra;
@@ -268,12 +361,12 @@ add_field_declaration( struct ParserState*       paser,
 
       wh_copy_first( tname, id->name, sizeof tname, id->length);
 
-      log_message( paser, paser->bufferPos, MSG_FIELD_TYPE_INVALID, tname);
+      log_message( parser, parser->bufferPos, MSG_FIELD_TYPE_INVALID, tname);
 
       return NULL;
     }
 
-  result = add_declaration( paser, var, type, FALSE, FALSE);
+  result = add_declaration( parser, var, type, FALSE, FALSE);
 
   result->extra = NULL, it = extra;
   while( it != NULL)

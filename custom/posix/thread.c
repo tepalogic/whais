@@ -178,37 +178,37 @@ wh_sleep( const uint_t millisecs)
 int16_t
 wh_atomic_inc16 (volatile int16_t* const value)
 {
-  return __sync_fetch_and_add (value, (int16_t)1) + 1;
+  return __sync_fetch_and_add (value, (int16_t)1);
 }
 
 int16_t
 wh_atomic_dec16 (volatile int16_t* const value)
 {
-  return __sync_fetch_and_sub (value, (int16_t)1) - 1;
+  return __sync_fetch_and_sub (value, (int16_t)1);
 }
 
 int32_t
 wh_atomic_inc32 (volatile int32_t* const value)
 {
-  return __sync_fetch_and_add (value, (int32_t)1) + 1;
+  return __sync_fetch_and_add (value, (int32_t)1);
 }
 
 int32_t
 wh_atomic_dec32 (volatile int32_t* const value)
 {
-  return __sync_fetch_and_sub (value, (int32_t)1) - 1;
+  return __sync_fetch_and_sub (value, (int32_t)1);
 }
 
 int64_t
 wh_atomic_inc64 (volatile int64_t* const value)
 {
-  return __sync_fetch_and_add (value, (int64_t)1) + 1;
+  return __sync_fetch_and_add (value, (int64_t)1);
 }
 
 int64_t
 wh_atomic_dec64 (volatile int64_t* const value)
 {
-  return __sync_fetch_and_sub (value, (int64_t)1) - 1;
+  return __sync_fetch_and_sub (value, (int64_t)1);
 }
 
 #else

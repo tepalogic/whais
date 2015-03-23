@@ -1,5 +1,5 @@
 /******************************************************************************
-WHAISC - A compiler for whais programs
+WHAISC - A compiler for Whais programs
 Copyright (C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -63,6 +63,8 @@ struct DeclaredVar
   uint32_t            offset;       /* Code offset for argumenting errors. */
   uint16_t            labelLength;  /* Label's length */
   uint16_t            type;         /* Type of this variable */
+  uint32_t            declarationPos;
+  uint32_t            definitionPos;
 };
 
 YYSTYPE
@@ -88,6 +90,11 @@ add_field_declaration( struct ParserState*       parser,
                        YYSTYPE                   var,
                        YYSTYPE                   type,
                        struct DeclaredVar* const extra);
+
+bool_t
+compare_extern_table_types (const struct DeclaredVar* const firstTable,
+                            const struct DeclaredVar* const secondFields);
+
 
 #endif /* VARDECL_H */
 

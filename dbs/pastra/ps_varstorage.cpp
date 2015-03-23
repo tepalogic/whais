@@ -94,10 +94,8 @@ VariableSizeStore::ReleaseReference()
 {
   assert( mRefsCount > 0);
 
-  if (wh_atomic_dec64 (_RC (int64_t*, &mRefsCount)) > 0)
-    return ;
-
-  delete this;
+  if (wh_atomic_dec64 (_RC (int64_t*, &mRefsCount)) == 1)
+    delete this;
 }
 
 

@@ -60,22 +60,28 @@ public:
     mListenThread.IgnoreExceptions( true);
   }
 
-  ~Listener()
-  {
-    assert( mListenThread.IsEnded());
-  }
-
-  UserHandler* SearchFreeUser()
+  bool SearchFreeUser(void (*task)( void* args), Socket& socket)
   {
     assert( mUsersPool.Size() > 0);
 
     for (uint_t index = 0; index < mUsersPool.Size(); ++index)
       {
-        if (mUsersPool[index].mThread.IsEnded())
-          return &mUsersPool[index];
+        while (mUsersPool[index].mClientSocket != NULL)
+          wh_yield ();
+
+        mUsersPool[index].mClientSocket = &socket;
+        if (mUsersPool[index].mThread.Run (task, &mUsersPool[index]))
+          {
+            while (mUsersPool[index].mClientSocket != NULL)
+              wh_yield ();
+
+            return true;
+          }
+
+        mUsersPool[index].mClientSocket = NULL;
       }
 
-    return NULL;
+    return false;
   }
 
   void Close()
@@ -93,7 +99,7 @@ public:
         mUsersPool[index].mThread.IgnoreExceptions( true);
         mUsersPool[index].mThread.DiscardException();
 
-        mUsersPool[index].mEndConnetion = true;
+        mUsersPool[index].mEndConnection = true;
         mUsersPool[index].mSocket.Close();
         mUsersPool[index].mThread.WaitToEnd( false);
       }
@@ -103,7 +109,7 @@ public:
   {
     for (uint_t c = 0; c < mUsersPool.Size(); ++c)
       {
-        if ((mUsersPool[c].mEndConnetion) || (mUsersPool[c].mLastReqTick == 0))
+        if ((mUsersPool[c].mEndConnection) || (mUsersPool[c].mLastReqTick == 0))
           continue;
 
         if (mUsersPool[c].mDesc == NULL)
@@ -154,8 +160,12 @@ client_handler_routine( void* args)
 {
   UserHandler* const client = _RC (UserHandler*, args);
 
+  client->mLastReqTick   = 0;
+  client->mSocket        = *client->mClientSocket;
+  client->mClientSocket  = NULL;
+  client->mEndConnection = false;
+
   assert( sDbsDescriptors != NULL);
-  assert( client->mLastReqTick == 0);
 
   try
   {
@@ -295,7 +305,7 @@ client_handler_routine( void* args)
   client->mSocket.Close();
 
   client->mLastReqTick  = 0;
-  client->mEndConnetion = true;
+  client->mEndConnection = true;
 }
 
 
@@ -370,7 +380,6 @@ listener_routine( void* args)
   Listener* const listener = _RC (Listener*, args);
 
   assert( listener->mUsersPool.Size() > 0);
-  assert( listener->mListenThread.IsEnded() == false);
   assert( listener->mListenThread.HasExceptionPending() == false);
   assert( listener->mPort != NULL);
 
@@ -400,22 +409,15 @@ listener_routine( void* args)
         {
           Socket client = listener->mSocket.Accept();
 
-          UserHandler* const hnd = listener->SearchFreeUser();
-
-          if (hnd != NULL)
-            {
-              hnd->mLastReqTick  = 0;
-              hnd->mSocket       = client;
-              hnd->mEndConnetion = false;
-
-              hnd->mThread.Run (client_handler_routine, hnd);
-            }
-          else
+          if ( ! listener->SearchFreeUser (client_handler_routine, client))
             {
               static const uint8_t busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
-
               client.Write( busyResp, sizeof busyResp);
-              client.Close();
+
+              sMainLog->Log (
+                    LOG_INFO,
+                    "Connection refused because of unavailable slots."
+                            );
             }
         }
         catch( SocketException& e)
@@ -505,13 +507,17 @@ StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
     {
       Listener* const listener = &listeners[index];
 
-      assert( listener->mListenThread.IsEnded());
-
       listener->mInterface = (server.mListens[index].mInterface.size() == 0)
                               ? NULL
                               : server.mListens[index].mInterface.c_str();
       listener->mPort = server.mListens[index].mService.c_str();
-      listener->mListenThread.Run (listener_routine, listener);
+      if ( ! listener->mListenThread.Run (listener_routine, listener))
+        {
+          ostringstream logBuffer;
+          logBuffer << "Failed to start listener for '"
+                    << server.mListens[index].mInterface << '\'';
+          log.Log (LOG_ERROR, logBuffer.str ());
+        }
     }
 
   ticks_routine();

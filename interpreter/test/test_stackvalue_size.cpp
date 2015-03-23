@@ -140,7 +140,7 @@ main()
 
   success &= test_stack_type<NativeObjectOperand> ("NativeObjectOperand");
 
-  success &= (sgMaxValue <= sizeof (StackValue));
+  success &= (sgMaxValue == sizeof (StackValue));
 
   std::cout << "Largest operand is: " << sgMaxValue << std::endl;
   std::cout << "Stack value size set at " <<  sizeof (StackValue) << " ... ";

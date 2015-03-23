@@ -105,11 +105,9 @@ GetInstance( const char* name, Logger* log)
   //TODO: 1. Investigate a potential mechanism to avoid allocating session on heap
   //         You need this in order to handle requested for force shout down.
   //      2. Throw an execution exception when pLog is null at this point
-  return *(new prima::Session(
-                        *log,
-                        gmNameSpaces.find( gDBSName)->second,
-                        it->second)
-                              );
+  return *(new prima::Session(*log,
+                              gmNameSpaces.find( gDBSName)->second,
+                              it->second));
 }
 
 

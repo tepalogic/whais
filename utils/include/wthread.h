@@ -274,7 +274,9 @@ public:
   Thread();
   ~Thread();
 
-  void Run (WH_THREAD_ROUTINE routine, void* const args);
+  bool Run (WH_THREAD_ROUTINE routine,
+            void* const       args,
+            const bool        waitPrevEnd = false);
 
   void WaitToEnd( const bool throwPending = true);
 
@@ -293,11 +295,6 @@ public:
     mException = NULL;
   }
 
-  bool IsEnded() const
-  {
-    return mEnded;
-  }
-
   bool HasExceptionPending()
   {
     return( mUnkExceptSignaled || (mException != NULL));
@@ -313,11 +310,10 @@ private:
   void*                   mRoutineArgs;
   Exception*              mException;
   WH_THREAD               mThread;
-  Lock                    mLock;
+  Lock                    mRoutineExecutionLock;
+  int32_t                 mEnded;
   bool                    mUnkExceptSignaled;
   bool                    mIgnoreExceptions;
-  bool                    mEnded;
-  bool                    mStarted;
   bool                    mNeedsClean;
 };
 

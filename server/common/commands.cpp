@@ -51,7 +51,7 @@ cmd_value_desc( ClientConnection& conn)
 
   if (conn.DataSize() < dataOffset)
     {
-      throw ConnectionException( 
+      throw ConnectionException(
                             _EXTRA( 0),
                             "Command used to retrieve description of globals"
                               " variables has invalid format."
@@ -66,7 +66,7 @@ cmd_value_desc( ClientConnection& conn)
         {
           if (! conn.IsAdmin())
             {
-              throw ConnectionException( 
+              throw ConnectionException(
                                     _EXTRA( 0),
                                     "Only and admin may request for a "
                                       "global value description."
@@ -403,7 +403,7 @@ cmd_update_stack( ClientConnection& conn)
           break;
 
       default:
-        throw ConnectionException( 
+        throw ConnectionException(
                                _EXTRA( subcmd),
                                "Encountered an unexpected update command."
                                   );
@@ -439,17 +439,34 @@ cmd_execute_procedure( ClientConnection& conn)
   }
   catch( InterException& e)
   {
-    if (e.Code() == InterException::INVALID_PROC_REQ)
-      {
-        result = WCS_PROC_NOTFOUND;
+    switch (e.Code ())
+    {
+      case InterException::INVALID_PROC_REQ:
+        {
+          result = WCS_PROC_NOTFOUND;
 
-        std::ostringstream logEntry;
+          std::ostringstream logEntry;
 
-        logEntry << "Failed to find procedure '" << procName << "'.";
-        session.GetLogger().Log (LOG_ERROR, logEntry.str ().c_str());
-      }
-    else
-      throw;
+          logEntry << "Failed to find procedure '" << procName << "'.";
+          session.GetLogger().Log (LOG_ERROR, logEntry.str ());
+        }
+        break;
+
+      case InterException::DIVIDE_BY_ZERO:
+        {
+          result = WCS_PROC_RUNTIME_ERR;
+
+          std::ostringstream logEntry;
+
+          logEntry << "Exception " << e.Code () << ": " << e.Description ()
+                   << std::endl << e.Message ();
+
+          session.GetLogger().Log (LOG_ERROR, logEntry.str ());
+        }
+        break;
+      default:
+        throw;
+    }
   }
 
   store_le_int32 (result, conn.Data());
@@ -480,7 +497,7 @@ cmd_list_globals( ClientConnection& conn)
 
   if (conn.DataSize() != sizeof( uint32_t))
     {
-      throw ConnectionException( 
+      throw ConnectionException(
                               _EXTRA( 0),
                               "Command used to retrieve context globals"
                                 " variables has invalid format."
@@ -562,7 +579,7 @@ cmd_list_procedures( ClientConnection& conn)
 
   if (conn.DataSize() != sizeof( uint32_t))
     {
-      throw ConnectionException( 
+      throw ConnectionException(
                               _EXTRA( 0),
                               "Command used to retrieve context globals"
                                 " variables has invalid format."
@@ -645,7 +662,7 @@ cmd_procedure_param_desc( ClientConnection& conn)
 
   if (conn.DataSize() < sizeof( uint16_t) + 2 * sizeof( uint8_t))
     {
-      throw ConnectionException( 
+      throw ConnectionException(
                               _EXTRA( 0),
                               "Command used to retrieve context globals"
                                 " variables has invalid format."

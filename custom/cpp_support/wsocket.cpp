@@ -47,6 +47,8 @@ Socket::Socket( const char* const   serverHost,
                              service);
     }
 
+  assert (mSocket != INVALID_SOCKET);
+
   mOwned = true;
 }
 
@@ -70,6 +72,8 @@ Socket::Socket( const char* const   serverHost,
                              _SC (uint_t, port));
     }
 
+  assert (mSocket != INVALID_SOCKET);
+
   mOwned = true;
 }
 
@@ -89,6 +93,7 @@ Socket::Socket( const char* const     localAdress,
                              service);
     }
 
+  assert (mSocket != INVALID_SOCKET);
   mOwned = true;
 }
 
@@ -112,13 +117,14 @@ Socket::Socket( const char* const   localAdress,
                              _SC (uint_t, port));
     }
 
+  assert (mSocket != INVALID_SOCKET);
   mOwned = true;
 }
 
 
 Socket::Socket( const WH_SOCKET sd)
-  : mSocket( sd),
-    mOwned( (sd != INVALID_SOCKET) ? true : false)
+  : mSocket (sd),
+    mOwned (sd != INVALID_SOCKET)
 {
 }
 
@@ -183,6 +189,8 @@ Socket::Read( uint8_t* const buffer, const uint_t maxCount)
   uint_t         result = maxCount;
   const uint32_t e      = whs_read( mSocket, buffer, &result);
 
+  assert (mSocket != INVALID_SOCKET);
+
   if (e != WOP_OK)
     {
       throw SocketException( _EXTRA( e),
@@ -199,10 +207,12 @@ Socket::Write( const uint8_t* const buffer, const uint_t count)
 {
   const uint32_t e = whs_write( mSocket, buffer, count);
 
+  assert (mSocket != INVALID_SOCKET);
+
   if (e != WOP_OK)
     {
-      throw SocketException( _EXTRA( e),
-                             "Failed to write on socket( %d).",
+      throw SocketException( _EXTRA (e),
+                             "Failed to write on socket (%d).",
                              mSocket);
     }
 

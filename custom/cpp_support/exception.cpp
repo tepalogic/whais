@@ -76,19 +76,12 @@ Exception::Message() const
 void
 Exception::Message( const char* fmtMsg, std::va_list vl)
 {
-  int msgSize = 256;
-  auto_array<char> errorMessage;
+  char errMsg[512];
 
-  while( true) //Loop until the message is stored completely
-    {
-      errorMessage.Reset( msgSize);
+  std::vsnprintf (errMsg, sizeof errMsg, fmtMsg, vl);
+  errMsg[sizeof errMsg - 1] = 0;
 
-      if (std::vsnprintf( errorMessage.Get (), msgSize, fmtMsg, vl) < msgSize)
-        break;
-
-      msgSize *= 2;
-    }
-  mErrorMessage = errorMessage.Get ();
+  mErrorMessage = errMsg;
 }
 
 

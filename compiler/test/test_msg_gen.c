@@ -55,18 +55,16 @@ my_postman( WLOG_FUNC_CONTEXT bag,
   const char *buffer = (const char *) bag;
   int buff_line = get_buffer_line_from_pos( buffer, buff_pos);
 
-  if (msgType == MSG_EXTRA_EVENT)
-    {
-      msg_id = last_msg_code;
-      msgType = last_msg_type;
-    }
   printf( MSG_PREFIX[msgType]);
   printf( "%d : line %d: ", msg_id, buff_line);
   vprintf( msgFormat, args);
   printf( "\n");
 
-  last_msg_code = msg_id;
-  last_msg_type = msgType;
+  if (msgType != MSG_EXTRA_EVENT)
+    {
+      last_msg_code = msg_id;
+      last_msg_type = msgType;
+    }
 }
 
 char test_prog_1[] = ""

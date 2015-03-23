@@ -601,18 +601,17 @@ ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
       result = keeper.get ();
     }
 
-  result->mCachedCharIndex = mCachedCharIndex;
-  result->mCachedCharIndexOffset = mCachedCharIndexOffset;
-
+  assert (result->mCachedCharIndex == mCachedCharIndex);
+  assert (result->mCachedCharIndexOffset == mCachedCharIndexOffset);
   assert (result->mCachedCharsCount == mCachedCharsCount);
   assert (mCachedCharIndexOffset == index);
 
   if (newCh == 0)
     {
       assert (result == this);
+      assert (result->mCachedCharIndex == index);
 
       result->TruncateUtf8U (mCachedCharIndexOffset);
-      assert (result->Utf8CountU () == mCachedCharIndexOffset);
 
       result->mCachedCharsCount = mCachedCharIndex;
       result->mCachedCharIndex  = result->mCachedCharIndexOffset = 0;
@@ -626,10 +625,11 @@ ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
           assert (mCachedCharsCount == index);
 
           result->mCachedCharIndexOffset = result->Utf8CountU ();
-          result->mCachedCharIndex = result->mCachedCharsCount++;
+          result->mCachedCharIndex       = result->mCachedCharsCount++;
         }
 
       assert (result->mCachedCharIndex < result->mCachedCharsCount);
+
       result->WriteUtf8U (result->mCachedCharIndexOffset, newCUCnt, newBuff);
     }
   else if (oldCUCnt < newCUCnt)
@@ -649,7 +649,9 @@ ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
                                 buffer);
             offset -= chunkSize;
           }
+
         assert (offset == from);
+
         result->WriteUtf8U (mCachedCharIndexOffset, newCUCnt, newBuff);
     }
   else
@@ -668,7 +670,9 @@ ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
                               buffer);
           offset += chunkSize;
         }
+
       assert (offset == utf8Count);
+
       result->TruncateUtf8U (result->Utf8CountU () - (oldCUCnt - newCUCnt));
     }
 
@@ -1110,7 +1114,6 @@ RowFieldText::~RowFieldText()
                              cachedMetaData);
 
       mStorage.DecrementRecordRef( mFirstEntry);
-//      mStorage.Flush();
       mStorage.ReleaseReference();
     }
 }
@@ -1185,7 +1188,6 @@ RowFieldText::WriteUtf8U (const uint64_t       offset,
       assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef( mFirstEntry);
-//      mStorage.Flush();
       mStorage.ReleaseReference();
 
       _CC(uint64_t&, mUtf8Count) = 0;
@@ -1222,7 +1224,6 @@ RowFieldText::TruncateUtf8U (const uint64_t atOffset)
       assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef( mFirstEntry);
-//      mStorage.Flush();
       mStorage.ReleaseReference();
 
       _CC(uint64_t&, mUtf8Count) = 0;

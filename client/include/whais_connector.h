@@ -82,6 +82,7 @@ static const uint_t WCS_INVALID_ROW        = 17;
 static const uint_t WCS_INVALID_FIELD      = 18;
 static const uint_t WCS_TYPE_MISMATCH      = 19;
 static const uint_t WCS_PROC_NOTFOUND      = 20;
+static const uint_t WCS_PROC_RUNTIME_ERR   = 21;
 static const uint_t WCS_GENERAL_ERR        = 0x0FFF;
 static const uint_t WCS_OS_ERR_BASE        = 0x1000;
 

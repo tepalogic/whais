@@ -83,7 +83,7 @@ public:
       assert (mArray.mElementRawSize > 0);
     }
 
-    const TE operator[] (const int64_t index) const
+    const TE operator[] (const uint64_t index) const
     {
       assert (index < mArray.mElementsCount);
 

@@ -43,7 +43,7 @@ get_buffer_line_from_pos( const char *buffer, uint_t buff_pos)
 }
 
 static char *MSG_PREFIX[] = {
-  "", "error ", "warning ", "error "
+  "", "error ", "warning ", "error ", "extra "
 };
 
 void
@@ -60,8 +60,11 @@ my_postman( WLOG_FUNC_CONTEXT bag,
   vprintf( msgFormat, args);
   printf( "\n");
 
-  last_msg_code = msg_id;
-  last_msg_type = msgType;
+  if (msgType != MSG_EXTRA_EVENT)
+    {
+      last_msg_code = msg_id;
+      last_msg_type = msgType;
+    }
 }
 
 char test_prog_1[] = ""
@@ -128,6 +131,83 @@ char test_prog_4[] = ""
   "PROCEDURE Proc_1 (v2 AS DATE) RETURN BOOL\n "
   "DO\n " "RETURN TRUE;\n " "ENDPROC\n " "\n ";
 
+
+char test_prog_5[] = ""
+  "EXTERN PROCEDURE Proc_2 () RETURN INT32;\n "
+  "PROCEDURE Proc_1 (v1 as DATE) RETURN BOOL\n "
+  "DO\n "
+  "LET v_t as BOOL;\n "
+  "RETURN v_t;\n "
+  "ENDPROC\n "
+  "\n "
+  "PROCEDURE Proc_2() RETURN INT32\n "
+  "DO\n "
+  "LET v1 as INT32;\n "
+  "RETURN v1;\n "
+  "ENDPROC\n "
+  "\n "
+  "EXTERN PROCEDURE Proc_1 (v1 AS DATE) RETURN BOOL;\n ";
+
+  char test_prog_6[] = ""
+    "EXTERN PROCEDURE Proc_2 () RETURN ARRAY;\n "
+    "PROCEDURE Proc_1 (v1 as DATE) RETURN BOOL\n "
+    "DO\n "
+    "LET v_t as BOOL;\n "
+    "RETURN v_t;\n "
+    "ENDPROC\n "
+    "\n "
+    "PROCEDURE Proc_2() RETURN INT32\n "
+    "DO\n "
+    "LET v1 as INT32;\n "
+    "RETURN v1;\n "
+    "ENDPROC\n "
+    "\n ";
+
+  char test_prog_7[] = ""
+    "EXTERN PROCEDURE Proc_2 (a AS INT16) RETURN INT32;\n "
+    "PROCEDURE Proc_1 (v1 as DATE) RETURN BOOL\n "
+    "DO\n "
+    "LET v_t as BOOL;\n "
+    "RETURN v_t;\n "
+    "ENDPROC\n "
+    "\n "
+    "PROCEDURE Proc_2() RETURN INT32\n "
+    "DO\n "
+    "LET v1 as INT32;\n "
+    "RETURN v1;\n "
+    "ENDPROC\n "
+    "\n ";
+
+  char test_prog_8[] = ""
+    "EXTERN PROCEDURE Proc_2 () RETURN INT32;\n "
+    "PROCEDURE Proc_1 (v1 as DATE) RETURN BOOL\n "
+    "DO\n "
+    "LET v_t as BOOL;\n "
+    "RETURN v_t;\n "
+    "ENDPROC\n "
+    "\n "
+    "PROCEDURE Proc_2(a AS INT16) RETURN INT32\n "
+    "DO\n "
+    "LET v1 as INT32;\n "
+    "RETURN v1;\n "
+    "ENDPROC\n "
+    "\n ";
+
+  char test_prog_9[] = ""
+    "EXTERN PROCEDURE Proc_2 (b AS TEXT, c AS DATE) RETURN INT32;\n "
+    "PROCEDURE Proc_1 (v1 as DATE) RETURN BOOL\n "
+    "DO\n "
+    "LET v_t as BOOL;\n "
+    "RETURN v_t;\n "
+    "ENDPROC\n "
+    "\n "
+    "PROCEDURE Proc_2(b AS TEXT, c AS DATETIME) RETURN INT32\n "
+    "DO\n "
+    "LET v1 as INT32;\n "
+    "RETURN v1;\n "
+    "ENDPROC\n "
+    "\n ";
+
 bool_t
 test_for_error( const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
@@ -141,8 +221,14 @@ test_for_error( const char *test_buffer, uint_t err_expected, uint_t err_type)
 
   if (handler != NULL)
     {
-      test_result = FALSE;
       wh_compiler_discard( handler);
+
+      if ((last_msg_type != MSG_WARNING_EVENT)
+          || (last_msg_type != err_type)
+          || (last_msg_code != err_expected))
+        {
+          test_result = FALSE;
+        }
     }
   else
     {
@@ -179,6 +265,27 @@ main()
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error( test_prog_4,
                                                      MSG_PROC_ADECL,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_5,
+                                                     MSG_PROC_EXT_LATE,
+                                                     MSG_WARNING_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_6,
+                                                     MSG_PROC_DECL_RET_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_7,
+                                                     MSG_PROC_DECL_LESS,
+                                                     MSG_ERROR_EVENT);
+
+   (test_result == FALSE) ? FALSE : test_for_error( test_prog_8,
+                                                     MSG_PROC_DECL_MORE,
+                                                     MSG_ERROR_EVENT);
+
+   (test_result == FALSE) ? FALSE : test_for_error( test_prog_9,
+                                                     MSG_PROC_DECL_PARAM_NA,
                                                      MSG_ERROR_EVENT);
   if (test_result == FALSE)
     {

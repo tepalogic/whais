@@ -122,6 +122,9 @@ wcmd_translate_status( const uint32_t cs)
   case WCS_PROC_NOTFOUND:
     return "Procedure not found.";
 
+  case WCS_PROC_RUNTIME_ERR:
+    return "Runtime error during procedure call.";
+
   case WCS_GENERAL_ERR:
     return "Unexpected internal error.";
   }

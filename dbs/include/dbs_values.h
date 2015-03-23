@@ -1887,7 +1887,7 @@ public:
   DText( const DText& source);
   DText& operator= (const DText& source);
 
-  virtual ~DText();
+  ~DText();
 
   bool IsNull() const;
 
@@ -1999,7 +1999,6 @@ public:
     return CompareTo (second) >= 0;
   }
 
-
   ITextStrategy& GetStrategy();
   StrategyRAII   GetStrategyRAII () const;
   void           ReleaseStrategy ();
@@ -2039,7 +2038,7 @@ public:
 
   explicit DArray( IArrayStrategy& array);
 
-  virtual ~DArray();
+  ~DArray();
 
   DArray( const DArray& source);
   DArray& operator= (const DArray& source);

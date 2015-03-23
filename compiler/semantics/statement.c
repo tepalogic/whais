@@ -87,6 +87,7 @@ init_proc_stmt( struct Statement* parent,
   outStmt->type                  = STMT_PROC;
   outStmt->parent                = parent;
   outStmt->spec.proc.syncTracker = 0;
+  outStmt->spec.proc.checkParams = FALSE;
 
   wh_array_init( &outStmt->spec.proc.paramsList, sizeof( struct DeclaredVar));
   wh_array_init( &outStmt->decls, sizeof( struct DeclaredVar));

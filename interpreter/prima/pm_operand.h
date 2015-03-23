@@ -3316,7 +3316,7 @@ private:
   Lock          mSync;
   bool          mOperandOwner;
 
-  uint64_t      mStorage[MAX_OP_QWORDS];
+  uint64_t      mStorage[QWORDS_PER_OP];
 };
 
 

@@ -21,8 +21,7 @@ using namespace whais;
 
 const char db_name[] = "t_baza_date_1";
 
-uint32_t  _iterationsCount = 20000;
-
+uint32_t  _iterationsCount = 5000;
 
 
 

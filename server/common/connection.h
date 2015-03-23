@@ -46,26 +46,23 @@ struct UserHandler
 {
   UserHandler()
     : mDesc( NULL),
+      mClientSocket (NULL),
       mLastReqTick( 0),
       mThread(),
       mSocket( INVALID_SOCKET),
       mRoot( false),
-      mEndConnetion( true)
+      mEndConnection( true)
   {
     mThread.IgnoreExceptions( true);
   }
 
-  ~UserHandler()
-  {
-    assert( mThread.IsEnded());
-  }
-
   const DBSDescriptors* mDesc;
+  Socket*               mClientSocket;
   uint64_t              mLastReqTick;
   Thread                mThread;
   Socket                mSocket;
   bool                  mRoot;
-  bool                  mEndConnetion;
+  bool                  mEndConnection;
 };
 
 

@@ -103,8 +103,11 @@ get_var_from_stmt( const struct Statement* stmt, uint_t item)
       if (IS_TABLE_FIELD( var->type))
         continue;
 
-      else if (RETRIVE_ID( var->varId) == item)
-        return var;
+      else if (((stmt->type == STMT_PROC) || IS_REFERRED (var->varId))
+               && (RETRIVE_ID( var->varId) == item))
+        {
+          return var;
+        }
     }
 
   return NULL;
@@ -130,7 +133,7 @@ wh_unit_global( WH_COMPILED_UNIT           hnd,
   outDescription->nameLength = var->labelLength;
   outDescription->defined    = (var->varId & EXTERN_DECL) ? 0 : ~0;
 
-  outDescription->type = wh_ostream_data( 
+  outDescription->type = wh_ostream_data(
                                   &(state->globalStmt.spec.glb.typesDescs)
                                          ) +
                          var->typeSpecOff;
@@ -181,20 +184,21 @@ wh_unit_procedure_get( WH_COMPILED_UNIT hnd, const uint_t id)
   struct ParserState*     state = (struct ParserState*)hnd;
   const struct Statement* stmt  = NULL;
 
-  const uint_t totalProcs = wh_array_count( 
+  const uint_t totalProcs = wh_array_count(
                                     &state->globalStmt.spec.glb.procsDecls
                                            );
   uint_t procIndex;
 
   for (procIndex = 0; procIndex < totalProcs; ++procIndex)
     {
-      const struct Statement* it = wh_array_get( 
+      const struct Statement* it = wh_array_get(
                                       &state->globalStmt.spec.glb.procsDecls,
                                       procIndex
                                                 );
       assert( it->type & STMT_PROC);
 
-      if (RETRIVE_ID( it->spec.proc.procId) == id)
+      if (IS_REFERRED (it->spec.proc.procId)
+          && (RETRIVE_ID( it->spec.proc.procId) == id))
         {
           stmt = it;
           break;
@@ -253,7 +257,7 @@ wh_procedure_return_type( WH_COMPILED_UNIT      hnd,
   struct ParserState* const state  = (struct ParserState*) hnd;
   struct Statement* const   stmt   = (struct Statement*) proc;
   struct DeclaredVar* const retVar = (struct DeclaredVar*)
-                                     wh_array_get( 
+                                     wh_array_get(
                                             &(stmt->spec.proc.paramsList),
                                             0
                                                   );

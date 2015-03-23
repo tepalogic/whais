@@ -89,7 +89,7 @@ Lock::Release()
 
 
 SpinLock::SpinLock ()
-  : mLock (-1)
+  : mLock (0)
 {
 }
 
@@ -99,7 +99,7 @@ SpinLock::Acquire ()
 {
   while (true)
     {
-      assert (mLock >= -1);
+      assert (mLock >= 0);
 
       if (wh_atomic_inc16 (&mLock) == 0)
         break;
@@ -113,7 +113,7 @@ SpinLock::Acquire ()
 bool
 SpinLock::TryAcquire ()
 {
-  assert (mLock >= -1);
+  assert (mLock >= 0);
 
   if (wh_atomic_inc16 (&mLock) == 0)
     return true;
@@ -125,7 +125,7 @@ SpinLock::TryAcquire ()
 void
 SpinLock::Release ()
 {
-  assert (mLock >= 0);
+  assert (mLock > 0);
   wh_atomic_dec16 (&mLock);
 }
 
@@ -136,27 +136,43 @@ Thread::Thread()
     mRoutineArgs( NULL),
     mException( NULL),
     mThread( 0),
-    mLock(),
+    mEnded(0),
     mUnkExceptSignaled( false),
     mIgnoreExceptions( false),
-    mEnded( true),
-    mStarted( true),
     mNeedsClean( false)
 {
 }
 
 
-void
-Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
+bool
+Thread::Run (WH_THREAD_ROUTINE routine,
+             void* const       args,
+             const bool        waitPrevEnd)
 {
-  //Wait for the the previous thread to be cleared.
-  WaitToEnd();
+  while (true)
+    {
+      if (wh_atomic_inc32 (&mEnded) == 0)
+        break;
 
-  assert( mEnded);
+      wh_atomic_dec32 (&mEnded);
+
+      if ( ! waitPrevEnd)
+        return false;
+
+      WaitToEnd (true);
+    }
+
+  if (mNeedsClean)
+    {
+      wh_thread_free( mThread);
+      mNeedsClean = false;
+
+      ThrowPendingException();
+    }
+
+  assert( mEnded > 0);
   assert( mNeedsClean == false);
 
-  mEnded       = true;
-  mStarted     = false;
   mRoutine     = routine;
   mRoutineArgs = args;
 
@@ -165,13 +181,12 @@ Thread::Run (WH_THREAD_ROUTINE routine, void* const args)
                                        this);
   if (res != WOP_OK)
     {
-      assert( mEnded);
+      assert( mEnded > 0);
 
-      mStarted = true;
       throw ThreadException( _EXTRA( errno), "Failed to create a thread.");
     }
 
-  mNeedsClean = true;
+  return true;
 }
 
 
@@ -181,8 +196,8 @@ Thread::~Thread()
 
   assert( mNeedsClean == false);
 
-  //If you did not throwed the exception until now,
-  //do not do it from during class destructor.
+  //If you did not have thrown the exception until now,
+  //do not do it now from destructor.
   delete mException;
 }
 
@@ -190,31 +205,30 @@ Thread::~Thread()
 void
 Thread::WaitToEnd( const bool throwPending)
 {
-  //Give a chance for the thread it owns to execute. Make sure it had
-  //acquired the lock( if it did not then spin), in case this method was
-  //called to soon.
-  while(  ! mStarted)
-    wh_yield();
-
-  //Wait till the spawned thread releases the lock.
-  LockRAII<Lock> holder( mLock);
-
-  assert( mEnded);
+  while (wh_atomic_inc32 (&mEnded) != 0)
+    {
+      wh_yield ();
+      LockRAII<Lock> _l (mRoutineExecutionLock); //Avoid spin locks!
+      wh_atomic_dec32 (&mEnded);
+    }
 
   if (mNeedsClean)
-    wh_thread_free( mThread);
+    {
+      wh_thread_free( mThread);
+      mNeedsClean = false;
 
-  mNeedsClean = false;
+      if (throwPending)
+        ThrowPendingException();
+    }
 
-  if (throwPending)
-    ThrowPendingException();
+  wh_atomic_dec32 (&mEnded);
 }
 
 
 void
 Thread::ThrowPendingException()
 {
-  assert( mEnded);
+  assert( mEnded > 0);
 
   if (HasExceptionPending() == false)
     return;
@@ -222,6 +236,9 @@ Thread::ThrowPendingException()
   if (mUnkExceptSignaled)
     {
       DiscardException();
+
+      wh_atomic_dec32 (&mEnded);
+
       throw ThreadException( _EXTRA( WOP_UNKNOW));
     }
 
@@ -229,6 +246,8 @@ Thread::ThrowPendingException()
     {
       Exception* clone = mException->Clone();
       DiscardException();
+
+      wh_atomic_dec32 (&mEnded);
 
       throw clone;
     }
@@ -240,10 +259,11 @@ Thread::ThreadWrapperRoutine( void* const args)
 {
   Thread* const th = _RC (Thread*, args);
 
-  th->mEnded = false;
-  th->mLock.Acquire();
-  th->mStarted = true; //Signal the we grabbed the lock
+  assert (th->mEnded > 0);
 
+  th->mNeedsClean = true;
+
+  LockRAII<Lock> _l (th->mRoutineExecutionLock);
   try
   {
       th->mRoutine( th->mRoutineArgs);
@@ -264,10 +284,7 @@ Thread::ThreadWrapperRoutine( void* const args)
       th->mUnkExceptSignaled = true;
   }
 
-  assert( th->mEnded == false);
-
-  th->mEnded = true;
-  th->mLock.Release();
+  wh_atomic_dec32 (&th->mEnded);
 }
 
 

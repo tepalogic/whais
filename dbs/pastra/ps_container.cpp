@@ -911,7 +911,7 @@ TemporalContainer::FillCache( uint64_t position)
     }
 }
 
-uint64_t  TemporalContainer::smTemporalsCount = 0;
+uint64_t  TemporalContainer::smTemporalsCount = 1;
 
 } //namespace pastra
 } //namespace whais

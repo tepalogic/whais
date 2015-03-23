@@ -809,8 +809,11 @@ DText::MakeMirror( DText& inoutText)
   StrategyRAII    s2 = inoutText.GetStrategyRAII ();
   ITextStrategy&  t2 = s2;
 
-  if (&t == &t2)
-    return ;
+  if ((&t != &NullText::GetSingletoneInstace ())
+      && (&t == &t2))
+    {
+      return ;
+    }
 
   ITextStrategy* const newText = t.MakeMirrorCopy ();
 
@@ -1558,8 +1561,12 @@ DArray::MakeMirror( DArray& inoutArray) const
   StrategyRAII    s2 = inoutArray.GetStrategyRAII ();
   IArrayStrategy& t2 = s2;
 
-  if (&t == &t2)
-    return ;
+
+  if ((&t != &NullArray::GetSingletoneInstace (t.Type ()))
+      && (&t == &t2))
+    {
+      return ;
+    }
 
   IArrayStrategy* const newArray = t.MakeMirrorCopy ();
 

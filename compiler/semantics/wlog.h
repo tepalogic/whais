@@ -50,13 +50,21 @@ struct MsgCodeEntry
 /* declaration related errors, base 250 */
 #define DCLS_MSGS               250
 #define MSG_VAR_DEFINED         DCLS_MSGS
-#define MSG_VAR_NFOUND          (MSG_VAR_DEFINED + 1)
+#define MSG_VAR_DECL_NA         (MSG_VAR_DEFINED + 1)
+#define MSG_VAR_EXT_LATE        (MSG_VAR_DECL_NA + 1)
+#define MSG_VAR_NFOUND          (MSG_VAR_EXT_LATE + 1)
 #define MSG_VAR_LATE            (MSG_VAR_NFOUND + 1)
 #define MSG_NOT_TABLE           (MSG_VAR_LATE + 1)
 #define MSG_SAME_FIELD          (MSG_NOT_TABLE + 1)
 #define MSG_FIELD_TYPE_INVALID  (MSG_SAME_FIELD + 1)
 #define MSG_PROC_ADECL          (MSG_FIELD_TYPE_INVALID + 1)
-#define MSG_COMPILER_ERR        (MSG_PROC_ADECL + 1)
+#define MSG_PROC_EXT_LATE       (MSG_PROC_ADECL + 1)
+#define MSG_PROC_DECL_RET_NA    (MSG_PROC_EXT_LATE + 1)
+#define MSG_PROC_DECL_PARAM_NA  (MSG_PROC_DECL_RET_NA + 1)
+#define MSG_PROC_DECL_LESS      (MSG_PROC_DECL_PARAM_NA + 1)
+#define MSG_PROC_DECL_MORE      (MSG_PROC_DECL_LESS + 1)
+#define MSG_DECL_PREV           (MSG_PROC_DECL_MORE + 1)
+#define MSG_COMPILER_ERR        (MSG_DECL_PREV + 1)
 
 /* expression semantic related errors, base 500 */
 #define EXPS_MSGS               500

@@ -42,8 +42,9 @@ get_buffer_line_from_pos( const char *buffer, uint_t buff_pos)
   return result;
 }
 
+
 static char *MSG_PREFIX[] = {
-  "", "error ", "warning ", "error "
+  "", "error ", "warning ", "error ", "extra "
 };
 
 void
@@ -60,13 +61,17 @@ my_postman( WLOG_FUNC_CONTEXT bag,
   vprintf( msgFormat, args);
   printf( "\n");
 
-  last_msg_code = msg_id;
-  last_msg_type = msgType;
+  if (msgType != MSG_EXTRA_EVENT)
+    {
+      last_msg_code = msg_id;
+      last_msg_type = msgType;
+    }
 }
 
 char test_prog_1[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 \n"
   "DO \n" "LET v1 AS INT64; \n" "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
+
 char test_prog_2[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v1 AS INT8) RETURN INT32 \n"
   "DO \n" "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
@@ -84,6 +89,27 @@ char test_prog_4[] = ""
   "v3 = v1 + v2;\n "
   "LET v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
+char test_prog_5[] = ""
+  "LET a AS INT32; \n"
+  "LET b AS INT32; \n"
+  "LET a AS INT32; \n";
+
+char test_prog_6[] = ""
+  "LET a AS INT32; \n"
+  "LET b AS INT32; \n"
+  "EXTERN LET a AS INT32; \n";
+
+char test_prog_7[] = ""
+  "EXTERN LET a AS ARRAY OF INT32; \n"
+  "LET b AS INT32; \n"
+  "LET a AS INT32; \n";
+
+char test_prog_8[] = ""
+  "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 \n"
+  "DO \n"
+  "EXTERN LET v3 as INT8;\n "
+  "v3 = v1 + v2;\n "
+  "LET v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
 
 bool_t
@@ -99,8 +125,14 @@ test_for_error( const char *test_buffer, uint_t err_expected, uint_t err_type)
 
   if (handler != NULL)
     {
-      test_result = FALSE;
       wh_compiler_discard( handler);
+
+      if ((last_msg_type != MSG_WARNING_EVENT)
+          || (last_msg_type != err_type)
+          || (last_msg_code != err_expected))
+        {
+          test_result = FALSE;
+        }
     }
   else
     {
@@ -127,6 +159,7 @@ main()
   printf( "Testing for received error messages...\n");
   test_result =
     test_for_error( test_prog_1, MSG_VAR_DEFINED, MSG_ERROR_EVENT);
+
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error( test_prog_2,
                                                      MSG_VAR_DEFINED,
@@ -140,6 +173,25 @@ main()
                                                      MSG_VAR_DEFINED,
                                                      MSG_ERROR_EVENT);
 
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_5,
+                                                     MSG_VAR_DEFINED,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_6,
+                                                     MSG_VAR_EXT_LATE,
+                                                     MSG_WARNING_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_7,
+                                                     MSG_VAR_DECL_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error( test_prog_8,
+                                                     MSG_COMPILER_ERR,
+                                                     MSG_ERROR_EVENT);
   if (test_result == FALSE)
     {
       printf( "TEST RESULT: FAIL\n");

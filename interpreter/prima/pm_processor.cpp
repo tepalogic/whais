@@ -1763,22 +1763,13 @@ ProcedureCall::Run ()
                 || (_SC (uint64_t, offset) == CodeSize()));
       }
 
-
+      if (mAquiredSync != NO_INDEX)
+       ReleaseSync( mAquiredSync);
   }
   catch( ...)
   {
       if (mAquiredSync != NO_INDEX)
        ReleaseSync( mAquiredSync);
-
-      std::ostringstream log;
-
-      log << "Exception catch in '"
-          << _RC (const char*, mProcedure.mProcMgr->Name( mProcedure.mId))
-          << "'.";
-
-      mSession.GetLogger().Log (LOG_ERROR, log.str ());
-
-      assert( mStack.Size() >= mStackBegin);
 
       throw;
   }

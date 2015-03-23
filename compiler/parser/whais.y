@@ -256,10 +256,10 @@ proc_decl_stmt: PROCEDURE IDENTIFIER
                 DO local_block_statement
                 ENDPROC
                     {
-                        
+
                         finish_proc_decl(state);
                         $$ = NULL;
-                    }    
+                    }
 ;
 
 extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER 

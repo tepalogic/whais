@@ -34,8 +34,10 @@
 
 namespace whais {
 
-//TODO: Make sure you compute this limit properly for all architectures
-static const uint_t MAX_OP_QWORDS = 16;
+#ifndef QWORDS_PER_OP
+#define QWORDS_PER_OP    4
+#warning "QWORDS_PER_OP holds the default value of 4 (e.g. 32 bytes per stack value)."
+#endif
 
 class StackValue;
 class INativeObject;
@@ -186,7 +188,7 @@ private:
     Operand().~IOperand();
   }
 
-  uint64_t mStorage[MAX_OP_QWORDS];
+  uint64_t mStorage[QWORDS_PER_OP];
 };
 
 

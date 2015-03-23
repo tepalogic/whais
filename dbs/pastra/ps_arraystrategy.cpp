@@ -491,6 +491,10 @@ IArrayStrategy::MakeMirrorCopy ()
     return Clone ()->MakeMirrorCopy ();
 
   ++mMirrorsCount;
+
+  assert (mCopyReferences == 1);
+  assert (mMirrorsCount > 0);
+
   return this;
 }
 

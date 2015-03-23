@@ -400,7 +400,7 @@ DO
         RETURN FALSE;
     END
 
-    write_log ("Start of null_test_1_1");
+    write_log ("End of null_test_1_1");
 
     RETURN TRUE;
 ENDPROC
@@ -1694,7 +1694,6 @@ DO
     write_log ("End of null_test_2_1");
     
     RETURN TRUE;
-
 ENDPROC
 
 
@@ -1720,7 +1719,7 @@ DO
         write_log ("... FAIL: 'result' is null.");
     END
     
-    IF (result[0] != NULL) DO
+    IF (result[0] == NULL) DO
         write_log ("... FAIL: 'result[0]' is null.");
     END
 
@@ -1732,7 +1731,7 @@ DO
         write_log ("... FAIL: 'result[2]' is not null.");
     END
 
-    write_log ("End of null_test_2");
+    write_log ("End of null_test_2_2");
 
     RETURN result;
 ENDPROC
